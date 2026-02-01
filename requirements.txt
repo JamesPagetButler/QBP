@@ -3,3 +3,7 @@ matplotlib
 sympy
 scipy
 jupyter
+
+# Visualization (Issue #1)
+vpython          # Interactive 3D physics - browser-based
+numpy-quaternion # Quaternion math library
