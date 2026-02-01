@@ -3,7 +3,14 @@ matplotlib
 sympy
 scipy
 jupyter
+numpy-quaternion
+vpython
 
-# Visualization (Issue #1)
-vpython          # Interactive 3D physics - browser-based
-numpy-quaternion # Quaternion math library
+# Testing
+pytest>=7.0
+pytest-cov>=4.0
+
+# Code Quality
+black
+mypy
+pre-commit
