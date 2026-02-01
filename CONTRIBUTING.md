@@ -5,7 +5,7 @@ This document outlines the process for contributing to the Quaternion-Based Phys
 ## The Project Constitution
 
 1.  **Start with an Issue:** All work must begin with a documented Issue. This creates a public record of the task and allows for initial discussion.
-2.  **Branch for Work:** All work is to be done on a descriptively named branch (e.g., `feature/exp01-sg-theory`). Do not commit directly to `main`.
+2.  **Branch for Work:** All work is to be done on a descriptively named branch (e.g., `feature/exp01-sg-theory`). Do not commit directly to `master`.
 3.  **Submit a Pull Request:** All changes must be proposed via a Pull Request (PR), which must reference the originating Issue in its description.
 4.  **Require Multi-Stage Review & Sign-Off:** All Pull Requests are subject to a formal, multi-stage review process. First, our 'Red Team' AI (Claude) provides a peer review. Second, Gemini (as Furey & Feynman) provides its review. Only after both AI reviews are complete and their feedback is addressed can the final sign-off from the principal human collaborator (James) be given.
 5.  **Link Tests to Reality:** Every automated test must be a "synthetic experiment" that simulates a real, physically verifiable experiment. This connection must be explicitly documented.
@@ -19,18 +19,9 @@ Our review process is designed to be rigorous and auditable. It proceeds in the 
 3.  **Documentation of Gemini's Review:** Claude will then act as a scribe, copying Gemini's Markdown review and posting it as a second, separate comment on the PR. This ensures all analysis is documented on GitHub.
 4.  **Final Approval:** Once both AI reviews are on the PR and all feedback has been discussed and addressed, James Paget Butler provides the final review and approval to merge.
 
-This ensures a comprehensive, multi-faceted analysis of every contribution.
-
-### Fast-Track for Trivial Changes
-
-For minor changes (typos, formatting, documentation fixes) that don't affect physics, code logic, or architecture:
-*   Label the PR with `trivial`
-*   Single human approval (James) is sufficient
-*   AI review is optional but encouraged
-
 ## How to Enforce Our Rules: Branch Protection
 
-The `main` branch is protected by rules configured on the Git hosting platform (e.g., GitHub). This is a one-time, manual setup for the repository administrator.
+The `master` branch is protected by rules configured on the Git hosting platform (e.g., GitHub). This is a one-time, manual setup for the repository administrator.
 
 ### Step-by-Step Guide for GitHub
 
@@ -38,7 +29,7 @@ The `main` branch is protected by rules configured on the Git hosting platform (
 2.  Click the **Settings** tab.
 3.  In the left sidebar, click on **Branches**.
 4.  Click the **Add branch protection rule** button.
-5.  In the "Branch name pattern" field, type `main`.
+5.  In the "Branch name pattern" field, type **`master`**.
 6.  Enable **Require a pull request before merging**.
 7.  Enable **Require approvals** and set the number of required approvals to **3**.
 8.  Click **Create** to save the rule.
@@ -52,8 +43,6 @@ This project uses a variety of tools for different purposes. Adherence to this t
 *   **Documentation:** Markdown
 *   **Exploration & Simulation:** Python with Jupyter Notebooks.
 *   **Python Libraries:** `numpy`, `matplotlib`, `sympy`, `scipy` (as defined in `requirements.txt`).
-*   **Visualization:** `vpython` for interactive 3D physics, `matplotlib` for plots.
-*   **Design System:** Futuristic Steampunk theme (see `docs/design-system.md`).
 *   **Formal Proof:** Lean 4.
 *   **Code Quality:** `pre-commit` framework using `black` for formatting and `mypy` for type checking.
 
