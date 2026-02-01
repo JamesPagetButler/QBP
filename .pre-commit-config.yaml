@@ -1,0 +1,17 @@
+# .pre-commit-config.yaml
+# Configuration for the pre-commit framework.
+# These hooks run automatically before each commit to ensure code quality and consistency.
+
+repos:
+-   repo: https://github.com/psf/black
+    rev: 22.3.0 # A stable version of black
+    hooks:
+    -   id: black
+        language_version: python3.10
+
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v0.961' # A stable version of mypy
+    hooks:
+    -   id: mypy
+        args: [--no-strict-optional, --ignore-missing-imports]
+        # We can tighten these rules as our library matures.
