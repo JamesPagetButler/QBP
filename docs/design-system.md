@@ -103,6 +103,71 @@ PYTHONPATH=src python -c "from viz.theme import show_palette; show_palette()"
 3. **Contrast for clarity** — Ensure readability (WCAG AA minimum)
 4. **Consistent axes** — XYZ = Crimson/Verdigris/Teal always
 5. **Depth through lighting** — Use amber glows for energy, steel for shadows
+6. **Show your work** — Every visualization must display formal math alongside motion
+7. **Link to learn** — Every animation must link to deeper documentation
+
+---
+
+## Animation Documentation Standard
+
+Every visualization **must** include:
+
+### 1. Brief Description Panel
+A concise explanation visible in the UI:
+- **What** is being shown (1 sentence)
+- **Why** it matters physically (1 sentence)
+- **Link** to full documentation
+
+Example:
+```
+┌─────────────────────────────────────────────────────┐
+│ QUATERNION ROTATION                                 │
+│ A unit quaternion q rotates vector v via q·v·q⁻¹   │
+│ This encodes 3D rotation without gimbal lock.      │
+│                                                     │
+│ 📖 docs/theory/quaternion-rotation.md              │
+└─────────────────────────────────────────────────────┘
+```
+
+### 2. Formal Math Display
+Show the equations being animated in real-time:
+- Display current values (e.g., `q = (0.707, 0, 0, 0.707)`)
+- Show the operation being performed
+- Update as animation progresses
+
+### 3. Documentation Link
+Each visualization must reference:
+- The relevant theory document in `docs/theory/`
+- The experiment it connects to (Rule 5: Link Tests to Reality)
+- Related proofs in `proofs/`
+
+### Template for Visualization Docstring
+
+```python
+"""
+[Visualization Name]
+
+WHAT: [One sentence describing what is shown]
+WHY:  [One sentence on physical significance]
+MATH: [Core equation, e.g., v' = q·v·q⁻¹]
+
+Links:
+- Theory: docs/theory/[topic].md
+- Proof:  proofs/[proof-name].lean
+- Experiment: experiments/[exp-name]/
+
+Run: python src/viz/[script].py
+"""
+```
+
+### Implementation Checklist
+
+For every new visualization:
+- [ ] Description panel in UI
+- [ ] Real-time math display (quaternion values, angles, etc.)
+- [ ] Docstring with WHAT/WHY/MATH/Links
+- [ ] Corresponding theory doc exists or is created
+- [ ] Link to related experiment (if applicable)
 
 ---
 
