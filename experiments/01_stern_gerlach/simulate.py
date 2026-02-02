@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 
 from src import qphysics
 
-def run_simulation(num_particles=10000):
+def run_simulation(num_particles=1000000):
     """
     Simulates the Stern-Gerlach experiment using the quaternionic framework.
     """
