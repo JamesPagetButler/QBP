@@ -79,7 +79,36 @@ Tell the user:
 - Summary of findings
 - Ready for Gemini review
 
-### Step 5: Wait
+### Step 5: Provide Gemini Trigger Prompt
+
+After completing your review, provide this copy/paste block for the user to send to Gemini:
+
+```
+---
+**Copy/paste this into Gemini CLI to start their review:**
+---
+
+Review PR #[NUMBER] - [TITLE]
+
+Your task:
+1. Review as Furey (algebraist) and Feynman (physicist)
+2. Save to: reviews/gemini_review_PR[NUMBER]_[DATE].md
+3. Report your findings
+4. STOP and wait
+
+Claude's review: Complete (reviews/claude_review_PR[NUMBER]_[DATE].md)
+
+Format your review as:
+- Furey verdict + feedback
+- Feynman verdict + feedback
+- Summary
+
+When done, tell James "Gemini review complete" with your summary.
+```
+
+Replace [NUMBER], [TITLE], and [DATE] with actual values.
+
+### Step 6: Wait
 
 Do NOT:
 - Create a PR (unless asked)
