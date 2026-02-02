@@ -47,8 +47,8 @@ class TestRotationPhysics:
 
         # Various rotations
         test_rotations = [
-            ([0, 0, 1], pi / 4),      # 45° around z
-            ([1, 0, 0], pi / 2),      # 90° around x
+            ([0, 0, 1], pi / 4),  # 45° around z
+            ([1, 0, 0], pi / 2),  # 90° around x
             ([1, 1, 1], 2 * pi / 3),  # 120° around diagonal
         ]
 
@@ -57,8 +57,9 @@ class TestRotationPhysics:
             v_rotated = rotate_vector_by_quaternion(v, q)
             new_length = np.linalg.norm(v_rotated)
 
-            assert np.isclose(original_length, new_length, atol=tolerance), \
-                f"Length changed from {original_length} to {new_length} for rotation {axis}, {angle}"
+            assert np.isclose(
+                original_length, new_length, atol=tolerance
+            ), f"Length changed from {original_length} to {new_length} for rotation {axis}, {angle}"
 
     def test_90_degree_rotation_z_axis(self, tolerance, pi):
         """
@@ -71,7 +72,7 @@ class TestRotationPhysics:
         """
         v = np.array([1.0, 0.0, 0.0])  # Pointing +x
         axis = [0, 0, 1]  # z-axis
-        angle = pi / 2    # 90°
+        angle = pi / 2  # 90°
 
         q = axis_angle_to_quaternion(axis, angle)
         v_rotated = rotate_vector_by_quaternion(v, q)
@@ -109,7 +110,7 @@ class TestRotationPhysics:
         """
         v = np.array([1.0, 2.0, 3.0])
         axis = [1, 1, 0]  # Arbitrary axis
-        angle = 2 * pi    # 360°
+        angle = 2 * pi  # 360°
 
         q = axis_angle_to_quaternion(axis, angle)
         v_rotated = rotate_vector_by_quaternion(v, q)
@@ -128,12 +129,13 @@ class TestRotationPhysics:
         v = np.array([0.0, 0.0, 1.0])  # Pointing +z
         axis = [0, 0, 1]  # z-axis (parallel to v)
 
-        for angle in [pi/6, pi/3, pi/2, pi, 3*pi/2]:
+        for angle in [pi / 6, pi / 3, pi / 2, pi, 3 * pi / 2]:
             q = axis_angle_to_quaternion(axis, angle)
             v_rotated = rotate_vector_by_quaternion(v, q)
 
-            assert np.allclose(v_rotated, v, atol=tolerance), \
-                f"Failed for angle={angle}"
+            assert np.allclose(
+                v_rotated, v, atol=tolerance
+            ), f"Failed for angle={angle}"
 
     def test_composition_of_rotations(self, tolerance, pi):
         """
@@ -147,9 +149,9 @@ class TestRotationPhysics:
         v = np.array([1.0, 0.0, 0.0])
 
         # First rotation: 90° around z
-        q1 = axis_angle_to_quaternion([0, 0, 1], pi/2)
+        q1 = axis_angle_to_quaternion([0, 0, 1], pi / 2)
         # Second rotation: 90° around x
-        q2 = axis_angle_to_quaternion([1, 0, 0], pi/2)
+        q2 = axis_angle_to_quaternion([1, 0, 0], pi / 2)
 
         # Apply sequentially
         v_after_q1 = rotate_vector_by_quaternion(v, q1)
@@ -157,6 +159,7 @@ class TestRotationPhysics:
 
         # Apply as composed quaternion (note: q2 * q1 for sequential application)
         from viz.quaternion_rotation import quaternion_multiply
+
         q_composed = quaternion_multiply(q2, q1)
         v_composed = rotate_vector_by_quaternion(v, q_composed)
 
@@ -190,12 +193,14 @@ class TestSpinorBehavior:
         q_360 = axis_angle_to_quaternion(axis, 2 * pi)
         # Should be close to -1 (i.e., [-1, 0, 0, 0])
         expected_360 = np.array([-1.0, 0.0, 0.0, 0.0])
-        assert np.allclose(q_360, expected_360, atol=tolerance), \
-            f"360° gave {q_360}, expected {expected_360}"
+        assert np.allclose(
+            q_360, expected_360, atol=tolerance
+        ), f"360° gave {q_360}, expected {expected_360}"
 
         # 720° rotation
         q_720 = axis_angle_to_quaternion(axis, 4 * pi)
         # Should be back to +1 (i.e., [1, 0, 0, 0])
         expected_720 = np.array([1.0, 0.0, 0.0, 0.0])
-        assert np.allclose(q_720, expected_720, atol=tolerance), \
-            f"720° gave {q_720}, expected {expected_720}"
+        assert np.allclose(
+            q_720, expected_720, atol=tolerance
+        ), f"720° gave {q_720}, expected {expected_720}"

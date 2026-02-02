@@ -24,12 +24,14 @@ def quaternion_multiply(q1, q2):
     """Multiply two quaternions q = (w, x, y, z)."""
     w1, x1, y1, z1 = q1
     w2, x2, y2, z2 = q2
-    return np.array([
-        w1*w2 - x1*x2 - y1*y2 - z1*z2,
-        w1*x2 + x1*w2 + y1*z2 - z1*y2,
-        w1*y2 - x1*z2 + y1*w2 + z1*x2,
-        w1*z2 + x1*y2 - y1*x2 + z1*w2
-    ])
+    return np.array(
+        [
+            w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+            w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+            w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+            w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+        ]
+    )
 
 
 def quaternion_conjugate(q):
@@ -70,36 +72,70 @@ def create_scene(dark_mode=False):
         width=900,
         height=700,
         center=vector(0, 0, 0),
-        background=bg
+        background=bg,
     )
-    scene.caption = "\n<b>Controls:</b> Drag to rotate | Scroll to zoom | Ctrl+C to exit\n\n"
+    scene.caption = (
+        "\n<b>Controls:</b> Drag to rotate | Scroll to zoom | Ctrl+C to exit\n\n"
+    )
 
     # Coordinate frame with steampunk colors
     axis_length = 2
     axis_thickness = 0.05
 
     # X-axis: Crimson (heat, energy)
-    arrow(pos=vector(0,0,0), axis=vector(axis_length,0,0),
-          color=PALETTE.AXIS_X.vpython, shaftwidth=axis_thickness)
-    label(pos=vector(axis_length+0.3,0,0), text='X', color=PALETTE.AXIS_X.vpython,
-          box=False, opacity=0, height=16)
+    arrow(
+        pos=vector(0, 0, 0),
+        axis=vector(axis_length, 0, 0),
+        color=PALETTE.AXIS_X.vpython,
+        shaftwidth=axis_thickness,
+    )
+    label(
+        pos=vector(axis_length + 0.3, 0, 0),
+        text="X",
+        color=PALETTE.AXIS_X.vpython,
+        box=False,
+        opacity=0,
+        height=16,
+    )
 
     # Y-axis: Verdigris (patina, growth)
-    arrow(pos=vector(0,0,0), axis=vector(0,axis_length,0),
-          color=PALETTE.AXIS_Y.vpython, shaftwidth=axis_thickness)
-    label(pos=vector(0,axis_length+0.3,0), text='Y', color=PALETTE.AXIS_Y.vpython,
-          box=False, opacity=0, height=16)
+    arrow(
+        pos=vector(0, 0, 0),
+        axis=vector(0, axis_length, 0),
+        color=PALETTE.AXIS_Y.vpython,
+        shaftwidth=axis_thickness,
+    )
+    label(
+        pos=vector(0, axis_length + 0.3, 0),
+        text="Y",
+        color=PALETTE.AXIS_Y.vpython,
+        box=False,
+        opacity=0,
+        height=16,
+    )
 
     # Z-axis: Teal (depth, mystery)
-    arrow(pos=vector(0,0,0), axis=vector(0,0,axis_length),
-          color=PALETTE.AXIS_Z.vpython, shaftwidth=axis_thickness)
-    label(pos=vector(0,0,axis_length+0.3), text='Z', color=PALETTE.AXIS_Z.vpython,
-          box=False, opacity=0, height=16)
+    arrow(
+        pos=vector(0, 0, 0),
+        axis=vector(0, 0, axis_length),
+        color=PALETTE.AXIS_Z.vpython,
+        shaftwidth=axis_thickness,
+    )
+    label(
+        pos=vector(0, 0, axis_length + 0.3),
+        text="Z",
+        color=PALETTE.AXIS_Z.vpython,
+        box=False,
+        opacity=0,
+        height=16,
+    )
 
     return scene, text_color
 
 
-def visualize_rotation(axis=[0, 0, 1], angle_degrees=360, duration=4.0, dark_mode=False):
+def visualize_rotation(
+    axis=[0, 0, 1], angle_degrees=360, duration=4.0, dark_mode=False
+):
     """
     Visualize a quaternion rotation with steampunk aesthetics.
 
@@ -116,7 +152,7 @@ def visualize_rotation(axis=[0, 0, 1], angle_degrees=360, duration=4.0, dark_mod
         pos=vector(0, 0, 0),
         axis=vector(1.5, 0, 0),
         color=COLORS.BRASS.vpython,
-        shaftwidth=0.12
+        shaftwidth=0.12,
     )
 
     # Small sphere at arrow tip for visual clarity
@@ -124,7 +160,7 @@ def visualize_rotation(axis=[0, 0, 1], angle_degrees=360, duration=4.0, dark_mod
         pos=vector(1.5, 0, 0),
         radius=0.08,
         color=COLORS.GOLD.vpython,
-        emissive=True  # Glowing effect
+        emissive=True,  # Glowing effect
     )
 
     # Show rotation axis as a steel ring
@@ -134,16 +170,16 @@ def visualize_rotation(axis=[0, 0, 1], angle_degrees=360, duration=4.0, dark_mod
         axis=vector(axis_norm[0], axis_norm[1], axis_norm[2]),
         radius=1.5,
         thickness=0.02,
-        color=COLORS.STEEL.vpython
+        color=COLORS.STEEL.vpython,
     )
 
     # Info display with amber glow effect
     info = label(
         pos=vector(0, -2.5, 0),
-        text=f'Axis: [{axis[0]}, {axis[1]}, {axis[2]}]\nAngle: 0°',
+        text=f"Axis: [{axis[0]}, {axis[1]}, {axis[2]}]\nAngle: 0°",
         color=text_color,
         box=False,
-        height=14
+        height=14,
     )
 
     # Animation parameters
@@ -170,9 +206,9 @@ def visualize_rotation(axis=[0, 0, 1], angle_degrees=360, duration=4.0, dark_mod
 
         # Update info with quaternion display
         info.text = (
-            f'Axis: [{axis[0]:.1f}, {axis[1]:.1f}, {axis[2]:.1f}]\n'
-            f'Angle: {current_degrees:.1f}°\n'
-            f'q = ({q[0]:.3f}, {q[1]:.3f}i, {q[2]:.3f}j, {q[3]:.3f}k)'
+            f"Axis: [{axis[0]:.1f}, {axis[1]:.1f}, {axis[2]:.1f}]\n"
+            f"Angle: {current_degrees:.1f}°\n"
+            f"q = ({q[0]:.3f}, {q[1]:.3f}i, {q[2]:.3f}j, {q[3]:.3f}k)"
         )
 
     # Keep scene open
@@ -217,19 +253,21 @@ def demo_menu():
     elif choice == "6":
         print("\n  Dark mode enabled. Select rotation:")
         sub = input("    Axis [1=Z, 2=X, 3=Y, 4=Diagonal]: ").strip() or "1"
-        axes = {"1": [0,0,1], "2": [1,0,0], "3": [0,1,0], "4": [1,1,1]}
-        return axes.get(sub, [0,0,1]), True
+        axes = {"1": [0, 0, 1], "2": [1, 0, 0], "3": [0, 1, 0], "4": [1, 1, 1]}
+        return axes.get(sub, [0, 0, 1]), True
     else:
         return [0, 0, 1], False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # When running directly, fix import path
     import sys
     from pathlib import Path
+
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
     from viz.theme import show_palette
+
     show_palette()
 
     axis, dark_mode = demo_menu()
@@ -237,9 +275,4 @@ if __name__ == '__main__':
     print("\n  Opening browser...")
     print("  Press Ctrl+C to exit\n")
 
-    visualize_rotation(
-        axis=axis,
-        angle_degrees=360,
-        duration=4.0,
-        dark_mode=dark_mode
-    )
+    visualize_rotation(axis=axis, angle_degrees=360, duration=4.0, dark_mode=dark_mode)

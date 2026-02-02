@@ -25,12 +25,24 @@ Follow these instructions to set up a local development environment.
     cd QBP
     ```
 
-2.  **Install Python dependencies:**
+2.  **Create and activate a virtual environment:**
+    It is highly recommended to use a virtual environment to manage project-specific dependencies.
+    ```bash
+    # Create the virtual environment
+    python3 -m venv venv
+
+    # Activate it (on Linux/macOS)
+    source venv/bin/activate
+    # On Windows, use: .\\venv\\Scripts\\activate
+    ```
+
+3.  **Install Python dependencies:**
+    With your virtual environment active, install the required packages.
     ```bash
     pip install -r requirements.txt
     ```
 
-3.  **Set up Git hooks:**
+4.  **Set up Git hooks:**
     This will install the pre-commit hooks defined in `.pre-commit-config.yaml`, which automatically format and check our code.
     ```bash
     pre-commit install
