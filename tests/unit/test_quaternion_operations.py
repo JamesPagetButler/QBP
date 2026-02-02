@@ -146,4 +146,6 @@ class TestAxisAngleConversion:
         for axis, angle in test_cases:
             q = axis_angle_to_quaternion(axis, angle)
             norm = np.linalg.norm(q)
-            assert np.isclose(norm, 1.0, atol=tolerance), f"Failed for axis={axis}, angle={angle}"
+            assert np.isclose(
+                norm, 1.0, atol=tolerance
+            ), f"Failed for axis={axis}, angle={angle}"

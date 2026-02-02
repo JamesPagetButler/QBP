@@ -42,7 +42,10 @@ This project uses a variety of tools for different purposes. Adherence to this t
 *   **Version Control:** Git
 *   **Documentation:** Markdown
 *   **Exploration & Simulation:** Python with Jupyter Notebooks.
-*   **Python Libraries:** `numpy`, `matplotlib`, `sympy`, `scipy` (as defined in `requirements.txt`).
+*   **Python Libraries:**
+    *   `numpy`, `matplotlib`, `sympy`, `scipy` for general scientific computing.
+    *   `numpy-quaternion` for core quaternion mathematics.
+    *   `vpython` for 3D visualization.
 *   **Formal Proof:** Lean 4.
 *   **Code Quality:** `pre-commit` framework using `black` for formatting and `mypy` for type checking.
 
@@ -52,6 +55,8 @@ This project uses a variety of tools for different purposes. Adherence to this t
     *   **Numba:** For just-in-time compilation to accelerate specific Python functions.
     *   **C++/Rust:** For rewriting performance-critical library components if necessary.
 *   **Large Data Storage:** HDF5.
-*   **Automation (CI/CD):** GitHub Actions.
+*   **Automation (CI/CD):** GitHub Actions (a basic setup should be implemented).
 *   **Knowledge Management:** Zotero or Mendeley.
 *   **Publishing:** Quarto and/or LaTeX for professional typesetting of the final paper.
+*   **Design System:** The front-end assets and framework implemented by Claude.
+*   **Formal Proof Setup:** The setup and configuration for Lean 4 must be documented.
