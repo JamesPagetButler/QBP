@@ -49,3 +49,6 @@ Thumbs.db
 
 # Project-specific
 *.log
+
+# AI Prompt files (local only)
+prompts/
