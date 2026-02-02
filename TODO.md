@@ -2,60 +2,78 @@
 
 This document serves as the official project plan, tracking our high-level roadmap and the granular tasks required to achieve our goals.
 
+**Workflow:** All work should be driven by GitHub Issues. PRs must reference the issue they address.
+
 ---
 
 ## Project Roadmap (The Eight-Fold Path)
 
 This is our strategic guide. We will tackle these items sequentially.
 
-1.  **[In Progress]** The Stern-Gerlach Experiment
-2.  **[Next]** The Double-Slit Experiment
-3.  **[Upcoming]** The Lamb Shift
-4.  **[Upcoming]** Bell's Theorem Experiments
-5.  **[Upcoming]** Derivation of Particle Statistics
-6.  **[Upcoming]** Modeling Positronium's Ground State
-7.  **[Upcoming]** The Hydrogen Atom Spectrum
-8.  **[Aspirational]** The Anomalous Magnetic Moment of the Electron (g-2)
-9.  **[Aspirational]** Gravitational Lensing & Galactic Rotation Curves
+| # | Experiment | Status | Issue |
+|---|------------|--------|-------|
+| 1 | The Stern-Gerlach Experiment | **In Progress** | — |
+| 2 | The Double-Slit Experiment | Next | [#22](https://github.com/JamesPagetButler/QBP/issues/22) |
+| 3 | The Lamb Shift | Upcoming | — |
+| 4 | Bell's Theorem Experiments | Upcoming | [#23](https://github.com/JamesPagetButler/QBP/issues/23) |
+| 5 | Derivation of Particle Statistics | Upcoming | — |
+| 6 | Modeling Positronium's Ground State | Upcoming | — |
+| 7 | The Hydrogen Atom Spectrum | Upcoming | — |
+| 8 | The Anomalous Magnetic Moment (g-2) | Aspirational | — |
+| 9 | Gravitational Lensing & Rotation Curves | Aspirational | — |
 
 ---
 
-## Current Sprint: Ground Truth Analysis
+## Current Sprint: Stern-Gerlach Refinement
 
-This is our highest priority. We must establish the real-world experimental results we aim to match with our synthetic tests.
-
--   **[In Progress] Action 0:** For each test on the Eight-Fold Path, search for real-world data and meta-analyses. Document the key expected results in a corresponding `/research` directory file. Start with Stern-Gerlach.
-
----
-
-## Next Sprint: Stern-Gerlach Implementation & Refinement
-
-These are the immediate action items derived from the review of Pull Request #13. We will work on these locally.
+These are the immediate action items derived from the review of Pull Request #13.
 
 ### Engineering & Refinement (Knuth's Feedback)
--   **[TODO] Action A:** Add an optional `seed` parameter to the `measure` function in `src/qphysics.py` for reproducible tests.
--   **[TODO] Action B:** Add Python type hints to all functions in `src/qphysics.py`.
--   **[TODO] Action C:** Vectorize the simulation loop in `experiments/01_stern_gerlach/simulate.py` using NumPy for performance.
+
+| Action | Task | Issue | Status |
+|--------|------|-------|--------|
+| A | Add `seed` parameter to `measure()` | [#16](https://github.com/JamesPagetButler/QBP/issues/16) | TODO |
+| B | Add type hints to `qphysics.py` | [#17](https://github.com/JamesPagetButler/QBP/issues/17) | TODO |
+| C | Vectorize simulation loop | [#18](https://github.com/JamesPagetButler/QBP/issues/18) | TODO |
 
 ### New Experiments (Sabine's & Feynman's Feedback)
--   **[TODO] Action D:** Create a new synthetic experiment, `experiments/02_angle_test/simulate_angle.py`, to verify the measurement probability formula at different angles.
+
+| Action | Task | Issue | Status |
+|--------|------|-------|--------|
+| D | Create angle-dependent test | [#19](https://github.com/JamesPagetButler/QBP/issues/19) | TODO |
 
 ---
 
-## Future Tasks & Research Backlog
+## Research & Theory Backlog
 
-These are important tasks to be addressed after the current sprint.
-
--   **[Backlog] Action E:** Open a GitHub Issue for the "Theoretical Investigation: Physical Meaning of the Quaternion Scalar Component" to address Furey's and Grothendieck's feedback.
--   **[Backlog]** Implement a basic CI/CD pipeline using GitHub Actions.
--   **[Backlog]** Document the Lean 4 setup process.
+| Action | Task | Issue | Status |
+|--------|------|-------|--------|
+| E | Investigate quaternion scalar component (S³ vs S²) | [#20](https://github.com/JamesPagetButler/QBP/issues/20) | TODO |
+| — | Document Lean 4 setup process | [#21](https://github.com/JamesPagetButler/QBP/issues/21) | TODO |
 
 ---
 
 ## Completed Tasks
 
-- **Initial Project Setup & Constitution:** All core documents (`CONTRIBUTING.md`, `README.md`, etc.) are in place.
-- **Initial Red Team Review:** Completed and feedback incorporated.
-- **`qphysics.py` v0.1:** Initial implementation of Axioms 1-3 and Measurement Postulate created.
-- **Synthetic Experiment v1:** `simulate.py` for Stern-Gerlach created.
-- **PR #13 Review:** Completed by both Red Team and Gemini.
+| Task | PR/Issue | Date |
+|------|----------|------|
+| Initial Project Setup & Constitution | — | 2026-02-01 |
+| Initial Red Team Review | PR #13 | 2026-02-01 |
+| `qphysics.py` v0.1 (Axioms 1-3 + Measurement) | PR #13 | 2026-02-01 |
+| Stern-Gerlach simulation v1 | PR #13 | 2026-02-01 |
+| Ground Truth Research (all 9 experiments) | PR #15 | 2026-02-02 |
+| CI/CD Pipeline | PR #8 | 2026-02-01 |
+
+---
+
+## Issue-Driven Workflow
+
+```
+1. Work identified → Create GitHub Issue
+2. Issue assigned → Create feature branch
+3. Work completed → Create PR referencing issue
+4. Reviews posted → Update TODO.md, create new issues from feedback
+5. PR merged → Issue auto-closed, TODO.md updated
+```
+
+All PRs should include `Closes #XX` or `Fixes #XX` in the description to auto-close issues on merge.
