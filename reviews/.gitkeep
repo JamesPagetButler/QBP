@@ -1,0 +1,7 @@
+# Reviews Directory
+
+This directory stores AI reviews locally before they are posted to PRs.
+
+Files follow the naming convention:
+- `claude_review_<PR#|branch>_<YYYY-MM-DD>.md`
+- `gemini_review_<PR#|branch>_<YYYY-MM-DD>.md`
