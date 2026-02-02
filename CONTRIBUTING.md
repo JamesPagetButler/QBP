@@ -12,12 +12,123 @@ This document outlines the process for contributing to the Quaternion-Based Phys
 
 ## Review Process Details
 
-Our review process is designed to be rigorous and auditable. It proceeds in the following order for every Pull Request:
+Our review process is designed to be rigorous and auditable.
 
-1.  **Red Team Review:** Our 'Red Team' AI, Claude, will first conduct its three-persona peer review (`Sabine`, `Grothendieck`, `Knuth`) and post its findings as a comment on the PR.
-2.  **Gemini Review:** After the Red Team review, Gemini will conduct its two-persona review (`Furey`, `Feynman`). This review will be provided in a structured Markdown format within the Gemini CLI.
-3.  **Documentation of Gemini's Review:** Claude will then act as a scribe, copying Gemini's Markdown review and posting it as a second, separate comment on the PR. This ensures all analysis is documented on GitHub.
-4.  **Final Approval:** Once both AI reviews are on the PR and all feedback has been discussed and addressed, James Paget Butler provides the final review and approval to merge.
+### Reviewing Agents
+
+| Agent | Persona(s) | Tool/CLI | Role |
+|-------|-----------|----------|------|
+| **Claude** | Sabine (Experimentalist) | Claude Code CLI | Red Team - tests, feasibility, measurements |
+| **Claude** | Grothendieck (Mathematician) | Claude Code CLI | Red Team - rigor, axioms, structure |
+| **Claude** | Knuth (Engineer) | Claude Code CLI | Red Team - code quality, efficiency, docs |
+| **Gemini** | Furey (Algebraist) | Gemini CLI | Theory - division algebras, elegance |
+| **Gemini** | Feynman (Physicist) | Gemini CLI | Theory - physical intuition, clarity |
+
+### Pre-Merge Requirements
+
+Before any PR can be merged, the PR **must** contain:
+
+| Requirement | Posted By | Format |
+|-------------|-----------|--------|
+| Red Team Review (3 personas) | Claude | PR Comment |
+| Red Team Summary | Claude | PR Comment |
+| Gemini Review (2 personas) | Claude (as scribe) | PR Comment |
+| Gemini Summary | Claude (as scribe) | PR Comment |
+| All CI checks passing | GitHub Actions | Status checks |
+| Human explicit merge command | James | CLI instruction |
+
+### Review Flow
+
+```
+1. PR Created
+      ↓
+2. Claude posts Red Team review (Sabine, Grothendieck, Knuth)
+      ↓
+3. Gemini provides review (Furey, Feynman) in Gemini CLI
+      ↓
+4. Claude scribes Gemini's review to PR
+      ↓
+5. CI checks pass
+      ↓
+6. James reviews summaries, asks questions if needed
+      ↓
+7. James issues explicit "merge" command
+      ↓
+8. Merge executed
+```
+
+### Review Process Steps
+
+1.  **Red Team Review:** Claude conducts three-persona peer review (`Sabine`, `Grothendieck`, `Knuth`) and posts findings as a PR comment with summary.
+2.  **Gemini Review:** Gemini conducts two-persona review (`Furey`, `Feynman`) in structured Markdown format within Gemini CLI.
+3.  **Documentation of Gemini's Review:** Claude acts as scribe, copying Gemini's Markdown review and posting it as a separate PR comment.
+4.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
+
+## Hard Gate: Human Merge Authorization
+
+**CRITICAL RULE:** No merge to `master` may occur without explicit human authorization.
+
+### Pre-Merge Checklist
+
+Before any merge can occur, the following must be completed:
+
+1. **Claude (Red Team) Review Confirmation**
+   - Claude must explicitly confirm: "Red Team review complete"
+   - Must provide a summary of findings from all three personas (Sabine, Grothendieck, Knuth)
+   - Summary must be posted as a PR comment
+
+2. **Gemini (Furey/Feynman) Review Confirmation**
+   - Gemini must explicitly confirm: "Gemini review complete"
+   - Must provide a summary of findings from both personas
+   - Claude scribes this to the PR as a comment
+
+3. **Review Summary Available**
+   - A consolidated summary of both AI reviews must be available
+   - Key concerns, approvals, and action items clearly listed
+   - Human can read this before deciding
+
+4. **Q&A Window**
+   - Before merge, human may pose questions to either AI agent via CLI
+   - Agents must be available to clarify their review findings
+   - Example: "Claude, explain Grothendieck's concern about X"
+   - Example: "Gemini, what did Feynman mean by Y?"
+
+5. **Explicit Human Merge Command**
+   - Only after reviewing summaries and asking any questions
+   - Human issues explicit merge instruction
+
+### For AI Agents (Claude, Gemini)
+
+When working on a task:
+1. Create a branch
+2. Make changes
+3. Push to remote
+4. Create a Pull Request
+5. Complete your review and post confirmation + summary
+6. **STOP and wait for explicit merge instruction**
+
+AI agents must **never** merge a PR based on:
+- Prior approval in the conversation
+- Assumed permission
+- CI passing
+- The change being "trivial"
+
+Each merge requires a fresh, explicit instruction such as:
+- "merge"
+- "merge it"
+- "merge PR #X"
+- "go ahead and merge"
+
+### Rationale
+
+This gate ensures the human collaborator always has time to:
+- Review the PR on GitHub
+- Read AI review summaries
+- Ask clarifying questions
+- Verify CI status
+- Make an informed decision
+
+This is a **hard gate** — no exceptions.
 
 ## How to Enforce Our Rules: Branch Protection
 
