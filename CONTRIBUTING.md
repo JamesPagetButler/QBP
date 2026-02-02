@@ -64,6 +64,15 @@ Before any PR can be merged, the PR **must** contain:
 3.  **Documentation of Gemini's Review:** Claude acts as scribe, copying Gemini's Markdown review and posting it as a separate PR comment.
 4.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
 
+## Updating the Design Rationale
+
+To ensure the project's intellectual history is preserved, the `paper/DESIGN_RATIONALE.md` file must be continuously updated.
+
+1.  **Rationale in PRs:** For any Pull Request that introduces a new feature, a significant change in logic, or a new architectural decision, the author **must** include a "Design Rationale" section in the PR's description, explaining the "why" behind the changes.
+2.  **Post-Merge Scribe Duty:** After such a PR is merged, it is the responsibility of the scribe AI (Claude) to create a subsequent PR that appends the "Design Rationale" from the merged PR's description into the main `paper/DESIGN_RATIONALE.md` document.
+
+This process creates a living document that evolves alongside the project itself.
+
 ## Hard Gate: Human Merge Authorization
 
 **CRITICAL RULE:** No merge to `master` may occur without explicit human authorization.
@@ -129,6 +138,17 @@ This gate ensures the human collaborator always has time to:
 - Make an informed decision
 
 This is a **hard gate** — no exceptions.
+
+## AI Prompt Conventions
+
+To maintain clarity and organization in how we instruct our AI collaborators, we will adhere to the following conventions for creating and storing prompt files.
+
+*   **Location:** All detailed prompt files for AI agents are stored in a top-level `/prompts` directory.
+*   **Naming Convention:** Files are named using the pattern: `prompt_{to-who}_{YYYY-MM-DD}_{short-task-description}.md`.
+    *   `{to-who}`: The AI the prompt is for (`claude` or `gemini`).
+    *   `{YYYY-MM-DD}`: The date of creation.
+    *   `{short-task-description}`: A brief, kebab-case summary of the task.
+*   **Git Status:** The `/prompts` directory is included in `.gitignore` and is not committed to the repository. It is a local-only tool for managing our workflow.
 
 ## How to Enforce Our Rules: Branch Protection
 
