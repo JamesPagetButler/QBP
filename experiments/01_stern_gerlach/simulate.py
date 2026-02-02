@@ -5,9 +5,10 @@ import sys
 import os
 
 # Add the project root to the Python path to allow imports from src
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from src import qphysics
+
 
 def run_simulation(num_particles=1000000):
     """
@@ -20,7 +21,7 @@ def run_simulation(num_particles=1000000):
     # We choose a state aligned with the X-axis. In traditional QM, this is an
     # equal superposition of spin-up and spin-down states when measured on the
     # Z-axis. We expect a roughly 50/50 split in our results.
-    initial_state_vector = [1, 0, 0] # Pointing along X
+    initial_state_vector = [1, 0, 0]  # Pointing along X
     psi_initial = qphysics.create_state_from_vector(initial_state_vector)
     print(f"Initial State (ψ): {psi_initial}")
 
@@ -50,7 +51,9 @@ def run_simulation(num_particles=1000000):
     print("--------------------------\n")
 
     print("Conclusion: The experiment successfully demonstrates spin quantization.")
-    print("As expected, the initial state in a superposition yielded a probabilistic split into two distinct outcomes.")
+    print(
+        "As expected, the initial state in a superposition yielded a probabilistic split into two distinct outcomes."
+    )
 
 
 if __name__ == "__main__":

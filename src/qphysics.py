@@ -6,6 +6,7 @@ import quaternion
 
 # --- Axiom 1: The Quaternionic State ---
 
+
 def create_state(a, b, c, d):
     """
     Creates a normalized quaternionic state from four components, enforcing the
@@ -27,6 +28,7 @@ def create_state(a, b, c, d):
         return np.quaternion(1, 0, 0, 0)
     return q / norm
 
+
 def create_state_from_vector(vec):
     """
     A user-friendly helper to create a quaternionic state aligned with a 3D vector.
@@ -43,6 +45,7 @@ def create_state_from_vector(vec):
         raise ValueError("Input vector must be 3-dimensional [x, y, z]")
     return create_state(0, vec[0], vec[1], vec[2])
 
+
 def get_state_vector(psi):
     """
     Utility function to get the vector part of a quaternionic state.
@@ -55,7 +58,9 @@ def get_state_vector(psi):
     """
     return quaternion.as_vector_part(psi)
 
+
 # --- Axiom 2: Quaternionic Observables ---
+
 
 def create_observable(vec):
     """
@@ -71,14 +76,15 @@ def create_observable(vec):
         raise ValueError("Input vector must be 3-dimensional [x, y, z]")
     return np.quaternion(0, vec[0], vec[1], vec[2])
 
-# Pre-defined observables for convenience, mapping to the Pauli matrices
-SPIN_X = np.quaternion(0, 1, 0, 0) # Corresponds to i
-SPIN_Y = np.quaternion(0, 0, 1, 0) # Corresponds to j
-SPIN_Z = np.quaternion(0, 0, 0, 1) # Corresponds to k
 
+# Pre-defined observables for convenience, mapping to the Pauli matrices
+SPIN_X = np.quaternion(0, 1, 0, 0)  # Corresponds to i
+SPIN_Y = np.quaternion(0, 0, 1, 0)  # Corresponds to j
+SPIN_Z = np.quaternion(0, 0, 0, 1)  # Corresponds to k
 
 
 # --- Axiom 3: Quaternionic Evolution ---
+
 
 def evolve_state(psi_initial, hamiltonian, time):
     """
@@ -94,7 +100,9 @@ def evolve_state(psi_initial, hamiltonian, time):
         np.quaternion: The final state of the system, ψ(t).
     """
     if hamiltonian.w != 0:
-        raise ValueError("Hamiltonian must be a pure quaternion (scalar part must be zero).")
+        raise ValueError(
+            "Hamiltonian must be a pure quaternion (scalar part must be zero)."
+        )
 
     # The evolution operator U = exp(-Ht)
     # For a pure quaternion H, this is a rotation.
@@ -105,7 +113,9 @@ def evolve_state(psi_initial, hamiltonian, time):
 
     return psi_final
 
+
 # --- Measurement Postulate ---
+
 
 def expectation_value(psi, observable):
     """
@@ -122,17 +132,18 @@ def expectation_value(psi, observable):
     """
     if observable.w != 0:
         raise ValueError("Observable must be a pure quaternion.")
-    
+
     # Normalize the observable's vector part to be safe
     obs_vec = quaternion.as_vector_part(observable)
     obs_norm = np.linalg.norm(obs_vec)
     if obs_norm == 0:
         return 0.0
-    
+
     # The state psi is assumed to have a non-zero vector part
     psi_vec = get_state_vector(psi)
-    
+
     return np.dot(psi_vec, obs_vec / obs_norm)
+
 
 def measure(psi, observable):
     """
@@ -152,16 +163,20 @@ def measure(psi, observable):
                with the observable).
     """
     exp_val = expectation_value(psi, observable)
-    
+
     # Probability of measuring the "up" state (+1)
     prob_up = (1 + exp_val) / 2.0
-    
+
     # "Roll the dice"
     if np.random.rand() < prob_up:
         # Outcome is "up" (+1), collapse state to be aligned with observable
-        collapsed_state = create_state_from_vector(quaternion.as_vector_part(observable))
+        collapsed_state = create_state_from_vector(
+            quaternion.as_vector_part(observable)
+        )
         return +1, collapsed_state
     else:
         # Outcome is "down" (-1), collapse state to be anti-aligned
-        collapsed_state = create_state_from_vector(-quaternion.as_vector_part(observable))
+        collapsed_state = create_state_from_vector(
+            -quaternion.as_vector_part(observable)
+        )
         return -1, collapsed_state
