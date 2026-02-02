@@ -28,6 +28,14 @@ In response to Grothendieck's required action, we establish the following minima
     `ψ(t) = exp(-Ht) * ψ(0)`.
     *(Note: This is a provisional form analogous to the Schrödinger equation and will be the first major point of investigation).*
 
+### Scope, Limitations, and Future Directions
+
+In response to Grothendieck's insightful critique, we explicitly acknowledge the following:
+
+*   **Sufficiency of Quaternions:** We recognize that quaternions alone are likely insufficient to encompass all symmetries of the Standard Model, particularly the SU(3) symmetry related to the strong force. Our current focus on quaternions is a deliberate strategy to address SU(2) and U(1) related phenomena (spin, electromagnetism).
+*   **Role of Octonions:** We hypothesize that an extension of this framework to include octonions will be necessary to incorporate SU(3) symmetries and provide a comprehensive description of one generation of fundamental particles, aligning with contemporary research in this area. This extension represents a future, but integral, phase of this project.
+*   **Relationship to Geometric Algebra (GA):** While GA offers a broader mathematical framework that subsumes quaternion algebra, our project maintains a specific focus on the 'Cayley-Dickson' sequence of division algebras (Real, Complex, Quaternion, Octonion). This provides a constrained, step-by-step approach to explore if fundamental physical properties emerge from these unique algebraic structures. Comparison with GA formulations and the potential for a unified GA-based description remains an important topic for future study.
+
 ## The Revised Eight-Fold Path of Verification
 
 We have defined a sequence of eight critical experimental and theoretical benchmarks to guide our work. We will proceed through this list sequentially, and successful validation at each step is required before proceeding to the next.
