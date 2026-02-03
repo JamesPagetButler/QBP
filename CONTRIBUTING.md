@@ -242,6 +242,25 @@ Every issue must include:
 - **Acceptance Criteria:** Checklist of requirements for completion
 - **References:** Links to relevant code, research docs, and prior PRs
 
+### Issue Closure Checklist
+
+**CRITICAL:** Issues must NOT be closed until ALL of the following are verified:
+
+- [ ] **All acceptance criteria verified** — Each criterion must be actively tested/confirmed, not just marked complete based on historical work
+- [ ] **Red Team review completed** — Claude's review (Sabine, Grothendieck, Knuth) posted to the issue
+- [ ] **Gemini review completed** — Gemini's review (Furey, Feynman) posted to the issue
+- [ ] **Human approval obtained** — Explicit sign-off from James
+
+**Why This Matters:**
+Closing issues prematurely (e.g., because "the work was done in PR #X") bypasses the review process and can allow defects to slip through. The review requirement exists precisely to catch issues that automated tests might miss.
+
+**Process Violation Recovery:**
+If an issue is found to have been closed without proper reviews:
+1. Reopen the issue immediately
+2. Add a comment documenting the process violation
+3. Conduct the missing reviews
+4. Only close after all checklist items are verified
+
 ### Post-Review Issue Creation
 
 After reviews are posted to a PR, Claude must:
