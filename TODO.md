@@ -51,7 +51,7 @@ Our work is organized into sprints, with each sprint corresponding to one experi
 ### Experiment 1: Stern-Gerlach
 -   ✅ **[Done]** Phase 1: Ground Truth & Planning ([#52](https://github.com/JamesPagetButler/QBP/issues/52))
 -   ✅ **[Done]** Phase 2: Implementation & Execution ([#53](https://github.com/JamesPagetButler/QBP/issues/53))
--   🔄 **[In Review]** Phase 3: Visualization & Analysis (PR #74, [#29](https://github.com/JamesPagetButler/QBP/issues/29))
+-   ✅ **[Done]** Phase 3: Visualization & Analysis ([#29](https://github.com/JamesPagetButler/QBP/issues/29))
 -   📋 **[TODO]** Phase 4: Formal Verification ([#55](https://github.com/JamesPagetButler/QBP/issues/55))
 -   📋 **[TODO]** Phase 5: Publication ([#64](https://github.com/JamesPagetButler/QBP/issues/64))
 
@@ -121,11 +121,8 @@ Our work is organized into sprints, with each sprint corresponding to one experi
 |---|-------|------|--------|
 | [#6](https://github.com/JamesPagetButler/QBP/issues/6) | Initial Project Premise Review | research | 📋 Triage |
 | [#20](https://github.com/JamesPagetButler/QBP/issues/20) | Quaternion scalar component (S³ vs S²) | research | 📋 TODO |
-| [#21](https://github.com/JamesPagetButler/QBP/issues/21) | Lean 4 setup documentation | docs | 🔄 In Progress |
+| [#21](https://github.com/JamesPagetButler/QBP/issues/21) | Lean 4 setup documentation | docs | ✅ Done |
 | [#54](https://github.com/JamesPagetButler/QBP/issues/54) | 5-Phase Workflow Proposal | research | ✅ Implemented |
-| [#75](https://github.com/JamesPagetButler/QBP/issues/75) | Lean 4 infrastructure | infrastructure | 🔄 In Review |
-| [#76](https://github.com/JamesPagetButler/QBP/issues/76) | Simplify TODO.md | docs | 🔄 In Review |
-| [#74](https://github.com/JamesPagetButler/QBP/issues/74) | S-G Phase 3 Visualization | experiment | 🔄 In Review |
 
 ---
 
