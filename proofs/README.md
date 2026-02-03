@@ -1,0 +1,1 @@
+# Formal Proofs\n\nThis directory contains Lean 4 proof files for each experiment.\n\n## Structure\n\nEach experiment has its own subdirectory:\n- `/proofs/01_stern_gerlach/`\n- `/proofs/02_double_slit/`\n- etc.\n\n## Prerequisites\n\nSee issue #21 for Lean 4 setup instructions.
