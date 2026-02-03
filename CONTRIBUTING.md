@@ -12,6 +12,24 @@ This document outlines the process for contributing to the Quaternion-Based Phys
 
 ---
 
+## The Research Lifecycle
+
+Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engine for our scientific discovery.
+
+1.  **Sprint (Experiment N):** We execute all 5 phases for a single experiment from our roadmap (Ground Truth, Implementation, Visualization, Formal Proof, Publication). A sprint is not complete until all 5 phases are successfully implemented and merged.
+
+2.  **Theory Refinement Stage:** After a sprint is complete, we enter a dedicated phase to:
+    *   **Analyze:** Discuss the results and what they imply for our theory.
+    *   **Check Guide Posts:** Evaluate if any "Guide Posts" (e.g., emergent conservation laws) have appeared.
+    *   **Extend Theory:** Develop the new theoretical underpinnings required to tackle the *next* experiment on our roadmap.
+    *   **Document:** All findings from this stage are documented in `paper/DESIGN_RATIONALE.md` and the main `paper/quaternion_physics.md`.
+
+3.  **Loop:** We then begin the next sprint for Experiment N+1.
+
+This ensures our theory evolves based on our experimental results.
+
+---
+
 ## The 5-Phase Experimental Lifecycle
 
 Every experiment on our roadmap follows a structured 5-phase lifecycle. This ensures rigorous validation before publication.
@@ -245,6 +263,46 @@ Every issue must include:
 - **Background:** Why this work is needed (link to review feedback, roadmap)
 - **Acceptance Criteria:** Checklist of requirements for completion
 - **References:** Links to relevant code, research docs, and prior PRs
+
+### Issue Labels
+
+Issues are categorized using labels to separate main research work from infrastructure concerns.
+
+#### Core Research Labels
+
+| Label | Description |
+|-------|-------------|
+| `type: experiment` | Experiment phase work (Phases 1-5) |
+| `type: research` | Theory Refinement and scientific investigation |
+| `phase: ground-truth` | Phase 1 work |
+| `phase: implementation` | Phase 2 work |
+| `phase: visualization` | Phase 3 work |
+| `phase: proof` | Phase 4 work |
+| `phase: publication` | Phase 5 work |
+
+#### Infrastructure Labels
+
+| Label | Description |
+|-------|-------------|
+| `housekeeping` | Maintenance tasks outside main research workflow |
+
+**Use `housekeeping` for:**
+- Documentation infrastructure (CONTRIBUTING.md, README updates)
+- CI/CD fixes and improvements
+- TODO.md maintenance and accuracy
+- Process/workflow documentation
+- Tooling setup (Lean 4, pre-commit, etc.)
+- Review process improvements
+
+**Do NOT use `housekeeping` for:**
+- Experiment phases (1-5) — use `type: experiment`
+- Theory Refinement issues — use `type: research`
+- Ground truth research — use `phase: ground-truth`
+- Scientific investigations — use `type: research`
+- Core physics implementation — use appropriate phase label
+
+**Why This Matters:**
+Separating housekeeping from research ensures infrastructure concerns don't block or distract from the main experimental workflow. Housekeeping issues can be addressed opportunistically without disrupting sprint progress.
 
 ### Issue Closure Checklist
 
