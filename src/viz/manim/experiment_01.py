@@ -283,11 +283,11 @@ class SternGerlachScene(QBPScene):
         self.play(*[FadeOut(p) for p in particles], run_time=0.3)
 
     def create_results_panel(self) -> VGroup:
-        """Create the results display panel."""
+        """Create the results display panel with comparison."""
         # Box
         box = Rectangle(
-            width=8,
-            height=1.5,
+            width=10,
+            height=2.2,
             color=QBPColors.BRASS,
             fill_color=QBPColors.DARK_SLATE,
             fill_opacity=0.8,
@@ -295,37 +295,74 @@ class SternGerlachScene(QBPScene):
 
         # Results text
         header = Text("RESULTS (n = 1,000,000)", color=QBPColors.BRASS, font_size=20)
-        header.next_to(box.get_top(), DOWN, buff=0.2)
+        header.next_to(box.get_top(), DOWN, buff=0.15)
+
+        # Left side: Measured results
+        measured_label = Text("Measured:", color=QBPColors.IVORY, font_size=16)
+        measured_label.next_to(header, DOWN, buff=0.2)
+        measured_label.align_to(box, LEFT)
+        measured_label.shift(RIGHT * 0.3)
 
         up_result = Text(
-            "Spin Up (+1):   ~50.0%",
+            "Spin Up (+1):   50.0%",
             color=QBPColors.TEAL,
-            font_size=18,
+            font_size=16,
         )
-        up_result.next_to(header, DOWN, buff=0.2)
-        up_result.align_to(box, LEFT)
-        up_result.shift(RIGHT * 0.5)
+        up_result.next_to(measured_label, DOWN, buff=0.1)
+        up_result.align_to(measured_label, LEFT)
 
         down_result = Text(
-            "Spin Down (-1): ~50.0%",
+            "Spin Down (-1): 50.0%",
             color=QBPColors.CRIMSON,
-            font_size=18,
+            font_size=16,
         )
-        down_result.next_to(up_result, DOWN, buff=0.1)
+        down_result.next_to(up_result, DOWN, buff=0.05)
         down_result.align_to(up_result, LEFT)
+
+        # Right side: Predictions comparison
+        comparison_header = Text("Predictions:", color=QBPColors.IVORY, font_size=16)
+        comparison_header.move_to(box.get_center() + RIGHT * 1.5 + UP * 0.4)
+
+        qbp_pred = Text(
+            "QBP Model:     50%",
+            color=QBPColors.BRASS,
+            font_size=14,
+        )
+        qbp_pred.next_to(comparison_header, DOWN, buff=0.1)
+        qbp_pred.align_to(comparison_header, LEFT)
+
+        qm_pred = Text(
+            "Standard QM:   50%",
+            color=QBPColors.IVORY,
+            font_size=14,
+        )
+        qm_pred.next_to(qbp_pred, DOWN, buff=0.05)
+        qm_pred.align_to(qbp_pred, LEFT)
 
         # Agreement indicator
         indicator = Circle(
-            radius=0.15,
+            radius=0.2,
             color=QBPColors.TEAL,
             fill_opacity=1.0,
         )
-        indicator.next_to(box.get_right(), LEFT, buff=0.5)
+        indicator.next_to(box.get_right(), LEFT, buff=0.4)
+        indicator.shift(UP * 0.2)
 
-        match_text = Text("Matches QM", color=QBPColors.TEAL, font_size=14)
+        match_text = Text("MATCH", color=QBPColors.TEAL, font_size=12)
         match_text.next_to(indicator, DOWN, buff=0.1)
 
-        return VGroup(box, header, up_result, down_result, indicator, match_text)
+        return VGroup(
+            box,
+            header,
+            measured_label,
+            up_result,
+            down_result,
+            comparison_header,
+            qbp_pred,
+            qm_pred,
+            indicator,
+            match_text,
+        )
 
 
 class SternGerlachShort(QBPScene):
