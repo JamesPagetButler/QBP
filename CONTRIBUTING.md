@@ -12,6 +12,24 @@ This document outlines the process for contributing to the Quaternion-Based Phys
 
 ---
 
+## The Research Lifecycle
+
+Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engine for our scientific discovery.
+
+1.  **Sprint (Experiment N):** We execute all 5 phases for a single experiment from our roadmap (Ground Truth, Implementation, Visualization, Formal Proof, Publication). A sprint is not complete until all 5 phases are successfully implemented and merged.
+
+2.  **Theory Refinement Stage:** After a sprint is complete, we enter a dedicated phase to:
+    *   **Analyze:** Discuss the results and what they imply for our theory.
+    *   **Check Guide Posts:** Evaluate if any "Guide Posts" (e.g., emergent conservation laws) have appeared.
+    *   **Extend Theory:** Develop the new theoretical underpinnings required to tackle the *next* experiment on our roadmap.
+    *   **Document:** All findings from this stage are documented in `paper/DESIGN_RATIONALE.md` and the main `paper/quaternion_physics.md`.
+
+3.  **Loop:** We then begin the next sprint for Experiment N+1.
+
+This ensures our theory evolves based on our experimental results.
+
+---
+
 ## The 5-Phase Experimental Lifecycle
 
 Every experiment on our roadmap follows a structured 5-phase lifecycle. This ensures rigorous validation before publication.
