@@ -55,3 +55,18 @@ This log tracks work done locally by Gemini that has not yet been pushed to the 
 **Changes:**
 - Formalized the number of simulation trials to N=1,000,000 to increase statistical certainty.
 - Updated the default `num_particles` in the simulation script to match.
+
+---
+
+### **Entry: 2026-02-01 (Session 6)**
+
+**Task:** Implement results logging.
+**Files to be Modified:**
+- `experiments/01_stern_gerlach/simulate.py`
+- `CONTRIBUTING.md`
+**Directories Created:**
+- `results/01_stern_gerlach`
+**Changes:**
+- Created directory structure for storing simulation results.
+- Will update simulation script to save its output to a timestamped file.
+- Will update `CONTRIBUTING.md` to document the `/results` directory.

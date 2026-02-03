@@ -232,3 +232,16 @@ This project uses a variety of tools for different purposes. Adherence to this t
 *   **Publishing:** Quarto and/or LaTeX for professional typesetting of the final paper.
 *   **Design System:** The front-end assets and framework implemented by Claude.
 *   **Formal Proof Setup:** The setup and configuration for Lean 4 must be documented.
+
+## Directory Structure
+
+This project follows a defined directory structure to keep our work organized.
+
+*   `/paper`: Contains the formal, human-readable research paper (`quaternion_physics.md`) and the intellectual history of the project (`DESIGN_RATIONALE.md`).
+*   `/research`: Contains markdown files detailing the ground truth, experimental methods, and expected results for each test on our Eight-Fold Path.
+*   `/src`: Contains the `qphysics.py` library, the computational heart of our formalism.
+*   `/experiments`: Contains the Python scripts for our "synthetic experiments," which use the `qphysics.py` library to test our hypotheses.
+*   `/results`: Contains the timestamped output logs from our synthetic experiments. This directory is in `.gitignore` and is not committed to the repository.
+*   `/reviews`: Contains locally saved review files from both Claude and Gemini before they are posted to a PR. This directory is in `.gitignore`.
+*   `/prompts`: Contains detailed prompt files for instructing AI agents. This directory is in `.gitignore`.
+*   `/docs`: Contains general project documentation, such as the overall `REVIEW_WORKFLOW.md`.

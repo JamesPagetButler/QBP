@@ -52,3 +52,6 @@ Thumbs.db
 
 # AI Prompt files (local only)
 prompts/
+
+# Simulation results (local only)
+results/
