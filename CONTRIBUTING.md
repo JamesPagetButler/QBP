@@ -10,6 +10,161 @@ This document outlines the process for contributing to the Quaternion-Based Phys
 4.  **Require Multi-Stage Review & Sign-Off:** All Pull Requests are subject to a formal, multi-stage review process. First, our 'Red Team' AI (Claude) provides a peer review. Second, Gemini (as Furey & Feynman) provides its review. Only after both AI reviews are complete and their feedback is addressed can the final sign-off from the principal human collaborator (James) be given.
 5.  **Link Tests to Reality:** Every automated test must be a "synthetic experiment" that simulates a real, physically verifiable experiment. This connection must be explicitly documented.
 
+---
+
+## The 5-Phase Experimental Lifecycle
+
+Every experiment on our roadmap follows a structured 5-phase lifecycle. This ensures rigorous validation before publication.
+
+### Phase Overview
+
+| Phase | Goal | Output | Success Criteria |
+|-------|------|--------|------------------|
+| **Phase 1: Ground Truth** | Research and document expected results | `research/NN_..._expected_results.md` | Complete specification with quantitative predictions |
+| **Phase 2: Implementation** | Build code and run synthetic experiment | `qphysics.py` updates, `/results` data | Results within 3σ of ground truth |
+| **Phase 3: Visualization** | Visualize results, verify success | `vpython` animations, Manim videos | Visual confirmation of Phase 2 success |
+| **Phase 4: Formal Proof** | Mathematically prove implementation | `.lean` proof files in `/proofs` | All theorems verified by Lean |
+| **Phase 5: Publication** | Document and communicate success | `paper/quaternion_physics.md` section | Complete, reviewed documentation |
+
+### Phase Transitions & Decision Gates
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                      │
+│  Phase 1: Ground Truth                                               │
+│  └── Output: research/NN_..._expected_results.md                     │
+│              ↓                                                       │
+│  Phase 2: Implementation                                             │
+│  └── Output: experiments/NN_.../simulate.py, tests, results          │
+│              ↓                                                       │
+│  Phase 3: Visualization ◄─────────────────────────────────┐          │
+│  └── Decision Gate:                                       │          │
+│      "Do results match ground truth within 3σ?"           │          │
+│              │                                            │          │
+│         [NO] └──► Create issue, loop back ────────────────┘          │
+│              │                                                       │
+│        [YES] ↓                                                       │
+│  Phase 4: Formal Proof ◄──────────────────────────────────┐          │
+│  └── Decision Gate:                                       │          │
+│      "Do all Lean proofs verify?"                         │          │
+│              │                                            │          │
+│         [NO] └──► Create issue, loop back to Phase 2 ─────┘          │
+│              │                                                       │
+│        [YES] ↓                                                       │
+│  Phase 5: Publication                                                │
+│  └── Output: paper/quaternion_physics.md section                     │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Phase Details
+
+#### Phase 1: Ground Truth & Planning
+
+**Goal:** Research and document the real-world results we need to match.
+
+**Tasks:**
+- Review existing literature and experimental data
+- Define quantitative predictions with error bounds
+- Specify acceptance criteria (e.g., "within 3σ of expected value")
+- Identify required tools or framework extensions
+
+**Output:** `research/NN_experiment_expected_results.md`
+
+**Exit Criteria:** Ground truth document reviewed and approved.
+
+---
+
+#### Phase 2: Implementation & Execution
+
+**Goal:** Build the code and run the synthetic experiment.
+
+**Tasks:**
+- Extend `qphysics.py` if needed
+- Create simulation script in `experiments/NN_name/simulate.py`
+- Create tests in `tests/physics/test_name.py`
+- Run simulation and capture results
+
+**Output:**
+- Updated `qphysics.py` (if needed)
+- Simulation script and tests
+- Raw data in `/results` directory
+
+**Exit Criteria:** All physics tests pass; results statistically match ground truth.
+
+---
+
+#### Phase 3: Visualization & Analysis (The Debug Loop)
+
+**Goal:** Visualize the results to gain intuitive understanding and verify success.
+
+**Tasks:**
+- Create `vpython` animations showing experiment
+- Create Manim scenes for publication videos
+- Generate plots comparing results to predictions
+- Build interactive dashboard components
+
+**Decision Gate:**
+> "Does the visualization accurately depict a successful experiment that matches the ground truth within 3σ?"
+
+- **If NO:** Document the failure, create a new issue, and **loop back to Phase 2**.
+- **If YES:** Proceed to Phase 4.
+
+**Output:** Visualizations in `src/viz/` that faithfully represent Phase 2 data.
+
+---
+
+#### Phase 4: Formal Verification
+
+**Goal:** Mathematically prove that the implementation is logically sound.
+
+**Tasks:**
+- Define formal statements of theorems in Lean 4
+- Write proofs connecting implementation to axioms
+- Verify all proofs compile without errors
+
+**Decision Gate:**
+> "Do all Lean proofs verify successfully?"
+
+- **If NO:** Document the flaw, create a new issue, and **loop back to Phase 2** to fix the implementation.
+- **If YES:** Proceed to Phase 5.
+
+**Output:** Completed `.lean` proof files in `/proofs` directory.
+
+---
+
+#### Phase 5: Publication
+
+**Goal:** Document and communicate our success.
+
+**Tasks:**
+- Write new section for `paper/quaternion_physics.md`
+- Include visualizations from Phase 3
+- Reference formal proofs from Phase 4
+- Update `DESIGN_RATIONALE.md` with key decisions
+
+**Output:** Finalized, reviewed section in the main paper.
+
+**Exit Criteria:** Section reviewed by Red Team and Gemini; merged to master.
+
+---
+
+### Issue Structure for 5-Phase Lifecycle
+
+Each experiment requires 5 issues, one per phase:
+
+| Issue Title Pattern | Labels |
+|---------------------|--------|
+| `Experiment N: Name - Phase 1: Ground Truth` | `type: experiment`, `phase: ground-truth` |
+| `Experiment N: Name - Phase 2: Implementation` | `type: experiment`, `phase: implementation` |
+| `Experiment N: Name - Phase 3: Visualization` | `type: experiment`, `phase: visualization` |
+| `Experiment N: Name - Phase 4: Formal Proof` | `type: experiment`, `phase: proof` |
+| `Experiment N: Name - Phase 5: Publication` | `type: experiment`, `phase: publication` |
+
+Phase 2 is blocked by Phase 1. Phase 3 is blocked by Phase 2. And so on.
+
+---
+
 ## Review Process Details
 
 Our review process is designed to be rigorous and auditable.
@@ -281,10 +436,13 @@ pre-commit autoupdate
 This project follows a defined directory structure to keep our work organized.
 
 *   `/paper`: Contains the formal, human-readable research paper (`quaternion_physics.md`) and the intellectual history of the project (`DESIGN_RATIONALE.md`).
-*   `/research`: Contains markdown files detailing the ground truth, experimental methods, and expected results for each test on our Eight-Fold Path.
-*   `/src`: Contains the `qphysics.py` library, the computational heart of our formalism.
-*   `/experiments`: Contains the Python scripts for our "synthetic experiments," which use the `qphysics.py` library to test our hypotheses.
+*   `/research`: Contains markdown files detailing the ground truth, experimental methods, and expected results for each test on our roadmap. (Phase 1 output)
+*   `/src`: Contains the `qphysics.py` library, the computational heart of our formalism. (Phase 2 output)
+*   `/src/viz`: Contains visualization code including `vpython` demos and Manim scenes. (Phase 3 output)
+*   `/experiments`: Contains the Python scripts for our "synthetic experiments," which use the `qphysics.py` library to test our hypotheses. (Phase 2 output)
+*   `/tests/physics`: Contains physics validation tests for each experiment. (Phase 2 output)
+*   `/proofs`: Contains Lean 4 formal proof files. (Phase 4 output)
 *   `/results`: Contains the timestamped output logs from our synthetic experiments. This directory is in `.gitignore` and is not committed to the repository.
 *   `/reviews`: Contains locally saved review files from both Claude and Gemini before they are posted to a PR. This directory is in `.gitignore`.
 *   `/prompts`: Contains detailed prompt files for instructing AI agents. This directory is in `.gitignore`.
-*   `/docs`: Contains general project documentation, such as the overall `REVIEW_WORKFLOW.md`.
+*   `/docs`: Contains general project documentation, schemas, and agent definitions.
