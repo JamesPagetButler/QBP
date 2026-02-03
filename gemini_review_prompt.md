@@ -64,14 +64,100 @@ Format:
 **Gemini review complete.**
 ```
 
-### Step 4: Notify User
+### Step 4: Generate PRD (If Applicable)
+
+After review, generate a PRD if the PR introduces:
+- New experiments
+- New visualization components
+- New API surfaces
+- Significant new features
+
+Save PRD to: `docs/prds/prd_NNN_[feature_name].md`
+
+**PRD Template:**
+
+```markdown
+# PRD: [Feature Name]
+
+**PRD Number:** NNN
+**Date:** YYYY-MM-DD
+**Author:** Gemini (Furey/Feynman)
+**Related PR:** #XX
+
+---
+
+## Problem Statement
+
+[What problem does this solve? Why is it needed?]
+
+---
+
+## Success Criteria
+
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+---
+
+## Technical Approach
+
+[High-level design from Furey/Feynman perspective]
+
+### Algebraic Structure (Furey)
+[How does this fit the division algebra framework?]
+
+### Physical Intuition (Feynman)
+[What's the physical picture? Can you explain it simply?]
+
+---
+
+## Acceptance Criteria
+
+- [ ] Testable criterion 1 (specific, measurable)
+- [ ] Testable criterion 2
+- [ ] Testable criterion 3
+
+---
+
+## Visualization Requirements
+
+| Aspect | Requirement |
+|--------|-------------|
+| Interactive | [yes/no] |
+| Video Tiers | [short/standard/deep_dive] |
+| Key Moments | [list of moments to animate] |
+| Dashboard | [yes/no] |
+
+---
+
+## Issues to Generate
+
+- [ ] Issue 1: [title] — [brief description]
+- [ ] Issue 2: [title] — [brief description]
+
+---
+
+## Dependencies
+
+- [List of dependencies, libraries, or prior work needed]
+
+---
+
+## Out of Scope
+
+- [Explicitly list what this PRD does NOT cover]
+```
+
+### Step 5: Notify User
 
 Tell the user:
 - Review saved to `reviews/` directory
 - Summary of findings
+- PRD generated (if applicable) with location
 - Ready for merge decision (if Claude review also complete)
 
-### Step 5: Wait
+### Step 7: Wait
 
 Do NOT:
 - Create a PR (unless asked)

@@ -6,6 +6,9 @@ jupyter
 numpy-quaternion
 vpython
 
+# Visualization & Animation
+manim  # Community edition for publication-quality math animations
+
 # Testing
 pytest>=7.0
 pytest-cov>=4.0

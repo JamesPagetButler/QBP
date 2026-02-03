@@ -1,0 +1,199 @@
+# QBP Publication Pipeline Schema
+#
+# Defines the workflow from experiment completion to published visualization.
+# This schema is used to track experiment status and trigger output generation.
+
+---
+
+# Pipeline trigger conditions
+experiment_complete:
+  description: >
+    Conditions that must be met before an experiment is considered
+    ready for the publication pipeline.
+
+  triggers:
+    all_tests_pass:
+      required: true
+      description: All pytest tests for the experiment must pass
+
+    physics_validation_pass:
+      required: true
+      description: Physical predictions must match expected behavior
+
+    red_team_approved:
+      required: true
+      description: Claude Red Team (Sabine/Grothendieck/Knuth) approved
+
+    gemini_approved:
+      required: true
+      description: Gemini (Furey/Feynman) approved
+
+  # Outputs generated when all triggers are met
+  outputs:
+
+    visualization:
+      interactive_demo:
+        path: "src/viz/experiment_{N}/"
+        format: vpython
+        required: true
+        description: Interactive 3D visualization
+
+      video_short:
+        path: "media/shorts/exp_{N}.mp4"
+        format: mp4
+        duration_max: 60  # seconds
+        resolution: "1080x1920"
+        required: true
+        description: YouTube Short / social media clip
+
+      video_standard:
+        path: "media/videos/exp_{N}_overview.mp4"
+        format: mp4
+        duration_max: 1200  # 20 minutes
+        resolution: "1920x1080"
+        required: true
+        description: Standard YouTube overview
+
+      video_deep_dive:
+        path: "media/videos/exp_{N}_deep_dive.mp4"
+        format: mp4
+        duration_max: 7200  # 2 hours
+        resolution: "1920x1080"
+        required: false
+        description: Extended technical walkthrough
+
+    documentation:
+      theory_doc:
+        path: "docs/theory/experiment_{N}.md"
+        required: true
+        description: Theoretical background and derivation
+
+      design_rationale_update:
+        path: "paper/DESIGN_RATIONALE.md"
+        action: append
+        required: true
+        description: Update design rationale with experiment findings
+
+    website:
+      experiment_page:
+        path: "website/experiments/{N}/"
+        required: false
+        description: Web page for the experiment
+
+      visualization_embed:
+        enabled: true
+        description: Embedded interactive visualization on web page
+
+---
+
+# Video production tiers
+video_tiers:
+
+  short:
+    duration_max: 60
+    resolution: "1080x1920"
+    fps: 60
+    format: mp4
+    audience: "Social media"
+    content: "Iconic moment, hook"
+    thumbnail_required: true
+
+  standard:
+    duration_max: 1200
+    resolution: "1920x1080"
+    fps: 60
+    format: mp4
+    audience: "Science writers, enthusiasts"
+    content: "Experiment overview"
+    thumbnail_required: true
+    chapters_optional: true
+
+  deep_dive:
+    duration_max: 7200
+    resolution: "1920x1080"
+    fps: 30
+    format: mp4
+    audience: "Advanced audience"
+    content: "Full technical details"
+    thumbnail_required: true
+    chapters_required: true
+
+---
+
+# Experiment registry
+experiments:
+
+  - id: 1
+    name: "Stern-Gerlach Simulation"
+    status: complete
+    pr: "#13"
+    manim_scene: "src/viz/manim/experiment_01.py"
+    interactive: "src/viz/stern_gerlach/"
+
+  - id: 2
+    name: "Angle-Dependent Measurement Test"
+    status: in_progress
+    pr: "#26"
+    manim_scene: "src/viz/manim/experiment_02.py"
+    interactive: null
+
+---
+
+# Visualization documentation standard
+# Each visualization must display this information
+visualization_standard:
+
+  header:
+    experiment_name: required
+    status: required  # Passed/In Progress/Failed
+
+  info_panel:
+    what: required    # One sentence description
+    why: required     # Physical significance
+    math: required    # Core equation
+
+  key_insight:
+    required: true
+    description: "What this proves about QBP model"
+
+  comparison:
+    model_prediction: required
+    standard_qm_prediction: required
+    measurement_result: required
+    agreement_indicator: required  # green/yellow/red
+
+  links:
+    results_data: optional
+    theory_docs: required
+    test_status: required
+
+---
+
+# Quality gates
+quality_gates:
+
+  pre_publication:
+    - name: "Code Review"
+      approvers: ["Red Team", "Gemini"]
+      required: true
+
+    - name: "Test Coverage"
+      minimum: 80
+      required: true
+
+    - name: "Documentation"
+      theory_doc: required
+      api_docs: required
+
+  video_review:
+    - name: "Scientific Accuracy"
+      reviewer: "Human"
+      required: true
+
+    - name: "Visual Quality"
+      minimum_resolution: "1080p"
+      required: true
+
+    - name: "Audio Quality"
+      if_narration: true
+      required_if_present: true
