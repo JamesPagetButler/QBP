@@ -198,154 +198,315 @@ Before any PR can be merged, the PR **must** contain:
 
 ### Review Flow
 
+
+
 ```
-1. PR Created
+
+1. Gemini completes local work for an Issue
+
       ↓
-2. Claude posts Red Team review (Sabine, Grothendieck, Knuth)
+
+2. Gemini creates branch, commits, pushes, and opens a PR
+
       ↓
-3. Gemini provides review (Furey, Feynman) in Gemini CLI
+
+3. PR is ready for review
+
       ↓
-4. Claude scribes Gemini's review to PR
+
+4. Claude posts Red Team review (Sabine, Grothendieck, Knuth)
+
       ↓
-5. CI checks pass
+
+5. Gemini posts Theory review (Furey, Feynman) via Claude scribe
+
       ↓
-6. James reviews summaries, asks questions if needed
+
+6. CI checks pass
+
       ↓
-7. James issues explicit "merge" command
+
+7. James reviews summaries and gives explicit "merge" command
+
       ↓
+
 8. Merge executed
+
 ```
+
+
 
 ### Review Process Steps
 
-1.  **Red Team Review:** Claude conducts three-persona peer review (`Sabine`, `Grothendieck`, `Knuth`) and posts findings as a PR comment with summary.
-2.  **Gemini Review:** Gemini conducts two-persona review (`Furey`, `Feynman`) in structured Markdown format within Gemini CLI.
-3.  **Documentation of Gemini's Review:** Claude acts as scribe, copying Gemini's Markdown review and posting it as a separate PR comment.
-4.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
+
+
+1.  **PR Creation:** Gemini completes work for an issue and creates a Pull Request.
+
+2.  **Red Team Review:** Claude conducts its three-persona peer review and posts the findings as a comment on the PR.
+
+3.  **Gemini Review:** Gemini conducts its two-persona review in the CLI.
+
+4.  **Scribe Duty:** Claude scribes Gemini's review to a comment on the PR.
+
+5.  **Final Approval:** James reviews all feedback and gives the explicit command to merge.
+
+
 
 ## Issue-Driven Workflow
 
 All work in this project is driven by GitHub Issues. This ensures traceability and prevents scope creep.
 
+
+
 ### The Issue Lifecycle
 
+
+
 ```
+
 1. Work identified        → Create GitHub Issue with acceptance criteria
+
 2. Issue discussed        → Refine scope, assign to sprint
-3. Work started           → Create feature branch referencing issue
-4. Work completed         → Create PR with "Closes #XX" in description
+
+3. Gemini assigned work   → Gemini completes work locally
+
+4. Gemini creates PR       → PR created referencing issue, ready for review
+
 5. Reviews complete       → Extract new action items, create follow-up issues
+
 6. PR merged              → Issue auto-closes, TODO.md updated
+
 ```
+
+
 
 ### Issue Requirements
 
+
+
 Every issue must include:
+
 - **Summary:** Clear description of the task
+
 - **Background:** Why this work is needed (link to review feedback, roadmap)
+
 - **Acceptance Criteria:** Checklist of requirements for completion
+
 - **References:** Links to relevant code, research docs, and prior PRs
+
+
 
 ### Issue Closure Checklist
 
+
+
 **CRITICAL:** Issues must NOT be closed until ALL of the following are verified:
 
+
+
 - [ ] **All acceptance criteria verified** — Each criterion must be actively tested/confirmed, not just marked complete based on historical work
+
 - [ ] **Red Team review completed** — Claude's review (Sabine, Grothendieck, Knuth) posted to the issue
+
 - [ ] **Gemini review completed** — Gemini's review (Furey, Feynman) posted to the issue
+
 - [ ] **Human approval obtained** — Explicit sign-off from James
 
+
+
 **Why This Matters:**
+
 Closing issues prematurely (e.g., because "the work was done in PR #X") bypasses the review process and can allow defects to slip through. The review requirement exists precisely to catch issues that automated tests might miss.
 
+
+
 **Process Violation Recovery:**
+
 If an issue is found to have been closed without proper reviews:
+
 1. Reopen the issue immediately
+
 2. Add a comment documenting the process violation
+
 3. Conduct the missing reviews
+
 4. Only close after all checklist items are verified
+
+
 
 ### Post-Review Issue Creation
 
+
+
 After reviews are posted to a PR, Claude must:
+
 1. Extract action items from reviewer feedback
+
 2. Create GitHub Issues for each new task
+
 3. Update `TODO.md` with issue links
+
 4. Reference the originating PR in new issues
+
+
 
 This ensures no feedback is lost and all follow-up work is tracked.
 
+
+
 ### Project Plan (TODO.md)
 
+
+
 The `TODO.md` file serves as the central project plan:
+
 - **Roadmap:** High-level experiment sequence with issue links
+
 - **Current Sprint:** Active tasks with issue links and status
+
 - **Backlog:** Future tasks with issue links
+
 - **Completed:** Historical record with PR references
+
+
 
 ## Updating the Design Rationale
 
+
+
 To ensure the project's intellectual history is preserved, the `paper/DESIGN_RATIONALE.md` file must be continuously updated.
 
+
+
 1.  **Rationale in PRs:** For any Pull Request that introduces a new feature, a significant change in logic, or a new architectural decision, the author **must** include a "Design Rationale" section in the PR's description, explaining the "why" behind the changes.
+
 2.  **Post-Merge Scribe Duty:** After such a PR is merged, it is the responsibility of the scribe AI (Claude) to create a subsequent PR that appends the "Design Rationale" from the merged PR's description into the main `paper/DESIGN_RATIONALE.md` document.
+
+
 
 This process creates a living document that evolves alongside the project itself.
 
+
+
 ## Hard Gate: Human Merge Authorization
+
+
 
 **CRITICAL RULE:** No merge to `master` may occur without explicit human authorization.
 
+
+
 ### Pre-Merge Checklist
+
+
 
 Before any merge can occur, the following must be completed:
 
+
+
 1. **Claude (Red Team) Review Confirmation**
+
    - Claude must explicitly confirm: "Red Team review complete"
+
    - Must provide a summary of findings from all three personas (Sabine, Grothendieck, Knuth)
+
    - Summary must be posted as a PR comment
 
+
+
 2. **Gemini (Furey/Feynman) Review Confirmation**
+
    - Gemini must explicitly confirm: "Gemini review complete"
+
    - Must provide a summary of findings from both personas
+
    - Claude scribes this to the PR as a comment
 
+
+
 3. **Review Summary Available**
+
    - A consolidated summary of both AI reviews must be available
+
    - Key concerns, approvals, and action items clearly listed
+
    - Human can read this before deciding
 
+
+
 4. **Q&A Window**
+
    - Before merge, human may pose questions to either AI agent via CLI
+
    - Agents must be available to clarify their review findings
+
    - Example: "Claude, explain Grothendieck's concern about X"
+
    - Example: "Gemini, what did Feynman mean by Y?"
 
+
+
 5. **Explicit Human Merge Command**
+
    - Only after reviewing summaries and asking any questions
+
    - Human issues explicit merge instruction
+
+
 
 ### For AI Agents (Claude, Gemini)
 
-When working on a task:
-1. Create a branch
-2. Make changes
-3. Push to remote
-4. Create a Pull Request
-5. Complete your review and post confirmation + summary
-6. **STOP and wait for explicit merge instruction**
+
+
+**Gemini's Role (Implementation):**
+
+1.  Complete all local work for an assigned issue.
+
+2.  Create a branch, commit, and push the changes.
+
+3.  **Create the Pull Request** using `gh pr create`.
+
+4.  Notify the team that the PR is ready for Red Team review.
+
+5.  **STOP** and wait for the review cycle to begin.
+
+
+
+**Claude's Role (Review & Scribe):**
+
+1.  When a PR is ready, perform the Red Team review.
+
+2.  Later, when Gemini's review is ready, scribe it to the PR.
+
+3.  Create new issues based on review feedback.
+
+4.  **STOP** and wait for the explicit merge instruction.
+
+
 
 AI agents must **never** merge a PR based on:
+
 - Prior approval in the conversation
+
 - Assumed permission
+
 - CI passing
+
 - The change being "trivial"
 
+
+
 Each merge requires a fresh, explicit instruction such as:
+
 - "merge"
+
 - "merge it"
+
 - "merge PR #X"
+
 - "go ahead and merge"
+
+
 
 ### Rationale
 
