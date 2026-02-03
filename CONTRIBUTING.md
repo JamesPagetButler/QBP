@@ -264,6 +264,46 @@ Every issue must include:
 - **Acceptance Criteria:** Checklist of requirements for completion
 - **References:** Links to relevant code, research docs, and prior PRs
 
+### Issue Labels
+
+Issues are categorized using labels to separate main research work from infrastructure concerns.
+
+#### Core Research Labels
+
+| Label | Description |
+|-------|-------------|
+| `type: experiment` | Experiment phase work (Phases 1-5) |
+| `type: research` | Theory Refinement and scientific investigation |
+| `phase: ground-truth` | Phase 1 work |
+| `phase: implementation` | Phase 2 work |
+| `phase: visualization` | Phase 3 work |
+| `phase: proof` | Phase 4 work |
+| `phase: publication` | Phase 5 work |
+
+#### Infrastructure Labels
+
+| Label | Description |
+|-------|-------------|
+| `housekeeping` | Maintenance tasks outside main research workflow |
+
+**Use `housekeeping` for:**
+- Documentation infrastructure (CONTRIBUTING.md, README updates)
+- CI/CD fixes and improvements
+- TODO.md maintenance and accuracy
+- Process/workflow documentation
+- Tooling setup (Lean 4, pre-commit, etc.)
+- Review process improvements
+
+**Do NOT use `housekeeping` for:**
+- Experiment phases (1-5) — use `type: experiment`
+- Theory Refinement issues — use `type: research`
+- Ground truth research — use `phase: ground-truth`
+- Scientific investigations — use `type: research`
+- Core physics implementation — use appropriate phase label
+
+**Why This Matters:**
+Separating housekeeping from research ensures infrastructure concerns don't block or distract from the main experimental workflow. Housekeeping issues can be addressed opportunistically without disrupting sprint progress.
+
 ### Issue Closure Checklist
 
 **CRITICAL:** Issues must NOT be closed until ALL of the following are verified:
