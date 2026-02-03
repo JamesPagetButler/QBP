@@ -385,13 +385,18 @@ Before any merge can occur, the following must be completed:
 
 ### For AI Agents (Claude, Gemini)
 
-When working on a task:
-1. Create a branch
-2. Make changes
-3. Push to remote
-4. Create a Pull Request
-5. Complete your review and post confirmation + summary
-6. **STOP and wait for explicit merge instruction**
+**Gemini's Role (Implementation):**
+1. Complete all local work for an assigned issue.
+2. Create a branch, commit, and push the changes.
+3. **Create the Pull Request** using `gh pr create`.
+4. Notify the team that the PR is ready for Red Team review.
+5. **STOP** and wait for the review cycle to begin.
+
+**Claude's Role (Review & Scribe):**
+1. When a PR is ready, perform the Red Team review.
+2. Later, when Gemini's review is ready, scribe it to the PR.
+3. Create new issues based on review feedback.
+4. **STOP** and wait for the explicit merge instruction.
 
 AI agents must **never** merge a PR based on:
 - Prior approval in the conversation
@@ -404,6 +409,20 @@ Each merge requires a fresh, explicit instruction such as:
 - "merge it"
 - "merge PR #X"
 - "go ahead and merge"
+
+### Multi-Agent Git Coordination
+
+When Claude and Gemini work on the repository simultaneously, branch confusion can occur. Both agents **must** follow the protocols in:
+
+**[docs/multi_agent_git_coordination.md](docs/multi_agent_git_coordination.md)**
+
+Key requirements:
+- **Always verify branch** with `git branch --show-current` before any commit
+- **Announce branch ownership** at the start of each work session
+- **One branch per agent** at any given time
+- **Include branch name in commit messages** as secondary verification
+
+Failure to follow these protocols can result in commits landing on wrong branches and appearing in unrelated PRs.
 
 ### Rationale
 
@@ -536,3 +555,4 @@ This project follows a defined directory structure to keep our work organized.
 *   `/reviews`: Contains locally saved review files from both Claude and Gemini before they are posted to a PR. This directory is in `.gitignore`.
 *   `/prompts`: Contains detailed prompt files for instructing AI agents. This directory is in `.gitignore`.
 *   `/docs`: Contains general project documentation, schemas, and agent definitions.
+    *   `multi_agent_git_coordination.md`: Mandatory git workflow protocols for Claude and Gemini.
