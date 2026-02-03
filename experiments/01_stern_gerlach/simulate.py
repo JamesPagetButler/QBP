@@ -73,7 +73,9 @@ def run_simulation(num_particles=1000000, seed=42):
             print("----------------------------------------------------")
 
             # Use measure_batch for efficient vectorized simulation
-            results = qphysics.measure_batch(psi_initial, observable, num_particles, seed)
+            results = qphysics.measure_batch(
+                psi_initial, observable, num_particles, seed
+            )
 
             # 4. Tally and print the results.
             num_up = np.sum(results == 1)

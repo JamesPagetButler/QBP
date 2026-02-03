@@ -39,9 +39,7 @@ class TestAngleDependentMeasurement:
         theta = np.radians(angle_deg)
 
         # Create state at angle theta from Z-axis (in XZ plane)
-        state = qphysics.create_state_from_vector(
-            [np.sin(theta), 0, np.cos(theta)]
-        )
+        state = qphysics.create_state_from_vector([np.sin(theta), 0, np.cos(theta)])
 
         # Measure against Z-axis
         outcomes = qphysics.measure_batch(
@@ -69,7 +67,9 @@ class TestAngleDependentMeasurement:
         """Test measurement when state is perpendicular to observable (theta=90)."""
         measured, expected = self._run_angle_test(90, seed=102)
         # At 90 degrees, P(+) = 0.5
-        deviation = self._calculate_deviation_sigma(measured, expected, self.NUM_PARTICLES)
+        deviation = self._calculate_deviation_sigma(
+            measured, expected, self.NUM_PARTICLES
+        )
         assert deviation < self.SIGMA_THRESHOLD, (
             f"90° test failed: measured {measured:.4f}, expected {expected:.4f}, "
             f"deviation {deviation:.2f}σ"
@@ -89,7 +89,9 @@ class TestAngleDependentMeasurement:
     def test_intermediate_angles(self, angle_deg, seed):
         """Test measurement at various intermediate angles."""
         measured, expected = self._run_angle_test(angle_deg, seed)
-        deviation = self._calculate_deviation_sigma(measured, expected, self.NUM_PARTICLES)
+        deviation = self._calculate_deviation_sigma(
+            measured, expected, self.NUM_PARTICLES
+        )
         assert deviation < self.SIGMA_THRESHOLD, (
             f"{angle_deg}° test failed: measured {measured:.4f}, expected {expected:.4f}, "
             f"deviation {deviation:.2f}σ"
@@ -125,6 +127,6 @@ class TestAngleDependentMeasurement:
                 deviations.append(deviation)
 
         # All non-edge-case deviations should be within threshold
-        assert all(d < self.SIGMA_THRESHOLD for d in deviations), (
-            f"Some angles exceed {self.SIGMA_THRESHOLD}σ threshold: {deviations}"
-        )
+        assert all(
+            d < self.SIGMA_THRESHOLD for d in deviations
+        ), f"Some angles exceed {self.SIGMA_THRESHOLD}σ threshold: {deviations}"
