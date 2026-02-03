@@ -12,35 +12,37 @@ This is our strategic guide. We will tackle these items sequentially.
 
 | # | Experiment | Status | Issue |
 |---|------------|--------|-------|
-| 1 | The Stern-Gerlach Experiment | **In Progress** | — |
+| 1 | The Stern-Gerlach Experiment | **Visualization** | [#29](https://github.com/JamesPagetButler/QBP/issues/29) |
 | 2 | The Double-Slit Experiment | Next | [#22](https://github.com/JamesPagetButler/QBP/issues/22) |
-| 3 | The Lamb Shift | Upcoming | — |
+| 3 | The Lamb Shift | Upcoming | [#30](https://github.com/JamesPagetButler/QBP/issues/30) |
 | 4 | Bell's Theorem Experiments | Upcoming | [#23](https://github.com/JamesPagetButler/QBP/issues/23) |
-| 5 | Derivation of Particle Statistics | Upcoming | — |
-| 6 | Modeling Positronium's Ground State | Upcoming | — |
-| 7 | The Hydrogen Atom Spectrum | Upcoming | — |
-| 8 | The Anomalous Magnetic Moment (g-2) | Aspirational | — |
-| 9 | Gravitational Lensing & Rotation Curves | Aspirational | — |
+| 5 | Derivation of Particle Statistics | Upcoming | [#32](https://github.com/JamesPagetButler/QBP/issues/32) |
+| 6 | Modeling Positronium's Ground State | Upcoming | [#33](https://github.com/JamesPagetButler/QBP/issues/33) |
+| 7 | The Hydrogen Atom Spectrum | Upcoming | [#34](https://github.com/JamesPagetButler/QBP/issues/34) |
+| 8 | The Anomalous Magnetic Moment (g-2) | Aspirational | [#31](https://github.com/JamesPagetButler/QBP/issues/31) |
+| 9 | Gravitational Lensing & Rotation Curves | Aspirational | [#35](https://github.com/JamesPagetButler/QBP/issues/35) |
 
 ---
 
-## Current Sprint: Stern-Gerlach Refinement
+## Current Sprint: Stern-Gerlach Visualization
 
-These are the immediate action items derived from the review of Pull Request #13.
+The core Stern-Gerlach simulation is complete. Current focus: publication-ready visualizations.
 
-### Engineering & Refinement (Knuth's Feedback)
+### Active Tasks
 
-| Action | Task | Issue | Status |
-|--------|------|-------|--------|
-| A | Add `seed` parameter to `measure()` | [#16](https://github.com/JamesPagetButler/QBP/issues/16) | TODO |
-| B | Add type hints to `qphysics.py` | [#17](https://github.com/JamesPagetButler/QBP/issues/17) | TODO |
-| C | Vectorize simulation loop | [#18](https://github.com/JamesPagetButler/QBP/issues/18) | TODO |
+| Task | Issue | Status |
+|------|-------|--------|
+| Stern-Gerlach Manim animations | [#29](https://github.com/JamesPagetButler/QBP/issues/29) | TODO |
+| Double-Slit theory & implementation | [#22](https://github.com/JamesPagetButler/QBP/issues/22) | TODO |
 
-### New Experiments (Sabine's & Feynman's Feedback)
+### Recently Completed (PR #27, #28)
 
-| Action | Task | Issue | Status |
-|--------|------|-------|--------|
-| D | Create angle-dependent test | [#19](https://github.com/JamesPagetButler/QBP/issues/19) | TODO |
+| Task | Issue | Status |
+|------|-------|--------|
+| Add `seed` parameter to `measure()` | [#16](https://github.com/JamesPagetButler/QBP/issues/16) | ✅ Done |
+| Add type hints to `qphysics.py` | [#17](https://github.com/JamesPagetButler/QBP/issues/17) | ✅ Done |
+| Vectorize simulation loop | [#18](https://github.com/JamesPagetButler/QBP/issues/18) | ✅ Done |
+| Create angle-dependent test | [#19](https://github.com/JamesPagetButler/QBP/issues/19) | ✅ Done |
 
 ---
 
