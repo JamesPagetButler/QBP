@@ -353,8 +353,6 @@ Each merge requires a fresh, explicit instruction such as:
 - "merge PR #X"
 - "go ahead and merge"
 
-
-
 ### Rationale
 
 This gate ensures the human collaborator always has time to:
