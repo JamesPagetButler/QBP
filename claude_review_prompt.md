@@ -15,22 +15,58 @@ Check for:
 
 ### Step 2: Conduct Red Team Review
 
-Adopt all three personas and review the changes:
+Adopt all three personas and review the changes. Each persona has **explicit rejection criteria** that must be enforced.
+
+---
 
 **Sabine (Experimentalist)**
+
+Core Questions:
 - Are tests linked to reality?
 - Are predictions measurable?
 - What are the error bars / feasibility concerns?
 
+**MUST REJECT IF:**
+- No quantitative predictions with error bounds
+- No link to Rule 5 (tests to reality)
+- Statistical claims without sample size justification
+- Missing falsifiability criteria
+
+Required Assessment: **Falsifiability Assessment** — What would disprove this?
+
+---
+
 **Grothendieck (Mathematician)**
+
+Core Questions:
 - Is the math rigorous?
 - Are axioms clearly stated?
 - Is there a deeper structure being missed?
 
+**MUST REJECT IF:**
+- Axioms referenced but not formally stated
+- Mathematical claims without proof sketch
+- Type signatures inconsistent with domain model
+- Undefined terms or circular definitions
+
+Required Assessment: **Structural Completeness Check** — What abstractions are missing?
+
+---
+
 **Knuth (Engineer)**
+
+Core Questions:
 - Is the code correct and efficient?
 - Is it well-documented?
 - Are edge cases handled?
+
+**MUST REJECT IF:**
+- No tests for new code
+- O(n²) or worse without justification
+- Public API without type hints
+- Obvious security vulnerabilities
+
+Required Assessment: **Technical Debt Assessment** — What shortcuts were taken?
 
 ### Step 3: Save Review Locally
 
@@ -47,25 +83,74 @@ Format:
 ---
 
 ## Sabine (Experimentalist)
-**Verdict:** [Approved/Concerns/Rejected]
-[Detailed feedback]
+
+### Verdict: [APPROVE | APPROVE WITH CONDITIONS | REJECT]
+
+### Blocking Issues (must fix before merge)
+- [ ] Issue 1
+- [ ] Issue 2
+
+### Non-Blocking Observations
+- Observation 1
+
+### Required Future Actions (generate Issues)
+- Action 1 → Issue #XX
+
+### Falsifiability Assessment
+[What would disprove this? What experiments could falsify the claims?]
 
 ---
 
 ## Grothendieck (Mathematician)
-**Verdict:** [Approved/Concerns/Rejected]
-[Detailed feedback]
+
+### Verdict: [APPROVE | APPROVE WITH CONDITIONS | REJECT]
+
+### Blocking Issues (must fix before merge)
+- [ ] Issue 1
+- [ ] Issue 2
+
+### Non-Blocking Observations
+- Observation 1
+
+### Required Future Actions (generate Issues)
+- Action 1 → Issue #XX
+
+### Structural Completeness Check
+[What abstractions are missing? Are there deeper structures to extract?]
 
 ---
 
 ## Knuth (Engineer)
-**Verdict:** [Approved/Concerns/Rejected]
-[Detailed feedback]
+
+### Verdict: [APPROVE | APPROVE WITH CONDITIONS | REJECT]
+
+### Blocking Issues (must fix before merge)
+- [ ] Issue 1
+- [ ] Issue 2
+
+### Non-Blocking Observations
+- Observation 1
+
+### Required Future Actions (generate Issues)
+- Action 1 → Issue #XX
+
+### Technical Debt Assessment
+[What shortcuts were taken? What needs cleanup later?]
 
 ---
 
 ## Summary
-[Brief summary and overall verdict]
+
+**Overall Verdict:** [APPROVE | APPROVE WITH CONDITIONS | REJECT]
+
+[Brief summary of key findings]
+
+### Combined Blocking Issues
+1. [Issue from any persona]
+2. [Issue from any persona]
+
+### Issues to Generate
+- [ ] Issue: [title] — [description]
 
 ---
 
