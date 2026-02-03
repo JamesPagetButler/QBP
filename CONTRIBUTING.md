@@ -385,13 +385,18 @@ Before any merge can occur, the following must be completed:
 
 ### For AI Agents (Claude, Gemini)
 
-When working on a task:
-1. Create a branch
-2. Make changes
-3. Push to remote
-4. Create a Pull Request
-5. Complete your review and post confirmation + summary
-6. **STOP and wait for explicit merge instruction**
+**Gemini's Role (Implementation):**
+1. Complete all local work for an assigned issue.
+2. Create a branch, commit, and push the changes.
+3. **Create the Pull Request** using `gh pr create`.
+4. Notify the team that the PR is ready for Red Team review.
+5. **STOP** and wait for the review cycle to begin.
+
+**Claude's Role (Review & Scribe):**
+1. When a PR is ready, perform the Red Team review.
+2. Later, when Gemini's review is ready, scribe it to the PR.
+3. Create new issues based on review feedback.
+4. **STOP** and wait for the explicit merge instruction.
 
 AI agents must **never** merge a PR based on:
 - Prior approval in the conversation
