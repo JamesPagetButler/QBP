@@ -55,3 +55,7 @@ prompts/
 
 # Simulation results (local only)
 results/
+
+# Lean 4
+proofs/.lake/
+proofs/lake-manifest.json
