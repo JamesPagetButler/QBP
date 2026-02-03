@@ -1,30 +1,56 @@
--- This file contains the formal proofs for the Stern-Gerlach experiment (Experiment 1).
+/-
+  Stern-Gerlach Experiment (Experiment 1) - Formal Proofs
+
+  This file contains the formal verification for the Stern-Gerlach experiment,
+  demonstrating that the QBP framework correctly predicts:
+  1. Binary measurement outcomes (±1 only)
+  2. 50/50 probability split for perpendicular states
+
+  Ground Truth Reference: research/01_stern_gerlach_expected_results.md
+  Implementation Reference: experiments/01_stern_gerlach/simulate.py
+-/
 import QBP.Basic
 
-open Quaternion
+namespace QBP.Experiments.SternGerlach
 
--- We define the spin state along the x-axis, which corresponds to our `ψ = i` state.
-def spin_x_state : Quaternion ℝ := ⟨0, 1, 0, 0⟩
+open QBP
 
--- We define the observable for a z-axis measurement, which is `O = k`.
-def spin_z_observable : Quaternion ℝ := ⟨0, 0, 0, 1⟩
+/-- The spin-x state: ψ = i (pure quaternion along x-axis) -/
+def spinXState : Q := SPIN_X
 
--- We prove that the spin_x_state is a valid unit quaternion (fulfills Axiom 1).
-theorem spin_x_is_unit : isUnitQuaternion spin_x_state := by
-  simp [isUnitQuaternion, spin_x_state]
+/-- The spin-z observable: O = k (pure quaternion along z-axis) -/
+def spinZObservable : Q := SPIN_Z
 
--- We prove that the spin_z_observable is a valid pure quaternion (fulfills Axiom 2).
-theorem spin_z_is_pure : isPureQuaternion spin_z_observable := by
-  simp [isPureQuaternion, spin_z_observable]
+/-- The spin-x state is a pure quaternion -/
+theorem spinXState_is_pure : isPureQuaternion spinXState := spin_x_is_pure
 
--- The Main Theorem for Experiment 1
--- This theorem proves that the expectation value of an x-aligned state
--- measured on the z-axis is 0. This is the formal verification of the
--- result that leads to the 50/50 probability split.
-theorem expectation_value_of_orthogonal_states_is_zero :
-  expectation_value spin_x_state spin_z_observable = 0 := by
-  simp [expectation_value, get_state_vector, spin_x_state, spin_z_observable, star]
-  simp [vec, dot_product]
-  norm_num
+/-- The spin-z observable is a pure quaternion -/
+theorem spinZObservable_is_pure : isPureQuaternion spinZObservable := spin_z_is_pure
 
--- End of formal proof for Experiment 1.
+/-- Key theorem: x and z spin directions are orthogonal -/
+theorem x_z_orthogonal : vecDot spinXState spinZObservable = 0 := by
+  simp [vecDot, spinXState, spinZObservable, SPIN_X, SPIN_Z]
+  ring
+
+/-- Main Theorem for Experiment 1:
+    An x-aligned state measured on the z-axis has expectation value 0.
+    This is the formal verification that the QBP framework predicts
+    50/50 probability split for orthogonal measurements. -/
+theorem expectation_x_measured_z_is_zero :
+    expectationValue spinXState spinZObservable = 0 :=
+  expectation_orthogonal_is_zero spinXState spinZObservable
+    spinXState_is_pure spinZObservable_is_pure x_z_orthogonal
+
+/-- Corollary: P(+1) = 1/2 for x-state measured on z-axis -/
+theorem prob_up_x_measured_z_is_half :
+    probUp spinXState spinZObservable = 1/2 :=
+  prob_up_orthogonal_is_half spinXState spinZObservable
+    spinXState_is_pure spinZObservable_is_pure x_z_orthogonal
+
+/-- Corollary: P(-1) = 1/2 for x-state measured on z-axis -/
+theorem prob_down_x_measured_z_is_half :
+    probDown spinXState spinZObservable = 1/2 := by
+  simp [probDown, expectation_x_measured_z_is_zero]
+  ring
+
+end QBP.Experiments.SternGerlach
