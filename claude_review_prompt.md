@@ -89,6 +89,7 @@ After completing your review, provide this copy/paste block for the user to send
 ---
 
 Review PR #[NUMBER] - [TITLE]
+URL: [PR_URL]
 
 Your task:
 1. Review as Furey (algebraist) and Feynman (physicist)
@@ -106,7 +107,13 @@ Format your review as:
 When done, tell James "Gemini review complete" with your summary.
 ```
 
-Replace [NUMBER], [TITLE], and [DATE] with actual values.
+Replace [NUMBER], [TITLE], [DATE], and [PR_URL] with actual values.
+
+**Required fields:**
+- `[NUMBER]` — PR number (e.g., 15)
+- `[TITLE]` — PR title
+- `[DATE]` — Current date (YYYY-MM-DD)
+- `[PR_URL]` — Full GitHub PR URL (e.g., https://github.com/JamesPagetButler/QBP/pull/15)
 
 ### Step 6: Update Project Plan & Create Issues
 
