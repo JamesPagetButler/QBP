@@ -233,6 +233,49 @@ This project uses a variety of tools for different purposes. Adherence to this t
 *   **Design System:** The front-end assets and framework implemented by Claude.
 *   **Formal Proof Setup:** The setup and configuration for Lean 4 must be documented.
 
+## Troubleshooting CI Failures
+
+### Pre-commit Hook Failures
+
+If CI fails due to formatting or type errors, follow these steps:
+
+1. **Run pre-commit locally:**
+   ```bash
+   pre-commit run --all-files
+   ```
+
+2. **Auto-fix formatting issues:**
+   Pre-commit will automatically fix `black` formatting issues. After running, stage the changes:
+   ```bash
+   git add -u
+   git commit -m "style: apply black formatting"
+   ```
+
+3. **Fix mypy type errors:**
+   Type errors require manual fixes. Review the output and update type hints accordingly.
+
+4. **Re-run pre-commit:**
+   Ensure all checks pass before pushing:
+   ```bash
+   pre-commit run --all-files
+   ```
+
+### Common Issues
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `black would reformat` | Code not formatted | Run `black .` or `pre-commit run black --all-files` |
+| `mypy: error` | Type annotation issues | Add/fix type hints per mypy output |
+| `pre-commit not found` | Hooks not installed | Run `pre-commit install` |
+| `ModuleNotFoundError` | Dependencies missing | Run `pip install -r requirements.txt` |
+
+### Keeping Pre-commit Updated
+
+Periodically update pre-commit hooks to their latest versions:
+```bash
+pre-commit autoupdate
+```
+
 ## Directory Structure
 
 This project follows a defined directory structure to keep our work organized.
