@@ -1,1 +1,68 @@
-# Formal Proofs\n\nThis directory contains Lean 4 proof files for each experiment.\n\n## Structure\n\nEach experiment has its own subdirectory:\n- `/proofs/01_stern_gerlach/`\n- `/proofs/02_double_slit/`\n- etc.\n\n## Prerequisites\n\nSee issue #21 for Lean 4 setup instructions.
+# QBP Formal Proofs
+
+This directory contains Lean 4 formal proofs for Quaternion-Based Physics experiments.
+
+## Quick Start
+
+```bash
+# Install Lean 4 (if not already installed)
+curl https://elan.lean-lang.org/elan-init.sh -sSf | sh
+source ~/.elan/env
+
+# Build the project
+cd proofs
+lake update
+lake exe cache get
+lake build
+```
+
+For detailed instructions, see [docs/lean4_setup.md](../docs/lean4_setup.md).
+
+## Project Structure
+
+```
+proofs/
+├── QBP.lean              # Root module
+├── QBP/
+│   ├── Basic.lean        # Core axiom definitions (Axioms 1 & 2)
+│   └── Experiments/      # Experiment-specific proofs
+│       ├── SternGerlach.lean   # Issue #55
+│       ├── DoubleSlit.lean     # Issue #56
+│       └── ...
+├── lakefile.lean         # Build configuration with mathlib4
+└── lean-toolchain        # Lean version specification
+```
+
+## Core Definitions (QBP/Basic.lean)
+
+| Definition | QBP Axiom | Description |
+|------------|-----------|-------------|
+| `Q` | - | Quaternion type over reals (`Quaternion ℝ`) |
+| `isUnitQuaternion` | Axiom 1 | State is a unit quaternion (normSq = 1) |
+| `isPureQuaternion` | Axiom 2 | Observable is a pure quaternion (re = 0) |
+| `SPIN_X/Y/Z` | Axiom 2 | Standard spin observables |
+
+## Phase 4 Formal Verification
+
+Each experiment's Phase 4 issue involves creating formal proofs:
+
+| Issue | Experiment | Proof File |
+|-------|------------|------------|
+| #55 | Stern-Gerlach | `QBP/Experiments/SternGerlach.lean` |
+| #56 | Double-Slit | `QBP/Experiments/DoubleSlit.lean` |
+| #57 | Lamb Shift | `QBP/Experiments/LambShift.lean` |
+| #58 | g-2 | `QBP/Experiments/AnomalousMagnetic.lean` |
+| #59 | Bell's Theorem | `QBP/Experiments/Bell.lean` |
+| #60 | Particle Statistics | `QBP/Experiments/Statistics.lean` |
+| #61 | Positronium | `QBP/Experiments/Positronium.lean` |
+| #62 | Hydrogen Spectrum | `QBP/Experiments/Hydrogen.lean` |
+| #63 | Gravity Tests | `QBP/Experiments/Gravity.lean` |
+
+See [docs/gemini_phase4_guide.md](../docs/gemini_phase4_guide.md) for the formal verification workflow.
+
+## Verification
+
+All proofs must:
+- Compile without errors (`lake build` succeeds)
+- Contain no `sorry` (incomplete proofs)
+- Match ground truth claims from Phase 1 research
