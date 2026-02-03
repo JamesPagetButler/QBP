@@ -6,21 +6,26 @@ import os
 from datetime import datetime
 
 # Add the project root to the Python path to allow imports from src
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from src import qphysics
 
+
 class Tee(object):
     """A helper class to redirect print statements to both console and a file."""
+
     def __init__(self, *files):
         self.files = files
+
     def write(self, obj):
         for f in self.files:
             f.write(obj)
             f.flush()  # Ensure content is written immediately
+
     def flush(self):
         for f in self.files:
             f.flush()
+
 
 def run_simulation(num_particles=1000000):
     """
@@ -31,9 +36,9 @@ def run_simulation(num_particles=1000000):
     os.makedirs(output_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     output_file_path = os.path.join(output_dir, f"simulation_output_{timestamp}.txt")
-    
+
     original_stdout = sys.stdout
-    with open(output_file_path, 'w') as f:
+    with open(output_file_path, "w") as f:
         sys.stdout = Tee(original_stdout, f)
 
         try:
@@ -55,17 +60,27 @@ def run_simulation(num_particles=1000000):
             print(f"Measuring with Observable (O): {observable}")
             print("----------------------------------------------------")
 
-            # 3. Run the measurement loop.
-            # For performance, we can do this in a vectorized way.
-            # However, for clarity and directness, we stick to a simple loop for now.
-            # (Knuth's recommendation to vectorize is logged in TODO.md for a future PR).
-            results = []
-            for _ in range(num_particles):
-                outcome, _ = qphysics.measure(psi_initial, observable)
-                results.append(outcome)
+            # 3. Run the measurement loop (Vectorized for performance).
+
+            # Set a seed for reproducibility. The result is now deterministic.
+            np.random.seed(42)
+
+            # Calculate the probability of measuring "up" for the single initial state.
+            exp_val = qphysics.expectation_value(psi_initial, observable)
+            prob_up = (1 + exp_val) / 2.0
+
+            print(f"Calculated Expectation Value: {exp_val:.4f}")
+            print(f"Calculated Probability of 'Up': {prob_up:.4f}")
+            print("----------------------------------------------------")
+
+            # Generate all random numbers for the simulation at once.
+            random_samples = np.random.rand(num_particles)
+
+            # Determine all outcomes in a single vectorized operation.
+            # If a random sample is less than prob_up, the outcome is +1, otherwise it's -1.
+            results = np.where(random_samples < prob_up, 1, -1)
 
             # 4. Tally and print the results.
-            results = np.array(results)
             num_up = np.sum(results == 1)
             num_down = np.sum(results == -1)
 
@@ -77,7 +92,9 @@ def run_simulation(num_particles=1000000):
             print(f"Outcome 'Down' (-1): {num_down} times ({percent_down:.2f}%)")
             print("--------------------------\n")
 
-            print("Conclusion: The experiment successfully demonstrates spin quantization.")
+            print(
+                "Conclusion: The experiment successfully demonstrates spin quantization."
+            )
             print(
                 "As expected, the initial state in a superposition yielded a probabilistic split into two distinct outcomes."
             )
