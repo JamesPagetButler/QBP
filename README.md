@@ -48,6 +48,12 @@ Follow these instructions to set up a local development environment.
     pre-commit install
     ```
 
+5.  **Run pre-commit on all files (recommended):**
+    Before starting work, run pre-commit on the entire codebase to ensure everything is properly formatted:
+    ```bash
+    pre-commit run --all-files
+    ```
+
 ## Usage
 
 The core work of this project is divided into theoretical development and computational experiments.
