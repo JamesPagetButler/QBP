@@ -15,6 +15,22 @@ This project aims to produce several distinct outputs:
 ### Proposing New Languages
 If the need for an additional software language arises, a formal proposal must be made via a project Issue. The proposal should argue for the new language's benefits over the existing toolkit and will be subject to the standard project review process.
 
+## Foundational Concepts
+
+Our project's methodology represents a synthesis of two distinct, powerful philosophies in theoretical physics. We combine the pragmatic, experiment-first, and intuitive approach of Richard P. Feynman with the mathematically rigorous, structure-driven "algebraic realism" of Cohl Furey.
+
+We are, in essence, using a Feynman-esque methodology to conduct a rigorous test of a Furey-esque hypothesis. A detailed analysis of the works that inform these perspectives, along with a core bibliography for this project, can be found in our [**Literature Review**](LITERATURE_REVIEW.md).
+
+## Guide Posts for Emergent Phenomena
+
+As our theoretical framework develops, we will not only be testing it against known experiments but also watching for the spontaneous emergence of known physical laws. These "guide posts" are phenomena that we will not build into our model, but which we expect to *fall out* of the algebra as a necessary consequence if our fundamental premises are correct. Their appearance will be a strong sign that we are on the right track.
+
+*   **Emergent Conservation Laws:** Does our formalism naturally lead to the conservation of physical quantities? For example, the unitarity of our evolution axiom should guarantee the conservation of probability.
+*   **Emergent Symmetries:** Do new group symmetries, corresponding to known physical principles (e.g., gauge symmetries), appear as we combine states and operators?
+*   **Particle Equivalents:** Can we identify operators or state representations within the algebra that correspond to other known particles, particularly bosons like the photon?
+*   **Interaction Models:** Does the algebra itself suggest natural forms for particle interactions beyond the simple precession modeled in our initial tests?
+*   **Collective Behavior:** When we are able to model multi-particle systems, do we observe emergent phenomena analogous to states of matter, such as particles arranging in shell structures (a consequence of the Pauli Exclusion Principle)?
+
 ## Axiomatic Framework (Version 0.1)
 
 In response to Grothendieck's required action, we establish the following minimal set of axioms before proceeding with any experiment. These are subject to revision as our understanding evolves.
