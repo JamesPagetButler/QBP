@@ -1,0 +1,89 @@
+name: Experiment
+description: Implement a physics experiment in the quaternionic framework
+title: "Experiment [N]: [Name] - Theory and Implementation"
+labels: ["type: experiment"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## New Experiment Issue
+        Use this template for implementing physics experiments.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief description of the experiment
+      placeholder: "Implement [Experiment Name] in the quaternionic framework."
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: Physical description and significance of this experiment
+      placeholder: |
+        Describe the experiment, its physical significance, and why it's
+        an important test for the quaternionic framework.
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: Breakdown of work phases
+      value: |
+        ### Theory Phase
+        - [ ] Review `research/NN_experiment_expected_results.md`
+        - [ ] Define quaternionic representation
+        - [ ] Determine acceptance criteria with error bounds
+
+        ### Implementation Phase
+        - [ ] Create `experiments/NN_name/simulate.py`
+        - [ ] Create `tests/physics/test_name.py`
+        - [ ] Validate against expected values
+
+        ### Visualization Phase (if applicable)
+        - [ ] Create Manim scene
+        - [ ] Create interactive demo
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Specific, testable criteria for completion
+      value: |
+        - [ ] Simulation produces correct prediction within tolerance
+        - [ ] Tests pass in CI
+        - [ ] Red Team review approved
+        - [ ] Gemini review approved
+    validations:
+      required: true
+
+  - type: textarea
+    id: definition-of-done
+    attributes:
+      label: Definition of Done
+      description: Standard completion checklist
+      value: |
+        - [ ] All acceptance criteria met
+        - [ ] Code reviewed and approved
+        - [ ] Documentation updated
+        - [ ] PR merged to master
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Related files, documentation, and resources
+      placeholder: |
+        - `research/NN_experiment_expected_results.md`
+        - [External reference](url)
+    validations:
+      required: false

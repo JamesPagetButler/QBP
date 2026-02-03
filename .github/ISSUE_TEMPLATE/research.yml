@@ -1,0 +1,82 @@
+name: Research / Investigation
+description: Theoretical investigation or research task
+title: "[Research]: "
+labels: ["type: research"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Research / Investigation
+        Use this template for theoretical investigations or research tasks.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief description of the research question
+      placeholder: "Investigate [topic] to understand [goal]."
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: Context and motivation for this research
+      placeholder: |
+        Explain why this research is needed and how it relates to the project.
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: Research tasks to complete
+      value: |
+        ### Research Phase
+        - [ ] Review existing literature
+        - [ ] Analyze mathematical properties
+        - [ ] Document findings
+
+        ### Documentation Phase
+        - [ ] Create research document
+        - [ ] Update relevant code/docs
+        - [ ] Recommend next steps
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How do we know the research is complete?
+      value: |
+        - [ ] Research question answered
+        - [ ] Findings documented
+        - [ ] Implications for project identified
+        - [ ] Next steps recommended
+    validations:
+      required: true
+
+  - type: textarea
+    id: definition-of-done
+    attributes:
+      label: Definition of Done
+      value: |
+        - [ ] All acceptance criteria met
+        - [ ] Research document created in `research/` or `docs/`
+        - [ ] Red Team review of conclusions
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Related literature, files, or resources
+      placeholder: |
+        - [Paper title](url)
+        - `path/to/relevant/file.py`
+    validations:
+      required: false

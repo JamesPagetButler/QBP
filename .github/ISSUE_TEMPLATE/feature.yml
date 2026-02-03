@@ -1,0 +1,75 @@
+name: Feature Request
+description: Propose a new feature or enhancement
+title: "[Feature]: "
+labels: ["type: feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+        Use this template for new features or enhancements.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief description of the feature
+      placeholder: "Add [feature] to improve [capability]."
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: Why is this feature needed? What problem does it solve?
+      placeholder: |
+        Explain the motivation for this feature and how it benefits the project.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Specific, testable criteria for completion
+      value: |
+        - [ ] Criterion 1 (specific, testable)
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: definition-of-done
+    attributes:
+      label: Definition of Done
+      description: Standard completion checklist
+      value: |
+        - [ ] All acceptance criteria met
+        - [ ] Code reviewed and approved
+        - [ ] Tests pass in CI
+        - [ ] Documentation updated (if applicable)
+        - [ ] PR merged to master
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Related files, issues, or documentation
+      placeholder: |
+        - Related issue: #XX
+        - `path/to/relevant/file.py`
+    validations:
+      required: false
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of Scope
+      description: Explicitly state what this feature does NOT cover
+      placeholder: "List items that are explicitly excluded from this feature"
+    validations:
+      required: false
