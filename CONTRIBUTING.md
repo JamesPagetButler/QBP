@@ -64,6 +64,47 @@ Before any PR can be merged, the PR **must** contain:
 3.  **Documentation of Gemini's Review:** Claude acts as scribe, copying Gemini's Markdown review and posting it as a separate PR comment.
 4.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
 
+## Issue-Driven Workflow
+
+All work in this project is driven by GitHub Issues. This ensures traceability and prevents scope creep.
+
+### The Issue Lifecycle
+
+```
+1. Work identified        → Create GitHub Issue with acceptance criteria
+2. Issue discussed        → Refine scope, assign to sprint
+3. Work started           → Create feature branch referencing issue
+4. Work completed         → Create PR with "Closes #XX" in description
+5. Reviews complete       → Extract new action items, create follow-up issues
+6. PR merged              → Issue auto-closes, TODO.md updated
+```
+
+### Issue Requirements
+
+Every issue must include:
+- **Summary:** Clear description of the task
+- **Background:** Why this work is needed (link to review feedback, roadmap)
+- **Acceptance Criteria:** Checklist of requirements for completion
+- **References:** Links to relevant code, research docs, and prior PRs
+
+### Post-Review Issue Creation
+
+After reviews are posted to a PR, Claude must:
+1. Extract action items from reviewer feedback
+2. Create GitHub Issues for each new task
+3. Update `TODO.md` with issue links
+4. Reference the originating PR in new issues
+
+This ensures no feedback is lost and all follow-up work is tracked.
+
+### Project Plan (TODO.md)
+
+The `TODO.md` file serves as the central project plan:
+- **Roadmap:** High-level experiment sequence with issue links
+- **Current Sprint:** Active tasks with issue links and status
+- **Backlog:** Future tasks with issue links
+- **Completed:** Historical record with PR references
+
 ## Updating the Design Rationale
 
 To ensure the project's intellectual history is preserved, the `paper/DESIGN_RATIONALE.md` file must be continuously updated.
@@ -191,3 +232,16 @@ This project uses a variety of tools for different purposes. Adherence to this t
 *   **Publishing:** Quarto and/or LaTeX for professional typesetting of the final paper.
 *   **Design System:** The front-end assets and framework implemented by Claude.
 *   **Formal Proof Setup:** The setup and configuration for Lean 4 must be documented.
+
+## Directory Structure
+
+This project follows a defined directory structure to keep our work organized.
+
+*   `/paper`: Contains the formal, human-readable research paper (`quaternion_physics.md`) and the intellectual history of the project (`DESIGN_RATIONALE.md`).
+*   `/research`: Contains markdown files detailing the ground truth, experimental methods, and expected results for each test on our Eight-Fold Path.
+*   `/src`: Contains the `qphysics.py` library, the computational heart of our formalism.
+*   `/experiments`: Contains the Python scripts for our "synthetic experiments," which use the `qphysics.py` library to test our hypotheses.
+*   `/results`: Contains the timestamped output logs from our synthetic experiments. This directory is in `.gitignore` and is not committed to the repository.
+*   `/reviews`: Contains locally saved review files from both Claude and Gemini before they are posted to a PR. This directory is in `.gitignore`.
+*   `/prompts`: Contains detailed prompt files for instructing AI agents. This directory is in `.gitignore`.
+*   `/docs`: Contains general project documentation, such as the overall `REVIEW_WORKFLOW.md`.

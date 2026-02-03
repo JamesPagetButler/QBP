@@ -1,24 +1,79 @@
-# QBP Project TODO
+# QBP Project Plan & TODO
 
-Our overall goal is to work through the Eight-Fold Path. Our current focus is **#1: The Stern-Gerlach Experiment**.
+This document serves as the official project plan, tracking our high-level roadmap and the granular tasks required to achieve our goals.
 
-Following our workflow (Paper -> Source -> Experiment):
-
-## Stage 1: Paper (Theorize)
-
-- [ ] **Task 1:** In `paper/quaternion_physics.md`, write a new section describing the Stern-Gerlach experiment in the language of traditional quantum mechanics (using state vectors and Pauli matrices).
-- [ ] **Task 2:** In the same document, formulate a hypothesis for how to represent a spin-1/2 particle's state and the magnetic field interaction using quaternions. We need to define what a "quaternion state" is and how it should behave.
-
-## Stage 2: Source (Build)
-
-- [ ] **Task 3:** Implement or choose a quaternion library in `src/qphysics.py`. We need to be able to create quaternions and perform basic operations (addition, multiplication, conjugate, norm).
-- [ ] **Task 4:** Based on the hypothesis from Task 2, implement the "quaternion state" and any necessary operators in `src/qphysics.py`.
-
-## Stage 3: Experiment (Test)
-
-- [ ] **Task 5:** Create a script `experiments/01_stern_gerlach/simulate.py`.
-- [ ] **Task 6:** In the simulation script, use the library from `src/qphysics.py` to build the initial state of the particle, apply the magnetic field operator, and evolve the state.
-- [ ] **Task 7:** The simulation must show that the final state is always one of two discrete outcomes, mirroring the "spin up" and "spin down" results of the real experiment.
+**Workflow:** All work should be driven by GitHub Issues. PRs must reference the issue they address.
 
 ---
-This `TODO.md` will be updated as we complete each task.
+
+## Project Roadmap (The Eight-Fold Path)
+
+This is our strategic guide. We will tackle these items sequentially.
+
+| # | Experiment | Status | Issue |
+|---|------------|--------|-------|
+| 1 | The Stern-Gerlach Experiment | **In Progress** | — |
+| 2 | The Double-Slit Experiment | Next | [#22](https://github.com/JamesPagetButler/QBP/issues/22) |
+| 3 | The Lamb Shift | Upcoming | — |
+| 4 | Bell's Theorem Experiments | Upcoming | [#23](https://github.com/JamesPagetButler/QBP/issues/23) |
+| 5 | Derivation of Particle Statistics | Upcoming | — |
+| 6 | Modeling Positronium's Ground State | Upcoming | — |
+| 7 | The Hydrogen Atom Spectrum | Upcoming | — |
+| 8 | The Anomalous Magnetic Moment (g-2) | Aspirational | — |
+| 9 | Gravitational Lensing & Rotation Curves | Aspirational | — |
+
+---
+
+## Current Sprint: Stern-Gerlach Refinement
+
+These are the immediate action items derived from the review of Pull Request #13.
+
+### Engineering & Refinement (Knuth's Feedback)
+
+| Action | Task | Issue | Status |
+|--------|------|-------|--------|
+| A | Add `seed` parameter to `measure()` | [#16](https://github.com/JamesPagetButler/QBP/issues/16) | TODO |
+| B | Add type hints to `qphysics.py` | [#17](https://github.com/JamesPagetButler/QBP/issues/17) | TODO |
+| C | Vectorize simulation loop | [#18](https://github.com/JamesPagetButler/QBP/issues/18) | TODO |
+
+### New Experiments (Sabine's & Feynman's Feedback)
+
+| Action | Task | Issue | Status |
+|--------|------|-------|--------|
+| D | Create angle-dependent test | [#19](https://github.com/JamesPagetButler/QBP/issues/19) | TODO |
+
+---
+
+## Research & Theory Backlog
+
+| Action | Task | Issue | Status |
+|--------|------|-------|--------|
+| E | Investigate quaternion scalar component (S³ vs S²) | [#20](https://github.com/JamesPagetButler/QBP/issues/20) | TODO |
+| — | Document Lean 4 setup process | [#21](https://github.com/JamesPagetButler/QBP/issues/21) | TODO |
+
+---
+
+## Completed Tasks
+
+| Task | PR/Issue | Date |
+|------|----------|------|
+| Initial Project Setup & Constitution | — | 2026-02-01 |
+| Initial Red Team Review | PR #13 | 2026-02-01 |
+| `qphysics.py` v0.1 (Axioms 1-3 + Measurement) | PR #13 | 2026-02-01 |
+| Stern-Gerlach simulation v1 | PR #13 | 2026-02-01 |
+| Ground Truth Research (all 9 experiments) | PR #15 | 2026-02-02 |
+| CI/CD Pipeline | PR #8 | 2026-02-01 |
+
+---
+
+## Issue-Driven Workflow
+
+```
+1. Work identified → Create GitHub Issue
+2. Issue assigned → Create feature branch
+3. Work completed → Create PR referencing issue
+4. Reviews posted → Update TODO.md, create new issues from feedback
+5. PR merged → Issue auto-closed, TODO.md updated
+```
+
+All PRs should include `Closes #XX` or `Fixes #XX` in the description to auto-close issues on merge.

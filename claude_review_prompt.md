@@ -89,6 +89,7 @@ After completing your review, provide this copy/paste block for the user to send
 ---
 
 Review PR #[NUMBER] - [TITLE]
+URL: [PR_URL]
 
 Your task:
 1. Review as Furey (algebraist) and Feynman (physicist)
@@ -106,9 +107,34 @@ Format your review as:
 When done, tell James "Gemini review complete" with your summary.
 ```
 
-Replace [NUMBER], [TITLE], and [DATE] with actual values.
+Replace [NUMBER], [TITLE], [DATE], and [PR_URL] with actual values.
 
-### Step 6: Wait
+**Required fields:**
+- `[NUMBER]` — PR number (e.g., 15)
+- `[TITLE]` — PR title
+- `[DATE]` — Current date (YYYY-MM-DD)
+- `[PR_URL]` — Full GitHub PR URL (e.g., https://github.com/JamesPagetButler/QBP/pull/15)
+
+### Step 6: Update Project Plan & Create Issues
+
+After reviews are posted to a PR:
+
+1. **Check TODO.md** for any new action items from review feedback
+2. **Create GitHub Issues** for each new action item:
+   - Reference relevant code files and line numbers
+   - Link to research documents (`research/*.md`)
+   - Quote specific reviewer feedback
+   - Include acceptance criteria
+3. **Update TODO.md** with issue links:
+   - Add `[#XX](link)` next to each action item
+   - This ensures PRs are driven by defined issues
+
+Example TODO.md entry:
+```markdown
+-   **[TODO] Action A:** Add seed parameter... [#16](https://github.com/.../issues/16)
+```
+
+### Step 7: Wait
 
 Do NOT:
 - Create a PR (unless asked)
