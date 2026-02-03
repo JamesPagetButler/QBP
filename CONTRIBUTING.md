@@ -37,16 +37,17 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 │  Phase 2: Implementation                                             │
 │  └── Output: experiments/NN_.../simulate.py, tests, results          │
 │              ↓                                                       │
-│  Phase 3: Visualization ◄─────────────────────────────────┐          │
+│  Phase 3: Visualization & Analysis ◄──────────────────────┐          │
 │  └── Decision Gate:                                       │          │
-│      "Do results match ground truth within 3σ?"           │          │
+│      "Do visualization & analysis confirm results          │          │
+│       match ground truth within defined tolerance?"       │          │
 │              │                                            │          │
 │         [NO] └──► Create issue, loop back ────────────────┘          │
 │              │                                                       │
 │        [YES] ↓                                                       │
-│  Phase 4: Formal Proof ◄──────────────────────────────────┐          │
+│  Phase 4: Formal Verification ◄───────────────────────────┐          │
 │  └── Decision Gate:                                       │          │
-│      "Do all Lean proofs verify?"                         │          │
+│      "Do all Lean proofs successfully verify?"            │          │
 │              │                                            │          │
 │         [NO] └──► Create issue, loop back to Phase 2 ─────┘          │
 │              │                                                       │
@@ -96,38 +97,41 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 
 #### Phase 3: Visualization & Analysis (The Debug Loop)
 
-**Goal:** Visualize the results to gain intuitive understanding and verify success.
+**Goal:** Visualize the results from Phase 2 to gain intuitive understanding and iteratively verify success. This phase is crucial for debugging and refining our model if initial results do not match ground truth.
 
 **Tasks:**
 - Create `vpython` animations showing experiment
-- Create Manim scenes for publication videos
-- Generate plots comparing results to predictions
+- Create plots comparing results to predictions
 - Build interactive dashboard components
 
+**Workflow:**
+1.  **Human Interpretation:** The principal human collaborator (James) reviews the visualization and states their interpretation of the experimental outcome.
+2.  **Gemini Verification:** Gemini programmatically analyzes the raw numerical data from the `/results` file and provides an independent statistical summary to confirm or clarify the human interpretation.
+
 **Decision Gate:**
-> "Does the visualization accurately depict a successful experiment that matches the ground truth within 3σ?"
+> "Do both the human interpretation and Gemini's data analysis confirm that the results from Phase 2 accurately depict a successful experiment that matches the ground truth within our defined tolerance (e.g., 3σ)?"
 
-- **If NO:** Document the failure, create a new issue, and **loop back to Phase 2**.
-- **If YES:** Proceed to Phase 4.
+-   **If NO:** Document the failure, create a new issue for debugging and refinement, and **loop back to Phase 2 (Implementation & Execution)**.
+-   **If YES:** Proceed to Phase 4.
 
-**Output:** Visualizations in `src/viz/` that faithfully represent Phase 2 data.
+**Output:** Verified visualizations in `src/viz/` that faithfully represent Phase 2 data and confirm understanding.
 
 ---
 
 #### Phase 4: Formal Verification
 
-**Goal:** Mathematically prove that the implementation is logically sound.
+**Goal:** Mathematically prove that the successful implementation (Phase 2) is logically sound according to our axioms.
 
 **Tasks:**
-- Define formal statements of theorems in Lean 4
-- Write proofs connecting implementation to axioms
-- Verify all proofs compile without errors
+- Define formal statements of theorems in Lean 4 based on the quaternionic model.
+- Write proofs connecting implementation's logic to our axioms.
+- Verify all proofs compile without errors in Lean 4.
 
 **Decision Gate:**
-> "Do all Lean proofs verify successfully?"
+> "Do all Lean proofs successfully verify the theoretical claims of the implementation?"
 
-- **If NO:** Document the flaw, create a new issue, and **loop back to Phase 2** to fix the implementation.
-- **If YES:** Proceed to Phase 5.
+-   **If NO:** Document the flaw (e.g., a mathematical inconsistency), create a new issue for theoretical re-evaluation or implementation fix, and **loop back to Phase 2 (Implementation & Execution)** to address the underlying problem.
+-   **If YES:** Proceed to Phase 5.
 
 **Output:** Completed `.lean` proof files in `/proofs` directory.
 
@@ -135,15 +139,15 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 
 #### Phase 5: Publication
 
-**Goal:** Document and communicate our success.
+**Goal:** Document and communicate our confirmed and verified success.
 
 **Tasks:**
-- Write new section for `paper/quaternion_physics.md`
-- Include visualizations from Phase 3
-- Reference formal proofs from Phase 4
-- Update `DESIGN_RATIONALE.md` with key decisions
+- Write a new, detailed section for `paper/quaternion_physics.md` for this experiment.
+- Include visualizations from Phase 3.
+- Reference formal proofs from Phase 4.
+- Update `DESIGN_RATIONALE.md` with key decisions and insights gained.
 
-**Output:** Finalized, reviewed section in the main paper.
+**Output:** Finalized, reviewed section in the main paper, ready for broader dissemination.
 
 **Exit Criteria:** Section reviewed by Red Team and Gemini; merged to master.
 
@@ -356,14 +360,23 @@ This is a **hard gate** — no exceptions.
 
 ## AI Prompt Conventions
 
-To maintain clarity and organization in how we instruct our AI collaborators, we will adhere to the following conventions for creating and storing prompt files.
+To maintain clarity and organization in how we instruct our AI collaborators, we adhere to the following conventions.
 
-*   **Location:** All detailed prompt files for AI agents are stored in a top-level `/prompts` directory.
-*   **Naming Convention:** Files are named using the pattern: `prompt_{to-who}_{YYYY-MM-DD}_{short-task-description}.md`.
-    *   `{to-who}`: The AI the prompt is for (`claude` or `gemini`).
-    *   `{YYYY-MM-DD}`: The date of creation.
-    *   `{short-task-description}`: A brief, kebab-case summary of the task.
-*   **Git Status:** The `/prompts` directory is included in `.gitignore` and is not committed to the repository. It is a local-only tool for managing our workflow.
+### Prompt Generation Workflow
+
+A detailed prompt file for Claude is generated by Gemini **only under two conditions**:
+1.  After Gemini has completed all local work required to resolve a specific GitHub Issue.
+2.  When explicitly requested by the principal human collaborator (James).
+
+This ensures that Pull Requests are always tied to discrete, completed units of work and are not created prematurely.
+
+### Storage and Naming
+
+*   **Location:** All detailed prompt files are stored in a top-level `/prompts` directory.
+*   **Git Status:** This directory is in `.gitignore` and is not committed to the repository.
+*   **General Convention:** `prompt_claude_{YYYY-MM-DD}_{short-task-description}.md`
+*   **Consolidated Sync Prompts:** For large, end-of-session prompts that bundle multiple changes, a timestamp is used for clarity: `prompt_claude_{YYYY-MM-DD}_{HH-MM-SS}_consolidated-sync.md`
+
 
 ## How to Enforce Our Rules: Branch Protection
 
