@@ -27,9 +27,13 @@ class Tee(object):
             f.flush()
 
 
-def run_simulation(num_particles=1000000):
+def run_simulation(num_particles=1000000, seed=42):
     """
     Simulates the Stern-Gerlach experiment using the quaternionic framework.
+
+    Args:
+        num_particles: Number of particles to simulate.
+        seed: Random seed for reproducibility.
     """
     # --- Setup Output Logging ---
     output_dir = "results/01_stern_gerlach"
@@ -52,7 +56,7 @@ def run_simulation(num_particles=1000000):
             # Z-axis. We expect a roughly 50/50 split in our results.
             initial_state_vector = [1, 0, 0]  # Pointing along X
             psi_initial = qphysics.create_state_from_vector(initial_state_vector)
-            print(f"Initial State (ψ): {psi_initial}")
+            print(f"Initial State (psi): {psi_initial}")
 
             # 2. Define the observable.
             # We are measuring the spin along the Z-axis.
@@ -60,12 +64,7 @@ def run_simulation(num_particles=1000000):
             print(f"Measuring with Observable (O): {observable}")
             print("----------------------------------------------------")
 
-            # 3. Run the measurement loop (Vectorized for performance).
-
-            # Set a seed for reproducibility. The result is now deterministic.
-            np.random.seed(42)
-
-            # Calculate the probability of measuring "up" for the single initial state.
+            # 3. Run the measurement using vectorized batch function.
             exp_val = qphysics.expectation_value(psi_initial, observable)
             prob_up = (1 + exp_val) / 2.0
 
@@ -73,12 +72,8 @@ def run_simulation(num_particles=1000000):
             print(f"Calculated Probability of 'Up': {prob_up:.4f}")
             print("----------------------------------------------------")
 
-            # Generate all random numbers for the simulation at once.
-            random_samples = np.random.rand(num_particles)
-
-            # Determine all outcomes in a single vectorized operation.
-            # If a random sample is less than prob_up, the outcome is +1, otherwise it's -1.
-            results = np.where(random_samples < prob_up, 1, -1)
+            # Use measure_batch for efficient vectorized simulation
+            results = qphysics.measure_batch(psi_initial, observable, num_particles, seed)
 
             # 4. Tally and print the results.
             num_up = np.sum(results == 1)
