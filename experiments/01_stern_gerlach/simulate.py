@@ -1,21 +1,10 @@
 # experiments/01_stern_gerlach/simulate.py
 
 import numpy as np
-import sys
-import os
-from datetime import datetime
-
-# Add the project root to the Python path to allow imports from src
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-
-from src import qphysics
-
-
-import numpy as np
-import sys
-import os
-from datetime import datetime
 import pandas as pd
+import sys
+import os
+from datetime import datetime
 
 # Add the project root to the Python path to allow imports from src
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
