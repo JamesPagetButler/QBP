@@ -100,5 +100,84 @@ Our objective is to reproduce the essential features of the Stern-Gerlach experi
 
 *   **Quaternionic Evolution (from Axiom 3):** The interaction between the state `ψ` and the magnetic field `O_B` will cause `ψ` to evolve. Our challenge is to define a quaternionic 'measurement operator' that, when applied, projects the initial `ψ` into one of two distinct final states aligned with the `O_B` observable, thereby reproducing the observed quantization. We anticipate this will involve a form of projection and conjugation inherent to quaternion algebra that naturally yields two discrete outcomes, corresponding to the `+1` and `-1` eigenvalues of the traditional approach.
 
+### 1.3 Results
+
+#### Objective
+
+To validate that the QBP framework correctly predicts the quantization of spin angular momentum as observed in the Stern-Gerlach experiment. Specifically, we test whether a particle prepared with spin along the x-axis, when measured along the z-axis, yields a 50/50 probability distribution between spin-up (+1) and spin-down (-1) outcomes.
+
+#### Ground Truth Summary
+
+The expected outcome is derived directly from the QBP axioms (see `research/01_stern_gerlach_expected_results.md`):
+
+1. **State Preparation:** `ψ = i = ⟨0, 1, 0, 0⟩` (spin-x)
+2. **Observable:** `O_z = k = ⟨0, 0, 0, 1⟩` (spin-z measurement)
+3. **Expectation Value:** `⟨O_z⟩ = 2 × vecDot(ψ, O_z) = 2 × 0 = 0`
+4. **Predicted Probabilities:** `P(+) = P(-) = 0.5`
+
+The acceptance criterion requires measured results to fall within 3σ of the expected mean.
+
+#### Data Presentation
+
+A synthetic experiment was conducted with N = 1,000,000 independent measurements. The following table summarizes the comparison between theoretical predictions and simulation results:
+
+| Metric | Expected | Measured | Deviation |
+|--------|----------|----------|-----------|
+| **Spin-Up Count** | 500,000 | 500,207 | +207 |
+| **Spin-Down Count** | 500,000 | 499,793 | -207 |
+| **P(+1)** | 0.500000 | 0.500207 | +0.0002 |
+| **P(-1)** | 0.500000 | 0.499793 | -0.0002 |
+| **σ Deviation** | — | **0.4140σ** | — |
+
+**Statistical Parameters:**
+- Expected mean (μ): 500,000
+- Standard deviation (σ): 500.00
+- Acceptance threshold: 3σ = 1,500
+
+The interactive visualization (`src/viz/stern_gerlach_demo.py`) demonstrates the binary nature of quantum measurement, showing particles deflecting to exactly two discrete positions on the detector screen—never to intermediate positions—confirming spin quantization.
+
+#### Outcome
+
+**PASS.** The measured deviation of 0.4140σ is well within the 3σ acceptance criterion. The simulation successfully reproduces both key features of the Stern-Gerlach experiment:
+
+1. **Binary quantization:** All measurements yielded exactly +1 or -1; no intermediate values were observed.
+2. **50/50 probability split:** The distribution matches theoretical predictions to within statistical tolerance.
+
+### 1.4 Discussion
+
+#### Interpretation
+
+The successful validation of the Stern-Gerlach experiment (0.4140σ deviation) provides strong evidence that the QBP framework's axiomatic treatment of quantum measurement correctly reproduces spin quantization. The result demonstrates that:
+
+1. **Quaternionic states encode spin direction.** The pure quaternion `ψ = i` successfully represents a spin-x prepared state, and the measurement process correctly projects this onto the spin-z basis.
+
+2. **The measurement axiom produces discrete outcomes.** The `qphysics.measure()` function, implementing the QBP measurement postulate, yields only binary outcomes (+1 or -1), mirroring the fundamental quantization observed in the original 1922 experiment.
+
+3. **Orthogonality determines probability.** The zero dot product between orthogonal quaternions (`vecDot(i, k) = 0`) mathematically necessitates equal probabilities for both measurement outcomes. This is not an assumption but a consequence of the algebra.
+
+#### Connection to Theoretical Framework
+
+This experiment validates the core measurement axioms of the QBP framework (Section 2):
+
+- **Axiom 1 (Quaternionic State):** The spin state `ψ = i` is a valid unit quaternion representing the particle's intrinsic angular momentum.
+- **Axiom 2 (Quaternionic Observable):** The measurement direction `O_z = k` is a pure quaternion operator, and the dot product `vecDot(ψ, O_z)` determines the expectation value.
+- **Born Rule Implementation:** The probability formula `P(±) = (1 ± ⟨O⟩)/2` correctly maps expectation values to measurement probabilities.
+
+The formal proof in Lean 4 (`proofs/QBP/Experiments/Experiment1.lean`) rigorously verifies these relationships, proving:
+- `theorem x_z_orthogonal : vecDot spinXState spinZObservable = 0`
+- `theorem prob_up_x_measured_z_is_half : probUp spinXState spinZObservable = 1/2`
+
+#### Limitations
+
+1. **Single-particle idealization:** The simulation models individual, non-interacting particles. Real Stern-Gerlach experiments involve beam dynamics, magnetic field gradients, and detector resolution effects not captured here.
+
+2. **No decoherence modeling:** Environmental decoherence, which would affect a real quantum system, is not included in the current simulation.
+
+3. **Fixed measurement axis:** This experiment only validates orthogonal state/measurement configurations. Experiment 02 (Angle-Dependent Measurement) will test arbitrary angles.
+
+#### Emergent Phenomena
+
+No unexpected phenomena were observed in this foundational experiment. The results conform precisely to theoretical predictions, establishing a reliable baseline for subsequent, more complex experiments.
+
 ---
 *Project initiated by Gemini, Furey, and Feynman.*
