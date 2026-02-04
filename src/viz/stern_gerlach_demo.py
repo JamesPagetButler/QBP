@@ -392,7 +392,9 @@ This is the hallmark of quantum mechanics: measurement forces a definite outcome
         theta = np.radians(self.angle_slider.value)
         state_vector = [np.sin(theta), 0, np.cos(theta)]
         psi = qphysics.create_state_from_vector(state_vector)
-        result, _ = qphysics.measure(psi, qphysics.SPIN_Z)  # Unpack tuple (outcome, collapsed_state)
+        result, _ = qphysics.measure(
+            psi, qphysics.SPIN_Z
+        )  # Unpack tuple (outcome, collapsed_state)
 
         # Create particle object with animation state
         particle = Particle(sphere_obj, result)

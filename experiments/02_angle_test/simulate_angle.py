@@ -58,9 +58,7 @@ def run_angle_test(angles=None, num_particles=100000, seed=42):
 
         # Create state at angle theta from Z-axis (in XZ plane)
         # State points along: (sin(theta), 0, cos(theta))
-        state = qphysics.create_state_from_vector(
-            [np.sin(theta), 0, np.cos(theta)]
-        )
+        state = qphysics.create_state_from_vector([np.sin(theta), 0, np.cos(theta)])
 
         # Use different seed for each angle to ensure independence
         angle_seed = seed + i if seed is not None else None
@@ -77,7 +75,9 @@ def run_angle_test(angles=None, num_particles=100000, seed=42):
         # Calculate statistical deviation in sigma
         # Standard deviation of binomial: sqrt(p*(1-p)/n)
         std_dev = np.sqrt(expected_prob * (1 - expected_prob) / num_particles)
-        deviation_sigma = abs(measured_prob - expected_prob) / std_dev if std_dev > 0 else 0
+        deviation_sigma = (
+            abs(measured_prob - expected_prob) / std_dev if std_dev > 0 else 0
+        )
 
         results["angles"].append(angle_deg)
         results["expected_prob"].append(expected_prob)
