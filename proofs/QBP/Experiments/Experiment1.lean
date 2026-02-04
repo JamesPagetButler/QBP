@@ -41,7 +41,6 @@ theorem spinZObservable_is_pure : isPureQuaternion spinZObservable := spin_z_is_
     foundation for the 50/50 probability split. -/
 theorem x_z_orthogonal : vecDot spinXState spinZObservable = 0 := by
   simp [vecDot, spinXState, spinZObservable, SPIN_X, SPIN_Z]
-  ring
 
 /-- **Physical Principle:** The average measurement outcome for an x-spin state
     measured on the z-axis is zero. This occurs because the particle is equally
@@ -72,6 +71,5 @@ theorem prob_up_x_measured_z_is_half :
 theorem prob_down_x_measured_z_is_half :
     probDown spinXState spinZObservable = 1/2 := by
   simp [probDown, expectation_x_measured_z_is_zero]
-  ring
 
 end QBP.Experiments.SternGerlach

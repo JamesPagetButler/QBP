@@ -28,10 +28,10 @@ The QBP framework must mathematically reproduce the observed quantum result. We 
 2.  **Observable (Spin-Z):** The measurement of spin along the z-axis is represented by the observable quaternion `O_z`. Per our axioms, this corresponds to the pure quaternion `k`.
     *   `O_z = k = ⟨0, 0, 0, 1⟩`
 
-3.  **Expectation Value Calculation:** The expectation value `⟨O_z⟩` for the state `ψ` is calculated as `⟨O_z⟩ = 2 * vecDot(ψ, O_z)`, where `vecDot` is the dot product of the vector parts of the quaternions.
+3.  **Expectation Value Calculation:** The expectation value `⟨O_z⟩` for the state `ψ` is calculated as `⟨O_z⟩ = vecDot(ψ, O_z)`, where `vecDot` is the dot product of the vector parts of the quaternions.
     *   `vecDot(ψ, O_z) = (ψ_i * O_z_i) + (ψ_j * O_z_j) + (ψ_k * O_z_k)`
     *   `vecDot(i, k) = (1 * 0) + (0 * 0) + (0 * 1) = 0`
-    *   `⟨O_z⟩ = 2 * 0 = 0`
+    *   `⟨O_z⟩ = 0`
 
 4.  **Probability Calculation:** The probability of measuring spin-up (`+1`) or spin-down (`-1`) is derived from the expectation value:
     *   `P(+) = (1 + ⟨O_z⟩) / 2`
