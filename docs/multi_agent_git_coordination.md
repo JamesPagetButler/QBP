@@ -200,24 +200,6 @@ If both agents need to modify the same files:
 
 ---
 
-## Agent Local Workspace Management
-
-To further enhance isolation and clarity for local development, the following workspace directories have been established:
-
--   **`workspace/gemini/`**: This directory is designated for Gemini's active development. When Gemini is assigned a task, it should clone the repository into this directory and perform all its work within it. This ensures that Gemini's changes are isolated from other agents' work until they are pushed to a dedicated branch.
-
--   **`workspace/claude/`**: Similarly, this directory is designated for Claude's active development and review tasks. Claude should clone the repository into this directory when undertaking its assignments.
-
--   **`workspace/human_review/`**: This directory serves as a dedicated space for human review. It should always maintain a clean, up-to-date clone of the `master` (or `main`) branch. Before any human review, this workspace should be refreshed to reflect the latest state of the main branch (e.g., `git pull origin master`). This ensures that human reviewers are always looking at the most current stable codebase.
-
-**Usage Guidelines:**
-
--   Agents are responsible for managing their respective workspaces, including cloning the repository and switching branches as per their workflow.
--   When switching tasks or branches, agents should ensure their current workspace is clean or that any uncommitted changes are appropriately handled (e.g., stashed or committed to the correct branch).
--   The `human_review` directory is strictly for review purposes and should not be used for active development by agents.
-
----
-
 ## Recovery Procedures
 
 ### Wrong Branch Commit (Not Yet Pushed)
@@ -300,12 +282,11 @@ This provides an audit trail for debugging future issues.
 
 The key rules:
 
-1. **Utilize dedicated local workspaces** (`workspace/gemini`, `workspace/claude`, `workspace/human_review`) for isolated development and review.
-2. **Always verify branch** with `git branch --show-current` before committing
-3. **Use safe branch creation** that fails loudly if branch exists
-4. **Include branch name in commits** as secondary verification
-5. **One branch per agent** at any given time
-6. **Announce branch ownership** in shared conversations
-7. **Never force push** to recover from errors
+1. **Always verify branch** with `git branch --show-current` before committing
+2. **Use safe branch creation** that fails loudly if branch exists
+3. **Include branch name in commits** as secondary verification
+4. **One branch per agent** at any given time
+5. **Announce branch ownership** in shared conversations
+6. **Never force push** to recover from errors
 
 Following these protocols ensures clean git history and prevents cross-contamination between PRs.
