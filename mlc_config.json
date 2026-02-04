@@ -2,7 +2,13 @@
   "ignorePatterns": [
     {
       "pattern": "^\\.\\./"
+    },
+    {
+      "pattern": "^https://rewind\\.com"
     }
   ],
-  "aliveStatusCodes": [200, 206]
+  "aliveStatusCodes": [200, 206, 403, 502],
+  "retryOn429": true,
+  "retryCount": 3,
+  "fallbackRetryDelay": "5s"
 }
