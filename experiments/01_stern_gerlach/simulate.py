@@ -44,9 +44,7 @@ def run_simulation(num_particles=1000000, seed=42):
     print("----------------------------------------------------")
 
     # Use measure_batch for efficient vectorized simulation
-    results = qphysics.measure_batch(
-        psi_initial, observable, num_particles, seed
-    )
+    results = qphysics.measure_batch(psi_initial, observable, num_particles, seed)
 
     # 4. Save raw results to a machine-readable CSV file.
     output_dir = "results/01_stern_gerlach"
