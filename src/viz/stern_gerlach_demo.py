@@ -110,7 +110,7 @@ class SternGerlachDemo:
             title='<b style="font-family: Georgia, serif;">⚙ Stern-Gerlach Experiment ⚙</b>',
             width=1100,
             height=650,
-            center=vector(0, 0, 0),
+            center=vector(0.5, 0, 0),
             background=COLORS.DARK_SLATE.vpython,
         )
 
@@ -118,15 +118,15 @@ class SternGerlachDemo:
         """Create the experiment description and key observations panel."""
         self.scene.caption = """
 <div style="font-family: Georgia, serif; padding: 10px; background: #1a1a2e; border: 1px solid #D4A574; margin: 10px 0;">
-<h3 style="color: #D4A574; margin-top: 0;">📋 EXPERIMENT OVERVIEW</h3>
-<p style="color: #FFFEF0; font-size: 14px;">
+<h3 style="color: #D4A574; margin: 0 0 5px 0;">📋 EXPERIMENT OVERVIEW</h3>
+<p style="color: #FFFEF0; font-size: 14px; margin: 0;">
 <b>What:</b> Silver atoms pass through an inhomogeneous magnetic field.<br>
 <b>Classical prediction:</b> Continuous distribution (smeared line).<br>
 <b>Quantum result:</b> Only TWO discrete spots (spin up or down).
 </p>
 
-<h3 style="color: #FFD700; margin-top: 15px;">🔍 WHAT TO OBSERVE</h3>
-<ol style="color: #FFFEF0; font-size: 13px; margin-bottom: 0;">
+<h3 style="color: #FFD700; margin: 10px 0 5px 0;">🔍 WHAT TO OBSERVE</h3>
+<ol style="color: #FFFEF0; font-size: 13px; margin: 0; padding-left: 20px;">
 <li><b>Binary Outcomes:</b> Each particle goes to EITHER +1 (teal) OR -1 (red) — never in between!</li>
 <li><b>Probabilistic:</b> At 90° angle, expect ~50% up, ~50% down</li>
 <li><b>Angle Dependence:</b> Change the angle slider to see P(up) = cos²(θ/2)</li>
@@ -134,8 +134,8 @@ class SternGerlachDemo:
 </ol>
 </div>
 
-<h3 style="color: #D4A574; font-family: Georgia, serif;">⚡ KEY INSIGHT</h3>
-<p style="color: #F4A261; font-family: Georgia, serif; font-size: 14px; border-left: 3px solid #F4A261; padding-left: 10px;">
+<h3 style="color: #D4A574; font-family: Georgia, serif; margin: 10px 0 5px 0;">⚡ KEY INSIGHT</h3>
+<p style="color: #F4A261; font-family: Georgia, serif; font-size: 14px; border-left: 3px solid #F4A261; padding-left: 10px; margin: 0;">
 <b>Continuous input → Discrete output</b><br>
 This is the hallmark of quantum mechanics: measurement forces a definite outcome from a superposition.
 </p>
@@ -241,9 +241,11 @@ This is the hallmark of quantum mechanics: measurement forces a definite outcome
 
     def setup_controls(self):
         """Create interactive controls."""
-        self.scene.append_to_caption("\n<hr style='border-color: #D4A574;'>\n")
         self.scene.append_to_caption(
-            "<h3 style='color: #D4A574; font-family: Georgia;'>🎮 CONTROLS</h3>\n"
+            "\n<hr style='border-color: #D4A574; margin: 10px 0;'>\n"
+        )
+        self.scene.append_to_caption(
+            "<h3 style='color: #D4A574; font-family: Georgia; margin: 0 0 8px 0;'>🎮 CONTROLS</h3>\n"
         )
 
         # Start/Stop button
@@ -286,16 +288,18 @@ This is the hallmark of quantum mechanics: measurement forces a definite outcome
 
     def setup_stats(self):
         """Create statistics display."""
-        self.scene.append_to_caption("<hr style='border-color: #D4A574;'>\n")
         self.scene.append_to_caption(
-            "<h3 style='color: #D4A574; font-family: Georgia;'>📊 RESULTS</h3>\n"
+            "<hr style='border-color: #D4A574; margin: 10px 0;'>\n"
+        )
+        self.scene.append_to_caption(
+            "<h3 style='color: #D4A574; font-family: Georgia; margin: 0 0 8px 0;'>📊 RESULTS</h3>\n"
         )
         self.stats_text = wtext(text="<i>Click 'Start Experiment' to begin...</i>")
-        self.scene.append_to_caption("\n\n")
+        self.scene.append_to_caption("\n")
 
         # Comparison panel
         self.scene.append_to_caption(
-            "<h3 style='color: #FFD700; font-family: Georgia;'>⚖️ QBP vs STANDARD QM</h3>\n"
+            "<h3 style='color: #FFD700; font-family: Georgia; margin: 10px 0 8px 0;'>⚖️ QBP vs STANDARD QM</h3>\n"
         )
         self.comparison_text = wtext(
             text="<span style='color: #D4A574;'>QBP Model:</span>    P(up) = cos²(θ/2) = 50.0%<br>"
