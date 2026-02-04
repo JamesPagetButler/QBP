@@ -540,6 +540,17 @@ Periodically update pre-commit hooks to their latest versions:
 pre-commit autoupdate
 ```
 
+### Link Checker Failures
+
+The `Link Checker` workflow runs on all pushes and pull requests to the `master` branch and verifies that all links in markdown files (`.md`) are valid.
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `ERROR: 404 Not Found ...` | A link points to a file or URL that does not exist. | Correct the link path. For links to files that will be created in the same PR, you may need to temporarily ignore the link. |
+| `ERROR: Invalid relative link ...` | A relative link is malformed or points to a location outside the repository. | Fix the relative path to be correct within the project structure. |
+
+To ignore specific links that are expected to fail temporarily (e.g., links to documents that will be created in the same PR), you can create a `mlc_config.json` file in the root of the repository. See the `github-action-markdown-link-check` documentation for configuration options.
+
 ## Directory Structure
 
 This project follows a defined directory structure to keep our work organized.
