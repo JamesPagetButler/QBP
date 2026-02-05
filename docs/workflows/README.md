@@ -41,5 +41,7 @@ Used for Phase 1 (Ground Truth) and Phase 4 (Formal Proof) work.
 | **Sabine** | Experimentalist - statistical rigor, methodology |
 | **Grothendieck** | Mathematician - proofs, logical structure |
 | **Knuth** | Computer Scientist - algorithms, code quality |
-| **Einstein** | Physics Communicator - clarity, insight, wonder |
-| **Bell** | Theory Evaluator - understanding vs. pattern-matching |
+| **Der Depperte** | Writer & Communicator - clarity, accessibility, wonder |
+| **Bell** | Theory Evaluator - understanding vs. pattern-matching (also Expert Panel member) |
+
+> **Full persona registry:** See [docs/personas/README.md](../personas/README.md) for all 14 personas.

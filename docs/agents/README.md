@@ -29,13 +29,21 @@ Red Team reviews are triggered via `claude_review_prompt.md` and produce structu
 
 Gemini reviews are triggered via `gemini_review_prompt.md` and generate PRDs for feature implementations.
 
-### Execution (Steve) — Implementation
+### Writing & Communication
+
+| Persona | Focus | Key Questions |
+|---------|-------|---------------|
+| **Der Depperte** | Communicator | Is it clear? Is it accessible? Does it inspire wonder? |
+
+Der Depperte handles Phase 5 publication writing — clarity, accessibility, and sense of wonder.
+
+### Execution (Steve) — *Deprecated*
 
 | Persona | Focus | Key Questions |
 |---------|-------|---------------|
 | **Steve** | Contractor | Is the PRD clear? Does it match existing patterns? |
 
-Steve executes PRDs and provides implementation feedback to the Red Team.
+> **Note:** Steve is deprecated. No persona definition exists and there is no evidence of active use in the current workflow. Retained here for historical reference only.
 
 ---
 
@@ -54,15 +62,9 @@ Steve executes PRDs and provides implementation feedback to the Red Team.
 │   ┌─────────────────────────────────┐                       │
 │   │  GEMINI REVIEW                  │                       │
 │   │  Furey + Feynman                │                       │
-│   │  → Generates PRD if feature PR  │                       │
 │   └─────────────────────────────────┘                       │
 │           ↓                                                  │
-│   ┌─────────────────────────────────┐                       │
-│   │  STEVE EXECUTES                 │                       │
-│   │  Implements PRD, writes tests   │                       │
-│   └─────────────────────────────────┘                       │
-│           ↓                                                  │
-│   Red Team reviews implementation                            │
+│   Issues synthesized & presented to James                    │
 │           ↓                                                  │
 │   Human merge authorization                                  │
 │                                                              │
@@ -73,7 +75,9 @@ Steve executes PRDs and provides implementation feedback to the Red Team.
 
 ## Agent Documentation
 
-- [Steve (Contractor)](./steve.md) — Software implementation agent
+- [Steve (Contractor)](./steve.md) — Software implementation agent (deprecated)
+- **[Central Persona Registry](../personas/README.md)** — Single source of truth for all 14 QBP personas
+- [Expert Panel](../personas/expert_panel.md) — 7 personas for Theory Refinement review
 
 ---
 

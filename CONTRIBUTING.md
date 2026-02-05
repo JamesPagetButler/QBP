@@ -24,6 +24,8 @@ Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engin
     *   **Extend Theory:** Develop the new theoretical underpinnings required to tackle the *next* experiment on our roadmap.
     *   **Document:** All findings from this stage are documented in `paper/DESIGN_RATIONALE.md` and the main `paper/quaternion_physics.md`.
 
+    The Expert Panel (7 personas) reviews all Theory Refinement work. See [Expert Panel](docs/personas/expert_panel.md).
+
 3.  **Loop:** We then begin the next sprint for Experiment N+1.
 
 This ensures our theory evolves based on our experimental results.
@@ -400,6 +402,8 @@ Our review process is designed to be rigorous and auditable.
 | **Gemini** | Furey (Algebraist) | Gemini CLI | Theory - division algebras, elegance |
 | **Gemini** | Feynman (Physicist) | Gemini CLI | Theory - physical intuition, clarity |
 | **Claude / Gemini** | Herschel (Process Navigator) | Either CLI | Process - lifecycle compliance, sprint transitions |
+| **Claude** | Der Depperte (Communicator) | Claude Code CLI | Writing - clarity, accessibility, wonder (Phase 5) |
+| **Claude** | Expert Panel (7 personas) | Claude Code CLI | Theory Refinement - deep theoretical validation (see [docs/personas/](docs/personas/)) |
 
 ### Pre-Merge Requirements
 
