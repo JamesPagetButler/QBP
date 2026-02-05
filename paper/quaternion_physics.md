@@ -163,7 +163,7 @@ This experiment validates the core measurement axioms of the QBP framework (Sect
 - **Axiom 2 (Quaternionic Observable):** The measurement direction `O_z = k` is a pure quaternion operator, and the dot product `vecDot(ψ, O_z)` determines the expectation value.
 - **Born Rule Implementation:** The probability formula `P(±) = (1 ± ⟨O⟩)/2` correctly maps expectation values to measurement probabilities.
 
-The formal proof in Lean 4 (`proofs/QBP/Experiments/Experiment1.lean`) rigorously verifies these relationships, proving:
+The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorously verifies these relationships, proving:
 - `theorem x_z_orthogonal : vecDot spinXState spinZObservable = 0`
 - `theorem prob_up_x_measured_z_is_half : probUp spinXState spinZObservable = 1/2`
 
