@@ -48,6 +48,7 @@
 
 - Sprint 2 Phase 1 (Ground Truth) was completed early (PR #116) before Theory Refinement. The work was good but out of order. We acknowledge this and proceed correctly from here.
 - Sprint 2 will resume at Phase 2 (Implementation, #36) after Theory Refinement #80 is complete.
+- **James's note (2026-02-04):** Experiment 01 Phase 4 (Formal Verification, #55) and Phase 5 (Publication, #64) likely need to be re-done due to the significant process updates since they were originally completed (Phase 4 sub-phases 4a/4b/4c, library development process, persona reconciliation, Expert Panel expansion to 7, etc.). These phases should be re-evaluated against the current process before closing.
 
 ---
 
