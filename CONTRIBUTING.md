@@ -91,8 +91,8 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 | **Phase 1: Ground Truth** | Research and document expected results | `research/NN_..._expected_results.md` | Complete specification with quantitative predictions |
 | **Phase 2: Implementation** | Build code and run synthetic experiment | `qphysics.py` updates, `/results` data | Results within 3σ of ground truth |
 | **Phase 3: Visualization** | Visualize results, verify success | `vpython` animations, Manim videos | Visual confirmation of Phase 2 success |
-| **Phase 4: Formal Proof** | Mathematically prove implementation | `.lean` proof files in `/proofs` | All theorems verified by Lean |
-| **Phase 5: Publication** | Document and communicate success | `paper/quaternion_physics.md` section | Complete, reviewed documentation |
+| **Phase 4: Formal Proof** | Mathematically prove implementation | `.lean` proof files in `/proofs`; `/libs` packages when needed | All theorems verified by Lean |
+| **Phase 5: Publication** | Document and communicate success | `paper/quaternion_physics.md` section; library releases when applicable | Complete, reviewed documentation |
 
 ### Phase Transitions & Decision Gates
 
@@ -203,11 +203,29 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 
 **Output:** Completed `.lean` proof files in `/proofs` directory.
 
+##### Library Development (When Needed)
+
+During Phase 4, proofs may require Lean 4 capabilities that do not exist in Mathlib or the broader ecosystem. When this happens, we build the missing capability as an independent library.
+
+*We do not speculatively create libraries — we build only when proofs demand capabilities that don't exist.*
+
+**Process:**
+1. **Document the gap** — create a GitHub Issue describing the missing capability and why existing libraries are insufficient.
+2. **Create a separate Lake package** in `/libs/<name>/` — the library must be a standalone project with its own `lakefile.lean`, `lean-toolchain`, and `README.md`.
+3. **Wire into proofs** via local `require` — the QBPProofs package references the library using a local path dependency during development.
+4. **Follow Library Quality Standards** — see the [Library Quality Standards](#library-quality-standards) section below. Full compliance is required before Phase 5 Track B publication, not during active Phase 4 development.
+
+**Key principle:** Libraries must remain general-purpose. They must not import from `proofs/QBP/` or depend on any QBP-specific definitions. If other Lean users could benefit from the capability, it belongs in `/libs/`.
+
 ---
 
 #### Phase 5: Publication
 
 **Goal:** Document and communicate our confirmed and verified success.
+
+Phase 5 has two tracks. Track A is always required. Track B applies only when Phase 4 produced one or more libraries in `/libs/`.
+
+##### Track A: Paper (Required)
 
 **Tasks:**
 - Write a new, detailed section for `paper/quaternion_physics.md` for this experiment.
@@ -218,6 +236,38 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 **Output:** Finalized, reviewed section in the main paper, ready for broader dissemination.
 
 **Exit Criteria:** Section reviewed by Red Team and Gemini; merged to master.
+
+##### Track B: Community Contribution (When Applicable)
+
+*Skip this track if no libraries were developed during Phase 4.*
+
+**Tasks:**
+- Finalize library to meet all [Library Quality Standards](#library-quality-standards).
+- Tag a semantic version (`vMAJOR.MINOR.PATCH`) on the library.
+- Submit the library to [Reservoir](https://reservoir.lean-lang.org/) for indexing.
+- Generate API documentation with `doc-gen4`.
+- Announce on [Lean Zulip](https://leanprover.zulipchat.com/) with a brief description and link.
+
+**Output:** Published, documented Lean 4 library available to the community.
+
+**Exit Criteria:** Library indexed on Reservoir; documentation live; announcement posted.
+
+---
+
+### Library Quality Standards
+
+The following standards apply to any library in `/libs/` before it can be published via Phase 5 Track B. During active Phase 4 development, these are goals to work toward — not blockers.
+
+| Requirement | Details |
+|-------------|---------|
+| Separate Lake package | Own `lakefile.lean`, `lean-toolchain`, `README.md` |
+| No QBP dependencies | General-purpose; no imports from `proofs/QBP/` |
+| CI builds | GitHub Actions workflow running `lake build` |
+| No `sorry` | All proofs complete |
+| API documentation | Doc-strings on public definitions; `doc-gen4` compatible |
+| Semantic versioning | Git tags `vMAJOR.MINOR.PATCH` |
+| Reservoir metadata | `lakefile.lean` includes `name`, `version`, `keywords`, `homepage` |
+| README | Purpose, installation, usage examples, license |
 
 ---
 
@@ -534,6 +584,7 @@ This project uses a variety of tools for different purposes. Adherence to this t
     *   `numpy-quaternion` for core quaternion mathematics.
     *   `vpython` for 3D visualization.
 *   **Formal Proof:** Lean 4.
+*   **Lean Library Publishing:** [Reservoir](https://reservoir.lean-lang.org/) for package registry; `doc-gen4` for API documentation.
 *   **Code Quality:** `pre-commit` framework using `black` for formatting and `mypy` for type checking.
 
 ### Advanced Toolkit (To be used as the need arises)
@@ -613,6 +664,7 @@ This project follows a defined directory structure to keep our work organized.
 *   `/experiments`: Contains the Python scripts for our "synthetic experiments," which use the `qphysics.py` library to test our hypotheses. (Phase 2 output)
 *   `/tests/physics`: Contains physics validation tests for each experiment. (Phase 2 output)
 *   `/proofs`: Contains Lean 4 formal proof files. (Phase 4 output)
+*   `/libs`: Independent Lean 4 library packages developed during Phase 4. Each subdirectory is a standalone Lake package with its own `lakefile.lean` and `lean-toolchain`. See [Library Quality Standards](#library-quality-standards).
 *   `/results`: Contains the timestamped output logs from our synthetic experiments. This directory is in `.gitignore` and is not committed to the repository.
 *   `/reviews`: Contains locally saved review files from both Claude and Gemini before they are posted to a PR. This directory is in `.gitignore`.
 *   `/prompts`: Contains detailed prompt files for instructing AI agents. This directory is in `.gitignore`.
