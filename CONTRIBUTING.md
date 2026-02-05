@@ -460,6 +460,24 @@ All work in this project is driven by GitHub Issues. This ensures traceability a
 6. PR merged              → Issue auto-closes, TODO.md updated
 ```
 
+### Sub-Phase Issues
+
+When a phase has sub-phases (e.g., Phase 4 has 4a, 4b, 4c), create a **separate GitHub issue for each sub-phase**. The parent phase issue becomes a tracking issue that links to all sub-phase issues.
+
+**Rules:**
+- A PR's `Closes #XX` must reference only the sub-phase issues it fully satisfies — never the parent tracking issue.
+- The parent tracking issue closes only when all sub-phase issues are closed.
+- This prevents premature auto-closure when a PR addresses one sub-phase but not others.
+
+**Example:**
+```
+#55 (Phase 4 — tracking issue)
+  ├── #131 (4a: Formal Proof)      ← closed by proof PR
+  ├── #132 (4b: Proof Review)      ← closed by review PR
+  └── #133 (4c: Interactive Viz)   ← closed by viz PR
+  └── #55 closes manually when #131 + #132 + #133 are all closed
+```
+
 ### Issue Requirements
 
 Every issue must include:

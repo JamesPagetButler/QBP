@@ -26,11 +26,11 @@
 - [x] Phase 1: Ground Truth (#52)
 - [x] Phase 2: Implementation (#53)
 - [x] Phase 3: Visualization (#29)
-- [ ] Phase 4: Formal Verification (#55) — **Reopened.** 4a exists, 4b and 4c not done.
-  - [x] 4a: Formal Proof (proofs exist, need file rename + build verification)
-  - [ ] 4b: Proof Review (Claude reviews and tests proofs)
-  - [ ] 4c: Interactive Proof Visualization (C/WASM browser viz — not started)
-- [ ] Phase 5: Publication (#64) — **Reopened.** Blocked by #55 4a+4b gate. Existing paper section needs audit.
+- [ ] Phase 4: Formal Verification (#55) — Tracking issue. 4a+4b gate passed; 4c outstanding.
+  - [x] 4a: Formal Proof (#131, closed) — Proofs verified, file renamed to SternGerlach.lean (PR #130)
+  - [x] 4b: Proof Review (#132, closed) — Review posted, decision gate PASS
+  - [ ] 4c: Interactive Proof Visualization (#133, open) — C/WASM browser viz, not started
+- [ ] Phase 5: Publication (#64) — **Unblocked** by 4a+4b gate. Paper section needs audit against current standards.
 - [ ] Theory Refinement (#80) — Not started
 
 ## Sprint 1 Retrospective
