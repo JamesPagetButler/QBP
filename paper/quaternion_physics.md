@@ -112,7 +112,7 @@ The expected outcome is derived directly from the QBP axioms (see `research/01_s
 
 1. **State Preparation:** `ψ = i = ⟨0, 1, 0, 0⟩` (spin-x)
 2. **Observable:** `O_z = k = ⟨0, 0, 0, 1⟩` (spin-z measurement)
-3. **Expectation Value:** `⟨O_z⟩ = 2 × vecDot(ψ, O_z) = 2 × 0 = 0`
+3. **Expectation Value:** `⟨O_z⟩ = vecDot(ψ, O_z) = 0` (dot product of orthogonal vectors)
 4. **Predicted Probabilities:** `P(+) = P(-) = 0.5`
 
 The acceptance criterion requires measured results to fall within 3σ of the expected mean.
@@ -134,7 +134,12 @@ A synthetic experiment was conducted with N = 1,000,000 independent measurements
 - Standard deviation (σ): 500.00
 - Acceptance threshold: 3σ = 1,500
 
-The interactive visualization (`src/viz/stern_gerlach_demo.py`) demonstrates the binary nature of quantum measurement, showing particles deflecting to exactly two discrete positions on the detector screen—never to intermediate positions—confirming spin quantization.
+The visualization below (Fig. 1) demonstrates the binary nature of quantum measurement, showing particles deflecting to exactly two discrete positions on the detector screen—never to intermediate positions—confirming spin quantization.
+
+![Figure 1: Stern-Gerlach Experiment Results](../src/viz/experiment_01_stern_gerlach_results.png)
+*Fig. 1: Distribution of 1,000,000 spin measurements showing the predicted 50/50 split between spin-up and spin-down outcomes. The deviation from the theoretical mean falls well within the 3σ acceptance threshold.*
+
+The interactive demo (`src/viz/stern_gerlach_demo.py`) provides real-time visualization of individual measurement events.
 
 #### Outcome
 
@@ -163,9 +168,12 @@ This experiment validates the core measurement axioms of the QBP framework (Sect
 - **Axiom 2 (Quaternionic Observable):** The measurement direction `O_z = k` is a pure quaternion operator, and the dot product `vecDot(ψ, O_z)` determines the expectation value.
 - **Born Rule Implementation:** The probability formula `P(±) = (1 ± ⟨O⟩)/2` correctly maps expectation values to measurement probabilities.
 
-The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorously verifies these relationships, proving:
-- `theorem x_z_orthogonal : vecDot spinXState spinZObservable = 0`
-- `theorem prob_up_x_measured_z_is_half : probUp spinXState spinZObservable = 1/2`
+The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorously verifies these relationships through a chain of 13 interconnected theorems:
+
+1. **Pure quaternion verification:** `spinXState_is_pure` and `spinZObservable_is_pure` confirm both the prepared state and measurement observable satisfy the QBP axioms.
+2. **Orthogonality:** `x_z_orthogonal : vecDot spinXState spinZObservable = 0` proves the x and z axes are perpendicular.
+3. **Zero expectation:** `expectation_x_measured_z_is_zero` applies the general theorem `expectation_orthogonal_is_zero` to derive ⟨O_z⟩ = 0.
+4. **Probability corollaries:** `prob_up_x_measured_z_is_half` and `prob_down_x_measured_z_is_half` complete the proof by showing P(±1) = 1/2.
 
 #### Limitations
 

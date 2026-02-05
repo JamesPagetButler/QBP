@@ -37,3 +37,23 @@ With the three axioms implemented in `qphysics.py`, the final piece required for
 *   **Probabilistic Collapse:** The probabilities for a binary outcome (`+1` or `-1`) are derived from the expectation value using the standard quantum mechanical formula `P(+) = (1 + <O>)/2`. A random number is then used to "roll the dice," collapsing the state into one of the two eigenstates (aligned or anti-aligned with the observable).
 
 This postulate is our first major, testable hypothesis connecting the abstract algebra to a probabilistic, real-world experimental result.
+
+## 5. Experiment 01: Stern-Gerlach — Lessons Learned
+
+The Stern-Gerlach experiment (Sprint 1) was our first complete cycle through the 5-phase experimental lifecycle. Key insights:
+
+### 5.1 What Worked
+
+*   **The expectation value formula.** For orthogonal state/observable configurations, `⟨O⟩ = vecDot(ψ, O) = 0` produces the correct 50/50 probability split. The simulation (N = 1,000,000 measurements) deviated only 0.4140σ from theoretical predictions.
+*   **Formal verification adds confidence.** The Lean 4 proofs in `proofs/QBP/Experiments/SternGerlach.lean` rigorously verify the entire dependency chain from axioms to the final probability result. The 13-theorem proof tree makes explicit which assumptions are required.
+*   **The axiom-first approach.** Establishing axioms (Axiom 1, 2, 3) before running simulations ensured the framework was mathematically constrained rather than ad-hoc fitted to results.
+
+### 5.2 What Was Refined
+
+*   **Expectation value normalization.** The initial formula included a factor of 2 (`⟨O⟩ = 2 × vecDot`). This was removed in Experiment 02 (PR #116) when it produced invalid probabilities for non-orthogonal configurations. The Stern-Gerlach case (orthogonal) was unaffected because 2 × 0 = 0.
+*   **Proof graph completeness.** Early visualizations omitted intermediate theorems (`spinXState_is_pure`, `spinZObservable_is_pure`) that are formal dependencies of the main result. Phase 4c review identified this gap, reinforcing the need for rigorous tracing of the proof chain.
+
+### 5.3 Open Questions Deferred
+
+*   **What determines the factor in the expectation formula?** The removal of the factor of 2 was empirically motivated. A deeper algebraic justification is needed.
+*   **How does decoherence affect real experiments?** The simulation models isolated, non-interacting particles without environmental coupling.
