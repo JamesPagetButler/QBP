@@ -10,7 +10,7 @@
 
 - **Active Sprint:** Sprint 1 (Stern-Gerlach) — completing final phases
 - **Lifecycle Stage:** Sprint 1 → **Theory Refinement (#80)** → Sprint 2
-- **Next Critical-Path Action:** Close Sprint 1 phase issues (#55, #64), then begin Theory Refinement #80
+- **Next Critical-Path Action:** Complete or waive 4c (#133), then close #55; audit Phase 5 (#64); then begin Theory Refinement #80
 
 ## Active Diversions
 
@@ -30,7 +30,7 @@
   - [x] 4a: Formal Proof (#131, closed) — Proofs verified, file renamed to SternGerlach.lean (PR #130)
   - [x] 4b: Proof Review (#132, closed) — Review posted, decision gate PASS
   - [ ] 4c: Interactive Proof Visualization (#133, open) — C/WASM browser viz, not started
-- [ ] Phase 5: Publication (#64) — **Unblocked** by 4a+4b gate. Paper section needs audit against current standards.
+- [ ] Phase 5: Publication (#64) — **Blocked** by 4c (#133) unless James waives. Paper section needs audit against current standards.
 - [ ] Theory Refinement (#80) — Not started
 
 ## Sprint 1 Retrospective

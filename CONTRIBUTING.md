@@ -93,7 +93,7 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 | **Phase 1: Ground Truth** | Research and document expected results | `research/NN_..._expected_results.md` | Complete specification with quantitative predictions |
 | **Phase 2: Implementation** | Build code and run synthetic experiment | `qphysics.py` updates, `/results` data | Results within 3σ of ground truth |
 | **Phase 3: Visualization** | Visualize results, verify success | `vpython` animations, Manim videos | Visual confirmation of Phase 2 success |
-| **Phase 4: Formal Verification** | Prove, review, and visualize | `.lean` proofs, review report, interactive WASM viz | 4a+4b gate publication; 4c parallel deliverable |
+| **Phase 4: Formal Verification** | Prove, review, and visualize | `.lean` proofs, review report, interactive WASM viz | 4a+4b+4c gate for Phase 5 (James may waive 4c) |
 | **Phase 5: Publication** | Document and communicate success | `paper/quaternion_physics.md` section; library releases when applicable | Complete, reviewed documentation |
 
 ### Phase Transitions & Decision Gates
@@ -123,16 +123,17 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 │  │   └── Output: review report, compilation check         │          │
 │  ├── 4c: Interactive Proof Visualization (Claude/team)    │          │
 │  │   └── Output: C/WASM interactive viz in browser        │          │
-│  │   (4c runs in parallel with Phase 5 — not a gate)     │          │
 │  │                                                        │          │
-│  └── Decision Gate (4a + 4b only):                        │          │
+│  └── Decision Gate (4a + 4b + 4c):                        │          │
 │      "Do all Lean proofs verify AND does the              │          │
-│       proof review confirm correctness?"                  │          │
+│       proof review confirm correctness AND is the         │          │
+│       interactive visualization complete?"                │          │
 │              │                                            │          │
 │         [NO] └──► Create issue, loop back to Phase 2 ─────┘          │
+│              │    (James may waive 4c to proceed)                    │
 │              │                                                       │
-│        [YES] ↓                                                       │
-│  Phase 5: Publication  (4c continues in parallel)                    │
+│        [YES / 4c WAIVED] ↓                                           │
+│  Phase 5: Publication                                                │
 │  └── Output: paper/quaternion_physics.md section                     │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
