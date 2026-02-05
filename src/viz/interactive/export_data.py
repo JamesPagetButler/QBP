@@ -7,7 +7,7 @@ Reads:
   proofs/QBP/Experiments/SternGerlach.lean
 
 Outputs:
-  data/experiment_01.json
+  data/proof_graph_01.json
 
 This is a semi-automated tool: it extracts theorem names and dependencies
 from the Lean source, and augments them with human-curated physical meanings.
@@ -23,7 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
 BASIC_LEAN = PROJECT_ROOT / "proofs" / "QBP" / "Basic.lean"
 SG_LEAN = PROJECT_ROOT / "proofs" / "QBP" / "Experiments" / "SternGerlach.lean"
-OUTPUT = Path(__file__).resolve().parent / "data" / "experiment_01.json"
+OUTPUT = Path(__file__).resolve().parent / "data" / "proof_graph_01.json"
 
 
 def parse_lean_file(path: Path) -> list[dict]:

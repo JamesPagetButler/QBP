@@ -24,7 +24,7 @@ help:
 	@echo "Targets:"
 	@echo "  make native          Build native binary for dev testing"
 	@echo "  make wasm            Build WASM for browser deployment"
-	@echo "  make data            Generate data/experiment_01.json from Lean files"
+	@echo "  make data            Generate data/proof_graph_01.json from Lean files"
 	@echo "  make clean           Remove build/ and dist/"
 	@echo ""
 	@echo "Options:"
@@ -54,7 +54,7 @@ wasm:
 
 data:
 	python3 export_data.py
-	@echo "Generated data/experiment_01.json"
+	@echo "Generated data/proof_graph_01.json"
 
 clean:
 	rm -rf build dist

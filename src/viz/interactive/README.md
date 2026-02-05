@@ -7,7 +7,7 @@ Browser-based interactive visualization of the Stern-Gerlach formal proofs. Step
 The visualization is built with **C + raylib**, compiled to **WASM via Emscripten** for browser deployment.
 
 ```
-export_data.py ──► data/experiment_01.json ──► C reads JSON
+export_data.py ──► data/proof_graph_01.json ──► C reads JSON
                                                     │
 proofs/QBP/Basic.lean ───┐                          ▼
 proofs/QBP/Experiments/  ├─► (proof metadata)   Interactive WASM app
@@ -32,7 +32,7 @@ src/viz/interactive/
 │   └── scenes/
 │       └── experiment_01_stern_gerlach.c
 ├── data/
-│   └── experiment_01.json
+│   └── proof_graph_01.json
 ├── build/              ← .gitignore'd
 └── dist/               ← .gitignore'd
 ```
