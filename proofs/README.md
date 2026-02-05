@@ -60,6 +60,12 @@ Each experiment's Phase 4 issue involves creating formal proofs:
 
 See [docs/gemini_phase4_guide.md](../docs/gemini_phase4_guide.md) for the formal verification workflow.
 
+## Library Development
+
+When Phase 4 proofs require Lean 4 capabilities that don't exist in Mathlib or the broader ecosystem, we develop them as independent Lake packages in `/libs/`. These libraries are general-purpose — they must not depend on QBP-specific definitions from this directory.
+
+During development, proofs in `/proofs` reference libraries via local `require` path dependencies. Before publication (Phase 5 Track B), libraries are finalized to meet the Library Quality Standards documented in [CONTRIBUTING.md](../CONTRIBUTING.md#library-quality-standards).
+
 ## Verification
 
 All proofs must:

@@ -1,89 +1,124 @@
-name: Experiment
-description: Implement a physics experiment in the quaternionic framework
-title: "Experiment [N]: [Name] - Theory and Implementation"
+name: "🔬 New Experiment Phase"
+description: "File an issue for one of the 5 phases of an experiment."
+title: "Experiment [N]: [Name] - Phase X: [Phase Title]"
 labels: ["type: experiment"]
 body:
   - type: markdown
     attributes:
       value: |
-        ## New Experiment Issue
-        Use this template for implementing physics experiments.
+        ## New Experiment Phase Issue
+        Use this template to create an issue for a specific phase of a physics experiment. Please fill in the experiment number `[N]` and `[Name]` in the title.
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Experiment Phase
+      description: "Select the phase of the experiment this issue is for, then delete the task sections below that do not apply."
+      options:
+        - "Phase 1: Ground Truth"
+        - "Phase 2: Implementation"
+        - "Phase 3: Visualization & Analysis"
+        - "Phase 4: Formal Proof"
+        - "Phase 5: Publication"
+    validations:
+      required: true
 
   - type: textarea
     id: summary
     attributes:
       label: Summary
-      description: Brief description of the experiment
-      placeholder: "Implement [Experiment Name] in the quaternionic framework."
+      description: "Briefly describe the goal of this specific phase."
+      placeholder: "e.g., To formally document the ground truth for the Double Slit experiment."
     validations:
       required: true
 
   - type: textarea
     id: background
     attributes:
-      label: Background
-      description: Physical description and significance of this experiment
-      placeholder: |
-        Describe the experiment, its physical significance, and why it's
-        an important test for the quaternionic framework.
+      label: Background & Justification
+      description: "Why is this phase necessary? What previous phase does it build upon? What will it enable?"
+      placeholder: "This builds upon the project roadmap and is a prerequisite for the Phase 2 implementation."
     validations:
       required: true
 
   - type: textarea
     id: tasks
     attributes:
-      label: Tasks
-      description: Breakdown of work phases
+      label: Tasks & Acceptance Criteria
+      description: "Delete the sections that do not apply to the phase you selected above. Fill in the relevant details."
       value: |
-        ### Theory Phase
-        - [ ] Review `research/NN_experiment_expected_results.md`
-        - [ ] Define quaternionic representation
-        - [ ] Determine acceptance criteria with error bounds
+        ### Phase 1: Ground Truth
+        **Goal:** Formally define the expected experimental outcome based on established theory.
+        - [ ] **Task:** Research and cite relevant literature and theoretical derivations.
+        - [ ] **Task:** Write a formal mathematical derivation of the quantitative predictions.
+        - [ ] **Task:** Create the `research/[NN]_[name]_expected_results.md` document.
+        - [ ] **AC:** The ground truth document includes a full derivation, quantitative predictions, and explicit acceptance criteria (e.g., 3σ tolerance).
+        - [ ] **AC:** The document is reviewed by the science team (Furey, Feynman, Grothendieck, Sabine) and approved.
 
-        ### Implementation Phase
-        - [ ] Create `experiments/NN_name/simulate.py`
-        - [ ] Create `tests/physics/test_name.py`
-        - [ ] Validate against expected values
+        ---
 
-        ### Visualization Phase (if applicable)
-        - [ ] Create Manim scene
-        - [ ] Create interactive demo
-    validations:
-      required: true
+        ### Phase 2: Implementation
+        **Goal:** Build the simulation code to test the hypothesis and generate raw data.
+        - [ ] **Task:** Extend `src/qphysics.py` if necessary.
+        - [ ] **Task:** Create the simulation script `experiments/[NN]_[name]/simulate.py`.
+        - [ ] **Task:** Ensure the script saves raw results to a machine-readable format (CSV/JSON) in `results/[NN]_[name]/`.
+        - [ ] **Task:** Create corresponding physics validation tests in `tests/physics/`.
+        - [ ] **AC:** All new and existing tests pass in CI.
+        - [ ] **AC:** The simulation runs successfully and generates a timestamped, machine-readable raw data file.
 
-  - type: textarea
-    id: acceptance-criteria
-    attributes:
-      label: Acceptance Criteria
-      description: Specific, testable criteria for completion
-      value: |
-        - [ ] Simulation produces correct prediction within tolerance
-        - [ ] Tests pass in CI
-        - [ ] Red Team review approved
-        - [ ] Gemini review approved
-    validations:
-      required: true
+        ---
 
-  - type: textarea
-    id: definition-of-done
-    attributes:
-      label: Definition of Done
-      description: Standard completion checklist
-      value: |
-        - [ ] All acceptance criteria met
-        - [ ] Code reviewed and approved
-        - [ ] Documentation updated
-        - [ ] PR merged to master
-    validations:
-      required: true
+        ### Phase 3: Visualization & Analysis
+        **Goal:** Programmatically compare simulation results against the ground truth and draw initial conclusions.
+        - [ ] **Task:** Create the `analysis/[NN]_[name]/` directory.
+        - [ ] **Task:** Develop an analysis script that loads data from `/results` and ground truth from `/research`.
+        - [ ] **Task:** The script must perform statistical comparison and calculate deviation metrics (e.g., in units of σ).
+        - [ ] **Task:** The script must generate visualizations (plots/charts) and save them to `/src/viz`.
+        - [ ] **Task:** The script must generate a comprehensive markdown `analysis_report.md`.
+        - [ ] **AC:** The analysis report clearly states whether the experiment PASSED or FAILED the acceptance criteria from Phase 1.
+        - [ ] **AC:** The report includes data tables and visualizations comparing measured vs. expected results.
+
+        ---
+
+        ### Phase 4: Formal Proof
+        **Goal:** Mathematically prove that the successful implementation is logically sound according to our axioms.
+        - [ ] **Task:** Write formal statements of theorems in Lean 4.
+        - [ ] **Task:** Write proofs connecting the implementation's logic to the QBP axioms.
+        - [ ] **Task:** Ensure all proofs compile without errors in Lean 4.
+        - [ ] **Task:** If a proof requires library capabilities not in Mathlib/ecosystem, create a library issue and develop in `/libs/` (see CONTRIBUTING.md Phase 4).
+        - [ ] **AC:** The formal proof correctly verifies the key physical outcomes that were validated empirically in Phase 3.
+        - [ ] **AC:** The proof is reviewed for mathematical rigor (Grothendieck) and physical intuition (Feynman/Furey).
+
+        ---
+
+        ### Phase 5: Publication
+
+        #### Track A: Paper (Required)
+        **Goal:** Document and communicate the confirmed success in the main research paper.
+        - [ ] **Task:** Synthesize the `analysis_report.md` into the "Results" and "Discussion" sections of `paper/quaternion_physics.md`.
+        - [ ] **Task:** Ensure the new section conforms to the `docs/schemas/physics_paper_schema.md`.
+        - [ ] **Task:** Integrate visualizations, tables, and references.
+        - [ ] **Task:** Update `paper/DESIGN_RATIONALE.md` with key insights.
+        - [ ] **AC:** The new paper section is coherent, well-written, and accurately represents the experimental findings.
+        - [ ] **AC:** The final text is reviewed and approved by all agents and the human collaborator.
+
+        #### Track B: Community Contribution (When Applicable)
+        *Skip this track if no libraries were developed during Phase 4.*
+        - [ ] **Task:** Finalize library in `/libs/` to meet all Library Quality Standards (see CONTRIBUTING.md).
+        - [ ] **Task:** Follow Lean 4 community publishing guidelines; extract to standalone repo if required by Reservoir.
+        - [ ] **Task:** Tag a semantic version (`vMAJOR.MINOR.PATCH`) on the library.
+        - [ ] **Task:** Submit library to Reservoir for indexing.
+        - [ ] **Task:** Generate API documentation with `doc-gen4`.
+        - [ ] **Task:** Announce on Lean Zulip with description and link.
+        - [ ] **AC:** Library indexed on Reservoir; documentation live; announcement posted.
 
   - type: textarea
     id: references
     attributes:
       label: References
-      description: Related files, documentation, and resources
+      description: "Link to the main experiment roadmap issue, previous phase issues, and any other relevant documents."
       placeholder: |
-        - `research/NN_experiment_expected_results.md`
-        - [External reference](url)
+        - Blocks #XX
+        - Blocked by #XX
     validations:
       required: false
