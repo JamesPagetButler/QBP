@@ -18,7 +18,7 @@ body:
         - "Phase 1: Ground Truth"
         - "Phase 2: Implementation"
         - "Phase 3: Visualization & Analysis"
-        - "Phase 4: Formal Proof"
+        - "Phase 4: Formal Verification (4a/4b/4c)"
         - "Phase 5: Publication"
     validations:
       required: true
@@ -80,14 +80,35 @@ body:
 
         ---
 
-        ### Phase 4: Formal Proof
+        ### Phase 4: Formal Verification (4a/4b/4c)
+
+        #### 4a: Formal Proof (Owner: Gemini)
         **Goal:** Mathematically prove that the successful implementation is logically sound according to our axioms.
         - [ ] **Task:** Write formal statements of theorems in Lean 4.
         - [ ] **Task:** Write proofs connecting the implementation's logic to the QBP axioms.
         - [ ] **Task:** Ensure all proofs compile without errors in Lean 4.
-        - [ ] **Task:** If a proof requires library capabilities not in Mathlib/ecosystem, create a library issue and develop in `/libs/` (see CONTRIBUTING.md Phase 4).
-        - [ ] **AC:** The formal proof correctly verifies the key physical outcomes that were validated empirically in Phase 3.
+        - [ ] **Task:** If a proof requires library capabilities not in Mathlib/ecosystem, create a library issue and develop in `/libs/` (see CONTRIBUTING.md Phase 4a).
+        - [ ] **AC:** All Lean proofs compile without `sorry`.
+        - [ ] **AC:** Proven theorems correspond to Phase 1 ground truth claims.
+
+        #### 4b: Proof Review (Owner: Claude)
+        **Goal:** Review Gemini's formal proofs for rigor and correctness.
+        - [ ] **Task:** Review all `.lean` proof files for mathematical rigor.
+        - [ ] **Task:** Verify clean compilation (`lake build` succeeds).
+        - [ ] **Task:** Check correspondence between proven theorems and Phase 1/2 results.
+        - [ ] **Task:** Post review report to this issue.
+        - [ ] **AC:** Review report confirms proof correctness or identifies specific issues.
         - [ ] **AC:** The proof is reviewed for mathematical rigor (Grothendieck) and physical intuition (Feynman/Furey).
+
+        #### 4c: Interactive Proof Visualization (Owner: Claude/team)
+        **Goal:** Build an interactive browser-based visualization combining physics simulation with proof annotations.
+        - [ ] **Task:** Port relevant quaternion math to C (`src/viz/interactive/src/qphysics.c`).
+        - [ ] **Task:** Create proof annotation overlay driven by Phase 4a proof metadata.
+        - [ ] **Task:** Build experiment scene implementing `init/update/draw/cleanup` interface.
+        - [ ] **Task:** Export Phase 2 results + Phase 4a proof structure to JSON via `src/viz/interactive/export_data.py`.
+        - [ ] **Task:** Compile to WASM with Emscripten; produce deployable output.
+        - [ ] **AC:** Interactive visualization renders in browser and accurately depicts the physics.
+        - [ ] **AC:** Proof annotations are visible and correspond to the formal proof structure.
 
         ---
 
