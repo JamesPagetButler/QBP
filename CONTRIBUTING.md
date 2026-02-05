@@ -91,7 +91,7 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 | **Phase 1: Ground Truth** | Research and document expected results | `research/NN_..._expected_results.md` | Complete specification with quantitative predictions |
 | **Phase 2: Implementation** | Build code and run synthetic experiment | `qphysics.py` updates, `/results` data | Results within 3σ of ground truth |
 | **Phase 3: Visualization** | Visualize results, verify success | `vpython` animations, Manim videos | Visual confirmation of Phase 2 success |
-| **Phase 4: Formal Proof** | Mathematically prove implementation | `.lean` proof files in `/proofs`; `/libs` packages when needed | All theorems verified by Lean |
+| **Phase 4: Formal Verification** | Prove, review, and visualize | `.lean` proofs, review report, interactive WASM viz | Sub-phase gates (4a/4b/4c) |
 | **Phase 5: Publication** | Document and communicate success | `paper/quaternion_physics.md` section; library releases when applicable | Complete, reviewed documentation |
 
 ### Phase Transitions & Decision Gates
@@ -114,8 +114,18 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 │              │                                                       │
 │        [YES] ↓                                                       │
 │  Phase 4: Formal Verification ◄───────────────────────────┐          │
+│  │                                                        │          │
+│  ├── 4a: Formal Proof (Gemini)                            │          │
+│  │   └── Output: .lean proof files in /proofs             │          │
+│  ├── 4b: Proof Review (Claude)                            │          │
+│  │   └── Output: review report, compilation check         │          │
+│  ├── 4c: Interactive Proof Visualization (Claude/team)    │          │
+│  │   └── Output: C/WASM interactive viz in browser        │          │
+│  │                                                        │          │
 │  └── Decision Gate:                                       │          │
-│      "Do all Lean proofs successfully verify?"            │          │
+│      "Do all Lean proofs verify AND does the              │          │
+│       interactive visualization accurately depict         │          │
+│       the physics and proof structure?"                   │          │
 │              │                                            │          │
 │         [NO] └──► Create issue, loop back to Phase 2 ─────┘          │
 │              │                                                       │
@@ -186,7 +196,13 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 
 ---
 
-#### Phase 4: Formal Verification
+#### Phase 4: Formal Verification (Sub-Phases 4a/4b/4c)
+
+Phase 4 is divided into three sub-phases. The phase count remains 5 and each experiment still has 5 issues — sub-phases are tracked as task sections within the single Phase 4 issue.
+
+##### Phase 4a: Formal Proof
+
+**Owner:** Gemini
 
 **Goal:** Mathematically prove that the successful implementation (Phase 2) is logically sound according to our axioms.
 
@@ -195,17 +211,11 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 - Write proofs connecting implementation's logic to our axioms.
 - Verify all proofs compile without errors in Lean 4.
 
-**Decision Gate:**
-> "Do all Lean proofs successfully verify the theoretical claims of the implementation?"
-
--   **If NO:** Document the flaw (e.g., a mathematical inconsistency), create a new issue for theoretical re-evaluation or implementation fix, and **loop back to Phase 2 (Implementation & Execution)** to address the underlying problem.
--   **If YES:** Proceed to Phase 5.
-
 **Output:** Completed `.lean` proof files in `/proofs` directory.
 
-##### Library Development (When Needed)
+**Library Development (When Needed)**
 
-During Phase 4, proofs may require Lean 4 capabilities that do not exist in Mathlib or the broader ecosystem. When this happens, we build the missing capability as an independent library.
+During Phase 4a, proofs may require Lean 4 capabilities that do not exist in Mathlib or the broader ecosystem. When this happens, we build the missing capability as an independent library.
 
 *We do not speculatively create libraries — we build only when proofs demand capabilities that don't exist.*
 
@@ -213,9 +223,89 @@ During Phase 4, proofs may require Lean 4 capabilities that do not exist in Math
 1. **Document the gap** — create a GitHub Issue describing the missing capability and why existing libraries are insufficient.
 2. **Create a separate Lake package** in `/libs/<name>/` — the library must be a standalone project with its own `lakefile.lean`, `lean-toolchain`, and `README.md`.
 3. **Wire into proofs** via local `require` — the QBPProofs package references the library using a local path dependency during development.
-4. **Follow Library Quality Standards** — see the [Library Quality Standards](#library-quality-standards) section below. Full compliance is required before Phase 5 Track B publication, not during active Phase 4 development.
+4. **Follow Library Quality Standards** — see the [Library Quality Standards](#library-quality-standards) section below. Full compliance is required before Phase 5 Track B publication, not during active Phase 4a development.
 
 **Key principle:** Libraries must remain general-purpose. They must not import from `proofs/QBP/` or depend on any QBP-specific definitions. If other Lean users could benefit from the capability, it belongs in `/libs/`.
+
+##### Phase 4b: Proof Review
+
+**Owner:** Claude
+
+**Goal:** Review Gemini's formal proofs for rigor, verify clean compilation, and check correspondence to Phase 1/2 results.
+
+**Tasks:**
+- Review all `.lean` proof files for mathematical rigor and structural correctness.
+- Verify clean compilation (`lake build` succeeds with no `sorry`).
+- Check that proven theorems correspond to the ground truth claims from Phase 1 and the implementation logic from Phase 2.
+- Document review findings in a review report posted to the Phase 4 issue.
+
+**Output:** Proof review report confirming correctness or identifying issues.
+
+##### Phase 4c: Interactive Proof Visualization
+
+**Owner:** Claude / team
+
+**Goal:** Build an interactive browser-based visualization that combines the physics simulation with proof annotations, allowing users to explore both the physical results and their formal justification.
+
+**Tech Stack:**
+1. **Primary:** C with [raylib](https://www.raylib.com/) compiled to WASM via [Emscripten](https://emscripten.org/)
+2. **Fallback 1:** SDL2 + Emscripten
+3. **Fallback 2:** Raw WebGL via Emscripten
+
+**Tasks:**
+- Port relevant quaternion math to C (`qphysics.c/h`).
+- Create proof annotation overlay (`proof_annotations.c/h`) driven by Phase 4a proof metadata.
+- Build scene for the specific experiment implementing `init/update/draw/cleanup` interface.
+- Compile to WASM with Emscripten; produce deployable `dist/` output.
+- Ensure interactive controls (rotate, zoom, toggle proof annotations, step through proof structure).
+- Follow the QBP design palette for visual consistency.
+
+**Data Flow:**
+```
+Phase 2 results (CSV/JSON) ──┐
+                              ├──► export_data.py ──► data/experiment_NN.json
+Phase 4a proofs (.lean) ──────┘
+                                            │
+                                            ▼
+                                   C reads JSON (Emscripten --preload-file)
+                                            │
+                                            ▼
+                                   Interactive WASM app in browser
+                                   (physics simulation + proof annotations)
+```
+
+**Scene Interface Pattern:** Each experiment implements a scene with `init/update/draw/cleanup` functions. New experiments add a `.c` file in `scenes/` and register it in `main.c`.
+
+**Directory Layout:**
+```
+src/viz/interactive/
+├── README.md                # Build instructions and usage
+├── CMakeLists.txt           # CMake build configuration
+├── Makefile                 # Convenience wrapper
+├── shell.html               # Emscripten HTML template
+├── src/
+│   ├── qphysics.c           # C port of quaternion math
+│   ├── qphysics.h
+│   ├── proof_annotations.c  # Proof overlay rendering
+│   ├── proof_annotations.h
+│   ├── scene.h              # Scene interface (init/update/draw/cleanup)
+│   ├── main.c               # Entry point, scene dispatch
+│   └── scenes/
+│       └── experiment_01_stern_gerlach.c
+├── data/
+│   └── experiment_01.json   # Phase 2 data + Phase 4a proof structure
+├── build/                   # .gitignore'd — native/WASM build artifacts
+└── dist/                    # .gitignore'd — deployable WASM output
+```
+
+**Output:** Interactive WASM visualization in `src/viz/interactive/dist/`.
+
+##### Phase 4 Decision Gate
+
+> "Do all Lean proofs verify AND does the interactive visualization accurately depict the physics and proof structure?"
+
+-   **If NO:** Document the flaw, create a new issue, and **loop back to Phase 2 (Implementation & Execution)** to address the underlying problem.
+-   **If YES:** Proceed to Phase 5.
 
 ---
 
@@ -283,10 +373,12 @@ Each experiment requires 5 issues, one per phase:
 | `Experiment N: Name - Phase 1: Ground Truth` | `type: experiment`, `phase: ground-truth` |
 | `Experiment N: Name - Phase 2: Implementation` | `type: experiment`, `phase: implementation` |
 | `Experiment N: Name - Phase 3: Visualization` | `type: experiment`, `phase: visualization` |
-| `Experiment N: Name - Phase 4: Formal Proof` | `type: experiment`, `phase: proof` |
+| `Experiment N: Name - Phase 4: Formal Verification` | `type: experiment`, `phase: proof` |
 | `Experiment N: Name - Phase 5: Publication` | `type: experiment`, `phase: publication` |
 
 Phase 2 is blocked by Phase 1. Phase 3 is blocked by Phase 2. And so on.
+
+**Note:** Phase 4 sub-phases (4a/4b/4c) are tracked as task sections within the single Phase 4 issue, not as 3 separate issues. The issue count per experiment remains 5.
 
 ---
 
@@ -587,6 +679,7 @@ This project uses a variety of tools for different purposes. Adherence to this t
     *   `numpy-quaternion` for core quaternion mathematics.
     *   `vpython` for 3D visualization.
 *   **Formal Proof:** Lean 4.
+*   **Interactive Visualization:** C with [raylib](https://www.raylib.com/) compiled to WASM via [Emscripten](https://emscripten.org/). (Phase 4c output)
 *   **Lean Library Publishing:** [Reservoir](https://reservoir.lean-lang.org/) for package registry; `doc-gen4` for API documentation.
 *   **Code Quality:** `pre-commit` framework using `black` for formatting and `mypy` for type checking.
 
@@ -664,6 +757,7 @@ This project follows a defined directory structure to keep our work organized.
 *   `/research`: Contains markdown files detailing the ground truth, experimental methods, and expected results for each test on our roadmap. (Phase 1 output)
 *   `/src`: Contains the `qphysics.py` library, the computational heart of our formalism. (Phase 2 output)
 *   `/src/viz`: Contains visualization code including `vpython` demos and Manim scenes. (Phase 3 output)
+*   `/src/viz/interactive`: C/WASM interactive proof visualizations. (Phase 4c output)
 *   `/experiments`: Contains the Python scripts for our "synthetic experiments," which use the `qphysics.py` library to test our hypotheses. (Phase 2 output)
 *   `/tests/physics`: Contains physics validation tests for each experiment. (Phase 2 output)
 *   `/proofs`: Contains Lean 4 formal proof files. (Phase 4 output)

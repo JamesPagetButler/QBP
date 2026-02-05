@@ -72,3 +72,7 @@ All proofs must:
 - Compile without errors (`lake build` succeeds)
 - Contain no `sorry` (incomplete proofs)
 - Match ground truth claims from Phase 1 research
+
+## Phase 4c Visualization Bridge
+
+Phase 4a proof structure is exported to JSON (alongside Phase 2 results) for consumption by the Phase 4c interactive visualization. A Python export script (`export_data.py`) extracts proof metadata — theorem names, statement summaries, and dependency structure — and combines it with Phase 2 simulation data into a single JSON file per experiment. The C/WASM visualization in `src/viz/interactive/` reads this JSON to render proof annotations overlaid on the physics simulation. See [CONTRIBUTING.md](../CONTRIBUTING.md#phase-4c-interactive-proof-visualization) for the full Phase 4c specification.

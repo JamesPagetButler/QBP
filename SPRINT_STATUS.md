@@ -26,7 +26,10 @@
 - [x] Phase 1: Ground Truth (#52)
 - [x] Phase 2: Implementation (#53)
 - [x] Phase 3: Visualization (#29)
-- [ ] Phase 4: Formal Proof (#55) — Verify acceptance criteria & close
+- [ ] Phase 4: Formal Verification (#55)
+  - [ ] 4a: Formal Proof (Gemini writes Lean 4 proofs)
+  - [ ] 4b: Proof Review (Claude reviews and tests proofs)
+  - [ ] 4c: Interactive Proof Visualization (C/WASM browser viz)
 - [ ] Phase 5: Publication (#64) — Verify acceptance criteria & close
 - [ ] Theory Refinement (#80) — Not started
 
@@ -58,7 +61,10 @@
 - [ ] Phase 1: Ground Truth (#XX)
 - [ ] Phase 2: Implementation (#XX)
 - [ ] Phase 3: Visualization (#XX)
-- [ ] Phase 4: Formal Proof (#XX)
+- [ ] Phase 4: Formal Verification (#XX)
+  - [ ] 4a: Formal Proof
+  - [ ] 4b: Proof Review
+  - [ ] 4c: Interactive Proof Visualization
 - [ ] Phase 5: Publication (#XX)
 - [ ] Theory Refinement (#XX)
 
