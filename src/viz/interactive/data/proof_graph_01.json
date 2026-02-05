@@ -1,0 +1,165 @@
+{
+  "experiment": "01_stern_gerlach",
+  "title": "Stern-Gerlach: Spin-X measured on Z-axis",
+  "description": "Formal proof that a spin-x state measured on the z-axis produces a 50/50 probability split, as predicted by the QBP quaternion framework and observed in the Stern-Gerlach experiment.",
+  "walk_order": [
+    "isPureQuaternion",
+    "vecDot",
+    "spin_x_is_pure",
+    "spin_z_is_pure",
+    "spinXState",
+    "spinZObservable",
+    "spinXState_is_pure",
+    "spinZObservable_is_pure",
+    "x_z_orthogonal",
+    "expectation_orthogonal_is_zero",
+    "expectation_x_measured_z_is_zero",
+    "prob_up_x_measured_z_is_half",
+    "prob_down_x_measured_z_is_half"
+  ],
+  "nodes": [
+    {
+      "id": "isPureQuaternion",
+      "name": "isPureQuaternion",
+      "kind": "definition",
+      "statement": "(q : Q) : Prop := q.re = 0",
+      "physical_meaning": "Definition encoding QBP Axiom 2: observables are pure quaternions (scalar part = 0).",
+      "dependencies": [],
+      "source_file": "Basic.lean"
+    },
+    {
+      "id": "vecDot",
+      "name": "vecDot",
+      "kind": "definition",
+      "statement": "(q\u2081 q\u2082 : Q) : \u211d :=",
+      "physical_meaning": "Dot product of vector parts: measures alignment between state and observable axes.",
+      "dependencies": [],
+      "source_file": "Basic.lean"
+    },
+    {
+      "id": "spin_x_is_pure",
+      "name": "spin_x_is_pure",
+      "kind": "theorem",
+      "statement": ": isPureQuaternion SPIN_X := rfl",
+      "physical_meaning": "SPIN_X = i is a valid observable (pure quaternion).",
+      "dependencies": [
+        "isPureQuaternion"
+      ],
+      "source_file": "Basic.lean"
+    },
+    {
+      "id": "spin_z_is_pure",
+      "name": "spin_z_is_pure",
+      "kind": "theorem",
+      "statement": ": isPureQuaternion SPIN_Z := rfl",
+      "physical_meaning": "SPIN_Z = k is a valid observable (pure quaternion).",
+      "dependencies": [
+        "isPureQuaternion"
+      ],
+      "source_file": "Basic.lean"
+    },
+    {
+      "id": "spinXState",
+      "name": "spinXState",
+      "kind": "definition",
+      "statement": ": Q := SPIN_X",
+      "physical_meaning": "Experiment state: particle with spin along +x axis (quaternion i).",
+      "dependencies": [],
+      "source_file": "SternGerlach.lean"
+    },
+    {
+      "id": "spinZObservable",
+      "name": "spinZObservable",
+      "kind": "definition",
+      "statement": ": Q := SPIN_Z",
+      "physical_meaning": "Measurement axis: spin measured along z axis (quaternion k).",
+      "dependencies": [],
+      "source_file": "SternGerlach.lean"
+    },
+    {
+      "id": "spinXState_is_pure",
+      "name": "spinXState_is_pure",
+      "kind": "theorem",
+      "statement": ": isPureQuaternion spinXState := spin_x_is_pure",
+      "physical_meaning": "The spin-x state satisfies the pure quaternion requirement.",
+      "dependencies": [
+        "spinXState",
+        "spin_x_is_pure"
+      ],
+      "source_file": "SternGerlach.lean"
+    },
+    {
+      "id": "spinZObservable_is_pure",
+      "name": "spinZObservable_is_pure",
+      "kind": "theorem",
+      "statement": ": isPureQuaternion spinZObservable := spin_z_is_pure",
+      "physical_meaning": "The spin-z observable satisfies the pure quaternion requirement.",
+      "dependencies": [
+        "spinZObservable",
+        "spin_z_is_pure"
+      ],
+      "source_file": "SternGerlach.lean"
+    },
+    {
+      "id": "x_z_orthogonal",
+      "name": "x_z_orthogonal",
+      "kind": "theorem",
+      "statement": ": vecDot spinXState spinZObservable = 0 := by",
+      "physical_meaning": "The x and z spin axes are perpendicular: their dot product is zero.",
+      "dependencies": [
+        "vecDot",
+        "spinXState",
+        "spinZObservable"
+      ],
+      "source_file": "SternGerlach.lean"
+    },
+    {
+      "id": "expectation_orthogonal_is_zero",
+      "name": "expectation_orthogonal_is_zero",
+      "kind": "theorem",
+      "statement": "(\u03c8 O : Q) (_h\u03c8 : isPureQuaternion \u03c8) (_hO : isPureQuaternion O) (h_ortho : vecDot \u03c8 O = 0) : expectationValue \u03c8 O = 0 := by",
+      "physical_meaning": "General principle: when state and observable axes are perpendicular, expectation value is zero.",
+      "dependencies": [
+        "isPureQuaternion",
+        "vecDot"
+      ],
+      "source_file": "Basic.lean"
+    },
+    {
+      "id": "expectation_x_measured_z_is_zero",
+      "name": "expectation_x_measured_z_is_zero",
+      "kind": "theorem",
+      "statement": ": expectationValue spinXState spinZObservable = 0 :=",
+      "physical_meaning": "Core result: <O_z> = 0 for spin-x state. Average measurement is zero.",
+      "dependencies": [
+        "expectation_orthogonal_is_zero",
+        "spinXState_is_pure",
+        "spinZObservable_is_pure",
+        "x_z_orthogonal"
+      ],
+      "source_file": "SternGerlach.lean"
+    },
+    {
+      "id": "prob_up_x_measured_z_is_half",
+      "name": "prob_up_x_measured_z_is_half",
+      "kind": "theorem",
+      "statement": ": probUp spinXState spinZObservable = 1/2 :=",
+      "physical_meaning": "Probability of spin-up (+1) is exactly 50%.",
+      "dependencies": [
+        "expectation_x_measured_z_is_zero"
+      ],
+      "source_file": "SternGerlach.lean"
+    },
+    {
+      "id": "prob_down_x_measured_z_is_half",
+      "name": "prob_down_x_measured_z_is_half",
+      "kind": "theorem",
+      "statement": ": probDown spinXState spinZObservable = 1/2 := by",
+      "physical_meaning": "Probability of spin-down (-1) is exactly 50%.",
+      "dependencies": [
+        "expectation_x_measured_z_is_zero"
+      ],
+      "source_file": "SternGerlach.lean"
+    }
+  ]
+}
