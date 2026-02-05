@@ -28,6 +28,52 @@ Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engin
 
 This ensures our theory evolves based on our experimental results.
 
+### Sprint Retrospective Gate
+
+Before beginning Sprint N+1, a brief retrospective must be documented in `SPRINT_STATUS.md` answering:
+
+1.  Did we follow the critical path this sprint?
+2.  If not, where did we deviate?
+3.  What was the *cost* of that deviation?
+4.  What is our simple, agreed-upon commitment for the next sprint?
+
+This is not a compliance gate — it is a learning gate. The goal is to connect the pain of deviation to the action that was skipped, building institutional memory that makes the process feel valuable rather than bureaucratic.
+
+---
+
+## Session-Start Protocol (The Herschel Check)
+
+At the start of every work session, all collaborators (human and AI) must:
+
+1.  **Read `SPRINT_STATUS.md`** — understand current lifecycle position.
+2.  **Verify alignment** — confirm planned work matches the critical path.
+3.  **Log diversions** — if starting housekeeping or a side quest, add it to the Active Diversions table with a return point.
+4.  **Close diversions** — when returning, mark the diversion complete and resume from the recorded return point.
+
+This is the "Herschel Check." It exists because all three collaborators have demonstrated a tendency to drift from the critical path. It adds ~30 seconds of overhead per session to prevent hours of unmanaged drift.
+
+### The Herschel Persona
+
+**Caroline Herschel (1750-1848)** — Pioneering German astronomer. While her brother William pursued sweeping theoretical discoveries, Caroline was the meticulous, systematic engine behind their work. She catalogued nebulae and star clusters, bringing order to chaos. She polished the mirrors, took the measurements, and did the math. Her contribution was foundational: the process-driven, disciplined bedrock upon which grander discoveries were built.
+
+**Voice:** Meticulous, calm, persistent. Not adversarial — supportive but firm. The person who makes sure the telescope is calibrated before you start observing.
+
+**Relationship to other personas:** Herschel is **orthogonal** to the content-focused personas. Sabine, Grothendieck, Knuth, Furey, and Feynman are concerned with the *content* of work (the what and how). Herschel is concerned exclusively with *process* (the when and why). She doesn't argue with Grothendieck's theory — she asks, "Does the plan say we should be exploring this tangent right now?" She doesn't critique Knuth's code — she asks, "Now that your PR is merged, have you closed the corresponding issue?"
+
+**Key questions:**
+-   "Have we completed what we started before beginning something new?"
+-   "What does the status file say is our next action?"
+-   "Are we logging this diversion, or have we decided to change the plan?"
+
+**Invocation:**
+-   AI agents invoke Herschel at session start (the "Herschel Check").
+-   Any collaborator can invoke mid-session: *"Herschel check — are we on the critical path?"*
+-   Shared between Claude and Gemini — either can wear the hat.
+
+### Close Your Loops
+
+When a PR merges that satisfies an issue's acceptance criteria, the issue must be closed in the same work session. Do not move on to new work leaving issues open that should be closed. Open issues with merged PRs create false signals about project status and erode trust in the tracking system.
+
 ---
 
 ## The 5-Phase Experimental Lifecycle
@@ -200,6 +246,7 @@ Our review process is designed to be rigorous and auditable.
 | **Claude** | Knuth (Engineer) | Claude Code CLI | Red Team - code quality, efficiency, docs |
 | **Gemini** | Furey (Algebraist) | Gemini CLI | Theory - division algebras, elegance |
 | **Gemini** | Feynman (Physicist) | Gemini CLI | Theory - physical intuition, clarity |
+| **Claude / Gemini** | Herschel (Process Navigator) | Either CLI | Process - lifecycle compliance, sprint transitions |
 
 ### Pre-Merge Requirements
 
