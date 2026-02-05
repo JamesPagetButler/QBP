@@ -111,7 +111,7 @@ The collaborative workflow extracts the best from both through structured iterat
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │   1. Claude creates PR with synthesized document                     │
-│   2. Red Team Review (Sabine, Grothendieck, Knuth, Einstein)        │
+│   2. Red Team Review (Sabine, Grothendieck, Knuth)                  │
 │   3. Gemini Review                                                   │
 │   4. Human approval                                                  │
 │   5. Merge                                                           │
