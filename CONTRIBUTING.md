@@ -70,9 +70,13 @@ This is the "Herschel Check." It exists because all three collaborators have dem
 -   Any collaborator can invoke mid-session: *"Herschel check — are we on the critical path?"*
 -   Shared between Claude and Gemini — either can wear the hat.
 
-### Close Your Loops
+---
+
+## Close Your Loops
 
 When a PR merges that satisfies an issue's acceptance criteria, the issue must be closed in the same work session. Do not move on to new work leaving issues open that should be closed. Open issues with merged PRs create false signals about project status and erode trust in the tracking system.
+
+**Responsibility:** The collaborator who merges the PR (or requests the merge) must verify that the issue's acceptance criteria are met, then close the issue immediately. If acceptance criteria are only partially met, document the remaining gaps on the issue rather than leaving it silently open.
 
 ---
 

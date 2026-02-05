@@ -44,3 +44,27 @@
 
 - Sprint 2 Phase 1 (Ground Truth) was completed early (PR #116) before Theory Refinement. The work was good but out of order. We acknowledge this and proceed correctly from here.
 - Sprint 2 will resume at Phase 2 (Implementation, #36) after Theory Refinement #80 is complete.
+
+---
+
+## Template: New Sprint Checklist
+
+*When beginning a new sprint, copy this template and fill in the issue numbers.*
+
+```markdown
+## Sprint N Closure Checklist
+
+- [ ] Phase 1: Ground Truth (#XX)
+- [ ] Phase 2: Implementation (#XX)
+- [ ] Phase 3: Visualization (#XX)
+- [ ] Phase 4: Formal Proof (#XX)
+- [ ] Phase 5: Publication (#XX)
+- [ ] Theory Refinement (#XX)
+
+## Sprint N Retrospective
+
+1. Did we follow the critical path this sprint?
+2. Where did we deviate?
+3. What was the cost?
+4. What is our commitment for Sprint N+1?
+```
