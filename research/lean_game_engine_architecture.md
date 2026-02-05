@@ -22,19 +22,30 @@ The goal is to create a virtual 3D laboratory where experiments can be visualize
 
 ## 3. Analysis of Game Engine Candidates
 
-### 3.1 Godot Engine (Recommended)
+### 3.1 Godot Engine (High-Level & Mature)
 
 *   **Pros:**
     *   **Fully Open Source (MIT License):** No restrictions on use or distribution.
     *   **Excellent Command-Line Interface:** Can be launched and controlled from an external script, which is essential for our Lean driver.
-    *   **Easy Scripting (GDScript):** The Python-like GDScript is easy to learn and perfectly suited for tasks like parsing JSON commands, manipulating 3D objects, and creating UI elements.
-    *   **Lightweight & Fast:** The engine itself is small and starts quickly.
-    *   **Mature 3D Environment:** Comes with a full 3D editor, physics engine (which we can use for non-experimental objects), animation system, and UI toolkit.
+    *   **Easy Scripting (GDScript):** The Python-like GDScript is extremely easy to learn and perfectly suited for the simple logic required (parsing JSON, triggering animations). This leads to very low development effort for the "Lab" side of the project.
+    *   **Mature Ecosystem:** Massive community, extensive documentation, tutorials, and a large asset library.
 
 *   **Cons:**
     *   While performant, it doesn't have the same raw graphical power as top-tier AAA engines like Unreal. This is not a significant drawback for our scientific visualization needs.
 
-### 3.2 Unreal Engine
+### 3.2 Kaiju Engine (Go-Native & Modern)
+
+*   **Pros:**
+    *   **Written in Go:** Directly aligns with the original user interest in a Go-based visualization engine. This allows for a unified language on the "visualization/simulation" side of the architecture.
+    *   **Modern Backend (Vulkan):** Utilizes a modern, high-performance graphics API.
+    *   **Full-Featured:** Includes a built-in editor, physics, animation, and UI systems, representing a massive advantage over a custom Go renderer.
+    *   **Open Source (MIT License):** Fully open for any use case.
+
+*   **Cons:**
+    *   **Ecosystem and Maturity:** As a newer, less-common engine, it has a much smaller community, fewer learning resources, and a less-developed asset ecosystem compared to Godot.
+    *   **Development Language:** While powerful, Go is more verbose and lower-level than GDScript. The development effort to write the simulation/visualization logic in Go would be higher than in Godot for the same result.
+
+### 3.3 Unreal Engine
 
 *   **Pros:**
     *   **Unmatched Visual Fidelity:** Capable of producing photorealistic graphics.
@@ -43,7 +54,7 @@ The goal is to create a virtual 3D laboratory where experiments can be visualize
     *   **Overkill:** Its feature set is far beyond our project's scope.
     *   **Licensing:** While source-available, it has royalty-based licensing that is less straightforward than Godot's MIT license.
 
-### 3.3 Unity
+### 3.4 Unity
 
 *   **Pros:**
     *   Popular and well-documented.
@@ -53,16 +64,16 @@ The goal is to create a virtual 3D laboratory where experiments can be visualize
 
 ---
 
-## 4. Proposed Architecture: The Lean + Godot Hybrid Model
+## 4. Proposed Architecture: The Lean + Game Engine Hybrid Model
 
-This architecture maximizes both rigor and visualization quality while minimizing development effort.
+This architecture maximizes both rigor and visualization quality. The core idea is the same regardless of the chosen engine (Godot or Kaiju).
 
 **Workflow:**
 
 1.  **Lean (The "Brain"):**
     *   Performs the Phase 1 Ground Truth derivation.
     *   Formally proves the expected outcome of an experiment (e.g., `P(+) = 0.5`).
-    *   Uses the `IO.Process.run` function to execute the Godot application.
+    *   Uses the `IO.Process.run` function to execute the chosen game engine.
 
 2.  **Communication (File-based):**
     *   Lean writes a simple JSON file with a high-level command. This is the most robust method.
@@ -76,35 +87,46 @@ This architecture maximizes both rigor and visualization quality while minimizin
           }
         }
         ```
-    *   Lean then launches Godot: `godot --headless --script /path/to/runner.gd -- /path/to/command.json`. The Godot project is launched in a headless mode to run the simulation based on the command file. For visualization, it would be launched normally, reading the command file on startup.
+    *   Lean then launches the engine, passing the command file path as an argument.
 
-3.  **Godot (The "Interactive Lab"):**
-    *   A Godot project is created containing the 3D assets for the laboratory (magnets, detectors, etc.).
-    *   A main GDScript file reads the `command.json` on startup.
-    *   Based on the `experiment_id`, it loads the correct scene and initiates the simulation.
-    *   It uses the `parameters` from Lean to run the visual part of the experiment. For example, it doesn't *calculate* `prob_up`; it *uses* the `prob_up` value provided by Lean to run a random number generator and decide the particle's path.
-    *   It handles all rendering, animation, camera controls, and UI, providing a rich, interactive experience.
+3.  **Game Engine (The "Interactive Lab"):**
+    *   A project is created containing the 3D assets for the laboratory.
+    *   A main script file (in GDScript for Godot, or Go for Kaiju) reads the `command.json` on startup.
+    *   Based on the `experiment_id`, it loads the correct scene and initiates the simulation logic.
+    *   It uses the `parameters` from Lean to run the visual part of the experiment. It does not calculate the physics itself.
+    *   It handles all rendering, animation, camera controls, and UI.
 
 ---
 
 ## 5. Comparison of Visualization Approaches
 
-| Approach | Rigor | Visual Fidelity | Performance | Dev Effort |
-|---|---|---|---|---|
-| **Python / VPython** | Low (Logic in Python) | Low-Medium | Low | **Very Low** |
-| **Custom Go Renderer** | High (Hybrid Model) | Low-Medium | High | **Very High** |
-| **Game Engine (Godot)**| High (Hybrid Model) | **High** | **High** | **Medium** |
+| Approach | Rigor (Lean Driven) | Visual Fidelity | Performance | Dev Effort | Ecosystem |
+|---|---|---|---|---|---|
+| **Python / VPython** | Low (Logic in Python) | Low-Medium | Low | **Very Low** | Excellent |
+| **Custom Go Renderer** | High (Hybrid Model) | Low-Medium | High | **Very High** | Minimal |
+| **Game Engine (Godot)**| High (Hybrid Model) | **High** | **High** | **Medium-Low** | **Excellent** |
+| **Game Engine (Kaiju)**| High (Hybrid Model) | **High** | **High** | **Medium-High**| Growing |
 
-The Game Engine approach strikes the best balance. The development effort is "Medium" because we are leveraging a massive, pre-built engine, but it is not "Low" because we still need to build the specific lab scenes and scripting logic within Godot.
+The Game Engine approach strikes the best balance. The development effort for Godot is rated "Medium-Low" due to the ease of GDScript, while Kaiju is "Medium-High" because writing the same logic in Go requires more effort.
 
 ---
 
 ## 6. Recommendation
 
-The use of a game engine, specifically **Godot**, is the superior architectural choice for creating a "Lean-driven Physics Laboratory." It provides a far better balance of visual fidelity, performance, and development effort than a custom Go renderer, while maintaining the same level of scientific rigor through the **Lean + Godot Hybrid Model**.
+The use of a game engine is the superior architectural choice for creating a "Lean-driven Physics Laboratory." This leaves a choice between two excellent candidates: Godot and Kaiju.
+
+*   **Choose Godot if the priority is...**
+    *   **Rapid Development and Ease of Use:** GDScript is significantly easier and faster for writing the necessary control scripts.
+    *   **Leveraging a Mature Ecosystem:** Access to a vast library of tutorials, assets, and community support.
+
+*   **Choose Kaiju if the priority is...**
+    *   **A Pure Go Environment:** Adhering to the original interest in using Go for the visualization side.
+    *   **A Modern, Opinionated Architecture:** Working with a newer engine built from the ground up on Go and Vulkan.
+
+**Final Recommendation:** For this project, **Godot remains the most pragmatic choice** because its ease of scripting (GDScript) will minimize the development time needed for the non-core (visualization) part of the task, allowing more focus on the Lean-based physics. However, Kaiju is a powerful and valid alternative if a Go-native environment is strongly preferred.
 
 **Proposed Next Step:**
-A small proof-of-concept (PoC) should be developed to validate the communication pipeline:
+The proof-of-concept (PoC) outlined previously remains the correct next step. It can be implemented with **Godot** to quickly validate the architecture.
 1.  Create a simple Lean 4 program that writes a `{"message": "Hello from Lean"}` JSON file.
 2.  Create a simple Godot project with a label.
 3.  Write a GDScript that, on startup, reads the JSON file and displays the message in the label.
