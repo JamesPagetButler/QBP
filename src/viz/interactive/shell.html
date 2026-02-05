@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBP Interactive Proof Visualization</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #0D1B2A; /* QBP Midnight */
+            color: #FFFEF0;            /* QBP Ivory */
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: #FFD700; /* QBP Gold */
+            font-size: 1.5em;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            color: #D4A574; /* QBP Brass */
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+
+        .canvas-container {
+            border: 2px solid #D4A574; /* QBP Brass */
+            box-shadow: 0 0 20px rgba(212, 165, 116, 0.3);
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .controls {
+            margin-top: 16px;
+            padding: 12px 24px;
+            background: #1A1A2E; /* QBP Dark Slate */
+            border: 1px solid #71797E; /* QBP Steel */
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: #E8E4E0; /* QBP Light Gray */
+        }
+
+        .controls kbd {
+            background: #2C2C2C;
+            border: 1px solid #71797E;
+            border-radius: 3px;
+            padding: 2px 6px;
+            margin: 0 2px;
+            color: #2A9D8F; /* QBP Teal */
+        }
+
+        footer {
+            margin-top: 20px;
+            padding: 12px;
+            color: #71797E;
+            font-size: 0.75em;
+        }
+
+        footer a {
+            color: #2A9D8F;
+            text-decoration: none;
+        }
+
+        .spinner {
+            display: none;
+            margin: 40px;
+            color: #D4A574;
+        }
+
+        .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+        div.emscripten { text-align: center; }
+        div.emscripten_border { border: 0; }
+
+        /* Progress bar during load */
+        .progress {
+            margin: 20px auto;
+            width: 300px;
+            height: 6px;
+            background: #1A1A2E;
+            border: 1px solid #71797E;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress .bar {
+            height: 100%;
+            background: #2A9D8F;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>QBP Proof Visualization</h1>
+        <p>Quaternion-Based Physics &mdash; Interactive Proof Explorer</p>
+    </header>
+
+    <div class="spinner" id="spinner">Loading...</div>
+
+    <div class="progress" id="progress">
+        <div class="bar" id="progress-bar"></div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas class="emscripten" id="canvas"
+                oncontextmenu="event.preventDefault()"
+                tabindex="-1">
+        </canvas>
+    </div>
+
+    <div class="controls">
+        <kbd>&larr;</kbd> / <kbd>&rarr;</kbd> Step through proofs &nbsp;&bull;&nbsp;
+        <kbd>R</kbd> Reset &nbsp;&bull;&nbsp;
+        Click a node to jump to it
+    </div>
+
+    <footer>
+        QBP &mdash; Quaternion-Based Physics
+    </footer>
+
+    <script>
+        var statusElement = document.getElementById('spinner');
+        var progressElement = document.getElementById('progress');
+        var progressBar = document.getElementById('progress-bar');
+
+        var Module = {
+            print: function(text) { console.log(text); },
+            printErr: function(text) { console.error(text); },
+            canvas: (function() {
+                var canvas = document.getElementById('canvas');
+                return canvas;
+            })(),
+            setStatus: function(text) {
+                if (!text) {
+                    progressElement.style.display = 'none';
+                    statusElement.style.display = 'none';
+                    return;
+                }
+                var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+                if (m) {
+                    var pct = (parseInt(m[2]) / parseInt(m[4]) * 100);
+                    progressBar.style.width = pct + '%';
+                    progressElement.style.display = 'block';
+                } else {
+                    statusElement.style.display = 'block';
+                    statusElement.innerText = text;
+                }
+            },
+            totalDependencies: 0,
+            monitorRunDependencies: function(left) {
+                this.totalDependencies = Math.max(this.totalDependencies, left);
+                Module.setStatus(left ? 'Loading... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : '');
+            }
+        };
+
+        Module.setStatus('Loading...');
+        window.onerror = function(event) {
+            Module.setStatus('Error — see browser console');
+        };
+    </script>
+
+    {{{ SCRIPT }}}
+</body>
+</html>
