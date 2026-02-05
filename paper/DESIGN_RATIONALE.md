@@ -45,7 +45,7 @@ The Stern-Gerlach experiment (Sprint 1) was our first complete cycle through the
 ### 5.1 What Worked
 
 *   **The expectation value formula.** For orthogonal state/observable configurations, `⟨O⟩ = vecDot(ψ, O) = 0` produces the correct 50/50 probability split. The simulation (N = 1,000,000 measurements) deviated only 0.4140σ from theoretical predictions.
-*   **Formal verification adds confidence.** The Lean 4 proofs in `proofs/QBP/Experiments/SternGerlach.lean` rigorously verify the entire dependency chain from axioms to the final probability result. The 13-theorem proof tree makes explicit which assumptions are required.
+*   **Formal verification adds confidence.** The Lean 4 proofs in `proofs/QBP/Experiments/SternGerlach.lean` rigorously verify the entire dependency chain from axioms to the final probability result. The 9-theorem proof tree (plus supporting definitions) makes explicit which assumptions are required.
 *   **The axiom-first approach.** Establishing axioms (Axiom 1, 2, 3) before running simulations ensured the framework was mathematically constrained rather than ad-hoc fitted to results.
 
 ### 5.2 What Was Refined
