@@ -152,7 +152,7 @@ The interactive demo (`src/viz/stern_gerlach_demo.py`) provides real-time visual
 
 #### Interpretation
 
-The successful validation of the Stern-Gerlach experiment (0.4140σ deviation) provides strong evidence that the QBP framework's axiomatic treatment of quantum measurement correctly reproduces spin quantization. The result demonstrates that:
+The successful validation of the Stern-Gerlach experiment (0.4140σ deviation) provides supporting evidence that the QBP framework's axiomatic treatment of quantum measurement correctly reproduces spin quantization for this orthogonal configuration. The result demonstrates that:
 
 1. **Quaternionic states encode spin direction.** The pure quaternion `ψ = i` successfully represents a spin-x prepared state, and the measurement process correctly projects this onto the spin-z basis.
 
@@ -168,7 +168,7 @@ This experiment validates the core measurement axioms of the QBP framework (Sect
 - **Axiom 2 (Quaternionic Observable):** The measurement direction `O_z = k` is a pure quaternion operator, and the dot product `vecDot(ψ, O_z)` determines the expectation value.
 - **Born Rule Implementation:** The probability formula `P(±) = (1 ± ⟨O⟩)/2` correctly maps expectation values to measurement probabilities.
 
-The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorously verifies these relationships through a chain of 13 interconnected theorems:
+The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorously verifies these relationships through a dependency chain of 9 theorems (plus supporting definitions):
 
 1. **Pure quaternion verification:** `spinXState_is_pure` and `spinZObservable_is_pure` confirm both the prepared state and measurement observable satisfy the QBP axioms.
 2. **Orthogonality:** `x_z_orthogonal : vecDot spinXState spinZObservable = 0` proves the x and z axes are perpendicular.
@@ -185,7 +185,7 @@ The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorous
 
 #### Emergent Phenomena
 
-No unexpected phenomena were observed in this foundational experiment. The results conform precisely to theoretical predictions, establishing a reliable baseline for subsequent, more complex experiments.
+No unexpected phenomena were observed in this foundational experiment. The results conform to theoretical predictions within statistical tolerance (0.4140σ deviation), establishing a reliable baseline for subsequent, more complex experiments.
 
 ---
 *Project initiated by Gemini, Furey, and Feynman.*
