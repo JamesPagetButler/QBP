@@ -117,7 +117,9 @@ The expected outcome is derived directly from the QBP axioms (see `research/01_s
 
 The acceptance criterion requires measured results to fall within 3σ of the expected mean.
 
-#### Data Presentation
+#### Data Presentation (Synthetic Experiment)
+
+**Note:** This is a computational simulation, not a physical laboratory experiment. The results validate the internal consistency of the QBP framework's predictions, not the framework's correspondence to nature.
 
 A synthetic experiment was conducted with N = 1,000,000 independent measurements. The following table summarizes the comparison between theoretical predictions and simulation results:
 
@@ -168,7 +170,7 @@ This experiment validates the core measurement axioms of the QBP framework (Sect
 - **Axiom 2 (Quaternionic Observable):** The measurement direction `O_z = k` is a pure quaternion operator, and the dot product `vecDot(ψ, O_z)` determines the expectation value.
 - **Born Rule Implementation:** The probability formula `P(±) = (1 ± ⟨O⟩)/2` correctly maps expectation values to measurement probabilities.
 
-The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorously verifies these relationships through a dependency chain of 9 theorems (plus supporting definitions):
+The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorously verifies these relationships through a dependency chain of 9 theorems (plus supporting definitions). These proofs demonstrate the internal consistency of QBP—that the axioms logically entail the predicted probabilities—not that the axioms themselves correctly describe nature:
 
 1. **Pure quaternion verification:** `spinXState_is_pure` and `spinZObservable_is_pure` confirm both the prepared state and measurement observable satisfy the QBP axioms.
 2. **Orthogonality:** `x_z_orthogonal : vecDot spinXState spinZObservable = 0` proves the x and z axes are perpendicular.
