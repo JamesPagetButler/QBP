@@ -11,6 +11,10 @@ Outputs:
 
 This is a semi-automated tool: it extracts theorem names and dependencies
 from the Lean source, and augments them with human-curated physical meanings.
+
+NOTE: The C visualization uses a hardcoded graph for simplicity. This JSON
+serves as a portable data exchange format and documentation. The C code does
+not parse it at runtime.
 """
 
 import json
@@ -18,7 +22,7 @@ import re
 import sys
 from pathlib import Path
 
-# Project root (two levels up from this script's location in src/viz/interactive/)
+# Project root (three levels up from this script's location in src/viz/interactive/)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
 BASIC_LEAN = PROJECT_ROOT / "proofs" / "QBP" / "Basic.lean"
@@ -62,7 +66,7 @@ def parse_lean_file(path: Path) -> list[dict]:
 
         # Determine kind
         if kind in ("def", "noncomputable def", "abbrev"):
-            node_kind = "definition" if "def" in kind else "definition"
+            node_kind = "definition"
         else:
             node_kind = "theorem"
 
@@ -76,63 +80,59 @@ def parse_lean_file(path: Path) -> list[dict]:
     return items
 
 
-# Human-curated physical meanings for the Stern-Gerlach proof chain
+# Human-curated physical meanings for the Stern-Gerlach proof chain (13 nodes)
 PHYSICAL_MEANINGS = {
-    "isUnitQuaternion": "Axiom 1: A quantum state is a unit quaternion (|psi|^2 = 1).",
-    "isPureQuaternion": "Axiom 2: An observable is a pure quaternion (scalar part = 0).",
+    "isPureQuaternion": "Definition encoding QBP Axiom 2: observables are pure quaternions (scalar part = 0).",
+    "vecDot": "Dot product of vector parts: measures alignment between state and observable axes.",
     "spin_x_is_pure": "SPIN_X = i is a valid observable (pure quaternion).",
-    "spin_y_is_pure": "SPIN_Y = j is a valid observable (pure quaternion).",
     "spin_z_is_pure": "SPIN_Z = k is a valid observable (pure quaternion).",
-    "vecDot": "Dot product of vector parts: measures alignment between states.",
-    "expectationValue": "Expectation value: vecDot of state and observable vector parts.",
-    "probUp": "Probability of measuring +1 (spin up): (1 + <O>) / 2.",
-    "probDown": "Probability of measuring -1 (spin down): (1 - <O>) / 2.",
-    "expectation_orthogonal_is_zero": "General principle: perpendicular states always give zero expectation.",
-    "prob_up_orthogonal_is_half": "General: perpendicular measurement gives 50% spin-up.",
     "spinXState": "Experiment state: particle with spin along +x axis (quaternion i).",
     "spinZObservable": "Measurement axis: spin measured along z axis (quaternion k).",
-    "spinXState_is_pure": "The spin-x state satisfies the pure quaternion axiom.",
-    "spinZObservable_is_pure": "The spin-z observable satisfies the pure quaternion axiom.",
+    "spinXState_is_pure": "The spin-x state satisfies the pure quaternion requirement.",
+    "spinZObservable_is_pure": "The spin-z observable satisfies the pure quaternion requirement.",
     "x_z_orthogonal": "The x and z spin axes are perpendicular: their dot product is zero.",
+    "expectation_orthogonal_is_zero": "General principle: when state and observable axes are perpendicular, expectation value is zero.",
     "expectation_x_measured_z_is_zero": "Core result: <O_z> = 0 for spin-x state. Average measurement is zero.",
     "prob_up_x_measured_z_is_half": "Probability of spin-up (+1) is exactly 50%.",
     "prob_down_x_measured_z_is_half": "Probability of spin-down (-1) is exactly 50%.",
 }
 
-# Dependency graph (manually curated from the Lean import chain)
+# Dependency graph (corrected to match actual Lean proof structure)
+# Key insight: `expectation_x_measured_z_is_zero` explicitly passes
+# `spinXState_is_pure` and `spinZObservable_is_pure` as arguments (lines 54-55).
 DEPENDENCIES = {
-    "isUnitQuaternion": [],
     "isPureQuaternion": [],
+    "vecDot": [],
     "spin_x_is_pure": ["isPureQuaternion"],
     "spin_z_is_pure": ["isPureQuaternion"],
-    "vecDot": [],
-    "expectationValue": ["vecDot"],
-    "probUp": ["expectationValue"],
-    "probDown": ["expectationValue"],
-    "expectation_orthogonal_is_zero": ["isPureQuaternion", "vecDot"],
-    "prob_up_orthogonal_is_half": ["expectation_orthogonal_is_zero"],
-    "spinXState": ["spin_x_is_pure"],
-    "spinZObservable": ["spin_z_is_pure"],
-    "spinXState_is_pure": ["spin_x_is_pure"],
-    "spinZObservable_is_pure": ["spin_z_is_pure"],
+    "spinXState": [],  # Simple definition := SPIN_X
+    "spinZObservable": [],  # Simple definition := SPIN_Z
+    "spinXState_is_pure": ["spinXState", "spin_x_is_pure"],
+    "spinZObservable_is_pure": ["spinZObservable", "spin_z_is_pure"],
     "x_z_orthogonal": ["vecDot", "spinXState", "spinZObservable"],
+    "expectation_orthogonal_is_zero": ["isPureQuaternion", "vecDot"],
     "expectation_x_measured_z_is_zero": [
         "expectation_orthogonal_is_zero",
-        "spinXState", "spinZObservable", "x_z_orthogonal"
+        "spinXState_is_pure",
+        "spinZObservable_is_pure",
+        "x_z_orthogonal",
     ],
     "prob_up_x_measured_z_is_half": ["expectation_x_measured_z_is_zero"],
     "prob_down_x_measured_z_is_half": ["expectation_x_measured_z_is_zero"],
 }
 
-# Nodes to include in the Stern-Gerlach visualization (walk order)
+# Walk order for Stern-Gerlach visualization (13 nodes)
+# Removed isUnitQuaternion (orphan node not used in this proof chain)
+# Added spinXState_is_pure and spinZObservable_is_pure (required by main theorem)
 SG_WALK_ORDER = [
-    "isUnitQuaternion",
     "isPureQuaternion",
     "vecDot",
     "spin_x_is_pure",
     "spin_z_is_pure",
     "spinXState",
     "spinZObservable",
+    "spinXState_is_pure",
+    "spinZObservable_is_pure",
     "x_z_orthogonal",
     "expectation_orthogonal_is_zero",
     "expectation_x_measured_z_is_zero",
@@ -151,8 +151,8 @@ def build_graph() -> dict:
     nodes = []
     for name in SG_WALK_ORDER:
         item = all_items.get(name, {})
-        kind = "axiom" if name in ("isUnitQuaternion", "isPureQuaternion") else \
-               item.get("kind", "theorem")
+        # Use the kind from the Lean file (definitions vs theorems)
+        kind = item.get("kind", "theorem")
 
         node = {
             "id": name,

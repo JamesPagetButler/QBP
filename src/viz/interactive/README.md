@@ -7,12 +7,21 @@ Browser-based interactive visualization of the Stern-Gerlach formal proofs. Step
 The visualization is built with **C + raylib**, compiled to **WASM via Emscripten** for browser deployment.
 
 ```
-export_data.py ──► data/proof_graph_01.json ──► C reads JSON
-                                                    │
-proofs/QBP/Basic.lean ───┐                          ▼
-proofs/QBP/Experiments/  ├─► (proof metadata)   Interactive WASM app
-  SternGerlach.lean ─────┘                      (proof tree + annotations)
+proofs/QBP/Basic.lean ───┐
+proofs/QBP/Experiments/  ├─► export_data.py ──► data/proof_graph_01.json
+  SternGerlach.lean ─────┘         │                    │
+                                   │                    │
+                                   │                    ▼
+                                   │            (data exchange format,
+                                   │             documentation)
+                                   │
+                                   └──► C hardcoded graph ──► Interactive WASM app
+                                       (proof_graph.c)        (proof tree + annotations)
 ```
+
+**Note:** The C code uses a hardcoded proof graph for simplicity. The JSON file serves as
+a portable data exchange format and documentation. The C code does not parse JSON at runtime.
+The hardcoded graph and generated JSON must be kept in sync manually.
 
 ## Directory Layout
 
@@ -22,11 +31,11 @@ src/viz/interactive/
 ├── CMakeLists.txt      ← CMake build configuration
 ├── Makefile            ← convenience wrapper
 ├── shell.html          ← Emscripten HTML template
-├── export_data.py      ← Lean → JSON parser
+├── export_data.py      ← Lean → JSON parser (stdlib-only, no simulation deps)
 ├── src/
 │   ├── main.c          ← entry point, scene dispatch
-│   ├── qphysics.c/h    ← C port of quaternion math
-│   ├── proof_graph.c/h ← proof tree data + navigation + rendering
+│   ├── qphysics.c/h    ← C port of quaternion math (scaffolding for future)
+│   ├── proof_graph.c/h ← hardcoded proof tree + navigation + rendering
 │   ├── scene.h         ← scene interface (init/update/draw/cleanup)
 │   ├── theme.h         ← QBP steampunk color palette
 │   └── scenes/
@@ -53,12 +62,15 @@ src/viz/interactive/
 ### Generate proof data
 
 ```bash
+cd src/viz/interactive
 python3 export_data.py
 ```
 
 ### Native (desktop window)
 
 ```bash
+cd src/viz/interactive
+
 # With system-installed raylib:
 make native
 
@@ -69,6 +81,8 @@ make native RAYLIB_SRC=/path/to/raylib
 ### WASM (browser)
 
 ```bash
+cd src/viz/interactive
+
 # Activate emsdk first:
 source /path/to/emsdk/emsdk_env.sh
 
@@ -88,37 +102,45 @@ python3 -m http.server -d dist
 | `R` / `Home` | Reset to beginning |
 | Click | Jump to node |
 
-## Proof Dependency Tree (12 nodes)
+## Proof Dependency Tree (13 nodes)
 
 ```
-Axioms (Basic.lean)                     Experiment Setup (SternGerlach.lean)
-─────────────────                       ────────────────────────────────────
-isUnitQuaternion ──┐                    spinXState := SPIN_X
-isPureQuaternion ──┤                    spinZObservable := SPIN_Z
-                   │                           │
-                   ├── spin_x_is_pure ─────────┤
-                   ├── spin_z_is_pure ─────────┤
-                   │                           │
-                   │   vecDot ─────────────────┤
-                   │         │                 │
-                   │         ↓                 ↓
-                   │    x_z_orthogonal: vecDot(i,k) = 0
-                   │         │
-                   ↓         ↓
-        expectation_orthogonal_is_zero
-                   │
-                   ↓
-        expectation_x_measured_z_is_zero: ⟨O_z⟩ = 0
-                   │
-            ┌──────┴──────┐
-            ↓             ↓
-  prob_up = 1/2    prob_down = 1/2
+Definitions (Basic.lean)              Experiment Setup (SternGerlach.lean)
+────────────────────────              ────────────────────────────────────
+isPureQuaternion ────┐                spinXState := SPIN_X
+                     │                spinZObservable := SPIN_Z
+vecDot ──────────────┤                      │           │
+                     │                      │           │
+                     │                      ▼           ▼
+                     ├─► spin_x_is_pure ──► spinXState_is_pure
+                     │                              │
+                     ├─► spin_z_is_pure ──► spinZObservable_is_pure
+                     │                              │
+                     │                              ▼
+                     │   x_z_orthogonal ◄──────────┘
+                     │         │
+                     ▼         ▼
+    expectation_orthogonal_is_zero
+                     │
+                     ▼
+    expectation_x_measured_z_is_zero ◄── spinXState_is_pure
+                     │                  ◄── spinZObservable_is_pure
+                     │                  ◄── x_z_orthogonal
+            ┌────────┴────────┐
+            ▼                 ▼
+    prob_up = 1/2      prob_down = 1/2
 ```
+
+The key insight: `expectation_x_measured_z_is_zero` explicitly passes
+`spinXState_is_pure` and `spinZObservable_is_pure` as arguments to the
+general theorem, making them formal dependencies.
 
 ## Adding New Experiments
 
 1. Create `src/scenes/experiment_NN_name.c` implementing the `Scene` interface
-2. Add a `ProofGraph` initializer with the experiment's proof tree
+2. Add a `ProofGraph` initializer with the experiment's proof tree (update `proof_graph.c`)
 3. Update `export_data.py` to handle the new Lean files
 4. Register the scene in `main.c`
 5. Add source files to `CMakeLists.txt`
+6. Run `python3 export_data.py` to regenerate JSON
+7. **Important:** Keep the C hardcoded graph and JSON in sync
