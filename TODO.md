@@ -26,7 +26,7 @@ Phase 5: Publication
 | **Phase 1: Ground Truth** | Establish target values from literature | Ground truth doc, success criteria, tool requirements | Red Team approved |
 | **Phase 2: Implementation** | Build simulation/calculation | Working code, tests, validated results | Results within 3σ of ground truth |
 | **Phase 3: Visualization** | Create comprehensible outputs | Manim videos, interactive demos, analysis | Red Team approved |
-| **Phase 4: Formal Verification** | Prove (4a), review (4b), visualize (4c) | `.lean` proofs, review report, WASM viz | Sub-phase gates (4a/4b/4c) |
+| **Phase 4: Formal Verification** | Prove (4a), review (4b), visualize (4c) | `.lean` proofs, review report, WASM viz | 4a+4b gate publication; 4c parallel deliverable |
 | **Phase 5: Publication** | Final documentation & release | Theory docs, videos, website | Ready for public |
 
 ### Decision Gates
@@ -34,7 +34,7 @@ Phase 5: Publication
 - **Phase 1 → 2:** Ground truth document exists with quantitative targets
 - **Phase 2 → 3:** Simulation results match ground truth within 3σ tolerance
 - **Phase 3 → 4:** Visualizations approved, ready for formal verification
-- **Phase 4 → 5:** Lean 4 proofs compile (4a), review approved (4b), interactive visualization depicts physics and proof structure (4c)
+- **Phase 4 → 5:** Lean 4 proofs compile (4a) AND proof review approved (4b). Phase 4c (interactive visualization) runs in parallel with Phase 5 — not a gate.
 
 ### Failure Loops
 

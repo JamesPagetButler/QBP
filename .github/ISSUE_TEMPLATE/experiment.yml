@@ -105,7 +105,7 @@ body:
         - [ ] **Task:** Port relevant quaternion math to C (`src/viz/interactive/src/qphysics.c`).
         - [ ] **Task:** Create proof annotation overlay driven by Phase 4a proof metadata.
         - [ ] **Task:** Build experiment scene implementing `init/update/draw/cleanup` interface.
-        - [ ] **Task:** Export Phase 2 results + Phase 4a proof structure to JSON via `export_data.py`.
+        - [ ] **Task:** Export Phase 2 results + Phase 4a proof structure to JSON via `src/viz/interactive/export_data.py`.
         - [ ] **Task:** Compile to WASM with Emscripten; produce deployable output.
         - [ ] **AC:** Interactive visualization renders in browser and accurately depicts the physics.
         - [ ] **AC:** Proof annotations are visible and correspond to the formal proof structure.
