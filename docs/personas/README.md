@@ -48,7 +48,7 @@ Gemini's theory review team. Invoked on every PR after Red Team review. Reviews 
 
 ### Writing & Communication — 1 persona
 
-- **Der Depperte** — Einstein's self-deprecating nickname ("the dopey one"). Writer and communicator. Brings clarity, accessibility, and wonder to Phase 5 publication work. Not a physicist persona — that role is filled by Einstein on the Expert Panel.
+- **Der Depperte** — A childhood nickname given to Einstein by the family maid ("the dopey one"), because he was slow to speak. Writer and communicator. Brings clarity, accessibility, and wonder to Phase 5 publication work. Not a physicist persona — that role is filled by Einstein on the Expert Panel.
 
 ### Process Navigator — 1 persona
 
@@ -64,7 +64,7 @@ Deep theoretical validation before sprint transitions. Unanimous approval requir
 - **von Neumann** — John von Neumann. Axiomatic rigor guardian.
 - **Pauli** — Wolfgang Pauli. Critical examiner.
 - **Einstein** — Albert Einstein. Thought experiments, unification.
-- **Bell** — John Stewart Bell. Understanding vs. pattern-matching.
+- **Bell** — John Stewart Bell. Understanding vs. pattern-matching. Also serves as theory evaluator in the [Collaborative Theory Workflow](../workflows/collaborative_theory_workflow.md).
 
 **Full definitions:** [Expert Panel](expert_panel.md)
 

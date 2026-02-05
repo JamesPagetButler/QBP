@@ -62,15 +62,9 @@ Der Depperte handles Phase 5 publication writing — clarity, accessibility, and
 │   ┌─────────────────────────────────┐                       │
 │   │  GEMINI REVIEW                  │                       │
 │   │  Furey + Feynman                │                       │
-│   │  → Generates PRD if feature PR  │                       │
 │   └─────────────────────────────────┘                       │
 │           ↓                                                  │
-│   ┌─────────────────────────────────┐                       │
-│   │  STEVE EXECUTES                 │                       │
-│   │  Implements PRD, writes tests   │                       │
-│   └─────────────────────────────────┘                       │
-│           ↓                                                  │
-│   Red Team reviews implementation                            │
+│   Issues synthesized & presented to James                    │
 │           ↓                                                  │
 │   Human merge authorization                                  │
 │                                                              │
