@@ -18,7 +18,8 @@
 |-----------|----------|--------------|--------|
 | Link checker CI | #114, PR #115 | Theory Refinement #80 | Complete |
 | Gemini agent connectivity test | — | Theory Refinement #80 | Complete |
-| Critical-path navigator | #120 | Theory Refinement #80 | In Progress |
+| Critical-path navigator | #120, PR #121 | Theory Refinement #80 | Complete |
+| Persona reconciliation | #122 | Theory Refinement #80 | Pending |
 
 ## Sprint 1 Closure Checklist
 
