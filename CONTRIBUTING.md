@@ -243,6 +243,8 @@ Phase 5 has two tracks. Track A is always required. Track B applies only when Ph
 
 **Tasks:**
 - Finalize library to meet all [Library Quality Standards](#library-quality-standards).
+- Follow Lean 4 community publishing guidelines (Reservoir submission requirements, naming conventions, documentation standards).
+- If Reservoir requires a standalone repository, extract the library from `/libs/` into its own repo. This is acceptable and expected for community publication.
 - Tag a semantic version (`vMAJOR.MINOR.PATCH`) on the library.
 - Submit the library to [Reservoir](https://reservoir.lean-lang.org/) for indexing.
 - Generate API documentation with `doc-gen4`.
@@ -262,12 +264,13 @@ The following standards apply to any library in `/libs/` before it can be publis
 |-------------|---------|
 | Separate Lake package | Own `lakefile.lean`, `lean-toolchain`, `README.md` |
 | No QBP dependencies | General-purpose; no imports from `proofs/QBP/` |
+| License | MIT license (`LICENSE` file in package root), matching the QBP project |
 | CI builds | GitHub Actions workflow running `lake build` |
 | No `sorry` | All proofs complete |
 | API documentation | Doc-strings on public definitions; `doc-gen4` compatible |
 | Semantic versioning | Git tags `vMAJOR.MINOR.PATCH` |
 | Reservoir metadata | `lakefile.lean` includes `name`, `version`, `keywords`, `homepage` |
-| README | Purpose, installation, usage examples, license |
+| README | Purpose, installation, usage examples, license reference |
 
 ---
 

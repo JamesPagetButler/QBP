@@ -13,7 +13,7 @@ body:
     id: phase
     attributes:
       label: Experiment Phase
-      description: "Select the phase of the experiment this issue is for. This will pre-populate the tasks and acceptance criteria."
+      description: "Select the phase of the experiment this issue is for, then delete the task sections below that do not apply."
       options:
         - "Phase 1: Ground Truth"
         - "Phase 2: Implementation"
@@ -105,6 +105,7 @@ body:
         #### Track B: Community Contribution (When Applicable)
         *Skip this track if no libraries were developed during Phase 4.*
         - [ ] **Task:** Finalize library in `/libs/` to meet all Library Quality Standards (see CONTRIBUTING.md).
+        - [ ] **Task:** Follow Lean 4 community publishing guidelines; extract to standalone repo if required by Reservoir.
         - [ ] **Task:** Tag a semantic version (`vMAJOR.MINOR.PATCH`) on the library.
         - [ ] **Task:** Submit library to Reservoir for indexing.
         - [ ] **Task:** Generate API documentation with `doc-gen4`.
