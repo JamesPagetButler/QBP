@@ -26,11 +26,11 @@
 - [x] Phase 1: Ground Truth (#52)
 - [x] Phase 2: Implementation (#53)
 - [x] Phase 3: Visualization (#29)
-- [ ] Phase 4: Formal Verification (#55)
-  - [ ] 4a: Formal Proof (Gemini writes Lean 4 proofs)
+- [ ] Phase 4: Formal Verification (#55) — **Reopened.** 4a exists, 4b and 4c not done.
+  - [x] 4a: Formal Proof (proofs exist, need file rename + build verification)
   - [ ] 4b: Proof Review (Claude reviews and tests proofs)
-  - [ ] 4c: Interactive Proof Visualization (C/WASM browser viz)
-- [ ] Phase 5: Publication (#64) — Verify acceptance criteria & close
+  - [ ] 4c: Interactive Proof Visualization (C/WASM browser viz — not started)
+- [ ] Phase 5: Publication (#64) — **Reopened.** Blocked by #55 4a+4b gate. Existing paper section needs audit.
 - [ ] Theory Refinement (#80) — Not started
 
 ## Sprint 1 Retrospective
@@ -48,7 +48,7 @@
 
 - Sprint 2 Phase 1 (Ground Truth) was completed early (PR #116) before Theory Refinement. The work was good but out of order. We acknowledge this and proceed correctly from here.
 - Sprint 2 will resume at Phase 2 (Implementation, #36) after Theory Refinement #80 is complete.
-- **James's note (2026-02-04):** Experiment 01 Phase 4 (Formal Verification, #55) and Phase 5 (Publication, #64) likely need to be re-done due to the significant process updates since they were originally completed (Phase 4 sub-phases 4a/4b/4c, library development process, persona reconciliation, Expert Panel expansion to 7, etc.). These phases should be re-evaluated against the current process before closing.
+- **James's note (2026-02-04):** Experiment 01 Phase 4 (#55) and Phase 5 (#64) need to be re-done against the current process. Both issues reopened with updated acceptance criteria. Phase 4a proofs exist but 4b (review) and 4c (viz) were never done. Phase 5 paper section exists but needs audit against current standards.
 
 ---
 
