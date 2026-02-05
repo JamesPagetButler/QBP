@@ -40,7 +40,8 @@ Phase 5: Publication
 
 - **Phase 2 FAIL:** Debug implementation, return to Phase 2
 - **Phase 3 FAIL:** Fix visualization issues, may require Phase 2 changes
-- **Phase 4 FAIL:** Proof failure may indicate implementation or theory issues → return to Phase 2
+- **Phase 4a/4b FAIL:** Proof failure may indicate implementation or theory issues → return to Phase 2
+- **Phase 4c FAIL:** Visualization issue → return to 4c (does not block publication)
 
 ---
 
