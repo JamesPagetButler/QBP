@@ -50,11 +50,26 @@ Thumbs.db
 # Project-specific
 *.log
 
+# Secrets and credentials (NEVER commit these)
+.env
+.env.*
+env.*
+*.key
+*.pem
+*.p12
+*.pfx
+credentials.*
+secrets.*
+*_secret*
+*.secret
+.netrc
+.npmrc
+.pypirc
+
 # AI Prompt files (local only)
 prompts/
 
-# Simulation results (local only)
-results/
+# Simulation results (now tracked by Git LFS)
 
 # Lean 4
 proofs/.lake/
