@@ -1,6 +1,6 @@
 # Research: Game Engine Architecture for a Lean-Driven Physics Laboratory
 
-This document investigates the feasibility of using a real-time game engine as an interactive 3D visualization front-end, driven by a formal proof assistant (Lean 4). It builds upon the previous research (`lean_golang_architecture.md`) and proposes a more powerful and practical architecture.
+This document investigates the feasibility of using a real-time game engine as an interactive 3D visualization front-end, driven by a formal proof assistant (Lean 4). It builds upon the previous research (`architecture_studies/lean_golang_architecture.md`) and proposes a more powerful and practical architecture.
 
 ---
 
