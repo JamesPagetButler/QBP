@@ -134,6 +134,8 @@ A synthetic experiment was conducted with N = 1,000,000 independent measurements
 - Standard deviation (σ): 500.00
 - Acceptance threshold: 3σ = 1,500
 
+The distribution of outcomes is shown in Figure 1 below.
+
 #### Visualizations
 
 **Figure 1: Stern-Gerlach Simulation Results**

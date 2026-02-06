@@ -46,11 +46,13 @@ The Stern-Gerlach experiment served as our foundational test of the QBP framewor
 
 The most significant insight from Experiment 01 is that the 50/50 probability split is not an assumption but a **mathematical consequence** of orthogonality in quaternion space. When the state quaternion `ψ = i` (spin-x) is measured against the observable `O = k` (spin-z), their vector parts are orthogonal: `vecDot(i, k) = 0`. This zero dot product mathematically necessitates `⟨O⟩ = 0`, which via the Born rule gives `P(+) = P(-) = 0.5`.
 
+**Intuitive analogy:** Imagine asking "how much does this arrow point east?" when the arrow points exactly north. The answer is zero — not because of uncertainty, but because north and east are perpendicular directions. Similarly, when a spin-x state is measured on the z-axis, the "overlap" is zero, forcing a perfectly random coin flip between +1 and -1.
+
 This is philosophically important: the randomness observed in quantum measurement emerges from the geometry of the state space, not from hidden variables or intrinsic indeterminacy.
 
 ### 5.2 The Factor-of-2 Correction
 
-During the development of Experiment 02 (Angle-Dependent Measurement), we discovered that the original expectation value formula `⟨O⟩ = 2 × vecDot(ψ, O)` produced invalid probabilities (> 1) for non-orthogonal configurations. The corrected formula `⟨O⟩ = vecDot(ψ, O)` was validated in Experiment 02 and retroactively confirmed to be consistent with Experiment 01 results (where the factor of 2 had no effect because `2 × 0 = 0`).
+During the development of Experiment 02 (Angle-Dependent Measurement), we discovered that the original expectation value formula `⟨O⟩ = 2 × vecDot(ψ, O)` produced invalid probabilities (> 1) for non-orthogonal configurations. The corrected formula `⟨O⟩ = vecDot(ψ, O)` was validated in Experiment 02 and subsequently confirmed to be consistent with Experiment 01 results (where the factor of 2 had no effect because `2 × 0 = 0`).
 
 This correction is documented in both `proofs/QBP/Basic.lean` and `src/qphysics.py`.
 
