@@ -391,7 +391,29 @@ All must pass the 3σ acceptance criterion (see §7.3).
 
 ---
 
-## 11. Phase 2 Acceptance Criteria
+## 11. Prediction Classification
+
+| Prediction | Type | Standard QM | Notes |
+|------------|------|-------------|-------|
+| P(+) = cos²(θ/2) = (1 + cos θ)/2 | Validation | cos²(θ/2) | Identical to QM |
+| P(-) = sin²(θ/2) = (1 - cos θ)/2 | Validation | sin²(θ/2) | Identical to QM |
+| Deterministic at θ=0°, 180° | Validation | Same | Aligned/anti-aligned cases |
+
+### Classification Summary
+
+**Validation:** This experiment confirms QBP reproduces standard quantum mechanics for angle-dependent spin measurement. The formula P(+) = cos²(θ/2) is identical to the standard QM result derived from spinor theory.
+
+**Novel predictions:** None for this experiment. The angle-dependent probability formula is a textbook QM result that QBP must reproduce to be viable.
+
+### Implications
+
+Experiment 02 extends Experiment 01's validation to arbitrary angles. Together, they establish that QBP correctly handles all single-particle spin-1/2 measurements. This is *mathematically necessary* because quaternions (ℍ) are isomorphic to the Pauli algebra underlying SU(2).
+
+For QBP to make novel predictions, we must look beyond single-particle systems — possibly to entanglement (Experiment 05: Bell's Theorem), multi-particle statistics, or regimes where octonion structure becomes relevant. See #167 for ongoing research.
+
+---
+
+## 12. Phase 2 Acceptance Criteria
 
 The following criteria must be met for Phase 2 (Implementation) to pass:
 
@@ -403,7 +425,7 @@ The following criteria must be met for Phase 2 (Implementation) to pass:
 
 ---
 
-## 12. References
+## 13. References
 
 1. Hamilton, W.R. (1844). "On Quaternions". *Proceedings of the Royal Irish Academy*.
 2. Sakurai, J.J. (1994). *Modern Quantum Mechanics*. Addison-Wesley.

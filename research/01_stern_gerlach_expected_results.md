@@ -45,7 +45,26 @@ This formal derivation shows that the QBP framework correctly predicts a 50/50 p
 
 ---
 
-## 4. Quantitative Predictions & Acceptance Criteria
+## 4. Prediction Classification
+
+| Prediction | Type | Standard QM | Notes |
+|------------|------|-------------|-------|
+| P(+) = P(-) = 0.5 for orthogonal states | Validation | 0.5 | Identical to QM |
+| Binary outcomes only (+1, -1) | Validation | Same | Spin quantization |
+
+### Classification Summary
+
+**Validation:** This experiment confirms QBP reproduces standard quantum mechanics for the orthogonal state/measurement case (spin-x prepared, spin-z measured). It does not distinguish QBP from QM.
+
+**Novel predictions:** None for this experiment. The 50/50 split for orthogonal states is a foundational QM result that QBP must reproduce to be viable.
+
+### Implications
+
+Experiment 01 establishes that QBP is *consistent* with QM for the simplest spin measurement case. This is necessary but not sufficient for QBP to be a distinct physical theory. See #167 for ongoing research into where QBP predictions might diverge from QM.
+
+---
+
+## 5. Quantitative Predictions & Acceptance Criteria
 
 Our `experiments/01_stern_gerlach/simulate.py` script will be considered successful if it meets the following criteria, which directly correspond to the real-world experimental results and our formal derivation.
 
@@ -71,7 +90,7 @@ To ensure statistically significant results, our synthetic experiments will adhe
 
 ---
 
-## 5. References
+## 6. References
 
 1.  Gerlach, W.; Stern, O. (1922). "Der experimentelle Nachweis der Richtungsquantelung im Magnetfeld". *Zeitschrift für Physik*. 9 (1): 349–352.
 2.  Griffiths, David J.; Schroeter, Darrell F. (2018). *Introduction to Quantum Mechanics*. Cambridge University Press.
