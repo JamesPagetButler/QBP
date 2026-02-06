@@ -1186,6 +1186,33 @@ Before entering Focus Mode, Claude must present and get explicit approval for:
 - Identify the appropriate tier (1/2/3) based on issue type (see [Tiered Review System](#tiered-review-system))
 - Confirm review requirements before starting
 
+**4. Bell Review (Physics Work)**
+
+For physics-related implementations, an optional **Bell Review** evaluates whether the code reflects genuine understanding of the physics, not just correct output.
+
+| Setting | Bell Review |
+|---------|-------------|
+| **Critical path issues** (sprint phases, theory refinement) | **Default ON** — opt-out with "skip Bell" |
+| **Other issues** (housekeeping, infrastructure) | Default OFF — opt-in with "include Bell" |
+
+**Bell evaluates:**
+
+| Criterion | What Bell Checks |
+|-----------|------------------|
+| Mathematical Rigor | Does the code correctly implement the physics derivation? |
+| Physical Insight | Are edge cases handled with understanding, not just code coverage? |
+| Anticipation of Difficulties | Does implementation address numerical precision, boundary conditions? |
+| Testability | Are tests meaningful physics validations, not just unit tests? |
+
+**Bell's Four Tests (adapted for code):**
+
+1. **The "Why" Question** — Does the code reflect *why* the physics works, not just *that* it works?
+2. **The Counterfactual Test** — Would the code catch it if the axioms were wrong?
+3. **The Surprise Test** — Did implementation reveal anything unexpected?
+4. **The Explanation Test** — Could a physicist read this code and understand the physics?
+
+Bell Review runs after standard tier reviews, before PR creation. See `workspace/evaluation/bell_evaluator_persona.md` for the full persona specification.
+
 #### Workflow
 
 ```
@@ -1236,19 +1263,21 @@ Before entering Focus Mode, Claude must present and get explicit approval for:
 #### Example Approval Dialog
 
 ```
-User: Focus on issue #183
+User: Focus on issue #161
 
-Claude: I'll enter Focus Mode for #183.
+Claude: I'll enter Focus Mode for #161.
 
-**Issue:** #183 — Fix expectation value normalization
+**Issue:** #161 — Experiment 02: Angle-Dependent Measurement - Phase 2: Implementation
 **Acceptance Criteria:**
-- [ ] expectation_value() returns values in [-1, 1] range
-- [ ] Unit tests updated with boundary cases
-- [ ] Documentation updated in qphysics.py docstring
+- [ ] All new and existing tests pass in CI
+- [ ] Simulation generates timestamped CSV output
+- [ ] Results match P(+) = cos²(θ/2) within 3σ
+- [ ] Edge cases pass: θ=0° → P(+)=1, θ=90° → P(+)=0.5, θ=180° → P(+)=0
 
-**Branch:** focus/issue-183-expectation-normalization
-**Estimated scope:** 2 files (qphysics.py, test_qphysics.py), ~30 lines
+**Branch:** sprint-2/phase-2-implementation
+**Estimated scope:** 4 files (~250 lines)
 **Review tier:** Tier 2 (code change)
+**Bell Review:** Yes (critical path issue — say "skip Bell" to opt out)
 
 **Required permissions:**
 - File edits, Git operations, GitHub CLI, pytest
@@ -1277,26 +1306,38 @@ Focus Mode ends when:
 ```
 ## Focus Mode Complete
 
-**Issue:** #183 — Fix expectation value normalization
-**Duration:** ~45 minutes
+**Issue:** #161 — Experiment 02: Phase 2 Implementation
+**Duration:** ~2 hours
 
 ### Work Completed
-- Fixed expectation_value() to clamp output to [-1, 1]
-- Added 4 boundary test cases to test_qphysics.py
-- Updated docstring with return value range
+- Extended qphysics.py with rotate_observable()
+- Created simulate.py for angle-dependent measurements
+- Added physics validation tests for 6 angles
+- Generated CSV results in results/02_angle_dependent/
 
 ### PR Created
-- **#184** — Fix expectation value normalization
+- **#177** — Implement angle-dependent measurement simulation
   - Red Team: APPROVE
+  - Gemini: APPROVE
+  - Bell Review: PASS (see below)
   - All tests passing
   - Ready for your merge
+
+### Bell Review Summary
+| Criterion | Assessment |
+|-----------|------------|
+| Mathematical Rigor | ✅ Quaternion rotation correctly implements half-angle formula |
+| Physical Insight | ✅ Edge cases (0°, 180°) handled with σ=0 special logic |
+| Testability | ✅ Tests validate physics predictions, not just code paths |
+| The "Why" Question | ✅ Code comments explain geometric interpretation |
 
 ### Acceptance Criteria Status
 | AC | Status |
 |----|--------|
-| expectation_value() returns [-1, 1] | ✅ Done |
-| Unit tests updated | ✅ Done |
-| Documentation updated | ✅ Done |
+| All tests pass | ✅ Done |
+| CSV output generated | ✅ Done |
+| Results within 3σ | ✅ Done |
+| Edge cases pass | ✅ Done |
 
 Focus Mode complete. Awaiting merge approval.
 ```
