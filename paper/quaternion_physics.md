@@ -52,11 +52,40 @@ In response to Grothendieck's insightful critique, we explicitly acknowledge the
 *   **Role of Octonions:** We hypothesize that an extension of this framework to include octonions will be necessary to incorporate SU(3) symmetries and provide a comprehensive description of one generation of fundamental particles, aligning with contemporary research in this area. This extension represents a future, but integral, phase of this project.
 *   **Relationship to Geometric Algebra (GA):** While GA offers a broader mathematical framework that subsumes quaternion algebra, our project maintains a specific focus on the 'Cayley-Dickson' sequence of division algebras (Real, Complex, Quaternion, Octonion). This provides a constrained, step-by-step approach to explore if fundamental physical properties emerge from these unique algebraic structures. Comparison with GA formulations and the potential for a unified GA-based description remains an important topic for future study.
 
+### Measurement Postulate (Added Post-Sprint 1)
+
+Based on the successful validation of the Stern-Gerlach experiment, we formalize the measurement postulate:
+
+*   **Expectation Value:** For a state `ψ` and observable `O` (both pure unit quaternions), the expectation value is the dot product of their vector parts:
+    `⟨O⟩ = vecDot(ψ, O) = ψ_i·O_i + ψ_j·O_j + ψ_k·O_k`
+
+*   **Measurement Probability:** The probability of measuring eigenvalue `+1` is:
+    `P(+) = (1 + ⟨O⟩) / 2`
+
+    And for eigenvalue `-1`:
+    `P(-) = (1 - ⟨O⟩) / 2`
+
+*   **Constraint:** For unit quaternion states and observables, `⟨O⟩ ∈ [-1, 1]`, ensuring valid probabilities.
+
+*Note: The original formula included a factor of 2, which was corrected during Sprint 2 development. See `DESIGN_RATIONALE.md` Section 5.2 for details.*
+
+### Rotation of Observables (Sprint 2 Extension)
+
+To handle measurements at arbitrary angles, we introduce the rotation formalism:
+
+*   **Rotation Quaternion:** A rotation by angle `θ` about unit axis `n̂` is represented by:
+    `q = cos(θ/2) + sin(θ/2)(n_x·i + n_y·j + n_z·k)`
+
+*   **Rotated Observable:** The observable `O` rotated by quaternion `q` is:
+    `O' = q · O · q⁻¹`
+
+This extension enables prediction of angle-dependent measurement probabilities, to be validated in Sprint 2.
+
 ## The Revised Eight-Fold Path of Verification
 
 We have defined a sequence of eight critical experimental and theoretical benchmarks to guide our work. We will proceed through this list sequentially, and successful validation at each step is required before proceeding to the next.
 
-1.  **The Stern-Gerlach Experiment:** Test the basic quantization of a spin-1/2 state using our Axiomatic Framework. This is our entry point.
+1.  **The Stern-Gerlach Experiment:** ✅ *Validated in Sprint 1.* Test the basic quantization of a spin-1/2 state using our Axiomatic Framework. This is our entry point.
 
 2.  **The Double-Slit Experiment:** Test the formalism's ability to handle superposition, path integrals, and the wave-particle duality of matter.
 

@@ -71,3 +71,97 @@ The Phase 4b review process (Claude reviewing Gemini's proofs) caught no errors 
 Phase 4c introduced a new capability: presenting formal proofs as interactive dependency graphs. The key design decision was to use **four levels of explanation** (L4 Formal → L3 Mathematical → L2 Physical → L1 Intuitive) so that the same proof structure can be understood by different audiences. This approach will scale to more complex proofs in future experiments.
 
 The visualization uses a data-driven JSON format (`stern_gerlach.viz.json`) that decouples content authoring from code, enabling rapid iteration on explanations without recompilation.
+
+## 6. Theory Refinement — Sprint 1 Analysis
+
+This section documents the formal theory refinement conducted after completing Sprint 1 (Stern-Gerlach experiment). The goal is to analyze implications, check for emergent phenomena, and prepare the theoretical foundation for Sprint 2.
+
+### 6.1 Summary of Theoretical Findings
+
+Sprint 1 validated the core QBP measurement framework:
+
+| Finding | Significance |
+|---------|--------------|
+| `vecDot(ψ, O) = 0` for orthogonal states | Orthogonality determines expectation value |
+| `⟨O⟩ = 0` implies `P(+) = P(-) = 0.5` | Born rule correctly maps to probabilities |
+| 0.41σ deviation over 1M trials | Statistical validation within 3σ criterion |
+| Factor-of-2 correction | `⟨O⟩ = vecDot(ψ, O)`, not `2 × vecDot` |
+
+**Key theoretical insight:** The quantum randomness observed in Stern-Gerlach is not intrinsic but emerges from the geometric structure of quaternion space. When two pure quaternions are orthogonal, the dot product is necessarily zero, forcing a maximally uncertain measurement outcome.
+
+### 6.2 Emergent Phenomena Analysis
+
+We evaluated Sprint 1 results against the Guide Posts for Emergent Phenomena defined in `paper/quaternion_physics.md`:
+
+| Guide Post | Status | Notes |
+|------------|--------|-------|
+| Emergent Conservation Laws | Not yet observed | Unitarity preservation expected but not tested in Sprint 1 |
+| Emergent Symmetries | Partial | SO(3) rotation symmetry implicit in quaternion structure |
+| Particle Equivalents | Not applicable | Single-particle experiment |
+| Interaction Models | Not applicable | No interactions modeled |
+| Collective Behavior | Not applicable | Single-particle experiment |
+
+**Primary emergent phenomenon:** The *probability values* emerge from quaternion geometry. This is philosophically significant — the specific probabilities (e.g., 50/50 for orthogonal states) arise from the algebraic structure of quaternions. Note: the probabilistic *interpretation* (measurement collapse) remains a separate postulate; what emerges is the numerical relationship between geometry and probability, not the collapse mechanism itself.
+
+### 6.3 Open Questions
+
+The following questions arose from Sprint 1 and require further investigation:
+
+1. **Expectation value bounds:** Is `⟨O⟩ ∈ [-1, 1]` formally guaranteed for all valid states and observables? In QBP, spin states are *pure unit quaternions* (both conditions: zero real part AND norm 1). For such quaternions, the bound follows from Cauchy-Schwarz: the imaginary parts of pure unit quaternions form unit 3-vectors in ℝ³, so their dot product satisfies `|vecDot(ψ, O)| ≤ ||ψ_im|| · ||O_im|| = 1`. This should be formally proven in Lean.
+
+2. **State rotation:** How do we mathematically represent rotating a spin state by an arbitrary angle θ? The formula `ψ' = q·ψ·q⁻¹` (quaternion conjugation) performs SO(3) rotation, but spin-1/2 requires SU(2) (the double cover). What is the correct mapping?
+
+3. **Sequential measurements:** What happens when we measure the same state twice? Does the QBP framework correctly model state collapse and subsequent measurements?
+
+4. **Entanglement representation:** Can two-particle entangled states be represented in quaternion form? What algebraic structure would capture Bell correlations?
+
+### 6.4 Theoretical Extensions for Sprint 2
+
+Sprint 2 (Angle-Dependent Measurement) will test whether the QBP framework reproduces the quantum mechanical prediction `P(+) = cos²(θ/2)` for measuring a spin-z state at angle θ from the z-axis.
+
+**Required theoretical developments:**
+
+#### 6.4.1 Rotation of Spin States
+
+To measure at angle θ, we need to rotate the observable (or equivalently, the state). In quaternion form, a rotation by angle θ about unit axis `n̂ = (nx, ny, nz)` is represented by:
+
+```
+q = cos(θ/2) + sin(θ/2)(nx·i + ny·j + nz·k)
+```
+
+The rotated observable is then `O' = q·O·q⁻¹`. Note the half-angle: this is the quaternion-to-SO(3) mapping. For spin-1/2, this half-angle is physical, not a mathematical artifact.
+
+**Important distinction:** The rotation quaternion `q` is a *unit quaternion* (norm 1, but has a non-zero real part) that acts as a rotation *operator*. This is different from spin state quaternions `ψ`, which are *pure unit quaternions* (norm 1 AND real part = 0) representing physical states. The rotation `q·O·q⁻¹` transforms observables; it does not represent a state itself.
+
+#### 6.4.2 Derivation of cos²(θ/2)
+
+**Spin state convention:** In QBP, the pure unit quaternions `i`, `j`, `k` represent eigenstates of spin along the x, y, and z axes respectively. Thus: spin-x eigenstate `ψ = i`, spin-y eigenstate `ψ = j`, spin-z eigenstate `ψ = k`.
+
+For a spin-z state `ψ = k` measured along an axis rotated by θ in the xz-plane (representative example; generalizes to any rotation plane):
+
+1. The rotated observable is `O_θ = q·k·q⁻¹` where `q = cos(θ/2) + sin(θ/2)·j`
+2. Expectation value: `⟨O_θ⟩ = vecDot(ψ, O_θ) = cos(θ)` (with `ψ = k`)
+3. Probability: `P(+) = (1 + cos(θ))/2 = cos²(θ/2)` (using the half-angle identity)
+
+This derivation will be formally verified in Lean for Sprint 2 Phase 4.
+
+#### 6.4.3 New Lean Theorems Required
+
+The following theorems should be proven for Sprint 2:
+
+1. **`expectation_bounded`**: `∀ ψ O, isPureQuaternion ψ → isPureQuaternion O → isUnitQuaternion ψ → isUnitQuaternion O → -1 ≤ expectationValue ψ O ≤ 1`
+
+2. **`rotation_preserves_norm`**: `∀ q v, isUnitQuaternion q → norm (q * v * q⁻¹) = norm v`
+
+3. **`angle_measurement_probability`**: `∀ θ, probUp (SPIN_Z) (rotateObservable SPIN_Z θ) = cos(θ/2)²`
+
+### 6.5 Decision: Theoretical Direction for Sprint 2
+
+Based on this analysis, we confirm the theoretical approach for Sprint 2:
+
+1. **Keep the existing axioms.** Sprint 1 validates the measurement postulate for orthogonal cases.
+2. **Extend with rotation formalism.** Add the quaternion rotation formula to handle arbitrary angles.
+3. **Strengthen formal proofs.** Prove the expectation value bounds and angle-dependent formula in Lean.
+4. **Defer multi-particle extensions.** Entanglement and collective behavior will be addressed in later sprints.
+
+This decision aligns with the project's incremental approach: each sprint tests one aspect of the framework before moving to more complex scenarios.
