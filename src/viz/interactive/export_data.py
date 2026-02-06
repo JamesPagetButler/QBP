@@ -39,9 +39,9 @@ def parse_lean_file(path: Path) -> list[dict]:
     pattern = re.compile(
         r"(?:^|\n)\s*(?:/--.*?-/\s*\n)?"  # optional doc comment
         r"(theorem|def|noncomputable def|abbrev)\s+"
-        r"(\w+)"                              # name
+        r"(\w+)"  # name
         r"(.*?)(?=\n(?:theorem|def|noncomputable|abbrev|end |--|/-)|\Z)",  # body
-        re.DOTALL
+        re.DOTALL,
     )
 
     for m in pattern.finditer(text):
@@ -70,12 +70,14 @@ def parse_lean_file(path: Path) -> list[dict]:
         else:
             node_kind = "theorem"
 
-        items.append({
-            "name": name,
-            "kind": node_kind,
-            "statement": statement,
-            "source": path.name,
-        })
+        items.append(
+            {
+                "name": name,
+                "kind": node_kind,
+                "statement": statement,
+                "source": path.name,
+            }
+        )
 
     return items
 
