@@ -107,7 +107,7 @@ We evaluated Sprint 1 results against the Guide Posts for Emergent Phenomena def
 
 The following questions arose from Sprint 1 and require further investigation:
 
-1. **Expectation value bounds:** Is `⟨O⟩ ∈ [-1, 1]` formally guaranteed for all valid states and observables? In QBP, spin states are *pure unit quaternions* (both conditions: zero real part AND norm 1). For such quaternions, the bound follows from Cauchy-Schwarz: if `ψ` and `O` are both unit vectors in the imaginary subspace, their dot product satisfies `|vecDot(ψ, O)| ≤ ||ψ|| · ||O|| = 1`. This should be formally proven in Lean.
+1. **Expectation value bounds:** Is `⟨O⟩ ∈ [-1, 1]` formally guaranteed for all valid states and observables? In QBP, spin states are *pure unit quaternions* (both conditions: zero real part AND norm 1). For such quaternions, the bound follows from Cauchy-Schwarz: the imaginary parts of pure unit quaternions form unit 3-vectors in ℝ³, so their dot product satisfies `|vecDot(ψ, O)| ≤ ||ψ_im|| · ||O_im|| = 1`. This should be formally proven in Lean.
 
 2. **State rotation:** How do we mathematically represent rotating a spin state by an arbitrary angle θ? The formula `ψ' = q·ψ·q⁻¹` (quaternion conjugation) performs SO(3) rotation, but spin-1/2 requires SU(2) (the double cover). What is the correct mapping?
 
@@ -131,14 +131,16 @@ q = cos(θ/2) + sin(θ/2)(nx·i + ny·j + nz·k)
 
 The rotated observable is then `O' = q·O·q⁻¹`. Note the half-angle: this is the quaternion-to-SO(3) mapping. For spin-1/2, this half-angle is physical, not a mathematical artifact.
 
+**Important distinction:** The rotation quaternion `q` is a *unit quaternion* (norm 1, but has a non-zero real part) that acts as a rotation *operator*. This is different from spin state quaternions `ψ`, which are *pure unit quaternions* (norm 1 AND real part = 0) representing physical states. The rotation `q·O·q⁻¹` transforms observables; it does not represent a state itself.
+
 #### 6.4.2 Derivation of cos²(θ/2)
 
 **Spin state convention:** In QBP, the pure unit quaternions `i`, `j`, `k` represent eigenstates of spin along the x, y, and z axes respectively. Thus: spin-x eigenstate `ψ = i`, spin-y eigenstate `ψ = j`, spin-z eigenstate `ψ = k`.
 
-For a spin-z state `ψ = k` measured along an axis rotated by θ in the xz-plane:
+For a spin-z state `ψ = k` measured along an axis rotated by θ in the xz-plane (representative example; generalizes to any rotation plane):
 
 1. The rotated observable is `O_θ = q·k·q⁻¹` where `q = cos(θ/2) + sin(θ/2)·j`
-2. Expectation value: `⟨O_θ⟩ = vecDot(k, O_θ) = cos(θ)`
+2. Expectation value: `⟨O_θ⟩ = vecDot(ψ, O_θ) = cos(θ)` (with `ψ = k`)
 3. Probability: `P(+) = (1 + cos(θ))/2 = cos²(θ/2)` (using the half-angle identity)
 
 This derivation will be formally verified in Lean for Sprint 2 Phase 4.
