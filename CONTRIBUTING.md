@@ -975,3 +975,166 @@ Which direction resonates? Or tell us something different:
 2. **Keep volleys short** — 2-4 exchanges, then synthesize
 3. **Cite who said what** — "Gemini suggested X, Claude pushed back with Y"
 4. **End with action** — Brainstorms must conclude with concrete next steps
+
+---
+
+### Housekeeping Mode
+
+An autonomous batch cleanup mode where Claude works through low-risk housekeeping tasks while the human is away, with pre-approved scope and permissions.
+
+**Invocation:** When the user mentions they're going to bed, sleeping, or stepping away, Claude should ask:
+
+> "Would you like me to switch into Housekeeping Mode while you're away?"
+
+**Purpose:** Allow productive work to continue during human downtime on tasks that don't require interactive decision-making.
+
+#### Pre-Approval Checklist
+
+Before entering Housekeeping Mode, Claude must present and get explicit approval for:
+
+**1. Work Plan**
+| Item | Description |
+|------|-------------|
+| Issues to address | List all issues with numbers and titles |
+| Proposed order | Sequence with rationale (dependencies, priority) |
+| Estimated scope | Number of files, approximate lines changed |
+
+**2. Required Permissions**
+
+| Category | Examples | Risk Level |
+|----------|----------|------------|
+| File edits | Edit, Write | Low |
+| Git operations | add, commit, push, branch | Low |
+| GitHub CLI | gh pr create, gh issue close | Low |
+| Build/test | make, pytest, lake build | Medium |
+| Install | pip install, npm install | Medium |
+
+**3. Risk Assessment**
+- **Reversible?** Confirm all git operations can be reverted
+- **Destructive?** Confirm no force-push, no delete without backup
+- **Scope-limited?** Confirm changes only touch files related to listed issues
+
+#### Scope Limits
+
+**IN SCOPE:**
+- Documentation fixes and improvements
+- Code cleanup and formatting
+- Minor bug fixes with clear acceptance criteria
+- Process improvements
+- Closing resolved issues
+- Creating housekeeping issues from review feedback
+
+**OUT OF SCOPE:**
+- New features
+- Architectural changes
+- Design decisions requiring human input
+- Sprint phase work (Phases 1-5)
+- Theory refinement
+- Changes to test assertions or expected values
+- Anything ambiguous or requiring clarification
+
+#### Process (After Approval)
+
+```
+1. Work Locally First
+   └── Make all edits, run local tests, commit with clear messages
+
+2. Batch Into PRs
+   └── Group related fixes, create PR with summary
+
+3. Run Tiered Reviews
+   └── Red Team review (always)
+   └── Gemini review (if Tier 2+)
+
+4. Fix Review Issues In-PR
+   └── Don't defer — iterate until reviews pass
+
+5. Leave Ready for Merge
+   └── PR approved by reviews
+   └── Summary comment posted
+   └── User merges when they return
+```
+
+#### Safety Rails
+
+| Rule | Description |
+|------|-------------|
+| **No force operations** | Never use `--force`, `--hard`, `-f` flags |
+| **No deletions without issues** | Only delete what's explicitly requested in an issue |
+| **No external API calls** | Except GitHub and Gemini for reviews |
+| **Checkpoint commits** | Commit frequently so work isn't lost |
+| **Stop on confusion** | If unclear, leave a note and move to next item |
+
+#### Example Approval Dialog
+
+```
+Claude: I see you're heading to bed. Would you like me to enter Housekeeping Mode?
+
+Here's my plan:
+
+**Issues to address:**
+1. #169 — Evaluate workspace/gemini submodule
+2. #170 — Update ground truth template
+3. #168 — Document SU(2) connection
+
+**Estimated scope:** 3 files, ~50 lines
+
+**Required permissions:**
+- File edits (Edit, Write)
+- Git operations (add, commit, push, branch)
+- GitHub CLI (gh pr create, gh issue close)
+
+**Risk assessment:**
+- All reversible via git
+- No destructive operations
+- Scope limited to listed issues
+
+Approve this plan to let me work autonomously?
+```
+
+**User Response Options:**
+- "Yes, go ahead" — Enters Housekeeping Mode with stated plan
+- "Yes, but skip #170" — Enters with modified scope
+- "No, just wait" — Does not enter Housekeeping Mode
+- Custom modifications to the plan
+
+#### Exit Conditions
+
+Housekeeping Mode ends when:
+1. All planned issues are addressed (or blocked)
+2. User returns and resumes interactive mode
+3. Claude encounters a blocking ambiguity that requires human input
+4. An unexpected error occurs that cannot be safely resolved
+
+**On Exit:** Claude posts a summary of work completed, PRs created, and any issues encountered.
+
+#### Example Exit Summary
+
+```
+## Housekeeping Mode Complete
+
+**Session:** 2026-02-06 23:00 - 2026-02-07 02:30
+
+### Work Completed
+| Issue | Status | PR |
+|-------|--------|-----|
+| #169 — Evaluate submodule | ✅ Done | #172 (ready for merge) |
+| #170 — Update template | ✅ Done | #172 (ready for merge) |
+| #168 — SU(2) docs | ⏸️ Blocked | Needs theory input |
+
+### PRs Created
+- **#172** — Housekeeping batch: #169, #170
+  - Red Team: APPROVE
+  - Ready for your merge
+
+### Issues Encountered
+- #168 requires clarification on SU(2) representation choice
+  - Left comment on issue, moved to next item
+
+### Next Steps
+When you return:
+1. Review and merge #172
+2. Clarify #168 so I can continue
+
+Welcome back!
+```
