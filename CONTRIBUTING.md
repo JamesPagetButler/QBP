@@ -178,15 +178,18 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 
 **Goal:** Research and document the real-world results we need to match.
 
+**Schema:** See [Ground Truth Schema](docs/schemas/ground_truth_schema.md) for required sections and format.
+
 **Tasks:**
 - Review existing literature and experimental data
 - Define quantitative predictions with error bounds
 - Specify acceptance criteria (e.g., "within 3σ of expected value")
+- Classify predictions as "Validation" (matches QM) or "Novel" (differs from QM)
 - Identify required tools or framework extensions
 
 **Output:** `research/NN_experiment_expected_results.md`
 
-**Exit Criteria:** Ground truth document reviewed and approved.
+**Exit Criteria:** Ground truth document reviewed and approved, with prediction classification complete.
 
 ---
 
