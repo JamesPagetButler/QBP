@@ -166,7 +166,8 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 │              │                                                       │
 │        [YES / 4c WAIVED] ↓                                           │
 │  Phase 5: Publication                                                │
-│  └── Output: paper/quaternion_physics.md section                     │
+│  ├── Track A (Required): paper/quaternion_physics.md section         │
+│  └── Track B (If applicable): /libs/ package → Reservoir publish     │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -252,14 +253,19 @@ Phase 4 is divided into three sub-phases. The phase count remains 5 and each exp
 
 **Library Development (When Needed)**
 
-During Phase 4a, proofs may require Lean 4 capabilities that do not exist in Mathlib or the broader ecosystem. When this happens, we build the missing capability as an independent library.
+During Phase 4a, proofs may require Lean 4 capabilities that do not exist in Mathlib or the broader ecosystem, or where existing capabilities are insufficient (buggy, incomplete, or incompatible API). When this happens, we build the missing capability as an independent library.
 
-*We do not speculatively create libraries — we build only when proofs demand capabilities that don't exist.*
+*We do not speculatively create libraries — we build only when proofs demand capabilities that don't exist or are inadequate.*
+
+**When existing libraries are insufficient:**
+- **Buggy:** File an upstream issue first. If no fix is forthcoming, fork and patch.
+- **Incomplete:** Contribute upstream if feasible. Otherwise, build a wrapper or extension.
+- **Incompatible API:** Build a wrapper that provides the interface we need.
 
 **Process:**
 1. **Document the gap** — create a GitHub Issue describing the missing capability and why existing libraries are insufficient.
 2. **Create a separate Lake package** in `/libs/<name>/` — the library must be a standalone project with its own `lakefile.lean`, `lean-toolchain`, and `README.md`.
-3. **Wire into proofs** via local `require` — the QBPProofs package references the library using a local path dependency during development.
+3. **Wire into proofs** via local `require` — the QBPProofs package references the library using a local path dependency during development. **Important:** During local development, the library's `lean-toolchain` must match the `proofs/` toolchain exactly. Version divergence is only acceptable after the library is published to Reservoir and referenced via a versioned dependency.
 4. **Follow Library Quality Standards** — see the [Library Quality Standards](#library-quality-standards) section below. Full compliance is required before Phase 5 Track B publication, not during active Phase 4a development.
 
 **Key principle:** Libraries must remain general-purpose. They must not import from `proofs/QBP/` or depend on any QBP-specific definitions. If other Lean users could benefit from the capability, it belongs in `/libs/`.
@@ -898,6 +904,7 @@ This project follows a defined directory structure to keep our work organized.
 *   `/src/viz/interactive`: C/WASM interactive proof visualizations. (Phase 4c output)
 *   `/experiments`: Contains the Python scripts for our "synthetic experiments," which use the `qphysics.py` library to test our hypotheses. (Phase 2 output)
 *   `/tests/physics`: Contains physics validation tests for each experiment. (Phase 2 output)
+*   `/analysis`: Contains analysis scripts and reports for each experiment (e.g., `analysis/01_stern_gerlach/`). (Phase 3 output)
 *   `/proofs`: Contains Lean 4 formal proof files. (Phase 4a output)
 *   `/libs`: Independent Lean 4 library packages developed during Phase 4a. Each subdirectory is a standalone Lake package with its own `lakefile.lean` and `lean-toolchain`. See [Library Quality Standards](#library-quality-standards).
 *   `/results`: Contains the timestamped output logs from our synthetic experiments. This directory is in `.gitignore` and is not committed to the repository.

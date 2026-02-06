@@ -430,39 +430,81 @@ void graph_init_stern_gerlach(ProofGraph *g)
  * See GitHub issue for details on planned improvements.
  */
 
+/*
+ * Automatic graph layout using topological levels.
+ *
+ * Algorithm:
+ * 1. Compute "level" for each node (longest path from any root)
+ *    - Roots (nodes with no dependencies) get level 0
+ *    - Each node's level = max(dependency levels) + 1
+ *    - Uses fixed-point iteration: repeat until no levels change
+ *
+ * 2. Group nodes by level and assign horizontal index within level
+ *
+ * 3. Distribute nodes:
+ *    - Vertically: evenly spaced rows, one per level (roots at top)
+ *    - Horizontally: centered within row, evenly spaced
+ *    - Formula: x = area_x + area_width * (index + 0.5) / count_at_level
+ *
+ * Example with 5 nodes (A,B depend on nothing; C depends on A; D,E depend on C):
+ *
+ *     Level 0:  [A]     [B]      <- roots, 2 nodes, each at 1/4 and 3/4 width
+ *     Level 1:      [C]          <- 1 node, centered at 1/2 width
+ *     Level 2:  [D]     [E]      <- 2 nodes, at 1/4 and 3/4 width
+ *
+ * This enables new experiments to be visualized without hardcoded positions.
+ */
 void graph_layout(ProofGraph *g, Rectangle area)
 {
+    if (g->node_count == 0) return;
+
     float x0 = area.x;
     float y0 = area.y;
     float w  = area.width;
     float h  = area.height;
 
-    float row_h = h / 7.0f;
+    /* Step 1: Compute levels using longest-path from roots */
+    int levels[MAX_NODES] = {0};
+    int max_level = 0;
 
-    #define POS(row, col, ncols) \
-        (Vector2){ x0 + w * ((col) + 0.5f) / (ncols), y0 + row_h * ((row) + 0.5f) }
+    /* Iterate until levels stabilize (simple fixed-point) */
+    for (int iter = 0; iter < g->node_count; iter++) {
+        for (int i = 0; i < g->node_count; i++) {
+            ProofNode *n = &g->nodes[i];
+            for (int d = 0; d < n->dep_count; d++) {
+                int dep_id = n->deps[d];
+                if (dep_id >= 0 && dep_id < g->node_count) {
+                    if (levels[i] <= levels[dep_id]) {
+                        levels[i] = levels[dep_id] + 1;
+                    }
+                }
+            }
+            if (levels[i] > max_level) max_level = levels[i];
+        }
+    }
 
-    g->nodes[N_IS_PURE].pos     = POS(0, 0, 2);
-    g->nodes[N_VEC_DOT].pos     = POS(0, 1, 2);
+    /* Step 2: Count nodes per level */
+    int level_counts[MAX_NODES] = {0};
+    int level_index[MAX_NODES] = {0};  /* Position within level */
 
-    g->nodes[N_SPIN_X_PURE].pos = POS(1, 0, 2);
-    g->nodes[N_SPIN_Z_PURE].pos = POS(1, 1, 2);
+    for (int i = 0; i < g->node_count; i++) {
+        level_index[i] = level_counts[levels[i]];
+        level_counts[levels[i]]++;
+    }
 
-    g->nodes[N_SG_STATE].pos    = POS(2, 0, 2);
-    g->nodes[N_SG_OBS].pos      = POS(2, 1, 2);
+    /* Step 3: Compute positions */
+    float row_h = (max_level > 0) ? h / (float)(max_level + 1) : h;
 
-    g->nodes[N_SG_STATE_IS_PURE].pos = POS(3, 0, 2);
-    g->nodes[N_SG_OBS_IS_PURE].pos   = POS(3, 1, 2);
+    for (int i = 0; i < g->node_count; i++) {
+        int lvl = levels[i];
+        int count = level_counts[lvl];
+        int idx = level_index[i];
 
-    g->nodes[N_X_Z_ORTHO].pos       = POS(4, 0, 2);
-    g->nodes[N_EXP_ORTHO_ZERO].pos  = POS(4, 1, 2);
+        float node_x = x0 + w * ((float)(idx) + 0.5f) / (float)count;
+        float node_y = y0 + row_h * ((float)lvl + 0.5f);
 
-    g->nodes[N_EXP_XZ_ZERO].pos = POS(5, 0, 1);
-
-    g->nodes[N_PROB_UP].pos     = POS(6, 0, 2);
-    g->nodes[N_PROB_DOWN].pos   = POS(6, 1, 2);
-
-    #undef POS
+        g->nodes[i].pos = (Vector2){ node_x, node_y };
+    }
 }
 
 /* ------------------------------------------------------------------ */

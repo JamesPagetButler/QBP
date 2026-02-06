@@ -141,7 +141,7 @@ The expected outcome is derived directly from the QBP axioms (see `research/01_s
 
 1. **State Preparation:** `ψ = i = ⟨0, 1, 0, 0⟩` (spin-x)
 2. **Observable:** `O_z = k = ⟨0, 0, 0, 1⟩` (spin-z measurement)
-3. **Expectation Value:** `⟨O_z⟩ = 2 × vecDot(ψ, O_z) = 2 × 0 = 0`
+3. **Expectation Value:** `⟨O_z⟩ = vecDot(ψ, O_z) = 0` *(see DESIGN_RATIONALE.md §5.2 for factor-of-2 correction history)*
 4. **Predicted Probabilities:** `P(+) = P(-) = 0.5`
 
 The acceptance criterion requires measured results to fall within 3σ of the expected mean.
