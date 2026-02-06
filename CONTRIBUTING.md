@@ -1260,6 +1260,32 @@ Bell Review runs after standard tier reviews, before PR creation. See `workspace
 | **Checkpoint commits** | Commit frequently so work isn't lost |
 | **No force operations** | Never use `--force`, `--hard`, `-f` flags |
 
+#### Merge Gate
+
+**Before executing a merge command, Claude must verify all required reviews are complete.**
+
+If the user requests merge but reviews are incomplete:
+
+```
+User: merge #178
+
+Claude: PR #178 hasn't completed the full review cycle:
+- Red Team: APPROVE ✅
+- Gemini: BLOCKED (MCP disconnected)
+- Bell Review: PENDING
+
+Options:
+1. "merge anyway" — Skip remaining reviews and merge now
+2. "wait" — Complete reviews first
+3. "skip [review]" — Skip specific review(s)
+
+Which would you prefer?
+```
+
+**Rationale:** Even explicit user commands should be validated against process gates. The cost of asking is low; the cost of skipping reviews unintentionally is higher.
+
+**Exception:** If the user has already acknowledged skipped reviews in the same conversation turn (e.g., "skip Gemini and merge"), proceed without re-asking.
+
 #### Example Approval Dialog
 
 ```
