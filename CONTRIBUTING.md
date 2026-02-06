@@ -1149,6 +1149,8 @@ An autonomous single-issue development mode for targeted work on one specific is
 
 **Purpose:** Enable concentrated, autonomous work on a single issue when you need dedicated attention outside of sprint phases or batch housekeeping.
 
+> **Note:** Focus Mode complements [Housekeeping Mode](#housekeeping-mode) (batch cleanup) and Sprint Mode (multi-phase experimental sprints, see #156). Choose Focus Mode when you need dedicated attention on a single issue outside the sprint lifecycle.
+
 **When to Use:**
 - Urgent fixes that can't wait for sprint flow
 - Complex issues requiring dedicated attention
@@ -1178,7 +1180,7 @@ Before entering Focus Mode, Claude must present and get explicit approval for:
 | External APIs | Gemini review requests | Low |
 
 **3. Review Tier**
-- Identify the appropriate tier (1/2/3) based on issue type
+- Identify the appropriate tier (1/2/3) based on issue type (see [Tiered Review System](#tiered-review-system))
 - Confirm review requirements before starting
 
 #### Workflow
@@ -1225,6 +1227,7 @@ Before entering Focus Mode, Claude must present and get explicit approval for:
 | **Single issue only** | Don't scope-creep into other issues |
 | **AC-driven** | Only do what acceptance criteria require |
 | **Escalate ambiguity** | If ACs are unclear, ask before assuming |
+| **Checkpoint commits** | Commit frequently so work isn't lost |
 | **No force operations** | Never use `--force`, `--hard`, `-f` flags |
 
 #### Example Approval Dialog
@@ -1250,6 +1253,12 @@ Claude: I'll enter Focus Mode for #183.
 Approve to begin Focus Mode?
 ```
 
+**User Response Options:**
+- "Yes, begin Focus Mode" — Enters with stated scope
+- "Yes, but change X" — Enters with modified scope
+- "No, let's discuss first" — Does not enter Focus Mode
+- Custom modifications to the plan
+
 #### Exit Conditions
 
 Focus Mode ends when:
@@ -1259,3 +1268,32 @@ Focus Mode ends when:
 4. Acceptance criteria cannot be met without scope expansion (escalate)
 
 **On Exit:** Claude posts a summary with PR link, review status, and any blockers.
+
+#### Example Exit Summary
+
+```
+## Focus Mode Complete
+
+**Issue:** #183 — Fix expectation value normalization
+**Duration:** ~45 minutes
+
+### Work Completed
+- Fixed expectation_value() to clamp output to [-1, 1]
+- Added 4 boundary test cases to test_qphysics.py
+- Updated docstring with return value range
+
+### PR Created
+- **#184** — Fix expectation value normalization
+  - Red Team: APPROVE
+  - All tests passing
+  - Ready for your merge
+
+### Acceptance Criteria Status
+| AC | Status |
+|----|--------|
+| expectation_value() returns [-1, 1] | ✅ Done |
+| Unit tests updated | ✅ Done |
+| Documentation updated | ✅ Done |
+
+Focus Mode complete. Awaiting merge approval.
+```
