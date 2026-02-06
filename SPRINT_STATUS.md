@@ -8,9 +8,21 @@
 
 ## Current Position
 
-- **Active Sprint:** Between sprints (housekeeping window)
-- **Lifecycle Stage:** Sprint 1 COMPLETE → Housekeeping → Sprint 2 (Angle-Dependent Measurement)
-- **Next Critical-Path Action:** Clear housekeeping backlog, then Sprint 2 Phase 2 (Implementation, #36)
+- **Active Sprint:** Sprint 2 (Angle-Dependent Measurement)
+- **Lifecycle Stage:** Sprint 2 Phase 1 (Rework)
+- **Next Critical-Path Action:** Complete Phase 1 Rework (#160)
+
+## Sprint 2 Closure Checklist
+
+- [ ] Phase 1: Ground Truth Rework (#160) ← **ACTIVE**
+- [ ] Phase 2: Implementation (#161)
+- [ ] Phase 3: Visualization (#162)
+- [ ] Phase 4: Formal Verification (#163)
+  - [ ] 4a: Formal Proof
+  - [ ] 4b: Proof Review
+  - [ ] 4c: Interactive Proof Visualization
+- [ ] Phase 5: Publication (#164)
+- [ ] Theory Refinement (#165)
 
 ## Active Diversions
 
@@ -79,6 +91,7 @@
 - **James's note (2026-02-04):** Experiment 01 Phase 4 (#55) and Phase 5 (#64) need to be re-done against the current process. Both issues reopened with updated acceptance criteria. Phase 4a proofs exist but 4b (review) and 4c (viz) were never done. Phase 5 paper section exists but needs audit against current standards.
 - **Session update (2026-02-05):** Phase 4c complete. PR #141 merged with data-driven JSON loader, custom fonts (Exo 2), 4-level descriptions, and dynamic node sizing. Created housekeeping issues #142 (automate graph from Lean) and #143 (generalize layout). Phase 4 (#55) closed with full review documentation. Phase 5 (#64) audited and closed — PR #146 added proper figures and DESIGN_RATIONALE Section 5. **Sprint 1 Phases 1-5 complete. Next: Theory Refinement #80.**
 - **Session update (2026-02-06):** Theory Refinement (#80) complete. PR #147 merged after 2 review cycles. Added DESIGN_RATIONALE Section 6 (theoretical findings, emergent phenomena, open questions, Sprint 2 extensions). Created security audit housekeeping issue #148. **Sprint 1 fully complete. Next: Sprint 1 Retrospective, then Sprint 2 Phase 2.**
+- **Session update (2026-02-06, later):** PR #155 merged (housekeeping batch). Created Sprint 2 issue set (#160-#165). Note: PR #116 did Phase 1 early but predates process maturity; reworking Phase 1 to incorporate Sprint 1 learnings. Created Housekeeping Mode issue (#159).
 
 ---
 
