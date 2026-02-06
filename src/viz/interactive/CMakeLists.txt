@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 11)
 # Source files
 set(SOURCES
     src/main.c
+    src/fonts.c
     src/qphysics.c
     src/proof_graph.c
     src/json_loader.c
@@ -41,6 +42,7 @@ if(EMSCRIPTEN)
     set_target_properties(index PROPERTIES
         LINK_FLAGS "--shell-file ${CMAKE_SOURCE_DIR}/shell.html \
                     --preload-file ${CMAKE_SOURCE_DIR}/data@/data \
+                    --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets \
                     -sUSE_GLFW=3 \
                     -sASSERTIONS=1 \
                     -sWASM=1 \
