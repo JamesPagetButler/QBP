@@ -14,7 +14,7 @@
 
 ## Sprint 2 Closure Checklist
 
-- [ ] Phase 1: Ground Truth Rework (#160) ← **ACTIVE**
+- [ ] Phase 1: Ground Truth Rework (#160) ← **IN PROGRESS**
 - [ ] Phase 2: Implementation (#161)
 - [ ] Phase 3: Visualization (#162)
 - [ ] Phase 4: Formal Verification (#163)

@@ -1,0 +1,18 @@
+Output for this run is being saved to: results/01_stern_gerlach/simulation_output_2026-02-02_21-30-59.txt
+
+--- Running Stern-Gerlach Synthetic Experiment ---
+Simulating 1000000 particles...
+Initial State (psi): quaternion(0, 1, 0, 0)
+Measuring with Observable (O): quaternion(0, 0, 0, 1)
+----------------------------------------------------
+Calculated Expectation Value: 0.0000
+Calculated Probability of 'Up': 0.5000
+----------------------------------------------------
+
+--- Simulation Results ---
+Outcome 'Up' (+1): 500207 times (50.02%)
+Outcome 'Down' (-1): 499793 times (49.98%)
+--------------------------
+
+Conclusion: The experiment successfully demonstrates spin quantization.
+As expected, the initial state in a superposition yielded a probabilistic split into two distinct outcomes.
