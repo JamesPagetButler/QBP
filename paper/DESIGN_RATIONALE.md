@@ -214,3 +214,111 @@ Based on this analysis, we confirm the theoretical approach for Sprint 2:
 4. **Defer multi-particle extensions.** Entanglement and collective behavior will be addressed in later sprints.
 
 This decision aligns with the project's incremental approach: each sprint tests one aspect of the framework before moving to more complex scenarios.
+
+### 6.6 The SU(2)/Quaternion Isomorphism
+
+This section addresses an open theoretical question from Sprint 1 (§6.3, question 2) and makes explicit the connection between quaternions and SU(2) that underlies the half-angle formula.
+
+#### 6.6.1 The Mathematical Statement
+
+**Unit quaternions form a Lie group isomorphic to SU(2).**
+
+Specifically:
+- The set of unit quaternions {q ∈ ℍ : |q| = 1} forms a 3-sphere S³
+- This is a Lie group under quaternion multiplication
+- There exists a group isomorphism φ: S³ → SU(2)
+
+The explicit isomorphism maps a unit quaternion `q = w + xi + yj + zk` to the SU(2) matrix:
+
+```
+φ(q) = [ w + zi    y + xi ]
+       [-y + xi    w - zi ]
+```
+
+This matrix has determinant 1 and satisfies U†U = I, confirming it's in SU(2).
+
+#### 6.6.2 The Double Cover of SO(3)
+
+**SU(2) is the double cover of SO(3).**
+
+This means:
+- There is a 2-to-1 surjective homomorphism π: SU(2) → SO(3)
+- For every 3D rotation R ∈ SO(3), there are exactly two elements ±U ∈ SU(2) mapping to it
+- π(U) = π(-U) for all U ∈ SU(2)
+
+**Equivalently for quaternions:** For every 3D rotation, there are two unit quaternions ±q that produce the same rotation via the conjugation action q·v·q⁻¹.
+
+#### 6.6.3 Why Spin-1/2 Requires the Double Cover
+
+**The 2π rotation problem:**
+
+In classical mechanics, rotating an object by 2π (360°) returns it to its original state. But for spin-1/2 particles:
+
+```
+Rotation by 2π:  ψ → -ψ  (state acquires a minus sign)
+Rotation by 4π:  ψ → +ψ  (state returns to original)
+```
+
+This is the defining characteristic of a **spinor** — an object that requires two full rotations to return to its initial state.
+
+**The quaternion explanation:**
+
+The rotation quaternion for angle θ about axis n̂ is:
+```
+q = cos(θ/2) + sin(θ/2)·n̂
+```
+
+For θ = 2π (full rotation):
+```
+q = cos(π) + sin(π)·n̂ = -1 + 0·n̂ = -1
+```
+
+So the rotated state is:
+```
+ψ' = q·ψ·q⁻¹ = (-1)·ψ·(-1)⁻¹ = (-1)·ψ·(-1) = ψ
+```
+
+Wait — this gives ψ, not -ψ! The resolution: **for spin states, we use the single-sided action** `ψ' = q·ψ`, not conjugation. Under single-sided action:
+```
+ψ' = q·ψ = (-1)·ψ = -ψ  ✓
+```
+
+This is consistent with how spinors transform in quantum mechanics: the state vector acquires a phase under rotation, while the observable expectation values (which involve |ψ|²) remain unchanged.
+
+**The double cover in action:**
+- Conjugation action `q·v·q⁻¹` performs SO(3) rotation (full rotation by 2π returns v)
+- Single-sided action `q·ψ` performs SU(2) transformation (full rotation by 2π gives -ψ)
+
+QBP uses conjugation for rotating *observables* (which are spatial directions) and conceptually uses single-sided action for *states* (which are spinors). However, since our measurement formula only involves `vecDot(ψ, O)`, the sign of ψ cancels out in probabilities — consistent with the QM principle that global phases are unobservable.
+
+#### 6.6.4 Connection to the Half-Angle Formula
+
+The half-angle θ/2 in the rotation quaternion is **not** a mathematical convenience — it is the physical manifestation of the SU(2) double cover.
+
+When we rotate the z-axis observable by θ about the y-axis to get an angle-dependent measurement:
+```
+q = cos(θ/2) + sin(θ/2)·j
+O_θ = q·k·q⁻¹ = cos(θ)·k + sin(θ)·i
+```
+
+The expectation value becomes `⟨O_θ⟩ = vecDot(ψ, O_θ) = cos(θ)` (for ψ = k), and the probability is:
+```
+P(+) = (1 + cos θ)/2 = cos²(θ/2)
+```
+
+The cos²(θ/2) form — with its explicit half-angle — is a direct signature of the SU(2) structure. In standard QM, this arises from the spinor transformation law. In QBP, it arises from quaternion rotation algebra. **These are the same mathematics in different notation.**
+
+#### 6.6.5 Implications for QBP
+
+The SU(2)/quaternion isomorphism explains why QBP reproduces standard QM for spin-1/2 systems: **they are algebraically equivalent**. The quaternion framework is not an approximation or analogy — it is an alternative parameterization of the same mathematical structure.
+
+This has both positive and negative implications:
+
+**Positive:** QBP is guaranteed to match QM for all single-particle spin-1/2 phenomena. Any discrepancy would indicate an implementation error, not a fundamental difference.
+
+**Negative:** QBP cannot produce novel predictions for single-particle systems. To find where QBP might diverge from standard QM, we must look to:
+- Multi-particle systems (entanglement, Bell correlations)
+- Higher-spin systems (where octonions might be relevant)
+- Relativistic extensions (where the quaternion structure might impose different constraints)
+
+See issue #167 for ongoing research into potential QBP divergences.
