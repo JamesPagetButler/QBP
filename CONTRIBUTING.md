@@ -1141,3 +1141,162 @@ When you return:
 
 Welcome back!
 ```
+
+---
+
+### Focus Mode
+
+An autonomous single-issue development mode for targeted work on one specific issue with pre-approved permissions.
+
+**Invocation:** "Focus on issue #X" or "Let's do #X in Focus Mode"
+
+**Purpose:** Enable concentrated, autonomous work on a single issue when you need dedicated attention outside of sprint phases or batch housekeeping.
+
+> **Note:** Focus Mode complements [Housekeeping Mode](#housekeeping-mode) (batch cleanup) and Sprint Mode (multi-phase experimental sprints, see #156). Choose Focus Mode when you need dedicated attention on a single issue outside the sprint lifecycle.
+
+**When to Use:**
+- Urgent fixes that can't wait for sprint flow
+- Complex issues requiring dedicated attention
+- Work outside the current sprint scope
+- One-off tasks that don't fit housekeeping or sprint categories
+
+#### Pre-Approval Checklist
+
+Before entering Focus Mode, Claude must present and get explicit approval for:
+
+**1. Issue Summary**
+| Item | Description |
+|------|-------------|
+| Issue | Number, title, and link |
+| Acceptance criteria | List all ACs from the issue |
+| Branch name | Following branch naming convention |
+| Estimated scope | Files affected, approximate complexity |
+
+**2. Required Permissions**
+
+| Category | Examples | Risk Level |
+|----------|----------|------------|
+| File edits | Edit, Write | Low |
+| Git operations | add, commit, push, branch | Low |
+| GitHub CLI | gh pr create, gh pr comment | Low |
+| Build/test | make, pytest, lake build | Medium |
+| External APIs | Gemini review requests | Low |
+
+**3. Review Tier**
+- Identify the appropriate tier (1/2/3) based on issue type (see [Tiered Review System](#tiered-review-system))
+- Confirm review requirements before starting
+
+#### Workflow
+
+```
+1. Create Branch
+   └── Branch from master: focus/issue-NNN-description
+
+2. Work Autonomously
+   └── Implement solution
+   └── Commit with clear messages
+   └── Run local tests
+
+3. Run Reviews
+   └── Apply appropriate tier reviews
+   └── Fix issues (up to 3 cycles)
+
+4. Create PR
+   └── Link to issue with "Closes #NNN"
+   └── Post review summaries as comments
+
+5. Present for Merge
+   └── Summary of work done
+   └── Review status
+   └── Await human merge approval
+```
+
+#### Scope Boundaries
+
+**IN SCOPE:**
+- Everything needed to satisfy the issue's acceptance criteria
+- Related test updates
+- Documentation updates for changed behavior
+
+**OUT OF SCOPE:**
+- Unrelated improvements noticed along the way (create separate issues)
+- Refactoring beyond what's needed for the fix
+- Changes to other issues (even if "quick")
+
+#### Safety Rails
+
+| Rule | Description |
+|------|-------------|
+| **Single issue only** | Don't scope-creep into other issues |
+| **AC-driven** | Only do what acceptance criteria require |
+| **Escalate ambiguity** | If ACs are unclear, ask before assuming |
+| **Checkpoint commits** | Commit frequently so work isn't lost |
+| **No force operations** | Never use `--force`, `--hard`, `-f` flags |
+
+#### Example Approval Dialog
+
+```
+User: Focus on issue #183
+
+Claude: I'll enter Focus Mode for #183.
+
+**Issue:** #183 — Fix expectation value normalization
+**Acceptance Criteria:**
+- [ ] expectation_value() returns values in [-1, 1] range
+- [ ] Unit tests updated with boundary cases
+- [ ] Documentation updated in qphysics.py docstring
+
+**Branch:** focus/issue-183-expectation-normalization
+**Estimated scope:** 2 files (qphysics.py, test_qphysics.py), ~30 lines
+**Review tier:** Tier 2 (code change)
+
+**Required permissions:**
+- File edits, Git operations, GitHub CLI, pytest
+
+Approve to begin Focus Mode?
+```
+
+**User Response Options:**
+- "Yes, begin Focus Mode" — Enters with stated scope
+- "Yes, but change X" — Enters with modified scope
+- "No, let's discuss first" — Does not enter Focus Mode
+- Custom modifications to the plan
+
+#### Exit Conditions
+
+Focus Mode ends when:
+1. PR is created and ready for merge
+2. Issue is blocked and requires human decision
+3. User requests to exit
+4. Acceptance criteria cannot be met without scope expansion (escalate)
+
+**On Exit:** Claude posts a summary with PR link, review status, and any blockers.
+
+#### Example Exit Summary
+
+```
+## Focus Mode Complete
+
+**Issue:** #183 — Fix expectation value normalization
+**Duration:** ~45 minutes
+
+### Work Completed
+- Fixed expectation_value() to clamp output to [-1, 1]
+- Added 4 boundary test cases to test_qphysics.py
+- Updated docstring with return value range
+
+### PR Created
+- **#184** — Fix expectation value normalization
+  - Red Team: APPROVE
+  - All tests passing
+  - Ready for your merge
+
+### Acceptance Criteria Status
+| AC | Status |
+|----|--------|
+| expectation_value() returns [-1, 1] | ✅ Done |
+| Unit tests updated | ✅ Done |
+| Documentation updated | ✅ Done |
+
+Focus Mode complete. Awaiting merge approval.
+```
