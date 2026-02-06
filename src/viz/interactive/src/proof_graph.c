@@ -59,6 +59,15 @@ static void add_node(ProofGraph *g, int id,
     for (int i = 0; i < dep_count; i++) n->deps[i] = deps[i];
 }
 
+/*
+ * DEPRECATED: Use graph_load_json() from json_loader.h instead.
+ *
+ * This hardcoded initialization is kept as a fallback during the
+ * transition to data-driven loading. Once JSON loading is proven
+ * stable, this function should be removed.
+ *
+ * See: data/stern_gerlach.viz.json for the data-driven version.
+ */
 void graph_init_stern_gerlach(ProofGraph *g)
 {
     memset(g, 0, sizeof(*g));

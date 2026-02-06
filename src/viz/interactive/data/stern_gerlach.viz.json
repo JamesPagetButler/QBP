@@ -1,0 +1,152 @@
+{
+  "experiment_id": "01_stern_gerlach",
+  "title": "Stern-Gerlach: Spin-X measured on Z-axis",
+  "description": "Formal proof that a spin-x state measured on the z-axis produces a 50/50 probability split, as predicted by the QBP quaternion framework and observed in the Stern-Gerlach experiment.",
+  "walk_order": [
+    "isPureQuaternion",
+    "vecDot",
+    "spin_x_is_pure",
+    "spin_z_is_pure",
+    "spinXState",
+    "spinZObservable",
+    "spinXState_is_pure",
+    "spinZObservable_is_pure",
+    "x_z_orthogonal",
+    "expectation_orthogonal_is_zero",
+    "expectation_x_measured_z_is_zero",
+    "prob_up_x_measured_z_is_half",
+    "prob_down_x_measured_z_is_half"
+  ],
+  "nodes": {
+    "isPureQuaternion": {
+      "display_name": "Pure Quaternion Definition",
+      "kind": "definition",
+      "L4_formal": "def isPureQuaternion (q : H) : Prop := q.re = 0",
+      "L3_math": "A quaternion q = a + bi + cj + dk is pure iff a = 0",
+      "L2_physical": "Pure quaternions represent physical directions in 3D space. They're the 'arrows' we use to describe spin orientations and measurement axes.",
+      "L1_intuitive": "Think of a pure quaternion as a 3D arrow with no 'extra dimension.' It's the mathematical way to point in a direction - like pointing your finger at something in the room.",
+      "key_insight": "Pure quaternions are directions, not scalars.",
+      "depends_on": []
+    },
+    "vecDot": {
+      "display_name": "Vector Dot Product",
+      "kind": "definition",
+      "L4_formal": "def vecDot (a b : H) : R := a.imI*b.imI + a.imJ*b.imJ + a.imK*b.imK",
+      "L3_math": "<a, b> = a_i*b_i + a_j*b_j + a_k*b_k  (Euclidean inner product)",
+      "L2_physical": "Measures how aligned two directions are. Zero means perpendicular; maximum means parallel. This is the key to determining quantum measurement probabilities.",
+      "L1_intuitive": "The dot product asks: 'How much do these two arrows point the same way?' If they're at right angles, the answer is zero. If they point the same direction, it's maximum.",
+      "key_insight": "Alignment between state and measurement determines randomness.",
+      "depends_on": []
+    },
+    "spin_x_is_pure": {
+      "display_name": "X-Axis is a Valid Direction",
+      "kind": "theorem",
+      "L4_formal": "theorem spin_x_is_pure : isPureQuaternion SPIN_X := rfl",
+      "L3_math": "Re(i) = 0, confirming SPIN_X = i is pure",
+      "L2_physical": "The x-direction is a legitimate physical direction - it lives purely in 3D space with no scalar component.",
+      "L1_intuitive": "'Pointing along the x-axis' is a valid direction in space. Nothing exotic here - just confirming our sideways direction is well-defined.",
+      "key_insight": "The x-axis is a proper direction for spin.",
+      "depends_on": ["isPureQuaternion"]
+    },
+    "spin_z_is_pure": {
+      "display_name": "Z-Axis is a Valid Direction",
+      "kind": "theorem",
+      "L4_formal": "theorem spin_z_is_pure : isPureQuaternion SPIN_Z := rfl",
+      "L3_math": "Re(k) = 0, confirming SPIN_Z = k is pure",
+      "L2_physical": "The z-direction is a legitimate physical direction - it lives purely in 3D space with no scalar component.",
+      "L1_intuitive": "'Pointing up' (along the z-axis) is a valid direction in space. We're confirming our vertical axis is well-defined.",
+      "key_insight": "The z-axis (vertical) is a proper direction for measurement.",
+      "depends_on": ["isPureQuaternion"]
+    },
+    "spinXState": {
+      "display_name": "The Particle's State: Spin-X",
+      "kind": "definition",
+      "L4_formal": "def spinXState : H := SPIN_X  -- the quaternion i",
+      "L3_math": "|psi_x> = i = <0, 1, 0, 0>, spin-up eigenstate along x-axis",
+      "L2_physical": "A particle prepared with its spin pointing along the positive x-axis. If you measured it along x, it would definitely give 'up.'",
+      "L1_intuitive": "Imagine a tiny compass needle pointing firmly to the right. This is our particle's spin state - it's committed to the x-direction, like a stubborn arrow pointing sideways.",
+      "key_insight": "The particle 'knows' it's pointing right (x-direction).",
+      "depends_on": []
+    },
+    "spinZObservable": {
+      "display_name": "The Detector: Measuring Z",
+      "kind": "definition",
+      "L4_formal": "def spinZObservable : H := SPIN_Z  -- the quaternion k",
+      "L3_math": "O_z = k = <0, 0, 0, 1>, spin measurement along z-axis",
+      "L2_physical": "A measuring device oriented vertically. It asks the particle: 'Is your spin pointing up or down along the z-axis?'",
+      "L1_intuitive": "Picture a detector that only cares about vertical: 'Are you pointing up toward the ceiling, or down toward the floor?' It can't ask about sideways - only up or down.",
+      "key_insight": "The detector asks 'up or down?' - not 'left or right?'",
+      "depends_on": []
+    },
+    "spinXState_is_pure": {
+      "display_name": "Spin-X State is Valid",
+      "kind": "theorem",
+      "L4_formal": "theorem spinXState_is_pure : isPureQuaternion spinXState := spin_x_is_pure",
+      "L3_math": "Re(|psi_x>) = 0, the state vector has no scalar part",
+      "L2_physical": "The spin-x state represents a genuine direction in physical space - it's a valid quantum state we can prepare in the lab.",
+      "L1_intuitive": "Our 'pointing right' state is mathematically well-formed. It's a proper arrow, not something weird or broken. We can actually create particles in this state.",
+      "key_insight": "The state we're testing is legitimate.",
+      "depends_on": ["spinXState", "spin_x_is_pure"]
+    },
+    "spinZObservable_is_pure": {
+      "display_name": "Z-Measurement is Valid",
+      "kind": "theorem",
+      "L4_formal": "theorem spinZObservable_is_pure : isPureQuaternion spinZObservable := spin_z_is_pure",
+      "L3_math": "Re(O_z) = 0, the observable has no scalar part",
+      "L2_physical": "The z-measurement axis represents a genuine direction in physical space - it's a valid observable we can measure.",
+      "L1_intuitive": "Our 'vertical detector' is mathematically well-formed. It measures a real direction in space - up versus down. This is a legitimate question to ask of a particle.",
+      "key_insight": "The measurement we're doing is legitimate.",
+      "depends_on": ["spinZObservable", "spin_z_is_pure"]
+    },
+    "x_z_orthogonal": {
+      "display_name": "X and Z are Perpendicular",
+      "kind": "theorem",
+      "L4_formal": "theorem x_z_orthogonal : vecDot spinXState spinZObservable = 0",
+      "L3_math": "<psi_x | O_z> = <i, k> = 0 (orthogonal vectors)",
+      "L2_physical": "The x-direction and z-direction are perpendicular. A particle pointing along x has no component along z - it's neither 'up' nor 'down', it's exactly in between.",
+      "L1_intuitive": "Right and up are at right angles. If you're pointing sideways, you're not pointing up or down - you're exactly in between. Like asking someone facing East: 'Are you facing North or South?' Neither!",
+      "key_insight": "Perpendicular directions share no information.",
+      "depends_on": ["vecDot", "spinXState", "spinZObservable"]
+    },
+    "expectation_orthogonal_is_zero": {
+      "display_name": "Perpendicular Means Zero Average",
+      "kind": "theorem",
+      "L4_formal": "theorem expectation_orthogonal_is_zero (psi O : H) :\n  vecDot psi O = 0 -> expectationValue psi O = 0",
+      "L3_math": "<psi|O> = 0  =>  <O>_psi = 0  (orthogonality implies zero expectation)",
+      "L2_physical": "When a quantum state is perpendicular to a measurement axis, the average outcome is zero - neither +1 nor -1 dominates. This is a general principle of quantum mechanics.",
+      "L1_intuitive": "If you're pointing sideways and I ask 'are you pointing up or down?', the fairest answer is 'equally up and down' - averaging to zero. You have no preference either way.",
+      "key_insight": "No alignment means no bias in the measurement.",
+      "depends_on": ["isPureQuaternion", "vecDot"]
+    },
+    "expectation_x_measured_z_is_zero": {
+      "display_name": "Average Measurement is Zero",
+      "kind": "theorem",
+      "L4_formal": "theorem expectation_x_measured_z_is_zero :\n  expectationValue spinXState spinZObservable = 0",
+      "L3_math": "<O_z>_{psi_x} = 0, applying the general theorem to our specific case",
+      "L2_physical": "When you measure a spin-x particle along z, the results are +1 and -1 with equal frequency. The average is zero - no bias toward 'up' or 'down'.",
+      "L1_intuitive": "Our rightward-pointing particle, when asked 'up or down?', has absolutely no preference. If you measured a million particles, you'd get equal numbers of 'up' and 'down' answers. The particle genuinely doesn't know!",
+      "key_insight": "The particle has no information about up vs. down.",
+      "depends_on": ["expectation_orthogonal_is_zero", "spinXState_is_pure", "spinZObservable_is_pure", "x_z_orthogonal"]
+    },
+    "prob_up_x_measured_z_is_half": {
+      "display_name": "50% Chance of 'Up'",
+      "kind": "theorem",
+      "L4_formal": "theorem prob_up_x_measured_z_is_half :\n  probUp spinXState spinZObservable = 1/2",
+      "L3_math": "P(+1 | psi_x, O_z) = 1/2, from the Born rule: P(+) = (1 + <O>)/2",
+      "L2_physical": "A spin-x particle measured along z has exactly 50% chance of registering 'spin-up'. Not approximately - exactly.",
+      "L1_intuitive": "The coin flip: point sideways, ask 'up or down?' - exactly half the time, the answer is 'up.' This isn't fuzzy or approximate. The math proves it's precisely 50%, every time, forever.",
+      "key_insight": "Quantum randomness is mathematically perfect.",
+      "depends_on": ["expectation_x_measured_z_is_zero"]
+    },
+    "prob_down_x_measured_z_is_half": {
+      "display_name": "50% Chance of 'Down'",
+      "kind": "theorem",
+      "L4_formal": "theorem prob_down_x_measured_z_is_half :\n  probDown spinXState spinZObservable = 1/2",
+      "L3_math": "P(-1 | psi_x, O_z) = 1/2, from the Born rule: P(-) = (1 - <O>)/2",
+      "L2_physical": "A spin-x particle measured along z has exactly 50% chance of registering 'spin-down'. Combined with spin-up, that's 100%.",
+      "L1_intuitive": "The other side of the coin: the remaining half of the time, the answer is 'down.' Together with 'up', that's 100%. We've just proven that quantum mechanics forces a perfect 50/50 split - not by experiment, but by pure logic.",
+      "key_insight": "Logic alone proves the 50/50 split - no experiments needed.",
+      "depends_on": ["expectation_x_measured_z_is_zero"]
+    }
+  }
+}

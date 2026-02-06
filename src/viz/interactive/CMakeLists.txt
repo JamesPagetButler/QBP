@@ -8,7 +8,9 @@ set(SOURCES
     src/main.c
     src/qphysics.c
     src/proof_graph.c
+    src/json_loader.c
     src/scenes/experiment_01_stern_gerlach.c
+    lib/cJSON.c
 )
 
 if(EMSCRIPTEN)

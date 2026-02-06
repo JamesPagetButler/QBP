@@ -8,8 +8,10 @@
 
 #include "../scene.h"
 #include "../proof_graph.h"
+#include "../json_loader.h"
 #include "../theme.h"
 #include "raylib.h"
+#include <stdio.h>
 
 static ProofGraph sg_graph;
 static int screen_width;
@@ -25,7 +27,12 @@ static void sg_init(int sw, int sh)
     screen_width = sw;
     screen_height = sh;
 
-    graph_init_stern_gerlach(&sg_graph);
+    /* Try to load from JSON first (enables hot-reload) */
+    if (graph_load_json(&sg_graph, "/data/stern_gerlach.viz.json") != 0) {
+        /* Fallback to hardcoded data if JSON loading fails */
+        fprintf(stderr, "[sg_init] JSON load failed, using hardcoded fallback\n");
+        graph_init_stern_gerlach(&sg_graph);
+    }
 
     /* Graph occupies left portion, panel on the right */
     Rectangle graph_area = {
