@@ -8,9 +8,9 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 1 (Stern-Gerlach) — **COMPLETE**
-- **Lifecycle Stage:** Sprint 1 complete → Sprint 2 (Angle-Dependent Measurement)
-- **Next Critical-Path Action:** Sprint 1 Retrospective, then Sprint 2 Phase 2 (Implementation, #36)
+- **Active Sprint:** Between sprints (housekeeping window)
+- **Lifecycle Stage:** Sprint 1 COMPLETE → Housekeeping → Sprint 2 (Angle-Dependent Measurement)
+- **Next Critical-Path Action:** Clear housekeeping backlog, then Sprint 2 Phase 2 (Implementation, #36)
 
 ## Active Diversions
 
@@ -35,12 +35,40 @@
 
 ## Sprint 1 Retrospective
 
-*(To be completed after Sprint 1 closure, before Sprint 2 Phase 2 begins.)*
+**Completed:** 2026-02-06
 
-1. Did we follow the critical path this sprint?
-2. Where did we deviate?
-3. What was the cost?
-4. What is our commitment for Sprint 2?
+### 1. Did we follow the critical path this sprint?
+
+**Partially.** The five phases were completed in order, but there were significant diversions and process refinements along the way.
+
+### 2. Where did we deviate?
+
+| Deviation | When | Impact |
+|-----------|------|--------|
+| Sprint 2 Phase 1 done early | Before Theory Refinement | Good work, wrong order. No rework needed, but set bad precedent. |
+| Phase 4 & 5 reopened | Mid-sprint | James caught that 4b/4c and 5 were incomplete. Required audit and rework. |
+| Multiple process diversions | Throughout | Link checker, persona reconciliation, workflow optimization — all valuable but off critical path. |
+| Security audit | End of sprint | Proactive housekeeping, but delayed Sprint 2 start. |
+
+### 3. What was the cost?
+
+- **Time:** ~2-3 sessions spent on diversions vs. physics work
+- **Context switching:** Multiple branch switches, mental overhead
+- **Positive tradeoff:** Process improvements (tiered reviews, Herschel check, AC verification) will pay dividends in future sprints
+
+### 4. What is our commitment for Sprint 2?
+
+1. **Start with Phase 2** — Phase 1 is already done (PR #116)
+2. **Minimize diversions** — Log housekeeping but defer to end of sprint
+3. **Use tiered reviews** — Tier 1 for docs, Tier 2 for code, Tier 3 for theory
+4. **Complete all phases before Theory Refinement** — No out-of-order work
+
+### Key Learnings
+
+- **The Herschel Check works** — Catching drift early prevented larger problems
+- **Reopening issues is healthy** — Better to audit and fix than to accumulate debt
+- **Process investment compounds** — AC verification and tiered reviews will save time long-term
+- **Theory Refinement is valuable** — Section 6 of DESIGN_RATIONALE now provides clear roadmap for Sprint 2
 
 ---
 
