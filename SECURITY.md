@@ -4,7 +4,9 @@ This document outlines security practices for the Quaternion-Based Physics (QBP)
 
 ## Reporting Vulnerabilities
 
-If you discover a security vulnerability, please report it privately by emailing the maintainer. Do not create a public issue.
+If you discover a security vulnerability, please report it privately. Do not create a public issue.
+
+**Security Contact:** Open a [private security advisory](https://github.com/JamesPagetButler/QBP/security/advisories/new) on GitHub, or email the repository owner directly via their GitHub profile.
 
 ## Secrets Management
 
@@ -52,6 +54,11 @@ To run manually:
 ```bash
 pre-commit run gitleaks --all-files
 ```
+
+**Bypassing the hook:** The hook can be bypassed with `git commit --no-verify`. This should only be done in exceptional circumstances (e.g., committing a file that triggers a false positive). If you bypass the hook:
+1. Document why in the commit message
+2. Run `gitleaks detect` manually afterward to verify no actual secrets were committed
+3. Consider updating the gitleaks configuration if it's a recurring false positive
 
 ### Files That Should Never Be Committed
 

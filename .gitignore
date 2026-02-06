@@ -53,6 +53,7 @@ Thumbs.db
 # Secrets and credentials (NEVER commit these)
 .env
 .env.*
+env.*
 *.key
 *.pem
 *.p12
