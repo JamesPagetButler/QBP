@@ -24,11 +24,12 @@ def create_state(a: float, b: float, c: float, d: float) -> np.quaternion:
         A normalized quaternion representing the state psi.
     """
     q = np.quaternion(a, b, c, d)
-    norm = q.norm()
-    if norm == 0:
+    # Note: q.norm() returns |q|^2, so we use np.abs(q) for the actual norm |q|
+    abs_q = np.abs(q)
+    if abs_q == 0:
         # Default to a neutral state if norm is zero to avoid division errors
         return np.quaternion(1, 0, 0, 0)
-    return q / norm
+    return q / abs_q
 
 
 def create_state_from_vector(vec: list | np.ndarray) -> np.quaternion:
@@ -213,3 +214,123 @@ def measure_batch(
     prob_up = (1 + exp_val) / 2.0
     randoms = rng.random(n)
     return np.where(randoms < prob_up, 1, -1)
+
+
+# --- Rotation Operations ---
+
+
+def create_rotation(theta: float, axis: list | np.ndarray) -> np.quaternion:
+    """
+    Create a rotation quaternion for rotation by angle theta about the given axis.
+
+    The rotation quaternion uses the half-angle formula:
+        q = cos(θ/2) + sin(θ/2) * (axis)
+
+    This reflects the SU(2) double-cover of SO(3): rotating a spin state by 2π
+    returns -ψ, not +ψ. A full 4π rotation is needed to return to the original state.
+
+    Args:
+        theta: Rotation angle in radians.
+        axis: A 3D unit vector [x, y, z] defining the rotation axis.
+
+    Returns:
+        A unit quaternion representing the rotation.
+    """
+    if len(axis) != 3:
+        raise ValueError("Axis must be 3-dimensional [x, y, z]")
+
+    # Normalize the axis
+    axis = np.array(axis, dtype=float)
+    norm = np.linalg.norm(axis)
+    if norm == 0:
+        raise ValueError("Rotation axis cannot be zero vector")
+    axis = axis / norm
+
+    # Half-angle formula: q = cos(θ/2) + sin(θ/2) * axis
+    half_theta = theta / 2.0
+    w = np.cos(half_theta)
+    xyz = np.sin(half_theta) * axis
+
+    return np.quaternion(w, xyz[0], xyz[1], xyz[2])
+
+
+def rotate_observable(
+    observable: np.quaternion, theta: float, axis: list | np.ndarray
+) -> np.quaternion:
+    """
+    Rotate an observable (pure quaternion) by angle theta about the given axis.
+
+    Uses the quaternion rotation formula: O' = q * O * q⁻¹
+
+    Physical meaning: This rotates the measurement axis in 3D space.
+    For example, rotating SPIN_Z by θ about the y-axis gives a measurement
+    axis tilted θ from z toward x.
+
+    Args:
+        observable: The pure quaternion observable to rotate.
+        theta: Rotation angle in radians.
+        axis: A 3D unit vector defining the rotation axis.
+
+    Returns:
+        The rotated observable (still a pure quaternion).
+    """
+    if observable.w != 0:
+        raise ValueError("Observable must be a pure quaternion.")
+
+    q = create_rotation(theta, axis)
+    q_conj = q.conjugate()
+
+    # O' = q * O * q⁻¹ (for unit quaternion, q⁻¹ = q*)
+    rotated = q * observable * q_conj
+
+    # The result should be pure (real part ≈ 0), but clean up numerical noise
+    return np.quaternion(0, rotated.x, rotated.y, rotated.z)
+
+
+def rotate_state(
+    psi: np.quaternion, theta: float, axis: list | np.ndarray
+) -> np.quaternion:
+    """
+    Rotate a state quaternion by angle theta about the given axis.
+
+    Uses the same rotation formula as observables: ψ' = q * ψ * q⁻¹
+
+    This is equivalent to physically rotating the spin preparation apparatus.
+
+    Args:
+        psi: The quaternionic state to rotate.
+        theta: Rotation angle in radians.
+        axis: A 3D unit vector defining the rotation axis.
+
+    Returns:
+        The rotated state (normalized pure quaternion).
+    """
+    q = create_rotation(theta, axis)
+    q_conj = q.conjugate()
+
+    rotated = q * psi * q_conj
+
+    # Ensure result is pure and normalized
+    return create_state(0, rotated.x, rotated.y, rotated.z)
+
+
+def create_tilted_state(theta: float) -> np.quaternion:
+    """
+    Create a spin state tilted by angle theta from the z-axis toward the x-axis.
+
+    This is a convenience function for angle-dependent measurement experiments.
+    The state lies in the x-z plane:
+        ψ(θ) = sin(θ)·i + cos(θ)·k
+
+    Physical meaning:
+        θ = 0°   → spin along +z (fully up)
+        θ = 90°  → spin along +x (orthogonal to z)
+        θ = 180° → spin along -z (fully down)
+
+    Args:
+        theta: Tilt angle in radians from the z-axis.
+
+    Returns:
+        A pure unit quaternion representing the tilted state.
+    """
+    return create_state(0, np.sin(theta), 0, np.cos(theta))
