@@ -77,6 +77,9 @@ int graph_is_dependency(const ProofGraph *g, int node_id);
 /* Get the currently active node */
 const ProofNode *graph_current_node(const ProofGraph *g);
 
+/* Get the bounding rectangle for a node (for click detection) */
+Rectangle graph_node_bounds(const ProofGraph *g, int node_id);
+
 /* Draw the proof graph */
 void graph_draw(const ProofGraph *g);
 

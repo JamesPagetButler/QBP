@@ -14,6 +14,7 @@
 
 #include "proof_graph.h"
 #include "theme.h"
+#include "fonts.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -416,10 +417,17 @@ void graph_init_stern_gerlach(ProofGraph *g)
 /*  Layout: position nodes in a logical tree arrangement              */
 /* ------------------------------------------------------------------ */
 /*
- * TODO: This layout is hardcoded for the Stern-Gerlach experiment topology.
- * To support multiple experiments with different graph structures, this
- * needs to be generalized (e.g., automatic layout from dependency graph
- * using topological sort + level assignment, or layout data in JSON).
+ * LIMITATION: This layout is hardcoded for the Stern-Gerlach experiment.
+ *
+ * The node positions are manually specified for the 13-node proof tree.
+ * Adding new experiments will require either:
+ *   1. Adding experiment-specific layout code, OR
+ *   2. Generalizing to automatic layout (topological sort + level assignment)
+ *
+ * Phase 4c should address this with a proper graph layout algorithm that
+ * derives positions from the dependency structure automatically.
+ *
+ * See GitHub issue for details on planned improvements.
  */
 
 void graph_layout(ProofGraph *g, Rectangle area)
@@ -500,17 +508,35 @@ const ProofNode *graph_current_node(const ProofGraph *g)
 /*  Drawing                                                           */
 /* ------------------------------------------------------------------ */
 
-#define NODE_W  180
-#define NODE_H   40
-#define FONT_SZ   14
+/* Larger sizes for readability */
+#define NODE_MIN_W  180
+#define NODE_H       56
+#define FONT_SZ      18
+#define BADGE_W      40
+#define NODE_PAD     16  /* padding on each side of text */
+
+/* Calculate node width based on display name text */
+static float calc_node_width(const ProofNode *n)
+{
+    int text_w = MeasureTextQBP(n->display_name, FONT_SZ);
+    float total_w = BADGE_W + NODE_PAD + text_w + NODE_PAD;
+    return (total_w < NODE_MIN_W) ? NODE_MIN_W : total_w;
+}
 
 static Rectangle node_rect(const ProofNode *n)
 {
+    float w = calc_node_width(n);
     return (Rectangle){
-        n->pos.x - NODE_W/2.0f,
+        n->pos.x - w/2.0f,
         n->pos.y - NODE_H/2.0f,
-        NODE_W, NODE_H
+        w, NODE_H
     };
+}
+
+/* Public function for click detection */
+Rectangle graph_node_bounds(const ProofGraph *g, int node_id)
+{
+    return node_rect(&g->nodes[node_id]);
 }
 
 static Color node_color(const ProofGraph *g, int id)
@@ -569,17 +595,16 @@ void graph_draw(const ProofGraph *g)
 
         /* Kind badge */
         Color badge = kind_badge_color(n->kind);
-        float badge_w = 32;
-        Rectangle br = { r.x + 2, r.y + 2, badge_w, NODE_H - 4 };
+        Rectangle br = { r.x + 3, r.y + 3, BADGE_W, NODE_H - 6 };
         DrawRectangleRounded(br, 0.3f, 4, badge);
-        DrawText(kind_label(n->kind),
-                 (int)(br.x + 3), (int)(br.y + (br.height - 10)/2),
-                 10, QBP_IVORY);
+        DrawTextQBP(kind_label(n->kind),
+                 (int)(br.x + 4), (int)(br.y + (br.height - 12)/2),
+                 12, QBP_IVORY);
 
-        /* Node name */
-        int text_x = (int)(r.x + badge_w + 8);
+        /* Node display name (short, readable) */
+        int text_x = (int)(r.x + BADGE_W + NODE_PAD/2);
         int text_y = (int)(r.y + (NODE_H - FONT_SZ) / 2);
-        DrawText(n->name, text_x, text_y, FONT_SZ, QBP_TEXT_PRIMARY);
+        DrawTextQBP(n->display_name, text_x, text_y, FONT_SZ, QBP_TEXT_PRIMARY);
     }
 }
 
@@ -610,7 +635,7 @@ static float draw_wrapped_text(const char *text, float x, float y,
         buf[chunk] = '\0';
         /* Trim newline */
         if (chunk > 0 && buf[chunk-1] == '\n') buf[chunk-1] = '\0';
-        DrawText(buf, (int)x, (int)y, font_size, color);
+        DrawTextQBP(buf, (int)x, (int)y, font_size, color);
         y += line_h;
         start = end;
     }
@@ -622,71 +647,75 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
     const ProofNode *n = graph_current_node(g);
 
     DrawRectangleRec(panel, QBP_PANEL_BG);
-    DrawRectangleLinesEx(panel, 1.0f, QBP_BRASS);
+    DrawRectangleLinesEx(panel, 2.0f, QBP_BRASS);
 
-    float x = panel.x + 12;
-    float y = panel.y + 10;
-    float max_w = panel.width - 24;
-    int section_gap = 12;
+    float x = panel.x + 16;
+    float y = panel.y + 14;
+    float max_w = panel.width - 32;
+    int section_gap = 14;
 
     /* Title: Display name */
-    DrawText(n->display_name, (int)x, (int)y, 16, QBP_GOLD);
-    y += 20;
+    DrawTextQBP(n->display_name, (int)x, (int)y, 24, QBP_GOLD);
+    y += 30;
+
+    /* Formal Lean name (smaller, dimmer) */
+    DrawTextQBP(n->name, (int)x, (int)y, 12, QBP_TEXT_DIM);
+    y += 18;
 
     /* Kind badge inline */
     const char *kind_str = (n->kind == NODE_AXIOM) ? "AXIOM" :
                            (n->kind == NODE_DEFINITION) ? "DEFINITION" : "THEOREM";
-    DrawText(kind_str, (int)x, (int)y, 10, kind_badge_color(n->kind));
-    y += 16;
+    DrawTextQBP(kind_str, (int)x, (int)y, 16, kind_badge_color(n->kind));
+    y += 24;
 
     /* Separator */
     DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 1.0f, QBP_STEEL);
-    y += 8;
+    y += 12;
 
     /* ============ LEVEL 4: FORMAL ============ */
-    DrawText("FORMAL (Lean)", (int)x, (int)y, 10, QBP_TEXT_DIM);
-    y += 14;
-    y = draw_wrapped_text(n->level4_formal, x, y, max_w, 11, QBP_TEAL);
+    DrawTextQBP("FORMAL (Lean)", (int)x, (int)y, 14, QBP_TEXT_DIM);
+    y += 18;
+    y = draw_wrapped_text(n->level4_formal, x, y, max_w, 16, QBP_TEAL);
     y += section_gap;
 
     /* ============ LEVEL 3: MATHEMATICAL ============ */
-    DrawText("MATHEMATICAL", (int)x, (int)y, 10, QBP_TEXT_DIM);
-    y += 14;
-    y = draw_wrapped_text(n->level3_math, x, y, max_w, 11, QBP_COPPER);
+    DrawTextQBP("MATHEMATICAL", (int)x, (int)y, 14, QBP_TEXT_DIM);
+    y += 18;
+    y = draw_wrapped_text(n->level3_math, x, y, max_w, 16, QBP_COPPER);
     y += section_gap;
 
     /* ============ LEVEL 2: PHYSICAL ============ */
-    DrawText("PHYSICAL", (int)x, (int)y, 10, QBP_TEXT_DIM);
-    y += 14;
-    y = draw_wrapped_text(n->level2_physical, x, y, max_w, 11, QBP_AMBER);
+    DrawTextQBP("PHYSICAL", (int)x, (int)y, 14, QBP_TEXT_DIM);
+    y += 18;
+    y = draw_wrapped_text(n->level2_physical, x, y, max_w, 16, QBP_AMBER);
     y += section_gap;
 
     /* ============ LEVEL 1: INTUITIVE ============ */
-    DrawRectangle((int)(x - 4), (int)y - 2, (int)(max_w + 8), 14, QBP_DARK_SLATE);
-    DrawText("INTUITIVE (Plain English)", (int)x, (int)y, 10, QBP_IVORY);
-    y += 16;
-    y = draw_wrapped_text(n->level1_intuitive, x, y, max_w, 12, QBP_IVORY);
+    DrawRectangle((int)(x - 6), (int)y - 4, (int)(max_w + 12), 24, QBP_DARK_SLATE);
+    DrawTextQBP("INTUITIVE (Plain English)", (int)x, (int)y, 16, QBP_IVORY);
+    y += 26;
+    y = draw_wrapped_text(n->level1_intuitive, x, y, max_w, 18, QBP_IVORY);
     y += section_gap;
 
     /* ============ KEY INSIGHT ============ */
     if (strlen(n->key_insight) > 0) {
-        DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 1.0f, QBP_GOLD);
-        y += 6;
-        DrawText("KEY INSIGHT", (int)x, (int)y, 9, QBP_GOLD);
-        y += 12;
-        y = draw_wrapped_text(n->key_insight, x, y, max_w, 11, QBP_GOLD);
+        DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 2.0f, QBP_GOLD);
+        y += 10;
+        DrawTextQBP("KEY INSIGHT", (int)x, (int)y, 14, QBP_GOLD);
+        y += 18;
+        y = draw_wrapped_text(n->key_insight, x, y, max_w, 16, QBP_GOLD);
     }
 
     /* Dependencies (if room remains) */
-    if (n->dep_count > 0 && y < panel.y + panel.height - 60) {
-        y += 8;
-        DrawText("Depends on:", (int)x, (int)y, 10, QBP_TEXT_DIM);
-        y += 14;
-        for (int i = 0; i < n->dep_count && y < panel.y + panel.height - 20; i++) {
+    if (n->dep_count > 0 && y < panel.y + panel.height - 80) {
+        y += 12;
+        DrawTextQBP("Depends on:", (int)x, (int)y, 14, QBP_TEXT_DIM);
+        y += 18;
+        for (int i = 0; i < n->dep_count && y < panel.y + panel.height - 24; i++) {
             char dep_buf[128];
             snprintf(dep_buf, sizeof(dep_buf), "  -> %s", g->nodes[n->deps[i]].display_name);
-            DrawText(dep_buf, (int)x, (int)y, 10, QBP_STEEL);
-            y += 12;
+            DrawTextQBP(dep_buf, (int)x, (int)y, 14, QBP_STEEL);
+            y += 16;
         }
     }
 }
@@ -694,21 +723,21 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
 void graph_draw_step_bar(const ProofGraph *g, Rectangle bar)
 {
     DrawRectangleRec(bar, QBP_PANEL_BG);
-    DrawRectangleLinesEx(bar, 1.0f, QBP_BRASS);
+    DrawRectangleLinesEx(bar, 2.0f, QBP_BRASS);
 
     const ProofNode *n = graph_current_node(g);
     char buf[256];
     snprintf(buf, sizeof(buf), "Step %d/%d  --  %s",
              g->current_step + 1, g->walk_len, n->display_name);
 
-    int text_w = MeasureText(buf, 14);
+    int text_w = MeasureTextQBP(buf, 20);
     float cx = bar.x + (bar.width - text_w) / 2;
-    float cy = bar.y + (bar.height - 14) / 2;
-    DrawText(buf, (int)cx, (int)cy, 14, QBP_TEXT_PRIMARY);
+    float cy = bar.y + (bar.height - 20) / 2;
+    DrawTextQBP(buf, (int)cx, (int)cy, 20, QBP_TEXT_PRIMARY);
 
-    /* Navigation buttons - now actual clickable areas */
-    Rectangle prev_btn = { bar.x + 8, bar.y + 6, 70, bar.height - 12 };
-    Rectangle next_btn = { bar.x + bar.width - 78, bar.y + 6, 70, bar.height - 12 };
+    /* Navigation buttons - larger and more visible */
+    Rectangle prev_btn = { bar.x + 16, bar.y + 10, 120, bar.height - 20 };
+    Rectangle next_btn = { bar.x + bar.width - 136, bar.y + 10, 120, bar.height - 20 };
 
     /* Draw button backgrounds */
     Color prev_col = (g->current_step > 0) ? QBP_STEEL : QBP_DARK_SLATE;
@@ -716,7 +745,14 @@ void graph_draw_step_bar(const ProofGraph *g, Rectangle bar)
 
     DrawRectangleRounded(prev_btn, 0.3f, 4, prev_col);
     DrawRectangleRounded(next_btn, 0.3f, 4, next_col);
+    DrawRectangleRoundedLinesEx(prev_btn, 0.3f, 4, 2.0f, QBP_BRASS);
+    DrawRectangleRoundedLinesEx(next_btn, 0.3f, 4, 2.0f, QBP_BRASS);
 
-    DrawText("< Prev", (int)(prev_btn.x + 10), (int)(prev_btn.y + 6), 12, QBP_IVORY);
-    DrawText("Next >", (int)(next_btn.x + 10), (int)(next_btn.y + 6), 12, QBP_IVORY);
+    /* Center text in buttons */
+    int prev_tw = MeasureTextQBP("<< Prev", 18);
+    int next_tw = MeasureTextQBP("Next >>", 18);
+    DrawTextQBP("<< Prev", (int)(prev_btn.x + (prev_btn.width - prev_tw)/2),
+             (int)(prev_btn.y + (prev_btn.height - 18)/2), 18, QBP_IVORY);
+    DrawTextQBP("Next >>", (int)(next_btn.x + (next_btn.width - next_tw)/2),
+             (int)(next_btn.y + (next_btn.height - 18)/2), 18, QBP_IVORY);
 }
