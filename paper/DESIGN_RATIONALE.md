@@ -66,7 +66,50 @@ The Lean 4 proofs for Experiment 01 (`proofs/QBP/Experiments/SternGerlach.lean`)
 
 The Phase 4b review process (Claude reviewing Gemini's proofs) caught no errors but confirmed the tight correspondence between the formal proofs and the Python implementation.
 
-### 5.4 Interactive Proof Visualization
+### 5.4 Statistical Significance in Synthetic Experiments
+
+In real-world experiments, σ deviation reflects measurement uncertainty and environmental noise. In synthetic (computational) experiments like ours, deviation has a different meaning:
+
+- **Real experiments:** Uncertainty from detector resolution, thermal fluctuations, alignment errors
+- **Synthetic experiments:** Deviation from PRNG (pseudo-random number generator) behavior and floating-point precision
+
+When we report "0.4140σ deviation over 1M trials," we're verifying that:
+1. The PRNG produces a statistically valid uniform distribution
+2. The probability formula correctly maps to measurement outcomes
+3. No systematic bias exists in the implementation
+
+This is not about "discovering" quantum behavior — we programmed the probabilities. It's about **validating that our implementation matches our theory**.
+
+### 5.5 Simplified Code Example
+
+For readers who want to understand the core calculation, here's a minimal Python example:
+
+```python
+import numpy as np
+
+# Step 1: Prepare a spin-x state (quaternion i)
+psi = np.array([0, 1, 0, 0])  # [real, i, j, k] = i
+
+# Step 2: Define spin-z observable (quaternion k)
+O_z = np.array([0, 0, 0, 1])  # [real, i, j, k] = k
+
+# Step 3: Compute expectation value (dot product of vector parts)
+vec_psi = psi[1:4]  # [1, 0, 0] — the i, j, k components
+vec_O   = O_z[1:4]  # [0, 0, 1]
+expectation = np.dot(vec_psi, vec_O)  # = 0 (orthogonal!)
+
+# Step 4: Compute probabilities
+P_up   = (1 + expectation) / 2  # = 0.5
+P_down = (1 - expectation) / 2  # = 0.5
+
+# Step 5: Simulate measurement (collapse)
+outcome = +1 if np.random.random() < P_up else -1
+# Over many trials, we expect 50% +1, 50% -1
+```
+
+The key insight: when `vec_psi` and `vec_O` are orthogonal, their dot product is zero, forcing `P_up = P_down = 0.5`.
+
+### 5.6 Interactive Proof Visualization
 
 Phase 4c introduced a new capability: presenting formal proofs as interactive dependency graphs. The key design decision was to use **four levels of explanation** (L4 Formal → L3 Mathematical → L2 Physical → L1 Intuitive) so that the same proof structure can be understood by different audiences. This approach will scale to more complex proofs in future experiments.
 
