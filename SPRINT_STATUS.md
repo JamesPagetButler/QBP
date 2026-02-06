@@ -10,7 +10,7 @@
 
 - **Active Sprint:** Sprint 1 (Stern-Gerlach) — completing final phases
 - **Lifecycle Stage:** Sprint 1 → **Theory Refinement (#80)** → Sprint 2
-- **Next Critical-Path Action:** Audit Phase 5 (#64); then begin Theory Refinement #80
+- **Next Critical-Path Action:** Begin Theory Refinement #80
 
 ## Active Diversions
 
@@ -30,7 +30,7 @@
   - [x] 4a: Formal Proof (#131, closed) — Proofs verified, file renamed to SternGerlach.lean (PR #130)
   - [x] 4b: Proof Review (#132, closed) — Review posted, decision gate PASS
   - [x] 4c: Interactive Proof Visualization (#133) — PR #141 merged. JSON loader, custom fonts, 4-level descriptions. Layout generalization deferred (#143).
-- [ ] Phase 5: Publication (#64) — No longer blocked. Paper section needs audit against current standards.
+- [x] Phase 5: Publication (#64) — CLOSED 2026-02-05. Paper updated with figures, DESIGN_RATIONALE updated with insights.
 - [ ] Theory Refinement (#80) — Not started
 
 ## Sprint 1 Retrospective
@@ -49,7 +49,7 @@
 - Sprint 2 Phase 1 (Ground Truth) was completed early (PR #116) before Theory Refinement. The work was good but out of order. We acknowledge this and proceed correctly from here.
 - Sprint 2 will resume at Phase 2 (Implementation, #36) after Theory Refinement #80 is complete.
 - **James's note (2026-02-04):** Experiment 01 Phase 4 (#55) and Phase 5 (#64) need to be re-done against the current process. Both issues reopened with updated acceptance criteria. Phase 4a proofs exist but 4b (review) and 4c (viz) were never done. Phase 5 paper section exists but needs audit against current standards.
-- **Session update (2026-02-05):** Phase 4c complete. PR #141 merged with data-driven JSON loader, custom fonts (Exo 2), 4-level descriptions, and dynamic node sizing. Created housekeeping issues #142 (automate graph from Lean) and #143 (generalize layout). Phase 4 (#55) closed with full review documentation.
+- **Session update (2026-02-05):** Phase 4c complete. PR #141 merged with data-driven JSON loader, custom fonts (Exo 2), 4-level descriptions, and dynamic node sizing. Created housekeeping issues #142 (automate graph from Lean) and #143 (generalize layout). Phase 4 (#55) closed with full review documentation. Phase 5 (#64) audited and closed — PR #146 added proper figures and DESIGN_RATIONALE Section 5. **Sprint 1 Phases 1-5 complete. Next: Theory Refinement #80.**
 
 ---
 
