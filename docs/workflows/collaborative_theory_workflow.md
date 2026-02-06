@@ -276,8 +276,29 @@ research/
 
 ---
 
+---
+
+## Multi-AI Integration
+
+This workflow requires reliable communication between Claude and Gemini.
+
+**Integration Methods:**
+1. **MCP Server** — Use directly when Gemini tools are available in Claude's tool list
+2. **CLI Fallback** — When MCP unavailable:
+   ```bash
+   ~/.claude/scripts/gemini review "content" "context"
+   ~/.claude/scripts/gemini critique "problem" "approach"
+   ```
+
+**Important:** Claude must never simulate Gemini's responses. If integration fails, pause and fix before proceeding.
+
+See [CONTRIBUTING.md § Multi-AI Integration](../../CONTRIBUTING.md#multi-ai-integration-claude--gemini) for full details.
+
+---
+
 ## Revision History
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-02-06 | Added Multi-AI Integration section | Claude |
 | 2026-02-04 | Initial workflow design | Claude + Human |

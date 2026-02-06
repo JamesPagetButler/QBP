@@ -65,6 +65,25 @@ QBP/
 └── gemini_review_prompt.md   ← Instructions for Gemini
 ```
 
+## Multi-AI Integration
+
+If Gemini CLI is unavailable or unresponsive, Claude can invoke Gemini reviews via fallback scripts:
+
+```bash
+# Test connection
+~/.claude/scripts/gemini test
+
+# PR review with Furey/Feynman
+~/.claude/scripts/gemini-pr-review.py <pr_number>
+
+# Ad-hoc review
+~/.claude/scripts/gemini review "content" "context"
+```
+
+See [CONTRIBUTING.md § Multi-AI Integration](../CONTRIBUTING.md#multi-ai-integration-claude--gemini) for full details.
+
+---
+
 ## Asking Questions
 
 During review, you can ask either AI clarifying questions:

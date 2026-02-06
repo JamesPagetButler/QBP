@@ -842,6 +842,40 @@ This project uses a variety of tools for different purposes. Adherence to this t
 *   **Design System:** The front-end assets and framework implemented by Claude.
 *   **Formal Proof Setup:** The setup and configuration for Lean 4 must be documented.
 
+### Multi-AI Integration (Claude + Gemini)
+
+This project uses a multi-AI architecture: Claude handles development and Red Team reviews; Gemini provides Theory Team reviews (Furey/Feynman personas).
+
+**Integration Methods (in order of preference):**
+
+1. **MCP Server** — When available, Gemini tools appear in Claude's tool list. Use these directly.
+
+2. **Direct CLI Script** — When MCP is unavailable, use the fallback scripts:
+   ```bash
+   # Test connection
+   ~/.claude/scripts/gemini test
+
+   # Quick question
+   ~/.claude/scripts/gemini ask "your prompt"
+
+   # Furey/Feynman review (stdin or argument)
+   ~/.claude/scripts/gemini review "content to review" "optional context"
+
+   # Critical analysis
+   ~/.claude/scripts/gemini critique "problem" "proposed approach"
+
+   # Full PR review with structured output
+   ~/.claude/scripts/gemini-pr-review.py <pr_number>
+   ~/.claude/scripts/gemini-pr-review.py 178 --output reviews/gemini_review_PR178_2026-02-06.md
+   ```
+
+**Usage in Modes:**
+- All collaboration modes (Brainstorm, Housekeeping, Focus, Sprint) should use MCP when available, falling back to CLI scripts when not
+- Reviews MUST call real Gemini — Claude must never write Gemini's review itself
+- If both methods fail, pause the workflow and notify the human
+
+**Script Location:** `~/.claude/scripts/` — Scripts auto-read API key from `~/.claude/settings.json`.
+
 ## Troubleshooting CI Failures
 
 ### Pre-commit Hook Failures
@@ -936,6 +970,8 @@ A collaborative ideation session where Claude and Gemini engage in creative dial
 
 **Invocation:** Say "brainstorm mode" or "let's brainstorm about X"
 
+**Multi-AI Integration:** Uses MCP or fallback scripts. See [Multi-AI Integration](#multi-ai-integration-claude--gemini).
+
 **Characteristics:**
 
 | Aspect | Description |
@@ -986,6 +1022,8 @@ Which direction resonates? Or tell us something different:
 An autonomous batch cleanup mode where Claude works through low-risk housekeeping tasks while the human is away, with pre-approved scope and permissions.
 
 **Invocation:** When the user mentions they're going to bed, sleeping, or stepping away, Claude should ask:
+
+**Multi-AI Integration:** For Gemini reviews during housekeeping, use MCP or fallback scripts. See [Multi-AI Integration](#multi-ai-integration-claude--gemini).
 
 > "Would you like me to switch into Housekeeping Mode while you're away?"
 
@@ -1149,6 +1187,8 @@ Welcome back!
 An autonomous single-issue development mode for targeted work on one specific issue with pre-approved permissions.
 
 **Invocation:** "Focus on issue #X" or "Let's do #X in Focus Mode"
+
+**Multi-AI Integration:** For Gemini reviews, use MCP or fallback scripts. See [Multi-AI Integration](#multi-ai-integration-claude--gemini).
 
 **Purpose:** Enable concentrated, autonomous work on a single issue when you need dedicated attention outside of sprint phases or batch housekeeping.
 
