@@ -111,7 +111,22 @@ The Game Engine approach strikes the best balance. The development effort for Go
 
 ---
 
-## 6. Recommendation
+## 6. Clarification: Physics Engines vs. Game Engines for QBP
+
+The user's research prompt included a link to a list of open-source *physics engines* (e.g., Bullet, Jolt, Project Chrono). It is important to clarify the role of these libraries in contrast to a *game engine*.
+
+*   A **Physics Engine** is a library that simulates classical mechanics—forces, collisions, rigid bodies. It does **not** handle rendering, sound, or user input. It is a component that a game engine uses internally.
+*   A **Game Engine** is a complete framework that includes a rendering engine, audio engine, input system, and typically, a built-in physics engine.
+
+**For the QBP project, a third-party classical physics engine is not what we need for our core simulation.** Our goal is to simulate *quantum* phenomena based on our own bespoke axioms, which are defined in Lean. The "physics" of our experiments (e.g., the probabilistic deflection in a Stern-Gerlach experiment) is an emergent property of the QBP axioms, not something that can be calculated by a classical engine like Bullet.
+
+In effect, our combination of **Lean proofs + the `qphysics` library constitutes our own "Quantum Physics Engine."**
+
+Therefore, a full **Game Engine (like Godot or Kaiju)** is the correct tool for the job because we need its **rendering, animation, and interaction** capabilities, not its physics simulation. The fact that these game engines come bundled with their own classical physics engines is a useful bonus for any secondary, environmental effects (e.g., making lab equipment movable), but it is not the primary reason for choosing them.
+
+This analysis reinforces the conclusion to use a game engine as the "interactive lab" front-end, as it provides the necessary visualization layer for the results computed by our unique, Lean-driven physics.
+
+## 7. Recommendation
 
 The use of a game engine is the superior architectural choice for creating a "Lean-driven Physics Laboratory." This leaves a choice between two excellent candidates: Godot and Kaiju.
 
