@@ -9,13 +9,13 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 2 (Angle-Dependent Measurement)
-- **Lifecycle Stage:** Sprint 2 Phase 1 (Rework)
-- **Next Critical-Path Action:** Complete Phase 1 Rework (#160)
+- **Lifecycle Stage:** Sprint 2 Phase 2 (Implementation)
+- **Next Critical-Path Action:** Implement angle-dependent measurement (#161)
 
 ## Sprint 2 Closure Checklist
 
-- [ ] Phase 1: Ground Truth Rework (#160) ← **IN PROGRESS**
-- [ ] Phase 2: Implementation (#161)
+- [x] Phase 1: Ground Truth Rework (#160) — CLOSED 2026-02-06. PR #166 merged. Full Tier 3 review.
+- [ ] Phase 2: Implementation (#161) ← **NEXT**
 - [ ] Phase 3: Visualization (#162)
 - [ ] Phase 4: Formal Verification (#163)
   - [ ] 4a: Formal Proof
@@ -92,6 +92,7 @@
 - **Session update (2026-02-05):** Phase 4c complete. PR #141 merged with data-driven JSON loader, custom fonts (Exo 2), 4-level descriptions, and dynamic node sizing. Created housekeeping issues #142 (automate graph from Lean) and #143 (generalize layout). Phase 4 (#55) closed with full review documentation. Phase 5 (#64) audited and closed — PR #146 added proper figures and DESIGN_RATIONALE Section 5. **Sprint 1 Phases 1-5 complete. Next: Theory Refinement #80.**
 - **Session update (2026-02-06):** Theory Refinement (#80) complete. PR #147 merged after 2 review cycles. Added DESIGN_RATIONALE Section 6 (theoretical findings, emergent phenomena, open questions, Sprint 2 extensions). Created security audit housekeeping issue #148. **Sprint 1 fully complete. Next: Sprint 1 Retrospective, then Sprint 2 Phase 2.**
 - **Session update (2026-02-06, later):** PR #155 merged (housekeeping batch). Created Sprint 2 issue set (#160-#165). Note: PR #116 did Phase 1 early but predates process maturity; reworking Phase 1 to incorporate Sprint 1 learnings. Created Housekeeping Mode issue (#159).
+- **Session update (2026-02-06, evening):** Phase 1 Rework complete. PR #166 merged after Tier 3 review. Key finding: QBP predictions match QM exactly for single-particle systems — this is expected, not a flaw. Created issues #167 (QBP divergence research), #168 (SU(2) docs), #169 (submodule housekeeping), #170 (ground truth template). **Next: Phase 2 Implementation (#161).**
 
 ---
 
