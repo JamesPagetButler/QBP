@@ -435,8 +435,22 @@ void graph_init_stern_gerlach(ProofGraph *g)
  *
  * Algorithm:
  * 1. Compute "level" for each node (longest path from any root)
- * 2. Group nodes by level
- * 3. Distribute nodes horizontally within each level
+ *    - Roots (nodes with no dependencies) get level 0
+ *    - Each node's level = max(dependency levels) + 1
+ *    - Uses fixed-point iteration: repeat until no levels change
+ *
+ * 2. Group nodes by level and assign horizontal index within level
+ *
+ * 3. Distribute nodes:
+ *    - Vertically: evenly spaced rows, one per level (roots at top)
+ *    - Horizontally: centered within row, evenly spaced
+ *    - Formula: x = area_x + area_width * (index + 0.5) / count_at_level
+ *
+ * Example with 5 nodes (A,B depend on nothing; C depends on A; D,E depend on C):
+ *
+ *     Level 0:  [A]     [B]      <- roots, 2 nodes, each at 1/4 and 3/4 width
+ *     Level 1:      [C]          <- 1 node, centered at 1/2 width
+ *     Level 2:  [D]     [E]      <- 2 nodes, at 1/4 and 3/4 width
  *
  * This enables new experiments to be visualized without hardcoded positions.
  */

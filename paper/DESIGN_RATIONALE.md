@@ -88,23 +88,29 @@ For readers who want to understand the core calculation, here's a minimal Python
 import numpy as np
 
 # Step 1: Prepare a spin-x state (quaternion i)
-psi = np.array([0, 1, 0, 0])  # [real, i, j, k] = i
+# Physical meaning: electron spin aligned along the +x axis
+# Quaternion format: [real, i, j, k] where i,j,k are imaginary units
+psi = np.array([0, 1, 0, 0])  # Pure quaternion i = spin-x eigenstate
 
 # Step 2: Define spin-z observable (quaternion k)
-O_z = np.array([0, 0, 0, 1])  # [real, i, j, k] = k
+# Physical meaning: measurement apparatus aligned along the z-axis
+O_z = np.array([0, 0, 0, 1])  # Pure quaternion k = spin-z direction
 
 # Step 3: Compute expectation value (dot product of vector parts)
-vec_psi = psi[1:4]  # [1, 0, 0] — the i, j, k components
-vec_O   = O_z[1:4]  # [0, 0, 1]
-expectation = np.dot(vec_psi, vec_O)  # = 0 (orthogonal!)
+# Physical meaning: "how aligned is the spin with the measurement axis?"
+vec_psi = psi[1:4]  # [1, 0, 0] — extract imaginary (i,j,k) components
+vec_O   = O_z[1:4]  # [0, 0, 1] — measurement direction in 3D
+expectation = np.dot(vec_psi, vec_O)  # = 0 (x and z are perpendicular!)
 
-# Step 4: Compute probabilities
-P_up   = (1 + expectation) / 2  # = 0.5
+# Step 4: Compute probabilities (Born rule)
+# Physical meaning: probability of measuring spin-up (+ℏ/2) or spin-down (-ℏ/2)
+P_up   = (1 + expectation) / 2  # = 0.5 (dimensionless probability)
 P_down = (1 - expectation) / 2  # = 0.5
 
 # Step 5: Simulate measurement (collapse)
+# Physical meaning: nature "chooses" one outcome with these probabilities
 outcome = +1 if np.random.random() < P_up else -1
-# Over many trials, we expect 50% +1, 50% -1
+# Over many trials, we expect 50% +1, 50% -1 — matching experiment
 ```
 
 The key insight: when `vec_psi` and `vec_O` are orthogonal, their dot product is zero, forcing `P_up = P_down = 0.5`.
