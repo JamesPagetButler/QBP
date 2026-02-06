@@ -456,10 +456,55 @@ Before any PR can be merged, the PR **must** contain:
 
 ### Review Process Steps
 
-1.  **Red Team Review:** Claude conducts three-persona peer review (`Sabine`, `Grothendieck`, `Knuth`) and posts findings as a PR comment with summary.
-2.  **Gemini Review:** Gemini conducts two-persona review (`Furey`, `Feynman`) in structured Markdown format within Gemini CLI.
+1.  **Red Team Review:** Claude conducts three-persona peer review (`Sabine`, `Grothendieck`, `Knuth`) and posts findings as a PR comment with summary. Must include **Acceptance Criteria Verification** (see below).
+2.  **Gemini Review:** Gemini conducts two-persona review (`Furey`, `Feynman`) in structured Markdown format within Gemini CLI. Must include **Acceptance Criteria Verification** (see below).
 3.  **Documentation of Gemini's Review:** Claude acts as scribe, copying Gemini's Markdown review and posting it as a separate PR comment.
-4.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
+4.  **Issue Synthesis:** Claude synthesizes both reviews into a numbered list of issues, flagging any unmet acceptance criteria as **BLOCKING**.
+5.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
+
+### Acceptance Criteria Verification Protocol
+
+Every review must include a formal **Acceptance Criteria Verification** section that checks the PR against the linked issue's requirements. This ensures PRs don't just receive qualitative approval but actually satisfy what was specified.
+
+**Prerequisites:** Requires GitHub CLI (`gh`) with repository access configured.
+
+**Protocol:**
+1. **Identify linked issues** from PR title, body, and commit messages (`Closes #X`, `Fixes #X`, etc.). If no issues are linked, AC verification is N/A (not a failure).
+2. **Fetch issue content** using `gh issue view <number>`
+3. **Extract requirements** — all `- [ ] **AC:**` lines and `Definition of Done` checkboxes
+4. **Verify each criterion:**
+   - Quote the criterion verbatim
+   - Assess: PASS / FAIL / PARTIAL
+   - Cite evidence (file:line or explanation)
+5. **Verdict:** PASS (all criteria met) or BLOCKING (any unmet)
+
+**Status Definitions:**
+- **PASS** — Criterion fully satisfied with cited evidence
+- **FAIL** — Criterion not satisfied; requires action before merge
+- **PARTIAL** — Criterion partially satisfied; treated as BLOCKING unless James explicitly approves proceeding
+
+**Template-Agnostic Design:** This protocol parses the actual issue text, not a hardcoded schema. If issue templates evolve, the verification protocol still works — the rigor comes from the process, not the template structure.
+
+**Rule:** Unmet acceptance criteria (FAIL or PARTIAL) = BLOCKING. Cannot be deferred to housekeeping without James's explicit approval.
+
+**Example:** For a PR linking to issue #64 (Phase 5: Publication), the AC verification section would look like:
+
+```markdown
+# Acceptance Criteria Verification
+
+**Linked Issue(s):** #64
+
+## Issue #64: Experiment 1 - Phase 5: Publication
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | "Paper section follows physics paper schema" | PASS | `paper/quaternion_physics.md:103-181` follows schema structure |
+| 2 | "Phase 4 formal proofs referenced" | PASS | Line 166 references `SternGerlach.lean` |
+| 3 | "Phase 3 visualizations included" | PARTIAL | References `stern_gerlach_demo.py` but no figure numbers |
+| 4 | "DESIGN_RATIONALE.md updated" | FAIL | No Experiment 1 insights added |
+
+**Verdict:** BLOCKING — Criteria 3-4 require action
+```
 
 ## Issue-Driven Workflow
 
