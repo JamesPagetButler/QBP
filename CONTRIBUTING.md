@@ -1030,6 +1030,7 @@ Before entering Housekeeping Mode, Claude must present and get explicit approval
 - Design decisions requiring human input
 - Sprint phase work (Phases 1-5)
 - Theory refinement
+- Changes to test assertions or expected values
 - Anything ambiguous or requiring clarification
 
 #### Process (After Approval)
@@ -1105,4 +1106,35 @@ Housekeeping Mode ends when:
 3. Claude encounters a blocking ambiguity that requires human input
 4. An unexpected error occurs that cannot be safely resolved
 
-**On Exit:** Claude posts a summary of work completed, PRs created, and any issues encountered
+**On Exit:** Claude posts a summary of work completed, PRs created, and any issues encountered.
+
+#### Example Exit Summary
+
+```
+## Housekeeping Mode Complete
+
+**Session:** 2026-02-06 23:00 - 2026-02-07 02:30
+
+### Work Completed
+| Issue | Status | PR |
+|-------|--------|-----|
+| #169 — Evaluate submodule | ✅ Done | #172 (ready for merge) |
+| #170 — Update template | ✅ Done | #172 (ready for merge) |
+| #168 — SU(2) docs | ⏸️ Blocked | Needs theory input |
+
+### PRs Created
+- **#172** — Housekeeping batch: #169, #170
+  - Red Team: APPROVE
+  - Ready for your merge
+
+### Issues Encountered
+- #168 requires clarification on SU(2) representation choice
+  - Left comment on issue, moved to next item
+
+### Next Steps
+When you return:
+1. Review and merge #172
+2. Clarify #168 so I can continue
+
+Welcome back!
+```
