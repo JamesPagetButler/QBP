@@ -1,0 +1,23 @@
+Output saved to: results/02_angle_test/angle_test_output_2026-02-02_21-31-18.txt
+
+============================================================
+ANGLE-DEPENDENT MEASUREMENT TEST
+============================================================
+Testing P(+) = (1 + cos(theta))/2 at various angles
+Particles per angle: 100000
+Random seed: 42
+------------------------------------------------------------
+Angle   0°: Expected 1.0000, Measured 1.0000, Deviation 0.00σ
+Angle  30°: Expected 0.9330, Measured 0.9328, Deviation 0.26σ
+Angle  45°: Expected 0.8536, Measured 0.8543, Deviation 0.67σ
+Angle  60°: Expected 0.7500, Measured 0.7503, Deviation 0.22σ
+Angle  90°: Expected 0.5000, Measured 0.4981, Deviation 1.21σ
+Angle 120°: Expected 0.2500, Measured 0.2472, Deviation 2.06σ
+Angle 135°: Expected 0.1464, Measured 0.1439, Deviation 2.31σ
+Angle 150°: Expected 0.0670, Measured 0.0679, Deviation 1.12σ
+Angle 180°: Expected 0.0000, Measured 0.0000, Deviation 0.00σ
+------------------------------------------------------------
+Maximum deviation: 2.31σ
+Average deviation: 0.87σ
+PASS: All measurements within 3σ of expected values
+============================================================

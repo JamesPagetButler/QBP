@@ -1,6 +1,8 @@
 # Expected Results for Angle-Dependent Measurement (Ground Truth)
 
-*This document was produced through the Collaborative Theory Workflow, synthesizing independent work from Claude and Gemini, evaluated by Bell.*
+*Experiment 02 Ground Truth — Sprint 2*
+
+*Originally produced through the Collaborative Theory Workflow (PR #116). Revised for Sprint 2 Phase 1 to incorporate lessons from Sprint 1 (Stern-Gerlach).*
 
 ---
 
@@ -8,7 +10,12 @@
 
 This document derives the QBP prediction for measurement probability as a function of the angle θ between preparation and measurement axes. We demonstrate that quaternion algebra necessarily produces the quantum mechanical result P(+) = (1 + cos θ)/2, and we explain *why* this is so—not merely that it is.
 
-**Key Finding:** During this derivation, we identified a critical issue with the stated QBP axioms. The expectation value formula ⟨O⟩ = 2 × vecDot(ψ, O) produces invalid probabilities for non-orthogonal cases. This document proposes a correction and validates it against known physics.
+**Key Result:** The corrected Measurement Postulate (see `paper/DESIGN_RATIONALE.md` §5.2) gives ⟨O⟩ = vecDot(ψ, O), which produces valid probabilities for all angles and matches standard quantum mechanics exactly.
+
+**Cross-references:**
+- Theory: `paper/DESIGN_RATIONALE.md` §6.4 (Sprint 2 theoretical extensions)
+- Axioms: `paper/quaternion_physics.md` §2 (Axiomatic Framework)
+- Implementation: `src/qphysics.py` (corrected in PR #117)
 
 ---
 
@@ -24,12 +31,16 @@ Imagine a Stern-Gerlach apparatus where we can rotate the magnet to any angle. W
 
 ---
 
-## 3. The QBP Axioms
+## 3. The QBP Axioms (Corrected)
+
+The following axioms govern the QBP measurement framework. Note that Axiom 3 was corrected after Experiment 01 (see `paper/DESIGN_RATIONALE.md` §5.2 for the correction history).
 
 1. **Axiom 1 (State):** A spin state is a pure unit quaternion ψ (real part = 0, |ψ| = 1)
 2. **Axiom 2 (Observable):** A measurement direction is a pure unit quaternion O
-3. **Axiom 3 (Expectation Value):** ⟨O⟩ = 2 × vecDot(ψ, O) ← *Under review*
+3. **Axiom 3 (Expectation Value):** ⟨O⟩ = vecDot(ψ, O) — *Corrected from 2 × vecDot*
 4. **Axiom 4 (Born Rule):** P(+) = (1 + ⟨O⟩)/2, P(-) = (1 - ⟨O⟩)/2
+
+**Why the correction was needed:** The original formula ⟨O⟩ = 2 × vecDot(ψ, O) produces expectation values in [-2, +2], which yields invalid probabilities (>1 or <0) for non-orthogonal configurations. The corrected formula produces expectation values in [-1, +1], guaranteed by the Cauchy-Schwarz inequality for unit vectors.
 
 ---
 
@@ -62,17 +73,11 @@ vecDot(ψ, O) = (sin θ × 0) + (0 × 0) + (cos θ × 1) = cos θ
 
 **Key insight:** The quaternion dot product of pure unit quaternions equals the cosine of the angle between them. This is not something we put in—it's a geometric property that Hamilton's algebra automatically provides.
 
-### 4.4 The Factor-of-2 Problem
+### 4.4 Historical Note: The Factor-of-2 Correction
 
-Applying Axiom 3 as stated:
+*This section documents how the axiom error was discovered. The correction has been applied — see `paper/DESIGN_RATIONALE.md` §5.2.*
 
-```
-⟨O⟩ = 2 × vecDot(ψ, O) = 2 × cos θ
-```
-
-This gives ⟨O⟩ ranging from -2 to +2. But for a ±1 observable, expectation values must lie in [-1, +1].
-
-**Testing the limiting cases:**
+The original Axiom 3 stated ⟨O⟩ = 2 × vecDot(ψ, O). This produced invalid probabilities:
 
 | θ | cos θ | ⟨O⟩ = 2 cos θ | P(+) = (1 + ⟨O⟩)/2 | Valid? |
 |---|-------|---------------|---------------------|--------|
@@ -80,17 +85,13 @@ This gives ⟨O⟩ ranging from -2 to +2. But for a ±1 observable, expectation 
 | 90° | 0 | 0 | 0.5 | ✓ Valid |
 | 180° | -1 | -2 | -0.5 | ❌ Invalid |
 
-**Conclusion:** The factor of 2 in Axiom 3 produces unphysical results. This error was not detected in Experiment 01 because vecDot(i, k) = 0, making the factor of 2 irrelevant (2 × 0 = 0).
+**Why Experiment 01 didn't catch it:** For orthogonal states, vecDot(i, k) = 0, so 2 × 0 = 0 — the factor was invisible.
 
-### 4.5 Proposed Axiom Correction
+**Lesson learned:** Edge cases (aligned, anti-aligned) are essential test coverage.
 
-The expectation value formula should be:
+### 4.5 The Corrected Formula
 
-```
-⟨O⟩ = vecDot(ψ, O)  [CORRECTED]
-```
-
-This gives:
+With the corrected Axiom 3 (⟨O⟩ = vecDot(ψ, O)):
 
 | θ | cos θ | ⟨O⟩ = cos θ | P(+) = (1 + cos θ)/2 | Valid? |
 |---|-------|-------------|----------------------|--------|
@@ -118,6 +119,65 @@ cos²(θ/2) = (1 + cos θ)/2
 ```
 
 **The QBP prediction matches standard QM exactly.** ✓
+
+### 4.8 The Rotation Formalism
+
+For more complex scenarios, we can also express angle-dependent measurement using quaternion rotation operators. This is the approach documented in `paper/DESIGN_RATIONALE.md` §6.4.
+
+**Rotation quaternion:** A rotation by angle θ about unit axis n̂ = (nx, ny, nz) is:
+```
+q = cos(θ/2) + sin(θ/2)(nx·i + ny·j + nz·k)
+```
+
+**Rotated observable:** O' = q·O·q⁻¹
+
+**Example:** To rotate the z-axis observable by θ in the xz-plane:
+- Rotation axis: y-axis, so q = cos(θ/2) + sin(θ/2)·j
+- O_θ = q·k·q⁻¹ = cos(θ)·k + sin(θ)·i
+
+This produces the same expectation value as the direct state construction in §4.2.
+
+**Physical interpretation:** The rotation quaternion q has a non-zero real part — it's an *operator*, not a state. The half-angle θ/2 reflects the SU(2) double-cover of SO(3): rotating a spin state by 360° returns it to −ψ, not +ψ.
+
+### 4.9 Simplified Code Example
+
+For readers who want to understand the core calculation (following the pattern from Experiment 01):
+
+```python
+import numpy as np
+
+def angle_measurement_probability(theta_degrees):
+    """
+    Calculate P(+) for measuring a state at angle θ from the z-axis.
+
+    Physical setup: Particle prepared with spin tilted θ from z-axis,
+    then measured along z-axis.
+    """
+    theta = np.radians(theta_degrees)
+
+    # State quaternion: ψ(θ) = sin(θ)·i + cos(θ)·k
+    # Physical meaning: spin direction tilted θ from z toward x
+    psi = np.array([0, np.sin(theta), 0, np.cos(theta)])  # [real, i, j, k]
+
+    # Observable: measurement along z-axis
+    O_z = np.array([0, 0, 0, 1])  # Pure quaternion k
+
+    # Expectation value = dot product of imaginary parts
+    vec_psi = psi[1:4]  # [sin θ, 0, cos θ]
+    vec_O = O_z[1:4]    # [0, 0, 1]
+    expectation = np.dot(vec_psi, vec_O)  # = cos θ
+
+    # Born rule
+    P_up = (1 + expectation) / 2  # = (1 + cos θ)/2 = cos²(θ/2)
+
+    return P_up
+
+# Verify key angles
+print(f"θ=0°:   P(+) = {angle_measurement_probability(0):.3f}")   # → 1.000
+print(f"θ=60°:  P(+) = {angle_measurement_probability(60):.3f}")  # → 0.750
+print(f"θ=90°:  P(+) = {angle_measurement_probability(90):.3f}")  # → 0.500
+print(f"θ=180°: P(+) = {angle_measurement_probability(180):.3f}") # → 0.000
+```
 
 ---
 
@@ -243,18 +303,18 @@ Any deviation indicates a bug, not statistical fluctuation.
 
 ## 8. Potential Difficulties and Concerns
 
-### 8.1 Axiom Correction (CRITICAL)
+### 8.1 Axiom Correction (COMPLETED)
 
-**Action Required:** The expectation value axiom must be corrected:
+**Status:** ✅ Corrected in Sprint 1 post-analysis.
 
-| Current | Proposed |
-|---------|----------|
-| ⟨O⟩ = 2 × vecDot(ψ, O) | ⟨O⟩ = vecDot(ψ, O) |
+The expectation value axiom was corrected from ⟨O⟩ = 2 × vecDot(ψ, O) to ⟨O⟩ = vecDot(ψ, O).
 
-This change must propagate to:
-- `src/qphysics.py`
-- `proofs/QBP/Basic.lean`
-- `paper/quaternion_physics.md`
+**Propagation verified:**
+- ✅ `src/qphysics.py` — PR #117
+- ✅ `proofs/QBP/Basic.lean` — PR #118
+- ✅ `paper/quaternion_physics.md` — PR #155
+
+See `paper/DESIGN_RATIONALE.md` §5.2 for full correction history.
 
 ### 8.2 Floating-Point Precision
 
@@ -309,25 +369,41 @@ The formula P(+) = (1 + cos θ)/2 is the foundation for all spin-1/2 measurement
 
 From QBP axioms (with corrected expectation value formula):
 
-**P(+) = (1 + cos θ)/2**
+**P(+) = (1 + cos θ)/2 = cos²(θ/2)**
 
-This matches the standard QM result P(+) = cos²(θ/2) exactly.
+This matches the standard QM result exactly.
 
-### What We Discovered
+### Key Insights
 
-The factor of 2 in the original expectation value axiom produces invalid probabilities. This experiment serves as validation for the axiom correction.
+1. **Geometric foundation:** Quaternion dot product = cos θ because pure unit quaternions parameterize S², the same space as the Bloch sphere.
 
-### Why It Works
+2. **Axiom validation:** The factor-of-2 correction (discovered here, applied in Sprint 1) is essential for valid probabilities at all angles.
 
-Quaternion algebra naturally encodes the geometry of spin-1/2 states. Pure unit quaternions parameterize S², the same space as the Bloch sphere. The dot product gives cos θ, directly measuring how much a state "points" in the measurement direction.
+3. **Rotation formalism:** The q·O·q⁻¹ rotation with half-angle reflects SU(2) structure.
 
-### What We Will Test
+### What Phase 2 Will Test
 
-Nine angles from 0° to 180°, each with 1,000,000 trials, with angle-specific acceptance criteria based on binomial statistics.
+Nine angles from 0° to 180°, each with 1,000,000 trials:
+- Edge cases: 0° (aligned), 90° (orthogonal), 180° (anti-aligned)
+- Intermediate angles: 30°, 45°, 60°, 120°, 135°, 150°
+
+All must pass the 3σ acceptance criterion (see §7.3).
 
 ---
 
-## 11. References
+## 11. Phase 2 Acceptance Criteria
+
+The following criteria must be met for Phase 2 (Implementation) to pass:
+
+- [ ] **AC:** Rotation function implemented in `src/qphysics.py`
+- [ ] **AC:** All 9 test angles pass within 3σ of predicted P(+)
+- [ ] **AC:** Deterministic cases (θ=0°, θ=180°) pass exactly
+- [ ] **AC:** Results saved to CSV in `results/02_angle_dependent/`
+- [ ] **AC:** Physics validation tests pass in CI
+
+---
+
+## 12. References
 
 1. Hamilton, W.R. (1844). "On Quaternions". *Proceedings of the Royal Irish Academy*.
 2. Sakurai, J.J. (1994). *Modern Quantum Mechanics*. Addison-Wesley.
@@ -337,5 +413,12 @@ Nine angles from 0° to 180°, each with 1,000,000 trials, with angle-specific a
 
 ---
 
-*Document produced through the Collaborative Theory Workflow*
-*Synthesis by Claude from independent work by Claude and Gemini, evaluated by Bell*
+## Revision History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-02-04 | Original via Collaborative Theory Workflow (PR #116) |
+| 2.0 | 2026-02-06 | Sprint 2 Phase 1 rework: updated axioms to corrected version, added rotation formalism, code example, Phase 2 acceptance criteria, cross-references |
+
+*Original synthesis by Claude from independent work by Claude and Gemini, evaluated by Bell*
+*Sprint 2 revision by Claude with Herschel coordination*
