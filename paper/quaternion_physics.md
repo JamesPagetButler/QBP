@@ -134,7 +134,23 @@ A synthetic experiment was conducted with N = 1,000,000 independent measurements
 - Standard deviation (σ): 500.00
 - Acceptance threshold: 3σ = 1,500
 
-The interactive visualization (`src/viz/stern_gerlach_demo.py`) demonstrates the binary nature of quantum measurement, showing particles deflecting to exactly two discrete positions on the detector screen—never to intermediate positions—confirming spin quantization.
+#### Visualizations
+
+**Figure 1: Stern-Gerlach Simulation Results**
+![Stern-Gerlach Results](../src/viz/experiment_01_stern_gerlach_results.png)
+*Histogram showing the distribution of 1,000,000 spin measurements. The two peaks at +1 and -1 demonstrate binary quantization with near-equal probability, consistent with theoretical predictions.*
+
+**Figure 2: Interactive Demonstration** (`src/viz/stern_gerlach_demo.py`)
+The Python visualization demonstrates the binary nature of quantum measurement in real-time, showing particles deflecting to exactly two discrete positions on the detector screen—never to intermediate positions—confirming spin quantization.
+
+**Figure 3: Interactive Proof Visualization** (`src/viz/interactive/`)
+A browser-based WASM application presents the formal proof structure as an interactive dependency graph. Users can step through the proof from axioms to the final 50/50 probability theorem, with four levels of explanation:
+- **L4 (Formal):** Lean 4 syntax for proof assistant users
+- **L3 (Mathematical):** Conventional notation for physicists
+- **L2 (Physical):** Physics interpretation for students
+- **L1 (Intuitive):** Plain English for general audience
+
+The visualization is available at `src/viz/interactive/dist/index.html`.
 
 #### Outcome
 

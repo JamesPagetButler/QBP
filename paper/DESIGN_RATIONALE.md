@@ -37,3 +37,35 @@ With the three axioms implemented in `qphysics.py`, the final piece required for
 *   **Probabilistic Collapse:** The probabilities for a binary outcome (`+1` or `-1`) are derived from the expectation value using the standard quantum mechanical formula `P(+) = (1 + <O>)/2`. A random number is then used to "roll the dice," collapsing the state into one of the two eigenstates (aligned or anti-aligned with the observable).
 
 This postulate is our first major, testable hypothesis connecting the abstract algebra to a probabilistic, real-world experimental result.
+
+## 5. Experiment 01: Stern-Gerlach — Key Insights
+
+The Stern-Gerlach experiment served as our foundational test of the QBP framework. The following insights emerged:
+
+### 5.1 Orthogonality as the Source of Randomness
+
+The most significant insight from Experiment 01 is that the 50/50 probability split is not an assumption but a **mathematical consequence** of orthogonality in quaternion space. When the state quaternion `ψ = i` (spin-x) is measured against the observable `O = k` (spin-z), their vector parts are orthogonal: `vecDot(i, k) = 0`. This zero dot product mathematically necessitates `⟨O⟩ = 0`, which via the Born rule gives `P(+) = P(-) = 0.5`.
+
+This is philosophically important: the randomness observed in quantum measurement emerges from the geometry of the state space, not from hidden variables or intrinsic indeterminacy.
+
+### 5.2 The Factor-of-2 Correction
+
+During the development of Experiment 02 (Angle-Dependent Measurement), we discovered that the original expectation value formula `⟨O⟩ = 2 × vecDot(ψ, O)` produced invalid probabilities (> 1) for non-orthogonal configurations. The corrected formula `⟨O⟩ = vecDot(ψ, O)` was validated in Experiment 02 and retroactively confirmed to be consistent with Experiment 01 results (where the factor of 2 had no effect because `2 × 0 = 0`).
+
+This correction is documented in both `proofs/QBP/Basic.lean` and `src/qphysics.py`.
+
+### 5.3 Formal Verification as a Design Tool
+
+The Lean 4 proofs for Experiment 01 (`proofs/QBP/Experiments/SternGerlach.lean`) served not just as verification but as a **design tool**. Writing formal proofs forced us to make every assumption explicit:
+
+- The state must be a pure quaternion (Axiom 1 compliance)
+- The observable must be a pure quaternion (Axiom 2 compliance)
+- The probability formula must map to [0, 1] for all valid inputs
+
+The Phase 4b review process (Claude reviewing Gemini's proofs) caught no errors but confirmed the tight correspondence between the formal proofs and the Python implementation.
+
+### 5.4 Interactive Proof Visualization
+
+Phase 4c introduced a new capability: presenting formal proofs as interactive dependency graphs. The key design decision was to use **four levels of explanation** (L4 Formal → L3 Mathematical → L2 Physical → L1 Intuitive) so that the same proof structure can be understood by different audiences. This approach will scale to more complex proofs in future experiments.
+
+The visualization uses a data-driven JSON format (`stern_gerlach.viz.json`) that decouples content authoring from code, enabling rapid iteration on explanations without recompilation.
