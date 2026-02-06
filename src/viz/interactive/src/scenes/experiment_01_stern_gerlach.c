@@ -8,24 +8,32 @@
 
 #include "../scene.h"
 #include "../proof_graph.h"
+#include "../json_loader.h"
 #include "../theme.h"
+#include "../fonts.h"
 #include "raylib.h"
+#include <stdio.h>
 
 static ProofGraph sg_graph;
 static int screen_width;
 static int screen_height;
 
-/* Layout constants */
-#define PANEL_WIDTH   320
-#define BAR_HEIGHT     40
-#define TITLE_HEIGHT   50
+/* Layout constants - larger for readability */
+#define PANEL_WIDTH   440  /* Wider to fit 4-level descriptions */
+#define BAR_HEIGHT     56
+#define TITLE_HEIGHT   60
 
 static void sg_init(int sw, int sh)
 {
     screen_width = sw;
     screen_height = sh;
 
-    graph_init_stern_gerlach(&sg_graph);
+    /* Try to load from JSON first (enables hot-reload) */
+    if (graph_load_json(&sg_graph, "/data/stern_gerlach.viz.json") != 0) {
+        /* Fallback to hardcoded data if JSON loading fails */
+        fprintf(stderr, "[sg_init] JSON load failed, using hardcoded fallback\n");
+        graph_init_stern_gerlach(&sg_graph);
+    }
 
     /* Graph occupies left portion, panel on the right */
     Rectangle graph_area = {
@@ -51,21 +59,33 @@ static void sg_update(void)
         graph_reset(&sg_graph);
     }
 
-    /* Click on nodes to jump to them */
+    /* Handle mouse clicks */
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         Vector2 mouse = GetMousePosition();
-        for (int i = 0; i < sg_graph.node_count; i++) {
-            Vector2 np = sg_graph.nodes[i].pos;
-            if (mouse.x >= np.x - 90 && mouse.x <= np.x + 90 &&
-                mouse.y >= np.y - 20 && mouse.y <= np.y + 20) {
-                /* Find this node in walk_order */
-                for (int s = 0; s < sg_graph.walk_len; s++) {
-                    if (sg_graph.walk_order[s] == i) {
-                        sg_graph.current_step = s;
-                        break;
+
+        /* Check step bar buttons first - must match graph_draw_step_bar button sizes */
+        Rectangle bar = { 0, (float)(screen_height - BAR_HEIGHT), (float)screen_width, BAR_HEIGHT };
+        Rectangle prev_btn = { bar.x + 16, bar.y + 10, 120, bar.height - 20 };
+        Rectangle next_btn = { bar.x + bar.width - 136, bar.y + 10, 120, bar.height - 20 };
+
+        if (CheckCollisionPointRec(mouse, prev_btn)) {
+            graph_step_back(&sg_graph);
+        } else if (CheckCollisionPointRec(mouse, next_btn)) {
+            graph_step_forward(&sg_graph);
+        } else {
+            /* Click on nodes to jump to them - use dynamic node bounds */
+            for (int i = 0; i < sg_graph.node_count; i++) {
+                Rectangle node_rect = graph_node_bounds(&sg_graph, i);
+                if (CheckCollisionPointRec(mouse, node_rect)) {
+                    /* Find this node in walk_order */
+                    for (int s = 0; s < sg_graph.walk_len; s++) {
+                        if (sg_graph.walk_order[s] == i) {
+                            sg_graph.current_step = s;
+                            break;
+                        }
                     }
+                    break;
                 }
-                break;
             }
         }
     }
@@ -73,11 +93,11 @@ static void sg_update(void)
 
 static void sg_draw(void)
 {
-    /* Title */
-    DrawText("QBP  |  Stern-Gerlach Proof Visualization",
-             20, 14, 22, QBP_GOLD);
-    DrawText("Experiment 01: Spin-X state measured on Z-axis",
-             20, 36, 12, QBP_TEXT_DIM);
+    /* Title - larger for readability */
+    DrawTextQBP("QBP  |  Stern-Gerlach Proof Visualization",
+             24, 16, 28, QBP_GOLD);
+    DrawTextQBP("Experiment 01: Spin-X state measured on Z-axis",
+             24, 44, 16, QBP_TEXT_DIM);
 
     /* Proof graph */
     graph_draw(&sg_graph);

@@ -10,6 +10,7 @@
 #include "raylib.h"
 #include "scene.h"
 #include "theme.h"
+#include "fonts.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
@@ -43,6 +44,9 @@ int main(void)
 {
     InitWindow(SCREEN_W, SCREEN_H, "QBP Interactive Proof Visualization");
 
+    /* Initialize custom fonts */
+    fonts_init();
+
 #ifndef __EMSCRIPTEN__
     SetTargetFPS(60);
 #endif
@@ -64,6 +68,9 @@ int main(void)
     if (current_scene && current_scene->cleanup) {
         current_scene->cleanup();
     }
+
+    /* Cleanup fonts */
+    fonts_cleanup();
 
     CloseWindow();
     return 0;
