@@ -25,7 +25,9 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 EXPORT_SCRIPT = PROJECT_ROOT / "src" / "viz" / "interactive" / "export_data.py"
-PROOF_GRAPH_JSON = PROJECT_ROOT / "src" / "viz" / "interactive" / "data" / "proof_graph_01.json"
+PROOF_GRAPH_JSON = (
+    PROJECT_ROOT / "src" / "viz" / "interactive" / "data" / "proof_graph_01.json"
+)
 
 # Directories that the export script must NOT depend on
 FORBIDDEN_DIRS = [
@@ -88,8 +90,16 @@ class TestStaticDependencies:
 
         # Standard library modules that export_data.py is allowed to use
         ALLOWED_MODULES = {
-            "json", "re", "sys", "pathlib", "os", "typing",
-            "collections", "dataclasses", "argparse", "textwrap",
+            "json",
+            "re",
+            "sys",
+            "pathlib",
+            "os",
+            "typing",
+            "collections",
+            "dataclasses",
+            "argparse",
+            "textwrap",
         }
 
         imported_modules = set()
@@ -138,9 +148,9 @@ class TestStaticDependencies:
                     # Allow the output .json file reference and self-references
                     if "proof_graph" in val or "export_data" in val:
                         continue
-                    assert ".lean" in val or val.startswith("data/"), (
-                        f"export_data.py references non-Lean file: '{val}'"
-                    )
+                    assert ".lean" in val or val.startswith(
+                        "data/"
+                    ), f"export_data.py references non-Lean file: '{val}'"
 
 
 # ============================================================================
@@ -153,9 +163,9 @@ class TestJsonSchema:
 
     @pytest.fixture
     def proof_data(self):
-        assert PROOF_GRAPH_JSON.exists(), (
-            f"proof_graph_01.json not found. Run export_data.py first."
-        )
+        assert (
+            PROOF_GRAPH_JSON.exists()
+        ), f"proof_graph_01.json not found. Run export_data.py first."
         with open(PROOF_GRAPH_JSON) as f:
             return json.load(f)
 
@@ -172,8 +182,13 @@ class TestJsonSchema:
     def test_node_fields(self, proof_data):
         """Each node must have only allowed fields."""
         allowed = {
-            "id", "name", "kind", "statement",
-            "physical_meaning", "dependencies", "source_file",
+            "id",
+            "name",
+            "kind",
+            "statement",
+            "physical_meaning",
+            "dependencies",
+            "source_file",
         }
         for node in proof_data["nodes"]:
             actual = set(node.keys())
@@ -185,6 +200,7 @@ class TestJsonSchema:
 
     def test_no_floating_point_values(self, proof_data):
         """Proof graph should not contain float values (simulation artifacts)."""
+
         def check_no_floats(obj, path=""):
             if isinstance(obj, float):
                 pytest.fail(
@@ -197,14 +213,23 @@ class TestJsonSchema:
             elif isinstance(obj, list):
                 for i, v in enumerate(obj):
                     check_no_floats(v, f"{path}[{i}]")
+
         check_no_floats(proof_data)
 
     def test_no_simulation_keywords_in_values(self, proof_data):
         """Values should not contain simulation-specific keywords."""
         simulation_keywords = {
-            "mean", "stdev", "standard deviation", "sample",
-            "measurement_count", "seed", "random", "histogram",
-            "frequency", "counts", "batch",
+            "mean",
+            "stdev",
+            "standard deviation",
+            "sample",
+            "measurement_count",
+            "seed",
+            "random",
+            "histogram",
+            "frequency",
+            "counts",
+            "batch",
         }
 
         def check_values(obj, path=""):
@@ -222,6 +247,7 @@ class TestJsonSchema:
             elif isinstance(obj, list):
                 for i, v in enumerate(obj):
                     check_values(v, f"{path}[{i}]")
+
         check_values(proof_data)
 
     def test_node_kinds_are_valid(self, proof_data):
@@ -248,9 +274,9 @@ class TestJsonSchema:
         for node in proof_data["nodes"]:
             src = node.get("source_file", "")
             if src:
-                assert src.endswith(".lean"), (
-                    f"Node '{node['name']}' references non-Lean source: '{src}'"
-                )
+                assert src.endswith(
+                    ".lean"
+                ), f"Node '{node['name']}' references non-Lean source: '{src}'"
 
     def test_walk_order_covers_all_nodes(self, proof_data):
         """Walk order must include all nodes exactly once."""
@@ -278,11 +304,13 @@ class TestSabotageIndependence:
         # First, generate the reference output
         result_ref = subprocess.run(
             [sys.executable, str(EXPORT_SCRIPT)],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT),
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
         )
-        assert result_ref.returncode == 0, (
-            f"export_data.py failed:\n{result_ref.stderr}"
-        )
+        assert (
+            result_ref.returncode == 0
+        ), f"export_data.py failed:\n{result_ref.stderr}"
 
         # Read reference output
         ref_json = PROOF_GRAPH_JSON.read_text()
@@ -295,12 +323,14 @@ class TestSabotageIndependence:
         }
         result_clean = subprocess.run(
             [sys.executable, str(EXPORT_SCRIPT)],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT),
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
             env=env_clean,
         )
-        assert result_clean.returncode == 0, (
-            f"export_data.py failed in clean env:\n{result_clean.stderr}"
-        )
+        assert (
+            result_clean.returncode == 0
+        ), f"export_data.py failed in clean env:\n{result_clean.stderr}"
 
         # Re-read the output (script overwrites the file)
         clean_json = PROOF_GRAPH_JSON.read_text()
@@ -316,7 +346,9 @@ class TestSabotageIndependence:
 
         # Check that BASIC_LEAN and SG_LEAN are the only file inputs
         assert "Basic.lean" in source, "export_data.py should reference Basic.lean"
-        assert "SternGerlach.lean" in source, "export_data.py should reference SternGerlach.lean"
+        assert (
+            "SternGerlach.lean" in source
+        ), "export_data.py should reference SternGerlach.lean"
 
         # Count Path / open / read_text calls to ensure no unexpected file reads
         tree = ast.parse(source)
