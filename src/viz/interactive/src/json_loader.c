@@ -2,7 +2,7 @@
  * json_loader.c — Load proof graphs from JSON files.
  *
  * Parses the .viz.json schema and populates a ProofGraph structure.
- * Enables hot-reload during development: edit JSON, refresh browser.
+ * Separates data from code, enabling description edits without recompiling.
  */
 
 #include "json_loader.h"
@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Helper to safely copy string with truncation */
-static void safe_strcpy(char *dest, size_t dest_size, const char *src)
+/* Helper to safely copy string with truncation warning */
+static void safe_strcpy(char *dest, size_t dest_size, const char *src, const char *field_name)
 {
     if (!src) {
         dest[0] = '\0';
@@ -20,6 +20,8 @@ static void safe_strcpy(char *dest, size_t dest_size, const char *src)
     }
     size_t len = strlen(src);
     if (len >= dest_size) {
+        fprintf(stderr, "[json_loader] Warning: '%s' truncated from %zu to %zu chars\n",
+                field_name ? field_name : "field", len, dest_size - 1);
         len = dest_size - 1;
     }
     memcpy(dest, src, len);
@@ -97,6 +99,12 @@ static char *read_file(const char *path)
 
 int graph_load_json(ProofGraph *g, const char *json_path)
 {
+    /* Defensive null checks */
+    if (!g || !json_path) {
+        fprintf(stderr, "[json_loader] Error: null argument to graph_load_json\n");
+        return -1;
+    }
+
     /* Initialize graph */
     memset(g, 0, sizeof(*g));
 
@@ -164,24 +172,24 @@ int graph_load_json(ProofGraph *g, const char *json_path)
         n->id = node_id;
 
         /* Copy node name */
-        safe_strcpy(n->name, MAX_NAME_LEN, node_name);
+        safe_strcpy(n->name, MAX_NAME_LEN, node_name, "name");
 
         /* Copy display name */
-        safe_strcpy(n->display_name, MAX_DISPLAY_NAME_LEN, get_string(node_json, "display_name"));
+        safe_strcpy(n->display_name, MAX_DISPLAY_NAME_LEN, get_string(node_json, "display_name"), "display_name");
         if (n->display_name[0] == '\0') {
             /* Fallback to node name if no display name */
-            safe_strcpy(n->display_name, MAX_DISPLAY_NAME_LEN, node_name);
+            safe_strcpy(n->display_name, MAX_DISPLAY_NAME_LEN, node_name, "display_name");
         }
 
         /* Parse kind */
         n->kind = parse_kind(get_string(node_json, "kind"));
 
         /* Copy 4 levels of descriptions */
-        safe_strcpy(n->level4_formal, MAX_FORMAL_LEN, get_string(node_json, "L4_formal"));
-        safe_strcpy(n->level3_math, MAX_MATH_LEN, get_string(node_json, "L3_math"));
-        safe_strcpy(n->level2_physical, MAX_PHYSICAL_LEN, get_string(node_json, "L2_physical"));
-        safe_strcpy(n->level1_intuitive, MAX_INTUITIVE_LEN, get_string(node_json, "L1_intuitive"));
-        safe_strcpy(n->key_insight, MAX_INSIGHT_LEN, get_string(node_json, "key_insight"));
+        safe_strcpy(n->level4_formal, MAX_FORMAL_LEN, get_string(node_json, "L4_formal"), "L4_formal");
+        safe_strcpy(n->level3_math, MAX_MATH_LEN, get_string(node_json, "L3_math"), "L3_math");
+        safe_strcpy(n->level2_physical, MAX_PHYSICAL_LEN, get_string(node_json, "L2_physical"), "L2_physical");
+        safe_strcpy(n->level1_intuitive, MAX_INTUITIVE_LEN, get_string(node_json, "L1_intuitive"), "L1_intuitive");
+        safe_strcpy(n->key_insight, MAX_INSIGHT_LEN, get_string(node_json, "key_insight"), "key_insight");
 
         /* Set walk order */
         g->walk_order[node_id] = node_id;
@@ -214,8 +222,11 @@ int graph_load_json(ProofGraph *g, const char *json_path)
                     if (dep_id >= 0) {
                         n->deps[dep_idx++] = dep_id;
                     } else {
-                        fprintf(stderr, "[json_loader] Warning: dependency '%s' not found for node '%s'\n",
+                        /* Missing dependency is a fatal error - proof structure would be corrupted */
+                        fprintf(stderr, "[json_loader] Error: dependency '%s' not found for node '%s'\n",
                                 dep_item->valuestring, node_name);
+                        cJSON_Delete(root);
+                        return -1;
                     }
                 }
             }

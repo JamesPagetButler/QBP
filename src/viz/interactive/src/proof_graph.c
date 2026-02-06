@@ -415,6 +415,12 @@ void graph_init_stern_gerlach(ProofGraph *g)
 /* ------------------------------------------------------------------ */
 /*  Layout: position nodes in a logical tree arrangement              */
 /* ------------------------------------------------------------------ */
+/*
+ * TODO: This layout is hardcoded for the Stern-Gerlach experiment topology.
+ * To support multiple experiments with different graph structures, this
+ * needs to be generalized (e.g., automatic layout from dependency graph
+ * using topological sort + level assignment, or layout data in JSON).
+ */
 
 void graph_layout(ProofGraph *g, Rectangle area)
 {

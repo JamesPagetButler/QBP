@@ -1,4 +1,14 @@
 {
+  "_schema": {
+    "description": "QBP Proof Visualization Schema v1.0",
+    "levels": {
+      "L4_formal": "Lean syntax - exact code from proof files, for proof assistant users",
+      "L3_math": "Mathematical notation - conventional symbols, for physicists/mathematicians",
+      "L2_physical": "Physics interpretation - what it means physically, for students",
+      "L1_intuitive": "Plain English - accessible explanation, for general audience"
+    },
+    "guidelines": "L4 should be copy-pasteable Lean. L3 uses standard math notation. L2 connects to observable phenomena. L1 uses analogies and avoids jargon."
+  },
   "experiment_id": "01_stern_gerlach",
   "title": "Stern-Gerlach: Spin-X measured on Z-axis",
   "description": "Formal proof that a spin-x state measured on the z-axis produces a 50/50 probability split, as predicted by the QBP quaternion framework and observed in the Stern-Gerlach experiment.",
