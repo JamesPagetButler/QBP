@@ -16,8 +16,8 @@ static int screen_width;
 static int screen_height;
 
 /* Layout constants */
-#define PANEL_WIDTH   320
-#define BAR_HEIGHT     40
+#define PANEL_WIDTH   380  /* Wider to fit 4-level descriptions */
+#define BAR_HEIGHT     44
 #define TITLE_HEIGHT   50
 
 static void sg_init(int sw, int sh)
@@ -51,21 +51,34 @@ static void sg_update(void)
         graph_reset(&sg_graph);
     }
 
-    /* Click on nodes to jump to them */
+    /* Handle mouse clicks */
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         Vector2 mouse = GetMousePosition();
-        for (int i = 0; i < sg_graph.node_count; i++) {
-            Vector2 np = sg_graph.nodes[i].pos;
-            if (mouse.x >= np.x - 90 && mouse.x <= np.x + 90 &&
-                mouse.y >= np.y - 20 && mouse.y <= np.y + 20) {
-                /* Find this node in walk_order */
-                for (int s = 0; s < sg_graph.walk_len; s++) {
-                    if (sg_graph.walk_order[s] == i) {
-                        sg_graph.current_step = s;
-                        break;
+
+        /* Check step bar buttons first */
+        Rectangle bar = { 0, (float)(screen_height - BAR_HEIGHT), (float)screen_width, BAR_HEIGHT };
+        Rectangle prev_btn = { bar.x + 8, bar.y + 6, 70, bar.height - 12 };
+        Rectangle next_btn = { bar.x + bar.width - 78, bar.y + 6, 70, bar.height - 12 };
+
+        if (CheckCollisionPointRec(mouse, prev_btn)) {
+            graph_step_back(&sg_graph);
+        } else if (CheckCollisionPointRec(mouse, next_btn)) {
+            graph_step_forward(&sg_graph);
+        } else {
+            /* Click on nodes to jump to them */
+            for (int i = 0; i < sg_graph.node_count; i++) {
+                Vector2 np = sg_graph.nodes[i].pos;
+                if (mouse.x >= np.x - 90 && mouse.x <= np.x + 90 &&
+                    mouse.y >= np.y - 20 && mouse.y <= np.y + 20) {
+                    /* Find this node in walk_order */
+                    for (int s = 0; s < sg_graph.walk_len; s++) {
+                        if (sg_graph.walk_order[s] == i) {
+                            sg_graph.current_step = s;
+                            break;
+                        }
                     }
+                    break;
                 }
-                break;
             }
         }
     }
