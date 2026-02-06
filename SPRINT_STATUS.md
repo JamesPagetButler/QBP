@@ -9,13 +9,14 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 2 (Angle-Dependent Measurement)
-- **Lifecycle Stage:** Sprint 2 Phase 2 (Implementation)
-- **Next Critical-Path Action:** Implement angle-dependent measurement (#161)
+- **Lifecycle Stage:** Sprint 2 Phase 3 (Visualization)
+- **Next Critical-Path Action:** Visualize angle-dependent results (#162)
+- **Blocking Issue:** #179 (experiment numbering) should be resolved first — directories need renaming from `02_` to `01b_`
 
 ## Sprint 2 Closure Checklist
 
 - [x] Phase 1: Ground Truth Rework (#160) — CLOSED 2026-02-06. PR #166 merged. Full Tier 3 review.
-- [ ] Phase 2: Implementation (#161) ← **NEXT**
+- [x] Phase 2: Implementation (#161) — CLOSED 2026-02-06. PR #178 merged. Red Team APPROVE. (Gemini/Bell reviews skipped due to MCP disconnect)
 - [ ] Phase 3: Visualization (#162)
 - [ ] Phase 4: Formal Verification (#163)
   - [ ] 4a: Formal Proof
@@ -93,6 +94,7 @@
 - **Session update (2026-02-06):** Theory Refinement (#80) complete. PR #147 merged after 2 review cycles. Added DESIGN_RATIONALE Section 6 (theoretical findings, emergent phenomena, open questions, Sprint 2 extensions). Created security audit housekeeping issue #148. **Sprint 1 fully complete. Next: Sprint 1 Retrospective, then Sprint 2 Phase 2.**
 - **Session update (2026-02-06, later):** PR #155 merged (housekeeping batch). Created Sprint 2 issue set (#160-#165). Note: PR #116 did Phase 1 early but predates process maturity; reworking Phase 1 to incorporate Sprint 1 learnings. Created Housekeeping Mode issue (#159).
 - **Session update (2026-02-06, evening):** Phase 1 Rework complete. PR #166 merged after Tier 3 review. Key finding: QBP predictions match QM exactly for single-particle systems — this is expected, not a flaw. Created issues #167 (QBP divergence research), #168 (SU(2) docs), #169 (submodule housekeeping), #170 (ground truth template). **Next: Phase 2 Implementation (#161).**
+- **Session update (2026-02-06, night):** Phase 2 Implementation complete. PR #178 merged (Red Team APPROVE, Gemini/Bell skipped due to MCP disconnect). Added rotation functions to qphysics.py, simulation passes all 9 angles within 3σ. Fixed normalization bug (np.abs vs q.norm). **Critical issue found:** Experiment numbering collision — both "02_angle_dependent" and "02_double_slit" exist. Created #179 to fix (Option A: angle-dependent = 01b). Created Focus Mode (#175), Bell Review extension, Merge Gate safety rail (#180). **Next: Resolve #179 (renumbering), then Phase 3 (#162).**
 
 ---
 
