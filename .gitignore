@@ -78,3 +78,6 @@ proofs/lake-manifest.json
 # Phase 4c interactive visualization build artifacts
 src/viz/interactive/build/
 src/viz/interactive/dist/
+
+# Workspace clones (agent-specific working directories)
+workspace/gemini/
