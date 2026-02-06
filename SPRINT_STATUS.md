@@ -8,9 +8,9 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 1 (Stern-Gerlach) — completing final phases
-- **Lifecycle Stage:** Sprint 1 → **Theory Refinement (#80)** → Sprint 2
-- **Next Critical-Path Action:** Begin Theory Refinement #80
+- **Active Sprint:** Sprint 1 (Stern-Gerlach) — **COMPLETE**
+- **Lifecycle Stage:** Sprint 1 complete → Sprint 2 (Angle-Dependent Measurement)
+- **Next Critical-Path Action:** Sprint 1 Retrospective, then Sprint 2 Phase 2 (Implementation, #36)
 
 ## Active Diversions
 
@@ -31,7 +31,7 @@
   - [x] 4b: Proof Review (#132, closed) — Review posted, decision gate PASS
   - [x] 4c: Interactive Proof Visualization (#133) — PR #141 merged. JSON loader, custom fonts, 4-level descriptions. Layout generalization deferred (#143).
 - [x] Phase 5: Publication (#64) — CLOSED 2026-02-05. Paper updated with figures, DESIGN_RATIONALE updated with insights.
-- [ ] Theory Refinement (#80) — Not started
+- [x] Theory Refinement (#80) — CLOSED 2026-02-06. PR #147 merged. Theoretical analysis, emergent phenomena, open questions, and Sprint 2 extensions documented.
 
 ## Sprint 1 Retrospective
 
@@ -50,6 +50,7 @@
 - Sprint 2 will resume at Phase 2 (Implementation, #36) after Theory Refinement #80 is complete.
 - **James's note (2026-02-04):** Experiment 01 Phase 4 (#55) and Phase 5 (#64) need to be re-done against the current process. Both issues reopened with updated acceptance criteria. Phase 4a proofs exist but 4b (review) and 4c (viz) were never done. Phase 5 paper section exists but needs audit against current standards.
 - **Session update (2026-02-05):** Phase 4c complete. PR #141 merged with data-driven JSON loader, custom fonts (Exo 2), 4-level descriptions, and dynamic node sizing. Created housekeeping issues #142 (automate graph from Lean) and #143 (generalize layout). Phase 4 (#55) closed with full review documentation. Phase 5 (#64) audited and closed — PR #146 added proper figures and DESIGN_RATIONALE Section 5. **Sprint 1 Phases 1-5 complete. Next: Theory Refinement #80.**
+- **Session update (2026-02-06):** Theory Refinement (#80) complete. PR #147 merged after 2 review cycles. Added DESIGN_RATIONALE Section 6 (theoretical findings, emergent phenomena, open questions, Sprint 2 extensions). Created security audit housekeeping issue #148. **Sprint 1 fully complete. Next: Sprint 1 Retrospective, then Sprint 2 Phase 2.**
 
 ---
 
