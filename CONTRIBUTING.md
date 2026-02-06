@@ -854,3 +854,13 @@ This project follows a defined directory structure to keep our work organized.
 *   `/prompts`: Contains detailed prompt files for instructing AI agents. This directory is in `.gitignore`.
 *   `/docs`: Contains general project documentation, schemas, and agent definitions.
     *   `multi_agent_git_coordination.md`: Mandatory git workflow protocols for Claude and Gemini.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for:
+- How to report vulnerabilities
+- Secrets management best practices
+- Pre-commit hook for detecting secrets (gitleaks)
+- Security audit log
+
+**Key rule:** Never commit API keys, tokens, passwords, or credentials to git. Use environment variables or `.env` files (which are in `.gitignore`).

@@ -3,6 +3,12 @@
 # These hooks run automatically before each commit to ensure code quality and consistency.
 
 repos:
+# Secret detection - runs first to catch leaks before any other processing
+-   repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+    -   id: gitleaks
+
 -   repo: https://github.com/psf/black
     rev: 24.4.2  # Updated stable version
     hooks:
