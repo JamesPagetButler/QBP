@@ -7,7 +7,7 @@ This document outlines the process for contributing to the Quaternion-Based Phys
 1.  **Start with an Issue:** All work must begin with a documented Issue. This creates a public record of the task and allows for initial discussion.
 2.  **Branch for Work:** All work is to be done on a descriptively named branch (e.g., `feature/exp01-sg-theory`). Do not commit directly to `master`.
 3.  **Submit a Pull Request:** All changes must be proposed via a Pull Request (PR), which must reference the originating Issue in its description.
-4.  **Require Multi-Stage Review & Sign-Off:** All Pull Requests are subject to a formal, multi-stage review process. First, our 'Red Team' AI (Claude) provides a peer review. Second, Gemini (as Furey & Feynman) provides its review. Only after both AI reviews are complete and their feedback is addressed can the final sign-off from the principal human collaborator (James) be given.
+4.  **Require Tiered Review & Sign-Off:** All Pull Requests are subject to a tiered review process based on scope. Tier 1 (docs/typos) requires single AI review. Tier 2 (code/tests) requires dual AI review (Red Team + Blue Team). Tier 3 (theory/proofs) requires full panel review. See [Tiered Review System](#tiered-review-system) for details. Final sign-off from James is always required.
 5.  **Link Tests to Reality:** Every automated test must be a "synthetic experiment" that simulates a real, physically verifiable experiment. This connection must be explicitly documented.
 
 ---
@@ -79,6 +79,38 @@ This is the "Herschel Check." It exists because all three collaborators have dem
 When a PR merges that satisfies an issue's acceptance criteria, the issue must be closed in the same work session. Do not move on to new work leaving issues open that should be closed. Open issues with merged PRs create false signals about project status and erode trust in the tracking system.
 
 **Responsibility:** The collaborator who merges the PR (or requests the merge) must verify that the issue's acceptance criteria are met, then close the issue immediately. If acceptance criteria are only partially met, document the remaining gaps on the issue rather than leaving it silently open.
+
+---
+
+## Branch Lifecycle
+
+All work must be done on branches. Never commit directly to `master`.
+
+### Branch Rules
+
+1. **All issues must be worked on a branch** — No exceptions.
+2. **Related issues can share a branch** — Group logically connected work (e.g., multiple fixes for same feature).
+3. **Mandatory new branch for major lifecycle stages:**
+   - New sprint phase (Phase 1, 2, 3, 4, 5)
+   - New sprint (Sprint 1, Sprint 2, etc.)
+   - Theory Refinement stage
+
+### Branch Naming Convention
+
+| Work Type | Branch Pattern | Example |
+|-----------|----------------|---------|
+| Sprint phase | `sprint-N/phase-M-name` | `sprint-2/phase-2-implementation` |
+| Theory Refinement | `sprint-N/theory-refinement` | `sprint-1/theory-refinement` |
+| Housekeeping | `housekeeping/description` | `housekeeping/security-audit` |
+| Feature (grouped issues) | `feature/description` | `feature/proof-viz-improvements` |
+| Docs | `docs/description` | `docs/update-contributing` |
+| Bugfix | `fix/description` | `fix/expectation-value-bounds` |
+
+### Branch Lifetime
+
+- **Target:** Merge branches within 1-3 work sessions
+- **Rebase frequently:** Keep branches up-to-date with master to minimize merge conflicts
+- **Smaller PRs:** Prefer multiple small, focused PRs over one large PR
 
 ---
 
@@ -406,7 +438,26 @@ Phase 2 is blocked by Phase 1. Phase 3 is blocked by Phase 2. And so on.
 
 ## Review Process Details
 
-Our review process is designed to be rigorous and auditable.
+Our review process is designed to be rigorous and auditable, with review depth matched to PR scope.
+
+### Tiered Review System
+
+Not all PRs need the same level of scrutiny. Use the appropriate tier based on PR scope:
+
+| Tier | PR Type | Review Process | Labels |
+|------|---------|----------------|--------|
+| **Tier 1** | Docs, typos, formatting, comments | Single AI review (Red OR Blue) | `tier-1-review` |
+| **Tier 2** | Code, tests, config, housekeeping | Dual AI review (Red AND Blue, can be parallel) | `tier-2-review` |
+| **Tier 3** | Theory, proofs, architecture, new phases | Full panel review (sequential, deep analysis) | `tier-3-review` |
+
+**Tier Selection Guidelines:**
+- **Tier 1:** Changes that don't affect behavior — README updates, comment fixes, formatting
+- **Tier 2:** Changes that affect behavior but not core theory — bug fixes, new tests, tooling
+- **Tier 3:** Changes that affect physics formalism, axioms, or formal proofs — theory refinement, new experiments
+
+**Parallel Reviews (Tier 2):** For Tier 2 PRs, Red Team and Blue Team reviews can run in parallel to reduce latency. Both reviews are still required before merge.
+
+**Default:** If unsure, default to Tier 2. James can upgrade or downgrade tier as needed.
 
 ### Reviewing Agents
 
@@ -864,3 +915,56 @@ See [SECURITY.md](SECURITY.md) for:
 - Security audit log
 
 **Key rule:** Never commit API keys, tokens, passwords, or credentials to git. Use environment variables or `.env` files (which are in `.gitignore`).
+
+---
+
+## Collaboration Modes
+
+### Brainstorm Mode
+
+A collaborative ideation session where Claude and Gemini engage in creative dialogue, pushing ideas back and forth while keeping the human in the loop.
+
+**Invocation:** Say "brainstorm mode" or "let's brainstorm about X"
+
+**Characteristics:**
+
+| Aspect | Description |
+|--------|-------------|
+| **Tone** | Creative, exploratory, "yes-and" mentality |
+| **Structure** | Conversational volleys between Claude ↔ Gemini |
+| **Question dynamics** | Push questions to each other, build on responses |
+| **Human role** | Can interject anytime; always offered free-form input |
+
+**Session Flow:**
+
+1. Claude poses opening question/framing
+2. Gemini responds with ideas + counter-questions
+3. Claude builds on Gemini's ideas + new angles
+4. Repeat 2-3 volleys
+5. Synthesize into concrete proposals
+6. Present to human with numbered options + free-form input
+
+**Output Format:**
+
+After a brainstorm session, present results like this:
+
+```
+## Brainstorm Results
+
+We explored X and Y. Here's what emerged:
+
+1. **Option A** — [description]
+2. **Option B** — [description]
+3. **Option C** — [description]
+
+Which direction resonates? Or tell us something different:
+
+> [Your thoughts here]
+```
+
+**Rules:**
+
+1. **Always include free-form option** — User is never boxed into AI-generated choices only
+2. **Keep volleys short** — 2-4 exchanges, then synthesize
+3. **Cite who said what** — "Gemini suggested X, Claude pushed back with Y"
+4. **End with action** — Brainstorms must conclude with concrete next steps
