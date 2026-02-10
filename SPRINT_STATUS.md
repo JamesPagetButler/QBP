@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 2 (Experiment 01b: Angle-Dependent Measurement)
-- **Lifecycle Stage:** Sprint 2 Phase 3 (Visualization)
-- **Next Critical-Path Action:** Visualize angle-dependent results (#162)
+- **Lifecycle Stage:** Sprint 2 Phase 4 (Formal Verification)
+- **Next Critical-Path Action:** Formal proof in Lean 4 (#200)
 
 > **Note:** Sprint 2 implements Experiment 01b (an extension of Stern-Gerlach to arbitrary angles), not a new experiment. See `research/README.md` for the Sprint ↔ Experiment mapping.
 
@@ -18,7 +18,7 @@
 
 - [x] Phase 1: Ground Truth Rework (#160) — CLOSED 2026-02-06. PR #166 merged. Full Tier 3 review.
 - [x] Phase 2: Implementation (#161) — CLOSED 2026-02-06. PR #178 merged. Red Team APPROVE. (Gemini/Bell reviews skipped due to MCP disconnect)
-- [ ] Phase 3: Visualization (#162)
+- [x] Phase 3: Visualization (#162) — CLOSED 2026-02-10. PR #205 merged. Bloch sphere + analysis plots. Design system updated for VPython captions.
 - [ ] Phase 4: Formal Verification (#163)
   - [ ] 4a: Formal Proof
   - [ ] 4b: Proof Review
