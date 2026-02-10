@@ -1219,6 +1219,30 @@ Welcome back!
 
 ---
 
+### Sprint Mode
+
+An autonomous multi-phase workflow for executing complete experimental sprints (Phases 1-5 + Theory Refinement) with pre-approved permissions.
+
+**Invocation:** "Engage Sprint Mode for Experiment N: [Name]"
+
+**Purpose:** Enable the AI team to manage an entire experimental sprint while James acts as a final reviewer on completed phases.
+
+**Key Features:**
+- Pre-approved permission categories at session start
+- Branch-per-phase structure for incremental progress
+- Internal reviews (Red Team + Gemini) for each phase
+- Human checkpoints for async review
+- Clear escalation conditions
+
+**When to Use:**
+- Starting a new experimental sprint
+- James will be away for extended periods
+- Experiment scope is well-defined
+
+**Full documentation:** [Sprint Mode Workflow](docs/workflows/sprint_mode_workflow.md)
+
+---
+
 ### Focus Mode
 
 An autonomous single-issue development mode for targeted work on one specific issue with pre-approved permissions.
@@ -1229,7 +1253,7 @@ An autonomous single-issue development mode for targeted work on one specific is
 
 **Purpose:** Enable concentrated, autonomous work on a single issue when you need dedicated attention outside of sprint phases or batch housekeeping.
 
-> **Note:** Focus Mode complements [Housekeeping Mode](#housekeeping-mode) (batch cleanup) and Sprint Mode (multi-phase experimental sprints, see #156). Choose Focus Mode when you need dedicated attention on a single issue outside the sprint lifecycle.
+> **Note:** Focus Mode complements [Housekeeping Mode](#housekeeping-mode) (batch cleanup) and [Sprint Mode](#sprint-mode) (multi-phase experimental sprints). Choose Focus Mode when you need dedicated attention on a single issue outside the sprint lifecycle.
 
 **When to Use:**
 - Urgent fixes that can't wait for sprint flow
