@@ -106,4 +106,4 @@ Where `NN` is the two-digit experiment number (01, 02, etc.).
 ## Examples
 
 - `research/01_expected_results.md` (Stern-Gerlach)
-- `research/02_angle_dependent_expected_results.md` (Angle-Dependent Measurement)
+- `research/01b_angle_dependent_expected_results.md` (Angle-Dependent Measurement)

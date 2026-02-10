@@ -20,6 +20,7 @@ These research files serve as the bridge between real physics and our quaternion
 Files follow the pattern: `{NN}_{experiment_name}_expected_results.md`
 
 - `{NN}`: Two-digit experiment number matching the `/experiments` directory
+- Sub-experiments use letter suffix (e.g., `01b` for Angle-Dependent, an extension of 01)
 - `{experiment_name}`: Snake_case description of the experiment
 - `_expected_results.md`: Standard suffix indicating ground truth documentation
 
@@ -27,7 +28,8 @@ Files follow the pattern: `{NN}_{experiment_name}_expected_results.md`
 
 | # | Experiment | Research File | Status |
 |---|------------|---------------|--------|
-| 01 | Stern-Gerlach | [01_stern_gerlach_expected_results.md](01_stern_gerlach_expected_results.md) | Implemented |
+| 01 | Stern-Gerlach | [01_stern_gerlach_expected_results.md](01_stern_gerlach_expected_results.md) | Complete |
+| 01b | Angle-Dependent Measurement | [01b_angle_dependent_expected_results.md](01b_angle_dependent_expected_results.md) | In Progress (Sprint 2) |
 | 02 | Double-Slit | [02_double_slit_expected_results.md](02_double_slit_expected_results.md) | Planned |
 | 03 | Lamb Shift | [03_lamb_shift_expected_results.md](03_lamb_shift_expected_results.md) | Planned |
 | 04 | Anomalous g-2 | [04_g-2_expected_results.md](04_g-2_expected_results.md) | Planned |
@@ -36,6 +38,14 @@ Files follow the pattern: `{NN}_{experiment_name}_expected_results.md`
 | 07 | Positronium Ground State | [07_positronium_ground_state_expected_results.md](07_positronium_ground_state_expected_results.md) | Planned |
 | 08 | Hydrogen Spectrum | [08_hydrogen_spectrum_expected_results.md](08_hydrogen_spectrum_expected_results.md) | Planned |
 | 09 | Gravity Tests | [09_gravity_tests_expected_results.md](09_gravity_tests_expected_results.md) | Planned |
+
+### Sprint ↔ Experiment Mapping
+
+| Sprint | Experiment | Description |
+|--------|------------|-------------|
+| Sprint 1 | 01 | Stern-Gerlach (basic: θ=90°) |
+| Sprint 2 | 01b | Angle-Dependent Measurement (general: arbitrary θ) |
+| Sprint 3+ | 02-09 | Per roadmap |
 
 ## Usage
 

@@ -39,7 +39,7 @@ def vecDot (q₁ q₂ : Q) : ℝ :=
 /-- Expectation value: ⟨O⟩ = vecDot(ψ, O)
     For pure quaternion state ψ and observable O, this equals the dot product
     of their vector parts, giving cos(θ) where θ is the angle between them.
-    Note: The factor of 2 was removed based on findings from Experiment 02
+    Note: The factor of 2 was removed based on findings from Experiment 01b
     (PR #116) which showed it produced invalid probabilities for non-orthogonal cases. -/
 def expectationValue (ψ O : Q) : ℝ :=
   let ψ_vec := vecPart ψ

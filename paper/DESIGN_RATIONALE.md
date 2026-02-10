@@ -52,7 +52,7 @@ This is philosophically important: the randomness observed in quantum measuremen
 
 ### 5.2 The Factor-of-2 Correction
 
-During the development of Experiment 02 (Angle-Dependent Measurement), we discovered that the original expectation value formula `⟨O⟩ = 2 × vecDot(ψ, O)` produced invalid probabilities (> 1) for non-orthogonal configurations. The corrected formula `⟨O⟩ = vecDot(ψ, O)` was validated in Experiment 02 and subsequently confirmed to be consistent with Experiment 01 results (where the factor of 2 had no effect because `2 × 0 = 0`).
+During the development of Experiment 01b (Angle-Dependent Measurement), we discovered that the original expectation value formula `⟨O⟩ = 2 × vecDot(ψ, O)` produced invalid probabilities (> 1) for non-orthogonal configurations. The corrected formula `⟨O⟩ = vecDot(ψ, O)` was validated in Experiment 01b and subsequently confirmed to be consistent with Experiment 01 results (where the factor of 2 had no effect because `2 × 0 = 0`).
 
 This correction is documented in both `proofs/QBP/Basic.lean` and `src/qphysics.py`.
 

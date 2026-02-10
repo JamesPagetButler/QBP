@@ -240,11 +240,13 @@ research/
 
 ---
 
-## Example: Experiment 02 (Angle-Dependent Measurement)
+## Example: Experiment 01b (Angle-Dependent Measurement)
+
+*Note: This experiment was originally labeled "Experiment 02" during early development. It was reclassified as Experiment 01b in issue #179 since it extends Stern-Gerlach to arbitrary angles.*
 
 ### Step 1: Parallel Exploration ✓
-- Claude produced: `workspace/claude/02_angle_test_ground_truth.md`
-- Gemini produced: `workspace/gemini/02_angle_test_ground_truth.md`
+- Claude produced: `workspace/claude/02_angle_test_ground_truth.md` (historical filename)
+- Gemini produced: `workspace/gemini/02_angle_test_ground_truth.md` (historical filename)
 
 ### Step 2: Bell's Evaluation ✓
 - Bell produced: `workspace/evaluation/bell_preliminary_analysis.md`
@@ -255,7 +257,7 @@ research/
 
 ### Step 4: Claude Synthesis (NEXT)
 - Claude will integrate both documents
-- Output: `research/02_angle_test_expected_results.md`
+- Output: `research/01b_angle_dependent_expected_results.md`
 
 ### Step 5: Standard Review Process
 - PR created

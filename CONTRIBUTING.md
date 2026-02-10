@@ -82,6 +82,43 @@ When a PR merges that satisfies an issue's acceptance criteria, the issue must b
 
 ---
 
+## Experiment Numbering
+
+Each experiment has a unique two-digit number (01, 02, 03...). Sub-experiments that extend a base experiment use a letter suffix (01b, 01c, etc.).
+
+### Current Experiment Registry
+
+| Number | Experiment | Sprint | Status |
+|--------|------------|--------|--------|
+| 01 | Stern-Gerlach | Sprint 1 | Complete |
+| 01b | Angle-Dependent Measurement | Sprint 2 | In Progress |
+| 02 | Double-Slit | — | Planned |
+| 03 | Lamb Shift | — | Planned |
+| 04 | Anomalous g-2 | — | Planned |
+| 05 | Bell's Theorem | — | Planned |
+| 06 | Particle Statistics | — | Planned |
+| 07 | Positronium Ground State | — | Planned |
+| 08 | Hydrogen Spectrum | — | Planned |
+| 09 | Gravity Tests | — | Planned |
+
+See `research/README.md` for the authoritative experiment list and Sprint mapping.
+
+### Adding a New Experiment
+
+When adding a new experiment:
+
+1. **Check for collisions:** Run `python scripts/validate_experiment_numbers.py` to verify the number is unique.
+2. **Reserve the number:** Add an entry to `research/README.md` before creating files.
+3. **Use consistent naming:** All files and directories must use the same number:
+   - `research/NN_name_expected_results.md`
+   - `experiments/NN_name/`
+   - `results/NN_name/`
+4. **Sub-experiments:** If extending an existing experiment, use a letter suffix (e.g., 01b for angle-dependent measurement, which extends Stern-Gerlach).
+
+CI will fail if duplicate experiment numbers are detected.
+
+---
+
 ## Branch Lifecycle
 
 All work must be done on branches. Never commit directly to `master`.
@@ -1307,7 +1344,7 @@ User: Focus on issue #161
 
 Claude: I'll enter Focus Mode for #161.
 
-**Issue:** #161 — Experiment 02: Angle-Dependent Measurement - Phase 2: Implementation
+**Issue:** #161 — Experiment 01b: Angle-Dependent Measurement - Phase 2: Implementation
 **Acceptance Criteria:**
 - [ ] All new and existing tests pass in CI
 - [ ] Simulation generates timestamped CSV output
@@ -1346,14 +1383,14 @@ Focus Mode ends when:
 ```
 ## Focus Mode Complete
 
-**Issue:** #161 — Experiment 02: Phase 2 Implementation
+**Issue:** #161 — Experiment 01b: Phase 2 Implementation
 **Duration:** ~2 hours
 
 ### Work Completed
 - Extended qphysics.py with rotate_observable()
 - Created simulate.py for angle-dependent measurements
 - Added physics validation tests for 6 angles
-- Generated CSV results in results/02_angle_dependent/
+- Generated CSV results in results/01b_angle_dependent/
 
 ### PR Created
 - **#177** — Implement angle-dependent measurement simulation

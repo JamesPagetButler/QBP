@@ -1,6 +1,6 @@
-# experiments/02_angle_dependent/simulate.py
+# experiments/01b_angle_dependent/simulate.py
 """
-Angle-Dependent Measurement Simulation
+Angle-Dependent Measurement Simulation (Experiment 01b)
 
 This experiment validates the QBP prediction that the probability of measuring
 spin-up along an axis at angle theta from the particle's spin direction follows:
@@ -16,7 +16,7 @@ Physical setup:
 - Record outcome (+1 or -1)
 - Repeat N times and verify statistics match QM prediction
 
-Ground truth: research/02_angle_dependent_expected_results.md
+Ground truth: research/01b_angle_dependent_expected_results.md
 """
 
 import numpy as np
@@ -74,7 +74,7 @@ def run_simulation(num_particles: int = NUM_PARTICLES, seed: int = 42) -> pd.Dat
     """
     print("=" * 70)
     print("ANGLE-DEPENDENT MEASUREMENT SIMULATION")
-    print("Experiment 02 - Sprint 2 Phase 2")
+    print("Experiment 01b - Sprint 2 Phase 2")
     print("=" * 70)
     print(f"Particles per angle: {num_particles:,}")
     print(f"Test angles: {TEST_ANGLES}")
@@ -141,7 +141,7 @@ def run_simulation(num_particles: int = NUM_PARTICLES, seed: int = 42) -> pd.Dat
     return df
 
 
-def save_results(df: pd.DataFrame, output_dir: str = "results/02_angle_dependent") -> str:
+def save_results(df: pd.DataFrame, output_dir: str = "results/01b_angle_dependent") -> str:
     """
     Save simulation results to timestamped CSV file.
 

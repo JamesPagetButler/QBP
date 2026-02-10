@@ -163,18 +163,18 @@ The `workspace/` directories serve to enhance isolation for concurrent agent act
 ### 5.1 Standardizing Ground Truth Documentation (Phase 1)
 
 *   **Action**: For every new experiment, `research/NN_experiment_expected_results.md` MUST be created before any code is written. This document will contain the full mathematical derivation and quantitative predictions.
-*   **Retroactive Action (for Experiment 02)**: Create `research/02_angle_test_expected_results.md` documenting the derivation of `P(+) = (1 + cos(theta))/2` and the specific predictions for the angles tested. This will be a new Phase 1 task.
+*   **Retroactive Action (for Experiment 01b)**: Create `research/01b_angle_dependent_expected_results.md` documenting the derivation of `P(+) = (1 + cos(theta))/2` and the specific predictions for the angles tested. This will be a new Phase 1 task.
 
 ### 5.2 Establishing Structured Analysis (Phase 3)
 
-*   **Action**: A new `analysis/` top-level directory will be created to house automated analysis scripts and generated analysis reports. Each experiment will have its own subdirectory (e.g., `analysis/02_angle_test/`).
+*   **Action**: A new `analysis/` top-level directory will be created to house automated analysis scripts and generated analysis reports. Each experiment will have its own subdirectory (e.g., `analysis/01b_angle_dependent/`).
 *   **Action**: Gemini will be tasked with creating analysis scripts that:
     *   Load raw data from `/results`.
     *   Load ground truth from `/research`.
     *   Perform statistical comparisons.
     *   Generate visualizations.
     *   Generate a markdown analysis report.
-*   **Retroactive Action (for Experiments 01 & 02)**: Create dedicated Phase 3 tasks to generate comprehensive analysis reports and visualizations for `Experiment 01 (Stern-Gerlach)` and `Experiment 02 (Angle-Dependent Measurement)`, comparing their respective `/results` data to the `research/` ground truths.
+*   **Retroactive Action (for Experiments 01 & 01b)**: Create dedicated Phase 3 tasks to generate comprehensive analysis reports and visualizations for `Experiment 01 (Stern-Gerlach)` and `Experiment 01b (Angle-Dependent Measurement)`, comparing their respective `/results` data to the `research/` ground truths.
 
 ---
 
