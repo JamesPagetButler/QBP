@@ -30,16 +30,44 @@ Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engin
 
 This ensures our theory evolves based on our experimental results.
 
-### Sprint Retrospective Gate
+### Sprint Retrospective
 
-Before beginning Sprint N+1, a brief retrospective must be documented in `SPRINT_STATUS.md` answering:
+After Theory Refinement completes, a formal Sprint Retrospective issue must be created and completed before beginning the next sprint. The retrospective is **tracked as a GitHub issue** (not just prose in SPRINT_STATUS.md).
 
-1.  Did we follow the critical path this sprint?
-2.  If not, where did we deviate?
-3.  What was the *cost* of that deviation?
-4.  What is our simple, agreed-upon commitment for the next sprint?
+**Each sprint's issue set includes:**
 
-This is not a compliance gate — it is a learning gate. The goal is to connect the pain of deviation to the action that was skipped, building institutional memory that makes the process feel valuable rather than bureaucratic.
+| Phase | Purpose |
+|-------|---------|
+| Phase 1: Ground Truth | Establish predictions |
+| Phase 2: Implementation | Build and validate |
+| Phase 3: Visualization | Visualize results |
+| Phase 4: Formal Verification | Prove correctness |
+| Phase 5: Publication | Document findings |
+| Theory Refinement | Extend theory |
+| **Sprint Retrospective** | **Capture learnings** |
+
+**The retrospective issue must answer:**
+
+1. Did we follow the critical path this sprint?
+2. If not, where did we deviate?
+3. What was the *cost* of that deviation?
+4. What is our simple, agreed-upon commitment for the next sprint?
+
+**Additionally, the retrospective captures:**
+
+5. **Procedural learnings** — What operational details did we learn? (e.g., validation frequencies, edge case handling)
+6. **Documentation updates** — Which docs need updating based on learnings?
+7. **Process refinements** — What should change in CONTRIBUTING.md or workflows?
+
+This is not a compliance gate — it is a learning gate. The goal is to connect the pain of deviation to the action that was skipped, and to backport operational learnings into documentation, building institutional memory.
+
+**Retrospective workflow:**
+1. Create retrospective issue after Theory Refinement PR merges
+2. Answer all questions with concrete examples
+3. Update relevant documentation with learnings
+4. Update SPRINT_STATUS.md with summary
+5. Close retrospective issue
+6. Begin next sprint
 
 ---
 
