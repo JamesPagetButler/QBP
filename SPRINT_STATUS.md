@@ -26,11 +26,12 @@
 - [ ] Phase 5: Publication (#164)
 - [ ] Theory Refinement (#165)
 
-## Research Sprint 1R (After Sprint 2)
+## Research Sprint 0R (After Sprint 1)
 
 **Tracking Issue:** #212
 
 Research sprints are dedicated blocks for theoretical investigation between experiment sprints.
+**Naming:** Research Sprint NR runs after Sprint N+1 (0R after Sprint 1, 1R after Sprint 2, etc.)
 
 - [ ] #167 — Research: Identify where QBP predictions diverge from standard QM
 - [ ] #136 — Theory: Clarify quaternion observable relationship to operator formalism
