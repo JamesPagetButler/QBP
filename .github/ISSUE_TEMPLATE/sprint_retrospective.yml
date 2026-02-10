@@ -1,0 +1,129 @@
+name: Sprint Retrospective
+description: Formal retrospective after completing a sprint's Theory Refinement phase
+title: "Sprint [N] Retrospective: [Experiment Name]"
+labels: ["retrospective", "process"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Sprint Retrospective
+
+        Complete this retrospective after Theory Refinement merges, before beginning the next sprint.
+        This is a learning gate, not a compliance gate.
+
+  - type: input
+    id: sprint_number
+    attributes:
+      label: Sprint Number
+      description: Which sprint is this retrospective for?
+      placeholder: "1"
+    validations:
+      required: true
+
+  - type: input
+    id: experiment
+    attributes:
+      label: Experiment
+      description: Which experiment(s) were completed this sprint?
+      placeholder: "01 Stern-Gerlach, 01b Angle-Dependent"
+    validations:
+      required: true
+
+  - type: textarea
+    id: critical_path
+    attributes:
+      label: "1. Did we follow the critical path this sprint?"
+      description: Were phases completed in order? Did we stay focused?
+      placeholder: |
+        Yes/No
+
+        Details...
+    validations:
+      required: true
+
+  - type: textarea
+    id: deviations
+    attributes:
+      label: "2. Where did we deviate?"
+      description: List any diversions, out-of-order work, or scope changes
+      placeholder: |
+        - Diversion 1: [description]
+        - Diversion 2: [description]
+    validations:
+      required: true
+
+  - type: textarea
+    id: cost
+    attributes:
+      label: "3. What was the cost of deviation?"
+      description: Time lost, rework required, context switching overhead
+      placeholder: |
+        - Time: ~X sessions on diversions
+        - Rework: [any rework needed]
+        - Positive tradeoffs: [if any]
+    validations:
+      required: true
+
+  - type: textarea
+    id: commitment
+    attributes:
+      label: "4. What is our commitment for next sprint?"
+      description: Simple, concrete commitment to improve next sprint
+      placeholder: |
+        1. [Commitment 1]
+        2. [Commitment 2]
+    validations:
+      required: true
+
+  - type: textarea
+    id: procedural_learnings
+    attributes:
+      label: "5. Procedural learnings"
+      description: What operational details did we learn? (validation frequencies, edge case handling, etc.)
+      placeholder: |
+        - Learned that X should be done every Y
+        - Edge case Z is handled by doing W
+        - Validation script needs to run before commits
+    validations:
+      required: true
+
+  - type: textarea
+    id: doc_updates
+    attributes:
+      label: "6. Documentation updates needed"
+      description: Which docs need updating based on learnings?
+      placeholder: |
+        - [ ] Update CONTRIBUTING.md with [specific section]
+        - [ ] Update docs/technical/X.md with [learnings]
+        - [ ] Add runbook for [process]
+    validations:
+      required: true
+
+  - type: textarea
+    id: process_refinements
+    attributes:
+      label: "7. Process refinements"
+      description: What should change in our workflows or guidelines?
+      placeholder: |
+        - Change review tier for X from Tier 2 to Tier 3
+        - Add CI check for Y
+        - Modify Herschel check to include Z
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: All must be checked before closing this issue
+      options:
+        - label: All 7 questions answered with concrete examples
+          required: true
+        - label: Documentation updates from section 6 completed (or issues created)
+          required: true
+        - label: Process refinements from section 7 applied (or issues created)
+          required: true
+        - label: SPRINT_STATUS.md updated with retrospective summary
+          required: true
+        - label: Ready to begin next sprint
+          required: true
