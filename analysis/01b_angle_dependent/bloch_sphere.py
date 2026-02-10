@@ -12,6 +12,15 @@ Features:
 - Real-time probability display as angle changes
 - Comparison with theoretical prediction
 
+Note on XZ Plane Restriction:
+    This visualization shows states in the XZ plane only (Y=0). This is not
+    a limitation of quaternion algebra — quaternions can represent any spin
+    direction on the full Bloch sphere. The XZ restriction is a deliberate
+    choice for this angle-sweep experiment, where we vary θ from 0° to 180°
+    in a single plane. A general quaternion state would be:
+        ψ = sin(θ)cos(φ)·i + sin(θ)sin(φ)·j + cos(θ)·k
+    Here we fix φ=0, giving ψ(θ) = sin(θ)·i + cos(θ)·k.
+
 Run: python analysis/01b_angle_dependent/bloch_sphere.py
 """
 
@@ -370,6 +379,11 @@ class BlochSphereDemo:
         # In our coordinate system: x = sin(θ), z = cos(θ)
         x = np.sin(theta_rad)
         z = np.cos(theta_rad)
+
+        # Verify quaternion normalization: ||ψ|| = 1
+        # For pure quaternion ψ = x·i + 0·j + z·k, norm = √(x² + z²)
+        norm = np.sqrt(x**2 + z**2)
+        assert np.isclose(norm, 1.0), f"State not normalized: ||ψ|| = {norm}"
 
         # Update state arrow
         self.state_arrow.axis = vector(x, 0, z)

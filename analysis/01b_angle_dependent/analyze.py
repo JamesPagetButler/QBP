@@ -95,6 +95,7 @@ def plot_probability_curve(df: pd.DataFrame, output_path: str):
 
     # Measured data points with error bars
     # Convert count σ to probability σ by dividing by N
+    trials_label = f"{n_particles // 1_000_000}M" if n_particles >= 1_000_000 else f"{n_particles:,}"
     ax.errorbar(df["angle_deg"], df["measured_prob"],
                 yerr=df["sigma"] / n_particles,
                 fmt='o',
@@ -103,7 +104,7 @@ def plot_probability_curve(df: pd.DataFrame, output_path: str):
                 capsize=4,
                 capthick=1.5,
                 elinewidth=1.5,
-                label="Measured (1M trials per angle)",
+                label=f"Measured ({trials_label} trials per angle)",
                 zorder=2)
 
     # Formatting
