@@ -10,7 +10,7 @@
 
 - **Active Sprint:** Sprint 2 (Experiment 01b: Angle-Dependent Measurement)
 - **Lifecycle Stage:** Sprint 2 Phase 4 (Formal Verification)
-- **Next Critical-Path Action:** Merge PR #210 (Phase 4a proof), then Phase 4b review
+- **Next Critical-Path Action:** Phase 4b Proof Review (#201)
 
 > **Note:** Sprint 2 implements Experiment 01b (an extension of Stern-Gerlach to arbitrary angles), not a new experiment. See `research/README.md` for the Sprint ↔ Experiment mapping.
 
@@ -20,7 +20,7 @@
 - [x] Phase 2: Implementation (#161) — CLOSED 2026-02-06. PR #178 merged. Red Team APPROVE. (Gemini/Bell reviews skipped due to MCP disconnect)
 - [x] Phase 3: Visualization (#162) — CLOSED 2026-02-10. PR #205 merged. Bloch sphere + analysis plots. Design system updated for VPython captions.
 - [ ] Phase 4: Formal Verification (#163)
-  - [x] 4a: Formal Proof (#200) — PR #210 ready. Lean 4 proofs for cos²(θ/2) formula.
+  - [x] 4a: Formal Proof (#200) — CLOSED 2026-02-10. PR #210 merged. Lean 4 proofs for cos²(θ/2) formula.
   - [ ] 4b: Proof Review
   - [ ] 4c: Interactive Proof Visualization
 - [ ] Phase 5: Publication (#164)
