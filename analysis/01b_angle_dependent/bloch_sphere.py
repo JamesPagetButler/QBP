@@ -266,9 +266,15 @@ class BlochSphereDemo:
         return curve(points, color=COLORS.AMBER.vpython, radius=0.012)
 
     def setup_controls(self):
-        """Create interactive controls."""
+        """Create interactive controls.
+
+        Note: All caption HTML uses inline styles with dark background (#1A1A2E)
+        to ensure text is readable. This follows our design system where light
+        text (IVORY, BRASS, GOLD) should always appear on dark backgrounds.
+        """
+        # Start dark container for all controls
         self.scene.append_to_caption(
-            "\n<hr style='border-color: #D4A574; margin: 10px 0;'>\n"
+            "\n<div style='background: #1A1A2E; padding: 15px; margin-top: 10px; border-radius: 5px;'>\n"
         )
         self.scene.append_to_caption(
             "<h3 style='color: #D4A574; font-family: Georgia; margin: 0 0 10px 0;'>🎮 ANGLE CONTROL</h3>\n"
@@ -303,7 +309,7 @@ class BlochSphereDemo:
     def setup_info_panel(self):
         """Create the probability and formula display."""
         self.scene.append_to_caption(
-            "\n<hr style='border-color: #D4A574; margin: 15px 0;'>\n"
+            "\n<hr style='border-color: #D4A574; margin: 15px 0 10px 0;'>\n"
         )
 
         # Probability display
@@ -341,8 +347,14 @@ class BlochSphereDemo:
         )
         self.scene.append_to_caption("</div>\n")
 
+        # Close the dark container div (opened in setup_controls)
+        self.scene.append_to_caption("</div>\n")
+
     def format_probability(self, theta_deg):
-        """Format the probability display for a given angle."""
+        """Format the probability display for a given angle.
+
+        Uses dark background with light text per design system.
+        """
         theta_rad = np.radians(theta_deg)
         cos_theta = np.cos(theta_rad)
         p_up = (1 + cos_theta) / 2
@@ -352,14 +364,16 @@ class BlochSphereDemo:
         cos_half = np.cos(theta_rad / 2)
         cos_sq_half = cos_half ** 2
 
+        # Use design system colors: light text on dark implied by parent container
+        # IVORY (#FFFEF0) for main text, STEEL (#71797E) for secondary
         return f"""
 <table style="font-family: Georgia; color: #FFFEF0; font-size: 14px;">
 <tr><td style="color: #2A9D8F; padding-right: 20px;"><b>P(+1) = </b></td>
     <td><b>{p_up:.4f}</b></td>
-    <td style="color: #888; padding-left: 15px;">= cos²({theta_deg}°/2) = cos²({theta_deg/2:.1f}°) = {cos_sq_half:.4f}</td></tr>
+    <td style="color: #71797E; padding-left: 15px;">= cos²({theta_deg}°/2) = cos²({theta_deg/2:.1f}°) = {cos_sq_half:.4f}</td></tr>
 <tr><td style="color: #9B2335; padding-right: 20px;"><b>P(−1) = </b></td>
     <td><b>{p_down:.4f}</b></td>
-    <td style="color: #888; padding-left: 15px;">= sin²({theta_deg}°/2) = {1-cos_sq_half:.4f}</td></tr>
+    <td style="color: #71797E; padding-left: 15px;">= sin²({theta_deg}°/2) = {1-cos_sq_half:.4f}</td></tr>
 <tr><td colspan="3" style="padding-top: 8px; color: #F4A261;">
     cos(θ) = cos({theta_deg}°) = {cos_theta:.4f}</td></tr>
 </table>
