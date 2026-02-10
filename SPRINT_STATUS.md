@@ -10,7 +10,7 @@
 
 - **Active Sprint:** Sprint 2 (Experiment 01b: Angle-Dependent Measurement)
 - **Lifecycle Stage:** Sprint 2 Phase 4 (Formal Verification)
-- **Next Critical-Path Action:** Formal proof in Lean 4 (#200)
+- **Next Critical-Path Action:** Merge PR #210 (Phase 4a proof), then Phase 4b review
 
 > **Note:** Sprint 2 implements Experiment 01b (an extension of Stern-Gerlach to arbitrary angles), not a new experiment. See `research/README.md` for the Sprint ↔ Experiment mapping.
 
@@ -20,11 +20,25 @@
 - [x] Phase 2: Implementation (#161) — CLOSED 2026-02-06. PR #178 merged. Red Team APPROVE. (Gemini/Bell reviews skipped due to MCP disconnect)
 - [x] Phase 3: Visualization (#162) — CLOSED 2026-02-10. PR #205 merged. Bloch sphere + analysis plots. Design system updated for VPython captions.
 - [ ] Phase 4: Formal Verification (#163)
-  - [ ] 4a: Formal Proof
+  - [x] 4a: Formal Proof (#200) — PR #210 ready. Lean 4 proofs for cos²(θ/2) formula.
   - [ ] 4b: Proof Review
   - [ ] 4c: Interactive Proof Visualization
 - [ ] Phase 5: Publication (#164)
 - [ ] Theory Refinement (#165)
+
+## Research Sprint 1R (After Sprint 2)
+
+**Tracking Issue:** #212
+
+Research sprints are dedicated blocks for theoretical investigation between experiment sprints.
+
+- [ ] #167 — Research: Identify where QBP predictions diverge from standard QM
+- [ ] #136 — Theory: Clarify quaternion observable relationship to operator formalism
+- [ ] #211 — Research: Generalize measurement to arbitrary 3D axes
+- [ ] #20 — Theoretical Investigation: Physical meaning of quaternion scalar component
+- [ ] #6 — Initial Project Premise & Setup Review
+- [ ] #123 — Research: Investigate Lean 4 as verified experiment engine
+- [ ] #203 — Research: 3D Interactive Experiment Visualizations
 
 ## Active Diversions
 
