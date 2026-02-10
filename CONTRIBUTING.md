@@ -312,6 +312,9 @@ During Phase 4a, proofs may require Lean 4 capabilities that do not exist in Mat
 
 > **CI enforcement:** The `libs-dependency-check` job in CI automatically scans any `.lean` files under `/libs/` for prohibited imports (`import QBP` or `import proofs`). PRs that introduce such dependencies will fail the check.
 
+**Cumulative Library Strategy:** As experiments progress, shared theorems should accumulate in `proofs/QBP/Basic.lean` and domain-specific libraries. See [Lean Library Strategy](docs/lean_library_strategy.md) for the full approach to organizing reusable proof components.
+
+
 ##### Phase 4b: Proof Review
 
 **Owner:** Claude
