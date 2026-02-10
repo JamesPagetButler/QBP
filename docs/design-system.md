@@ -228,20 +228,35 @@ print(f"Contrast: {result['ratio']}:1, AA: {result['AA']}")
 
 ### HTML/CSS (VPython Captions)
 
+**IMPORTANT:** VPython's caption area has a **light gray background** that cannot be overridden with CSS. Always use `TEXT.LIGHT` colors (dark text) for VPython captions, not `TEXT.DARK` colors.
+
 ```python
-# CORRECT: Use TEXT hierarchy colors
+# CORRECT: Use TEXT.LIGHT for VPython captions (light background)
 self.scene.append_to_caption(f"""
-<div style='background: {COLORS.VERDANT_NIGHT.hex}; padding: 15px;'>
-    <h3 style='color: {TEXT.DARK.ACCENT.hex};'>Title</h3>
-    <p style='color: {TEXT.DARK.PRIMARY.hex};'>Main text here</p>
-    <span style='color: {TEXT.DARK.SECONDARY.hex};'>Supporting info</span>
+<div style='padding: 15px;'>
+    <h3 style='color: {COLORS.COPPER.hex};'>Title</h3>
+    <p style='color: {TEXT.LIGHT.PRIMARY.hex};'>Main text here</p>
+    <span style='color: {TEXT.LIGHT.SECONDARY.hex};'>Supporting info</span>
 </div>
 """)
 
-# WRONG: Don't use arbitrary colors
-# color: #E8E4E0  <- Not in system
-# color: #888     <- Not in system
+# WRONG: Don't use TEXT.DARK colors - they're invisible on light background!
+# color: {TEXT.DARK.PRIMARY.hex}  <- #F5F5F5 white - INVISIBLE
+# color: {COLORS.IVORY.hex}       <- #FFFEF0 cream - INVISIBLE
 ```
+
+**VPython Caption Color Quick Reference:**
+
+| Element | Color | Hex |
+|---------|-------|-----|
+| Headers | Copper | `#B87333` |
+| Body text | Shadow (TEXT.LIGHT.PRIMARY) | `#2C2C2C` |
+| Secondary | Charcoal (TEXT.LIGHT.SECONDARY) | `#3D3D3D` |
+| Positive values | Sage | `#3D8B6E` |
+| Negative values | Terracotta | `#C4785A` |
+| Accents | Verdigris, Copper | `#3D7A73`, `#B87333` |
+
+**Note:** The 3D canvas background (controlled by `scene.background`) CAN be dark. Only the caption HTML area is fixed to light gray.
 
 ### View Palette and Contrast Report
 
