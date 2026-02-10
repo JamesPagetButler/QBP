@@ -72,11 +72,22 @@ theorem prob_up_angle_cos_sq (θ : ℝ) :
   rw [Real.cos_sq]
   ring_nf
 
-/-- P(-) = (1 - cos θ)/2 = sin²(θ/2) -/
+/-- P(-) = (1 - cos θ)/2 -/
 theorem prob_down_angle (θ : ℝ) :
     probDown (psiAngle θ) spinZObservable = (1 - Real.cos θ) / 2 := by
   unfold probDown
   rw [expectation_angle]
+
+/-- **Alternative form:** P(-) = sin²(θ/2)
+    Uses the half-angle identity: sin²(θ/2) = (1 - cos θ)/2 -/
+theorem prob_down_angle_sin_sq (θ : ℝ) :
+    probDown (psiAngle θ) spinZObservable = Real.sin (θ / 2) ^ 2 := by
+  rw [prob_down_angle]
+  have h : Real.sin (θ / 2) ^ 2 = (1 - Real.cos θ) / 2 := by
+    have h1 : Real.cos θ = Real.cos (2 * (θ / 2)) := by ring_nf
+    rw [h1, Real.cos_two_mul, Real.sin_sq]
+    ring
+  rw [h]
 
 -- ### EDGE CASES: Verify Known Results ###
 
