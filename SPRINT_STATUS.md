@@ -24,9 +24,10 @@
   - [ ] 4b: Proof Review
   - [ ] 4c: Interactive Proof Visualization
 - [ ] Phase 5: Publication (#164)
+- [ ] **Research Sprint 0R** (#212) — One-off: doing research before Theory Refinement
 - [ ] Theory Refinement (#165)
 
-## Research Sprint 0R (After Sprint 1)
+## Research Sprint 0R (Before Theory Refinement — One-Off)
 
 **Tracking Issue:** #212
 
