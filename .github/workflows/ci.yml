@@ -104,6 +104,40 @@ jobs:
       - name: Validate experiment numbers
         run: python scripts/validate_experiment_numbers.py
 
+  libs-dependency-check:
+    name: Library Independence Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check libs/ for QBP dependencies
+        run: |
+          # Skip if libs/ directory doesn't exist
+          if [ ! -d "libs" ]; then
+            echo "No libs/ directory found - check passes (nothing to validate)"
+            exit 0
+          fi
+
+          # Check for prohibited imports in .lean files under libs/
+          # Libraries must not depend on QBP-specific definitions
+          echo "Checking libs/ for prohibited QBP imports..."
+
+          VIOLATIONS=$(grep -r -l -E "^import (QBP|proofs)" libs/ --include="*.lean" 2>/dev/null || true)
+
+          if [ -n "$VIOLATIONS" ]; then
+            echo "ERROR: Found QBP-specific imports in libs/"
+            echo "Libraries in /libs/ must remain general-purpose and must not import from proofs/QBP/"
+            echo ""
+            echo "Files with violations:"
+            echo "$VIOLATIONS"
+            echo ""
+            echo "Details:"
+            grep -r -n -E "^import (QBP|proofs)" libs/ --include="*.lean"
+            exit 1
+          fi
+
+          echo "All clear - no QBP-specific imports found in libs/"
+
   code-quality:
     name: Code Quality Scan
     runs-on: ubuntu-latest
