@@ -1241,6 +1241,28 @@ An autonomous multi-phase workflow for executing complete experimental sprints (
 
 **Full documentation:** [Sprint Mode Workflow](docs/workflows/sprint_mode_workflow.md)
 
+### Full Project Mode
+
+An advanced autonomous workflow for end-to-end execution of the entire experimental roadmap (Experiments 1-N) with AI-authorized internal merges.
+
+**Invocation:** "Engage Full Project Mode for Experiments 1-9"
+
+**Purpose:** Enable the AI team to autonomously execute multiple complete experimental sprints, presenting a comprehensive body of work in a single Pull Request for final human review.
+
+**Key Features:**
+- Single integration branch with Draft PR as master logbook
+- Per-experiment sprint branches merged into integration
+- AI-authorized internal merges (sprint → integration, not to master)
+- Best-effort continuation after failures (document and proceed)
+- Comprehensive Process Report at completion
+
+**When to Use:**
+- Well-defined experimental roadmap
+- James wants substantial progress with minimal intervention
+- AI team has demonstrated reliability in prior sprints
+
+**Full documentation:** [Full Project Mode Workflow](docs/workflows/full_project_mode_workflow.md)
+
 ---
 
 ### Focus Mode
