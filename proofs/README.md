@@ -2,6 +2,17 @@
 
 This directory contains Lean 4 formal proofs for Quaternion-Based Physics experiments.
 
+## Toolchain Requirements
+
+| Component | Version | Notes |
+|-----------|---------|-------|
+| Lean 4 | v4.28.0-rc1 | Specified in `lean-toolchain` |
+| Lake | 5.0.0 | Ships with Lean |
+| Mathlib4 | Compatible with Lean 4.28 | Locked in `lake-manifest.json` |
+| elan | Latest | Required to manage Lean versions |
+
+**Important:** Always use `elan` to manage Lean installations. The `lean-toolchain` file ensures the correct version is used automatically. Running `lake` directly with a system-installed Lean (e.g., v4.15.0) will cause build errors.
+
 ## Quick Start
 
 ```bash
