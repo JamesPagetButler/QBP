@@ -220,7 +220,7 @@ The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorous
 
 2. **No decoherence modeling:** Environmental decoherence, which would affect a real quantum system, is not included in the current simulation.
 
-3. **Fixed measurement axis:** This experiment only validates orthogonal state/measurement configurations. Experiment 02 (Angle-Dependent Measurement) will test arbitrary angles.
+3. **Fixed measurement axis:** This experiment only validates orthogonal state/measurement configurations. Experiment 01b (Angle-Dependent Measurement) will test arbitrary angles.
 
 #### Emergent Phenomena
 

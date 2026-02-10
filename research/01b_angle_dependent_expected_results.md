@@ -1,6 +1,6 @@
 # Expected Results for Angle-Dependent Measurement (Ground Truth)
 
-*Experiment 02 Ground Truth — Sprint 2*
+*Experiment 01b Ground Truth — Sprint 2*
 
 *Originally produced through the Collaborative Theory Workflow (PR #116). Revised for Sprint 2 Phase 1 to incorporate lessons from Sprint 1 (Stern-Gerlach).*
 
@@ -407,7 +407,7 @@ All must pass the 3σ acceptance criterion (see §7.3).
 
 ### Implications
 
-Experiment 02 extends Experiment 01's validation to arbitrary angles. Together, they establish that QBP correctly handles all single-particle spin-1/2 measurements. This is *mathematically necessary* because quaternions (ℍ) are isomorphic to the Pauli algebra underlying SU(2).
+Experiment 01b extends Experiment 01's validation to arbitrary angles. Together, they establish that QBP correctly handles all single-particle spin-1/2 measurements. This is *mathematically necessary* because quaternions (ℍ) are isomorphic to the Pauli algebra underlying SU(2).
 
 For QBP to make novel predictions, we must look beyond single-particle systems — possibly to entanglement (Experiment 05: Bell's Theorem), multi-particle statistics, or regimes where octonion structure becomes relevant. See #167 for ongoing research.
 
@@ -420,7 +420,7 @@ The following criteria must be met for Phase 2 (Implementation) to pass:
 - [ ] **AC:** Rotation function implemented in `src/qphysics.py`
 - [ ] **AC:** All 9 test angles pass within 3σ of predicted P(+)
 - [ ] **AC:** Deterministic cases (θ=0°, θ=180°) pass exactly
-- [ ] **AC:** Results saved to CSV in `results/02_angle_dependent/`
+- [ ] **AC:** Results saved to CSV in `results/01b_angle_dependent/`
 - [ ] **AC:** Physics validation tests pass in CI
 
 ---

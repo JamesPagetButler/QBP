@@ -90,6 +90,20 @@ jobs:
         run: |
           PYTHONPATH=src pytest tests/physics/ -v --tb=long
 
+  experiment-validation:
+    name: Experiment Number Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate experiment numbers
+        run: python scripts/validate_experiment_numbers.py
+
   code-quality:
     name: Code Quality Scan
     runs-on: ubuntu-latest

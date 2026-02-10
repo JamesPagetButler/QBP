@@ -66,14 +66,15 @@ This document outlines a phased approach to integrate the "QBP Scientific Workfl
     *   **Gemini's Task**: Develop analysis script in `analysis/01_stern_gerlach/` and generate a markdown analysis report comparing existing results to the existing ground truth.
     *   **Claude's Task**: Review the analysis report and visualizations.
 
-### 3.2 Experiment 02: Angle-Dependent Measurement
+### 3.2 Experiment 01b: Angle-Dependent Measurement
 
-*   **Status**: Ground truth is embedded in code. Raw results (`results/02_angle_test/`) exist.
-*   **Action 1**: Create a new GitHub Issue: `Experiment 02: Angle-Dependent Measurement - Phase 1: Ground Truth (Retrofit)`.
-    *   **Gemini's Task**: Create `research/02_angle_test_expected_results.md` by formally deriving `P(+) = (1 + cos(theta))/2` and listing quantitative predictions.
+*   **Status**: Ground truth (`research/01b_angle_dependent_expected_results.md`) exists. Raw results (`results/01b_angle_dependent/`) exist.
+*   **Note**: Originally planned as "Experiment 02", this was reclassified as Experiment 01b since it extends the Stern-Gerlach experiment to arbitrary angles (see #179). The original `02_angle_test/` prototype remains for historical reference.
+*   **Action 1**: Create a new GitHub Issue: `Experiment 01b: Angle-Dependent Measurement - Phase 1: Ground Truth (Retrofit)`.
+    *   **Gemini's Task**: Create `research/01b_angle_dependent_expected_results.md` by formally deriving `P(+) = (1 + cos(theta))/2` and listing quantitative predictions.
     *   **Claude's Task**: Review the new ground truth document.
-*   **Action 2**: Once Phase 1 (Retrofit) is approved, create a new GitHub Issue: `Experiment 02: Angle-Dependent Measurement - Phase 3: Visualization & Analysis (Retrofit)`.
-    *   **Gemini's Task**: Develop analysis script in `analysis/02_angle_test/` and generate a markdown analysis report comparing existing results to the newly documented ground truth.
+*   **Action 2**: Once Phase 1 (Retrofit) is approved, create a new GitHub Issue: `Experiment 01b: Angle-Dependent Measurement - Phase 3: Visualization & Analysis (Retrofit)`.
+    *   **Gemini's Task**: Develop analysis script in `analysis/01b_angle_dependent/` and generate a markdown analysis report comparing existing results to the newly documented ground truth.
     *   **Claude's Task**: Review the analysis report and visualizations.
 
 ---
@@ -93,6 +94,6 @@ This document outlines a phased approach to integrate the "QBP Scientific Workfl
 ## 5. Next Steps & Timeline (High-Level)
 
 1.  **Immediate**: Create the new `/analysis` top-level directory (DONE).
-2.  **Week 1**: Implement Retroactive Application for Experiment 02 Phase 1 (Ground Truth).
-3.  **Week 2**: Implement Retroactive Application for Experiment 01 and Experiment 02 Phase 3 (Analysis).
+2.  **Week 1**: Implement Retroactive Application for Experiment 01b Phase 1 (Ground Truth).
+3.  **Week 2**: Implement Retroactive Application for Experiment 01 and Experiment 01b Phase 3 (Analysis).
 4.  **Ongoing**: Apply new workflow to all future experiments, starting from Phase 1.

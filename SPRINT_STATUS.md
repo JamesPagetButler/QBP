@@ -8,10 +8,11 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 2 (Angle-Dependent Measurement)
+- **Active Sprint:** Sprint 2 (Experiment 01b: Angle-Dependent Measurement)
 - **Lifecycle Stage:** Sprint 2 Phase 3 (Visualization)
 - **Next Critical-Path Action:** Visualize angle-dependent results (#162)
-- **Blocking Issue:** #179 (experiment numbering) should be resolved first — directories need renaming from `02_` to `01b_`
+
+> **Note:** Sprint 2 implements Experiment 01b (an extension of Stern-Gerlach to arbitrary angles), not a new experiment. See `research/README.md` for the Sprint ↔ Experiment mapping.
 
 ## Sprint 2 Closure Checklist
 

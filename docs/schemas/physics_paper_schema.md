@@ -69,7 +69,7 @@ Our paper will follow the "hourglass" structure, starting broad, narrowing to sp
 
 ### **4. Results**
 *   **Purpose**: To present the findings of each experiment, objectively and without interpretation.
-*   **Structure**: This section should be divided into subsections, one for each experiment (e.g., "4.1 Experiment 01: Stern-Gerlach", "4.2 Experiment 02: Angle-Dependent Measurement").
+*   **Structure**: This section should be divided into subsections, one for each experiment (e.g., "4.1 Experiment 01: Stern-Gerlach", "4.2 Experiment 01b: Angle-Dependent Measurement").
 *   **Content for each subsection**:
     1.  **Objective**: State the specific hypothesis tested in the experiment.
     2.  **Ground Truth Summary**: Briefly summarize the expected outcome as defined in the corresponding `research/` document.
