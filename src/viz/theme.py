@@ -2,13 +2,11 @@
 QBP Design System: Academic Steampunk → Solarpunk Aesthetic
 
 A visual language bridging Victorian mechanical precision with organic,
-nature-inspired optimism. The palette tells the story of moving from
-"broken theories" (industrial complexity) toward "working theories"
-(elegant natural truth).
+nature-inspired optimism. Designed for physics visualization with
+WCAG-compliant accessibility.
 
 AESTHETIC: Brass orreries in a greenhouse. Precision instruments
-illuminated by sunlight filtering through leaves. The machinery of
-discovery growing into understanding.
+illuminated by sunlight filtering through leaves.
 
 ACADEMIC APPROACH: Colors named after natural materials and historical
 pigments (Sage, Patina, Clay, Ochre, Sienna). Muted tones that enhance
@@ -19,7 +17,6 @@ ACCESSIBILITY: All text colors meet WCAG 2.1 AA minimum (4.5:1 for normal text,
 3:1 for large text). Use TEXT hierarchy for proper contrast.
 
 References:
-- Solarpunk aesthetic: https://aesthetics.fandom.com/wiki/Solarpunk
 - WCAG contrast: https://webaim.org/articles/contrast/
 
 Usage:
@@ -211,10 +208,10 @@ class COLORS:
     # =========================================================================
     # TEXT COLORS: Dark Mode (on VERDANT_NIGHT/DARK_SLATE)
     # =========================================================================
-    CLOUD = Color("Cloud", "#F5F5F5")       # Primary text (15.7:1)
-    SILVER = Color("Silver", "#B8B8B8")     # Secondary text (8.6:1)
-    ASH = Color("Ash", "#9A9A9A")           # Tertiary text (6.1:1)
-    # IVORY for warm accent text (16.8:1)
+    CLOUD = Color("Cloud", "#F5F5F5")       # Primary text (14.4:1)
+    SILVER = Color("Silver", "#B8B8B8")     # Secondary text (7.9:1)
+    ASH = Color("Ash", "#9A9A9A")           # Tertiary text (5.6:1)
+    # IVORY for warm accent text (15.4:1)
 
     # =========================================================================
     # TEXT COLORS: Light Mode (on PARCHMENT)
@@ -227,13 +224,13 @@ class COLORS:
     # ACADEMIC LIGHT VARIANTS — Accessible on dark backgrounds
     # Used for axis colors and accent elements
     # =========================================================================
-    SAGE_LIGHT = Color("Sage Light", "#5BA88A")         # Y-axis on dark (5.9:1)
+    SAGE_LIGHT = Color("Sage Light", "#5BA88A")         # Y-axis on dark (5.5:1)
 
-    # Legacy aliases for backward compatibility (map to academic colors)
-    CORAL_BRIGHT = Color("Clay", "#D9956E")             # → CLAY (same color)
-    JADE_BRIGHT = Color("Sage Light", "#5BA88A")        # → SAGE_LIGHT (same color)
-    TEAL_BRIGHT = Color("Patina", "#5A9E94")            # → PATINA (same color)
-    CRIMSON_BRIGHT = Color("Crimson Bright", "#E84057") # Legacy vivid red (4.3:1)
+    # Legacy aliases for backward compatibility (reference existing colors)
+    CORAL_BRIGHT = CLAY                                  # Legacy alias → CLAY
+    JADE_BRIGHT = SAGE_LIGHT                             # Legacy alias → SAGE_LIGHT
+    TEAL_BRIGHT = PATINA                                 # Legacy alias → PATINA
+    CRIMSON_BRIGHT = Color("Crimson Bright", "#E84057")  # Legacy vivid red (4.0:1)
     VERDIGRIS_BRIGHT = Color("Verdigris Bright", "#5FA393")  # Bright patina (5.4:1)
 
     # =========================================================================
@@ -262,11 +259,11 @@ class TEXT:
 
     class DARK:
         """Text colors for dark backgrounds (VERDANT_NIGHT, DARK_SLATE)."""
-        PRIMARY = COLORS.CLOUD      # Main body text (15.7:1) - clear, neutral
-        SECONDARY = COLORS.SILVER   # Supporting text (8.6:1) - still prominent
-        TERTIARY = COLORS.ASH       # Captions, hints (6.1:1) - subtle but readable
-        ACCENT = COLORS.IVORY       # Warm emphasis (16.8:1) - titles, highlights
-        MUTED = COLORS.STEEL        # Large text only (3.9:1) - use sparingly
+        PRIMARY = COLORS.CLOUD      # Main body text (14.4:1) - clear, neutral
+        SECONDARY = COLORS.SILVER   # Supporting text (7.9:1) - still prominent
+        TERTIARY = COLORS.ASH       # Captions, hints (5.6:1) - subtle but readable
+        ACCENT = COLORS.IVORY       # Warm emphasis (15.4:1) - titles, highlights
+        MUTED = COLORS.STEEL        # Large text only (3.5:1) - use sparingly
 
     class LIGHT:
         """Text colors for light backgrounds (PARCHMENT)."""
