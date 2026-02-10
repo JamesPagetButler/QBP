@@ -473,6 +473,141 @@ Some dependencies are definitions being unfolded, others are theorems being appl
 
 ---
 
+## Unfolded Dependency Tracking (Clarification)
+
+**Concern:** How do we ensure all relevant unfoldings are captured? What about hidden assumptions?
+
+### How Unfolded Dependencies Are Tracked
+
+When Lean elaborates a proof, definitions are expanded (unfolded) to check type correctness. The `getUsedConstants` API captures constants that appear in the *elaborated* term, which includes unfolded definitions.
+
+**Example:** Consider this proof:
+
+```lean
+-- Definitions
+def spinXState : Q := SPIN_X
+def SPIN_X : Q := ⟨0, 1, 0, 0⟩
+
+-- Theorem
+theorem spinXState_is_pure : isPureQuaternion spinXState := spin_x_is_pure
+```
+
+**What happens during elaboration:**
+1. `spinXState` unfolds to `SPIN_X`
+2. The proof term references `spin_x_is_pure`
+3. `getUsedConstants` returns: `[isPureQuaternion, spinXState, spin_x_is_pure]`
+
+**What gets classified as "unfolded":**
+- `spinXState` — it's a `.defnInfo` (definition), so classified as `unfolded`
+- `spin_x_is_pure` — it's a `.thmInfo` (theorem), so classified as `explicit`
+
+### Validation Strategy
+
+1. **Cross-reference with source syntax:** If a constant appears in the elaborated term but NOT in the source syntax, it was introduced during unfolding.
+
+2. **Track unfolding depth:** For deeply nested unfoldings (A → B → C → D), we capture the immediate unfolding (A → B) but note that transitive unfoldings exist.
+
+3. **Manual review for critical proofs:** For Phase 4 Tier 3 reviews, the reviewer should verify that the extracted dependencies match their understanding of the proof.
+
+### What Could Be Missed
+
+| Case | Risk | Mitigation |
+|------|------|------------|
+| Instance resolution | Typeclass instances may be inserted invisibly | Filter to QBP namespace; Mathlib instances are intentionally excluded |
+| Coercions | Type coercions are elaborated away | Low risk for QBP (minimal coercion use) |
+| Nested unfoldings | A → B → C shows A → B, not A → C | Transitive closure computed at visualization layer if needed |
+
+### Example of Complete Tracking
+
+For `expectation_orthogonal_is_zero`:
+
+```lean
+theorem expectation_orthogonal_is_zero (ψ O : Q)
+    (_hψ : isPureQuaternion ψ) (_hO : isPureQuaternion O)
+    (h_ortho : vecDot ψ O = 0) : expectationValue ψ O = 0 := by
+  simp [expectationValue, vecPart]
+  exact h_ortho
+```
+
+**Extracted dependencies:**
+
+| Dependency | Kind | Source | Why |
+|------------|------|--------|-----|
+| `expectationValue` | `unfolded` | `simp_arg` | Definition unfolded by simp |
+| `vecPart` | `unfolded` | `simp_arg` | Definition unfolded by simp |
+| `h_ortho` | `explicit` | `exact` | Explicitly applied hypothesis |
+| `vecDot` | `type_dep` | `hypothesis` | Appears in h_ortho's type |
+| `isPureQuaternion` | `type_dep` | `hypothesis` | Appears in _hψ, _hO types |
+
+This captures the semantic structure: the *key logical step* is applying `h_ortho`; the rest is computational setup.
+
+---
+
+## Semantic Override Governance
+
+**Concern:** Who maintains `semantic_overrides.json`? What's the review process?
+
+### Responsibility
+
+| Role | Responsibility |
+|------|----------------|
+| **PR Author** | Add overrides for new theorems with opaque proofs (`rfl`, bare `simp`) |
+| **Red Team (Knuth)** | Review override accuracy during PR review |
+| **James** | Final approval for semantic meaning descriptions |
+
+### Override File Structure
+
+```json
+{
+  "_metadata": {
+    "schema_version": "1.0",
+    "last_updated": "2026-02-10",
+    "maintainer": "QBP Team"
+  },
+  "overrides": {
+    "spin_x_is_pure": {
+      "semantic_deps": ["isPureQuaternion", "SPIN_X"],
+      "dep_kinds": {
+        "isPureQuaternion": "unfolded",
+        "SPIN_X": "unfolded"
+      },
+      "note": "rfl proof - definitional equality after unfolding",
+      "added_by": "PR #XXX",
+      "reviewed_by": "Knuth"
+    }
+  }
+}
+```
+
+### Testing Criteria
+
+1. **Schema validation:** CI validates override file matches JSON schema
+2. **Completeness check:** Every theorem with `extraction_method: "proof_term"` that uses `rfl` or bare `simp` should have an override (warning if missing)
+3. **Orphan detection:** Overrides for theorems that no longer exist are flagged
+4. **Consistency:** Override `semantic_deps` must reference valid QBP constants
+
+### Review Process
+
+1. **New overrides:** Required for any PR adding `rfl` or opaque `simp` proofs
+2. **Review checklist:**
+   - [ ] Dependencies listed are actually used (not just mentioned)
+   - [ ] Dependency kinds are correct (unfolded vs explicit)
+   - [ ] Note explains *why* manual override is needed
+3. **Quarterly audit:** Review override ratio (target: <20% of theorems)
+
+### CI Integration
+
+```yaml
+- name: Validate semantic overrides
+  run: |
+    python scripts/validate_overrides.py \
+      --schema proofs/QBP/Meta/override_schema.json \
+      --overrides proofs/QBP/Meta/semantic_overrides.json \
+      --lean-env proofs/QBP/
+```
+
+---
+
 ## References (Updated)
 
 - [Lean 4 Metaprogramming Book](https://leanprover-community.github.io/lean4-metaprogramming-book/)
