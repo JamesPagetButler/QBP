@@ -15,6 +15,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 from datetime import datetime
+from typing import Tuple
 
 # Add project root to path for imports
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,8 +24,12 @@ sys.path.insert(0, project_root)
 from src.viz.theme import apply_matplotlib_theme, COLORS, PALETTE
 
 
-def load_latest_results(results_dir: str) -> pd.DataFrame:
-    """Load the most recent simulation CSV file."""
+def load_latest_results(results_dir: str) -> Tuple[pd.DataFrame, str]:
+    """Load the most recent simulation CSV file.
+
+    Returns:
+        Tuple of (DataFrame with results, path to source file)
+    """
     pattern = os.path.join(results_dir, "simulation_results_*.csv")
     files = glob.glob(pattern)
     if not files:
@@ -34,31 +39,30 @@ def load_latest_results(results_dir: str) -> pd.DataFrame:
     return pd.read_csv(latest), latest
 
 
-def calculate_chi_squared(df: pd.DataFrame, n_particles: int = 1_000_000) -> tuple:
+def calculate_chi_squared(df: pd.DataFrame) -> Tuple[float, float, int]:
     """
     Calculate χ² goodness-of-fit statistic.
 
-    Excludes deterministic cases (θ=0°, θ=180°) where σ=0.
+    Deterministic cases (θ=0°, θ=180°) are excluded because:
+    - At these angles, σ=0 (no variance in binomial distribution when p=0 or p=1)
+    - The χ² test assumes normally distributed errors, which requires σ>0
+    - These cases are verified separately as exact matches
+
+    The theoretical curve P(+) = cos²(θ/2) has NO free parameters, so we
+    do not subtract any fitted parameters from the degrees of freedom.
 
     Returns:
-        (chi2_statistic, p_value, degrees_of_freedom)
+        Tuple of (chi2_statistic, p_value, degrees_of_freedom)
     """
-    # Filter out deterministic cases (σ = 0)
+    # Filter out deterministic cases (σ = 0) — see docstring for rationale
     df_stochastic = df[df["sigma"] > 0].copy()
 
-    # Observed counts
-    observed = df_stochastic["measured_prob"] * n_particles
-
-    # Expected counts
-    expected = df_stochastic["expected_prob"] * n_particles
-
-    # Calculate χ² = Σ (O - E)² / E
-    # But since we're dealing with probabilities, use the standard form
-    # χ² = Σ (deviation_sigma)² which is equivalent
+    # χ² = Σ (deviation_sigma)² = Σ [(O - E) / σ]²
+    # This is equivalent to the standard form Σ (O - E)² / variance
     chi2 = np.sum(df_stochastic["deviation_sigma"] ** 2)
 
-    # Degrees of freedom = number of stochastic data points - 0 fitted parameters
-    # (the theoretical curve has no free parameters)
+    # Degrees of freedom = number of stochastic data points
+    # No fitted parameters to subtract (theory has no free parameters)
     dof = len(df_stochastic)
 
     # P-value from chi-squared distribution
@@ -86,9 +90,13 @@ def plot_probability_curve(df: pd.DataFrame, output_path: str):
             label=r"Theory: $P(+) = \cos^2(\theta/2)$",
             zorder=1)
 
+    # Extract trial count from data (σ comes from binomial: σ = √(Np(1-p)))
+    n_particles = df["num_particles"].iloc[0]
+
     # Measured data points with error bars
+    # Convert count σ to probability σ by dividing by N
     ax.errorbar(df["angle_deg"], df["measured_prob"],
-                yerr=df["sigma"] / 1_000_000,  # Convert count σ to probability σ
+                yerr=df["sigma"] / n_particles,
                 fmt='o',
                 color=COLORS.BRASS.hex,
                 markersize=8,
@@ -187,6 +195,7 @@ def generate_results_md(df: pd.DataFrame, source_file: str, chi2: float,
     # Check if all points passed
     all_passed = df["passed"].all()
     max_deviation = df["deviation_sigma"].abs().max()
+    n_particles = int(df["num_particles"].iloc[0])
 
     # Build comparison table
     comparison_rows = []
@@ -197,6 +206,19 @@ def generate_results_md(df: pd.DataFrame, source_file: str, chi2: float,
             f"{'✓' if row['passed'] else '✗'} |"
         )
     comparison_table = "\n".join(comparison_rows)
+
+    # Build per-angle breakdown table dynamically from data
+    breakdown_rows = []
+    for _, row in df.iterrows():
+        n = int(row['num_particles'])
+        count = int(row['num_up'])
+        mu = int(row['expected_prob'] * n)
+        sigma = row['sigma']
+        diff = abs(count - mu)
+        breakdown_rows.append(
+            f"| {row['angle_deg']:.0f}° | {n:,} | {count:,} | {mu:,} | {sigma:.1f} | {diff:,} |"
+        )
+    breakdown_table = "\n".join(breakdown_rows)
 
     verdict = "PASS" if all_passed and p_value > 0.05 else "FAIL"
     verdict_emoji = "✓" if verdict == "PASS" else "✗"
@@ -247,6 +269,10 @@ The χ² test evaluates whether the measured distribution matches the theoretica
 
 **Interpretation:** {"The measured data is statistically consistent with the theoretical prediction. The deviations are explained by expected statistical fluctuations." if p_value > 0.05 else "The measured data shows significant deviation from the theoretical prediction."}
 
+**Important caveat:** A high p-value indicates the data is *consistent* with the model, but does not *prove* the model is correct. Alternative models could also produce similar results. What we can conclude is that the QBP prediction is not falsified by this experiment.
+
+**Note on deterministic cases:** Angles θ=0° and θ=180° are excluded from the χ² calculation because they have σ=0 (deterministic outcomes). The χ² test requires normally distributed errors, which is not valid when variance is zero. These cases are verified separately as exact matches.
+
 ---
 
 ## 4. Visualizations
@@ -263,25 +289,41 @@ The smooth teal curve shows the theoretical prediction P(+) = cos²(θ/2). Brass
 
 Each point shows how far the measured probability deviates from the prediction, measured in standard deviations (σ). The shaded bands indicate ±1σ (teal), ±2σ (amber), and ±3σ (red) regions. All points fall well within the ±3σ acceptance threshold.
 
+### 4.3 Interactive Bloch Sphere
+
+An interactive 3D visualization is available to explore how the state angle θ affects measurement probability:
+
+```bash
+python analysis/01b_angle_dependent/bloch_sphere.py
+```
+
+This opens a browser-based VPython visualization showing:
+- The Bloch sphere with state vector ψ(θ) and measurement axis
+- A slider to sweep θ from 0° to 180°
+- Real-time probability calculation P(+) = cos²(θ/2)
+
 ---
 
 ## 5. Detailed Statistics
 
-### 5.1 Per-Angle Breakdown
+### 5.1 Error Bar Derivation
+
+The error bars (σ) come from **binomial statistics**. For N independent trials with success probability p:
+
+$$\\sigma = \\sqrt{{N \\cdot p \\cdot (1-p)}}$$
+
+For example, at θ=90° with p=0.5 and N={n_particles:,}:
+$$\\sigma = \\sqrt{{{n_particles:,} \\times 0.5 \\times 0.5}} = 500$$
+
+At θ=0° and θ=180°, p=1 or p=0, so σ=0 (deterministic outcomes).
+
+### 5.2 Per-Angle Breakdown
 
 | Angle | N trials | Count(+) | μ (expected) | σ | |Count - μ| |
 |-------|----------|----------|--------------|---|------------|
-| 0° | 1,000,000 | 1,000,000 | 1,000,000 | 0.0 | 0 |
-| 30° | 1,000,000 | {int(df[df['angle_deg']==30]['measured_prob'].values[0] * 1_000_000):,} | 933,013 | 250.0 | {abs(int(df[df['angle_deg']==30]['measured_prob'].values[0] * 1_000_000) - 933013):,} |
-| 45° | 1,000,000 | {int(df[df['angle_deg']==45]['measured_prob'].values[0] * 1_000_000):,} | 853,553 | 353.6 | {abs(int(df[df['angle_deg']==45]['measured_prob'].values[0] * 1_000_000) - 853553):,} |
-| 60° | 1,000,000 | {int(df[df['angle_deg']==60]['measured_prob'].values[0] * 1_000_000):,} | 750,000 | 433.0 | {abs(int(df[df['angle_deg']==60]['measured_prob'].values[0] * 1_000_000) - 750000):,} |
-| 90° | 1,000,000 | {int(df[df['angle_deg']==90]['measured_prob'].values[0] * 1_000_000):,} | 500,000 | 500.0 | {abs(int(df[df['angle_deg']==90]['measured_prob'].values[0] * 1_000_000) - 500000):,} |
-| 120° | 1,000,000 | {int(df[df['angle_deg']==120]['measured_prob'].values[0] * 1_000_000):,} | 250,000 | 433.0 | {abs(int(df[df['angle_deg']==120]['measured_prob'].values[0] * 1_000_000) - 250000):,} |
-| 135° | 1,000,000 | {int(df[df['angle_deg']==135]['measured_prob'].values[0] * 1_000_000):,} | 146,447 | 353.6 | {abs(int(df[df['angle_deg']==135]['measured_prob'].values[0] * 1_000_000) - 146447):,} |
-| 150° | 1,000,000 | {int(df[df['angle_deg']==150]['measured_prob'].values[0] * 1_000_000):,} | 66,987 | 250.0 | {abs(int(df[df['angle_deg']==150]['measured_prob'].values[0] * 1_000_000) - 66987):,} |
-| 180° | 1,000,000 | 0 | 0 | 0.0 | 0 |
+{breakdown_table}
 
-### 5.2 Acceptance Criteria Verification
+### 5.3 Acceptance Criteria Verification
 
 | Criterion | Status |
 |-----------|--------|
@@ -312,6 +354,7 @@ This result confirms that quaternion-based quantum mechanics correctly predicts 
 - **Ground Truth:** `research/01b_angle_dependent_expected_results.md`
 - **Simulation Code:** `experiments/01b_angle_dependent/run_experiment.py`
 - **Raw Data:** `results/01b_angle_dependent/`
+- **Interactive Visualization:** `analysis/01b_angle_dependent/bloch_sphere.py`
 
 ---
 

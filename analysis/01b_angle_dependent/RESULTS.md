@@ -1,6 +1,6 @@
 # Experiment 01b: Angle-Dependent Measurement Results
 
-**Analysis Date:** 2026-02-10 13:12:24
+**Analysis Date:** 2026-02-10 13:40:47
 **Data Source:** `simulation_results_2026-02-06_15-00-02.csv`
 **Verdict:** **PASS** ✓
 
@@ -52,6 +52,10 @@ The χ² test evaluates whether the measured distribution matches the theoretica
 
 **Interpretation:** The measured data is statistically consistent with the theoretical prediction. The deviations are explained by expected statistical fluctuations.
 
+**Important caveat:** A high p-value indicates the data is *consistent* with the model, but does not *prove* the model is correct. Alternative models could also produce similar results. What we can conclude is that the QBP prediction is not falsified by this experiment.
+
+**Note on deterministic cases:** Angles θ=0° and θ=180° are excluded from the χ² calculation because they have σ=0 (deterministic outcomes). The χ² test requires normally distributed errors, which is not valid when variance is zero. These cases are verified separately as exact matches.
+
 ---
 
 ## 4. Visualizations
@@ -68,25 +72,49 @@ The smooth teal curve shows the theoretical prediction P(+) = cos²(θ/2). Brass
 
 Each point shows how far the measured probability deviates from the prediction, measured in standard deviations (σ). The shaded bands indicate ±1σ (teal), ±2σ (amber), and ±3σ (red) regions. All points fall well within the ±3σ acceptance threshold.
 
+### 4.3 Interactive Bloch Sphere
+
+An interactive 3D visualization is available to explore how the state angle θ affects measurement probability:
+
+```bash
+python analysis/01b_angle_dependent/bloch_sphere.py
+```
+
+This opens a browser-based VPython visualization showing:
+- The Bloch sphere with state vector ψ(θ) and measurement axis
+- A slider to sweep θ from 0° to 180°
+- Real-time probability calculation P(+) = cos²(θ/2)
+
 ---
 
 ## 5. Detailed Statistics
 
-### 5.1 Per-Angle Breakdown
+### 5.1 Error Bar Derivation
+
+The error bars (σ) come from **binomial statistics**. For N independent trials with success probability p:
+
+$$\sigma = \sqrt{N \cdot p \cdot (1-p)}$$
+
+For example, at θ=90° with p=0.5 and N=1,000,000:
+$$\sigma = \sqrt{1,000,000 \times 0.5 \times 0.5} = 500$$
+
+At θ=0° and θ=180°, p=1 or p=0, so σ=0 (deterministic outcomes).
+
+### 5.2 Per-Angle Breakdown
 
 | Angle | N trials | Count(+) | μ (expected) | σ | |Count - μ| |
 |-------|----------|----------|--------------|---|------------|
 | 0° | 1,000,000 | 1,000,000 | 1,000,000 | 0.0 | 0 |
-| 30° | 1,000,000 | 933,012 | 933,013 | 250.0 | 1 |
+| 30° | 1,000,000 | 933,012 | 933,012 | 250.0 | 0 |
 | 45° | 1,000,000 | 853,625 | 853,553 | 353.6 | 72 |
 | 60° | 1,000,000 | 749,732 | 750,000 | 433.0 | 268 |
 | 90° | 1,000,000 | 499,125 | 500,000 | 500.0 | 875 |
 | 120° | 1,000,000 | 249,747 | 250,000 | 433.0 | 253 |
-| 135° | 1,000,000 | 146,148 | 146,447 | 353.6 | 299 |
+| 135° | 1,000,000 | 146,148 | 146,446 | 353.6 | 298 |
 | 150° | 1,000,000 | 67,149 | 66,987 | 250.0 | 162 |
 | 180° | 1,000,000 | 0 | 0 | 0.0 | 0 |
 
-### 5.2 Acceptance Criteria Verification
+### 5.3 Acceptance Criteria Verification
 
 | Criterion | Status |
 |-----------|--------|
@@ -117,6 +145,7 @@ This result confirms that quaternion-based quantum mechanics correctly predicts 
 - **Ground Truth:** `research/01b_angle_dependent_expected_results.md`
 - **Simulation Code:** `experiments/01b_angle_dependent/run_experiment.py`
 - **Raw Data:** `results/01b_angle_dependent/`
+- **Interactive Visualization:** `analysis/01b_angle_dependent/bloch_sphere.py`
 
 ---
 
