@@ -268,20 +268,19 @@ class BlochSphereDemo:
     def setup_controls(self):
         """Create interactive controls.
 
-        Note: All caption HTML uses inline styles with dark background (#1A1A2E)
-        to ensure text is readable. This follows our design system where light
-        text (IVORY, BRASS, GOLD) should always appear on dark backgrounds.
+        Note: VPython caption area has a light background, so we use TEXT.LIGHT
+        colors (dark text on light background) for readability.
         """
-        # Start dark container for all controls
+        # Container with explicit styling for light background
         self.scene.append_to_caption(
-            f"\n<div style='background: {COLORS.DARK_SLATE.hex}; padding: 15px; margin-top: 10px; border-radius: 5px;'>\n"
+            f"\n<div style='padding: 15px; margin-top: 10px;'>\n"
         )
         self.scene.append_to_caption(
-            f"<h3 style='color: {COLORS.BRASS.hex}; font-family: Georgia; margin: 0 0 10px 0;'>🎮 ANGLE CONTROL</h3>\n"
+            f"<h3 style='color: {COLORS.COPPER.hex}; font-family: Georgia; margin: 0 0 10px 0;'>🎮 ANGLE CONTROL</h3>\n"
         )
 
         self.scene.append_to_caption(
-            f"<span style='color: {TEXT.DARK.PRIMARY.hex}; font-size: 14px;'>State angle θ from Z-axis: </span>"
+            f"<span style='color: {TEXT.LIGHT.PRIMARY.hex}; font-size: 14px;'>State angle θ from Z-axis: </span>"
         )
         self.angle_slider = slider(
             min=0,
@@ -291,12 +290,12 @@ class BlochSphereDemo:
             bind=self.update_state,
             length=400,
         )
-        self.angle_text = wtext(text=f" <b style='color: {COLORS.AMBER.hex};'>45°</b>")
+        self.angle_text = wtext(text=f" <b style='color: {COLORS.COPPER.hex};'>45°</b>")
         self.scene.append_to_caption("\n\n")
 
         # Quick angle buttons
         self.scene.append_to_caption(
-            f"<span style='color: {TEXT.DARK.PRIMARY.hex};'>Quick angles: </span>"
+            f"<span style='color: {TEXT.LIGHT.PRIMARY.hex};'>Quick angles: </span>"
         )
         for angle in [0, 30, 45, 60, 90, 120, 180]:
             button(
@@ -307,53 +306,56 @@ class BlochSphereDemo:
         self.scene.append_to_caption("\n")
 
     def setup_info_panel(self):
-        """Create the probability and formula display."""
+        """Create the probability and formula display.
+
+        Uses TEXT.LIGHT colors (dark text) since VPython caption has light background.
+        """
         self.scene.append_to_caption(
-            f"\n<hr style='border-color: {COLORS.BRASS.hex}; margin: 15px 0 10px 0;'>\n"
+            f"\n<hr style='border-color: {COLORS.COPPER.hex}; margin: 15px 0 10px 0;'>\n"
         )
 
         # Probability display
         self.scene.append_to_caption(
-            f"<h3 style='color: {COLORS.GOLD.hex}; font-family: Georgia; margin: 0 0 10px 0;'>📊 MEASUREMENT PROBABILITY</h3>\n"
+            f"<h3 style='color: {COLORS.COPPER.hex}; font-family: Georgia; margin: 0 0 10px 0;'>📊 MEASUREMENT PROBABILITY</h3>\n"
         )
         self.prob_text = wtext(text=self.format_probability(45))
         self.scene.append_to_caption("\n")
 
         # Formula explanation
         self.scene.append_to_caption(
-            f"\n<hr style='border-color: {COLORS.BRASS.hex}; margin: 15px 0;'>\n"
+            f"\n<hr style='border-color: {COLORS.COPPER.hex}; margin: 15px 0;'>\n"
         )
         self.scene.append_to_caption(
-            f"<h3 style='color: {COLORS.BRASS.hex}; font-family: Georgia; margin: 0 0 10px 0;'>📐 THE PHYSICS</h3>\n"
+            f"<h3 style='color: {COLORS.COPPER.hex}; font-family: Georgia; margin: 0 0 10px 0;'>📐 THE PHYSICS</h3>\n"
         )
         self.scene.append_to_caption(f"""
-<div style="font-family: Georgia; color: {TEXT.DARK.PRIMARY.hex}; font-size: 13px; line-height: 1.6;">
-<p><b style="color: {COLORS.BRASS.hex};">State:</b> ψ(θ) = sin(θ)·<b>i</b> + cos(θ)·<b>k</b></p>
-<p><b style="color: {COLORS.PATINA.hex};">Observable:</b> O = <b>k</b> (measurement along Z)</p>
-<p><b style="color: {COLORS.AMBER.hex};">Expectation:</b> ⟨O⟩ = vecDot(ψ, O) = cos(θ)</p>
-<p><b style="color: {COLORS.GOLD.hex};">Probability:</b> P(+) = (1 + cos θ)/2 = cos²(θ/2)</p>
+<div style="font-family: Georgia; color: {TEXT.LIGHT.PRIMARY.hex}; font-size: 13px; line-height: 1.6;">
+<p><b style="color: {COLORS.COPPER.hex};">State:</b> ψ(θ) = sin(θ)·<b>i</b> + cos(θ)·<b>k</b></p>
+<p><b style="color: {COLORS.VERDIGRIS.hex};">Observable:</b> O = <b>k</b> (measurement along Z)</p>
+<p><b style="color: {COLORS.TERRACOTTA.hex};">Expectation:</b> ⟨O⟩ = vecDot(ψ, O) = cos(θ)</p>
+<p><b style="color: {COLORS.SAGE.hex};">Probability:</b> P(+) = (1 + cos θ)/2 = cos²(θ/2)</p>
 </div>
 """)
 
         # Key insight
         self.scene.append_to_caption(
-            f"\n<div style='border-left: 3px solid {COLORS.AMBER.hex}; padding-left: 10px; margin: 10px 0;'>\n"
+            f"\n<div style='border-left: 3px solid {COLORS.COPPER.hex}; padding-left: 10px; margin: 10px 0;'>\n"
         )
         self.scene.append_to_caption(
-            f"<p style='color: {COLORS.AMBER.hex}; font-family: Georgia; font-size: 13px; margin: 0;'>"
-            "<b>Key Insight:</b> The quaternion dot product equals cos(θ) — "
+            f"<p style='color: {TEXT.LIGHT.SECONDARY.hex}; font-family: Georgia; font-size: 13px; margin: 0;'>"
+            f"<b style='color: {COLORS.COPPER.hex};'>Key Insight:</b> The quaternion dot product equals cos(θ) — "
             "the projection of the state onto the measurement axis. "
             "This geometric fact is why quantum probabilities follow cos²(θ/2).</p>\n"
         )
         self.scene.append_to_caption("</div>\n")
 
-        # Close the dark container div (opened in setup_controls)
+        # Close container div (opened in setup_controls)
         self.scene.append_to_caption("</div>\n")
 
     def format_probability(self, theta_deg):
         """Format the probability display for a given angle.
 
-        Uses dark background with light text per design system.
+        Uses light background with dark text since VPython caption is light.
         """
         theta_rad = np.radians(theta_deg)
         cos_theta = np.cos(theta_rad)
@@ -364,21 +366,21 @@ class BlochSphereDemo:
         cos_half = np.cos(theta_rad / 2)
         cos_sq_half = cos_half ** 2
 
-        # Use design system colors: light text on dark implied by parent container
-        patina = COLORS.PATINA.hex
-        terracotta = COLORS.TERRACOTTA.hex
-        steel = COLORS.STEEL.hex
-        amber = COLORS.AMBER.hex
-        ivory = TEXT.DARK.PRIMARY.hex
+        # Use design system colors for LIGHT background
+        sage = COLORS.SAGE.hex          # Green for positive
+        terracotta = COLORS.TERRACOTTA.hex  # Warm for negative
+        secondary = TEXT.LIGHT.SECONDARY.hex  # Gray for details
+        copper = COLORS.COPPER.hex      # Accent
+        primary = TEXT.LIGHT.PRIMARY.hex  # Main text
         return f"""
-<table style="font-family: Georgia; color: {ivory}; font-size: 14px;">
-<tr><td style="color: {patina}; padding-right: 20px;"><b>P(+1) = </b></td>
+<table style="font-family: Georgia; color: {primary}; font-size: 14px;">
+<tr><td style="color: {sage}; padding-right: 20px;"><b>P(+1) = </b></td>
     <td><b>{p_up:.4f}</b></td>
-    <td style="color: {steel}; padding-left: 15px;">= cos²({theta_deg}°/2) = cos²({theta_deg/2:.1f}°) = {cos_sq_half:.4f}</td></tr>
+    <td style="color: {secondary}; padding-left: 15px;">= cos²({theta_deg}°/2) = cos²({theta_deg/2:.1f}°) = {cos_sq_half:.4f}</td></tr>
 <tr><td style="color: {terracotta}; padding-right: 20px;"><b>P(−1) = </b></td>
     <td><b>{p_down:.4f}</b></td>
-    <td style="color: {steel}; padding-left: 15px;">= sin²({theta_deg}°/2) = {1-cos_sq_half:.4f}</td></tr>
-<tr><td colspan="3" style="padding-top: 8px; color: {amber};">
+    <td style="color: {secondary}; padding-left: 15px;">= sin²({theta_deg}°/2) = {1-cos_sq_half:.4f}</td></tr>
+<tr><td colspan="3" style="padding-top: 8px; color: {copper};">
     cos(θ) = cos({theta_deg}°) = {cos_theta:.4f}</td></tr>
 </table>
 """
@@ -432,7 +434,7 @@ class BlochSphereDemo:
             self.projection_line.append(vector(0, 0, z))
 
         # Update text displays
-        self.angle_text.text = f" <b style='color: {COLORS.AMBER.hex};'>{theta_deg:.0f}°</b>"
+        self.angle_text.text = f" <b style='color: {COLORS.COPPER.hex};'>{theta_deg:.0f}°</b>"
         self.prob_text.text = self.format_probability(theta_deg)
 
     def run(self):
