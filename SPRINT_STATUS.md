@@ -35,7 +35,6 @@ Research sprints are dedicated blocks for theoretical investigation between expe
 
 - [ ] #167 — Research: Identify where QBP predictions diverge from standard QM
 - [ ] #136 — Theory: Clarify quaternion observable relationship to operator formalism
-- [ ] #211 — Research: Generalize measurement to arbitrary 3D axes
 - [ ] #20 — Theoretical Investigation: Physical meaning of quaternion scalar component
 - [ ] #6 — Initial Project Premise & Setup Review
 - [ ] #123 — Research: Investigate Lean 4 as verified experiment engine
