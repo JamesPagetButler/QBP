@@ -12,12 +12,20 @@
 
 This document records the formal review of the Lean 4 proofs for Experiment 01b (Angle-Dependent Measurement). The review applies the axiom-first principle: every axiom must be justified on first principles alone, not reverse-engineered from simulation results.
 
+**Phase 4a Reference:** PR #210 (merged)
+
 **Files Reviewed:**
 - `proofs/QBP/Basic.lean` — Core axioms
 - `proofs/QBP/Experiments/AngleDependent.lean` — Experiment-specific proofs
 
 **Ground Truth Reference:**
 - `research/01b_angle_dependent_expected_results.md`
+
+### Scope Clarification
+
+**Goal:** QBP aims to predict *real-world experimental outcomes*, not to reproduce standard quantum mechanics. Our ground truth documents derive predictions from QBP axioms; these predictions are then compared against known experimental results (which happen to match QM for single-particle systems).
+
+**Implementation correspondence:** This review verifies proof-to-*ground-truth* correspondence. Proof-to-*implementation* correspondence (i.e., that `src/qphysics.py` computes the same values) was verified in Phase 2.
 
 ---
 
@@ -152,6 +160,10 @@ No custom axioms or `sorry` escape hatches were used.
 
 **Overall assessment:** All axioms are derivable from first principles. The factor-of-2 correction discovered in PR #116 was a bug fix (the original violated probability bounds), not a fit to empirical data.
 
+### Note on Single-Particle Systems
+
+For single-particle spin-1/2 systems, QBP predictions necessarily match standard QM because quaternions (ℍ) are isomorphic to the Pauli algebra underlying SU(2). This is *expected*, not a novel validation. The real test of QBP's predictive power comes with multi-particle systems (Experiment 05: Bell's Theorem) where the algebraic structure may yield different predictions.
+
 ---
 
 ## 7. Decision Gate
@@ -201,3 +213,4 @@ angle_consistent_with_stern_gerlach
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-02-10 | Initial review (Phase 4b) |
+| 1.1 | 2026-02-10 | Added scope clarification, PR #210 reference, single-particle caveat |
