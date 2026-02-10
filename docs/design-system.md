@@ -1,56 +1,180 @@
 # QBP Design System
 
-## Philosophy: Futuristic Steampunk
+## Philosophy: Academic Steampunk → Solarpunk
 
-> *"Precision instruments measuring the fabric of reality"*
+> *"Brass orreries in a greenhouse"*
 
-Our visual language combines **Victorian mechanical elegance** with **cutting-edge physics**. Think brass orreries tracking quantum states, gaslight illuminating equations, clockwork gears encoding rotations.
+Our visual language bridges **Victorian mechanical precision** with **organic, nature-inspired optimism**. The aesthetic tells the story of QBP: moving from "broken theories" (industrial complexity) toward "working theories" (elegant natural truth).
 
-This aesthetic serves accessibility: warm colors, high contrast, motion-based understanding over text-heavy explanations.
+**Academic Approach:** Colors are named after natural materials and historical pigments (Sage, Patina, Clay, Ochre, Sienna). Muted tones enhance rather than distract from rigorous mathematics and physics — approachable yet credible for academic audiences.
+
+Think brass instruments illuminated by sunlight filtering through leaves. The machinery of discovery growing into understanding.
+
+### The Narrative
+
+| Element | Steampunk (Legacy) | Solarpunk (QBP) |
+|---------|-------------------|-----------------|
+| **Feel** | Industrial, mechanical | Organic, elegant |
+| **Metals** | Brass, copper, bronze | Brass with sage/patina accents |
+| **Accents** | Crimson, amber | Clay, sage, patina |
+| **Background** | Dark Slate (industrial) | Verdant Night (green-tinted) |
+| **Mood** | Nostalgic, mysterious | Hopeful, illuminated |
+| **Naming** | Vivid colors | Natural materials & pigments |
+
+---
+
+## Accessibility Commitment
+
+**WCAG 2.1 Compliance:** All text colors meet AA minimum contrast ratios.
+
+| Level | Normal Text | Large Text (18pt+ or 14pt+ bold) |
+|-------|-------------|----------------------------------|
+| AA (required) | 4.5:1 | 3:1 |
+| AAA (enhanced) | 7:1 | 4.5:1 |
+
+Use the `TEXT` hierarchy from `viz/theme.py` to ensure compliance. Run `python src/viz/theme.py` to see the contrast report.
 
 ---
 
 ## Color Palette
 
-### The Metals (Primary)
+### Legacy Metals — The Precision Instruments We Inherited
 
-| Name | Hex | RGB | Use |
-|------|-----|-----|-----|
-| **Brass** | `#D4A574` | 212, 165, 116 | Primary objects, key elements |
-| **Copper** | `#B87333` | 184, 115, 51 | Secondary objects, warmth |
-| **Bronze** | `#CD7F32` | 205, 127, 50 | Accents, highlights |
-| **Steel** | `#71797E` | 113, 121, 126 | Neutral elements, grids |
-| **Gold** | `#FFD700` | 255, 215, 0 | Special highlights, energy |
+| Name | Hex | Use | Verdant Night | Parchment |
+|------|-----|-----|---------------|-----------|
+| **Brass** | `#D4A574` | Primary objects, key elements | 7.0:1 AAA | 1.8:1 -- |
+| **Copper** | `#B87333` | Secondary objects, warmth | 4.3:1 AA | 3.1:1 -- |
+| **Bronze** | `#CD7F32` | Accents, mechanisms | 5.2:1 AA | 2.4:1 -- |
+| **Steel** | `#71797E` | Muted elements, grids | 3.5:1 -- | 3.6:1 -- |
 
-### The Elements (Secondary)
+### Solar Light — Illumination and Understanding
 
-| Name | Hex | RGB | Use |
-|------|-----|-----|-----|
-| **Teal** | `#2A9D8F` | 42, 157, 143 | Z-axis, depth, calm states |
-| **Verdigris** | `#4A766E` | 74, 118, 110 | Y-axis, aged copper patina |
-| **Amber** | `#F4A261` | 244, 162, 97 | Glows, energy, activity |
-| **Crimson** | `#9B2335` | 155, 35, 53 | X-axis, warnings, intensity |
-| **Ivory** | `#FFFEF0` | 255, 254, 240 | Labels, text on dark |
+| Name | Hex | Use | Verdant Night | Parchment |
+|------|-----|-----|---------------|-----------|
+| **Gold** | `#FFD700` | Vibrant highlights, key emphasis | 11.2:1 AAA | 1.4:1 -- |
+| **Ochre** | `#D4AA5A` | Earth pigment, warm academic tone | 7.1:1 AAA | 1.9:1 -- |
+| **Amber** | `#F4A261` | Warnings, attention | 7.6:1 AAA | 1.7:1 -- |
+| **Sienna** | `#C9956A` | Burnt earth, warm accent | 5.8:1 AA | 2.2:1 -- |
+
+### Academic Greens — Natural Materials & Aged Surfaces
+
+| Name | Hex | Use | Verdant Night | Parchment |
+|------|-----|-----|---------------|-----------|
+| **Sage** | `#3D8B6E` | Muted green, Y-axis base | 4.5:1 AA | 2.8:1 -- |
+| **Sage Light** | `#5BA88A` | Y-axis on dark | 5.5:1 AA | 2.3:1 -- |
+| **Patina** | `#5A9E94` | Z-axis on dark, aged copper-green | 5.0:1 AA | 2.5:1 -- |
+| **Verdigris** | `#3D7A73` | Z-axis base, aged copper | 3.7:1 -- | 3.4:1 -- |
+
+### Earth & Sky — Natural Pigments
+
+| Name | Hex | Use | Verdant Night | Parchment |
+|------|-----|-----|---------------|-----------|
+| **Terracotta** | `#C4785A` | X-axis base, baked earth | 4.9:1 AA | 2.6:1 -- |
+| **Clay** | `#D9956E` | X-axis on dark, warm earth | 6.3:1 AA | 2.0:1 -- |
+| **Sky** | `#87CEEB` | Openness, possibility | 10.0:1 AAA | 1.5:1 -- |
+| **Ivory** | `#FFFEF0` | Warm labels, accent text | 15.4:1 AAA | 1.1:1 -- |
+
+### Academic Axis Colors (Accessible on Dark)
+
+For axis elements on dark backgrounds, use these muted academic tones:
+
+| Name | Hex | Use | Verdant Night |
+|------|-----|-----|---------------|
+| **Clay** | `#D9956E` | X-axis on dark | 6.3:1 AA |
+| **Sage Light** | `#5BA88A` | Y-axis on dark | 5.5:1 AA |
+| **Patina** | `#5A9E94` | Z-axis on dark | 5.0:1 AA |
+
+### Legacy Colors (For Backward Compatibility)
+
+| Name | Hex | Use | Verdant Night |
+|------|-----|-----|---------------|
+| **Jade** | `#00A86B` | Legacy Y-axis (vivid) | 5.3:1 AA |
+| **Teal** | `#2A9D8F` | Legacy Z-axis (vivid) | 4.7:1 AA |
+| **Coral** | `#E07B53` | Legacy X-axis (vivid) | 5.1:1 AA |
+| **Crimson** | `#9B2335` | Legacy warnings | 2.0:1 -- |
 
 ### Backgrounds
 
 | Name | Hex | RGB | Use |
 |------|-----|-----|-----|
 | **Parchment** | `#F5E6D3` | 245, 230, 211 | Light mode background |
-| **Dark Slate** | `#1A1A2E` | 26, 26, 46 | Dark mode background |
-| **Midnight** | `#0D1B2A` | 13, 27, 42 | Deep space / void |
+| **Verdant Night** | `#0D2820` | 13, 40, 32 | Dark mode (solarpunk, primary) |
+| **Dark Slate** | `#1A1A2E` | 26, 26, 46 | Dark mode (steampunk, legacy) |
+| **Midnight** | `#0D1B2A` | 13, 27, 42 | Deep space black |
+
+---
+
+## Text Hierarchy
+
+**Always use the `TEXT` class for text colors** to ensure accessibility compliance.
+
+### Text on Dark Backgrounds (Verdant Night)
+
+```python
+from viz.theme import TEXT
+
+# On VERDANT_NIGHT or DARK_SLATE backgrounds:
+TEXT.DARK.PRIMARY    # #F5F5F5 Cloud   - Main body text (14.4:1)
+TEXT.DARK.SECONDARY  # #B8B8B8 Silver  - Supporting text (7.9:1)
+TEXT.DARK.TERTIARY   # #9A9A9A Ash     - Captions, hints (5.6:1)
+TEXT.DARK.ACCENT     # #FFFEF0 Ivory   - Warm emphasis, titles (15.4:1)
+TEXT.DARK.MUTED      # #71797E Steel   - Large text only (3.5:1)
+```
+
+| Level | Color | Hex | Ratio | WCAG | Use |
+|-------|-------|-----|-------|------|-----|
+| PRIMARY | Cloud | `#F5F5F5` | 14.4:1 | AAA | Main body text, formulas |
+| SECONDARY | Silver | `#B8B8B8` | 7.9:1 | AAA | Supporting info, labels |
+| TERTIARY | Ash | `#9A9A9A` | 5.6:1 | AA | Captions, hints, metadata |
+| ACCENT | Ivory | `#FFFEF0` | 15.4:1 | AAA | Titles, warm emphasis |
+| MUTED | Steel | `#71797E` | 3.5:1 | -- | Large text only (18pt+) |
+
+### Text on Light Backgrounds (Parchment)
+
+```python
+from viz.theme import TEXT
+
+# On PARCHMENT backgrounds:
+TEXT.LIGHT.PRIMARY    # #2C2C2C Shadow   - Main body text (11.4:1)
+TEXT.LIGHT.SECONDARY  # #3D3D3D Charcoal - Supporting text (8.9:1)
+TEXT.LIGHT.TERTIARY   # #555566 Slate    - Captions, hints (6.0:1)
+TEXT.LIGHT.ACCENT     # #B87333 Copper   - Warm emphasis (3.1:1, large only)
+TEXT.LIGHT.MUTED      # #71797E Steel    - Large text only (3.6:1)
+```
 
 ---
 
 ## Axis Convention
 
-We maintain the **RGB = XYZ** convention with steampunk tones:
+The axis colors tell QBP's story using natural materials:
 
 ```
-X-axis: Crimson  (#9B2335) — heat, energy
-Y-axis: Verdigris (#4A766E) — growth, patina
-Z-axis: Teal     (#2A9D8F) — depth, mystery
+X-axis: Terracotta (#C4785A)  — baked earth, warmth, energy
+        Clay (#D9956E)        on dark — 6.3:1 AA
+Y-axis: Sage (#3D8B6E)        — natural growth, correctness, life
+        Sage Light (#5BA88A)  on dark — 5.5:1 AA
+Z-axis: Verdigris (#3D7A73)   — aged copper, depth, measured truth
+        Patina (#5A9E94)      on dark — 5.0:1 AA
 ```
+
+Use `PALETTE.AXIS_X_DARK`, `PALETTE.AXIS_Y_DARK`, `PALETTE.AXIS_Z_DARK` for dark mode.
+
+For legacy compatibility: `PALETTE.AXIS_X_LEGACY` (Crimson), `PALETTE.AXIS_Y_LEGACY` (Jade), `PALETTE.AXIS_Z_LEGACY` (Teal)
+
+---
+
+## Semantic Colors
+
+| Purpose | Color | Use |
+|---------|-------|-----|
+| `PALETTE.SUCCESS` | Sage | Correct, passing, verified |
+| `PALETTE.WARNING` | Amber | Caution, attention needed |
+| `PALETTE.ERROR` | Terracotta | Problems, errors (warm earth, not harsh) |
+| `PALETTE.ACCENT` | Ochre | Energy, muted academic highlights |
+| `PALETTE.HIGHLIGHT` | Gold | Vibrant emphasis (use sparingly) |
+| `PALETTE.PRIMARY` | Brass | Main objects |
+| `PALETTE.SECONDARY` | Verdigris | Supporting elements (aged patina) |
+| `PALETTE.TERTIARY` | Sage | Growth, correctness |
 
 ---
 
@@ -58,10 +182,12 @@ Z-axis: Teal     (#2A9D8F) — depth, mystery
 
 | Context | Recommendation |
 |---------|----------------|
-| **Titles** | Bold, clean sans-serif (system default) |
-| **Labels** | Regular weight, high contrast |
-| **Code** | Monospace, Ivory on Dark Slate |
-| **Annotations** | Italic for emphasis |
+| **Titles** | Bold, clean sans-serif, use `TEXT.*.ACCENT` |
+| **Body** | Regular weight, use `TEXT.*.PRIMARY` |
+| **Labels** | Use `TEXT.*.SECONDARY` |
+| **Captions** | Use `TEXT.*.TERTIARY` |
+| **Code** | Monospace, use `TEXT.*.PRIMARY` |
+| **Disabled** | Use `TEXT.*.MUTED` (large text only) |
 
 Keep text minimal. Let motion and color convey meaning.
 
@@ -72,125 +198,89 @@ Keep text minimal. Let motion and color convey meaning.
 ### Python (vpython/matplotlib)
 
 ```python
-from viz.theme import COLORS, PALETTE, apply_matplotlib_theme
+from viz.theme import COLORS, PALETTE, TEXT, apply_matplotlib_theme, check_contrast
 
-# Access colors
+# Access colors (academic naming)
 axis_color = COLORS.BRASS.vpython      # For vpython
-line_color = COLORS.TEAL.hex           # For matplotlib
-rgb_tuple = COLORS.COPPER.rgb_norm     # (0.72, 0.45, 0.20)
+line_color = COLORS.PATINA.hex         # For matplotlib
+rgb_tuple = COLORS.SAGE.rgb_norm       # (0.24, 0.55, 0.43)
 
-# Apply matplotlib theme globally
-apply_matplotlib_theme()
+# Text colors (always use TEXT hierarchy!)
+primary_text = TEXT.DARK.PRIMARY.hex   # For dark backgrounds
+secondary_text = TEXT.DARK.SECONDARY.hex
 
-# Use palette presets
-background = PALETTE.BG_LIGHT.vpython
+# Academic axis colors for dark mode
+x_axis = PALETTE.AXIS_X_DARK.vpython   # Clay
+y_axis = PALETTE.AXIS_Y_DARK.vpython   # Sage Light
+z_axis = PALETTE.AXIS_Z_DARK.vpython   # Patina
+
+# Vibrant gold for key emphasis
+highlight = COLORS.GOLD.vpython        # Pure vibrant gold
+
+# Apply matplotlib theme (use legacy=True for steampunk dark)
+apply_matplotlib_theme(dark_mode=True)           # Verdant Night (solarpunk)
+apply_matplotlib_theme(dark_mode=True, legacy=True)  # Dark Slate (steampunk)
+
+# Check accessibility
+result = check_contrast(TEXT.DARK.PRIMARY, COLORS.VERDANT_NIGHT)
+print(f"Contrast: {result['ratio']}:1, AA: {result['AA']}")
 ```
 
-### View Palette
+### HTML/CSS (VPython Captions)
+
+```python
+# CORRECT: Use TEXT hierarchy colors
+self.scene.append_to_caption(f"""
+<div style='background: {COLORS.VERDANT_NIGHT.hex}; padding: 15px;'>
+    <h3 style='color: {TEXT.DARK.ACCENT.hex};'>Title</h3>
+    <p style='color: {TEXT.DARK.PRIMARY.hex};'>Main text here</p>
+    <span style='color: {TEXT.DARK.SECONDARY.hex};'>Supporting info</span>
+</div>
+""")
+
+# WRONG: Don't use arbitrary colors
+# color: #E8E4E0  <- Not in system
+# color: #888     <- Not in system
+```
+
+### View Palette and Contrast Report
 
 ```bash
-source ~/qbp-env/bin/activate
-cd ~/Documents/QBP
-PYTHONPATH=src python -c "from viz.theme import show_palette; show_palette()"
+PYTHONPATH=src python src/viz/theme.py
 ```
 
 ---
 
 ## Design Principles
 
-1. **Warmth over clinical** — Brass tones feel approachable
-2. **Motion over text** — Animate rather than annotate
-3. **Contrast for clarity** — Ensure readability (WCAG AA minimum)
-4. **Consistent axes** — XYZ = Crimson/Verdigris/Teal always
-5. **Depth through lighting** — Use amber glows for energy, steel for shadows
-6. **Show your work** — Every visualization must display formal math alongside motion
-7. **Link to learn** — Every animation must link to deeper documentation
+1. **Academic credibility** — Natural material names (Sage, Patina, Clay) enhance rigor
+2. **Warmth with hope** — Brass warmth meets organic greens
+3. **Motion over text** — Animate rather than annotate
+4. **Contrast for clarity** — Use `TEXT` hierarchy for WCAG compliance
+5. **Consistent axes** — XYZ = Terracotta/Sage/Verdigris (Clay/Sage Light/Patina on dark)
+6. **Light as understanding** — Vibrant Gold for key emphasis, Ochre for subtle warmth
+7. **Show your work** — Every visualization must display formal math
+8. **Link to learn** — Every animation must link to documentation
 
 ---
 
-## Animation Documentation Standard
+## The Aesthetic Story
 
-Every visualization **must** include:
+The QBP design system tells the story of moving from complexity to clarity:
 
-### 1. Brief Description Panel
-A concise explanation visible in the UI:
-- **What** is being shown (1 sentence)
-- **Why** it matters physically (1 sentence)
-- **Link** to full documentation
+- **Legacy metals** (Brass, Copper) represent the inherited machinery of physics — still beautiful, still precise, but part of the old paradigm
+- **Academic greens** (Sage, Patina, Verdigris) represent nature's truth emerging — named after natural materials for scholarly credibility
+- **Earth tones** (Clay, Terracotta, Ochre, Sienna) ground the palette in historical pigments — approachable yet rigorous
+- **Solar light** (Gold, Amber) represents illumination and understanding — the "aha" moments when the math clicks (vibrant Gold kept for key emphasis)
+- **Verdant Night** background vs **Dark Slate** — the shift from industrial (steampunk) to organic (solarpunk)
 
-Example:
-```
-┌─────────────────────────────────────────────────────┐
-│ QUATERNION ROTATION                                 │
-│ A unit quaternion q rotates vector v via q·v·q⁻¹   │
-│ This encodes 3D rotation without gimbal lock.      │
-│                                                     │
-│ 📖 docs/theory/quaternion-rotation.md              │
-└─────────────────────────────────────────────────────┘
-```
-
-### 2. Formal Math Display
-Show the equations being animated in real-time:
-- Display current values (e.g., `q = (0.707, 0, 0, 0.707)`)
-- Show the operation being performed
-- Update as animation progresses
-
-### 3. Documentation Link
-Each visualization must reference:
-- The relevant theory document in `docs/theory/`
-- The experiment it connects to (Rule 5: Link Tests to Reality)
-- Related proofs in `proofs/`
-
-### Template for Visualization Docstring
-
-```python
-"""
-[Visualization Name]
-
-WHAT: [One sentence describing what is shown]
-WHY:  [One sentence on physical significance]
-MATH: [Core equation, e.g., v' = q·v·q⁻¹]
-
-Links:
-- Theory: docs/theory/[topic].md
-- Proof:  proofs/[proof-name].lean
-- Experiment: experiments/[exp-name]/
-
-Run: python src/viz/[script].py
-"""
-```
-
-### Implementation Checklist
-
-For every new visualization:
-- [ ] Description panel in UI
-- [ ] Real-time math display (quaternion values, angles, etc.)
-- [ ] Docstring with WHAT/WHY/MATH/Links
-- [ ] Corresponding theory doc exists or is created
-- [ ] Link to related experiment (if applicable)
+This is the visual language of a theory that works — academic enough to be taken seriously, hopeful enough to inspire.
 
 ---
 
-## Examples
+## References
 
-### Light Mode Scene
-- Background: Parchment (`#F5E6D3`)
-- Objects: Brass, Copper
-- Axes: Crimson, Verdigris, Teal
-- Text: Shadow (`#2C2C2C`)
-
-### Dark Mode Scene
-- Background: Dark Slate (`#1A1A2E`)
-- Objects: Brass (brighter), Gold accents
-- Axes: Same (high saturation)
-- Text: Ivory (`#FFFEF0`)
-
----
-
-## Accessibility Notes
-
-- All color pairs tested for WCAG AA contrast (4.5:1 minimum)
-- Brass on Parchment: ✓ 4.8:1
-- Ivory on Dark Slate: ✓ 13.2:1
-- Crimson on Parchment: ✓ 5.1:1
-- Never rely on color alone — use shape + motion + label
+- [Solarpunk Aesthetics Wiki](https://aesthetics.fandom.com/wiki/Solarpunk)
+- [WCAG 2.1 Contrast Guidelines](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
+- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
+- [WebAIM Contrast and Color Accessibility](https://webaim.org/articles/contrast/)
