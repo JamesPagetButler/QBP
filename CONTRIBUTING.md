@@ -310,6 +310,8 @@ During Phase 4a, proofs may require Lean 4 capabilities that do not exist in Mat
 
 **Key principle:** Libraries must remain general-purpose. They must not import from `proofs/QBP/` or depend on any QBP-specific definitions. If other Lean users could benefit from the capability, it belongs in `/libs/`.
 
+> **CI enforcement:** The `libs-dependency-check` job in CI automatically scans any `.lean` files under `/libs/` for prohibited imports (`import QBP` or `import proofs`). PRs that introduce such dependencies will fail the check.
+
 ##### Phase 4b: Proof Review
 
 **Owner:** Claude
