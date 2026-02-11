@@ -1,0 +1,64 @@
+# Knowledge Graph-Based Systematic Literature Review Automation
+# Reference paper for QBP knowledge graph design
+
+id: source-arxiv-2208-02334
+type: Source
+category: paper
+
+metadata:
+  title: "Knowledge Graph-Based Systematic Literature Review Automation"
+  authors:
+    - name: "Nada Sahlab"
+      affiliation: null
+    - name: "Hesham Kahoul"
+      affiliation: null
+    - name: "Nasser Jazdi"
+      affiliation: null
+    - name: "Michael Weyrich"
+      affiliation: null
+  date: 2022-07-06
+  url: https://arxiv.org/abs/2208.02334
+  doi: null
+  venue: "arXiv preprint (cs.DL)"
+
+abstract: |
+  This paper presents software that partially automates systematic literature
+  reviews by classifying and visualizing results as a knowledge graph. The
+  approach addresses the challenge of efficiently screening and assessing
+  relevant publications given the massive and rapidly growing availability
+  of digital publications.
+
+quotes:
+  - id: q1
+    text: "with the massive availability of publications at a rapid growing rate, especially digitally, it becomes challenging to efficiently screen and assess relevant publications"
+    location: "Abstract"
+    relevance: "Motivation for automated literature review - applies to QBP research sprints"
+
+  - id: q2
+    text: "Knowledge graphs organize research concepts and publications in a connected, relational manner"
+    location: "Introduction"
+    relevance: "Core approach we're adopting for QBP knowledge management"
+
+tags:
+  - knowledge-graph
+  - systematic-review
+  - automation
+  - methodology
+
+relationships: []
+  # Future: Add relationship when concept-knowledge-graph-literature is created
+
+key_insights:
+  - Knowledge graphs enable relational modeling of research concepts
+  - Automated classification can achieve accuracy comparable to manual review
+  - Visualization aids in discovering patterns across literature
+  - Continuous updates are more feasible with structured representation
+
+qbp_relevance: |
+  This paper informs the design of QBP's knowledge graph system for Research
+  Sprints. We adopt the entity-relationship approach for organizing sources,
+  concepts, claims, and questions discovered during systematic research.
+
+added_by: claude
+added_date: 2026-02-10
+research_sprint: "0R (preparation)"
