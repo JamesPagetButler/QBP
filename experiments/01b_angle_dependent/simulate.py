@@ -108,32 +108,42 @@ def run_simulation(num_particles: int = NUM_PARTICLES, seed: int = 42) -> pd.Dat
 
         # Calculate deviation in sigma units
         if sigma > 0:
-            deviation_sigma = abs(measured_prob - expected_prob) / (sigma / num_particles)
+            deviation_sigma = abs(measured_prob - expected_prob) / (
+                sigma / num_particles
+            )
             # Actually: deviation should be in terms of count, not probability
-            deviation_sigma = abs(num_up - expected_prob * num_particles) / sigma if sigma > 0 else 0
+            deviation_sigma = (
+                abs(num_up - expected_prob * num_particles) / sigma if sigma > 0 else 0
+            )
         else:
             # Deterministic case: any deviation is infinite sigma
-            deviation_sigma = 0 if num_up == int(expected_prob * num_particles) else float('inf')
+            deviation_sigma = (
+                0 if num_up == int(expected_prob * num_particles) else float("inf")
+            )
 
         # Determine pass/fail (3σ criterion)
         passed = deviation_sigma <= 3.0
 
-        results.append({
-            'angle_deg': angle_deg,
-            'angle_rad': theta_rad,
-            'num_particles': num_particles,
-            'num_up': num_up,
-            'num_down': num_down,
-            'measured_prob': measured_prob,
-            'expected_prob': expected_prob,
-            'sigma': sigma,
-            'deviation_sigma': deviation_sigma,
-            'passed': passed
-        })
+        results.append(
+            {
+                "angle_deg": angle_deg,
+                "angle_rad": theta_rad,
+                "num_particles": num_particles,
+                "num_up": num_up,
+                "num_down": num_down,
+                "measured_prob": measured_prob,
+                "expected_prob": expected_prob,
+                "sigma": sigma,
+                "deviation_sigma": deviation_sigma,
+                "passed": passed,
+            }
+        )
 
         status = "PASS" if passed else "FAIL"
-        print(f"θ = {angle_deg:3d}°: P(+) expected={expected_prob:.4f}, "
-              f"measured={measured_prob:.6f}, deviation={deviation_sigma:.2f}σ [{status}]")
+        print(
+            f"θ = {angle_deg:3d}°: P(+) expected={expected_prob:.4f}, "
+            f"measured={measured_prob:.6f}, deviation={deviation_sigma:.2f}σ [{status}]"
+        )
 
     print("-" * 70)
 
@@ -141,7 +151,9 @@ def run_simulation(num_particles: int = NUM_PARTICLES, seed: int = 42) -> pd.Dat
     return df
 
 
-def save_results(df: pd.DataFrame, output_dir: str = "results/01b_angle_dependent") -> str:
+def save_results(
+    df: pd.DataFrame, output_dir: str = "results/01b_angle_dependent"
+) -> str:
     """
     Save simulation results to timestamped CSV file.
 
@@ -165,20 +177,20 @@ def print_summary(df: pd.DataFrame):
     print("SUMMARY")
     print("=" * 70)
 
-    all_passed = df['passed'].all()
-    max_deviation = df['deviation_sigma'].replace([np.inf], np.nan).max()
+    all_passed = df["passed"].all()
+    max_deviation = df["deviation_sigma"].replace([np.inf], np.nan).max()
 
     print(f"\nTotal angles tested: {len(df)}")
     print(f"All tests passed: {'YES' if all_passed else 'NO'}")
     print(f"Maximum deviation: {max_deviation:.2f}σ")
 
     # Check edge cases specifically
-    edge_cases = df[df['angle_deg'].isin([0, 90, 180])]
+    edge_cases = df[df["angle_deg"].isin([0, 90, 180])]
     print("\nEdge case verification:")
     for _, row in edge_cases.iterrows():
-        angle = row['angle_deg']
-        expected = row['expected_prob']
-        measured = row['measured_prob']
+        angle = row["angle_deg"]
+        expected = row["expected_prob"]
+        measured = row["measured_prob"]
         print(f"  θ={angle:3d}°: expected P(+)={expected:.1f}, measured={measured:.6f}")
 
     if all_passed:
@@ -189,7 +201,7 @@ def print_summary(df: pd.DataFrame):
     else:
         print("\n" + "=" * 70)
         print("EXPERIMENT FAILED: Some angles exceed 3σ deviation")
-        failed = df[~df['passed']]
+        failed = df[~df["passed"]]
         for _, row in failed.iterrows():
             print(f"  FAILED: θ={row['angle_deg']}° ({row['deviation_sigma']:.2f}σ)")
         print("=" * 70)
@@ -210,7 +222,7 @@ def main():
     print_summary(df)
 
     # Return exit code based on pass/fail
-    return 0 if df['passed'].all() else 1
+    return 0 if df["passed"].all() else 1
 
 
 if __name__ == "__main__":

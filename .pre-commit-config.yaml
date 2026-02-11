@@ -19,3 +19,4 @@ repos:
     hooks:
     -   id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
+        exclude: ^experiments/  # Standalone scripts, not importable packages
