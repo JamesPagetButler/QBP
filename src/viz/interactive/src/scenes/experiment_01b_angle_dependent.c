@@ -1,9 +1,9 @@
 /*
- * experiment_01_stern_gerlach.c — Stern-Gerlach proof visualization scene.
+ * experiment_01b_angle_dependent.c — Angle-dependent measurement proof visualization scene.
  *
- * Implements the Scene interface for the Stern-Gerlach experiment.
- * Users step through the proof dependency tree, seeing how axioms
- * connect to the 50/50 probability result.
+ * Implements the Scene interface for the angle-dependent measurement experiment.
+ * Users step through the proof dependency tree, seeing how the axioms and
+ * trigonometric identities combine to prove P(+) = cos²(θ/2).
  */
 
 #include "../scene.h"
@@ -14,7 +14,7 @@
 #include "raylib.h"
 #include <stdio.h>
 
-static ProofGraph sg_graph;
+static ProofGraph ad_graph;
 static int screen_width;
 static int screen_height;
 
@@ -23,16 +23,18 @@ static int screen_height;
 #define BAR_HEIGHT     56
 #define TITLE_HEIGHT   60
 
-static void sg_init(int sw, int sh)
+static void ad_init(int sw, int sh)
 {
     screen_width = sw;
     screen_height = sh;
 
-    /* Try to load from JSON first (enables hot-reload) */
-    if (graph_load_json(&sg_graph, "/data/stern_gerlach.viz.json") != 0) {
-        /* Fallback to hardcoded data if JSON loading fails */
-        fprintf(stderr, "[sg_init] JSON load failed, using hardcoded fallback\n");
-        graph_init_stern_gerlach(&sg_graph);
+    /* Load from JSON - no hardcoded fallback for this experiment */
+    if (graph_load_json(&ad_graph, "/data/angle_dependent.viz.json") != 0) {
+        fprintf(stderr, "[ad_init] ERROR: Failed to load angle_dependent.viz.json\n");
+        /* Initialize empty graph to prevent crashes */
+        ad_graph.node_count = 0;
+        ad_graph.walk_len = 0;
+        ad_graph.current_step = 0;
     }
 
     /* Graph occupies left portion, panel on the right */
@@ -42,26 +44,26 @@ static void sg_init(int sw, int sh)
         (float)(sw - PANEL_WIDTH - 40),
         (float)(sh - TITLE_HEIGHT - BAR_HEIGHT - 20)
     };
-    graph_viewport_init(&sg_graph);
-    graph_layout(&sg_graph, graph_area);
+    graph_viewport_init(&ad_graph);
+    graph_layout(&ad_graph, graph_area);
 }
 
-static void sg_update(void)
+static void ad_update(void)
 {
     /* Handle viewport pan/zoom input */
-    graph_viewport_update(&sg_graph);
+    graph_viewport_update(&ad_graph);
 
     if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_DOWN) ||
         IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER)) {
-        graph_step_forward(&sg_graph);
+        graph_step_forward(&ad_graph);
     }
     if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_UP) ||
         IsKeyPressed(KEY_BACKSPACE)) {
-        graph_step_back(&sg_graph);
+        graph_step_back(&ad_graph);
     }
     if (IsKeyPressed(KEY_R) || IsKeyPressed(KEY_HOME)) {
-        graph_reset(&sg_graph);
-        graph_reset_viewport(&sg_graph);
+        graph_reset(&ad_graph);
+        graph_reset_viewport(&ad_graph);
     }
 
     /* Handle mouse clicks */
@@ -74,18 +76,18 @@ static void sg_update(void)
         Rectangle next_btn = { bar.x + bar.width - 136, bar.y + 10, 120, bar.height - 20 };
 
         if (CheckCollisionPointRec(mouse, prev_btn)) {
-            graph_step_back(&sg_graph);
+            graph_step_back(&ad_graph);
         } else if (CheckCollisionPointRec(mouse, next_btn)) {
-            graph_step_forward(&sg_graph);
+            graph_step_forward(&ad_graph);
         } else {
             /* Click on nodes to jump to them - use dynamic node bounds */
-            for (int i = 0; i < sg_graph.node_count; i++) {
-                Rectangle node_rect = graph_node_bounds(&sg_graph, i);
+            for (int i = 0; i < ad_graph.node_count; i++) {
+                Rectangle node_rect = graph_node_bounds(&ad_graph, i);
                 if (CheckCollisionPointRec(mouse, node_rect)) {
                     /* Find this node in walk_order */
-                    for (int s = 0; s < sg_graph.walk_len; s++) {
-                        if (sg_graph.walk_order[s] == i) {
-                            sg_graph.current_step = s;
+                    for (int s = 0; s < ad_graph.walk_len; s++) {
+                        if (ad_graph.walk_order[s] == i) {
+                            ad_graph.current_step = s;
                             break;
                         }
                     }
@@ -96,16 +98,16 @@ static void sg_update(void)
     }
 }
 
-static void sg_draw(void)
+static void ad_draw(void)
 {
     /* Title - larger for readability */
-    DrawTextQBP("QBP  |  Stern-Gerlach Proof Visualization",
+    DrawTextQBP("QBP  |  Angle-Dependent Proof Visualization",
              24, 16, 28, QBP_GOLD);
-    DrawTextQBP("Experiment 01: Spin-X state measured on Z-axis",
+    DrawTextQBP("Experiment 01b: P(+) = cos^2(theta/2) for state at angle theta",
              24, 44, 16, QBP_TEXT_DIM);
 
     /* Proof graph */
-    graph_draw(&sg_graph);
+    graph_draw(&ad_graph);
 
     /* Info panel (right side) */
     Rectangle panel = {
@@ -114,7 +116,7 @@ static void sg_draw(void)
         PANEL_WIDTH,
         (float)(screen_height - TITLE_HEIGHT - BAR_HEIGHT - 20)
     };
-    graph_draw_info_panel(&sg_graph, panel);
+    graph_draw_info_panel(&ad_graph, panel);
 
     /* Step bar (bottom) */
     Rectangle bar = {
@@ -123,18 +125,18 @@ static void sg_draw(void)
         (float)screen_width,
         BAR_HEIGHT
     };
-    graph_draw_step_bar(&sg_graph, bar);
+    graph_draw_step_bar(&ad_graph, bar);
 }
 
-static void sg_cleanup(void)
+static void ad_cleanup(void)
 {
     /* Nothing to free — all static data */
 }
 
-Scene scene_stern_gerlach = {
-    .init    = sg_init,
-    .update  = sg_update,
-    .draw    = sg_draw,
-    .cleanup = sg_cleanup,
-    .name    = "Stern-Gerlach Proof Visualization"
+Scene scene_angle_dependent = {
+    .init    = ad_init,
+    .update  = ad_update,
+    .draw    = ad_draw,
+    .cleanup = ad_cleanup,
+    .name    = "Angle-Dependent Proof Visualization"
 };

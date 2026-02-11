@@ -1,0 +1,41 @@
+# .github/workflows/validate-json.yml
+# Validates JSON files in the repository
+
+name: Validate JSON
+
+on:
+  pull_request:
+    paths:
+      - '**.json'
+      - '!package*.json'  # Exclude package.json files
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Validate JSON files
+        run: |
+          echo "Validating JSON files..."
+          failed=0
+          for f in $(find . -name "*.json" -not -path "./.git/*" -not -name "package*.json"); do
+            if python -c "import json; json.load(open('$f'))" 2>/dev/null; then
+              echo "✓ $f"
+            else
+              echo "✗ $f - INVALID JSON"
+              failed=1
+            fi
+          done
+          if [ $failed -eq 1 ]; then
+            echo ""
+            echo "JSON validation failed!"
+            exit 1
+          fi
+          echo ""
+          echo "All JSON files are valid."

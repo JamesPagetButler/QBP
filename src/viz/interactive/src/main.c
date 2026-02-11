@@ -3,6 +3,10 @@
  *
  * Entry point for the raylib/Emscripten application.
  * Dispatches to experiment scenes via the Scene interface.
+ *
+ * Scene selection:
+ *   Press '1' for Experiment 01 (Stern-Gerlach)
+ *   Press '2' for Experiment 01b (Angle-Dependent)
  */
 
 #include <stddef.h>
@@ -18,14 +22,48 @@
 
 /* --- Scene registry --- */
 extern Scene scene_stern_gerlach;
+extern Scene scene_angle_dependent;
 
+static Scene *scenes[] = {
+    &scene_stern_gerlach,
+    &scene_angle_dependent,
+};
+static int scene_count = sizeof(scenes) / sizeof(scenes[0]);
+static int current_scene_idx = 0;
 static Scene *current_scene = NULL;
 
 #define SCREEN_W 1100
 #define SCREEN_H  700
 
+static void switch_scene(int idx)
+{
+    if (idx < 0 || idx >= scene_count) return;
+    if (idx == current_scene_idx && current_scene != NULL) return;
+
+    /* Cleanup old scene */
+    if (current_scene && current_scene->cleanup) {
+        current_scene->cleanup();
+    }
+
+    /* Switch to new scene */
+    current_scene_idx = idx;
+    current_scene = scenes[idx];
+
+    if (current_scene->init) {
+        current_scene->init(SCREEN_W, SCREEN_H);
+    }
+}
+
 static void frame_loop(void)
 {
+    /* Scene selection via number keys */
+    if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_KP_1)) {
+        switch_scene(0);  /* Stern-Gerlach */
+    }
+    if (IsKeyPressed(KEY_TWO) || IsKeyPressed(KEY_KP_2)) {
+        switch_scene(1);  /* Angle-Dependent */
+    }
+
     if (current_scene && current_scene->update) {
         current_scene->update();
     }
@@ -36,6 +74,10 @@ static void frame_loop(void)
     if (current_scene && current_scene->draw) {
         current_scene->draw();
     }
+
+    /* Build version in title bar area (top-right) for debugging */
+    DrawTextQBP("Build: " __DATE__ " " __TIME__,
+                SCREEN_W - 170, 4, 10, QBP_TEXT_DIM);
 
     EndDrawing();
 }
@@ -51,11 +93,8 @@ int main(void)
     SetTargetFPS(60);
 #endif
 
-    /* Select scene — currently only Stern-Gerlach */
-    current_scene = &scene_stern_gerlach;
-    if (current_scene->init) {
-        current_scene->init(SCREEN_W, SCREEN_H);
-    }
+    /* Default to Stern-Gerlach scene */
+    switch_scene(0);
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(frame_loop, 0, 1);

@@ -22,10 +22,63 @@
 - [ ] Phase 4: Formal Verification (#163)
   - [x] 4a: Formal Proof (#200) — CLOSED 2026-02-10. PR #210 merged. Lean 4 proofs for cos²(θ/2) formula.
   - [x] 4b: Proof Review (#201) — CLOSED 2026-02-10. PR #216 merged. Axiom-first review passed. CI fixes included.
-  - [ ] 4c: Interactive Proof Visualization
+  - [ ] 4c: Interactive Proof Visualization — IN PROGRESS. PR #226.
 - [ ] Phase 5: Publication (#164)
 - [ ] **Research Sprint 0R** (#212) — One-off: doing research before Theory Refinement
 - [ ] Theory Refinement (#165)
+
+## Sprint 2 Lessons Learned (Phase 4c)
+
+**Date:** 2026-02-11
+
+### 1. Browser Caching & Build Verification
+
+**Problem:** Made code changes but browser showed old behavior. Wasted debugging time thinking code was wrong.
+
+**Root Causes:**
+- HTTP server was serving from wrong directory (`dist` instead of `build/wasm`)
+- Browser cache persisted even after rebuild
+- Make didn't always regenerate HTML from shell template
+
+**Solutions Implemented:**
+- Added **build timestamp** to UI (`Build: Feb 11 2026 13:XX:XX` in top-right)
+- Always use **hard refresh** (Ctrl+Shift+R) when testing WASM builds
+- Verify server directory matches build output
+- Force rebuild of HTML by deleting `index.html` when template changes
+
+**Lesson:** For WASM/web development, add a visible build indicator early. It saves hours of "why isn't my change showing?" debugging.
+
+### 2. UX Review Before Implementation
+
+**Problem:** Initial layout algorithm positioned nodes mathematically but ignored actual node widths, causing overlap.
+
+**Process Used:**
+- Asked Dev Team (Bret Victor, Tufte, Rob Pike personas) to analyze UX before implementing scrolling
+- Team recommended: **improve layout first, defer scrolling unless necessary**
+- Result: Implemented barycenter ordering + no-overlap guarantee, which solved the core problem
+
+**Lesson:** Get UX/design review before adding features. Often the right solution is fixing the underlying problem, not adding workarounds (scrolling).
+
+### 3. Iterative Feedback with Screenshots
+
+**Process:** User dropped screenshots to `workspace/human_review/screen shots/` after each change.
+
+**Benefits:**
+- Immediate visual feedback on layout issues
+- Could verify exact state user was seeing
+- Caught issues like text overflow and button overlap quickly
+
+**Lesson:** Screenshot-based feedback loops accelerate UI debugging. The local `workspace/human_review/` directory (gitignored) is a good pattern for human-in-the-loop reviews.
+
+### 4. Layout Algorithm Design
+
+**What Worked:**
+- **Topological level assignment** — nodes at same dependency depth share a row
+- **Barycenter ordering** — sort nodes by average parent position to minimize edge crossings
+- **Actual width calculation** — compute each node's width from text, ensure spacing exceeds it
+- **Virtual canvas** — let graph bounds expand beyond view area, add pan/zoom to navigate
+
+**Key Insight:** Graph layout is a two-pass problem: (1) assign levels and order, (2) compute positions with real dimensions. Doing both in one pass leads to overlap.
 
 ## Research Sprint 0R (Before Theory Refinement — One-Off)
 

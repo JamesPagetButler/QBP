@@ -18,7 +18,7 @@
 #include "raylib.h"
 
 #define MAX_DEPS 6
-#define MAX_NODES 16
+#define MAX_NODES 32
 #define MAX_NAME_LEN 64
 #define MAX_DISPLAY_NAME_LEN 128
 #define MAX_FORMAL_LEN 256
@@ -57,6 +57,13 @@ typedef struct {
     int         walk_order[MAX_NODES]; /* order to visit nodes in walkthrough */
     int         walk_len;
     int         current_step;          /* 0-based index into walk_order */
+
+    /* Viewport state for pan/zoom */
+    float       viewport_x;            /* Pan offset X (positive = graph shifted left) */
+    float       viewport_y;            /* Pan offset Y (positive = graph shifted up) */
+    float       viewport_zoom;         /* Zoom factor (1.0 = 100%) */
+    Rectangle   graph_bounds;          /* Computed bounding box of all nodes */
+    Rectangle   view_area;             /* Visible area on screen */
 } ProofGraph;
 
 /* Initialize the Stern-Gerlach proof graph (hardcoded from Lean files) */
@@ -88,5 +95,12 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel);
 
 /* Draw the step indicator at the bottom */
 void graph_draw_step_bar(const ProofGraph *g, Rectangle bar);
+
+/* Viewport control for pan/zoom */
+void graph_viewport_init(ProofGraph *g);
+void graph_viewport_update(ProofGraph *g);  /* Call each frame to handle input */
+void graph_pan(ProofGraph *g, float dx, float dy);
+void graph_zoom(ProofGraph *g, float delta, Vector2 focus);
+void graph_reset_viewport(ProofGraph *g);
 
 #endif /* QBP_PROOF_GRAPH_H */

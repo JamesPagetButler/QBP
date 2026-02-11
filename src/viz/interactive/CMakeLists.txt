@@ -11,6 +11,7 @@ set(SOURCES
     src/proof_graph.c
     src/json_loader.c
     src/scenes/experiment_01_stern_gerlach.c
+    src/scenes/experiment_01b_angle_dependent.c
     lib/cJSON.c
 )
 
