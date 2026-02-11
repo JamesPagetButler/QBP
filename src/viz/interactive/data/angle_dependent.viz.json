@@ -1,0 +1,235 @@
+{
+  "_schema": {
+    "description": "QBP Proof Visualization Schema v1.0",
+    "levels": {
+      "L4_formal": "Lean syntax - exact code from proof files, for proof assistant users",
+      "L3_math": "Mathematical notation - conventional symbols, for physicists/mathematicians",
+      "L2_physical": "Physics interpretation - what it means physically, for students",
+      "L1_intuitive": "Plain English - accessible explanation, for general audience"
+    },
+    "guidelines": "L4 should be copy-pasteable Lean. L3 uses standard math notation. L2 connects to observable phenomena. L1 uses analogies and avoids jargon."
+  },
+  "experiment_id": "01b_angle_dependent",
+  "title": "Angle-Dependent Measurement: P(+) = cos²(θ/2)",
+  "description": "Formal proof that the QBP framework correctly predicts the probability formula P(+) = cos²(θ/2) for measuring a state at angle θ from the measurement axis. This generalizes the Stern-Gerlach result to arbitrary angles.",
+  "walk_order": [
+    "isPureQuaternion",
+    "isUnitQuaternion",
+    "vecDot",
+    "expectationValue",
+    "probUp",
+    "psiAngle",
+    "spinZObservable",
+    "psiAngle_is_pure",
+    "spinZObservable_is_pure",
+    "psiAngle_is_unit",
+    "expectation_angle",
+    "prob_up_angle",
+    "prob_up_angle_cos_sq",
+    "prob_down_angle_sin_sq",
+    "prob_up_theta_zero",
+    "prob_up_theta_pi",
+    "prob_up_theta_pi_div_two",
+    "angle_consistent_with_stern_gerlach"
+  ],
+  "nodes": {
+    "isPureQuaternion": {
+      "display_name": "Pure Quaternion Definition",
+      "kind": "definition",
+      "source_file": "QBP/Basic.lean",
+      "L4_formal": "def isPureQuaternion (q : Q) : Prop := q.re = 0",
+      "L3_math": "A quaternion q = a + bi + cj + dk is pure iff a = 0",
+      "L2_physical": "Pure quaternions represent physical directions in 3D space. They're the 'arrows' we use to describe spin orientations and measurement axes.",
+      "L1_intuitive": "Think of a pure quaternion as a 3D arrow with no 'extra dimension.' It's the mathematical way to point in a direction.",
+      "key_insight": "Pure quaternions are directions, not scalars.",
+      "depends_on": []
+    },
+    "isUnitQuaternion": {
+      "display_name": "Unit Quaternion Definition",
+      "kind": "definition",
+      "source_file": "QBP/Basic.lean",
+      "L4_formal": "def isUnitQuaternion (q : Q) : Prop := q.normSq = 1",
+      "L3_math": "|q|² = 1, the quaternion has unit length",
+      "L2_physical": "Unit quaternions represent normalized quantum states. The unit length constraint ensures probabilities sum to 1.",
+      "L1_intuitive": "A unit quaternion is an arrow of exactly length 1. Like a compass needle - it points somewhere but always has the same 'strength'.",
+      "key_insight": "Normalization ensures valid probabilities.",
+      "depends_on": []
+    },
+    "vecDot": {
+      "display_name": "Vector Dot Product",
+      "kind": "definition",
+      "source_file": "QBP/Basic.lean",
+      "L4_formal": "def vecDot (q₁ q₂ : Q) : ℝ :=\n  q₁.imI * q₂.imI + q₁.imJ * q₂.imJ + q₁.imK * q₂.imK",
+      "L3_math": "⟨a, b⟩ = aᵢbᵢ + aⱼbⱼ + aₖbₖ (Euclidean inner product)",
+      "L2_physical": "Measures how aligned two directions are. Zero means perpendicular; +1 means parallel; -1 means anti-parallel.",
+      "L1_intuitive": "The dot product asks: 'How much do these two arrows point the same way?' It's the mathematical measure of alignment.",
+      "key_insight": "Alignment between state and measurement determines outcome bias.",
+      "depends_on": []
+    },
+    "expectationValue": {
+      "display_name": "Expectation Value",
+      "kind": "definition",
+      "source_file": "QBP/Basic.lean",
+      "L4_formal": "def expectationValue (ψ O : Q) : ℝ :=\n  let ψ_vec := vecPart ψ\n  let O_vec := vecPart O\n  vecDot ψ_vec O_vec",
+      "L3_math": "⟨O⟩_ψ = ⟨ψ, O⟩ = cos(θ) where θ is angle between ψ and O",
+      "L2_physical": "The average measurement result. If you measured many identical particles, this is what you'd get on average: +1 times P(+) plus -1 times P(-).",
+      "L1_intuitive": "If the particle points in the same direction as the detector, the answer is always 'yes' (+1). If opposite, always 'no' (-1). In between? A mix that averages out.",
+      "key_insight": "Expectation value = cosine of angle between state and measurement.",
+      "depends_on": ["vecDot"]
+    },
+    "probUp": {
+      "display_name": "Probability Formula (Up)",
+      "kind": "definition",
+      "source_file": "QBP/Basic.lean",
+      "L4_formal": "noncomputable def probUp (ψ O : Q) : ℝ := (1 + expectationValue ψ O) / 2",
+      "L3_math": "P(+) = (1 + ⟨O⟩)/2 = (1 + cos θ)/2",
+      "L2_physical": "The Born rule for spin-1/2: converts the expectation value into a probability. This formula ensures 0 ≤ P ≤ 1.",
+      "L1_intuitive": "This formula converts 'how aligned' into 'how likely'. Perfect alignment gives 100% chance of 'up'. Perfect anti-alignment gives 0%. Perpendicular gives 50%.",
+      "key_insight": "The Born rule bridges expectation values and probabilities.",
+      "depends_on": ["expectationValue"]
+    },
+    "psiAngle": {
+      "display_name": "State at Angle θ",
+      "kind": "definition",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "noncomputable def psiAngle (θ : ℝ) : Q := ⟨0, Real.sin θ, 0, Real.cos θ⟩",
+      "L3_math": "ψ(θ) = sin(θ)·i + cos(θ)·k, a state in the xz-plane at angle θ from z-axis",
+      "L2_physical": "A spin state tilted at angle θ from vertical. At θ=0, it points straight up (z). At θ=90°, it points sideways (x). At θ=180°, it points down (-z).",
+      "L1_intuitive": "Imagine tilting an arrow from pointing up (ceiling) toward pointing sideways (wall). The angle θ measures how much you've tilted it. This formula captures that tilt mathematically.",
+      "key_insight": "We can prepare a particle pointing at any angle we want.",
+      "depends_on": []
+    },
+    "spinZObservable": {
+      "display_name": "Z-Axis Measurement",
+      "kind": "definition",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "def spinZObservable : Q := SPIN_Z  -- the quaternion k = ⟨0, 0, 0, 1⟩",
+      "L3_math": "O_z = k, the spin-z measurement axis (vertical)",
+      "L2_physical": "A Stern-Gerlach apparatus oriented vertically. It separates particles into 'spin-up' and 'spin-down' along the z-axis.",
+      "L1_intuitive": "A detector that asks: 'Is your spin pointing up toward the ceiling, or down toward the floor?' It only cares about vertical.",
+      "key_insight": "We're always measuring along z, but varying the state's angle.",
+      "depends_on": []
+    },
+    "psiAngle_is_pure": {
+      "display_name": "Angle State is Pure",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem psiAngle_is_pure (θ : ℝ) : isPureQuaternion (psiAngle θ) := rfl",
+      "L3_math": "Re(ψ(θ)) = 0 for all θ",
+      "L2_physical": "The angle-dependent state represents a genuine direction in 3D space - it has no scalar component regardless of the angle.",
+      "L1_intuitive": "No matter which way you tilt the arrow, it's still just an arrow pointing somewhere in space. It doesn't suddenly become something else.",
+      "key_insight": "Valid states at all angles.",
+      "depends_on": ["isPureQuaternion", "psiAngle"]
+    },
+    "spinZObservable_is_pure": {
+      "display_name": "Z-Measurement is Pure",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem spinZObservable_is_pure : isPureQuaternion spinZObservable := spin_z_is_pure",
+      "L3_math": "Re(O_z) = 0",
+      "L2_physical": "The z-axis measurement is a valid observable - it represents a real physical direction.",
+      "L1_intuitive": "The vertical detector measures a real direction in space. Nothing exotic here.",
+      "key_insight": "Valid measurement axis.",
+      "depends_on": ["isPureQuaternion", "spinZObservable"]
+    },
+    "psiAngle_is_unit": {
+      "display_name": "Angle State is Normalized",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem psiAngle_is_unit (θ : ℝ) : isUnitQuaternion (psiAngle θ) := by\n  unfold isUnitQuaternion psiAngle\n  simp [Quaternion.normSq]\n  ring_nf\n  exact Real.sin_sq_add_cos_sq θ",
+      "L3_math": "|ψ(θ)|² = sin²(θ) + cos²(θ) = 1 (Pythagorean identity)",
+      "L2_physical": "The state has unit length for all angles. This is guaranteed by the fundamental trigonometric identity sin² + cos² = 1.",
+      "L1_intuitive": "No matter how you tilt the arrow, it stays the same length. The math identity sin² + cos² = 1 ensures this automatically. It's like a compass needle that can point anywhere but never stretches or shrinks.",
+      "key_insight": "Normalization preserved at all angles via Pythagorean identity.",
+      "depends_on": ["isUnitQuaternion", "psiAngle"]
+    },
+    "expectation_angle": {
+      "display_name": "Expectation = cos(θ)",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem expectation_angle (θ : ℝ) :\n    expectationValue (psiAngle θ) spinZObservable = Real.cos θ := by\n  unfold expectationValue psiAngle spinZObservable vecDot vecPart SPIN_Z\n  simp",
+      "L3_math": "⟨O_z⟩_ψ(θ) = cos(θ)",
+      "L2_physical": "The average measurement result is simply the cosine of the angle between state and detector. This is the projection of the state onto the measurement axis.",
+      "L1_intuitive": "If you're pointing straight at the detector (θ=0), the answer is definitely +1. Pointing away (θ=180°), definitely -1. In between, it's the cosine of the angle - a smooth transition from +1 to -1.",
+      "key_insight": "Cosine encodes the projection onto the measurement axis.",
+      "depends_on": ["expectationValue", "psiAngle", "spinZObservable"]
+    },
+    "prob_up_angle": {
+      "display_name": "P(+) = (1 + cos θ)/2",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem prob_up_angle (θ : ℝ) :\n    probUp (psiAngle θ) spinZObservable = (1 + Real.cos θ) / 2 := by\n  unfold probUp\n  rw [expectation_angle]",
+      "L3_math": "P(+|θ) = (1 + cos θ)/2",
+      "L2_physical": "The probability of measuring 'spin-up' follows directly from the expectation value via the Born rule.",
+      "L1_intuitive": "We convert the alignment (cosine) into a probability. When cos θ = 1 (perfect alignment), P = 100%. When cos θ = -1 (opposite), P = 0%. When cos θ = 0 (perpendicular), P = 50%.",
+      "key_insight": "Linear transformation from cosine to probability.",
+      "depends_on": ["probUp", "expectation_angle"]
+    },
+    "prob_up_angle_cos_sq": {
+      "display_name": "P(+) = cos²(θ/2)",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem prob_up_angle_cos_sq (θ : ℝ) :\n    probUp (psiAngle θ) spinZObservable = Real.cos (θ / 2) ^ 2 := by\n  rw [prob_up_angle]\n  rw [Real.cos_sq]\n  ring_nf",
+      "L3_math": "P(+|θ) = cos²(θ/2), using the half-angle identity: cos²(θ/2) = (1 + cos θ)/2",
+      "L2_physical": "The famous quantum mechanical probability formula! The half-angle form reveals the deep connection to spinors - spin-1/2 particles see half the angle.",
+      "L1_intuitive": "This is THE formula for quantum spin measurement. The factor of θ/2 is profound: a spin-1/2 particle needs to rotate 720° (not 360°) to return to its original state. That 'half-angle' shows up here in the probability formula.",
+      "key_insight": "The half-angle is the signature of spin-1/2 particles.",
+      "depends_on": ["prob_up_angle"]
+    },
+    "prob_down_angle_sin_sq": {
+      "display_name": "P(-) = sin²(θ/2)",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem prob_down_angle_sin_sq (θ : ℝ) :\n    probDown (psiAngle θ) spinZObservable = Real.sin (θ / 2) ^ 2 := by\n  rw [prob_down_angle]\n  have h : Real.sin (θ / 2) ^ 2 = (1 - Real.cos θ) / 2 := by\n    have h1 : Real.cos θ = Real.cos (2 * (θ / 2)) := by ring_nf\n    rw [h1, Real.cos_two_mul, Real.sin_sq]\n    ring\n  rw [h]",
+      "L3_math": "P(-|θ) = sin²(θ/2) = (1 - cos θ)/2",
+      "L2_physical": "The complementary probability for 'spin-down'. Note that P(+) + P(-) = cos²(θ/2) + sin²(θ/2) = 1, as required.",
+      "L1_intuitive": "Whatever isn't 'up' must be 'down'. The probabilities always add to 100%. Sin² and cos² are dance partners that always sum to 1.",
+      "key_insight": "Probabilities sum to 1 via Pythagorean identity.",
+      "depends_on": ["prob_up_angle_cos_sq"]
+    },
+    "prob_up_theta_zero": {
+      "display_name": "θ=0: Aligned → P(+)=1",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem prob_up_theta_zero : probUp (psiAngle 0) spinZObservable = 1 := by\n  rw [prob_up_angle]\n  simp [Real.cos_zero]",
+      "L3_math": "P(+|0) = cos²(0) = 1",
+      "L2_physical": "When the state points along +z (θ=0), measuring along z always gives 'up'. No uncertainty - perfect alignment means certain outcome.",
+      "L1_intuitive": "If you're pointing straight at the detector and it asks 'are you pointing at me?', the answer is always 'yes!' No randomness when perfectly aligned.",
+      "key_insight": "Perfect alignment eliminates quantum randomness.",
+      "depends_on": ["prob_up_angle"]
+    },
+    "prob_up_theta_pi": {
+      "display_name": "θ=π: Anti-aligned → P(+)=0",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem prob_up_theta_pi : probUp (psiAngle Real.pi) spinZObservable = 0 := by\n  rw [prob_up_angle]\n  simp [Real.cos_pi]",
+      "L3_math": "P(+|π) = cos²(π/2) = 0",
+      "L2_physical": "When the state points along -z (θ=π), measuring along z always gives 'down'. The particle is definitely pointing the opposite way.",
+      "L1_intuitive": "If you're pointing directly away from the detector and it asks 'are you pointing at me?', the answer is always 'no!' Opposite direction means certain opposite outcome.",
+      "key_insight": "Anti-alignment also eliminates randomness (certain 'down').",
+      "depends_on": ["prob_up_angle"]
+    },
+    "prob_up_theta_pi_div_two": {
+      "display_name": "θ=π/2: Perpendicular → P(+)=1/2",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem prob_up_theta_pi_div_two :\n    probUp (psiAngle (Real.pi / 2)) spinZObservable = 1 / 2 := by\n  rw [prob_up_angle]\n  simp [Real.cos_pi_div_two]",
+      "L3_math": "P(+|π/2) = cos²(π/4) = 1/2",
+      "L2_physical": "When the state is perpendicular to the measurement axis, we get maximum quantum randomness: exactly 50/50. This is the Stern-Gerlach case.",
+      "L1_intuitive": "Point sideways, ask 'up or down?' - perfect coin flip. The particle genuinely has no preference. This is pure quantum randomness, not hidden ignorance.",
+      "key_insight": "Perpendicular = maximum uncertainty = perfect coin flip.",
+      "depends_on": ["prob_up_angle"]
+    },
+    "angle_consistent_with_stern_gerlach": {
+      "display_name": "Matches Stern-Gerlach at θ=π/2",
+      "kind": "theorem",
+      "source_file": "QBP/Experiments/AngleDependent.lean",
+      "L4_formal": "theorem angle_consistent_with_stern_gerlach :\n    psiAngle (Real.pi / 2) = SPIN_X := by\n  unfold psiAngle SPIN_X\n  simp [Real.sin_pi_div_two, Real.cos_pi_div_two]",
+      "L3_math": "ψ(π/2) = sin(π/2)·i + cos(π/2)·k = i = SPIN_X",
+      "L2_physical": "At θ=90°, our angle-dependent state reduces to exactly the spin-x state from the Stern-Gerlach experiment. The formulas are consistent.",
+      "L1_intuitive": "Tilting 90° from vertical gives horizontal - exactly the spin-x state we studied before. The general formula contains the special case as expected. Mathematics is consistent!",
+      "key_insight": "The angle formula generalizes Stern-Gerlach.",
+      "depends_on": ["psiAngle", "prob_up_theta_pi_div_two"]
+    }
+  }
+}
