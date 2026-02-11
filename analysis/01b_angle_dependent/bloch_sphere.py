@@ -330,14 +330,16 @@ class BlochSphereDemo:
         self.scene.append_to_caption(
             f"<h3 style='color: {COLORS.COPPER.hex}; font-family: Georgia; margin: 0 0 10px 0;'>📐 THE PHYSICS</h3>\n"
         )
-        self.scene.append_to_caption(f"""
+        self.scene.append_to_caption(
+            f"""
 <div style="font-family: Georgia; color: {TEXT.LIGHT.PRIMARY.hex}; font-size: 13px; line-height: 1.6;">
 <p><b style="color: {COLORS.COPPER.hex};">State:</b> ψ(θ) = sin(θ)·<b>i</b> + cos(θ)·<b>k</b></p>
 <p><b style="color: {COLORS.VERDIGRIS.hex};">Observable:</b> O = <b>k</b> (measurement along Z)</p>
 <p><b style="color: {COLORS.TERRACOTTA.hex};">Expectation:</b> ⟨O⟩ = vecDot(ψ, O) = cos(θ)</p>
 <p><b style="color: {COLORS.SAGE.hex};">Probability:</b> P(+) = (1 + cos θ)/2 = cos²(θ/2)</p>
 </div>
-""")
+"""
+        )
 
         # Key insight
         self.scene.append_to_caption(
