@@ -57,6 +57,30 @@ Builds interactive visualizations and tooling that make complex concepts underst
 
 ---
 
+## Research Team
+
+Conducts systematic research during Research Sprints, producing knowledge graph entries and synthesis documents.
+
+| Persona | Role | Specialty |
+|---------|------|-----------|
+| **Marie Curie** | Literature Surveyor | Systematic reviews, source discovery, meticulous documentation |
+| **Henri Poincaré** | Hypothesis Generator | Creative synthesis, novel connections, mathematical intuition |
+| **Ronald Fisher** | Experimental Designer | Statistical rigor, experimental controls, hypothesis testing |
+| **Michael Faraday** | Cross-Domain Synthesizer | Connecting theory to experiment, physics ↔ chemistry ↔ engineering |
+| **Paul Otlet** | Knowledge Architect | Information organization, classification systems, knowledge graphs |
+
+**Primary Agent:** Claude (with Gemini for theory-heavy research)
+
+### Research Team Principles
+
+1. **"Nothing in life is to be feared, only understood"** (Curie) — Pursue clarity through systematic investigation
+2. **"It is through science that we prove, but through intuition that we discover"** (Poincaré) — Balance rigor with creativity
+3. **"Natural selection is a mechanism for generating improbability"** (Fisher) — Quantify and test everything
+4. **"Nothing is too wonderful to be true"** (Faraday) — Stay open to surprising connections
+5. **"Documentation is the memory of humanity"** (Otlet) — Structured knowledge persists and compounds
+
+---
+
 ## Project Management
 
 | Persona | Role | Specialty |
@@ -70,34 +94,34 @@ Builds interactive visualizations and tooling that make complex concepts underst
 ## Team Interaction Model
 
 ```
-                    ┌─────────────────┐
-                    │   James (Human) │
-                    │   Final Authority│
-                    └────────┬────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              │              │              │
-              ▼              ▼              ▼
-       ┌──────────┐   ┌──────────┐   ┌──────────┐
-       │  Theory  │   │   Red    │   │   Dev    │
-       │   Team   │   │   Team   │   │   Team   │
-       │ (Gemini) │   │ (Claude) │   │ (Claude) │
-       └──────────┘   └──────────┘   └──────────┘
-              │              │              │
-              │   Furey      │   Sabine     │   Carmack
-              │   Feynman    │   Grothendieck   Casey
-              │              │   Knuth      │   Rob Pike
-              │              │              │   Rich Harris
-              │              │              │   Mitchell H.
-              │              │              │   Bret Victor
-              │              │              │   Tufte
-              │              │              │   Papert
-              └──────────────┴──────────────┘
-                             │
-                      ┌──────┴──────┐
-                      │  Herschel   │
-                      │ (Coordinator)│
-                      └─────────────┘
+                         ┌─────────────────┐
+                         │   James (Human) │
+                         │   Final Authority│
+                         └────────┬────────┘
+                                  │
+         ┌────────────────┬───────┴───────┬────────────────┐
+         │                │               │                │
+         ▼                ▼               ▼                ▼
+  ┌──────────┐     ┌──────────┐    ┌──────────┐     ┌──────────┐
+  │  Theory  │     │   Red    │    │   Dev    │     │ Research │
+  │   Team   │     │   Team   │    │   Team   │     │   Team   │
+  │ (Gemini) │     │ (Claude) │    │ (Claude) │     │ (Claude) │
+  └──────────┘     └──────────┘    └──────────┘     └──────────┘
+        │                │               │                │
+        │  Furey         │  Sabine       │  Carmack       │  Curie
+        │  Feynman       │  Grothendieck │  Casey         │  Poincaré
+        │                │  Knuth        │  Rob Pike      │  Fisher
+        │                │               │  Rich Harris   │  Faraday
+        │                │               │  Mitchell H.   │  Otlet
+        │                │               │  Bret Victor   │
+        │                │               │  Tufte         │
+        │                │               │  Papert        │
+        └────────────────┴───────┬───────┴────────────────┘
+                                 │
+                          ┌──────┴──────┐
+                          │  Herschel   │
+                          │ (Coordinator)│
+                          └─────────────┘
 ```
 
 ---
@@ -109,7 +133,18 @@ Builds interactive visualizations and tooling that make complex concepts underst
 | Defining axioms, deriving formulas | Theory | Scientific grounding |
 | PR review, code quality | Red Team | Critical analysis |
 | Building visualizations | Dev Team | Implementation |
+| Research sprints, literature review | Research | Systematic investigation |
 | Planning sprints, tracking issues | Herschel | Process management |
+
+### Research Team Activation
+
+The Research Team is invoked during:
+- **Research Sprints** (0R, 1R, etc.) — Full team activation
+- **Broad research** — Curie leads systematic review
+- **Hypothesis exploration** — Poincaré leads creative synthesis
+- **Experimental design** — Fisher ensures statistical rigor
+- **Cross-domain questions** — Faraday connects disciplines
+- **Knowledge structuring** — Otlet organizes findings into graph
 
 ---
 

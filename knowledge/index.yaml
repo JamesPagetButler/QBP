@@ -1,0 +1,30 @@
+# QBP Knowledge Graph Index
+# Master index of all knowledge graph entries
+
+version: "1.0"
+last_updated: 2026-02-10
+
+# Statistics (update when adding entries)
+counts:
+  sources: 1
+  concepts: 0
+  claims: 0
+  questions: 1
+
+# Entry listings
+sources:
+  - id: source-arxiv-2208-02334
+    file: sources/arxiv-2208-02334.yaml
+    title: "Knowledge Graph-Based Systematic Literature Review Automation"
+    added: 2026-02-10
+
+concepts: []
+
+claims: []
+
+questions:
+  - id: question-qbp-divergence
+    file: questions/qbp-divergence.yaml
+    question: "Where do QBP predictions diverge from standard QM?"
+    status: open
+    added: 2026-02-10

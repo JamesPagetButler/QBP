@@ -1,0 +1,69 @@
+# Where do QBP predictions diverge from standard QM?
+# High-priority research question for Research Sprint 0R
+
+id: question-qbp-divergence
+type: Question
+
+question: "Where do QBP predictions diverge from standard quantum mechanics?"
+
+context: |
+  QBP (Quaternion-Based Physics) matches standard quantum mechanics exactly
+  for single-particle spin-1/2 systems. This is mathematically necessary
+  because quaternions (ℍ) are isomorphic to the Pauli algebra underlying SU(2).
+
+  For QBP to make novel, testable predictions, we must identify regimes where
+  the quaternion formalism produces different results than standard QM. These
+  could arise in:
+  - Multi-particle systems (entanglement, correlations)
+  - Extensions to octonions or other division algebras
+  - Specific experimental configurations
+  - Higher-spin systems
+
+status: open
+
+priority: high
+
+related_issues:
+  - 167  # Research: Identify where QBP predictions diverge from standard QM
+
+background:
+  - source: source-qbp-proof-review
+    finding: "Single-particle match is mathematically necessary due to quaternion-Pauli isomorphism"
+    date: 2026-02-10
+
+  - source: source-qbp-angle-dependent
+    finding: "Experiment 01b confirms P(+) = cos²(θ/2) matches standard QM exactly"
+    date: 2026-02-10
+
+investigation_approaches:
+  - approach: "Analyze Bell inequality predictions"
+    rationale: "Multi-particle correlations may differ"
+    status: not_started
+
+  - approach: "Investigate multi-particle entanglement formalism"
+    rationale: "Tensor products of quaternions vs standard QM formalism"
+    status: not_started
+
+  - approach: "Explore octonion extensions"
+    rationale: "Octonions are non-associative, may yield different predictions"
+    status: not_started
+
+  - approach: "Review literature on quaternion QM attempts"
+    rationale: "Learn from prior work in this area"
+    status: not_started
+
+success_criteria:
+  - "Identify at least one regime where QBP predicts differently than QM"
+  - "OR prove that QBP is mathematically equivalent to QM in all regimes"
+  - "Document the analysis path either way"
+
+tags:
+  - novel-predictions
+  - foundations
+  - high-priority
+  - bell-theorem
+  - entanglement
+
+added_by: claude
+added_date: 2026-02-10
+research_sprint: 0R
