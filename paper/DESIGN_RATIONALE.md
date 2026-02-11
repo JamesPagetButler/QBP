@@ -322,3 +322,116 @@ This has both positive and negative implications:
 - Relativistic extensions (where the quaternion structure might impose different constraints)
 
 See issue #167 for ongoing research into potential QBP divergences.
+
+## 7. Sprint 2 Analysis — Experiment 01b: Angle-Dependent Measurement
+
+This section documents the findings from Sprint 2, which tested the QBP framework's ability to reproduce the quantum mechanical prediction P(+) = cos²(θ/2) for angle-dependent spin measurements.
+
+### 7.1 Summary of Findings
+
+Sprint 2 validated the quaternion rotation formalism and its connection to SU(2):
+
+| Finding | Significance |
+|---------|--------------|
+| `P(+) = cos²(θ/2)` reproduced exactly | QBP matches QM for all angles tested |
+| 9 angles tested, all within 3σ | Statistical validation across parameter space |
+| Rotation via conjugation `q·O·q⁻¹` | Quaternion formula correctly implements SO(3) rotation |
+| Half-angle appears naturally | SU(2) double-cover structure emerges from algebra |
+
+**Key validation:** The cos²(θ/2) formula — predicted by Section 6.4.2 — was confirmed experimentally across angles from 0° to 180°. Maximum deviation was 0.67σ at θ = 120° (10,000 trials per angle).
+
+### 7.2 The Rotation Implementation
+
+Sprint 2 added the rotation functions to `qphysics.py`. The core implementation:
+
+```python
+def rotate_quaternion(q, axis, angle):
+    """
+    Rotate quaternion q by angle (radians) about axis (3-vector).
+    Uses the conjugation formula: q' = r * q * r⁻¹
+    where r = cos(θ/2) + sin(θ/2) * axis_quaternion
+    """
+    # Construct rotation quaternion (note: half-angle!)
+    half = angle / 2
+    r = np.array([np.cos(half),                    # real part
+                  np.sin(half) * axis[0],          # i component
+                  np.sin(half) * axis[1],          # j component
+                  np.sin(half) * axis[2]])         # k component
+
+    # Apply conjugation: r * q * r⁻¹
+    return quat_mul(quat_mul(r, q), quat_conjugate(r))
+```
+
+**Critical insight:** The half-angle `θ/2` in the rotation quaternion is not a mathematical convenience — it is the physical manifestation of the SU(2) double cover. This was proven formally in Lean (see `proofs/Experiments/AngleDependent.lean`).
+
+### 7.3 Why the Half-Angle is Physical
+
+Section 6.6 predicted that the half-angle would appear naturally. Sprint 2 confirmed this prediction and clarified the mechanism:
+
+1. **Rotation quaternion:** `r = cos(θ/2) + sin(θ/2)·ĵ` for rotation about y-axis
+2. **Observable rotation:** `O_θ = r·k·r⁻¹ = cos(θ)·k + sin(θ)·î`
+3. **Expectation value:** `⟨O_θ⟩ = vecDot(ψ, O_θ) = cos(θ)` for ψ = k
+4. **Probability:** `P(+) = (1 + cos θ)/2 = cos²(θ/2)`
+
+The half-angle appears *twice*:
+- Once in the rotation quaternion construction (algebraic necessity)
+- Once in the final probability formula (physical result)
+
+This double appearance is the signature of spin-1/2: a 360° rotation of the measurement apparatus produces a 180° change in the underlying state, not 360°.
+
+### 7.4 Formal Verification Summary
+
+The Lean 4 proofs in `proofs/Experiments/AngleDependent.lean` establish:
+
+| Theorem | Statement |
+|---------|-----------|
+| `rotation_quaternion_is_unit` | `‖cos(θ/2) + sin(θ/2)·ĵ‖ = 1` |
+| `rotated_observable_is_pure` | `q·O·q⁻¹` has zero real part when O is pure |
+| `expectation_for_rotated` | `vecDot(k, rotate(k, θ)) = cos(θ)` |
+| `prob_up_angle` | `P(+) = (1 + cos(θ))/2 = cos²(θ/2)` |
+
+The proof uses the half-angle identity `(1 + cos θ)/2 = cos²(θ/2)` as a lemma, making explicit that this standard trigonometric fact encodes the SU(2) structure.
+
+### 7.5 Emergent Phenomena
+
+We evaluated Sprint 2 against the Guide Posts for Emergent Phenomena:
+
+| Guide Post | Status | Notes |
+|------------|--------|-------|
+| Emergent Conservation Laws | Not yet observed | Unitarity preserved in rotation (norm-preserving) |
+| Emergent Symmetries | **Confirmed** | SO(3) rotation symmetry fully operational |
+| Particle Equivalents | Not applicable | Single-particle experiment |
+| Interaction Models | Not applicable | No interactions modeled |
+| Collective Behavior | Not applicable | Single-particle experiment |
+
+**Primary emergent phenomenon:** The continuous variation of measurement probability with angle emerges naturally from the geometry of quaternion rotation. The specific functional form cos²(θ/2) is not imposed but arises from:
+1. The quaternion rotation formula (with its half-angle)
+2. The measurement postulate (expectation via dot product)
+3. Standard trigonometry (half-angle identity)
+
+### 7.6 Visualization Advances
+
+Sprint 2 Phase 4c extended the interactive proof visualization with:
+
+1. **Larger graph support:** The angle-dependent proof has 18 nodes (vs. 7 for Stern-Gerlach)
+2. **No-overlap layout:** Barycenter ordering + actual width calculation guarantees readability
+3. **Pan/zoom navigation:** Virtual canvas with mouse/keyboard controls for exploring large graphs
+4. **Build timestamps:** Visible version indicator for debugging WASM cache issues
+
+Key UX lesson: When layout problems occur, fix the layout algorithm first — don't immediately add scrolling as a workaround.
+
+### 7.7 Open Questions for Future Sprints
+
+1. **Sequential measurements:** What happens when we measure, then rotate, then measure again? Does QBP correctly model the collapse-rotate-measure sequence?
+
+2. **Non-orthogonal states:** Sprint 1-2 used eigenstates (pure quaternions aligned with axes). What happens with superposition states?
+
+3. **Entanglement:** Can the rotation formalism extend to two-particle systems? How would we represent `|↑↓⟩ - |↓↑⟩`?
+
+4. **Higher spins:** The quaternion framework naturally handles spin-1/2 (SU(2)). What algebraic structure would handle spin-1 or spin-3/2?
+
+### 7.8 Conclusion
+
+Sprint 2 confirms that QBP reproduces standard quantum mechanics for angle-dependent measurements. The theoretical prediction from Section 6.4 was validated both numerically (simulation) and formally (Lean proofs). The half-angle formula cos²(θ/2) emerges naturally from quaternion algebra, providing an alternative but equivalent description of spin-1/2 physics.
+
+This completes the single-particle, single-measurement validation of QBP. Future sprints will probe more complex scenarios where QBP might diverge from standard QM predictions.
