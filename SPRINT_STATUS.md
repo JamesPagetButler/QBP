@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 2 (Experiment 01b: Angle-Dependent Measurement)
-- **Lifecycle Stage:** Sprint 2 Phase 5 (Publication)
-- **Next Critical-Path Action:** Phase 5 Publication (#164)
+- **Lifecycle Stage:** Sprint 2 Complete — Research Sprint 0R next
+- **Next Critical-Path Action:** Research Sprint 0R (#212) or Theory Refinement (#165)
 
 > **Note:** Sprint 2 implements Experiment 01b (an extension of Stern-Gerlach to arbitrary angles), not a new experiment. See `research/README.md` for the Sprint ↔ Experiment mapping.
 
@@ -23,7 +23,7 @@
   - [x] 4a: Formal Proof (#200) — CLOSED 2026-02-10. PR #210 merged. Lean 4 proofs for cos²(θ/2) formula.
   - [x] 4b: Proof Review (#201) — CLOSED 2026-02-10. PR #216 merged. Axiom-first review passed. CI fixes included.
   - [x] 4c: Interactive Proof Visualization (#202) — CLOSED 2026-02-11. PR #226 merged. Viewport pan/zoom, no-overlap layout.
-- [ ] Phase 5: Publication (#164)
+- [x] Phase 5: Publication (#164) — CLOSED 2026-02-11. PR #230 merged. Paper Task 2, DESIGN_RATIONALE Section 7, API docs.
 - [ ] **Research Sprint 0R** (#212) — One-off: doing research before Theory Refinement
 - [ ] Theory Refinement (#165)
 
