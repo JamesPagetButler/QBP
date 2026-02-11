@@ -345,21 +345,20 @@ Sprint 2 validated the quaternion rotation formalism and its connection to SU(2)
 Sprint 2 added the rotation functions to `qphysics.py`. The core implementation:
 
 ```python
-def rotate_quaternion(q, axis, angle):
+def rotate_observable(observable, theta, axis):
     """
-    Rotate quaternion q by angle (radians) about axis (3-vector).
-    Uses the conjugation formula: q' = r * q * r⁻¹
-    where r = cos(θ/2) + sin(θ/2) * axis_quaternion
+    Rotate an observable (pure quaternion) by angle theta about the given axis.
+    Uses the quaternion rotation formula: O' = q * O * q⁻¹
     """
     # Construct rotation quaternion (note: half-angle!)
-    half = angle / 2
-    r = np.array([np.cos(half),                    # real part
-                  np.sin(half) * axis[0],          # i component
-                  np.sin(half) * axis[1],          # j component
-                  np.sin(half) * axis[2]])         # k component
+    q = create_rotation(theta, axis)
+    q_conj = q.conjugate()
 
-    # Apply conjugation: r * q * r⁻¹
-    return quat_mul(quat_mul(r, q), quat_conjugate(r))
+    # Apply conjugation: q * O * q⁻¹
+    rotated = q * observable * q_conj
+
+    # Clean up numerical noise (result should be pure)
+    return np.quaternion(0, rotated.x, rotated.y, rotated.z)
 ```
 
 **Critical insight:** The half-angle `θ/2` in the rotation quaternion is not a mathematical convenience — it is the physical manifestation of the SU(2) double cover. This was proven formally in Lean (see `proofs/Experiments/AngleDependent.lean`).
