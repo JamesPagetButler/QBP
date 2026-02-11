@@ -46,7 +46,7 @@ def find_experiments(base_path: Path) -> dict[str, list[str]]:
 
     Returns dict mapping experiment number to list of names.
     """
-    experiments = defaultdict(list)
+    experiments: dict[str, list[str]] = defaultdict(list)
 
     if not base_path.exists():
         return experiments

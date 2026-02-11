@@ -29,7 +29,9 @@ import sys
 import os
 
 # Add project root to path for imports
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 sys.path.insert(0, project_root)
 
 from vpython import (
@@ -249,7 +251,7 @@ class BlochSphereDemo:
     def create_angle_arc(self, theta_deg):
         """Create an arc showing the angle between state and z-axis."""
         # Remove old arc if exists
-        if hasattr(self, 'angle_arc') and self.angle_arc:
+        if hasattr(self, "angle_arc") and self.angle_arc:
             self.angle_arc.visible = False
 
         theta_rad = np.radians(theta_deg)
@@ -364,13 +366,13 @@ class BlochSphereDemo:
 
         # Also show cos²(θ/2) form
         cos_half = np.cos(theta_rad / 2)
-        cos_sq_half = cos_half ** 2
+        cos_sq_half = cos_half**2
 
         # Use design system colors for LIGHT background
-        sage = COLORS.SAGE.hex          # Green for positive
+        sage = COLORS.SAGE.hex  # Green for positive
         terracotta = COLORS.TERRACOTTA.hex  # Warm for negative
         secondary = TEXT.LIGHT.SECONDARY.hex  # Gray for details
-        copper = COLORS.COPPER.hex      # Accent
+        copper = COLORS.COPPER.hex  # Accent
         primary = TEXT.LIGHT.PRIMARY.hex  # Main text
         return f"""
 <table style="font-family: Georgia; color: {primary}; font-size: 14px;">
@@ -421,9 +423,7 @@ class BlochSphereDemo:
         arc_mid_angle = theta_rad / 2
         label_r = 0.4
         self.angle_label.pos = vector(
-            label_r * np.sin(arc_mid_angle),
-            0.1,
-            label_r * np.cos(arc_mid_angle)
+            label_r * np.sin(arc_mid_angle), 0.1, label_r * np.cos(arc_mid_angle)
         )
         self.angle_label.text = f"θ = {theta_deg:.0f}°"
 
@@ -434,7 +434,9 @@ class BlochSphereDemo:
             self.projection_line.append(vector(0, 0, z))
 
         # Update text displays
-        self.angle_text.text = f" <b style='color: {COLORS.COPPER.hex};'>{theta_deg:.0f}°</b>"
+        self.angle_text.text = (
+            f" <b style='color: {COLORS.COPPER.hex};'>{theta_deg:.0f}°</b>"
+        )
         self.prob_text.text = self.format_probability(theta_deg)
 
     def run(self):

@@ -18,7 +18,9 @@ from datetime import datetime
 from typing import Tuple
 
 # Add project root to path for imports
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 sys.path.insert(0, project_root)
 
 from src.viz.theme import apply_matplotlib_theme, COLORS, PALETTE
@@ -84,52 +86,73 @@ def plot_probability_curve(df: pd.DataFrame, output_path: str):
     theta_rad = np.radians(theta_smooth)
     p_theory = np.cos(theta_rad / 2) ** 2
 
-    ax.plot(theta_smooth, p_theory,
-            color=COLORS.TEAL.hex,
-            linewidth=2.5,
-            label=r"Theory: $P(+) = \cos^2(\theta/2)$",
-            zorder=1)
+    ax.plot(
+        theta_smooth,
+        p_theory,
+        color=COLORS.TEAL.hex,
+        linewidth=2.5,
+        label=r"Theory: $P(+) = \cos^2(\theta/2)$",
+        zorder=1,
+    )
 
     # Extract trial count from data (σ comes from binomial: σ = √(Np(1-p)))
     n_particles = df["num_particles"].iloc[0]
 
     # Measured data points with error bars
     # Convert count σ to probability σ by dividing by N
-    trials_label = f"{n_particles // 1_000_000}M" if n_particles >= 1_000_000 else f"{n_particles:,}"
-    ax.errorbar(df["angle_deg"], df["measured_prob"],
-                yerr=df["sigma"] / n_particles,
-                fmt='o',
-                color=COLORS.BRASS.hex,
-                markersize=8,
-                capsize=4,
-                capthick=1.5,
-                elinewidth=1.5,
-                label=f"Measured ({trials_label} trials per angle)",
-                zorder=2)
+    trials_label = (
+        f"{n_particles // 1_000_000}M"
+        if n_particles >= 1_000_000
+        else f"{n_particles:,}"
+    )
+    ax.errorbar(
+        df["angle_deg"],
+        df["measured_prob"],
+        yerr=df["sigma"] / n_particles,
+        fmt="o",
+        color=COLORS.BRASS.hex,
+        markersize=8,
+        capsize=4,
+        capthick=1.5,
+        elinewidth=1.5,
+        label=f"Measured ({trials_label} trials per angle)",
+        zorder=2,
+    )
 
     # Formatting
     ax.set_xlabel("Angle θ (degrees)", fontsize=12)
     ax.set_ylabel("Probability P(+)", fontsize=12)
-    ax.set_title("Angle-Dependent Spin Measurement: QBP vs Theory", fontsize=14, fontweight='bold')
+    ax.set_title(
+        "Angle-Dependent Spin Measurement: QBP vs Theory",
+        fontsize=14,
+        fontweight="bold",
+    )
 
     ax.set_xlim(-5, 185)
     ax.set_ylim(-0.05, 1.05)
     ax.set_xticks([0, 30, 45, 60, 90, 120, 135, 150, 180])
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
 
-    ax.legend(loc='upper right', fontsize=10)
+    ax.legend(loc="upper right", fontsize=10)
     ax.grid(True, alpha=0.3)
 
     # Add annotation for key physics
-    ax.annotate(r"$P(+) = \frac{1 + \cos\theta}{2}$",
-                xy=(90, 0.5), xytext=(110, 0.65),
-                fontsize=11,
-                arrowprops=dict(arrowstyle='->', color=COLORS.STEEL.hex, lw=1.5),
-                bbox=dict(boxstyle='round,pad=0.3', facecolor=COLORS.IVORY.hex,
-                         edgecolor=COLORS.BRASS.hex, alpha=0.9))
+    ax.annotate(
+        r"$P(+) = \frac{1 + \cos\theta}{2}$",
+        xy=(90, 0.5),
+        xytext=(110, 0.65),
+        fontsize=11,
+        arrowprops=dict(arrowstyle="->", color=COLORS.STEEL.hex, lw=1.5),
+        bbox=dict(
+            boxstyle="round,pad=0.3",
+            facecolor=COLORS.IVORY.hex,
+            edgecolor=COLORS.BRASS.hex,
+            alpha=0.9,
+        ),
+    )
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
     print(f"Saved: {output_path}")
 
@@ -143,54 +166,79 @@ def plot_deviation_analysis(df: pd.DataFrame, output_path: str):
     fig, ax = plt.subplots(figsize=(10, 5))
 
     # Horizontal bands for ±1σ, ±2σ, ±3σ
-    ax.axhspan(-1, 1, alpha=0.3, color=COLORS.TEAL.hex, label='±1σ')
+    ax.axhspan(-1, 1, alpha=0.3, color=COLORS.TEAL.hex, label="±1σ")
     ax.axhspan(-2, -1, alpha=0.2, color=COLORS.AMBER.hex)
-    ax.axhspan(1, 2, alpha=0.2, color=COLORS.AMBER.hex, label='±2σ')
+    ax.axhspan(1, 2, alpha=0.2, color=COLORS.AMBER.hex, label="±2σ")
     ax.axhspan(-3, -2, alpha=0.15, color=COLORS.CRIMSON.hex)
-    ax.axhspan(2, 3, alpha=0.15, color=COLORS.CRIMSON.hex, label='±3σ (threshold)')
+    ax.axhspan(2, 3, alpha=0.15, color=COLORS.CRIMSON.hex, label="±3σ (threshold)")
 
     # Zero line
-    ax.axhline(0, color=COLORS.STEEL.hex, linewidth=1, linestyle='--', alpha=0.7)
+    ax.axhline(0, color=COLORS.STEEL.hex, linewidth=1, linestyle="--", alpha=0.7)
 
     # ±3σ threshold lines
-    ax.axhline(3, color=COLORS.CRIMSON.hex, linewidth=1.5, linestyle='-', alpha=0.8)
-    ax.axhline(-3, color=COLORS.CRIMSON.hex, linewidth=1.5, linestyle='-', alpha=0.8)
+    ax.axhline(3, color=COLORS.CRIMSON.hex, linewidth=1.5, linestyle="-", alpha=0.8)
+    ax.axhline(-3, color=COLORS.CRIMSON.hex, linewidth=1.5, linestyle="-", alpha=0.8)
 
     # Data points
     # Mark deterministic cases (σ=0) differently
     df_stochastic = df[df["sigma"] > 0]
     df_deterministic = df[df["sigma"] == 0]
 
-    ax.scatter(df_stochastic["angle_deg"], df_stochastic["deviation_sigma"],
-               s=100, color=COLORS.BRASS.hex, edgecolors=COLORS.COPPER.hex,
-               linewidths=1.5, zorder=5, label='Measured deviation')
+    ax.scatter(
+        df_stochastic["angle_deg"],
+        df_stochastic["deviation_sigma"],
+        s=100,
+        color=COLORS.BRASS.hex,
+        edgecolors=COLORS.COPPER.hex,
+        linewidths=1.5,
+        zorder=5,
+        label="Measured deviation",
+    )
 
     # Deterministic cases: always exactly 0 deviation
-    ax.scatter(df_deterministic["angle_deg"], df_deterministic["deviation_sigma"],
-               s=100, color=COLORS.GOLD.hex, edgecolors=COLORS.COPPER.hex,
-               linewidths=1.5, marker='D', zorder=5, label='Deterministic (exact)')
+    ax.scatter(
+        df_deterministic["angle_deg"],
+        df_deterministic["deviation_sigma"],
+        s=100,
+        color=COLORS.GOLD.hex,
+        edgecolors=COLORS.COPPER.hex,
+        linewidths=1.5,
+        marker="D",
+        zorder=5,
+        label="Deterministic (exact)",
+    )
 
     # Formatting
     ax.set_xlabel("Angle θ (degrees)", fontsize=12)
     ax.set_ylabel("Deviation from Prediction (σ units)", fontsize=12)
-    ax.set_title("Statistical Deviation Analysis: All Points Within 3σ", fontsize=14, fontweight='bold')
+    ax.set_title(
+        "Statistical Deviation Analysis: All Points Within 3σ",
+        fontsize=14,
+        fontweight="bold",
+    )
 
     ax.set_xlim(-5, 185)
     ax.set_ylim(-4, 4)
     ax.set_xticks([0, 30, 45, 60, 90, 120, 135, 150, 180])
     ax.set_yticks([-3, -2, -1, 0, 1, 2, 3])
 
-    ax.legend(loc='upper right', fontsize=9)
-    ax.grid(True, alpha=0.3, axis='x')
+    ax.legend(loc="upper right", fontsize=9)
+    ax.grid(True, alpha=0.3, axis="x")
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
     print(f"Saved: {output_path}")
 
 
-def generate_results_md(df: pd.DataFrame, source_file: str, chi2: float,
-                        p_value: float, dof: int, output_dir: str):
+def generate_results_md(
+    df: pd.DataFrame,
+    source_file: str,
+    chi2: float,
+    p_value: float,
+    dof: int,
+    output_dir: str,
+):
     """Generate RESULTS.md report."""
 
     # Check if all points passed
@@ -211,10 +259,10 @@ def generate_results_md(df: pd.DataFrame, source_file: str, chi2: float,
     # Build per-angle breakdown table dynamically from data
     breakdown_rows = []
     for _, row in df.iterrows():
-        n = int(row['num_particles'])
-        count = int(row['num_up'])
-        mu = int(row['expected_prob'] * n)
-        sigma = row['sigma']
+        n = int(row["num_particles"])
+        count = int(row["num_up"])
+        mu = int(row["expected_prob"] * n)
+        sigma = row["sigma"]
         diff = abs(count - mu)
         breakdown_rows.append(
             f"| {row['angle_deg']:.0f}° | {n:,} | {count:,} | {mu:,} | {sigma:.1f} | {diff:,} |"

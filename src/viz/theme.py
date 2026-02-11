@@ -26,7 +26,6 @@ Usage:
 from dataclasses import dataclass
 from typing import Tuple, Optional
 
-
 # =============================================================================
 # COLOR DEFINITIONS
 # =============================================================================
@@ -81,12 +80,14 @@ def relative_luminance(r: int, g: int, b: int) -> float:
     Returns:
         Relative luminance 0-1
     """
+
     def channel(c: int) -> float:
         c_norm = c / 255
         if c_norm <= 0.04045:
             return c_norm / 12.92
         else:
             return ((c_norm + 0.055) / 1.055) ** 2.4
+
     return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
 
 
@@ -155,81 +156,83 @@ class COLORS:
     # =========================================================================
     # LEGACY METALS — The precision instruments we inherited
     # =========================================================================
-    BRASS = Color("Brass", "#D4A574")       # Warm, polished brass (keep)
-    COPPER = Color("Copper", "#B87333")     # Rich copper patina
-    BRONZE = Color("Bronze", "#CD7F32")     # Deep bronze mechanisms
-    STEEL = Color("Steel", "#71797E")       # Cool iron-steel (muted)
+    BRASS = Color("Brass", "#D4A574")  # Warm, polished brass (keep)
+    COPPER = Color("Copper", "#B87333")  # Rich copper patina
+    BRONZE = Color("Bronze", "#CD7F32")  # Deep bronze mechanisms
+    STEEL = Color("Steel", "#71797E")  # Cool iron-steel (muted)
 
     # =========================================================================
     # SOLAR LIGHT — Illumination and understanding
     # =========================================================================
-    GOLD = Color("Gold", "#FFD700")         # Pure solar gold, highlights (vibrant!)
-    OCHRE = Color("Ochre", "#D4AA5A")       # Earth pigment, warm academic tone
-    AMBER = Color("Amber", "#F4A261")       # Gaslight glow, warmth
-    SIENNA = Color("Sienna", "#C9956A")     # Burnt earth, warm accent
+    GOLD = Color("Gold", "#FFD700")  # Pure solar gold, highlights (vibrant!)
+    OCHRE = Color("Ochre", "#D4AA5A")  # Earth pigment, warm academic tone
+    AMBER = Color("Amber", "#F4A261")  # Gaslight glow, warmth
+    SIENNA = Color("Sienna", "#C9956A")  # Burnt earth, warm accent
 
     # Legacy alias for backward compatibility
-    SOLAR = Color("Solar", "#D4AA5A")       # Alias for OCHRE
+    SOLAR = Color("Solar", "#D4AA5A")  # Alias for OCHRE
 
     # =========================================================================
     # LIVING GREENS — Nature's truth, organic elegance
     # Academic naming: Natural materials and aged surfaces
     # =========================================================================
-    SAGE = Color("Sage", "#3D8B6E")         # Muted green, growth, life
-    JADE = Color("Jade", "#00A86B")         # Legacy: Growth, correctness
-    PATINA = Color("Patina", "#5A9E94")     # Aged copper-green, depth
-    TEAL = Color("Teal", "#2A9D8F")         # Legacy: Deep ocean, Z-axis
-    VERDANT = Color("Verdant", "#228B22")   # Forest green, flourishing
+    SAGE = Color("Sage", "#3D8B6E")  # Muted green, growth, life
+    JADE = Color("Jade", "#00A86B")  # Legacy: Growth, correctness
+    PATINA = Color("Patina", "#5A9E94")  # Aged copper-green, depth
+    TEAL = Color("Teal", "#2A9D8F")  # Legacy: Deep ocean, Z-axis
+    VERDANT = Color("Verdant", "#228B22")  # Forest green, flourishing
     VERDIGRIS = Color("Verdigris", "#3D7A73")  # Aged copper, transition
 
     # =========================================================================
     # SKY & EARTH — Openness and warmth
     # Academic naming: Natural pigments and materials
     # =========================================================================
-    SKY = Color("Sky", "#87CEEB")           # Open sky, possibility
+    SKY = Color("Sky", "#87CEEB")  # Open sky, possibility
     TERRACOTTA = Color("Terracotta", "#C4785A")  # Baked earth, X-axis base
-    CLAY = Color("Clay", "#D9956E")         # Warm earth, accessible X-axis
-    CORAL = Color("Coral", "#E07B53")       # Legacy: Warm accent
+    CLAY = Color("Clay", "#D9956E")  # Warm earth, accessible X-axis
+    CORAL = Color("Coral", "#E07B53")  # Legacy: Warm accent
 
     # =========================================================================
     # LEGACY ACCENTS — Kept for continuity
     # =========================================================================
-    CRIMSON = Color("Crimson", "#9B2335")   # X-axis on light bg, warnings
-    IVORY = Color("Ivory", "#FFFEF0")       # Aged paper, warm labels
+    CRIMSON = Color("Crimson", "#9B2335")  # X-axis on light bg, warnings
+    IVORY = Color("Ivory", "#FFFEF0")  # Aged paper, warm labels
 
     # =========================================================================
     # BACKGROUNDS — From industrial dark to verdant night
     # =========================================================================
-    PARCHMENT = Color("Parchment", "#F5E6D3")    # Light mode, warm paper
-    VERDANT_NIGHT = Color("Verdant Night", "#0D2820")  # Dark with green tint (new primary)
+    PARCHMENT = Color("Parchment", "#F5E6D3")  # Light mode, warm paper
+    VERDANT_NIGHT = Color(
+        "Verdant Night", "#0D2820"
+    )  # Dark with green tint (new primary)
     DARK_SLATE = Color("Dark Slate", "#1A1A2E")  # Legacy industrial dark
-    MIDNIGHT = Color("Midnight", "#0D1B2A")      # Deep space black
+    MIDNIGHT = Color("Midnight", "#0D1B2A")  # Deep space black
 
     # =========================================================================
     # TEXT COLORS: Dark Mode (on VERDANT_NIGHT/DARK_SLATE)
     # =========================================================================
-    CLOUD = Color("Cloud", "#F5F5F5")       # Primary text (14.4:1)
-    SILVER = Color("Silver", "#B8B8B8")     # Secondary text (7.9:1)
-    ASH = Color("Ash", "#9A9A9A")           # Tertiary text (5.6:1)
+    CLOUD = Color("Cloud", "#F5F5F5")  # Primary text (14.4:1)
+    SILVER = Color("Silver", "#B8B8B8")  # Secondary text (7.9:1)
+    ASH = Color("Ash", "#9A9A9A")  # Tertiary text (5.6:1)
     # IVORY for warm accent text (15.4:1)
 
     # =========================================================================
     # TEXT COLORS: Light Mode (on PARCHMENT)
     # =========================================================================
-    SHADOW = Color("Shadow", "#2C2C2C")     # Primary text (11.4:1)
-    CHARCOAL = Color("Charcoal", "#3D3D3D") # Secondary text (8.9:1)
-    SLATE = Color("Slate", "#555566")       # Tertiary text (6.0:1)
+    SHADOW = Color("Shadow", "#2C2C2C")  # Primary text (11.4:1)
+    CHARCOAL = Color("Charcoal", "#3D3D3D")  # Secondary text (8.9:1)
+    SLATE = Color("Slate", "#555566")  # Tertiary text (6.0:1)
 
     # =========================================================================
     # ACADEMIC LIGHT VARIANTS — Accessible on dark backgrounds
     # Used for axis colors and accent elements
     # =========================================================================
-    SAGE_LIGHT = Color("Sage Light", "#5BA88A")         # Y-axis on dark (5.5:1)
+    SAGE_LIGHT = Color("Sage Light", "#5BA88A")  # Y-axis on dark (5.5:1)
 
     # Legacy aliases for backward compatibility (reference existing colors)
-    CORAL_BRIGHT = CLAY                                  # Legacy alias → CLAY
-    JADE_BRIGHT = SAGE_LIGHT                             # Legacy alias → SAGE_LIGHT
-    TEAL_BRIGHT = PATINA                                 # Legacy alias → PATINA
+    CORAL_BRIGHT = CLAY  # Legacy alias → CLAY
+    JADE_BRIGHT = SAGE_LIGHT  # Legacy alias → SAGE_LIGHT
+    TEAL_BRIGHT = PATINA  # Legacy alias → PATINA
     CRIMSON_BRIGHT = Color("Crimson Bright", "#E84057")  # Legacy vivid red (4.0:1)
     VERDIGRIS_BRIGHT = Color("Verdigris Bright", "#5FA393")  # Bright patina (5.4:1)
 
@@ -259,19 +262,21 @@ class TEXT:
 
     class DARK:
         """Text colors for dark backgrounds (VERDANT_NIGHT, DARK_SLATE)."""
-        PRIMARY = COLORS.CLOUD      # Main body text (14.4:1) - clear, neutral
-        SECONDARY = COLORS.SILVER   # Supporting text (7.9:1) - still prominent
-        TERTIARY = COLORS.ASH       # Captions, hints (5.6:1) - subtle but readable
-        ACCENT = COLORS.IVORY       # Warm emphasis (15.4:1) - titles, highlights
-        MUTED = COLORS.STEEL        # Large text only (3.5:1) - use sparingly
+
+        PRIMARY = COLORS.CLOUD  # Main body text (14.4:1) - clear, neutral
+        SECONDARY = COLORS.SILVER  # Supporting text (7.9:1) - still prominent
+        TERTIARY = COLORS.ASH  # Captions, hints (5.6:1) - subtle but readable
+        ACCENT = COLORS.IVORY  # Warm emphasis (15.4:1) - titles, highlights
+        MUTED = COLORS.STEEL  # Large text only (3.5:1) - use sparingly
 
     class LIGHT:
         """Text colors for light backgrounds (PARCHMENT)."""
-        PRIMARY = COLORS.SHADOW     # Main body text (11.4:1) - strong contrast
-        SECONDARY = COLORS.CHARCOAL # Supporting text (8.9:1) - good clarity
-        TERTIARY = COLORS.SLATE     # Captions, hints (6.0:1) - subtle
-        ACCENT = COLORS.COPPER      # Warm emphasis (3.1:1) - large text only
-        MUTED = COLORS.STEEL        # Large text only (3.6:1) - use sparingly
+
+        PRIMARY = COLORS.SHADOW  # Main body text (11.4:1) - strong contrast
+        SECONDARY = COLORS.CHARCOAL  # Supporting text (8.9:1) - good clarity
+        TERTIARY = COLORS.SLATE  # Captions, hints (6.0:1) - subtle
+        ACCENT = COLORS.COPPER  # Warm emphasis (3.1:1) - large text only
+        MUTED = COLORS.STEEL  # Large text only (3.6:1) - use sparingly
 
 
 # =============================================================================
@@ -292,38 +297,38 @@ class PALETTE:
     # AXIS COLORS — The story of measurement (Academic naming)
     # =========================================================================
     # On light backgrounds
-    AXIS_X = COLORS.TERRACOTTA      # X-axis: warm earth
-    AXIS_Y = COLORS.SAGE            # Y-axis: natural growth
-    AXIS_Z = COLORS.VERDIGRIS       # Z-axis: aged depth
+    AXIS_X = COLORS.TERRACOTTA  # X-axis: warm earth
+    AXIS_Y = COLORS.SAGE  # Y-axis: natural growth
+    AXIS_Z = COLORS.VERDIGRIS  # Z-axis: aged depth
 
     # On dark backgrounds (accessible muted academic tones)
-    AXIS_X_DARK = COLORS.CLAY           # X-axis on dark (6.2:1)
-    AXIS_Y_DARK = COLORS.SAGE_LIGHT     # Y-axis on dark (5.9:1)
-    AXIS_Z_DARK = COLORS.PATINA         # Z-axis on dark (5.4:1)
+    AXIS_X_DARK = COLORS.CLAY  # X-axis on dark (6.2:1)
+    AXIS_Y_DARK = COLORS.SAGE_LIGHT  # Y-axis on dark (5.9:1)
+    AXIS_Z_DARK = COLORS.PATINA  # Z-axis on dark (5.4:1)
 
     # Legacy axis colors (for backward compatibility)
-    AXIS_X_LEGACY = COLORS.CRIMSON      # Original X-axis
-    AXIS_Y_LEGACY = COLORS.JADE         # Original Y-axis (vivid)
-    AXIS_Z_LEGACY = COLORS.TEAL         # Original Z-axis (vivid)
+    AXIS_X_LEGACY = COLORS.CRIMSON  # Original X-axis
+    AXIS_Y_LEGACY = COLORS.JADE  # Original Y-axis (vivid)
+    AXIS_Z_LEGACY = COLORS.TEAL  # Original Z-axis (vivid)
 
     # =========================================================================
     # SEMANTIC COLORS — For data and states
     # =========================================================================
-    PRIMARY = COLORS.BRASS          # Main objects, key elements
-    SECONDARY = COLORS.VERDIGRIS    # Supporting elements (aged patina)
-    TERTIARY = COLORS.SAGE          # Growth, success, correctness
-    ACCENT = COLORS.OCHRE           # Energy, highlights (academic gold)
-    HIGHLIGHT = COLORS.GOLD         # Pure vibrant gold for key emphasis
-    WARNING = COLORS.AMBER          # Caution, attention
-    ERROR = COLORS.TERRACOTTA       # Problems, errors (warm earth, not harsh)
-    SUCCESS = COLORS.SAGE           # Correct, passing, verified
+    PRIMARY = COLORS.BRASS  # Main objects, key elements
+    SECONDARY = COLORS.VERDIGRIS  # Supporting elements (aged patina)
+    TERTIARY = COLORS.SAGE  # Growth, success, correctness
+    ACCENT = COLORS.OCHRE  # Energy, highlights (academic gold)
+    HIGHLIGHT = COLORS.GOLD  # Pure vibrant gold for key emphasis
+    WARNING = COLORS.AMBER  # Caution, attention
+    ERROR = COLORS.TERRACOTTA  # Problems, errors (warm earth, not harsh)
+    SUCCESS = COLORS.SAGE  # Correct, passing, verified
 
     # =========================================================================
     # BACKGROUNDS
     # =========================================================================
     BG_LIGHT = COLORS.PARCHMENT
-    BG_DARK = COLORS.VERDANT_NIGHT   # Primary dark (green-tinted, solarpunk)
-    BG_LEGACY = COLORS.DARK_SLATE    # Legacy industrial dark (steampunk)
+    BG_DARK = COLORS.VERDANT_NIGHT  # Primary dark (green-tinted, solarpunk)
+    BG_LEGACY = COLORS.DARK_SLATE  # Legacy industrial dark (steampunk)
 
     # =========================================================================
     # LEGACY ALIASES (for backward compatibility)
@@ -432,7 +437,12 @@ def show_palette():
         ),
         (
             "BACKGROUNDS",
-            [COLORS.PARCHMENT, COLORS.VERDANT_NIGHT, COLORS.DARK_SLATE, COLORS.MIDNIGHT],
+            [
+                COLORS.PARCHMENT,
+                COLORS.VERDANT_NIGHT,
+                COLORS.DARK_SLATE,
+                COLORS.MIDNIGHT,
+            ],
         ),
         (
             "TEXT (DARK BG)",
@@ -490,9 +500,11 @@ def show_contrast_report():
 
     print("  ACADEMIC AXIS COLORS ON VERDANT NIGHT")
     print("  " + "-" * 50)
-    for name, color in [("X (Clay)", COLORS.CLAY),
-                        ("Y (Sage Light)", COLORS.SAGE_LIGHT),
-                        ("Z (Patina)", COLORS.PATINA)]:
+    for name, color in [
+        ("X (Clay)", COLORS.CLAY),
+        ("Y (Sage Light)", COLORS.SAGE_LIGHT),
+        ("Z (Patina)", COLORS.PATINA),
+    ]:
         result = check_contrast(color, verdant_bg)
         aa = "AA" if result["AA"] else "--"
         aaa = "AAA" if result["AAA"] else "---"
