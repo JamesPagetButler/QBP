@@ -24,8 +24,8 @@
   - [x] 4b: Proof Review (#201) — CLOSED 2026-02-10. PR #216 merged. Axiom-first review passed. CI fixes included.
   - [x] 4c: Interactive Proof Visualization (#202) — CLOSED 2026-02-11. PR #226 merged. Viewport pan/zoom, no-overlap layout.
 - [x] Phase 5: Publication (#164) — CLOSED 2026-02-11. PR #230 merged. Paper Task 2, DESIGN_RATIONALE Section 7, API docs.
-- [ ] **Research Sprint 0R** (#212) — One-off: doing research before Theory Refinement
-- [ ] Theory Refinement (#165)
+- [ ] **Research Sprint 0R** (#212) — *must complete before Theory Refinement*
+- [ ] Theory Refinement (#165) — *blocked by Research Sprint 0R*
 - [ ] Retrospective (#191)
 
 ## Sprint 2 Lessons Learned (Phase 4c)
@@ -188,7 +188,8 @@ Research sprints are dedicated blocks for theoretical investigation between expe
   - [ ] 4b: Proof Review
   - [ ] 4c: Interactive Proof Visualization
 - [ ] Phase 5: Publication (#XX)
-- [ ] Theory Refinement (#XX)
+- [ ] Research Sprint NR (#XX) — *must complete before Theory Refinement*
+- [ ] Theory Refinement (#XX) — *blocked by Research Sprint*
 - [ ] Retrospective (#XX)
 
 ## Sprint N Retrospective
