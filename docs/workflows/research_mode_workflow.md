@@ -211,11 +211,14 @@ Each entry is a YAML file in `knowledge/`:
 ```yaml
 id: source-arxiv-2208-02334
 type: Source
-title: "Knowledge Graph-Based Systematic Literature Review Automation"
-url: https://arxiv.org/abs/2208.02334
-date: 2022-07-06
-authors:
-  - name: "[Author names]"
+category: paper
+metadata:
+  title: "Knowledge Graph-Based Systematic Literature Review Automation"
+  authors:
+    - name: "Nada Sahlab"
+    - name: "Hesham Kahoul"
+  url: https://arxiv.org/abs/2208.02334
+  date: 2022-07-06
 
 quotes:
   - id: q1
@@ -223,21 +226,13 @@ quotes:
     location: "Abstract"
     relevance: "Motivation for automated literature review"
 
-concepts:
+tags:
   - knowledge-graph
   - systematic-review
-  - automation
-
-claims:
-  - id: c1
-    text: "Knowledge graphs can automate literature review classification"
-    evidence: "Prototype tested on context-awareness, achieved accurate results"
 
 relationships:
   - type: defines
-    target: concept-knowledge-graph
-  - type: supports
-    target: claim-kg-enables-synthesis
+    target: concept-knowledge-graph  # Add when concept exists
 ```
 
 ---
@@ -321,6 +316,73 @@ Every Research Sprint produces:
 | **Success** | Questions answered | Acceptance criteria met |
 | **Personas** | Research Team | Theory/Red/Dev Teams |
 | **Duration** | Variable | 5 phases + Theory Refinement |
+
+---
+
+## Integration with Herschel
+
+Research Mode integrates with the existing Herschel project coordination system.
+
+### Session-Start Check
+
+At the start of every session, Herschel reads `SPRINT_STATUS.md` to understand current lifecycle position. For Research Sprints:
+
+1. **Check Research Sprint status** — Is a Research Sprint active (0R, 1R, etc.)?
+2. **Identify current phase** — Which research phase is in progress?
+3. **Review knowledge graph state** — Are there pending entries or open questions?
+4. **Verify alignment** — Does planned work align with research goals?
+
+### Critical Path Audit
+
+When research is on the critical path, the Critical Path Audit should:
+
+1. **Track Research Sprint issues** — Ensure tracking issues exist for each research question
+2. **Verify knowledge graph entries** — Check that sources and findings are being documented
+3. **Monitor question status** — Flag open questions blocking downstream work
+
+### SPRINT_STATUS.md Updates
+
+For Research Sprints, `SPRINT_STATUS.md` should include:
+
+```markdown
+## Research Sprint 0R: [Topic]
+
+**Status:** In Progress / Complete
+**Current Phase:** Question Formulation / Discovery / Extraction / Synthesis / Integration
+
+### Research Questions
+- [ ] Question 1 (tracking issue #XXX)
+- [ ] Question 2 (tracking issue #XXX)
+
+### Knowledge Graph Entries Added
+- sources: N new entries
+- concepts: N new entries
+- claims: N new entries
+```
+
+---
+
+## Philosophy: Structure Supports Thinking
+
+> "It is through science that we prove, but through intuition that we discover." — Henri Poincaré
+
+This framework exists to **support** creative scientific thinking, not replace it. The structure provides:
+
+- **Traceability** — Know where ideas came from
+- **Reproducibility** — Others can follow your path
+- **Collaboration** — Shared vocabulary and format
+
+But the structure should never become bureaucratic overhead. If you have an insight while shaving, write it down! The knowledge graph captures serendipity too — just tag it appropriately.
+
+**Signs the process is working:**
+- Discoveries get documented and built upon
+- Questions get answered (or refined into better questions)
+- New connections emerge from structured data
+
+**Signs to course-correct:**
+- More time on forms than thinking
+- Entries become rote rather than insightful
+- Questions stay open indefinitely without progress
 
 ---
 
