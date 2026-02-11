@@ -75,9 +75,9 @@ static void frame_loop(void)
         current_scene->draw();
     }
 
-    /* Draw scene selector hint at bottom-left */
-    DrawTextQBP("[1] Stern-Gerlach  [2] Angle-Dependent",
-                8, SCREEN_H - 20, 12, QBP_TEXT_DIM);
+    /* Build version in title bar area (top-right) for debugging */
+    DrawTextQBP("Build: " __DATE__ " " __TIME__,
+                SCREEN_W - 170, 4, 10, QBP_TEXT_DIM);
 
     EndDrawing();
 }

@@ -42,11 +42,15 @@ static void sg_init(int sw, int sh)
         (float)(sw - PANEL_WIDTH - 40),
         (float)(sh - TITLE_HEIGHT - BAR_HEIGHT - 20)
     };
+    graph_viewport_init(&sg_graph);
     graph_layout(&sg_graph, graph_area);
 }
 
 static void sg_update(void)
 {
+    /* Handle viewport pan/zoom input */
+    graph_viewport_update(&sg_graph);
+
     if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_DOWN) ||
         IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER)) {
         graph_step_forward(&sg_graph);
@@ -57,6 +61,7 @@ static void sg_update(void)
     }
     if (IsKeyPressed(KEY_R) || IsKeyPressed(KEY_HOME)) {
         graph_reset(&sg_graph);
+        graph_reset_viewport(&sg_graph);
     }
 
     /* Handle mouse clicks */

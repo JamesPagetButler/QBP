@@ -454,20 +454,20 @@ void graph_init_stern_gerlach(ProofGraph *g)
  *
  * This enables new experiments to be visualized without hardcoded positions.
  */
+/* Forward declaration for calc_node_width */
+static float calc_node_width(const ProofNode *n);
+
 void graph_layout(ProofGraph *g, Rectangle area)
 {
     if (g->node_count == 0) return;
 
-    float x0 = area.x;
-    float y0 = area.y;
-    float w  = area.width;
-    float h  = area.height;
+    /* Store view area for viewport calculations */
+    g->view_area = area;
 
     /* Step 1: Compute levels using longest-path from roots */
     int levels[MAX_NODES] = {0};
     int max_level = 0;
 
-    /* Iterate until levels stabilize (simple fixed-point) */
     for (int iter = 0; iter < g->node_count; iter++) {
         for (int i = 0; i < g->node_count; i++) {
             ProofNode *n = &g->nodes[i];
@@ -483,27 +483,209 @@ void graph_layout(ProofGraph *g, Rectangle area)
         }
     }
 
-    /* Step 2: Count nodes per level */
+    /* Step 2: Collect nodes per level and compute actual widths needed */
     int level_counts[MAX_NODES] = {0};
-    int level_index[MAX_NODES] = {0};  /* Position within level */
+    int nodes_at_level[MAX_NODES][MAX_NODES];
+    float level_widths[MAX_NODES] = {0};  /* Total width needed per level */
 
-    for (int i = 0; i < g->node_count; i++) {
-        level_index[i] = level_counts[levels[i]];
-        level_counts[levels[i]]++;
-    }
-
-    /* Step 3: Compute positions */
-    float row_h = (max_level > 0) ? h / (float)(max_level + 1) : h;
+    #define NODE_H 44
+    #define NODE_MARGIN 20  /* Minimum gap between nodes */
 
     for (int i = 0; i < g->node_count; i++) {
         int lvl = levels[i];
+        nodes_at_level[lvl][level_counts[lvl]] = i;
+        level_counts[lvl]++;
+    }
+
+    /* Compute required width for each level (sum of node widths + margins) */
+    for (int lvl = 0; lvl <= max_level; lvl++) {
+        float total = 0;
+        for (int idx = 0; idx < level_counts[lvl]; idx++) {
+            int node_id = nodes_at_level[lvl][idx];
+            total += calc_node_width(&g->nodes[node_id]) + NODE_MARGIN;
+        }
+        level_widths[lvl] = total;
+    }
+
+    /* Find max width needed across all levels */
+    float max_width_needed = area.width;
+    for (int lvl = 0; lvl <= max_level; lvl++) {
+        if (level_widths[lvl] > max_width_needed) {
+            max_width_needed = level_widths[lvl];
+        }
+    }
+
+    /* Compute required height */
+    float row_height = NODE_H + 40;  /* Node height + vertical gap */
+    float total_height_needed = row_height * (max_level + 1) + 40;
+    if (total_height_needed < area.height) {
+        total_height_needed = area.height;
+    }
+
+    /* Store graph bounds (the virtual canvas size) */
+    g->graph_bounds = (Rectangle){
+        0, 0,
+        max_width_needed + 40,  /* Add padding */
+        total_height_needed
+    };
+
+    /* Step 3: Position nodes with barycenter ordering, NO OVERLAP */
+    float center_x = g->graph_bounds.width / 2.0f;
+
+    /* Position level 0 first */
+    if (level_counts[0] > 0) {
+        float total_w = level_widths[0];
+        float start_x = center_x - total_w / 2.0f;
+        float cur_x = start_x;
+        for (int idx = 0; idx < level_counts[0]; idx++) {
+            int node_id = nodes_at_level[0][idx];
+            float nw = calc_node_width(&g->nodes[node_id]);
+            g->nodes[node_id].pos = (Vector2){
+                cur_x + nw / 2.0f,
+                row_height * 0.5f + 20
+            };
+            cur_x += nw + NODE_MARGIN;
+        }
+    }
+
+    /* Position subsequent levels with barycenter ordering */
+    for (int lvl = 1; lvl <= max_level; lvl++) {
         int count = level_counts[lvl];
-        int idx = level_index[i];
+        if (count == 0) continue;
 
-        float node_x = x0 + w * ((float)(idx) + 0.5f) / (float)count;
-        float node_y = y0 + row_h * ((float)lvl + 0.5f);
+        /* Compute barycenter for each node */
+        float barycenters[MAX_NODES];
+        for (int idx = 0; idx < count; idx++) {
+            int node_id = nodes_at_level[lvl][idx];
+            ProofNode *n = &g->nodes[node_id];
 
-        g->nodes[i].pos = (Vector2){ node_x, node_y };
+            if (n->dep_count == 0) {
+                barycenters[idx] = center_x;
+            } else {
+                float sum_x = 0;
+                for (int d = 0; d < n->dep_count; d++) {
+                    sum_x += g->nodes[n->deps[d]].pos.x;
+                }
+                barycenters[idx] = sum_x / (float)n->dep_count;
+            }
+        }
+
+        /* Sort by barycenter */
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = i + 1; j < count; j++) {
+                if (barycenters[j] < barycenters[i]) {
+                    float tmp_b = barycenters[i];
+                    barycenters[i] = barycenters[j];
+                    barycenters[j] = tmp_b;
+                    int tmp_n = nodes_at_level[lvl][i];
+                    nodes_at_level[lvl][i] = nodes_at_level[lvl][j];
+                    nodes_at_level[lvl][j] = tmp_n;
+                }
+            }
+        }
+
+        /* Position nodes - compute total width first */
+        float total_w = level_widths[lvl];
+        float start_x = center_x - total_w / 2.0f;
+        float cur_x = start_x;
+        for (int idx = 0; idx < count; idx++) {
+            int node_id = nodes_at_level[lvl][idx];
+            float nw = calc_node_width(&g->nodes[node_id]);
+            g->nodes[node_id].pos = (Vector2){
+                cur_x + nw / 2.0f,
+                row_height * ((float)lvl + 0.5f) + 20
+            };
+            cur_x += nw + NODE_MARGIN;
+        }
+    }
+
+    #undef NODE_H
+    #undef NODE_MARGIN
+}
+
+/* ------------------------------------------------------------------ */
+/*  Viewport control for pan/zoom                                     */
+/* ------------------------------------------------------------------ */
+
+void graph_viewport_init(ProofGraph *g)
+{
+    g->viewport_x = 0;
+    g->viewport_y = 0;
+    g->viewport_zoom = 1.0f;
+}
+
+void graph_reset_viewport(ProofGraph *g)
+{
+    g->viewport_x = 0;
+    g->viewport_y = 0;
+    g->viewport_zoom = 1.0f;
+}
+
+void graph_pan(ProofGraph *g, float dx, float dy)
+{
+    g->viewport_x += dx;
+    g->viewport_y += dy;
+
+    /* Clamp to graph bounds */
+    float max_pan_x = g->graph_bounds.width - g->view_area.width / g->viewport_zoom;
+    float max_pan_y = g->graph_bounds.height - g->view_area.height / g->viewport_zoom;
+
+    if (max_pan_x < 0) max_pan_x = 0;
+    if (max_pan_y < 0) max_pan_y = 0;
+
+    if (g->viewport_x < 0) g->viewport_x = 0;
+    if (g->viewport_y < 0) g->viewport_y = 0;
+    if (g->viewport_x > max_pan_x) g->viewport_x = max_pan_x;
+    if (g->viewport_y > max_pan_y) g->viewport_y = max_pan_y;
+}
+
+void graph_zoom(ProofGraph *g, float delta, Vector2 focus)
+{
+    float old_zoom = g->viewport_zoom;
+    g->viewport_zoom += delta * 0.1f;
+
+    /* Clamp zoom */
+    if (g->viewport_zoom < 0.5f) g->viewport_zoom = 0.5f;
+    if (g->viewport_zoom > 2.0f) g->viewport_zoom = 2.0f;
+
+    /* Adjust pan to keep focus point stable */
+    float zoom_ratio = g->viewport_zoom / old_zoom;
+    float focus_graph_x = g->viewport_x + (focus.x - g->view_area.x) / old_zoom;
+    float focus_graph_y = g->viewport_y + (focus.y - g->view_area.y) / old_zoom;
+
+    g->viewport_x = focus_graph_x - (focus.x - g->view_area.x) / g->viewport_zoom;
+    g->viewport_y = focus_graph_y - (focus.y - g->view_area.y) / g->viewport_zoom;
+
+    /* Re-clamp after zoom */
+    graph_pan(g, 0, 0);
+}
+
+void graph_viewport_update(ProofGraph *g)
+{
+    Vector2 mouse = GetMousePosition();
+
+    /* Only handle viewport input when mouse is in graph area */
+    if (!CheckCollisionPointRec(mouse, g->view_area)) return;
+
+    /* Mouse wheel: vertical scroll (Shift+wheel for horizontal) */
+    float wheel = GetMouseWheelMove();
+    if (wheel != 0) {
+        if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
+            /* Ctrl+wheel = zoom */
+            graph_zoom(g, wheel, mouse);
+        } else if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
+            /* Shift+wheel = horizontal scroll */
+            graph_pan(g, -wheel * 40.0f / g->viewport_zoom, 0);
+        } else {
+            /* Wheel = vertical scroll */
+            graph_pan(g, 0, -wheel * 40.0f / g->viewport_zoom);
+        }
+    }
+
+    /* Middle mouse drag for pan */
+    if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
+        Vector2 delta = GetMouseDelta();
+        graph_pan(g, -delta.x / g->viewport_zoom, -delta.y / g->viewport_zoom);
     }
 }
 
@@ -550,12 +732,12 @@ const ProofNode *graph_current_node(const ProofGraph *g)
 /*  Drawing                                                           */
 /* ------------------------------------------------------------------ */
 
-/* Larger sizes for readability */
-#define NODE_MIN_W  180
-#define NODE_H       56
-#define FONT_SZ      18
-#define BADGE_W      40
-#define NODE_PAD     16  /* padding on each side of text */
+/* Node sizes - balanced for readability and fit */
+#define NODE_MIN_W  140
+#define NODE_H       44
+#define FONT_SZ      14
+#define BADGE_W      36
+#define NODE_PAD     10  /* padding on each side of text */
 
 /* Calculate node width based on display name text */
 static float calc_node_width(const ProofNode *n)
@@ -565,7 +747,8 @@ static float calc_node_width(const ProofNode *n)
     return (total_w < NODE_MIN_W) ? NODE_MIN_W : total_w;
 }
 
-static Rectangle node_rect(const ProofNode *n)
+/* Get node rectangle in graph coordinates (before viewport transform) */
+static Rectangle node_rect_graph(const ProofNode *n)
 {
     float w = calc_node_width(n);
     return (Rectangle){
@@ -575,10 +758,40 @@ static Rectangle node_rect(const ProofNode *n)
     };
 }
 
-/* Public function for click detection */
+/* Transform graph coordinates to screen coordinates */
+static Vector2 graph_to_screen(const ProofGraph *g, Vector2 pos)
+{
+    return (Vector2){
+        g->view_area.x + (pos.x - g->viewport_x) * g->viewport_zoom,
+        g->view_area.y + (pos.y - g->viewport_y) * g->viewport_zoom
+    };
+}
+
+/* Transform screen coordinates to graph coordinates */
+static Vector2 screen_to_graph(const ProofGraph *g, Vector2 pos)
+{
+    return (Vector2){
+        g->viewport_x + (pos.x - g->view_area.x) / g->viewport_zoom,
+        g->viewport_y + (pos.y - g->view_area.y) / g->viewport_zoom
+    };
+}
+
+/* Get node rectangle in screen coordinates */
+static Rectangle node_rect_screen(const ProofGraph *g, const ProofNode *n)
+{
+    Rectangle r = node_rect_graph(n);
+    Vector2 top_left = graph_to_screen(g, (Vector2){r.x, r.y});
+    return (Rectangle){
+        top_left.x, top_left.y,
+        r.width * g->viewport_zoom,
+        r.height * g->viewport_zoom
+    };
+}
+
+/* Public function for click detection (returns screen coordinates) */
 Rectangle graph_node_bounds(const ProofGraph *g, int node_id)
 {
-    return node_rect(&g->nodes[node_id]);
+    return node_rect_screen(g, &g->nodes[node_id]);
 }
 
 static Color node_color(const ProofGraph *g, int id)
@@ -613,6 +826,19 @@ static const char *kind_label(NodeKind kind)
 
 void graph_draw(const ProofGraph *g)
 {
+    /* Set up scissor to clip drawing to view area */
+    BeginScissorMode((int)g->view_area.x, (int)g->view_area.y,
+                     (int)g->view_area.width, (int)g->view_area.height);
+
+    /* Draw scroll indicator background */
+    DrawRectangleRec(g->view_area, QBP_BG);
+
+    float zoom = g->viewport_zoom;
+    int scaled_font = (int)(FONT_SZ * zoom);
+    if (scaled_font < 8) scaled_font = 8;
+    int scaled_badge_font = (int)(12 * zoom);
+    if (scaled_badge_font < 6) scaled_badge_font = 6;
+
     /* Draw edges first (behind nodes) */
     for (int i = 0; i < g->node_count; i++) {
         const ProofNode *n = &g->nodes[i];
@@ -622,31 +848,84 @@ void graph_draw(const ProofGraph *g)
             if (graph_is_active(g, i) && graph_is_dependency(g, n->deps[d])) {
                 c = QBP_EDGE;
             }
-            DrawLineEx(dep->pos, n->pos, 2.0f, c);
+            Vector2 p1 = graph_to_screen(g, dep->pos);
+            Vector2 p2 = graph_to_screen(g, n->pos);
+            DrawLineEx(p1, p2, 2.0f * zoom, c);
         }
     }
 
     /* Draw nodes */
     for (int i = 0; i < g->node_count; i++) {
         const ProofNode *n = &g->nodes[i];
-        Rectangle r = node_rect(n);
+        Rectangle r = node_rect_screen(g, n);
         Color bg = node_color(g, i);
 
         DrawRectangleRounded(r, 0.3f, 8, bg);
-        DrawRectangleRoundedLinesEx(r, 0.3f, 8, 1.5f, QBP_BRASS);
+        DrawRectangleRoundedLinesEx(r, 0.3f, 8, 1.5f * zoom, QBP_BRASS);
 
         /* Kind badge */
         Color badge = kind_badge_color(n->kind);
-        Rectangle br = { r.x + 3, r.y + 3, BADGE_W, NODE_H - 6 };
+        float badge_w = BADGE_W * zoom;
+        Rectangle br = { r.x + 3*zoom, r.y + 3*zoom, badge_w, r.height - 6*zoom };
         DrawRectangleRounded(br, 0.3f, 4, badge);
         DrawTextQBP(kind_label(n->kind),
-                 (int)(br.x + 4), (int)(br.y + (br.height - 12)/2),
-                 12, QBP_IVORY);
+                 (int)(br.x + 4*zoom), (int)(br.y + (br.height - scaled_badge_font)/2),
+                 scaled_badge_font, QBP_IVORY);
 
         /* Node display name (short, readable) */
-        int text_x = (int)(r.x + BADGE_W + NODE_PAD/2);
-        int text_y = (int)(r.y + (NODE_H - FONT_SZ) / 2);
-        DrawTextQBP(n->display_name, text_x, text_y, FONT_SZ, QBP_TEXT_PRIMARY);
+        int text_x = (int)(r.x + badge_w + NODE_PAD*zoom/2);
+        int text_y = (int)(r.y + (r.height - scaled_font) / 2);
+        DrawTextQBP(n->display_name, text_x, text_y, scaled_font, QBP_TEXT_PRIMARY);
+    }
+
+    /* Draw scroll indicators if content extends beyond view */
+    Color indicator = (Color){255, 255, 255, 60};
+    float view_w = g->view_area.width;
+    float view_h = g->view_area.height;
+
+    if (g->viewport_x > 1) {
+        /* Left arrow indicator */
+        DrawTriangle(
+            (Vector2){g->view_area.x + 15, g->view_area.y + view_h/2},
+            (Vector2){g->view_area.x + 25, g->view_area.y + view_h/2 - 10},
+            (Vector2){g->view_area.x + 25, g->view_area.y + view_h/2 + 10},
+            indicator);
+    }
+    float max_x = g->graph_bounds.width - view_w / zoom;
+    if (g->viewport_x < max_x - 1) {
+        /* Right arrow indicator */
+        DrawTriangle(
+            (Vector2){g->view_area.x + view_w - 15, g->view_area.y + view_h/2},
+            (Vector2){g->view_area.x + view_w - 25, g->view_area.y + view_h/2 + 10},
+            (Vector2){g->view_area.x + view_w - 25, g->view_area.y + view_h/2 - 10},
+            indicator);
+    }
+    if (g->viewport_y > 1) {
+        /* Up arrow indicator */
+        DrawTriangle(
+            (Vector2){g->view_area.x + view_w/2, g->view_area.y + 15},
+            (Vector2){g->view_area.x + view_w/2 + 10, g->view_area.y + 25},
+            (Vector2){g->view_area.x + view_w/2 - 10, g->view_area.y + 25},
+            indicator);
+    }
+    float max_y = g->graph_bounds.height - view_h / zoom;
+    if (g->viewport_y < max_y - 1) {
+        /* Down arrow indicator */
+        DrawTriangle(
+            (Vector2){g->view_area.x + view_w/2, g->view_area.y + view_h - 15},
+            (Vector2){g->view_area.x + view_w/2 - 10, g->view_area.y + view_h - 25},
+            (Vector2){g->view_area.x + view_w/2 + 10, g->view_area.y + view_h - 25},
+            indicator);
+    }
+
+    EndScissorMode();
+
+    /* Draw zoom level indicator */
+    if (g->viewport_zoom != 1.0f) {
+        char zoom_text[32];
+        snprintf(zoom_text, sizeof(zoom_text), "%.0f%%", g->viewport_zoom * 100);
+        DrawTextQBP(zoom_text, (int)(g->view_area.x + 8), (int)(g->view_area.y + 8),
+                    12, QBP_TEXT_DIM);
     }
 }
 
@@ -688,77 +967,107 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
 {
     const ProofNode *n = graph_current_node(g);
 
+    /* Draw panel background and border */
     DrawRectangleRec(panel, QBP_PANEL_BG);
     DrawRectangleLinesEx(panel, 2.0f, QBP_BRASS);
 
-    float x = panel.x + 16;
-    float y = panel.y + 14;
-    float max_w = panel.width - 32;
-    int section_gap = 14;
+    /* Use smaller fonts to fit more content */
+    int title_font = 20;
+    int header_font = 12;
+    int body_font = 13;
+    int section_gap = 10;
+
+    float x = panel.x + 12;
+    float y = panel.y + 10;
+    float max_w = panel.width - 24;
+    float panel_bottom = panel.y + panel.height - 4;
+
+    /* Clip content to panel area */
+    BeginScissorMode((int)panel.x + 2, (int)panel.y + 2,
+                     (int)panel.width - 4, (int)panel.height - 4);
 
     /* Title: Display name */
-    DrawTextQBP(n->display_name, (int)x, (int)y, 24, QBP_GOLD);
-    y += 30;
+    DrawTextQBP(n->display_name, (int)x, (int)y, title_font, QBP_GOLD);
+    y += title_font + 6;
 
     /* Formal Lean name (smaller, dimmer) */
-    DrawTextQBP(n->name, (int)x, (int)y, 12, QBP_TEXT_DIM);
-    y += 18;
+    DrawTextQBP(n->name, (int)x, (int)y, 10, QBP_TEXT_DIM);
+    y += 14;
 
     /* Kind badge inline */
     const char *kind_str = (n->kind == NODE_AXIOM) ? "AXIOM" :
                            (n->kind == NODE_DEFINITION) ? "DEFINITION" : "THEOREM";
-    DrawTextQBP(kind_str, (int)x, (int)y, 16, kind_badge_color(n->kind));
-    y += 24;
+    DrawTextQBP(kind_str, (int)x, (int)y, 14, kind_badge_color(n->kind));
+    y += 20;
 
     /* Separator */
     DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 1.0f, QBP_STEEL);
-    y += 12;
+    y += 8;
 
     /* ============ LEVEL 4: FORMAL ============ */
-    DrawTextQBP("FORMAL (Lean)", (int)x, (int)y, 14, QBP_TEXT_DIM);
-    y += 18;
-    y = draw_wrapped_text(n->level4_formal, x, y, max_w, 16, QBP_TEAL);
+    DrawTextQBP("FORMAL (Lean)", (int)x, (int)y, header_font, QBP_TEXT_DIM);
+    y += header_font + 4;
+    y = draw_wrapped_text(n->level4_formal, x, y, max_w, body_font, QBP_TEAL);
     y += section_gap;
 
     /* ============ LEVEL 3: MATHEMATICAL ============ */
-    DrawTextQBP("MATHEMATICAL", (int)x, (int)y, 14, QBP_TEXT_DIM);
-    y += 18;
-    y = draw_wrapped_text(n->level3_math, x, y, max_w, 16, QBP_COPPER);
+    DrawTextQBP("MATHEMATICAL", (int)x, (int)y, header_font, QBP_TEXT_DIM);
+    y += header_font + 4;
+    y = draw_wrapped_text(n->level3_math, x, y, max_w, body_font, QBP_COPPER);
     y += section_gap;
 
     /* ============ LEVEL 2: PHYSICAL ============ */
-    DrawTextQBP("PHYSICAL", (int)x, (int)y, 14, QBP_TEXT_DIM);
-    y += 18;
-    y = draw_wrapped_text(n->level2_physical, x, y, max_w, 16, QBP_AMBER);
+    DrawTextQBP("PHYSICAL", (int)x, (int)y, header_font, QBP_TEXT_DIM);
+    y += header_font + 4;
+    y = draw_wrapped_text(n->level2_physical, x, y, max_w, body_font, QBP_AMBER);
     y += section_gap;
 
     /* ============ LEVEL 1: INTUITIVE ============ */
-    DrawRectangle((int)(x - 6), (int)y - 4, (int)(max_w + 12), 24, QBP_DARK_SLATE);
-    DrawTextQBP("INTUITIVE (Plain English)", (int)x, (int)y, 16, QBP_IVORY);
-    y += 26;
-    y = draw_wrapped_text(n->level1_intuitive, x, y, max_w, 18, QBP_IVORY);
+    DrawRectangle((int)(x - 4), (int)y - 2, (int)(max_w + 8), 18, QBP_DARK_SLATE);
+    DrawTextQBP("INTUITIVE", (int)x, (int)y, 14, QBP_IVORY);
+    y += 20;
+    y = draw_wrapped_text(n->level1_intuitive, x, y, max_w, body_font + 1, QBP_IVORY);
     y += section_gap;
 
     /* ============ KEY INSIGHT ============ */
     if (strlen(n->key_insight) > 0) {
-        DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 2.0f, QBP_GOLD);
-        y += 10;
-        DrawTextQBP("KEY INSIGHT", (int)x, (int)y, 14, QBP_GOLD);
-        y += 18;
-        y = draw_wrapped_text(n->key_insight, x, y, max_w, 16, QBP_GOLD);
+        DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 1.5f, QBP_GOLD);
+        y += 6;
+        DrawTextQBP("KEY INSIGHT", (int)x, (int)y, header_font, QBP_GOLD);
+        y += header_font + 4;
+        y = draw_wrapped_text(n->key_insight, x, y, max_w, body_font, QBP_GOLD);
     }
 
+    /* Track if content overflowed */
+    float content_bottom = y;
+
     /* Dependencies (if room remains) */
-    if (n->dep_count > 0 && y < panel.y + panel.height - 80) {
-        y += 12;
-        DrawTextQBP("Depends on:", (int)x, (int)y, 14, QBP_TEXT_DIM);
-        y += 18;
-        for (int i = 0; i < n->dep_count && y < panel.y + panel.height - 24; i++) {
+    if (n->dep_count > 0) {
+        y += 8;
+        DrawTextQBP("Depends on:", (int)x, (int)y, header_font, QBP_TEXT_DIM);
+        y += header_font + 4;
+        for (int i = 0; i < n->dep_count; i++) {
             char dep_buf[128];
-            snprintf(dep_buf, sizeof(dep_buf), "  -> %s", g->nodes[n->deps[i]].display_name);
-            DrawTextQBP(dep_buf, (int)x, (int)y, 14, QBP_STEEL);
-            y += 16;
+            snprintf(dep_buf, sizeof(dep_buf), "-> %s", g->nodes[n->deps[i]].display_name);
+            DrawTextQBP(dep_buf, (int)x, (int)y, 12, QBP_STEEL);
+            y += 14;
         }
+        content_bottom = y;
+    }
+
+    EndScissorMode();
+
+    /* Draw "more content" indicator if content was clipped */
+    if (content_bottom > panel_bottom) {
+        /* Fade gradient at bottom */
+        for (int i = 0; i < 20; i++) {
+            Color fade = (Color){13, 27, 42, (unsigned char)(255 - i * 12)};
+            DrawLine((int)panel.x + 4, (int)panel_bottom - 20 + i,
+                     (int)(panel.x + panel.width - 4), (int)panel_bottom - 20 + i, fade);
+        }
+        /* Down arrow indicator */
+        DrawTextQBP("...", (int)(panel.x + panel.width/2 - 8),
+                    (int)(panel_bottom - 14), 12, QBP_TEXT_DIM);
     }
 }
 
