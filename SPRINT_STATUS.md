@@ -91,6 +91,9 @@ Research sprints are dedicated blocks for theoretical investigation between expe
 - [ ] #136 — Theory: Clarify quaternion observable relationship to operator formalism
 - [ ] #20 — Theoretical Investigation: Physical meaning of quaternion scalar component
 - [ ] #6 — Initial Project Premise & Setup Review
+- [ ] #232 — Research: Division algebra justification for QBP
+- [ ] #233 — Research: Intuitive physical explanation for quaternion spin formulas
+- [ ] #234 — Research: Geometric interpretation in spacetime context
 - [ ] #123 — Research: Investigate Lean 4 as verified experiment engine
 - [ ] #203 — Research: 3D Interactive Experiment Visualizations
 
