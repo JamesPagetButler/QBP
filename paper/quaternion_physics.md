@@ -226,5 +226,136 @@ The formal proof in Lean 4 (`proofs/QBP/Experiments/SternGerlach.lean`) rigorous
 
 No unexpected phenomena were observed in this foundational experiment. The results conform precisely to theoretical predictions, establishing a reliable baseline for subsequent, more complex experiments.
 
+## Task 2: Angle-Dependent Measurement (Experiment 01b)
+
+### 2.1 Traditional Quantum Mechanical Description
+
+The Stern-Gerlach experiment (Task 1) tested only the special case of orthogonal preparation and measurement axes. In standard quantum mechanics, the probability of measuring a spin-1/2 particle in the "up" state along an axis tilted by angle θ from the preparation axis follows the fundamental formula:
+
+$$P(+|\theta) = \cos^2(\theta/2)$$
+
+This "half-angle" dependence is a distinctive signature of spin-1/2 particles and arises from the SU(2) representation of rotations. The factor of θ/2 reflects the fact that a 360° rotation of a spinor returns it to minus itself, requiring a 720° rotation to return to the original state.
+
+### 2.2 Quaternionic Hypothesis for Angle-Dependent Measurement
+
+We extend the QBP framework to handle arbitrary measurement angles using quaternion rotations:
+
+*   **Rotation Quaternion:** A rotation by angle θ about unit axis n̂ is represented by:
+    `q(θ, n̂) = cos(θ/2) + sin(θ/2)(n_x·i + n_y·j + n_z·k)`
+
+*   **Rotated State:** For a state initially along the z-axis (ψ₀ = k), the state at angle θ from z is:
+    `ψ(θ) = sin(θ)·i + cos(θ)·k`
+    (This is the state rotated by θ about the y-axis from the z-axis.)
+
+*   **Prediction:** The expectation value for measuring this state along z is:
+    `⟨O_z⟩ = vecDot(ψ(θ), k) = cos(θ)`
+
+    Applying the Born rule: `P(+) = (1 + cos(θ))/2 = cos²(θ/2)`
+
+This matches the standard quantum mechanical prediction, providing a strong test of the QBP framework's rotational symmetry.
+
+### 2.3 Results
+
+#### Objective
+
+To validate that the QBP framework correctly predicts angle-dependent spin measurement probabilities across the full range θ ∈ [0°, 180°].
+
+#### Ground Truth Summary
+
+The expected outcome derives from the QBP axioms extended with rotations (see `research/01b_angle_dependent_expected_results.md`):
+
+1. **State Preparation:** `ψ(θ) = sin(θ)·i + cos(θ)·k` (spin at angle θ from z)
+2. **Observable:** `O_z = k` (spin-z measurement)
+3. **Expectation Value:** `⟨O_z⟩ = cos(θ)`
+4. **Predicted Probability:** `P(+) = cos²(θ/2)`
+
+Nine test angles were selected: 0°, 30°, 45°, 60°, 90°, 120°, 135°, 150°, 180°.
+
+#### Data Presentation
+
+N = 1,000,000 measurements were performed at each angle. The following table summarizes results:
+
+| Angle | Expected P(+) | Measured P(+) | Deviation | Pass |
+|-------|---------------|---------------|-----------|------|
+| 0° | 1.000000 | 1.000000 | +0.0000σ | ✓ |
+| 30° | 0.933013 | 0.933012 | +0.0028σ | ✓ |
+| 45° | 0.853553 | 0.853625 | +0.2025σ | ✓ |
+| 60° | 0.750000 | 0.749732 | +0.6189σ | ✓ |
+| 90° | 0.500000 | 0.499125 | +1.7500σ | ✓ |
+| 120° | 0.250000 | 0.249747 | +0.5843σ | ✓ |
+| 135° | 0.146447 | 0.146148 | +0.8446σ | ✓ |
+| 150° | 0.066987 | 0.067149 | +0.6468σ | ✓ |
+| 180° | 0.000000 | 0.000000 | +0.0000σ | ✓ |
+
+**Statistical Summary:**
+- Maximum deviation: 1.75σ (threshold: 3σ)
+- χ² goodness-of-fit: χ² = 4.96, p = 0.665 (df = 7)
+- All angles pass the 3σ acceptance criterion
+
+#### Visualizations
+
+**Figure 4: Probability vs Angle**
+![Probability Curve](../analysis/01b_angle_dependent/probability_vs_angle.png)
+*The smooth curve shows the theoretical prediction P(+) = cos²(θ/2). Markers show measured probabilities with error bars (±1σ). All measurements lie on or very close to the theoretical curve, validating the angle-dependent formula.*
+
+**Figure 5: Deviation Analysis**
+![Deviation Plot](../analysis/01b_angle_dependent/deviation_analysis.png)
+*Deviation from prediction in standard deviations (σ). Shaded bands: ±1σ (teal), ±2σ (amber), ±3σ (red). All points fall well within the acceptance threshold.*
+
+**Figure 6: Interactive Bloch Sphere** (`analysis/01b_angle_dependent/bloch_sphere.py`)
+A VPython visualization allows exploration of how the state angle θ affects measurement probability, with a slider to sweep from 0° to 180° and real-time probability display.
+
+**Figure 7: Interactive Proof Visualization** (`src/viz/interactive/`)
+The WASM proof explorer now includes Experiment 01b (press [2] to switch). Users can navigate the 18-node proof graph from axioms to the cos²(θ/2) theorem with four levels of explanation.
+
+#### Outcome
+
+**PASS.** All angles within 3σ of prediction. χ² test confirms statistical consistency (p = 0.665).
+
+### 2.4 Discussion
+
+#### Interpretation
+
+The successful validation of angle-dependent measurement extends the QBP framework's empirical support from orthogonal cases (Task 1) to arbitrary angles:
+
+1. **Quaternion rotations encode spin transformations.** The rotation quaternion `q(θ, n̂) = cos(θ/2) + sin(θ/2)n̂` correctly transforms states, with the half-angle naturally emerging from the algebra.
+
+2. **The cos²(θ/2) formula is a mathematical consequence.** Given our axioms for states, observables, and the Born rule, the angle-dependent probability is not an additional assumption but follows from quaternion geometry.
+
+3. **Edge cases are exact.** At θ = 0° (aligned), P(+) = 1 exactly. At θ = 180° (anti-aligned), P(+) = 0 exactly. At θ = 90° (orthogonal), P(+) = 0.5—recovering Task 1.
+
+#### Connection to SU(2) and Half-Angles
+
+The appearance of θ/2 in the rotation quaternion is not accidental—it reflects the fundamental fact that quaternions provide a **double cover** of 3D rotations. The unit quaternions form the group Sp(1) ≅ SU(2), which covers SO(3) twice:
+
+- Two quaternions q and -q produce the same rotation
+- A 360° rotation of a spinor returns -ψ, not ψ
+- A full 720° rotation is needed to return to the original state
+
+This is precisely why spin-1/2 particles exhibit half-angle dependence. The QBP framework inherits this property directly from quaternion algebra, without needing to impose it separately.
+
+#### Formal Verification
+
+The Lean 4 proofs in `proofs/QBP/Experiments/AngleDependent.lean` rigorously verify:
+
+```lean
+theorem prob_up_angle_cos_sq (θ : ℝ) :
+  probUp (psiAngle θ) spinZObservable = Real.cos (θ / 2) ^ 2
+
+theorem angle_consistent_with_stern_gerlach :
+  probUp (psiAngle (π/2)) spinZObservable = 1/2
+```
+
+The second theorem confirms that the angle-dependent formula recovers the orthogonal case from Task 1 at θ = π/2.
+
+#### Emergent Phenomena
+
+The half-angle formula P(+) = cos²(θ/2) emerges naturally from:
+1. The quaternion rotation formula with θ/2
+2. The expectation value as a dot product
+3. The Born rule mapping expectations to probabilities
+
+No additional postulates were required. This suggests the SU(2) structure of quantum spin is not an arbitrary feature but a necessary consequence of representing states as unit quaternions.
+
 ---
 *Project initiated by Gemini, Furey, and Feynman.*
