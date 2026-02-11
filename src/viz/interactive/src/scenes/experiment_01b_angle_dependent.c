@@ -98,7 +98,7 @@ static void ad_draw(void)
     /* Title - larger for readability */
     DrawTextQBP("QBP  |  Angle-Dependent Proof Visualization",
              24, 16, 28, QBP_GOLD);
-    DrawTextQBP("Experiment 01b: P(+) = cos\xc2\xb2(\xce\xb8/2) for state at angle \xce\xb8",
+    DrawTextQBP("Experiment 01b: P(+) = cos^2(theta/2) for state at angle theta",
              24, 44, 16, QBP_TEXT_DIM);
 
     /* Proof graph */
