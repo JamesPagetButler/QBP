@@ -26,6 +26,7 @@
 - [x] Phase 5: Publication (#164) — CLOSED 2026-02-11. PR #230 merged. Paper Task 2, DESIGN_RATIONALE Section 7, API docs.
 - [ ] **Research Sprint 0R** (#212) — One-off: doing research before Theory Refinement
 - [ ] Theory Refinement (#165)
+- [ ] Retrospective (#191)
 
 ## Sprint 2 Lessons Learned (Phase 4c)
 
@@ -117,6 +118,7 @@ Research sprints are dedicated blocks for theoretical investigation between expe
   - [x] 4c: Interactive Proof Visualization (#133) — PR #141 merged. JSON loader, custom fonts, 4-level descriptions. Layout generalization deferred (#143).
 - [x] Phase 5: Publication (#64) — CLOSED 2026-02-05. Paper updated with figures, DESIGN_RATIONALE updated with insights.
 - [x] Theory Refinement (#80) — CLOSED 2026-02-06. PR #147 merged. Theoretical analysis, emergent phenomena, open questions, and Sprint 2 extensions documented.
+- [x] Retrospective — CLOSED 2026-02-06. Documented below.
 
 ## Sprint 1 Retrospective
 
@@ -187,6 +189,7 @@ Research sprints are dedicated blocks for theoretical investigation between expe
   - [ ] 4c: Interactive Proof Visualization
 - [ ] Phase 5: Publication (#XX)
 - [ ] Theory Refinement (#XX)
+- [ ] Retrospective (#XX)
 
 ## Sprint N Retrospective
 
