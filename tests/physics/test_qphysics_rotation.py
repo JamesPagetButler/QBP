@@ -75,12 +75,16 @@ class TestCreateRotation:
         for angle, axis in test_cases:
             q = qphysics.create_rotation(angle, axis)
             norm = np.sqrt(q.w**2 + q.x**2 + q.y**2 + q.z**2)
-            assert np.isclose(norm, 1.0, atol=1e-10), f"Failed for angle={angle}, axis={axis}"
+            assert np.isclose(
+                norm, 1.0, atol=1e-10
+            ), f"Failed for angle={angle}, axis={axis}"
 
     def test_axis_normalization(self):
         """Non-unit axis should be normalized automatically."""
         q1 = qphysics.create_rotation(np.pi / 2, [0, 0, 1])
-        q2 = qphysics.create_rotation(np.pi / 2, [0, 0, 5])  # Same direction, different magnitude
+        q2 = qphysics.create_rotation(
+            np.pi / 2, [0, 0, 5]
+        )  # Same direction, different magnitude
         assert np.isclose(q1.w, q2.w, atol=1e-10)
         assert np.isclose(q1.z, q2.z, atol=1e-10)
 
@@ -214,9 +218,9 @@ class TestRotationAndMeasurement:
             exp_val = qphysics.expectation_value(psi, qphysics.SPIN_Z)
 
             expected = np.cos(theta)
-            assert np.isclose(exp_val, expected, atol=1e-10), (
-                f"Failed at {angle_deg}°: got {exp_val}, expected {expected}"
-            )
+            assert np.isclose(
+                exp_val, expected, atol=1e-10
+            ), f"Failed at {angle_deg}°: got {exp_val}, expected {expected}"
 
     def test_rotated_observable_equivalent_to_tilted_state(self):
         """Rotating observable should give same expectation as tilting state."""
