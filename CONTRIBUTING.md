@@ -110,6 +110,31 @@ Each iteration makes the theory stronger. We don't fear discovering changes are 
 
 ---
 
+## Pre-Sprint Research Phase
+
+Some sprints introduce qualitatively new physics where we can't define "ground truth" without first answering research questions. The Pre-Sprint Research Phase addresses this.
+
+**When needed:** Theory Refinement identifies blocking questions for the next sprint.
+
+**Activities:**
+1. Identify what blocks Phase 1 (Ground Truth) definition
+2. Literature review and theoretical development
+3. Update knowledge hypergraph with new concepts/claims
+4. Update DESIGN_RATIONALE with findings section
+5. Gate check: Can we now define Ground Truth?
+
+**Exit criteria:**
+- Blocking research questions resolved
+- Knowledge graph updated
+- Paper updated
+- Phase 1 scope is definable
+
+**Example:** Sprint 3 requires Pre-Sprint Research (#255) to answer how quaternions represent spatial superposition before we can define double-slit ground truth.
+
+**Full documentation:** [docs/process/operational_modes.md](docs/process/operational_modes.md#pre-sprint-research-phase)
+
+---
+
 ## Session-Start Protocol (The Herschel Check)
 
 At the start of every work session, all collaborators (human and AI) must:

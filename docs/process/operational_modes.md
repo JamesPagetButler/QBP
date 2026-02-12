@@ -181,13 +181,81 @@ Modes are enabled progressively as process validation occurs:
                     Decision Gate:
                     Continue or Project Mode?
                            │
-              ┌────────────┴────────────┐
-              ↓                         ↓
-         Continue to              Enter Project Mode
-         next Sprint              (rework/add/remove)
+              ┌────────────┼────────────┐
+              ↓            ↓            ↓
+         Continue      Pre-Sprint        Enter Project Mode
+         (no blockers) Research          (rework/add/remove)
+                       (has blockers)
+                           │
+                    ┌──────┴──────┐
+                    │ Resolve     │
+                    │ questions   │
+                    │ Update KB   │
+                    │ Update paper│
+                    └──────┬──────┘
+                           ↓
+                    Sprint N+1 Phase 1
 ```
 
-**Key principle:** Theory Refinement is the checkpoint where we decide whether to continue linearly or step back to Project Mode.
+**Key principle:** Theory Refinement is the checkpoint where we decide:
+1. Continue linearly (no blockers)
+2. Pre-Sprint Research (has blocking questions for next sprint)
+3. Project Mode (portfolio-level changes needed)
+
+---
+
+## Pre-Sprint Research Phase
+
+**Purpose:** Resolve theoretical questions that block Phase 1 (Ground Truth) definition.
+
+Some sprints introduce qualitatively new physics where we can't define "ground truth" without first answering research questions.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  PRE-SPRINT RESEARCH                                    │
+│                                                         │
+│  Entry: Theory Refinement identified blocking questions │
+│            ↓                                            │
+│  1. Identify what blocks Phase 1                        │
+│            ↓                                            │
+│  2. Literature review / theoretical work                │
+│            ↓                                            │
+│  3. Update knowledge hypergraph                         │
+│     - Add concepts, claims, evidence                    │
+│            ↓                                            │
+│  4. Update DESIGN_RATIONALE                             │
+│     - New section documenting findings                  │
+│            ↓                                            │
+│  5. Gate check: Can we now define Ground Truth?         │
+│            ↓                                            │
+│  Exit: Sprint N+1 Phase 1 (Ground Truth)                │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Entry criteria:**
+- Theory Refinement complete for Sprint N
+- Open research questions identified that block Sprint N+1 Phase 1
+
+**Exit criteria:**
+- Blocking research questions resolved (or consciously deferred)
+- Knowledge hypergraph updated with findings
+- DESIGN_RATIONALE updated with new section
+- Phase 1 scope is now definable
+
+**Outputs:**
+- Research issues closed
+- Knowledge graph vertices/hyperedges added
+- DESIGN_RATIONALE Section (Pre-Sprint N+1 Research)
+- Go/No-Go decision for Phase 1
+
+**Example: Sprint 3 (Double-Slit)**
+
+Before we can define Ground Truth for double-slit, we must answer:
+- How do quaternions represent spatial superposition? (#249)
+- What's the physical motivation? (#250)
+- What are the falsification criteria? (#251)
+
+These require Pre-Sprint Research before Phase 1 can begin.
 
 ---
 
