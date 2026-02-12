@@ -1,0 +1,32 @@
+name: Differential Test (Phase 4d)
+
+on:
+  pull_request:
+    paths:
+      - 'src/qphysics.py'
+      - 'experiments/**'
+      - 'tests/oracle_predictions.json'
+      - 'tests/test_differential.py'
+      - 'scripts/differential_test.py'
+
+jobs:
+  differential-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install numpy numpy-quaternion pytest
+
+      - name: Run differential test harness
+        run: python scripts/differential_test.py --verbose
+
+      - name: Run pytest differential tests
+        run: python -m pytest tests/test_differential.py -v

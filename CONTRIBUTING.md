@@ -419,7 +419,7 @@ python scripts/qbp_knowledge.py link visualization "bloch_sphere_rotation.py" cl
 
 Phase 4 is divided into three sub-phases. The phase count remains 5 and each experiment still has 5 issues — sub-phases are tracked as task sections within the single Phase 4 issue.
 
-**Sub-phase dependencies:** 4a (Formal Proof) must complete before 4b (Proof Review) can begin. 4b must complete before 4c (Interactive Proof Visualization) can begin. Phase 4c runs in parallel with Phase 5 preparation — it is a deliverable, not a gate for publication. Phase 4d (Verified Differential Testing) is optional and can run after 4a completes — it validates Python against Lean oracles.
+**Sub-phase dependencies:** 4a (Formal Proof) must complete before 4b (Proof Review) can begin. 4b must complete before 4c (Interactive Proof Visualization) can begin. Phase 4c runs in parallel with Phase 5 preparation — it is a deliverable, not a gate for publication. Phase 4d (Verified Differential Testing) is optional and can run after 4a completes — it validates Python against Lean oracles. Phase 4e (Verified Simulation Engine) is optional and can run after 4d — it provides interactive 3D V&V using the proven oracle.
 
 ##### Phase 4a: Formal Proof
 
@@ -596,6 +596,59 @@ python scripts/qbp_knowledge_sqlite.py add hyperedge "proof-link-cosine" proof_l
 **Output:** CI passes with "0 divergences in N test cases"
 
 **Reference:** `docs/research/verified_experiment_engine.md`
+
+**Running locally:**
+```bash
+# Run the differential test harness
+python scripts/differential_test.py --verbose
+
+# Run via pytest
+python -m pytest tests/test_differential.py -v
+
+# Regenerate oracle predictions (requires Lean 4)
+cd proofs && lake build oracle && lake exe oracle > ../tests/oracle_predictions.json
+```
+
+**Adding a new experiment to Phase 4d:**
+1. Add Float computations to `proofs/QBP/Oracle/FloatCompute.lean`
+2. Add test cases to `proofs/QBP/Oracle/Main.lean`
+3. Regenerate `tests/oracle_predictions.json`
+4. Update `scripts/differential_test.py` if the new experiment uses different parameters
+5. Run `python scripts/differential_test.py` to verify
+
+##### Phase 4e: Verified Simulation Engine (Optional)
+
+**Owner:** Claude / Dev Team
+
+**Goal:** Provide interactive 3D simulation for human Verification & Validation (V&V) of experiments, using the proven Lean oracle as the physics source of truth.
+
+**Tech Stack:** Go + Raylib-go for 3D rendering, Lean oracle for physics.
+
+**Architecture:**
+```
+Lean 4 Proofs ──► Float Oracle ──► JSON predictions
+                                        │
+                                   Go Simulation
+                                   ├── Physics (oracle.go)
+                                   ├── Scene (apparatus, particles)
+                                   └── UI (controls, V&V display)
+```
+
+**V&V Workflow:**
+1. **Setup Verification** — Human inspects apparatus configuration
+2. **Behavior Verification** — Watch particle dynamics for sensibility
+3. **Results Validation** — Compare real-time statistics to oracle predictions
+4. **Iterate** — Fix and re-verify if any step fails
+
+**Running the simulation:**
+```bash
+cd src/simulation
+go run .
+```
+
+**Prerequisites:** Go 1.21+, system graphics libraries. See `src/simulation/README.md`.
+
+**V&V Methodology:** See `docs/workflows/verification_validation.md`.
 
 ##### Phase 4 Decision Gate
 

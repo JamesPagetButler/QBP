@@ -10,3 +10,7 @@ package «QBPProofs» where
 @[default_target]
 lean_lib «QBP» where
   roots := #[`QBP]
+
+-- Phase 4d: Float oracle executable for differential testing
+lean_exe «oracle» where
+  root := `QBP.Oracle.Main
