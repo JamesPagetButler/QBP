@@ -67,3 +67,16 @@ tags:
 added_by: claude
 added_date: 2026-02-10
 research_sprint: 0R
+
+# Hypergraph extension: n-ary relationships
+hyperedges:
+  - id: divergence-research-cluster
+    type: research_cluster
+    members:
+      # Other entries this question is deeply connected to
+      - claim-qbp-matches-qm-single-particle
+      - concept-quaternion-pauli-isomorphism
+      - concept-multipartite-entanglement
+    properties:
+      description: "Core research theme: finding where QBP uniquely predicts"
+      priority: high
