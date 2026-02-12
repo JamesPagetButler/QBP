@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QBP Knowledge Graph Hyperedge Schemas",
+  "description": "JSON Schema definitions for QBP knowledge graph hyperedge types",
+
+  "definitions": {
+    "evidence_chain": {
+      "description": "Links a Claim to its supporting evidence (sources, proofs)",
+      "min_members": 2,
+      "member_requirements": "Must include at least 1 Claim and 1+ evidence Sources or Proofs",
+      "properties": {
+        "strength": {
+          "type": "string",
+          "enum": ["strong", "moderate", "weak"],
+          "description": "Overall evidence strength"
+        }
+      }
+    },
+
+    "equivalence": {
+      "description": "Links mathematically equivalent structures or concepts",
+      "min_members": 2,
+      "member_requirements": "Must include 2+ Concepts",
+      "properties": {
+        "relation": {
+          "type": "string",
+          "description": "Type of equivalence (isomorphism, homeomorphism, etc.)"
+        }
+      }
+    },
+
+    "theory_axioms": {
+      "description": "Groups the foundational axioms of a theory",
+      "min_members": 2,
+      "member_requirements": "Must include 2+ Claims representing axioms",
+      "properties": {
+        "theory_name": {
+          "type": "string",
+          "description": "Name of the theory these axioms define"
+        }
+      }
+    },
+
+    "research_cluster": {
+      "description": "Groups related research questions",
+      "min_members": 2,
+      "member_requirements": "Must include 2+ Questions",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "description": "Common theme of the questions"
+        }
+      }
+    },
+
+    "proof_link": {
+      "description": "Links a Claim to its formal Lean proof",
+      "min_members": 2,
+      "member_requirements": "Must include exactly 1 Claim and 1 Proof",
+      "properties": {
+        "theorem_name": {
+          "type": "string",
+          "description": "Specific theorem name in the proof file"
+        }
+      }
+    },
+
+    "emergence": {
+      "description": "Shows how multiple concepts combine to yield emergent properties",
+      "min_members": 2,
+      "member_requirements": "Must include multiple Concepts and/or Claims",
+      "properties": {
+        "emergent_property": {
+          "type": "string",
+          "description": "What emerges from the combination"
+        }
+      }
+    },
+
+    "review_consensus": {
+      "description": "Records multi-reviewer agreement on a claim",
+      "min_members": 2,
+      "member_requirements": "Must include 1 Claim and reviewer Sources/notes",
+      "properties": {
+        "reviewers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Reviewers who agreed"
+        },
+        "pr_number": {
+          "type": "integer",
+          "description": "PR where consensus was reached"
+        }
+      }
+    },
+
+    "investigation": {
+      "description": "Links a Question to its investigation materials",
+      "min_members": 2,
+      "member_requirements": "Must include 1 Question and 1+ Sources",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["planned", "in_progress", "complete"],
+          "description": "Investigation status"
+        },
+        "findings": {
+          "type": "string",
+          "description": "Summary of findings"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QBP Knowledge Graph Vertex Schemas",
+  "description": "JSON Schema definitions for QBP knowledge graph vertex types",
+
+  "definitions": {
+    "Source": {
+      "type": "object",
+      "description": "Academic source (paper, book, etc.)",
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string", "description": "Full title of the source" },
+        "category": {
+          "type": "string",
+          "enum": ["textbook", "paper", "preprint", "foundational", "review"],
+          "description": "Type of source"
+        },
+        "authors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of authors"
+        },
+        "date": { "type": "string", "description": "Publication date (YYYY or YYYY-MM-DD)" },
+        "url": { "type": "string", "format": "uri", "description": "URL to source" },
+        "doi": { "type": "string", "description": "Digital Object Identifier" },
+        "venue": { "type": "string", "description": "Journal, conference, or publisher" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Categorization tags"
+        },
+        "abstract": { "type": "string", "description": "Abstract or summary" },
+        "key_insights": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Key insights relevant to QBP"
+        },
+        "research_sprint": { "type": "string", "description": "Sprint where source was added" },
+        "added_date": { "type": "string", "format": "date", "description": "Date added to knowledge base" },
+        "added_by": { "type": "string", "description": "Who added this entry" }
+      }
+    },
+
+    "Concept": {
+      "type": "object",
+      "description": "Mathematical or physical concept",
+      "required": ["term"],
+      "properties": {
+        "term": { "type": "string", "description": "The concept name" },
+        "definition": { "type": "string", "description": "Plain English definition" },
+        "formal_definition": { "type": "string", "description": "Mathematical/formal definition" },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Alternative names"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Categorization tags"
+        },
+        "added_date": { "type": "string", "format": "date" },
+        "added_by": { "type": "string" }
+      }
+    },
+
+    "Claim": {
+      "type": "object",
+      "description": "Scientific claim that can be tested/proven",
+      "required": ["statement"],
+      "properties": {
+        "statement": { "type": "string", "description": "The claim statement" },
+        "context": { "type": "string", "description": "When/where this claim applies" },
+        "status": {
+          "type": "string",
+          "enum": ["proposed", "supported", "proven", "disputed", "refuted"],
+          "description": "Current evidence status"
+        },
+        "confidence_tier": {
+          "type": "string",
+          "enum": ["Tier-1-certain", "Tier-2-likely", "Tier-3-speculative"],
+          "description": "Confidence level per QBP methodology"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "implications": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "What follows if this claim is true"
+        },
+        "added_date": { "type": "string", "format": "date" },
+        "added_by": { "type": "string" }
+      }
+    },
+
+    "Question": {
+      "type": "object",
+      "description": "Open research question",
+      "required": ["question"],
+      "properties": {
+        "question": { "type": "string", "description": "The research question" },
+        "context": { "type": "string", "description": "Background context" },
+        "status": {
+          "type": "string",
+          "enum": ["open", "investigating", "answered", "deferred"],
+          "description": "Investigation status"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Research priority"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "related_issues": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "GitHub issue numbers"
+        },
+        "investigation_approaches": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Potential ways to investigate"
+        },
+        "success_criteria": { "type": "string", "description": "What would answer this question" },
+        "added_date": { "type": "string", "format": "date" },
+        "added_by": { "type": "string" }
+      }
+    },
+
+    "Proof": {
+      "type": "object",
+      "description": "Formal Lean 4 proof",
+      "required": ["lean_file"],
+      "properties": {
+        "lean_file": { "type": "string", "description": "Path to Lean file" },
+        "theorems": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Theorem names proven in this file"
+        },
+        "verified": { "type": "boolean", "description": "Has passed verification" },
+        "no_sorry": { "type": "boolean", "description": "Contains no sorry placeholders" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "added_date": { "type": "string", "format": "date" },
+        "added_by": { "type": "string" }
+      }
+    }
+  }
+}

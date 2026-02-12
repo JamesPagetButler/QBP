@@ -683,6 +683,127 @@ class QBPKnowledgeSQLite:
         }
 
     # -------------------------------------------------------------------------
+    # Validation
+    # -------------------------------------------------------------------------
+
+    def validate(self) -> Dict[str, Any]:
+        """
+        Validate the entire knowledge base for integrity issues.
+
+        Returns:
+            {
+                "valid": bool,
+                "errors": [...],
+                "warnings": [...],
+                "stats": {...}
+            }
+        """
+        errors: List[str] = []
+        warnings: List[str] = []
+
+        with self._connection() as conn:
+            # 1. Validate vertex schemas
+            for row in conn.execute("SELECT id, type, data FROM vertices"):
+                v_id = row["id"]
+                v_type = row["type"]
+                data = json.loads(row["data"])
+
+                # Check type is valid
+                if v_type not in VERTEX_TYPES:
+                    errors.append(f"Vertex {v_id}: invalid type '{v_type}'")
+                    continue
+
+                # Check required fields
+                schema = VERTEX_TYPES[v_type]
+                for req in schema["required"]:
+                    if req not in data:
+                        errors.append(f"Vertex {v_id}: missing required field '{req}'")
+
+                # Check ID prefix convention
+                expected_prefix = v_type.lower() + ":"
+                if not v_id.startswith(expected_prefix):
+                    warnings.append(
+                        f"Vertex {v_id}: ID should start with '{expected_prefix}'"
+                    )
+
+            # 2. Validate hyperedge schemas
+            for row in conn.execute("SELECT id, type, data FROM hyperedges"):
+                e_id = row["id"]
+                e_type = row["type"]
+
+                # Check type is valid
+                if e_type not in HYPEREDGE_TYPES:
+                    errors.append(f"Hyperedge {e_id}: invalid type '{e_type}'")
+                    continue
+
+                # Check minimum members
+                schema = HYPEREDGE_TYPES[e_type]
+                member_count = conn.execute(
+                    "SELECT COUNT(*) FROM incidences WHERE edge_id = ?", (e_id,)
+                ).fetchone()[0]
+
+                min_members = schema.get("min_members", 2)
+                if member_count < min_members:
+                    errors.append(
+                        f"Hyperedge {e_id}: has {member_count} members, "
+                        f"requires at least {min_members}"
+                    )
+
+            # 3. Check referential integrity (dangling references)
+            # Note: SQLite FOREIGN KEYs should prevent this, but check anyway
+            dangling = conn.execute(
+                """
+                SELECT i.vertex_id, i.edge_id
+                FROM incidences i
+                LEFT JOIN vertices v ON i.vertex_id = v.id
+                WHERE v.id IS NULL
+                """
+            ).fetchall()
+            for row in dangling:
+                errors.append(
+                    f"Dangling reference: vertex '{row['vertex_id']}' "
+                    f"in edge '{row['edge_id']}' does not exist"
+                )
+
+            # 4. Check for orphan vertices (not in any hyperedge)
+            orphans = conn.execute(
+                """
+                SELECT v.id FROM vertices v
+                LEFT JOIN incidences i ON v.id = i.vertex_id
+                WHERE i.edge_id IS NULL
+                """
+            ).fetchall()
+            for row in orphans:
+                warnings.append(f"Orphan vertex: {row['id']} is not in any hyperedge")
+
+            # 5. Check for empty hyperedges
+            empty_edges = conn.execute(
+                """
+                SELECT e.id FROM hyperedges e
+                LEFT JOIN incidences i ON e.id = i.edge_id
+                WHERE i.vertex_id IS NULL
+                """
+            ).fetchall()
+            for row in empty_edges:
+                errors.append(f"Empty hyperedge: {row['id']} has no members")
+
+            # Stats
+            total_vertices = conn.execute("SELECT COUNT(*) FROM vertices").fetchone()[0]
+            total_edges = conn.execute("SELECT COUNT(*) FROM hyperedges").fetchone()[0]
+
+        return {
+            "valid": len(errors) == 0,
+            "errors": errors,
+            "warnings": warnings,
+            "stats": {
+                "vertices": total_vertices,
+                "hyperedges": total_edges,
+                "error_count": len(errors),
+                "warning_count": len(warnings),
+            },
+        }
+
+    # -------------------------------------------------------------------------
     # Export (HIF and HyperNetX)
     # -------------------------------------------------------------------------
 
@@ -800,6 +921,14 @@ def main():
     query_p.add_argument("--tag", help="Filter by tag")
     query_p.add_argument("--search", help="Search in data")
 
+    # Validate
+    validate_p = subparsers.add_parser(
+        "validate", help="Validate knowledge base integrity"
+    )
+    validate_p.add_argument(
+        "--strict", action="store_true", help="Exit with error on warnings too"
+    )
+
     # Research queries
     subparsers.add_parser("weak-claims", help="Find claims with weak evidence")
     subparsers.add_parser("unproven", help="Find claims without proofs")
@@ -850,6 +979,39 @@ def main():
         elif args.command == "bridges":
             results = kb.find_bridge_concepts()
             print(json.dumps(results, indent=2))
+
+        elif args.command == "validate":
+            import sys
+
+            result = kb.validate()
+            print(f"Knowledge Base Validation: {args.db}")
+            print(f"{'=' * 50}")
+            print(f"Status: {'VALID' if result['valid'] else 'INVALID'}")
+            print(
+                f"Vertices: {result['stats']['vertices']}, "
+                f"Hyperedges: {result['stats']['hyperedges']}"
+            )
+            print()
+
+            if result["errors"]:
+                print(f"ERRORS ({len(result['errors'])}):")
+                for e in result["errors"]:
+                    print(f"  ✗ {e}")
+                print()
+
+            if result["warnings"]:
+                print(f"WARNINGS ({len(result['warnings'])}):")
+                for w in result["warnings"]:
+                    print(f"  ⚠ {w}")
+                print()
+
+            if not result["valid"]:
+                sys.exit(1)
+            elif args.strict and result["warnings"]:
+                print("Failing due to --strict mode")
+                sys.exit(1)
+            else:
+                print("✓ Validation passed")
 
         elif args.command == "export":
             if args.format == "hif":

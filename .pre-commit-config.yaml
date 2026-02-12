@@ -22,3 +22,13 @@ repos:
         additional_dependencies:
           - types-PyYAML>=6.0.0  # Type stubs for yaml module
         exclude: ^experiments/  # Standalone scripts, not importable packages
+
+# Knowledge base validation - checks schema compliance and referential integrity
+-   repo: local
+    hooks:
+    -   id: validate-knowledge
+        name: Validate knowledge base
+        entry: python scripts/validate_knowledge.py
+        language: python
+        files: ^knowledge/
+        pass_filenames: false
