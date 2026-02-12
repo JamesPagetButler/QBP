@@ -872,6 +872,95 @@ class QBPKnowledgeSQLite:
     # Import from Hypergraph-DB
     # -------------------------------------------------------------------------
 
+    def import_hif(self, hif_path: str) -> Dict[str, int]:
+        """
+        Import data from Hypergraph Interchange Format (HIF) JSON.
+
+        Args:
+            hif_path: Path to HIF JSON file
+
+        Returns:
+            Dict with counts of imported nodes, edges, incidences
+        """
+        with open(hif_path) as f:
+            hif = json.load(f)
+
+        counts = {"nodes": 0, "edges": 0, "incidences": 0}
+
+        # Import nodes
+        for node in hif.get("nodes", []):
+            node_id = node["node"]
+            attrs = node.get("attrs", {})
+            node_type = attrs.pop("type", "Concept")  # Default type
+
+            # Validate type exists
+            if node_type not in VERTEX_TYPES:
+                node_type = "Concept"
+
+            # Extract the required field based on type
+            schema = VERTEX_TYPES[node_type]
+            for req in schema["required"]:
+                if req not in attrs:
+                    # Try to infer from node_id
+                    attrs[req] = node_id.split(":")[-1].replace("-", " ").title()
+
+            self.add_vertex(node_id, node_type, attrs, skip_if_exists=False)
+            counts["nodes"] += 1
+
+        # Import edges
+        for edge_entry in hif.get("edges", []):
+            edge_id = edge_entry["edge"]
+            attrs = edge_entry.get("attrs", {})
+            edge_type = attrs.pop("type", "evidence_chain")
+
+            if edge_type not in HYPEREDGE_TYPES:
+                edge_type = "evidence_chain"
+
+            # Collect members from incidences
+            members = [
+                inc["node"]
+                for inc in hif.get("incidences", [])
+                if inc["edge"] == edge_id
+            ]
+
+            if len(members) >= HYPEREDGE_TYPES[edge_type].get("min_members", 2):
+                self.add_hyperedge(
+                    edge_id, edge_type, members, attrs, skip_if_exists=False
+                )
+                counts["edges"] += 1
+
+        counts["incidences"] = sum(
+            len([i for i in hif.get("incidences", []) if i["edge"] == e["edge"]])
+            for e in hif.get("edges", [])
+        )
+
+        return counts
+
+    def visualize(self, output_path: str, title: str = "QBP Knowledge Hypergraph"):
+        """
+        Visualize the hypergraph using HyperNetX and save as PNG.
+
+        Args:
+            output_path: Path for output PNG file
+            title: Plot title
+        """
+        try:
+            import hypernetx as hnx
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError("Requires: pip install hypernetx matplotlib")
+
+        H = self.to_hypernetx()
+
+        fig, ax = plt.subplots(1, 1, figsize=(14, 10))
+        hnx.draw(H, ax=ax)
+        ax.set_title(title, fontsize=14)
+        fig.tight_layout()
+        fig.savefig(output_path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+
+        return output_path
+
     @classmethod
     def import_from_hypergraphdb(
         cls, hgdb_path: str, sqlite_path: str
@@ -948,11 +1037,26 @@ def main():
     export_p.add_argument("--format", choices=["hif", "json"], default="hif")
     export_p.add_argument("--output", required=True, help="Output file")
 
-    # Import
+    # Import from Hypergraph-DB
     import_p = subparsers.add_parser("import", help="Import from Hypergraph-DB")
     import_p.add_argument(
         "--from", dest="source", required=True, help="Source .hgdb file"
     )
+
+    # Import from HIF
+    import_hif_p = subparsers.add_parser("import-hif", help="Import from HIF JSON")
+    import_hif_p.add_argument("file", help="HIF JSON file to import")
+
+    # Visualize
+    viz_p = subparsers.add_parser(
+        "visualize", help="Visualize hypergraph as PNG (requires HyperNetX)"
+    )
+    viz_p.add_argument(
+        "--output",
+        default="workspace/qbp_knowledge.png",
+        help="Output PNG path (default: workspace/qbp_knowledge.png)",
+    )
+    viz_p.add_argument("--title", default="QBP Knowledge Hypergraph", help="Plot title")
 
     args = parser.parse_args()
 
@@ -1025,6 +1129,17 @@ def main():
             if args.format == "hif":
                 kb.export_hif(args.output)
                 print(f"Exported HIF to {args.output}")
+
+        elif args.command == "import-hif":
+            counts = kb.import_hif(args.file)
+            print(f"Imported from {args.file}:")
+            print(f"  Nodes: {counts['nodes']}")
+            print(f"  Edges: {counts['edges']}")
+            print(f"  Incidences: {counts['incidences']}")
+
+        elif args.command == "visualize":
+            output = kb.visualize(args.output, title=args.title)
+            print(f"Visualization saved to {output}")
 
         else:
             parser.print_help()
