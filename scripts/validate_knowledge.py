@@ -38,7 +38,7 @@ def main():
         print("Skipping validation (no database)")
         return 0
 
-    kb = QBPKnowledgeSQLite(db_path)
+    kb = QBPKnowledgeSQLite(db_path, read_only=True)
     result = kb.validate()
 
     if result["errors"]:

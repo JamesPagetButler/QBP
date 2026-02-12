@@ -142,24 +142,32 @@ class QBPKnowledgeSQLite:
 
     SCHEMA_VERSION = 1
 
-    def __init__(self, db_path: str = "knowledge/qbp.db"):
+    def __init__(self, db_path: str = "knowledge/qbp.db", read_only: bool = False):
         """Initialize or open the database."""
         self.db_path = Path(db_path)
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self.read_only = read_only
 
-        self._init_schema()
+        if not read_only:
+            self.db_path.parent.mkdir(parents=True, exist_ok=True)
+            self._init_schema()
 
     @contextmanager
     def _connection(self):
         """Context manager for database connections."""
-        conn = sqlite3.connect(str(self.db_path))
+        if self.read_only:
+            # Open in read-only mode via URI
+            conn = sqlite3.connect(f"file:{self.db_path}?mode=ro", uri=True)
+        else:
+            conn = sqlite3.connect(str(self.db_path))
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
         try:
             yield conn
-            conn.commit()
+            if not self.read_only:
+                conn.commit()
         except Exception:
-            conn.rollback()
+            if not self.read_only:
+                conn.rollback()
             raise
         finally:
             conn.close()
