@@ -71,9 +71,10 @@ def validate_no_duplicates(
     errors = []
     for exp_num, names in experiments.items():
         if len(names) > 1:
+            name_list = "\n".join(f"  - {n}" for n in names)
             errors.append(
                 f"Duplicate experiment number '{exp_num}' in {location}:\n"
-                f"  - {chr(10).join('  - ' + n for n in names)}"
+                f"{name_list}"
             )
     return errors
 
@@ -108,6 +109,14 @@ def main():
     for num in research_nums - exp_nums:
         # This is a warning, not an error (planned experiments are okay)
         print(f"Note: research/{num}_* exists but experiments/{num}_*/ does not")
+
+    # Cross-check: warn if results dir exists without experiment dir
+    results_nums = set(results_experiments.keys())
+    for num in results_nums - exp_nums:
+        print(
+            f"Warning: results/{num}_* exists but experiments/{num}_*/ does not "
+            "(orphan results directory)"
+        )
 
     if all_errors:
         print("VALIDATION FAILED: Duplicate experiment numbers found\n")
