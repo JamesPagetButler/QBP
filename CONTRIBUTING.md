@@ -26,6 +26,24 @@ Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engin
 
     The Expert Panel (7 personas) reviews all Theory Refinement work. See [Expert Panel](docs/personas/expert_panel.md).
 
+    **Knowledge Graph Touchpoint (Theory Refinement):**
+    ```bash
+    # Full knowledge graph analysis
+    python scripts/qbp_knowledge_sqlite.py summary          # Overview statistics
+    python scripts/qbp_knowledge_sqlite.py weak-claims      # Claims with thin evidence
+    python scripts/qbp_knowledge_sqlite.py unproven         # Claims not yet proven
+    python scripts/qbp_knowledge_sqlite.py gaps             # Questions without answers
+    python scripts/qbp_knowledge_sqlite.py bridges          # Bridge concepts connecting areas
+
+    # Impact analysis: if axiom changes, what's affected?
+    python scripts/qbp_knowledge_sqlite.py query --search "quaternion-measurement"
+
+    # Update: Add new claims from theory refinement
+    python scripts/qbp_knowledge_sqlite.py add claim "su2-double-cover" \
+      "SU(2) double cover of SO(3) explains half-angle formula" \
+      --status proposed --confidence_tier Tier-2-likely
+    ```
+
 3.  **Loop:** We then begin the next sprint for Experiment N+1.
 
 This ensures our theory evolves based on our experimental results.
@@ -528,6 +546,18 @@ src/viz/interactive/
 
 **Output:** Interactive WASM visualization in `src/viz/interactive/dist/`.
 
+**Knowledge Graph Touchpoint (Phase 4):**
+```bash
+# Query: What claims does this proof establish?
+python scripts/qbp_knowledge_sqlite.py query --type Claim --tag angle-dependent
+
+# Update: Mark claims as proven, link proof to claims
+python scripts/qbp_knowledge_sqlite.py add proof "angle-dependent" "proofs/QBP/Experiments/AngleDependent.lean" \
+  --theorems "prob_up_angle,expectation_orthogonal" --verified true --no_sorry true
+python scripts/qbp_knowledge_sqlite.py add hyperedge "proof-link-cosine" proof_link \
+  "claim:cosine-squared,proof:angle-dependent" --theorem_name "prob_up_angle"
+```
+
 ##### Phase 4d: Verified Differential Testing (Optional)
 
 **Owner:** Claude / Dev Team
@@ -612,6 +642,20 @@ Phase 5 has two tracks. Track A is always required. Track B applies only when Ph
 **Output:** Published, documented Lean 4 library available to the community.
 
 **Exit Criteria:** Library indexed on Reservoir; documentation live; announcement posted.
+
+**Knowledge Graph Touchpoint (Phase 5):**
+```bash
+# Query: What claims are ready for publication? What gaps remain?
+python scripts/qbp_knowledge_sqlite.py unproven  # Claims not yet proven
+python scripts/qbp_knowledge_sqlite.py gaps      # Research gaps
+
+# Update: Link paper sections to claims they document
+python scripts/qbp_knowledge_sqlite.py add source "paper-section-angle-dep" \
+  "QBP Paper Section 3: Angle-Dependent Measurements" \
+  --category paper --tags "publication,angle-dependent"
+python scripts/qbp_knowledge_sqlite.py add hyperedge "publication-angle-dep" evidence_chain \
+  "claim:cosine-squared,claim:half-angle-from-su2,source:paper-section-angle-dep"
+```
 
 ---
 
