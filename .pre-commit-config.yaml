@@ -15,8 +15,10 @@ repos:
     -   id: black
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v1.8.0'  # Updated stable version
+    rev: 'v1.14.0'  # Updated to match common local versions
     hooks:
     -   id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
+        additional_dependencies:
+          - types-PyYAML>=6.0.0  # Type stubs for yaml module
         exclude: ^experiments/  # Standalone scripts, not importable packages
