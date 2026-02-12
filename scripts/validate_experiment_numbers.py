@@ -32,7 +32,7 @@ def extract_experiment_number(name: str) -> str | None:
     Matches patterns like:
     - 01_stern_gerlach -> 01
     - 01b_angle_dependent -> 01b
-    - 02_double_slit -> 02
+    - 03_double_slit -> 03
 
     Returns None if no experiment number found.
     """
