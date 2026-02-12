@@ -668,7 +668,7 @@ The half-angle θ/2 in the rotation quaternion is the physical signature of the 
 
 This is consistent with spinor behavior in standard QM. The double-cover is not an artifact but a physical property of spin-1/2 particles, reflected faithfully in quaternion algebra.
 
-### 9.3 Emergent Phenomena Verification
+### 9.3 Verification of Expected Properties
 
 Sprint 2 Guide Post evaluation:
 
@@ -685,13 +685,13 @@ Sprint 2 Guide Post evaluation:
 
 Research Sprint 0R (Section 8) established:
 
-1. **Observable Formalism (§8.3):** Pure quaternions O correspond to Pauli matrices via i↔-iσₓ, j↔-iσᵧ, k↔-iσᵤ. The representation is not approximate — it's an exact algebraic isomorphism.
+1. **Observable Formalism (§8.3):** Pure quaternions O correspond to Pauli matrices via i↔-iσₓ, j↔-iσᵧ, k↔-iσ_z (here i,j,k are quaternion basis elements, not the complex unit). The representation is not approximate — it's an exact algebraic isomorphism.
 
 2. **Half-Angle Origin (§8.6):** The θ/2 arises from the Hopf fibration S³→S² and the spinor transformation law. It's the same mathematics as standard QM in different notation.
 
 3. **Division Algebra Necessity (§8.2):** Quaternions are required (not merely sufficient) for SU(2)/spin-1/2 physics. Complex numbers lack the structure; octonions are for SU(3).
 
-4. **QBP-QM Equivalence (§8.1):** The Moretti-Oppio theorem proves that QBP reproduces standard QM for all relativistic single-particle systems.
+4. **QBP-QM Equivalence (§8.1):** The Moretti-Oppio theorem proves that QBP reproduces standard QM for relativistic single-particle systems (this scope limitation is important — multi-particle or spatial superposition systems are not covered by this theorem).
 
 ### 9.5 Theoretical Requirements for Sprint 3 (Double-Slit)
 
@@ -706,10 +706,12 @@ Sprint 3 introduces qualitatively new physics that Sprint 1-2 did not address:
 
 **Current limitation:** QBP states are single pure quaternions ψ = ai + bj + ck. This naturally represents spin states but not spatial superpositions.
 
-**Proposed approaches:**
+**Proposed approaches** (each requires rigorous mathematical development in Sprint 3 Phase 1):
 1. **Quaternion pairs:** Represent superposition as (ψ₁, ψ₂) with complex coefficients (α, β)
 2. **Quaternionic wavefunction:** ψ(x) as a quaternion-valued function of position
 3. **Density matrix analog:** Use quaternion products to represent mixed/superposed states
+
+**Key question for Sprint 3:** Why might quaternions provide insight here that complex numbers don't? The physical motivation must be articulated before diving into formalism.
 
 #### 9.5.2 Interference Mechanism
 
@@ -721,7 +723,7 @@ Sprint 3 introduces qualitatively new physics that Sprint 1-2 did not address:
 
 #### 9.5.3 Measurement-Induced Decoherence
 
-**Challenge:** A which-path measurement must destroy the interference pattern, collapsing to classical two-band distribution.
+**Challenge:** A which-path measurement must destroy the interference pattern, collapsing to a probability distribution without interference fringes (two peaks at slit locations).
 
 **QBP measurement postulate:** Currently handles spin measurements via vecDot(ψ, O). Need to extend to position measurements.
 
