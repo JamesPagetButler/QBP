@@ -873,6 +873,175 @@ class QBPKnowledgeSQLite:
     # Import from Hypergraph-DB
     # -------------------------------------------------------------------------
 
+    def suggest_updates(self, file_paths: List[str]) -> List[Dict[str, str]]:
+        """
+        Suggest knowledge graph updates based on changed files.
+
+        Analyzes file types and paths to identify potential impacts:
+        - .lean files → proof vertices, proof_link edges
+        - research/*_expected_results.md → claim vertices
+        - src/qphysics.py → concept/claim consistency
+        - paper/*.md → source vertices
+        - analysis/ → evidence chain updates
+        """
+        suggestions: List[Dict[str, str]] = []
+
+        for fp in file_paths:
+            path = Path(fp)
+            name = path.name
+            parts = path.parts
+
+            if name.endswith(".lean"):
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "proof",
+                        "action": f"Run `scan-proofs --apply` to sync Proof vertex for {name}",
+                        "impact": "May affect proof_link hyperedges",
+                    }
+                )
+            elif "research" in parts and "expected_results" in name:
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "claim",
+                        "action": "Review claims derived from this ground truth",
+                        "impact": "Claims may need updating if predictions changed",
+                    }
+                )
+            elif name == "qphysics.py":
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "concept",
+                        "action": "Verify axiom implementations match knowledge graph",
+                        "impact": "Core physics changes affect all downstream claims",
+                    }
+                )
+            elif "paper" in parts and name.endswith(".md"):
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "source",
+                        "action": "Check if Source vertices need updating",
+                        "impact": "Design rationale changes may affect claim context",
+                    }
+                )
+            elif "analysis" in parts:
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "evidence",
+                        "action": "Verify evidence chains include this analysis",
+                        "impact": "New analysis may strengthen or weaken claims",
+                    }
+                )
+            elif "viz" in parts or "theme" in name:
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "visualization",
+                        "action": "No knowledge graph impact (visualization only)",
+                        "impact": "None",
+                    }
+                )
+
+        return suggestions
+
+    def generate_report(self) -> str:
+        """
+        Generate a full knowledge graph analysis report for Theory Refinement.
+
+        Returns Markdown-formatted report covering:
+        - Summary statistics
+        - Weak claims (no evidence)
+        - Unproven claims (no proof_link)
+        - Research gaps (open questions without investigation)
+        - Bridge concepts (high-degree nodes)
+        """
+        summary = self.summary()
+        weak = self.find_weak_claims()
+        unproven = self.find_unproven_claims()
+        gaps = self.find_research_gaps()
+        bridges = self.find_bridge_concepts(min_degree=2)
+
+        lines = [
+            "# Knowledge Graph Analysis Report",
+            "",
+            "## Summary",
+            "",
+            f"- **Vertices:** {summary['vertices']['total']}",
+        ]
+        for vtype, count in summary["vertices"].get("by_type", {}).items():
+            lines.append(f"  - {vtype}: {count}")
+        lines.append(f"- **Hyperedges:** {summary['hyperedges']['total']}")
+        for etype, count in summary["hyperedges"].get("by_type", {}).items():
+            lines.append(f"  - {etype}: {count}")
+
+        lines.extend(
+            [
+                "",
+                "## Weak Claims (No Evidence Chain)",
+                "",
+            ]
+        )
+        if weak:
+            for c in weak:
+                lines.append(
+                    f"- **{c['id']}**: {c.get('statement', 'N/A')} "
+                    f"— {c.get('reason', 'no evidence')}"
+                )
+        else:
+            lines.append("None found — all claims have evidence chains.")
+
+        lines.extend(
+            [
+                "",
+                "## Unproven Claims (No proof_link)",
+                "",
+            ]
+        )
+        if unproven:
+            for c in unproven:
+                lines.append(f"- **{c['id']}**: {c.get('statement', 'N/A')}")
+        else:
+            lines.append("None found — all claims have formal proofs.")
+
+        lines.extend(
+            [
+                "",
+                "## Research Gaps (Open Questions Without Investigation)",
+                "",
+            ]
+        )
+        if gaps:
+            for q in gaps:
+                lines.append(
+                    f"- **{q['id']}**: {q.get('question', 'N/A')} "
+                    f"— {q.get('reason', 'no investigation')}"
+                )
+        else:
+            lines.append("None found — all open questions have investigations.")
+
+        lines.extend(
+            [
+                "",
+                "## Bridge Concepts (High Connectivity)",
+                "",
+            ]
+        )
+        if bridges:
+            for b in bridges:
+                lines.append(
+                    f"- **{b['id']}**: {b.get('term', 'N/A')} "
+                    f"(degree: {b.get('degree', 0)})"
+                )
+        else:
+            lines.append("No bridge concepts found (min degree: 2).")
+
+        lines.append("")
+        return "\n".join(lines)
+
     def import_hif(self, hif_path: str) -> Dict[str, int]:
         """
         Import data from Hypergraph Interchange Format (HIF) JSON.
@@ -1068,6 +1237,25 @@ def main():
         help="Sync scan results before validating",
     )
 
+    # Trace evidence
+    trace_p = subparsers.add_parser(
+        "trace", help="Trace all evidence supporting a claim"
+    )
+    trace_p.add_argument("claim_id", help="Claim ID (with or without claim: prefix)")
+
+    # Suggest updates
+    suggest_p = subparsers.add_parser(
+        "suggest-updates",
+        help="Suggest knowledge graph impacts from changed files",
+    )
+    suggest_p.add_argument("files", nargs="+", help="Changed file paths")
+
+    # Report
+    subparsers.add_parser(
+        "report",
+        help="Generate full knowledge graph analysis for Theory Refinement",
+    )
+
     # Visualize
     viz_p = subparsers.add_parser(
         "visualize", help="Visualize hypergraph as PNG (requires HyperNetX)"
@@ -1155,6 +1343,28 @@ def main():
             print(f"  Nodes: {counts['nodes']}")
             print(f"  Edges: {counts['edges']}")
             print(f"  Incidences: {counts['incidences']}")
+
+        elif args.command == "trace":
+            claim_id = args.claim_id
+            if not claim_id.startswith("claim:"):
+                claim_id = f"claim:{claim_id}"
+            result = kb.trace_evidence(claim_id)
+            print(json.dumps(result, indent=2))
+
+        elif args.command == "suggest-updates":
+            suggestions = kb.suggest_updates(args.files)
+            if not suggestions:
+                print("No knowledge graph impacts detected for these files.")
+            else:
+                print("## Knowledge Graph Impact Suggestions\n")
+                for s in suggestions:
+                    print(f"**{s['file']}** ({s['type']})")
+                    print(f"  Action: {s['action']}")
+                    print(f"  Impact: {s['impact']}")
+                    print()
+
+        elif args.command == "report":
+            print(kb.generate_report())
 
         elif args.command == "visualize":
             output = kb.visualize(args.output, title=args.title)
