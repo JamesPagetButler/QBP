@@ -26,26 +26,22 @@ Files follow the pattern: `{NN}_{experiment_name}_expected_results.md`
 
 ## Experiments
 
-| # | Experiment | Research File | Status |
-|---|------------|---------------|--------|
-| 01 | Stern-Gerlach | [01_stern_gerlach_expected_results.md](01_stern_gerlach_expected_results.md) | Complete |
-| 01b | Angle-Dependent Measurement | [01b_angle_dependent_expected_results.md](01b_angle_dependent_expected_results.md) | In Progress (Sprint 2) |
-| 02 | Double-Slit | [02_double_slit_expected_results.md](02_double_slit_expected_results.md) | Planned |
-| 03 | Lamb Shift | [03_lamb_shift_expected_results.md](03_lamb_shift_expected_results.md) | Planned |
-| 04 | Anomalous g-2 | [04_g-2_expected_results.md](04_g-2_expected_results.md) | Planned |
-| 05 | Bell's Theorem | [05_bell_theorem_expected_results.md](05_bell_theorem_expected_results.md) | Planned |
-| 06 | Particle Statistics | [06_particle_statistics_derivation.md](06_particle_statistics_derivation.md) | Planned |
-| 07 | Positronium Ground State | [07_positronium_ground_state_expected_results.md](07_positronium_ground_state_expected_results.md) | Planned |
-| 08 | Hydrogen Spectrum | [08_hydrogen_spectrum_expected_results.md](08_hydrogen_spectrum_expected_results.md) | Planned |
-| 09 | Gravity Tests | [09_gravity_tests_expected_results.md](09_gravity_tests_expected_results.md) | Planned |
+**Note:** Experiment numbers align with sprint numbers (Sprint N = Experiment N). Experiment 01b is a sub-experiment extending 01.
 
-### Sprint ↔ Experiment Mapping
+| # | Experiment | Sprint | Research File | Status |
+|---|------------|--------|---------------|--------|
+| 01 | Stern-Gerlach | 1 | [01_stern_gerlach_expected_results.md](01_stern_gerlach_expected_results.md) | Complete |
+| 01b | Angle-Dependent Measurement | 2 | [01b_angle_dependent_expected_results.md](01b_angle_dependent_expected_results.md) | Complete |
+| 03 | Double-Slit | 3 | [03_double_slit_expected_results.md](03_double_slit_expected_results.md) | Planned |
+| 04 | Lamb Shift | 4 | [04_lamb_shift_expected_results.md](04_lamb_shift_expected_results.md) | Planned |
+| 05 | Anomalous g-2 | 5 | [05_g-2_expected_results.md](05_g-2_expected_results.md) | Planned |
+| 06 | Bell's Theorem | 6 | [06_bell_theorem_expected_results.md](06_bell_theorem_expected_results.md) | Planned |
+| 07 | Particle Statistics | 7 | [07_particle_statistics_derivation.md](07_particle_statistics_derivation.md) | Planned |
+| 08 | Positronium Ground State | 8 | [08_positronium_ground_state_expected_results.md](08_positronium_ground_state_expected_results.md) | Planned |
+| 09 | Hydrogen Spectrum | 9 | [09_hydrogen_spectrum_expected_results.md](09_hydrogen_spectrum_expected_results.md) | Planned |
+| 10 | Gravity Tests | 10 | [10_gravity_tests_expected_results.md](10_gravity_tests_expected_results.md) | Planned |
 
-| Sprint | Experiment | Description |
-|--------|------------|-------------|
-| Sprint 1 | 01 | Stern-Gerlach (basic: θ=90°) |
-| Sprint 2 | 01b | Angle-Dependent Measurement (general: arbitrary θ) |
-| Sprint 3+ | 02-09 | Per roadmap |
+> **File Renaming Pending:** Research files 02-09 need renaming to match new experiment numbers. Tracked in #256.
 
 ## Usage
 

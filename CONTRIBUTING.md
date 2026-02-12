@@ -181,18 +181,22 @@ Each experiment has a unique two-digit number (01, 02, 03...). Sub-experiments t
 
 ### Current Experiment Registry
 
+**Principle:** Sprint N = Experiment N (with exception for sub-experiments like 01b).
+
 | Number | Experiment | Sprint | Status |
 |--------|------------|--------|--------|
 | 01 | Stern-Gerlach | Sprint 1 | Complete |
-| 01b | Angle-Dependent Measurement | Sprint 2 | In Progress |
-| 02 | Double-Slit | — | Planned |
-| 03 | Lamb Shift | — | Planned |
-| 04 | Anomalous g-2 | — | Planned |
-| 05 | Bell's Theorem | — | Planned |
-| 06 | Particle Statistics | — | Planned |
-| 07 | Positronium Ground State | — | Planned |
-| 08 | Hydrogen Spectrum | — | Planned |
-| 09 | Gravity Tests | — | Planned |
+| 01b | Angle-Dependent Measurement | Sprint 2 | Complete |
+| 03 | Double-Slit | Sprint 3 | Planned |
+| 04 | Lamb Shift | Sprint 4 | Planned |
+| 05 | Anomalous g-2 | Sprint 5 | Planned |
+| 06 | Bell's Theorem | Sprint 6 | Planned |
+| 07 | Particle Statistics | Sprint 7 | Planned |
+| 08 | Positronium Ground State | Sprint 8 | Planned |
+| 09 | Hydrogen Spectrum | Sprint 9 | Planned |
+| 10 | Gravity Tests | Sprint 10 | Planned |
+
+> **Why no Experiment 02?** Sprint 2 runs Experiment 01b (an extension of Stern-Gerlach). This is the only exception to the Sprint=Experiment rule.
 
 See `research/README.md` for the authoritative experiment list and Sprint mapping.
 
@@ -317,6 +321,16 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 - Classify predictions as "Validation" (matches QM) or "Novel" (differs from QM)
 - Identify required tools or framework extensions
 
+**Knowledge Graph Touchpoint:**
+```bash
+# Query: What claims depend on this experiment's predictions?
+python scripts/qbp_knowledge.py query claims-for-experiment stern-gerlach
+
+# Update: Add new claims about expected results
+python scripts/qbp_knowledge.py add claim "SG-prediction-01" "Spin-up probability = cos²(θ/2)"
+python scripts/qbp_knowledge.py link claim "SG-prediction-01" axiom "quaternion-measurement"
+```
+
 **Output:** `research/NN_experiment_expected_results.md`
 
 **Exit Criteria:** Ground truth document reviewed and approved, with prediction classification complete.
@@ -332,6 +346,15 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 - Create simulation script in `experiments/NN_name/simulate.py`
 - Create tests in `tests/physics/test_name.py`
 - Run simulation and capture results
+
+**Knowledge Graph Touchpoint:**
+```bash
+# Query: What concepts does this implementation use?
+python scripts/qbp_knowledge.py query concepts-for-file src/qphysics.py
+
+# Update: Link implementation to concepts, flag missing definitions
+python scripts/qbp_knowledge.py link implementation "qphysics.py:rotation()" concept "quaternion-rotation"
+```
 
 **Output:**
 - Updated `qphysics.py` (if needed)
@@ -354,6 +377,15 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 **Workflow:**
 1.  **Human Interpretation:** The principal human collaborator (James) reviews the visualization and states their interpretation of the experimental outcome.
 2.  **Gemini Verification:** Gemini programmatically analyzes the raw numerical data from the `/results` file and provides an independent statistical summary to confirm or clarify the human interpretation.
+
+**Knowledge Graph Touchpoint:**
+```bash
+# Query: What should this visualization demonstrate?
+python scripts/qbp_knowledge.py query claims-for-experiment angle-dependent
+
+# Update: Link visualization outputs to claims they illustrate
+python scripts/qbp_knowledge.py link visualization "bloch_sphere_rotation.py" claim "cosine-squared-formula"
+```
 
 **Decision Gate:**
 > "Do both the human interpretation and Gemini's data analysis confirm that the results from Phase 2 accurately depict a successful experiment that matches the ground truth within our defined tolerance (e.g., 3σ)?"

@@ -8,13 +8,13 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 2 (Experiment 01b: Angle-Dependent Measurement)
-- **Lifecycle Stage:** Sprint 2 Complete — Ready for Research Sprint 0R
-- **Next Critical-Path Action:** Research Sprint 0R (#212)
+- **Active Sprint:** Between Sprints (Sprint 2 Complete, Sprint 3 Pending)
+- **Lifecycle Stage:** Pre-Sprint Research Phase
+- **Next Critical-Path Action:** Pre-Sprint Research (#255) → then Sprint 3 Phase 1 (#22)
 
 > **Hypergraph System Ready:** Core infrastructure complete (21 vertices, 9 hyperedges). Use `python scripts/qbp_knowledge.py` to interact with knowledge base during research.
 
-> **Note:** Sprint 2 implements Experiment 01b (an extension of Stern-Gerlach to arbitrary angles), not a new experiment. See `research/README.md` for the Sprint ↔ Experiment mapping.
+> **Sprint 3 Note:** Experiment 03 (Double-Slit) requires Pre-Sprint Research to define quaternionic superposition before Ground Truth can be written.
 
 ## Sprint 2 Closure Checklist
 
@@ -31,8 +31,8 @@
   - [x] YAML migration (#237) — CLOSED 2026-02-11. 21 vertices, 9 hyperedges seeded
   - [ ] Schema validation (#220) — Vertex and hyperedge validation (can do during 0R)
 - [x] **Research Sprint 0R** (#212) — **COMPLETE** (7/9 issues closed, 2 deferred)
-- [ ] Theory Refinement (#165) — **UNBLOCKED** (0R complete)
-- [ ] Retrospective (#191)
+- [x] Theory Refinement (#165) — CLOSED 2026-02-12. PR #243 merged. DESIGN_RATIONALE Section 9.
+- [x] Retrospective (#191) — CLOSED 2026-02-12. Full retrospective documented.
 
 ## Sprint 2 Lessons Learned (Phase 4c)
 
@@ -114,6 +114,36 @@ Research sprints are dedicated blocks for theoretical investigation between expe
 1. QBP is a reformulation of standard QM (Moretti-Oppio theorem). See DESIGN_RATIONALE.md Section 8.
 2. Lean 4 verified oracle feasible (Cedar pattern). See docs/research/verified_experiment_engine.md.
 3. Go 3D engines not mature; current viz approach optimal.
+
+## Sprint 2 Retrospective
+
+**Completed:** 2026-02-12
+
+### Summary
+Sprint 2 (Experiment 01b: Angle-Dependent Measurement) completed successfully in 7 days. All 5 phases + Research Sprint 0R + Theory Refinement finished.
+
+### Key Achievements
+- **Angle-dependent cos²(θ/2) formula** derived, implemented, visualized, and formally proven
+- **Hypergraph Knowledge System** built (21 vertices, 9 hyperedges)
+- **Pre-Sprint Research Phase** added to workflow for new physics
+- **Operational Modes** documented (Focus/Sprint/Project)
+- **Experiment renumbering** fixed (Sprint N = Experiment N)
+
+### Diversions (All Value-Positive)
+| Diversion | Impact |
+|-----------|--------|
+| Hypergraph System | Foundation for systematic claim tracking |
+| Research Sprint 0R | Resolved 7 blocking questions |
+| MCP fallback scripts | Reliable Gemini integration |
+| Process documentation | Enables future autonomy scaling |
+
+### Commitment for Sprint 3
+1. Complete Pre-Sprint Research (#255) before Phase 1
+2. Use knowledge graph actively
+3. Maintain Sprint=Experiment numbering
+4. Document lessons immediately
+
+**Full retrospective:** Issue #191
 
 ## Active Diversions
 
