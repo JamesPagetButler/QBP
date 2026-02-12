@@ -27,6 +27,7 @@ Usage:
 
 import json
 import sqlite3
+import sys
 from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
@@ -872,6 +873,262 @@ class QBPKnowledgeSQLite:
     # Import from Hypergraph-DB
     # -------------------------------------------------------------------------
 
+    def suggest_updates(self, file_paths: List[str]) -> List[Dict[str, str]]:
+        """
+        Suggest knowledge graph updates based on changed files.
+
+        Analyzes file types and paths to identify potential impacts:
+        - .lean files → proof vertices, proof_link edges
+        - research/*_expected_results.md → claim vertices
+        - src/qphysics.py → concept/claim consistency
+        - paper/*.md → source vertices
+        - analysis/ → evidence chain updates
+        """
+        suggestions: List[Dict[str, str]] = []
+
+        for fp in file_paths:
+            path = Path(fp)
+            name = path.name
+            parts = path.parts
+
+            if name.endswith(".lean"):
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "proof",
+                        "action": f"Run `scan-proofs --apply` to sync Proof vertex for {name}",
+                        "impact": "May affect proof_link hyperedges",
+                    }
+                )
+            elif "research" in parts and "expected_results" in name:
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "claim",
+                        "action": "Review claims derived from this ground truth",
+                        "impact": "Claims may need updating if predictions changed",
+                    }
+                )
+            elif name == "qphysics.py":
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "concept",
+                        "action": "Verify axiom implementations match knowledge graph",
+                        "impact": "Core physics changes affect all downstream claims",
+                    }
+                )
+            elif "paper" in parts and name.endswith(".md"):
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "source",
+                        "action": "Check if Source vertices need updating",
+                        "impact": "Design rationale changes may affect claim context",
+                    }
+                )
+            elif "analysis" in parts:
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "evidence",
+                        "action": "Verify evidence chains include this analysis",
+                        "impact": "New analysis may strengthen or weaken claims",
+                    }
+                )
+            elif "viz" in parts or "theme" in name:
+                suggestions.append(
+                    {
+                        "file": fp,
+                        "type": "visualization",
+                        "action": "No knowledge graph impact (visualization only)",
+                        "impact": "None",
+                    }
+                )
+
+        return suggestions
+
+    def generate_report(self) -> str:
+        """
+        Generate a full knowledge graph analysis report for Theory Refinement.
+
+        Returns Markdown-formatted report covering:
+        - Summary statistics
+        - Weak claims (no evidence)
+        - Unproven claims (no proof_link)
+        - Research gaps (open questions without investigation)
+        - Bridge concepts (high-degree nodes)
+        """
+        summary = self.summary()
+        weak = self.find_weak_claims()
+        unproven = self.find_unproven_claims()
+        gaps = self.find_research_gaps()
+        bridges = self.find_bridge_concepts(min_degree=2)
+
+        lines = [
+            "# Knowledge Graph Analysis Report",
+            "",
+            "## Summary",
+            "",
+            f"- **Vertices:** {summary['vertices']['total']}",
+        ]
+        for vtype, count in summary["vertices"].get("by_type", {}).items():
+            lines.append(f"  - {vtype}: {count}")
+        lines.append(f"- **Hyperedges:** {summary['hyperedges']['total']}")
+        for etype, count in summary["hyperedges"].get("by_type", {}).items():
+            lines.append(f"  - {etype}: {count}")
+
+        lines.extend(
+            [
+                "",
+                "## Weak Claims (No Evidence Chain)",
+                "",
+            ]
+        )
+        if weak:
+            for c in weak:
+                lines.append(
+                    f"- **{c['id']}**: {c.get('statement', 'N/A')} "
+                    f"— {c.get('reason', 'no evidence')}"
+                )
+        else:
+            lines.append("None found — all claims have evidence chains.")
+
+        lines.extend(
+            [
+                "",
+                "## Unproven Claims (No proof_link)",
+                "",
+            ]
+        )
+        if unproven:
+            for c in unproven:
+                lines.append(f"- **{c['id']}**: {c.get('statement', 'N/A')}")
+        else:
+            lines.append("None found — all claims have formal proofs.")
+
+        lines.extend(
+            [
+                "",
+                "## Research Gaps (Open Questions Without Investigation)",
+                "",
+            ]
+        )
+        if gaps:
+            for q in gaps:
+                lines.append(
+                    f"- **{q['id']}**: {q.get('question', 'N/A')} "
+                    f"— {q.get('reason', 'no investigation')}"
+                )
+        else:
+            lines.append("None found — all open questions have investigations.")
+
+        lines.extend(
+            [
+                "",
+                "## Bridge Concepts (High Connectivity)",
+                "",
+            ]
+        )
+        if bridges:
+            for b in bridges:
+                lines.append(
+                    f"- **{b['id']}**: {b.get('term', 'N/A')} "
+                    f"(degree: {b.get('degree', 0)})"
+                )
+        else:
+            lines.append("No bridge concepts found (min degree: 2).")
+
+        lines.append("")
+        return "\n".join(lines)
+
+    def import_hif(self, hif_path: str) -> Dict[str, int]:
+        """
+        Import data from Hypergraph Interchange Format (HIF) JSON.
+
+        Args:
+            hif_path: Path to HIF JSON file
+
+        Returns:
+            Dict with counts of imported nodes, edges, incidences
+        """
+        with open(hif_path) as f:
+            hif = json.load(f)
+
+        counts = {"nodes": 0, "edges": 0, "incidences": 0}
+
+        # Pre-build incidence index: edge_id -> [node_ids]
+        incidence_index: Dict[str, List[str]] = {}
+        for inc in hif.get("incidences", []):
+            incidence_index.setdefault(inc["edge"], []).append(inc["node"])
+
+        # Import nodes
+        for node in hif.get("nodes", []):
+            node_id = node["node"]
+            attrs = dict(node.get("attrs", {}))  # Copy to avoid mutating input
+            node_type = attrs.pop("type", "Concept")
+
+            # Validate type exists
+            if node_type not in VERTEX_TYPES:
+                node_type = "Concept"
+
+            # Extract the required field based on type
+            schema = VERTEX_TYPES[node_type]
+            for req in schema["required"]:
+                if req not in attrs:
+                    # Try to infer from node_id
+                    attrs[req] = node_id.split(":")[-1].replace("-", " ").title()
+
+            self.add_vertex(node_id, node_type, attrs, skip_if_exists=False)
+            counts["nodes"] += 1
+
+        # Import edges
+        for edge_entry in hif.get("edges", []):
+            edge_id = edge_entry["edge"]
+            attrs = dict(edge_entry.get("attrs", {}))  # Copy to avoid mutating input
+            edge_type = attrs.pop("type", "evidence_chain")
+
+            if edge_type not in HYPEREDGE_TYPES:
+                edge_type = "evidence_chain"
+
+            # Look up members from pre-built index
+            members = incidence_index.get(edge_id, [])
+
+            if len(members) >= HYPEREDGE_TYPES[edge_type].get("min_members", 2):
+                self.add_hyperedge(
+                    edge_id, edge_type, members, attrs, skip_if_exists=False
+                )
+                counts["edges"] += 1
+
+        counts["incidences"] = sum(len(m) for m in incidence_index.values())
+
+        return counts
+
+    def visualize(self, output_path: str, title: str = "QBP Knowledge Hypergraph"):
+        """
+        Visualize the hypergraph using HyperNetX and save as PNG.
+
+        Args:
+            output_path: Path for output PNG file
+            title: Plot title
+        """
+        try:
+            import hypernetx as hnx
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError("Requires: pip install hypernetx matplotlib")
+
+        H = self.to_hypernetx()
+
+        fig, ax = plt.subplots(1, 1, figsize=(14, 10))
+        hnx.draw(H, ax=ax)
+        ax.set_title(title, fontsize=14)
+        fig.tight_layout()
+        fig.savefig(output_path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+
+        return output_path
+
     @classmethod
     def import_from_hypergraphdb(
         cls, hgdb_path: str, sqlite_path: str
@@ -948,11 +1205,65 @@ def main():
     export_p.add_argument("--format", choices=["hif", "json"], default="hif")
     export_p.add_argument("--output", required=True, help="Output file")
 
-    # Import
+    # Import from Hypergraph-DB
     import_p = subparsers.add_parser("import", help="Import from Hypergraph-DB")
     import_p.add_argument(
         "--from", dest="source", required=True, help="Source .hgdb file"
     )
+
+    # Import from HIF
+    import_hif_p = subparsers.add_parser("import-hif", help="Import from HIF JSON")
+    import_hif_p.add_argument("file", help="HIF JSON file to import")
+
+    # Scan proofs
+    scan_p = subparsers.add_parser(
+        "scan-proofs", help="Scan Lean files and sync Proof vertices"
+    )
+    scan_p.add_argument(
+        "--apply",
+        action="store_true",
+        help="Write to knowledge graph (default: dry-run)",
+    )
+
+    # Validate proofs
+    val_proofs_p = subparsers.add_parser(
+        "validate-proofs", help="Validate proof_link hyperedges"
+    )
+    val_proofs_p.add_argument(
+        "--apply",
+        action="store_true",
+        help="Sync scan results before validating",
+    )
+
+    # Trace evidence
+    trace_p = subparsers.add_parser(
+        "trace", help="Trace all evidence supporting a claim"
+    )
+    trace_p.add_argument("claim_id", help="Claim ID (with or without claim: prefix)")
+
+    # Suggest updates
+    suggest_p = subparsers.add_parser(
+        "suggest-updates",
+        help="Suggest knowledge graph impacts from changed files",
+    )
+    suggest_p.add_argument("files", nargs="+", help="Changed file paths")
+
+    # Report
+    subparsers.add_parser(
+        "report",
+        help="Generate full knowledge graph analysis for Theory Refinement",
+    )
+
+    # Visualize
+    viz_p = subparsers.add_parser(
+        "visualize", help="Visualize hypergraph as PNG (requires HyperNetX)"
+    )
+    viz_p.add_argument(
+        "--output",
+        default="workspace/qbp_knowledge.png",
+        help="Output PNG path (default: workspace/qbp_knowledge.png)",
+    )
+    viz_p.add_argument("--title", default="QBP Knowledge Hypergraph", help="Plot title")
 
     args = parser.parse_args()
 
@@ -989,8 +1300,6 @@ def main():
             print(json.dumps(results, indent=2))
 
         elif args.command == "validate":
-            import sys
-
             result = kb.validate()
             print(f"Knowledge Base Validation: {args.db}")
             print(f"{'=' * 50}")
@@ -1025,6 +1334,72 @@ def main():
             if args.format == "hif":
                 kb.export_hif(args.output)
                 print(f"Exported HIF to {args.output}")
+
+        elif args.command == "import-hif":
+            counts = kb.import_hif(args.file)
+            print(f"Imported from {args.file}:")
+            print(f"  Nodes: {counts['nodes']}")
+            print(f"  Edges: {counts['edges']}")
+            print(f"  Incidences: {counts['incidences']}")
+
+        elif args.command == "trace":
+            claim_id = args.claim_id
+            if not claim_id.startswith("claim:"):
+                claim_id = f"claim:{claim_id}"
+            result = kb.trace_evidence(claim_id)
+            print(json.dumps(result, indent=2))
+
+        elif args.command == "suggest-updates":
+            suggestions = kb.suggest_updates(args.files)
+            if not suggestions:
+                print("No knowledge graph impacts detected for these files.")
+            else:
+                print("## Knowledge Graph Impact Suggestions\n")
+                for s in suggestions:
+                    print(f"**{s['file']}** ({s['type']})")
+                    print(f"  Action: {s['action']}")
+                    print(f"  Impact: {s['impact']}")
+                    print()
+
+        elif args.command == "report":
+            print(kb.generate_report())
+
+        elif args.command == "visualize":
+            output = kb.visualize(args.output, title=args.title)
+            print(f"Visualization saved to {output}")
+
+        elif args.command in ("scan-proofs", "validate-proofs"):
+            from scan_lean_proofs import scan_all_proofs, sync_to_knowledge_graph
+            from scan_lean_proofs import validate_proof_links
+
+            root = Path(__file__).parent.parent
+            results = scan_all_proofs(root)
+
+            if args.command == "scan-proofs":
+                for lf in results:
+                    print(f"\n{lf.path} (namespace: {lf.namespace})")
+                    for d in lf.declarations:
+                        sorry_marker = " [SORRY]" if d.has_sorry else ""
+                        print(f"  L{d.line:3d} {d.kind} {d.name}{sorry_marker}")
+
+                actions = sync_to_knowledge_graph(results, kb, dry_run=not args.apply)
+                mode = "Applied" if args.apply else "Dry run"
+                print(f"\n{mode}:")
+                print(f"  Created: {len(actions['created'])} vertices")
+                print(f"  Updated: {len(actions['updated'])} vertices")
+
+            else:  # validate-proofs
+                if args.apply:
+                    sync_to_knowledge_graph(results, kb, dry_run=False)
+                validation = validate_proof_links(results, kb)
+                print(f"Proof Link Validation: {validation['checked']} checked")
+                print(f"Status: {'VALID' if validation['valid'] else 'INVALID'}")
+                for e in validation["errors"]:
+                    print(f"  x {e}")
+                for w in validation["warnings"]:
+                    print(f"  ! {w}")
+                if not validation["valid"]:
+                    sys.exit(1)
 
         else:
             parser.print_help()

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBP Design System: Steampunk → Solarpunk</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: linear-gradient(135deg, #0D2820 0%, #1A1A2E 100%);
+            min-height: 100vh;
+            color: #F5F5F5;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: rgba(13, 40, 32, 0.8);
+            border: 2px solid #D4A574;
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #D4A574;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            font-style: italic;
+            color: #F5C542;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        }
+
+        .philosophy {
+            color: #B8B8B8;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .narrative-table {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .narrative-cell {
+            padding: 15px;
+            background: rgba(26, 26, 46, 0.5);
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .narrative-cell.header {
+            color: #D4A574;
+            font-weight: bold;
+        }
+
+        .narrative-cell.steampunk {
+            color: #9A9A9A;
+        }
+
+        .narrative-cell.solarpunk {
+            color: #3DDC84;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #D4A574;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #4A766E;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 .subtitle {
+            font-size: 0.7em;
+            color: #9A9A9A;
+            font-weight: normal;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .color-card {
+            background: rgba(26, 26, 46, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #4A766E;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .color-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-swatch {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+
+        .color-info {
+            padding: 15px;
+        }
+
+        .color-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .color-hex {
+            font-family: 'Courier New', monospace;
+            color: #B8B8B8;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .color-use {
+            font-size: 0.85em;
+            color: #9A9A9A;
+            line-height: 1.4;
+        }
+
+        .contrast-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-family: monospace;
+            margin-top: 8px;
+        }
+
+        .contrast-aaa {
+            background: #00A86B;
+            color: #0D2820;
+        }
+
+        .contrast-aa {
+            background: #F5C542;
+            color: #0D2820;
+        }
+
+        .contrast-fail {
+            background: #71797E;
+            color: #F5F5F5;
+        }
+
+        .text-hierarchy {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .text-card {
+            background: #0D2820;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #4A766E;
+        }
+
+        .text-card.light {
+            background: #F5E6D3;
+        }
+
+        .text-sample {
+            margin-bottom: 10px;
+        }
+
+        .text-label {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .axis-demo {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 40px;
+            background: #0D2820;
+            border-radius: 8px;
+            border: 1px solid #4A766E;
+        }
+
+        .axis-item {
+            text-align: center;
+        }
+
+        .axis-arrow {
+            width: 120px;
+            height: 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .axis-arrow::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 0;
+            border: 10px solid transparent;
+            border-left-width: 15px;
+        }
+
+        .axis-x .axis-arrow { background: linear-gradient(90deg, transparent, #FF7F5C); }
+        .axis-x .axis-arrow::after { border-left-color: #FF7F5C; }
+        .axis-y .axis-arrow { background: linear-gradient(90deg, transparent, #3DDC84); }
+        .axis-y .axis-arrow::after { border-left-color: #3DDC84; }
+        .axis-z .axis-arrow { background: linear-gradient(90deg, transparent, #3DBFAE); }
+        .axis-z .axis-arrow::after { border-left-color: #3DBFAE; }
+
+        .axis-label {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .axis-meaning {
+            font-size: 0.85em;
+            color: #9A9A9A;
+            margin-top: 5px;
+        }
+
+        .background-compare {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .bg-card {
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .bg-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .bg-card p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid #4A766E;
+            color: #9A9A9A;
+        }
+
+        footer a {
+            color: #3DBFAE;
+        }
+
+        .semantic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .semantic-card {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .semantic-card .label {
+            font-size: 0.8em;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>QBP Design System</h1>
+            <p class="tagline">"Brass orreries in a greenhouse"</p>
+            <p class="philosophy">
+                A visual language bridging Victorian mechanical precision with organic,
+                nature-inspired optimism. The aesthetic tells the story of QBP: moving from
+                "broken theories" (industrial complexity) toward "working theories" (elegant natural truth).
+            </p>
+
+            <div class="narrative-table">
+                <div class="narrative-cell header">Element</div>
+                <div class="narrative-cell header">Steampunk (Legacy)</div>
+                <div class="narrative-cell header">Solarpunk (QBP)</div>
+
+                <div class="narrative-cell">Feel</div>
+                <div class="narrative-cell steampunk">Industrial, mechanical</div>
+                <div class="narrative-cell solarpunk">Organic, elegant</div>
+
+                <div class="narrative-cell">Accents</div>
+                <div class="narrative-cell steampunk">Crimson, amber</div>
+                <div class="narrative-cell solarpunk">Coral, jade, teal</div>
+
+                <div class="narrative-cell">Background</div>
+                <div class="narrative-cell steampunk">Dark Slate</div>
+                <div class="narrative-cell solarpunk">Verdant Night</div>
+
+                <div class="narrative-cell">Mood</div>
+                <div class="narrative-cell steampunk">Nostalgic, mysterious</div>
+                <div class="narrative-cell solarpunk">Hopeful, illuminated</div>
+            </div>
+        </header>
+
+        <section>
+            <h2>Legacy Metals <span class="subtitle">The precision instruments we inherited</span></h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #D4A574;">⚙</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #D4A574;">Brass</div>
+                        <div class="color-hex">#D4A574</div>
+                        <div class="color-use">Primary objects, key elements</div>
+                        <span class="contrast-badge contrast-aaa">7.0:1 AAA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #B87333;">⚙</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #B87333;">Copper</div>
+                        <div class="color-hex">#B87333</div>
+                        <div class="color-use">Secondary objects, warmth</div>
+                        <span class="contrast-badge contrast-aa">4.3:1 AA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #CD7F32;">⚙</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #CD7F32;">Bronze</div>
+                        <div class="color-hex">#CD7F32</div>
+                        <div class="color-use">Accents, mechanisms</div>
+                        <span class="contrast-badge contrast-aa">5.2:1 AA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #71797E;">⚙</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #71797E;">Steel</div>
+                        <div class="color-hex">#71797E</div>
+                        <div class="color-use">Muted elements, grids</div>
+                        <span class="contrast-badge contrast-fail">3.5:1 Large only</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Solar Light <span class="subtitle">Illumination and understanding</span></h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FFD700;">☀</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #FFD700;">Gold</div>
+                        <div class="color-hex">#FFD700</div>
+                        <div class="color-use">Highlights, energy</div>
+                        <span class="contrast-badge contrast-aaa">11.2:1 AAA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #F5C542;">☀</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #F5C542;">Solar</div>
+                        <div class="color-hex">#F5C542</div>
+                        <div class="color-use">Warm sunlight, emphasis</div>
+                        <span class="contrast-badge contrast-aaa">9.3:1 AAA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #F4A261;">☀</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #F4A261;">Amber</div>
+                        <div class="color-hex">#F4A261</div>
+                        <div class="color-use">Warnings, attention</div>
+                        <span class="contrast-badge contrast-aaa">7.6:1 AAA</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Living Greens <span class="subtitle">Nature's truth, organic elegance</span></h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #00A86B;">🌿</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #00A86B;">Jade</div>
+                        <div class="color-hex">#00A86B</div>
+                        <div class="color-use">Growth, success, Y-axis</div>
+                        <span class="contrast-badge contrast-aa">5.3:1 AA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #2A9D8F;">🌿</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #2A9D8F;">Teal</div>
+                        <div class="color-hex">#2A9D8F</div>
+                        <div class="color-use">Depth, Z-axis, truth</div>
+                        <span class="contrast-badge contrast-aa">4.7:1 AA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #228B22;">🌿</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #228B22;">Verdant</div>
+                        <div class="color-hex">#228B22</div>
+                        <div class="color-use">Forest, flourishing</div>
+                        <span class="contrast-badge contrast-fail">3.8:1 Large only</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #4A766E;">🌿</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #4A766E;">Verdigris</div>
+                        <div class="color-hex">#4A766E</div>
+                        <div class="color-use">Aged patina, transition</div>
+                        <span class="contrast-badge contrast-fail">3.1:1 Large only</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Sky & Accents</h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #87CEEB;">☁</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #87CEEB;">Sky</div>
+                        <div class="color-hex">#87CEEB</div>
+                        <div class="color-use">Openness, possibility</div>
+                        <span class="contrast-badge contrast-aaa">10.0:1 AAA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #E07B53;">🔥</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #E07B53;">Coral</div>
+                        <div class="color-hex">#E07B53</div>
+                        <div class="color-use">X-axis, warm energy</div>
+                        <span class="contrast-badge contrast-aa">5.1:1 AA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FFFEF0; color: #2C2C2C;">📜</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #FFFEF0;">Ivory</div>
+                        <div class="color-hex">#FFFEF0</div>
+                        <div class="color-use">Warm labels, accent text</div>
+                        <span class="contrast-badge contrast-aaa">15.4:1 AAA</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Bright Variants <span class="subtitle">Accessible on dark backgrounds</span></h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FF7F5C;">✦</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #FF7F5C;">Coral Bright</div>
+                        <div class="color-hex">#FF7F5C</div>
+                        <div class="color-use">X-axis on dark</div>
+                        <span class="contrast-badge contrast-aa">6.3:1 AA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #3DDC84;">✦</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #3DDC84;">Jade Bright</div>
+                        <div class="color-hex">#3DDC84</div>
+                        <div class="color-use">Y-axis on dark</div>
+                        <span class="contrast-badge contrast-aaa">8.8:1 AAA</span>
+                    </div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #3DBFAE;">✦</div>
+                    <div class="color-info">
+                        <div class="color-name" style="color: #3DBFAE;">Teal Bright</div>
+                        <div class="color-hex">#3DBFAE</div>
+                        <div class="color-use">Z-axis on dark</div>
+                        <span class="contrast-badge contrast-aa">6.9:1 AA</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Axis Colors <span class="subtitle">The story of measurement</span></h2>
+            <div class="axis-demo">
+                <div class="axis-item axis-x">
+                    <div class="axis-arrow"></div>
+                    <div class="axis-label" style="color: #FF7F5C;">X-Axis</div>
+                    <div class="axis-meaning">Warmth, energy, change</div>
+                </div>
+                <div class="axis-item axis-y">
+                    <div class="axis-arrow"></div>
+                    <div class="axis-label" style="color: #3DDC84;">Y-Axis</div>
+                    <div class="axis-meaning">Growth, correctness, life</div>
+                </div>
+                <div class="axis-item axis-z">
+                    <div class="axis-arrow"></div>
+                    <div class="axis-label" style="color: #3DBFAE;">Z-Axis</div>
+                    <div class="axis-meaning">Depth, measurement, truth</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Backgrounds <span class="subtitle">The shift from industrial to organic</span></h2>
+            <div class="background-compare">
+                <div class="bg-card" style="background: #0D2820; color: #F5F5F5; border: 2px solid #3DDC84;">
+                    <h3 style="color: #3DDC84;">Verdant Night</h3>
+                    <p>#0D2820</p>
+                    <p style="margin-top: 10px;">Solarpunk (Primary)</p>
+                    <p style="font-size: 0.8em; margin-top: 5px;">Green-tinted, hopeful, organic</p>
+                </div>
+                <div class="bg-card" style="background: #1A1A2E; color: #F5F5F5; border: 2px solid #71797E;">
+                    <h3 style="color: #71797E;">Dark Slate</h3>
+                    <p>#1A1A2E</p>
+                    <p style="margin-top: 10px;">Steampunk (Legacy)</p>
+                    <p style="font-size: 0.8em; margin-top: 5px;">Industrial, mysterious</p>
+                </div>
+                <div class="bg-card" style="background: #F5E6D3; color: #2C2C2C; border: 2px solid #D4A574;">
+                    <h3 style="color: #B87333;">Parchment</h3>
+                    <p>#F5E6D3</p>
+                    <p style="margin-top: 10px;">Light Mode</p>
+                    <p style="font-size: 0.8em; margin-top: 5px;">Warm paper, classic</p>
+                </div>
+                <div class="bg-card" style="background: #0D1B2A; color: #F5F5F5; border: 2px solid #2A9D8F;">
+                    <h3 style="color: #2A9D8F;">Midnight</h3>
+                    <p>#0D1B2A</p>
+                    <p style="margin-top: 10px;">Deep Space</p>
+                    <p style="font-size: 0.8em; margin-top: 5px;">Cosmic, infinite</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Text Hierarchy <span class="subtitle">On Verdant Night background</span></h2>
+            <div class="text-hierarchy">
+                <div class="text-card">
+                    <div class="text-sample" style="color: #F5F5F5; font-size: 1.2em;">Primary Text (Cloud)</div>
+                    <div class="text-label" style="color: #9A9A9A;">#F5F5F5 · 14.4:1 AAA · Body text, formulas</div>
+                </div>
+                <div class="text-card">
+                    <div class="text-sample" style="color: #B8B8B8; font-size: 1.1em;">Secondary Text (Silver)</div>
+                    <div class="text-label" style="color: #9A9A9A;">#B8B8B8 · 7.9:1 AAA · Labels, supporting</div>
+                </div>
+                <div class="text-card">
+                    <div class="text-sample" style="color: #9A9A9A; font-size: 1em;">Tertiary Text (Ash)</div>
+                    <div class="text-label" style="color: #71797E;">#9A9A9A · 5.6:1 AA · Captions, hints</div>
+                </div>
+                <div class="text-card">
+                    <div class="text-sample" style="color: #FFFEF0; font-size: 1.3em; font-weight: bold;">Accent Text (Ivory)</div>
+                    <div class="text-label" style="color: #9A9A9A;">#FFFEF0 · 15.4:1 AAA · Titles, emphasis</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Semantic Colors <span class="subtitle">Meaning through color</span></h2>
+            <div class="semantic-grid">
+                <div class="semantic-card" style="background: #00A86B; color: #0D2820;">
+                    ✓
+                    <div class="label">Success</div>
+                </div>
+                <div class="semantic-card" style="background: #F4A261; color: #0D2820;">
+                    ⚠
+                    <div class="label">Warning</div>
+                </div>
+                <div class="semantic-card" style="background: #E07B53; color: #0D2820;">
+                    ✕
+                    <div class="label">Error</div>
+                </div>
+                <div class="semantic-card" style="background: #F5C542; color: #0D2820;">
+                    ★
+                    <div class="label">Accent</div>
+                </div>
+                <div class="semantic-card" style="background: #D4A574; color: #0D2820;">
+                    ●
+                    <div class="label">Primary</div>
+                </div>
+                <div class="semantic-card" style="background: #2A9D8F; color: #F5F5F5;">
+                    ◆
+                    <div class="label">Secondary</div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>QBP Design System · Steampunk → Solarpunk</p>
+            <p style="margin-top: 10px;">
+                References:
+                <a href="https://aesthetics.fandom.com/wiki/Solarpunk">Solarpunk Aesthetics</a> ·
+                <a href="https://webaim.org/articles/contrast/">WCAG Contrast Guidelines</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
