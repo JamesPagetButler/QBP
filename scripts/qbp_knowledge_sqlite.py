@@ -27,6 +27,7 @@ Usage:
 
 import json
 import sqlite3
+import sys
 from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
@@ -1047,6 +1048,26 @@ def main():
     import_hif_p = subparsers.add_parser("import-hif", help="Import from HIF JSON")
     import_hif_p.add_argument("file", help="HIF JSON file to import")
 
+    # Scan proofs
+    scan_p = subparsers.add_parser(
+        "scan-proofs", help="Scan Lean files and sync Proof vertices"
+    )
+    scan_p.add_argument(
+        "--apply",
+        action="store_true",
+        help="Write to knowledge graph (default: dry-run)",
+    )
+
+    # Validate proofs
+    val_proofs_p = subparsers.add_parser(
+        "validate-proofs", help="Validate proof_link hyperedges"
+    )
+    val_proofs_p.add_argument(
+        "--apply",
+        action="store_true",
+        help="Sync scan results before validating",
+    )
+
     # Visualize
     viz_p = subparsers.add_parser(
         "visualize", help="Visualize hypergraph as PNG (requires HyperNetX)"
@@ -1093,8 +1114,6 @@ def main():
             print(json.dumps(results, indent=2))
 
         elif args.command == "validate":
-            import sys
-
             result = kb.validate()
             print(f"Knowledge Base Validation: {args.db}")
             print(f"{'=' * 50}")
@@ -1140,6 +1159,39 @@ def main():
         elif args.command == "visualize":
             output = kb.visualize(args.output, title=args.title)
             print(f"Visualization saved to {output}")
+
+        elif args.command in ("scan-proofs", "validate-proofs"):
+            from scan_lean_proofs import scan_all_proofs, sync_to_knowledge_graph
+            from scan_lean_proofs import validate_proof_links
+
+            root = Path(__file__).parent.parent
+            results = scan_all_proofs(root)
+
+            if args.command == "scan-proofs":
+                for lf in results:
+                    print(f"\n{lf.path} (namespace: {lf.namespace})")
+                    for d in lf.declarations:
+                        sorry_marker = " [SORRY]" if d.has_sorry else ""
+                        print(f"  L{d.line:3d} {d.kind} {d.name}{sorry_marker}")
+
+                actions = sync_to_knowledge_graph(results, kb, dry_run=not args.apply)
+                mode = "Applied" if args.apply else "Dry run"
+                print(f"\n{mode}:")
+                print(f"  Created: {len(actions['created'])} vertices")
+                print(f"  Updated: {len(actions['updated'])} vertices")
+
+            else:  # validate-proofs
+                if args.apply:
+                    sync_to_knowledge_graph(results, kb, dry_run=False)
+                validation = validate_proof_links(results, kb)
+                print(f"Proof Link Validation: {validation['checked']} checked")
+                print(f"Status: {'VALID' if validation['valid'] else 'INVALID'}")
+                for e in validation["errors"]:
+                    print(f"  x {e}")
+                for w in validation["warnings"]:
+                    print(f"  ! {w}")
+                if not validation["valid"]:
+                    sys.exit(1)
 
         else:
             parser.print_help()
