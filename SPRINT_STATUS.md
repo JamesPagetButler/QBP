@@ -12,7 +12,7 @@
 - **Lifecycle Stage:** Pre-Sprint Research Phase
 - **Next Critical-Path Action:** Pre-Sprint Research (#255) → then Sprint 3 Phase 1 (#22)
 
-> **Hypergraph System Ready:** Core infrastructure complete (21 vertices, 9 hyperedges). Use `python scripts/qbp_knowledge.py` to interact with knowledge base during research.
+> **Hypergraph System Ready:** Core infrastructure complete (42 vertices, 10 hyperedges). Use `python scripts/qbp_knowledge_sqlite.py` to interact with knowledge base during research.
 
 > **Sprint 3 Note:** Experiment 03 (Double-Slit) requires Pre-Sprint Research to define quaternionic superposition before Ground Truth can be written.
 
