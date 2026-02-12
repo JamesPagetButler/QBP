@@ -1,326 +1,181 @@
-# QBP Knowledge Graph
+# QBP Hypergraph Knowledge System
 
-This directory contains structured knowledge entries produced during Research Sprints.
-
----
-
-## Purpose
-
-The knowledge graph captures:
-- **Sources** — Papers, books, and documents reviewed
-- **Concepts** — Scientific ideas and terms defined
-- **Claims** — Assertions made with supporting evidence
-- **Questions** — Open research questions and their status
-- **Relationships** — How entries connect to each other
+This directory contains the QBP research knowledge base, stored as a native hypergraph using Hypergraph-DB.
 
 ---
 
-## Directory Structure
+## Quick Start
+
+```bash
+# Install dependencies
+pip install -r scripts/requirements-knowledge.txt
+
+# View summary
+python scripts/qbp_knowledge.py summary
+
+# Find research gaps
+python scripts/qbp_knowledge.py query gaps
+
+# Visualize
+python scripts/qbp_knowledge.py viz --output graph.png
+
+# Open interactive web visualization
+python scripts/qbp_knowledge.py viz --web
+```
+
+---
+
+## Architecture
+
+**Data Store:** `knowledge/qbp.hgdb` — Hypergraph-DB native format
+**API:** `scripts/qbp_knowledge.py` — Python wrapper with CLI
+**Analysis:** HyperNetX for advanced queries
+
+---
+
+## Data Model
+
+### Vertices (Entities)
+
+| Type | Required Fields | Description |
+|------|-----------------|-------------|
+| **Source** | type, title | Papers, books, internal docs |
+| **Concept** | type, term | Scientific ideas and definitions |
+| **Claim** | type, statement | Assertions with evidence |
+| **Question** | type, question | Open research questions |
+| **Proof** | type, lean_file | Formal Lean 4 proofs |
+
+### Hyperedges (N-ary Relationships)
+
+| Type | Min Members | Description |
+|------|-------------|-------------|
+| **evidence_chain** | 3 | Claim + 2+ supporting sources |
+| **equivalence** | 2 | Mathematically equivalent structures |
+| **theory_axioms** | 3 | Axioms that define a theory |
+| **research_cluster** | 2 | Related questions forming a theme |
+| **proof_link** | 2 | Claim linked to Lean 4 proof |
+| **emergence** | 2 | Concepts yielding emergent property |
+| **investigation** | 2 | Question + investigation sources |
+
+---
+
+## Python API
+
+```python
+from scripts.qbp_knowledge import QBPKnowledge
+
+# Load or create knowledge base
+kb = QBPKnowledge("knowledge/qbp.hgdb")
+
+# Add vertices
+kb.add_source("furey-2016", "Standard Model from an Algebra?",
+              authors=["Cohl Furey"], tags=["octonions"])
+kb.add_concept("octonion-algebra", "Octonion Algebra",
+               definition="8-dimensional non-associative division algebra")
+kb.add_claim("octonion-generations", "Octonions accommodate 3 generations",
+             status="proposed", confidence_tier=2)
+kb.add_question("octonion-physics", "What physics do octonions predict?",
+                status="open", priority="high")
+
+# Add hyperedges
+kb.add_evidence_chain("claim:octonion-generations",
+                      ["source:furey-2016", "source:other-paper"],
+                      confidence_tier=2)
+kb.add_proof_link("claim:cosine-squared", "proof:lean-angle",
+                  theorem="measurement_probability_formula")
+
+# Research queries
+weak = kb.find_weak_claims()       # Claims with < 2 evidence sources
+unproven = kb.find_unproven_claims()  # Claims without proof_link
+gaps = kb.find_research_gaps()     # Open questions without investigation
+bridges = kb.find_bridge_concepts()  # Concepts in multiple hyperedges
+
+# Trace evidence for a claim
+evidence = kb.trace_evidence("claim:qbp-cosine-squared")
+
+# Coverage report
+report = kb.coverage_report()
+
+# Save
+kb.save()
+```
+
+---
+
+## CLI Reference
+
+```bash
+# Summary
+python scripts/qbp_knowledge.py summary
+
+# Queries
+python scripts/qbp_knowledge.py query weak-claims
+python scripts/qbp_knowledge.py query unproven
+python scripts/qbp_knowledge.py query gaps
+python scripts/qbp_knowledge.py query bridges
+
+# Information
+python scripts/qbp_knowledge.py info claim:qbp-cosine-squared
+python scripts/qbp_knowledge.py evidence claim:qbp-cosine-squared
+python scripts/qbp_knowledge.py report
+
+# Visualization
+python scripts/qbp_knowledge.py viz --output graph.png
+python scripts/qbp_knowledge.py viz --web --port 8080
+```
+
+---
+
+## Research Workflow Integration
+
+| Research Phase | Knowledge System Activity |
+|----------------|---------------------------|
+| Question Formulation | Add Question vertices |
+| Source Discovery | Add Source vertices |
+| Concept Extraction | Add Concept vertices, link to sources |
+| Claim Formation | Add Claim vertices with evidence_chain |
+| Formal Verification | Add Proof vertices, create proof_link |
+| Gap Analysis | Run `query gaps` to find uninvestigated questions |
+
+---
+
+## Files
 
 ```
 knowledge/
 ├── README.md           # This file
-├── sources/            # Source entries (papers, books)
-├── concepts/           # Concept definitions
-├── claims/             # Claims with evidence
-├── questions/          # Open research questions
-└── index.yaml          # Master index of all entries
+├── qbp.hgdb           # Hypergraph database (Hypergraph-DB format)
+├── sources/           # Legacy YAML (deprecated)
+├── concepts/          # Legacy YAML (deprecated)
+├── claims/            # Legacy YAML (deprecated)
+├── questions/         # Legacy YAML (deprecated)
+└── index.yaml         # Legacy index (deprecated)
 ```
 
 ---
 
-## Schema
+## Migration from YAML
 
-### Source Entry
+The system has migrated from YAML files to Hypergraph-DB. Legacy YAML files are preserved for reference but no longer used.
 
-```yaml
-# sources/arxiv-2208-02334.yaml
-id: source-arxiv-2208-02334
-type: Source
-category: paper  # paper, book, website, internal
+To migrate additional YAML entries:
+```python
+from scripts.qbp_knowledge import QBPKnowledge
+import yaml
 
-metadata:
-  title: "Knowledge Graph-Based Systematic Literature Review Automation"
-  authors:
-    - name: "Author Name"
-      affiliation: "Institution"
-  date: 2022-07-06
-  url: https://arxiv.org/abs/2208.02334
-  doi: null
-  venue: "arXiv preprint"
+kb = QBPKnowledge("knowledge/qbp.hgdb")
 
-abstract: |
-  Brief summary of the source content.
+with open("knowledge/sources/example.yaml") as f:
+    data = yaml.safe_load(f)
 
-quotes:
-  - id: q1
-    text: "Exact quote from the source"
-    location: "Section 2.1, paragraph 3"
-    page: 4
-    relevance: "Why this quote matters to QBP"
-
-  - id: q2
-    text: "Another important quote"
-    location: "Conclusion"
-    relevance: "Key finding"
-
-tags:
-  - knowledge-graph
-  - systematic-review
-  - automation
-
-relationships:
-  - type: cites
-    target: source-other-paper
-  - type: defines
-    target: concept-knowledge-graph
-  - type: asserts
-    target: claim-kg-enables-synthesis
-
-notes: |
-  Free-form notes about this source.
-
-added_by: claude
-added_date: 2026-02-10
-research_sprint: 0R
-```
-
-### Concept Entry
-
-```yaml
-# concepts/quaternion-state.yaml
-id: concept-quaternion-state
-type: Concept
-
-term: "Quaternion State Representation"
-aliases:
-  - "quaternion state"
-  - "QBP state"
-
-definition: |
-  In QBP, a spin-1/2 quantum state is represented as a pure unit quaternion
-  ψ with real part zero and |ψ| = 1. The space of such quaternions is
-  isomorphic to S², the Bloch sphere.
-
-formal_definition: |
-  ψ ∈ ℍ such that Re(ψ) = 0 and |ψ|² = 1
-
-sources:
-  - source-qbp-paper
-  - source-hamilton-1843
-
-related_concepts:
-  - concept-bloch-sphere
-  - concept-pauli-algebra
-
-tags:
-  - quantum-mechanics
-  - quaternions
-  - foundations
-
-added_by: claude
-added_date: 2026-02-10
-```
-
-### Claim Entry
-
-```yaml
-# claims/qbp-matches-qm-single-particle.yaml
-id: claim-qbp-matches-qm-single-particle
-type: Claim
-
-statement: |
-  QBP predictions match standard quantum mechanics exactly for
-  single-particle spin-1/2 systems.
-
-context: |
-  This is expected because quaternions (ℍ) are isomorphic to the
-  Pauli algebra underlying SU(2).
-
-evidence:
-  - type: proof
-    source: source-qbp-stern-gerlach-proof
-    description: "Lean 4 proofs verify P(+) = cos²(θ/2)"
-    strength: strong
-
-  - type: simulation
-    source: source-qbp-angle-dependent-sim
-    description: "Monte Carlo simulation matches theory within 3σ"
-    strength: supporting
-
-counterevidence: []
-
-status: established  # proposed, supported, established, contested, refuted
-
-implications:
-  - "Single-particle experiments validate QBP but don't distinguish it from QM"
-  - "Must look to multi-particle systems for novel predictions"
-
-tags:
-  - validation
-  - single-particle
-  - experiment-01b
-
-added_by: claude
-added_date: 2026-02-10
-```
-
-### Question Entry
-
-```yaml
-# questions/qbp-divergence.yaml
-id: question-qbp-divergence
-type: Question
-
-question: "Where do QBP predictions diverge from standard quantum mechanics?"
-
-context: |
-  QBP matches QM for single-particle systems by construction (quaternion
-  isomorphism to Pauli algebra). Novel predictions, if any, must emerge
-  in multi-particle systems or specific experimental regimes.
-
-status: open  # open, partially-answered, answered, superseded
-
-priority: high
-
-related_issues:
-  - 167  # GitHub issue number
-
-investigation:
-  - date: 2026-02-10
-    finding: "Single-particle match is mathematically necessary"
-    source: source-qbp-proof-review
-
-  - date: null
-    finding: null
-    source: null
-
-potential_approaches:
-  - "Analyze Bell inequality predictions"
-  - "Investigate multi-particle entanglement"
-  - "Look for octonion extensions"
-
-tags:
-  - novel-predictions
-  - foundations
-  - high-priority
-
-added_by: claude
-added_date: 2026-02-10
-research_sprint: 0R
+kb.add_source(data["id"], data["metadata"]["title"], **data)
+kb.save()
 ```
 
 ---
 
-## Relationships
+## References
 
-Entries connect via typed relationships:
-
-| Relationship | From | To | Meaning |
-|--------------|------|-----|---------|
-| `cites` | Source | Source | A cites B in its references |
-| `defines` | Source | Concept | Source introduces/defines concept |
-| `asserts` | Source | Claim | Source makes this claim |
-| `supports` | Evidence | Claim | Evidence supports the claim |
-| `contradicts` | Evidence | Claim | Evidence contradicts the claim |
-| `raises` | Claim/Source | Question | This raises the question |
-| `answers` | Evidence | Question | This provides an answer |
-| `related_to` | Any | Any | General semantic relationship |
-| `supersedes` | Entry | Entry | New entry replaces old |
-
----
-
-## Quotes
-
-Quotes are first-class entities within source entries:
-
-```yaml
-quotes:
-  - id: q1                    # Unique within this source
-    text: "Exact quote"       # Verbatim from source
-    location: "Section 2.1"   # Where in the source
-    page: 4                   # Page number if applicable
-    relevance: "Why it matters"  # Connection to QBP
-```
-
-**Quote guidelines:**
-- Use exact text (copy-paste when possible)
-- Include enough context to understand meaning
-- Specify precise location for verification
-- Explain relevance to QBP research
-
----
-
-## Tags
-
-Common tags for categorization:
-
-**Disciplines:**
-- `physics`, `mathematics`, `chemistry`, `optics`, `engineering`, `software`
-
-**Topics:**
-- `quaternions`, `quantum-mechanics`, `spin`, `measurement`, `entanglement`
-
-**Status:**
-- `foundations`, `validation`, `novel-predictions`, `open-question`
-
-**Priority:**
-- `high-priority`, `low-priority`, `blocking`
-
----
-
-## Usage
-
-### Adding an Entry
-
-1. Create YAML file in appropriate subdirectory
-2. Follow schema for entry type
-3. Add relationships to existing entries
-4. Update `index.yaml` with new entry
-5. Commit with descriptive message
-
-### Querying the Graph
-
-Simple queries via grep:
-```bash
-# Find all sources about quaternions
-grep -l "quaternions" knowledge/sources/*.yaml
-
-# Find claims with strong evidence
-grep -l "strength: strong" knowledge/claims/*.yaml
-
-# Find open questions
-grep -l "status: open" knowledge/questions/*.yaml
-```
-
-For complex queries, use the (future) knowledge graph tooling.
-
-### Validation
-
-All entries should:
-- Have unique IDs
-- Follow the schema
-- Include required fields
-- Reference existing entries correctly
-
----
-
-## Integration with Research Sprints
-
-| Sprint Phase | Knowledge Graph Activity |
-|--------------|--------------------------|
-| Question Formulation | Create/update Question entries |
-| Source Discovery | Create Source entries |
-| Extraction | Add quotes, link concepts |
-| Synthesis | Create Claim entries, add relationships |
-| Integration | Link to issues, update index |
-
----
-
-## Future Enhancements
-
-- [ ] JSON-LD export for semantic web compatibility
-- [ ] SQLite index for efficient querying
-- [ ] Visualization of graph structure
-- [ ] Automated validation of schema
-- [ ] Integration with Lean 4 proofs
+- [Hypergraph-DB Documentation](https://imoonlab.github.io/Hypergraph-DB/)
+- [HyperNetX Documentation](https://hypernetx.readthedocs.io/)
+- [QBP Hypergraph Design Plan](../docs/plans/hypergraph_knowledge_system.md)

@@ -9,8 +9,10 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 2 (Experiment 01b: Angle-Dependent Measurement)
-- **Lifecycle Stage:** Sprint 2 Complete — Research Sprint 0R next
-- **Next Critical-Path Action:** Research Sprint 0R (#212) or Theory Refinement (#165)
+- **Lifecycle Stage:** Sprint 2 Complete — Ready for Research Sprint 0R
+- **Next Critical-Path Action:** Research Sprint 0R (#212)
+
+> **Hypergraph System Ready:** Core infrastructure complete (21 vertices, 9 hyperedges). Use `python scripts/qbp_knowledge.py` to interact with knowledge base during research.
 
 > **Note:** Sprint 2 implements Experiment 01b (an extension of Stern-Gerlach to arbitrary angles), not a new experiment. See `research/README.md` for the Sprint ↔ Experiment mapping.
 
@@ -24,7 +26,11 @@
   - [x] 4b: Proof Review (#201) — CLOSED 2026-02-10. PR #216 merged. Axiom-first review passed. CI fixes included.
   - [x] 4c: Interactive Proof Visualization (#202) — CLOSED 2026-02-11. PR #226 merged. Viewport pan/zoom, no-overlap layout.
 - [x] Phase 5: Publication (#164) — CLOSED 2026-02-11. PR #230 merged. Paper Task 2, DESIGN_RATIONALE Section 7, API docs.
-- [ ] **Research Sprint 0R** (#212) — *must complete before Theory Refinement*
+- [x] **Hypergraph Knowledge System** (#235) — Core implementation complete
+  - [x] Core infrastructure (#236) — CLOSED 2026-02-11. Hypergraph-DB + API wrapper
+  - [x] YAML migration (#237) — CLOSED 2026-02-11. 21 vertices, 9 hyperedges seeded
+  - [ ] Schema validation (#220) — Vertex and hyperedge validation (can do during 0R)
+- [ ] **Research Sprint 0R** (#212) — *blocked by Hypergraph infrastructure*
 - [ ] Theory Refinement (#165) — *blocked by Research Sprint 0R*
 - [ ] Retrospective (#191)
 
