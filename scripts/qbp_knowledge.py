@@ -563,6 +563,162 @@ class QBPKnowledge:
         else:
             plt.show()
 
+    def visualize_d3(self, output_path: str = "hypergraph.html",
+                      title: str = "QBP Knowledge Hypergraph"):
+        """Generate interactive D3.js visualization (recommended).
+
+        This is the recommended visualization method. Hypergraph-DB's built-in
+        web visualization has compatibility issues with its custom G6 build.
+        """
+        import json
+
+        # Gather node data
+        nodes = []
+        for v in self.hg.all_v:
+            data = self.hg.v(v)
+            label = (data.get("term") or data.get("title") or
+                    data.get("statement", "")[:30] or v.split(":")[-1])
+            nodes.append({
+                "id": v,
+                "type": data.get("type", "Unknown"),
+                "label": label[:25]
+            })
+
+        # Gather edge data
+        edges = []
+        for e in self.hg.all_e:
+            data = self.hg.e(e)
+            edges.append({
+                "members": list(e),
+                "type": data.get("type", "unknown")
+            })
+
+        html = f'''<!DOCTYPE html>
+<html>
+<head>
+    <title>{title}</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {{ font-family: sans-serif; margin: 0; background: #fafafa; }}
+        svg {{ width: 100vw; height: 100vh; }}
+        .node {{ cursor: pointer; }}
+        .node text {{ font-size: 10px; pointer-events: none; }}
+        .hyperedge {{ fill-opacity: 0.15; stroke-width: 2; stroke-opacity: 0.6; }}
+        .legend {{ font-size: 12px; }}
+        h1 {{ position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+             font-size: 16px; color: #333; margin: 0; }}
+    </style>
+</head>
+<body>
+<h1>{title}</h1>
+<svg></svg>
+<script>
+const nodes = {json.dumps(nodes)};
+const hyperedges = {json.dumps(edges)};
+
+const width = window.innerWidth;
+const height = window.innerHeight;
+const svg = d3.select("svg");
+
+const typeColors = {{
+    "Source": "#4CAF50",
+    "Concept": "#2196F3",
+    "Claim": "#FF9800",
+    "Question": "#E91E63",
+    "Proof": "#9C27B0"
+}};
+
+const edgeColors = {{
+    "evidence_chain": "#FF5722",
+    "equivalence": "#00BCD4",
+    "theory_axioms": "#8BC34A",
+    "proof_link": "#673AB7",
+    "emergence": "#FFC107",
+    "research_cluster": "#795548",
+    "investigation": "#607D8B"
+}};
+
+const simulation = d3.forceSimulation(nodes)
+    .force("charge", d3.forceManyBody().strength(-300))
+    .force("center", d3.forceCenter(width/2, height/2))
+    .force("collision", d3.forceCollide().radius(50));
+
+const hullGroup = svg.append("g").attr("class", "hulls");
+
+function updateHulls() {{
+    hullGroup.selectAll("*").remove();
+    hyperedges.forEach((he, i) => {{
+        const memberNodes = nodes.filter(n => he.members.includes(n.id));
+        if (memberNodes.length < 2) return;
+        const points = memberNodes.map(n => [n.x, n.y]);
+        const color = edgeColors[he.type] || "#999";
+        if (points.length >= 3) {{
+            const hull = d3.polygonHull(points);
+            if (hull) {{
+                const expandedHull = hull.map(p => {{
+                    const cx = d3.mean(hull, d => d[0]);
+                    const cy = d3.mean(hull, d => d[1]);
+                    const dx = p[0] - cx, dy = p[1] - cy;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    const expand = 25;
+                    return [p[0] + dx/dist*expand, p[1] + dy/dist*expand];
+                }});
+                hullGroup.append("path")
+                    .attr("class", "hyperedge")
+                    .attr("d", "M" + expandedHull.join("L") + "Z")
+                    .attr("fill", color).attr("stroke", color);
+            }}
+        }} else {{
+            hullGroup.append("line")
+                .attr("class", "hyperedge")
+                .attr("x1", points[0][0]).attr("y1", points[0][1])
+                .attr("x2", points[1][0]).attr("y2", points[1][1])
+                .attr("stroke", color).attr("stroke-width", 3).attr("stroke-opacity", 0.5);
+        }}
+    }});
+}}
+
+const nodeGroup = svg.append("g").attr("class", "nodes");
+const node = nodeGroup.selectAll(".node").data(nodes).enter().append("g")
+    .attr("class", "node")
+    .call(d3.drag()
+        .on("start", (e,d) => {{ if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }})
+        .on("drag", (e,d) => {{ d.fx = e.x; d.fy = e.y; }})
+        .on("end", (e,d) => {{ if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }}));
+
+node.append("circle").attr("r", 18).attr("fill", d => typeColors[d.type] || "#999").attr("stroke", "#fff").attr("stroke-width", 2);
+node.append("text").attr("dy", 30).attr("text-anchor", "middle").text(d => d.label);
+
+const legend = svg.append("g").attr("transform", "translate(20,50)");
+let y = 0;
+legend.append("text").attr("x", 0).attr("y", y-10).text("Vertex Types").style("font-weight", "bold");
+for (const [type, color] of Object.entries(typeColors)) {{
+    legend.append("circle").attr("cx", 8).attr("cy", y).attr("r", 8).attr("fill", color);
+    legend.append("text").attr("x", 22).attr("y", y+4).text(type).attr("class", "legend");
+    y += 22;
+}}
+y += 15;
+legend.append("text").attr("x", 0).attr("y", y).text("Hyperedge Types").style("font-weight", "bold");
+y += 15;
+for (const [type, color] of Object.entries(edgeColors)) {{
+    legend.append("rect").attr("x", 0).attr("y", y-8).attr("width", 16).attr("height", 16).attr("fill", color).attr("fill-opacity", 0.3).attr("stroke", color);
+    legend.append("text").attr("x", 22).attr("y", y+4).text(type).attr("class", "legend");
+    y += 22;
+}}
+
+simulation.on("tick", () => {{
+    node.attr("transform", d => `translate(${{d.x}},${{d.y}})`);
+    updateHulls();
+}});
+</script>
+</body>
+</html>'''
+
+        with open(output_path, 'w') as f:
+            f.write(html)
+        print(f"Created interactive visualization: {output_path}")
+        print("Open in browser to view. Drag nodes to rearrange.")
+
     def to_hypernetx(self) -> 'hnx.Hypergraph':
         """Convert to HyperNetX Hypergraph for analysis."""
         if not HNX_AVAILABLE:
@@ -623,8 +779,10 @@ Examples:
   python qbp_knowledge.py query weak-claims
   python qbp_knowledge.py query unproven
   python qbp_knowledge.py query gaps
-  python qbp_knowledge.py viz --web
-  python qbp_knowledge.py viz --output graph.png
+  python qbp_knowledge.py viz --d3                    # Interactive D3.js (recommended)
+  python qbp_knowledge.py viz --output graph.html     # Same as --d3
+  python qbp_knowledge.py viz --output graph.png      # Static matplotlib
+  python qbp_knowledge.py viz --web                   # Hypergraph-DB (has issues)
   python qbp_knowledge.py report
         """
     )
@@ -645,9 +803,10 @@ Examples:
 
     # Visualization
     viz_parser = subparsers.add_parser('viz', help='Visualize the hypergraph')
-    viz_parser.add_argument('--web', action='store_true', help='Open web visualization')
-    viz_parser.add_argument('--output', type=str, help='Save to file')
-    viz_parser.add_argument('--port', type=int, default=8088, help='Port for web viz (default 8088 to avoid conflict with proof viz on 8080)')
+    viz_parser.add_argument('--d3', action='store_true', help='D3.js interactive HTML (recommended)')
+    viz_parser.add_argument('--web', action='store_true', help='Hypergraph-DB web viz (has known issues)')
+    viz_parser.add_argument('--output', type=str, help='Output file path')
+    viz_parser.add_argument('--port', type=int, default=8088, help='Port for web viz')
 
     # Report
     subparsers.add_parser('report', help='Generate coverage report')
@@ -714,7 +873,12 @@ Examples:
 
     elif args.command == 'viz':
         if args.web:
+            print("Note: Hypergraph-DB web viz has known rendering issues.")
+            print("Consider using --d3 for reliable visualization.")
             kb.visualize_web(port=args.port)
+        elif args.d3 or (args.output and args.output.endswith('.html')):
+            output = args.output or 'hypergraph.html'
+            kb.visualize_d3(output_path=output)
         else:
             kb.visualize_matplotlib(output_path=args.output)
 
