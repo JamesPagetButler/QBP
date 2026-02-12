@@ -30,8 +30,8 @@
   - [x] Core infrastructure (#236) — CLOSED 2026-02-11. Hypergraph-DB + API wrapper
   - [x] YAML migration (#237) — CLOSED 2026-02-11. 21 vertices, 9 hyperedges seeded
   - [ ] Schema validation (#220) — Vertex and hyperedge validation (can do during 0R)
-- [ ] **Research Sprint 0R** (#212) — **UNBLOCKED** (Hypergraph ready)
-- [ ] Theory Refinement (#165) — *blocked by Research Sprint 0R*
+- [x] **Research Sprint 0R** (#212) — **COMPLETE** (7/9 issues closed, 2 deferred)
+- [ ] Theory Refinement (#165) — **UNBLOCKED** (0R complete)
 - [ ] Retrospective (#191)
 
 ## Sprint 2 Lessons Learned (Phase 4c)
@@ -90,19 +90,27 @@
 ## Research Sprint 0R (Before Theory Refinement — One-Off)
 
 **Tracking Issue:** #212
+**Status:** P1/P2 Complete, P3 Deferred
 
 Research sprints are dedicated blocks for theoretical investigation between experiment sprints.
 **Naming:** Research Sprint NR runs after Sprint N+1 (0R after Sprint 1, 1R after Sprint 2, etc.)
 
-- [ ] #167 — Research: Identify where QBP predictions diverge from standard QM
-- [ ] #136 — Theory: Clarify quaternion observable relationship to operator formalism
-- [ ] #20 — Theoretical Investigation: Physical meaning of quaternion scalar component
-- [ ] #6 — Initial Project Premise & Setup Review
-- [ ] #232 — Research: Division algebra justification for QBP
-- [ ] #233 — Research: Intuitive physical explanation for quaternion spin formulas
-- [ ] #234 — Research: Geometric interpretation in spacetime context
+### Priority 1: Critical Path (COMPLETE)
+- [x] #167 — Research: Identify where QBP predictions diverge from standard QM
+- [x] #136 — Theory: Clarify quaternion observable relationship to operator formalism
+
+### Priority 2: Foundations (COMPLETE)
+- [x] #20 — Theoretical Investigation: Physical meaning of quaternion scalar component
+- [x] #6 — Initial Project Premise & Setup Review
+- [x] #232 — Research: Division algebra justification for QBP
+- [x] #233 — Research: Intuitive physical explanation for quaternion spin formulas
+- [x] #234 — Research: Geometric interpretation in spacetime context
+
+### Priority 3: Infrastructure (DEFERRED)
 - [ ] #123 — Research: Investigate Lean 4 as verified experiment engine
 - [ ] #203 — Research: 3D Interactive Experiment Visualizations
+
+**Key Finding:** QBP is a reformulation of standard QM, not a competing theory. The Moretti-Oppio theorem (2019) proves that relativistic systems with Poincaré symmetry in quaternionic Hilbert space necessarily reduce to complex QM. See DESIGN_RATIONALE.md Section 8.
 
 ## Active Diversions
 
