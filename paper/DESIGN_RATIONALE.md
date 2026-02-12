@@ -634,3 +634,134 @@ The quaternion formulation makes the geometric structure of spin explicit. In st
 | Neutron interferometry test | Kaiser et al. | 1984 | Experimental null result |
 
 **Knowledge base updated:** 31 vertices, 9 hyperedges (see `python scripts/qbp_knowledge.py summary`).
+
+## 9. Theory Refinement — Sprint 2 Analysis
+
+This section synthesizes the theoretical insights from Sprint 2 (Angle-Dependent Measurement) and Research Sprint 0R, preparing the foundation for Sprint 3 (Double-Slit).
+
+### 9.1 Verification of Rotation Formalism
+
+Sprint 2 validated the quaternion rotation formalism across all tested angles:
+
+| Angle (θ) | Expected P(+) | Measured P(+) | Deviation (σ) |
+|-----------|---------------|---------------|---------------|
+| 0° | 1.0000 | 1.0000 | 0.00 |
+| 30° | 0.9330 | 0.9327 | 0.12 |
+| 45° | 0.8536 | 0.8542 | 0.23 |
+| 60° | 0.7500 | 0.7508 | 0.31 |
+| 90° | 0.5000 | 0.4987 | 0.41 |
+| 120° | 0.2500 | 0.2517 | 0.67 |
+| 135° | 0.1464 | 0.1472 | 0.33 |
+| 150° | 0.0670 | 0.0664 | 0.29 |
+| 180° | 0.0000 | 0.0000 | 0.00 |
+
+**All deviations within 3σ criterion.** The rotation formula `O_θ = q·O·q⁻¹` with `q = cos(θ/2) + sin(θ/2)·ĵ` correctly implements SO(3) rotation of observables.
+
+### 9.2 SU(2) Double-Cover Behavior
+
+The half-angle θ/2 in the rotation quaternion is the physical signature of the SU(2) double cover:
+
+**Observed behaviors:**
+1. **360° rotation:** State acquires factor of -1 (ψ → -ψ)
+2. **720° rotation:** State returns to original (ψ → ψ)
+3. **Probabilities invariant under global sign:** P(+) depends on |⟨ψ|O⟩|, so ±ψ give identical physics
+
+This is consistent with spinor behavior in standard QM. The double-cover is not an artifact but a physical property of spin-1/2 particles, reflected faithfully in quaternion algebra.
+
+### 9.3 Emergent Phenomena Verification
+
+Sprint 2 Guide Post evaluation:
+
+| Guide Post | Status | Evidence |
+|------------|--------|----------|
+| **Emergent Conservation Laws** | Confirmed | Rotation preserves quaternion norm (unitarity) |
+| **Emergent Symmetries** | Confirmed | Full SO(3) rotation symmetry operational |
+| **Probability from Geometry** | Confirmed | cos²(θ/2) emerges from dot product structure |
+| **Phase Invariance** | Confirmed | Global phase (±ψ) has no observable effect |
+
+**No unexpected emergent phenomena.** This is consistent with Section 8's finding that QBP is algebraically equivalent to standard QM for single-particle systems.
+
+### 9.4 Theoretical Foundations Confirmed
+
+Research Sprint 0R (Section 8) established:
+
+1. **Observable Formalism (§8.3):** Pure quaternions O correspond to Pauli matrices via i↔-iσₓ, j↔-iσᵧ, k↔-iσᵤ. The representation is not approximate — it's an exact algebraic isomorphism.
+
+2. **Half-Angle Origin (§8.6):** The θ/2 arises from the Hopf fibration S³→S² and the spinor transformation law. It's the same mathematics as standard QM in different notation.
+
+3. **Division Algebra Necessity (§8.2):** Quaternions are required (not merely sufficient) for SU(2)/spin-1/2 physics. Complex numbers lack the structure; octonions are for SU(3).
+
+4. **QBP-QM Equivalence (§8.1):** The Moretti-Oppio theorem proves that QBP reproduces standard QM for all relativistic single-particle systems.
+
+### 9.5 Theoretical Requirements for Sprint 3 (Double-Slit)
+
+Sprint 3 introduces qualitatively new physics that Sprint 1-2 did not address:
+
+#### 9.5.1 Superposition Representation
+
+**Challenge:** The double-slit experiment requires representing a particle in a superposition of two spatial paths:
+```
+|ψ⟩ = α|path_1⟩ + β|path_2⟩
+```
+
+**Current limitation:** QBP states are single pure quaternions ψ = ai + bj + ck. This naturally represents spin states but not spatial superpositions.
+
+**Proposed approaches:**
+1. **Quaternion pairs:** Represent superposition as (ψ₁, ψ₂) with complex coefficients (α, β)
+2. **Quaternionic wavefunction:** ψ(x) as a quaternion-valued function of position
+3. **Density matrix analog:** Use quaternion products to represent mixed/superposed states
+
+#### 9.5.2 Interference Mechanism
+
+**Challenge:** When no which-path measurement occurs, the two paths must interfere to produce the characteristic fringe pattern.
+
+**Standard QM mechanism:** |α|² + |β|² + 2Re(α*β) cross-term produces interference
+
+**QBP equivalent needed:** Define how quaternion states from different paths combine. The non-commutativity of quaternions may introduce novel effects here — this is a potential divergence point.
+
+#### 9.5.3 Measurement-Induced Decoherence
+
+**Challenge:** A which-path measurement must destroy the interference pattern, collapsing to classical two-band distribution.
+
+**QBP measurement postulate:** Currently handles spin measurements via vecDot(ψ, O). Need to extend to position measurements.
+
+**Open question:** Does quaternion non-commutativity affect the order of measurements differently than standard QM?
+
+### 9.6 Open Questions for Sprint 3
+
+1. **Spatial wavefunction representation:** How should ψ(x) be quaternion-valued? Pure quaternion at each point, or general quaternion?
+
+2. **Path integral formulation:** Can the Feynman path integral be reformulated with quaternion phases? This might provide a natural interference mechanism.
+
+3. **Two-slit amplitude addition:** When adding amplitudes from two paths, does quaternion non-commutativity affect the result? (ψ₁ + ψ₂ vs ψ₂ + ψ₁ should be identical for addition, but quaternion multiplication is not commutative.)
+
+4. **Measurement formalism extension:** The current postulate assumes spin observables. What is the quaternion representation of position/momentum observables?
+
+5. **Potential divergence point:** If QBP predicts different interference patterns than standard QM, this would be the first experimentally distinguishable prediction. Sprint 3 may reveal whether QBP is truly equivalent or subtly different.
+
+### 9.7 Recommended Approach for Sprint 3
+
+Based on this analysis:
+
+1. **Phase 1 (Ground Truth):** Carefully specify the quaternionic representation of double-slit geometry. This is a theoretical decision, not an empirical fact to look up.
+
+2. **Phase 2 (Implementation):** Implement the simplest extension first — quaternion-valued wavefunction with standard Born rule P(x) = |ψ(x)|².
+
+3. **Phase 4 (Proof):** Focus on proving that the interference term behaves correctly. This is where divergence from QM would appear.
+
+4. **Key test:** Compare QBP interference pattern to standard QM prediction. Any deviation would be scientifically significant.
+
+### 9.8 Summary
+
+Sprint 2 Theory Refinement confirms:
+- Rotation formalism is validated across all angles
+- SU(2) double-cover behavior is correctly captured
+- Emergent phenomena match expectations
+- Observable formalism and half-angle origin are well-understood
+
+Sprint 3 introduces the first genuinely challenging extension:
+- Superposition representation requires new formalism
+- Interference mechanism may reveal QBP-specific behavior
+- This is where QBP could either confirm equivalence or diverge from QM
+
+**Theory status:** Ready for Sprint 3. The theoretical framework is solid for single-particle, single-observable physics. Multi-path superposition is the next frontier.
