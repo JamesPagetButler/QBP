@@ -70,8 +70,9 @@ def scan_lean_file(file_path: Path, root: Path) -> LeanFile:
             namespace = ns_match.group(1)
             result.namespace = namespace
 
-    # Check for sorry in file
-    result.has_sorry = "sorry" in content
+    # Check for sorry in file (word boundary to avoid false positives in comments)
+    sorry_pattern = re.compile(r"\bsorry\b")
+    result.has_sorry = bool(sorry_pattern.search(content))
 
     # Pattern for declarations
     decl_pattern = re.compile(
@@ -105,7 +106,7 @@ def scan_lean_file(file_path: Path, root: Path) -> LeanFile:
         next_decl = decl_pattern.search(content, m.end())
         decl_end = next_decl.start() if next_decl else len(content)
         decl_body = content[decl_start:decl_end]
-        has_sorry = "sorry" in decl_body
+        has_sorry = bool(sorry_pattern.search(decl_body))
 
         decl = LeanDeclaration(
             kind=kind,
@@ -159,8 +160,7 @@ def sync_to_knowledge_graph(
             d.name for d in lean_file.declarations if d.kind in ("theorem", "lemma")
         ]
 
-        attrs = {
-            "lean_file": lean_file.path,
+        extra_attrs = {
             "theorems": theorems,
             "verified": not lean_file.has_sorry,
             "no_sorry": not lean_file.has_sorry,
@@ -174,20 +174,15 @@ def sync_to_knowledge_graph(
             if dry_run:
                 actions["updated"].append(proof_id)
             else:
-                kb.add_vertex(proof_id, "Proof", attrs, skip_if_exists=False)
+                full_attrs = {"lean_file": lean_file.path, **extra_attrs}
+                kb.add_vertex(proof_id, "Proof", full_attrs, skip_if_exists=False)
                 actions["updated"].append(proof_id)
         else:
             if dry_run:
                 actions["created"].append(proof_id)
             else:
-                kb.add_proof(
-                    proof_id,
-                    lean_file.path,
-                    **{k: v for k, v in attrs.items() if k != "lean_file"},
-                )
+                kb.add_proof(proof_id, lean_file.path, **extra_attrs)
                 actions["created"].append(proof_id)
-
-        actions["skipped"] = []  # Nothing skipped in current logic
 
     return actions
 

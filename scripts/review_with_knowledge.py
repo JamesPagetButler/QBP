@@ -25,7 +25,7 @@ from qbp_knowledge_sqlite import QBPKnowledgeSQLite
 
 def get_pr_files(pr_number: int) -> List[str]:
     """Get list of changed files from a PR using gh CLI."""
-    gh_path = os.environ.get("GH_PATH", "/home/prime/.local/bin/gh")
+    gh_path = os.environ.get("GH_PATH", "gh")
     try:
         result = subprocess.run(
             [gh_path, "pr", "diff", str(pr_number), "--name-only"],

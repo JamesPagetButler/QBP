@@ -1057,11 +1057,16 @@ class QBPKnowledgeSQLite:
 
         counts = {"nodes": 0, "edges": 0, "incidences": 0}
 
+        # Pre-build incidence index: edge_id -> [node_ids]
+        incidence_index: Dict[str, List[str]] = {}
+        for inc in hif.get("incidences", []):
+            incidence_index.setdefault(inc["edge"], []).append(inc["node"])
+
         # Import nodes
         for node in hif.get("nodes", []):
             node_id = node["node"]
-            attrs = node.get("attrs", {})
-            node_type = attrs.pop("type", "Concept")  # Default type
+            attrs = dict(node.get("attrs", {}))  # Copy to avoid mutating input
+            node_type = attrs.pop("type", "Concept")
 
             # Validate type exists
             if node_type not in VERTEX_TYPES:
@@ -1080,18 +1085,14 @@ class QBPKnowledgeSQLite:
         # Import edges
         for edge_entry in hif.get("edges", []):
             edge_id = edge_entry["edge"]
-            attrs = edge_entry.get("attrs", {})
+            attrs = dict(edge_entry.get("attrs", {}))  # Copy to avoid mutating input
             edge_type = attrs.pop("type", "evidence_chain")
 
             if edge_type not in HYPEREDGE_TYPES:
                 edge_type = "evidence_chain"
 
-            # Collect members from incidences
-            members = [
-                inc["node"]
-                for inc in hif.get("incidences", [])
-                if inc["edge"] == edge_id
-            ]
+            # Look up members from pre-built index
+            members = incidence_index.get(edge_id, [])
 
             if len(members) >= HYPEREDGE_TYPES[edge_type].get("min_members", 2):
                 self.add_hyperedge(
@@ -1099,10 +1100,7 @@ class QBPKnowledgeSQLite:
                 )
                 counts["edges"] += 1
 
-        counts["incidences"] = sum(
-            len([i for i in hif.get("incidences", []) if i["edge"] == e["edge"]])
-            for e in hif.get("edges", [])
-        )
+        counts["incidences"] = sum(len(m) for m in incidence_index.values())
 
         return counts
 

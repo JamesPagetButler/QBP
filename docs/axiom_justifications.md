@@ -62,7 +62,7 @@ The Pauli correspondence makes this precise:
 
 where `i` on the left is the quaternion basis element and `i` on the right is the complex unit. A general pure quaternion `O = ai + bj + ck` corresponds to the Hermitian operator `aσₓ + bσᵧ + cσ_z`.
 
-This isomorphism is exact — QBP observables *are* Pauli operators in a different parameterization. A measurement direction is a point on S², which is the space of pure unit quaternions. The requirement `Re(O) = 0` ensures the observable represents a spatial direction, not a rotation.
+More precisely, this is a **Lie algebra isomorphism**: the imaginary quaternions Im(ℍ) with the commutator bracket form a Lie algebra isomorphic to su(2), and the Pauli matrices provide a representation of this algebra. The commutation relations are preserved: `[i, j] = 2k` corresponds to `[σₓ, σᵧ] = 2iσ_z`. QBP observables *are* Pauli operators in a different parameterization. A measurement direction is a point on S², which is the space of pure unit quaternions. The requirement `Re(O) = 0` ensures the observable represents a spatial direction, not a rotation.
 
 ### Intuition
 
@@ -136,15 +136,17 @@ noncomputable def probDown (ψ O : Q) : ℝ := (1 - expectationValue ψ O) / 2
 
 ### Derivation
 
-The Born rule `P(+) = (1 + ⟨O⟩)/2` is the **unique** linear map from `[-1, +1]` to `[0, 1]` satisfying three boundary conditions:
+The Born rule `P(+) = (1 + ⟨O⟩)/2` is the **unique** linear map from `[-1, +1]` to `[0, 1]` satisfying the boundary conditions `f(+1) = 1` (aligned → certain spin-up) and `f(-1) = 0` (anti-aligned → certain spin-down):
 
 | Condition | ⟨O⟩ | P(+) | Physical meaning |
 |-----------|------|------|-----------------|
 | Aligned | +1 | 1 | Certain spin-up |
 | Anti-aligned | -1 | 0 | Certain spin-down |
-| Orthogonal | 0 | 0.5 | Maximally uncertain |
+| Orthogonal | 0 | 0.5 | Maximally uncertain (consequence) |
 
-**Uniqueness proof:** Any linear function `f(x) = ax + b` mapping `[-1,1] → [0,1]` with `f(+1) = 1` and `f(-1) = 0` gives `a + b = 1` and `-a + b = 0`, so `a = b = 1/2`, yielding `f(x) = (1 + x)/2`.
+**Uniqueness proof:** Any linear function `f(x) = ax + b` with `f(+1) = 1` and `f(-1) = 0` gives `a + b = 1` and `-a + b = 0`, so `a = b = 1/2`, yielding `f(x) = (1 + x)/2`. The orthogonal case `f(0) = 0.5` follows as a consequence, not an independent constraint.
+
+**Why linearity?** While non-linear maps from `[-1, +1]` to `[0, 1]` satisfying the same boundary conditions are possible (e.g., `f(x) = (1 + x)²/4`), the linear form is the simplest and most natural choice. It is also the only form consistent with the standard QM expectation value formula, where probabilities depend linearly on the expectation value.
 
 The complementary probability `P(-) = (1 - ⟨O⟩)/2` ensures `P(+) + P(-) = 1`.
 
@@ -168,10 +170,18 @@ The QBP Born rule is algebraically identical, with `vecDot(ψ, O)` replacing `�
 |-------|----------------------|--------|
 | State normalization | Probability conservation (∑P = 1) | YES |
 | Observable as pure quaternion | Geometric necessity (S² ↔ Im(ℍ) ∩ S³) | YES |
-| Expectation = vecDot | Probability bounds + Cauchy-Schwarz | YES |
+| Expectation = vecDot | Probability bounds + Cauchy-Schwarz | YES* |
 | Born rule (1 + ⟨O⟩)/2 | Unique linear map with correct boundaries | YES |
 
-All axioms are derivable from first principles. The factor-of-2 correction discovered during Experiment 01b development was a bug fix — the original violated probability bounds for non-orthogonal configurations. The simulation revealed the bug, but the correct formula follows from mathematics alone.
+*\*Axiom 3 note: The simulation revealed that the original factor-of-2 formula produced invalid probabilities (PR #116). However, the correct formula `⟨O⟩ = vecDot(ψ, O)` is derivable from first principles alone — the probability bound `P ∈ [0, 1]` combined with Cauchy-Schwarz forces this form. The simulation discovered the bug; mathematics provides the fix.*
+
+All axioms are derivable from first principles. The factor-of-2 correction discovered during Experiment 01b development was a bug fix — the original violated probability bounds for non-orthogonal configurations.
+
+---
+
+## Scope: Single-Particle Systems
+
+**Important caveat:** These axioms apply to single-particle spin-1/2 systems only. For this scope, QBP predictions necessarily match standard quantum mechanics because the quaternion algebra is isomorphic to the Pauli algebra underlying SU(2). This is expected, not a novel validation. The real test of QBP's predictive power comes with multi-particle systems (e.g., Experiment 05: Bell's Theorem) where the algebraic structure may yield different predictions. See `paper/DESIGN_RATIONALE.md` §8.5 for analysis of potential divergence regimes.
 
 ---
 
