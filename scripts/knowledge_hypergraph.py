@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Set, Any, Optional
 from dataclasses import dataclass, field
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 # Check for HyperNetX
 try:

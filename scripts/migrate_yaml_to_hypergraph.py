@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 # Add scripts to path for import
 sys.path.insert(0, str(Path(__file__).parent))
