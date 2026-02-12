@@ -30,7 +30,7 @@
   - [x] Core infrastructure (#236) — CLOSED 2026-02-11. Hypergraph-DB + API wrapper
   - [x] YAML migration (#237) — CLOSED 2026-02-11. 21 vertices, 9 hyperedges seeded
   - [ ] Schema validation (#220) — Vertex and hyperedge validation (can do during 0R)
-- [ ] **Research Sprint 0R** (#212) — *blocked by Hypergraph infrastructure*
+- [ ] **Research Sprint 0R** (#212) — **UNBLOCKED** (Hypergraph ready)
 - [ ] Theory Refinement (#165) — *blocked by Research Sprint 0R*
 - [ ] Retrospective (#191)
 
