@@ -167,7 +167,8 @@ class QBPKnowledgeSQLite:
     def _init_schema(self):
         """Create tables if they don't exist."""
         with self._connection() as conn:
-            conn.executescript("""
+            conn.executescript(
+                """
                 -- Metadata table for schema versioning
                 CREATE TABLE IF NOT EXISTS metadata (
                     key TEXT PRIMARY KEY,
@@ -209,7 +210,8 @@ class QBPKnowledgeSQLite:
                 -- Indexes for efficient lookups
                 CREATE INDEX IF NOT EXISTS idx_incidences_vertex ON incidences(vertex_id);
                 CREATE INDEX IF NOT EXISTS idx_incidences_edge ON incidences(edge_id);
-            """)
+            """
+            )
 
             # Set schema version
             conn.execute(
@@ -531,7 +533,8 @@ class QBPKnowledgeSQLite:
         """Find claims with no evidence chain or fewer than 2 evidence sources."""
         with self._connection() as conn:
             # Claims without any evidence_chain edges
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT v.id, v.data
                 FROM vertices v
                 WHERE v.type = 'Claim'
@@ -541,7 +544,8 @@ class QBPKnowledgeSQLite:
                     JOIN hyperedges h ON i.edge_id = h.id
                     WHERE h.type = 'evidence_chain'
                 )
-            """).fetchall()
+            """
+            ).fetchall()
 
             return [
                 {
@@ -555,7 +559,8 @@ class QBPKnowledgeSQLite:
     def find_unproven_claims(self) -> List[Dict[str, Any]]:
         """Find claims without proof_link hyperedges."""
         with self._connection() as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT v.id, v.data
                 FROM vertices v
                 WHERE v.type = 'Claim'
@@ -565,14 +570,16 @@ class QBPKnowledgeSQLite:
                     JOIN hyperedges h ON i.edge_id = h.id
                     WHERE h.type = 'proof_link'
                 )
-            """).fetchall()
+            """
+            ).fetchall()
 
             return [{"id": row["id"], **json.loads(row["data"])} for row in rows]
 
     def find_research_gaps(self) -> List[Dict[str, Any]]:
         """Find open questions with no investigation hyperedges."""
         with self._connection() as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT v.id, v.data
                 FROM vertices v
                 WHERE v.type = 'Question'
@@ -583,7 +590,8 @@ class QBPKnowledgeSQLite:
                     JOIN hyperedges h ON i.edge_id = h.id
                     WHERE h.type = 'investigation'
                 )
-            """).fetchall()
+            """
+            ).fetchall()
 
             return [
                 {
@@ -643,13 +651,17 @@ class QBPKnowledgeSQLite:
     def summary(self) -> Dict[str, Any]:
         """Get database statistics."""
         with self._connection() as conn:
-            vertex_counts = conn.execute("""
+            vertex_counts = conn.execute(
+                """
                 SELECT type, COUNT(*) as count FROM vertices GROUP BY type
-            """).fetchall()
+            """
+            ).fetchall()
 
-            edge_counts = conn.execute("""
+            edge_counts = conn.execute(
+                """
                 SELECT type, COUNT(*) as count FROM hyperedges GROUP BY type
-            """).fetchall()
+            """
+            ).fetchall()
 
             total_vertices = conn.execute("SELECT COUNT(*) FROM vertices").fetchone()[0]
             total_edges = conn.execute("SELECT COUNT(*) FROM hyperedges").fetchone()[0]
