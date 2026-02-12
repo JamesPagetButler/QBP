@@ -304,7 +304,7 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 
 Phase 4 is divided into three sub-phases. The phase count remains 5 and each experiment still has 5 issues — sub-phases are tracked as task sections within the single Phase 4 issue.
 
-**Sub-phase dependencies:** 4a (Formal Proof) must complete before 4b (Proof Review) can begin. 4b must complete before 4c (Interactive Proof Visualization) can begin. Phase 4c runs in parallel with Phase 5 preparation — it is a deliverable, not a gate for publication.
+**Sub-phase dependencies:** 4a (Formal Proof) must complete before 4b (Proof Review) can begin. 4b must complete before 4c (Interactive Proof Visualization) can begin. Phase 4c runs in parallel with Phase 5 preparation — it is a deliverable, not a gate for publication. Phase 4d (Verified Differential Testing) is optional and can run after 4a completes — it validates Python against Lean oracles.
 
 ##### Phase 4a: Formal Proof
 
@@ -430,6 +430,45 @@ src/viz/interactive/
 ```
 
 **Output:** Interactive WASM visualization in `src/viz/interactive/dist/`.
+
+##### Phase 4d: Verified Differential Testing (Optional)
+
+**Owner:** Claude / Dev Team
+
+**Goal:** Validate that Python simulations match proven-correct Lean oracles. This phase uses the "Cedar pattern" (Amazon) to provide mathematical confidence that published results are computed correctly.
+
+**Architecture:**
+```
+┌─────────────────────────────────────────────────────────┐
+│  Lean 4 (Verified Oracle)                               │
+│  ┌─────────────────────┐  ┌─────────────────────────┐   │
+│  │ Proofs (Real)       │  │ Computation (Float)     │   │
+│  │ - prob_up_angle     │→→│ - probUpFloat           │   │
+│  └─────────────────────┘  └──────────┬──────────────┘   │
+│                                      │ JSON output       │
+└──────────────────────────────────────┼──────────────────┘
+                                       ↓
+┌──────────────────────────────────────┼──────────────────┐
+│  Python Simulation                   │                  │
+│  qphysics.py ←←←←←←←←←←←←← Differential Comparator     │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Tasks:**
+- Create `proofs/QBP/Oracle/` with `Float` versions of probability calculations
+- Implement JSON export of test predictions from Lean
+- Build Python differential harness (`scripts/differential_test.py`)
+- Property testing with random inputs (10,000+ cases)
+- CI integration (GitHub Action fails on divergence)
+
+**When to use Phase 4d:**
+- High-stakes experiments where implementation bugs could invalidate results
+- When Python implementation is complex or has had past bugs
+- Before major publications or presentations
+
+**Output:** CI passes with "0 divergences in N test cases"
+
+**Reference:** `docs/research/verified_experiment_engine.md`
 
 ##### Phase 4 Decision Gate
 

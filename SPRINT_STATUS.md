@@ -106,11 +106,14 @@ Research sprints are dedicated blocks for theoretical investigation between expe
 - [x] #233 — Research: Intuitive physical explanation for quaternion spin formulas
 - [x] #234 — Research: Geometric interpretation in spacetime context
 
-### Priority 3: Infrastructure (DEFERRED)
-- [ ] #123 — Research: Investigate Lean 4 as verified experiment engine
-- [ ] #203 — Research: 3D Interactive Experiment Visualizations
+### Priority 3: Infrastructure (COMPLETE)
+- [x] #123 — Research: Lean 4 as verified experiment engine → **Phase 4d proposed (#242)**
+- [x] #203 — Research: 3D Interactive Visualizations → **Keep current C/Raylib approach**
 
-**Key Finding:** QBP is a reformulation of standard QM, not a competing theory. The Moretti-Oppio theorem (2019) proves that relativistic systems with Poincaré symmetry in quaternionic Hilbert space necessarily reduce to complex QM. See DESIGN_RATIONALE.md Section 8.
+**Key Findings:**
+1. QBP is a reformulation of standard QM (Moretti-Oppio theorem). See DESIGN_RATIONALE.md Section 8.
+2. Lean 4 verified oracle feasible (Cedar pattern). See docs/research/verified_experiment_engine.md.
+3. Go 3D engines not mature; current viz approach optimal.
 
 ## Active Diversions
 
