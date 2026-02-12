@@ -131,7 +131,7 @@ VERTEX_TYPES = {
 # Hyperedge Type Definitions
 # =============================================================================
 
-HYPEREDGE_TYPES = {
+HYPEREDGE_TYPES: Dict[str, Dict[str, Any]] = {
     "evidence_chain": {
         "description": "Claim + all supporting evidence sources",
         "min_members": 3,  # 1 claim + at least 2 evidence sources
@@ -334,7 +334,7 @@ class QBPKnowledge:
 
         # Validate required vertex types
         if "required_vertex_types" in schema:
-            type_counts = {}
+            type_counts: Dict[str, int] = {}
             for member in members:
                 v_data = self.get_vertex(member)
                 if v_data:

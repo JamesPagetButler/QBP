@@ -30,7 +30,7 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 # =============================================================================
 # Schema Definitions (same as before, for validation)
@@ -104,7 +104,7 @@ VERTEX_TYPES = {
     },
 }
 
-HYPEREDGE_TYPES = {
+HYPEREDGE_TYPES: Dict[str, Dict[str, Any]] = {
     "evidence_chain": {"min_members": 2, "description": "Claim + supporting evidence"},
     "equivalence": {
         "min_members": 2,
@@ -688,35 +688,33 @@ class QBPKnowledgeSQLite:
 
     def export_hif(self, output_path: str) -> str:
         """Export to Hypergraph Interchange Format (HIF)."""
-        hif = {
+        nodes: List[Dict[str, Any]] = []
+        edges: List[Dict[str, Any]] = []
+        incidences: List[Dict[str, str]] = []
+
+        with self._connection() as conn:
+            # Export vertices
+            for row in conn.execute("SELECT id, data FROM vertices"):
+                nodes.append({"node": row["id"], "attrs": json.loads(row["data"])})
+
+            # Export edges and incidences
+            for row in conn.execute("SELECT id, data FROM hyperedges"):
+                edges.append({"edge": row["id"], "attrs": json.loads(row["data"])})
+
+            for row in conn.execute("SELECT vertex_id, edge_id FROM incidences"):
+                incidences.append({"node": row["vertex_id"], "edge": row["edge_id"]})
+
+        hif: Dict[str, Any] = {
             "network-type": "undirected",
             "metadata": {
                 "name": "QBP Knowledge Hypergraph",
                 "exported_from": "qbp_knowledge_sqlite",
                 "export_date": str(date.today()),
             },
-            "nodes": [],
-            "edges": [],
-            "incidences": [],
+            "nodes": nodes,
+            "edges": edges,
+            "incidences": incidences,
         }
-
-        with self._connection() as conn:
-            # Export vertices
-            for row in conn.execute("SELECT id, data FROM vertices"):
-                hif["nodes"].append(
-                    {"node": row["id"], "attrs": json.loads(row["data"])}
-                )
-
-            # Export edges and incidences
-            for row in conn.execute("SELECT id, data FROM hyperedges"):
-                hif["edges"].append(
-                    {"edge": row["id"], "attrs": json.loads(row["data"])}
-                )
-
-            for row in conn.execute("SELECT vertex_id, edge_id FROM incidences"):
-                hif["incidences"].append(
-                    {"node": row["vertex_id"], "edge": row["edge_id"]}
-                )
 
         with open(output_path, "w") as f:
             json.dump(hif, f, indent=2)

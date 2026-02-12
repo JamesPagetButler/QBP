@@ -309,50 +309,49 @@ class KnowledgeHypergraph:
         """Analyze the hypergraph structure."""
         H = self.to_hypernetx()
 
-        analysis = {
-            "node_count": len(H.nodes),
-            "edge_count": len(H.edges),
-            "edge_types": {},
-            "node_degrees": {},
-            "largest_edges": [],
-            "most_connected_nodes": [],
-        }
+        edge_types: Dict[str, int] = {}
+        node_degrees: Dict[str, int] = {}
+        largest_edges: List[Dict[str, Any]] = []
+        most_connected_nodes: List[Dict[str, Any]] = []
 
         # Count edge types
         for he in self.hyperedges.values():
             etype = he.type
-            analysis["edge_types"][etype] = analysis["edge_types"].get(etype, 0) + 1
+            edge_types[etype] = edge_types.get(etype, 0) + 1
 
         # Node degrees
         for node in H.nodes:
-            analysis["node_degrees"][node] = H.degree(node)
+            node_degrees[node] = H.degree(node)
 
         # Top 5 largest edges
         sorted_edges = sorted(
             self.hyperedges.items(), key=lambda x: len(x[1].members), reverse=True
         )
-        analysis["largest_edges"] = [
+        largest_edges = [
             {"id": e[0], "type": e[1].type, "size": len(e[1].members)}
             for e in sorted_edges[:5]
         ]
 
         # Top 5 most connected nodes
-        sorted_nodes = sorted(
-            analysis["node_degrees"].items(), key=lambda x: x[1], reverse=True
-        )
-        analysis["most_connected_nodes"] = [
-            {"id": n[0], "degree": n[1]} for n in sorted_nodes[:5]
-        ]
+        sorted_nodes = sorted(node_degrees.items(), key=lambda x: x[1], reverse=True)
+        most_connected_nodes = [{"id": n[0], "degree": n[1]} for n in sorted_nodes[:5]]
 
-        return analysis
+        return {
+            "node_count": len(H.nodes),
+            "edge_count": len(H.edges),
+            "edge_types": edge_types,
+            "node_degrees": node_degrees,
+            "largest_edges": largest_edges,
+            "most_connected_nodes": most_connected_nodes,
+        }
 
     def query_by_node(self, node_id: str) -> Dict[str, Any]:
         """Find all hyperedges containing a node."""
-        result = {"node": node_id, "entry": self.entries.get(node_id), "hyperedges": []}
+        hyperedges: List[Dict[str, Any]] = []
 
         for edge_id, hyperedge in self.hyperedges.items():
             if node_id in hyperedge.members:
-                result["hyperedges"].append(
+                hyperedges.append(
                     {
                         "id": edge_id,
                         "type": hyperedge.type,
@@ -361,7 +360,11 @@ class KnowledgeHypergraph:
                     }
                 )
 
-        return result
+        return {
+            "node": node_id,
+            "entry": self.entries.get(node_id),
+            "hyperedges": hyperedges,
+        }
 
     def query_by_type(self, edge_type: str) -> List[Hyperedge]:
         """Find all hyperedges of a given type."""
@@ -387,14 +390,14 @@ class KnowledgeHypergraph:
         lines.append(f"- Hyperedges: {len(self.hyperedges)}\n")
 
         lines.append("## Entries by Type\n")
-        type_counts = {}
+        type_counts: Dict[str, int] = {}
         for entry in self.entries.values():
             type_counts[entry.type] = type_counts.get(entry.type, 0) + 1
         for etype, count in sorted(type_counts.items()):
             lines.append(f"- {etype}: {count}")
 
         lines.append("\n## Hyperedges by Type\n")
-        edge_type_counts = {}
+        edge_type_counts: Dict[str, int] = {}
         for he in self.hyperedges.values():
             edge_type_counts[he.type] = edge_type_counts.get(he.type, 0) + 1
         for etype, count in sorted(edge_type_counts.items()):
