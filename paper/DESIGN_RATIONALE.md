@@ -434,3 +434,203 @@ Key UX lesson: When layout problems occur, fix the layout algorithm first — do
 Sprint 2 confirms that QBP reproduces standard quantum mechanics for angle-dependent measurements. The theoretical prediction from Section 6.4 was validated both numerically (simulation) and formally (Lean proofs). The half-angle formula cos²(θ/2) emerges naturally from quaternion algebra, providing an alternative but equivalent description of spin-1/2 physics.
 
 This completes the single-particle, single-measurement validation of QBP. Future sprints will probe more complex scenarios where QBP might diverge from standard QM predictions.
+
+## 8. Research Sprint 0R — Theoretical Foundations
+
+This section documents the findings from Research Sprint 0R, a dedicated block for investigating foundational questions that emerged during Sprints 1-2.
+
+### 8.1 Central Question: Is QBP a Reformulation or a New Theory?
+
+The most critical question facing QBP: **If QBP predictions match standard QM exactly for single-particle systems, is it merely an elegant reformulation or a genuinely different theory?**
+
+**Answer:** QBP is mathematically equivalent to standard QM for single-particle spin-1/2 systems, but may diverge in multi-particle correlations.
+
+This conclusion rests on two key theoretical results:
+
+#### 8.1.1 The Moretti-Oppio Reduction Theorem
+
+Moretti & Oppio (2019) proved that **relativistic systems with Poincaré symmetry in quaternionic Hilbert space necessarily reduce to complex QM formulations**.
+
+> "Elementary relativistic systems defined as locally-faithful irreducible unitary representations of the Poincaré group in quaternionic Hilbert space, if the squared-mass operator is non-negative, admit a natural Poincaré-invariant complex structure."
+
+**Implication for QBP:** For any relativistic single-particle system with positive mass, QBP *must* reproduce standard QM predictions. This is not a limitation of our implementation — it's a mathematical necessity.
+
+#### 8.1.2 The Tsirelson Bound Violation
+
+Theoretical analysis suggests quaternionic QM can achieve **perfect CHSH violation** (probability 1.0), exceeding the Tsirelson bound of standard QM (cos²(π/8) ≈ 0.85).
+
+This occurs because the tensor product structure fails in QQM: local operations on separate subsystems don't commute due to quaternion non-commutativity.
+
+**Critical caveat:** This actually argues *against* QQM as a physical theory, since exceeding the Tsirelson bound violates information causality. If QBP predicts this, it may indicate QBP is physically incorrect for entangled systems.
+
+### 8.2 Why Quaternions? (#232)
+
+**Research Question:** Why are quaternions the appropriate algebra for QBP, rather than complex numbers or octonions?
+
+**Findings:**
+
+| Algebra | Dimension | Properties | Physical Role |
+|---------|-----------|------------|---------------|
+| ℂ (complex) | 2 | Commutative | Standard QM Hilbert space |
+| ℍ (quaternion) | 4 | Non-commutative | SU(2), spin-1/2, rotations |
+| 𝕆 (octonion) | 8 | Non-associative | SU(3) color, 3 generations |
+
+**Why not just complex numbers?**
+
+Complex numbers are *insufficient* for spin-1/2 physics because:
+1. Unit quaternions form SU(2), the double cover of SO(3) — this is the correct symmetry group for spin
+2. The half-angle formula q = cos(θ/2) + sin(θ/2)n̂ emerges from quaternion algebra, not complex algebra
+3. Cohl Furey's work shows quaternions generate all Lorentz representations (Weyl spinors, Dirac spinors, four-vectors)
+
+**Why not octonions?**
+
+Octonions become necessary for:
+- SU(3) color symmetry (strong force)
+- Three-generation structure of fermions
+- Full Standard Model gauge group U(1)×SU(2)×SU(3)
+
+For spin-1/2 single-particle physics, quaternions are both necessary and sufficient.
+
+**Key Reference:** Furey (2016), "Standard Model Physics from an Algebra?" — shows C⊗ℍ generates all Lorentz representations.
+
+### 8.3 Observable Formalism (#136)
+
+**Research Question:** How do quaternion "observables" relate to Hermitian operators in standard QM?
+
+**Findings:**
+
+In QBP, observables are pure quaternions O with Re(O) = 0. The measurement postulate computes:
+```
+⟨O⟩ = vecDot(ψ, O) / |vec(O)|
+```
+
+In standard QM, observables are Hermitian operators  = †. The correspondence is:
+
+| QBP | Standard QM |
+|-----|-------------|
+| Pure quaternion O = ai + bj + ck | Pauli matrix aσₓ + bσᵧ + cσ_z |
+| vecDot(ψ, O) | ⟨ψ|Ô|ψ⟩ |
+| Quaternion eigenstates ±O/|O| | Eigenvectors of Ô |
+
+The isomorphism is:
+```
+i ↔ -iσₓ,  j ↔ -iσᵧ,  k ↔ -iσ_z
+```
+
+This is the well-known quaternion-Pauli algebra correspondence. QBP's measurement postulate is algebraically equivalent to the standard QM expectation value formula.
+
+**Implication:** QBP observables *are* Hermitian operators in disguise. The pure quaternion representation is a different parameterization, not a different physics.
+
+### 8.4 Physical Meaning of the Scalar Component (#20)
+
+**Research Question:** What does Re(ψ) ≠ 0 mean physically?
+
+**Findings from Literature:**
+
+1. **Energy interpretation:** In quaternionic field equations, the scalar component typically encodes energy while vector components encode momentum (consistent with the four-vector structure).
+
+2. **State space constraint:** In QBP, valid spin states are *pure unit quaternions* (Re(ψ) = 0 AND |ψ| = 1). A non-zero scalar part indicates either:
+   - An invalid state (violates Axiom 1)
+   - A rotation operator rather than a state
+   - A mixed state in some extensions
+
+3. **Rotation quaternions:** The scalar part appears in rotation quaternions q = cos(θ/2) + sin(θ/2)n̂. Here Re(q) = cos(θ/2) encodes the rotation angle.
+
+**QBP Position:** States must be pure (Re(ψ) = 0); rotation operators are unit quaternions with Re(q) ≠ 0 in general. This distinction is physically meaningful: states transform under SU(2), while rotations act as SU(2) group elements.
+
+### 8.5 Where Might QBP Diverge from QM? (#167)
+
+This is the critical question for the project's scientific value.
+
+**Regimes where QBP cannot diverge (proven):**
+- Single-particle relativistic systems (Moretti-Oppio theorem)
+- Any system with Poincaré symmetry
+
+**Potential divergence candidates:**
+
+| Regime | Mechanism | Risk |
+|--------|-----------|------|
+| Bell correlations | Tensor product failure | May exceed Tsirelson bound (physically problematic) |
+| Non-relativistic composite systems | Poincaré constraint doesn't apply | Needs investigation |
+| Barrier ordering | Quaternionic phase shifts | Kaiser 1984: null result to 1:30,000 |
+
+**The Bell Correlation Problem:**
+
+If QBP predicts CHSH violations above the Tsirelson bound, this is both:
+- A **novel prediction** (differs from standard QM)
+- A **falsification criterion** (would prove QBP wrong)
+
+Standard QM already matches experimental Bell tests. If QBP predicts stronger correlations, experiments would rule it out.
+
+**Conclusion:** The most likely scenario is that QBP is a reformulation of standard QM, not a competing theory. Its value lies in:
+1. Providing geometric intuition for spin physics
+2. Connecting to the division algebra structure of the Standard Model (via Furey's program)
+3. Serving as a stepping stone toward octonionic extensions
+
+### 8.6 The Half-Angle: Physical Intuition (#233)
+
+**Research Question:** Why does θ/2 appear in the probability formula? What's the physical picture?
+
+**Intuitive Explanation:**
+
+The half-angle is the signature of **spinors** — objects that require two full rotations (4π) to return to their original state.
+
+**Physical picture:**
+1. Spin-1/2 particles are not little spinning balls — they're quantum objects with intrinsic angular momentum
+2. The state space is S² (the Bloch sphere), but the underlying algebra is S³ (unit quaternions / SU(2))
+3. S³ double-covers S²: two antipodal quaternions ±ψ represent the same physical state
+
+**The plate trick analogy:**
+Hold a plate flat on your palm. Rotate it 360° about the vertical axis — your arm is twisted. Rotate another 360° (total 720°) — your arm returns to normal. The plate is like a spin state; your arm is the reference frame.
+
+**Why cos²(θ/2) specifically:**
+
+The rotation quaternion q = cos(θ/2) + sin(θ/2)n̂ encodes the half-angle because:
+- A π rotation (θ = π) gives q = n̂ (pure imaginary)
+- A 2π rotation (θ = 2π) gives q = -1 (flips sign but same rotation)
+
+The probability P(+) = cos²(θ/2) directly inherits this half-angle structure.
+
+### 8.7 Geometric Interpretation (#234)
+
+**Research Question:** How do quaternions relate to spacetime geometry, fibre bundles, and gauge theory?
+
+**Findings:**
+
+**Fibre Bundle Interpretation:**
+- The Bloch sphere S² is the base space of physical states
+- The unit quaternions S³ form the total space (SU(2))
+- The Hopf fibration S³ → S² realizes QBP state space as a U(1) bundle over S²
+
+**Gauge Theory Connection:**
+- The quaternion phase freedom (ψ and -ψ give same physics) is a Z₂ gauge symmetry
+- This is the simplest case of what becomes U(1) gauge invariance in electromagnetism
+- Furey's program extends this: ℍ → SU(2) weak force, 𝕆 → SU(3) strong force
+
+**Novel Insight:**
+The quaternion formulation makes the geometric structure of spin explicit. In standard QM, the SU(2) structure is hidden inside 2×2 matrices. In QBP, it's manifest in the quaternion algebra.
+
+### 8.8 Summary: Research Sprint 0R Conclusions
+
+| Issue | Question | Answer |
+|-------|----------|--------|
+| #6 | Is the premise sound? | Yes — quaternions are mathematically necessary for spin-1/2 |
+| #136 | Observable formalism? | QBP observables ≅ Pauli matrices via standard isomorphism |
+| #20 | Scalar component? | Re(ψ) = 0 for states; Re(q) ≠ 0 for rotation operators |
+| #232 | Why quaternions? | SU(2) structure requires ℍ; ℂ insufficient, 𝕆 for later |
+| #233 | Half-angle intuition? | Spinor double-cover; plate trick analogy |
+| #234 | Geometric meaning? | Hopf fibration S³ → S²; gauge theory connection |
+| #167 | QBP divergence? | Probably none for single-particle; Bell tests may differ (problematically) |
+
+**Key Takeaway:** QBP is a valid reformulation of spin-1/2 QM with pedagogical and structural value. It may not produce novel *testable* predictions but provides a foundation for Furey-style octonionic extensions to the full Standard Model.
+
+### 8.9 References Added to Knowledge Base
+
+| Source | Authors | Year | Contribution |
+|--------|---------|------|--------------|
+| Quaternionic QM and Quantum Fields | Adler | 1995 | Foundational textbook |
+| Standard Model from an Algebra? | Furey | 2016 | Division algebra program |
+| Poincaré symmetry reduction | Moretti, Oppio | 2019 | Reduction theorem |
+| Neutron interferometry test | Kaiser et al. | 1984 | Experimental null result |
+
+**Knowledge base updated:** 31 vertices, 9 hyperedges (see `python scripts/qbp_knowledge.py summary`).
