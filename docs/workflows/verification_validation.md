@@ -59,30 +59,35 @@ If V&V fails at any step:
 
 ## Per-Experiment V&V Checklists
 
+These checklists are **templates** to be filled in during human review sessions.
+The reviewer runs the simulation, inspects each item, and records Pass/Fail with
+the date and reviewer initials. Copy the relevant table into a review record
+(e.g., `workspace/human_review/vv_01_YYYY-MM-DD.md`) and fill it in.
+
 ### Experiment 01: Stern-Gerlach
 
-| Step | Check | Pass/Fail |
-|------|-------|-----------|
-| Setup V | Magnet poles oriented vertically (N up, S down) | |
-| Setup V | Particle source on beam axis | |
-| Setup V | Detector screen positioned after magnet | |
-| Behavior V | Particles deflect up or down (never sideways) | |
-| Behavior V | No particles remain undeflected | |
-| Results V | P(+) = 0.50 +/- 0.05 for theta=90 deg | |
-| Results V | Matches oracle: P(+) = cos^2(theta/2) | |
+| Step | Check | Pass/Fail | Reviewer | Date |
+|------|-------|-----------|----------|------|
+| Setup V | Magnet poles oriented vertically (N up, S down) | | | |
+| Setup V | Particle source on beam axis | | | |
+| Setup V | Detector screen positioned after magnet | | | |
+| Behavior V | Particles deflect up or down (never sideways) | | | |
+| Behavior V | No particles remain undeflected | | | |
+| Results V | P(+) = 0.50 +/- 0.05 for theta=90 deg | | | |
+| Results V | Matches oracle: P(+) = cos^2(theta/2) | | | |
 
 ### Experiment 01b: Angle-Dependent Measurement
 
-| Step | Check | Pass/Fail |
-|------|-------|-----------|
-| Setup V | Angle slider controls state preparation angle | |
-| Setup V | Measurement axis is fixed (z-axis) | |
-| Behavior V | theta=0: all particles deflect up | |
-| Behavior V | theta=180: all particles deflect down | |
-| Behavior V | theta=90: roughly equal up/down | |
-| Results V | P(+) matches cos^2(theta/2) at 9 test angles | |
-| Results V | N > 1000 for statistical confidence | |
-| Results V | Oracle and simulation agree within 5% | |
+| Step | Check | Pass/Fail | Reviewer | Date |
+|------|-------|-----------|----------|------|
+| Setup V | Angle slider controls state preparation angle | | | |
+| Setup V | Measurement axis is fixed (z-axis) | | | |
+| Behavior V | theta=0: all particles deflect up | | | |
+| Behavior V | theta=180: all particles deflect down | | | |
+| Behavior V | theta=90: roughly equal up/down | | | |
+| Results V | P(+) matches cos^2(theta/2) at 9 test angles | | | |
+| Results V | N > 1000 for statistical confidence | | | |
+| Results V | Oracle and simulation agree within 5% | | | |
 
 ## Integration with Phase 4
 

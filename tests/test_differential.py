@@ -15,7 +15,6 @@ import sys
 from pathlib import Path
 from unittest.mock import patch
 
-import numpy as np
 import pytest
 
 # Add project root for imports
@@ -92,35 +91,57 @@ def test_expectation_matches_oracle(case: dict) -> None:
 
 
 class TestBugDetection:
-    """Verify the differential testing harness detects intentional bugs."""
+    """Verify the differential testing harness detects intentional bugs.
 
-    def test_detects_wrong_formula(self) -> None:
-        """If qphysics used cos(theta) instead of cos(theta/2)^2,
-        the differential test should catch it at theta=45 degrees."""
-        theta_45 = np.pi / 4.0  # 45 degrees
-        psi = qphysics.create_tilted_state(theta_45)
-        correct_exp = qphysics.expectation_value(psi, qphysics.SPIN_Z)
+    These tests use unittest.mock.patch to inject buggy implementations
+    into qphysics, then run the actual differential harness to confirm
+    it reports divergences. This validates the testing infrastructure itself.
+    """
 
-        # Intentionally wrong: use cos(theta) directly as prob_up
-        # instead of (1 + cos(theta)) / 2
-        buggy_prob_up = np.cos(theta_45)  # Wrong formula
-        correct_prob_up = (1 + correct_exp) / 2.0
+    def test_harness_catches_wrong_expectation(self) -> None:
+        """Patch expectation_value to return wrong sign — harness must detect it."""
+        sys.path.insert(0, str(project_root / "scripts"))
+        from differential_test import run_differential_tests
 
-        # These should differ — proving the test can detect bugs
+        original = qphysics.expectation_value
+
+        def buggy_expectation(psi, obs):
+            return -original(psi, obs)  # Sign flip
+
+        with patch.object(qphysics, "expectation_value", side_effect=buggy_expectation):
+            total, divergences, details = run_differential_tests(tolerance=1e-6)
+
+        # Harness should detect divergences at non-trivial angles
+        assert divergences > 0, (
+            "Harness failed to detect sign-flipped expectation_value. "
+            f"Ran {total} comparisons but found 0 divergences."
+        )
+
+    def test_harness_catches_wrong_state_prep(self) -> None:
+        """Patch create_tilted_state to use wrong angle — harness must detect it."""
+        sys.path.insert(0, str(project_root / "scripts"))
+        from differential_test import run_differential_tests
+
+        original_create = qphysics.create_tilted_state
+
+        def buggy_create(theta):
+            return original_create(theta + 0.5)  # Offset angle by 0.5 rad
+
+        with patch.object(qphysics, "create_tilted_state", side_effect=buggy_create):
+            total, divergences, details = run_differential_tests(tolerance=1e-6)
+
+        assert divergences > 0, (
+            "Harness failed to detect angle-offset bug in create_tilted_state. "
+            f"Ran {total} comparisons but found 0 divergences."
+        )
+
+    def test_harness_passes_with_correct_code(self) -> None:
+        """Unpatched qphysics should produce 0 divergences (sanity check)."""
+        sys.path.insert(0, str(project_root / "scripts"))
+        from differential_test import run_differential_tests
+
+        total, divergences, _ = run_differential_tests(tolerance=1e-6)
+
         assert (
-            abs(buggy_prob_up - correct_prob_up) > 0.01
-        ), "Bug detection test failed: wrong formula should diverge from correct one"
-
-    def test_detects_sign_error(self) -> None:
-        """Sign error in expectation value should be caught."""
-        theta_45 = np.pi / 4.0
-        psi = qphysics.create_tilted_state(theta_45)
-        correct_exp = qphysics.expectation_value(psi, qphysics.SPIN_Z)
-
-        # Intentional sign error
-        buggy_exp = -correct_exp
-
-        # At 45 degrees, cos(theta) ≈ 0.707, so negating it should differ
-        assert (
-            abs(buggy_exp - correct_exp) > 0.1
-        ), "Sign error should produce detectable divergence"
+            divergences == 0
+        ), f"Expected 0 divergences with correct code, got {divergences}/{total}"
