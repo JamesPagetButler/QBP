@@ -71,14 +71,54 @@ This is not a compliance gate — it is a learning gate. The goal is to connect 
 
 ---
 
+## Operational Modes: Focus, Sprint & Project
+
+The project operates in one of three modes, with progressive autonomy as the process is validated.
+
+| Mode | Status | Human Role | Claude Role |
+|------|--------|------------|-------------|
+| **Focus** | **CURRENT** | Directs each step | Executes on request |
+| **Sprint** | Planned | Reviews at sprint boundaries | Runs full sprint autonomously |
+| **Project** | Planned | Approves portfolio proposals | Analyzes & proposes changes |
+
+### Focus Mode (Current)
+
+Human explicitly requests each phase/task. Claude executes and reports back. Human reviews before proceeding. This validates the process works correctly before increasing autonomy.
+
+### Sprint Mode (Planned)
+
+Human says "Run Sprint N". Claude executes all phases autonomously, then presents summary for review. Human reviews at sprint boundaries, not phase boundaries. PR workflow still applies.
+
+**Entry criteria:** Focus Mode has validated the process; human explicitly enables Sprint Mode.
+
+### Project Mode (Planned)
+
+Claude analyzes the experiment portfolio and proposes changes (add/remove/reorder experiments, axiom updates). Human reviews and approves/modifies/rejects proposals. Enables faster iterations and handling of rework.
+
+**Entry criteria:** Sprint Mode validated across multiple experiments; human explicitly enables Project Mode.
+
+### Iterative & Antifragile
+
+The process is designed to handle:
+- **Axiom changes** that affect multiple experiments → Project Mode rework
+- **New experiments** needed to fill gaps → Project Mode adds them
+- **Redundant experiments** discovered → Project Mode removes them
+
+Each iteration makes the theory stronger. We don't fear discovering changes are needed.
+
+**Full documentation:** [docs/process/operational_modes.md](docs/process/operational_modes.md)
+
+---
+
 ## Session-Start Protocol (The Herschel Check)
 
 At the start of every work session, all collaborators (human and AI) must:
 
-1.  **Read `SPRINT_STATUS.md`** — understand current lifecycle position.
-2.  **Verify alignment** — confirm planned work matches the critical path.
-3.  **Log diversions** — if starting housekeeping or a side quest, add it to the Active Diversions table with a return point.
-4.  **Close diversions** — when returning, mark the diversion complete and resume from the recorded return point.
+1.  **Run toolchain check** — `python scripts/check_toolchain.py` to verify local tools match CI.
+2.  **Read `SPRINT_STATUS.md`** — understand current lifecycle position.
+3.  **Verify alignment** — confirm planned work matches the critical path.
+4.  **Log diversions** — if starting housekeeping or a side quest, add it to the Active Diversions table with a return point.
+5.  **Close diversions** — when returning, mark the diversion complete and resume from the recorded return point.
 
 This is the "Herschel Check." It exists because all three collaborators have demonstrated a tendency to drift from the critical path. It adds ~30 seconds of overhead per session to prevent hours of unmanaged drift.
 

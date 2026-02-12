@@ -1,0 +1,72 @@
+# pyproject.toml
+# Central configuration for Python tools
+
+[project]
+name = "qbp"
+version = "0.1.0"
+description = "Quaternion-Based Quantum Physics Simulation"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311']
+exclude = '''
+/(
+    \.git
+    | \.venv
+    | venv
+    | __pycache__
+    | build
+    | dist
+    | experiments
+)/
+'''
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+ignore_missing_imports = true
+no_strict_optional = true
+exclude = [
+    "experiments/",
+    "venv/",
+    ".venv/",
+]
+
+# Per-module overrides
+[[tool.mypy.overrides]]
+module = "yaml"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "hypernetx.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "vpython.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "experiments",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]  # Line too long - handled by black
