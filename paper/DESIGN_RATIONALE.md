@@ -767,3 +767,124 @@ Sprint 3 introduces the first genuinely challenging extension:
 - This is where QBP could either confirm equivalence or diverge from QM
 
 **Theory status:** Ready for Sprint 3. The theoretical framework is solid for single-particle, single-observable physics. Multi-path superposition is the next frontier.
+
+## 10. Pre-Sprint 3 Research — Quaternionic Superposition Foundations
+
+This section documents the Pre-Sprint Research conducted before Sprint 3 (Double-Slit), resolving foundational questions about quaternionic spatial superposition.
+
+### 10.1 Central Finding: The Tensor Product Problem
+
+**The critical obstacle:** Quaternionic quantum mechanics cannot naively define spatial superposition |path_1⟩ + |path_2⟩.
+
+**Why this matters:**
+1. Operations on separate subsystems don't commute due to quaternion non-commutativity
+2. Applying operations R_i and R_j to a bipartite state produces different final states depending on order
+3. The interference term is ambiguous: q₁*·q₂ ≠ q₂*·q₁
+
+**The PR-box problem (arXiv:0911.1761):**
+
+Unrestricted quaternionic quantum mechanics can simulate a Popescu-Rohrlich box—a hypothetical device that maximally violates CHSH inequalities (value 4.0 vs Tsirelson bound 2√2 ≈ 2.83). This violates **information causality**, making unrestricted QQM "implausible as a physical theory."
+
+### 10.2 Moretti-Oppio Scope Clarification
+
+**What the theorem proves:**
+
+For elementary relativistic systems with non-negative mass and Poincaré symmetry, QQM necessarily reduces to standard complex QM.
+
+**What the theorem does NOT cover:**
+
+| Scenario | Status |
+|----------|--------|
+| Multi-particle systems | Not covered (tensor product problem) |
+| Spatial superposition | Not covered (single-particle theorem) |
+| Non-relativistic limits | Not covered (requires Poincaré) |
+| Position-basis wavefunctions | Not addressed |
+
+**Implication for double-slit:** The theorem does not prove equivalence for position-space interference, but the tensor product problem makes "full QQM" for double-slit mathematically problematic anyway.
+
+### 10.3 Quaternionic Wavefunction Formalism
+
+**Adler's definition (1995):**
+```
+ψ(x) = σ₀(x)·1 + ϕ₁(x)·i + ϕ₂(x)·j + ϕ₃(x)·k
+```
+where x ∈ R³ and the components are real-valued functions.
+
+**Inner product:**
+```
+⟨ψ₁, ψ₂⟩ = ∫_Ω ψ₁* · ψ₂ dx
+```
+
+**Born rule:** |ψ|² = ψ·ψ* works, but non-commutativity requires careful ordering in inner products.
+
+**No quaternionic path integral exists** — this is an open mathematical problem. Standard Feynman path integrals cannot be straightforwardly generalized due to non-commutativity.
+
+### 10.4 Decision: Complex Subspace Approach
+
+Based on this research, Sprint 3 will adopt the **complex subspace approach**:
+
+**Definition:** Restrict wavefunctions to the complex subspace C(1,i) of ℍ:
+```
+ψ(x) = α(x)·1 + β(x)·i
+```
+where α, β are real functions, equivalent to a complex wavefunction ψ(x) = α(x) + iβ(x).
+
+**Rationale:**
+1. Moretti-Oppio guarantees this produces standard QM results
+2. Avoids the tensor product problem
+3. Maintains quaternionic "flavor" while being mathematically rigorous
+4. Adler's scattering theory shows intrinsically quaternionic terms have exponential spatial decay
+
+**Consequence:** QBP for pure double-slit is a **reformulation exercise**, not a divergence test. The experiment validates the formalism extension but is not expected to produce novel predictions.
+
+### 10.5 Physical Motivation Assessment
+
+**Weak motivation for pure spatial superposition:**
+
+The quaternionic non-commutativity that makes QBP interesting for spin does not naturally extend to position-space interference. The interference cross-term 2Re(α*β) does not benefit from quaternionic structure.
+
+**Strong motivation for spin-path coupling:**
+
+Where QBP could add value:
+- Stern-Gerlach interferometers with spin-dependent paths
+- Spin-orbit coupling experiments
+- Magnetic field gradient effects on interference
+
+**Recommendation:** After completing standard double-slit (Sprint 3), consider a spin-path coupled experiment for Sprint 4+ where quaternionic structure naturally appears.
+
+### 10.6 Falsification Criteria
+
+**Pre-registered predictions for Sprint 3:**
+
+| Scenario | QBP Prediction | Standard QM Prediction | Match? |
+|----------|---------------|----------------------|--------|
+| No which-path | Interference fringes | Interference fringes | MUST match |
+| With which-path | Two peaks, no fringes | Two peaks, no fringes | MUST match |
+| Fringe spacing | d sin(θ) = nλ | d sin(θ) = nλ | MUST match |
+| Fringe visibility | Function of coherence | Function of coherence | MUST match |
+
+**Falsification criterion:** If QBP predicts different interference patterns than standard QM for pure double-slit, this would **falsify QBP** (since standard QM matches experimental reality).
+
+**Null hypothesis value:** If QBP matches QM exactly, we confirm:
+1. Quaternionic reformulation is consistent
+2. Single-particle spatial interference is not where QQM diverges
+3. Multi-particle/entanglement (Bell tests) remain the true divergence test
+
+### 10.7 Key References
+
+1. **Adler, S.L.** (1995). *Quaternionic Quantum Mechanics and Quantum Fields*. Oxford University Press.
+2. **Moretti, V. & Oppio, M.** (2019). "Quantum theory in quaternionic Hilbert space." arXiv:1709.09246
+3. **McKague, M.** (2009). "Quaternionic quantum mechanics allows non-local boxes." arXiv:0911.1761
+4. **Finkelstein et al.** (1962). "Foundations of Quaternion Quantum Mechanics." J. Math. Phys. 3, 207
+
+### 10.8 Summary
+
+Pre-Sprint Research established:
+
+1. **Tensor product problem** makes full QQM for double-slit mathematically problematic
+2. **Complex subspace approach** is the rigorous path forward
+3. **QBP will match standard QM** for pure double-slit (by construction)
+4. **Falsification criteria** are pre-registered
+5. **Future work** should focus on spin-path coupled experiments
+
+**Research status:** Complete. Ready for Sprint 3 Phase 1 (Ground Truth).
