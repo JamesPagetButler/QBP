@@ -208,6 +208,12 @@ angle_consistent_with_stern_gerlach
 
 ---
 
+## See Also
+
+- **[Axiom Justifications](../docs/axiom_justifications.md)** — Consolidated first-principles justifications for all QBP axioms, including the factor-of-2 correction with worked examples.
+
+---
+
 ## Revision History
 
 | Version | Date | Changes |
