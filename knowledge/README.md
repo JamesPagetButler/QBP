@@ -1,6 +1,6 @@
 # QBP Hypergraph Knowledge System
 
-This directory contains the QBP research knowledge base, stored as a native hypergraph using Hypergraph-DB.
+This directory contains the QBP research knowledge base, stored as a SQLite hypergraph database.
 
 ---
 
@@ -11,47 +11,91 @@ This directory contains the QBP research knowledge base, stored as a native hype
 pip install -r scripts/requirements-knowledge.txt
 
 # View summary
-python scripts/qbp_knowledge.py summary
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db summary
+
+# Query concepts by tag
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db query --type Concept --tag foundations
 
 # Find research gaps
-python scripts/qbp_knowledge.py query gaps
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db gaps
 
-# Visualize
-python scripts/qbp_knowledge.py viz --output graph.png
-
-# Open interactive web visualization
-python scripts/qbp_knowledge.py viz --web
+# Export to HIF format
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db export --format hif --output qbp.hif.json
 ```
 
 ---
 
 ## Architecture
 
-**Data Store:** `knowledge/qbp.hgdb` — Hypergraph-DB native format
-**API:** `scripts/qbp_knowledge.py` — Python wrapper with CLI
-**Analysis:** HyperNetX for advanced queries
+```
+knowledge/qbp.db (SQLite)     ← Source of truth
+    ↓
+qbp_knowledge_sqlite.py       ← API + SQL queries
+    ↓
+├── HIF export                ← Interchange format (HyperNetX, XGI compatible)
+├── HyperNetX                 ← Mathematical analysis
+└── D3.js                     ← Interactive visualization
+```
+
+### Why SQLite?
+
+| Feature | SQLite | Hypergraph-DB (old) |
+|---------|--------|---------------------|
+| Querying | SQL (fast, flexible) | Python loops |
+| Concurrent access | Yes | No |
+| ACID transactions | Yes | No |
+| Browser tools | DB Browser, etc. | None |
+| Standard format | Yes | Pickle binary |
 
 ---
 
 ## Data Model
 
-### Vertices (Entities)
+### Schema
+
+```sql
+-- Vertices table (nodes)
+CREATE TABLE vertices (
+    id TEXT PRIMARY KEY,        -- e.g., "concept:quaternion-state"
+    type TEXT NOT NULL,         -- Source, Concept, Claim, Question, Proof
+    data JSON NOT NULL,         -- All attributes as JSON
+    created_at TIMESTAMP
+);
+
+-- Hyperedges table
+CREATE TABLE hyperedges (
+    id TEXT PRIMARY KEY,        -- e.g., "e0_evidence_chain"
+    type TEXT NOT NULL,         -- evidence_chain, proof_link, etc.
+    data JSON NOT NULL,         -- Edge attributes as JSON
+    created_at TIMESTAMP
+);
+
+-- Incidences (vertex-edge membership) — the hypergraph structure
+CREATE TABLE incidences (
+    vertex_id TEXT NOT NULL,
+    edge_id TEXT NOT NULL,
+    position INTEGER DEFAULT 0,
+    PRIMARY KEY (vertex_id, edge_id)
+);
+```
+
+### Vertex Types
 
 | Type | Required Fields | Description |
 |------|-----------------|-------------|
-| **Source** | type, title | Papers, books, internal docs |
-| **Concept** | type, term | Scientific ideas and definitions |
-| **Claim** | type, statement | Assertions with evidence |
-| **Question** | type, question | Open research questions |
-| **Proof** | type, lean_file | Formal Lean 4 proofs |
+| **Source** | title | Papers, books, internal docs |
+| **Concept** | term | Scientific ideas and definitions |
+| **Claim** | statement | Assertions with evidence |
+| **Question** | question | Open research questions |
+| **Proof** | lean_file | Formal Lean 4 proofs |
 
-### Hyperedges (N-ary Relationships)
+### Hyperedge Types
 
 | Type | Min Members | Description |
 |------|-------------|-------------|
-| **evidence_chain** | 3 | Claim + 2+ supporting sources |
+| **evidence_chain** | 2 | Claim + supporting sources |
 | **equivalence** | 2 | Mathematically equivalent structures |
-| **theory_axioms** | 3 | Axioms that define a theory |
+| **theory_axioms** | 2 | Axioms that define a theory |
 | **research_cluster** | 2 | Related questions forming a theme |
 | **proof_link** | 2 | Claim linked to Lean 4 proof |
 | **emergence** | 2 | Concepts yielding emergent property |
@@ -62,10 +106,10 @@ python scripts/qbp_knowledge.py viz --web
 ## Python API
 
 ```python
-from scripts.qbp_knowledge import QBPKnowledge
+from scripts.qbp_knowledge_sqlite import QBPKnowledgeSQLite
 
-# Load or create knowledge base
-kb = QBPKnowledge("knowledge/qbp.hgdb")
+# Open database
+kb = QBPKnowledgeSQLite("knowledge/qbp.db")
 
 # Add vertices
 kb.add_source("furey-2016", "Standard Model from an Algebra?",
@@ -74,30 +118,30 @@ kb.add_concept("octonion-algebra", "Octonion Algebra",
                definition="8-dimensional non-associative division algebra")
 kb.add_claim("octonion-generations", "Octonions accommodate 3 generations",
              status="proposed", confidence_tier=2)
-kb.add_question("octonion-physics", "What physics do octonions predict?",
-                status="open", priority="high")
 
 # Add hyperedges
 kb.add_evidence_chain("claim:octonion-generations",
-                      ["source:furey-2016", "source:other-paper"],
+                      ["source:furey-2016", "source:other"],
                       confidence_tier=2)
-kb.add_proof_link("claim:cosine-squared", "proof:lean-angle",
-                  theorem="measurement_probability_formula")
+kb.add_proof_link("claim:cosine-squared", "proof:angle-dependent",
+                  theorem="prob_up_angle_cos_sq")
 
-# Research queries
-weak = kb.find_weak_claims()       # Claims with < 2 evidence sources
+# SQL-powered research queries
+weak = kb.find_weak_claims()          # Claims with no evidence
 unproven = kb.find_unproven_claims()  # Claims without proof_link
-gaps = kb.find_research_gaps()     # Open questions without investigation
-bridges = kb.find_bridge_concepts()  # Concepts in multiple hyperedges
+gaps = kb.find_research_gaps()        # Open questions uninvestigated
+bridges = kb.find_bridge_concepts()   # Concepts in 3+ hyperedges
 
-# Trace evidence for a claim
-evidence = kb.trace_evidence("claim:qbp-cosine-squared")
+# Query with filters
+concepts = kb.query_vertices(vertex_type="Concept", tag="foundations")
+claims = kb.query_vertices(search="quaternion")
 
-# Coverage report
-report = kb.coverage_report()
+# Trace evidence
+evidence = kb.trace_evidence("claim:cosine-squared-formula")
 
-# Save
-kb.save()
+# Export
+kb.export_hif("output.hif.json")      # HIF interchange format
+H = kb.to_hypernetx()                 # HyperNetX for analysis
 ```
 
 ---
@@ -106,36 +150,54 @@ kb.save()
 
 ```bash
 # Summary
-python scripts/qbp_knowledge.py summary
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db summary
 
-# Queries
-python scripts/qbp_knowledge.py query weak-claims
-python scripts/qbp_knowledge.py query unproven
-python scripts/qbp_knowledge.py query gaps
-python scripts/qbp_knowledge.py query bridges
+# Query vertices
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db query --type Concept
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db query --tag foundations
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db query --search quaternion
 
-# Information
-python scripts/qbp_knowledge.py info claim:qbp-cosine-squared
-python scripts/qbp_knowledge.py evidence claim:qbp-cosine-squared
-python scripts/qbp_knowledge.py report
+# Research queries
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db weak-claims
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db unproven
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db gaps
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db bridges
 
-# Visualization
-python scripts/qbp_knowledge.py viz --output graph.png
-python scripts/qbp_knowledge.py viz --web --port 8080
+# Export
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db export --format hif --output qbp.hif.json
 ```
 
 ---
 
-## Research Workflow Integration
+## Visualization
 
-| Research Phase | Knowledge System Activity |
-|----------------|---------------------------|
-| Question Formulation | Add Question vertices |
-| Source Discovery | Add Source vertices |
-| Concept Extraction | Add Concept vertices, link to sources |
-| Claim Formation | Add Claim vertices with evidence_chain |
-| Formal Verification | Add Proof vertices, create proof_link |
-| Gap Analysis | Run `query gaps` to find uninvestigated questions |
+```bash
+# D3.js interactive (recommended)
+python scripts/qbp_knowledge.py viz --d3 --output graph.html
+xdg-open graph.html
+
+# Static matplotlib
+python scripts/qbp_knowledge.py viz --output graph.png
+```
+
+Note: Hypergraph-DB's built-in web visualization has known issues (see issue #222). Use D3.js instead.
+
+---
+
+## Migration
+
+### From Hypergraph-DB
+
+```bash
+python scripts/migrate_to_sqlite.py --source knowledge/qbp.hgdb --target knowledge/qbp.db
+```
+
+### From YAML (legacy)
+
+```bash
+python scripts/migrate_yaml_to_hypergraph.py --dry-run
+python scripts/migrate_yaml_to_hypergraph.py
+```
 
 ---
 
@@ -143,39 +205,46 @@ python scripts/qbp_knowledge.py viz --web --port 8080
 
 ```
 knowledge/
-├── README.md           # This file
-├── qbp.hgdb           # Hypergraph database (Hypergraph-DB format)
-├── sources/           # Legacy YAML (deprecated)
-├── concepts/          # Legacy YAML (deprecated)
-├── claims/            # Legacy YAML (deprecated)
-├── questions/         # Legacy YAML (deprecated)
-└── index.yaml         # Legacy index (deprecated)
+├── README.md               # This file
+├── qbp.db                  # SQLite hypergraph database (primary)
+├── qbp.hgdb               # Hypergraph-DB format (legacy)
+├── sources/               # Legacy YAML (deprecated)
+├── concepts/              # Legacy YAML (deprecated)
+├── claims/                # Legacy YAML (deprecated)
+└── questions/             # Legacy YAML (deprecated)
 ```
 
 ---
 
-## Migration from YAML
+## Interchange Format (HIF)
 
-The system has migrated from YAML files to Hypergraph-DB. Legacy YAML files are preserved for reference but no longer used.
+The database exports to [HIF (Hypergraph Interchange Format)](https://github.com/HIF-org/HIF-standard), enabling interoperability with:
 
-To migrate additional YAML entries:
-```python
-from scripts.qbp_knowledge import QBPKnowledge
-import yaml
+- [HyperNetX](https://hypernetx.readthedocs.io/) — Mathematical analysis
+- [XGI](https://xgi.readthedocs.io/) — Higher-order network analysis
+- [Hypergraphx](https://hypergraphx.readthedocs.io/) — Hypergraph algorithms
 
-kb = QBPKnowledge("knowledge/qbp.hgdb")
-
-with open("knowledge/sources/example.yaml") as f:
-    data = yaml.safe_load(f)
-
-kb.add_source(data["id"], data["metadata"]["title"], **data)
-kb.save()
+```json
+{
+  "network-type": "undirected",
+  "metadata": { "name": "QBP Knowledge Hypergraph" },
+  "nodes": [
+    { "node": "concept:quaternion-state", "attrs": { "type": "Concept", ... } }
+  ],
+  "edges": [
+    { "edge": "e0_evidence_chain", "attrs": { "type": "evidence_chain", ... } }
+  ],
+  "incidences": [
+    { "node": "concept:quaternion-state", "edge": "e0_evidence_chain" }
+  ]
+}
 ```
 
 ---
 
 ## References
 
-- [Hypergraph-DB Documentation](https://imoonlab.github.io/Hypergraph-DB/)
+- [HIF Standard](https://github.com/HIF-org/HIF-standard) — Hypergraph Interchange Format
 - [HyperNetX Documentation](https://hypernetx.readthedocs.io/)
+- [SQLite JSON Functions](https://www.sqlite.org/json1.html)
 - [QBP Hypergraph Design Plan](../docs/plans/hypergraph_knowledge_system.md)
