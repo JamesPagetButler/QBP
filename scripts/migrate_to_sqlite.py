@@ -45,7 +45,7 @@ def migrate(source_path: str, target_path: str, dry_run: bool = False) -> dict:
     stats = {
         "vertices": {"total": 0, "by_type": {}},
         "hyperedges": {"total": 0, "by_type": {}},
-        "incidences": 0
+        "incidences": 0,
     }
 
     # Count source data
@@ -54,13 +54,17 @@ def migrate(source_path: str, target_path: str, dry_run: bool = False) -> dict:
         v_data = hg.v(v_id)
         v_type = v_data.get("type", "Unknown")
         stats["vertices"]["total"] += 1
-        stats["vertices"]["by_type"][v_type] = stats["vertices"]["by_type"].get(v_type, 0) + 1
+        stats["vertices"]["by_type"][v_type] = (
+            stats["vertices"]["by_type"].get(v_type, 0) + 1
+        )
 
     for e in hg.all_e:
         e_data = hg.e(e)
         e_type = e_data.get("type", "unknown")
         stats["hyperedges"]["total"] += 1
-        stats["hyperedges"]["by_type"][e_type] = stats["hyperedges"]["by_type"].get(e_type, 0) + 1
+        stats["hyperedges"]["by_type"][e_type] = (
+            stats["hyperedges"]["by_type"].get(e_type, 0) + 1
+        )
         stats["incidences"] += len(e)
 
     print(f"  Vertices: {stats['vertices']['total']}")
@@ -122,9 +126,9 @@ def migrate(source_path: str, target_path: str, dry_run: bool = False) -> dict:
     print(f"  Database: {result['db_path']}")
 
     # Check counts match
-    if result['vertices']['total'] != stats['vertices']['total']:
+    if result["vertices"]["total"] != stats["vertices"]["total"]:
         print(f"\n  WARNING: Vertex count mismatch!")
-    if result['hyperedges']['total'] != stats['hyperedges']['total']:
+    if result["hyperedges"]["total"] != stats["hyperedges"]["total"]:
         print(f"\n  WARNING: Hyperedge count mismatch!")
 
     return stats
@@ -135,24 +139,24 @@ def main():
         description="Migrate QBP knowledge base from Hypergraph-DB to SQLite"
     )
     parser.add_argument(
-        '--source',
-        default='knowledge/qbp.hgdb',
-        help='Source Hypergraph-DB file (default: knowledge/qbp.hgdb)'
+        "--source",
+        default="knowledge/qbp.hgdb",
+        help="Source Hypergraph-DB file (default: knowledge/qbp.hgdb)",
     )
     parser.add_argument(
-        '--target',
-        default='knowledge/qbp.db',
-        help='Target SQLite database (default: knowledge/qbp.db)'
+        "--target",
+        default="knowledge/qbp.db",
+        help="Target SQLite database (default: knowledge/qbp.db)",
     )
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Show what would be migrated without making changes'
+        "--dry-run",
+        action="store_true",
+        help="Show what would be migrated without making changes",
     )
 
     args = parser.parse_args()
     migrate(args.source, args.target, args.dry_run)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -33,6 +33,7 @@ from hyperdb import HypergraphDB
 # Optional analysis (HyperNetX)
 try:
     import hypernetx as hnx
+
     HNX_AVAILABLE = True
 except ImportError:
     HNX_AVAILABLE = False
@@ -40,6 +41,7 @@ except ImportError:
 # Optional visualization
 try:
     import matplotlib.pyplot as plt
+
     MPL_AVAILABLE = True
 except ImportError:
     MPL_AVAILABLE = False
@@ -52,32 +54,76 @@ except ImportError:
 VERTEX_TYPES = {
     "Source": {
         "required": ["type", "title"],
-        "optional": ["category", "authors", "date", "url", "doi", "venue", "tags",
-                     "abstract", "quotes", "key_insights", "research_sprint", "added_date", "added_by"],
-        "categories": ["paper", "book", "website", "internal", "proof", "simulation"]
+        "optional": [
+            "category",
+            "authors",
+            "date",
+            "url",
+            "doi",
+            "venue",
+            "tags",
+            "abstract",
+            "quotes",
+            "key_insights",
+            "research_sprint",
+            "added_date",
+            "added_by",
+        ],
+        "categories": ["paper", "book", "website", "internal", "proof", "simulation"],
     },
     "Concept": {
         "required": ["type", "term"],
-        "optional": ["definition", "formal_definition", "aliases", "tags",
-                     "sources", "related_concepts", "added_date", "added_by"],
+        "optional": [
+            "definition",
+            "formal_definition",
+            "aliases",
+            "tags",
+            "sources",
+            "related_concepts",
+            "added_date",
+            "added_by",
+        ],
     },
     "Claim": {
         "required": ["type", "statement"],
-        "optional": ["context", "status", "confidence_tier", "tags", "implications",
-                     "added_date", "added_by"],
-        "statuses": ["proposed", "supported", "established", "contested", "refuted"]
+        "optional": [
+            "context",
+            "status",
+            "confidence_tier",
+            "tags",
+            "implications",
+            "added_date",
+            "added_by",
+        ],
+        "statuses": ["proposed", "supported", "established", "contested", "refuted"],
     },
     "Question": {
         "required": ["type", "question"],
-        "optional": ["context", "status", "priority", "tags", "related_issues",
-                     "investigation_approaches", "success_criteria", "added_date", "added_by"],
+        "optional": [
+            "context",
+            "status",
+            "priority",
+            "tags",
+            "related_issues",
+            "investigation_approaches",
+            "success_criteria",
+            "added_date",
+            "added_by",
+        ],
         "statuses": ["open", "partially-answered", "answered", "superseded"],
-        "priorities": ["high", "medium", "low"]
+        "priorities": ["high", "medium", "low"],
     },
     "Proof": {
         "required": ["type", "lean_file"],
-        "optional": ["theorems", "verified", "no_sorry", "tags", "added_date", "added_by"],
-    }
+        "optional": [
+            "theorems",
+            "verified",
+            "no_sorry",
+            "tags",
+            "added_date",
+            "added_by",
+        ],
+    },
 }
 
 
@@ -90,55 +136,56 @@ HYPEREDGE_TYPES = {
         "description": "Claim + all supporting evidence sources",
         "min_members": 3,  # 1 claim + at least 2 evidence sources
         "required_vertex_types": {"Claim": 1},  # Exactly 1 claim
-        "properties": ["confidence_tier", "established_date", "description"]
+        "properties": ["confidence_tier", "established_date", "description"],
     },
     "equivalence": {
         "description": "Mathematically equivalent structures",
         "min_members": 2,
         "required_vertex_types": {"Concept": 2},  # At least 2 concepts
-        "properties": ["description", "isomorphism_proven", "proof_ref"]
+        "properties": ["description", "isomorphism_proven", "proof_ref"],
     },
     "theory_axioms": {
         "description": "Axioms that together define a theory",
         "min_members": 3,
-        "properties": ["theory", "completeness", "open_questions"]
+        "properties": ["theory", "completeness", "open_questions"],
     },
     "research_cluster": {
         "description": "Related questions forming a research theme",
         "min_members": 2,
         "required_vertex_types": {"Question": 1},  # At least 1 question
-        "properties": ["theme", "priority", "target_sprint"]
+        "properties": ["theme", "priority", "target_sprint"],
     },
     "proof_link": {
         "description": "Claim linked to formal Lean 4 proof",
         "min_members": 2,
         "max_members": 3,
         "required_vertex_types": {"Claim": 1, "Proof": 1},
-        "properties": ["theorem", "theorem_line", "verification_status"]
+        "properties": ["theorem", "theorem_line", "verification_status"],
     },
     "emergence": {
         "description": "Concepts that together yield emergent property",
         "min_members": 2,
         "required_vertex_types": {"Concept": 2},
-        "properties": ["emergent_property", "physical_significance"]
+        "properties": ["emergent_property", "physical_significance"],
     },
     "review_consensus": {
         "description": "Multiple reviewers agree on assessment",
         "min_members": 2,
-        "properties": ["verdict", "review_date", "reviewers"]
+        "properties": ["verdict", "review_date", "reviewers"],
     },
     "investigation": {
         "description": "Question + investigation sources",
         "min_members": 2,
         "required_vertex_types": {"Question": 1},
-        "properties": ["findings", "status"]
-    }
+        "properties": ["findings", "status"],
+    },
 }
 
 
 # =============================================================================
 # QBP Knowledge System
 # =============================================================================
+
 
 class QBPKnowledge:
     """
@@ -168,7 +215,9 @@ class QBPKnowledge:
     # Vertex Operations
     # -------------------------------------------------------------------------
 
-    def add_vertex(self, vertex_id: str, vertex_type: str, attributes: Dict[str, Any]) -> str:
+    def add_vertex(
+        self, vertex_id: str, vertex_type: str, attributes: Dict[str, Any]
+    ) -> str:
         """
         Add a vertex with validation.
 
@@ -181,7 +230,9 @@ class QBPKnowledge:
             The vertex ID
         """
         if vertex_type not in VERTEX_TYPES:
-            raise ValueError(f"Invalid vertex type: {vertex_type}. Must be one of {list(VERTEX_TYPES.keys())}")
+            raise ValueError(
+                f"Invalid vertex type: {vertex_type}. Must be one of {list(VERTEX_TYPES.keys())}"
+            )
 
         schema = VERTEX_TYPES[vertex_type]
         attrs = {"type": vertex_type, **attributes}
@@ -221,7 +272,9 @@ class QBPKnowledge:
         """Add a Question vertex."""
         if not question_id.startswith("question:"):
             question_id = f"question:{question_id}"
-        return self.add_vertex(question_id, "Question", {"question": question, **kwargs})
+        return self.add_vertex(
+            question_id, "Question", {"question": question, **kwargs}
+        )
 
     def add_proof(self, proof_id: str, lean_file: str, **kwargs) -> str:
         """Add a Proof vertex."""
@@ -244,8 +297,12 @@ class QBPKnowledge:
     # Hyperedge Operations
     # -------------------------------------------------------------------------
 
-    def add_hyperedge(self, members: Tuple[str, ...], edge_type: str,
-                      properties: Optional[Dict[str, Any]] = None) -> Tuple[str, ...]:
+    def add_hyperedge(
+        self,
+        members: Tuple[str, ...],
+        edge_type: str,
+        properties: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[str, ...]:
         """
         Add a hyperedge with validation.
 
@@ -258,16 +315,22 @@ class QBPKnowledge:
             The hyperedge (tuple of members)
         """
         if edge_type not in HYPEREDGE_TYPES:
-            raise ValueError(f"Invalid hyperedge type: {edge_type}. Must be one of {list(HYPEREDGE_TYPES.keys())}")
+            raise ValueError(
+                f"Invalid hyperedge type: {edge_type}. Must be one of {list(HYPEREDGE_TYPES.keys())}"
+            )
 
         schema = HYPEREDGE_TYPES[edge_type]
         props = {"type": edge_type, **(properties or {})}
 
         # Validate member count
         if len(members) < schema.get("min_members", 2):
-            raise ValueError(f"{edge_type} requires at least {schema['min_members']} members")
+            raise ValueError(
+                f"{edge_type} requires at least {schema['min_members']} members"
+            )
         if "max_members" in schema and len(members) > schema["max_members"]:
-            raise ValueError(f"{edge_type} allows at most {schema['max_members']} members")
+            raise ValueError(
+                f"{edge_type} allows at most {schema['max_members']} members"
+            )
 
         # Validate required vertex types
         if "required_vertex_types" in schema:
@@ -280,7 +343,9 @@ class QBPKnowledge:
 
             for req_type, min_count in schema["required_vertex_types"].items():
                 if type_counts.get(req_type, 0) < min_count:
-                    raise ValueError(f"{edge_type} requires at least {min_count} {req_type} vertex(es)")
+                    raise ValueError(
+                        f"{edge_type} requires at least {min_count} {req_type} vertex(es)"
+                    )
 
         # Add metadata
         if "created_date" not in props:
@@ -290,8 +355,9 @@ class QBPKnowledge:
         self._hnx_cache = None
         return members
 
-    def add_evidence_chain(self, claim_id: str, evidence_ids: List[str],
-                           confidence_tier: int = 2, **kwargs) -> Tuple[str, ...]:
+    def add_evidence_chain(
+        self, claim_id: str, evidence_ids: List[str], confidence_tier: int = 2, **kwargs
+    ) -> Tuple[str, ...]:
         """
         Add an evidence chain hyperedge.
 
@@ -301,42 +367,41 @@ class QBPKnowledge:
             confidence_tier: 1=weak, 2=moderate, 3=strong
         """
         members = tuple([claim_id] + evidence_ids)
-        return self.add_hyperedge(members, "evidence_chain", {
-            "confidence_tier": confidence_tier,
-            **kwargs
-        })
+        return self.add_hyperedge(
+            members, "evidence_chain", {"confidence_tier": confidence_tier, **kwargs}
+        )
 
-    def add_equivalence(self, concept_ids: List[str], description: str = "",
-                        **kwargs) -> Tuple[str, ...]:
+    def add_equivalence(
+        self, concept_ids: List[str], description: str = "", **kwargs
+    ) -> Tuple[str, ...]:
         """Add an equivalence class hyperedge."""
-        return self.add_hyperedge(tuple(concept_ids), "equivalence", {
-            "description": description,
-            **kwargs
-        })
+        return self.add_hyperedge(
+            tuple(concept_ids), "equivalence", {"description": description, **kwargs}
+        )
 
-    def add_proof_link(self, claim_id: str, proof_id: str, theorem: str,
-                       **kwargs) -> Tuple[str, ...]:
+    def add_proof_link(
+        self, claim_id: str, proof_id: str, theorem: str, **kwargs
+    ) -> Tuple[str, ...]:
         """Add a proof link hyperedge."""
-        return self.add_hyperedge((claim_id, proof_id), "proof_link", {
-            "theorem": theorem,
-            **kwargs
-        })
+        return self.add_hyperedge(
+            (claim_id, proof_id), "proof_link", {"theorem": theorem, **kwargs}
+        )
 
-    def add_research_cluster(self, member_ids: List[str], theme: str,
-                             **kwargs) -> Tuple[str, ...]:
+    def add_research_cluster(
+        self, member_ids: List[str], theme: str, **kwargs
+    ) -> Tuple[str, ...]:
         """Add a research cluster hyperedge."""
-        return self.add_hyperedge(tuple(member_ids), "research_cluster", {
-            "theme": theme,
-            **kwargs
-        })
+        return self.add_hyperedge(
+            tuple(member_ids), "research_cluster", {"theme": theme, **kwargs}
+        )
 
-    def add_theory_axioms(self, axiom_ids: List[str], theory: str,
-                          **kwargs) -> Tuple[str, ...]:
+    def add_theory_axioms(
+        self, axiom_ids: List[str], theory: str, **kwargs
+    ) -> Tuple[str, ...]:
         """Add a theory axioms hyperedge."""
-        return self.add_hyperedge(tuple(axiom_ids), "theory_axioms", {
-            "theory": theory,
-            **kwargs
-        })
+        return self.add_hyperedge(
+            tuple(axiom_ids), "theory_axioms", {"theory": theory, **kwargs}
+        )
 
     def get_hyperedge(self, members: Tuple[str, ...]) -> Optional[Dict[str, Any]]:
         """Get hyperedge properties."""
@@ -372,38 +437,47 @@ class QBPKnowledge:
         """Find claims with fewer than 2 evidence sources."""
         weak = []
         for claim_id in self.get_vertices_by_type("Claim"):
-            evidence_chains = [e for e in self.get_hyperedges_containing(claim_id)
-                              if self.get_hyperedge(e).get("type") == "evidence_chain"]
+            evidence_chains = [
+                e
+                for e in self.get_hyperedges_containing(claim_id)
+                if self.get_hyperedge(e).get("type") == "evidence_chain"
+            ]
 
             if not evidence_chains:
-                weak.append({
-                    "claim_id": claim_id,
-                    "claim": self.get_vertex(claim_id),
-                    "evidence_count": 0,
-                    "reason": "no evidence chain"
-                })
+                weak.append(
+                    {
+                        "claim_id": claim_id,
+                        "claim": self.get_vertex(claim_id),
+                        "evidence_count": 0,
+                        "reason": "no evidence chain",
+                    }
+                )
             else:
                 for chain in evidence_chains:
                     if len(chain) < 3:  # claim + at least 2 sources
-                        weak.append({
-                            "claim_id": claim_id,
-                            "claim": self.get_vertex(claim_id),
-                            "evidence_count": len(chain) - 1,
-                            "reason": "insufficient evidence"
-                        })
+                        weak.append(
+                            {
+                                "claim_id": claim_id,
+                                "claim": self.get_vertex(claim_id),
+                                "evidence_count": len(chain) - 1,
+                                "reason": "insufficient evidence",
+                            }
+                        )
         return weak
 
     def find_unproven_claims(self) -> List[Dict[str, Any]]:
         """Find claims without proof_link hyperedges."""
         unproven = []
         for claim_id in self.get_vertices_by_type("Claim"):
-            proof_links = [e for e in self.get_hyperedges_containing(claim_id)
-                          if self.get_hyperedge(e).get("type") == "proof_link"]
+            proof_links = [
+                e
+                for e in self.get_hyperedges_containing(claim_id)
+                if self.get_hyperedge(e).get("type") == "proof_link"
+            ]
             if not proof_links:
-                unproven.append({
-                    "claim_id": claim_id,
-                    "claim": self.get_vertex(claim_id)
-                })
+                unproven.append(
+                    {"claim_id": claim_id, "claim": self.get_vertex(claim_id)}
+                )
         return unproven
 
     def find_research_gaps(self) -> List[Dict[str, Any]]:
@@ -414,14 +488,19 @@ class QBPKnowledge:
             if q_data.get("status") != "open":
                 continue
 
-            investigations = [e for e in self.get_hyperedges_containing(q_id)
-                             if self.get_hyperedge(e).get("type") == "investigation"]
+            investigations = [
+                e
+                for e in self.get_hyperedges_containing(q_id)
+                if self.get_hyperedge(e).get("type") == "investigation"
+            ]
             if not investigations:
-                gaps.append({
-                    "question_id": q_id,
-                    "question": q_data,
-                    "reason": "no investigation hyperedge"
-                })
+                gaps.append(
+                    {
+                        "question_id": q_id,
+                        "question": q_data,
+                        "reason": "no investigation hyperedge",
+                    }
+                )
         return gaps
 
     def find_bridge_concepts(self, min_degree: int = 3) -> List[Dict[str, Any]]:
@@ -430,21 +509,31 @@ class QBPKnowledge:
         for c_id in self.get_vertices_by_type("Concept"):
             edges = self.get_hyperedges_containing(c_id)
             if len(edges) >= min_degree:
-                bridges.append({
-                    "concept_id": c_id,
-                    "concept": self.get_vertex(c_id),
-                    "degree": len(edges),
-                    "edge_types": [self.get_hyperedge(e).get("type") for e in edges]
-                })
+                bridges.append(
+                    {
+                        "concept_id": c_id,
+                        "concept": self.get_vertex(c_id),
+                        "degree": len(edges),
+                        "edge_types": [
+                            self.get_hyperedge(e).get("type") for e in edges
+                        ],
+                    }
+                )
         return sorted(bridges, key=lambda x: x["degree"], reverse=True)
 
     def trace_evidence(self, claim_id: str) -> Dict[str, Any]:
         """Trace all evidence supporting a claim."""
         claim_data = self.get_vertex(claim_id)
-        evidence_chains = [e for e in self.get_hyperedges_containing(claim_id)
-                          if self.get_hyperedge(e).get("type") == "evidence_chain"]
-        proof_links = [e for e in self.get_hyperedges_containing(claim_id)
-                      if self.get_hyperedge(e).get("type") == "proof_link"]
+        evidence_chains = [
+            e
+            for e in self.get_hyperedges_containing(claim_id)
+            if self.get_hyperedge(e).get("type") == "evidence_chain"
+        ]
+        proof_links = [
+            e
+            for e in self.get_hyperedges_containing(claim_id)
+            if self.get_hyperedge(e).get("type") == "proof_link"
+        ]
 
         return {
             "claim_id": claim_id,
@@ -453,19 +542,16 @@ class QBPKnowledge:
                 {
                     "members": list(e),
                     "properties": self.get_hyperedge(e),
-                    "sources": [m for m in e if m != claim_id]
+                    "sources": [m for m in e if m != claim_id],
                 }
                 for e in evidence_chains
             ],
             "proof_links": [
-                {
-                    "members": list(e),
-                    "properties": self.get_hyperedge(e)
-                }
+                {"members": list(e), "properties": self.get_hyperedge(e)}
                 for e in proof_links
             ],
             "has_formal_proof": len(proof_links) > 0,
-            "evidence_count": sum(len(e) - 1 for e in evidence_chains)
+            "evidence_count": sum(len(e) - 1 for e in evidence_chains),
         }
 
     def coverage_report(self) -> Dict[str, Any]:
@@ -473,14 +559,25 @@ class QBPKnowledge:
         claims = self.get_vertices_by_type("Claim")
         questions = self.get_vertices_by_type("Question")
 
-        claims_with_evidence = sum(1 for c in claims
-                                   if any(self.get_hyperedge(e).get("type") == "evidence_chain"
-                                         for e in self.get_hyperedges_containing(c)))
-        claims_with_proof = sum(1 for c in claims
-                               if any(self.get_hyperedge(e).get("type") == "proof_link"
-                                     for e in self.get_hyperedges_containing(c)))
-        open_questions = sum(1 for q in questions
-                            if self.get_vertex(q).get("status") == "open")
+        claims_with_evidence = sum(
+            1
+            for c in claims
+            if any(
+                self.get_hyperedge(e).get("type") == "evidence_chain"
+                for e in self.get_hyperedges_containing(c)
+            )
+        )
+        claims_with_proof = sum(
+            1
+            for c in claims
+            if any(
+                self.get_hyperedge(e).get("type") == "proof_link"
+                for e in self.get_hyperedges_containing(c)
+            )
+        )
+        open_questions = sum(
+            1 for q in questions if self.get_vertex(q).get("status") == "open"
+        )
 
         return {
             "vertices": {
@@ -489,22 +586,26 @@ class QBPKnowledge:
                 "concepts": len(self.get_vertices_by_type("Concept")),
                 "claims": len(claims),
                 "questions": len(questions),
-                "proofs": len(self.get_vertices_by_type("Proof"))
+                "proofs": len(self.get_vertices_by_type("Proof")),
             },
             "hyperedges": {
                 "total": self.hg.num_e,
                 "by_type": {
                     etype: len(self.get_hyperedges_by_type(etype))
                     for etype in HYPEREDGE_TYPES.keys()
-                }
+                },
             },
             "coverage": {
                 "claims_with_evidence": claims_with_evidence,
-                "claims_with_evidence_pct": (claims_with_evidence / len(claims) * 100) if claims else 0,
+                "claims_with_evidence_pct": (
+                    (claims_with_evidence / len(claims) * 100) if claims else 0
+                ),
                 "claims_with_proof": claims_with_proof,
-                "claims_with_proof_pct": (claims_with_proof / len(claims) * 100) if claims else 0,
-                "open_questions": open_questions
-            }
+                "claims_with_proof_pct": (
+                    (claims_with_proof / len(claims) * 100) if claims else 0
+                ),
+                "open_questions": open_questions,
+            },
         }
 
     # -------------------------------------------------------------------------
@@ -533,8 +634,9 @@ class QBPKnowledge:
         """Open interactive visualization in browser (default port 8088)."""
         self.hg.draw(port=port)
 
-    def visualize_matplotlib(self, output_path: Optional[str] = None,
-                             title: str = "QBP Knowledge Hypergraph"):
+    def visualize_matplotlib(
+        self, output_path: Optional[str] = None, title: str = "QBP Knowledge Hypergraph"
+    ):
         """Generate static visualization using HyperNetX."""
         if not HNX_AVAILABLE or not MPL_AVAILABLE:
             print("Requires: pip install hypernetx matplotlib")
@@ -558,13 +660,16 @@ class QBPKnowledge:
         ax.set_title(title)
 
         if output_path:
-            plt.savefig(output_path, dpi=150, bbox_inches='tight')
+            plt.savefig(output_path, dpi=150, bbox_inches="tight")
             print(f"Saved to {output_path}")
         else:
             plt.show()
 
-    def visualize_d3(self, output_path: str = "hypergraph.html",
-                      title: str = "QBP Knowledge Hypergraph"):
+    def visualize_d3(
+        self,
+        output_path: str = "hypergraph.html",
+        title: str = "QBP Knowledge Hypergraph",
+    ):
         """Generate interactive D3.js visualization (recommended).
 
         This is the recommended visualization method. Hypergraph-DB's built-in
@@ -576,24 +681,23 @@ class QBPKnowledge:
         nodes = []
         for v in self.hg.all_v:
             data = self.hg.v(v)
-            label = (data.get("term") or data.get("title") or
-                    data.get("statement", "")[:30] or v.split(":")[-1])
-            nodes.append({
-                "id": v,
-                "type": data.get("type", "Unknown"),
-                "label": label[:25]
-            })
+            label = (
+                data.get("term")
+                or data.get("title")
+                or data.get("statement", "")[:30]
+                or v.split(":")[-1]
+            )
+            nodes.append(
+                {"id": v, "type": data.get("type", "Unknown"), "label": label[:25]}
+            )
 
         # Gather edge data
         edges = []
         for e in self.hg.all_e:
             data = self.hg.e(e)
-            edges.append({
-                "members": list(e),
-                "type": data.get("type", "unknown")
-            })
+            edges.append({"members": list(e), "type": data.get("type", "unknown")})
 
-        html = f'''<!DOCTYPE html>
+        html = f"""<!DOCTYPE html>
 <html>
 <head>
     <title>{title}</title>
@@ -712,14 +816,14 @@ simulation.on("tick", () => {{
 }});
 </script>
 </body>
-</html>'''
+</html>"""
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             f.write(html)
         print(f"Created interactive visualization: {output_path}")
         print("Open in browser to view. Drag nodes to rearrange.")
 
-    def to_hypernetx(self) -> 'hnx.Hypergraph':
+    def to_hypernetx(self) -> "hnx.Hypergraph":
         """Convert to HyperNetX Hypergraph for analysis."""
         if not HNX_AVAILABLE:
             raise ImportError("Requires: pip install hypernetx")
@@ -750,17 +854,19 @@ simulation.on("tick", () => {{
             "## Hyperedges",
             f"- Total: {report['hyperedges']['total']}",
         ]
-        for etype, count in report['hyperedges']['by_type'].items():
+        for etype, count in report["hyperedges"]["by_type"].items():
             if count > 0:
                 lines.append(f"- {etype}: {count}")
 
-        lines.extend([
-            "",
-            "## Coverage",
-            f"- Claims with evidence: {report['coverage']['claims_with_evidence']} ({report['coverage']['claims_with_evidence_pct']:.1f}%)",
-            f"- Claims with formal proof: {report['coverage']['claims_with_proof']} ({report['coverage']['claims_with_proof_pct']:.1f}%)",
-            f"- Open questions: {report['coverage']['open_questions']}",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Coverage",
+                f"- Claims with evidence: {report['coverage']['claims_with_evidence']} ({report['coverage']['claims_with_evidence_pct']:.1f}%)",
+                f"- Claims with formal proof: {report['coverage']['claims_with_proof']} ({report['coverage']['claims_with_proof_pct']:.1f}%)",
+                f"- Open questions: {report['coverage']['open_questions']}",
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -768,6 +874,7 @@ simulation.on("tick", () => {{
 # =============================================================================
 # CLI
 # =============================================================================
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -784,40 +891,52 @@ Examples:
   python qbp_knowledge.py viz --output graph.png      # Static matplotlib
   python qbp_knowledge.py viz --web                   # Hypergraph-DB (has issues)
   python qbp_knowledge.py report
-        """
+        """,
     )
 
-    parser.add_argument('--db', type=str, default='knowledge/qbp.hgdb',
-                        help='Path to hypergraph database')
+    parser.add_argument(
+        "--db",
+        type=str,
+        default="knowledge/qbp.hgdb",
+        help="Path to hypergraph database",
+    )
 
-    subparsers = parser.add_subparsers(dest='command', help='Commands')
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # Summary
-    subparsers.add_parser('summary', help='Show summary of knowledge graph')
+    subparsers.add_parser("summary", help="Show summary of knowledge graph")
 
     # Query
-    query_parser = subparsers.add_parser('query', help='Run research queries')
-    query_parser.add_argument('query_type',
-                              choices=['weak-claims', 'unproven', 'gaps', 'bridges'],
-                              help='Type of query')
+    query_parser = subparsers.add_parser("query", help="Run research queries")
+    query_parser.add_argument(
+        "query_type",
+        choices=["weak-claims", "unproven", "gaps", "bridges"],
+        help="Type of query",
+    )
 
     # Visualization
-    viz_parser = subparsers.add_parser('viz', help='Visualize the hypergraph')
-    viz_parser.add_argument('--d3', action='store_true', help='D3.js interactive HTML (recommended)')
-    viz_parser.add_argument('--web', action='store_true', help='Hypergraph-DB web viz (has known issues)')
-    viz_parser.add_argument('--output', type=str, help='Output file path')
-    viz_parser.add_argument('--port', type=int, default=8088, help='Port for web viz')
+    viz_parser = subparsers.add_parser("viz", help="Visualize the hypergraph")
+    viz_parser.add_argument(
+        "--d3", action="store_true", help="D3.js interactive HTML (recommended)"
+    )
+    viz_parser.add_argument(
+        "--web", action="store_true", help="Hypergraph-DB web viz (has known issues)"
+    )
+    viz_parser.add_argument("--output", type=str, help="Output file path")
+    viz_parser.add_argument("--port", type=int, default=8088, help="Port for web viz")
 
     # Report
-    subparsers.add_parser('report', help='Generate coverage report')
+    subparsers.add_parser("report", help="Generate coverage report")
 
     # Info
-    info_parser = subparsers.add_parser('info', help='Get info about a vertex')
-    info_parser.add_argument('vertex_id', help='Vertex ID')
+    info_parser = subparsers.add_parser("info", help="Get info about a vertex")
+    info_parser.add_argument("vertex_id", help="Vertex ID")
 
     # Evidence
-    evidence_parser = subparsers.add_parser('evidence', help='Trace evidence for a claim')
-    evidence_parser.add_argument('claim_id', help='Claim ID')
+    evidence_parser = subparsers.add_parser(
+        "evidence", help="Trace evidence for a claim"
+    )
+    evidence_parser.add_argument("claim_id", help="Claim ID")
 
     args = parser.parse_args()
 
@@ -830,11 +949,11 @@ Examples:
         print(f"Note: Database {db_path} not found. Using empty graph.")
 
     # Execute command
-    if args.command == 'summary':
+    if args.command == "summary":
         print(kb.summary())
 
-    elif args.command == 'query':
-        if args.query_type == 'weak-claims':
+    elif args.command == "query":
+        if args.query_type == "weak-claims":
             results = kb.find_weak_claims()
             if results:
                 print(f"Found {len(results)} weak claims:")
@@ -843,7 +962,7 @@ Examples:
             else:
                 print("No weak claims found.")
 
-        elif args.query_type == 'unproven':
+        elif args.query_type == "unproven":
             results = kb.find_unproven_claims()
             if results:
                 print(f"Found {len(results)} unproven claims:")
@@ -852,17 +971,17 @@ Examples:
             else:
                 print("All claims have formal proofs.")
 
-        elif args.query_type == 'gaps':
+        elif args.query_type == "gaps":
             results = kb.find_research_gaps()
             if results:
                 print(f"Found {len(results)} research gaps:")
                 for r in results:
-                    q = r['question'].get('question', '')[:60]
+                    q = r["question"].get("question", "")[:60]
                     print(f"  - {r['question_id']}: {q}...")
             else:
                 print("No research gaps found.")
 
-        elif args.query_type == 'bridges':
+        elif args.query_type == "bridges":
             results = kb.find_bridge_concepts()
             if results:
                 print(f"Found {len(results)} bridge concepts:")
@@ -871,29 +990,29 @@ Examples:
             else:
                 print("No bridge concepts found.")
 
-    elif args.command == 'viz':
+    elif args.command == "viz":
         if args.web:
             print("Note: Hypergraph-DB web viz has known rendering issues.")
             print("Consider using --d3 for reliable visualization.")
             kb.visualize_web(port=args.port)
-        elif args.d3 or (args.output and args.output.endswith('.html')):
-            output = args.output or 'hypergraph.html'
+        elif args.d3 or (args.output and args.output.endswith(".html")):
+            output = args.output or "hypergraph.html"
             kb.visualize_d3(output_path=output)
         else:
             kb.visualize_matplotlib(output_path=args.output)
 
-    elif args.command == 'report':
+    elif args.command == "report":
         report = kb.coverage_report()
         print(json.dumps(report, indent=2))
 
-    elif args.command == 'info':
+    elif args.command == "info":
         data = kb.get_vertex(args.vertex_id)
         if data:
             print(json.dumps(data, indent=2))
         else:
             print(f"Vertex not found: {args.vertex_id}")
 
-    elif args.command == 'evidence':
+    elif args.command == "evidence":
         result = kb.trace_evidence(args.claim_id)
         print(json.dumps(result, indent=2, default=str))
 
@@ -901,5 +1020,5 @@ Examples:
         parser.print_help()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

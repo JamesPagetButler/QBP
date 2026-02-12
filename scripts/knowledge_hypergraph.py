@@ -21,6 +21,7 @@ import yaml
 # Check for HyperNetX
 try:
     import hypernetx as hnx
+
     HNX_AVAILABLE = True
 except ImportError:
     HNX_AVAILABLE = False
@@ -28,6 +29,7 @@ except ImportError:
 
 try:
     import matplotlib.pyplot as plt
+
     MPL_AVAILABLE = True
 except ImportError:
     MPL_AVAILABLE = False
@@ -36,6 +38,7 @@ except ImportError:
 @dataclass
 class KnowledgeEntry:
     """Represents a single knowledge graph entry."""
+
     id: str
     type: str  # Source, Concept, Claim, Question
     data: Dict[str, Any]
@@ -43,29 +46,30 @@ class KnowledgeEntry:
 
     @property
     def tags(self) -> List[str]:
-        return self.data.get('tags', [])
+        return self.data.get("tags", [])
 
     @property
     def relationships(self) -> List[Dict]:
-        return self.data.get('relationships', [])
+        return self.data.get("relationships", [])
 
     @property
     def title(self) -> str:
         """Get display title for this entry."""
-        if self.type == 'Source':
-            return self.data.get('metadata', {}).get('title', self.id)
-        elif self.type == 'Question':
-            return self.data.get('question', self.id)[:50]
-        elif self.type == 'Claim':
-            return self.data.get('statement', self.id)[:50]
-        elif self.type == 'Concept':
-            return self.data.get('term', self.id)
+        if self.type == "Source":
+            return self.data.get("metadata", {}).get("title", self.id)
+        elif self.type == "Question":
+            return self.data.get("question", self.id)[:50]
+        elif self.type == "Claim":
+            return self.data.get("statement", self.id)[:50]
+        elif self.type == "Concept":
+            return self.data.get("term", self.id)
         return self.id
 
 
 @dataclass
 class Hyperedge:
     """Represents an n-ary relationship."""
+
     id: str
     type: str  # evidence, equivalence, emergence, tag_cluster, etc.
     members: Set[str]
@@ -90,15 +94,15 @@ class KnowledgeHypergraph:
         self.knowledge_dir = Path(knowledge_dir)
         self.entries: Dict[str, KnowledgeEntry] = {}
         self.hyperedges: Dict[str, Hyperedge] = {}
-        self._hnx_graph: Optional['hnx.Hypergraph'] = None
+        self._hnx_graph: Optional["hnx.Hypergraph"] = None
 
-    def load(self) -> 'KnowledgeHypergraph':
+    def load(self) -> "KnowledgeHypergraph":
         """Load all YAML entries from knowledge directory."""
-        for subdir in ['sources', 'concepts', 'claims', 'questions']:
+        for subdir in ["sources", "concepts", "claims", "questions"]:
             dir_path = self.knowledge_dir / subdir
             if not dir_path.exists():
                 continue
-            for yaml_file in dir_path.glob('*.yaml'):
+            for yaml_file in dir_path.glob("*.yaml"):
                 self._load_entry(yaml_file)
 
         # Build hyperedges after loading all entries
@@ -108,15 +112,15 @@ class KnowledgeHypergraph:
     def _load_entry(self, file_path: Path):
         """Load a single YAML entry."""
         try:
-            with open(file_path, 'r') as f:
+            with open(file_path, "r") as f:
                 data = yaml.safe_load(f)
 
-            if data and 'id' in data:
+            if data and "id" in data:
                 entry = KnowledgeEntry(
-                    id=data['id'],
-                    type=data.get('type', 'Unknown'),
+                    id=data["id"],
+                    type=data.get("type", "Unknown"),
                     data=data,
-                    file_path=file_path
+                    file_path=file_path,
                 )
                 self.entries[entry.id] = entry
         except Exception as e:
@@ -127,15 +131,15 @@ class KnowledgeHypergraph:
         # 1. Binary relationships as 2-edges
         for entry_id, entry in self.entries.items():
             for rel in entry.relationships:
-                target = rel.get('target')
-                rel_type = rel.get('type', 'related')
+                target = rel.get("target")
+                rel_type = rel.get("type", "related")
                 if target:
                     edge_id = f"rel:{entry_id}->{target}"
                     self.hyperedges[edge_id] = Hyperedge(
                         id=edge_id,
                         type=f"binary:{rel_type}",
                         members={entry_id, target},
-                        properties={'relationship_type': rel_type}
+                        properties={"relationship_type": rel_type},
                     )
 
         # 2. Tag clusters (entries sharing same tag form a hyperedge)
@@ -153,73 +157,77 @@ class KnowledgeHypergraph:
                     id=edge_id,
                     type="tag_cluster",
                     members=members,
-                    properties={'tag': tag}
+                    properties={"tag": tag},
                 )
 
         # 3. Evidence chains (for Claims with multiple evidence sources)
         for entry_id, entry in self.entries.items():
-            if entry.type == 'Claim':
-                evidence = entry.data.get('evidence', [])
+            if entry.type == "Claim":
+                evidence = entry.data.get("evidence", [])
                 if len(evidence) >= 2:
                     members = {entry_id}
                     for ev in evidence:
-                        if 'source' in ev:
-                            members.add(ev['source'])
+                        if "source" in ev:
+                            members.add(ev["source"])
                     edge_id = f"evidence:{entry_id}"
                     self.hyperedges[edge_id] = Hyperedge(
                         id=edge_id,
                         type="multi_source_evidence",
                         members=members,
-                        properties={'claim': entry_id, 'evidence_count': len(evidence)}
+                        properties={"claim": entry_id, "evidence_count": len(evidence)},
                     )
 
         # 4. Question investigation groups
         for entry_id, entry in self.entries.items():
-            if entry.type == 'Question':
+            if entry.type == "Question":
                 # Background sources
-                background = entry.data.get('background', [])
+                background = entry.data.get("background", [])
                 if len(background) >= 2:
                     members = {entry_id}
                     for bg in background:
-                        if 'source' in bg:
-                            members.add(bg['source'])
+                        if "source" in bg:
+                            members.add(bg["source"])
                     edge_id = f"investigation:{entry_id}"
                     self.hyperedges[edge_id] = Hyperedge(
                         id=edge_id,
                         type="investigation_context",
                         members=members,
-                        properties={'question': entry_id}
+                        properties={"question": entry_id},
                     )
 
         # 5. Explicit hyperedges from YAML (if present)
         for entry_id, entry in self.entries.items():
-            explicit_edges = entry.data.get('hyperedges', [])
+            explicit_edges = entry.data.get("hyperedges", [])
             for he in explicit_edges:
-                edge_id = he.get('id', f"explicit:{entry_id}:{len(self.hyperedges)}")
-                members = set(he.get('members', []))
+                edge_id = he.get("id", f"explicit:{entry_id}:{len(self.hyperedges)}")
+                members = set(he.get("members", []))
                 members.add(entry_id)  # Include the entry itself
                 self.hyperedges[edge_id] = Hyperedge(
                     id=edge_id,
-                    type=he.get('type', 'explicit'),
+                    type=he.get("type", "explicit"),
                     members=members,
-                    properties=he.get('properties', {})
+                    properties=he.get("properties", {}),
                 )
 
-    def add_hyperedge(self, edge_id: str, edge_type: str, members: Set[str],
-                      properties: Optional[Dict] = None):
+    def add_hyperedge(
+        self,
+        edge_id: str,
+        edge_type: str,
+        members: Set[str],
+        properties: Optional[Dict] = None,
+    ):
         """Manually add a hyperedge."""
         self.hyperedges[edge_id] = Hyperedge(
-            id=edge_id,
-            type=edge_type,
-            members=members,
-            properties=properties or {}
+            id=edge_id, type=edge_type, members=members, properties=properties or {}
         )
         self._hnx_graph = None  # Invalidate cache
 
-    def to_hypernetx(self) -> 'hnx.Hypergraph':
+    def to_hypernetx(self) -> "hnx.Hypergraph":
         """Convert to HyperNetX Hypergraph for analysis."""
         if not HNX_AVAILABLE:
-            raise ImportError("hypernetx is required. Install with: pip install hypernetx")
+            raise ImportError(
+                "hypernetx is required. Install with: pip install hypernetx"
+            )
 
         if self._hnx_graph is not None:
             return self._hnx_graph
@@ -232,9 +240,12 @@ class KnowledgeHypergraph:
         self._hnx_graph = hnx.Hypergraph(edges)
         return self._hnx_graph
 
-    def visualize(self, output_path: Optional[Path] = None,
-                  title: str = "QBP Knowledge Hypergraph",
-                  figsize: tuple = (14, 10)):
+    def visualize(
+        self,
+        output_path: Optional[Path] = None,
+        title: str = "QBP Knowledge Hypergraph",
+        figsize: tuple = (14, 10),
+    ):
         """Visualize the hypergraph."""
         if not HNX_AVAILABLE or not MPL_AVAILABLE:
             print("Visualization requires: pip install hypernetx matplotlib")
@@ -251,37 +262,45 @@ class KnowledgeHypergraph:
         # Color edges by type
         edge_colors = {}
         type_colors = {
-            'tag_cluster': '#3498db',
-            'multi_source_evidence': '#2ecc71',
-            'investigation_context': '#9b59b6',
-            'binary:cites': '#e74c3c',
-            'binary:supports': '#f39c12',
-            'binary:defines': '#1abc9c',
-            'explicit': '#34495e',
+            "tag_cluster": "#3498db",
+            "multi_source_evidence": "#2ecc71",
+            "investigation_context": "#9b59b6",
+            "binary:cites": "#e74c3c",
+            "binary:supports": "#f39c12",
+            "binary:defines": "#1abc9c",
+            "explicit": "#34495e",
         }
 
         for edge_id, hyperedge in self.hyperedges.items():
-            edge_colors[edge_id] = type_colors.get(hyperedge.type, '#95a5a6')
+            edge_colors[edge_id] = type_colors.get(hyperedge.type, "#95a5a6")
 
-        hnx.draw(H, ax=ax,
-                 edges_kwargs={'facecolors': [edge_colors.get(e, '#95a5a6') for e in H.edges]},
-                 with_edge_labels=True,
-                 with_node_labels=True)
+        hnx.draw(
+            H,
+            ax=ax,
+            edges_kwargs={
+                "facecolors": [edge_colors.get(e, "#95a5a6") for e in H.edges]
+            },
+            with_edge_labels=True,
+            with_node_labels=True,
+        )
 
-        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.set_title(title, fontsize=14, fontweight="bold")
 
         # Add legend
         from matplotlib.patches import Patch
-        legend_elements = [Patch(facecolor=color, label=etype.replace('binary:', ''))
-                          for etype, color in type_colors.items()
-                          if any(he.type == etype for he in self.hyperedges.values())]
+
+        legend_elements = [
+            Patch(facecolor=color, label=etype.replace("binary:", ""))
+            for etype, color in type_colors.items()
+            if any(he.type == etype for he in self.hyperedges.values())
+        ]
         if legend_elements:
-            ax.legend(handles=legend_elements, loc='upper left', fontsize=8)
+            ax.legend(handles=legend_elements, loc="upper left", fontsize=8)
 
         plt.tight_layout()
 
         if output_path:
-            plt.savefig(output_path, dpi=150, bbox_inches='tight')
+            plt.savefig(output_path, dpi=150, bbox_inches="tight")
             print(f"Saved visualization to {output_path}")
         else:
             plt.show()
@@ -291,56 +310,56 @@ class KnowledgeHypergraph:
         H = self.to_hypernetx()
 
         analysis = {
-            'node_count': len(H.nodes),
-            'edge_count': len(H.edges),
-            'edge_types': {},
-            'node_degrees': {},
-            'largest_edges': [],
-            'most_connected_nodes': [],
+            "node_count": len(H.nodes),
+            "edge_count": len(H.edges),
+            "edge_types": {},
+            "node_degrees": {},
+            "largest_edges": [],
+            "most_connected_nodes": [],
         }
 
         # Count edge types
         for he in self.hyperedges.values():
             etype = he.type
-            analysis['edge_types'][etype] = analysis['edge_types'].get(etype, 0) + 1
+            analysis["edge_types"][etype] = analysis["edge_types"].get(etype, 0) + 1
 
         # Node degrees
         for node in H.nodes:
-            analysis['node_degrees'][node] = H.degree(node)
+            analysis["node_degrees"][node] = H.degree(node)
 
         # Top 5 largest edges
-        sorted_edges = sorted(self.hyperedges.items(),
-                             key=lambda x: len(x[1].members), reverse=True)
-        analysis['largest_edges'] = [
-            {'id': e[0], 'type': e[1].type, 'size': len(e[1].members)}
+        sorted_edges = sorted(
+            self.hyperedges.items(), key=lambda x: len(x[1].members), reverse=True
+        )
+        analysis["largest_edges"] = [
+            {"id": e[0], "type": e[1].type, "size": len(e[1].members)}
             for e in sorted_edges[:5]
         ]
 
         # Top 5 most connected nodes
-        sorted_nodes = sorted(analysis['node_degrees'].items(),
-                             key=lambda x: x[1], reverse=True)
-        analysis['most_connected_nodes'] = [
-            {'id': n[0], 'degree': n[1]} for n in sorted_nodes[:5]
+        sorted_nodes = sorted(
+            analysis["node_degrees"].items(), key=lambda x: x[1], reverse=True
+        )
+        analysis["most_connected_nodes"] = [
+            {"id": n[0], "degree": n[1]} for n in sorted_nodes[:5]
         ]
 
         return analysis
 
     def query_by_node(self, node_id: str) -> Dict[str, Any]:
         """Find all hyperedges containing a node."""
-        result = {
-            'node': node_id,
-            'entry': self.entries.get(node_id),
-            'hyperedges': []
-        }
+        result = {"node": node_id, "entry": self.entries.get(node_id), "hyperedges": []}
 
         for edge_id, hyperedge in self.hyperedges.items():
             if node_id in hyperedge.members:
-                result['hyperedges'].append({
-                    'id': edge_id,
-                    'type': hyperedge.type,
-                    'members': list(hyperedge.members),
-                    'properties': hyperedge.properties
-                })
+                result["hyperedges"].append(
+                    {
+                        "id": edge_id,
+                        "type": hyperedge.type,
+                        "members": list(hyperedge.members),
+                        "properties": hyperedge.properties,
+                    }
+                )
 
         return result
 
@@ -352,8 +371,9 @@ class KnowledgeHypergraph:
         """Find nodes that connect otherwise disconnected hyperedges."""
         bridges = []
         for node in self.entries.keys():
-            edges_containing = [eid for eid, he in self.hyperedges.items()
-                               if node in he.members]
+            edges_containing = [
+                eid for eid, he in self.hyperedges.items() if node in he.members
+            ]
             if len(edges_containing) >= 2:
                 bridges.append(node)
         return bridges
@@ -384,7 +404,9 @@ class KnowledgeHypergraph:
         for edge_id, he in self.hyperedges.items():
             lines.append(f"### {edge_id}")
             lines.append(f"- Type: {he.type}")
-            lines.append(f"- Members ({len(he.members)}): {', '.join(sorted(he.members))}")
+            lines.append(
+                f"- Members ({len(he.members)}): {', '.join(sorted(he.members))}"
+            )
             if he.properties:
                 lines.append(f"- Properties: {he.properties}")
             lines.append("")
@@ -399,79 +421,145 @@ def create_demo_hypergraph() -> KnowledgeHypergraph:
 
     # Add sample entries directly (simulating loaded YAML)
     entries = [
-        KnowledgeEntry("claim-cosine-squared", "Claim", {
-            'statement': "P(+) = cos²(θ/2) for spin measurement at angle θ",
-            'tags': ['quantum-mechanics', 'spin', 'measurement', 'validated'],
-            'evidence': [
-                {'source': 'proof-lean-angle', 'strength': 'strong'},
-                {'source': 'sim-monte-carlo-01b', 'strength': 'supporting'},
-                {'source': 'derivation-standard-qm', 'strength': 'supporting'}
-            ]
-        }),
-        KnowledgeEntry("claim-qbp-matches-qm", "Claim", {
-            'statement': "QBP matches standard QM for single-particle systems",
-            'tags': ['quantum-mechanics', 'validation', 'single-particle'],
-        }),
-        KnowledgeEntry("concept-quaternion-state", "Concept", {
-            'term': "Quaternion State Representation",
-            'tags': ['quaternions', 'quantum-mechanics', 'foundations'],
-            'relationships': [
-                {'type': 'equivalent_to', 'target': 'concept-pauli-algebra'},
-                {'type': 'equivalent_to', 'target': 'concept-bloch-sphere'}
-            ]
-        }),
-        KnowledgeEntry("concept-pauli-algebra", "Concept", {
-            'term': "Pauli Algebra",
-            'tags': ['quantum-mechanics', 'algebra', 'foundations'],
-        }),
-        KnowledgeEntry("concept-bloch-sphere", "Concept", {
-            'term': "Bloch Sphere",
-            'tags': ['quantum-mechanics', 'geometry', 'visualization'],
-        }),
-        KnowledgeEntry("concept-half-angle", "Concept", {
-            'term': "Half-Angle Formula",
-            'tags': ['quaternions', 'rotation', 'spin'],
-        }),
-        KnowledgeEntry("question-divergence", "Question", {
-            'question': "Where do QBP predictions diverge from standard QM?",
-            'tags': ['foundations', 'novel-predictions', 'high-priority'],
-            'background': [
-                {'source': 'proof-lean-angle', 'finding': 'Single-particle match proven'},
-                {'source': 'review-theory-sprint1', 'finding': 'Entanglement may differ'},
-            ]
-        }),
-        KnowledgeEntry("question-octonion", "Question", {
-            'question': "Can octonion extensions yield novel predictions?",
-            'tags': ['foundations', 'novel-predictions', 'octonions'],
-        }),
-        KnowledgeEntry("proof-lean-angle", "Source", {
-            'metadata': {'title': "Lean 4 Proof: Angle-Dependent Measurement"},
-            'tags': ['proof', 'lean4', 'formal-verification', 'validated'],
-        }),
-        KnowledgeEntry("sim-monte-carlo-01b", "Source", {
-            'metadata': {'title': "Monte Carlo Simulation: Experiment 01b"},
-            'tags': ['simulation', 'validation', 'experiment-01b'],
-        }),
-        KnowledgeEntry("derivation-standard-qm", "Source", {
-            'metadata': {'title': "Standard QM Derivation of cos²(θ/2)"},
-            'tags': ['quantum-mechanics', 'derivation', 'textbook'],
-        }),
-        KnowledgeEntry("review-theory-sprint1", "Source", {
-            'metadata': {'title': "Theory Refinement: Sprint 1 Review"},
-            'tags': ['review', 'sprint-1', 'foundations'],
-        }),
-        KnowledgeEntry("axiom-states", "Concept", {
-            'term': "Axiom 1: Quaternionic States",
-            'tags': ['axiom', 'qbp', 'foundations'],
-        }),
-        KnowledgeEntry("axiom-observables", "Concept", {
-            'term': "Axiom 2: Quaternionic Observables",
-            'tags': ['axiom', 'qbp', 'foundations'],
-        }),
-        KnowledgeEntry("axiom-evolution", "Concept", {
-            'term': "Axiom 3: Quaternionic Evolution",
-            'tags': ['axiom', 'qbp', 'foundations'],
-        }),
+        KnowledgeEntry(
+            "claim-cosine-squared",
+            "Claim",
+            {
+                "statement": "P(+) = cos²(θ/2) for spin measurement at angle θ",
+                "tags": ["quantum-mechanics", "spin", "measurement", "validated"],
+                "evidence": [
+                    {"source": "proof-lean-angle", "strength": "strong"},
+                    {"source": "sim-monte-carlo-01b", "strength": "supporting"},
+                    {"source": "derivation-standard-qm", "strength": "supporting"},
+                ],
+            },
+        ),
+        KnowledgeEntry(
+            "claim-qbp-matches-qm",
+            "Claim",
+            {
+                "statement": "QBP matches standard QM for single-particle systems",
+                "tags": ["quantum-mechanics", "validation", "single-particle"],
+            },
+        ),
+        KnowledgeEntry(
+            "concept-quaternion-state",
+            "Concept",
+            {
+                "term": "Quaternion State Representation",
+                "tags": ["quaternions", "quantum-mechanics", "foundations"],
+                "relationships": [
+                    {"type": "equivalent_to", "target": "concept-pauli-algebra"},
+                    {"type": "equivalent_to", "target": "concept-bloch-sphere"},
+                ],
+            },
+        ),
+        KnowledgeEntry(
+            "concept-pauli-algebra",
+            "Concept",
+            {
+                "term": "Pauli Algebra",
+                "tags": ["quantum-mechanics", "algebra", "foundations"],
+            },
+        ),
+        KnowledgeEntry(
+            "concept-bloch-sphere",
+            "Concept",
+            {
+                "term": "Bloch Sphere",
+                "tags": ["quantum-mechanics", "geometry", "visualization"],
+            },
+        ),
+        KnowledgeEntry(
+            "concept-half-angle",
+            "Concept",
+            {
+                "term": "Half-Angle Formula",
+                "tags": ["quaternions", "rotation", "spin"],
+            },
+        ),
+        KnowledgeEntry(
+            "question-divergence",
+            "Question",
+            {
+                "question": "Where do QBP predictions diverge from standard QM?",
+                "tags": ["foundations", "novel-predictions", "high-priority"],
+                "background": [
+                    {
+                        "source": "proof-lean-angle",
+                        "finding": "Single-particle match proven",
+                    },
+                    {
+                        "source": "review-theory-sprint1",
+                        "finding": "Entanglement may differ",
+                    },
+                ],
+            },
+        ),
+        KnowledgeEntry(
+            "question-octonion",
+            "Question",
+            {
+                "question": "Can octonion extensions yield novel predictions?",
+                "tags": ["foundations", "novel-predictions", "octonions"],
+            },
+        ),
+        KnowledgeEntry(
+            "proof-lean-angle",
+            "Source",
+            {
+                "metadata": {"title": "Lean 4 Proof: Angle-Dependent Measurement"},
+                "tags": ["proof", "lean4", "formal-verification", "validated"],
+            },
+        ),
+        KnowledgeEntry(
+            "sim-monte-carlo-01b",
+            "Source",
+            {
+                "metadata": {"title": "Monte Carlo Simulation: Experiment 01b"},
+                "tags": ["simulation", "validation", "experiment-01b"],
+            },
+        ),
+        KnowledgeEntry(
+            "derivation-standard-qm",
+            "Source",
+            {
+                "metadata": {"title": "Standard QM Derivation of cos²(θ/2)"},
+                "tags": ["quantum-mechanics", "derivation", "textbook"],
+            },
+        ),
+        KnowledgeEntry(
+            "review-theory-sprint1",
+            "Source",
+            {
+                "metadata": {"title": "Theory Refinement: Sprint 1 Review"},
+                "tags": ["review", "sprint-1", "foundations"],
+            },
+        ),
+        KnowledgeEntry(
+            "axiom-states",
+            "Concept",
+            {
+                "term": "Axiom 1: Quaternionic States",
+                "tags": ["axiom", "qbp", "foundations"],
+            },
+        ),
+        KnowledgeEntry(
+            "axiom-observables",
+            "Concept",
+            {
+                "term": "Axiom 2: Quaternionic Observables",
+                "tags": ["axiom", "qbp", "foundations"],
+            },
+        ),
+        KnowledgeEntry(
+            "axiom-evolution",
+            "Concept",
+            {
+                "term": "Axiom 3: Quaternionic Evolution",
+                "tags": ["axiom", "qbp", "foundations"],
+            },
+        ),
     ]
 
     for entry in entries:
@@ -485,22 +573,26 @@ def create_demo_hypergraph() -> KnowledgeHypergraph:
         "equiv:spin-representations",
         "equivalence_class",
         {"concept-quaternion-state", "concept-pauli-algebra", "concept-bloch-sphere"},
-        {"description": "Equivalent mathematical representations of spin-1/2"}
+        {"description": "Equivalent mathematical representations of spin-1/2"},
     )
 
     kg.add_hyperedge(
         "axioms:qbp-foundation",
         "theory_axioms",
         {"axiom-states", "axiom-observables", "axiom-evolution"},
-        {"description": "The three axioms that define QBP"}
+        {"description": "The three axioms that define QBP"},
     )
 
     kg.add_hyperedge(
         "research:divergence-investigation",
         "research_cluster",
-        {"question-divergence", "question-octonion", "concept-quaternion-state",
-         "claim-qbp-matches-qm"},
-        {"description": "Core research questions about QBP uniqueness"}
+        {
+            "question-divergence",
+            "question-octonion",
+            "concept-quaternion-state",
+            "claim-qbp-matches-qm",
+        },
+        {"description": "Core research questions about QBP uniqueness"},
     )
 
     return kg
@@ -508,14 +600,17 @@ def create_demo_hypergraph() -> KnowledgeHypergraph:
 
 def main():
     parser = argparse.ArgumentParser(description="QBP Knowledge Hypergraph")
-    parser.add_argument('--demo', action='store_true', help='Run with demo data')
-    parser.add_argument('--analyze', action='store_true', help='Show analysis')
-    parser.add_argument('--output', type=str, help='Save visualization to file')
-    parser.add_argument('--summary', action='store_true', help='Print text summary')
-    parser.add_argument('--query', type=str, help='Query node by ID')
-    parser.add_argument('--knowledge-dir', type=str,
-                        default='knowledge',
-                        help='Path to knowledge directory')
+    parser.add_argument("--demo", action="store_true", help="Run with demo data")
+    parser.add_argument("--analyze", action="store_true", help="Show analysis")
+    parser.add_argument("--output", type=str, help="Save visualization to file")
+    parser.add_argument("--summary", action="store_true", help="Print text summary")
+    parser.add_argument("--query", type=str, help="Query node by ID")
+    parser.add_argument(
+        "--knowledge-dir",
+        type=str,
+        default="knowledge",
+        help="Path to knowledge directory",
+    )
 
     args = parser.parse_args()
 
@@ -528,7 +623,7 @@ def main():
         if not knowledge_dir.exists():
             # Try relative to script location
             script_dir = Path(__file__).parent.parent
-            knowledge_dir = script_dir / 'knowledge'
+            knowledge_dir = script_dir / "knowledge"
 
         print(f"Loading knowledge graph from {knowledge_dir}...")
         kg = KnowledgeHypergraph(knowledge_dir).load()
@@ -539,11 +634,11 @@ def main():
     if args.query:
         result = kg.query_by_node(args.query)
         print(f"\nNode: {args.query}")
-        if result['entry']:
+        if result["entry"]:
             print(f"Type: {result['entry'].type}")
             print(f"Title: {result['entry'].title}")
         print(f"\nHyperedges containing this node:")
-        for he in result['hyperedges']:
+        for he in result["hyperedges"]:
             print(f"  - {he['id']} ({he['type']})")
             print(f"    Members: {', '.join(he['members'])}")
 
@@ -553,13 +648,13 @@ def main():
         print(f"Nodes: {analysis['node_count']}")
         print(f"Hyperedges: {analysis['edge_count']}")
         print("\nEdge types:")
-        for etype, count in analysis['edge_types'].items():
+        for etype, count in analysis["edge_types"].items():
             print(f"  - {etype}: {count}")
         print("\nMost connected nodes:")
-        for node in analysis['most_connected_nodes']:
+        for node in analysis["most_connected_nodes"]:
             print(f"  - {node['id']}: degree {node['degree']}")
         print("\nLargest hyperedges:")
-        for edge in analysis['largest_edges']:
+        for edge in analysis["largest_edges"]:
             print(f"  - {edge['id']} ({edge['type']}): {edge['size']} members")
 
     if args.summary:
@@ -568,13 +663,15 @@ def main():
     if args.output or (not args.analyze and not args.summary and not args.query):
         output_path = Path(args.output) if args.output else None
         if HNX_AVAILABLE and MPL_AVAILABLE:
-            kg.visualize(output_path=output_path,
-                        title="QBP Knowledge Hypergraph" + (" (Demo)" if args.demo else ""))
+            kg.visualize(
+                output_path=output_path,
+                title="QBP Knowledge Hypergraph" + (" (Demo)" if args.demo else ""),
+            )
         else:
             print("\nTo visualize, install: pip install hypernetx matplotlib")
             print("\nText summary instead:")
             print(kg.export_summary())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

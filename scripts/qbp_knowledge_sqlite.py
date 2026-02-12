@@ -32,7 +32,6 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-
 # =============================================================================
 # Schema Definitions (same as before, for validation)
 # =============================================================================
@@ -40,45 +39,96 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Union
 VERTEX_TYPES = {
     "Source": {
         "required": ["title"],
-        "optional": ["category", "authors", "date", "url", "doi", "venue", "tags",
-                     "abstract", "key_insights", "research_sprint", "added_date", "added_by"],
+        "optional": [
+            "category",
+            "authors",
+            "date",
+            "url",
+            "doi",
+            "venue",
+            "tags",
+            "abstract",
+            "key_insights",
+            "research_sprint",
+            "added_date",
+            "added_by",
+        ],
     },
     "Concept": {
         "required": ["term"],
-        "optional": ["definition", "formal_definition", "aliases", "tags",
-                     "added_date", "added_by"],
+        "optional": [
+            "definition",
+            "formal_definition",
+            "aliases",
+            "tags",
+            "added_date",
+            "added_by",
+        ],
     },
     "Claim": {
         "required": ["statement"],
-        "optional": ["context", "status", "confidence_tier", "tags", "implications",
-                     "added_date", "added_by"],
+        "optional": [
+            "context",
+            "status",
+            "confidence_tier",
+            "tags",
+            "implications",
+            "added_date",
+            "added_by",
+        ],
     },
     "Question": {
         "required": ["question"],
-        "optional": ["context", "status", "priority", "tags", "related_issues",
-                     "investigation_approaches", "success_criteria", "added_date", "added_by"],
+        "optional": [
+            "context",
+            "status",
+            "priority",
+            "tags",
+            "related_issues",
+            "investigation_approaches",
+            "success_criteria",
+            "added_date",
+            "added_by",
+        ],
     },
     "Proof": {
         "required": ["lean_file"],
-        "optional": ["theorems", "verified", "no_sorry", "tags", "added_date", "added_by"],
-    }
+        "optional": [
+            "theorems",
+            "verified",
+            "no_sorry",
+            "tags",
+            "added_date",
+            "added_by",
+        ],
+    },
 }
 
 HYPEREDGE_TYPES = {
     "evidence_chain": {"min_members": 2, "description": "Claim + supporting evidence"},
-    "equivalence": {"min_members": 2, "description": "Mathematically equivalent structures"},
+    "equivalence": {
+        "min_members": 2,
+        "description": "Mathematically equivalent structures",
+    },
     "theory_axioms": {"min_members": 2, "description": "Axioms defining a theory"},
     "research_cluster": {"min_members": 2, "description": "Related research questions"},
     "proof_link": {"min_members": 2, "description": "Claim linked to formal proof"},
-    "emergence": {"min_members": 2, "description": "Concepts yielding emergent property"},
+    "emergence": {
+        "min_members": 2,
+        "description": "Concepts yielding emergent property",
+    },
     "review_consensus": {"min_members": 2, "description": "Multi-reviewer agreement"},
-    "investigation": {"min_members": 2, "description": "Question + investigation sources"},
+    "investigation": {
+        "min_members": 2,
+        "description": "Question + investigation sources",
+    },
 }
 
 
 # =============================================================================
 # SQLite Hypergraph Database
 # =============================================================================
+
 
 class QBPKnowledgeSQLite:
     """
@@ -164,18 +214,43 @@ class QBPKnowledgeSQLite:
             # Set schema version
             conn.execute(
                 "INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)",
-                ("schema_version", str(self.SCHEMA_VERSION))
+                ("schema_version", str(self.SCHEMA_VERSION)),
             )
 
     # -------------------------------------------------------------------------
     # Vertex Operations
     # -------------------------------------------------------------------------
 
-    def add_vertex(self, vertex_id: str, vertex_type: str,
-                   attributes: Dict[str, Any]) -> str:
-        """Add a vertex with validation."""
+    def add_vertex(
+        self,
+        vertex_id: str,
+        vertex_type: str,
+        attributes: Dict[str, Any],
+        skip_if_exists: bool = True,
+    ) -> str:
+        """
+        Add a vertex with validation.
+
+        Args:
+            vertex_id: Unique vertex identifier
+            vertex_type: One of the defined vertex types
+            attributes: Vertex properties
+            skip_if_exists: If True, return existing ID without modification (idempotent).
+                           If False, update existing vertex with new data.
+
+        Returns:
+            The vertex ID (existing or new)
+        """
         if vertex_type not in VERTEX_TYPES:
             raise ValueError(f"Invalid vertex type: {vertex_type}")
+
+        # Check for existing vertex (idempotency)
+        with self._connection() as conn:
+            existing = conn.execute(
+                "SELECT id FROM vertices WHERE id = ?", (vertex_id,)
+            ).fetchone()
+            if existing and skip_if_exists:
+                return vertex_id  # Already exists, return without modification
 
         # Validate required fields
         schema = VERTEX_TYPES[vertex_type]
@@ -191,7 +266,7 @@ class QBPKnowledgeSQLite:
         with self._connection() as conn:
             conn.execute(
                 "INSERT OR REPLACE INTO vertices (id, type, data) VALUES (?, ?, ?)",
-                (vertex_id, vertex_type, json.dumps(data))
+                (vertex_id, vertex_type, json.dumps(data)),
             )
 
         return vertex_id
@@ -218,7 +293,9 @@ class QBPKnowledgeSQLite:
         """Add a Question vertex."""
         if not question_id.startswith("question:"):
             question_id = f"question:{question_id}"
-        return self.add_vertex(question_id, "Question", {"question": question, **kwargs})
+        return self.add_vertex(
+            question_id, "Question", {"question": question, **kwargs}
+        )
 
     def add_proof(self, proof_id: str, lean_file: str, **kwargs) -> str:
         """Add a Proof vertex."""
@@ -242,9 +319,12 @@ class QBPKnowledgeSQLite:
             ).fetchall()
             return [row["id"] for row in rows]
 
-    def query_vertices(self, vertex_type: Optional[str] = None,
-                       tag: Optional[str] = None,
-                       search: Optional[str] = None) -> List[Dict[str, Any]]:
+    def query_vertices(
+        self,
+        vertex_type: Optional[str] = None,
+        tag: Optional[str] = None,
+        search: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
         """
         Query vertices with filters.
 
@@ -266,7 +346,7 @@ class QBPKnowledgeSQLite:
 
         if search:
             query += " AND data LIKE ?"
-            params.append(f'%{search}%')
+            params.append(f"%{search}%")
 
         with self._connection() as conn:
             rows = conn.execute(query, params).fetchall()
@@ -282,8 +362,14 @@ class QBPKnowledgeSQLite:
     # Hyperedge Operations
     # -------------------------------------------------------------------------
 
-    def add_hyperedge(self, edge_id: str, edge_type: str,
-                      members: List[str], attributes: Dict[str, Any] = None) -> str:
+    def add_hyperedge(
+        self,
+        edge_id: str,
+        edge_type: str,
+        members: List[str],
+        attributes: Dict[str, Any] = None,
+        skip_if_exists: bool = True,
+    ) -> str:
         """
         Add a hyperedge connecting multiple vertices.
 
@@ -292,13 +378,28 @@ class QBPKnowledgeSQLite:
             edge_type: One of the defined hyperedge types
             members: List of vertex IDs in this edge
             attributes: Edge properties
+            skip_if_exists: If True, return existing ID without modification (idempotent).
+                           If False, update existing edge with new data.
+
+        Returns:
+            The edge ID (existing or new)
         """
         if edge_type not in HYPEREDGE_TYPES:
             raise ValueError(f"Invalid hyperedge type: {edge_type}")
 
         schema = HYPEREDGE_TYPES[edge_type]
         if len(members) < schema.get("min_members", 2):
-            raise ValueError(f"{edge_type} requires at least {schema['min_members']} members")
+            raise ValueError(
+                f"{edge_type} requires at least {schema['min_members']} members"
+            )
+
+        # Check for existing edge (idempotency)
+        with self._connection() as conn:
+            existing = conn.execute(
+                "SELECT id FROM hyperedges WHERE id = ?", (edge_id,)
+            ).fetchone()
+            if existing and skip_if_exists:
+                return edge_id  # Already exists, return without modification
 
         data = {"type": edge_type, **(attributes or {})}
         if "created_date" not in data:
@@ -308,7 +409,7 @@ class QBPKnowledgeSQLite:
             # Insert edge
             conn.execute(
                 "INSERT OR REPLACE INTO hyperedges (id, type, data) VALUES (?, ?, ?)",
-                (edge_id, edge_type, json.dumps(data))
+                (edge_id, edge_type, json.dumps(data)),
             )
 
             # Clear existing incidences for this edge (in case of update)
@@ -318,35 +419,41 @@ class QBPKnowledgeSQLite:
             for i, vertex_id in enumerate(members):
                 conn.execute(
                     "INSERT INTO incidences (vertex_id, edge_id, position) VALUES (?, ?, ?)",
-                    (vertex_id, edge_id, i)
+                    (vertex_id, edge_id, i),
                 )
 
         return edge_id
 
-    def add_evidence_chain(self, claim_id: str, evidence_ids: List[str],
-                           confidence_tier: int = 2, **kwargs) -> str:
+    def add_evidence_chain(
+        self, claim_id: str, evidence_ids: List[str], confidence_tier: int = 2, **kwargs
+    ) -> str:
         """Add an evidence chain hyperedge."""
         edge_id = f"ev_{claim_id.replace(':', '_')}_{len(evidence_ids)}"
         members = [claim_id] + evidence_ids
-        return self.add_hyperedge(edge_id, "evidence_chain", members, {
-            "confidence_tier": confidence_tier, **kwargs
-        })
+        return self.add_hyperedge(
+            edge_id,
+            "evidence_chain",
+            members,
+            {"confidence_tier": confidence_tier, **kwargs},
+        )
 
-    def add_proof_link(self, claim_id: str, proof_id: str,
-                       theorem: str, **kwargs) -> str:
+    def add_proof_link(
+        self, claim_id: str, proof_id: str, theorem: str, **kwargs
+    ) -> str:
         """Add a proof link hyperedge."""
         edge_id = f"pl_{claim_id.replace(':', '_')}_{proof_id.replace(':', '_')}"
-        return self.add_hyperedge(edge_id, "proof_link", [claim_id, proof_id], {
-            "theorem": theorem, **kwargs
-        })
+        return self.add_hyperedge(
+            edge_id, "proof_link", [claim_id, proof_id], {"theorem": theorem, **kwargs}
+        )
 
-    def add_equivalence(self, concept_ids: List[str],
-                        description: str = "", **kwargs) -> str:
+    def add_equivalence(
+        self, concept_ids: List[str], description: str = "", **kwargs
+    ) -> str:
         """Add an equivalence hyperedge."""
         edge_id = f"eq_{len(concept_ids)}_{hash(tuple(concept_ids)) % 10000}"
-        return self.add_hyperedge(edge_id, "equivalence", concept_ids, {
-            "description": description, **kwargs
-        })
+        return self.add_hyperedge(
+            edge_id, "equivalence", concept_ids, {"description": description, **kwargs}
+        )
 
     def get_hyperedge(self, edge_id: str) -> Optional[Dict[str, Any]]:
         """Get hyperedge by ID, including members."""
@@ -363,7 +470,7 @@ class QBPKnowledgeSQLite:
             # Get members
             members = conn.execute(
                 "SELECT vertex_id FROM incidences WHERE edge_id = ? ORDER BY position",
-                (edge_id,)
+                (edge_id,),
             ).fetchall()
             data["members"] = [m["vertex_id"] for m in members]
 
@@ -372,12 +479,15 @@ class QBPKnowledgeSQLite:
     def get_edges_containing(self, vertex_id: str) -> List[Dict[str, Any]]:
         """Get all hyperedges containing a vertex."""
         with self._connection() as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT h.id, h.data
                 FROM hyperedges h
                 JOIN incidences i ON h.id = i.edge_id
                 WHERE i.vertex_id = ?
-            """, (vertex_id,)).fetchall()
+            """,
+                (vertex_id,),
+            ).fetchall()
 
             results = []
             for row in rows:
@@ -386,7 +496,7 @@ class QBPKnowledgeSQLite:
                 # Get all members
                 members = conn.execute(
                     "SELECT vertex_id FROM incidences WHERE edge_id = ? ORDER BY position",
-                    (row["id"],)
+                    (row["id"],),
                 ).fetchall()
                 data["members"] = [m["vertex_id"] for m in members]
                 results.append(data)
@@ -406,7 +516,7 @@ class QBPKnowledgeSQLite:
                 data["id"] = row["id"]
                 members = conn.execute(
                     "SELECT vertex_id FROM incidences WHERE edge_id = ? ORDER BY position",
-                    (row["id"],)
+                    (row["id"],),
                 ).fetchall()
                 data["members"] = [m["vertex_id"] for m in members]
                 results.append(data)
@@ -433,8 +543,14 @@ class QBPKnowledgeSQLite:
                 )
             """).fetchall()
 
-            return [{"id": row["id"], **json.loads(row["data"]),
-                     "reason": "no evidence chain"} for row in rows]
+            return [
+                {
+                    "id": row["id"],
+                    **json.loads(row["data"]),
+                    "reason": "no evidence chain",
+                }
+                for row in rows
+            ]
 
     def find_unproven_claims(self) -> List[Dict[str, Any]]:
         """Find claims without proof_link hyperedges."""
@@ -469,13 +585,20 @@ class QBPKnowledgeSQLite:
                 )
             """).fetchall()
 
-            return [{"id": row["id"], **json.loads(row["data"]),
-                     "reason": "no investigation"} for row in rows]
+            return [
+                {
+                    "id": row["id"],
+                    **json.loads(row["data"]),
+                    "reason": "no investigation",
+                }
+                for row in rows
+            ]
 
     def find_bridge_concepts(self, min_degree: int = 3) -> List[Dict[str, Any]]:
         """Find concepts that appear in multiple hyperedges."""
         with self._connection() as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT v.id, v.data, COUNT(DISTINCT i.edge_id) as degree
                 FROM vertices v
                 JOIN incidences i ON v.id = i.vertex_id
@@ -483,10 +606,14 @@ class QBPKnowledgeSQLite:
                 GROUP BY v.id
                 HAVING degree >= ?
                 ORDER BY degree DESC
-            """, (min_degree,)).fetchall()
+            """,
+                (min_degree,),
+            ).fetchall()
 
-            return [{"id": row["id"], **json.loads(row["data"]),
-                     "degree": row["degree"]} for row in rows]
+            return [
+                {"id": row["id"], **json.loads(row["data"]), "degree": row["degree"]}
+                for row in rows
+            ]
 
     def trace_evidence(self, claim_id: str) -> Dict[str, Any]:
         """Trace all evidence supporting a claim."""
@@ -504,7 +631,9 @@ class QBPKnowledgeSQLite:
             "evidence_chains": evidence_chains,
             "proof_links": proof_links,
             "has_formal_proof": len(proof_links) > 0,
-            "total_evidence_sources": sum(len(e["members"]) - 1 for e in evidence_chains)
+            "total_evidence_sources": sum(
+                len(e["members"]) - 1 for e in evidence_chains
+            ),
         }
 
     # -------------------------------------------------------------------------
@@ -524,19 +653,21 @@ class QBPKnowledgeSQLite:
 
             total_vertices = conn.execute("SELECT COUNT(*) FROM vertices").fetchone()[0]
             total_edges = conn.execute("SELECT COUNT(*) FROM hyperedges").fetchone()[0]
-            total_incidences = conn.execute("SELECT COUNT(*) FROM incidences").fetchone()[0]
+            total_incidences = conn.execute(
+                "SELECT COUNT(*) FROM incidences"
+            ).fetchone()[0]
 
         return {
             "vertices": {
                 "total": total_vertices,
-                "by_type": {row["type"]: row["count"] for row in vertex_counts}
+                "by_type": {row["type"]: row["count"] for row in vertex_counts},
             },
             "hyperedges": {
                 "total": total_edges,
-                "by_type": {row["type"]: row["count"] for row in edge_counts}
+                "by_type": {row["type"]: row["count"] for row in edge_counts},
             },
             "incidences": total_incidences,
-            "db_path": str(self.db_path)
+            "db_path": str(self.db_path),
         }
 
     # -------------------------------------------------------------------------
@@ -550,35 +681,32 @@ class QBPKnowledgeSQLite:
             "metadata": {
                 "name": "QBP Knowledge Hypergraph",
                 "exported_from": "qbp_knowledge_sqlite",
-                "export_date": str(date.today())
+                "export_date": str(date.today()),
             },
             "nodes": [],
             "edges": [],
-            "incidences": []
+            "incidences": [],
         }
 
         with self._connection() as conn:
             # Export vertices
             for row in conn.execute("SELECT id, data FROM vertices"):
-                hif["nodes"].append({
-                    "node": row["id"],
-                    "attrs": json.loads(row["data"])
-                })
+                hif["nodes"].append(
+                    {"node": row["id"], "attrs": json.loads(row["data"])}
+                )
 
             # Export edges and incidences
             for row in conn.execute("SELECT id, data FROM hyperedges"):
-                hif["edges"].append({
-                    "edge": row["id"],
-                    "attrs": json.loads(row["data"])
-                })
+                hif["edges"].append(
+                    {"edge": row["id"], "attrs": json.loads(row["data"])}
+                )
 
             for row in conn.execute("SELECT vertex_id, edge_id FROM incidences"):
-                hif["incidences"].append({
-                    "node": row["vertex_id"],
-                    "edge": row["edge_id"]
-                })
+                hif["incidences"].append(
+                    {"node": row["vertex_id"], "edge": row["edge_id"]}
+                )
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(hif, f, indent=2)
 
         return output_path
@@ -606,7 +734,9 @@ class QBPKnowledgeSQLite:
     # -------------------------------------------------------------------------
 
     @classmethod
-    def import_from_hypergraphdb(cls, hgdb_path: str, sqlite_path: str) -> 'QBPKnowledgeSQLite':
+    def import_from_hypergraphdb(
+        cls, hgdb_path: str, sqlite_path: str
+    ) -> "QBPKnowledgeSQLite":
         """
         Import data from Hypergraph-DB format to SQLite.
 
@@ -642,76 +772,77 @@ class QBPKnowledgeSQLite:
 # CLI
 # =============================================================================
 
+
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="QBP Knowledge System (SQLite)")
-    parser.add_argument('--db', default='knowledge/qbp.db', help='Database path')
+    parser.add_argument("--db", default="knowledge/qbp.db", help="Database path")
 
-    subparsers = parser.add_subparsers(dest='command')
+    subparsers = parser.add_subparsers(dest="command")
 
     # Summary
-    subparsers.add_parser('summary', help='Show database summary')
+    subparsers.add_parser("summary", help="Show database summary")
 
     # Query
-    query_p = subparsers.add_parser('query', help='Query vertices')
-    query_p.add_argument('--type', help='Vertex type')
-    query_p.add_argument('--tag', help='Filter by tag')
-    query_p.add_argument('--search', help='Search in data')
+    query_p = subparsers.add_parser("query", help="Query vertices")
+    query_p.add_argument("--type", help="Vertex type")
+    query_p.add_argument("--tag", help="Filter by tag")
+    query_p.add_argument("--search", help="Search in data")
 
     # Research queries
-    subparsers.add_parser('weak-claims', help='Find claims with weak evidence')
-    subparsers.add_parser('unproven', help='Find claims without proofs')
-    subparsers.add_parser('gaps', help='Find research gaps')
-    subparsers.add_parser('bridges', help='Find bridge concepts')
+    subparsers.add_parser("weak-claims", help="Find claims with weak evidence")
+    subparsers.add_parser("unproven", help="Find claims without proofs")
+    subparsers.add_parser("gaps", help="Find research gaps")
+    subparsers.add_parser("bridges", help="Find bridge concepts")
 
     # Export
-    export_p = subparsers.add_parser('export', help='Export data')
-    export_p.add_argument('--format', choices=['hif', 'json'], default='hif')
-    export_p.add_argument('--output', required=True, help='Output file')
+    export_p = subparsers.add_parser("export", help="Export data")
+    export_p.add_argument("--format", choices=["hif", "json"], default="hif")
+    export_p.add_argument("--output", required=True, help="Output file")
 
     # Import
-    import_p = subparsers.add_parser('import', help='Import from Hypergraph-DB')
-    import_p.add_argument('--from', dest='source', required=True, help='Source .hgdb file')
+    import_p = subparsers.add_parser("import", help="Import from Hypergraph-DB")
+    import_p.add_argument(
+        "--from", dest="source", required=True, help="Source .hgdb file"
+    )
 
     args = parser.parse_args()
 
-    if args.command == 'import':
+    if args.command == "import":
         kb = QBPKnowledgeSQLite.import_from_hypergraphdb(args.source, args.db)
         print(f"Imported to {args.db}")
         print(json.dumps(kb.summary(), indent=2))
     else:
         kb = QBPKnowledgeSQLite(args.db)
 
-        if args.command == 'summary':
+        if args.command == "summary":
             print(json.dumps(kb.summary(), indent=2))
 
-        elif args.command == 'query':
+        elif args.command == "query":
             results = kb.query_vertices(
-                vertex_type=args.type,
-                tag=args.tag,
-                search=args.search
+                vertex_type=args.type, tag=args.tag, search=args.search
             )
             print(json.dumps(results, indent=2))
 
-        elif args.command == 'weak-claims':
+        elif args.command == "weak-claims":
             results = kb.find_weak_claims()
             print(json.dumps(results, indent=2))
 
-        elif args.command == 'unproven':
+        elif args.command == "unproven":
             results = kb.find_unproven_claims()
             print(json.dumps(results, indent=2))
 
-        elif args.command == 'gaps':
+        elif args.command == "gaps":
             results = kb.find_research_gaps()
             print(json.dumps(results, indent=2))
 
-        elif args.command == 'bridges':
+        elif args.command == "bridges":
             results = kb.find_bridge_concepts()
             print(json.dumps(results, indent=2))
 
-        elif args.command == 'export':
-            if args.format == 'hif':
+        elif args.command == "export":
+            if args.format == "hif":
                 kb.export_hif(args.output)
                 print(f"Exported HIF to {args.output}")
 
@@ -719,5 +850,5 @@ def main():
             parser.print_help()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
