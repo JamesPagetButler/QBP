@@ -29,7 +29,7 @@
 - [x] **Hypergraph Knowledge System** (#235) — Core implementation complete
   - [x] Core infrastructure (#236) — CLOSED 2026-02-11. Hypergraph-DB + API wrapper
   - [x] YAML migration (#237) — CLOSED 2026-02-11. 21 vertices, 9 hyperedges seeded
-  - [ ] Schema validation (#220) — Vertex and hyperedge validation (can do during 0R)
+  - [x] Schema validation (#220) — CLOSED 2026-02-12. Validate command + JSON schemas + pre-commit hook.
 - [x] **Research Sprint 0R** (#212) — **COMPLETE** (7/9 issues closed, 2 deferred)
 - [x] Theory Refinement (#165) — CLOSED 2026-02-12. PR #243 merged. DESIGN_RATIONALE Section 9.
 - [x] Retrospective (#191) — CLOSED 2026-02-12. Full retrospective documented.
