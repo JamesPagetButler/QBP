@@ -293,6 +293,35 @@ This is the visual language of a theory that works — academic enough to be tak
 
 ---
 
+## Axis Color Rationale
+
+The axis color assignments are **aesthetic with structural justification**, not mathematical encodings. They are not arbitrary, but they are choices — different choices could work equally well.
+
+| Axis | Color | Rationale |
+|------|-------|-----------|
+| **X** | Clay `#D9956E` | Warm, advancing tone — the x-axis extends "toward" the viewer in standard orientation. Clay (baked earth) conveys energy and immediacy. |
+| **Y** | Sage Light `#5BA88A` | Green tones are perceptually sensitive — the eye distinguishes green variations most finely. The y-axis (vertical in most physics plots) benefits from this sensitivity. Sage (natural growth) conveys correctness. |
+| **Z** | Patina `#5A9E94` | Cool, receding tone — the z-axis extends "into" depth. Patina (aged copper-green) conveys measured depth and truth revealed over time. |
+
+**Why not encode physics?** We considered mapping colors to physical meaning (e.g., spin components), but axis colors must be stable across all visualizations — spin, position, momentum. Encoding physics into axis color would create contradictions across experiments. Natural-material naming keeps the associations stable and memorable without false precision.
+
+---
+
+## Visual Comparisons
+
+The palette evolved from vibrant primary colors to muted academic tones. Two comparison documents show this transition:
+
+- **[Palette Comparison](design-system-compare.html)** — Side-by-side view of old (vivid) vs. new (muted) palette applied to the same visualization elements. The muted palette enhances readability for academic audiences while maintaining visual warmth.
+- **[Design Preview](design-system-preview.html)** — Full preview of the current design system applied to typical QBP visualization layouts, showing text hierarchy, axis colors, and semantic colors in context.
+
+**Key differences from old palette:**
+- Legacy Crimson/Jade/Teal replaced with Clay/Sage/Patina — warmer, less saturated
+- Background shifted from Dark Slate (`#1A1A2E`) to Verdant Night (`#0D2820`) — green-tinted, organic
+- Text hierarchy formalized with WCAG-compliant contrast ratios
+- Color names changed from descriptive (Red, Green, Blue) to material (Clay, Sage, Patina)
+
+---
+
 ## References
 
 - [Solarpunk Aesthetics Wiki](https://aesthetics.fandom.com/wiki/Solarpunk)

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBP Design System: Palette Comparison</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #D4A574;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-style: italic;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .palette {
+            background: #0D2820;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #3a5a4a;
+        }
+
+        .palette.academic {
+            background: #0F2622;
+            border-color: #4a6a5a;
+        }
+
+        .palette-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3a5a4a;
+        }
+
+        .palette-title {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .palette-title.vibrant { color: #3DDC84; }
+        .palette-title.academic { color: #6B9B8A; }
+
+        .palette-desc {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .color-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 0.85em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .color-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90px;
+        }
+
+        .swatch {
+            width: 70px;
+            height: 50px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .color-name {
+            font-size: 0.75em;
+            color: #aaa;
+            text-align: center;
+        }
+
+        .color-hex {
+            font-size: 0.65em;
+            color: #666;
+            font-family: monospace;
+        }
+
+        /* Sample panels */
+        .sample-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #3a5a4a;
+        }
+
+        .sample-panel {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .sample-title {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .sample-body {
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .sample-caption {
+            font-size: 0.8em;
+        }
+
+        .axis-demo {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .axis-item {
+            text-align: center;
+        }
+
+        .axis-bar {
+            width: 80px;
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+
+        .axis-label {
+            font-size: 0.8em;
+        }
+
+        /* Footer comparison */
+        .verdict {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .verdict-card {
+            background: #0D2820;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #3a5a4a;
+        }
+
+        .verdict-card h3 {
+            margin-bottom: 15px;
+            color: #D4A574;
+        }
+
+        .verdict-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .verdict-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9em;
+        }
+
+        .verdict-card li:last-child {
+            border-bottom: none;
+        }
+
+        .pro { color: #7aba9a; }
+        .con { color: #ba8a7a; }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>QBP Design System: Palette Comparison</h1>
+            <p class="subtitle">Vibrant (Tech) vs Academic (Scholarly)</p>
+        </header>
+
+        <div class="comparison">
+            <!-- VIBRANT PALETTE -->
+            <div class="palette vibrant">
+                <div class="palette-header">
+                    <div class="palette-title vibrant">Vibrant Palette</div>
+                    <div class="palette-desc">"Tech startup meets nature" — saturated, energetic</div>
+                </div>
+
+                <div class="color-section">
+                    <div class="section-title">Living Greens</div>
+                    <div class="color-row">
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #00A86B;">🌿</div>
+                            <div class="color-name">Jade</div>
+                            <div class="color-hex">#00A86B</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #3DDC84;">✦</div>
+                            <div class="color-name">Jade Bright</div>
+                            <div class="color-hex">#3DDC84</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #2A9D8F;"></div>
+                            <div class="color-name">Teal</div>
+                            <div class="color-hex">#2A9D8F</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #3DBFAE;">✦</div>
+                            <div class="color-name">Teal Bright</div>
+                            <div class="color-hex">#3DBFAE</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-section">
+                    <div class="section-title">Warm Accents</div>
+                    <div class="color-row">
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #E07B53;">🔥</div>
+                            <div class="color-name">Coral</div>
+                            <div class="color-hex">#E07B53</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #FF7F5C;">✦</div>
+                            <div class="color-name">Coral Bright</div>
+                            <div class="color-hex">#FF7F5C</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #F5C542;">☀</div>
+                            <div class="color-name">Solar</div>
+                            <div class="color-hex">#F5C542</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #F4A261;"></div>
+                            <div class="color-name">Amber</div>
+                            <div class="color-hex">#F4A261</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-section">
+                    <div class="section-title">Legacy Metals</div>
+                    <div class="color-row">
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #D4A574;">⚙</div>
+                            <div class="color-name">Brass</div>
+                            <div class="color-hex">#D4A574</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #B87333;"></div>
+                            <div class="color-name">Copper</div>
+                            <div class="color-hex">#B87333</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #FFD700;">★</div>
+                            <div class="color-name">Gold</div>
+                            <div class="color-hex">#FFD700</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sample-section">
+                    <div class="section-title">Sample: Dark Mode Panel</div>
+                    <div class="sample-panel" style="background: #0D2820;">
+                        <div class="sample-title" style="color: #3DDC84;">Quaternion State Vector</div>
+                        <div class="sample-body" style="color: #F5F5F5;">
+                            The state ψ(θ) = sin(θ)·<b style="color: #FF7F5C;">i</b> + cos(θ)·<b style="color: #3DBFAE;">k</b> represents a pure quaternion on the Bloch sphere.
+                        </div>
+                        <div class="sample-caption" style="color: #B8B8B8;">
+                            Probability: P(+) = cos²(θ/2) — <span style="color: #F5C542;">validated experimentally</span>
+                        </div>
+                    </div>
+
+                    <div class="axis-demo">
+                        <div class="axis-item">
+                            <div class="axis-bar" style="background: linear-gradient(90deg, #0D2820, #FF7F5C);"></div>
+                            <div class="axis-label" style="color: #FF7F5C;">X-Axis</div>
+                        </div>
+                        <div class="axis-item">
+                            <div class="axis-bar" style="background: linear-gradient(90deg, #0D2820, #3DDC84);"></div>
+                            <div class="axis-label" style="color: #3DDC84;">Y-Axis</div>
+                        </div>
+                        <div class="axis-item">
+                            <div class="axis-bar" style="background: linear-gradient(90deg, #0D2820, #3DBFAE);"></div>
+                            <div class="axis-label" style="color: #3DBFAE;">Z-Axis</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACADEMIC PALETTE -->
+            <div class="palette academic">
+                <div class="palette-header">
+                    <div class="palette-title academic">Academic Palette</div>
+                    <div class="palette-desc">"Illuminated manuscript" — muted, scholarly, warm</div>
+                </div>
+
+                <div class="color-section">
+                    <div class="section-title">Living Greens (Muted)</div>
+                    <div class="color-row">
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #3D8B6E;">🌿</div>
+                            <div class="color-name">Sage</div>
+                            <div class="color-hex">#3D8B6E</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #5BA88A;">✦</div>
+                            <div class="color-name">Sage Light</div>
+                            <div class="color-hex">#5BA88A</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #3D7A73;"></div>
+                            <div class="color-name">Verdigris</div>
+                            <div class="color-hex">#3D7A73</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #5A9E94;">✦</div>
+                            <div class="color-name">Patina</div>
+                            <div class="color-hex">#5A9E94</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-section">
+                    <div class="section-title">Warm Accents (Earthen)</div>
+                    <div class="color-row">
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #C4785A;">🔥</div>
+                            <div class="color-name">Terracotta</div>
+                            <div class="color-hex">#C4785A</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #D9956E;">✦</div>
+                            <div class="color-name">Clay</div>
+                            <div class="color-hex">#D9956E</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #D4AA5A;">☀</div>
+                            <div class="color-name">Ochre</div>
+                            <div class="color-hex">#D4AA5A</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #C9956A;"></div>
+                            <div class="color-name">Sienna</div>
+                            <div class="color-hex">#C9956A</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-section">
+                    <div class="section-title">Legacy Metals (Same)</div>
+                    <div class="color-row">
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #D4A574;">⚙</div>
+                            <div class="color-name">Brass</div>
+                            <div class="color-hex">#D4A574</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #B87333;"></div>
+                            <div class="color-name">Copper</div>
+                            <div class="color-hex">#B87333</div>
+                        </div>
+                        <div class="color-chip">
+                            <div class="swatch" style="background: #D4B896;">★</div>
+                            <div class="color-name">Gilt</div>
+                            <div class="color-hex">#D4B896</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sample-section">
+                    <div class="section-title">Sample: Dark Mode Panel</div>
+                    <div class="sample-panel" style="background: #0F2622;">
+                        <div class="sample-title" style="color: #5BA88A;">Quaternion State Vector</div>
+                        <div class="sample-body" style="color: #E8E4E0;">
+                            The state ψ(θ) = sin(θ)·<b style="color: #D9956E;">i</b> + cos(θ)·<b style="color: #5A9E94;">k</b> represents a pure quaternion on the Bloch sphere.
+                        </div>
+                        <div class="sample-caption" style="color: #A8A49C;">
+                            Probability: P(+) = cos²(θ/2) — <span style="color: #D4AA5A;">validated experimentally</span>
+                        </div>
+                    </div>
+
+                    <div class="axis-demo">
+                        <div class="axis-item">
+                            <div class="axis-bar" style="background: linear-gradient(90deg, #0F2622, #D9956E);"></div>
+                            <div class="axis-label" style="color: #D9956E;">X-Axis</div>
+                        </div>
+                        <div class="axis-item">
+                            <div class="axis-bar" style="background: linear-gradient(90deg, #0F2622, #5BA88A);"></div>
+                            <div class="axis-label" style="color: #5BA88A;">Y-Axis</div>
+                        </div>
+                        <div class="axis-item">
+                            <div class="axis-bar" style="background: linear-gradient(90deg, #0F2622, #5A9E94);"></div>
+                            <div class="axis-label" style="color: #5A9E94;">Z-Axis</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIGHT MODE COMPARISON -->
+        <h2 style="text-align: center; margin: 40px 0 20px; color: #D4A574;">Light Mode Comparison</h2>
+        <div class="comparison">
+            <div class="palette" style="background: #F5E6D3; border-color: #D4A574;">
+                <div class="palette-header" style="border-color: #D4A574;">
+                    <div class="palette-title" style="color: #2C2C2C;">Vibrant on Parchment</div>
+                </div>
+                <div class="sample-panel" style="background: #F5E6D3; border: 1px solid #D4A574;">
+                    <div class="sample-title" style="color: #00A86B;">Measurement Probability</div>
+                    <div class="sample-body" style="color: #2C2C2C;">
+                        The <span style="color: #E07B53;">X-component</span> and <span style="color: #2A9D8F;">Z-component</span> determine the projection onto the measurement axis.
+                    </div>
+                    <div class="sample-caption" style="color: #555566;">
+                        Result: <span style="color: #00A86B;">PASS</span> — χ² = 4.96, p = 0.665
+                    </div>
+                </div>
+            </div>
+            <div class="palette" style="background: #F5E6D3; border-color: #B87333;">
+                <div class="palette-header" style="border-color: #B87333;">
+                    <div class="palette-title" style="color: #2C2C2C;">Academic on Parchment</div>
+                </div>
+                <div class="sample-panel" style="background: #F5E6D3; border: 1px solid #B87333;">
+                    <div class="sample-title" style="color: #3D8B6E;">Measurement Probability</div>
+                    <div class="sample-body" style="color: #2C2C2C;">
+                        The <span style="color: #C4785A;">X-component</span> and <span style="color: #3D7A73;">Z-component</span> determine the projection onto the measurement axis.
+                    </div>
+                    <div class="sample-caption" style="color: #555566;">
+                        Result: <span style="color: #3D8B6E;">PASS</span> — χ² = 4.96, p = 0.665
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VERDICT -->
+        <div class="verdict">
+            <div class="verdict-card">
+                <h3>Vibrant Palette</h3>
+                <ul>
+                    <li class="pro">✓ High energy, optimistic</li>
+                    <li class="pro">✓ Strong visual hierarchy</li>
+                    <li class="pro">✓ Modern, accessible feel</li>
+                    <li class="con">✗ May feel "tech startup"</li>
+                    <li class="con">✗ Saturated greens feel commercial</li>
+                    <li class="con">✗ Could distract from content</li>
+                </ul>
+            </div>
+            <div class="verdict-card">
+                <h3>Academic Palette</h3>
+                <ul>
+                    <li class="pro">✓ Scholarly, trustworthy</li>
+                    <li class="pro">✓ "Illuminated manuscript" feel</li>
+                    <li class="pro">✓ Colors support, don't dominate</li>
+                    <li class="pro">✓ Feels like Nature/Science journals</li>
+                    <li class="con">✗ Slightly less visual pop</li>
+                    <li class="con">✗ May need higher contrast for some uses</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- KEY DIFFERENCES -->
+        <h2 style="text-align: center; margin: 40px 0 20px; color: #D4A574;">Key Differences</h2>
+        <div class="comparison">
+            <div class="palette" style="background: #1a1a1a;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                    <tr style="border-bottom: 1px solid #333;">
+                        <th style="text-align: left; padding: 10px; color: #888;">Role</th>
+                        <th style="text-align: left; padding: 10px; color: #3DDC84;">Vibrant</th>
+                        <th style="text-align: left; padding: 10px; color: #5BA88A;">Academic</th>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 10px; color: #aaa;">Y-Axis / Success</td>
+                        <td style="padding: 10px;"><span style="background: #3DDC84; padding: 2px 8px; border-radius: 3px; color: #000;">Jade Bright</span></td>
+                        <td style="padding: 10px;"><span style="background: #5BA88A; padding: 2px 8px; border-radius: 3px; color: #000;">Sage Light</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 10px; color: #aaa;">X-Axis / Warm</td>
+                        <td style="padding: 10px;"><span style="background: #FF7F5C; padding: 2px 8px; border-radius: 3px; color: #000;">Coral Bright</span></td>
+                        <td style="padding: 10px;"><span style="background: #D9956E; padding: 2px 8px; border-radius: 3px; color: #000;">Clay</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 10px; color: #aaa;">Z-Axis / Depth</td>
+                        <td style="padding: 10px;"><span style="background: #3DBFAE; padding: 2px 8px; border-radius: 3px; color: #000;">Teal Bright</span></td>
+                        <td style="padding: 10px;"><span style="background: #5A9E94; padding: 2px 8px; border-radius: 3px; color: #000;">Patina</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 10px; color: #aaa;">Highlight</td>
+                        <td style="padding: 10px;"><span style="background: #F5C542; padding: 2px 8px; border-radius: 3px; color: #000;">Solar</span></td>
+                        <td style="padding: 10px;"><span style="background: #D4AA5A; padding: 2px 8px; border-radius: 3px; color: #000;">Ochre</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; color: #aaa;">Gold</td>
+                        <td style="padding: 10px;"><span style="background: #FFD700; padding: 2px 8px; border-radius: 3px; color: #000;">Pure Gold</span></td>
+                        <td style="padding: 10px;"><span style="background: #D4B896; padding: 2px 8px; border-radius: 3px; color: #000;">Gilt</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="palette" style="background: #1a1a1a;">
+                <div style="padding: 20px; text-align: center;">
+                    <p style="color: #888; margin-bottom: 20px;">The academic palette uses names that evoke natural materials and historical art:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                        <span style="background: #2a2a2a; padding: 8px 15px; border-radius: 20px; color: #5BA88A;">Sage</span>
+                        <span style="background: #2a2a2a; padding: 8px 15px; border-radius: 20px; color: #5A9E94;">Patina</span>
+                        <span style="background: #2a2a2a; padding: 8px 15px; border-radius: 20px; color: #D9956E;">Clay</span>
+                        <span style="background: #2a2a2a; padding: 8px 15px; border-radius: 20px; color: #C4785A;">Terracotta</span>
+                        <span style="background: #2a2a2a; padding: 8px 15px; border-radius: 20px; color: #D4AA5A;">Ochre</span>
+                        <span style="background: #2a2a2a; padding: 8px 15px; border-radius: 20px; color: #C9956A;">Sienna</span>
+                        <span style="background: #2a2a2a; padding: 8px 15px; border-radius: 20px; color: #D4B896;">Gilt</span>
+                    </div>
+                    <p style="color: #666; margin-top: 20px; font-size: 0.85em;">
+                        These names reference botanical illustration, oil painting pigments, and gilded manuscripts — the visual language of pre-digital scholarship.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>QBP Design System Comparison · Which feels right for rigorous physics?</p>
+        </footer>
+    </div>
+</body>
+</html>
