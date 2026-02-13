@@ -319,39 +319,47 @@ def _potential_step(
     psi1: np.ndarray,
     U0: np.ndarray,
     U1: np.ndarray,
-    dt: float,
+    dz: float,
     hbar: float,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Exact potential step for the coupled quaternionic system.
 
-    The equations:
-        iℏ dψ₀/dz = U₀·ψ₀ - U₁·ψ₁*
+    Derived from the quaternionic Hamiltonian H = U₀ + U₁·j acting on
+    ψ = ψ₀ + ψ₁·j via left multiplication:
+
+        H·ψ = (U₀·ψ₀ − U₁·ψ₁*) + (U₀·ψ₁ + U₁·ψ₀*)·j
+
+    where the conjugation arises from j·z = z*·j for complex z, giving
+    j·ψ₁·j = −ψ₁*. This yields the coupled equations:
+
+        iℏ dψ₀/dz = U₀·ψ₀ − U₁·ψ₁*
         iℏ dψ₁/dz = U₀·ψ₁ + U₁·ψ₀*
 
     Solved in two stages:
-    1. U₀ phase rotation (standard)
-    2. U₁ coupling rotation (handles conjugation)
+    1. U₀ phase rotation: exp(−iU₀·dz/ℏ) applied to both components
+    2. U₁ coupling rotation: SO(4) rotation in (Re ψ₀, Im ψ₀, Re ψ₁, Im ψ₁)
+       space, preserving |ψ₀|² + |ψ₁|² pointwise
 
     Args:
         psi0, psi1: wavefunctions
         U0, U1: potentials (real arrays)
-        dt: step size (dz)
+        dz: propagation step size
         hbar: ℏ
 
     Returns:
         (psi0_new, psi1_new)
     """
     # Stage 1: U₀ phase rotation
-    phase = np.exp(-1j * U0 * dt / hbar)
+    phase = np.exp(-1j * U0 * dz / hbar)
     psi0 = psi0 * phase
     psi1 = psi1 * phase
 
     # Stage 2: U₁ coupling
     # Real/imaginary decomposition to handle conjugation:
-    # dp/dt = (U₁/ℏ)s,  dq/dt = (U₁/ℏ)r
-    # dr/dt = -(U₁/ℏ)q, ds/dt = -(U₁/ℏ)p
-    theta = U1 * dt / hbar
+    # dp/dz = (U₁/ℏ)s,  dq/dz = (U₁/ℏ)r
+    # dr/dz = -(U₁/ℏ)q, ds/dz = -(U₁/ℏ)p
+    theta = U1 * dz / hbar
     cos_t = np.cos(theta)
     sin_t = np.sin(theta)
 
@@ -502,6 +510,11 @@ def propagate(
     use_gpu = config.device == "cuda" and HAS_TORCH and torch.cuda.is_available()
 
     if use_gpu:
+        if potential_func is not None:
+            raise NotImplementedError(
+                "GPU propagation does not support potential_func. "
+                "Use device='cpu' or pass slit/U0_static/U1_static instead."
+            )
         return _propagate_gpu(
             psi0_init, psi1_init, grid, config, slit, U0_static, U1_static
         )

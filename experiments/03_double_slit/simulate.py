@@ -45,6 +45,19 @@ from src.simulation.wave_propagation import (
 # ---------------------------------------------------------------------------
 # Default parameters
 # ---------------------------------------------------------------------------
+#
+# BPM parameters use natural units (ℏ=1, m=0.5) for numerical convenience.
+# The physics is scale-invariant; what matters is the dimensionless ratios:
+#   - k0 * slit_width ≈ 9 (several wavelengths per slit → Fraunhofer regime)
+#   - barrier_height / kinetic_energy ≈ 3.3 (opaque barrier)
+#   - U1_strength / kinetic_energy = 0–0.33 (coupling sweep)
+#   - Total propagation = Nz*dz = 200 units (>> slit region, far-field reached)
+#
+# Analytical parameters use SI units for direct comparison with literature
+# (Kaiser 1984 neutron bound: ~10⁻¹² eV; Procopio 2017 photon bound).
+#
+# See docs/design/experiment_03_alternatives.md for parameter space discussion.
+#
 
 # Physical parameters (natural units for BPM)
 BPM_CONFIG = SimulationConfig(
@@ -168,7 +181,7 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
         slit: slit config (default: BPM_SLIT)
 
     Returns:
-        (fringe_df, decay_df, visibility)
+        (fringe_df, decay_df, visibility, norm_final)
     """
     if config is None:
         config = BPM_CONFIG
@@ -227,7 +240,7 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
             }
         )
 
-    return pd.DataFrame(fringe_rows), pd.DataFrame(decay_rows), V
+    return pd.DataFrame(fringe_rows), pd.DataFrame(decay_rows), V, final_norm
 
 
 # ---------------------------------------------------------------------------
@@ -282,7 +295,7 @@ def main():
     print("\n--- Scenario C: Quaternionic BPM (Parameter Sweep) ---")
     for u1 in U1_VALUES:
         for eta0 in ETA0_VALUES:
-            fringe_df, decay_df, V_c = run_scenario_c(u1, eta0)
+            fringe_df, decay_df, V_c, V_c_norm = run_scenario_c(u1, eta0)
             all_fringe_dfs.append(fringe_df)
             all_decay_dfs.append(decay_df)
             summary_rows.append(
@@ -291,7 +304,7 @@ def main():
                     "U1_strength": u1,
                     "eta0": eta0,
                     "visibility": V_c,
-                    "norm_final": fringe_df["intensity_total"].sum(),
+                    "norm_final": V_c_norm,
                 }
             )
 
