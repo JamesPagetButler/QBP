@@ -76,6 +76,32 @@ James approves by confirming:
 
 ---
 
+## Pre-Sprint Research Gate
+
+Before beginning Phase 1, Claude **must** run the Research Gate checkpoint:
+
+```bash
+python scripts/research_gate.py --scope sprint-N experiment-NN
+```
+
+| Verdict | Action |
+|---------|--------|
+| **PASS** (exit 0) | Proceed to Phase 1 |
+| **BLOCK** (exit 1) | Enter Pre-Sprint Research to resolve scoped findings, then re-run gate |
+| **ERROR** (exit 2) | Escalate to James — KG may need attention |
+
+**In Sprint Mode:** Claude runs the gate autonomously as the first action after receiving sprint approval. If the gate returns BLOCK, Claude enters a research loop:
+
+1. Run gate → BLOCK
+2. Identify scoped weak claims and research gaps from gate output
+3. Conduct focused research to resolve them (literature review, KG updates)
+4. Re-run gate
+5. Repeat until PASS or escalate if stuck after 2 cycles
+
+**Precedent:** Sprint 3 Pre-Sprint Research (#255) resolved 5 blocking questions before Phase 1 could begin. The gate formalises this pattern.
+
+---
+
 ## Phase 2: Autonomous Execution
 
 ### Branch-Per-Phase Structure
@@ -186,8 +212,18 @@ After all phases merge:
 1. **Post sprint summary** to tracking issue
 2. **Close phase issues** that are satisfied
 3. **Update SPRINT_STATUS.md** with completion status
-4. **Run retrospective** (answer the 4 questions)
-5. **Notify James** of completion
+4. **KG Consolidation** — before Theory Refinement begins:
+   ```bash
+   git diff master...HEAD --name-only | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
+   python scripts/qbp_knowledge_sqlite.py report
+   ```
+5. **Run Theory Refinement** using KG report as input
+6. **Run retrospective** (answer the 4 questions)
+7. **Run Research Gate** for next sprint:
+   ```bash
+   python scripts/research_gate.py --scope sprint-N+1 experiment-NN
+   ```
+8. **Notify James** of completion
 
 ### Sprint Summary Template
 

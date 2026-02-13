@@ -27,6 +27,31 @@ Research Mode is NOT appropriate when:
 
 ---
 
+## Triggering Research Mode: The Research Gate
+
+Research Mode is formally triggered by the **Research Gate** checkpoint script. After every sprint's Theory Refinement, run:
+
+```bash
+python scripts/research_gate.py --scope sprint-N+1 experiment-NN
+```
+
+| Verdict | Action |
+|---------|--------|
+| **PASS** (exit 0) | Proceed directly to Sprint N+1 Phase 1 — no research needed |
+| **BLOCK** (exit 1) | Enter Research Mode to resolve scoped weak claims and research gaps |
+
+**What the gate checks:**
+- **Weak claims** tagged with the next sprint's scope (claims lacking evidence chains)
+- **Research gaps** tagged with the next sprint's scope (open questions without investigations)
+
+When the gate returns BLOCK, the scoped findings become the starting research questions for Research Mode.
+
+**Manual trigger:** James can always invoke Research Mode manually regardless of gate output — the gate is a safety net, not a straitjacket. The Sprint 3 Pre-Sprint Research (#255) was triggered manually before the gate existed.
+
+**After research completes:** Re-run the gate to confirm PASS before proceeding to Phase 1.
+
+---
+
 ## Research Scope Modes
 
 ### Broad Research (Systematic Review)
