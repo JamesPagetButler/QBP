@@ -8,10 +8,12 @@ Research phase is needed before the next sprint can begin.
 
 Usage:
     python scripts/research_gate.py --scope sprint-4 experiment-04
+    python scripts/research_gate.py --scope sprint-4 --exclude claim:my-target-claim
+    python scripts/research_gate.py --force --scope sprint-4 experiment-04
     python scripts/research_gate.py              # global-only analysis
 
 Exit codes:
-    0 - PASS  (no scoped blocking items)
+    0 - PASS  (no scoped blocking items, or --force used)
     1 - BLOCK (scoped weak claims or research gaps found)
     2 - Error (database not found, etc.)
 """
@@ -19,7 +21,7 @@ Exit codes:
 import argparse
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -63,7 +65,17 @@ def render_item(item: Dict[str, Any]) -> str:
     return f"- **{vid}**: {label}{suffix}"
 
 
-def run_gate(scope_tags: Set[str]) -> int:
+def is_excluded(item: Dict[str, Any], exclude_ids: Set[str]) -> bool:
+    """Check if an item's ID matches any exclusion pattern."""
+    vid = item.get("id", "")
+    return vid in exclude_ids
+
+
+def run_gate(
+    scope_tags: Set[str],
+    exclude_ids: Optional[Set[str]] = None,
+    force: bool = False,
+) -> int:
     """Run the Research Gate and return exit code."""
     if not Path(DB_PATH).exists():
         print(f"ERROR: Knowledge base not found: {DB_PATH}")
@@ -74,6 +86,8 @@ def run_gate(scope_tags: Set[str]) -> int:
     except Exception as exc:
         print(f"ERROR: Cannot open knowledge base: {exc}")
         return 2
+
+    exclude_ids = exclude_ids or set()
 
     weak = kb.find_weak_claims()
     gaps = kb.find_research_gaps()
@@ -107,8 +121,25 @@ def run_gate(scope_tags: Set[str]) -> int:
         global_gaps = gaps
         global_unproven = unproven
 
+    # Separate excluded items from blocking items
+    if exclude_ids and has_scope:
+        excluded_weak = [i for i in scoped_weak if is_excluded(i, exclude_ids)]
+        scoped_weak = [i for i in scoped_weak if not is_excluded(i, exclude_ids)]
+        excluded_gaps = [i for i in scoped_gaps if is_excluded(i, exclude_ids)]
+        scoped_gaps = [i for i in scoped_gaps if not is_excluded(i, exclude_ids)]
+    else:
+        excluded_weak = []
+        excluded_gaps = []
+
     blocking = bool(scoped_weak or scoped_gaps)
-    verdict = "BLOCK" if blocking else "PASS"
+
+    if force and blocking:
+        verdict = "FORCED PASS"
+        print("WARNING: Gate forced — BLOCK findings ignored.\n")
+    elif blocking:
+        verdict = "BLOCK"
+    else:
+        verdict = "PASS"
 
     # ── Render report ────────────────────────────────────────────────
     lines = ["# Research Gate Report", ""]
@@ -117,6 +148,10 @@ def run_gate(scope_tags: Set[str]) -> int:
         lines.append(f"**Scope tags:** {', '.join(sorted(scope_tags))}")
     else:
         lines.append("**Scope:** global (no --scope provided)")
+    if exclude_ids:
+        lines.append(f"**Excluded:** {', '.join(sorted(exclude_ids))}")
+    if force:
+        lines.append("**Mode:** --force (blocking findings ignored)")
     lines.append(f"**Verdict:** {verdict}")
     lines.append("")
 
@@ -137,6 +172,14 @@ def run_gate(scope_tags: Set[str]) -> int:
         else:
             lines.append("None.")
         lines.append("")
+
+        if excluded_weak or excluded_gaps:
+            lines.append("### Excluded (target claims — not blocking)")
+            for i in excluded_weak:
+                lines.append(f"- **{i.get('id', '?')}**: excluded (weak claim)")
+            for i in excluded_gaps:
+                lines.append(f"- **{i.get('id', '?')}**: excluded (research gap)")
+            lines.append("")
 
         lines.append("### Unproven Claims (informational — proofs come in Phase 4)")
         if scoped_unproven:
@@ -170,6 +213,8 @@ def run_gate(scope_tags: Set[str]) -> int:
     lines.append("")
 
     print("\n".join(lines))
+    if force:
+        return 0
     return 1 if blocking else 0
 
 
@@ -183,10 +228,22 @@ def main() -> int:
         default=[],
         help="Scope tags to filter findings (e.g. sprint-4 experiment-04)",
     )
+    parser.add_argument(
+        "--exclude",
+        nargs="*",
+        default=[],
+        help="Claim/question IDs to exclude from blocking (target claims)",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force PASS regardless of findings (logs warning)",
+    )
     args = parser.parse_args()
 
     scope_tags = {t.lower() for t in args.scope}
-    return run_gate(scope_tags)
+    exclude_ids = set(args.exclude)
+    return run_gate(scope_tags, exclude_ids=exclude_ids, force=args.force)
 
 
 if __name__ == "__main__":
