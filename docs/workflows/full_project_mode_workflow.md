@@ -287,6 +287,43 @@ Hard limit of 5 review cycles per phase prevents infinite loops. If limit reache
 
 ---
 
+## Permission Hygiene
+
+### Canonical Project Mode Permissions
+
+Project Mode uses all Sprint Mode permissions plus internal merge capability. Before entering Project Mode, set up `.claude/settings.local.json`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(/home/prime/.local/bin/gh *)",
+      "Bash(python3 *)",
+      "Bash(lake *)",
+      "Bash(timeout *)",
+      "Bash(ls *)",
+      "Bash(GEMINI_API_KEY=* *)",
+      "Bash(cd *)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "mcp__gemini__*"
+    ]
+  }
+}
+```
+
+**Note:** The `Bash(git *)` pattern covers `git merge` for internal merges (sprint → integration branch). Merging to master is prohibited by the safety rails below, not by permissions — it's enforced by process.
+
+See [Sprint Mode: Permission Hygiene](sprint_mode_workflow.md#permission-hygiene) for detailed pattern explanations and env-prefix strategy.
+
+---
+
 ## Safety Rails
 
 ### Prohibited Actions

@@ -273,6 +273,13 @@ The Research Gate queries the Knowledge Graph for blocking issues scoped to the 
 # Check readiness for Sprint 4, Experiment 04
 python scripts/research_gate.py --scope sprint-4 experiment-04
 
+# Exclude target claims (claims the sprint will strengthen, not depend on)
+python scripts/research_gate.py --scope sprint-4 experiment-04 \
+  --exclude claim:qbp-matches-qm-double-slit
+
+# Force PASS regardless of findings (logs warning, still shows report)
+python scripts/research_gate.py --force --scope sprint-4 experiment-04
+
 # Global analysis only (no scope filtering)
 python scripts/research_gate.py
 ```
@@ -282,8 +289,13 @@ python scripts/research_gate.py
 | Exit Code | Verdict | Meaning |
 |-----------|---------|---------|
 | 0 | **PASS** | No scoped blocking items — proceed to Sprint N+1 Phase 1 |
+| 0 | **FORCED PASS** | Blocking items found but `--force` used — proceed with warning |
 | 1 | **BLOCK** | Scoped weak claims or research gaps found — enter Pre-Sprint Research |
 | 2 | **ERROR** | Database not found or unreadable |
+
+**Flags:**
+- `--exclude <id> [<id> ...]` — Exempt specific claim/question IDs from blocking. Use for **target claims** that the sprint is designed to strengthen (as opposed to dependency claims that must be strong before the sprint begins).
+- `--force` — Override BLOCK verdict, returning exit 0. The full report is still generated. Use when a research gap is intended to be resolved experimentally rather than through literature review.
 
 **What blocks:**
 - **Weak claims** scoped to the next sprint — a claim is "weak" when it has no `evidence_chain` hyperedge linking it to supporting sources (i.e. `find_weak_claims()` returns it)

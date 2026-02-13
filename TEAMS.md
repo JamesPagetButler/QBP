@@ -91,6 +91,17 @@ Conducts systematic research during Research Sprints, producing knowledge graph 
 
 ---
 
+## Cross-Agent Communication Protocol
+
+All Claude–Gemini exchanges must follow the [Communication Protocol](docs/workflows/claude_gemini_communication.md), which ensures:
+
+1. **Human-readable summaries** posted where James can find them
+2. **Core Premise Relevance** section on every exchange
+3. **Structured disagreement resolution** with show-your-work evidence
+4. **Session persistence** via Gemini's decision/session tools
+
+---
+
 ## Team Interaction Model
 
 ```
