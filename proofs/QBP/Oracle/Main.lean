@@ -17,11 +17,22 @@ def floatToJson (f : Float) : String :=
   if s.contains '.' then s
   else s ++ ".0"
 
-/-- Generate a single test case as a JSON object string -/
+/-- Generate a single test case as a JSON object string (xz-plane, 1 angle) -/
 def testCaseJson (experiment : String) (label : String) (theta : Float)
     (probUp probDown expectation : Float) : String :=
   s!"  \{\"experiment\": \"{experiment}\", \"label\": \"{label}\", " ++
   s!"\"theta_rad\": {floatToJson theta}, " ++
+  s!"\"prob_up\": {floatToJson probUp}, " ++
+  s!"\"prob_down\": {floatToJson probDown}, " ++
+  s!"\"expectation\": {floatToJson expectation}}"
+
+/-- Generate a 3D test case as a JSON object string (arbitrary directions) -/
+def testCase3DJson (experiment : String) (label : String)
+    (theta_s phi_s theta_o phi_o : Float)
+    (probUp probDown expectation : Float) : String :=
+  s!"  \{\"experiment\": \"{experiment}\", \"label\": \"{label}\", " ++
+  s!"\"theta_s\": {floatToJson theta_s}, \"phi_s\": {floatToJson phi_s}, " ++
+  s!"\"theta_o\": {floatToJson theta_o}, \"phi_o\": {floatToJson phi_o}, " ++
   s!"\"prob_up\": {floatToJson probUp}, " ++
   s!"\"prob_down\": {floatToJson probDown}, " ++
   s!"\"expectation\": {floatToJson expectation}}"
@@ -60,6 +71,29 @@ def generateTestCases : List String := Id.run do
       (floatProbUp psi floatSpinZ)
       (floatProbDown psi floatSpinZ)
       (floatExpectationValue psi floatSpinZ)]
+
+  -- General 3D test cases (#211): arbitrary state and observable directions
+  let cases3D := #[
+    -- y-state measured on z (j component, previously untested)
+    ("3d_y_on_z", pi / 2.0, pi / 2.0, 0.0, 0.0),
+    -- y-state measured on x
+    ("3d_y_on_x", pi / 2.0, pi / 2.0, pi / 2.0, 0.0),
+    -- general oblique angles
+    ("3d_oblique_1", pi / 6.0, pi / 4.0, pi / 3.0, pi / 2.0),
+    ("3d_oblique_2", pi / 4.0, pi, 3.0 * pi / 4.0, 0.0),
+    ("3d_oblique_3", 2.0 * pi / 3.0, pi / 4.0, pi / 6.0, 5.0 * pi / 4.0),
+    -- same direction → P(+) = 1
+    ("3d_same_dir", pi / 4.0, pi / 3.0, pi / 4.0, pi / 3.0),
+    -- opposite directions → P(+) = 0
+    ("3d_opposite", pi / 3.0, pi / 4.0, 2.0 * pi / 3.0, pi + pi / 4.0)
+  ]
+  for (label, ts, ps, to_, po) in cases3D do
+    let psi := floatPsiGeneral ts ps
+    let obs := floatPsiGeneral to_ po
+    cases := cases ++ [testCase3DJson "3d" label ts ps to_ po
+      (floatProbUp psi obs)
+      (floatProbDown psi obs)
+      (floatExpectationValue psi obs)]
 
   return cases
 

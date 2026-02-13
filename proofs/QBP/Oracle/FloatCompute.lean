@@ -54,4 +54,14 @@ def floatPsiAngle (theta : Float) : QFloat :=
 def QFloat.normSq (q : QFloat) : Float :=
   q.re * q.re + q.imI * q.imI + q.imJ * q.imJ + q.imK * q.imK
 
+/-- General state on Bloch sphere: ψ(θ,φ) = sinθ cosφ·i + sinθ sinφ·j + cosθ·k
+    Generalizes floatPsiAngle to arbitrary 3D directions (#211) -/
+def floatPsiGeneral (theta phi : Float) : QFloat :=
+  QFloat.pure (Float.sin theta * Float.cos phi)
+              (Float.sin theta * Float.sin phi)
+              (Float.cos theta)
+
+/-- Spin-Y observable: j direction (mirrors QBP.SPIN_Y) -/
+def floatSpinY : QFloat := QFloat.pure 0.0 1.0 0.0
+
 end QBP.Oracle

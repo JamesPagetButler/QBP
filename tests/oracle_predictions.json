@@ -11,5 +11,12 @@
   {"experiment": "01b", "label": "angle_dep_180.000000deg", "theta_rad": 3.141593, "prob_up": 0.000000, "prob_down": 1.000000, "expectation": -1.000000},
   {"experiment": "edge", "label": "edge_theta_0", "theta_rad": 0.000000, "prob_up": 1.000000, "prob_down": 0.000000, "expectation": 1.000000},
   {"experiment": "edge", "label": "edge_theta_pi", "theta_rad": 3.141593, "prob_up": 0.000000, "prob_down": 1.000000, "expectation": -1.000000},
-  {"experiment": "edge", "label": "edge_theta_2pi", "theta_rad": 6.283185, "prob_up": 1.000000, "prob_down": 0.000000, "expectation": 1.000000}
+  {"experiment": "edge", "label": "edge_theta_2pi", "theta_rad": 6.283185, "prob_up": 1.000000, "prob_down": 0.000000, "expectation": 1.000000},
+  {"experiment": "3d", "label": "3d_y_on_z", "theta_s": 1.570796, "phi_s": 1.570796, "theta_o": 0.000000, "phi_o": 0.000000, "prob_up": 0.500000, "prob_down": 0.500000, "expectation": 0.000000},
+  {"experiment": "3d", "label": "3d_y_on_x", "theta_s": 1.570796, "phi_s": 1.570796, "theta_o": 1.570796, "phi_o": 0.000000, "prob_up": 0.500000, "prob_down": 0.500000, "expectation": 0.000000},
+  {"experiment": "3d", "label": "3d_oblique_1", "theta_s": 0.523599, "phi_s": 0.785398, "theta_o": 1.047198, "phi_o": 1.570796, "prob_up": 0.869599, "prob_down": 0.130401, "expectation": 0.739199},
+  {"experiment": "3d", "label": "3d_oblique_2", "theta_s": 0.785398, "phi_s": 3.141593, "theta_o": 2.356194, "phi_o": 0.000000, "prob_up": 0.000000, "prob_down": 1.000000, "expectation": -1.000000},
+  {"experiment": "3d", "label": "3d_oblique_3", "theta_s": 2.094395, "phi_s": 0.785398, "theta_o": 0.523599, "phi_o": 3.926991, "prob_up": 0.066987, "prob_down": 0.933013, "expectation": -0.866025},
+  {"experiment": "3d", "label": "3d_same_dir", "theta_s": 0.785398, "phi_s": 1.047198, "theta_o": 0.785398, "phi_o": 1.047198, "prob_up": 1.000000, "prob_down": 0.000000, "expectation": 1.000000},
+  {"experiment": "3d", "label": "3d_opposite", "theta_s": 1.047198, "phi_s": 0.785398, "theta_o": 2.094395, "phi_o": 3.926991, "prob_up": 0.000000, "prob_down": 1.000000, "expectation": -1.000000}
 ]
