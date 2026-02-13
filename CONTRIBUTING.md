@@ -869,6 +869,50 @@ Every review must include a formal **Acceptance Criteria Verification** section 
 **Verdict:** BLOCKING — Criteria 3-4 require action
 ```
 
+### Empirical Grounding Verification
+
+For **Tier 3 (theory) PRs** — particularly Phase 1 (Ground Truth) — both Red Team and Gemini reviews must include an Empirical Grounding Verification section. This ensures that every experiment is anchored to real-world measurements, not just theoretical derivations.
+
+**When required:** Any PR that creates or modifies a ground truth document (`research/NN_*_expected_results.md`).
+
+**Checklist:**
+
+| Check | Status |
+|-------|--------|
+| Empirical Anchor section present | PASS/FAIL |
+| At least one measured value with uncertainty cited | PASS/FAIL/N/A |
+| Citations have DOIs or stable identifiers | PASS/FAIL |
+| Data type classification declared | PASS/FAIL |
+| QBP predictions compared to empirical values, not just QM formulas | PASS/FAIL |
+| Null results / experimental constraints cited (if any exist) | PASS/PARTIAL/N/A |
+
+**Verdict:** PASS (all checks satisfied) or BLOCKING (any FAIL)
+
+**N/A status** is permitted only for:
+- "At least one measured value" — when the data type is Theoretical-derived
+- "Null results cited" — when no relevant null results exist (must be explicitly stated)
+
+**Persona responsibilities:**
+- **Sabine** (Red Team): Verifies empirical data is real, correctly quoted, error bars are accurate, and sources are reputable peer-reviewed publications. Flags any cherry-picked or outdated data.
+- **Feynman** (Gemini Theory Team): Assesses whether the QBP-vs-empirical comparison is physically meaningful — not just numerically matching but testing the right physical content.
+
+**Example:**
+
+```markdown
+# Empirical Grounding Verification
+
+| Check | Status | Evidence |
+|-------|--------|----------|
+| Empirical Anchor section present | PASS | §3 Empirical Anchor in document |
+| At least one measured value with uncertainty cited | PASS | Gerlach & Stern 1922: binary splitting observed |
+| Citations have DOIs or stable identifiers | PASS | ZS.9.349 cited |
+| Data type classification declared | PASS | Qualitative-binary |
+| QBP predictions compared to empirical values | PASS | §3.3 compares QBP binary prediction to observed binary splitting |
+| Null results cited | N/A | No null results for basic Stern-Gerlach |
+
+Verdict: PASS
+```
+
 ## Issue-Driven Workflow
 
 All work in this project is driven by GitHub Issues. This ensures traceability and prevents scope creep.
