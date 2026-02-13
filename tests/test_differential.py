@@ -4,6 +4,9 @@ Phase 4d: Differential Testing — Pytest wrapper
 Parametrized tests comparing Python qphysics.py against Lean oracle predictions.
 Each oracle test case becomes a separate pytest test for clear failure reporting.
 
+Supports both xz-plane cases (theta_rad) and general 3D cases (theta_s, phi_s,
+theta_o, phi_o) added by #211.
+
 Also includes a bug-detection test that verifies the harness catches intentional
 formula errors (validates the testing infrastructure itself).
 """
@@ -20,8 +23,10 @@ import pytest
 # Add project root for imports
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
+sys.path.insert(0, str(project_root / "scripts"))
 
 import qphysics  # noqa: E402
+from differential_test import compute_python_prediction  # noqa: E402
 
 ORACLE_PATH = project_root / "tests" / "oracle_predictions.json"
 TOLERANCE = 1e-6
@@ -44,14 +49,11 @@ oracle_cases = load_oracle_cases()
 )
 def test_prob_up_matches_oracle(case: dict) -> None:
     """P(+) from Python matches Lean oracle within tolerance."""
-    theta = case["theta_rad"]
-    psi = qphysics.create_tilted_state(theta)
-    exp_val = qphysics.expectation_value(psi, qphysics.SPIN_Z)
-    python_prob_up = (1 + exp_val) / 2.0
+    python = compute_python_prediction(case)
 
-    assert abs(python_prob_up - case["prob_up"]) <= TOLERANCE, (
-        f"prob_up divergence at theta={theta:.6f}: "
-        f"oracle={case['prob_up']:.10f} python={python_prob_up:.10f}"
+    assert abs(python["prob_up"] - case["prob_up"]) <= TOLERANCE, (
+        f"prob_up divergence for {case['label']}: "
+        f"oracle={case['prob_up']:.10f} python={python['prob_up']:.10f}"
     )
 
 
@@ -62,14 +64,11 @@ def test_prob_up_matches_oracle(case: dict) -> None:
 )
 def test_prob_down_matches_oracle(case: dict) -> None:
     """P(-) from Python matches Lean oracle within tolerance."""
-    theta = case["theta_rad"]
-    psi = qphysics.create_tilted_state(theta)
-    exp_val = qphysics.expectation_value(psi, qphysics.SPIN_Z)
-    python_prob_down = (1 - exp_val) / 2.0
+    python = compute_python_prediction(case)
 
-    assert abs(python_prob_down - case["prob_down"]) <= TOLERANCE, (
-        f"prob_down divergence at theta={theta:.6f}: "
-        f"oracle={case['prob_down']:.10f} python={python_prob_down:.10f}"
+    assert abs(python["prob_down"] - case["prob_down"]) <= TOLERANCE, (
+        f"prob_down divergence for {case['label']}: "
+        f"oracle={case['prob_down']:.10f} python={python['prob_down']:.10f}"
     )
 
 
@@ -80,13 +79,11 @@ def test_prob_down_matches_oracle(case: dict) -> None:
 )
 def test_expectation_matches_oracle(case: dict) -> None:
     """Expectation value from Python matches Lean oracle within tolerance."""
-    theta = case["theta_rad"]
-    psi = qphysics.create_tilted_state(theta)
-    python_exp = qphysics.expectation_value(psi, qphysics.SPIN_Z)
+    python = compute_python_prediction(case)
 
-    assert abs(python_exp - case["expectation"]) <= TOLERANCE, (
-        f"expectation divergence at theta={theta:.6f}: "
-        f"oracle={case['expectation']:.10f} python={python_exp:.10f}"
+    assert abs(python["expectation"] - case["expectation"]) <= TOLERANCE, (
+        f"expectation divergence for {case['label']}: "
+        f"oracle={case['expectation']:.10f} python={python['expectation']:.10f}"
     )
 
 
@@ -100,7 +97,6 @@ class TestBugDetection:
 
     def test_harness_catches_wrong_expectation(self) -> None:
         """Patch expectation_value to return wrong sign — harness must detect it."""
-        sys.path.insert(0, str(project_root / "scripts"))
         from differential_test import run_differential_tests
 
         original = qphysics.expectation_value
@@ -119,7 +115,6 @@ class TestBugDetection:
 
     def test_harness_catches_wrong_state_prep(self) -> None:
         """Patch create_tilted_state to use wrong angle — harness must detect it."""
-        sys.path.insert(0, str(project_root / "scripts"))
         from differential_test import run_differential_tests
 
         original_create = qphysics.create_tilted_state
@@ -137,7 +132,6 @@ class TestBugDetection:
 
     def test_harness_passes_with_correct_code(self) -> None:
         """Unpatched qphysics should produce 0 divergences (sanity check)."""
-        sys.path.insert(0, str(project_root / "scripts"))
         from differential_test import run_differential_tests
 
         total, divergences, _ = run_differential_tests(tolerance=1e-6)

@@ -37,10 +37,20 @@ def load_oracle_predictions(path: Path | None = None) -> list[dict[str, Any]]:
         return json.load(f)
 
 
-def compute_python_prediction(theta_rad: float) -> dict[str, float]:
-    """Compute predictions using qphysics.py for a given angle."""
-    psi = qphysics.create_tilted_state(theta_rad)
-    obs = qphysics.SPIN_Z
+def compute_python_prediction(case: dict[str, Any]) -> dict[str, float]:
+    """Compute predictions using qphysics.py for a given test case.
+
+    Supports both xz-plane cases (theta_rad field) and general 3D cases
+    (theta_s, phi_s, theta_o, phi_o fields).
+    """
+    if "theta_s" in case:
+        # General 3D case (#211)
+        psi = qphysics.create_general_state(case["theta_s"], case["phi_s"])
+        obs = qphysics.create_general_state(case["theta_o"], case["phi_o"])
+    else:
+        # xz-plane case (original)
+        psi = qphysics.create_tilted_state(case["theta_rad"])
+        obs = qphysics.SPIN_Z
 
     exp_val = qphysics.expectation_value(psi, obs)
     prob_up = (1 + exp_val) / 2.0
@@ -69,8 +79,7 @@ def run_differential_tests(
     total = 0
 
     for case in predictions:
-        theta = case["theta_rad"]
-        python = compute_python_prediction(theta)
+        python = compute_python_prediction(case)
 
         for field in ["prob_up", "prob_down", "expectation"]:
             total += 1
@@ -91,7 +100,6 @@ def run_differential_tests(
                     {
                         "label": case["label"],
                         "field": field,
-                        "theta_rad": theta,
                         "oracle": oracle_val,
                         "python": python_val,
                         "difference": diff,

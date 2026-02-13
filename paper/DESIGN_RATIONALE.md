@@ -489,9 +489,27 @@ Octonions become necessary for:
 - Three-generation structure of fermions
 - Full Standard Model gauge group U(1)×SU(2)×SU(3)
 
-For spin-1/2 single-particle physics, quaternions are both necessary and sufficient.
+**Quaternions and SU(2): Natural, Not Unique (#252)**
 
-**Key Reference:** Furey (2016), "Standard Model Physics from an Algebra?" — shows C⊗ℍ generates all Lorentz representations.
+The original claim "quaternions are both necessary and sufficient" requires nuance. The precise mathematical situation is:
+
+The following structures are all *isomorphic* — they describe the same abstract algebraic object:
+
+| Structure | Description |
+|-----------|-------------|
+| Unit quaternions Sp(1) | {q ∈ ℍ : \|q\| = 1} with quaternion multiplication |
+| SU(2) | 2×2 unitary matrices with det = 1 |
+| even(Cl(3,0)) | Even subalgebra of the Clifford algebra on ℝ³ |
+| {a₀I - i(a₁σₓ + a₂σᵧ + a₃σ_z)} | Pauli matrix parameterization |
+
+The isomorphism chain: i ↔ e₂e₃ ↔ -iσₓ, j ↔ e₃e₁ ↔ -iσᵧ, k ↔ e₁e₂ ↔ -iσ_z.
+
+**Revised claim:** Quaternions are the *natural and minimal* normed division algebra for SU(2)/spin-1/2 physics. While isomorphic representations exist (Pauli matrices, Clifford algebras), the quaternion structure is inherently present within all of them. No lower-dimensional normed division algebra captures SU(2), and higher-dimensional ones (octonions) introduce unnecessary structure. In this sense, ℍ is *canonical* for SU(2), even if not strictly unique.
+
+**Key References:**
+- Furey (2016), "Standard Model Physics from an Algebra?" — shows C⊗ℍ generates all Lorentz representations
+- Hurwitz theorem: ℝ, ℂ, ℍ, 𝕆 are the only normed division algebras
+- The Frobenius theorem: ℝ, ℂ, ℍ are the only finite-dimensional associative division algebras over ℝ
 
 ### 8.3 Observable Formalism (#136)
 
@@ -877,7 +895,50 @@ Where QBP could add value:
 3. **McKague, M.** (2009). "Quaternionic quantum mechanics allows non-local boxes." arXiv:0911.1761
 4. **Finkelstein et al.** (1962). "Foundations of Quaternion Quantum Mechanics." J. Math. Phys. 3, 207
 
-### 10.8 Summary
+### 10.8 Visualization Concepts for Quaternionic Superposition (#253)
+
+Feynman noted: "Pictures would help understanding." Here are the visualization concepts developed for Sprint 3 and beyond.
+
+#### Sprint 3 Visualizations (Double-Slit)
+
+**1. Component-Wise Intensity Decay (HIGH PRIORITY)**
+
+Plot the intensity of each quaternion component (σ₀², ϕ₁², ϕ₂², ϕ₃²) as a function of distance from the slits. The j and k components exhibit Adler's exponential spatial decay — this is genuinely new physics not present in standard QM. Color-code: blue for complex components (1, i), red/orange for quaternionic components (j, k), showing the decay explicitly.
+
+This is the single most illuminating visualization because it directly demonstrates what quaternionic QM adds beyond complex QM.
+
+**2. Quaternion Interference Comparison (MEDIUM PRIORITY)**
+
+Display two interference patterns side-by-side:
+- Left: Standard complex QM pattern |ψ₁(x) + ψ₂(x)|² using only i-component
+- Right: Full quaternionic pattern including j, k contributions
+- Below: Difference map showing where they diverge (near the slits, where j/k haven't decayed)
+
+Since the complex subspace approach guarantees agreement at large distances, the difference map will show signal only near the source — confirming the theoretical prediction visually.
+
+**3. Spatial Quaternion Field (MEDIUM PRIORITY)**
+
+At each point in space, represent ψ(x) as an arrow showing the vector part (ϕ₁, ϕ₂, ϕ₃) direction, with color/intensity showing magnitude |ψ(x)|. This extends the Bloch sphere concept to position-dependent states.
+
+#### Sprint 6 Visualizations (Bell Test — Deferred)
+
+**4. Sequential Rotation Non-Commutativity (HIGH PRIORITY for Sprint 6)**
+
+Two side-by-side Bloch sphere sequences:
+- Path A: |ψ⟩ → R₁|ψ⟩ → R₂R₁|ψ⟩
+- Path B: |ψ⟩ → R₂|ψ⟩ → R₁R₂|ψ⟩
+- Show the final states differ: R₂R₁|ψ⟩ ≠ R₁R₂|ψ⟩
+
+This directly visualizes how non-commutativity affects entangled measurements — the core of Bell inequality violations.
+
+#### Implementation Notes
+
+- Component decay plot: Matplotlib static for DESIGN_RATIONALE, interactive in Phase 4e simulation
+- Interference comparison: Extend existing analysis plotting infrastructure
+- Quaternion field: Raylib-go 3D rendering in Phase 4e
+- Non-commutativity: Defer to Sprint 6 Phase 3
+
+### 10.9 Summary
 
 Pre-Sprint Research established:
 
@@ -888,3 +949,85 @@ Pre-Sprint Research established:
 5. **Future work** should focus on spin-path coupled experiments
 
 **Research status:** Complete. Ready for Sprint 3 Phase 1 (Ground Truth).
+
+## 11. Research Sprint 1R — Generalization to Arbitrary 3D Axes (#211)
+
+### 11.1 Motivation
+
+Sprints 1 and 2 restricted measurement to the xz-plane: states ψ(θ) = sin(θ)·i + cos(θ)·k measured along the z-axis. The Phase 4a review (PR #210) identified this as a gap — Furey and Feynman both asked about generalization to arbitrary 3D measurement axes.
+
+This matters for:
+- **Bell inequality tests** (Sprint 6): require arbitrary detector orientations
+- **Full Bloch sphere coverage**: validating the quaternion formalism isn't accidentally restricted
+- **Standard QM equivalence**: proving P(+) = cos²(γ/2) holds in full generality
+
+### 11.2 General Spherical Parameterization
+
+**State:** ψ(θ,φ) = sin(θ)cos(φ)·i + sin(θ)sin(φ)·j + cos(θ)·k
+
+**Observable:** O(α,β) = sin(α)cos(β)·i + sin(α)sin(β)·j + cos(α)·k
+
+where θ,α are polar angles from z-axis and φ,β are azimuthal angles in the xy-plane.
+
+**Key result — General expectation value:**
+
+⟨O⟩ = sin(θ)sin(α)cos(φ−β) + cos(θ)cos(α) = cos(γ)
+
+where γ is the angle between the two directions on the unit sphere.
+
+**Probability:** P(+) = (1 + cos γ)/2 = cos²(γ/2)
+
+This reproduces the standard QM result for arbitrary 3D measurement, confirming the quaternion formalism is not restricted to any particular plane.
+
+### 11.3 Rotation Equivalence
+
+The direct parameterization ψ(θ,φ) is equivalent to rotating the z-axis state via quaternion conjugation:
+
+q = cos(θ/2) + sin(θ/2)·(−sin(φ)·i + cos(φ)·j)
+
+ψ(θ,φ) = q·k·q⁻¹
+
+This confirms that the SU(2) rotation structure of quaternions naturally generates the full Bloch sphere from any reference state.
+
+### 11.4 Standard QM Verification
+
+Verified against the standard QM matrix formalism at 10 arbitrary (θ,φ) pairs:
+
+|⟨↑_O|ψ⟩|² matches the quaternion P(+) to machine precision (< 10⁻¹⁰).
+
+The quaternion formalism and standard QM are provably equivalent for all single-particle spin-½ measurements in 3D, consistent with the Moretti-Oppio theorem identified in Research Sprint 0R.
+
+### 11.5 Formal Verification (Lean 4)
+
+`proofs/QBP/Experiments/General3D.lean` proves:
+
+| Theorem | Statement |
+|---------|-----------|
+| `psiGeneral_is_unit` | |ψ(θ,φ)|² = 1 for all θ,φ |
+| `psiGeneral_phi_zero` | ψ(θ,0) = psiAngle(θ) (backward compatible) |
+| `expectation_general` | ⟨O⟩ = sinθ sinα cos(φ−β) + cosθ cosα |
+| `prob_up_general` | P(+) = (1 + ⟨O⟩)/2 |
+| `prob_up_same_direction` | Same direction → P(+) = 1 |
+| `prob_up_x_on_z` | Recovers Stern-Gerlach |
+| `prob_up_y_on_z` | New: j-component case = 1/2 |
+| `expectation_azimuthal_invariance` | Only relative angle (φ−β) matters |
+
+### 11.6 Limitations Discovered
+
+**None fundamental.** The i, j, k components are algebraically symmetric — the xz-plane restriction was a convenience, not a mathematical limitation. The generalization is straightforward because:
+
+1. `vecDot` and `expectationValue` in Basic.lean were already axis-agnostic
+2. The Born rule P(+) = (1 + ⟨O⟩)/2 is direction-independent
+3. Quaternion rotation q·v·q⁻¹ generates the full SO(3) rotation group
+
+The only "limitation" is that this analysis applies to single-particle spin-½ systems. Multi-particle entanglement (relevant for Sprint 6: Bell's Theorem) will require additional formalism.
+
+### 11.7 Summary
+
+Research Sprint 1R confirmed that the quaternion measurement formalism extends seamlessly from the xz-plane to arbitrary 3D directions. The cos²(γ/2) law holds universally, matching standard QM exactly. This provides the foundation for arbitrary detector orientations needed in Sprint 6 (Bell's Theorem).
+
+**Deliverables:**
+- [x] Formulas for P(+) with arbitrary measurement axis
+- [x] Lean 4 proofs generalizing AngleDependent.lean
+- [x] Verification against standard QM rotation matrices (10⁻¹⁰ agreement)
+- [x] Documentation of limitations (none fundamental)

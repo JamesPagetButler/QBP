@@ -334,3 +334,56 @@ def create_tilted_state(theta: float) -> np.quaternion:
         A pure unit quaternion representing the tilted state.
     """
     return create_state(0, np.sin(theta), 0, np.cos(theta))
+
+
+def create_general_state(theta: float, phi: float) -> np.quaternion:
+    """
+    Create a spin state pointing in an arbitrary direction on the Bloch sphere.
+
+    Generalizes create_tilted_state to full 3D using spherical coordinates:
+        ψ(θ,φ) = sin(θ)cos(φ)·i + sin(θ)sin(φ)·j + cos(θ)·k
+
+    Physical meaning:
+        θ: polar angle from z-axis (0 to π)
+        φ: azimuthal angle in xy-plane from x-axis (0 to 2π)
+
+    Special cases:
+        φ = 0 recovers create_tilted_state(theta) (xz-plane)
+        θ = 0 gives spin-up along z regardless of φ
+        θ = π gives spin-down along z regardless of φ
+
+    Args:
+        theta: Polar angle from z-axis in radians.
+        phi: Azimuthal angle in xy-plane in radians.
+
+    Returns:
+        A pure unit quaternion representing the state.
+    """
+    return create_state(
+        0,
+        np.sin(theta) * np.cos(phi),
+        np.sin(theta) * np.sin(phi),
+        np.cos(theta),
+    )
+
+
+def angle_between_states(psi: np.quaternion, observable: np.quaternion) -> float:
+    """
+    Calculate the angle between a state and an observable direction.
+
+    For pure unit quaternions, this is the angle γ such that:
+        cos(γ) = vecDot(ψ, O) = ⟨O⟩
+
+    This angle satisfies: P(+) = cos²(γ/2)
+
+    Args:
+        psi: A pure unit quaternion state.
+        observable: A pure unit quaternion observable.
+
+    Returns:
+        The angle γ in radians between the two directions.
+    """
+    dot = expectation_value(psi, observable)
+    # Clamp to [-1, 1] for numerical safety
+    dot = max(-1.0, min(1.0, dot))
+    return float(np.arccos(dot))
