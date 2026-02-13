@@ -61,7 +61,4 @@ def floatPsiGeneral (theta phi : Float) : QFloat :=
               (Float.sin theta * Float.sin phi)
               (Float.cos theta)
 
-/-- Spin-Y observable: j direction (mirrors QBP.SPIN_Y) -/
-def floatSpinY : QFloat := QFloat.pure 0.0 1.0 0.0
-
 end QBP.Oracle

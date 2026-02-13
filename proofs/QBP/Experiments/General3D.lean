@@ -8,8 +8,9 @@
   Key results:
   - psiGeneral: full spherical parameterization ψ(θ,φ)
   - expectation_general: ⟨O⟩ = cos(γ) where γ is the angle between directions
-  - prob_up_general_cos_sq: P(+) = cos²(γ/2) for arbitrary directions
-  - Rotation equivalence: q·k·q⁻¹ = ψ(θ,φ)
+  - prob_up_general: P(+) = (1 + cos γ)/2 for arbitrary directions
+    (equivalent to cos²(γ/2) by the half-angle identity proven in AngleDependent.lean)
+  - expectation_azimuthal_invariance: only relative angle (φ-β) matters
 -/
 import QBP.Basic
 import QBP.Experiments.AngleDependent
