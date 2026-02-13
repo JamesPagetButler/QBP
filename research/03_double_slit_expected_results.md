@@ -62,7 +62,7 @@ For this experiment, "matching reality" has two components:
 
 **Parameter-space mapping:** These null results constrain the quaternionic coupling U₁:
 - **Kaiser bound:** A phase deviation < 1:30,000 over a neutron interferometer path length (~cm scale) implies |U₁| << ℏv/L_path, where v is the neutron velocity. For thermal neutrons (v ≈ 2200 m/s, L_path ≈ 0.05 m): |U₁| << ℏ × 2200 / 0.05 ≈ 5 × 10⁻³⁰ J ≈ 3 × 10⁻¹¹ eV.
-- **Procopio bound:** θ = 0.03° ± 0.13° constrains the quaternionic phase accumulated over the interferometer path. For single photons (v = c, path length L_path ≈ 0.3 m in their interferometer), the quaternionic phase is φ_q ≈ |U₁|·L_path/(ℏc). The bound θ < 0.16° (1σ) gives |U₁| < ℏc·θ/L_path ≈ (3.2 × 10⁻²⁶ J·m) × (2.8 × 10⁻³ rad) / 0.3 m ≈ 3 × 10⁻²⁸ J ≈ 2 × 10⁻⁹ eV. This is tighter than the Kaiser neutron bound by about two orders of magnitude.
+- **Procopio bound:** θ = 0.03° ± 0.13° constrains the quaternionic phase accumulated over the interferometer path. For single photons (v = c, path length L_path ≈ 0.3 m in their interferometer), the quaternionic phase is φ_q ≈ |U₁|·L_path/(ℏc). The bound θ < 0.16° (1σ) gives |U₁| < ℏc·θ/L_path ≈ (3.2 × 10⁻²⁶ J·m) × (2.8 × 10⁻³ rad) / 0.3 m ≈ 3 × 10⁻²⁸ J ≈ 2 × 10⁻⁹ eV. This is approximately two orders of magnitude *weaker* than the Kaiser neutron bound (3 × 10⁻¹¹ eV), reflecting the shorter interaction time for photons at optical path lengths. The Kaiser neutron result remains the most constraining bound on |U₁|.
 
 Our simulation treats U₁ as a free parameter scanned over a range that includes values both within and far above these experimental bounds. The simulation must show: (1) for U₁ within the Kaiser/Procopio bounds, the far-field pattern is indistinguishable from standard QM; (2) for artificially large U₁, the decay dynamics are qualitatively visible and follow the predicted form.
 
@@ -453,7 +453,7 @@ V = (I_max - I_min) / (I_max + I_min)
 - Scenario A: V = 1.0 (complex baseline)
 - Scenario B: V = 0.0 (which-path)
 - Scenario C at detector: V → 1.0 (after j,k decay)
-- Scenario C near slits: V < 1.0 (j,k components add incoherent background)
+- Scenario C near slits: V < 1.0 (ψ₁ fringes reduce combined visibility)
 
 ## 7. Falsification Criteria
 
@@ -528,7 +528,7 @@ For which-path detection:
 1. Measurement at the slits projects the quaternionic state onto a slit eigenstate
 2. Both ψ₀ and ψ₁ components collapse for the measured slit
 3. After measurement, propagate only the single-slit state
-4. The j,k components of the single-slit state still decay during propagation to the detector
+4. If evanescent ψ₁ modes were generated at the slit (see §4.3.2), they decay beyond it; otherwise ψ₁ propagates normally with attenuated amplitude
 
 ### 9.4 Visualization (Phase 3)
 
