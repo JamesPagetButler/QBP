@@ -653,6 +653,104 @@ class QBPKnowledgeSQLite:
             ),
         }
 
+    def coverage_report(self) -> Dict[str, Any]:
+        """Generate coverage metrics: % of claims with evidence, proofs, etc."""
+        with self._connection() as conn:
+            total_claims = conn.execute(
+                "SELECT COUNT(*) FROM vertices WHERE type = 'Claim'"
+            ).fetchone()[0]
+
+            claims_with_evidence = conn.execute(
+                """
+                SELECT COUNT(DISTINCT v.id)
+                FROM vertices v
+                JOIN incidences i ON v.id = i.vertex_id
+                JOIN hyperedges h ON i.edge_id = h.id
+                WHERE v.type = 'Claim' AND h.type = 'evidence_chain'
+            """
+            ).fetchone()[0]
+
+            claims_with_proofs = conn.execute(
+                """
+                SELECT COUNT(DISTINCT v.id)
+                FROM vertices v
+                JOIN incidences i ON v.id = i.vertex_id
+                JOIN hyperedges h ON i.edge_id = h.id
+                WHERE v.type = 'Claim' AND h.type = 'proof_link'
+            """
+            ).fetchone()[0]
+
+            total_questions = conn.execute(
+                "SELECT COUNT(*) FROM vertices WHERE type = 'Question'"
+            ).fetchone()[0]
+
+            open_questions = conn.execute(
+                """
+                SELECT COUNT(*) FROM vertices
+                WHERE type = 'Question'
+                AND json_extract(data, '$.status') = 'open'
+            """
+            ).fetchone()[0]
+
+            investigated_questions = conn.execute(
+                """
+                SELECT COUNT(DISTINCT v.id)
+                FROM vertices v
+                JOIN incidences i ON v.id = i.vertex_id
+                JOIN hyperedges h ON i.edge_id = h.id
+                WHERE v.type = 'Question' AND h.type = 'investigation'
+            """
+            ).fetchone()[0]
+
+        def pct(n: int, total: int) -> str:
+            return f"{n}/{total} ({100 * n // total}%)" if total else "0/0 (N/A)"
+
+        return {
+            "claims": {
+                "total": total_claims,
+                "with_evidence": claims_with_evidence,
+                "with_proofs": claims_with_proofs,
+                "evidence_coverage": pct(claims_with_evidence, total_claims),
+                "proof_coverage": pct(claims_with_proofs, total_claims),
+            },
+            "questions": {
+                "total": total_questions,
+                "open": open_questions,
+                "investigated": investigated_questions,
+                "investigation_coverage": pct(investigated_questions, total_questions),
+            },
+        }
+
+    def dependency_chain(self, vertex_id: str) -> Dict[str, Any]:
+        """Trace all vertices connected to a given vertex via hyperedges."""
+        visited_vertices: set = set()
+        visited_edges: set = set()
+        queue = [vertex_id]
+
+        while queue:
+            vid = queue.pop(0)
+            if vid in visited_vertices:
+                continue
+            visited_vertices.add(vid)
+
+            edges = self.get_edges_containing(vid)
+            for edge in edges:
+                eid = edge.get("id", "")
+                if eid in visited_edges:
+                    continue
+                visited_edges.add(eid)
+                for member in edge.get("members", []):
+                    if member not in visited_vertices:
+                        queue.append(member)
+
+        return {
+            "root": vertex_id,
+            "connected_vertices": sorted(visited_vertices),
+            "connected_edges": sorted(visited_edges),
+            "vertex_count": len(visited_vertices),
+            "edge_count": len(visited_edges),
+        }
+
     # -------------------------------------------------------------------------
     # Statistics & Summary
     # -------------------------------------------------------------------------
@@ -1200,6 +1298,13 @@ def main():
     subparsers.add_parser("gaps", help="Find research gaps")
     subparsers.add_parser("bridges", help="Find bridge concepts")
 
+    # Coverage report
+    subparsers.add_parser("coverage", help="Show coverage metrics (evidence, proofs)")
+
+    # Dependency chain
+    deps_p = subparsers.add_parser("deps", help="Trace dependency chain from a vertex")
+    deps_p.add_argument("vertex_id", help="Vertex ID to trace from")
+
     # Export
     export_p = subparsers.add_parser("export", help="Export data")
     export_p.add_argument("--format", choices=["hif", "json"], default="hif")
@@ -1298,6 +1403,29 @@ def main():
         elif args.command == "bridges":
             results = kb.find_bridge_concepts()
             print(json.dumps(results, indent=2))
+
+        elif args.command == "coverage":
+            report = kb.coverage_report()
+            print("Knowledge Graph Coverage Report")
+            print("=" * 40)
+            print(f"\nClaims:")
+            print(f"  Total: {report['claims']['total']}")
+            print(f"  With evidence: {report['claims']['evidence_coverage']}")
+            print(f"  With proofs: {report['claims']['proof_coverage']}")
+            print(f"\nQuestions:")
+            print(f"  Total: {report['questions']['total']}")
+            print(f"  Open: {report['questions']['open']}")
+            print(f"  Investigated: {report['questions']['investigation_coverage']}")
+
+        elif args.command == "deps":
+            result = kb.dependency_chain(args.vertex_id)
+            print(f"Dependency chain from: {result['root']}")
+            print(f"Connected vertices ({result['vertex_count']}):")
+            for v in result["connected_vertices"]:
+                print(f"  - {v}")
+            print(f"Connected edges ({result['edge_count']}):")
+            for e in result["connected_edges"]:
+                print(f"  - {e}")
 
         elif args.command == "validate":
             result = kb.validate()
