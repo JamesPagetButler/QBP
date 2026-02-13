@@ -182,8 +182,9 @@ At the start of every work session, all collaborators (human and AI) must:
 1.  **Run toolchain check** — `python scripts/check_toolchain.py` to verify local tools match CI.
 2.  **Read `SPRINT_STATUS.md`** — understand current lifecycle position.
 3.  **Verify alignment** — confirm planned work matches the critical path.
-4.  **Log diversions** — if starting housekeeping or a side quest, add it to the Active Diversions table with a return point.
-5.  **Close diversions** — when returning, mark the diversion complete and resume from the recorded return point.
+4.  **Validate permissions** — check `.claude/settings.local.json` for malformed entries (API keys in patterns, oversized literals, parse-error-prone `:` characters). See [Sprint Mode: Permission Hygiene](docs/workflows/sprint_mode_workflow.md#permission-hygiene).
+5.  **Log diversions** — if starting housekeeping or a side quest, add it to the Active Diversions table with a return point.
+6.  **Close diversions** — when returning, mark the diversion complete and resume from the recorded return point.
 
 This is the "Herschel Check." It exists because all three collaborators have demonstrated a tendency to drift from the critical path. It adds ~30 seconds of overhead per session to prevent hours of unmanaged drift.
 

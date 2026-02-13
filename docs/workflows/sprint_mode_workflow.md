@@ -258,6 +258,92 @@ After all phases merge:
 
 ---
 
+## Permission Hygiene
+
+### The Problem
+
+Claude Code stores tool permissions in `.claude/settings.local.json`. When "Always allow" is clicked on a specific command, the **exact literal** gets saved. Over time this causes:
+- Giant literal commands with heredocs and special characters
+- API keys embedded in saved patterns
+- Parse errors when `:` characters in literals are misinterpreted
+- Settings file skipped entirely on parse error — losing ALL permissions
+
+### Canonical Sprint Mode Permissions
+
+Before entering Sprint Mode, set up `.claude/settings.local.json` with these wildcard patterns. This replaces one-off literal accumulation with broad category coverage:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(/home/prime/.local/bin/gh *)",
+      "Bash(python3 *)",
+      "Bash(lake *)",
+      "Bash(timeout *)",
+      "Bash(ls *)",
+      "Bash(GEMINI_API_KEY=* *)",
+      "Bash(cd *)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "mcp__gemini__*"
+    ]
+  }
+}
+```
+
+**Pattern explanations:**
+
+| Pattern | Covers |
+|---------|--------|
+| `Bash(git *)` | All git operations (add, commit, push, branch, etc.) |
+| `Bash(/home/prime/.local/bin/gh *)` | GitHub CLI — full path avoids the outdated system `gh` |
+| `Bash(python3 *)` | pytest, research_gate.py, validate_knowledge.py, etc. |
+| `Bash(lake *)` | Lean build system |
+| `Bash(timeout *)` | Timeout-wrapped commands (e.g., `timeout 5 python3 ...`) |
+| `Bash(ls *)` | Directory listings |
+| `Bash(GEMINI_API_KEY=* *)` | Env-prefixed commands (see below) |
+| `Bash(cd *)` | Directory changes |
+| `mcp__gemini__*` | All Gemini MCP tools |
+
+### Env-Prefix Strategy
+
+Claude Code matches the **first token** of a command. So `Bash(gh *)` matches `gh issue view` but NOT `GEMINI_API_KEY=xxx gh issue view` because the first token is `GEMINI_API_KEY=xxx`.
+
+**Solution:** Add explicit patterns for env-prefix wrappers:
+- `Bash(GEMINI_API_KEY=* *)` — covers any command run with the API key env var
+- `Bash(timeout *)` — covers timeout-wrapped commands
+
+### Setup Procedure
+
+1. **At session start**, Claude checks for the canonical patterns (part of Herschel Check)
+2. **If missing**, Claude proposes the canonical template to James
+3. **Periodically**, remove accumulated literal patterns that are already covered by wildcards
+4. **Never** save patterns containing API keys, heredocs, or multi-line content
+
+### Cleanup
+
+To clean accumulated literals:
+```bash
+# Back up current settings
+cp ~/.claude/settings.local.json ~/.claude/settings.local.json.bak
+
+# Replace with canonical template (review first!)
+cat ~/.claude/settings.local.json
+```
+
+Remove any entry that:
+- Contains `GEMINI_API_KEY=` followed by an actual key value
+- Contains heredoc content (`<<'EOF'`)
+- Is a long literal already covered by a wildcard (e.g., `gh issue comment 289 --body "..."` is covered by `Bash(/home/prime/.local/bin/gh *)`)
+
+---
+
 ## Safety Rails
 
 ### Prohibited Actions
