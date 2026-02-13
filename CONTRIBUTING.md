@@ -22,7 +22,7 @@ Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engin
     *   **KG Consolidation** (first step):
         ```bash
         # What changed files affect the knowledge graph?
-        git diff --name-only HEAD~5 | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
+        git diff master...HEAD --name-only | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
         # Full analysis report — feeds into the discussion below
         python scripts/qbp_knowledge_sqlite.py report
         ```

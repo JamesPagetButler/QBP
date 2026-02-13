@@ -286,12 +286,14 @@ python scripts/research_gate.py
 | 2 | **ERROR** | Database not found or unreadable |
 
 **What blocks:**
-- **Weak claims** scoped to the next sprint (claims with no evidence chain)
-- **Research gaps** scoped to the next sprint (open questions with no investigation)
+- **Weak claims** scoped to the next sprint — a claim is "weak" when it has no `evidence_chain` hyperedge linking it to supporting sources (i.e. `find_weak_claims()` returns it)
+- **Research gaps** scoped to the next sprint — an open question with no `investigation` hyperedge (i.e. `find_research_gaps()` returns it)
 
 **What does NOT block:**
 - **Unproven claims** — these are informational; formal proofs come in Phase 4
 - **Global findings** — items not tagged with the next sprint's scope are reported but don't trigger a BLOCK
+
+**Prerequisite:** The gate assumes the Knowledge Graph is current. Run KG Consolidation (`suggest-updates` + `report`) during Theory Refinement *before* invoking the gate.
 
 **Precedent:** Sprint 3 Pre-Sprint Research (#255) was the ad-hoc version of this gate. The gate formalises that decision for all future sprints.
 
@@ -305,7 +307,7 @@ At the start of Theory Refinement (Phase 6), run two KG commands to surface impa
 
 ```bash
 # 1. Impact analysis — what changed files affect the KG?
-git diff --name-only HEAD~5 | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
+git diff master...HEAD --name-only | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
 
 # 2. Full analysis report — feeds into Theory Refinement discussion
 python scripts/qbp_knowledge_sqlite.py report

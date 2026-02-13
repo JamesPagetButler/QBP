@@ -19,7 +19,7 @@ Exit codes:
 import argparse
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, Tuple
 
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -39,7 +39,9 @@ def tags_for_item(item: Dict[str, Any]) -> Set[str]:
     return set()
 
 
-def partition_by_scope(items: List[Dict[str, Any]], scope_tags: Set[str]) -> tuple:
+def partition_by_scope(
+    items: List[Dict[str, Any]], scope_tags: Set[str]
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Split items into (scoped, global) based on tag overlap."""
     scoped = []
     unscoped = []

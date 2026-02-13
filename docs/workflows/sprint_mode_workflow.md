@@ -214,7 +214,7 @@ After all phases merge:
 3. **Update SPRINT_STATUS.md** with completion status
 4. **KG Consolidation** — before Theory Refinement begins:
    ```bash
-   git diff --name-only HEAD~5 | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
+   git diff master...HEAD --name-only | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
    python scripts/qbp_knowledge_sqlite.py report
    ```
 5. **Run Theory Refinement** using KG report as input
