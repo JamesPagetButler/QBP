@@ -66,7 +66,7 @@ def render_item(item: Dict[str, Any]) -> str:
 
 
 def is_excluded(item: Dict[str, Any], exclude_ids: Set[str]) -> bool:
-    """Check if an item's ID matches any exclusion pattern."""
+    """Check if an item's ID is in the exclusion set."""
     vid = item.get("id", "")
     return vid in exclude_ids
 

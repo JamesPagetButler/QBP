@@ -721,8 +721,11 @@ class QBPKnowledgeSQLite:
             },
         }
 
-    def dependency_chain(self, vertex_id: str) -> Dict[str, Any]:
-        """Trace all vertices connected to a given vertex via hyperedges."""
+    def connected_component(self, vertex_id: str) -> Dict[str, Any]:
+        """Find all vertices reachable from a given vertex via hyperedges (BFS)."""
+        if not self.get_vertex(vertex_id):
+            return {"error": f"Vertex not found: {vertex_id}"}
+
         visited_vertices: set = set()
         visited_edges: set = set()
         queue = [vertex_id]
@@ -1301,9 +1304,11 @@ def main():
     # Coverage report
     subparsers.add_parser("coverage", help="Show coverage metrics (evidence, proofs)")
 
-    # Dependency chain
-    deps_p = subparsers.add_parser("deps", help="Trace dependency chain from a vertex")
-    deps_p.add_argument("vertex_id", help="Vertex ID to trace from")
+    # Connected component
+    comp_p = subparsers.add_parser(
+        "component", help="Find connected component from a vertex"
+    )
+    comp_p.add_argument("vertex_id", help="Vertex ID to trace from")
 
     # Export
     export_p = subparsers.add_parser("export", help="Export data")
@@ -1417,13 +1422,16 @@ def main():
             print(f"  Open: {report['questions']['open']}")
             print(f"  Investigated: {report['questions']['investigation_coverage']}")
 
-        elif args.command == "deps":
-            result = kb.dependency_chain(args.vertex_id)
-            print(f"Dependency chain from: {result['root']}")
-            print(f"Connected vertices ({result['vertex_count']}):")
+        elif args.command == "component":
+            result = kb.connected_component(args.vertex_id)
+            if "error" in result:
+                print(f"Error: {result['error']}")
+                sys.exit(1)
+            print(f"Connected component from: {result['root']}")
+            print(f"Vertices ({result['vertex_count']}):")
             for v in result["connected_vertices"]:
                 print(f"  - {v}")
-            print(f"Connected edges ({result['edge_count']}):")
+            print(f"Edges ({result['edge_count']}):")
             for e in result["connected_edges"]:
                 print(f"  - {e}")
 
