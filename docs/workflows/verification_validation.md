@@ -48,6 +48,7 @@ Compare simulation output to expected real-world results:
 - Does the measurement distribution match QM predictions?
 - Does it match the Lean oracle predictions?
 - Does it match historical experimental data?
+- **Do results match the Empirical Anchor values** from the ground truth document (§3)? Compare simulation output directly to the measured values, uncertainties, and constraints recorded in the Empirical Anchor — not just to QM formulas.
 
 ### Step 4: Iterate
 
@@ -75,6 +76,7 @@ the date and reviewer initials. Copy the relevant table into a review record
 | Behavior V | No particles remain undeflected | | | |
 | Results V | P(+) = 0.50 +/- 0.05 for theta=90 deg | | | |
 | Results V | Matches oracle: P(+) = cos^2(theta/2) | | | |
+| Results V | Simulation results consistent with Empirical Anchor values | | | |
 
 ### Experiment 01b: Angle-Dependent Measurement
 
@@ -88,6 +90,7 @@ the date and reviewer initials. Copy the relevant table into a review record
 | Results V | P(+) matches cos^2(theta/2) at 9 test angles | | | |
 | Results V | N > 1000 for statistical confidence | | | |
 | Results V | Oracle and simulation agree within 5% | | | |
+| Results V | Simulation results consistent with Empirical Anchor values | | | |
 
 ## Integration with Phase 4
 

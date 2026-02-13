@@ -18,7 +18,38 @@ A beam of neutral silver atoms is passed through an inhomogeneous magnetic field
 
 ---
 
-## 3. Formal Derivation from QBP Axioms
+## 3. Empirical Anchor
+
+**Data type:** Qualitative-binary
+
+### Key Measured Values
+
+| Quantity | Measured Value | Uncertainty | Source | Year | DOI / Identifier |
+|----------|---------------|-------------|--------|------|------------------|
+| Beam splitting | Two discrete spots (spin-up, spin-down) | Binary outcome — no intermediate values observed | Gerlach, W. & Stern, O. | 1922 | Z. Phys. 9, 349–352 |
+| Relative intensity | Approximately equal intensity in both spots | Statistical (N-dependent) | Gerlach & Stern | 1922 | Z. Phys. 9, 349–352 |
+
+### Experimental Confidence
+
+| Factor | Assessment |
+|--------|------------|
+| Replication status | Replicated thousands of times across all major physics laboratories worldwide. Standard undergraduate lab demonstration. |
+| Measurement precision | Binary outcome — the measurement is whether the beam splits into two discrete spots or a continuous smear. No precision issue. |
+| Relevance to QBP test | Direct — QBP must reproduce the discrete two-spot splitting (spin quantization) and the 50/50 probability split for orthogonal state/measurement configurations. |
+
+### What "Matching Reality" Means
+
+The Stern-Gerlach experiment produces a qualitative-binary outcome: a beam of silver atoms either splits into two discrete spots or it doesn't. There is no "close enough" — any continuous distribution would falsify both QM and QBP.
+
+For the specific configuration modeled here (spin-x prepared, spin-z measured), "matching reality" means: (1) the measurement function returns only +1 or -1, never any other value, and (2) over many trials, the ratio converges to 50/50 within statistical bounds. The 50/50 ratio for orthogonal axes is a consequence of spin quantization that has been confirmed in every Stern-Gerlach experiment since 1922.
+
+### Null Results and Constraints
+
+No known null results specific to this phenomenon. The discrete two-spot splitting has been universally observed for spin-1/2 particles; no experiment has ever found intermediate outcomes.
+
+---
+
+## 4. Formal Derivation from QBP Axioms
 
 The QBP framework must mathematically reproduce the observed quantum result. We model the most common S-G configuration: preparing a particle with spin along the x-axis and measuring it along the z-axis.
 
@@ -45,7 +76,7 @@ This formal derivation shows that the QBP framework correctly predicts a 50/50 p
 
 ---
 
-## 4. Prediction Classification
+## 5. Prediction Classification
 
 | Prediction | Type | Standard QM | Notes |
 |------------|------|-------------|-------|
@@ -64,11 +95,11 @@ Experiment 01 establishes that QBP is *consistent* with QM for the simplest spin
 
 ---
 
-## 5. Quantitative Predictions & Acceptance Criteria
+## 6. Quantitative Predictions & Acceptance Criteria
 
 Our `experiments/01_stern_gerlach/simulate.py` script will be considered successful if it meets the following criteria, which directly correspond to the real-world experimental results and our formal derivation.
 
-### 4.1 Primary Acceptance Criteria
+### 6.1 Primary Acceptance Criteria
 
 1.  **Binary Measurement Outcome:** The `qphysics.measure()` function must only ever return one of two discrete values: `+1` or `-1`. No other values are permissible.
 
@@ -80,7 +111,7 @@ Our `experiments/01_stern_gerlach/simulate.py` script will be considered success
         *   `|Count(+) - μ_+| <= 3σ`
         *   `|Count(-) - μ_-| <= 3σ`
 
-### 4.2 Simulation Parameters
+### 6.2 Simulation Parameters
 
 To ensure statistically significant results, our synthetic experiments will adhere to a standard number of trials.
 
@@ -90,7 +121,7 @@ To ensure statistically significant results, our synthetic experiments will adhe
 
 ---
 
-## 6. References
+## 7. References
 
 1.  Gerlach, W.; Stern, O. (1922). "Der experimentelle Nachweis der Richtungsquantelung im Magnetfeld". *Zeitschrift für Physik*. 9 (1): 349–352.
 2.  Griffiths, David J.; Schroeter, Darrell F. (2018). *Introduction to Quantum Mechanics*. Cambridge University Press.

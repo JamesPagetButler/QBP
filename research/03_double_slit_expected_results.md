@@ -24,9 +24,47 @@ This document defines the quantitative predictions for the double-slit interfere
 
 Scenario C is the genuinely new QBP test. Scenarios A and B establish the baseline.
 
-## 2. QBP Formalism: Full Quaternionic Approach
+## 2. Empirical Anchor
 
-### 2.1 Why Full Quaternions, Not Just C(1,i)
+**Data type:** Quantitative-moderate (fringe spacing, visibility) + Constraint-based (quaternionic deviations)
+
+### Key Measured Values
+
+| Quantity | Measured Value | Uncertainty | Source | Year | DOI / Identifier |
+|----------|---------------|-------------|--------|------|------------------|
+| Double-slit interference pattern | Fringes observed at single-electron level | Qualitative (buildup confirms wave behavior) | Tonomura, A. et al. | 1989 | Am. J. Phys. 57, 117 |
+| Fringe spacing | Δx = λL/d confirmed for electrons | ~1% (apparatus-dependent) | Jönsson, C. | 1961 | Z. Phys. 161, 454 |
+| Quaternionic phase deviation | < 1:30,000 of complex phase | Upper bound (null result) | Kaiser, R. et al. | 1984 | Neutron interferometry |
+| Quaternionic phase angle | θ = 0.03° ± 0.13° | Consistent with zero | Procopio, L.M. et al. | 2017 | Nat. Commun. 8, 15044 |
+
+### Experimental Confidence
+
+| Factor | Assessment |
+|--------|------------|
+| Replication status | Standard double-slit: replicated thousands of times with electrons, neutrons, photons, even molecules. Quaternionic null results: two independent experiments (Kaiser 1984, Procopio 2017) using different particles and techniques. |
+| Measurement precision | Fringe positions: ~1% for electron experiments. Quaternionic bounds: extremely precise null results (1:30,000 for neutrons, sub-degree for photons). |
+| Relevance to QBP test | Direct — Scenarios A/B test standard interference; Scenario C tests whether quaternionic deviations exist within the experimental bounds. |
+
+### What "Matching Reality" Means
+
+For this experiment, "matching reality" has two components:
+
+**Standard QM baseline (Scenarios A & B):** The simulation must reproduce the textbook double-slit interference pattern — fringe spacing Δx = λL/d, visibility V ≈ 1.0 for coherent sources, V ≈ 0 with which-path detection. These results have been replicated in laboratories worldwide since Jönsson (1961) and most famously demonstrated at the single-particle level by Tonomura et al. (1989). Matching means: fringe positions within 1% of predicted values, intensity pattern fitting cos²(πxd/λL) with R² > 0.99.
+
+**Quaternionic dynamics (Scenario C):** The Adler decay prediction — that j,k components decay exponentially during spatial propagation — has not been directly measured. However, the null results of Kaiser et al. (1984) and Procopio et al. (2017) set stringent upper bounds on observable quaternionic effects. "Matching reality" here means: (1) the far-field interference pattern must be indistinguishable from the standard QM result (within the Kaiser/Procopio bounds), and (2) the decay dynamics must be consistent with Adler's (1988, 1995) theoretical framework. The simulation explores what happens *between* source and detector, where no experimental data currently exists.
+
+### Null Results and Constraints
+
+| Constraint | Bound | Source | Year | DOI / Identifier |
+|-----------|-------|--------|------|------------------|
+| Quaternionic phase in neutron interferometry | < 1:30,000 of complex phase | Kaiser, R. et al. | 1984 | Neutron interferometry experiment |
+| Quaternionic phase angle in single-photon test | θ = 0.03° ± 0.13° (consistent with zero) | Procopio, L.M. et al. | 2017 | Nat. Commun. 8, 15044 |
+
+These null results constrain the quaternionic potential coupling U₁ to be extremely small. Our simulation treats U₁ as a free parameter but must show that for any U₁ consistent with these bounds, the far-field pattern is indistinguishable from standard QM.
+
+## 3. QBP Formalism: Full Quaternionic Approach
+
+### 3.1 Why Full Quaternions, Not Just C(1,i)
 
 Pre-Sprint Research (#249-#253) identified the complex subspace C(1,i) as a safe restriction where QBP trivially reproduces standard QM. However, restricting to C(1,i) from the start tests nothing quaternionic — it is standard QM in quaternionic notation.
 
@@ -36,7 +74,7 @@ The scientific question is not "does QBP reproduce standard QM?" (Moretti-Oppio 
 
 Adler (1995) predicts that j,k components exhibit exponential spatial decay. Sprint 3 tests this prediction directly.
 
-### 2.2 Symplectic Decomposition
+### 3.2 Symplectic Decomposition
 
 Following Adler (1995) and Davies & McKellar (1989), a quaternionic wavefunction is decomposed as:
 
@@ -56,7 +94,7 @@ The full quaternionic expansion is:
 
 where ψ₀ = α₀ + β₀·i and ψ₁ = α₁ + β₁·i.
 
-### 2.3 Coupled Quaternionic Schrödinger Equations
+### 3.3 Coupled Quaternionic Schrödinger Equations
 
 The quaternionic Schrödinger equation with a quaternionic potential U = U₀ + U₁·j yields two coupled complex equations (Adler 1988, Eqs. 42-43):
 
@@ -73,7 +111,7 @@ where:
 
 **Key feature:** The coupling involves complex conjugation of the opposite component. This is the hallmark of quaternionic non-commutativity and has no analog in standard complex QM.
 
-### 2.4 Born Rule (Full Quaternionic)
+### 3.4 Born Rule (Full Quaternionic)
 
 The probability density uses the full quaternionic norm:
 
@@ -84,9 +122,9 @@ P(x) = |ψ(x)|² = |ψ₀(x)|² + |ψ₁(x)|²
 
 This reduces to the standard Born rule when ψ₁ = 0.
 
-## 3. Quantitative Predictions
+## 4. Quantitative Predictions
 
-### 3.1 Scenario A: Complex Baseline (No Which-Path, No j,k)
+### 4.1 Scenario A: Complex Baseline (No Which-Path, No j,k)
 
 This scenario uses ψ₁ = 0 throughout, serving as the baseline that must match standard QM exactly.
 
@@ -120,7 +158,7 @@ I(x) = 4A² · cos²(πxd / λL)
 
 **Minima:** x_n = (n + 1/2)λL/d
 
-### 3.2 Scenario B: With Which-Path Detection (No Interference)
+### 4.2 Scenario B: With Which-Path Detection (No Interference)
 
 Measurement at the slits collapses the superposition. The intensity is the incoherent sum of single-slit patterns:
 
@@ -137,11 +175,11 @@ I(x) = A² · sinc²(πxa / λL)
 
 The interference cross-term vanishes because the paths are distinguishable.
 
-### 3.3 Scenario C: Quaternionic Dynamics (The New QBP Test)
+### 4.3 Scenario C: Quaternionic Dynamics (The New QBP Test)
 
 **This is the genuinely quaternionic scenario.** Initialize the wavefunction with nonzero j,k components and observe what happens during propagation.
 
-#### 3.3.1 Initial State
+#### 4.3.1 Initial State
 
 At the source (before the slits), the electron has a quaternionic wavefunction:
 
@@ -157,7 +195,7 @@ where ψ₁(x, 0) ≠ 0. The initial quaternionic fraction is parameterized by:
 
 where η ∈ (0, 1) controls how "quaternionic" the initial state is. We test η = 0.01, 0.1, 0.5.
 
-#### 3.3.2 Propagation: Adler's Decay Prediction
+#### 4.3.2 Propagation: Adler's Decay Prediction
 
 In free space (U₁ = 0), the coupled equations decouple:
 
@@ -176,7 +214,7 @@ The ψ₀ component has standard propagating plane-wave solutions with real wave
 
 where κ is a characteristic inverse decay length.
 
-#### 3.3.3 Decay Length Estimate
+#### 4.3.3 Decay Length Estimate
 
 The decay rate depends on the quaternionic potential strength and particle energy. From Adler's perturbative analysis:
 
@@ -194,7 +232,7 @@ The quaternionic fraction at distance r from the source scales as:
 
 For any physical U₁ and macroscopic propagation distance L, the decay is complete: η(L) ≈ 0.
 
-#### 3.3.4 Predicted Interference Pattern (Scenario C)
+#### 4.3.4 Predicted Interference Pattern (Scenario C)
 
 At the detector screen (distance L from slits):
 
@@ -204,7 +242,7 @@ At the detector screen (distance L from slits):
 
 **The quaternionic component does NOT contribute to the far-field interference pattern.** This is why standard QM works — the complex subspace is an attractor of the free-space dynamics.
 
-#### 3.3.5 What Sprint 3 Actually Tests
+#### 4.3.5 What Sprint 3 Actually Tests
 
 The scientifically interesting measurements are not at the detector (where everything matches standard QM), but **during propagation**:
 
@@ -213,7 +251,7 @@ The scientifically interesting measurements are not at the detector (where every
 3. **Convergence:** At what distance does the interference pattern become indistinguishable from standard QM? This defines the "quaternionic coherence length."
 4. **Parameter dependence:** How does the decay rate depend on η₀, U₁, and particle energy?
 
-### 3.4 Single-Slit Envelope (Finite Slit Width)
+### 4.4 Single-Slit Envelope (Finite Slit Width)
 
 For finite slit width a, all scenarios are modulated by the single-slit diffraction envelope:
 
@@ -223,9 +261,9 @@ I(x) → I(x) · sinc²(πxa / λL)
 
 The envelope has zeros at x = nλL/a.
 
-## 4. Simulation Parameters
+## 5. Simulation Parameters
 
-### 4.1 Default Configuration
+### 5.1 Default Configuration
 
 | Parameter | Value | Rationale |
 |-----------|-------|-----------|
@@ -236,7 +274,7 @@ The envelope has zeros at x = nλL/a.
 | k | 1.257 × 10¹¹ m⁻¹ | k = 2π/λ |
 | Δx | 50 μm | Predicted fringe spacing = λL/d |
 
-### 4.2 Quaternionic Parameters (Scenario C)
+### 5.2 Quaternionic Parameters (Scenario C)
 
 | Parameter | Values to Test | Description |
 |-----------|---------------|-------------|
@@ -246,7 +284,7 @@ The envelope has zeros at x = nλL/a.
 
 **Note on U₁:** The quaternionic potential strength is unknown experimentally. Experimental upper bounds (Kaiser 1984 neutron interferometry: 1:30,000; Procopio 2017 photon: θ = 0.03°) constrain it to be extremely small. In simulation, we treat U₁ as a free parameter and show that the physics (decay → standard QM convergence) is qualitatively the same for any U₁ > 0.
 
-### 4.3 Parameter Sensitivity Tests
+### 5.3 Parameter Sensitivity Tests
 
 | Test | Variation | Expected Effect |
 |------|-----------|-----------------|
@@ -256,9 +294,9 @@ The envelope has zeros at x = nλL/a.
 | Double η₀ | η₀ → 2η₀ | Decay curve shifts up but same κ |
 | Increase U₁ | U₁ → 10·U₁ | Faster decay (larger κ) |
 
-## 5. Success Criteria
+## 6. Success Criteria
 
-### 5.1 Quantitative Acceptance Criteria
+### 6.1 Quantitative Acceptance Criteria
 
 **Baseline (Scenarios A & B):**
 
@@ -281,7 +319,7 @@ The envelope has zeros at x = nλL/a.
 | 10 | Total probability conserved throughout propagation | |ψ₀|² + |ψ₁|² constant to < 10⁻⁶ |
 | 11 | In limit U₁ → 0, ψ₁ propagates without decay (no coupling) | Control test |
 
-### 5.2 Fringe Visibility
+### 6.2 Fringe Visibility
 
 ```
 V = (I_max - I_min) / (I_max + I_min)
@@ -292,9 +330,9 @@ V = (I_max - I_min) / (I_max + I_min)
 - Scenario C at detector: V → 1.0 (after j,k decay)
 - Scenario C near slits: V < 1.0 (j,k components add incoherent background)
 
-## 6. Falsification Criteria
+## 7. Falsification Criteria
 
-### 6.1 Baseline Falsification (Must Match Standard QM)
+### 7.1 Baseline Falsification (Must Match Standard QM)
 
 | Scenario | QBP Prediction | Standard QM | Match Required? |
 |----------|---------------|-------------|-----------------|
@@ -304,7 +342,7 @@ V = (I_max - I_min) / (I_max + I_min)
 
 If QBP predicts different interference patterns at the detector than standard QM, this would **falsify QBP**.
 
-### 6.2 Quaternionic Dynamics Falsification
+### 7.2 Quaternionic Dynamics Falsification
 
 | Prediction | Expected | Would Falsify If... |
 |-----------|----------|-------------------|
@@ -313,7 +351,7 @@ If QBP predicts different interference patterns at the detector than standard QM
 | U₁ → 0 limit | No decay (standard QM) | Decay without coupling |
 | Convergence | Detector matches standard QM | Persistent j,k contribution at detector |
 
-### 6.3 Null Hypothesis Value
+### 7.3 Null Hypothesis Value
 
 If all predictions hold (expected), Sprint 3 confirms:
 1. Quaternionic dynamics reduce to standard QM at macroscopic distances (Adler's decay)
@@ -322,16 +360,16 @@ If all predictions hold (expected), Sprint 3 confirms:
 4. Single-particle spatial interference is not where QQM diverges from standard QM
 5. The true divergence test remains multi-particle entanglement (Sprint 6: Bell's Theorem)
 
-## 7. What This Experiment Does NOT Test
+## 8. What This Experiment Does NOT Test
 
 1. **The value of U₁** — We treat it as a free parameter. Determining U₁ from experiment requires specialized apparatus (neutron interferometry, photon tests).
 2. **Multi-particle entanglement** — The tensor product problem (#249) means QQM may diverge from standard QM for entangled states. This is Sprint 6.
 3. **Spin-path coupling** — Where quaternionic structure naturally appears in internal degrees of freedom. Candidate for Sprint 3 extension or future sprint.
 4. **Relativistic effects** — Adler (1988) shows quaternionic effects may persist in the relativistic (Klein-Gordon) case. Our simulation is non-relativistic.
 
-## 8. Implementation Notes for Phase 2
+## 9. Implementation Notes for Phase 2
 
-### 8.1 Two-Layer Simulation Architecture
+### 9.1 Two-Layer Simulation Architecture
 
 The simulation has two layers:
 
@@ -342,12 +380,12 @@ The simulation has two layers:
 
 **Layer 2: Quaternionic propagation** (tests Adler's decay)
 - Full quaternionic wavefunctions: ψ₀(x) + ψ₁(x)·j
-- Propagate via coupled Schrödinger equations (§2.3)
+- Propagate via coupled Schrödinger equations (§3.3)
 - Track all four components (α₀, β₀, α₁, β₁) at each grid point
 
 **Note on normalization:** Position-space wavefunctions satisfy ∫|ψ(x)|²dx = 1 over the spatial grid. This differs from the unit-quaternion normalization in qphysics.py (|ψ|² = 1 at a point). Phase 2 will need per-grid-point unnormalized quaternions with the overall wavefunction normalized.
 
-### 8.2 Propagation Method
+### 9.2 Propagation Method
 
 For 1D spatial propagation (sufficient for far-field double-slit):
 
@@ -357,7 +395,7 @@ For 1D spatial propagation (sufficient for far-field double-slit):
 4. In free space (U₁ = 0), equations decouple — propagate independently
 5. In the slit region (if modeling U₁ ≠ 0), use the full coupled system
 
-### 8.3 Measurement in QBP (Scenario B)
+### 9.3 Measurement in QBP (Scenario B)
 
 For which-path detection:
 1. Measurement at the slits projects the quaternionic state onto a slit eigenstate
@@ -365,7 +403,7 @@ For which-path detection:
 3. After measurement, propagate only the single-slit state
 4. The j,k components of the single-slit state still decay during propagation to the detector
 
-### 8.4 Visualization (Phase 3)
+### 9.4 Visualization (Phase 3)
 
 Sprint 3 Phase 3 should implement:
 - **Component-wise decay plot** (HIGH PRIORITY): α₀², β₀², α₁², β₁² vs distance from slits. Blue for 1,i components, red/orange for j,k. This directly visualizes Adler's decay.
@@ -373,7 +411,7 @@ Sprint 3 Phase 3 should implement:
 - **Fringe visibility vs distance:** V(r) showing how visibility increases from V < 1 (near slits, j,k background) to V → 1 (at detector, after decay)
 - **Parameter exploration:** Interactive slider for η₀ showing effect on decay dynamics
 
-## 9. Proof-of-Concept: Free-Space Quaternionic Propagation
+## 10. Proof-of-Concept: Free-Space Quaternionic Propagation
 
 Before implementing the full double-slit simulation, Phase 2 should first build a minimal proof-of-concept:
 
@@ -386,7 +424,7 @@ Before implementing the full double-slit simulation, Phase 2 should first build 
 
 This proof-of-concept validates the propagation infrastructure before the full double-slit geometry.
 
-## 10. References
+## 11. References
 
 1. **Adler, S.L.** (1988). "Scattering and decay theory for quaternionic quantum mechanics." *Phys. Rev. D* 37, 3654.
 2. **Adler, S.L.** (1995). *Quaternionic Quantum Mechanics and Quantum Fields*. Oxford University Press.

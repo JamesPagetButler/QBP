@@ -111,6 +111,17 @@ Theory Refinement
 ───────────────────────────────────────────────────────
 ```
 
+### Phase 1 Exit Criteria
+
+Phase 1 (Ground Truth) is not complete until:
+
+1. **Empirical Anchor section** is present and complete per the [ground truth schema](../schemas/ground_truth_schema.md#3-empirical-anchor-required)
+2. **At least one primary source** with a measured value is cited — or the experiment has an explicit **Theoretical-derived** data type classification
+3. **Data type classification** is declared (Quantitative-precise, Quantitative-moderate, Qualitative-binary, Formula-confirmed, Theoretical-derived, or Constraint-based)
+4. **Null results** are cited if relevant experimental constraints exist
+
+These criteria are enforced by the [Empirical Grounding Verification](../../CONTRIBUTING.md#empirical-grounding-verification) checklist during review.
+
 ### Per-Phase Workflow
 
 For each phase:

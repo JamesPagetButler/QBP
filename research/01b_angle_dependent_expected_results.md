@@ -31,7 +31,38 @@ Imagine a Stern-Gerlach apparatus where we can rotate the magnet to any angle. W
 
 ---
 
-## 3. The QBP Axioms (Corrected)
+## 3. Empirical Anchor
+
+**Data type:** Formula-confirmed
+
+### Key Measured Values
+
+| Quantity | Measured Value | Uncertainty | Source | Year | DOI / Identifier |
+|----------|---------------|-------------|--------|------|------------------|
+| P(+) = cos²(θ/2) for spin-1/2 | Functional form confirmed across all angles | Exact agreement within statistical bounds | Sakurai, J.J. (textbook, citing extensive experimental literature) | 1994 | ISBN 0-201-53929-2 |
+| Discrete binary outcomes at all angles | Only ±1 observed, never intermediate | Exact (qualitative) | Gerlach & Stern; all subsequent SG experiments | 1922– | Z. Phys. 9, 349–352 |
+
+### Experimental Confidence
+
+| Factor | Assessment |
+|--------|------------|
+| Replication status | The cos²(θ/2) angular dependence has been confirmed in countless experiments across electron, neutron, and atom systems. It is one of the most thoroughly verified predictions in quantum mechanics. |
+| Measurement precision | For individual angle measurements: statistical precision scales as 1/√N. The functional form cos²(θ/2) is confirmed to high precision by fitting across many angles simultaneously. |
+| Relevance to QBP test | Direct — QBP must derive the cos²(θ/2) formula from its axioms, not import it. The formula's status as experimentally confirmed means any QBP derivation is tested against reality, not just against standard QM theory. |
+
+### What "Matching Reality" Means
+
+The cos²(θ/2) formula is a **formula-confirmed** result: the functional form itself has been verified by extensive experiments. "Matching reality" means QBP must derive this exact functional form — P(+) = (1 + cos θ)/2 = cos²(θ/2) — from its axioms alone. The identity between these two expressions follows from the half-angle identity and is mathematically exact, not approximate.
+
+At the implementation level, "matching" means: for each test angle θ, the simulation's measured frequency of spin-up outcomes must fall within 3σ of the predicted P(+) = cos²(θ/2) over N trials. The deterministic cases (θ = 0° gives P(+) = 1, θ = 180° gives P(+) = 0) must be exact — any deviation indicates a bug, not a statistical fluctuation.
+
+### Null Results and Constraints
+
+No known null results specific to this phenomenon. The cos²(θ/2) dependence has been universally confirmed for spin-1/2 systems. No experiment has reported a deviation from this formula for single-particle spin measurements.
+
+---
+
+## 4. The QBP Axioms (Corrected)
 
 The following axioms govern the QBP measurement framework. Note that Axiom 3 was corrected after Experiment 01 (see `paper/DESIGN_RATIONALE.md` §5.2 for the correction history).
 
@@ -44,9 +75,9 @@ The following axioms govern the QBP measurement framework. Note that Axiom 3 was
 
 ---
 
-## 4. The Core Derivation
+## 5. The Core Derivation
 
-### 4.1 Representing Directions as Quaternions
+### 5.1 Representing Directions as Quaternions
 
 A pure unit quaternion has the form:
 
@@ -56,7 +87,7 @@ q = ai + bj + ck,  where a² + b² + c² = 1
 
 This is isomorphic to a unit vector in ℝ³: **v** = (a, b, c). The space of pure unit quaternions *is* the 2-sphere S²—every point corresponds to a direction in 3D space, and hence to a possible spin orientation.
 
-### 4.2 Setup for Angle-Dependent Measurement
+### 5.2 Setup for Angle-Dependent Measurement
 
 Following the convention from our simulation code:
 
@@ -65,7 +96,7 @@ Following the convention from our simulation code:
 
 This gives vec(ψ) = (sin θ, 0, cos θ) and vec(O) = (0, 0, 1).
 
-### 4.3 Computing the Vector Dot Product
+### 5.3 Computing the Vector Dot Product
 
 ```
 vecDot(ψ, O) = (sin θ × 0) + (0 × 0) + (cos θ × 1) = cos θ
@@ -73,7 +104,7 @@ vecDot(ψ, O) = (sin θ × 0) + (0 × 0) + (cos θ × 1) = cos θ
 
 **Key insight:** The quaternion dot product of pure unit quaternions equals the cosine of the angle between them. This is not something we put in—it's a geometric property that Hamilton's algebra automatically provides.
 
-### 4.4 Historical Note: The Factor-of-2 Correction
+### 5.4 Historical Note: The Factor-of-2 Correction
 
 *This section documents how the axiom error was discovered. The correction has been applied — see `paper/DESIGN_RATIONALE.md` §5.2.*
 
@@ -89,7 +120,7 @@ The original Axiom 3 stated ⟨O⟩ = 2 × vecDot(ψ, O). This produced invalid 
 
 **Lesson learned:** Edge cases (aligned, anti-aligned) are essential test coverage.
 
-### 4.5 The Corrected Formula
+### 5.5 The Corrected Formula
 
 With the corrected Axiom 3 (⟨O⟩ = vecDot(ψ, O)):
 
@@ -99,7 +130,7 @@ With the corrected Axiom 3 (⟨O⟩ = vecDot(ψ, O)):
 | 90° | 0 | 0 | 0.5 | ✓ |
 | 180° | -1 | -1 | 0.0 | ✓ |
 
-### 4.6 Final Derivation
+### 5.6 Final Derivation
 
 With the corrected axiom:
 
@@ -109,7 +140,7 @@ With the corrected axiom:
 P(+) = (1 + ⟨O⟩)/2 = (1 + cos θ)/2
 ```
 
-### 4.7 Verification Against Standard QM
+### 5.7 Verification Against Standard QM
 
 Standard quantum mechanics gives: P(+) = cos²(θ/2)
 
@@ -120,7 +151,7 @@ cos²(θ/2) = (1 + cos θ)/2
 
 **The QBP prediction matches standard QM exactly.** ✓
 
-### 4.8 The Rotation Formalism
+### 5.8 The Rotation Formalism
 
 For more complex scenarios, we can also express angle-dependent measurement using quaternion rotation operators. This is the approach documented in `paper/DESIGN_RATIONALE.md` §6.4.
 
@@ -135,11 +166,11 @@ q = cos(θ/2) + sin(θ/2)(nx·i + ny·j + nz·k)
 - Rotation axis: y-axis, so q = cos(θ/2) + sin(θ/2)·j
 - O_θ = q·k·q⁻¹ = cos(θ)·k + sin(θ)·i
 
-This produces the same expectation value as the direct state construction in §4.2.
+This produces the same expectation value as the direct state construction in §5.2.
 
 **Physical interpretation:** The rotation quaternion q has a non-zero real part — it's an *operator*, not a state. The half-angle θ/2 reflects the SU(2) double-cover of SO(3): rotating a spin state by 360° returns it to −ψ, not +ψ.
 
-### 4.9 Simplified Code Example
+### 5.9 Simplified Code Example
 
 For readers who want to understand the core calculation (following the pattern from Experiment 01):
 
@@ -181,11 +212,11 @@ print(f"θ=180°: P(+) = {angle_measurement_probability(180):.3f}") # → 0.000
 
 ---
 
-## 5. Why Does This Work?
+## 6. Why Does This Work?
 
 It is not enough to show *that* quaternions give the right answer. We must understand *why*.
 
-### 5.1 The Geometry of Spin States
+### 6.1 The Geometry of Spin States
 
 In standard QM, spin-1/2 states live in a 2D complex Hilbert space (ℂ²). The space of pure states is the Bloch sphere—a 2-sphere S².
 
@@ -193,13 +224,13 @@ In QBP, spin states are pure unit quaternions. The space of pure unit quaternion
 
 **These are the same space.** The quaternion formulation is not an approximation—it is an alternative parameterization of the same geometric object.
 
-### 5.2 Why Cos θ Appears
+### 6.2 Why Cos θ Appears
 
 The dot product of unit vectors gives cos θ—this is the projection of one direction onto another. For spin-1/2, measuring a state prepared along **n̂₁** using an apparatus aligned with **n̂₂** asks: "How much does this state 'point' in the measurement direction?"
 
 The quaternion formulation makes this geometric interpretation manifest. The answer is cos θ because that is literally what "projection" means in Euclidean geometry.
 
-### 5.3 Why (1 + cos θ)/2?
+### 6.3 Why (1 + cos θ)/2?
 
 The raw projection cos θ ranges from -1 to +1, but probabilities must be non-negative. The Born rule P(+) = (1 + ⟨O⟩)/2 is the unique linear map that:
 
@@ -207,7 +238,7 @@ The raw projection cos θ ranges from -1 to +1, but probabilities must be non-ne
 - Maps ⟨O⟩ = -1 (anti-aligned) → P(+) = 0
 - Maps ⟨O⟩ = 0 (orthogonal) → P(+) = 0.5
 
-### 5.4 The Deep Connection
+### 6.4 The Deep Connection
 
 Hamilton quaternions encode SO(3) rotations. Spin-1/2 transforms under SU(2), which is the double cover of SO(3). The mathematics is connected at a fundamental level.
 
@@ -215,9 +246,9 @@ Hamilton quaternions encode SO(3) rotations. Spin-1/2 transforms under SU(2), wh
 
 ---
 
-## 6. Edge Cases and Physical Interpretation
+## 7. Edge Cases and Physical Interpretation
 
-### 6.1 θ = 0° (Aligned)
+### 7.1 θ = 0° (Aligned)
 
 - vecDot(ψ, O) = cos(0°) = 1
 - ⟨O⟩ = 1
@@ -225,7 +256,7 @@ Hamilton quaternions encode SO(3) rotations. Spin-1/2 transforms under SU(2), wh
 
 **Physical meaning:** Measuring spin along the preparation axis always gives the prepared value. Complete certainty.
 
-### 6.2 θ = 90° (Orthogonal)
+### 7.2 θ = 90° (Orthogonal)
 
 - vecDot(ψ, O) = cos(90°) = 0
 - ⟨O⟩ = 0
@@ -233,7 +264,7 @@ Hamilton quaternions encode SO(3) rotations. Spin-1/2 transforms under SU(2), wh
 
 **Physical meaning:** The state has no "preference" for either outcome along the perpendicular axis. Maximum uncertainty. (This is Experiment 01.)
 
-### 6.3 θ = 180° (Anti-aligned)
+### 7.3 θ = 180° (Anti-aligned)
 
 - vecDot(ψ, O) = cos(180°) = -1
 - ⟨O⟩ = -1
@@ -241,7 +272,7 @@ Hamilton quaternions encode SO(3) rotations. Spin-1/2 transforms under SU(2), wh
 
 **Physical meaning:** Measuring along the opposite direction always gives the opposite result. Complete certainty of spin-down.
 
-### 6.4 θ = 60°
+### 7.4 θ = 60°
 
 - vecDot(ψ, O) = cos(60°) = 0.5
 - ⟨O⟩ = 0.5
@@ -251,9 +282,9 @@ Hamilton quaternions encode SO(3) rotations. Spin-1/2 transforms under SU(2), wh
 
 ---
 
-## 7. Quantitative Predictions & Acceptance Criteria
+## 8. Quantitative Predictions & Acceptance Criteria
 
-### 7.1 Test Angles
+### 8.1 Test Angles
 
 | θ (degrees) | θ (radians) | cos θ | Expected P(+) | Rationale |
 |-------------|-------------|-------|---------------|-----------|
@@ -267,7 +298,7 @@ Hamilton quaternions encode SO(3) rotations. Spin-1/2 transforms under SU(2), wh
 | 150° | 5π/6 | -0.866 | 0.067 | Near anti-alignment |
 | 180° | π | -1.000 | 0.000 | Perfect anti-alignment (deterministic) |
 
-### 7.2 Statistical Parameters
+### 8.2 Statistical Parameters
 
 For N = 1,000,000 trials per angle:
 
@@ -277,7 +308,7 @@ For N = 1,000,000 trials per angle:
 
 **Note:** σ varies with angle. At θ = 90°, σ = 500. At θ = 0° or 180°, σ = 0 (deterministic).
 
-### 7.3 Detailed Acceptance Table
+### 8.3 Detailed Acceptance Table
 
 | θ | P(+) | μ | σ | 3σ Range |
 |---|------|---|---|----------|
@@ -291,7 +322,7 @@ For N = 1,000,000 trials per angle:
 | 150° | 0.067 | 66,987 | 250.0 | [66,237, 67,737] |
 | 180° | 0.000 | 0 | 0.0 | Exactly 0 |
 
-### 7.4 Special Handling for Deterministic Cases
+### 8.4 Special Handling for Deterministic Cases
 
 At θ = 0° and θ = 180°, σ = 0. The acceptance criterion becomes exact:
 - θ = 0°: All 1,000,000 measurements must be +1
@@ -301,9 +332,9 @@ Any deviation indicates a bug, not statistical fluctuation.
 
 ---
 
-## 8. Potential Difficulties and Concerns
+## 9. Potential Difficulties and Concerns
 
-### 8.1 Axiom Correction (COMPLETED)
+### 9.1 Axiom Correction (COMPLETED)
 
 **Status:** ✅ Corrected in Sprint 1 post-analysis.
 
@@ -316,7 +347,7 @@ The expectation value axiom was corrected from ⟨O⟩ = 2 × vecDot(ψ, O) to �
 
 See `paper/DESIGN_RATIONALE.md` §5.2 for full correction history.
 
-### 8.2 Floating-Point Precision
+### 9.2 Floating-Point Precision
 
 For angles near 0° or 180°:
 - cos θ approaches ±1
@@ -324,7 +355,7 @@ For angles near 0° or 180°:
 - Use radians for trigonometric calculations
 - Handle P = 0 and P = 1 as deterministic cases
 
-### 8.3 Quaternion Construction
+### 9.3 Quaternion Construction
 
 Experiment 01 used axis-aligned quaternions (i, j, k). For arbitrary angles:
 ```
@@ -332,22 +363,22 @@ Experiment 01 used axis-aligned quaternions (i, j, k). For arbitrary angles:
 ```
 The implementation must correctly construct and normalize these quaternions.
 
-### 8.4 Numerical Verification
+### 9.4 Numerical Verification
 
 Before running statistical tests, verify analytically:
 - Compute vecDot(ψ, O) for known quaternions
 - Confirm it equals cos θ
 - Catch implementation errors before statistical noise obscures them
 
-### 8.5 Off-Axis States
+### 9.5 Off-Axis States
 
 This test is confined to the x-z plane. A more comprehensive test could include states with j components, verifying full 3D angular dependence.
 
 ---
 
-## 9. Connection to Future Experiments
+## 10. Connection to Future Experiments
 
-### 9.1 Bell's Theorem (Experiment 05)
+### 10.1 Bell's Theorem (Experiment 05)
 
 This experiment validates single-particle angle dependence. Experiment 05 will test correlations between two entangled particles measured at different angles:
 
@@ -357,13 +388,13 @@ E(a, b) = -cos(θ_ab)
 
 Getting angle dependence right here is essential groundwork.
 
-### 9.2 General Angular Formula
+### 10.2 General Angular Formula
 
 The formula P(+) = (1 + cos θ)/2 is the foundation for all spin-1/2 measurements in QBP. Every subsequent experiment involving spin will depend on this result.
 
 ---
 
-## 10. Summary
+## 11. Summary
 
 ### What We Derived
 
@@ -387,11 +418,11 @@ Nine angles from 0° to 180°, each with 1,000,000 trials:
 - Edge cases: 0° (aligned), 90° (orthogonal), 180° (anti-aligned)
 - Intermediate angles: 30°, 45°, 60°, 120°, 135°, 150°
 
-All must pass the 3σ acceptance criterion (see §7.3).
+All must pass the 3σ acceptance criterion (see §8.3).
 
 ---
 
-## 11. Prediction Classification
+## 12. Prediction Classification
 
 | Prediction | Type | Standard QM | Notes |
 |------------|------|-------------|-------|
@@ -413,7 +444,7 @@ For QBP to make novel predictions, we must look beyond single-particle systems �
 
 ---
 
-## 12. Phase 2 Acceptance Criteria
+## 13. Phase 2 Acceptance Criteria
 
 The following criteria must be met for Phase 2 (Implementation) to pass:
 
@@ -425,7 +456,7 @@ The following criteria must be met for Phase 2 (Implementation) to pass:
 
 ---
 
-## 13. References
+## 14. References
 
 1. Hamilton, W.R. (1844). "On Quaternions". *Proceedings of the Royal Irish Academy*.
 2. Sakurai, J.J. (1994). *Modern Quantum Mechanics*. Addison-Wesley.
