@@ -19,6 +19,13 @@ Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engin
 1.  **Sprint (Experiment N):** We execute all 5 phases for a single experiment from our roadmap (Ground Truth, Implementation, Visualization, Formal Proof, Publication). A sprint is not complete until all 5 phases are successfully implemented and merged.
 
 2.  **Theory Refinement Stage:** After a sprint is complete, we enter a dedicated phase to:
+    *   **KG Consolidation** (first step):
+        ```bash
+        # What changed files affect the knowledge graph?
+        git diff --name-only HEAD~5 | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
+        # Full analysis report — feeds into the discussion below
+        python scripts/qbp_knowledge_sqlite.py report
+        ```
     *   **Analyze:** Discuss the results and what they imply for our theory.
     *   **Check Guide Posts:** Evaluate if any "Guide Posts" (e.g., emergent conservation laws) have appeared.
     *   **Extend Theory:** Develop the new theoretical underpinnings required to tackle the *next* experiment on our roadmap.
@@ -43,6 +50,14 @@ Our project operates on a `Sprint -> Refine -> Sprint` cycle, which is the engin
       "SU(2) double cover of SO(3) explains half-angle formula" \
       --status proposed --confidence_tier Tier-2-likely
     ```
+
+2b. **Research Gate Checkpoint:** After Theory Refinement, run the Research Gate to decide whether Pre-Sprint Research is needed:
+    ```bash
+    python scripts/research_gate.py --scope sprint-N+1 experiment-NN
+    ```
+    - **PASS** (exit 0): Proceed directly to Sprint N+1.
+    - **BLOCK** (exit 1): Enter Pre-Sprint Research to resolve scoped weak claims and research gaps.
+    - See [Research Gate Checkpoint](docs/process/operational_modes.md#research-gate-checkpoint) for full details.
 
 3.  **Loop:** We then begin the next sprint for Experiment N+1.
 
@@ -132,7 +147,14 @@ Each iteration makes the theory stronger. We don't fear discovering changes are 
 
 Some sprints introduce qualitatively new physics where we can't define "ground truth" without first answering research questions. The Pre-Sprint Research Phase addresses this.
 
-**When needed:** Theory Refinement identifies blocking questions for the next sprint.
+**When needed:** The [Research Gate](docs/process/operational_modes.md#research-gate-checkpoint) returns BLOCK, or James manually identifies blocking questions.
+
+```bash
+# Formal trigger — run after Theory Refinement
+python scripts/research_gate.py --scope sprint-N+1 experiment-NN
+# BLOCK (exit 1) → enter Pre-Sprint Research
+# PASS  (exit 0) → skip directly to Phase 1
+```
 
 **Activities:**
 1. Identify what blocks Phase 1 (Ground Truth) definition

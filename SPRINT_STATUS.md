@@ -31,6 +31,7 @@
   - [ ] 4c: Interactive Proof Visualization (#261)
 - [ ] Phase 5: Publication (#65)
 - [ ] Theory Refinement (#81)
+- [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`
 - [ ] Retrospective (#192)
 
 ## Sprint 2 Closure Checklist
@@ -254,6 +255,7 @@ Sprint 2 (Experiment 01b: Angle-Dependent Measurement) completed successfully in
 - [ ] Phase 5: Publication (#XX)
 - [ ] Research Sprint NR (#XX) — *must complete before Theory Refinement*
 - [ ] Theory Refinement (#XX) — *blocked by Research Sprint*
+- [ ] Research Gate: `python scripts/research_gate.py --scope sprint-N+1 experiment-NN`
 - [ ] Retrospective (#XX)
 
 ## Sprint N Retrospective

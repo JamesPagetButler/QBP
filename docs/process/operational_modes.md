@@ -178,14 +178,17 @@ Modes are enabled progressively as process validation occurs:
               │            │            │
               └────────────┴────────────┘
                            │
-                    Decision Gate:
-                    Continue or Project Mode?
+                   ┌───────┴───────┐
+                   │ Research Gate │  ← python scripts/research_gate.py
+                   │   Checkpoint  │    --scope sprint-N+1 experiment-NN
+                   └───────┬───────┘
                            │
               ┌────────────┼────────────┐
               ↓            ↓            ↓
-         Continue      Pre-Sprint        Enter Project Mode
-         (no blockers) Research          (rework/add/remove)
-                       (has blockers)
+         PASS:         BLOCK:           Enter Project Mode
+         Continue      Pre-Sprint       (rework/add/remove)
+         to Sprint N+1 Research
+                       (resolve gaps)
                            │
                     ┌──────┴──────┐
                     │ Resolve     │
@@ -197,10 +200,10 @@ Modes are enabled progressively as process validation occurs:
                     Sprint N+1 Phase 1
 ```
 
-**Key principle:** Theory Refinement is the checkpoint where we decide:
-1. Continue linearly (no blockers)
-2. Pre-Sprint Research (has blocking questions for next sprint)
-3. Project Mode (portfolio-level changes needed)
+**Key principle:** Theory Refinement feeds the Research Gate checkpoint where we decide:
+1. **PASS** — Continue linearly (no scoped blocking items)
+2. **BLOCK** — Pre-Sprint Research required (scoped weak claims or research gaps)
+3. **Project Mode** — Portfolio-level changes needed (human decision)
 
 ---
 
@@ -256,6 +259,63 @@ Before we can define Ground Truth for double-slit, we must answer:
 - What are the falsification criteria? (#251)
 
 These require Pre-Sprint Research before Phase 1 can begin.
+
+---
+
+## Research Gate Checkpoint
+
+**Purpose:** Lightweight, mandatory checkpoint after every sprint that decides whether a full Pre-Sprint Research phase is needed.
+
+The Research Gate queries the Knowledge Graph for blocking issues scoped to the upcoming sprint. It replaces ad-hoc "do we need research?" discussions with a deterministic, scriptable check.
+
+**Invocation:**
+```bash
+# Check readiness for Sprint 4, Experiment 04
+python scripts/research_gate.py --scope sprint-4 experiment-04
+
+# Global analysis only (no scope filtering)
+python scripts/research_gate.py
+```
+
+**Verdicts:**
+
+| Exit Code | Verdict | Meaning |
+|-----------|---------|---------|
+| 0 | **PASS** | No scoped blocking items — proceed to Sprint N+1 Phase 1 |
+| 1 | **BLOCK** | Scoped weak claims or research gaps found — enter Pre-Sprint Research |
+| 2 | **ERROR** | Database not found or unreadable |
+
+**What blocks:**
+- **Weak claims** scoped to the next sprint (claims with no evidence chain)
+- **Research gaps** scoped to the next sprint (open questions with no investigation)
+
+**What does NOT block:**
+- **Unproven claims** — these are informational; formal proofs come in Phase 4
+- **Global findings** — items not tagged with the next sprint's scope are reported but don't trigger a BLOCK
+
+**Precedent:** Sprint 3 Pre-Sprint Research (#255) was the ad-hoc version of this gate. The gate formalises that decision for all future sprints.
+
+---
+
+## Phase 6 KG Consolidation
+
+**Purpose:** Ensure the Knowledge Graph reflects each sprint's findings before Theory Refinement analysis begins.
+
+At the start of Theory Refinement (Phase 6), run two KG commands to surface impacts and generate a structured report:
+
+```bash
+# 1. Impact analysis — what changed files affect the KG?
+git diff --name-only HEAD~5 | xargs python scripts/qbp_knowledge_sqlite.py suggest-updates
+
+# 2. Full analysis report — feeds into Theory Refinement discussion
+python scripts/qbp_knowledge_sqlite.py report
+```
+
+**Outputs:**
+- `suggest-updates` lists files that may need KG vertex/edge updates
+- `report` generates a Markdown summary of weak claims, research gaps, unproven claims, and bridge concepts
+
+These outputs inform the Theory Refinement panel and feed directly into the Research Gate checkpoint that follows.
 
 ---
 
