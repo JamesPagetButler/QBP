@@ -62,7 +62,7 @@ For this experiment, "matching reality" has two components:
 
 **Parameter-space mapping:** These null results constrain the quaternionic coupling U₁:
 - **Kaiser bound:** A phase deviation < 1:30,000 over a neutron interferometer path length (~cm scale) implies |U₁| << ℏv/L_path, where v is the neutron velocity. For thermal neutrons (v ≈ 2200 m/s, L_path ≈ 0.05 m): |U₁| << ℏ × 2200 / 0.05 ≈ 5 × 10⁻³⁰ J ≈ 3 × 10⁻¹¹ eV.
-- **Procopio bound:** θ = 0.03° ± 0.13° is consistent with zero quaternionic phase at optical wavelengths, giving a comparable or tighter bound.
+- **Procopio bound:** θ = 0.03° ± 0.13° constrains the quaternionic phase accumulated over the interferometer path. For single photons (v = c, path length L_path ≈ 0.3 m in their interferometer), the quaternionic phase is φ_q ≈ |U₁|·L_path/(ℏc). The bound θ < 0.16° (1σ) gives |U₁| < ℏc·θ/L_path ≈ (3.2 × 10⁻²⁶ J·m) × (2.8 × 10⁻³ rad) / 0.3 m ≈ 3 × 10⁻²⁸ J ≈ 2 × 10⁻⁹ eV. This is tighter than the Kaiser neutron bound by about two orders of magnitude.
 
 Our simulation treats U₁ as a free parameter scanned over a range that includes values both within and far above these experimental bounds. The simulation must show: (1) for U₁ within the Kaiser/Procopio bounds, the far-field pattern is indistinguishable from standard QM; (2) for artificially large U₁, the decay dynamics are qualitatively visible and follow the predicted form.
 
@@ -76,7 +76,11 @@ Pre-Sprint Research (#249-#253) identified the complex subspace C(1,i) as a safe
 
 The scientific question is not "does QBP reproduce standard QM?" (Moretti-Oppio already guarantees this for elementary systems) but rather: **what happens to quaternionic structure during spatial propagation through a double slit?**
 
-Adler (1995) predicts that j,k components exhibit exponential spatial decay. Sprint 3 tests this prediction directly.
+Adler's work contains two distinct decay predictions that should not be conflated:
+- **Adler (1988), §IV:** Single-particle scattering through a quaternionic potential produces modified transmission coefficients. The ψ₁ component is attenuated by the potential barrier — this is a standard scattering effect, testable in our single-particle simulation.
+- **Adler (1995), Ch. 4:** In the statistical mechanics of trace dynamics (the deeper theory underlying QQM), j,k components undergo thermodynamic decoherence in many-body systems — a collective effect not testable in a single-particle simulation.
+
+Sprint 3 tests the **single-particle scattering mechanism** (Adler 1988). Whether the j,k components decay exponentially beyond the slits or merely suffer amplitude attenuation at the slits is the central question the simulation will answer.
 
 ### 3.2 Symplectic Decomposition
 
@@ -120,7 +124,7 @@ The quaternionic potential is decomposed as:
 U(x) = U₀(x) + U₁(x)·j
 ```
 
-where U₀(x) ∈ C(1,i) is the standard complex potential (barrier walls, slit geometry) and U₁(x) ∈ C(1,i) is the quaternionic coupling strength. For the double-slit experiment, U₁(x) is nonzero only in the slit region — it is the genuinely new physics.
+where U₀(x) ∈ C(1,i) is the standard complex potential (barrier walls, slit geometry) and U₁(x) ∈ C(1,i) is the quaternionic coupling strength. The derivation holds for general complex U₁ ∈ C(1,i); the simulation restricts to **real U₁** for simplicity (real ⊂ C(1,i)). For the double-slit experiment, U₁(x) is nonzero only in the slit region — it is the genuinely new physics.
 
 **Step 3: Substitute the symplectic decomposition**
 
@@ -260,13 +264,7 @@ iℏ ∂ψ₀/∂t = -(ℏ²/2m)∇²ψ₀ + U₀·ψ₀ - U₁·ψ₁*
 iℏ ∂ψ₁/∂t = -(ℏ²/2m)∇²ψ₁ + U₀·ψ₁ + U₁·ψ₀*
 ```
 
-The coupling terms mix the ψ₀ and ψ₁ sectors. When an incoming quaternionic wavefunction (with nonzero ψ₁) encounters the slit potential, the interaction acts as a boundary condition that projects the transmitted wave into the eigenmodes of the post-slit free-space Hamiltonian.
-
-For ψ₀, the standard complex component, the eigenmodes are propagating plane waves with real wavevector k = √(2mE)/ℏ.
-
-For ψ₁, the quaternionic component, the situation is different. The coupling term U₁·ψ₀* in the slit region generates ψ₁ components whose energy-momentum relation is modified by the interaction. When these components are projected onto the free-space basis (regime 2), they include evanescent modes — solutions with imaginary wavevector that decay exponentially beyond the slit region.
-
-This is analogous to quantum tunneling: a particle encountering a potential barrier acquires evanescent components in the classically forbidden region. Here, the quaternionic potential at the slits creates "quaternionically forbidden" modes in ψ₁ that decay beyond the interaction region.
+The coupling terms mix the ψ₀ and ψ₁ sectors. The interaction with the localized quaternionic potential U₁ at the slits acts as a **channel-mixing operator** that scatters the incoming wave into a superposition of outgoing modes.
 
 **Regime 2: Free space (U₁ = 0)**
 
@@ -279,13 +277,25 @@ iℏ ∂ψ₁/∂t = -(ℏ²/2m)∇²ψ₁    [identical equation]
 
 **Both components satisfy the same Schrödinger equation.** In free space, there is no mechanism that selects one component for decay over the other. The dynamics are symmetric.
 
-However, the *solutions* differ because the *boundary conditions* set by the slit interaction (regime 1) are different for each component:
-- **ψ₀** exits the slits in propagating modes (real wavevector) → carries the standard interference pattern to the detector
-- **ψ₁** exits the slits predominantly in evanescent modes (imaginary wavevector) → decays exponentially with distance from the slits
+**Novel QBP prediction — evanescent ψ₁ modes:**
 
-**The decay is not caused by free-space propagation.** It is caused by the slit interaction projecting ψ₁ into evanescent modes. Free space merely preserves this evanescent character.
+In standard QM scattering, a localized potential attenuates a wave via a transmission coefficient, but the transmitted wave beyond the barrier always propagates freely (real wavevector). The coupled equations of QBP predict a qualitatively different phenomenon.
 
-**Important consequence:** In the limit U₁ → 0, there is no coupling at the slits, no evanescent projection, and ψ₁ propagates normally alongside ψ₀. This is acceptance criterion #11 and serves as a control test.
+The quaternionic coupling U₁ at the slits modifies the dispersion relation for ψ₁ inside the slit region (see §4.3.3). The resulting ψ₁ transmission through the slits includes solutions with **complex wavevector** — modes whose imaginary wavevector component produces exponential decay beyond the slit region, even in free space. This is a unique prediction of quaternionic scattering theory that does not occur in standard QM, where transmission through a localized barrier always yields propagating modes.
+
+The physical picture:
+- **ψ₀** exits the slits in standard propagating modes (real wavevector) → carries the interference pattern to the detector
+- **ψ₁** exits the slits in modes whose wavevector acquired an imaginary component from the quaternionic coupling → decays exponentially with distance from the slits
+
+**The decay is not caused by free-space dynamics** (both components satisfy the same SE in free space). Rather, the slit interaction imprints a decaying spatial profile onto ψ₁ via the modified dispersion relation, and free-space propagation preserves this profile.
+
+**Important caveat:** This evanescent ψ₁ transmission is a **prediction to be tested by the simulation**, not an established result. Standard 1D scattering theory (where transmitted waves always propagate) would predict that ψ₁ exits the slits with reduced amplitude but propagates normally thereafter. The simulation will discriminate between these two outcomes:
+- **(a) QBP evanescent prediction:** η(r) decays exponentially beyond the slits (acceptance criterion #7)
+- **(b) Standard scattering prediction:** η(r) ≈ η_exit = constant beyond the slits, with η_exit determined by the slit transmission coefficient
+
+If outcome (b) occurs, acceptance criterion #7 would fail but criteria #9-11 may still hold — the interesting physics question shifts to whether the slit attenuation alone is sufficient to produce convergence to standard QM at the detector.
+
+**Important consequence:** In the limit U₁ → 0, there is no coupling at the slits, no channel mixing, and ψ₁ propagates normally alongside ψ₀. This is acceptance criterion #11 and serves as a control test.
 
 #### 4.3.3 Decay Length Estimate
 
@@ -327,7 +337,13 @@ The quaternionic fraction at distance r beyond the slits scales as:
 η(r) ≈ η_slit · exp(-2κr)
 ```
 
-where η_slit is the quaternionic fraction immediately after the slit interaction (set by U₁ and the slit geometry).
+where η_slit is the quaternionic fraction immediately after the slit interaction. For a slit of width a with quaternionic coupling U₁, the slit transmission gives approximately:
+
+```
+η_slit ≈ η₀ · |T₁(U₁, a)|²
+```
+
+where T₁ is the ψ₁ transmission coefficient through the slit region and η₀ is the initial quaternionic fraction. The exact value of T₁ depends on the scattering solution of the coupled equations in the slit region; for weak coupling (|U₁|a << ℏv), η_slit ≈ η₀ (negligible attenuation).
 
 For any physical U₁ consistent with the Kaiser/Procopio bounds and macroscopic propagation distance L >> L_decay, the decay is complete: η(L) ≈ 0.
 
@@ -345,7 +361,7 @@ The full two-slit expression decomposes as (cf. §3.4 Born rule):
 P(x) = |ψ₀,slit1(x) + ψ₀,slit2(x)|² + |ψ₁,slit1(x) + ψ₁,slit2(x)|²
 ```
 
-where subscripts denote (component, slit). There are no cross-terms between ψ₀ and ψ₁ because they live in orthogonal quaternionic subspaces. Near the slits, the ψ₁ interference term adds an incoherent background that reduces fringe visibility. At the detector (after ψ₁ decay), only the ψ₀ term contributes and visibility approaches 1.0.
+where subscripts denote (component, slit). There are no cross-terms between ψ₀ and ψ₁ because they live in orthogonal quaternionic subspaces. Near the slits, the ψ₁ term produces its own coherent interference pattern (within the j,k sector) that is summed incoherently with the ψ₀ pattern (no cross-terms between sectors). This second pattern reduces the combined fringe visibility because the two patterns need not be in phase. At the detector (after ψ₁ attenuation), only the ψ₀ term contributes and visibility approaches 1.0.
 
 **The complex subspace C(1,i) is dynamically selected** — not by fiat, but by the slit interaction boundary conditions. This is the central prediction of Scenario C.
 
