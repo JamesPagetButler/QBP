@@ -15,7 +15,7 @@ This document defines the quantitative predictions for the double-slit interfere
 | Wavelength | λ | de Broglie wavelength λ = h/p |
 | Wave number | k | k = 2π/λ |
 | Screen position | x | Position on detector screen (x=0 at center) |
-| Quaternionic coupling | U₁ | Strength of quaternionic potential at slits (free parameter) |
+| Quaternionic coupling | U₁ | Strength of quaternionic potential at slits (real-valued, free parameter, localized to slit region) |
 
 **Conditions:**
 - **Scenario A:** No which-path information (interference), complex initial state
@@ -34,7 +34,7 @@ Scenario C is the genuinely new QBP test. Scenarios A and B establish the baseli
 |----------|---------------|-------------|--------|------|------------------|
 | Double-slit interference pattern | Fringes observed at single-electron level | Qualitative (buildup confirms wave behavior) | Tonomura, A. et al. | 1989 | Am. J. Phys. 57, 117 |
 | Fringe spacing | Δx = λL/d confirmed for electrons | ~1% (apparatus-dependent) | Jönsson, C. | 1961 | Z. Phys. 161, 454 |
-| Quaternionic phase deviation | < 1:30,000 of complex phase | Upper bound (null result) | Kaiser, R. et al. | 1984 | Neutron interferometry |
+| Quaternionic phase deviation | < 1:30,000 of complex phase | Upper bound (null result) | Kaiser, H., George, E.A. & Werner, S.A. | 1984 | Phys. Rev. A 29, 2276 |
 | Quaternionic phase angle | θ = 0.03° ± 0.13° | Consistent with zero | Procopio, L.M. et al. | 2017 | Nat. Commun. 8, 15044 |
 
 ### Experimental Confidence
@@ -57,10 +57,14 @@ For this experiment, "matching reality" has two components:
 
 | Constraint | Bound | Source | Year | DOI / Identifier |
 |-----------|-------|--------|------|------------------|
-| Quaternionic phase in neutron interferometry | < 1:30,000 of complex phase | Kaiser, R. et al. | 1984 | Neutron interferometry experiment |
+| Quaternionic phase in neutron interferometry | < 1:30,000 of complex phase | Kaiser, H., George, E.A. & Werner, S.A. | 1984 | Phys. Rev. A 29, 2276 |
 | Quaternionic phase angle in single-photon test | θ = 0.03° ± 0.13° (consistent with zero) | Procopio, L.M. et al. | 2017 | Nat. Commun. 8, 15044 |
 
-These null results constrain the quaternionic potential coupling U₁ to be extremely small. Our simulation treats U₁ as a free parameter but must show that for any U₁ consistent with these bounds, the far-field pattern is indistinguishable from standard QM.
+**Parameter-space mapping:** These null results constrain the quaternionic coupling U₁:
+- **Kaiser bound:** A phase deviation < 1:30,000 over a neutron interferometer path length (~cm scale) implies |U₁| << ℏv/L_path, where v is the neutron velocity. For thermal neutrons (v ≈ 2200 m/s, L_path ≈ 0.05 m): |U₁| << ℏ × 2200 / 0.05 ≈ 5 × 10⁻³⁰ J ≈ 3 × 10⁻¹¹ eV.
+- **Procopio bound:** θ = 0.03° ± 0.13° is consistent with zero quaternionic phase at optical wavelengths, giving a comparable or tighter bound.
+
+Our simulation treats U₁ as a free parameter scanned over a range that includes values both within and far above these experimental bounds. The simulation must show: (1) for U₁ within the Kaiser/Procopio bounds, the far-field pattern is indistinguishable from standard QM; (2) for artificially large U₁, the decay dynamics are qualitatively visible and follow the predicted form.
 
 ## 3. QBP Formalism: Full Quaternionic Approach
 
@@ -94,22 +98,70 @@ The full quaternionic expansion is:
 
 where ψ₀ = α₀ + β₀·i and ψ₁ = α₁ + β₁·i.
 
-### 3.3 Coupled Quaternionic Schrödinger Equations
+### 3.3 Derivation: QBP Axioms → Coupled Equations
 
-The quaternionic Schrödinger equation with a quaternionic potential U = U₀ + U₁·j yields two coupled complex equations (Adler 1988, Eqs. 42-43):
+This subsection derives the working equations from QBP's axiomatic framework, rather than simply citing Adler.
+
+**Step 1: Quaternionic Schrödinger Equation**
+
+The QBP framework extends standard QM by allowing the wavefunction and potential to be quaternion-valued. The time evolution is governed by the quaternionic Schrödinger equation (Adler 1995, Ch. 2):
+
+```
+iℏ ∂ψ/∂t = Hψ = -(ℏ²/2m)∇²ψ + Uψ
+```
+
+where ψ(x,t) is a quaternion-valued wavefunction and U(x) is a quaternion-valued potential. Note that i (the imaginary unit in the Schrödinger equation) acts by **left multiplication** — this is a convention choice that determines the complex subspace C(1,i).
+
+**Step 2: Decompose the potential**
+
+The quaternionic potential is decomposed as:
+
+```
+U(x) = U₀(x) + U₁(x)·j
+```
+
+where U₀(x) ∈ C(1,i) is the standard complex potential (barrier walls, slit geometry) and U₁(x) ∈ C(1,i) is the quaternionic coupling strength. For the double-slit experiment, U₁(x) is nonzero only in the slit region — it is the genuinely new physics.
+
+**Step 3: Substitute the symplectic decomposition**
+
+Insert ψ = ψ₀ + ψ₁·j and U = U₀ + U₁·j into Hψ = -(ℏ²/2m)∇²ψ + Uψ:
+
+```
+Uψ = (U₀ + U₁·j)(ψ₀ + ψ₁·j)
+    = U₀·ψ₀ + U₀·ψ₁·j + U₁·j·ψ₀ + U₁·j·ψ₁·j
+```
+
+The critical step uses the quaternion algebra identities j·z = z*·j for any z ∈ C(1,i), and j·j = -1:
+
+```
+U₁·j·ψ₀ = U₁·ψ₀*·j
+U₁·j·ψ₁·j = U₁·ψ₁*·j·j = -U₁·ψ₁*
+```
+
+Therefore:
+
+```
+Uψ = (U₀·ψ₀ - U₁·ψ₁*) + (U₀·ψ₁ + U₁·ψ₀*)·j
+```
+
+**Step 4: Separate complex and quaternionic parts**
+
+Since i(ψ₀ + ψ₁·j) = iψ₀ + iψ₁·j (left multiplication by i commutes with j on the right), the LHS separates cleanly. Matching the 1-part and j-part on both sides:
 
 ```
 iℏ ∂ψ₀/∂t = -(ℏ²/2m)∇²ψ₀ + U₀·ψ₀ - U₁·ψ₁*
 iℏ ∂ψ₁/∂t = -(ℏ²/2m)∇²ψ₁ + U₀·ψ₁ + U₁·ψ₀*
 ```
 
-where:
-- U₀ is the standard complex potential (barrier walls, slit geometry)
-- U₁ is the quaternionic potential coupling (free parameter, new physics)
-- The asterisk denotes complex conjugation
-- The coupling terms -U₁·ψ₁\* and +U₁·ψ₀\* mix the complex and quaternionic sectors
+These are two coupled complex Schrödinger equations (Adler 1988, Eqs. 42-43; Davies & McKellar 1989, Eq. 7).
 
-**Key feature:** The coupling involves complex conjugation of the opposite component. This is the hallmark of quaternionic non-commutativity and has no analog in standard complex QM.
+**Key features:**
+- U₀ is the standard complex potential (barrier walls, slit geometry)
+- U₁ is the quaternionic potential coupling (free parameter, localized at slits)
+- The asterisk denotes complex conjugation — arising from j·z = z*·j
+- The coupling terms -U₁·ψ₁\* and +U₁·ψ₀\* mix the complex and quaternionic sectors
+- The sign asymmetry (-U₁ in the first equation, +U₁ in the second) follows from j² = -1
+- When U₁ = 0, the equations decouple into two independent standard Schrödinger equations
 
 ### 3.4 Born Rule (Full Quaternionic)
 
@@ -120,7 +172,7 @@ P(x) = |ψ(x)|² = |ψ₀(x)|² + |ψ₁(x)|²
      = α₀(x)² + β₀(x)² + α₁(x)² + β₁(x)²
 ```
 
-This reduces to the standard Born rule when ψ₁ = 0.
+This is equivalent to the standard quaternionic inner product: P(x) = Re(ψ̄(x)·ψ(x)) where ψ̄ is the quaternionic conjugate. The cross-terms between ψ₀ and ψ₁ vanish because they live in orthogonal quaternionic subspaces (the 1,i and j,k planes). This reduces to the standard Born rule when ψ₁ = 0.
 
 ## 4. Quantitative Predictions
 
@@ -195,61 +247,118 @@ where ψ₁(x, 0) ≠ 0. The initial quaternionic fraction is parameterized by:
 
 where η ∈ (0, 1) controls how "quaternionic" the initial state is. We test η = 0.01, 0.1, 0.5.
 
-#### 4.3.2 Propagation: Adler's Decay Prediction
+#### 4.3.2 Two Propagation Regimes
 
-In free space (U₁ = 0), the coupled equations decouple:
+The physics of Scenario C involves two distinct regimes with different dynamics:
 
-```
-iℏ ∂ψ₀/∂t = -(ℏ²/2m)∇²ψ₀ + V·ψ₀    [standard complex SE]
-iℏ ∂ψ₁/∂t = -(ℏ²/2m)∇²ψ₁ + V·ψ₁    [same form, but see boundary conditions]
-```
+**Regime 1: Slit region (U₁ ≠ 0)**
 
-The ψ₀ component has standard propagating plane-wave solutions with real wavevector k = √(2mE)/ℏ.
-
-**Adler's key result (1988):** The ψ₁ component, having been generated by (or initialized with) quaternionic coupling, does not match the energy-dispersion relation for free propagating modes. When projected onto the free-space Green's function, ψ₁ acquires an **imaginary wavevector**, giving exponential decay:
+In the slit region, the quaternionic potential U₁ is nonzero. The full coupled equations (§3.3) are active:
 
 ```
-ψ₁(x) ~ exp(-κ|x|)
+iℏ ∂ψ₀/∂t = -(ℏ²/2m)∇²ψ₀ + U₀·ψ₀ - U₁·ψ₁*
+iℏ ∂ψ₁/∂t = -(ℏ²/2m)∇²ψ₁ + U₀·ψ₁ + U₁·ψ₀*
 ```
 
-where κ is a characteristic inverse decay length.
+The coupling terms mix the ψ₀ and ψ₁ sectors. When an incoming quaternionic wavefunction (with nonzero ψ₁) encounters the slit potential, the interaction acts as a boundary condition that projects the transmitted wave into the eigenmodes of the post-slit free-space Hamiltonian.
+
+For ψ₀, the standard complex component, the eigenmodes are propagating plane waves with real wavevector k = √(2mE)/ℏ.
+
+For ψ₁, the quaternionic component, the situation is different. The coupling term U₁·ψ₀* in the slit region generates ψ₁ components whose energy-momentum relation is modified by the interaction. When these components are projected onto the free-space basis (regime 2), they include evanescent modes — solutions with imaginary wavevector that decay exponentially beyond the slit region.
+
+This is analogous to quantum tunneling: a particle encountering a potential barrier acquires evanescent components in the classically forbidden region. Here, the quaternionic potential at the slits creates "quaternionically forbidden" modes in ψ₁ that decay beyond the interaction region.
+
+**Regime 2: Free space (U₁ = 0)**
+
+Beyond the slits, U₁ = 0 and the coupled equations decouple:
+
+```
+iℏ ∂ψ₀/∂t = -(ℏ²/2m)∇²ψ₀    [standard free-particle SE]
+iℏ ∂ψ₁/∂t = -(ℏ²/2m)∇²ψ₁    [identical equation]
+```
+
+**Both components satisfy the same Schrödinger equation.** In free space, there is no mechanism that selects one component for decay over the other. The dynamics are symmetric.
+
+However, the *solutions* differ because the *boundary conditions* set by the slit interaction (regime 1) are different for each component:
+- **ψ₀** exits the slits in propagating modes (real wavevector) → carries the standard interference pattern to the detector
+- **ψ₁** exits the slits predominantly in evanescent modes (imaginary wavevector) → decays exponentially with distance from the slits
+
+**The decay is not caused by free-space propagation.** It is caused by the slit interaction projecting ψ₁ into evanescent modes. Free space merely preserves this evanescent character.
+
+**Important consequence:** In the limit U₁ → 0, there is no coupling at the slits, no evanescent projection, and ψ₁ propagates normally alongside ψ₀. This is acceptance criterion #11 and serves as a control test.
 
 #### 4.3.3 Decay Length Estimate
 
-The decay rate depends on the quaternionic potential strength and particle energy. From Adler's perturbative analysis:
+The decay of the evanescent ψ₁ modes beyond the slit region is characterized by a decay constant κ that depends on the slit interaction strength and particle energy.
+
+**Derivation sketch** (following Adler 1988, §IV; see also Davies & McKellar 1989, §3):
+
+In the slit region, the coupled system has eigenmodes with modified dispersion relations. For a particle with energy E incident on a quaternionic potential of strength U₁, the ψ₁ transmission coefficient includes evanescent contributions with:
 
 ```
-κ ~ √(2m|U₁|² / (ℏ²E))
+κ = Im(k₁)
 ```
 
-**Decay length:** L_decay = 1/κ
-
-The quaternionic fraction at distance r from the source scales as:
+where k₁ is the complex wavevector of ψ₁ in the slit region. From the modified dispersion relation (Adler 1988, Eq. 48):
 
 ```
-η(r) ~ η₀ · exp(-2κr)
+ℏ²k₁²/2m = E - U₀ ± i|U₁|
 ```
 
-For any physical U₁ and macroscopic propagation distance L, the decay is complete: η(L) ≈ 0.
+The imaginary part of U₁ gives an imaginary contribution to k₁². For |U₁| << E:
+
+```
+κ ≈ m|U₁| / (ℏ²k)  where k = √(2mE)/ℏ
+```
+
+This can be rewritten as:
+
+```
+κ ≈ |U₁| / (ℏv)  where v = ℏk/m is the particle velocity
+```
+
+**Decay length:** L_decay = 1/κ = ℏv/|U₁|
+
+Physical interpretation: faster particles (larger v) have longer decay lengths — the evanescent ψ₁ components persist farther from the slits. This is intuitive: a higher-energy particle spends less time in the slit interaction region, so the evanescent projection is weaker.
+
+The quaternionic fraction at distance r beyond the slits scales as:
+
+```
+η(r) ≈ η_slit · exp(-2κr)
+```
+
+where η_slit is the quaternionic fraction immediately after the slit interaction (set by U₁ and the slit geometry).
+
+For any physical U₁ consistent with the Kaiser/Procopio bounds and macroscopic propagation distance L >> L_decay, the decay is complete: η(L) ≈ 0.
 
 #### 4.3.4 Predicted Interference Pattern (Scenario C)
 
 At the detector screen (distance L from slits):
 
 1. **ψ₀ component** produces the standard interference pattern: I₀(x) = 4A₀² · cos²(πxd/λL)
-2. **ψ₁ component** has decayed exponentially: |ψ₁(x)|² ≈ 0 at the detector
-3. **Total intensity** converges to the standard pattern: I(x) → I₀(x) as L → ∞
+2. **ψ₁ component** has decayed exponentially: |ψ₁(x)|² ≈ 0 at the detector (for L >> L_decay)
+3. **Total intensity** converges to the standard pattern: I(x) → I₀(x)
 
-**The quaternionic component does NOT contribute to the far-field interference pattern.** This is why standard QM works — the complex subspace is an attractor of the free-space dynamics.
+The full two-slit expression decomposes as (cf. §3.4 Born rule):
+
+```
+P(x) = |ψ₀,slit1(x) + ψ₀,slit2(x)|² + |ψ₁,slit1(x) + ψ₁,slit2(x)|²
+```
+
+where subscripts denote (component, slit). There are no cross-terms between ψ₀ and ψ₁ because they live in orthogonal quaternionic subspaces. Near the slits, the ψ₁ interference term adds an incoherent background that reduces fringe visibility. At the detector (after ψ₁ decay), only the ψ₀ term contributes and visibility approaches 1.0.
+
+**The complex subspace C(1,i) is dynamically selected** — not by fiat, but by the slit interaction boundary conditions. This is the central prediction of Scenario C.
 
 #### 4.3.5 What Sprint 3 Actually Tests
 
 The scientifically interesting measurements are not at the detector (where everything matches standard QM), but **during propagation**:
 
-1. **Decay curve:** Plot η(r) = |ψ₁|²/|ψ|² as a function of distance from source. Should follow exp(-2κr).
+1. **Decay curve:** Plot η(r) = |ψ₁|²/|ψ|² as a function of distance from slits. Should follow exp(-2κr).
 2. **Component-wise intensity:** Plot each component (α₀², β₀², α₁², β₁²) vs position. The j,k components should visibly decay while the 1,i components carry the interference pattern.
 3. **Convergence:** At what distance does the interference pattern become indistinguishable from standard QM? This defines the "quaternionic coherence length."
-4. **Parameter dependence:** How does the decay rate depend on η₀, U₁, and particle energy?
+4. **Parameter dependence:** How does the decay rate depend on η_slit, U₁, and particle energy?
+
+**Note on measurement feasibility:** These are *simulation* measurements — the simulation has direct access to the four quaternionic components (α₀, β₀, α₁, β₁) at every grid point. A real experiment cannot measure component-wise intensities mid-flight without introducing a measurement interaction that would disturb the state. The simulation serves as a theoretical laboratory that probes dynamics inaccessible to current experimental techniques. The experimentally observable prediction remains the far-field interference pattern at the detector.
 
 ### 4.4 Single-Slit Envelope (Finite Slit Width)
 
@@ -279,7 +388,7 @@ The envelope has zeros at x = nλL/a.
 | Parameter | Values to Test | Description |
 |-----------|---------------|-------------|
 | η₀ | 0.01, 0.1, 0.5 | Initial quaternionic fraction |
-| U₁ | Free parameter | Quaternionic potential strength |
+| U₁ | Scan: 0, 10⁻¹⁵, 10⁻¹², 10⁻⁹, 10⁻⁶, 10⁻³ eV | Quaternionic potential strength (0 = control; 10⁻¹² eV ≈ Kaiser bound) |
 | N_grid | 1000+ | Spatial grid points for propagation |
 
 **Note on U₁:** The quaternionic potential strength is unknown experimentally. Experimental upper bounds (Kaiser 1984 neutron interferometry: 1:30,000; Procopio 2017 photon: θ = 0.03°) constrain it to be extremely small. In simulation, we treat U₁ as a free parameter and show that the physics (decay → standard QM convergence) is qualitatively the same for any U₁ > 0.
@@ -342,6 +451,8 @@ V = (I_max - I_min) / (I_max + I_min)
 
 If QBP predicts different interference patterns at the detector than standard QM, this would **falsify QBP**.
 
+**Primary falsification test:** If Scenario C produces an interference pattern at the detector that deviates from Scenario A by more than the tolerance in acceptance criterion #9 (difference > 10⁻⁴), QBP's claim that C(1,i) is dynamically selected is falsified.
+
 ### 7.2 Quaternionic Dynamics Falsification
 
 | Prediction | Expected | Would Falsify If... |
@@ -380,7 +491,7 @@ The simulation has two layers:
 
 **Layer 2: Quaternionic propagation** (tests Adler's decay)
 - Full quaternionic wavefunctions: ψ₀(x) + ψ₁(x)·j
-- Propagate via coupled Schrödinger equations (§3.3)
+- Propagate via coupled Schrödinger equations (§3.3, Step 4)
 - Track all four components (α₀, β₀, α₁, β₁) at each grid point
 
 **Note on normalization:** Position-space wavefunctions satisfy ∫|ψ(x)|²dx = 1 over the spatial grid. This differs from the unit-quaternion normalization in qphysics.py (|ψ|² = 1 at a point). Phase 2 will need per-grid-point unnormalized quaternions with the overall wavefunction normalized.
@@ -431,7 +542,7 @@ This proof-of-concept validates the propagation infrastructure before the full d
 3. **Davies, A.J. & McKellar, B.H.J.** (1989). "Nonrelativistic quaternionic quantum mechanics in one dimension." *Phys. Rev. A* 40, 4209.
 4. **De Leo, S. & Ducati, G.** (2012). "Quaternionic potentials in non-relativistic quantum mechanics." arXiv:1012.4613.
 5. **Moretti, V. & Oppio, M.** (2017). "Quantum theory in quaternionic Hilbert space." arXiv:1709.09246.
-6. **Kaiser, R. et al.** (1984). Neutron interferometry test of quaternionic QM (null result at 1:30,000).
+6. **Kaiser, H., George, E.A. & Werner, S.A.** (1984). "Neutron interferometric search for quaternions in quantum mechanics." *Phys. Rev. A* 29, 2276.
 7. **Procopio, L.M. et al.** (2017). "Single-photon test of hyper-complex quantum theories using a metamaterial." *Nature Communications* 8, 15044.
 8. **Tonomura, A. et al.** (1989). "Demonstration of single-electron buildup of an interference pattern." *Am. J. Phys.* 57, 117.
 
