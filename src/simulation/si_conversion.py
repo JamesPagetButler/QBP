@@ -1,6 +1,11 @@
 """
 SI Conversion Library for the QBP Beam Propagation Method
 
+Project convention: ℏ = c = 1 (standard HEP natural units).
+c does not appear in the current non-relativistic BPM, but the convention
+is established now for forward compatibility with relativistic (galactic-scale)
+extensions.  C_SI = 299_792_458 m/s is provided for SI recovery.
+
 Two-layer unit conversion framework:
 
 Layer 1: Standard BPM natural units <-> SI
@@ -9,10 +14,10 @@ Layer 1: Standard BPM natural units <-> SI
     (MEEP, LAMMPS, Quantum ESPRESSO; Agrawal Ch. 2.4; Saleh & Teich).
     SI conversion happens at output boundaries via {L_0, E_0, T_0} scales.
 
-Layer 2: Quaternionic derived quantities (PROVISIONAL)
+Layer 2: Quaternionic derived quantities (MODEL-DEPENDENT)
     L_Q and zeta are derived from the algebraic structure but have NOT yet
     been validated against peer-reviewed experiments. They must be treated
-    as theoretical predictions until experimental confirmation is documented.
+    as model-dependent predictions until experimental confirmation is documented.
 
 See docs/conventions/units.md for the full architecture description.
 """
@@ -46,6 +51,7 @@ V_Z_CODE: float = HBAR_CODE * K0_CODE / M_CODE  # = 40.0
 H_SI = 6.626_070_15e-34  # J*s  (exact)
 HBAR_SI = H_SI / (2 * math.pi)  # J*s
 EV_IN_JOULES = 1.602_176_634e-19  # J per eV (exact)
+C_SI = 299_792_458  # m/s  (exact, defines the metre)
 
 
 # ---------------------------------------------------------------------------
@@ -127,8 +133,15 @@ def convert_position(x_code: float, scales: ScaleFactors) -> float:
 def convert_potential(U_code: float, scales: ScaleFactors) -> float:
     """Convert potential from code units to SI electron-volts.
 
-    Uses U_phys = U_code * v_z_code * E_0, then divides by eV.
+    The BPM propagates in z (space) rather than t (time).  This converts
+    the Schrödinger time-derivative to a spatial derivative, absorbing the
+    longitudinal velocity v_z into every potential term.  Therefore
+    U_physical = U_code * v_z_code * E_0.  Dividing by eV gives electron-volts.
+
+    Derivation: see docs/conventions/units.md § "V_Z_CODE Derivation".
+    Proven correct: PR #323 (3 independent tests).
     """
+    # V_Z_CODE factor: Jacobian of time→space propagation (see module docstring)
     return U_code * V_Z_CODE * scales.E0 / EV_IN_JOULES
 
 
@@ -184,17 +197,17 @@ def annotate_columns(df: pd.DataFrame, unit_map: dict[str, str]) -> pd.DataFrame
 class QuaternionicQuantities:
     """Quaternionic derived physical quantities.
 
-    PROVISIONAL — these quantities are derived from the algebraic structure
-    but have NOT yet been validated against peer-reviewed experiments.
-    They must be treated as theoretical predictions until experimental
-    confirmation is documented.
+    MODEL-DEPENDENT — these quantities are derived from the quaternionic
+    algebraic structure but have NOT yet been validated against peer-reviewed
+    experiments. They must be treated as model-dependent predictions until
+    experimental confirmation is documented.
 
     Experimental grounding requirement:
         1. An experiment produces data where L_Q or zeta appears as measurable
         2. The measurement is published in peer-reviewed literature
         3. The result has been independently reproduced
 
-    Until then, these are labeled PROVISIONAL in code and documentation.
+    Until then, these are labeled MODEL-DEPENDENT in code and documentation.
     """
 
     L_Q: float  # Quaternionic beat length [m]: pi * hbar * v_g / U1
@@ -206,7 +219,7 @@ def compute_quaternionic_quantities(
 ) -> QuaternionicQuantities:
     """Compute derived quaternionic quantities from SI inputs.
 
-    These are CANDIDATE physical quantities motivated by the quaternionic
+    These are model-dependent predictions motivated by the quaternionic
     algebra. Their status as meaningful physical units depends on
     experimental validation (see docs/conventions/units.md).
 
@@ -219,12 +232,14 @@ def compute_quaternionic_quantities(
         QuaternionicQuantities with L_Q [m] and zeta [dimensionless].
 
     Raises:
-        ValueError: if U1_si or E_kin_si is non-positive.
+        ValueError: if U1_si, E_kin_si, or v_g_si is non-positive.
     """
     if U1_si <= 0:
         raise ValueError(f"U1_si must be positive, got {U1_si}")
     if E_kin_si <= 0:
         raise ValueError(f"E_kin_si must be positive, got {E_kin_si}")
+    if v_g_si <= 0:
+        raise ValueError(f"v_g_si must be positive, got {v_g_si}")
 
     L_Q = math.pi * HBAR_SI * v_g_si / U1_si
     zeta = U1_si / E_kin_si

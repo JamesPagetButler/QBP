@@ -15,6 +15,7 @@ import pandas as pd
 import pytest
 
 from src.simulation.si_conversion import (
+    C_SI,
     EV_IN_JOULES,
     HBAR_CODE,
     HBAR_SI,
@@ -241,3 +242,26 @@ class TestQuaternionicQuantities:
     def test_zero_E_kin_raises(self) -> None:
         with pytest.raises(ValueError, match="E_kin_si must be positive"):
             compute_quaternionic_quantities(1e-18, 0.0, 1e6)
+
+    def test_zero_v_g_raises(self) -> None:
+        with pytest.raises(ValueError, match="v_g_si must be positive"):
+            compute_quaternionic_quantities(1e-18, 1e-17, 0.0)
+
+    def test_negative_v_g_raises(self) -> None:
+        with pytest.raises(ValueError, match="v_g_si must be positive"):
+            compute_quaternionic_quantities(1e-18, 1e-17, -1e6)
+
+
+# ===================================================================
+# Physical constants
+# ===================================================================
+
+
+class TestPhysicalConstants:
+    """Verify exact 2019 SI redefinition values."""
+
+    def test_c_si_exact(self) -> None:
+        assert C_SI == 299_792_458
+
+    def test_c_si_type(self) -> None:
+        assert isinstance(C_SI, int)

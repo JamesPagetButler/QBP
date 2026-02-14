@@ -11,8 +11,6 @@ This is an artifact validation test — more robust than source-code parsing.
 
 from __future__ import annotations
 
-import json
-import math
 import os
 import sys
 
@@ -23,7 +21,7 @@ import pytest
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from src.simulation.si_conversion import ScaleFactors, compute_scales
+from src.simulation.si_conversion import compute_scales
 from src.simulation.wave_propagation import SimulationConfig, SlitConfig
 
 
@@ -58,15 +56,8 @@ SI_SCALES = compute_scales(M_ELECTRON, LAMBDA_ELECTRON)
 
 
 @pytest.fixture(scope="module")
-def scenario_c_output():
-    """Run a minimal Scenario C and return (fringe_df, decay_df)."""
-    from experiments._03_double_slit_helper import run_scenario_c_minimal
-
-    return run_scenario_c_minimal(FAST_CONFIG, FAST_SLIT, SI_SCALES)
-
-
-def _run_minimal_scenario_c():
-    """Run minimal Scenario C directly (no fixture dependency)."""
+def _simulation_output():
+    """Run minimal Scenario C once for all schema tests (module-scoped)."""
     from src.simulation.wave_propagation import (
         create_initial_wavepacket,
         create_transverse_grid,
@@ -74,7 +65,6 @@ def _run_minimal_scenario_c():
         propagate,
     )
     from src.simulation.si_conversion import (
-        V_Z_CODE,
         convert_position,
         convert_potential,
     )
@@ -137,8 +127,8 @@ class TestFringeSchema:
     """Validate fringe output CSV column names and value ranges."""
 
     @pytest.fixture(autouse=True)
-    def setup(self):
-        self.fringe_df, self.decay_df, self.metadata = _run_minimal_scenario_c()
+    def setup(self, _simulation_output):
+        self.fringe_df, self.decay_df, self.metadata = _simulation_output
 
     def test_required_columns_exist(self) -> None:
         required = {
@@ -184,8 +174,8 @@ class TestDecaySchema:
     """Validate decay output CSV column names and value ranges."""
 
     @pytest.fixture(autouse=True)
-    def setup(self):
-        self.fringe_df, self.decay_df, self.metadata = _run_minimal_scenario_c()
+    def setup(self, _simulation_output):
+        self.fringe_df, self.decay_df, self.metadata = _simulation_output
 
     def test_required_columns_exist(self) -> None:
         required = {"U1_strength_eV", "eta0", "z_m", "eta_fraction"}
@@ -212,8 +202,8 @@ class TestMetadataSchema:
     """Validate metadata sidecar content."""
 
     @pytest.fixture(autouse=True)
-    def setup(self):
-        self.fringe_df, self.decay_df, self.metadata = _run_minimal_scenario_c()
+    def setup(self, _simulation_output):
+        self.fringe_df, self.decay_df, self.metadata = _simulation_output
 
     def test_required_keys_exist(self) -> None:
         required = {

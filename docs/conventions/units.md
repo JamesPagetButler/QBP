@@ -4,6 +4,10 @@
 
 QBP simulations use a **two-layer unit architecture**: BPM internals operate in natural units for numerical stability, while all outputs are converted to SI at the boundary. This is standard practice in production physics codes.
 
+**Project convention: ℏ = c = 1** (standard HEP natural units, following Furey's algebraic realism framework). The speed of light `c` does not appear in the current non-relativistic BPM, but the convention is established now for forward compatibility with relativistic (galactic-scale) extensions.
+
+`C_SI = 299_792_458 m/s` (exact, 2019 SI redefinition) is provided in `si_conversion.py` for SI recovery when relativistic terms are introduced.
+
 **Evidence from established codebases:**
 
 | Code | Domain | Internal Units | SI at Boundary? |
@@ -28,9 +32,15 @@ The BPM solver uses these natural-unit constants:
 |-----------|--------|------------|---------|
 | Reduced Planck constant | `hbar_code` | 1.0 | Sets action scale |
 | Particle mass | `m_code` | 0.5 | Sets dispersion relation |
-| Central wavenumber | `k0_code` | 20.0 | Sets spatial resolution |
+| Central wavenumber | `k0_code` | 20.0 | Sets unit-convention length scale |
 
 These are **not** physical values — they define a convenient coordinate system where the split-step BPM propagator has well-conditioned numerics.
+
+### K0_CODE vs BPM k0
+
+`K0_CODE = 20.0` is a **unit-convention constant** that defines the meaning of "1 code length unit" in the SI conversion framework. It appears in the scale factor formula: `L₀ = K0_CODE × λ / (2π)`.
+
+This is distinct from the BPM simulation parameter `k0` (e.g., `BPM_CONFIG.k0 = 30.0`), which controls the number of grid points per wavelength — a **resolution** parameter. The simulation `k0` can be tuned freely for numerical convergence without affecting the physical scale of the output, because SI conversion always uses `K0_CODE`.
 
 ### The v_z Structural Invariant
 
@@ -41,6 +51,42 @@ v_z_code = hbar_code * k0_code / m_code = 1.0 * 20.0 / 0.5 = 40.0
 ```
 
 This is the Jacobian of the time-to-space propagation transformation. If this invariant breaks, the BPM violates unitarity. `V_Z_CODE` is defined as the **canonical single source of truth** in `src/simulation/si_conversion.py`.
+
+### V_Z_CODE Derivation
+
+The standard Schrödinger equation propagates in time:
+
+```
+iℏ ∂ψ/∂t = Ĥψ = [(-ℏ²/2m)∂²/∂x² + V(x)]ψ
+```
+
+The BPM propagates in z (space) instead of t (time). Using z = v_z × t:
+
+```
+∂/∂t = v_z × ∂/∂z
+```
+
+Substituting:
+
+```
+iℏ v_z ∂ψ/∂z = [(-ℏ²/2m)∂²/∂x² + V(x)]ψ
+```
+
+Dividing both sides by v_z:
+
+```
+iℏ ∂ψ/∂z = [(-ℏ²/2m v_z)∂²/∂x² + V(x)/v_z]ψ
+```
+
+Both the kinetic and potential terms absorb 1/v_z identically. In code units with ℏ=1, m=0.5, k0=20:
+
+```
+v_z_code = ℏ_code × k0_code / m_code = 1.0 × 20.0 / 0.5 = 40.0
+```
+
+This is why `convert_potential` multiplies by V_Z_CODE: the potential in the BPM has already been divided by v_z_code, so recovering the physical potential requires multiplying it back.
+
+**Proven correct:** PR #323, verified by 3 independent tests in `tests/test_si_defining_constants.py`.
 
 ### Scale Factors {L_0, E_0, T_0}
 
@@ -73,7 +119,7 @@ These are computed via `si_conversion.compute_scales(m_si, lambda_si)` which ret
 
 ---
 
-## Layer 2: Quaternionic Derived Quantities (PROVISIONAL)
+## Layer 2: Quaternionic Derived Quantities (MODEL-DEPENDENT)
 
 The quaternionic algebra motivates two derived quantities:
 
@@ -82,16 +128,16 @@ The quaternionic algebra motivates two derived quantities:
 | Quaternionic beat length | `L_Q` | `pi * hbar_SI * v_g / U1` | metres |
 | Quaternionic coupling parameter | `zeta` | `U1 / E_kin` | dimensionless |
 
-### PROVISIONAL Status
+### MODEL-DEPENDENT Status
 
-These quantities are derived from the algebraic structure but have **NOT** been validated against peer-reviewed experiments. They are labeled `PROVISIONAL` in code and documentation.
+These quantities are model-dependent predictions derived from the algebraic structure but have **NOT** been validated against peer-reviewed experiments. They are labeled `MODEL-DEPENDENT` in code and documentation.
 
 **Requirements for promotion to established status:**
 1. An experiment produces data where L_Q or zeta appears as a measurable quantity
 2. The measurement is published in peer-reviewed literature
 3. The result has been independently reproduced
 
-Until all three conditions are met, these remain theoretical predictions.
+Until all three conditions are met, these remain model-dependent predictions.
 
 Computed via `si_conversion.compute_quaternionic_quantities(U1_si, E_kin_si, v_g_si)`.
 

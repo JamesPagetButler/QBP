@@ -42,13 +42,10 @@ from src.simulation.wave_propagation import (
     compute_eta,
 )
 from src.simulation.si_conversion import (
-    EV_IN_JOULES,
     V_Z_CODE,
     compute_scales,
     convert_position,
     convert_potential,
-    annotate_columns,
-    compute_quaternionic_quantities,
 )
 
 
@@ -359,6 +356,7 @@ def main():
     # Metadata sidecar — persists scale factors for reproducibility
     metadata = {
         "format_version": "2.0",
+        "unit_convention": "hbar=c=1 (standard HEP natural units)",
         "particle": "electron",
         "mass_kg": SI_SCALES.mass_si,
         "lambda_m": SI_SCALES.lambda_si,
@@ -371,6 +369,8 @@ def main():
         "BPM_k0": BPM_CONFIG.k0,
         "BPM_hbar": BPM_CONFIG.hbar,
         "BPM_mass": BPM_CONFIG.mass,
+        "conversion_applied": True,
+        "conversion_library": "src/simulation/si_conversion.py",
         "timestamp": timestamp,
         "column_units": {
             "x_position_m": "metres",
