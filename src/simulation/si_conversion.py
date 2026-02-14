@@ -27,8 +27,6 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-import pandas as pd
-
 # ---------------------------------------------------------------------------
 # BPM code parameters (from quaternionic_si_definitions.md Section 7.1)
 # ---------------------------------------------------------------------------
@@ -170,11 +168,11 @@ def convert_energy_to_code(val_J: float, scales: ScaleFactors) -> float:
 # ---------------------------------------------------------------------------
 
 
-def annotate_columns(df: pd.DataFrame, unit_map: dict[str, str]) -> pd.DataFrame:
+def annotate_columns(df, unit_map: dict[str, str]):
     """Rename DataFrame columns by appending unit suffixes.
 
     Args:
-        df: Input DataFrame.
+        df: Input pandas DataFrame.
         unit_map: Mapping from current column name to unit suffix string.
             Example: {"x_position": "m", "potential": "eV"}
             Result:  x_position -> x_position_m, potential -> potential_eV
