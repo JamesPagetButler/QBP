@@ -8,9 +8,9 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit) — In Progress
-- **Lifecycle Stage:** Sprint 3 Phase 1 (Ground Truth) COMPLETE — Phase 2 (Implementation) is next
-- **Next Critical-Path Action:** Sprint 3 Phase 2: Implementation (#36)
+- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit) — RESTARTING (PIVOT-S3-001)
+- **Lifecycle Stage:** Research (#319) in progress — Sprint 3 restarts from Phase 1 after SI definitions resolved
+- **Next Critical-Path Action:** Complete #319 (SI Definitions) → #320 (SI Enforcement) → #322 (Phase 1 SI Redo)
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -33,6 +33,40 @@
 - [ ] Theory Refinement (#81)
 - [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`
 - [ ] Retrospective (#192)
+
+## Pivot Log
+
+| ID | Sprint | Original AC | Research Issue | Status |
+|----|--------|-------------|----------------|--------|
+| PIVOT-S3-001 | 3 | AC #9: C matches A, diff < 1e-4 | #319 | OPEN |
+
+### PIVOT-S3-001: Unit System Mismatch
+
+- **Date:** 2026-02-13
+- **Sprint/Phase:** 3 / Phase 3 (Visualization)
+- **Original AC:** "At detector, Scenario C matches Scenario A — Difference < 10^(-4)" (Issue #37)
+- **Root Cause:** Scenario A (Fraunhofer) uses SI metres with plane-wave source. Scenario C (BPM) uses natural units (hbar=1, m=0.5) with absorbed v_z factor. The comparison is physically meaningless — different unit systems, different source profiles. Not a code bug.
+- **Evidence:** Red Team (Sabine) and Gemini (Furey, Feynman) independently flagged. James identified the deeper cause: no SI mapping exists for quaternionic quantities. BPM conversion formula was wrong by 10 orders of magnitude.
+- **Research Issue:** #319 (Quaternionic SI Definitions)
+- **Housekeeping Issues:** #320 (SI Standardization), #321 (Pivot Protocol), #322 (Phase 1 SI Redo)
+- **Temporary AC #9:** Verify C(U1>0) vs C(U1=0) shows measurable visibility reduction (V_norm drop > 5% at U1=10)
+- **Status:** OPEN — resolves when #319 delivers SI definitions
+
+### Sprint 3 Restart Plan
+
+Original phases struck through; sprint restarts after research:
+1. ~~Phase 1 (Ground Truth #22) — was COMPLETE, now invalidated by unit mismatch~~
+2. ~~Phase 2 (#36) — blocked by research~~
+3. ~~Phase 3 (#37) — PR #318 closed without merge~~
+
+**New critical path:** #319 → #320 → #322 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Theory Refinement → Retrospective
+
+**Sprint 3 Retrospective must include:**
+- [ ] Pivot Analysis: PIVOT-S3-001 (mandatory per pivot protocol)
+- [ ] What assumption was wrong? (Unit systems were never compared)
+- [ ] What check would have caught it? (Dimensional analysis in ground truth review)
+
+---
 
 ## Sprint 2 Closure Checklist
 
