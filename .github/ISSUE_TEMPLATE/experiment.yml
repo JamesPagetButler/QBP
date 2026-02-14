@@ -134,6 +134,38 @@ body:
         - [ ] **AC:** Library indexed on Reservoir; documentation live; announcement posted.
 
   - type: textarea
+    id: physical_parameters
+    attributes:
+      label: Physical Parameters & Units
+      description: "Document all physical quantities introduced or modified by this phase. Required for Phases 1 and 2."
+      value: |
+        ### Physical Parameters & Units
+
+        | Quantity | Symbol | SI Unit | Value / Range |
+        |----------|--------|---------|---------------|
+        | (e.g., Slit separation) | d | m | 1.0e-6 |
+
+        **Quaternionic quantities involved?** Yes / No
+        If yes, note PROVISIONAL status per `docs/conventions/units.md`.
+    validations:
+      required: false
+
+  - type: textarea
+    id: conversion_library
+    attributes:
+      label: Conversion Library Usage (Definition of Done)
+      description: "Verify that all unit conversions use the standard library. Required for Phase 2."
+      value: |
+        ### Conversion Library Usage
+
+        - [ ] All SI conversions use `src/simulation/si_conversion.py` (no ad-hoc conversion code)
+        - [ ] Any new conversion functions added to the library (not inline in experiment code)
+        - [ ] Scale factors computed via `compute_scales()`, not manually
+        - [ ] If Lean proofs exist for this experiment's conversions, reference them
+    validations:
+      required: false
+
+  - type: textarea
     id: references
     attributes:
       label: References
