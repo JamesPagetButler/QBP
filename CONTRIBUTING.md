@@ -182,9 +182,10 @@ At the start of every work session, all collaborators (human and AI) must:
 1.  **Run toolchain check** — `python scripts/check_toolchain.py` to verify local tools match CI.
 2.  **Read `SPRINT_STATUS.md`** — understand current lifecycle position.
 3.  **Verify alignment** — confirm planned work matches the critical path.
-4.  **Validate permissions** — check `.claude/settings.local.json` for malformed entries (API keys in patterns, oversized literals, parse-error-prone `:` characters). See [Sprint Mode: Permission Hygiene](docs/workflows/sprint_mode_workflow.md#permission-hygiene).
-5.  **Log diversions** — if starting housekeeping or a side quest, add it to the Active Diversions table with a return point.
-6.  **Close diversions** — when returning, mark the diversion complete and resume from the recorded return point.
+4.  **Spot-check board hygiene** — verify the next 3 critical-path issues have correct Sprint field values and labels (see [Label Schema](docs/workflows/critical_path_audit.md#5-check-labels-mandatory)). Flag any gaps immediately.
+5.  **Validate permissions** — check `.claude/settings.local.json` for malformed entries (API keys in patterns, oversized literals, parse-error-prone `:` characters). See [Sprint Mode: Permission Hygiene](docs/workflows/sprint_mode_workflow.md#permission-hygiene).
+6.  **Log diversions** — if starting housekeeping or a side quest, add it to the Active Diversions table with a return point.
+7.  **Close diversions** — when returning, mark the diversion complete and resume from the recorded return point.
 
 This is the "Herschel Check." It exists because all three collaborators have demonstrated a tendency to drift from the critical path. It adds ~30 seconds of overhead per session to prevent hours of unmanaged drift.
 
@@ -300,7 +301,7 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 | **Phase 1: Ground Truth** | Research and document expected results | `research/NN_..._expected_results.md` | Complete specification with quantitative predictions |
 | **Phase 2: Implementation** | Build code and run synthetic experiment | `qphysics.py` updates, `/results` data | Results within 3σ of ground truth |
 | **Phase 3: Visualization** | Visualize results, verify success | `vpython` animations, Manim videos | Visual confirmation of Phase 2 success |
-| **Phase 4: Formal Verification** | Prove, review, and visualize | `.lean` proofs, review report, interactive WASM viz | 4a+4b+4c gate for Phase 5 (James may waive 4c) |
+| **Phase 4: Formal Verification** | Prove, review, visualize, and validate | `.lean` proofs, review report, WASM viz, differential tests, V&V sim | 4a+4b gate for Phase 5; 4c/4d/4e are parallel deliverables |
 | **Phase 5: Publication** | Document and communicate success | `paper/quaternion_physics.md` section; library releases when applicable | Complete, reviewed documentation |
 
 ### Phase Transitions & Decision Gates
@@ -330,16 +331,18 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 │  │   └── Output: review report, compilation check         │          │
 │  ├── 4c: Interactive Proof Visualization (Claude/team)    │          │
 │  │   └── Output: C/WASM interactive viz in browser        │          │
+│  ├── 4d: Verified Differential Testing (Claude/Dev)       │          │
+│  │   └── Output: CI passes, 0 divergences                │          │
+│  ├── 4e: Verified Simulation Engine (Claude/Dev)          │          │
+│  │   └── Output: Interactive 3D V&V simulation            │          │
 │  │                                                        │          │
-│  └── Decision Gate (4a + 4b + 4c):                        │          │
+│  └── Decision Gate (4a + 4b):                             │          │
 │      "Do all Lean proofs verify AND does the              │          │
-│       proof review confirm correctness AND is the         │          │
-│       interactive visualization complete?"                │          │
+│       proof review confirm correctness?"                  │          │
 │              │                                            │          │
 │         [NO] └──► Create issue, loop back to Phase 2 ─────┘          │
-│              │    (James may waive 4c to proceed)                    │
 │              │                                                       │
-│        [YES / 4c WAIVED] ↓                                           │
+│        [YES] ↓  (4c/4d/4e run parallel with Phase 5)                │
 │  Phase 5: Publication                                                │
 │  ├── Track A (Required): paper/quaternion_physics.md section         │
 │  └── Track B (If applicable): /libs/ package → Reservoir publish     │
@@ -438,11 +441,11 @@ python scripts/qbp_knowledge.py link visualization "bloch_sphere_rotation.py" cl
 
 ---
 
-#### Phase 4: Formal Verification (Sub-Phases 4a/4b/4c)
+#### Phase 4: Formal Verification (Sub-Phases 4a/4b/4c/4d/4e)
 
-Phase 4 is divided into three sub-phases. The phase count remains 5 and each experiment still has 5 issues — sub-phases are tracked as task sections within the single Phase 4 issue.
+Phase 4 is divided into five sub-phases. The phase count remains 5 and each experiment still has 5 issues — sub-phases are tracked as task sections within the single Phase 4 issue.
 
-**Sub-phase dependencies:** 4a (Formal Proof) must complete before 4b (Proof Review) can begin. 4b must complete before 4c (Interactive Proof Visualization) can begin. Phase 4c runs in parallel with Phase 5 preparation — it is a deliverable, not a gate for publication. Phase 4d (Verified Differential Testing) is optional and can run after 4a completes — it validates Python against Lean oracles. Phase 4e (Verified Simulation Engine) is optional and can run after 4d — it provides interactive 3D V&V using the proven oracle.
+**Sub-phase dependencies:** 4a (Formal Proof) must complete before 4b (Proof Review) can begin. 4b must complete before 4c (Interactive Proof Visualization) can begin. Phase 4d (Verified Differential Testing) can run after 4a completes — it validates Python against Lean oracles. Phase 4e (Verified Simulation Engine) can run after 4d — it provides interactive 3D V&V using the proven oracle. Phases 4c, 4d, and 4e run in parallel with Phase 5 preparation — they are deliverables, not gates for publication.
 
 ##### Phase 4a: Formal Proof
 
@@ -581,7 +584,7 @@ python scripts/qbp_knowledge_sqlite.py add hyperedge "proof-link-cosine" proof_l
   "claim:cosine-squared,proof:angle-dependent" --theorem_name "prob_up_angle"
 ```
 
-##### Phase 4d: Verified Differential Testing (Optional)
+##### Phase 4d: Verified Differential Testing
 
 **Owner:** Claude / Dev Team
 
@@ -639,7 +642,7 @@ cd proofs && lake build oracle && lake exe oracle > ../tests/oracle_predictions.
 4. Update `scripts/differential_test.py` if the new experiment uses different parameters
 5. Run `python scripts/differential_test.py` to verify
 
-##### Phase 4e: Verified Simulation Engine (Optional)
+##### Phase 4e: Verified Simulation Engine
 
 **Owner:** Claude / Dev Team
 
@@ -678,9 +681,9 @@ go run .
 > "Do all Lean proofs verify (4a) AND does the proof review confirm correctness (4b)?"
 
 -   **If NO (4a/4b failure):** Document the flaw (e.g., a mathematical inconsistency), create a new issue, and **loop back to Phase 2 (Implementation & Execution)** to address the underlying problem.
--   **If YES:** Proceed to Phase 5. Phase 4c (visualization) runs in parallel with Phase 5 — it is a deliverable, not a blocker.
+-   **If YES:** Proceed to Phase 5. Phases 4c, 4d, and 4e run in parallel with Phase 5 — they are deliverables, not blockers.
 
-**Phase 4c failures** (visualization bugs, build issues, rendering problems) are engineering problems. They loop back to 4c, not to Phase 2. A 4c issue does not block publication.
+**Phase 4c/4d/4e failures** are engineering problems. They loop back to the failing sub-phase, not to Phase 2. They do not block publication.
 
 ---
 
@@ -762,12 +765,17 @@ Each experiment requires 5 issues, one per phase:
 | `Experiment N: Name - Phase 1: Ground Truth` | `type: experiment`, `phase: ground-truth` |
 | `Experiment N: Name - Phase 2: Implementation` | `type: experiment`, `phase: implementation` |
 | `Experiment N: Name - Phase 3: Visualization` | `type: experiment`, `phase: visualization` |
-| `Experiment N: Name - Phase 4: Formal Verification (4a/4b/4c)` | `type: experiment`, `phase: proof` |
+| `Experiment N: Name - Phase 4: Formal Verification (4a/4b/4c/4d/4e)` | `type: experiment`, `phase: proof` |
+| `Experiment N: Phase 4a — Formal Proof (Lean 4)` | `type: experiment`, `phase: proof` |
+| `Experiment N: Phase 4b — Proof Review` | `type: experiment`, `phase: proof` |
+| `Experiment N: Phase 4c — Interactive Proof Visualization` | `type: experiment`, `phase: proof` |
+| `Experiment N: Phase 4d — Verified Differential Testing` | `type: experiment`, `phase: proof` |
+| `Experiment N: Phase 4e — Verified Simulation Engine` | `type: experiment`, `phase: proof` |
 | `Experiment N: Name - Phase 5: Publication` | `type: experiment`, `phase: publication` |
 
 Phase 2 is blocked by Phase 1. Phase 3 is blocked by Phase 2. And so on.
 
-**Note:** Phase 4 sub-phases (4a/4b/4c) are tracked as task sections within the single Phase 4 issue, not as 3 separate issues. The issue count per experiment remains 5.
+**Note:** Phase 4 sub-phases (4a/4b/4c/4d/4e) are tracked as separate sub-issues under the Phase 4 parent tracking issue. The parent issue closes only when all sub-issues are closed.
 
 ---
 
@@ -963,10 +971,12 @@ When a phase has sub-phases (e.g., Phase 4 has 4a, 4b, 4c), create a **separate 
 **Example:**
 ```
 #55 (Phase 4 — tracking issue)
-  ├── #131 (4a: Formal Proof)      ← closed by proof PR
-  ├── #132 (4b: Proof Review)      ← closed by review PR
-  └── #133 (4c: Interactive Viz)   ← closed by viz PR
-  └── #55 closes manually when #131 + #132 + #133 are all closed
+  ├── #131 (4a: Formal Proof)              ← closed by proof PR
+  ├── #132 (4b: Proof Review)              ← closed by review PR
+  ├── #133 (4c: Interactive Viz)           ← closed by viz PR
+  ├── #297 (4d: Verified Differential)     ← closed by differential test PR
+  └── #298 (4e: Verified Simulation)       ← closed by simulation PR
+  └── #55 closes manually when all 5 sub-issues are closed
 ```
 
 ### Issue Requirements

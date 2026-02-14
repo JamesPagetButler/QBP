@@ -176,6 +176,8 @@ For each phase:
 | Phase 4a: Proof | Tier 3 | Red Team + Gemini |
 | Phase 4b: Review | Tier 2 | Red Team |
 | Phase 4c: Viz | Tier 2 | Red Team |
+| Phase 4d: Differential Testing | Tier 2 | Red Team |
+| Phase 4e: Simulation Engine | Tier 2 | Red Team |
 | Phase 5: Publication | Tier 2 | Red Team + Gemini |
 | Theory Refinement | Tier 3 | Red Team + Gemini |
 

@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit) — In Progress
-- **Lifecycle Stage:** Sprint 3 Phase 1 (Ground Truth) COMPLETE — Phase 2 (Implementation) is next
-- **Next Critical-Path Action:** Sprint 3 Phase 2: Implementation (#36)
+- **Lifecycle Stage:** Sprint 3 Phase 2 (Implementation) COMPLETE — Phase 3 (Visualization) is next
+- **Next Critical-Path Action:** Sprint 3 Phase 3: Visualization (#37)
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -23,16 +23,19 @@
 ## Sprint 3 Closure Checklist
 
 - [x] Phase 1: Ground Truth (#22) — CLOSED 2026-02-13. PR #285 merged. 5 review rounds. Empirical Anchor framework introduced.
-- [ ] Phase 2: Implementation (#36)
+- [x] Phase 2: Implementation (#36) — CLOSED 2026-02-13. PR #287 merged. Double-slit interference simulation.
 - [ ] Phase 3: Visualization (#37)
 - [ ] Phase 4: Formal Verification (#56)
   - [ ] 4a: Formal Proof (#259)
   - [ ] 4b: Proof Review (#260)
   - [ ] 4c: Interactive Proof Visualization (#261)
+  - [ ] 4d: Verified Differential Testing (#301)
+  - [ ] 4e: Verified Simulation Engine (#302)
 - [ ] Phase 5: Publication (#65)
 - [ ] Theory Refinement (#81)
 - [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`
 - [ ] Retrospective (#192)
+  - [ ] **Review:** Parallel sub-agent workflow trial (#317) — go/no-go for Sprint 4
 
 ## Sprint 2 Closure Checklist
 
@@ -252,6 +255,8 @@ Sprint 2 (Experiment 01b: Angle-Dependent Measurement) completed successfully in
   - [ ] 4a: Formal Proof
   - [ ] 4b: Proof Review
   - [ ] 4c: Interactive Proof Visualization
+  - [ ] 4d: Verified Differential Testing
+  - [ ] 4e: Verified Simulation Engine
 - [ ] Phase 5: Publication (#XX)
 - [ ] Research Sprint NR (#XX) — *must complete before Theory Refinement*
 - [ ] Theory Refinement (#XX) — *blocked by Research Sprint*

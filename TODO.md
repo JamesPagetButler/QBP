@@ -26,7 +26,7 @@ Phase 5: Publication
 | **Phase 1: Ground Truth** | Establish target values from literature | Ground truth doc, success criteria, tool requirements | Red Team approved |
 | **Phase 2: Implementation** | Build simulation/calculation | Working code, tests, validated results | Results within 3σ of ground truth |
 | **Phase 3: Visualization** | Create comprehensible outputs | Manim videos, interactive demos, analysis | Red Team approved |
-| **Phase 4: Formal Verification** | Prove (4a), review (4b), visualize (4c) | `.lean` proofs, review report, WASM viz | 4a+4b gate publication; 4c parallel deliverable |
+| **Phase 4: Formal Verification** | Prove (4a), review (4b), visualize (4c), differential test (4d), V&V sim (4e) | `.lean` proofs, review report, WASM viz, differential tests, V&V sim | 4a+4b gate publication; 4c/4d/4e parallel deliverables |
 | **Phase 5: Publication** | Final documentation & release | Theory docs, videos, website | Ready for public |
 
 ### Decision Gates
