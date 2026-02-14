@@ -146,7 +146,7 @@ body:
         | (e.g., Slit separation) | d | m | 1.0e-6 |
 
         **Quaternionic quantities involved?** Yes / No
-        If yes, note PROVISIONAL status per `docs/conventions/units.md`.
+        If yes, note MODEL-DEPENDENT status per `docs/conventions/units.md`.
     validations:
       required: false
 

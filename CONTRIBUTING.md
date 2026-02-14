@@ -922,8 +922,8 @@ For all PRs that modify simulation code or produce output data, reviews must ver
 - [ ] Cross-check: if experiment introduces a new physical quantity, it must have a library conversion function
 
 **Quaternionic Quantities:**
-- [ ] Any new derived quantities flagged as PROVISIONAL until experimentally validated
-- [ ] PROVISIONAL quantities clearly separated from established ones in output
+- [ ] Any new derived quantities flagged as MODEL-DEPENDENT until experimentally validated
+- [ ] MODEL-DEPENDENT quantities clearly separated from established ones in output
 
 See `docs/conventions/units.md` for the full unit architecture.
 

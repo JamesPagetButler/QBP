@@ -189,7 +189,7 @@ def annotate_columns(df: pd.DataFrame, unit_map: dict[str, str]) -> pd.DataFrame
 
 
 # ---------------------------------------------------------------------------
-# Layer 2: Quaternionic Derived Quantities (PROVISIONAL)
+# Layer 2: Quaternionic Derived Quantities (MODEL-DEPENDENT)
 # ---------------------------------------------------------------------------
 
 

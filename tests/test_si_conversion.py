@@ -3,7 +3,7 @@ Tests for src/simulation/si_conversion.py
 
 Verifies the two-layer SI conversion framework:
   Layer 1: BPM natural units <-> SI (ScaleFactors, conversion functions)
-  Layer 2: Quaternionic derived quantities (PROVISIONAL)
+  Layer 2: Quaternionic derived quantities (MODEL-DEPENDENT)
 """
 
 from __future__ import annotations
@@ -204,7 +204,7 @@ class TestAnnotateColumns:
 
 
 # ===================================================================
-# Layer 2: Quaternionic quantities (PROVISIONAL)
+# Layer 2: Quaternionic quantities (MODEL-DEPENDENT)
 # ===================================================================
 
 
