@@ -92,6 +92,19 @@ After Theory Refinement completes, a formal Sprint Retrospective issue must be c
 6. **Documentation updates** — Which docs need updating based on learnings?
 7. **Process refinements** — What should change in CONTRIBUTING.md or workflows?
 
+**If any pivots occurred during the sprint**, the retrospective must include a **Pivot Analysis** section for each:
+
+```
+### Pivot Analysis: PIVOT-SN-XXX
+
+1. What assumption was wrong?
+2. Why didn't we catch it earlier? (Pre-Sprint Research? Ground truth review?)
+3. What check would have caught it? (Dimensional analysis? Unit consistency?)
+4. Process update: [What workflow change prevents recurrence]
+```
+
+This is **required** for sprint closure, even if the research issue is still open.
+
 This is not a compliance gate — it is a learning gate. The goal is to connect the pain of deviation to the action that was skipped, and to backport operational learnings into documentation, building institutional memory.
 
 **Retrospective workflow:**
@@ -846,7 +859,8 @@ Before any PR can be merged, the PR **must** contain:
 2.  **Gemini Review:** Gemini conducts two-persona review (`Furey`, `Feynman`) in structured Markdown format within Gemini CLI. Must include **Acceptance Criteria Verification** (see below).
 3.  **Documentation of Gemini's Review:** Claude acts as scribe, copying Gemini's Markdown review and posting it as a separate PR comment.
 4.  **Issue Synthesis:** Claude synthesizes both reviews into a numbered list of issues, flagging any unmet acceptance criteria as **BLOCKING**.
-5.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
+5.  **Pivot Detection:** If a review identifies a **systemic failure** (the AC itself is flawed, not the code), flag as **BLOCKING (PIVOT REQUIRED)** and follow the [Pivot Protocol](docs/workflows/pivot_protocol.md). See "Pivot Protocol Integration" below.
+6.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
 
 ### Acceptance Criteria Verification Protocol
 
@@ -935,6 +949,35 @@ For **Tier 3 (theory) PRs** — particularly Phase 1 (Ground Truth) — both Red
 
 Verdict: PASS
 ```
+
+### Pivot Protocol Integration
+
+When a review identifies that an AC failure is **systemic** (theory/assumptions are flawed, not the code), the standard fix-or-defer workflow does not apply. Instead, follow the [Pivot Protocol](docs/workflows/pivot_protocol.md).
+
+**Detection criteria** — a failure is systemic if:
+
+| Signal | Example |
+|--------|---------|
+| AC compares incompatible things | "Verify BPM natural units match Fraunhofer SI" |
+| Code is correct but AC remains unmet | Simulation matches equations, but equations don't match AC |
+| Fixing requires research/derivation | "Need to define SI mapping for quaternionic quantities" |
+| Both reviews flag the same conceptual problem | Red Team and Gemini independently identify theory error |
+
+**Review verdict:** Use **BLOCKING (PIVOT REQUIRED)** when a systemic failure is detected. This is distinct from standard BLOCKING (which means "fix the code").
+
+**Workflow:**
+1. Red Team / Gemini flags as "BLOCKING (PIVOT REQUIRED)"
+2. Claude creates pivot log entry in SPRINT_STATUS.md (`PIVOT-SN-XXX`)
+3. Claude creates research issue to resolve the underlying question
+4. Claude proposes a temporary replacement AC (must be scientifically testable)
+5. James approves the temporary AC or blocks the sprint
+6. Sprint proceeds with temporary AC; pivot remains OPEN until research resolves it
+
+**Anti-fragility rule:** Each pivot must produce at least one workflow/checklist improvement. Pivots make the system stronger, not just patched.
+
+**Full protocol:** [docs/workflows/pivot_protocol.md](docs/workflows/pivot_protocol.md)
+
+---
 
 ## Issue-Driven Workflow
 
