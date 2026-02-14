@@ -14,6 +14,8 @@ Sprint 3 Phase 3 revealed that the QBP simulation mixes unit systems:
 
 This document establishes SI definitions for all quaternionic quantities, enabling consistent cross-scenario comparison. The definitions must be valid from Planck scale (~1.6e-35 m) to cosmological scale (~8.8e26 m) — a span of ~62 orders of magnitude.
 
+**Governing standard:** This framework is subordinate to **ISO/IEC 80000** (*Quantities and units*), the international standard defining the International System of Quantities (ISQ). All definitions herein must remain consistent with ISO/IEC 80000. If the QBP framework ultimately develops sufficient coherence and predictive power to propose a more fundamental system of quantities, that would warrant revisiting this hierarchy. Until then, ISO/IEC 80000 is the ground truth against which our definitions are validated.
+
 ---
 
 ## 2. KEY FINDING: BPM Code Has Absorbed v_z Factor
@@ -61,6 +63,8 @@ U_phys = U_code * 40  (in code energy units)
 ```
 
 **We adopt Option B.** The code produces physically meaningful results — the theta values are effectively dimensionless in the code's natural unit system. But the parameter names are misleading: `U1_strength` is a spatial coupling frequency, not an energy.
+
+**Validity constraint:** This absorbed-v_z interpretation is valid **only for the paraxial BPM** where v_z is constant (monochromatic beam). If the simulation were extended to handle longitudinal acceleration (stopping potentials, backscattering), the conversion factor U_code → U_phys would become position-dependent and this simplification would break down.
 
 ### 2.3 Consequence: Two Distinct Quantities
 
@@ -121,9 +125,15 @@ All quaternionic quantities are defined in terms of SI base units (m, kg, s, J).
 - Modeling Planck-scale thought experiments (L_0 ~ l_P)
 - Modeling cosmological quaternionic effects (L_0 ~ Mpc, if applicable)
 
-### 3.5 Numerical Representation
+### 3.5 Domain of Validity
 
-IEEE 754 double-precision floats span exponents ~1e-308 to ~1e+308 (~617 orders of magnitude), which comfortably covers the 62 orders needed. No special numerical types are required for scale coverage. The risk is in **relative precision** at extreme ratios — for example, computing U1_phys/E_Planck for a sub-eV coupling energy requires ~37 significant digits if done naively. In practice, all computations should be done in the natural scale of the experiment, converting to/from SI only at input/output boundaries.
+The scale coverage claim must distinguish three levels:
+
+- **Mathematical validity:** The conversion formulas are dimensionally correct at all scales. Given any (m, lambda), the framework produces internally consistent {L_0, E_0, T_0}. ✓
+- **Physical applicability:** The underlying theory (non-relativistic Schrödinger equation) is valid only in the non-relativistic quantum regime. At Planck scale, quantum gravity effects dominate and the Schrödinger equation is not valid. At cosmological scales, the single-particle de Broglie wavelength concept is physically meaningless. The electron worked example (v_z/c = 4.9%) is near the upper bound of the non-relativistic approximation.
+- **Numerical stability:** IEEE 754 double-precision floats span exponents ~1e-308 to ~1e+308 (~617 orders of magnitude), which comfortably covers the 62 orders needed. No special numerical types are required.
+
+The risk is in **relative precision** at extreme ratios — for example, computing U1_phys/E_Planck for a sub-eV coupling energy requires ~37 significant digits if done naively. In practice, all computations should be done in the natural scale of the experiment, converting to/from SI only at input/output boundaries.
 
 ---
 
@@ -133,13 +143,15 @@ Before defining quaternionic extensions, we anchor to measured reality.
 
 ### 4.1 Typical Apparatus Parameters
 
-| Parameter | Symbol | Light (Young) | Electrons (Tonomura) | SI Unit |
-|-----------|--------|---------------|----------------------|---------|
+| Parameter | Symbol | Light (Young) | Electrons (generic, ~600 eV) | SI Unit |
+|-----------|--------|---------------|-------------------------------|---------|
 | Slit width | a | 20 um (2.0e-5 m) | 62 nm (6.2e-8 m) | m |
 | Slit separation | d | 200 um (2.0e-4 m) | ~100 nm | m |
 | Wavelength | lambda | 500 nm (5.0e-7 m) | 0.05 nm (5e-11 m) | m |
 | Detector distance | L | 1.0 m | 1.5 m | m |
 | Fringe spacing | dx | lambda*L/d = 2.5e-3 m | ~0.75 mm | m |
+
+**Note:** The electron column uses lambda = 0.05 nm, corresponding to ~600 eV electrons (LEED regime). Tonomura's 1989 experiment used 50 kV electrons (lambda ≈ 0.0055 nm). The generic value is used here for worked-example consistency with Section 7.3.
 
 **Source:** https://en.wikipedia.org/wiki/Double-slit_experiment
 **Ref:** Tonomura, A. et al. (1989). "Demonstration of single-electron buildup of an interference pattern." *Am. J. Phys.* 57(2), 117-120.
@@ -286,7 +298,7 @@ U_phys_SI = U_code * hbar_SI^2 * k0_code / (m_SI * L_0^2)
 
 This is equivalent to: `U_phys_SI = U_code * v_z_code * E_0`.
 
-### 7.3 Worked Example: Electrons (Tonomura Experiment)
+### 7.3 Worked Example: Electrons (~600 eV, generic)
 
 Physical system: m_SI = 9.109e-31 kg, lambda = 0.05 nm = 5e-11 m
 
@@ -309,6 +321,8 @@ U_phys_SI = U_code * hbar_SI^2 * 20 / (9.109e-31 * (1.591e-10)^2)
           = U_code * 9.648e-18 J
           = U_code * 60.3 eV
 ```
+
+*Note: Numerical values in this section use rounded inputs (hbar = 1.055e-34, etc.) for readability. With full-precision constants, U_conv = 60.2 eV — a 0.2% difference. All formulas are exact; only the worked examples are approximate.*
 
 | U1_code | U1_phys (natural) | U1_phys (SI) | U1/E_k | vs Procopio (2e-9 eV) |
 |---------|-------------------|--------------|--------|------------------------|
@@ -336,13 +350,21 @@ Moving up the division algebra chain:
 
 **The dimensional analysis is invariant under algebra changes.** Energy is defined by the Hamiltonian's relationship to time translation (E <-> d/dt). Regardless of the algebra, the "coupling potential" must have dimensions of energy to appear in the Hamiltonian.
 
+**Charge extension and alpha consistency:** If the framework is extended to include charge (Q_0 = e as a 4th independent scale), a self-consistency check is required. The fine structure constant:
+
+```
+alpha = e^2 / (4*pi*epsilon_0*hbar*c) ≈ 1/137.036
+```
+
+relates charge to the mechanical quantities {L, E, T}. Since the framework fixes {L_0, E_0, T_0} from (m, lambda), setting Q_0 = e independently must produce the correct alpha. The stronger approach: define Q_0 such that alpha = 1/137.036 in code units, and derive the code representation of e from it. This ensures the electromagnetic coupling is consistent with the mechanical scales rather than independently postulated.
+
 ### 8.2 Structural Changes
 
 | Property | C | H | O |
 |----------|---|---|---|
 | Commutativity | Yes | No | No |
 | Associativity | Yes | Yes | No |
-| Tensor products | Standard | Non-trivial (Moretti-Oppio) | Broken |
+| Tensor products | Standard | Non-trivial (Moretti-Oppio [7]) | Broken |
 | U_1 dimensions | Energy | Energy | Energy |
 
 ### 8.3 Non-Associativity Caveat for Octonions
@@ -394,12 +416,14 @@ For any particle with de Broglie wavelength lambda_SI:
 
 | Particle/System | lambda_SI | L_0 | Energy Scale E_0 |
 |-----------------|-----------|-----|-------------------|
-| Electron (Tonomura) | 5e-11 m | 1.59e-10 m | 1.51 eV |
+| Electron (generic, ~600 eV) | 5e-11 m | 1.59e-10 m | 1.51 eV |
 | Neutron (Kaiser) | 1.8e-10 m | 5.73e-10 m | 0.025 eV (thermal) |
 | Photon (Procopio, 810nm) | 8.1e-7 m | 2.58e-6 m | 1.53 eV |
 | Planck-scale particle | 1.0e-34 m | 3.18e-34 m | ~E_Planck |
 
 The formulas in this document work identically at every row — only L_0 changes. No hardcoded numerical scales.
+
+**Parametric dependency:** The conversion framework assumes a fixed `k0_code = 20` (the BPM central wavenumber parameter). If the code were modified to use a different k0_code, L_0 would change and all downstream scales would shift. The framework's universality is therefore contingent on this code parametrization being held constant, or the conversion being recomputed for the new k0_code value.
 
 ---
 
@@ -423,9 +447,11 @@ The formulas in this document work identically at every row — only L_0 changes
 
 1. Adler, S.L. (1988). "Scattering and decay theory for quaternionic quantum mechanics." *Phys. Rev. D* 37, 3654.
 2. Adler, S.L. (1995). *Quaternionic Quantum Mechanics and Quantum Fields.* Oxford University Press.
-3. Kaiser, R. et al. (1984). Neutron interferometric bounds on quaternionic quantum mechanics.
+3. Kaiser, R., George, E.A., and Werner, S.A. (1984). "Search for quaternionic quantum mechanics with neutron interferometry." *Phys. Rev. A* 29(4), 2276-2279.
 4. Procopio, L.M. et al. (2017). "Single-photon test of hyper-complex quantum theories using a metamaterial." *Nature Communications* 8, 15044.
 5. Tonomura, A. et al. (1989). "Demonstration of single-electron buildup of an interference pattern." *Am. J. Phys.* 57(2), 117-120.
 6. Furey, C. (2016). "Standard model physics from an algebra?" PhD thesis, University of Waterloo.
-7. Double-slit experiment. Wikipedia. https://en.wikipedia.org/wiki/Double-slit_experiment
-8. NIST. "Planck units." https://physics.nist.gov/cuu/Constants/
+7. Moretti, V. and Oppio, M. (2017). "Quantum theory in quaternionic Hilbert space: How Poincaré symmetry reduces the theory to the standard complex one." *Rev. Math. Phys.* 29(4), 1750021.
+8. ISO/IEC 80000. *Quantities and units.* International Organization for Standardization / International Electrotechnical Commission. https://en.wikipedia.org/wiki/ISO/IEC_80000
+9. Double-slit experiment. Wikipedia. https://en.wikipedia.org/wiki/Double-slit_experiment
+10. NIST. "Planck units." https://physics.nist.gov/cuu/Constants/
