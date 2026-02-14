@@ -87,6 +87,15 @@ M_CODE = 0.5
 K0_CODE = 20.0
 
 # ---------------------------------------------------------------------------
+# Structural invariant: v_z absorption factor
+# ---------------------------------------------------------------------------
+# Both BPM split-step components (diffraction and potential) absorb
+# v_z_code = hbar_code * k0_code / m_code identically.  This is the
+# Jacobian of the time→space propagation transformation.  If this
+# invariant breaks, the BPM violates unitarity.
+V_Z_CODE = HBAR_CODE * K0_CODE / M_CODE  # = 40
+
+# ---------------------------------------------------------------------------
 # Physical systems for multi-scale testing
 # ---------------------------------------------------------------------------
 
@@ -115,6 +124,16 @@ def compute_scales(m_si: float, lambda_si: float) -> dict:
     """
     Given a particle mass and de Broglie wavelength (both SI), compute
     the quaternionic framework conversion scales.
+
+    This is pure arithmetic — no grids or arrays are allocated.  Safe to
+    call with any physically representable (IEEE 754) inputs.
+
+    Args:
+        m_si: Particle rest mass in kg.  Must be positive (massive particles only;
+              photon-like m=0 requires a different, energy-based scaling topology).
+        lambda_si: de Broglie wavelength in metres (lambda = h / p).  This is the
+                   carrier wavelength that sets the momentum scale k = 2*pi/lambda,
+                   NOT a wavepacket envelope width.
 
     Returns dict with keys: L_0, E_0, T_0, v_z_SI, k_SI.
 
@@ -435,7 +454,7 @@ class TestPotentialConversion:
         # Form 1: direct formula from Section 7.2
         U_phys_direct = U_code * HBAR_SI**2 * K0_CODE / (m_si * sc["L_0"] ** 2)
         # Form 2: via v_z_code * E_0
-        v_z_code = HBAR_CODE * K0_CODE / M_CODE  # = 40
+        v_z_code = V_Z_CODE
         U_phys_via_vz = U_code * v_z_code * sc["E_0"]
         assert U_phys_direct == pytest.approx(U_phys_via_vz, rel=RTOL)
 
@@ -569,7 +588,7 @@ class TestFrameworkConsistency:
         This must match hbar_SI * k_SI / m_SI.
         """
         sc = compute_scales(m_si, lambda_si)
-        v_z_code = HBAR_CODE * K0_CODE / M_CODE  # = 40
+        v_z_code = V_Z_CODE
         v_z_from_scales = v_z_code * sc["L_0"] / sc["T_0"]
         assert v_z_from_scales == pytest.approx(sc["v_z_SI"], rel=RTOL)
 
@@ -625,7 +644,11 @@ class TestEdgeCases:
         assert sc["E_0"] > 0
 
     def test_very_large_wavelength(self) -> None:
-        """Cosmological-scale wavelength should still produce finite scales."""
+        """Cosmological-scale wavelength should still produce finite scales.
+
+        Note: compute_scales is pure arithmetic (returns coefficients only).
+        No grids are allocated, so extreme wavelengths cannot cause OOM.
+        """
         sc = compute_scales(M_ELECTRON, 1e10)  # ~10 billion metres
         assert np.isfinite(sc["L_0"])
         assert np.isfinite(sc["E_0"])
@@ -695,7 +718,7 @@ class TestDiffractionStep:
         overall BPM to be physically meaningful.
         """
         dz_code = 0.05
-        v_z_code = HBAR_CODE * K0_CODE / M_CODE  # = 40
+        v_z_code = V_Z_CODE
 
         # Code's formula for half-step argument at kx = k0
         arg_code = HBAR_CODE * K0_CODE**2 * dz_code / (4 * M_CODE)
