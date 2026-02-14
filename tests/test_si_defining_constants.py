@@ -20,6 +20,44 @@ The 7 SI defining constants:
     5. k_B        = 1.380649e-23 J/K
     6. N_A        = 6.02214076e23 mol^{-1}
     7. K_cd       = 683 lm/W
+
+Test Classification (per Knuth review, PR #323)
+-----------------------------------------------
+Tests fall into three categories:
+
+NON-TRIVIAL (independently verify physical relationships):
+    - test_h_round_trip: converts h via E_0*T_0 and recovers h_SI
+    - test_h_code_is_2pi: verifies h_code = 2*pi at each scale
+    - test_c_round_trip: converts c via L_0/T_0 (two independent scales)
+    - test_delta_nu_round_trip: converts frequency via T_0
+    - test_velocity_scale: connects v_z_code*L_0/T_0 to hbar*k/m (independent paths)
+    - test_potential_conversion_formula: two independent derivations of U_phys agree
+    - test_potential_equals_kinetic_at_U1_10: physics check — U_phys = E_k
+    - test_potential_round_trip: arbitrary value survives round-trip
+    - test_electron_conversion_value: numerical check against document (~60.2 eV)
+    - test_alpha_from_si_constants: alpha from fundamental constants
+    - test_coulomb_energy_round_trip: Coulomb energy through framework
+    - test_diffraction_step_dimensional: BPM diffraction propagator consistency
+
+DEFINITIONAL (verify framework definitions are self-consistent):
+    - test_h_code_value: h_code = 2*pi*hbar_code (definitional identity)
+    - test_kb_round_trip: k_B round-trip via T_K_0 = E_0/k_B (tautological)
+    - test_kb_code_is_unity: k_code = 1 by construction
+    - test_charge_extension_round_trip: e/Q_0 * Q_0 = e (Q_0 := e)
+    - test_charge_not_in_current_framework: documents scope gap
+    - test_na_is_dimensionless: N_A = N_A (trivially true)
+    - test_na_scale_independent: N_A unchanged by scale (trivially true)
+    - test_candela_not_in_current_framework: documents scope gap
+    - test_alpha_in_code_units: alpha is dimensionless (must be scale-independent)
+    - test_T0_equals_hbar_over_E0: T_0 = hbar/E_0 by definition
+    - test_action_scale_is_hbar: E_0*T_0 = hbar by definition
+
+GUARD (verify positivity, finiteness, or representability):
+    - test_c_code_value_electron: c_code > 0 and finite
+    - test_delta_nu_code_positive: dnu_code > 0 and finite
+    - test_power_component_round_trip: power [W] = E_0/T_0 round-trips
+    - test_L0_is_positive_and_finite: IEEE 754 representability
+    - test_E0_is_positive_and_finite: IEEE 754 representability
 """
 
 from __future__ import annotations
@@ -79,7 +117,14 @@ def compute_scales(m_si: float, lambda_si: float) -> dict:
     the quaternionic framework conversion scales.
 
     Returns dict with keys: L_0, E_0, T_0, v_z_SI, k_SI.
+
+    Raises:
+        ValueError: if m_si or lambda_si is non-positive.
     """
+    if m_si <= 0:
+        raise ValueError(f"Mass must be positive, got {m_si}")
+    if lambda_si <= 0:
+        raise ValueError(f"Wavelength must be positive, got {lambda_si}")
     k_si = 2 * math.pi / lambda_si
     L_0 = K0_CODE * lambda_si / (2 * math.pi)  # = K0_CODE / k_si
 
@@ -122,9 +167,8 @@ class TestPlanckConstant:
     Round-trip: h_code * (E_0 * T_0) must recover h_SI.
     """
 
-    @pytest.mark.parametrize("m_si,lambda_si", SCALES)
-    def test_h_code_value(self, m_si: float, lambda_si: float) -> None:
-        """In code units, h_code = 2*pi (since hbar_code = 1)."""
+    def test_h_code_value(self) -> None:
+        """In code units, h_code = 2*pi (since hbar_code = 1). Definitional — no scale dependence."""
         h_code = 2 * math.pi * HBAR_CODE
         assert h_code == pytest.approx(2 * math.pi, rel=RTOL)
 
@@ -542,6 +586,167 @@ class TestFrameworkConsistency:
         sc = compute_scales(m_si, lambda_si)
         assert sc["E_0"] > 0
         assert np.isfinite(sc["E_0"])
+
+
+# ===================================================================
+# 11. Edge case validation (Knuth NB6)
+# ===================================================================
+
+
+class TestEdgeCases:
+    """Verify compute_scales rejects invalid inputs and handles extremes."""
+
+    def test_zero_mass_raises(self) -> None:
+        """Zero mass causes division by zero in E_0."""
+        with pytest.raises(ValueError, match="Mass must be positive"):
+            compute_scales(0.0, LAMBDA_ELEC)
+
+    def test_negative_mass_raises(self) -> None:
+        """Negative mass is unphysical."""
+        with pytest.raises(ValueError, match="Mass must be positive"):
+            compute_scales(-1.0, LAMBDA_ELEC)
+
+    def test_zero_wavelength_raises(self) -> None:
+        """Zero wavelength causes division by zero in k_SI."""
+        with pytest.raises(ValueError, match="Wavelength must be positive"):
+            compute_scales(M_ELECTRON, 0.0)
+
+    def test_negative_wavelength_raises(self) -> None:
+        """Negative wavelength is unphysical."""
+        with pytest.raises(ValueError, match="Wavelength must be positive"):
+            compute_scales(M_ELECTRON, -1e-10)
+
+    def test_very_small_wavelength(self) -> None:
+        """Near-Planck wavelength should still produce finite scales."""
+        sc = compute_scales(M_PLANCK, 1e-35)  # sub-Planck
+        assert np.isfinite(sc["L_0"])
+        assert np.isfinite(sc["E_0"])
+        assert sc["L_0"] > 0
+        assert sc["E_0"] > 0
+
+    def test_very_large_wavelength(self) -> None:
+        """Cosmological-scale wavelength should still produce finite scales."""
+        sc = compute_scales(M_ELECTRON, 1e10)  # ~10 billion metres
+        assert np.isfinite(sc["L_0"])
+        assert np.isfinite(sc["E_0"])
+        assert sc["L_0"] > 0
+        assert sc["E_0"] > 0
+
+    def test_very_small_mass(self) -> None:
+        """Tiny mass (neutrino-scale) should produce finite scales."""
+        m_neutrino = 1e-37  # ~0.1 eV/c^2 equivalent
+        sc = compute_scales(m_neutrino, 1e-6)
+        assert np.isfinite(sc["L_0"])
+        assert np.isfinite(sc["E_0"])
+
+    def test_very_large_mass(self) -> None:
+        """Macroscopic mass should produce finite scales."""
+        m_macro = 1.0  # 1 kg
+        sc = compute_scales(m_macro, 1e-30)  # de Broglie at macro scale
+        assert np.isfinite(sc["L_0"])
+        assert np.isfinite(sc["E_0"])
+
+
+# ===================================================================
+# 12. Diffraction step dimensional analysis (Grothendieck §2)
+# ===================================================================
+
+
+class TestDiffractionStep:
+    """
+    Verify the BPM diffraction propagator's dimensional consistency.
+
+    The diffraction half-step propagator (wave_propagation.py line 122):
+        exp(-i * hbar * kx^2 * dz / (4 * mass))
+
+    Dimensional analysis in code natural units (hbar=1, mass=0.5):
+        [hbar] * [kx]^2 * [dz] / [mass]
+        = [action] * [1/length]^2 * [length] / [mass]
+        = [action/length] * [1/mass]
+
+    In SI:
+        [J*s] * [m^-2] * [m] / [kg]
+        = [J*s/m] / [kg]
+        = [kg*m^2*s/(s^2*m)] / [kg]
+        = [m/s]  ... NOT dimensionless!
+
+    This confirms the same absorbed-v_z pattern as the potential step:
+    the diffraction propagator is dimensionless only in the code's natural
+    units where hbar=1, mass=0.5. In SI, the argument has dimensions of
+    velocity, which is absorbed by the spatial-propagation convention.
+
+    The key consistency check: the diffraction step and potential step
+    must produce results in the same unit system. We verify this by
+    checking that a full BPM step preserves norm.
+    """
+
+    @pytest.mark.parametrize("m_si,lambda_si", SCALES)
+    def test_diffraction_step_dimensional(self, m_si: float, lambda_si: float) -> None:
+        """
+        The BPM diffraction propagator absorbs v_z in the SAME way as the
+        potential step (Section 2 of the SI definitions document).
+
+        Code formula (half step):  exp(-i * hbar * kx^2 * dz / (4 * mass))
+        Standard paraxial BPM:     exp(-i * kx^2 * dz / (4 * k0))
+
+        These differ by exactly v_z_code = hbar*k0/mass = 40.
+        This confirms the v_z absorption is consistent across both split-step
+        components (diffraction and potential), which is required for the
+        overall BPM to be physically meaningful.
+        """
+        dz_code = 0.05
+        v_z_code = HBAR_CODE * K0_CODE / M_CODE  # = 40
+
+        # Code's formula for half-step argument at kx = k0
+        arg_code = HBAR_CODE * K0_CODE**2 * dz_code / (4 * M_CODE)
+        assert arg_code == pytest.approx(10.0, rel=RTOL)
+
+        # Standard paraxial BPM formula for half-step argument at kx = k0
+        arg_standard = K0_CODE**2 * dz_code / (4 * K0_CODE)
+        assert arg_standard == pytest.approx(0.25, rel=RTOL)
+
+        # The ratio must be v_z_code — confirming consistent v_z absorption
+        assert arg_code / arg_standard == pytest.approx(v_z_code, rel=RTOL)
+
+        # Both produce unit-magnitude propagators (pure phase rotation)
+        assert abs(np.exp(-1j * arg_code)) == pytest.approx(1.0, rel=RTOL)
+        assert abs(np.exp(-1j * arg_standard)) == pytest.approx(1.0, rel=RTOL)
+
+        # Cross-check: the SI-corrected argument (dividing by v_z)
+        # recovers the standard BPM formula
+        sc = compute_scales(m_si, lambda_si)
+        k_si = sc["k_SI"]
+        dz_si = dz_code * sc["L_0"]
+        v_z_si = sc["v_z_SI"]
+        arg_si_physical = HBAR_SI * k_si**2 * dz_si / (4 * m_si * v_z_si)
+        assert arg_si_physical == pytest.approx(arg_standard, rel=1e-6)
+
+    def test_diffraction_preserves_norm(self) -> None:
+        """
+        A diffraction-only step (no potential) must preserve |psi|^2.
+        This is the fundamental consistency requirement.
+        """
+        Nx = 256
+        dx = 0.1
+        kx = 2 * np.pi * np.fft.fftfreq(Nx, d=dx)
+        dz = 0.05
+        prop_half = np.exp(-1j * HBAR_CODE * kx**2 * dz / (4 * M_CODE))
+
+        # Create a Gaussian wavepacket
+        x = np.arange(Nx) * dx - Nx * dx / 2
+        psi = np.exp(-(x**2) / 4.0 + 1j * K0_CODE * x)
+        norm_before = np.sum(np.abs(psi) ** 2) * dx
+
+        # Apply full diffraction step (two halves)
+        psi_k = np.fft.fft(psi)
+        psi_k *= prop_half
+        psi = np.fft.ifft(psi_k)
+        psi_k = np.fft.fft(psi)
+        psi_k *= prop_half
+        psi = np.fft.ifft(psi_k)
+
+        norm_after = np.sum(np.abs(psi) ** 2) * dx
+        assert norm_after == pytest.approx(norm_before, rel=1e-10)
 
 
 # ===================================================================
