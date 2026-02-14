@@ -67,6 +67,11 @@ import math
 import numpy as np
 import pytest
 
+from src.simulation.si_conversion import (
+    V_Z_CODE,
+    compute_scales as _compute_scales_dataclass,
+)
+
 # ---------------------------------------------------------------------------
 # Physical constants (exact values from the 2019 SI redefinition)
 # ---------------------------------------------------------------------------
@@ -85,15 +90,6 @@ K_CD = 683  # lm/W  (exact)
 HBAR_CODE = 1.0
 M_CODE = 0.5
 K0_CODE = 20.0
-
-# ---------------------------------------------------------------------------
-# Structural invariant: v_z absorption factor
-# ---------------------------------------------------------------------------
-# Both BPM split-step components (diffraction and potential) absorb
-# v_z_code = hbar_code * k0_code / m_code identically.  This is the
-# Jacobian of the time→space propagation transformation.  If this
-# invariant breaks, the BPM violates unitarity.
-V_Z_CODE = HBAR_CODE * K0_CODE / M_CODE  # = 40
 
 # ---------------------------------------------------------------------------
 # Physical systems for multi-scale testing
@@ -122,46 +118,18 @@ LAMBDA_PLANCK = 2 * math.pi * L_PLANCK  # ~ 1.016e-34 m
 
 def compute_scales(m_si: float, lambda_si: float) -> dict:
     """
-    Given a particle mass and de Broglie wavelength (both SI), compute
-    the quaternionic framework conversion scales.
-
-    This is pure arithmetic — no grids or arrays are allocated.  Safe to
-    call with any physically representable (IEEE 754) inputs.
-
-    Args:
-        m_si: Particle rest mass in kg.  Must be positive (massive particles only;
-              photon-like m=0 requires a different, energy-based scaling topology).
-        lambda_si: de Broglie wavelength in metres (lambda = h / p).  This is the
-                   carrier wavelength that sets the momentum scale k = 2*pi/lambda,
-                   NOT a wavepacket envelope width.
+    Thin wrapper around si_conversion.compute_scales returning a dict
+    for backward compatibility with existing parametrized tests.
 
     Returns dict with keys: L_0, E_0, T_0, v_z_SI, k_SI.
-
-    Raises:
-        ValueError: if m_si or lambda_si is non-positive.
     """
-    if m_si <= 0:
-        raise ValueError(f"Mass must be positive, got {m_si}")
-    if lambda_si <= 0:
-        raise ValueError(f"Wavelength must be positive, got {lambda_si}")
-    k_si = 2 * math.pi / lambda_si
-    L_0 = K0_CODE * lambda_si / (2 * math.pi)  # = K0_CODE / k_si
-
-    # E_0 = hbar_SI^2 * m_code / (m_SI * L_0^2 * hbar_code^2)
-    E_0 = HBAR_SI**2 * M_CODE / (m_si * L_0**2 * HBAR_CODE**2)
-
-    # T_0 = hbar_SI / E_0
-    T_0 = HBAR_SI / E_0
-
-    # Physical velocity
-    v_z_si = HBAR_SI * k_si / m_si
-
+    sc = _compute_scales_dataclass(m_si, lambda_si)
     return {
-        "L_0": L_0,
-        "E_0": E_0,
-        "T_0": T_0,
-        "v_z_SI": v_z_si,
-        "k_SI": k_si,
+        "L_0": sc.L0,
+        "E_0": sc.E0,
+        "T_0": sc.T0,
+        "v_z_SI": sc.v_z_si,
+        "k_SI": sc.k_si,
     }
 
 

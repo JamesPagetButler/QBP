@@ -16,6 +16,7 @@ Usage:
     python experiments/03_double_slit/simulate.py
 """
 
+import json
 import numpy as np
 import pandas as pd
 import sys
@@ -39,6 +40,12 @@ from src.simulation.wave_propagation import (
     propagate,
     far_field_intensity,
     compute_eta,
+)
+from src.simulation.si_conversion import (
+    V_Z_CODE,
+    compute_scales,
+    convert_position,
+    convert_potential,
 )
 
 
@@ -95,6 +102,17 @@ U1_VALUES = [0.0, 0.5, 1.0, 2.0, 5.0, 10.0]
 # Initial quaternionic fractions
 ETA0_VALUES = [0.01, 0.1, 0.5]
 
+# ---------------------------------------------------------------------------
+# SI conversion scales
+# ---------------------------------------------------------------------------
+# Electron with 0.05 nm de Broglie wavelength (matches analytical params).
+# Note: BPM uses k0=30 not the default K0_CODE=20 — but the scale factors
+# are particle properties, not BPM parameters. The BPM k0 only controls the
+# number of grid points per wavelength (resolution), not the physical scale.
+M_ELECTRON = 9.109_383_7015e-31  # kg (CODATA 2018)
+LAMBDA_ELECTRON = 0.05e-9  # m (de Broglie wavelength)
+SI_SCALES = compute_scales(M_ELECTRON, LAMBDA_ELECTRON)
+
 
 # ---------------------------------------------------------------------------
 # Scenario runners
@@ -122,12 +140,12 @@ def run_scenario_a():
         rows.append(
             {
                 "scenario": "A",
-                "U1_strength": 0.0,
+                "U1_strength_eV": 0.0,
                 "eta0": 0.0,
-                "x_position": xi,
-                "intensity_total": Ii,
-                "intensity_psi0": Ii,
-                "intensity_psi1": 0.0,
+                "x_position_m": xi,
+                "intensity_total_normalized": Ii,
+                "intensity_psi0_normalized": Ii,
+                "intensity_psi1_normalized": 0.0,
             }
         )
 
@@ -158,12 +176,12 @@ def run_scenario_b():
         rows.append(
             {
                 "scenario": "B",
-                "U1_strength": 0.0,
+                "U1_strength_eV": 0.0,
                 "eta0": 0.0,
-                "x_position": xi,
-                "intensity_total": Ii,
-                "intensity_psi0": Ii,
-                "intensity_psi1": 0.0,
+                "x_position_m": xi,
+                "intensity_total_normalized": Ii,
+                "intensity_psi0_normalized": Ii,
+                "intensity_psi1_normalized": 0.0,
             }
         )
 
@@ -213,29 +231,32 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
         f"norm={final_norm:.8f}"
     )
 
-    # Fringe data
+    # Convert U1 to SI (eV) at output boundary
+    u1_eV = convert_potential(u1_strength, SI_SCALES)
+
+    # Fringe data — convert x_position from code units to SI metres
     fringe_rows = []
     for xi, It, I0, I1 in zip(x, I_total, I_psi0, I_psi1):
         fringe_rows.append(
             {
                 "scenario": "C",
-                "U1_strength": u1_strength,
+                "U1_strength_eV": u1_eV,
                 "eta0": eta0,
-                "x_position": xi,
-                "intensity_total": It,
-                "intensity_psi0": I0,
-                "intensity_psi1": I1,
+                "x_position_m": convert_position(xi, SI_SCALES),
+                "intensity_total_normalized": It,
+                "intensity_psi0_normalized": I0,
+                "intensity_psi1_normalized": I1,
             }
         )
 
-    # Decay data
+    # Decay data — convert z from code units to SI metres
     decay_rows = []
     for z_val, eta_val in result.decay_curve:
         decay_rows.append(
             {
-                "U1_strength": u1_strength,
+                "U1_strength_eV": u1_eV,
                 "eta0": eta0,
-                "z": z_val,
+                "z_m": convert_position(z_val, SI_SCALES),
                 "eta_fraction": eta_val,
             }
         )
@@ -271,7 +292,7 @@ def main():
     summary_rows.append(
         {
             "scenario": "A",
-            "U1_strength": 0.0,
+            "U1_strength_eV": 0.0,
             "eta0": 0.0,
             "visibility": V_a,
             "norm_final": 1.0,
@@ -284,7 +305,7 @@ def main():
     summary_rows.append(
         {
             "scenario": "B",
-            "U1_strength": 0.0,
+            "U1_strength_eV": 0.0,
             "eta0": 0.0,
             "visibility": V_b,
             "norm_final": 1.0,
@@ -301,7 +322,7 @@ def main():
             summary_rows.append(
                 {
                     "scenario": "C",
-                    "U1_strength": u1,
+                    "U1_strength_eV": convert_potential(u1, SI_SCALES),
                     "eta0": eta0,
                     "visibility": V_c,
                     "norm_final": V_c_norm,
@@ -332,15 +353,51 @@ def main():
     summary_df.to_csv(summary_path, index=False)
     print(f"Summary: {summary_path}")
 
+    # Metadata sidecar — persists scale factors for reproducibility
+    metadata = {
+        "format_version": "2.0",
+        "unit_convention": "hbar=c=1 (standard HEP natural units)",
+        "particle": "electron",
+        "mass_kg": SI_SCALES.mass_si,
+        "lambda_m": SI_SCALES.lambda_si,
+        "L0_m": SI_SCALES.L0,
+        "E0_J": SI_SCALES.E0,
+        "T0_s": SI_SCALES.T0,
+        "v_z_si_m_per_s": SI_SCALES.v_z_si,
+        "k_si_per_m": SI_SCALES.k_si,
+        "V_Z_CODE": V_Z_CODE,
+        "BPM_k0": BPM_CONFIG.k0,
+        "BPM_hbar": BPM_CONFIG.hbar,
+        "BPM_mass": BPM_CONFIG.mass,
+        "conversion_applied": True,
+        "conversion_library": "src/simulation/si_conversion.py",
+        "timestamp": timestamp,
+        "column_units": {
+            "x_position_m": "metres",
+            "U1_strength_eV": "electron-volts",
+            "z_m": "metres",
+            "intensity_total_normalized": "dimensionless (normalized)",
+            "intensity_psi0_normalized": "dimensionless (normalized)",
+            "intensity_psi1_normalized": "dimensionless (normalized)",
+            "eta_fraction": "dimensionless",
+            "visibility": "dimensionless",
+            "norm_final": "dimensionless",
+        },
+    }
+    metadata_path = os.path.join(output_dir, f"metadata_{timestamp}.json")
+    with open(metadata_path, "w") as f:
+        json.dump(metadata, f, indent=2)
+    print(f"Metadata: {metadata_path}")
+
     # Print summary table
     print("\n" + "=" * 70)
     print("SUMMARY")
     print("=" * 70)
-    print(f"\n{'Scenario':<12} {'U₁':<8} {'η₀':<8} {'Visibility':<12}")
-    print("-" * 40)
+    print(f"\n{'Scenario':<12} {'U₁ (eV)':<14} {'η₀':<8} {'Visibility':<12}")
+    print("-" * 46)
     for _, row in summary_df.iterrows():
         print(
-            f"{row['scenario']:<12} {row['U1_strength']:<8.1f} "
+            f"{row['scenario']:<12} {row['U1_strength_eV']:<14.4e} "
             f"{row['eta0']:<8.2f} {row['visibility']:<12.4f}"
         )
 

@@ -906,6 +906,27 @@ Every review must include a formal **Acceptance Criteria Verification** section 
 **Verdict:** BLOCKING — Criteria 3-4 require action
 ```
 
+### Unit Consistency Verification
+
+For all PRs that modify simulation code or produce output data, reviews must verify:
+
+**Output Format:**
+- [ ] Output CSV columns have unit suffixes (e.g., `x_position_m`, not `x_position`)
+- [ ] Scale factors persisted with output (metadata sidecar JSON or equivalent)
+- [ ] No undocumented natural-unit constants in output code
+
+**Conversion Library Enforcement:**
+- [ ] All SI conversions use `src/simulation/si_conversion.py` — inline/ad-hoc conversions are review failures
+- [ ] New conversion functions go into the library with tests, not into experiment scripts
+- [ ] Scale factors computed via `compute_scales()`, not manually
+- [ ] Cross-check: if experiment introduces a new physical quantity, it must have a library conversion function
+
+**Quaternionic Quantities:**
+- [ ] Any new derived quantities flagged as MODEL-DEPENDENT until experimentally validated
+- [ ] MODEL-DEPENDENT quantities clearly separated from established ones in output
+
+See `docs/conventions/units.md` for the full unit architecture.
+
 ### Empirical Grounding Verification
 
 For **Tier 3 (theory) PRs** — particularly Phase 1 (Ground Truth) — both Red Team and Gemini reviews must include an Empirical Grounding Verification section. This ensures that every experiment is anchored to real-world measurements, not just theoretical derivations.
