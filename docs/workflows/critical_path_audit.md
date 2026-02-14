@@ -104,7 +104,26 @@ gh project item-list 1 --owner JamesPagetButler --format json | \
   jq '.items[] | select(.sprint == "Sprint 2: Angle-Dependent (01b)")'
 ```
 
-### 6. Common Issues to Check
+### 6. Unresolved Pivot Check
+
+Check SPRINT_STATUS.md for the Pivot Log section. For each pivot entry:
+
+| Check | Threshold | Action |
+|-------|-----------|--------|
+| Pivot OPEN in current sprint | OK | Normal — research in progress |
+| Pivot OPEN for > 1 sprint | **WARNING** | Flag in audit report. Verify research issue is actively worked. |
+| Pivot OPEN for > 2 sprints | **FAILURE** | Audit fails. Pivot must be resolved or escalated to James. |
+| Pivot resolved but no retrospective entry | **WARNING** | Retrospective must include Pivot Analysis section. |
+
+**How to check:**
+```bash
+# Find OPEN pivots in SPRINT_STATUS.md
+grep -A1 "PIVOT-S" SPRINT_STATUS.md | grep "OPEN"
+```
+
+Temporary ACs must not become permanent silently. Each audit should verify that resolved pivots have been backported to their original issues (original AC reinstated or permanently replaced with rationale).
+
+### 7. Common Issues to Check
 
 | Issue Type | How to Detect | Fix |
 |------------|---------------|-----|
@@ -114,6 +133,7 @@ gh project item-list 1 --owner JamesPagetButler --format json | \
 | Issues not on board | Not in project item list | `gh project item-add` |
 | Sprint field options wrong | API shows wrong names | Fix in UI (manual) |
 | Sprint field not set | `sprint: null` in item list | `gh project item-edit` with field ID |
+| Unresolved pivot > 1 sprint | Check Pivot Log in SPRINT_STATUS.md | Verify research issue is active |
 
 ## Output
 
