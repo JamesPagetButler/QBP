@@ -215,16 +215,7 @@ Housekeeping issues are created in 3 contexts:
 
 ### Creation Checklist
 
-Every housekeeping issue must have:
-
-1. **Title:** "Housekeeping: \<descriptive title\>"
-2. **Body:** Origin (which PR/review/observation), Action items, AC checkboxes
-3. **Label:** `housekeeping`
-4. **Project board:** Add to "QBP Research Lifecycle"
-5. **Sprint field:** Set to "House Keeping"
-6. **Status:** "Todo"
-
-After any PR review cycle (Step 4 — Issues Identified), every deferred item **must** become a GitHub issue with this checklist applied. No "we'll get to it" without a tracked issue.
+Follow the **[Housekeeping Issue Creation Checklist](../../CONTRIBUTING.md#housekeeping-issue-creation-checklist)** in CONTRIBUTING.md. Every housekeeping issue needs: title convention, body with origin and AC, `housekeeping` label, board placement, Sprint = "House Keeping", Status = "Todo".
 
 ### Prioritization
 

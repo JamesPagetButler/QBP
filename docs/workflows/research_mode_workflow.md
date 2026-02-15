@@ -425,14 +425,7 @@ Research issues follow a structured lifecycle integrated with the project board.
 
 ### Creation Checklist
 
-Every research issue must have:
-
-1. **Title:** "Research: \<descriptive question\>"
-2. **Body:** Origin, Research question, Expected deliverables, AC checkboxes
-3. **Label:** `type: research`
-4. **Project board:** Add to "QBP Research Lifecycle"
-5. **Sprint field:** "House Keeping" (if unscoped) or "Research Sprint NR" (if blocking critical path)
-6. **Status:** "Todo"
+Follow the **[Research Issue Creation Checklist](../../CONTRIBUTING.md#research-issue-creation-checklist)** in CONTRIBUTING.md. Every research issue needs: title convention, body with research question and AC, `type: research` label, board placement, Sprint = "House Keeping" (or Research Sprint NR if blocking), Status = "Todo".
 
 ### Triage
 

@@ -791,11 +791,11 @@ Not all work is sprint phases. Housekeeping, research, and infrastructure issues
 ```
 Is it blocking the next sprint's critical path?
   YES → Sprint field = Research Sprint NR (scoped, critical path)
-  NO  → Sprint field = House Keeping (single backlog for all types)
+  NO  → Sprint field = "House Keeping" (single backlog for all types)
     Then label by type:
-      Code/docs/process/tooling → label: housekeeping
-      Physics/math/theory       → label: type: research
-      Infrastructure/CI/tooling → label: type: infra
+      Code/docs/process/local tooling  → label: housekeeping
+      Physics/math/theory              → label: type: research
+      Shared CI/CD/infra               → label: type: infra
 ```
 
 One backlog sprint ("House Keeping") for all non-critical-path work. Labels differentiate type. This avoids categorization paralysis for hybrid issues and provides a single place to look.
