@@ -110,6 +110,9 @@ ANALYTICAL_PARAMS = SlitParameters(
 # The physics is scale-invariant: decay, monotonicity, norm conservation,
 # and U₁=0 control behavior are identical at any U₁ scale.
 # See ground truth §4.3.3 for physical SI worked examples.
+#
+# Rotation angle per step: θ = U₁·dz/ℏ. At max U₁=10, dz=0.02:
+#   θ_max = 0.2 rad/step (< π/4 ≈ 0.785, no aliasing risk).
 U1_VALUES = [0.0, 0.5, 1.0, 2.0, 5.0, 10.0]
 
 # Initial quaternionic fractions
@@ -369,7 +372,7 @@ def main():
     # Metadata sidecar — persists scale factors for reproducibility
     metadata = {
         "format_version": "2.0",
-        "unit_convention": "hbar=c=1 (standard HEP natural units)",
+        "unit_convention": "hbar=1 natural units (c=1 reserved for relativistic extensions)",
         "particle": "electron",
         "mass_kg": SI_SCALES.mass_si,
         "lambda_m": SI_SCALES.lambda_si,
@@ -400,6 +403,7 @@ def main():
     metadata_path = os.path.join(output_dir, f"metadata_{timestamp}.json")
     with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
+        f.write("\n")
     print(f"Metadata: {metadata_path}")
 
     # Print summary table

@@ -322,23 +322,22 @@ class TestStage1Decay:
         """AC #7: η evolves at coupling region, conserved during free propagation.
 
         Ground truth §5.1 specifies η(r) fits exp(−2κr). In the BPM
-        (unitary simulation), the coupling mechanism is an SO(4) rotation
-        that changes η only where U₁ is active. Free propagation preserves
-        η exactly (unitarity). The Adler exponential decay is a
-        thermodynamic prediction requiring environmental decoherence beyond
-        the BPM's unitary framework.
+        (unitary simulation), the coupling is an SO(4) rotation derived
+        from H = U₀ + U₁·j (ground truth §3.3). The rotation changes η
+        only where U₁ is active; once the unitary generator vanishes
+        (U₁ = 0), η is exactly conserved. The Adler exponential decay
+        is a thermodynamic prediction requiring environmental decoherence
+        (Adler 1995, Ch. 4) beyond the BPM's unitary framework.
 
-        This test verifies the underlying coupling mechanism using a
-        z-localized potential (U₁ active in z ∈ [10, 20] only):
+        This test verifies the coupling mechanism using a z-localized
+        potential (U₁ active in z ∈ [10, 20] only):
         1. Before coupling region: η = η₀ (no change)
-        2. Inside coupling region: η evolves (coupling active)
-        3. After coupling region: η = η_exit = const (unitarity)
+        2. Inside coupling region: η evolves (rotation active)
+        3. After coupling region: η = η_exit = const (generator off)
         4. The exit value differs from η₀ (coupling had measurable effect)
 
-        This is consistent with outcome (b) from ground truth §4.3.2:
-        constant η_exit after the coupling region. The simulation
-        discriminates between outcomes (a) and (b) — see Phase 3
-        visualization for full analysis.
+        Result: outcome (b) from ground truth §4.3.2 — constant η_exit
+        after the coupling region. See Phase 3 for full analysis.
         """
         grid = create_transverse_grid(self.CONFIG)
         psi0, psi1 = create_initial_wavepacket(grid, k0=20.0, sigma=2.0, eta0=0.0)
