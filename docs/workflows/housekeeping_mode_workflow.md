@@ -199,6 +199,41 @@ Claude: ## Housekeeping Mode Complete
 
 ---
 
+## Issue Lifecycle
+
+Housekeeping issues follow a structured lifecycle from creation to closure.
+
+### Creation
+
+Housekeeping issues are created in 3 contexts:
+
+| Context | Example | Who creates |
+|---------|---------|-------------|
+| **Review findings** | "K-2: Document sampling dependency" | Herschel, during PR review synthesis (Step 4) |
+| **Sprint observations** | "Mypy doesn't cover analysis/" | Herschel, when encountered during sprint work |
+| **James's request** | "Let's clean up the label scheme" | James, directly |
+
+### Creation Checklist
+
+Follow the **[Housekeeping Issue Creation Checklist](../../CONTRIBUTING.md#housekeeping-issue-creation-checklist)** in CONTRIBUTING.md. Every housekeeping issue needs: title convention, body with origin and AC, `housekeeping` label, board placement, Sprint = "House Keeping", Status = "Todo".
+
+### Prioritization
+
+Housekeeping items are done opportunistically, with implicit ordering:
+
+1. **Blocking future work** (e.g., trusted unit conversion) — do before the sprint that needs it
+2. **Review debt** (findings deferred from PRs) — do soon to prevent accumulation
+3. **Polish** (viz improvements, layout tweaks) — do when convenient
+
+### Completion
+
+Same rules as any issue:
+- PR with `Closes #X` (or manual close if no code change needed)
+- AC verification in review
+- For docs-only housekeeping: Tier 1 review sufficient
+
+---
+
 ## References
 
 - [Sprint Mode Workflow](sprint_mode_workflow.md) — Full experiment sprints
