@@ -14,23 +14,19 @@ def main : IO Unit := do
   let electronScales := computeScales electronMass electronLambda
   let neutronScales := computeScales neutronMass neutronLambda
 
-  -- Output JSON
-  IO.println "{"
-  IO.println "  \"generator\": \"QBP Lean 4 Oracle\","
-  IO.println s!"  \"v_z_code\": {floatToScientific v_z_code},"
-  IO.println s!"  \"hbar_SI\": {floatToScientific hbar_SI},"
-  IO.println s!"  \"eV_in_J\": {floatToScientific eV_in_J},"
-
-  -- Scale factors
-  IO.println "  \"scale_factors\": ["
-  IO.println s!"    {scaleFactorsToJson "electron" electronScales},"
-  IO.println s!"    {scaleFactorsToJson "neutron" neutronScales}"
-  IO.println "  ],"
-
-  -- Round-trip tests
-  IO.println "  \"round_trips\": ["
-  IO.println s!"    {roundTripToJson "electron" electronScales},"
-  IO.println s!"    {roundTripToJson "neutron" neutronScales}"
-  IO.println "  ]"
-
-  IO.println "}"
+  -- Build JSON using structured helpers (no manual comma placement)
+  let json := jsonObj [
+    ("generator", jsonStr "QBP Lean 4 Oracle"),
+    ("v_z_code", floatToScientific v_z_code),
+    ("hbar_SI", floatToScientific hbar_SI),
+    ("eV_in_J", floatToScientific eV_in_J),
+    ("scale_factors", jsonArr [
+      scaleFactorsToJson "electron" electronScales,
+      scaleFactorsToJson "neutron" neutronScales
+    ]),
+    ("round_trips", jsonArr [
+      roundTripToJson "electron" electronScales,
+      roundTripToJson "neutron" neutronScales
+    ])
+  ]
+  IO.println json

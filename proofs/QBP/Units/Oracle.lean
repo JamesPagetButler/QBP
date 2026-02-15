@@ -136,17 +136,36 @@ def floatToScientific (f : Float) : String :=
     let restStr := String.join (rest.map (fun d => toString d))
     s!"{sign}{first}.{restStr}e{if exp >= 0 then "+" else ""}{exp}"
 
-/-- Generate a JSON object for one test particle's scale factors.
-    Uses hex encoding for lossless IEEE 754 precision. -/
+/-! ## Structured JSON Builder
+
+Eliminates manual comma placement — the `jsonObj` and `jsonArr` helpers
+handle separators automatically, preventing the class of bugs where a
+missing or extra comma produces invalid JSON.
+-/
+
+/-- Build a JSON object from key-value pairs. Handles comma separation. -/
+def jsonObj (pairs : List (String × String)) : String :=
+  "{" ++ String.intercalate ", " (pairs.map fun (k, v) => "\"" ++ k ++ "\": " ++ v) ++ "}"
+
+/-- Build a JSON array from elements. Handles comma separation. -/
+def jsonArr (items : List String) : String :=
+  "[" ++ String.intercalate ", " items ++ "]"
+
+/-- JSON-encode a string value. -/
+def jsonStr (s : String) : String := "\"" ++ s ++ "\""
+
+/-- Generate a JSON object for one test particle's scale factors. -/
 def scaleFactorsToJson (name : String) (sc : FloatScaleFactors) : String :=
-  s!"\{\"particle\": \"{name}\", " ++
-  s!"\"mass_si\": {floatToScientific sc.mass_si}, " ++
-  s!"\"lambda_si\": {floatToScientific sc.lambda_si}, " ++
-  s!"\"L0\": {floatToScientific sc.L0}, " ++
-  s!"\"E0\": {floatToScientific sc.E0}, " ++
-  s!"\"T0\": {floatToScientific sc.T0}, " ++
-  s!"\"v_z_si\": {floatToScientific sc.v_z_si}, " ++
-  s!"\"k_si\": {floatToScientific sc.k_si}}"
+  jsonObj [
+    ("particle", jsonStr name),
+    ("mass_si", floatToScientific sc.mass_si),
+    ("lambda_si", floatToScientific sc.lambda_si),
+    ("L0", floatToScientific sc.L0),
+    ("E0", floatToScientific sc.E0),
+    ("T0", floatToScientific sc.T0),
+    ("v_z_si", floatToScientific sc.v_z_si),
+    ("k_si", floatToScientific sc.k_si)
+  ]
 
 /-- Generate round-trip test vectors for a particle. -/
 def roundTripToJson (name : String) (sc : FloatScaleFactors) : String :=
@@ -158,14 +177,16 @@ def roundTripToJson (name : String) (sc : FloatScaleFactors) : String :=
   let E_back := convertEnergyToCode E_si sc
   let U_code := 10.0
   let U_eV := convertPotential U_code sc
-  s!"\{\"particle\": \"{name}\", " ++
-  s!"\"position_code\": {floatToScientific x_code}, " ++
-  s!"\"position_si\": {floatToScientific x_si}, " ++
-  s!"\"position_roundtrip\": {floatToScientific x_back}, " ++
-  s!"\"energy_code\": {floatToScientific E_code}, " ++
-  s!"\"energy_si\": {floatToScientific E_si}, " ++
-  s!"\"energy_roundtrip\": {floatToScientific E_back}, " ++
-  s!"\"potential_code\": {floatToScientific U_code}, " ++
-  s!"\"potential_eV\": {floatToScientific U_eV}}"
+  jsonObj [
+    ("particle", jsonStr name),
+    ("position_code", floatToScientific x_code),
+    ("position_si", floatToScientific x_si),
+    ("position_roundtrip", floatToScientific x_back),
+    ("energy_code", floatToScientific E_code),
+    ("energy_si", floatToScientific E_si),
+    ("energy_roundtrip", floatToScientific E_back),
+    ("potential_code", floatToScientific U_code),
+    ("potential_eV", floatToScientific U_eV)
+  ]
 
 end QBP.Units.Oracle

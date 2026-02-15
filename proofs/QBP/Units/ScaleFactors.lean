@@ -105,6 +105,24 @@ theorem E0_pos (m_si lam_si : ℝ) (hm : m_si > 0) (hl : lam_si > 0) :
 theorem T0_def (m_si lam_si : ℝ) : T0 m_si lam_si = hbar_SI / E0 m_si lam_si :=
   rfl
 
+/-- T₀ is positive for positive mass and wavelength.
+    Causality requires a positive time scale — this is foundational. -/
+theorem T0_pos (m_si lam_si : ℝ) (hm : m_si > 0) (hl : lam_si > 0) :
+    T0 m_si lam_si > 0 := by
+  unfold T0
+  exact div_pos hbar_SI_pos (E0_pos m_si lam_si hm hl)
+
+/-- k_SI is positive for positive wavelength. -/
+theorem k_si_pos (lam_si : ℝ) (hl : lam_si > 0) : k_si lam_si > 0 := by
+  simp [k_si]
+  exact div_pos (mul_pos (by norm_num : (0:ℝ) < 2) Real.pi_pos) hl
+
+/-- v_z_SI is positive for positive mass and wavelength. -/
+theorem v_z_si_pos (m_si lam_si : ℝ) (hm : m_si > 0) (hl : lam_si > 0) :
+    v_z_si m_si lam_si > 0 := by
+  simp [v_z_si]
+  exact div_pos (mul_pos hbar_SI_pos (k_si_pos lam_si hl)) hm
+
 /-- **Round-trip theorem (position):**
     Converting code→SI→code is the identity (on Reals). -/
 theorem position_round_trip (x_code : ℝ) (lam_si : ℝ) (hl : lam_si > 0) :
@@ -152,5 +170,12 @@ theorem position_zero (lam_si : ℝ) : convert_position 0 lam_si = 0 := by
 /-- **Zero maps to zero (energy):** -/
 theorem energy_zero (m_si lam_si : ℝ) : convert_energy 0 m_si lam_si = 0 := by
   simp [convert_energy]
+
+/-- **Scaling (energy):**
+    convert_energy(α × E) = α × convert_energy(E). -/
+theorem energy_scaling (α E : ℝ) (m_si lam_si : ℝ) :
+    convert_energy (α * E) m_si lam_si = α * convert_energy E m_si lam_si := by
+  simp [convert_energy]
+  ring
 
 end QBP.Units

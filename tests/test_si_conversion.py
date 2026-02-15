@@ -298,14 +298,15 @@ st_wavelength = st.floats(
 )
 
 # Strategy for code-unit values (typical BPM range).
-# Excludes subnormals and extreme values that cause IEEE 754 precision loss.
+# Excludes subnormals and near-zero values (|x| < 1e-250) that underflow
+# when multiplied by scale factors (~1e-23), causing IEEE 754 precision loss.
 st_code_value = st.floats(
     min_value=-1e6,
     max_value=1e6,
     allow_nan=False,
     allow_infinity=False,
     allow_subnormal=False,
-)
+).filter(lambda x: x == 0.0 or abs(x) > 1e-250)
 
 
 class TestPropertyRoundTrip:
@@ -459,6 +460,17 @@ class TestPropertyVZInvariant:
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "si_test_vectors.json"
 
 
+def _find_particle(vectors: list, particle: str) -> dict:
+    """Find a particle entry in test vectors, with clear error on missing."""
+    for entry in vectors:
+        if entry["particle"] == particle:
+            return entry
+    raise ValueError(
+        f"Particle '{particle}' not found in test vectors. "
+        f"Available: {[e['particle'] for e in vectors]}"
+    )
+
+
 @pytest.mark.skipif(not FIXTURE_PATH.exists(), reason="Lean test vectors not generated")
 class TestCrossLanguageLean:
     """Verify Python agrees with Lean 4 oracle on test vectors."""
@@ -481,9 +493,7 @@ class TestCrossLanguageLean:
         assert EV_IN_JOULES == pytest.approx(lean_val, rel=1e-15)
 
     def test_electron_scale_factors(self) -> None:
-        lean = next(
-            s for s in self.vectors["scale_factors"] if s["particle"] == "electron"
-        )
+        lean = _find_particle(self.vectors["scale_factors"], "electron")
         sc = compute_scales(float(lean["mass_si"]), float(lean["lambda_si"]))
         assert sc.L0 == pytest.approx(float(lean["L0"]), rel=1e-15)
         assert sc.E0 == pytest.approx(float(lean["E0"]), rel=1e-15)
@@ -492,9 +502,7 @@ class TestCrossLanguageLean:
         assert sc.k_si == pytest.approx(float(lean["k_si"]), rel=1e-15)
 
     def test_neutron_scale_factors(self) -> None:
-        lean = next(
-            s for s in self.vectors["scale_factors"] if s["particle"] == "neutron"
-        )
+        lean = _find_particle(self.vectors["scale_factors"], "neutron")
         sc = compute_scales(float(lean["mass_si"]), float(lean["lambda_si"]))
         assert sc.L0 == pytest.approx(float(lean["L0"]), rel=1e-15)
         assert sc.E0 == pytest.approx(float(lean["E0"]), rel=1e-15)
@@ -503,12 +511,8 @@ class TestCrossLanguageLean:
         assert sc.k_si == pytest.approx(float(lean["k_si"]), rel=1e-15)
 
     def test_electron_round_trips(self) -> None:
-        lean = next(
-            r for r in self.vectors["round_trips"] if r["particle"] == "electron"
-        )
-        lean_sf = next(
-            s for s in self.vectors["scale_factors"] if s["particle"] == "electron"
-        )
+        lean = _find_particle(self.vectors["round_trips"], "electron")
+        lean_sf = _find_particle(self.vectors["scale_factors"], "electron")
         sc = compute_scales(float(lean_sf["mass_si"]), float(lean_sf["lambda_si"]))
 
         x_code = float(lean["position_code"])
@@ -524,12 +528,8 @@ class TestCrossLanguageLean:
         assert U_eV == pytest.approx(float(lean["potential_eV"]), rel=1e-15)
 
     def test_neutron_round_trips(self) -> None:
-        lean = next(
-            r for r in self.vectors["round_trips"] if r["particle"] == "neutron"
-        )
-        lean_sf = next(
-            s for s in self.vectors["scale_factors"] if s["particle"] == "neutron"
-        )
+        lean = _find_particle(self.vectors["round_trips"], "neutron")
+        lean_sf = _find_particle(self.vectors["scale_factors"], "neutron")
         sc = compute_scales(float(lean_sf["mass_si"]), float(lean_sf["lambda_si"]))
 
         x_code = float(lean["position_code"])

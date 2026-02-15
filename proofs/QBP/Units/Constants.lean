@@ -105,4 +105,9 @@ theorem m_code_pos : m_code > 0 := by
 theorem k0_code_pos : k0_code > 0 := by
   norm_num [k0_code]
 
+/-- ℏ_SI is positive: h/(2π) > 0 since h > 0 and π > 0. -/
+theorem hbar_SI_pos : hbar_SI > 0 := by
+  simp [hbar_SI]
+  exact div_pos h_SI_pos (mul_pos (by norm_num : (0:ℝ) < 2) Real.pi_pos)
+
 end QBP.Units
