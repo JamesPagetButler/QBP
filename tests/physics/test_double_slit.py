@@ -358,6 +358,14 @@ class TestStage1Decay:
         z_vals = np.array([z for z, eta in result.decay_curve])
         eta_vals = np.array([eta for z, eta in result.decay_curve])
 
+        # Diagnostic sampling dependency (K-2):
+        # decay_curve is sampled every 100 steps (wave_propagation.py:575).
+        # With dz=0.01, that gives one sample per z=1.0 unit.
+        # Coupling region: z ∈ [10, 20]. Pre-coupling check uses z < 9.0
+        # → 9 samples (z = 0, 1, ..., 8). Post-coupling uses z > 21.0.
+        # If dz, Nz_steps, or the diagnostic interval changes, these
+        # assertion boundaries must be updated to ensure sufficient samples.
+
         # Before coupling (z < 10): η should be ~0 (no U₁ yet)
         pre_coupling = eta_vals[z_vals < 9.0]
         assert np.all(

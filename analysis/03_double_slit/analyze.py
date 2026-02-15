@@ -214,7 +214,12 @@ def compute_metrics(
             }
         )
 
-    # η₀-independence: max V difference across eta0 for each U1
+    # η₀-independence of visibility (S-2, #334):
+    # Since ψ₁ ∝ ψ₀ at initialization (same spatial profile), the total
+    # intensity I = |ψ₀|² + |ψ₁|² = (1-η₀)|ψ₀_norm|² + η₀|ψ₀_norm|²
+    # = |ψ₀_norm|², making the interference pattern η₀-independent.
+    # The η₀ sweep is still informative for decay curves (different
+    # starting conditions) but not for fringe visibility.
     eta0_max_diff = 0.0
     for u1 in sc["U1_strength_eV"].unique():
         v_vals = sc[sc["U1_strength_eV"] == u1]["visibility"].values
@@ -697,6 +702,10 @@ def plot_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
 
 def plot_eta0_independence(summary_df: pd.DataFrame, output_path: str):
     """Generate small-multiples plot showing V is η₀-independent.
+
+    Physics: ψ₁ ∝ ψ₀ at initialization means I_total = |ψ₀|² + |ψ₁|²
+    is independent of the η₀ mixing ratio. The η₀ sweep adds information
+    for decay curves but not for fringe visibility. See #334.
 
     One mini-panel per U₁ value, each showing V vs η₀ as a flat line
     with y-axis zoomed to show the ±10⁻¹⁴ variation.
