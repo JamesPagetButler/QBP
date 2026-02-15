@@ -4,15 +4,24 @@ Tests for src/simulation/si_conversion.py
 Verifies the two-layer SI conversion framework:
   Layer 1: BPM natural units <-> SI (ScaleFactors, conversion functions)
   Layer 2: Quaternionic derived quantities (MODEL-DEPENDENT)
+
+Includes:
+  - Unit tests (deterministic, known-value)
+  - Property-based tests (hypothesis: algebraic invariants)
+  - Cross-language verification (Lean 4 oracle test vectors)
 """
 
 from __future__ import annotations
 
+import json
 import math
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 from src.simulation.si_conversion import (
     C_SI,
@@ -265,3 +274,272 @@ class TestPhysicalConstants:
 
     def test_c_si_type(self) -> None:
         assert isinstance(C_SI, int)
+
+
+# ===================================================================
+# Property-based tests (hypothesis)
+#
+# These mirror the algebraic properties proven in Lean 4:
+#   proofs/QBP/Units/ScaleFactors.lean
+#
+# Lean proves on ideal Reals; hypothesis verifies on IEEE 754 floats.
+# ===================================================================
+
+# Strategy for physically reasonable particle masses [kg]
+# Range: electron mass to uranium atom mass
+st_mass = st.floats(
+    min_value=1e-31, max_value=1e-24, allow_nan=False, allow_infinity=False
+)
+
+# Strategy for physically reasonable de Broglie wavelengths [m]
+# Range: hard X-ray to thermal neutron
+st_wavelength = st.floats(
+    min_value=1e-12, max_value=1e-8, allow_nan=False, allow_infinity=False
+)
+
+# Strategy for code-unit values (typical BPM range).
+# Excludes subnormals and extreme values that cause IEEE 754 precision loss.
+st_code_value = st.floats(
+    min_value=-1e6,
+    max_value=1e6,
+    allow_nan=False,
+    allow_infinity=False,
+    allow_subnormal=False,
+)
+
+
+class TestPropertyRoundTrip:
+    """Round-trip: SI→Code→SI and Code→SI→Code must preserve values.
+
+    Mirrors Lean theorems: position_round_trip, energy_round_trip
+    """
+
+    @given(x_code=st_code_value, m_si=st_mass, lam_si=st_wavelength)
+    @settings(max_examples=200)
+    def test_position_round_trip(
+        self, x_code: float, m_si: float, lam_si: float
+    ) -> None:
+        """code→SI→code preserves value. Lean proves exact on Reals;
+        IEEE 754 round-trip error bounded by ~1e-12 for normal values."""
+        sc = compute_scales(m_si, lam_si)
+        x_si = convert_position(x_code, sc)
+        x_back = convert_length_to_code(x_si, sc)
+        assert x_back == pytest.approx(x_code, rel=1e-12, abs=1e-300)
+
+    @given(E_code=st_code_value, m_si=st_mass, lam_si=st_wavelength)
+    @settings(max_examples=200)
+    def test_energy_round_trip(self, E_code: float, m_si: float, lam_si: float) -> None:
+        """code→SI→code preserves value. Lean proves exact on Reals;
+        IEEE 754 round-trip error bounded by ~1e-12 for normal values."""
+        sc = compute_scales(m_si, lam_si)
+        E_si = convert_energy(E_code, sc)
+        E_back = convert_energy_to_code(E_si, sc)
+        assert E_back == pytest.approx(E_code, rel=1e-12, abs=1e-300)
+
+
+class TestPropertyLinearity:
+    """Conversion functions are linear: f(a+b) = f(a) + f(b), f(αx) = αf(x).
+
+    Mirrors Lean theorems: position_linear, energy_linear, position_scaling
+    """
+
+    @given(x1=st_code_value, x2=st_code_value, m_si=st_mass, lam_si=st_wavelength)
+    @settings(max_examples=200)
+    def test_position_additive(
+        self, x1: float, x2: float, m_si: float, lam_si: float
+    ) -> None:
+        """f(x1+x2) = f(x1) + f(x2). Tolerance relaxed to 1e-10 to account
+        for catastrophic cancellation when x1 ≈ -x2 (inherent to IEEE 754,
+        not a code bug — Lean proves this exactly on Reals)."""
+        sc = compute_scales(m_si, lam_si)
+        sum_then_convert = convert_position(x1 + x2, sc)
+        convert_then_sum = convert_position(x1, sc) + convert_position(x2, sc)
+        assert sum_then_convert == pytest.approx(
+            convert_then_sum, rel=1e-10, abs=1e-300
+        )
+
+    @given(E1=st_code_value, E2=st_code_value, m_si=st_mass, lam_si=st_wavelength)
+    @settings(max_examples=200)
+    def test_energy_additive(
+        self, E1: float, E2: float, m_si: float, lam_si: float
+    ) -> None:
+        """f(E1+E2) = f(E1) + f(E2). Same cancellation tolerance as position."""
+        sc = compute_scales(m_si, lam_si)
+        convert_then_sum = convert_energy(E1, sc) + convert_energy(E2, sc)
+        result = convert_energy(E1 + E2, sc)
+        assert result == pytest.approx(convert_then_sum, rel=1e-10, abs=1e-300)
+
+    @given(
+        alpha=st.floats(
+            min_value=-1e3, max_value=1e3, allow_nan=False, allow_infinity=False
+        ),
+        x=st_code_value,
+        m_si=st_mass,
+        lam_si=st_wavelength,
+    )
+    @settings(max_examples=200)
+    def test_position_scaling(
+        self, alpha: float, x: float, m_si: float, lam_si: float
+    ) -> None:
+        sc = compute_scales(m_si, lam_si)
+        scaled_then_convert = convert_position(alpha * x, sc)
+        convert_then_scale = alpha * convert_position(x, sc)
+        assert scaled_then_convert == pytest.approx(
+            convert_then_scale, rel=1e-14, abs=1e-300
+        )
+
+
+class TestPropertyPositivity:
+    """All scale factors are positive for positive inputs.
+
+    Mirrors Lean theorems: L0_pos, E0_pos
+    """
+
+    @given(m_si=st_mass, lam_si=st_wavelength)
+    @settings(max_examples=200)
+    def test_scale_factors_positive(self, m_si: float, lam_si: float) -> None:
+        sc = compute_scales(m_si, lam_si)
+        assert sc.L0 > 0, f"L0 = {sc.L0}"
+        assert sc.E0 > 0, f"E0 = {sc.E0}"
+        assert sc.T0 > 0, f"T0 = {sc.T0}"
+        assert sc.v_z_si > 0, f"v_z_si = {sc.v_z_si}"
+        assert sc.k_si > 0, f"k_si = {sc.k_si}"
+
+    @given(m_si=st_mass, lam_si=st_wavelength)
+    @settings(max_examples=200)
+    def test_scale_factors_finite(self, m_si: float, lam_si: float) -> None:
+        sc = compute_scales(m_si, lam_si)
+        assert np.isfinite(sc.L0)
+        assert np.isfinite(sc.E0)
+        assert np.isfinite(sc.T0)
+        assert np.isfinite(sc.v_z_si)
+        assert np.isfinite(sc.k_si)
+
+
+class TestPropertyZero:
+    """Zero maps to zero for all conversion functions.
+
+    Mirrors Lean theorems: position_zero, energy_zero
+    """
+
+    @given(m_si=st_mass, lam_si=st_wavelength)
+    def test_position_zero(self, m_si: float, lam_si: float) -> None:
+        sc = compute_scales(m_si, lam_si)
+        assert convert_position(0.0, sc) == 0.0
+
+    @given(m_si=st_mass, lam_si=st_wavelength)
+    def test_energy_zero(self, m_si: float, lam_si: float) -> None:
+        sc = compute_scales(m_si, lam_si)
+        assert convert_energy(0.0, sc) == 0.0
+
+
+class TestPropertyVZInvariant:
+    """V_Z_CODE = hbar_code * k0_code / m_code = 40 exactly.
+
+    Mirrors Lean theorem: v_z_code_eq_40
+    """
+
+    def test_v_z_code_structural_invariant(self) -> None:
+        """V_Z_CODE must be computed from its constituent parameters, not hardcoded."""
+        computed = HBAR_CODE * K0_CODE / M_CODE
+        assert V_Z_CODE == computed  # exact equality, not approx
+        assert computed == 40.0
+
+
+# ===================================================================
+# Cross-language verification (Lean 4 oracle)
+#
+# Python results must match Lean's Float oracle within IEEE 754
+# tolerance (< 1e-15 relative error).
+#
+# Test vectors generated by: lake exe gen_test_vectors
+# Source of truth: proofs/QBP/Units/ScaleFactors.lean (algebraic proofs)
+# ===================================================================
+
+FIXTURE_PATH = Path(__file__).parent / "fixtures" / "si_test_vectors.json"
+
+
+@pytest.mark.skipif(not FIXTURE_PATH.exists(), reason="Lean test vectors not generated")
+class TestCrossLanguageLean:
+    """Verify Python agrees with Lean 4 oracle on test vectors."""
+
+    @pytest.fixture(autouse=True)
+    def load_vectors(self) -> None:
+        with open(FIXTURE_PATH) as f:
+            self.vectors = json.load(f)
+
+    def test_v_z_code_matches_lean(self) -> None:
+        lean_val = float(self.vectors["v_z_code"])
+        assert V_Z_CODE == pytest.approx(lean_val, rel=1e-15)
+
+    def test_hbar_si_matches_lean(self) -> None:
+        lean_val = float(self.vectors["hbar_SI"])
+        assert HBAR_SI == pytest.approx(lean_val, rel=1e-15)
+
+    def test_eV_matches_lean(self) -> None:
+        lean_val = float(self.vectors["eV_in_J"])
+        assert EV_IN_JOULES == pytest.approx(lean_val, rel=1e-15)
+
+    def test_electron_scale_factors(self) -> None:
+        lean = next(
+            s for s in self.vectors["scale_factors"] if s["particle"] == "electron"
+        )
+        sc = compute_scales(float(lean["mass_si"]), float(lean["lambda_si"]))
+        assert sc.L0 == pytest.approx(float(lean["L0"]), rel=1e-15)
+        assert sc.E0 == pytest.approx(float(lean["E0"]), rel=1e-15)
+        assert sc.T0 == pytest.approx(float(lean["T0"]), rel=1e-15)
+        assert sc.v_z_si == pytest.approx(float(lean["v_z_si"]), rel=1e-15)
+        assert sc.k_si == pytest.approx(float(lean["k_si"]), rel=1e-15)
+
+    def test_neutron_scale_factors(self) -> None:
+        lean = next(
+            s for s in self.vectors["scale_factors"] if s["particle"] == "neutron"
+        )
+        sc = compute_scales(float(lean["mass_si"]), float(lean["lambda_si"]))
+        assert sc.L0 == pytest.approx(float(lean["L0"]), rel=1e-15)
+        assert sc.E0 == pytest.approx(float(lean["E0"]), rel=1e-15)
+        assert sc.T0 == pytest.approx(float(lean["T0"]), rel=1e-15)
+        assert sc.v_z_si == pytest.approx(float(lean["v_z_si"]), rel=1e-15)
+        assert sc.k_si == pytest.approx(float(lean["k_si"]), rel=1e-15)
+
+    def test_electron_round_trips(self) -> None:
+        lean = next(
+            r for r in self.vectors["round_trips"] if r["particle"] == "electron"
+        )
+        lean_sf = next(
+            s for s in self.vectors["scale_factors"] if s["particle"] == "electron"
+        )
+        sc = compute_scales(float(lean_sf["mass_si"]), float(lean_sf["lambda_si"]))
+
+        x_code = float(lean["position_code"])
+        x_si = convert_position(x_code, sc)
+        assert x_si == pytest.approx(float(lean["position_si"]), rel=1e-15)
+
+        E_code = float(lean["energy_code"])
+        E_si = convert_energy(E_code, sc)
+        assert E_si == pytest.approx(float(lean["energy_si"]), rel=1e-15)
+
+        U_code = float(lean["potential_code"])
+        U_eV = convert_potential(U_code, sc)
+        assert U_eV == pytest.approx(float(lean["potential_eV"]), rel=1e-15)
+
+    def test_neutron_round_trips(self) -> None:
+        lean = next(
+            r for r in self.vectors["round_trips"] if r["particle"] == "neutron"
+        )
+        lean_sf = next(
+            s for s in self.vectors["scale_factors"] if s["particle"] == "neutron"
+        )
+        sc = compute_scales(float(lean_sf["mass_si"]), float(lean_sf["lambda_si"]))
+
+        x_code = float(lean["position_code"])
+        x_si = convert_position(x_code, sc)
+        assert x_si == pytest.approx(float(lean["position_si"]), rel=1e-15)
+
+        E_code = float(lean["energy_code"])
+        E_si = convert_energy(E_code, sc)
+        assert E_si == pytest.approx(float(lean["energy_si"]), rel=1e-15)
+
+        U_code = float(lean["potential_code"])
+        U_eV = convert_potential(U_code, sc)
+        assert U_eV == pytest.approx(float(lean["potential_eV"]), rel=1e-15)

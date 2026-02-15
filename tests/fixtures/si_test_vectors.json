@@ -1,0 +1,14 @@
+{
+  "generator": "QBP Lean 4 Oracle",
+  "v_z_code": 4.000000000000000e+1,
+  "hbar_SI": 1.054571817646156e-34,
+  "eV_in_J": 1.602176633999999e-19,
+  "scale_factors": [
+    {"particle": "electron", "mass_si": 9.109383701499996e-31, "lambda_si": 5.000000000000000e-11, "L0": 1.591549430918953e-10, "E0": 2.409866960895028e-19, "T0": 4.376058242047050e-16, "v_z_si": 1.454779020650742e+7, "k_si": 1.256637061435917e+11},
+    {"particle": "neutron", "mass_si": 1.674927498040000e-27, "lambda_si": 1.800000000000000e-10, "L0": 5.729577951308230e-10, "E0": 1.011302425917109e-23, "T0": 1.042785808300427e-11, "v_z_si": 2.197796673373035e+3, "k_si": 3.490658503988658e+10}
+  ],
+  "round_trips": [
+    {"particle": "electron", "position_code": 3.700000000000000e+0, "position_si": 5.888732894400128e-10, "position_roundtrip": 3.700000000000000e+0, "energy_code": 5.500000000000000e+0, "energy_si": 1.325426828492265e-18, "energy_roundtrip": 5.500000000000000e+0, "potential_code": 1.000000000000000e+1, "potential_eV": 6.016482601867799e+2},
+    {"particle": "neutron", "position_code": 3.700000000000000e+0, "position_si": 2.119943841984045e-9, "position_roundtrip": 3.699999999999999e+0, "energy_code": 5.500000000000000e+0, "energy_si": 5.562163342544098e-23, "energy_roundtrip": 5.500000000000000e+0, "potential_code": 1.000000000000000e+1, "potential_eV": 2.524821307354327e-2}
+  ]
+}
