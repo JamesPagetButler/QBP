@@ -71,10 +71,13 @@ def load_data(
         if os.path.exists(farfield_path):
             ff_df = pd.read_csv(farfield_path)
             # farfield has 'scenario' column already (A/B)
-            # Add missing columns so concat works
+            # Add missing columns so concat works (type-aware defaults)
             for col in nf_df.columns:
                 if col not in ff_df.columns:
-                    ff_df[col] = 0.0
+                    if nf_df[col].dtype == object:
+                        ff_df[col] = ""
+                    else:
+                        ff_df[col] = 0.0
             fringe_df = pd.concat([ff_df, nf_df], ignore_index=True)
         else:
             fringe_df = nf_df

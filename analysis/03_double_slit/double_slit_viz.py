@@ -161,7 +161,7 @@ def load_latest_data():
 # ============================================================================
 
 
-class DoubleSitDemo:
+class DoubleSlitDemo:
     """Interactive 6-panel double-slit explorer."""
 
     def __init__(self):
@@ -976,7 +976,7 @@ class DoubleSitDemo:
 
 def main():
     """Entry point for the double-slit visualization demo."""
-    demo = DoubleSitDemo()
+    demo = DoubleSlitDemo()
     demo.run()
 
 

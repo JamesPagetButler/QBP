@@ -356,8 +356,8 @@ def main():
     x_ref = nearfield_fringe_dfs[0]["x_position_m"].values
     for i, df in enumerate(nearfield_fringe_dfs[1:], 1):
         x_check = df["x_position_m"].values
-        assert np.allclose(
-            x_ref, x_check, atol=0
+        assert np.array_equal(
+            x_ref, x_check
         ), f"Grid mismatch in run {i}: all BPM runs must share identical x-grids"
     print(
         f"\n  Grid alignment verified: {len(nearfield_fringe_dfs)} runs, "
