@@ -10,7 +10,7 @@
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
 - **Lifecycle Stage:** Phase 3 (Visualization) — Phases 1 & 2 complete, results format standardized (v3)
-- **Next Critical-Path Action:** Phase 3 Visualization (#338) → Phase 4 → Phase 5 → Theory Refinement → Retrospective
+- **Next Critical-Path Action:** Phase 3 Visualization (#342) → Phase 4 → Phase 5 → Theory Refinement → Retrospective
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
