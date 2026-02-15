@@ -21,7 +21,7 @@ repos:
         args: [--no-strict-optional, --ignore-missing-imports]
         additional_dependencies:
           - types-PyYAML>=6.0.0  # Type stubs for yaml module
-        exclude: ^experiments/  # Standalone scripts, not importable packages
+        exclude: ^(experiments|analysis)/  # Standalone scripts, not importable packages
 
 # Knowledge base validation - checks schema compliance and referential integrity
 -   repo: local
