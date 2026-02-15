@@ -857,22 +857,29 @@ Our review process is designed to be rigorous and auditable, with review depth m
 
 ### Tiered Review System
 
-Not all PRs need the same level of scrutiny. Use the appropriate tier based on PR scope:
+Not all PRs need the same level of scrutiny. Use the appropriate tier based on PR scope.
 
-| Tier | PR Type | Review Process | Labels |
-|------|---------|----------------|--------|
+**Full reference:** [docs/workflows/review_tiers.md](docs/workflows/review_tiers.md) — checklists, tool configs, BLOCKING criteria.
+
+| Tier | When | Review Process | Labels |
+|------|------|----------------|--------|
+| **Tier 0** | Before implementing non-trivial designs | Gemini critique (`critique_my_approach`) | *(no label — pre-PR)* |
 | **Tier 1** | Docs, typos, formatting, comments | Single AI review (Red OR Blue) | `tier-1-review` |
-| **Tier 2** | Code, tests, config, housekeeping | Dual AI review (Red AND Blue, can be parallel) | `tier-2-review` |
-| **Tier 3** | Theory, proofs, architecture, new phases | Full panel review (sequential, deep analysis) | `tier-3-review` |
+| **Tier 2** | Code, tests, config, housekeeping | Red Team + Gemini, Human Visual Review | `tier-2-review` |
+| **Tier 3** | Theory, proofs, architecture, new phases | Red Team → Gemini (sequential), Human Visual Review | `tier-3-review` |
 
-**Tier Selection Guidelines:**
-- **Tier 1:** Changes that don't affect behavior — README updates, comment fixes, formatting
-- **Tier 2:** Changes that affect behavior but not core theory — bug fixes, new tests, tooling
-- **Tier 3:** Changes that affect physics formalism, axioms, or formal proofs — theory refinement, new experiments
+**Tier Selection Decision Tree:**
+```
+Design decision before implementation? → Tier 0
+Physics/axioms/proofs?                 → Tier 3
+Code/tests/results?                    → Tier 2
+Docs/formatting only?                  → Tier 1
+Unsure?                                → Tier 2
+```
 
-**Parallel Reviews (Tier 2):** For Tier 2 PRs, Red Team and Blue Team reviews can run in parallel to reduce latency. Both reviews are still required before merge.
+James can upgrade or downgrade any PR's tier.
 
-**Default:** If unsure, default to Tier 2. James can upgrade or downgrade tier as needed.
+**Session-based reviews:** For multi-round PRs, Gemini reviews use `session_id` to maintain context across rounds. See [review_tiers.md](docs/workflows/review_tiers.md#session-based-reviews-multi-round-prs).
 
 ### Reviewing Agents
 
@@ -907,27 +914,37 @@ Before any PR can be merged, the PR **must** contain:
       ↓
 2. Claude posts Red Team review (Sabine, Grothendieck, Knuth)
       ↓
-3. Gemini provides review (Furey, Feynman) in Gemini CLI
+3. Gemini provides review (Furey, Feynman) via MCP
+   (uses session_id for multi-round PRs)
       ↓
 4. Claude scribes Gemini's review to PR
       ↓
-5. CI checks pass
+5. Claude synthesizes issues — posts summary table
+   (traffic-light format: PASS/FAIL/PARTIAL)
       ↓
-6. James reviews summaries, asks questions if needed
+6. CI checks pass
       ↓
-7. James issues explicit "merge" command
+7. Human Visual Review (Tier 2+)
+   - AI prepares visual artifacts (plots, comparison tables)
+   - James inspects for anomalies via pattern recognition
+   - Findings are BLOCKING
       ↓
-8. Merge executed
+8. James reviews, asks questions if needed
+      ↓
+9. James issues explicit "merge" command
+      ↓
+10. Merge executed
 ```
 
 ### Review Process Steps
 
 1.  **Red Team Review:** Claude conducts three-persona peer review (`Sabine`, `Grothendieck`, `Knuth`) and posts findings as a PR comment with summary. Must include **Acceptance Criteria Verification** (see below).
-2.  **Gemini Review:** Gemini conducts two-persona review (`Furey`, `Feynman`) in structured Markdown format within Gemini CLI. Must include **Acceptance Criteria Verification** (see below).
+2.  **Gemini Review:** Gemini conducts two-persona review (`Furey`, `Feynman`) via Gemini MCP `review_document`. For multi-round PRs, uses `session_id` so Gemini retains context across rounds. Must include **Acceptance Criteria Verification** (see below).
 3.  **Documentation of Gemini's Review:** Claude acts as scribe, copying Gemini's Markdown review and posting it as a separate PR comment.
-4.  **Issue Synthesis:** Claude synthesizes both reviews into a numbered list of issues, flagging any unmet acceptance criteria as **BLOCKING**.
+4.  **Issue Synthesis:** Claude synthesizes both reviews into a summary using **traffic-light table format** (PASS/FAIL/PARTIAL) — tables first, prose second. Flags unmet acceptance criteria as **BLOCKING**. If Claude and Gemini disagree on a finding, uses the **CONFLICT template** (see [review_tiers.md](docs/workflows/review_tiers.md#contested-use-debate-lite)).
 5.  **Pivot Detection:** If a review identifies a **systemic failure** (the AC itself is flawed, not the code), flag as **BLOCKING (PIVOT REQUIRED)** and follow the [Pivot Protocol](docs/workflows/pivot_protocol.md). See "Pivot Protocol Integration" below.
-6.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
+6.  **Human Visual Review (Tier 2+):** AI prepares visual artifacts for James — plots, comparison tables, before/after screenshots, traffic-light AC tables. James inspects for anomalies using pattern recognition. Findings from this step are **BLOCKING**. See [review_tiers.md](docs/workflows/review_tiers.md#human-visual-review-tier-2).
+7.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
 
 ### Acceptance Criteria Verification Protocol
 
