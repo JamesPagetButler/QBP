@@ -45,6 +45,8 @@ James can upgrade or downgrade any PR's tier.
 
 **When to skip:** Single-line fixes, obvious bugs, tasks where James gave specific instructions.
 
+**Weight:** Advisory means Tier 0 does not block PR creation. However, Tier 2/3 reviewers should reference any Tier 0 findings — if a critique flagged a flaw that wasn't addressed, that becomes a Tier 2/3 BLOCKING finding.
+
 ---
 
 ## Tier 1: Light Review
@@ -162,6 +164,7 @@ For PRs that go through multiple review rounds, Gemini reviews use `session_id` 
 - Security vulnerability
 - Human Visual Review finding (James spots an anomaly)
 - Test failure
+- Any unforeseen critical error not listed above — when in doubt, it's BLOCKING
 
 ### NON-BLOCKING (note but don't block)
 
