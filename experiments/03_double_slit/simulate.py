@@ -286,10 +286,15 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
 
 
 def main():
-    """Run all scenarios and save results."""
+    """Run all scenarios and save results.
+
+    Output format v3.0: near-field BPM data (Expected vs QBP) in a single
+    self-describing CSV with a ``regime`` column.  Far-field analytical
+    data goes to a separate file (different method, spatial scale, grid).
+    """
     print("=" * 70)
     print("DOUBLE-SLIT INTERFERENCE SIMULATION")
-    print("Experiment 03 — Sprint 3 Phase 2")
+    print("Experiment 03 — Sprint 3 Phase 2 (v3 format)")
     print("=" * 70)
     print(f"Started: {datetime.now().isoformat()}")
     print(
@@ -298,29 +303,91 @@ def main():
     )
     print(f"Device: {BPM_CONFIG.device}")
 
-    all_fringe_dfs = []
-    all_decay_dfs = []
+    nearfield_fringe_dfs = []
+    decay_dfs = []
     summary_rows = []
 
-    # Scenario A
+    # -----------------------------------------------------------------
+    # Near-field BPM runs
+    # -----------------------------------------------------------------
+
+    # Expected: BPM at U₁=0 (standard QM prediction)
+    print("\n--- Expected (BPM at U₁=0) ---")
+    for eta0 in ETA0_VALUES:
+        fringe_df, decay_df, V, norm = run_scenario_c(0.0, eta0)
+        fringe_df["regime"] = "expected"
+        fringe_df = fringe_df.drop(columns=["scenario"])
+        decay_df["regime"] = "expected"
+        nearfield_fringe_dfs.append(fringe_df)
+        decay_dfs.append(decay_df)
+        summary_rows.append(
+            {
+                "regime": "expected",
+                "U1_strength_eV": 0.0,
+                "eta0": eta0,
+                "visibility": V,
+                "norm_final": norm,
+            }
+        )
+
+    # QBP: BPM at U₁>0 (quaternionic coupling active)
+    print("\n--- QBP (BPM at U₁>0) ---")
+    for u1 in U1_VALUES[1:]:  # skip 0.0
+        for eta0 in ETA0_VALUES:
+            fringe_df, decay_df, V, norm = run_scenario_c(u1, eta0)
+            fringe_df["regime"] = "qbp"
+            fringe_df = fringe_df.drop(columns=["scenario"])
+            decay_df["regime"] = "qbp"
+            nearfield_fringe_dfs.append(fringe_df)
+            decay_dfs.append(decay_df)
+            summary_rows.append(
+                {
+                    "regime": "qbp",
+                    "U1_strength_eV": convert_potential(u1, SI_SCALES),
+                    "eta0": eta0,
+                    "visibility": V,
+                    "norm_final": norm,
+                }
+            )
+
+    # -----------------------------------------------------------------
+    # Grid alignment assertion — all BPM runs share identical x-grids
+    # -----------------------------------------------------------------
+    x_ref = nearfield_fringe_dfs[0]["x_position_m"].values
+    for i, df in enumerate(nearfield_fringe_dfs[1:], 1):
+        x_check = df["x_position_m"].values
+        assert np.array_equal(
+            x_ref, x_check
+        ), f"Grid mismatch in run {i}: all BPM runs must share identical x-grids"
+    print(
+        f"\n  Grid alignment verified: {len(nearfield_fringe_dfs)} runs, "
+        f"{len(x_ref)} points each"
+    )
+
+    # -----------------------------------------------------------------
+    # Far-field analytical reference (separate file)
+    # -----------------------------------------------------------------
     df_a, V_a = run_scenario_a()
-    all_fringe_dfs.append(df_a)
+    df_b, V_b = run_scenario_b()
+    farfield_df = pd.concat(
+        [
+            df_a[["scenario", "x_position_m", "intensity_total_normalized"]],
+            df_b[["scenario", "x_position_m", "intensity_total_normalized"]],
+        ],
+        ignore_index=True,
+    )
     summary_rows.append(
         {
-            "scenario": "A",
+            "regime": "farfield_A",
             "U1_strength_eV": 0.0,
             "eta0": 0.0,
             "visibility": V_a,
             "norm_final": 1.0,
         }
     )
-
-    # Scenario B
-    df_b, V_b = run_scenario_b()
-    all_fringe_dfs.append(df_b)
     summary_rows.append(
         {
-            "scenario": "B",
+            "regime": "farfield_B",
             "U1_strength_eV": 0.0,
             "eta0": 0.0,
             "visibility": V_b,
@@ -328,50 +395,43 @@ def main():
         }
     )
 
-    # Scenario C: parameter sweep
-    print("\n--- Scenario C: Quaternionic BPM (Parameter Sweep) ---")
-    for u1 in U1_VALUES:
-        for eta0 in ETA0_VALUES:
-            fringe_df, decay_df, V_c, V_c_norm = run_scenario_c(u1, eta0)
-            all_fringe_dfs.append(fringe_df)
-            all_decay_dfs.append(decay_df)
-            summary_rows.append(
-                {
-                    "scenario": "C",
-                    "U1_strength_eV": convert_potential(u1, SI_SCALES),
-                    "eta0": eta0,
-                    "visibility": V_c,
-                    "norm_final": V_c_norm,
-                }
-            )
-
-    # Combine and save
-    output_dir = "results/03_double_slit"
+    # -----------------------------------------------------------------
+    # Save — versioned output directory
+    # -----------------------------------------------------------------
+    output_dir = "results/03_double_slit/v3"
     os.makedirs(output_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    # Fringe CSV
-    fringe_df = pd.concat(all_fringe_dfs, ignore_index=True)
-    fringe_path = os.path.join(output_dir, f"fringe_data_{timestamp}.csv")
-    fringe_df.to_csv(fringe_path, index=False)
-    print(f"\nFringe data: {fringe_path} ({len(fringe_df)} rows)")
+    # Near-field fringe CSV (primary data file)
+    nearfield_df = pd.concat(nearfield_fringe_dfs, ignore_index=True)
+    cols = ["regime"] + [c for c in nearfield_df.columns if c != "regime"]
+    nearfield_df = nearfield_df[cols]
+    nearfield_path = os.path.join(output_dir, f"results_nearfield_{timestamp}.csv")
+    nearfield_df.to_csv(nearfield_path, index=False)
+    print(f"\nNear-field data: {nearfield_path} ({len(nearfield_df)} rows)")
+
+    # Far-field fringe CSV
+    farfield_path = os.path.join(output_dir, f"results_farfield_{timestamp}.csv")
+    farfield_df.to_csv(farfield_path, index=False)
+    print(f"Far-field data: {farfield_path} ({len(farfield_df)} rows)")
 
     # Decay CSV
-    if all_decay_dfs:
-        decay_df = pd.concat(all_decay_dfs, ignore_index=True)
-        decay_path = os.path.join(output_dir, f"decay_data_{timestamp}.csv")
-        decay_df.to_csv(decay_path, index=False)
-        print(f"Decay data: {decay_path} ({len(decay_df)} rows)")
+    if decay_dfs:
+        all_decay_df = pd.concat(decay_dfs, ignore_index=True)
+        all_decay_df.insert(0, "regime", all_decay_df.pop("regime"))
+        decay_path = os.path.join(output_dir, f"decay_{timestamp}.csv")
+        all_decay_df.to_csv(decay_path, index=False)
+        print(f"Decay data: {decay_path} ({len(all_decay_df)} rows)")
 
-    # Summary
+    # Summary CSV
     summary_df = pd.DataFrame(summary_rows)
     summary_path = os.path.join(output_dir, f"summary_{timestamp}.csv")
     summary_df.to_csv(summary_path, index=False)
     print(f"Summary: {summary_path}")
 
-    # Metadata sidecar — persists scale factors for reproducibility
+    # Metadata JSON (v3.0)
     metadata = {
-        "format_version": "2.0",
+        "format_version": "3.0",
         "unit_convention": "hbar=1 natural units (c=1 reserved for relativistic extensions)",
         "particle": "electron",
         "mass_kg": SI_SCALES.mass_si,
@@ -388,6 +448,23 @@ def main():
         "conversion_applied": True,
         "conversion_library": "src/simulation/si_conversion.py",
         "timestamp": timestamp,
+        "datasets": {
+            "nearfield": {
+                "regime_values": ["expected", "qbp"],
+                "method": "BPM",
+                "description": "expected=U1=0 (standard QM), qbp=U1>0 (quaternionic coupling)",
+                "spatial_scale": "nm",
+                "grid_points": BPM_CONFIG.Nx,
+            },
+            "farfield": {
+                "scenario_values": ["A", "B"],
+                "method": "analytical (Fraunhofer)",
+                "spatial_scale": "mm",
+                "grid_points": 10001,
+            },
+        },
+        "comparison_valid_between": "nearfield regime='expected' vs regime='qbp'",
+        "WARNING": "Do NOT compare nearfield to farfield — different methods, scales, and grids",
         "column_units": {
             "x_position_m": "metres",
             "U1_strength_eV": "electron-volts",
@@ -406,19 +483,23 @@ def main():
         f.write("\n")
     print(f"Metadata: {metadata_path}")
 
+    # -----------------------------------------------------------------
     # Print summary table
+    # -----------------------------------------------------------------
     print("\n" + "=" * 70)
     print("SUMMARY")
     print("=" * 70)
-    print(f"\n{'Scenario':<12} {'U₁ (eV)':<14} {'η₀':<8} {'Visibility':<12}")
-    print("-" * 46)
+    print(f"\n{'Regime':<14} {'U₁ (eV)':<14} {'η₀':<8} {'Visibility':<12}")
+    print("-" * 48)
     for _, row in summary_df.iterrows():
         print(
-            f"{row['scenario']:<12} {row['U1_strength_eV']:<14.4e} "
+            f"{row['regime']:<14} {row['U1_strength_eV']:<14.4e} "
             f"{row['eta0']:<8.2f} {row['visibility']:<12.4f}"
         )
 
-    # Checks
+    # -----------------------------------------------------------------
+    # Acceptance criteria checks
+    # -----------------------------------------------------------------
     print("\n" + "=" * 70)
     print("ACCEPTANCE CRITERIA CHECKS")
     print("=" * 70)
