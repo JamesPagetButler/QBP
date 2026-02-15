@@ -8,9 +8,9 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit) — RESTARTING (PIVOT-S3-001)
-- **Lifecycle Stage:** Research (#319) COMPLETE — Sprint 3 resumes with SI enforcement and Phase 1 redo
-- **Next Critical-Path Action:** #320 (SI Enforcement) → #322 (Phase 1 SI Redo) → Phase 2 → Phase 3
+- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
+- **Lifecycle Stage:** Phase 3 (Visualization) — Phases 1 & 2 complete, results format standardized (v3)
+- **Next Critical-Path Action:** Phase 3 Visualization (#342) → Phase 4 → Phase 5 → Theory Refinement → Retrospective
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -23,8 +23,8 @@
 ## Sprint 3 Closure Checklist
 
 - [x] Phase 1: Ground Truth (#22) — CLOSED 2026-02-13. PR #285 merged. 5 review rounds. Empirical Anchor framework introduced.
-- [ ] Phase 2: Implementation (#36)
-- [ ] Phase 3: Visualization (#37)
+- [x] Phase 2: Implementation (#36) — CLOSED. PR #287 (original), PR #333 (SI compliance redo), PR #343 (v3 results format rework). SI-compliant BPM with self-describing output.
+- [ ] Phase 3: Visualization (#342, v3 rework) — next on critical path
 - [ ] Phase 4: Formal Verification (#56)
   - [ ] 4a: Formal Proof (#259)
   - [ ] 4b: Proof Review (#260)
@@ -50,7 +50,7 @@
 - **Research Issue:** #319 (Quaternionic SI Definitions)
 - **Housekeeping Issues:** #320 (SI Standardization), #321 (Pivot Protocol), #322 (Phase 1 SI Redo)
 - **Temporary AC #9:** Verify C(U1>0) vs C(U1=0) shows measurable visibility reduction (V_norm drop > 5% at U1=10)
-- **Status:** OPEN — resolves when #319 delivers SI definitions
+- **Status:** RESOLVED — #319 closed (PR #323), #320 closed, #322 closed (PR #285). Phase 2 reimplemented with SI compliance (PR #333). Results format standardized (PR #343).
 
 ### Sprint 3 Restart Plan
 

@@ -10,18 +10,40 @@ Modes are enabled progressively as process validation occurs:
 
 | Phase | Mode | Autonomy | Status |
 |-------|------|----------|--------|
-| 1 | **Focus Mode** | Human controls each step | **CURRENT** |
-| 2 | **Sprint Mode** | Claude runs full sprint, human reviews | Planned |
+| 1 | **Focus Mode** | Human controls each step | **CURRENT** (default) |
+| 2 | **Sprint Mode** | Claude runs full sprint, human reviews | Available (workflow documented) |
 | 3 | **Project Mode** | Claude proposes portfolio changes, human approves | Planned |
 
 **Principle:** Validate process works under human control before increasing autonomy.
 
 ---
 
+## AI Model Capabilities (as of 2026-02)
+
+| Model | Role | Key Capabilities |
+|-------|------|-----------------|
+| **Claude Opus 4.6** | Primary dev & review (Red Team, Dev Team, Herschel) | Extended reasoning, agentic multi-step tool use, large context utilization |
+| **Gemini 3 Pro Preview** | Theory review (Furey, Feynman) | Multi-turn MCP sessions (debate, review cycles), scientific review |
+
+**Model activation by mode:**
+
+| Capability | Focus Mode | Sprint Mode | Project Mode |
+|------------|-----------|-------------|--------------|
+| Claude extended reasoning | Always on | Always on | Always on |
+| Gemini reviews (Furey, Feynman) | Per-PR (sequential after Red Team) | Per-phase | Per-sprint |
+| Gemini thinking mode | Future: deep think in Focus Mode | Standard | Standard |
+| Gemini debate sessions | On request | On request | Portfolio analysis |
+
+**Preferences (set by James):**
+- Default Gemini model: `gemini-3-pro-preview` for all calls
+- When Gemini 3 deep think is available, activate in Focus Mode for deep single-topic work
+
+---
+
 ## The Three Modes
 
-### Focus Mode (Current)
-**Focus:** Human-directed work with AI assistance.
+### Focus Mode (Current Default)
+**Focus:** Human-directed work with AI assistance. Leverages Claude Opus 4.6 extended reasoning and Gemini 3 Pro reviews.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -50,8 +72,8 @@ Modes are enabled progressively as process validation occurs:
 
 ---
 
-### Sprint Mode (Planned)
-**Focus:** Claude autonomously completes one experiment through all phases.
+### Sprint Mode (Available)
+**Focus:** Claude autonomously completes one experiment through all phases. Full workflow documented in `docs/workflows/sprint_mode_workflow.md`.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -432,7 +454,7 @@ The status file must always reflect current mode:
 
 | Aspect | Focus Mode | Sprint Mode | Project Mode |
 |--------|------------|-------------|--------------|
-| **Status** | **CURRENT** | Planned | Planned |
+| **Status** | **CURRENT** (default) | Available | Planned |
 | **Focus** | One phase at a time | One full sprint | Whole portfolio |
 | **Human role** | Directs each step | Reviews at boundaries | Approves proposals |
 | **Claude role** | Executes on request | Runs autonomously | Analyzes & proposes |
