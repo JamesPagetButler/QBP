@@ -65,6 +65,7 @@ Original phases struck through; sprint restarts after research:
 - [ ] Pivot Analysis: PIVOT-S3-001 (mandatory per pivot protocol)
 - [ ] What assumption was wrong? (Unit systems were never compared)
 - [ ] What check would have caught it? (Dimensional analysis in ground truth review)
+- [ ] **Workflow Process Review (#346):** Evaluate new review tiers, session-based reviews, Human Visual Review gate, CONFLICT template. Did they improve quality? What needs refinement?
 
 ---
 
