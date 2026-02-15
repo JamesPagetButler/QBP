@@ -411,6 +411,50 @@ But the structure should never become bureaucratic overhead. If you have an insi
 
 ---
 
+## Issue Lifecycle
+
+Research issues follow a structured lifecycle integrated with the project board.
+
+### Issue Types
+
+| Type | Example | Sprint field |
+|------|---------|-------------|
+| **Pre-sprint research** | Blocking questions before Phase 1 | Research Sprint NR |
+| **Open research** | Polychromatic beams, charge scale | House Keeping (with `type: research` label) |
+| **Theory Refinement** | Post-experiment analysis | Sprint N (the sprint it belongs to) |
+
+### Creation Checklist
+
+Every research issue must have:
+
+1. **Title:** "Research: \<descriptive question\>"
+2. **Body:** Origin, Research question, Expected deliverables, AC checkboxes
+3. **Label:** `type: research`
+4. **Project board:** Add to "QBP Research Lifecycle"
+5. **Sprint field:** "House Keeping" (if unscoped) or "Research Sprint NR" (if blocking critical path)
+6. **Status:** "Todo"
+
+### Triage
+
+Research issues in the backlog need periodic triage so they don't rot:
+
+| Signal | Meaning | Action |
+|--------|---------|--------|
+| **Blocking next sprint** | Research Gate identifies this as required | Move to Research Sprint NR, work immediately |
+| **Informs upcoming experiment** | Not blocking, but would improve next sprint quality | Surface during sprint retrospective |
+| **Open curiosity** | Interesting but no experiment depends on it | Keep in backlog, revisit during housekeeping mode |
+
+**Triage trigger:** During each sprint retrospective, scan research backlog and ask: "Does any open research item block or significantly inform the next sprint?" If yes, promote to Research Sprint NR.
+
+### Completion
+
+Same rules as any issue:
+- PR with `Closes #X` (or manual close if no code change needed)
+- AC verification in review
+- Research conclusions documented in knowledge graph
+
+---
+
 ## References
 
 - [Lakatos: Methodology of Scientific Research Programmes](https://en.wikipedia.org/wiki/Imre_Lakatos)

@@ -199,6 +199,50 @@ Claude: ## Housekeeping Mode Complete
 
 ---
 
+## Issue Lifecycle
+
+Housekeeping issues follow a structured lifecycle from creation to closure.
+
+### Creation
+
+Housekeeping issues are created in 3 contexts:
+
+| Context | Example | Who creates |
+|---------|---------|-------------|
+| **Review findings** | "K-2: Document sampling dependency" | Herschel, during PR review synthesis (Step 4) |
+| **Sprint observations** | "Mypy doesn't cover analysis/" | Herschel, when encountered during sprint work |
+| **James's request** | "Let's clean up the label scheme" | James, directly |
+
+### Creation Checklist
+
+Every housekeeping issue must have:
+
+1. **Title:** "Housekeeping: \<descriptive title\>"
+2. **Body:** Origin (which PR/review/observation), Action items, AC checkboxes
+3. **Label:** `housekeeping`
+4. **Project board:** Add to "QBP Research Lifecycle"
+5. **Sprint field:** Set to "House Keeping"
+6. **Status:** "Todo"
+
+After any PR review cycle (Step 4 — Issues Identified), every deferred item **must** become a GitHub issue with this checklist applied. No "we'll get to it" without a tracked issue.
+
+### Prioritization
+
+Housekeeping items are done opportunistically, with implicit ordering:
+
+1. **Blocking future work** (e.g., trusted unit conversion) — do before the sprint that needs it
+2. **Review debt** (findings deferred from PRs) — do soon to prevent accumulation
+3. **Polish** (viz improvements, layout tweaks) — do when convenient
+
+### Completion
+
+Same rules as any issue:
+- PR with `Closes #X` (or manual close if no code change needed)
+- AC verification in review
+- For docs-only housekeeping: Tier 1 review sufficient
+
+---
+
 ## References
 
 - [Sprint Mode Workflow](sprint_mode_workflow.md) — Full experiment sprints

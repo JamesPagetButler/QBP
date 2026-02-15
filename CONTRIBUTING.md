@@ -782,6 +782,73 @@ Phase 2 is blocked by Phase 1. Phase 3 is blocked by Phase 2. And so on.
 
 **Note:** Phase 4 sub-phases (4a/4b/4c) are tracked as task sections within the single Phase 4 issue, not as 3 separate issues. The issue count per experiment remains 5.
 
+### Non-Critical-Path Issue Lifecycle
+
+Not all work is sprint phases. Housekeeping, research, and infrastructure issues follow a unified backlog lifecycle.
+
+#### Decision Tree: Which Label?
+
+```
+Is it blocking the next sprint's critical path?
+  YES → Sprint field = Research Sprint NR (scoped, critical path)
+  NO  → Sprint field = House Keeping (single backlog for all types)
+    Then label by type:
+      Code/docs/process/tooling → label: housekeeping
+      Physics/math/theory       → label: type: research
+      Infrastructure/CI/tooling → label: type: infra
+```
+
+One backlog sprint ("House Keeping") for all non-critical-path work. Labels differentiate type. This avoids categorization paralysis for hybrid issues and provides a single place to look.
+
+#### Housekeeping Issue Creation Checklist
+
+Housekeeping issues are created during PR reviews (Step 4 deferred items), from sprint observations, or by James directly.
+
+**Every housekeeping issue must have:**
+
+```
+1. Title: "Housekeeping: <descriptive title>"
+2. Body: Origin (which PR/review/observation), Action items, AC checkboxes
+3. Label: `housekeeping`
+4. Project board: Add to "QBP Research Lifecycle"
+5. Sprint field: Set to "House Keeping"
+6. Status: "Todo"
+```
+
+After any PR review cycle (Step 4), every deferred item **must** become a GitHub issue with this checklist applied. No "we'll get to it" without a tracked issue.
+
+#### Research Issue Creation Checklist
+
+Research issues come from Research Gate blocks, open questions during sprints, or Theory Refinement.
+
+**Every research issue must have:**
+
+```
+1. Title: "Research: <descriptive question>"
+2. Body: Origin, Research question, Expected deliverables, AC checkboxes
+3. Label: `type: research`
+4. Project board: Add to "QBP Research Lifecycle"
+5. Sprint field: "House Keeping" (if unscoped) or "Research Sprint NR" (if blocking critical path)
+6. Status: "Todo"
+```
+
+#### When Do We Work on Backlog Items?
+
+| Trigger | Action |
+|---------|--------|
+| **James says "housekeeping mode"** | Switch to batch housekeeping, work through backlog |
+| **James is stepping away** | Offer to do housekeeping autonomously |
+| **Between sprint phases** | Herschel surfaces top 3 items as suggestions |
+| **Sprint retrospective** | Review open backlog, close stale items |
+| **Research Gate BLOCK** | Pre-sprint research, scoped to blocking items |
+
+#### Completion & Closure
+
+Same rules as any issue:
+- PR with `Closes #X` (or manual close if no code change needed)
+- AC verification in review
+- For docs-only housekeeping: Tier 1 review sufficient
+
 ---
 
 ## Review Process Details
