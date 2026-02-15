@@ -96,7 +96,20 @@ ANALYTICAL_PARAMS = SlitParameters(
     L=1.0,  # 1 m screen distance
 )
 
-# U₁ values for parameter sweep
+# U₁ values for parameter sweep (BPM code units)
+#
+# ACCELERATED TEST VALUES — the BPM domain (~32 nm) is too small for
+# physical U₁ values (10⁻¹⁵ to 10⁻³ eV) to produce visible effects.
+# Physical L_decay at U₁ = 10⁻⁶ eV is ~9.6 mm >> 32 nm domain.
+#
+# SI mapping (via convert_potential with V_Z_CODE = 40.0):
+#   U1_code=0.5  → 30.1 eV    U1_code=5.0  → 300.8 eV
+#   U1_code=1.0  → 60.2 eV    U1_code=10.0 → 601.7 eV
+#   U1_code=2.0  → 120.3 eV
+#
+# The physics is scale-invariant: decay, monotonicity, norm conservation,
+# and U₁=0 control behavior are identical at any U₁ scale.
+# See ground truth §4.3.3 for physical SI worked examples.
 U1_VALUES = [0.0, 0.5, 1.0, 2.0, 5.0, 10.0]
 
 # Initial quaternionic fractions

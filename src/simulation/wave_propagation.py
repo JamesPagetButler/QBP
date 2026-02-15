@@ -11,6 +11,10 @@ diffraction (via FFT in x) and potential interactions at each z-step.
 Physics reference: research/03_double_slit_expected_results.md §3.3
 Algorithm: Split-step BPM (half diffraction → full potential → half diffraction)
 
+Unit architecture: BPM internals use natural units (ℏ=1, m=0.5).
+SI conversion happens at the output boundary via si_conversion.py.
+See docs/conventions/units.md for the two-layer architecture.
+
 Device strategy:
 - GPU (PyTorch + ROCm) when available — primary compute path
 - CPU (NumPy) fallback — slower but functional
