@@ -14,3 +14,7 @@ lean_lib «QBP» where
 -- Phase 4d: Float oracle executable for differential testing
 lean_exe «oracle» where
   root := `QBP.Oracle.Main
+
+-- SI conversion test vector generator
+lean_exe «gen_test_vectors» where
+  root := `QBP.Units.GenTestVectors
