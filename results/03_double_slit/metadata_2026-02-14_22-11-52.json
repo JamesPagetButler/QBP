@@ -1,0 +1,30 @@
+{
+  "format_version": "2.0",
+  "unit_convention": "hbar=c=1 (standard HEP natural units)",
+  "particle": "electron",
+  "mass_kg": 9.1093837015e-31,
+  "lambda_m": 5e-11,
+  "L0_m": 1.5915494309189535e-10,
+  "E0_J": 2.4098669608950283e-19,
+  "T0_s": 4.3760582420470503e-16,
+  "v_z_si_m_per_s": 14547790.206507418,
+  "k_si_per_m": 125663706143.59172,
+  "V_Z_CODE": 40.0,
+  "BPM_k0": 30.0,
+  "BPM_hbar": 1.0,
+  "BPM_mass": 0.5,
+  "conversion_applied": true,
+  "conversion_library": "src/simulation/si_conversion.py",
+  "timestamp": "2026-02-14_22-11-52",
+  "column_units": {
+    "x_position_m": "metres",
+    "U1_strength_eV": "electron-volts",
+    "z_m": "metres",
+    "intensity_total_normalized": "dimensionless (normalized)",
+    "intensity_psi0_normalized": "dimensionless (normalized)",
+    "intensity_psi1_normalized": "dimensionless (normalized)",
+    "eta_fraction": "dimensionless",
+    "visibility": "dimensionless",
+    "norm_final": "dimensionless"
+  }
+}
