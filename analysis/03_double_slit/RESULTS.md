@@ -1,6 +1,6 @@
 # Experiment 03: Double-Slit — Phase 3 Visualization Results
 
-**Analysis Date:** 2026-02-15 23:37:43
+**Analysis Date:** 2026-02-15 23:48:09
 **Data Source:** `results/03_double_slit/`
 **Sprint:** 3 (SI Redo)
 
@@ -102,9 +102,9 @@ spatial structure demonstrates the quaternionic coupling signal.
 
 | Metric | Value |
 |--------|-------|
-| Max residual | +0.035768 |
-| Min residual | -0.021408 |
-| RMS residual | 0.007928 |
+| Max residual | +0.025205 |
+| Min residual | -0.034104 |
+| RMS residual | 0.007311 |
 | Pattern | Oscillatory (modulates fringe peaks) |
 
 The residual is not flat noise — it shows systematic oscillatory structure aligned with

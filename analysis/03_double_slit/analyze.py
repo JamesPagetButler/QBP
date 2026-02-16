@@ -637,12 +637,13 @@ def plot_hero_fringe_overlay(
     ].sort_values("x_position_m")
 
     x_nm_exp = c_expected["x_position_m"].values * 1e9
-    i_exp = c_expected["intensity_total_normalized"].values
-    i_exp = i_exp / i_exp.max()
+    i_exp_raw = c_expected["intensity_total_normalized"].values
+    max_ref = i_exp_raw.max()  # Common reference: normalize both to Expected max
+    i_exp = i_exp_raw / max_ref
 
     x_nm_qbp = c_qbp["x_position_m"].values * 1e9
-    i_qbp = c_qbp["intensity_total_normalized"].values
-    i_qbp = i_qbp / i_qbp.max()
+    i_qbp_raw = c_qbp["intensity_total_normalized"].values
+    i_qbp = i_qbp_raw / max_ref  # Same reference — preserves amplitude difference
 
     # Get visibility values from summary
     sc_sum = summary_df[summary_df["scenario"] == "C"]
@@ -671,7 +672,7 @@ def plot_hero_fringe_overlay(
     )
 
     ax.set_xlabel("Detector Position x (nm)", fontsize=12)
-    ax.set_ylabel("I / max(I)", fontsize=12)
+    ax.set_ylabel("I / max(I_expected)", fontsize=12)
     ax.set_title(
         "Detector Interference Pattern: Expected vs QBP",
         fontsize=14,
@@ -719,12 +720,13 @@ def plot_hero_fringe_zoomed(
     ].sort_values("x_position_m")
 
     x_nm_exp = c_expected["x_position_m"].values * 1e9
-    i_exp = c_expected["intensity_total_normalized"].values
-    i_exp = i_exp / i_exp.max()
+    i_exp_raw = c_expected["intensity_total_normalized"].values
+    max_ref = i_exp_raw.max()  # Common reference: normalize both to Expected max
+    i_exp = i_exp_raw / max_ref
 
     x_nm_qbp = c_qbp["x_position_m"].values * 1e9
-    i_qbp = c_qbp["intensity_total_normalized"].values
-    i_qbp = i_qbp / i_qbp.max()
+    i_qbp_raw = c_qbp["intensity_total_normalized"].values
+    i_qbp = i_qbp_raw / max_ref  # Same reference — preserves amplitude difference
 
     # Get visibility values
     sc_sum = summary_df[summary_df["scenario"] == "C"]
@@ -771,7 +773,7 @@ def plot_hero_fringe_zoomed(
 
     ax.set_xlim(-0.05, 0.05)
     ax.set_xlabel("Detector Position x (nm)", fontsize=12)
-    ax.set_ylabel("I / max(I)", fontsize=12)
+    ax.set_ylabel("I / max(I_expected)", fontsize=12)
     ax.set_title(
         "Zoomed Fringes: ±0.05 nm (~12 fringes at 8.5 pm spacing)",
         fontsize=14,
@@ -815,18 +817,28 @@ def plot_residual(fringe_df: pd.DataFrame, output_path: str):
         (sc_c["U1_strength_eV"] == u1_max) & (sc_c["eta0"] == eta0_val)
     ].sort_values("x_position_m")
 
-    x_nm = c_expected["x_position_m"].values * 1e9
-    i_exp = c_expected["intensity_total_normalized"].values
-    i_exp = i_exp / i_exp.max()
+    x_nm_exp = c_expected["x_position_m"].values * 1e9
+    x_nm_qbp = c_qbp["x_position_m"].values * 1e9
 
-    i_qbp = c_qbp["intensity_total_normalized"].values
-    i_qbp = i_qbp / i_qbp.max()
+    # Grid identity assertion (Phase 2 guarantees identical grids)
+    assert len(x_nm_exp) == len(
+        x_nm_qbp
+    ), f"Grid length mismatch: Expected {len(x_nm_exp)}, QBP {len(x_nm_qbp)}"
+    assert np.allclose(
+        x_nm_exp, x_nm_qbp, atol=1e-12
+    ), "Grid values mismatch: Expected and QBP x-grids differ"
 
-    # Direct subtraction (same grid guaranteed)
+    i_exp_raw = c_expected["intensity_total_normalized"].values
+    max_ref = i_exp_raw.max()  # Common reference: normalize both to Expected max
+    i_exp = i_exp_raw / max_ref
+
+    i_qbp_raw = c_qbp["intensity_total_normalized"].values
+    i_qbp = i_qbp_raw / max_ref  # Same reference — preserves amplitude difference
+
     residual = i_qbp - i_exp
 
     ax.plot(
-        x_nm,
+        x_nm_exp,
         residual,
         color=COLORS.CRIMSON.hex,
         linewidth=1.0,
@@ -853,7 +865,7 @@ def plot_residual(fringe_df: pd.DataFrame, output_path: str):
     )
 
     ax.set_xlabel("Detector Position x (nm)", fontsize=12)
-    ax.set_ylabel("Residual  (I_QBP − I_Expected)", fontsize=12)
+    ax.set_ylabel("Residual  (I_QBP − I_Expected) / max(I_Expected)", fontsize=12)
     ax.set_title(
         "Residual: QBP − Expected",
         fontsize=14,
@@ -1110,8 +1122,9 @@ def generate_results_md(
 
     i_exp_raw = c_exp["intensity_total_normalized"].values
     i_qbp_raw = c_qbp["intensity_total_normalized"].values
-    i_exp_norm = i_exp_raw / i_exp_raw.max()
-    i_qbp_norm = i_qbp_raw / i_qbp_raw.max()
+    max_ref = i_exp_raw.max()  # Common reference: normalize both to Expected max
+    i_exp_norm = i_exp_raw / max_ref
+    i_qbp_norm = i_qbp_raw / max_ref
     residual = i_qbp_norm - i_exp_norm
     res_max = residual.max()
     res_min = residual.min()
