@@ -535,12 +535,13 @@ def plot_fringe_comparison(
     ].sort_values("x_position_m")
 
     x_nm_base = c_base["x_position_m"].values * 1e9  # m → nm
-    i_base = c_base["intensity_total_normalized"].values
-    i_base = i_base / i_base.max()
+    i_base_raw = c_base["intensity_total_normalized"].values
+    max_ref = i_base_raw.max()  # Common reference: normalize both to Expected max
+    i_base = i_base_raw / max_ref
 
     x_nm_max = c_max["x_position_m"].values * 1e9
-    i_max_curve = c_max["intensity_total_normalized"].values
-    i_max_curve = i_max_curve / i_max_curve.max()
+    i_max_raw = c_max["intensity_total_normalized"].values
+    i_max_curve = i_max_raw / max_ref  # Same reference — consistent with hero plots
 
     ax.plot(
         x_nm_base,
@@ -558,7 +559,7 @@ def plot_fringe_comparison(
     )
 
     ax.set_xlabel("Position x (nm)", fontsize=11)
-    ax.set_ylabel("I / max(I)", fontsize=11)
+    ax.set_ylabel("I / max(I_expected)", fontsize=11)
     ax.set_title(
         "Scenario C: BPM Simulation (Quaternionic Coupling)",
         fontsize=12,
