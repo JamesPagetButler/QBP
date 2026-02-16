@@ -48,8 +48,12 @@ def load_data(
     are combined into a single ``fringe_df`` with a ``scenario`` column
     for backward-compatible downstream consumption.
 
+    Also loads ``results_farfield_qbp_*.csv`` if present (from hybrid
+    BPM + Fraunhofer FFT).
+
     Returns:
         Tuple of (summary_df, fringe_df, decay_df, metadata_dict)
+        metadata_dict may contain key 'farfield_qbp_df' with the far-field QBP DataFrame.
     """
     v3_dir = os.path.join(results_dir, "v3")
 
@@ -109,12 +113,24 @@ def load_data(
             with open(meta_path) as f:
                 metadata = json.load(f)
 
-        print(f"Loaded v3 format from {v3_dir}")
-        print(f"  Nearfield:  {os.path.basename(latest_nf)}")
-        print(f"  Farfield:   results_farfield_{timestamp}.csv")
-        print(f"  Decay:      decay_{timestamp}.csv")
-        print(f"  Summary:    summary_{timestamp}.csv")
-        print(f"  Metadata:   metadata_{timestamp}.json")
+        # Far-field QBP (BPM + Fraunhofer FFT) — optional
+        ff_qbp_path = os.path.join(v3_dir, f"results_farfield_qbp_{timestamp}.csv")
+        if os.path.exists(ff_qbp_path):
+            metadata["farfield_qbp_df"] = pd.read_csv(ff_qbp_path)
+            print(f"Loaded v3 format from {v3_dir}")
+            print(f"  Nearfield:     {os.path.basename(latest_nf)}")
+            print(f"  Farfield:      results_farfield_{timestamp}.csv")
+            print(f"  Farfield QBP:  results_farfield_qbp_{timestamp}.csv")
+            print(f"  Decay:         decay_{timestamp}.csv")
+            print(f"  Summary:       summary_{timestamp}.csv")
+            print(f"  Metadata:      metadata_{timestamp}.json")
+        else:
+            print(f"Loaded v3 format from {v3_dir}")
+            print(f"  Nearfield:  {os.path.basename(latest_nf)}")
+            print(f"  Farfield:   results_farfield_{timestamp}.csv")
+            print(f"  Decay:      decay_{timestamp}.csv")
+            print(f"  Summary:    summary_{timestamp}.csv")
+            print(f"  Metadata:   metadata_{timestamp}.json")
 
         return summary_df, fringe_df, decay_df, metadata
 
@@ -227,9 +243,16 @@ def compute_metrics(
             diff = v_vals.max() - v_vals.min()
             eta0_max_diff = max(eta0_max_diff, diff)
 
-    # V range for scenario C
+    # V range for scenario C (near-field)
     v_min = sc["visibility"].min()
     v_max = sc["visibility"].max()
+
+    # Far-field visibility (if available in summary)
+    ff_v_range = None
+    if "visibility_farfield" in summary_df.columns:
+        ff_vis = sc["visibility_farfield"].dropna()
+        if len(ff_vis) > 0:
+            ff_v_range = (ff_vis.min(), ff_vis.max())
 
     return {
         "visibility_table": vis_table,
@@ -237,6 +260,7 @@ def compute_metrics(
         "eta_jump_table": eta_jumps,
         "eta0_independence_max_diff": eta0_max_diff,
         "v_range": (v_min, v_max),
+        "v_range_farfield": ff_v_range,
     }
 
 

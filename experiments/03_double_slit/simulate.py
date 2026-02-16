@@ -39,6 +39,8 @@ from src.simulation.wave_propagation import (
     create_initial_wavepacket,
     propagate,
     far_field_intensity,
+    far_field_from_bpm,
+    FarFieldResult,
     compute_eta,
 )
 from src.simulation.si_conversion import (
@@ -215,7 +217,8 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
         slit: slit config (default: BPM_SLIT)
 
     Returns:
-        (fringe_df, decay_df, visibility, norm_final)
+        (fringe_df, decay_df, visibility, norm_final,
+         farfield_fringe_df, visibility_farfield)
     """
     if config is None:
         config = BPM_CONFIG
@@ -234,23 +237,38 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
 
     result = propagate(psi0, psi1, grid, config, slit=slit)
 
-    # Intensity at detector
+    # Near-field intensity at BPM exit plane
     x, I_total, I_psi0, I_psi1 = far_field_intensity(result)
     V = fringe_visibility(I_total)
+
+    # Far-field: Fraunhofer FFT of exit-plane amplitudes
+    dx_si = grid.dx * SI_SCALES.L0  # code units → SI metres
+    slit_sep_si = slit.separation * SI_SCALES.L0
+    ff_result = far_field_from_bpm(
+        psi0=result.detector_psi0,
+        psi1=result.detector_psi1,
+        dx_si=dx_si,
+        lambda_si=SI_SCALES.lambda_si,
+        screen_distance=ANALYTICAL_PARAMS.L,  # 1.0 m — same as analytical
+        pad_factor=4,
+        slit_separation_si=slit_sep_si,
+    )
+    V_farfield = fringe_visibility(ff_result.I_total)
 
     # Norm check
     final_norm = result.norm_history[-1] if result.norm_history else 1.0
 
     print(
         f"  U₁={u1_strength:.1f}, η₀={eta0:.2f}: "
-        f"V={V:.4f}, η_final={result.decay_curve[-1][1]:.6f}, "
+        f"V_nf={V:.4f}, V_ff={V_farfield:.4f}, "
+        f"η_final={result.decay_curve[-1][1]:.6f}, "
         f"norm={final_norm:.8f}"
     )
 
     # Convert U1 to SI (eV) at output boundary
     u1_eV = convert_potential(u1_strength, SI_SCALES)
 
-    # Fringe data — convert x_position from code units to SI metres
+    # Near-field fringe data — convert x_position from code units to SI metres
     fringe_rows = []
     for xi, It, I0, I1 in zip(x, I_total, I_psi0, I_psi1):
         fringe_rows.append(
@@ -259,6 +277,22 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
                 "U1_strength_eV": u1_eV,
                 "eta0": eta0,
                 "x_position_m": convert_position(xi, SI_SCALES),
+                "intensity_total_normalized": It,
+                "intensity_psi0_normalized": I0,
+                "intensity_psi1_normalized": I1,
+            }
+        )
+
+    # Far-field fringe data (already in SI metres from FFT)
+    farfield_rows = []
+    for xi, It, I0, I1 in zip(
+        ff_result.x_screen, ff_result.I_total, ff_result.I_psi0, ff_result.I_psi1
+    ):
+        farfield_rows.append(
+            {
+                "U1_strength_eV": u1_eV,
+                "eta0": eta0,
+                "x_position_m": xi,
                 "intensity_total_normalized": It,
                 "intensity_psi0_normalized": I0,
                 "intensity_psi1_normalized": I1,
@@ -277,7 +311,14 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
             }
         )
 
-    return pd.DataFrame(fringe_rows), pd.DataFrame(decay_rows), V, final_norm
+    return (
+        pd.DataFrame(fringe_rows),
+        pd.DataFrame(decay_rows),
+        V,
+        final_norm,
+        pd.DataFrame(farfield_rows),
+        V_farfield,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -304,21 +345,24 @@ def main():
     print(f"Device: {BPM_CONFIG.device}")
 
     nearfield_fringe_dfs = []
+    farfield_qbp_dfs = []
     decay_dfs = []
     summary_rows = []
 
     # -----------------------------------------------------------------
-    # Near-field BPM runs
+    # Near-field BPM runs + far-field Fraunhofer FFT
     # -----------------------------------------------------------------
 
     # Expected: BPM at U₁=0 (standard QM prediction)
     print("\n--- Expected (BPM at U₁=0) ---")
     for eta0 in ETA0_VALUES:
-        fringe_df, decay_df, V, norm = run_scenario_c(0.0, eta0)
+        fringe_df, decay_df, V, norm, ff_df, V_ff = run_scenario_c(0.0, eta0)
         fringe_df["regime"] = "expected"
         fringe_df = fringe_df.drop(columns=["scenario"])
+        ff_df["regime"] = "expected"
         decay_df["regime"] = "expected"
         nearfield_fringe_dfs.append(fringe_df)
+        farfield_qbp_dfs.append(ff_df)
         decay_dfs.append(decay_df)
         summary_rows.append(
             {
@@ -326,6 +370,7 @@ def main():
                 "U1_strength_eV": 0.0,
                 "eta0": eta0,
                 "visibility": V,
+                "visibility_farfield": V_ff,
                 "norm_final": norm,
             }
         )
@@ -334,11 +379,13 @@ def main():
     print("\n--- QBP (BPM at U₁>0) ---")
     for u1 in U1_VALUES[1:]:  # skip 0.0
         for eta0 in ETA0_VALUES:
-            fringe_df, decay_df, V, norm = run_scenario_c(u1, eta0)
+            fringe_df, decay_df, V, norm, ff_df, V_ff = run_scenario_c(u1, eta0)
             fringe_df["regime"] = "qbp"
             fringe_df = fringe_df.drop(columns=["scenario"])
+            ff_df["regime"] = "qbp"
             decay_df["regime"] = "qbp"
             nearfield_fringe_dfs.append(fringe_df)
+            farfield_qbp_dfs.append(ff_df)
             decay_dfs.append(decay_df)
             summary_rows.append(
                 {
@@ -346,6 +393,7 @@ def main():
                     "U1_strength_eV": convert_potential(u1, SI_SCALES),
                     "eta0": eta0,
                     "visibility": V,
+                    "visibility_farfield": V_ff,
                     "norm_final": norm,
                 }
             )
@@ -410,10 +458,20 @@ def main():
     nearfield_df.to_csv(nearfield_path, index=False)
     print(f"\nNear-field data: {nearfield_path} ({len(nearfield_df)} rows)")
 
-    # Far-field fringe CSV
+    # Far-field analytical CSV
     farfield_path = os.path.join(output_dir, f"results_farfield_{timestamp}.csv")
     farfield_df.to_csv(farfield_path, index=False)
-    print(f"Far-field data: {farfield_path} ({len(farfield_df)} rows)")
+    print(f"Far-field analytical: {farfield_path} ({len(farfield_df)} rows)")
+
+    # Far-field QBP CSV (BPM + Fraunhofer FFT)
+    farfield_qbp_df = pd.concat(farfield_qbp_dfs, ignore_index=True)
+    cols_ff = ["regime"] + [c for c in farfield_qbp_df.columns if c != "regime"]
+    farfield_qbp_df = farfield_qbp_df[cols_ff]
+    farfield_qbp_path = os.path.join(
+        output_dir, f"results_farfield_qbp_{timestamp}.csv"
+    )
+    farfield_qbp_df.to_csv(farfield_qbp_path, index=False)
+    print(f"Far-field QBP: {farfield_qbp_path} ({len(farfield_qbp_df)} rows)")
 
     # Decay CSV
     if decay_dfs:
@@ -456,11 +514,20 @@ def main():
                 "spatial_scale": "nm",
                 "grid_points": BPM_CONFIG.Nx,
             },
-            "farfield": {
+            "farfield_analytical": {
                 "scenario_values": ["A", "B"],
                 "method": "analytical (Fraunhofer)",
                 "spatial_scale": "mm",
                 "grid_points": 10001,
+            },
+            "farfield_qbp": {
+                "regime_values": ["expected", "qbp"],
+                "method": "BPM + Fraunhofer FFT (hybrid)",
+                "description": "BPM through slit region, then Fraunhofer FFT to detector plane",
+                "pad_factor": 4,
+                "screen_distance_m": ANALYTICAL_PARAMS.L,
+                "spatial_scale": "mm",
+                "grid_points": BPM_CONFIG.Nx * 4,
             },
         },
         "comparison_valid_between": "nearfield regime='expected' vs regime='qbp'",
@@ -504,9 +571,18 @@ def main():
     print("ACCEPTANCE CRITERIA CHECKS")
     print("=" * 70)
 
+    # Far-field QBP sanity check: V(U1=0) should be high (near 1.0)
+    ff_expected_rows = [r for r in summary_rows if r["regime"] == "expected"]
+    V_ff_u1_zero = max(r["visibility_farfield"] for r in ff_expected_rows)
+
     checks = [
         ("AC #5: Scenario A visibility > 0.95", V_a > 0.95, f"V_A = {V_a:.4f}"),
         ("AC #4: Scenario B visibility < 0.01", V_b < 0.01, f"V_B = {V_b:.6f}"),
+        (
+            "AC #7: Far-field BPM+FFT U1=0 visibility > 0.55",
+            V_ff_u1_zero > 0.55,
+            f"V_ff(U1=0) = {V_ff_u1_zero:.4f}",
+        ),
     ]
 
     all_passed = True

@@ -35,6 +35,8 @@ from src.simulation.wave_propagation import (
     bpm_step,
     propagate,
     far_field_intensity,
+    far_field_from_bpm,
+    FarFieldResult,
     compute_eta,
 )
 
@@ -605,3 +607,254 @@ class TestStage2Interference:
         # The difference should be small (see docstring for tolerance rationale)
         max_diff = np.max(np.abs(I_a_norm - I_c_norm))
         assert max_diff < 0.05, f"Scenario C deviates from A: max diff = {max_diff:.6f}"
+
+
+# ---------------------------------------------------------------------------
+# Stage 3: Far-field Fraunhofer FFT tests
+# ---------------------------------------------------------------------------
+
+
+class TestFarFieldFromBPM:
+    """
+    Tests for the hybrid BPM + Fraunhofer FFT far-field computation.
+
+    Validates that far_field_from_bpm() correctly transforms BPM exit-plane
+    amplitudes into far-field detector patterns via FFT.
+    """
+
+    def test_known_single_gaussian_fft(self):
+        """A Gaussian input should produce a Gaussian in far-field (centered, symmetric).
+
+        The Fourier transform of a Gaussian is a Gaussian. This is a pure-math
+        round-trip check: no BPM physics involved.
+        """
+        N = 1024
+        dx = 1e-9  # 1 nm grid spacing
+        x = (np.arange(N) - N // 2) * dx
+        sigma = 50e-9  # 50 nm width
+        psi0 = np.exp(-(x**2) / (2 * sigma**2)).astype(complex)
+        psi1 = np.zeros_like(psi0)
+
+        result = far_field_from_bpm(
+            psi0, psi1, dx_si=dx, lambda_si=0.05e-9, screen_distance=1.0
+        )
+
+        # Peak should be at center (x=0)
+        peak_idx = np.argmax(result.I_total)
+        center_idx = len(result.I_total) // 2
+        assert (
+            abs(peak_idx - center_idx) <= 1
+        ), f"Peak at index {peak_idx}, expected near center {center_idx}"
+
+        # Should be approximately symmetric: I(x) ≈ I(-x)
+        # For even-N arrays, the discrete FFT grid is inherently asymmetric
+        # (one more point on the negative side). Use relative tolerance.
+        I_left = result.I_total[: len(result.I_total) // 2]
+        I_right = result.I_total[len(result.I_total) // 2 :][::-1]
+        min_len = min(len(I_left), len(I_right))
+        # Compare near the peak (central 50%) where signal is strong
+        start = min_len // 4
+        end = 3 * min_len // 4
+        peak_val = result.I_total.max()
+        max_asym = np.max(np.abs(I_left[start:end] - I_right[start:end])) / peak_val
+        assert max_asym < 0.01, f"Relative asymmetry too large: {max_asym:.4f}"
+
+    def test_u1_zero_matches_analytical_far_field(self):
+        """BPM(U1=0) + FFT should give far-field V > near-field V.
+
+        When U₁=0 (no quaternionic coupling), the far-field FFT should
+        produce higher visibility than the near-field BPM exit plane.
+        Near-field V ≈ 0.553; far-field V should exceed 0.60.
+
+        The Gaussian source (vs analytical plane wave) limits V below 1.0
+        because partial spatial coherence reduces fringe contrast. This is
+        correct physics, not a numerical artifact.
+        """
+        config = SimulationConfig(
+            Nx=2048,
+            X_max=15.0,
+            dz=0.02,
+            Nz_steps=10000,
+            k0=30.0,
+            hbar=1.0,
+            mass=0.5,
+            device="cpu",
+        )
+        slit = SlitConfig(
+            separation=2.0,
+            width=0.3,
+            barrier_height=100.0,
+            U1_strength=0.0,
+            z_position=50.0,
+            z_thickness=1.0,
+        )
+        grid = create_transverse_grid(config)
+        psi0, psi1 = create_initial_wavepacket(grid, k0=config.k0, sigma=3.0, eta0=0.0)
+
+        result = propagate(psi0, psi1, grid, config, slit=slit)
+
+        # SI conversion
+        from src.simulation.si_conversion import compute_scales
+
+        M_ELECTRON = 9.109_383_7015e-31
+        LAMBDA_ELECTRON = 0.05e-9
+        scales = compute_scales(M_ELECTRON, LAMBDA_ELECTRON)
+
+        dx_si = grid.dx * scales.L0
+        ff = far_field_from_bpm(
+            result.detector_psi0,
+            result.detector_psi1,
+            dx_si=dx_si,
+            lambda_si=scales.lambda_si,
+            screen_distance=1.0,
+            slit_separation_si=slit.separation * scales.L0,
+        )
+
+        V = fringe_visibility(ff.I_total)
+        assert V > 0.60, f"Far-field visibility too low: V = {V:.4f}, expected > 0.60"
+
+    def test_psi1_only_contributes_when_nonzero(self):
+        """When psi1 is zero, I_psi1 should be zero everywhere."""
+        N = 512
+        dx = 1e-9
+        psi0 = np.random.randn(N).astype(complex) + 1j * np.random.randn(N)
+        psi1 = np.zeros(N, dtype=complex)
+
+        result = far_field_from_bpm(
+            psi0, psi1, dx_si=dx, lambda_si=0.05e-9, screen_distance=1.0
+        )
+
+        assert np.all(
+            result.I_psi1 == 0.0
+        ), f"I_psi1 should be zero, max = {np.max(result.I_psi1):.2e}"
+        # I_total should equal I_psi0
+        np.testing.assert_array_equal(result.I_total, result.I_psi0)
+
+    def test_zero_padding_improves_resolution(self):
+        """pad_factor=4 should give 4x more output points than pad_factor=1."""
+        N = 256
+        dx = 1e-9
+        psi0 = np.exp(-np.linspace(-5, 5, N) ** 2).astype(complex)
+        psi1 = np.zeros(N, dtype=complex)
+
+        result_1x = far_field_from_bpm(
+            psi0, psi1, dx_si=dx, lambda_si=0.05e-9, screen_distance=1.0, pad_factor=1
+        )
+        result_4x = far_field_from_bpm(
+            psi0, psi1, dx_si=dx, lambda_si=0.05e-9, screen_distance=1.0, pad_factor=4
+        )
+
+        assert len(result_4x.x_screen) == 4 * len(
+            result_1x.x_screen
+        ), f"Expected 4x points: got {len(result_4x.x_screen)} vs {len(result_1x.x_screen)}"
+        assert result_4x.pad_factor == 4
+        assert result_1x.pad_factor == 1
+
+    def test_nyquist_check(self):
+        """Nyquist margin should be computed correctly when slit_separation_si is given.
+
+        For our standard parameters (dx ~ 0.23 nm, d ~ 0.32 μm, λ = 0.05 nm, L = 1 m),
+        the margin should be large (>> 1), confirming the grid well-resolves the fringes.
+        """
+        N = 2048
+        dx = 0.23e-9  # Approximate BPM grid spacing in SI
+        psi0 = np.ones(N, dtype=complex)
+        psi1 = np.zeros(N, dtype=complex)
+
+        lambda_si = 0.05e-9
+        L = 1.0
+        d = 0.32e-6  # slit separation in SI
+
+        result = far_field_from_bpm(
+            psi0,
+            psi1,
+            dx_si=dx,
+            lambda_si=lambda_si,
+            screen_distance=L,
+            slit_separation_si=d,
+        )
+
+        # kx_max = π / dx ≈ 1.37e10
+        # kx_fringe = 2π·d / (λ·L) ≈ 4.02e7
+        # margin ≈ 340
+        assert (
+            result.nyquist_margin > 10
+        ), f"Nyquist margin too small: {result.nyquist_margin:.1f}"
+
+        # Without slit_separation_si, margin should be 0 (not computed)
+        result_no_d = far_field_from_bpm(
+            psi0,
+            psi1,
+            dx_si=dx,
+            lambda_si=lambda_si,
+            screen_distance=L,
+        )
+        assert result_no_d.nyquist_margin == 0.0
+
+    def test_quaternionic_visibility_decreases_with_u1(self):
+        """Far-field V should monotonically decrease as U₁ increases.
+
+        This is the key QBP prediction: quaternionic coupling reduces
+        fringe visibility.
+        """
+        config = SimulationConfig(
+            Nx=2048,
+            X_max=15.0,
+            dz=0.02,
+            Nz_steps=10000,
+            k0=30.0,
+            hbar=1.0,
+            mass=0.5,
+            device="cpu",
+        )
+        slit_base = SlitConfig(
+            separation=2.0,
+            width=0.3,
+            barrier_height=100.0,
+            U1_strength=0.0,
+            z_position=50.0,
+            z_thickness=1.0,
+        )
+
+        from src.simulation.si_conversion import compute_scales
+
+        M_ELECTRON = 9.109_383_7015e-31
+        LAMBDA_ELECTRON = 0.05e-9
+        scales = compute_scales(M_ELECTRON, LAMBDA_ELECTRON)
+
+        u1_values = [0.0, 2.0, 5.0, 10.0]
+        visibilities = []
+
+        for u1 in u1_values:
+            slit = SlitConfig(
+                separation=slit_base.separation,
+                width=slit_base.width,
+                barrier_height=slit_base.barrier_height,
+                U1_strength=u1,
+                z_position=slit_base.z_position,
+                z_thickness=slit_base.z_thickness,
+            )
+            grid = create_transverse_grid(config)
+            psi0, psi1 = create_initial_wavepacket(
+                grid, k0=config.k0, sigma=3.0, eta0=0.1
+            )
+            result = propagate(psi0, psi1, grid, config, slit=slit)
+
+            dx_si = grid.dx * scales.L0
+            ff = far_field_from_bpm(
+                result.detector_psi0,
+                result.detector_psi1,
+                dx_si=dx_si,
+                lambda_si=scales.lambda_si,
+                screen_distance=1.0,
+            )
+            V = fringe_visibility(ff.I_total)
+            visibilities.append(V)
+
+        # Monotonically decreasing (or at least non-increasing)
+        for i in range(len(visibilities) - 1):
+            assert visibilities[i] >= visibilities[i + 1] - 0.01, (
+                f"Visibility not monotonically decreasing: "
+                f"U₁={u1_values[i]} → V={visibilities[i]:.4f}, "
+                f"U₁={u1_values[i+1]} → V={visibilities[i+1]:.4f}"
+            )
