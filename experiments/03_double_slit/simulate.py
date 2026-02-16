@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 import sys
 import os
+from dataclasses import dataclass
 from datetime import datetime
 
 # Add project root to path
@@ -206,6 +207,18 @@ def run_scenario_b():
     return pd.DataFrame(rows), V
 
 
+@dataclass
+class ScenarioCResult:
+    """Results from a Scenario C (BPM + far-field FFT) run."""
+
+    fringe_df: pd.DataFrame
+    decay_df: pd.DataFrame
+    visibility: float
+    norm_final: float
+    farfield_fringe_df: pd.DataFrame
+    visibility_farfield: float
+
+
 def run_scenario_c(u1_strength, eta0, config=None, slit=None):
     """
     Scenario C: Full quaternionic propagation via BPM.
@@ -217,8 +230,7 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
         slit: slit config (default: BPM_SLIT)
 
     Returns:
-        (fringe_df, decay_df, visibility, norm_final,
-         farfield_fringe_df, visibility_farfield)
+        ScenarioCResult with near-field, far-field, and decay data.
     """
     if config is None:
         config = BPM_CONFIG
@@ -242,6 +254,9 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
     V = fringe_visibility(I_total)
 
     # Far-field: Fraunhofer FFT of exit-plane amplitudes
+    # The QBP visibility reduction (ΔV) is similar in near-field and far-field
+    # (~8% relative). This is expected: the Fraunhofer transform is linear and
+    # preserves the relative fringe contrast degradation from quaternionic coupling.
     dx_si = grid.dx * SI_SCALES.L0  # code units → SI metres
     slit_sep_si = slit.separation * SI_SCALES.L0
     ff_result = far_field_from_bpm(
@@ -311,13 +326,13 @@ def run_scenario_c(u1_strength, eta0, config=None, slit=None):
             }
         )
 
-    return (
-        pd.DataFrame(fringe_rows),
-        pd.DataFrame(decay_rows),
-        V,
-        final_norm,
-        pd.DataFrame(farfield_rows),
-        V_farfield,
+    return ScenarioCResult(
+        fringe_df=pd.DataFrame(fringe_rows),
+        decay_df=pd.DataFrame(decay_rows),
+        visibility=V,
+        norm_final=final_norm,
+        farfield_fringe_df=pd.DataFrame(farfield_rows),
+        visibility_farfield=V_farfield,
     )
 
 
@@ -356,22 +371,22 @@ def main():
     # Expected: BPM at U₁=0 (standard QM prediction)
     print("\n--- Expected (BPM at U₁=0) ---")
     for eta0 in ETA0_VALUES:
-        fringe_df, decay_df, V, norm, ff_df, V_ff = run_scenario_c(0.0, eta0)
-        fringe_df["regime"] = "expected"
-        fringe_df = fringe_df.drop(columns=["scenario"])
-        ff_df["regime"] = "expected"
-        decay_df["regime"] = "expected"
-        nearfield_fringe_dfs.append(fringe_df)
-        farfield_qbp_dfs.append(ff_df)
-        decay_dfs.append(decay_df)
+        r = run_scenario_c(0.0, eta0)
+        r.fringe_df["regime"] = "expected"
+        r.fringe_df = r.fringe_df.drop(columns=["scenario"])
+        r.farfield_fringe_df["regime"] = "expected"
+        r.decay_df["regime"] = "expected"
+        nearfield_fringe_dfs.append(r.fringe_df)
+        farfield_qbp_dfs.append(r.farfield_fringe_df)
+        decay_dfs.append(r.decay_df)
         summary_rows.append(
             {
                 "regime": "expected",
                 "U1_strength_eV": 0.0,
                 "eta0": eta0,
-                "visibility": V,
-                "visibility_farfield": V_ff,
-                "norm_final": norm,
+                "visibility": r.visibility,
+                "visibility_farfield": r.visibility_farfield,
+                "norm_final": r.norm_final,
             }
         )
 
@@ -379,22 +394,22 @@ def main():
     print("\n--- QBP (BPM at U₁>0) ---")
     for u1 in U1_VALUES[1:]:  # skip 0.0
         for eta0 in ETA0_VALUES:
-            fringe_df, decay_df, V, norm, ff_df, V_ff = run_scenario_c(u1, eta0)
-            fringe_df["regime"] = "qbp"
-            fringe_df = fringe_df.drop(columns=["scenario"])
-            ff_df["regime"] = "qbp"
-            decay_df["regime"] = "qbp"
-            nearfield_fringe_dfs.append(fringe_df)
-            farfield_qbp_dfs.append(ff_df)
-            decay_dfs.append(decay_df)
+            r = run_scenario_c(u1, eta0)
+            r.fringe_df["regime"] = "qbp"
+            r.fringe_df = r.fringe_df.drop(columns=["scenario"])
+            r.farfield_fringe_df["regime"] = "qbp"
+            r.decay_df["regime"] = "qbp"
+            nearfield_fringe_dfs.append(r.fringe_df)
+            farfield_qbp_dfs.append(r.farfield_fringe_df)
+            decay_dfs.append(r.decay_df)
             summary_rows.append(
                 {
                     "regime": "qbp",
                     "U1_strength_eV": convert_potential(u1, SI_SCALES),
                     "eta0": eta0,
-                    "visibility": V,
-                    "visibility_farfield": V_ff,
-                    "norm_final": norm,
+                    "visibility": r.visibility,
+                    "visibility_farfield": r.visibility_farfield,
+                    "norm_final": r.norm_final,
                 }
             )
 

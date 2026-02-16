@@ -20,6 +20,8 @@ Device strategy:
 - CPU (NumPy) fallback — slower but functional
 """
 
+import warnings
+
 import numpy as np
 from dataclasses import dataclass, field
 from typing import Optional
@@ -681,6 +683,14 @@ def _propagate_gpu(
 # ---------------------------------------------------------------------------
 
 
+def _zero_pad_center(psi: np.ndarray, N_pad: int) -> np.ndarray:
+    """Zero-pad a 1D array, centering the original data in the padded array."""
+    padded = np.zeros(N_pad, dtype=complex)
+    start = (N_pad - len(psi)) // 2
+    padded[start : start + len(psi)] = psi
+    return padded
+
+
 @dataclass
 class FarFieldResult:
     """Results from Fraunhofer FFT propagation of BPM exit-plane amplitudes.
@@ -707,7 +717,7 @@ def far_field_from_bpm(
     lambda_si: float,
     screen_distance: float,
     pad_factor: int = 4,
-    slit_separation_si: float = None,
+    slit_separation_si: Optional[float] = None,
 ) -> FarFieldResult:
     """
     Compute far-field intensity via Fraunhofer FFT of BPM exit-plane amplitudes.
@@ -754,14 +764,8 @@ def far_field_from_bpm(
     N_pad = N_orig * pad_factor
 
     # --- Zero-pad: center original data in larger array ---
-    def _zero_pad(psi, N_pad):
-        padded = np.zeros(N_pad, dtype=complex)
-        start = (N_pad - len(psi)) // 2
-        padded[start : start + len(psi)] = psi
-        return padded
-
-    psi0_pad = _zero_pad(psi0, N_pad)
-    psi1_pad = _zero_pad(psi1, N_pad)
+    psi0_pad = _zero_pad_center(psi0, N_pad)
+    psi1_pad = _zero_pad_center(psi1, N_pad)
 
     # --- FFT with proper centering ---
     # ifftshift centers the zero-frequency component for FFT input
@@ -772,10 +776,15 @@ def far_field_from_bpm(
     # --- k-space grid ---
     kx = 2 * np.pi * np.fft.fftshift(np.fft.fftfreq(N_pad, d=dx_si))
 
-    # --- Screen mapping: x_screen = kx * λ * L / (2π) ---
+    # --- Screen mapping (paraxial / small-angle approximation) ---
+    # x_screen = sin(θ) · L ≈ θ · L, with sin(θ) = kx · λ / (2π)
+    # Valid because max diffraction angles are tiny (< 1 mrad for our parameters)
     x_screen = kx * lambda_si * screen_distance / (2 * np.pi)
 
     # --- Intensities ---
+    # Incoherent sum: I = |FFT(ψ₀)|² + |FFT(ψ₁)|². Cross-terms vanish because
+    # ψ₀ and ψ₁ live in orthogonal quaternion subspaces (C vs jC), so the
+    # detector measures the quaternionic norm |ψ|² = |ψ₀|² + |ψ₁|².
     I_psi0 = np.abs(F_psi0) ** 2
     I_psi1 = np.abs(F_psi1) ** 2
     I_total = I_psi0 + I_psi1
@@ -796,6 +805,14 @@ def far_field_from_bpm(
         # Nyquist margin = kx_max_grid / kx_fringe
         kx_fringe = 2 * np.pi * slit_separation_si / (lambda_si * screen_distance)
         nyquist_margin = kx_max_grid / kx_fringe
+        if nyquist_margin < 2.0:
+            warnings.warn(
+                f"Nyquist margin is {nyquist_margin:.2f} (< 2.0). "
+                f"Grid spacing dx={dx_si:.2e} m may not resolve fringes from "
+                f"slit separation d={slit_separation_si:.2e} m. "
+                f"Consider using a finer grid.",
+                stacklevel=2,
+            )
     else:
         nyquist_margin = 0.0  # Not computed
 

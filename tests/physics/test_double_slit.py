@@ -851,10 +851,121 @@ class TestFarFieldFromBPM:
             V = fringe_visibility(ff.I_total)
             visibilities.append(V)
 
-        # Monotonically decreasing (or at least non-increasing)
+        # Monotonically decreasing (or at least non-increasing within tolerance)
         for i in range(len(visibilities) - 1):
-            assert visibilities[i] >= visibilities[i + 1] - 0.01, (
+            assert visibilities[i] >= visibilities[i + 1] - 0.005, (
                 f"Visibility not monotonically decreasing: "
                 f"U₁={u1_values[i]} → V={visibilities[i]:.4f}, "
                 f"U₁={u1_values[i+1]} → V={visibilities[i+1]:.4f}"
+            )
+
+        # Global decrease: V(U1=0) should exceed V(U1=max) by meaningful amount
+        assert visibilities[0] > visibilities[-1] + 0.03, (
+            f"Global visibility decrease too small: "
+            f"V(U₁=0)={visibilities[0]:.4f}, V(U₁=max)={visibilities[-1]:.4f}, "
+            f"delta={visibilities[0] - visibilities[-1]:.4f}"
+        )
+
+    def test_wide_gaussian_approaches_plane_wave(self):
+        """With sigma >> d, far-field V should be higher than with sigma=3.
+
+        This confirms that V=0.655 with sigma=3 is a Gaussian source coherence
+        effect, not a bug. When the Gaussian is wider (sigma=10 vs d=2),
+        both slits are illuminated more uniformly, giving higher visibility.
+
+        We keep X_max=15 to maintain grid resolution (~20 points per slit).
+        sigma=10 means the Gaussian is 5× the slit separation — at the slits
+        (|x|=1), amplitude is exp(-1/200) ≈ 0.995 (essentially uniform).
+        """
+        config = SimulationConfig(
+            Nx=2048,
+            X_max=15.0,
+            dz=0.02,
+            Nz_steps=10000,
+            k0=30.0,
+            hbar=1.0,
+            mass=0.5,
+            device="cpu",
+        )
+        slit = SlitConfig(
+            separation=2.0,
+            width=0.3,
+            barrier_height=100.0,
+            U1_strength=0.0,
+            z_position=50.0,
+            z_thickness=1.0,
+        )
+        grid = create_transverse_grid(config)
+        psi0, psi1 = create_initial_wavepacket(grid, k0=config.k0, sigma=10.0, eta0=0.0)
+
+        result = propagate(psi0, psi1, grid, config, slit=slit)
+
+        from src.simulation.si_conversion import compute_scales
+
+        M_ELECTRON = 9.109_383_7015e-31
+        LAMBDA_ELECTRON = 0.05e-9
+        scales = compute_scales(M_ELECTRON, LAMBDA_ELECTRON)
+
+        dx_si = grid.dx * scales.L0
+        ff = far_field_from_bpm(
+            result.detector_psi0,
+            result.detector_psi1,
+            dx_si=dx_si,
+            lambda_si=scales.lambda_si,
+            screen_distance=1.0,
+            slit_separation_si=slit.separation * scales.L0,
+        )
+
+        V = fringe_visibility(ff.I_total)
+        # sigma=10 should give higher V than sigma=3 (V≈0.655)
+        # Also get V for the standard sigma=3 setup for direct comparison
+        psi0_narrow, psi1_narrow = create_initial_wavepacket(
+            grid, k0=config.k0, sigma=3.0, eta0=0.0
+        )
+        result_narrow = propagate(psi0_narrow, psi1_narrow, grid, config, slit=slit)
+        ff_narrow = far_field_from_bpm(
+            result_narrow.detector_psi0,
+            result_narrow.detector_psi1,
+            dx_si=dx_si,
+            lambda_si=scales.lambda_si,
+            screen_distance=1.0,
+        )
+        V_narrow = fringe_visibility(ff_narrow.I_total)
+
+        assert V > V_narrow, (
+            f"Wider Gaussian (sigma=10) should give higher V than sigma=3: "
+            f"V_wide={V:.4f}, V_narrow={V_narrow:.4f}"
+        )
+
+    def test_invalid_inputs_raise(self):
+        """Input validation should raise ValueError for bad parameters."""
+        psi0 = np.ones(64, dtype=complex)
+        psi1 = np.zeros(64, dtype=complex)
+
+        with pytest.raises(ValueError, match="same length"):
+            far_field_from_bpm(psi0, np.zeros(32, dtype=complex), 1e-9, 0.05e-9, 1.0)
+
+        with pytest.raises(ValueError, match="dx_si must be positive"):
+            far_field_from_bpm(
+                psi0, psi1, dx_si=0, lambda_si=0.05e-9, screen_distance=1.0
+            )
+
+        with pytest.raises(ValueError, match="lambda_si must be positive"):
+            far_field_from_bpm(
+                psi0, psi1, dx_si=1e-9, lambda_si=-1, screen_distance=1.0
+            )
+
+        with pytest.raises(ValueError, match="screen_distance must be positive"):
+            far_field_from_bpm(
+                psi0, psi1, dx_si=1e-9, lambda_si=0.05e-9, screen_distance=0
+            )
+
+        with pytest.raises(ValueError, match="pad_factor must be >= 1"):
+            far_field_from_bpm(
+                psi0,
+                psi1,
+                dx_si=1e-9,
+                lambda_si=0.05e-9,
+                screen_distance=1.0,
+                pad_factor=0,
             )
