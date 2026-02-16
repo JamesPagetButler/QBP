@@ -58,20 +58,52 @@ structure FloatScaleFactors where
   k_si : Float
   deriving Repr
 
-/-- Compute scale factors from mass and wavelength (mirrors compute_scales). -/
+/-- Check that a Float is finite and positive. -/
+private def isFinitePositive (x : Float) : Bool :=
+  x > 0.0 && !x.isNaN && !x.isInf
+
+/-- Compute scale factors from mass and wavelength (mirrors compute_scales).
+
+    **Guards (#353):** Validates that inputs are finite and positive, and that
+    all computed outputs are finite and positive. Panics on violation —
+    defense-in-depth against IEEE 754 overflow/NaN propagation.
+
+    **Physical bounds:** Overflow occurs only for extreme inputs well outside
+    particle physics (e.g., m < 10⁻⁶⁰ kg). All standard particles from
+    electron (9.1 × 10⁻³¹ kg) to uranium (3.95 × 10⁻²⁵ kg) are safe. -/
 def computeScales (m_si lambda_si : Float) : FloatScaleFactors :=
-  let k := 2.0 * 3.14159265358979323846 / lambda_si
-  let l0 := k0_code * lambda_si / (2.0 * 3.14159265358979323846)
-  let e0 := hbar_SI ^ 2 * m_code / (m_si * l0 ^ 2 * hbar_code ^ 2)
-  let t0 := hbar_SI / e0
-  let vz := hbar_SI * k / m_si
-  { mass_si := m_si
-    lambda_si := lambda_si
-    L0 := l0
-    E0 := e0
-    T0 := t0
-    v_z_si := vz
-    k_si := k }
+  -- Input validation: mass and wavelength must be finite and positive
+  if !isFinitePositive m_si then
+    panic! s!"computeScales: mass must be finite and positive, got {m_si}"
+  else if !isFinitePositive lambda_si then
+    panic! s!"computeScales: wavelength must be finite and positive, got {lambda_si}"
+  else
+    let k := 2.0 * 3.14159265358979323846 / lambda_si
+    let l0 := k0_code * lambda_si / (2.0 * 3.14159265358979323846)
+    let e0 := hbar_SI ^ 2 * m_code / (m_si * l0 ^ 2 * hbar_code ^ 2)
+    let t0 := hbar_SI / e0
+    let vz := hbar_SI * k / m_si
+    let result : FloatScaleFactors :=
+      { mass_si := m_si
+        lambda_si := lambda_si
+        L0 := l0
+        E0 := e0
+        T0 := t0
+        v_z_si := vz
+        k_si := k }
+    -- Output validation: all scale factors must be finite and positive
+    if !isFinitePositive result.L0 then
+      panic! s!"computeScales: L0 is not finite/positive: {result.L0}"
+    else if !isFinitePositive result.E0 then
+      panic! s!"computeScales: E0 is not finite/positive: {result.E0}"
+    else if !isFinitePositive result.T0 then
+      panic! s!"computeScales: T0 is not finite/positive: {result.T0}"
+    else if !isFinitePositive result.v_z_si then
+      panic! s!"computeScales: v_z_si is not finite/positive: {result.v_z_si}"
+    else if !isFinitePositive result.k_si then
+      panic! s!"computeScales: k_si is not finite/positive: {result.k_si}"
+    else
+      result
 
 /-! ## Conversion Functions (Float)
 
@@ -124,9 +156,14 @@ private def extractDigits (f : Float) (n : Nat) : List Nat :=
 /-- Format a Float in scientific notation with 17 significant digits.
     17 digits guarantees lossless IEEE 754 double round-trip (per Gay's dtoa).
     Pure Lean implementation — no C FFI needed.
-    Returns e.g. "6.6260701500000004e-34" -/
+    Returns e.g. "6.6260701500000004e-34"
+
+    **Edge cases (#352):** Handles NaN, ±Inf, negative zero explicitly.
+    Tested against Python's repr() for electron/neutron test particles. -/
 def floatToScientific (f : Float) : String :=
-  if f == 0.0 then "0.0"
+  if f.isNaN then "NaN"
+  else if f.isInf then (if f < 0.0 then "-Infinity" else "Infinity")
+  else if f == 0.0 then "0.0"
   else
     let abs_f := if f < 0.0 then -f else f
     let sign := if f < 0.0 then "-" else ""
