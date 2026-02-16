@@ -121,16 +121,17 @@ private def extractDigits (f : Float) (n : Nat) : List Nat :=
     let d := if d > 9 then 9 else d  -- clamp
     d :: extractDigits ((f - d.toFloat) * 10.0) n
 
-/-- Format a Float in scientific notation with 15 significant digits.
+/-- Format a Float in scientific notation with 17 significant digits.
+    17 digits guarantees lossless IEEE 754 double round-trip (per Gay's dtoa).
     Pure Lean implementation — no C FFI needed.
-    Returns e.g. "6.626070150000000e-34" -/
+    Returns e.g. "6.6260701500000004e-34" -/
 def floatToScientific (f : Float) : String :=
   if f == 0.0 then "0.0"
   else
     let abs_f := if f < 0.0 then -f else f
     let sign := if f < 0.0 then "-" else ""
     let (mantissa, exp) := normalize abs_f 0
-    let digits := extractDigits mantissa 16
+    let digits := extractDigits mantissa 17
     let first := digits.head!
     let rest := digits.tail!
     let restStr := String.join (rest.map (fun d => toString d))
@@ -151,8 +152,20 @@ def jsonObj (pairs : List (String × String)) : String :=
 def jsonArr (items : List String) : String :=
   "[" ++ String.intercalate ", " items ++ "]"
 
-/-- JSON-encode a string value. -/
-def jsonStr (s : String) : String := "\"" ++ s ++ "\""
+/-- Escape special characters for JSON string values.
+    Handles: backslash, double-quote, newline, tab. -/
+def escapeJsonString (s : String) : String :=
+  s.toList.foldl (fun acc c =>
+    acc ++ match c with
+    | '\\' => "\\\\"
+    | '"'  => "\\\""
+    | '\n' => "\\n"
+    | '\t' => "\\t"
+    | c    => c.toString
+  ) ""
+
+/-- JSON-encode a string value with proper escaping. -/
+def jsonStr (s : String) : String := "\"" ++ escapeJsonString s ++ "\""
 
 /-- Generate a JSON object for one test particle's scale factors. -/
 def scaleFactorsToJson (name : String) (sc : FloatScaleFactors) : String :=

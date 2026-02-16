@@ -447,6 +447,117 @@ class TestPropertyVZInvariant:
         assert computed == 40.0
 
 
+class TestPropertyInputValidation:
+    """ValueError guards must reject invalid inputs consistently.
+
+    Property-based tests exercise the validation boundaries that
+    unit tests only check at specific points.
+    """
+
+    @given(
+        lam_si=st.floats(
+            min_value=1e-12, max_value=1e-8, allow_nan=False, allow_infinity=False
+        )
+    )
+    def test_zero_mass_always_raises(self, lam_si: float) -> None:
+        with pytest.raises(ValueError, match="Mass must be positive"):
+            compute_scales(0.0, lam_si)
+
+    @given(
+        lam_si=st.floats(
+            min_value=1e-12, max_value=1e-8, allow_nan=False, allow_infinity=False
+        )
+    )
+    def test_negative_mass_always_raises(self, lam_si: float) -> None:
+        with pytest.raises(ValueError, match="Mass must be positive"):
+            compute_scales(-1e-30, lam_si)
+
+    @given(
+        m_si=st.floats(
+            min_value=1e-31, max_value=1e-24, allow_nan=False, allow_infinity=False
+        )
+    )
+    def test_zero_wavelength_always_raises(self, m_si: float) -> None:
+        with pytest.raises(ValueError, match="Wavelength must be positive"):
+            compute_scales(m_si, 0.0)
+
+    @given(
+        m_si=st.floats(
+            min_value=1e-31, max_value=1e-24, allow_nan=False, allow_infinity=False
+        )
+    )
+    def test_negative_wavelength_always_raises(self, m_si: float) -> None:
+        with pytest.raises(ValueError, match="Wavelength must be positive"):
+            compute_scales(m_si, -1e-10)
+
+
+# ===================================================================
+# Stress test particles (extreme mass/wavelength)
+#
+# Electron and neutron are "safe" middle-ground particles.
+# These test extreme ends of the physical range to check for
+# float underflow/overflow in scale factor computation.
+# ===================================================================
+
+
+class TestStressParticles:
+    """Stress test with extreme mass/wavelength combinations."""
+
+    # Muon: lighter than neutron but heavier than electron
+    M_MUON = 1.883_531_627e-28  # kg
+    LAMBDA_MUON = 1.0e-12  # m (very short wavelength — hard X-ray)
+
+    # Uranium-238: heaviest common atom
+    M_URANIUM = 3.952_860e-25  # kg
+    LAMBDA_URANIUM = 5.0e-12  # m (thermal neutron at extreme mass)
+
+    def test_muon_short_wavelength(self) -> None:
+        """Tiny wavelength → large k_si, large E0. Check no overflow."""
+        sc = compute_scales(self.M_MUON, self.LAMBDA_MUON)
+        assert np.isfinite(sc.L0) and sc.L0 > 0
+        assert np.isfinite(sc.E0) and sc.E0 > 0
+        assert np.isfinite(sc.T0) and sc.T0 > 0
+        assert np.isfinite(sc.v_z_si) and sc.v_z_si > 0
+        assert np.isfinite(sc.k_si) and sc.k_si > 0
+
+    def test_muon_round_trip(self) -> None:
+        """Round-trip must work even at extreme scale."""
+        sc = compute_scales(self.M_MUON, self.LAMBDA_MUON)
+        x_code = 100.0
+        x_si = convert_position(x_code, sc)
+        x_back = convert_length_to_code(x_si, sc)
+        assert x_back == pytest.approx(x_code, rel=1e-12)
+
+        E_code = 50.0
+        E_si = convert_energy(E_code, sc)
+        E_back = convert_energy_to_code(E_si, sc)
+        assert E_back == pytest.approx(E_code, rel=1e-12)
+
+    def test_uranium_heavy_mass(self) -> None:
+        """Heavy mass → small E0, large T0. Check no underflow to zero."""
+        sc = compute_scales(self.M_URANIUM, self.LAMBDA_URANIUM)
+        assert np.isfinite(sc.L0) and sc.L0 > 0
+        assert np.isfinite(sc.E0) and sc.E0 > 0
+        assert np.isfinite(sc.T0) and sc.T0 > 0
+        assert np.isfinite(sc.v_z_si) and sc.v_z_si > 0
+        assert np.isfinite(sc.k_si) and sc.k_si > 0
+
+    def test_uranium_round_trip(self) -> None:
+        """Round-trip at heavy-mass extreme."""
+        sc = compute_scales(self.M_URANIUM, self.LAMBDA_URANIUM)
+        x_code = 100.0
+        x_si = convert_position(x_code, sc)
+        x_back = convert_length_to_code(x_si, sc)
+        assert x_back == pytest.approx(x_code, rel=1e-12)
+
+    def test_T0_positive_at_extremes(self) -> None:
+        """T0 > 0 at both extremes — mirrors Lean T0_pos theorem."""
+        sc_muon = compute_scales(self.M_MUON, self.LAMBDA_MUON)
+        sc_uranium = compute_scales(self.M_URANIUM, self.LAMBDA_URANIUM)
+        assert sc_muon.T0 > 0, f"Muon T0 = {sc_muon.T0}"
+        assert sc_uranium.T0 > 0, f"Uranium T0 = {sc_uranium.T0}"
+
+
 # ===================================================================
 # Cross-language verification (Lean 4 oracle)
 #
