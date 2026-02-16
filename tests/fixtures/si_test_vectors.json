@@ -1,14 +1,1 @@
-{
-  "generator": "QBP Lean 4 Oracle",
-  "v_z_code": 4.000000000000000e+1,
-  "hbar_SI": 1.054571817646156e-34,
-  "eV_in_J": 1.602176633999999e-19,
-  "scale_factors": [
-    {"particle": "electron", "mass_si": 9.109383701499996e-31, "lambda_si": 5.000000000000000e-11, "L0": 1.591549430918953e-10, "E0": 2.409866960895028e-19, "T0": 4.376058242047050e-16, "v_z_si": 1.454779020650742e+7, "k_si": 1.256637061435917e+11},
-    {"particle": "neutron", "mass_si": 1.674927498040000e-27, "lambda_si": 1.800000000000000e-10, "L0": 5.729577951308230e-10, "E0": 1.011302425917109e-23, "T0": 1.042785808300427e-11, "v_z_si": 2.197796673373035e+3, "k_si": 3.490658503988658e+10}
-  ],
-  "round_trips": [
-    {"particle": "electron", "position_code": 3.700000000000000e+0, "position_si": 5.888732894400128e-10, "position_roundtrip": 3.700000000000000e+0, "energy_code": 5.500000000000000e+0, "energy_si": 1.325426828492265e-18, "energy_roundtrip": 5.500000000000000e+0, "potential_code": 1.000000000000000e+1, "potential_eV": 6.016482601867799e+2},
-    {"particle": "neutron", "position_code": 3.700000000000000e+0, "position_si": 2.119943841984045e-9, "position_roundtrip": 3.699999999999999e+0, "energy_code": 5.500000000000000e+0, "energy_si": 5.562163342544098e-23, "energy_roundtrip": 5.500000000000000e+0, "potential_code": 1.000000000000000e+1, "potential_eV": 2.524821307354327e-2}
-  ]
-}
+{"generator": "QBP Lean 4 Oracle", "v_z_code": 4.0000000000000000e+1, "hbar_SI": 1.0545718176461564e-34, "eV_in_J": 1.6021766339999992e-19, "scale_factors": [{"particle": "electron", "mass_si": 9.1093837014999969e-31, "lambda_si": 5.0000000000000000e-11, "L0": 1.5915494309189530e-10, "E0": 2.4098669608950284e-19, "T0": 4.3760582420470504e-16, "v_z_si": 1.4547790206507420e+7, "k_si": 1.2566370614359172e+11}, {"particle": "neutron", "mass_si": 1.6749274980400001e-27, "lambda_si": 1.8000000000000003e-10, "L0": 5.7295779513082303e-10, "E0": 1.0113024259171092e-23, "T0": 1.0427858083004279e-11, "v_z_si": 2.1977966733730354e+3, "k_si": 3.4906585039886586e+10}], "round_trips": [{"particle": "electron", "position_code": 3.7000000000000001e+0, "position_si": 5.8887328944001282e-10, "position_roundtrip": 3.7000000000000001e+0, "energy_code": 5.5000000000000000e+0, "energy_si": 1.3254268284922654e-18, "energy_roundtrip": 5.5000000000000000e+0, "potential_code": 1.0000000000000000e+1, "potential_eV": 6.0164826018677999e+2}, {"particle": "neutron", "position_code": 3.7000000000000001e+0, "position_si": 2.1199438419840457e-9, "position_roundtrip": 3.6999999999999997e+0, "energy_code": 5.5000000000000000e+0, "energy_si": 5.5621633425440988e-23, "energy_roundtrip": 5.5000000000000000e+0, "potential_code": 1.0000000000000000e+1, "potential_eV": 2.5248213073543279e-2}]}
