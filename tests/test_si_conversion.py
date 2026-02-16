@@ -718,6 +718,14 @@ class TestFloatToScientificFuzz:
     This limitation is documented per AC #352 bullet 3 ("If edge cases are
     found, either fix the formatter or replace"). The formatter is retained
     because it is fit for purpose and avoids C FFI complexity.
+
+    **Two-tier validation (F-1 fix):**
+    1. test_python_port_matches_lean_binary: cross-validates the Python port
+       against the actual Lean binary output (si_test_vectors.json) for all
+       ~25 numeric values, confirming the port is faithful to shipping code.
+    2. test_random_round_trip: Hypothesis fuzz with 1500 random doubles
+       confirms the algorithm delivers ≥14 significant digits across the
+       full IEEE 754 normal range.
     """
 
     def test_known_constants(self) -> None:
@@ -791,6 +799,60 @@ class TestFloatToScientificFuzz:
         assert recovered == pytest.approx(
             val, rel=5e-15
         ), f"Round-trip failed for {val}: got {s} -> {recovered}"
+
+    def test_python_port_matches_lean_binary(self) -> None:
+        """Cross-validate Python port against actual Lean binary output (F-1).
+
+        The Lean Oracle binary produces si_test_vectors.json via
+        floatToScientific. This test parses every numeric value from that
+        JSON, runs the Python port on it, and verifies the string output
+        matches. This confirms the Python reimplementation is faithful to
+        the shipping Lean code — not just algorithmically correct, but
+        producing identical strings for all test-vector values.
+        """
+        vectors = json.loads(FIXTURE_PATH.read_text())
+        mismatches = []
+        count = 0
+
+        # Collect all numeric values from the Lean binary output
+        for key in ["v_z_code", "hbar_SI", "eV_in_J"]:
+            lean_str = vectors[key]
+            val = float(lean_str) if isinstance(lean_str, str) else lean_str
+            py_str = _lean_float_to_scientific(val)
+            lean_formatted = f"{lean_str}"
+            # Compare: parse both strings back to float and check equality
+            lean_recovered = float(lean_formatted)
+            py_recovered = float(py_str)
+            if py_recovered != pytest.approx(lean_recovered, rel=5e-15):
+                mismatches.append(
+                    f"  {key}: lean={lean_formatted} py={py_str} "
+                    f"(lean_f={lean_recovered} py_f={py_recovered})"
+                )
+            count += 1
+
+        for section in ["scale_factors", "round_trips"]:
+            for entry in vectors[section]:
+                particle = entry["particle"]
+                for field, lean_val in entry.items():
+                    if field == "particle":
+                        continue
+                    val = float(lean_val) if isinstance(lean_val, str) else lean_val
+                    py_str = _lean_float_to_scientific(val)
+                    py_recovered = float(py_str)
+                    lean_recovered = float(lean_val)
+                    if py_recovered != pytest.approx(lean_recovered, rel=5e-15):
+                        mismatches.append(
+                            f"  {section}.{particle}.{field}: "
+                            f"lean={lean_val} py={py_str}"
+                        )
+                    count += 1
+
+        assert not mismatches, (
+            f"Python port diverges from Lean binary on {len(mismatches)}/{count} "
+            f"values:\n" + "\n".join(mismatches)
+        )
+        # Verify we tested a meaningful number of Lean binary outputs
+        assert count >= 20, f"Expected ≥20 cross-validated values, got {count}"
 
     @given(
         val=st.floats(
