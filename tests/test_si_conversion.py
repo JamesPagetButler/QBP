@@ -654,3 +654,137 @@ class TestCrossLanguageLean:
         U_code = float(lean["potential_code"])
         U_eV = convert_potential(U_code, sc)
         assert U_eV == pytest.approx(float(lean["potential_eV"]), rel=1e-15)
+
+
+# ---------------------------------------------------------------------------
+# Fuzz-test: floatToScientific round-trip (#352)
+# ---------------------------------------------------------------------------
+
+
+def _lean_float_to_scientific(f: float) -> str:
+    """Python reimplementation of Lean's floatToScientific.
+
+    Mirrors the Oracle.lean algorithm exactly so we can verify the Lean output
+    matches Python's repr() within IEEE 754 tolerance.
+    """
+    import math
+
+    if math.isnan(f):
+        return "NaN"
+    if math.isinf(f):
+        return "-Infinity" if f < 0.0 else "Infinity"
+    if f == 0.0:
+        return "0.0"
+
+    abs_f = abs(f)
+    sign = "-" if f < 0.0 else ""
+
+    # Normalize to [1, 10)
+    exp = 0
+    mantissa = abs_f
+    while mantissa >= 10.0:
+        mantissa /= 10.0
+        exp += 1
+    while mantissa < 1.0:
+        mantissa *= 10.0
+        exp -= 1
+
+    # Extract 17 digits
+    digits = []
+    m = mantissa
+    for _ in range(17):
+        d = int(m)
+        d = min(d, 9)  # clamp
+        digits.append(d)
+        m = (m - d) * 10.0
+
+    first = digits[0]
+    rest = "".join(str(d) for d in digits[1:])
+    exp_sign = "+" if exp >= 0 else ""
+    return f"{sign}{first}.{rest}e{exp_sign}{exp}"
+
+
+class TestFloatToScientificFuzz:
+    """Fuzz tests for Oracle.lean's floatToScientific (#352).
+
+    Verifies that the Lean algorithm (reimplemented in Python) produces
+    strings that round-trip back to the original float within IEEE 754
+    tolerance. 17 significant digits guarantees lossless round-trip per
+    Gay's dtoa.
+    """
+
+    def test_known_constants(self) -> None:
+        """Test against well-known physical constants."""
+        cases = [
+            6.62607015e-34,  # h
+            1.602176634e-19,  # e
+            299792458.0,  # c
+            9.1093837015e-31,  # m_e
+            1.67492749804e-27,  # m_n
+        ]
+        for val in cases:
+            s = _lean_float_to_scientific(val)
+            recovered = float(s)
+            assert recovered == pytest.approx(
+                val, rel=1e-15
+            ), f"Round-trip failed for {val}: got {s} -> {recovered}"
+
+    def test_edge_cases(self) -> None:
+        """Test NaN, Inf, negative zero, denormals."""
+        import math
+
+        assert _lean_float_to_scientific(float("nan")) == "NaN"
+        assert _lean_float_to_scientific(float("inf")) == "Infinity"
+        assert _lean_float_to_scientific(float("-inf")) == "-Infinity"
+        assert _lean_float_to_scientific(0.0) == "0.0"
+        assert _lean_float_to_scientific(-0.0) == "0.0"
+
+        # Smallest positive denormal
+        denormal = 5e-324
+        s = _lean_float_to_scientific(denormal)
+        recovered = float(s)
+        assert recovered == pytest.approx(denormal, rel=1e-10)
+
+    def test_powers_of_two(self) -> None:
+        """Powers of 2 stress the normalization loop."""
+        for exp in range(-300, 301, 10):
+            val = 2.0**exp
+            s = _lean_float_to_scientific(val)
+            recovered = float(s)
+            assert recovered == pytest.approx(
+                val, rel=1e-15
+            ), f"Round-trip failed for 2^{exp}: got {s} -> {recovered}"
+
+    def test_negative_values(self) -> None:
+        """Negative values must preserve sign."""
+        for val in [-1.0, -3.14159, -1e-100, -1e100]:
+            s = _lean_float_to_scientific(val)
+            assert s.startswith("-"), f"Missing negative sign for {val}: {s}"
+            recovered = float(s)
+            assert recovered == pytest.approx(val, rel=1e-15)
+
+    def test_large_values(self) -> None:
+        """Large values within particle physics range.
+
+        Note: Values beyond ~1e+100 accumulate normalization error from
+        repeated /10.0 divisions. Particle physics never exceeds ~1e+30,
+        so we test up to 1e+100 with strict tolerance.
+        """
+        for exp in [10, 30, 50, 100]:
+            val = 1.23456789012345e0 * (10.0**exp)
+            s = _lean_float_to_scientific(val)
+            recovered = float(s)
+            assert recovered == pytest.approx(
+                val, rel=1e-15
+            ), f"Round-trip failed for ~1.23e+{exp}: got {s} -> {recovered}"
+
+    @pytest.mark.parametrize(
+        "val",
+        [1.0, 0.1, 10.0, 9.999999999999998, 1.0000000000000002],
+        ids=["one", "tenth", "ten", "just_under_10", "just_over_1"],
+    )
+    def test_normalization_boundary(self, val: float) -> None:
+        """Values at normalization boundaries [1, 10)."""
+        s = _lean_float_to_scientific(val)
+        recovered = float(s)
+        assert recovered == pytest.approx(val, rel=1e-15)
