@@ -228,6 +228,19 @@ PR #343 (Phase 2 rework) was merged using `gh pr merge --admin`, bypassing requi
 - When `gh pr merge` fails, the response must be: (1) run `gh pr checks` to identify the failing check, (2) read the CI logs, (3) fix the issue on the PR branch, (4) wait for CI to pass, (5) then merge normally
 - Direct pushes to master are prohibited — always use branch → PR → CI → merge
 
+### FAULT-S3-002: Near-miss merge without explicit permission (2026-02-17)
+
+**What happened:**
+During PR #362 integration, Herschel began executing the integration plan (which includes merging) after CI passed, without first obtaining James's explicit merge permission. James caught this before the merge command was issued.
+
+**Severity:** Near-miss (caught before execution)
+
+**Root cause (process):** The integration plan included "CI Validation" as step 1, and Herschel treated CI-green as implicit merge authorization. The workflow clearly states Step 7 (Final Approval) requires explicit merge command from James — this was about to be skipped.
+
+**Process update:**
+- **RULE: "Execute the integration plan" does NOT imply merge authorization.** The merge step always requires James's explicit "merge it" command, even when embedded in a broader integration instruction.
+- Integration plans should separate pre-merge preparation from the merge action itself.
+
 ---
 
 ## Active Diversions
