@@ -15,6 +15,8 @@
 #include "proof_graph.h"
 #include "theme.h"
 #include "fonts.h"
+#include <math.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -457,6 +459,18 @@ void graph_init_stern_gerlach(ProofGraph *g)
 /* Forward declaration for calc_node_width */
 static float calc_node_width(const ProofNode *n);
 
+/* Barycenter pair for qsort-based ordering (replaces O(n²) bubble sort) */
+typedef struct { float bc; int node_id; } BcPair;
+
+static int cmp_bc_pair(const void *a, const void *b) {
+    float fa = ((const BcPair *)a)->bc;
+    float fb = ((const BcPair *)b)->bc;
+    /* NaN-safe: treat NaN as +∞ so qsort gets a total order */
+    if (isnan(fa)) return isnan(fb) ? 0 : 1;
+    if (isnan(fb)) return -1;
+    return (fa > fb) - (fa < fb);
+}
+
 void graph_layout(ProofGraph *g, Rectangle area)
 {
     if (g->node_count == 0) return;
@@ -570,18 +584,16 @@ void graph_layout(ProofGraph *g, Rectangle area)
             }
         }
 
-        /* Sort by barycenter */
-        for (int i = 0; i < count - 1; i++) {
-            for (int j = i + 1; j < count; j++) {
-                if (barycenters[j] < barycenters[i]) {
-                    float tmp_b = barycenters[i];
-                    barycenters[i] = barycenters[j];
-                    barycenters[j] = tmp_b;
-                    int tmp_n = nodes_at_level[lvl][i];
-                    nodes_at_level[lvl][i] = nodes_at_level[lvl][j];
-                    nodes_at_level[lvl][j] = tmp_n;
-                }
-            }
+        /* Sort by barycenter using paired sort (O(n log n) via qsort) */
+        BcPair bc_pairs[MAX_NODES];
+        for (int i = 0; i < count; i++) {
+            bc_pairs[i].bc = barycenters[i];
+            bc_pairs[i].node_id = nodes_at_level[lvl][i];
+        }
+        qsort(bc_pairs, (size_t)count, sizeof(BcPair), cmp_bc_pair);
+        for (int i = 0; i < count; i++) {
+            barycenters[i] = bc_pairs[i].bc;
+            nodes_at_level[lvl][i] = bc_pairs[i].node_id;
         }
 
         /* Position nodes - compute total width first */

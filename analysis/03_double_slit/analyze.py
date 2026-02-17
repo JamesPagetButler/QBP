@@ -31,6 +31,7 @@ project_root = os.path.dirname(
 sys.path.insert(0, project_root)
 
 from src.viz.theme import apply_matplotlib_theme, COLORS, PALETTE
+from tests.physics.test_double_slit import ETA_NOISE_FLOOR
 
 
 # ============================================================================
@@ -181,6 +182,8 @@ def compute_metrics(
     norm_max_dev = (summary_df["norm_final"] - 1.0).abs().max()
 
     # η jump characterization (using eta0=0.5 for largest dynamic range)
+    # Note: visibility is η₀-independent (unitarity of SO(4)), but global η
+    # shifts during propagation when Re(ψ₀·ψ₁*) ≠ 0 pointwise (#335).
     eta_jumps = []
     u1_values = sorted(decay_df["U1_strength_eV"].unique())
     for u1 in u1_values:
@@ -231,12 +234,22 @@ def compute_metrics(
     v_min = sc["visibility"].min()
     v_max = sc["visibility"].max()
 
+    # Flag η values below ETA_NOISE_FLOOR as numerical artifact (PR #362)
+    eta_below_floor = []
+    if len(decay_df) > 0 and "eta_fraction" in decay_df.columns:
+        artifact_mask = decay_df["eta_fraction"].abs() < ETA_NOISE_FLOOR
+        eta_below_floor_count = artifact_mask.sum()
+    else:
+        eta_below_floor_count = 0
+
     return {
         "visibility_table": vis_table,
         "norm_max_deviation": norm_max_dev,
         "eta_jump_table": eta_jumps,
         "eta0_independence_max_diff": eta0_max_diff,
         "v_range": (v_min, v_max),
+        "eta_noise_floor": ETA_NOISE_FLOOR,
+        "eta_below_floor_count": eta_below_floor_count,
     }
 
 
@@ -1276,7 +1289,7 @@ context strip below shows where the coupling potential U₁(z) is active.
 
 ---
 
-## 6. Norm Conservation
+## 6. Norm Conservation & Numerical Baseline
 
 | Metric | Value |
 |--------|-------|
@@ -1286,6 +1299,17 @@ context strip below shows where the coupling potential U₁(z) is active.
 
 All BPM runs conserve norm to machine precision, confirming the unitary
 evolution is correctly implemented.
+
+### Numerical Noise Floor
+
+| Metric | Value |
+|--------|-------|
+| η noise floor | {metrics['eta_noise_floor']:.0e} |
+| Decay points below floor | {metrics['eta_below_floor_count']} |
+
+Any η value below {metrics['eta_noise_floor']:.0e} is numerical artifact, not physics.
+This threshold was established by free-space control testing (PR #333, #362)
+and validated at every BPM diagnostic step.
 
 ---
 
