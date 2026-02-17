@@ -527,10 +527,9 @@ def plot_fringe_comparison(
     ax = axes[1]
     sc_b = fringe_df[fringe_df["scenario"] == "B"].sort_values("x_position_m")
     x_mm = sc_b["x_position_m"].values * 1e3
-    i_norm = sc_b["intensity_total_normalized"].values
-    i_max = i_norm.max()
-    if i_max > 0:
-        i_norm = i_norm / i_max
+    i_b_raw = sc_b["intensity_total_normalized"].values
+    # Normalize to Panel A peak for consistent relative amplitude
+    i_norm = i_b_raw / i_a_peak if i_a_peak > 0 else i_b_raw
 
     ax.plot(x_mm, i_norm, color=COLORS.BRASS.hex, linewidth=1.2)
     ax.set_xlim(-0.5, 0.5)
@@ -602,7 +601,7 @@ def plot_fringe_comparison(
             label=f"U₁ = {u1_max:.0f} eV (V_ff ≈ {v_qbp:.3f})",
         )
 
-        ax.set_xlim(-2000, 2000)
+        ax.set_xlim(-1500, 1500)
         ax.set_xlabel("Position x (mm)", fontsize=11)
         ax.set_ylabel("I / max(I_expected)", fontsize=11)
         ax.set_title(
@@ -629,7 +628,7 @@ def plot_fringe_comparison(
         )
         caption_text = (
             "Panels A/B: analytical far-field (±0.5 mm, 47 µm fringes). "
-            "Panel C: QBP far-field (±2 m, ~13 mm fringes from Gaussian source).\n"
+            "Panel C: QBP far-field (±1.5 m, ~13 mm fringes from Gaussian source).\n"
             "Different scales reflect different source profiles — see V(U₁) curve for quantitative comparison."
         )
     else:
@@ -1039,11 +1038,15 @@ def _get_farfield_qbp_curve(
             & (ff_qbp_df["eta0"] == eta0_val)
         ].sort_values("x_position_m")
 
+    if len(sel) == 0:
+        raise ValueError(
+            f"No far-field QBP data for U1={u1_value}, eta0={eta0_val}, regime={regime}"
+        )
+
     return sel["x_position_m"].values, sel["intensity_total_normalized"].values
 
 
 def plot_farfield_hero_overlay(
-    fringe_df: pd.DataFrame,
     summary_df: pd.DataFrame,
     metadata: Dict,
     output_path: str,
@@ -1091,9 +1094,14 @@ def plot_farfield_hero_overlay(
         2, 1, figsize=(12, 8), gridspec_kw={"height_ratios": [3, 2]}
     )
 
+    # Validate grids match before any operations that assume it
+    assert len(x_base_m) == len(x_max_m) and np.allclose(
+        x_base_m, x_max_m
+    ), "QBP grids must match for baseline vs coupled comparison"
+
     x_base_mm = x_base_m * 1e3
     x_max_mm = x_max_m * 1e3
-    x_lim_mm = 2000  # ±2000 mm — shows full FWHM envelope with fringes
+    x_lim_mm = 1500  # ±1500 mm — avoids FFT edge artifacts at boundaries
 
     # --- Top panel: full far-field envelope with fringes ---
     ax = axes[0]
@@ -1227,7 +1235,7 @@ def plot_farfield_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
         color=COLORS.TEAL.hex,
         markersize=10,
         linewidth=2,
-        label=f"Far-field V (BPM+FFT)",
+        label="Far-field V (BPM+FFT)",
         zorder=5,
     )
 
@@ -1240,7 +1248,7 @@ def plot_farfield_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
         markersize=7,
         linewidth=1.5,
         alpha=0.5,
-        label=f"Near-field V (BPM only)",
+        label="Near-field V (BPM only)",
         zorder=3,
     )
 
@@ -1308,7 +1316,6 @@ def plot_farfield_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
 
 
 def plot_farfield_residual(
-    fringe_df: pd.DataFrame,
     metadata: Dict,
     output_path: str,
 ):
@@ -1337,7 +1344,7 @@ def plot_farfield_residual(
     residual = (i_max - i_base) / i_base_peak
 
     x_mm = x_base_m * 1e3
-    x_lim_mm = 2000  # ±2000 mm — matches hero overlay
+    x_lim_mm = 1500  # ±1500 mm — matches hero overlay, avoids FFT edge artifacts
 
     # Clip to view range for stats
     mask = (x_mm >= -x_lim_mm) & (x_mm <= x_lim_mm)
@@ -1684,9 +1691,9 @@ def generate_results_md(
             _, i_max_ff = _get_farfield_qbp_curve(metadata, u1_value=u1_max_ff)
             i_base_peak_ff = i_base_ff.max()
             ff_residual = (i_max_ff - i_base_ff) / i_base_peak_ff
-            # Stats within ±2000 mm view
+            # Stats within ±1500 mm view (matches hero overlay clip)
             x_mm_ff = x_base_ff * 1e3
-            view_mask = (x_mm_ff >= -2000) & (x_mm_ff <= 2000)
+            view_mask = (x_mm_ff >= -1500) & (x_mm_ff <= 1500)
             ff_res_view = ff_residual[view_mask]
             ff_res_max = ff_res_view.max()
             ff_res_min = ff_res_view.min()
@@ -1699,8 +1706,15 @@ def generate_results_md(
                 f"| RMS residual | {ff_res_rms:.6f} |\n"
                 f"| Pattern | Oscillatory (modulates far-field fringes) |"
             )
+            ff_residual_asymmetry_str = (
+                f"\nThe residual is asymmetric: peak suppression (max {ff_res_max:+.6f}) is stronger than\n"
+                f"trough elevation (min {ff_res_min:+.6f}), suggesting the quaternionic coupling preferentially\n"
+                f"reduces fringe peaks rather than uniformly redistributing intensity. This is consistent\n"
+                f"with an out-scattering mechanism rather than pure symmetric decoherence."
+            )
         except Exception:
             ff_residual_stats_str = "*(Residual computation failed)*"
+            ff_residual_asymmetry_str = ""
 
         ff_reduction_pct = (ff_v_max - ff_v_min) / ff_v_max * 100
 
@@ -1728,8 +1742,10 @@ Fraunhofer FFT to the far-field detector plane (mm scale).
 **Far-field V reduction:** {ff_v_max:.6f} → {ff_v_min:.6f} ({ff_reduction_pct:.1f}% decrease)
 
 The far-field baseline V_ff ≈ {ff_v_max:.3f} (vs analytical V = 1.0) reflects the
-Gaussian source coherence of the BPM — the finite spatial extent of the source
-wavepacket reduces fringe visibility even in the absence of quaternionic coupling.
+finite spatial extent of the Gaussian BPM source. V_ff > V_nf because far-field
+propagation via diffraction expands the wavepackets from each slit, increasing
+their spatial overlap at the detector and improving interference contrast
+relative to the near-field where the two beams are more spatially distinct.
 The ~{ff_reduction_pct:.0f}% reduction from QBP coupling is preserved through the FFT
 propagation to the far field.
 
@@ -1737,10 +1753,11 @@ propagation to the far field.
 
 ![Far-Field Hero Overlay](farfield_hero_overlay.png)
 
-**Caption:** Far-field detector pattern on mm-scale axes. Grey: analytical A
-(V = 1.0). Teal: QBP baseline (U₁ = 0 eV, V_ff = {ff_v_max:.4f}). Crimson:
-QBP max coupling (U₁ = {u1_max_val:.0f} eV, V_ff = {ff_v_min:.4f}). All three
-curves share the same far-field x-axis for true apples-to-apples comparison.
+**Caption:** Far-field detector pattern on mm-scale axes.
+Teal: QBP baseline (U₁ = 0 eV, V_ff = {ff_v_max:.4f}). Crimson:
+QBP max coupling (U₁ = {u1_max_val:.0f} eV, V_ff = {ff_v_min:.4f}).
+Analytical A (plane-wave, 47 µm fringes) is at a fundamentally different
+scale and cannot be overlaid — see V(U₁) curve for quantitative comparison.
 
 ### 9.4 Far-Field Visibility vs U₁
 
@@ -1761,17 +1778,21 @@ structure confirms the QBP signal survives FFT propagation to experimentally
 observable scales.
 
 {ff_residual_stats_str}
+{ff_residual_asymmetry_str}
 
 ### 9.6 Updated Three-Panel Comparison (A/B/C — Far-Field)
 
 ![Fringe Comparison](fringe_comparison.png)
 
-**Caption:** Three-panel comparison with all panels on the same mm-scale far-field axes:
-- **Top (A):** Analytical full interference (V = 1.0)
-- **Middle (B):** Analytical which-path (V = 0.0)
-- **Bottom (C):** QBP far-field via BPM + Fraunhofer FFT
+**Caption:** Three-panel comparison — all panels show far-field patterns, though at
+different spatial scales reflecting different source profiles:
+- **Top (A):** Analytical full interference (V = 1.0) — plane-wave, ±0.5 mm
+- **Middle (B):** Analytical which-path (V = 0.0) — plane-wave, ±0.5 mm
+- **Bottom (C):** QBP far-field via BPM + Fraunhofer FFT — Gaussian source, ±1.5 m
 
-This is a true apples-to-apples comparison — all three scenarios at the same detector scale.
+**Note:** The 3-order-of-magnitude scale difference between Panels A/B and C reflects
+the different source profiles (plane-wave vs Gaussian), not a plotting error. See V(U₁)
+curve (§9.4) for the quantitative apples-to-apples visibility comparison.
 """
 
     # AC verification — near-field (#342) + far-field (#360)
@@ -2047,7 +2068,6 @@ def main():
     if metadata.get("farfield_qbp_df") is not None:
         print("Generating far-field visualizations...")
         plot_farfield_hero_overlay(
-            fringe_df,
             summary_df,
             metadata,
             os.path.join(output_dir, "farfield_hero_overlay.png"),
@@ -2057,7 +2077,6 @@ def main():
             os.path.join(output_dir, "farfield_visibility_vs_u1.png"),
         )
         plot_farfield_residual(
-            fringe_df,
             metadata,
             os.path.join(output_dir, "farfield_residual.png"),
         )

@@ -1,6 +1,6 @@
 # Experiment 03: Double-Slit — Phase 3 Visualization Results
 
-**Analysis Date:** 2026-02-17 16:07:48
+**Analysis Date:** 2026-02-17 16:44:28
 **Data Source:** `results/03_double_slit/`
 **Sprint:** 3 (SI Redo)
 
@@ -241,8 +241,10 @@ Fraunhofer FFT to the far-field detector plane (mm scale).
 **Far-field V reduction:** 0.655363 → 0.599590 (8.5% decrease)
 
 The far-field baseline V_ff ≈ 0.655 (vs analytical V = 1.0) reflects the
-Gaussian source coherence of the BPM — the finite spatial extent of the source
-wavepacket reduces fringe visibility even in the absence of quaternionic coupling.
+finite spatial extent of the Gaussian BPM source. V_ff > V_nf because far-field
+propagation via diffraction expands the wavepackets from each slit, increasing
+their spatial overlap at the detector and improving interference contrast
+relative to the near-field where the two beams are more spatially distinct.
 The ~9% reduction from QBP coupling is preserved through the FFT
 propagation to the far field.
 
@@ -250,10 +252,11 @@ propagation to the far field.
 
 ![Far-Field Hero Overlay](farfield_hero_overlay.png)
 
-**Caption:** Far-field detector pattern on mm-scale axes. Grey: analytical A
-(V = 1.0). Teal: QBP baseline (U₁ = 0 eV, V_ff = 0.6554). Crimson:
-QBP max coupling (U₁ = 602 eV, V_ff = 0.5996). All three
-curves share the same far-field x-axis for true apples-to-apples comparison.
+**Caption:** Far-field detector pattern on mm-scale axes.
+Teal: QBP baseline (U₁ = 0 eV, V_ff = 0.6554). Crimson:
+QBP max coupling (U₁ = 602 eV, V_ff = 0.5996).
+Analytical A (plane-wave, 47 µm fringes) is at a fundamentally different
+scale and cannot be overlaid — see V(U₁) curve for quantitative comparison.
 
 ### 9.4 Far-Field Visibility vs U₁
 
@@ -277,19 +280,27 @@ observable scales.
 |--------|-------|
 | Max residual | +0.049672 |
 | Min residual | -0.014332 |
-| RMS residual | 0.003607 |
+| RMS residual | 0.003779 |
 | Pattern | Oscillatory (modulates far-field fringes) |
+
+The residual is asymmetric: peak suppression (max +0.049672) is stronger than
+trough elevation (min -0.014332), suggesting the quaternionic coupling preferentially
+reduces fringe peaks rather than uniformly redistributing intensity. This is consistent
+with an out-scattering mechanism rather than pure symmetric decoherence.
 
 ### 9.6 Updated Three-Panel Comparison (A/B/C — Far-Field)
 
 ![Fringe Comparison](fringe_comparison.png)
 
-**Caption:** Three-panel comparison with all panels on the same mm-scale far-field axes:
-- **Top (A):** Analytical full interference (V = 1.0)
-- **Middle (B):** Analytical which-path (V = 0.0)
-- **Bottom (C):** QBP far-field via BPM + Fraunhofer FFT
+**Caption:** Three-panel comparison — all panels show far-field patterns, though at
+different spatial scales reflecting different source profiles:
+- **Top (A):** Analytical full interference (V = 1.0) — plane-wave, ±0.5 mm
+- **Middle (B):** Analytical which-path (V = 0.0) — plane-wave, ±0.5 mm
+- **Bottom (C):** QBP far-field via BPM + Fraunhofer FFT — Gaussian source, ±1.5 m
 
-This is a true apples-to-apples comparison — all three scenarios at the same detector scale.
+**Note:** The 3-order-of-magnitude scale difference between Panels A/B and C reflects
+the different source profiles (plane-wave vs Gaussian), not a plotting error. See V(U₁)
+curve (§9.4) for the quantitative apples-to-apples visibility comparison.
 
 ---
 
