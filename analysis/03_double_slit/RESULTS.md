@@ -1,6 +1,6 @@
 # Experiment 03: Double-Slit — Phase 3 Visualization Results
 
-**Analysis Date:** 2026-02-17 16:44:28
+**Analysis Date:** 2026-02-17 18:21:21
 **Data Source:** `results/03_double_slit/`
 **Sprint:** 3 (SI Redo)
 
@@ -70,9 +70,9 @@ Fraunhofer far-field conditions (mm scale).
 ![Hero Fringe Overlay](hero_fringe_overlay.png)
 
 **Caption:** Full nearfield detector pattern comparing the Expected baseline (U₁ = 0 eV,
-teal) with the QBP coupling case (U₁ = 602 eV, crimson). Both curves share
+crimson/red) with the QBP coupling case (U₁ = 602 eV, teal). Both curves share
 the same detector x-axis in nm. The reduction in peak height under quaternionic coupling
-is visible as lower fringe contrast in the crimson curve.
+is visible as lower fringe contrast in the teal curve.
 
 ### 3.2 Zoomed Fringes (±0.05 nm)
 
@@ -177,9 +177,10 @@ and validated at every BPM diagnostic step.
 | AC #7 | RESULTS.md with residual analysis | PASS | See §3.4 |
 | AC #8 | VPython loads v3 | PASS | double_slit_viz.py supports v3 |
 | FF-AC #1 | Hero far-field overlay (mm scale) | PASS | See farfield_hero_overlay.png, §9.3 |
-| FF-AC #2 | Far-field V(U₁) curve | PASS | See farfield_visibility_vs_u1.png, §9.4 |
-| FF-AC #3 | Far-field residual plot | PASS | See farfield_residual.png, §9.5 |
-| FF-AC #4 | Panel C uses far-field QBP (mm scale) | PASS | See fringe_comparison.png, §9.6 |
+| FF-AC #1b | Far-field A vs QBP comparison | PASS | See farfield_ab_comparison.png, §9.4 |
+| FF-AC #2 | Far-field V(U₁) curve | PASS | See farfield_visibility_vs_u1.png, §9.5 |
+| FF-AC #3 | Far-field residual plot | PASS | See farfield_residual.png, §9.6 |
+| FF-AC #4 | Panel C uses far-field QBP (mm scale) | PASS | See fringe_comparison.png, §9.7 |
 | FF-AC #5 | RESULTS.md with far-field findings | PASS | See §9 |
 | FF-AC #6 | All plots labeled, SI units, ≥300 dpi | PASS | All PNGs at 300 dpi |
 
@@ -253,12 +254,23 @@ propagation to the far field.
 ![Far-Field Hero Overlay](farfield_hero_overlay.png)
 
 **Caption:** Far-field detector pattern on mm-scale axes.
-Teal: QBP baseline (U₁ = 0 eV, V_ff = 0.6554). Crimson:
+Crimson (red): Expected baseline (U₁ = 0 eV, V_ff = 0.6554). Teal:
 QBP max coupling (U₁ = 602 eV, V_ff = 0.5996).
 Analytical A (plane-wave, 47 µm fringes) is at a fundamentally different
 scale and cannot be overlaid — see V(U₁) curve for quantitative comparison.
 
-### 9.4 Far-Field Visibility vs U₁
+### 9.4 Far-Field Comparison: Standard QM vs QBP
+
+![Far-Field A/B Comparison](farfield_ab_comparison.png)
+
+**Caption:** Direct comparison of the two far-field predictions for the same double-slit:
+- **Panel A:** Standard QM (plane-wave source, V = 1.0) — fringes at ~47 µm spacing.
+- **Panel B:** QBP (Gaussian BPM + FFT, U₁ = 602 eV, V = 0.5996) — fringes at ~13 mm spacing.
+
+The fringe broadening in Panel B reflects the finite Gaussian source, not the quaternionic
+coupling. The coupling's effect is the reduced visibility (V = 0.5996 vs 1.0).
+
+### 9.5 Far-Field Visibility vs U₁
 
 ![Far-Field Visibility](farfield_visibility_vs_u1.png)
 
@@ -267,7 +279,7 @@ scale and cannot be overlaid — see V(U₁) curve for quantitative comparison.
 decrease with increasing quaternionic coupling. The far-field curve has higher
 baseline visibility due to Gaussian source coherence at the detector plane.
 
-### 9.5 Far-Field Residual
+### 9.6 Far-Field Residual
 
 ![Far-Field Residual](farfield_residual.png)
 
@@ -288,7 +300,7 @@ trough elevation (min -0.014332), suggesting the quaternionic coupling preferent
 reduces fringe peaks rather than uniformly redistributing intensity. This is consistent
 with an out-scattering mechanism rather than pure symmetric decoherence.
 
-### 9.6 Updated Three-Panel Comparison (A/B/C — Far-Field)
+### 9.7 Updated Three-Panel Comparison (A/B/C — Far-Field)
 
 ![Fringe Comparison](fringe_comparison.png)
 
@@ -300,7 +312,7 @@ different spatial scales reflecting different source profiles:
 
 **Note:** The 3-order-of-magnitude scale difference between Panels A/B and C reflects
 the different source profiles (plane-wave vs Gaussian), not a plotting error. See V(U₁)
-curve (§9.4) for the quantitative apples-to-apples visibility comparison.
+curve (§9.5) for the quantitative apples-to-apples visibility comparison.
 
 ---
 

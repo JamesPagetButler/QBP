@@ -14,7 +14,7 @@ Six graph panels:
   2  — "Visibility vs Coupling Strength": V vs U₁ scatter
   3  — "Near-Field BPM Fringe Pattern": I(x) in nm (full)
   4  — "Zoomed: Individual Interference Fringes": ~12 fringes at center
-  5  — "Far-Field Reference": Standard QM vs Which-Path (mm scale)
+  5  — "Far-Field Comparison": Standard QM vs QBP (mm scale, actual BPM+FFT)
 
 Controls: U₁ slider, η₀ buttons, live stats.
 
@@ -58,8 +58,8 @@ from src.viz.theme import COLORS, TEXT
 # ---------------------------------------------------------------------------
 COL_ADLER = COLORS.BRASS  # #D4A574 — Adler prediction
 COL_STD_QM = COLORS.STEEL  # #71797E — Standard QM (U₁=0 control)
-COL_BPM = COLORS.TEAL  # #2A9D8F — QBP BPM result
-COL_BPM_MAX = COLORS.CRIMSON  # #9B2335 — QBP at max coupling
+COL_EXPECTED = COLORS.CRIMSON  # #9B2335 — Expected/baseline (red = expected)
+COL_QBP = COLORS.TEAL  # #2A9D8F — QBP coupling result (teal = QBP)
 COL_AMBER = COLORS.AMBER  # #F4A261 — Coupling region shade
 COL_GOLD = COLORS.GOLD  # #FFD700 — Current-selection highlight
 
@@ -89,11 +89,12 @@ def load_latest_data():
     Tries v3 format first (``results/03_double_slit/v3/``), then falls
     back to the legacy v2 format in the parent directory.
 
-    Returns ``(decay_df, nearfield_df, farfield_df, summary_df, metadata, timestamp)``.
+    Returns ``(decay_df, nearfield_df, farfield_df, farfield_qbp_df, summary_df, metadata, timestamp)``.
 
     For v3 format, ``nearfield_df`` contains BPM data with a ``regime``
-    column (``"expected"`` or ``"qbp"``), and ``farfield_df`` contains
-    analytical scenarios A/B.  For legacy format, ``nearfield_df`` holds
+    column (``"expected"`` or ``"qbp"``), ``farfield_df`` contains
+    analytical scenarios A/B, and ``farfield_qbp_df`` contains BPM+FFT
+    far-field predictions.  For legacy format, ``nearfield_df`` holds
     all fringe data (scenarios A+B+C) and ``farfield_df`` is ``None``.
     """
     # --- Try v3 format first ---
@@ -112,6 +113,15 @@ def load_latest_data():
             pd.read_csv(farfield_path) if os.path.exists(farfield_path) else None
         )
 
+        farfield_qbp_path = os.path.join(
+            V3_DIR, f"results_farfield_qbp_{timestamp}.csv"
+        )
+        farfield_qbp_df = (
+            pd.read_csv(farfield_qbp_path)
+            if os.path.exists(farfield_qbp_path)
+            else None
+        )
+
         decay_path = os.path.join(V3_DIR, f"decay_{timestamp}.csv")
         decay_df = pd.read_csv(decay_path) if os.path.exists(decay_path) else None
 
@@ -125,7 +135,17 @@ def load_latest_data():
                 metadata = json.load(f)
 
         print(f"Loaded v3 data (timestamp {timestamp})")
-        return decay_df, nearfield_df, farfield_df, summary_df, metadata, timestamp
+        if farfield_qbp_df is not None:
+            print(f"  Far-field QBP: {len(farfield_qbp_df)} rows")
+        return (
+            decay_df,
+            nearfield_df,
+            farfield_df,
+            farfield_qbp_df,
+            summary_df,
+            metadata,
+            timestamp,
+        )
 
     # --- Fall back to legacy v2 format ---
     decay_files = sorted(glob.glob(os.path.join(DATA_DIR, "decay_data_*.csv")))
@@ -153,7 +173,7 @@ def load_latest_data():
             metadata = json.load(f)
 
     print(f"Loaded legacy v2 data (timestamp {timestamp})")
-    return decay_df, nearfield_df, None, summary_df, metadata, timestamp
+    return decay_df, nearfield_df, None, None, summary_df, metadata, timestamp
 
 
 # ============================================================================
@@ -180,9 +200,15 @@ class DoubleSlitDemo:
         Supports both v3 format (regime column, separate nearfield/farfield)
         and legacy v2 format (scenario column, single fringe_data CSV).
         """
-        (decay_df, nearfield_df, farfield_df, summary_df, metadata, timestamp) = (
-            load_latest_data()
-        )
+        (
+            decay_df,
+            nearfield_df,
+            farfield_df,
+            farfield_qbp_df,
+            summary_df,
+            metadata,
+            timestamp,
+        ) = load_latest_data()
         self.timestamp = timestamp
         self.metadata = metadata
         self.is_v3 = farfield_df is not None  # v3 provides a separate farfield df
@@ -283,6 +309,18 @@ class DoubleSlitDemo:
                     df_b["x_position_m"].values * 1e3,
                     df_b["intensity_total_normalized"].values,
                 )
+
+        # --- Far-field QBP data: (u1, eta0) → (x_mm, I_norm) ---
+        self.farfield_qbp = {}
+        if farfield_qbp_df is not None:
+            for regime in ("expected", "qbp"):
+                sub = farfield_qbp_df[farfield_qbp_df["regime"] == regime]
+                for (u1, eta0), grp in sub.groupby(["U1_strength_eV", "eta0"]):
+                    grp = grp.sort_values("x_position_m")
+                    x_mm = grp["x_position_m"].values * 1e3
+                    I_tot = grp["intensity_total_normalized"].values
+                    self.farfield_qbp[(regime, u1, eta0)] = (x_mm, I_tot)
+            print(f"  Far-field QBP indexed: {len(self.farfield_qbp)} curves")
 
         # Baseline visibility per η₀ (U₁=0)
         self.v_baseline = {}
@@ -462,12 +500,17 @@ class DoubleSlitDemo:
         )
         self.curves_4 = []
 
-        # --- Panel 5: Far-field reference (A vs B) ---
+        # --- Panel 5: Far-field comparison (A vs QBP) ---
+        has_qbp_ff = len(self.farfield_qbp) > 0
+        panel5_title = (
+            "<b>Far-Field Comparison: Standard QM vs QBP</b>"
+            " &mdash; <i>what an experimentalist would measure</i>"
+            if has_qbp_ff
+            else "<b>Far-Field Reference: Standard QM vs Which-Path</b>"
+            " &mdash; <i>classic mm-scale Fraunhofer diffraction</i>"
+        )
         self.g5 = graph(
-            title=(
-                "<b>Far-Field Reference: Standard QM vs Which-Path</b>"
-                " &mdash; <i>classic mm-scale Fraunhofer diffraction</i>"
-            ),
+            title=panel5_title,
             xtitle="x (mm)",
             ytitle="I(x) normalized",
             width=900,
@@ -521,10 +564,10 @@ class DoubleSlitDemo:
         )
         c_base = gcurve(
             graph=self.g2,
-            color=to_vpy(COL_BPM),
+            color=to_vpy(COL_EXPECTED),
             label=f"QBP baseline U\u2081=0 (V={v_base:.4f})",
             dot=True,
-            dot_color=to_vpy(COL_BPM),
+            dot_color=to_vpy(COL_EXPECTED),
             radius=0,
         )
         c_base.plot(0, v_base)
@@ -534,9 +577,9 @@ class DoubleSlitDemo:
         eta0_for_scatter = self.eta0_values[-1]
         c_data = gcurve(
             graph=self.g2,
-            color=to_vpy(COL_BPM),
+            color=to_vpy(COL_EXPECTED),
             dot=True,
-            dot_color=to_vpy(COL_BPM),
+            dot_color=to_vpy(COL_EXPECTED),
             label="QBP BPM visibility",
         )
         for u1 in self.u1_values:
@@ -613,7 +656,7 @@ class DoubleSlitDemo:
         # QBP BPM result
         c_bpm = gcurve(
             graph=self.g1a,
-            color=to_vpy(COL_BPM),
+            color=to_vpy(COL_EXPECTED),
             label=f"QBP BPM (U\u2081={u1:.0f} eV)",
         )
         for i in range(len(z_nm)):
@@ -652,7 +695,7 @@ class DoubleSlitDemo:
         delta_eta = eta_bpm - eta0
         c_bpm = gcurve(
             graph=self.g1b,
-            color=to_vpy(COL_BPM) if u1 < max(self.u1_values) else to_vpy(COL_BPM_MAX),
+            color=to_vpy(COL_EXPECTED) if u1 < max(self.u1_values) else to_vpy(COL_QBP),
             label=f"QBP BPM \u0394\u03b7 (U\u2081={u1:.0f} eV)",
         )
         for i in range(len(z_nm)):
@@ -750,7 +793,7 @@ class DoubleSlitDemo:
         main_key = (u1, eta0)
         if main_key in self.fringe:
             x_main, I_main = self.fringe[main_key]
-            col = COL_BPM if u1 < max(self.u1_values) else COL_BPM_MAX
+            col = COL_EXPECTED if u1 < max(self.u1_values) else COL_QBP
             c_main = gcurve(
                 graph=self.g3,
                 color=to_vpy(col),
@@ -815,7 +858,7 @@ class DoubleSlitDemo:
             mask = (x_all >= -zoom_half) & (x_all <= zoom_half)
             x_z, I_z = x_all[mask], I_all[mask]
             if len(x_z) > 0:
-                col = COL_BPM if u1 < max(self.u1_values) else COL_BPM_MAX
+                col = COL_EXPECTED if u1 < max(self.u1_values) else COL_QBP
                 c_main = gcurve(
                     graph=self.g4,
                     color=to_vpy(col),
@@ -851,14 +894,11 @@ class DoubleSlitDemo:
                 c_b.plot(x_mm[i], I_b[i])
 
     def _update_panel_5(self):
-        """Far-field synthetic QBP curve — three perspectives.
+        """Far-field QBP curve — actual BPM+FFT data when available.
 
         a. Adler predicted: Scenario B (which-path, V=0) — static
         b. Standard QM: Scenario A (full fringes, V=1) — static
-        c. QBP predicted: I = I_B + V_norm * (I_A − I_B), dynamic with U₁
-
-        V_norm = V_bpm(U₁) / V_bpm(0) gives the relative visibility
-        reduction, applied to far-field scale.
+        c. QBP: actual far-field BPM+FFT data, dynamic with U₁
         """
         if not hasattr(self, "curves_5"):
             self.curves_5 = []
@@ -866,10 +906,55 @@ class DoubleSlitDemo:
             c.delete()
         self.curves_5 = []
 
+        u1 = self.current_u1
+        eta0 = self.current_eta0
+
+        # Try actual far-field QBP data first
+        if self.farfield_qbp:
+            # For U₁=0, use "expected" regime; for U₁>0, use "qbp"
+            if u1 == 0.0:
+                qbp_key = ("expected", 0.0, eta0)
+            else:
+                # Find closest U₁ in available data
+                qbp_keys = [
+                    k for k in self.farfield_qbp if k[0] == "qbp" and k[2] == eta0
+                ]
+                if qbp_keys:
+                    qbp_key = min(qbp_keys, key=lambda k: abs(k[1] - u1))
+                else:
+                    qbp_key = None
+
+            if qbp_key and qbp_key in self.farfield_qbp:
+                x_mm, I_qbp = self.farfield_qbp[qbp_key]
+                # Normalize to peak
+                I_peak = I_qbp.max()
+                I_norm = I_qbp / I_peak if I_peak > 0 else I_qbp
+
+                # Get far-field visibility from summary if available
+                v_key = ("C", qbp_key[1], eta0)
+                v_ff = self.summary.get(v_key, {}).get("visibility", None)
+                v_label = f", V_ff={v_ff:.3f}" if v_ff is not None else ""
+
+                col = COL_EXPECTED if u1 < max(self.u1_values) else COL_QBP
+                c_qbp = gcurve(
+                    graph=self.g5,
+                    color=to_vpy(col),
+                    label=f"QBP far-field (U\u2081={qbp_key[1]:.0f} eV{v_label})",
+                )
+                # Clip to ±1500 mm to avoid FFT edge artifacts
+                mask = np.abs(x_mm) <= 1500
+                x_clip = x_mm[mask]
+                I_clip = I_norm[mask]
+                step = max(1, len(x_clip) // 2000)
+                for i in range(0, len(x_clip), step):
+                    c_qbp.plot(x_clip[i], I_clip[i])
+                self.curves_5.append(c_qbp)
+                return
+
+        # Fallback: synthetic QBP from A/B interpolation
         if self.farfield_a is None or self.farfield_b is None:
             return
 
-        u1 = self.current_u1
         eta0_for_v = self.eta0_values[-1]
         v_key = ("C", u1, eta0_for_v)
         v_cur = self.summary.get(v_key, {}).get("visibility", 0.55)
@@ -878,17 +963,14 @@ class DoubleSlitDemo:
 
         x_a, I_a = self.farfield_a
         x_b, I_b = self.farfield_b
-        # Interpolate B onto A's grid (they should match, but be safe)
         I_b_interp = np.interp(x_a, x_b, I_b)
-
-        # Synthetic QBP: I = I_B + V_norm * (I_A − I_B)
         I_qbp = I_b_interp + v_norm * (I_a - I_b_interp)
 
-        col = COL_BPM if u1 < max(self.u1_values) else COL_BPM_MAX
+        col = COL_EXPECTED if u1 < max(self.u1_values) else COL_QBP
         c_qbp = gcurve(
             graph=self.g5,
             color=to_vpy(col),
-            label=f"QBP predicted (V\u2248{v_norm:.3f}, U\u2081={u1:.0f} eV)",
+            label=f"QBP synthetic (V\u2248{v_norm:.3f}, U\u2081={u1:.0f} eV)",
         )
         step = max(1, len(x_a) // 2000)
         for i in range(0, len(x_a), step):

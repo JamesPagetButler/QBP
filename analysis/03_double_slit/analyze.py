@@ -33,6 +33,12 @@ sys.path.insert(0, project_root)
 from src.viz.theme import apply_matplotlib_theme, COLORS, PALETTE
 from tests.physics.test_double_slit import ETA_NOISE_FLOOR
 
+# Semantic color convention (James's preference):
+#   Expected/baseline/Standard QM  →  CRIMSON (red)
+#   QBP/coupling result            →  TEAL
+COL_EXPECTED = COLORS.CRIMSON.hex  # red = expected/baseline
+COL_QBP = COLORS.TEAL.hex  # teal = QBP result
+
 
 # ============================================================================
 # DATA LOADING
@@ -308,9 +314,9 @@ def plot_eta_decay(decay_df: pd.DataFrame, metadata: Dict, output_path: str):
     # Compute Δη = η(z) − η₀
     df_filtered["delta_eta"] = df_filtered["eta_fraction"] - eta0_val
 
-    # Color interpolation: TEAL (U1=0) → CRIMSON (U1=max)
-    teal_rgb = np.array(COLORS.TEAL.rgb_norm)
-    crimson_rgb = np.array(COLORS.CRIMSON.rgb_norm)
+    # Color interpolation: CRIMSON (U1=0, expected) → TEAL (U1=max, QBP)
+    expected_rgb = np.array(COLORS.CRIMSON.rgb_norm)
+    qbp_rgb = np.array(COLORS.TEAL.rgb_norm)
 
     # Collect all curves for envelope
     z_common = None
@@ -321,7 +327,7 @@ def plot_eta_decay(decay_df: pd.DataFrame, metadata: Dict, output_path: str):
         z = subset["z_nm"].values
         delta = subset["delta_eta"].values
         t = i / max(n_u1 - 1, 1)
-        color = tuple((1 - t) * teal_rgb + t * crimson_rgb)
+        color = tuple((1 - t) * expected_rgb + t * qbp_rgb)
 
         if z_common is None:
             z_common = z
@@ -329,21 +335,21 @@ def plot_eta_decay(decay_df: pd.DataFrame, metadata: Dict, output_path: str):
 
         # Draw individual curves with thin lines
         if i == 0:
-            # U1=0 control — bold TEAL
+            # U1=0 control — bold (expected/baseline)
             ax_eta.plot(
                 z,
                 delta,
-                color=COLORS.TEAL.hex,
+                color=COL_EXPECTED,
                 linewidth=2.5,
                 label=f"U₁ = 0 eV (control)",
                 zorder=5,
             )
         elif i == n_u1 - 1:
-            # U1=max — bold CRIMSON
+            # U1=max — bold (QBP coupling)
             ax_eta.plot(
                 z,
                 delta,
-                color=COLORS.CRIMSON.hex,
+                color=COL_QBP,
                 linewidth=2.5,
                 label=f"U₁ = {u1:.0f} eV (max)",
                 zorder=5,
@@ -421,7 +427,7 @@ def plot_eta_decay(decay_df: pd.DataFrame, metadata: Dict, output_path: str):
         bbox=dict(
             boxstyle="round,pad=0.4",
             facecolor=COLORS.IVORY.hex,
-            edgecolor=COLORS.TEAL.hex,
+            edgecolor=COL_EXPECTED,
             alpha=0.9,
         ),
     )
@@ -498,7 +504,7 @@ def plot_fringe_comparison(
     i_a_peak = i_a_raw.max()
     i_norm = i_a_raw / i_a_peak  # normalize to peak
 
-    ax.plot(x_mm, i_norm, color=COLORS.TEAL.hex, linewidth=1.2)
+    ax.plot(x_mm, i_norm, color=COL_EXPECTED, linewidth=1.2)
     ax.set_xlim(-0.5, 0.5)
     ax.set_ylabel("I / max(I)", fontsize=11)
     ax.set_title(
@@ -514,11 +520,11 @@ def plot_fringe_comparison(
         va="top",
         bbox=dict(
             boxstyle="round,pad=0.3",
-            facecolor=COLORS.TEAL.hex,
+            facecolor=COL_EXPECTED,
             edgecolor="none",
             alpha=0.15,
         ),
-        color=COLORS.TEAL.hex,
+        color=COL_EXPECTED,
         fontweight="bold",
     )
     ax.grid(True, alpha=0.3)
@@ -589,14 +595,14 @@ def plot_fringe_comparison(
         ax.plot(
             x_mm_base,
             i_base_norm,
-            color=COLORS.TEAL.hex,
+            color=COL_EXPECTED,
             linewidth=1.2,
             label=f"U₁ = 0 eV (V_ff ≈ {v_baseline:.3f})",
         )
         ax.plot(
             x_mm_max,
             i_max_norm,
-            color=COLORS.CRIMSON.hex,
+            color=COL_QBP,
             linewidth=1.2,
             label=f"U₁ = {u1_max:.0f} eV (V_ff ≈ {v_qbp:.3f})",
         )
@@ -619,11 +625,11 @@ def plot_fringe_comparison(
             va="top",
             bbox=dict(
                 boxstyle="round,pad=0.3",
-                facecolor=COLORS.CRIMSON.hex,
+                facecolor=COL_QBP,
                 edgecolor="none",
                 alpha=0.15,
             ),
-            color=COLORS.CRIMSON.hex,
+            color=COL_QBP,
             fontweight="bold",
         )
         caption_text = (
@@ -667,14 +673,14 @@ def plot_fringe_comparison(
         ax.plot(
             x_nm_base,
             i_base,
-            color=COLORS.TEAL.hex,
+            color=COL_EXPECTED,
             linewidth=1.2,
             label=f"U₁ = 0 eV (V ≈ {v_base:.3f})",
         )
         ax.plot(
             x_nm_max,
             i_max_curve,
-            color=COLORS.CRIMSON.hex,
+            color=COL_QBP,
             linewidth=1.2,
             label=f"U₁ = {u1_max:.0f} eV (V ≈ {v_max:.3f})",
         )
@@ -696,11 +702,11 @@ def plot_fringe_comparison(
             va="top",
             bbox=dict(
                 boxstyle="round,pad=0.3",
-                facecolor=COLORS.CRIMSON.hex,
+                facecolor=COL_QBP,
                 edgecolor="none",
                 alpha=0.15,
             ),
-            color=COLORS.CRIMSON.hex,
+            color=COL_QBP,
             fontweight="bold",
         )
         caption_text = (
@@ -782,7 +788,7 @@ def plot_hero_fringe_overlay(
     ax.plot(
         x_nm_exp,
         i_exp,
-        color=COLORS.TEAL.hex,
+        color=COL_EXPECTED,
         linewidth=1.5,
         label=f"Expected (U₁ = 0 eV, V = {v_exp:.4f})",
         zorder=3,
@@ -790,7 +796,7 @@ def plot_hero_fringe_overlay(
     ax.plot(
         x_nm_qbp,
         i_qbp,
-        color=COLORS.CRIMSON.hex,
+        color=COL_QBP,
         linewidth=1.5,
         label=f"QBP (U₁ = {u1_max:.0f} eV, V = {v_qbp:.4f})",
         zorder=4,
@@ -865,7 +871,7 @@ def plot_hero_fringe_zoomed(
     ax.plot(
         x_nm_exp,
         i_exp,
-        color=COLORS.TEAL.hex,
+        color=COL_EXPECTED,
         linewidth=1.5,
         label=f"Expected (V = {v_exp:.4f})",
         zorder=3,
@@ -873,7 +879,7 @@ def plot_hero_fringe_zoomed(
     ax.plot(
         x_nm_qbp,
         i_qbp,
-        color=COLORS.CRIMSON.hex,
+        color=COL_QBP,
         linewidth=1.5,
         label=f"QBP (V = {v_qbp:.4f})",
         zorder=4,
@@ -965,7 +971,7 @@ def plot_residual(fringe_df: pd.DataFrame, output_path: str):
     ax.plot(
         x_nm_exp,
         residual,
-        color=COLORS.CRIMSON.hex,
+        color=COL_QBP,
         linewidth=1.0,
         zorder=3,
     )
@@ -984,7 +990,7 @@ def plot_residual(fringe_df: pd.DataFrame, output_path: str):
         bbox=dict(
             boxstyle="round,pad=0.3",
             facecolor=COLORS.IVORY.hex,
-            edgecolor=COLORS.CRIMSON.hex,
+            edgecolor=COL_QBP,
             alpha=0.9,
         ),
     )
@@ -1108,7 +1114,7 @@ def plot_farfield_hero_overlay(
     ax.plot(
         x_base_mm,
         i_base_norm,
-        color=COLORS.TEAL.hex,
+        color=COL_EXPECTED,
         linewidth=0.8,
         label=f"Expected (U₁ = 0 eV, V_ff = {v_ff_baseline:.4f})",
         zorder=3,
@@ -1116,7 +1122,7 @@ def plot_farfield_hero_overlay(
     ax.plot(
         x_max_mm,
         i_max_norm,
-        color=COLORS.CRIMSON.hex,
+        color=COL_QBP,
         linewidth=0.8,
         label=f"QBP (U₁ = {u1_max:.0f} eV, V_ff = {v_ff_qbp:.4f})",
         zorder=4,
@@ -1141,14 +1147,14 @@ def plot_farfield_hero_overlay(
     ax_zoom.plot(
         x_base_mm[mask_base],
         i_base_norm[mask_base],
-        color=COLORS.TEAL.hex,
+        color=COL_EXPECTED,
         linewidth=1.2,
         zorder=3,
     )
     ax_zoom.plot(
         x_max_mm[mask_max],
         i_max_norm[mask_max],
-        color=COLORS.CRIMSON.hex,
+        color=COL_QBP,
         linewidth=1.2,
         zorder=4,
     )
@@ -1194,6 +1200,115 @@ def plot_farfield_hero_overlay(
     print(f"Saved: {output_path}")
 
 
+def plot_farfield_ab_comparison(
+    fringe_df: pd.DataFrame,
+    summary_df: pd.DataFrame,
+    metadata: Dict,
+    output_path: str,
+):
+    """Two-panel comparison: (A) Analytical far-field vs (B) QBP far-field.
+
+    Each panel at its natural fringe scale so the pattern is visible.
+    The key visual: both are far-field predictions for the same double-slit,
+    but the QBP coupling broadens fringes and reduces visibility.
+    """
+    apply_matplotlib_theme()
+
+    ff_qbp_df = metadata.get("farfield_qbp_df")
+    if ff_qbp_df is None:
+        print("SKIP: farfield_ab_comparison — no far-field QBP data")
+        return
+
+    # --- Panel A: Analytical far-field (plane-wave, V=1.0) ---
+    sc_a = fringe_df[fringe_df["scenario"] == "A"].sort_values("x_position_m")
+    x_a_mm = sc_a["x_position_m"].values * 1e3
+    i_a = sc_a["intensity_total_normalized"].values
+    i_a_norm = i_a / i_a.max()
+
+    # --- Panel B: QBP far-field (BPM+FFT, max coupling) ---
+    u1_vals = sorted(ff_qbp_df[ff_qbp_df["regime"] == "qbp"]["U1_strength_eV"].unique())
+    u1_max = u1_vals[-1]
+    x_qbp_m, i_qbp = _get_farfield_qbp_curve(metadata, u1_value=u1_max)
+    i_qbp_norm = i_qbp / i_qbp.max()
+    x_qbp_mm = x_qbp_m * 1e3
+
+    # Get visibilities
+    sc_c = summary_df[summary_df["scenario"] == "C"]
+    v_ff_qbp = sc_c[np.isclose(sc_c["U1_strength_eV"], u1_max, rtol=1e-6)][
+        "visibility_farfield"
+    ].iloc[0]
+
+    fig, (ax_a, ax_b) = plt.subplots(2, 1, figsize=(12, 8))
+
+    # Panel A
+    ax_a.plot(x_a_mm, i_a_norm, color=COL_EXPECTED, linewidth=1.0)
+    ax_a.set_xlim(-0.5, 0.5)
+    ax_a.set_ylabel("I / max(I)", fontsize=12)
+    ax_a.set_title(
+        "A: Standard QM Far-Field (Plane-Wave, V = 1.0)",
+        fontsize=13,
+        fontweight="bold",
+    )
+    ax_a.text(
+        0.02,
+        0.92,
+        "Fringe spacing: ~47 µm\nDetector: ±0.5 mm",
+        transform=ax_a.transAxes,
+        fontsize=10,
+        va="top",
+        bbox=dict(
+            boxstyle="round,pad=0.3",
+            facecolor=COLORS.IVORY.hex,
+            edgecolor=COL_EXPECTED,
+            alpha=0.9,
+        ),
+    )
+    ax_a.grid(True, alpha=0.3)
+
+    # Panel B
+    ax_b.plot(x_qbp_mm, i_qbp_norm, color=COL_QBP, linewidth=1.0)
+    ax_b.set_xlim(-1500, 1500)
+    ax_b.set_xlabel("Detector Position x (mm)", fontsize=12)
+    ax_b.set_ylabel("I / max(I)", fontsize=12)
+    ax_b.set_title(
+        f"B: QBP Far-Field (BPM + FFT, U₁ = {u1_max:.0f} eV, V = {v_ff_qbp:.4f})",
+        fontsize=13,
+        fontweight="bold",
+    )
+    ax_b.text(
+        0.02,
+        0.92,
+        "Fringe spacing: ~13 mm\nDetector: ±1.5 m",
+        transform=ax_b.transAxes,
+        fontsize=10,
+        va="top",
+        bbox=dict(
+            boxstyle="round,pad=0.3",
+            facecolor=COLORS.IVORY.hex,
+            edgecolor=COL_QBP,
+            alpha=0.9,
+        ),
+    )
+    ax_b.grid(True, alpha=0.3)
+
+    # Caption
+    fig.text(
+        0.5,
+        -0.02,
+        "Same double-slit geometry. Panel A: ideal plane-wave source (standard QM).\n"
+        "Panel B: Gaussian BPM source with quaternionic coupling — broader fringes, reduced visibility.",
+        ha="center",
+        fontsize=10,
+        style="italic",
+        color=COLORS.STEEL.hex,
+    )
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.close()
+    print(f"Saved: {output_path}")
+
+
 def plot_farfield_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
     """Far-field V(U₁) curve — visibility vs coupling strength in far-field regime.
 
@@ -1227,12 +1342,12 @@ def plot_farfield_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    # Far-field (primary)
+    # Far-field (primary — QBP model results)
     ax.plot(
         u1,
         v_ff,
         "o-",
-        color=COLORS.TEAL.hex,
+        color=COL_QBP,
         markersize=10,
         linewidth=2,
         label="Far-field V (BPM+FFT)",
@@ -1273,7 +1388,7 @@ def plot_farfield_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
     v_ff_baseline = v_ff[0]
     ax.axhline(
         v_ff_baseline,
-        color=COLORS.TEAL.hex,
+        color=COL_EXPECTED,
         linestyle=":",
         linewidth=1.5,
         label=f"V_ff ≈ {v_ff_baseline:.3f} (BPM+FFT baseline, U₁=0)",
@@ -1289,11 +1404,11 @@ def plot_farfield_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
         xytext=(u1[-1] - 100, v_ff_min - 0.06),
         fontsize=10,
         ha="right",
-        arrowprops=dict(arrowstyle="->", color=COLORS.CRIMSON.hex, lw=1.5),
+        arrowprops=dict(arrowstyle="->", color=COL_QBP, lw=1.5),
         bbox=dict(
             boxstyle="round,pad=0.3",
             facecolor=COLORS.IVORY.hex,
-            edgecolor=COLORS.CRIMSON.hex,
+            edgecolor=COL_QBP,
             alpha=0.9,
         ),
     )
@@ -1355,7 +1470,7 @@ def plot_farfield_residual(
     ax.plot(
         x_mm[mask],
         residual_view,
-        color=COLORS.CRIMSON.hex,
+        color=COL_QBP,
         linewidth=0.8,
         zorder=3,
     )
@@ -1375,7 +1490,7 @@ def plot_farfield_residual(
         bbox=dict(
             boxstyle="round,pad=0.3",
             facecolor=COLORS.IVORY.hex,
-            edgecolor=COLORS.CRIMSON.hex,
+            edgecolor=COL_QBP,
             alpha=0.9,
         ),
     )
@@ -1418,12 +1533,12 @@ def plot_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
     u1 = v_by_u1["U1_strength_eV"].values
     v = v_by_u1["visibility"].values
 
-    # Data points
+    # Data points (QBP model results)
     ax.plot(
         u1,
         v,
         "o-",
-        color=COLORS.TEAL.hex,
+        color=COL_QBP,
         markersize=10,
         linewidth=2,
         label="BPM visibility (mean over η₀)",
@@ -1450,7 +1565,7 @@ def plot_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
     v_baseline = v[0]
     ax.axhline(
         v_baseline,
-        color=COLORS.TEAL.hex,
+        color=COL_EXPECTED,
         linestyle=":",
         linewidth=1.5,
         label=f"V ≈ {v_baseline:.3f} (BPM baseline, U₁=0)",
@@ -1466,11 +1581,11 @@ def plot_visibility_vs_u1(summary_df: pd.DataFrame, output_path: str):
         xytext=(u1[-1] - 100, v_min - 0.04),
         fontsize=10,
         ha="right",
-        arrowprops=dict(arrowstyle="->", color=COLORS.CRIMSON.hex, lw=1.5),
+        arrowprops=dict(arrowstyle="->", color=COL_QBP, lw=1.5),
         bbox=dict(
             boxstyle="round,pad=0.3",
             facecolor=COLORS.IVORY.hex,
-            edgecolor=COLORS.CRIMSON.hex,
+            edgecolor=COL_QBP,
             alpha=0.9,
         ),
     )
@@ -1516,9 +1631,9 @@ def plot_eta0_independence(summary_df: pd.DataFrame, output_path: str):
     fig, axes = plt.subplots(2, 3, figsize=(12, 6))
     axes = axes.flatten()
 
-    # Color interpolation: TEAL → CRIMSON
-    teal_rgb = np.array(COLORS.TEAL.rgb_norm)
-    crimson_rgb = np.array(COLORS.CRIMSON.rgb_norm)
+    # Color interpolation: CRIMSON (expected) → TEAL (QBP)
+    expected_rgb = np.array(COLORS.CRIMSON.rgb_norm)
+    qbp_rgb = np.array(COLORS.TEAL.rgb_norm)
 
     for i, u1 in enumerate(u1_values):
         ax = axes[i]
@@ -1528,7 +1643,7 @@ def plot_eta0_independence(summary_df: pd.DataFrame, output_path: str):
         v_mean = v_vals.mean()
 
         t = i / max(n_u1 - 1, 1)
-        color = tuple((1 - t) * teal_rgb + t * crimson_rgb)
+        color = tuple((1 - t) * expected_rgb + t * qbp_rgb)
 
         # Plot ΔV = V - V̄ (deviation from mean) for clean y-axis
         delta_v = v_vals - v_mean
@@ -1754,12 +1869,23 @@ propagation to the far field.
 ![Far-Field Hero Overlay](farfield_hero_overlay.png)
 
 **Caption:** Far-field detector pattern on mm-scale axes.
-Teal: QBP baseline (U₁ = 0 eV, V_ff = {ff_v_max:.4f}). Crimson:
+Crimson (red): Expected baseline (U₁ = 0 eV, V_ff = {ff_v_max:.4f}). Teal:
 QBP max coupling (U₁ = {u1_max_val:.0f} eV, V_ff = {ff_v_min:.4f}).
 Analytical A (plane-wave, 47 µm fringes) is at a fundamentally different
 scale and cannot be overlaid — see V(U₁) curve for quantitative comparison.
 
-### 9.4 Far-Field Visibility vs U₁
+### 9.4 Far-Field Comparison: Standard QM vs QBP
+
+![Far-Field A/B Comparison](farfield_ab_comparison.png)
+
+**Caption:** Direct comparison of the two far-field predictions for the same double-slit:
+- **Panel A:** Standard QM (plane-wave source, V = 1.0) — fringes at ~47 µm spacing.
+- **Panel B:** QBP (Gaussian BPM + FFT, U₁ = {u1_max_val:.0f} eV, V = {ff_v_min:.4f}) — fringes at ~13 mm spacing.
+
+The fringe broadening in Panel B reflects the finite Gaussian source, not the quaternionic
+coupling. The coupling's effect is the reduced visibility (V = {ff_v_min:.4f} vs 1.0).
+
+### 9.5 Far-Field Visibility vs U₁
 
 ![Far-Field Visibility](farfield_visibility_vs_u1.png)
 
@@ -1768,7 +1894,7 @@ scale and cannot be overlaid — see V(U₁) curve for quantitative comparison.
 decrease with increasing quaternionic coupling. The far-field curve has higher
 baseline visibility due to Gaussian source coherence at the detector plane.
 
-### 9.5 Far-Field Residual
+### 9.6 Far-Field Residual
 
 ![Far-Field Residual](farfield_residual.png)
 
@@ -1780,7 +1906,7 @@ observable scales.
 {ff_residual_stats_str}
 {ff_residual_asymmetry_str}
 
-### 9.6 Updated Three-Panel Comparison (A/B/C — Far-Field)
+### 9.7 Updated Three-Panel Comparison (A/B/C — Far-Field)
 
 ![Fringe Comparison](fringe_comparison.png)
 
@@ -1792,7 +1918,7 @@ different spatial scales reflecting different source profiles:
 
 **Note:** The 3-order-of-magnitude scale difference between Panels A/B and C reflects
 the different source profiles (plane-wave vs Gaussian), not a plotting error. See V(U₁)
-curve (§9.4) for the quantitative apples-to-apples visibility comparison.
+curve (§9.5) for the quantitative apples-to-apples visibility comparison.
 """
 
     # AC verification — near-field (#342) + far-field (#360)
@@ -1812,9 +1938,10 @@ curve (§9.4) for the quantitative apples-to-apples visibility comparison.
         ac_table_rows.extend(
             [
                 f"| FF-AC #1 | Hero far-field overlay (mm scale) | {ac_pass} | See farfield_hero_overlay.png, §9.3 |",
-                f"| FF-AC #2 | Far-field V(U₁) curve | {ac_pass} | See farfield_visibility_vs_u1.png, §9.4 |",
-                f"| FF-AC #3 | Far-field residual plot | {ac_pass} | See farfield_residual.png, §9.5 |",
-                f"| FF-AC #4 | Panel C uses far-field QBP (mm scale) | {ac_pass} | See fringe_comparison.png, §9.6 |",
+                f"| FF-AC #1b | Far-field A vs QBP comparison | {ac_pass} | See farfield_ab_comparison.png, §9.4 |",
+                f"| FF-AC #2 | Far-field V(U₁) curve | {ac_pass} | See farfield_visibility_vs_u1.png, §9.5 |",
+                f"| FF-AC #3 | Far-field residual plot | {ac_pass} | See farfield_residual.png, §9.6 |",
+                f"| FF-AC #4 | Panel C uses far-field QBP (mm scale) | {ac_pass} | See fringe_comparison.png, §9.7 |",
                 f"| FF-AC #5 | RESULTS.md with far-field findings | {ac_pass} | See §9 |",
                 f"| FF-AC #6 | All plots labeled, SI units, ≥300 dpi | {ac_pass} | All PNGs at 300 dpi |",
             ]
@@ -1876,9 +2003,9 @@ Fraunhofer far-field conditions (mm scale).
 ![Hero Fringe Overlay](hero_fringe_overlay.png)
 
 **Caption:** Full nearfield detector pattern comparing the Expected baseline (U₁ = 0 eV,
-teal) with the QBP coupling case (U₁ = {u1_max_val:.0f} eV, crimson). Both curves share
+crimson/red) with the QBP coupling case (U₁ = {u1_max_val:.0f} eV, teal). Both curves share
 the same detector x-axis in nm. The reduction in peak height under quaternionic coupling
-is visible as lower fringe contrast in the crimson curve.
+is visible as lower fringe contrast in the teal curve.
 
 ### 3.2 Zoomed Fringes (±0.05 nm)
 
@@ -2080,6 +2207,12 @@ def main():
             metadata,
             os.path.join(output_dir, "farfield_residual.png"),
         )
+        plot_farfield_ab_comparison(
+            fringe_df,
+            summary_df,
+            metadata,
+            os.path.join(output_dir, "farfield_ab_comparison.png"),
+        )
     print()
 
     # Generate report
@@ -2111,6 +2244,7 @@ def main():
                 "farfield_hero_overlay.png",
                 "farfield_visibility_vs_u1.png",
                 "farfield_residual.png",
+                "farfield_ab_comparison.png",
             ]
         )
     all_present = True
