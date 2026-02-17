@@ -1181,8 +1181,11 @@ Closing issues prematurely (e.g., because "the work was done in PR #X") bypasses
 If an issue is found to have been closed without proper reviews:
 1. Reopen the issue immediately
 2. Add a comment documenting the process violation
-3. Conduct the missing reviews
-4. Only close after all checklist items are verified
+3. Log the violation in [`docs/process_violation_log.md`](docs/process_violation_log.md) using the `FAULT-SN-XXX` format
+4. Conduct the missing reviews
+5. Only close after all checklist items are verified
+
+When any process violation occurs (not just premature closure), immediately log it in `docs/process_violation_log.md`. This includes direct commits to master, CI bypasses, review skips, etc.
 
 ### Post-Review Issue Creation
 

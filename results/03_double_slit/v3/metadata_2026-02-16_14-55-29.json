@@ -1,0 +1,65 @@
+{
+  "format_version": "3.0",
+  "unit_convention": "hbar=1 natural units (c=1 reserved for relativistic extensions)",
+  "particle": "electron",
+  "mass_kg": 9.1093837015e-31,
+  "lambda_m": 5e-11,
+  "L0_m": 1.5915494309189535e-10,
+  "E0_J": 2.4098669608950283e-19,
+  "T0_s": 4.3760582420470503e-16,
+  "v_z_si_m_per_s": 14547790.206507418,
+  "k_si_per_m": 125663706143.59172,
+  "V_Z_CODE": 40.0,
+  "BPM_k0": 30.0,
+  "BPM_hbar": 1.0,
+  "BPM_mass": 0.5,
+  "conversion_applied": true,
+  "conversion_library": "src/simulation/si_conversion.py",
+  "timestamp": "2026-02-16_14-55-29",
+  "datasets": {
+    "nearfield": {
+      "regime_values": [
+        "expected",
+        "qbp"
+      ],
+      "method": "BPM",
+      "description": "expected=U1=0 (standard QM), qbp=U1>0 (quaternionic coupling)",
+      "spatial_scale": "nm",
+      "grid_points": 2048
+    },
+    "farfield_analytical": {
+      "scenario_values": [
+        "A",
+        "B"
+      ],
+      "method": "analytical (Fraunhofer)",
+      "spatial_scale": "mm",
+      "grid_points": 10001
+    },
+    "farfield_qbp": {
+      "regime_values": [
+        "expected",
+        "qbp"
+      ],
+      "method": "BPM + Fraunhofer FFT (hybrid)",
+      "description": "BPM through slit region, then Fraunhofer FFT to detector plane",
+      "pad_factor": 4,
+      "screen_distance_m": 1.0,
+      "spatial_scale": "mm",
+      "grid_points": 8192
+    }
+  },
+  "comparison_valid_between": "nearfield regime='expected' vs regime='qbp'",
+  "WARNING": "Do NOT compare nearfield to farfield \u2014 different methods, scales, and grids",
+  "column_units": {
+    "x_position_m": "metres",
+    "U1_strength_eV": "electron-volts",
+    "z_m": "metres",
+    "intensity_total_normalized": "dimensionless (normalized)",
+    "intensity_psi0_normalized": "dimensionless (normalized)",
+    "intensity_psi1_normalized": "dimensionless (normalized)",
+    "eta_fraction": "dimensionless",
+    "visibility": "dimensionless",
+    "norm_final": "dimensionless"
+  }
+}

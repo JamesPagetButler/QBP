@@ -20,6 +20,8 @@ Device strategy:
 - CPU (NumPy) fallback — slower but functional
 """
 
+import warnings
+
 import numpy as np
 from dataclasses import dataclass, field
 from typing import Optional
@@ -681,9 +683,157 @@ def _propagate_gpu(
 # ---------------------------------------------------------------------------
 
 
+def _zero_pad_center(psi: np.ndarray, N_pad: int) -> np.ndarray:
+    """Zero-pad a 1D array, centering the original data in the padded array."""
+    padded = np.zeros(N_pad, dtype=complex)
+    start = (N_pad - len(psi)) // 2
+    padded[start : start + len(psi)] = psi
+    return padded
+
+
+@dataclass
+class FarFieldResult:
+    """Results from Fraunhofer FFT propagation of BPM exit-plane amplitudes.
+
+    The hybrid BPM + Fraunhofer approach:
+    1. BPM propagates through the slit region (captures quaternionic coupling)
+    2. Fraunhofer FFT propagates to the far-field detector plane
+
+    All quantities are in SI units.
+    """
+
+    x_screen: np.ndarray  # screen positions (SI metres)
+    I_total: np.ndarray  # |FFT(psi0)|^2 + |FFT(psi1)|^2, normalized to peak=1
+    I_psi0: np.ndarray  # |FFT(psi0)|^2, normalized to peak of I_total
+    I_psi1: np.ndarray  # |FFT(psi1)|^2, normalized to peak of I_total
+    pad_factor: int  # zero-padding factor used
+    nyquist_margin: float  # ratio: max resolvable kx / max diffraction kx
+
+
+def far_field_from_bpm(
+    psi0: np.ndarray,
+    psi1: np.ndarray,
+    dx_si: float,
+    lambda_si: float,
+    screen_distance: float,
+    pad_factor: int = 4,
+    slit_separation_si: Optional[float] = None,
+) -> FarFieldResult:
+    """
+    Compute far-field intensity via Fraunhofer FFT of BPM exit-plane amplitudes.
+
+    This implements the hybrid approach: BPM captures quaternionic coupling
+    in the slit region, then Fraunhofer FFT propagates to the detector plane.
+
+    Algorithm:
+        1. Zero-pad exit-plane amplitudes (improves spectral resolution)
+        2. FFT with proper centering: fftshift(fft(ifftshift(psi_padded)))
+        3. Map k-space to screen coordinates: x = kx * λ * L / (2π)
+        4. Compute intensities, normalize to peak of I_total = 1.0
+
+    Args:
+        psi0: BPM exit-plane ψ₀(x) amplitude (complex, N points)
+        psi1: BPM exit-plane ψ₁(x) amplitude (complex, N points)
+        dx_si: Grid spacing in SI metres
+        lambda_si: de Broglie wavelength in SI metres
+        screen_distance: Distance to detector screen in SI metres
+        pad_factor: Zero-padding factor (default 4; final array size = N * pad_factor)
+        slit_separation_si: Slit separation in SI metres (for Nyquist check; optional)
+
+    Returns:
+        FarFieldResult with screen positions, intensities, and diagnostics
+
+    Raises:
+        ValueError: if inputs are invalid
+    """
+    # --- Validate inputs ---
+    if len(psi0) != len(psi1):
+        raise ValueError(
+            f"psi0 and psi1 must have same length, got {len(psi0)} and {len(psi1)}"
+        )
+    if dx_si <= 0:
+        raise ValueError(f"dx_si must be positive, got {dx_si}")
+    if lambda_si <= 0:
+        raise ValueError(f"lambda_si must be positive, got {lambda_si}")
+    if screen_distance <= 0:
+        raise ValueError(f"screen_distance must be positive, got {screen_distance}")
+    if pad_factor < 1:
+        raise ValueError(f"pad_factor must be >= 1, got {pad_factor}")
+
+    N_orig = len(psi0)
+    N_pad = N_orig * pad_factor
+
+    # --- Zero-pad: center original data in larger array ---
+    psi0_pad = _zero_pad_center(psi0, N_pad)
+    psi1_pad = _zero_pad_center(psi1, N_pad)
+
+    # --- FFT with proper centering ---
+    # ifftshift centers the zero-frequency component for FFT input
+    # fftshift recenters the output
+    F_psi0 = np.fft.fftshift(np.fft.fft(np.fft.ifftshift(psi0_pad)))
+    F_psi1 = np.fft.fftshift(np.fft.fft(np.fft.ifftshift(psi1_pad)))
+
+    # --- k-space grid ---
+    kx = 2 * np.pi * np.fft.fftshift(np.fft.fftfreq(N_pad, d=dx_si))
+
+    # --- Screen mapping (paraxial / small-angle approximation) ---
+    # x_screen = sin(θ) · L ≈ θ · L, with sin(θ) = kx · λ / (2π)
+    # Valid because max diffraction angles are tiny (< 1 mrad for our parameters)
+    x_screen = kx * lambda_si * screen_distance / (2 * np.pi)
+
+    # --- Intensities ---
+    # Incoherent sum: I = |FFT(ψ₀)|² + |FFT(ψ₁)|². Cross-terms vanish because
+    # ψ₀ and ψ₁ live in orthogonal quaternion subspaces (C vs jC), so the
+    # detector measures the quaternionic norm |ψ|² = |ψ₀|² + |ψ₁|².
+    I_psi0 = np.abs(F_psi0) ** 2
+    I_psi1 = np.abs(F_psi1) ** 2
+    I_total = I_psi0 + I_psi1
+
+    # Normalize to peak of I_total = 1.0 (same convention as analytical)
+    peak = np.max(I_total)
+    if peak > 0:
+        I_total = I_total / peak
+        I_psi0 = I_psi0 / peak
+        I_psi1 = I_psi1 / peak
+
+    # --- Nyquist check ---
+    # Max resolvable kx from grid: kx_max = π / dx_si
+    kx_max_grid = np.pi / dx_si
+    if slit_separation_si is not None and slit_separation_si > 0:
+        # Max diffraction kx for double-slit: kx_fringe = 2π / (λL/d) * 2π
+        # More precisely: the fringe spacing is Δx = λL/d, so kx_fringe = 2π/Δx = 2πd/(λL)
+        # Nyquist margin = kx_max_grid / kx_fringe
+        kx_fringe = 2 * np.pi * slit_separation_si / (lambda_si * screen_distance)
+        nyquist_margin = kx_max_grid / kx_fringe
+        if nyquist_margin < 2.0:
+            warnings.warn(
+                f"Nyquist margin is {nyquist_margin:.2f} (< 2.0). "
+                f"Grid spacing dx={dx_si:.2e} m may not resolve fringes from "
+                f"slit separation d={slit_separation_si:.2e} m. "
+                f"Consider using a finer grid.",
+                stacklevel=2,
+            )
+    else:
+        nyquist_margin = 0.0  # Not computed
+
+    return FarFieldResult(
+        x_screen=x_screen,
+        I_total=I_total,
+        I_psi0=I_psi0,
+        I_psi1=I_psi1,
+        pad_factor=pad_factor,
+        nyquist_margin=nyquist_margin,
+    )
+
+
 def far_field_intensity(result: PropagationResult) -> tuple:
     """
-    Compute far-field intensity from propagation result.
+    Compute exit-plane (near-field) intensity from propagation result.
+
+    NOTE: Despite the name, this returns the intensity at the BPM exit plane,
+    which is near-field (~32 nm propagation). For true far-field intensity,
+    use far_field_from_bpm() which applies Fraunhofer FFT to propagate to
+    the detector plane.
 
     Returns:
         (x, I_total, I_psi0, I_psi1)
