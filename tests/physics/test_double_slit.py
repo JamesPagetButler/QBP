@@ -247,9 +247,13 @@ class TestStage1Decay:
         Free-space control: η must remain at numerical noise floor throughout.
 
         No slits, no potential — pure free-space propagation starting from
-        η₀=0. Measures η at the exit plane to establish the inherent noise
-        floor of the grid's η evolution. This value serves as a baseline:
-        any η above this floor in slit experiments is real physics, not numerics.
+        η₀=0. Verifies η stays below the noise floor at every diagnostic
+        step during propagation, not just at the exit plane. This catches
+        transient numerical spikes that might decay before reaching the
+        detector. The measured floor serves as a baseline: any η above
+        this in slit experiments is real physics, not numerics.
+
+        Noise floor: 1e-14 (double-precision numerical limit for η evolution).
 
         Origin: PR #333, Gemini R-4 (Richard Feynman).
         """
@@ -258,15 +262,20 @@ class TestStage1Decay:
 
         result = propagate(psi0, psi1, grid, self.CONFIG)
 
-        # Measure η at exit plane
-        eta_final = compute_eta(result.detector_psi0, result.detector_psi1, grid.dx)
-
-        # η should be at machine-precision noise floor
         noise_floor = 1e-14
+
+        # Check η at every diagnostic step throughout propagation
+        for z, eta in result.decay_curve:
+            assert eta < noise_floor, (
+                f"Free-space η spike at z={z:.4f}: η = {eta:.2e}, "
+                f"expected < {noise_floor:.0e} at all steps."
+            )
+
+        # Also verify exit-plane η
+        eta_final = compute_eta(result.detector_psi0, result.detector_psi1, grid.dx)
         assert eta_final < noise_floor, (
-            f"Free-space η noise floor too high: η = {eta_final:.2e}, "
-            f"expected < {noise_floor:.0e}. Any η above this in slit "
-            f"experiments may be numerical artifact rather than physics."
+            f"Free-space η noise floor too high at exit: η = {eta_final:.2e}, "
+            f"expected < {noise_floor:.0e}."
         )
 
     def test_quaternionic_barrier_coupling(self):
