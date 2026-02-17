@@ -15,6 +15,7 @@
 #include "proof_graph.h"
 #include "theme.h"
 #include "fonts.h"
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -464,6 +465,9 @@ typedef struct { float bc; int node_id; } BcPair;
 static int cmp_bc_pair(const void *a, const void *b) {
     float fa = ((const BcPair *)a)->bc;
     float fb = ((const BcPair *)b)->bc;
+    /* NaN-safe: treat NaN as +∞ so qsort gets a total order */
+    if (isnan(fa)) return isnan(fb) ? 0 : 1;
+    if (isnan(fb)) return -1;
     return (fa > fb) - (fa < fb);
 }
 
