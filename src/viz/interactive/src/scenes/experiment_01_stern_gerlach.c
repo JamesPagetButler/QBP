@@ -66,9 +66,8 @@ static void sg_update(void)
     if (IsKeyPressed(KEY_O)) {
         graph_toggle_overview(&sg_graph);
     }
-    if (IsKeyPressed(KEY_T)) {
-        graph_toggle_angle_highlight(&sg_graph);
-    }
+    /* KEY_T (angle highlight) intentionally omitted — SG experiment has no
+       angle-dependent nodes, so the toggle would have no visible effect. */
 
     /* Handle mouse clicks */
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {

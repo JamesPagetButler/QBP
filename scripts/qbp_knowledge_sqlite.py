@@ -683,7 +683,13 @@ class QBPKnowledgeSQLite:
             return [{"id": row["id"], **json.loads(row["data"])} for row in rows]
 
     def find_uninvestigated_questions(self) -> List[Dict[str, Any]]:
-        """Find open questions that have no linked investigation or evidence edges."""
+        """Find open questions with no linked investigation or evidence_chain edges.
+
+        Note: This filters on BOTH 'investigation' AND 'evidence_chain' edge types,
+        which is more conservative than filtering on investigation alone. A question
+        linked to evidence but lacking a formal investigation is still considered
+        "under work" and excluded from results.
+        """
         with self._connection() as conn:
             rows = conn.execute(
                 """
@@ -714,7 +720,8 @@ class QBPKnowledgeSQLite:
         """Trace the full dependency chain from a vertex through hyperedges.
 
         Returns all vertices reachable by following hyperedge connections
-        (breadth-first), with the path depth for each.
+        (breadth-first), with the path depth for each.  Uses a single DB
+        connection for the entire traversal to avoid O(B^D) open/close cycles.
         """
         root = self.get_vertex(vertex_id)
         if not root:
@@ -722,36 +729,48 @@ class QBPKnowledgeSQLite:
 
         visited = {vertex_id: 0}
         frontier = [vertex_id]
-        edges_seen = set()
-        chain = []
+        edges_seen: set = set()
+        chain: list = []
 
-        while frontier:
-            next_frontier = []
-            for vid in frontier:
-                depth = visited[vid]
-                edges = self.get_edges_containing(vid)
-                for edge in edges:
-                    eid = edge.get("id", "")
-                    if eid in edges_seen:
-                        continue
-                    edges_seen.add(eid)
-                    members = edge.get("members", [])
-                    for member in members:
-                        mid = (
-                            member if isinstance(member, str) else member.get("id", "")
-                        )
-                        if mid and mid not in visited:
-                            visited[mid] = depth + 1
-                            next_frontier.append(mid)
-                            chain.append(
-                                {
-                                    "vertex": mid,
-                                    "depth": depth + 1,
-                                    "via_edge": eid,
-                                    "edge_type": edge.get("type", ""),
-                                }
-                            )
-            frontier = next_frontier
+        with self._connection() as conn:
+            while frontier:
+                next_frontier = []
+                for vid in frontier:
+                    depth = visited[vid]
+                    # Inline edge lookup to reuse the single connection
+                    edge_rows = conn.execute(
+                        """
+                        SELECT h.id, h.data
+                        FROM hyperedges h
+                        JOIN incidences i ON h.id = i.edge_id
+                        WHERE i.vertex_id = ?
+                        """,
+                        (vid,),
+                    ).fetchall()
+                    for erow in edge_rows:
+                        eid = erow["id"]
+                        if eid in edges_seen:
+                            continue
+                        edges_seen.add(eid)
+                        edata = json.loads(erow["data"])
+                        members = conn.execute(
+                            "SELECT vertex_id FROM incidences WHERE edge_id = ? ORDER BY position",
+                            (eid,),
+                        ).fetchall()
+                        for m in members:
+                            mid = m["vertex_id"]
+                            if mid not in visited:
+                                visited[mid] = depth + 1
+                                next_frontier.append(mid)
+                                chain.append(
+                                    {
+                                        "vertex": mid,
+                                        "depth": depth + 1,
+                                        "via_edge": eid,
+                                        "edge_type": edata.get("type", ""),
+                                    }
+                                )
+                frontier = next_frontier
 
         return {
             "root": vertex_id,
