@@ -26,6 +26,7 @@
 #define MAX_PHYSICAL_LEN 512
 #define MAX_INTUITIVE_LEN 512
 #define MAX_INSIGHT_LEN 256
+#define MAX_TAGS_LEN 256
 
 typedef enum {
     NODE_AXIOM,
@@ -49,6 +50,11 @@ typedef struct {
     int         deps[MAX_DEPS];      /* ids of nodes this depends on */
     int         dep_count;
     Vector2     pos;                 /* layout position (set by graph_layout) */
+
+    /* Tags for filtering/highlighting (#228, #229) */
+    char        tags[MAX_TAGS_LEN];  /* comma-separated tags from JSON */
+    int         has_tag_angle;       /* precomputed: 1 if "angle" tag present */
+    char        proof_role[32];      /* "goal", "lemma", "utility", "" */
 } ProofNode;
 
 typedef struct {
@@ -64,6 +70,10 @@ typedef struct {
     float       viewport_zoom;         /* Zoom factor (1.0 = 100%) */
     Rectangle   graph_bounds;          /* Computed bounding box of all nodes */
     Rectangle   view_area;             /* Visible area on screen */
+
+    /* Display modes (#228, #229) */
+    int         angle_highlight;       /* 1 = emphasize angle-dependent nodes */
+    int         overview_mode;         /* 1 = show overview panel instead of graph */
 } ProofGraph;
 
 /* Initialize the Stern-Gerlach proof graph (hardcoded from Lean files) */
@@ -95,6 +105,18 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel);
 
 /* Draw the step indicator at the bottom */
 void graph_draw_step_bar(const ProofGraph *g, Rectangle bar);
+
+/* Draw overview panel showing proof structure summary (#228) */
+void graph_draw_overview(const ProofGraph *g, Rectangle panel);
+
+/* Toggle angle-dependent node emphasis (#229) */
+void graph_toggle_angle_highlight(ProofGraph *g);
+
+/* Toggle overview mode (#228) */
+void graph_toggle_overview(ProofGraph *g);
+
+/* Check if a node has a specific tag */
+int graph_node_has_tag(const ProofNode *n, const char *tag);
 
 /* Viewport control for pan/zoom */
 void graph_viewport_init(ProofGraph *g);

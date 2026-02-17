@@ -43,4 +43,9 @@
 #define QBP_TEXT_DIM     QBP_LIGHT_GRAY
 #define QBP_PANEL_BG    QBP_MIDNIGHT
 
+/* --- Angle-emphasis highlight (#229) --- */
+#define QBP_ANGLE_GLOW  (Color){ 255, 200,  60, 255 }  /* Warm gold for angle-dependent nodes */
+#define QBP_ANGLE_EDGE  (Color){ 255, 180,  40, 200 }  /* Semi-transparent gold for angle edges */
+#define QBP_ANGLE_DIM   (Color){  60,  60,  70, 255 }  /* Dimmed non-angle nodes when filter active */
+
 #endif /* QBP_THEME_H */

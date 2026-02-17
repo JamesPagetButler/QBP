@@ -611,6 +611,139 @@ class QBPKnowledgeSQLite:
                 for row in rows
             ]
 
+    def find_contested_claims(self) -> List[Dict[str, Any]]:
+        """Find claims that have counterevidence or 'contested' status."""
+        with self._connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT v.id, v.data
+                FROM vertices v
+                WHERE v.type = 'Claim'
+                AND (
+                    json_extract(v.data, '$.status') = 'contested'
+                    OR json_extract(v.data, '$.status') = 'disputed'
+                    OR json_extract(v.data, '$.tags') LIKE '%"counterevidence"%'
+                )
+            """
+            ).fetchall()
+
+            return [{"id": row["id"], **json.loads(row["data"])} for row in rows]
+
+    def evidence_strength(self, claim_id: str) -> Dict[str, Any]:
+        """Return evidence chain details and confidence tier for a claim."""
+        if not claim_id.startswith("claim:"):
+            claim_id = f"claim:{claim_id}"
+
+        claim = self.get_vertex(claim_id)
+        if not claim:
+            return {"error": f"Claim not found: {claim_id}"}
+
+        edges = self.get_edges_containing(claim_id)
+        evidence_chains = [e for e in edges if e.get("type") == "evidence_chain"]
+        proof_links = [e for e in edges if e.get("type") == "proof_link"]
+
+        tiers = [e.get("confidence_tier", 0) for e in evidence_chains]
+        max_tier = max(tiers) if tiers else 0
+
+        return {
+            "claim_id": claim_id,
+            "statement": claim.get("statement"),
+            "confidence_tier": max_tier,
+            "evidence_count": len(evidence_chains),
+            "proof_count": len(proof_links),
+            "has_formal_proof": len(proof_links) > 0,
+            "chains": evidence_chains,
+        }
+
+    def find_equivalences(self) -> List[Dict[str, Any]]:
+        """Find all equivalence class hyperedges."""
+        return self.get_hyperedges_by_type("equivalence")
+
+    def find_theory_axioms(self) -> List[Dict[str, Any]]:
+        """Find all theory_axioms hyperedges."""
+        return self.get_hyperedges_by_type("theory_axioms")
+
+    def find_research_clusters(self) -> List[Dict[str, Any]]:
+        """Find all research_cluster hyperedges."""
+        return self.get_hyperedges_by_type("research_cluster")
+
+    def sprint_additions(self, sprint_id: str) -> Dict[str, Any]:
+        """Find vertices and edges added during a specific sprint."""
+        with self._connection() as conn:
+            vertices = conn.execute(
+                """
+                SELECT id, type, data FROM vertices
+                WHERE json_extract(data, '$.research_sprint') = ?
+                   OR json_extract(data, '$.added_sprint') = ?
+            """,
+                (sprint_id, sprint_id),
+            ).fetchall()
+
+            edges = conn.execute(
+                """
+                SELECT id, type, data FROM hyperedges
+                WHERE json_extract(data, '$.sprint') = ?
+            """,
+                (sprint_id,),
+            ).fetchall()
+
+        return {
+            "sprint": sprint_id,
+            "vertices": [
+                {"id": row["id"], "type": row["type"], **json.loads(row["data"])}
+                for row in vertices
+            ],
+            "edges": [
+                {"id": row["id"], "type": row["type"], **json.loads(row["data"])}
+                for row in edges
+            ],
+            "vertex_count": len(vertices),
+            "edge_count": len(edges),
+        }
+
+    def recent_activity(self, days: int = 7) -> Dict[str, Any]:
+        """Find recently added or modified entries."""
+        with self._connection() as conn:
+            vertices = conn.execute(
+                """
+                SELECT id, type, data, created_at FROM vertices
+                WHERE created_at >= datetime('now', ? || ' days')
+                ORDER BY created_at DESC
+            """,
+                (f"-{days}",),
+            ).fetchall()
+
+            edges = conn.execute(
+                """
+                SELECT id, type, data, created_at FROM hyperedges
+                WHERE created_at >= datetime('now', ? || ' days')
+                ORDER BY created_at DESC
+            """,
+                (f"-{days}",),
+            ).fetchall()
+
+        return {
+            "period_days": days,
+            "vertices": [
+                {
+                    "id": row["id"],
+                    "type": row["type"],
+                    "created_at": row["created_at"],
+                }
+                for row in vertices
+            ],
+            "edges": [
+                {
+                    "id": row["id"],
+                    "type": row["type"],
+                    "created_at": row["created_at"],
+                }
+                for row in edges
+            ],
+            "vertex_count": len(vertices),
+            "edge_count": len(edges),
+        }
+
     def find_bridge_concepts(self, min_degree: int = 3) -> List[Dict[str, Any]]:
         """Find concepts that appear in multiple hyperedges."""
         with self._connection() as conn:
@@ -1301,6 +1434,27 @@ def main():
     subparsers.add_parser("gaps", help="Find research gaps")
     subparsers.add_parser("bridges", help="Find bridge concepts")
 
+    # Additional research queries
+    subparsers.add_parser("contested", help="Find contested claims")
+    subparsers.add_parser("equivalences", help="Find all equivalence classes")
+    subparsers.add_parser("axioms", help="Find theory axiom sets")
+    subparsers.add_parser("clusters", help="Find research clusters")
+
+    strength_p = subparsers.add_parser(
+        "strength", help="Show evidence strength for a claim"
+    )
+    strength_p.add_argument("claim_id", help="Claim ID (with or without claim: prefix)")
+
+    sprint_p = subparsers.add_parser(
+        "sprint-additions", help="Show vertices/edges added in a sprint"
+    )
+    sprint_p.add_argument("sprint_id", help="Sprint identifier (e.g., 'Sprint 3')")
+
+    recent_p = subparsers.add_parser("recent", help="Show recent activity")
+    recent_p.add_argument(
+        "--days", type=int, default=7, help="Number of days (default: 7)"
+    )
+
     # Coverage report
     subparsers.add_parser("coverage", help="Show coverage metrics (evidence, proofs)")
 
@@ -1408,6 +1562,61 @@ def main():
         elif args.command == "bridges":
             results = kb.find_bridge_concepts()
             print(json.dumps(results, indent=2))
+
+        elif args.command == "contested":
+            results = kb.find_contested_claims()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "equivalences":
+            results = kb.find_equivalences()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "axioms":
+            results = kb.find_theory_axioms()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "clusters":
+            results = kb.find_research_clusters()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "strength":
+            claim_id = args.claim_id
+            if not claim_id.startswith("claim:"):
+                claim_id = f"claim:{claim_id}"
+            result = kb.evidence_strength(claim_id)
+            print(json.dumps(result, indent=2))
+
+        elif args.command == "sprint-additions":
+            result = kb.sprint_additions(args.sprint_id)
+            print(
+                f"Sprint '{result['sprint']}': "
+                f"{result['vertex_count']} vertices, "
+                f"{result['edge_count']} edges"
+            )
+            if result["vertices"]:
+                print("\nVertices:")
+                for v in result["vertices"]:
+                    print(f"  - {v['id']} ({v['type']})")
+            if result["edges"]:
+                print("\nEdges:")
+                for e in result["edges"]:
+                    print(f"  - {e['id']} ({e['type']})")
+
+        elif args.command == "recent":
+            result = kb.recent_activity(days=args.days)
+            print(
+                f"Activity in last {result['period_days']} days: "
+                f"{result['vertex_count']} vertices, "
+                f"{result['edge_count']} edges"
+            )
+            if result["vertices"]:
+                print("\nVertices:")
+                for v in result["vertices"]:
+                    print(f"  - {v['id']} ({v['type']}) @ {v['created_at']}")
+            if result["edges"]:
+                print("\nEdges:")
+                for e in result["edges"]:
+                    print(f"  - {e['id']} ({e['type']}) @ {e['created_at']}")
 
         elif args.command == "coverage":
             report = kb.coverage_report()
