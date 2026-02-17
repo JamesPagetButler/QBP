@@ -16,9 +16,11 @@
 
 > **Empirical Anchor Framework:** New required section in ground truth schema. Review protocol, sprint workflow, and V&V workflow all updated. Retroactive anchors added to Sprints 1 & 2 (#286 closed).
 
-> **Hypergraph System Ready:** Core infrastructure complete (48 vertices, 10 hyperedges). Use `python scripts/qbp_knowledge_sqlite.py` to interact with knowledge base.
+> **Hypergraph System Ready:** Core infrastructure complete (76 vertices, 15 hyperedges). 14 research queries + CLI. Legacy Hypergraph-DB archived. Use `python scripts/qbp_knowledge_sqlite.py` to interact with knowledge base.
 
 > **Pre-Sprint Research Complete:** #255 closed. All 5 research issues resolved (#249-#253). Sprint 3 is unblocked.
+
+> **Housekeeping Batch 2 (PR #363):** Closed #228, #229, #238. All experiments migrated to versioned results (`v{N}/` + `CURRENT` symlink). Legacy Hypergraph-DB archived to `archive/`. Follow-ups: #365 (activation matrix), #366 (consumer symlink adoption).
 
 ## Sprint 3 Closure Checklist
 
