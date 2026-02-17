@@ -191,6 +191,36 @@ int graph_load_json(ProofGraph *g, const char *json_path)
         safe_strcpy(n->level1_intuitive, MAX_INTUITIVE_LEN, get_string(node_json, "L1_intuitive"), "L1_intuitive");
         safe_strcpy(n->key_insight, MAX_INSIGHT_LEN, get_string(node_json, "key_insight"), "key_insight");
 
+        /* Parse tags (comma-separated string or JSON array) */
+        const cJSON *tags_json = cJSON_GetObjectItemCaseSensitive(node_json, "tags");
+        if (cJSON_IsString(tags_json) && tags_json->valuestring) {
+            safe_strcpy(n->tags, MAX_TAGS_LEN, tags_json->valuestring, "tags");
+        } else if (cJSON_IsArray(tags_json)) {
+            /* Join array elements with commas */
+            n->tags[0] = '\0';
+            int pos = 0;
+            const cJSON *tag_item;
+            cJSON_ArrayForEach(tag_item, tags_json) {
+                if (cJSON_IsString(tag_item) && tag_item->valuestring) {
+                    int len = (int)strlen(tag_item->valuestring);
+                    if (pos + len + 2 < MAX_TAGS_LEN) {
+                        if (pos > 0) n->tags[pos++] = ',';
+                        memcpy(n->tags + pos, tag_item->valuestring, len);
+                        pos += len;
+                    }
+                }
+            }
+            n->tags[pos] = '\0';
+        } else {
+            n->tags[0] = '\0';
+        }
+
+        /* Precompute angle tag flag */
+        n->has_tag_angle = (strstr(n->tags, "angle") != NULL) ? 1 : 0;
+
+        /* Parse proof_role */
+        safe_strcpy(n->proof_role, sizeof(n->proof_role), get_string(node_json, "proof_role"), "proof_role");
+
         /* Set walk order */
         g->walk_order[node_id] = node_id;
 

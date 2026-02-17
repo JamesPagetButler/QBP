@@ -651,7 +651,7 @@ The quaternion formulation makes the geometric structure of spin explicit. In st
 | Poincaré symmetry reduction | Moretti, Oppio | 2019 | Reduction theorem |
 | Neutron interferometry test | Kaiser et al. | 1984 | Experimental null result |
 
-**Knowledge base updated:** 31 vertices, 9 hyperedges (see `python scripts/qbp_knowledge.py summary`).
+**Knowledge base updated:** See `python scripts/qbp_knowledge_sqlite.py summary` for current statistics.
 
 ## 9. Theory Refinement — Sprint 2 Analysis
 

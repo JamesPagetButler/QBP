@@ -15,6 +15,8 @@
 #include "proof_graph.h"
 #include "theme.h"
 #include "fonts.h"
+#include <math.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -457,6 +459,18 @@ void graph_init_stern_gerlach(ProofGraph *g)
 /* Forward declaration for calc_node_width */
 static float calc_node_width(const ProofNode *n);
 
+/* Barycenter pair for qsort-based ordering (replaces O(n²) bubble sort) */
+typedef struct { float bc; int node_id; } BcPair;
+
+static int cmp_bc_pair(const void *a, const void *b) {
+    float fa = ((const BcPair *)a)->bc;
+    float fb = ((const BcPair *)b)->bc;
+    /* NaN-safe: treat NaN as +∞ so qsort gets a total order */
+    if (isnan(fa)) return isnan(fb) ? 0 : 1;
+    if (isnan(fb)) return -1;
+    return (fa > fb) - (fa < fb);
+}
+
 void graph_layout(ProofGraph *g, Rectangle area)
 {
     if (g->node_count == 0) return;
@@ -570,18 +584,16 @@ void graph_layout(ProofGraph *g, Rectangle area)
             }
         }
 
-        /* Sort by barycenter */
-        for (int i = 0; i < count - 1; i++) {
-            for (int j = i + 1; j < count; j++) {
-                if (barycenters[j] < barycenters[i]) {
-                    float tmp_b = barycenters[i];
-                    barycenters[i] = barycenters[j];
-                    barycenters[j] = tmp_b;
-                    int tmp_n = nodes_at_level[lvl][i];
-                    nodes_at_level[lvl][i] = nodes_at_level[lvl][j];
-                    nodes_at_level[lvl][j] = tmp_n;
-                }
-            }
+        /* Sort by barycenter using paired sort (O(n log n) via qsort) */
+        BcPair bc_pairs[MAX_NODES];
+        for (int i = 0; i < count; i++) {
+            bc_pairs[i].bc = barycenters[i];
+            bc_pairs[i].node_id = nodes_at_level[lvl][i];
+        }
+        qsort(bc_pairs, (size_t)count, sizeof(BcPair), cmp_bc_pair);
+        for (int i = 0; i < count; i++) {
+            barycenters[i] = bc_pairs[i].bc;
+            nodes_at_level[lvl][i] = bc_pairs[i].node_id;
         }
 
         /* Position nodes - compute total width first */
@@ -794,8 +806,34 @@ Rectangle graph_node_bounds(const ProofGraph *g, int node_id)
     return node_rect_screen(g, &g->nodes[node_id]);
 }
 
+int graph_node_has_tag(const ProofNode *n, const char *tag)
+{
+    if (!n || !tag || n->tags[0] == '\0') return 0;
+    const char *p = n->tags;
+    int tag_len = (int)strlen(tag);
+    while (*p) {
+        if (strncmp(p, tag, tag_len) == 0 &&
+            (p[tag_len] == ',' || p[tag_len] == '\0')) {
+            return 1;
+        }
+        /* Skip to next comma */
+        while (*p && *p != ',') p++;
+        if (*p == ',') p++;
+    }
+    return 0;
+}
+
 static Color node_color(const ProofGraph *g, int id)
 {
+    /* Angle highlight mode: dim non-angle nodes */
+    if (g->angle_highlight && !g->nodes[id].has_tag_angle) {
+        if (graph_is_active(g, id)) return QBP_VERDIGRIS;
+        return QBP_ANGLE_DIM;
+    }
+    if (g->angle_highlight && g->nodes[id].has_tag_angle) {
+        if (graph_is_active(g, id)) return QBP_ANGLE_GLOW;
+        return QBP_GOLD;
+    }
     if (graph_is_active(g, id))     return QBP_NODE_ACTIVE;
     if (graph_is_dependency(g, id)) return QBP_NODE_DEP;
     for (int s = 0; s < g->current_step; s++) {
@@ -1047,7 +1085,7 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
         DrawTextQBP("Depends on:", (int)x, (int)y, header_font, QBP_TEXT_DIM);
         y += header_font + 4;
         for (int i = 0; i < n->dep_count; i++) {
-            char dep_buf[128];
+            char dep_buf[256];
             snprintf(dep_buf, sizeof(dep_buf), "-> %s", g->nodes[n->deps[i]].display_name);
             DrawTextQBP(dep_buf, (int)x, (int)y, 12, QBP_STEEL);
             y += 14;
@@ -1106,4 +1144,149 @@ void graph_draw_step_bar(const ProofGraph *g, Rectangle bar)
              (int)(prev_btn.y + (prev_btn.height - 18)/2), 18, QBP_IVORY);
     DrawTextQBP("Next >>", (int)(next_btn.x + (next_btn.width - next_tw)/2),
              (int)(next_btn.y + (next_btn.height - 18)/2), 18, QBP_IVORY);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Toggle functions (#228, #229)                                      */
+/* ------------------------------------------------------------------ */
+
+void graph_toggle_angle_highlight(ProofGraph *g)
+{
+    g->angle_highlight = !g->angle_highlight;
+}
+
+void graph_toggle_overview(ProofGraph *g)
+{
+    g->overview_mode = !g->overview_mode;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Overview panel (#228)                                              */
+/* ------------------------------------------------------------------ */
+
+void graph_draw_overview(const ProofGraph *g, Rectangle panel)
+{
+    DrawRectangleRec(panel, QBP_PANEL_BG);
+    DrawRectangleLinesEx(panel, 2.0f, QBP_BRASS);
+
+    float x = panel.x + 12;
+    float y = panel.y + 10;
+    float max_w = panel.width - 24;
+
+    BeginScissorMode((int)panel.x + 2, (int)panel.y + 2,
+                     (int)panel.width - 4, (int)panel.height - 4);
+
+    /* Title */
+    DrawTextQBP("PROOF OVERVIEW", (int)x, (int)y, 20, QBP_GOLD);
+    y += 26;
+
+    /* Count by role */
+    int n_axiom = 0, n_def = 0, n_thm = 0, n_angle = 0;
+    for (int i = 0; i < g->node_count; i++) {
+        switch (g->nodes[i].kind) {
+            case NODE_AXIOM:      n_axiom++; break;
+            case NODE_DEFINITION: n_def++; break;
+            case NODE_THEOREM:    n_thm++; break;
+        }
+        if (g->nodes[i].has_tag_angle) n_angle++;
+    }
+
+    char buf[256];
+
+    /* Summary stats */
+    snprintf(buf, sizeof(buf), "Total nodes: %d", g->node_count);
+    DrawTextQBP(buf, (int)x, (int)y, 14, QBP_TEXT_PRIMARY);
+    y += 18;
+
+    snprintf(buf, sizeof(buf), "  Axioms: %d", n_axiom);
+    DrawTextQBP(buf, (int)x, (int)y, 13, QBP_CRIMSON);
+    y += 16;
+
+    snprintf(buf, sizeof(buf), "  Definitions: %d", n_def);
+    DrawTextQBP(buf, (int)x, (int)y, 13, QBP_AMBER);
+    y += 16;
+
+    snprintf(buf, sizeof(buf), "  Theorems: %d", n_thm);
+    DrawTextQBP(buf, (int)x, (int)y, 13, QBP_TEAL);
+    y += 16;
+
+    if (n_angle > 0) {
+        snprintf(buf, sizeof(buf), "  Angle-dependent: %d", n_angle);
+        DrawTextQBP(buf, (int)x, (int)y, 13, QBP_ANGLE_GLOW);
+        y += 16;
+    }
+
+    y += 8;
+    DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 1.0f, QBP_STEEL);
+    y += 8;
+
+    /* Proof structure: list nodes grouped by kind */
+    DrawTextQBP("STRUCTURE", (int)x, (int)y, 14, QBP_TEXT_DIM);
+    y += 18;
+
+    /* Goal nodes (theorems at bottom of tree = highest level) */
+    DrawTextQBP("Goal:", (int)x, (int)y, 13, QBP_GOLD);
+    y += 16;
+    for (int i = 0; i < g->node_count; i++) {
+        if (g->nodes[i].kind != NODE_THEOREM) continue;
+        /* Check if this theorem is depended on by anyone */
+        int is_used = 0;
+        for (int j = 0; j < g->node_count; j++) {
+            for (int d = 0; d < g->nodes[j].dep_count; d++) {
+                if (g->nodes[j].deps[d] == i) { is_used = 1; break; }
+            }
+            if (is_used) break;
+        }
+        if (!is_used) {
+            /* Terminal theorem = goal */
+            Color c = g->nodes[i].has_tag_angle ? QBP_ANGLE_GLOW : QBP_IVORY;
+            snprintf(buf, sizeof(buf), "  %s", g->nodes[i].display_name);
+            DrawTextQBP(buf, (int)x, (int)y, 12, c);
+            y += 14;
+        }
+    }
+    y += 4;
+
+    /* Key lemmas (theorems that are used by other nodes) */
+    DrawTextQBP("Key lemmas:", (int)x, (int)y, 13, QBP_TEAL);
+    y += 16;
+    for (int i = 0; i < g->node_count; i++) {
+        if (g->nodes[i].kind != NODE_THEOREM) continue;
+        int is_used = 0;
+        for (int j = 0; j < g->node_count; j++) {
+            for (int d = 0; d < g->nodes[j].dep_count; d++) {
+                if (g->nodes[j].deps[d] == i) { is_used = 1; break; }
+            }
+            if (is_used) break;
+        }
+        if (is_used) {
+            Color c = g->nodes[i].has_tag_angle ? QBP_ANGLE_GLOW : QBP_IVORY;
+            snprintf(buf, sizeof(buf), "  %s", g->nodes[i].display_name);
+            DrawTextQBP(buf, (int)x, (int)y, 12, c);
+            y += 14;
+        }
+    }
+    y += 4;
+
+    /* Definitions */
+    DrawTextQBP("Definitions:", (int)x, (int)y, 13, QBP_AMBER);
+    y += 16;
+    for (int i = 0; i < g->node_count; i++) {
+        if (g->nodes[i].kind != NODE_DEFINITION) continue;
+        Color c = g->nodes[i].has_tag_angle ? QBP_ANGLE_GLOW : QBP_TEXT_DIM;
+        snprintf(buf, sizeof(buf), "  %s", g->nodes[i].display_name);
+        DrawTextQBP(buf, (int)x, (int)y, 12, c);
+        y += 14;
+    }
+
+    y += 8;
+    DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 1.0f, QBP_STEEL);
+    y += 8;
+
+    /* Controls hint */
+    DrawTextQBP("[O] Toggle overview", (int)x, (int)y, 11, QBP_TEXT_DIM);
+    y += 14;
+    DrawTextQBP("[T] Toggle angle emphasis", (int)x, (int)y, 11, QBP_TEXT_DIM);
+
+    EndScissorMode();
 }

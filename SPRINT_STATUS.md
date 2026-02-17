@@ -16,9 +16,11 @@
 
 > **Empirical Anchor Framework:** New required section in ground truth schema. Review protocol, sprint workflow, and V&V workflow all updated. Retroactive anchors added to Sprints 1 & 2 (#286 closed).
 
-> **Hypergraph System Ready:** Core infrastructure complete (48 vertices, 10 hyperedges). Use `python scripts/qbp_knowledge_sqlite.py` to interact with knowledge base.
+> **Hypergraph System Ready:** Core infrastructure complete (76 vertices, 15 hyperedges). 14 research queries + CLI. Legacy Hypergraph-DB archived. Use `python scripts/qbp_knowledge_sqlite.py` to interact with knowledge base.
 
 > **Pre-Sprint Research Complete:** #255 closed. All 5 research issues resolved (#249-#253). Sprint 3 is unblocked.
+
+> **Housekeeping Batch 2 (PR #363):** Closed #228, #229, #238. All experiments migrated to versioned results (`v{N}/` + `CURRENT` symlink). Legacy Hypergraph-DB archived to `archive/`. Follow-ups: #365 (activation matrix), #366 (consumer symlink adoption).
 
 ## Sprint 3 Closure Checklist
 
@@ -233,6 +235,19 @@ PR #343 (Phase 2 rework) was merged using `gh pr merge --admin`, bypassing requi
 - **RULE: Never use `--admin` or `--force` merge flags without first investigating the blocking requirement and getting explicit approval from James**
 - When `gh pr merge` fails, the response must be: (1) run `gh pr checks` to identify the failing check, (2) read the CI logs, (3) fix the issue on the PR branch, (4) wait for CI to pass, (5) then merge normally
 - Direct pushes to master are prohibited — always use branch → PR → CI → merge
+
+### FAULT-S3-002: Near-miss merge without explicit permission (2026-02-17)
+
+**What happened:**
+During PR #362 integration, Herschel began executing the integration plan (which includes merging) after CI passed, without first obtaining James's explicit merge permission. James caught this before the merge command was issued.
+
+**Severity:** Near-miss (caught before execution)
+
+**Root cause (process):** The integration plan included "CI Validation" as step 1, and Herschel treated CI-green as implicit merge authorization. The workflow clearly states Step 7 (Final Approval) requires explicit merge command from James — this was about to be skipped.
+
+**Process update:**
+- **RULE: "Execute the integration plan" does NOT imply merge authorization.** The merge step always requires James's explicit "merge it" command, even when embedded in a broader integration instruction.
+- Integration plans should separate pre-merge preparation from the merge action itself.
 
 ---
 

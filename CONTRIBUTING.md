@@ -377,12 +377,12 @@ Every experiment on our roadmap follows a structured 5-phase lifecycle. This ens
 
 **Knowledge Graph Touchpoint:**
 ```bash
-# Query: What claims depend on this experiment's predictions?
-python scripts/qbp_knowledge.py query claims-for-experiment stern-gerlach
+# Query: What claims relate to this experiment?
+python scripts/qbp_knowledge_sqlite.py query --search stern-gerlach
 
-# Update: Add new claims about expected results
-python scripts/qbp_knowledge.py add claim "SG-prediction-01" "Spin-up probability = cos²(θ/2)"
-python scripts/qbp_knowledge.py link claim "SG-prediction-01" axiom "quaternion-measurement"
+# Research queries
+python scripts/qbp_knowledge_sqlite.py weak-claims
+python scripts/qbp_knowledge_sqlite.py gaps
 ```
 
 **Output:** `research/NN_experiment_expected_results.md`
@@ -404,10 +404,10 @@ python scripts/qbp_knowledge.py link claim "SG-prediction-01" axiom "quaternion-
 **Knowledge Graph Touchpoint:**
 ```bash
 # Query: What concepts does this implementation use?
-python scripts/qbp_knowledge.py query concepts-for-file src/qphysics.py
+python scripts/qbp_knowledge_sqlite.py query --type Concept --search quaternion
 
-# Update: Link implementation to concepts, flag missing definitions
-python scripts/qbp_knowledge.py link implementation "qphysics.py:rotation()" concept "quaternion-rotation"
+# Trace evidence for a claim
+python scripts/qbp_knowledge_sqlite.py trace claim:cosine-squared-formula
 ```
 
 **Output:**
@@ -434,11 +434,11 @@ python scripts/qbp_knowledge.py link implementation "qphysics.py:rotation()" con
 
 **Knowledge Graph Touchpoint:**
 ```bash
-# Query: What should this visualization demonstrate?
-python scripts/qbp_knowledge.py query claims-for-experiment angle-dependent
+# Query: What claims should this visualization demonstrate?
+python scripts/qbp_knowledge_sqlite.py query --type Claim --search angle-dependent
 
-# Update: Link visualization outputs to claims they illustrate
-python scripts/qbp_knowledge.py link visualization "bloch_sphere_rotation.py" claim "cosine-squared-formula"
+# Check dependency chain
+python scripts/qbp_knowledge_sqlite.py dep-chain claim:cosine-squared-formula
 ```
 
 **Decision Gate:**
