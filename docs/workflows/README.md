@@ -34,6 +34,25 @@ Used for Phase 1 (Ground Truth) and Phase 4 (Formal Proof) work.
 
 ---
 
+### [Parallel Sub-Agent Workflow](parallel_subagent_workflow.md)
+
+Five-phase execution model using Claude's parallel sub-agents:
+1. Explore (parallel) → 2. Contract (serial) → 3. Build (parallel) → 4. Run (serial) → 5. Review (serial)
+
+### [Results Versioning Protocol](results_versioning.md)
+
+Protocol for managing experiment result files across sprint rework cycles. Uses versioned subdirectories (`v1/`, `v2/`, ...) with `CURRENT` symlinks for consumer discovery.
+
+### [Claude-Gemini Communication](claude_gemini_communication.md)
+
+Prescriptive patterns for Claude-Gemini collaboration: pre-implementation critique, structured debate, session-based reviews, human tie-breaking, and interactive questions.
+
+### [Review Tiers](review_tiers.md)
+
+Tiered review system (L0-L3) with BLOCKING criteria, human visual review gates, and CONFLICT resolution templates.
+
+---
+
 ## Personas
 
 | Persona | Role |

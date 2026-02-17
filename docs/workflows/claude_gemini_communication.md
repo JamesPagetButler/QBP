@@ -207,8 +207,79 @@ At the start of sessions involving Gemini, check for relevant prior context:
 
 ---
 
+## 6. Prescriptive Collaboration Patterns
+
+### Pattern 1: Pre-Implementation Critique
+
+**When:** Before implementing any non-trivial design decision.
+**Tool:** `critique_my_approach` via Gemini MCP (`thinking=true`)
+
+| Step | Actor | Action |
+|------|-------|--------|
+| 1 | Claude | Drafts approach (plan, architecture, algorithm) |
+| 2 | Gemini | Critiques — finds flaws, edge cases, alternatives |
+| 3 | Claude | Integrates feedback, proceeds to implementation |
+
+**Skip when:** Single-line fixes, obvious bugs, tasks where James gave specific instructions.
+
+**Precedent:** PR #340 — Gemini's critique changed single-file to split nearfield/farfield results.
+
+### Pattern 2: Structured Debate for Contested Physics
+
+**When:** A review finding is ambiguous, or two valid interpretations exist.
+**Tool:** `debate_turn` with session history
+
+| Step | Actor | Action |
+|------|-------|--------|
+| 1 | Claude | Identifies contested finding, opens debate session |
+| 2 | Gemini | Responds (Furey or Feynman persona) |
+| 3 | Both | Multiple rounds until convergence |
+| 4 | Escalate | If no convergence after 3 rounds → present to James as tie-breaker |
+
+### Pattern 3: Session-Based Iterative Reviews
+
+**When:** Multi-round PRs where Gemini has previously reviewed.
+**Tool:** `review_document` with `session_id` for continuity
+
+| Round | What Happens |
+|-------|-------------|
+| 1 | Gemini reviews PR diff. Claude records returned `session_id`. |
+| 2+ | Gemini re-reviews with same `session_id` — can reference Round 1 findings. |
+
+**Advantage:** Without session continuity, Gemini reviews each round from scratch, losing context about what it previously flagged.
+
+### Pattern 4: Human Tie-Breaking (James-in-the-Loop)
+
+**When:** Claude and Gemini genuinely disagree on a significant finding after 3 debate rounds.
+
+| Escalation Trigger | Action |
+|-------------------|--------|
+| Disagreement after 3 debate rounds | Present both positions to James |
+| Finding would change sprint direction | Present impact analysis to James |
+| Acceptance criterion is contested | Present evidence for both sides to James |
+
+**Design principle:** Not a bottleneck — routine reviews proceed without James. Tie-breaking triggers only on genuine disagreement or large-impact findings.
+
+**Output:** Decision recorded via `record_decision` or issue comment.
+
+### Pattern 5: Interactive Question Sessions
+
+**When:** Claude needs James's input on a decision.
+**Tool:** `AskUserQuestion` with multi-select options
+
+James can:
+- **Refine the question** — ask Claude to rephrase
+- **Request more context** — ask for more information before answering
+- **Reject the framing** — "wrong question, the real question is..."
+
+Questions are a conversation, not a one-shot form.
+
+---
+
 ## References
 
 - [TEAMS.md](../../TEAMS.md) — Persona definitions
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) — Review process
+- [Review Tiers](review_tiers.md) — Tier system and BLOCKING criteria
 - PR #287 — Motivating example for disagreement resolution
+- [Issue #346](https://github.com/JamesPagetButler/QBP/issues/346) — Living issue for workflow refinement
