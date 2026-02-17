@@ -181,6 +181,8 @@ def compute_metrics(
     norm_max_dev = (summary_df["norm_final"] - 1.0).abs().max()
 
     # η jump characterization (using eta0=0.5 for largest dynamic range)
+    # Note: visibility is η₀-independent (unitarity of SO(4)), but global η
+    # itself shifts during propagation when ψ₁ is in-phase with ψ₀ (#335).
     eta_jumps = []
     u1_values = sorted(decay_df["U1_strength_eV"].unique())
     for u1 in u1_values:

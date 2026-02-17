@@ -242,6 +242,33 @@ class TestStage1Decay:
         psi1_norm = np.sum(np.abs(result.detector_psi1) ** 2) * grid.dx
         assert psi1_norm < 1e-14, f"Spurious ψ₁ in free propagation: {psi1_norm:.2e}"
 
+    def test_free_space_eta_noise_floor(self):
+        """
+        Free-space control: η must remain at numerical noise floor throughout.
+
+        No slits, no potential — pure free-space propagation starting from
+        η₀=0. Measures η at the exit plane to establish the inherent noise
+        floor of the grid's η evolution. This value serves as a baseline:
+        any η above this floor in slit experiments is real physics, not numerics.
+
+        Origin: PR #333, Gemini R-4 (Richard Feynman).
+        """
+        grid = create_transverse_grid(self.CONFIG)
+        psi0, psi1 = create_initial_wavepacket(grid, k0=20.0, sigma=2.0, eta0=0.0)
+
+        result = propagate(psi0, psi1, grid, self.CONFIG)
+
+        # Measure η at exit plane
+        eta_final = compute_eta(result.detector_psi0, result.detector_psi1, grid.dx)
+
+        # η should be at machine-precision noise floor
+        noise_floor = 1e-14
+        assert eta_final < noise_floor, (
+            f"Free-space η noise floor too high: η = {eta_final:.2e}, "
+            f"expected < {noise_floor:.0e}. Any η above this in slit "
+            f"experiments may be numerical artifact rather than physics."
+        )
+
     def test_quaternionic_barrier_coupling(self):
         """
         Test 1b: Quaternionic barrier generates ψ₁ from ψ₀.
