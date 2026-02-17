@@ -1516,11 +1516,18 @@ class QBPKnowledgeSQLite:
 # =============================================================================
 
 
+def _default_db_path() -> str:
+    """Resolve the default DB path relative to the project root (parent of scripts/)."""
+    script_dir = Path(__file__).resolve().parent
+    project_root = script_dir.parent
+    return str(project_root / "knowledge" / "qbp.db")
+
+
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="QBP Knowledge System (SQLite)")
-    parser.add_argument("--db", default="knowledge/qbp.db", help="Database path")
+    parser.add_argument("--db", default=_default_db_path(), help="Database path")
 
     subparsers = parser.add_subparsers(dest="command")
 

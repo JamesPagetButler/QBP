@@ -141,11 +141,11 @@ During each Phase 2 rework:
 
 | Experiment | Latest Version | Notes |
 |-----------|---------------|-------|
-| 01_stern_gerlach | v1 (implicit) | No versioned subdirectory yet |
-| 01b_angle_dependent | v1 (implicit) | No versioned subdirectory yet |
-| 03_double_slit | v3 | First experiment to use versioning |
+| 01_stern_gerlach | v1 | Migrated — `CURRENT -> v1` |
+| 01b_angle_dependent | v1 | Migrated — `CURRENT -> v1` |
+| 03_double_slit | v3 | `CURRENT -> v3` (v2 archived) |
 
-**Migration plan:** Existing experiments without versioned directories will be migrated when they next undergo a Phase 2 rework. No retroactive migration needed.
+All experiments now follow the versioned protocol.
 
 ---
 
