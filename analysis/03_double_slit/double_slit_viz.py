@@ -503,8 +503,8 @@ class DoubleSlitDemo:
         # --- Panel 5: Far-field comparison (A vs QBP) ---
         has_qbp_ff = len(self.farfield_qbp) > 0
         panel5_title = (
-            "<b>Far-Field Comparison: Standard QM vs QBP</b>"
-            " &mdash; <i>what an experimentalist would measure</i>"
+            "<b>Far-Field QBP: Expected vs Quaternionic Coupling</b>"
+            " &mdash; <i>BPM + Fraunhofer FFT (mm scale)</i>"
             if has_qbp_ff
             else "<b>Far-Field Reference: Standard QM vs Which-Path</b>"
             " &mdash; <i>classic mm-scale Fraunhofer diffraction</i>"
@@ -870,35 +870,37 @@ class DoubleSlitDemo:
 
     # --------------------------------------------------- Panel 5
     def _plot_panel5_static(self):
-        """Far-field static elements: Scenario A and B (plotted once)."""
-        if self.farfield_a is not None:
-            x_mm, I_a = self.farfield_a
-            c_a = gcurve(
-                graph=self.g5,
-                color=to_vpy(COL_STD_QM),
-                label="Standard QM (V=1, full fringes)",
-            )
-            step = max(1, len(x_mm) // 2000)
-            for i in range(0, len(x_mm), step):
-                c_a.plot(x_mm[i], I_a[i])
+        """Far-field static element: BPM+FFT baseline (U₁=0), plotted once.
 
-        if self.farfield_b is not None:
-            x_mm, I_b = self.farfield_b
-            c_b = gcurve(
+        Analytical A/B are NOT shown here — they use a plane-wave source at
+        ±0.5 mm scale, while BPM+FFT uses a Gaussian source at ±1.5 m scale.
+        Mixing them on the same axes makes comparison meaningless.
+        """
+        # Plot the BPM+FFT Expected baseline (U₁=0) as static reference
+        baseline_key = ("expected", 0.0, self.eta0_values[0])
+        if self.farfield_qbp and baseline_key in self.farfield_qbp:
+            x_mm, I_base = self.farfield_qbp[baseline_key]
+            I_peak = I_base.max()
+            I_norm = I_base / I_peak if I_peak > 0 else I_base
+            mask = np.abs(x_mm) <= 1500
+            x_clip = x_mm[mask]
+            I_clip = I_norm[mask]
+
+            c_base = gcurve(
                 graph=self.g5,
-                color=to_vpy(COL_ADLER),
-                label="Adler predicted (V=0, no fringes)",
+                color=to_vpy(COL_EXPECTED),
+                label="Expected baseline (U₁=0, BPM+FFT)",
             )
-            step = max(1, len(x_mm) // 2000)
-            for i in range(0, len(x_mm), step):
-                c_b.plot(x_mm[i], I_b[i])
+            step = max(1, len(x_clip) // 2000)
+            for i in range(0, len(x_clip), step):
+                c_base.plot(x_clip[i], I_clip[i])
 
     def _update_panel_5(self):
-        """Far-field QBP curve — actual BPM+FFT data when available.
+        """Far-field QBP dynamic curve — actual BPM+FFT data.
 
-        a. Adler predicted: Scenario B (which-path, V=0) — static
-        b. Standard QM: Scenario A (full fringes, V=1) — static
-        c. QBP: actual far-field BPM+FFT data, dynamic with U₁
+        Static baseline (U₁=0, red) is plotted once in _plot_panel5_static().
+        This method adds the dynamic QBP coupling curve (teal) for current U₁.
+        At U₁=0, nothing to add (static baseline already shows it).
         """
         if not hasattr(self, "curves_5"):
             self.curves_5 = []
@@ -909,72 +911,43 @@ class DoubleSlitDemo:
         u1 = self.current_u1
         eta0 = self.current_eta0
 
-        # Try actual far-field QBP data first
-        if self.farfield_qbp:
-            # For U₁=0, use "expected" regime; for U₁>0, use "qbp"
-            if u1 == 0.0:
-                qbp_key = ("expected", 0.0, eta0)
-            else:
-                # Find closest U₁ in available data
-                qbp_keys = [
-                    k for k in self.farfield_qbp if k[0] == "qbp" and k[2] == eta0
-                ]
-                if qbp_keys:
-                    qbp_key = min(qbp_keys, key=lambda k: abs(k[1] - u1))
-                else:
-                    qbp_key = None
-
-            if qbp_key and qbp_key in self.farfield_qbp:
-                x_mm, I_qbp = self.farfield_qbp[qbp_key]
-                # Normalize to peak
-                I_peak = I_qbp.max()
-                I_norm = I_qbp / I_peak if I_peak > 0 else I_qbp
-
-                # Get far-field visibility from summary if available
-                v_key = ("C", qbp_key[1], eta0)
-                v_ff = self.summary.get(v_key, {}).get("visibility", None)
-                v_label = f", V_ff={v_ff:.3f}" if v_ff is not None else ""
-
-                col = COL_EXPECTED if u1 < max(self.u1_values) else COL_QBP
-                c_qbp = gcurve(
-                    graph=self.g5,
-                    color=to_vpy(col),
-                    label=f"QBP far-field (U\u2081={qbp_key[1]:.0f} eV{v_label})",
-                )
-                # Clip to ±1500 mm to avoid FFT edge artifacts
-                mask = np.abs(x_mm) <= 1500
-                x_clip = x_mm[mask]
-                I_clip = I_norm[mask]
-                step = max(1, len(x_clip) // 2000)
-                for i in range(0, len(x_clip), step):
-                    c_qbp.plot(x_clip[i], I_clip[i])
-                self.curves_5.append(c_qbp)
-                return
-
-        # Fallback: synthetic QBP from A/B interpolation
-        if self.farfield_a is None or self.farfield_b is None:
+        # At U₁=0, the static baseline already covers it
+        if u1 == 0.0:
             return
 
-        eta0_for_v = self.eta0_values[-1]
-        v_key = ("C", u1, eta0_for_v)
-        v_cur = self.summary.get(v_key, {}).get("visibility", 0.55)
-        v_base = self.v_baseline.get(eta0_for_v, 0.55)
-        v_norm = v_cur / v_base if v_base > 0 else 1.0
+        if not self.farfield_qbp:
+            return
 
-        x_a, I_a = self.farfield_a
-        x_b, I_b = self.farfield_b
-        I_b_interp = np.interp(x_a, x_b, I_b)
-        I_qbp = I_b_interp + v_norm * (I_a - I_b_interp)
+        # Find closest U₁ in available QBP data
+        qbp_keys = [k for k in self.farfield_qbp if k[0] == "qbp" and k[2] == eta0]
+        if not qbp_keys:
+            return
+        qbp_key = min(qbp_keys, key=lambda k: abs(k[1] - u1))
 
-        col = COL_EXPECTED if u1 < max(self.u1_values) else COL_QBP
+        if qbp_key not in self.farfield_qbp:
+            return
+
+        x_mm, I_qbp = self.farfield_qbp[qbp_key]
+        I_peak = I_qbp.max()
+        I_norm = I_qbp / I_peak if I_peak > 0 else I_qbp
+
+        # Get far-field visibility from summary if available
+        v_key = ("C", qbp_key[1], eta0)
+        v_ff = self.summary.get(v_key, {}).get("visibility", None)
+        v_label = f", V_ff={v_ff:.3f}" if v_ff is not None else ""
+
         c_qbp = gcurve(
             graph=self.g5,
-            color=to_vpy(col),
-            label=f"QBP synthetic (V\u2248{v_norm:.3f}, U\u2081={u1:.0f} eV)",
+            color=to_vpy(COL_QBP),
+            label=f"QBP coupling (U\u2081={qbp_key[1]:.0f} eV{v_label})",
         )
-        step = max(1, len(x_a) // 2000)
-        for i in range(0, len(x_a), step):
-            c_qbp.plot(x_a[i], I_qbp[i])
+        # Clip to ±1500 mm to avoid FFT edge artifacts
+        mask = np.abs(x_mm) <= 1500
+        x_clip = x_mm[mask]
+        I_clip = I_norm[mask]
+        step = max(1, len(x_clip) // 2000)
+        for i in range(0, len(x_clip), step):
+            c_qbp.plot(x_clip[i], I_clip[i])
         self.curves_5.append(c_qbp)
 
     # --------------------------------------------------- Stats
