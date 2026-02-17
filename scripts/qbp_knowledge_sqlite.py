@@ -667,6 +667,100 @@ class QBPKnowledgeSQLite:
         """Find all research_cluster hyperedges."""
         return self.get_hyperedges_by_type("research_cluster")
 
+    def find_open_questions(self) -> List[Dict[str, Any]]:
+        """Find all questions with 'open' status."""
+        with self._connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT v.id, v.data
+                FROM vertices v
+                WHERE v.type = 'Question'
+                AND json_extract(v.data, '$.status') = 'open'
+                ORDER BY v.id
+            """
+            ).fetchall()
+
+            return [{"id": row["id"], **json.loads(row["data"])} for row in rows]
+
+    def find_uninvestigated_questions(self) -> List[Dict[str, Any]]:
+        """Find open questions that have no linked investigation or evidence edges."""
+        with self._connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT v.id, v.data
+                FROM vertices v
+                WHERE v.type = 'Question'
+                AND json_extract(v.data, '$.status') = 'open'
+                AND v.id NOT IN (
+                    SELECT DISTINCT i.vertex_id
+                    FROM incidences i
+                    JOIN hyperedges h ON i.edge_id = h.id
+                    WHERE h.type IN ('investigation', 'evidence_chain')
+                )
+                ORDER BY v.id
+            """
+            ).fetchall()
+
+            return [
+                {
+                    "id": row["id"],
+                    **json.loads(row["data"]),
+                    "reason": "no investigation or evidence chain",
+                }
+                for row in rows
+            ]
+
+    def dependency_chain(self, vertex_id: str) -> Dict[str, Any]:
+        """Trace the full dependency chain from a vertex through hyperedges.
+
+        Returns all vertices reachable by following hyperedge connections
+        (breadth-first), with the path depth for each.
+        """
+        root = self.get_vertex(vertex_id)
+        if not root:
+            return {"error": f"Vertex not found: {vertex_id}"}
+
+        visited = {vertex_id: 0}
+        frontier = [vertex_id]
+        edges_seen = set()
+        chain = []
+
+        while frontier:
+            next_frontier = []
+            for vid in frontier:
+                depth = visited[vid]
+                edges = self.get_edges_containing(vid)
+                for edge in edges:
+                    eid = edge.get("id", "")
+                    if eid in edges_seen:
+                        continue
+                    edges_seen.add(eid)
+                    members = edge.get("members", [])
+                    for member in members:
+                        mid = (
+                            member if isinstance(member, str) else member.get("id", "")
+                        )
+                        if mid and mid not in visited:
+                            visited[mid] = depth + 1
+                            next_frontier.append(mid)
+                            chain.append(
+                                {
+                                    "vertex": mid,
+                                    "depth": depth + 1,
+                                    "via_edge": eid,
+                                    "edge_type": edge.get("type", ""),
+                                }
+                            )
+            frontier = next_frontier
+
+        return {
+            "root": vertex_id,
+            "chain": chain,
+            "total_reachable": len(visited) - 1,
+            "max_depth": max(visited.values()) if visited else 0,
+            "edges_traversed": len(edges_seen),
+        }
+
     def sprint_additions(self, sprint_id: str) -> Dict[str, Any]:
         """Find vertices and edges added during a specific sprint."""
         with self._connection() as conn:
@@ -1439,6 +1533,15 @@ def main():
     subparsers.add_parser("equivalences", help="Find all equivalence classes")
     subparsers.add_parser("axioms", help="Find theory axiom sets")
     subparsers.add_parser("clusters", help="Find research clusters")
+    subparsers.add_parser("open-questions", help="Find all open questions")
+    subparsers.add_parser(
+        "uninvestigated", help="Find open questions with no investigation"
+    )
+
+    dep_chain_p = subparsers.add_parser(
+        "dep-chain", help="Trace dependency chain from a vertex"
+    )
+    dep_chain_p.add_argument("vertex_id", help="Vertex ID to trace from")
 
     strength_p = subparsers.add_parser(
         "strength", help="Show evidence strength for a claim"
@@ -1578,6 +1681,31 @@ def main():
         elif args.command == "clusters":
             results = kb.find_research_clusters()
             print(json.dumps(results, indent=2))
+
+        elif args.command == "open-questions":
+            results = kb.find_open_questions()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "uninvestigated":
+            results = kb.find_uninvestigated_questions()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "dep-chain":
+            result = kb.dependency_chain(args.vertex_id)
+            if "error" in result:
+                print(f"Error: {result['error']}")
+                sys.exit(1)
+            print(
+                f"Dependency chain from: {result['root']}"
+                f" ({result['total_reachable']} reachable, "
+                f"max depth {result['max_depth']})"
+            )
+            for item in result["chain"]:
+                indent = "  " * item["depth"]
+                print(
+                    f"{indent}{item['vertex']} "
+                    f"(via {item['edge_type']}: {item['via_edge']})"
+                )
 
         elif args.command == "strength":
             claim_id = args.claim_id

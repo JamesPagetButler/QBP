@@ -65,6 +65,12 @@ static void ad_update(void)
         graph_reset(&ad_graph);
         graph_reset_viewport(&ad_graph);
     }
+    if (IsKeyPressed(KEY_O)) {
+        graph_toggle_overview(&ad_graph);
+    }
+    if (IsKeyPressed(KEY_T)) {
+        graph_toggle_angle_highlight(&ad_graph);
+    }
 
     /* Handle mouse clicks */
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -106,17 +112,27 @@ static void ad_draw(void)
     DrawTextQBP("Experiment 01b: P(+) = cos^2(theta/2) for state at angle theta",
              24, 44, 16, QBP_TEXT_DIM);
 
-    /* Proof graph */
-    graph_draw(&ad_graph);
-
-    /* Info panel (right side) */
+    /* Info panel area (right side) */
     Rectangle panel = {
         (float)(screen_width - PANEL_WIDTH - 10),
         TITLE_HEIGHT,
         PANEL_WIDTH,
         (float)(screen_height - TITLE_HEIGHT - BAR_HEIGHT - 20)
     };
-    graph_draw_info_panel(&ad_graph, panel);
+
+    if (ad_graph.overview_mode) {
+        /* Overview replaces both graph and info panel */
+        Rectangle overview = {
+            20, TITLE_HEIGHT,
+            (float)(screen_width - 40),
+            (float)(screen_height - TITLE_HEIGHT - BAR_HEIGHT - 20)
+        };
+        graph_draw_overview(&ad_graph, overview);
+    } else {
+        /* Normal mode: proof graph + info panel */
+        graph_draw(&ad_graph);
+        graph_draw_info_panel(&ad_graph, panel);
+    }
 
     /* Step bar (bottom) */
     Rectangle bar = {
