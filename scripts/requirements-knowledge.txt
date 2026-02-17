@@ -1,9 +1,6 @@
 # Requirements for QBP Hypergraph Knowledge System
 # Install with: pip install -r scripts/requirements-knowledge.txt
 
-# Core data store
-hypergraph-db>=0.3.0
-
 # Analysis and visualization
 hypernetx>=2.4.0
 matplotlib>=3.5.0
