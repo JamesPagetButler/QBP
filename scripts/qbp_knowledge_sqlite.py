@@ -611,6 +611,252 @@ class QBPKnowledgeSQLite:
                 for row in rows
             ]
 
+    def find_contested_claims(self) -> List[Dict[str, Any]]:
+        """Find claims that have counterevidence or 'contested' status."""
+        with self._connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT v.id, v.data
+                FROM vertices v
+                WHERE v.type = 'Claim'
+                AND (
+                    json_extract(v.data, '$.status') = 'contested'
+                    OR json_extract(v.data, '$.status') = 'disputed'
+                    OR json_extract(v.data, '$.tags') LIKE '%"counterevidence"%'
+                )
+            """
+            ).fetchall()
+
+            return [{"id": row["id"], **json.loads(row["data"])} for row in rows]
+
+    def evidence_strength(self, claim_id: str) -> Dict[str, Any]:
+        """Return evidence chain details and confidence tier for a claim."""
+        if not claim_id.startswith("claim:"):
+            claim_id = f"claim:{claim_id}"
+
+        claim = self.get_vertex(claim_id)
+        if not claim:
+            return {"error": f"Claim not found: {claim_id}"}
+
+        edges = self.get_edges_containing(claim_id)
+        evidence_chains = [e for e in edges if e.get("type") == "evidence_chain"]
+        proof_links = [e for e in edges if e.get("type") == "proof_link"]
+
+        tiers = [e.get("confidence_tier", 0) for e in evidence_chains]
+        max_tier = max(tiers) if tiers else 0
+
+        return {
+            "claim_id": claim_id,
+            "statement": claim.get("statement"),
+            "confidence_tier": max_tier,
+            "evidence_count": len(evidence_chains),
+            "proof_count": len(proof_links),
+            "has_formal_proof": len(proof_links) > 0,
+            "chains": evidence_chains,
+        }
+
+    def find_equivalences(self) -> List[Dict[str, Any]]:
+        """Find all equivalence class hyperedges."""
+        return self.get_hyperedges_by_type("equivalence")
+
+    def find_theory_axioms(self) -> List[Dict[str, Any]]:
+        """Find all theory_axioms hyperedges."""
+        return self.get_hyperedges_by_type("theory_axioms")
+
+    def find_research_clusters(self) -> List[Dict[str, Any]]:
+        """Find all research_cluster hyperedges."""
+        return self.get_hyperedges_by_type("research_cluster")
+
+    def find_open_questions(self) -> List[Dict[str, Any]]:
+        """Find all questions with 'open' status."""
+        with self._connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT v.id, v.data
+                FROM vertices v
+                WHERE v.type = 'Question'
+                AND json_extract(v.data, '$.status') = 'open'
+                ORDER BY v.id
+            """
+            ).fetchall()
+
+            return [{"id": row["id"], **json.loads(row["data"])} for row in rows]
+
+    def find_uninvestigated_questions(self) -> List[Dict[str, Any]]:
+        """Find open questions with no linked investigation or evidence_chain edges.
+
+        Note: This filters on BOTH 'investigation' AND 'evidence_chain' edge types,
+        which is more conservative than filtering on investigation alone. A question
+        linked to evidence but lacking a formal investigation is still considered
+        "under work" and excluded from results.
+        """
+        with self._connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT v.id, v.data
+                FROM vertices v
+                WHERE v.type = 'Question'
+                AND json_extract(v.data, '$.status') = 'open'
+                AND v.id NOT IN (
+                    SELECT DISTINCT i.vertex_id
+                    FROM incidences i
+                    JOIN hyperedges h ON i.edge_id = h.id
+                    WHERE h.type IN ('investigation', 'evidence_chain')
+                )
+                ORDER BY v.id
+            """
+            ).fetchall()
+
+            return [
+                {
+                    "id": row["id"],
+                    **json.loads(row["data"]),
+                    "reason": "no investigation or evidence chain",
+                }
+                for row in rows
+            ]
+
+    def dependency_chain(self, vertex_id: str) -> Dict[str, Any]:
+        """Trace the full dependency chain from a vertex through hyperedges.
+
+        Returns all vertices reachable by following hyperedge connections
+        (breadth-first), with the path depth for each.  Uses a single DB
+        connection for the entire traversal to avoid O(B^D) open/close cycles.
+        """
+        root = self.get_vertex(vertex_id)
+        if not root:
+            return {"error": f"Vertex not found: {vertex_id}"}
+
+        visited = {vertex_id: 0}
+        frontier = [vertex_id]
+        edges_seen: set = set()
+        chain: list = []
+
+        with self._connection() as conn:
+            while frontier:
+                next_frontier = []
+                for vid in frontier:
+                    depth = visited[vid]
+                    # Inline edge lookup to reuse the single connection
+                    edge_rows = conn.execute(
+                        """
+                        SELECT h.id, h.data
+                        FROM hyperedges h
+                        JOIN incidences i ON h.id = i.edge_id
+                        WHERE i.vertex_id = ?
+                        """,
+                        (vid,),
+                    ).fetchall()
+                    for erow in edge_rows:
+                        eid = erow["id"]
+                        if eid in edges_seen:
+                            continue
+                        edges_seen.add(eid)
+                        edata = json.loads(erow["data"])
+                        members = conn.execute(
+                            "SELECT vertex_id FROM incidences WHERE edge_id = ? ORDER BY position",
+                            (eid,),
+                        ).fetchall()
+                        for m in members:
+                            mid = m["vertex_id"]
+                            if mid not in visited:
+                                visited[mid] = depth + 1
+                                next_frontier.append(mid)
+                                chain.append(
+                                    {
+                                        "vertex": mid,
+                                        "depth": depth + 1,
+                                        "via_edge": eid,
+                                        "edge_type": edata.get("type", ""),
+                                    }
+                                )
+                frontier = next_frontier
+
+        return {
+            "root": vertex_id,
+            "chain": chain,
+            "total_reachable": len(visited) - 1,
+            "max_depth": max(visited.values()) if visited else 0,
+            "edges_traversed": len(edges_seen),
+        }
+
+    def sprint_additions(self, sprint_id: str) -> Dict[str, Any]:
+        """Find vertices and edges added during a specific sprint."""
+        with self._connection() as conn:
+            vertices = conn.execute(
+                """
+                SELECT id, type, data FROM vertices
+                WHERE json_extract(data, '$.research_sprint') = ?
+                   OR json_extract(data, '$.added_sprint') = ?
+            """,
+                (sprint_id, sprint_id),
+            ).fetchall()
+
+            edges = conn.execute(
+                """
+                SELECT id, type, data FROM hyperedges
+                WHERE json_extract(data, '$.sprint') = ?
+            """,
+                (sprint_id,),
+            ).fetchall()
+
+        return {
+            "sprint": sprint_id,
+            "vertices": [
+                {"id": row["id"], "type": row["type"], **json.loads(row["data"])}
+                for row in vertices
+            ],
+            "edges": [
+                {"id": row["id"], "type": row["type"], **json.loads(row["data"])}
+                for row in edges
+            ],
+            "vertex_count": len(vertices),
+            "edge_count": len(edges),
+        }
+
+    def recent_activity(self, days: int = 7) -> Dict[str, Any]:
+        """Find recently added or modified entries."""
+        with self._connection() as conn:
+            vertices = conn.execute(
+                """
+                SELECT id, type, data, created_at FROM vertices
+                WHERE created_at >= datetime('now', ? || ' days')
+                ORDER BY created_at DESC
+            """,
+                (f"-{days}",),
+            ).fetchall()
+
+            edges = conn.execute(
+                """
+                SELECT id, type, data, created_at FROM hyperedges
+                WHERE created_at >= datetime('now', ? || ' days')
+                ORDER BY created_at DESC
+            """,
+                (f"-{days}",),
+            ).fetchall()
+
+        return {
+            "period_days": days,
+            "vertices": [
+                {
+                    "id": row["id"],
+                    "type": row["type"],
+                    "created_at": row["created_at"],
+                }
+                for row in vertices
+            ],
+            "edges": [
+                {
+                    "id": row["id"],
+                    "type": row["type"],
+                    "created_at": row["created_at"],
+                }
+                for row in edges
+            ],
+            "vertex_count": len(vertices),
+            "edge_count": len(edges),
+        }
+
     def find_bridge_concepts(self, min_degree: int = 3) -> List[Dict[str, Any]]:
         """Find concepts that appear in multiple hyperedges."""
         with self._connection() as conn:
@@ -1270,11 +1516,18 @@ class QBPKnowledgeSQLite:
 # =============================================================================
 
 
+def _default_db_path() -> str:
+    """Resolve the default DB path relative to the project root (parent of scripts/)."""
+    script_dir = Path(__file__).resolve().parent
+    project_root = script_dir.parent
+    return str(project_root / "knowledge" / "qbp.db")
+
+
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="QBP Knowledge System (SQLite)")
-    parser.add_argument("--db", default="knowledge/qbp.db", help="Database path")
+    parser.add_argument("--db", default=_default_db_path(), help="Database path")
 
     subparsers = parser.add_subparsers(dest="command")
 
@@ -1300,6 +1553,36 @@ def main():
     subparsers.add_parser("unproven", help="Find claims without proofs")
     subparsers.add_parser("gaps", help="Find research gaps")
     subparsers.add_parser("bridges", help="Find bridge concepts")
+
+    # Additional research queries
+    subparsers.add_parser("contested", help="Find contested claims")
+    subparsers.add_parser("equivalences", help="Find all equivalence classes")
+    subparsers.add_parser("axioms", help="Find theory axiom sets")
+    subparsers.add_parser("clusters", help="Find research clusters")
+    subparsers.add_parser("open-questions", help="Find all open questions")
+    subparsers.add_parser(
+        "uninvestigated", help="Find open questions with no investigation"
+    )
+
+    dep_chain_p = subparsers.add_parser(
+        "dep-chain", help="Trace dependency chain from a vertex"
+    )
+    dep_chain_p.add_argument("vertex_id", help="Vertex ID to trace from")
+
+    strength_p = subparsers.add_parser(
+        "strength", help="Show evidence strength for a claim"
+    )
+    strength_p.add_argument("claim_id", help="Claim ID (with or without claim: prefix)")
+
+    sprint_p = subparsers.add_parser(
+        "sprint-additions", help="Show vertices/edges added in a sprint"
+    )
+    sprint_p.add_argument("sprint_id", help="Sprint identifier (e.g., 'Sprint 3')")
+
+    recent_p = subparsers.add_parser("recent", help="Show recent activity")
+    recent_p.add_argument(
+        "--days", type=int, default=7, help="Number of days (default: 7)"
+    )
 
     # Coverage report
     subparsers.add_parser("coverage", help="Show coverage metrics (evidence, proofs)")
@@ -1408,6 +1691,86 @@ def main():
         elif args.command == "bridges":
             results = kb.find_bridge_concepts()
             print(json.dumps(results, indent=2))
+
+        elif args.command == "contested":
+            results = kb.find_contested_claims()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "equivalences":
+            results = kb.find_equivalences()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "axioms":
+            results = kb.find_theory_axioms()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "clusters":
+            results = kb.find_research_clusters()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "open-questions":
+            results = kb.find_open_questions()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "uninvestigated":
+            results = kb.find_uninvestigated_questions()
+            print(json.dumps(results, indent=2))
+
+        elif args.command == "dep-chain":
+            result = kb.dependency_chain(args.vertex_id)
+            if "error" in result:
+                print(f"Error: {result['error']}")
+                sys.exit(1)
+            print(
+                f"Dependency chain from: {result['root']}"
+                f" ({result['total_reachable']} reachable, "
+                f"max depth {result['max_depth']})"
+            )
+            for item in result["chain"]:
+                indent = "  " * item["depth"]
+                print(
+                    f"{indent}{item['vertex']} "
+                    f"(via {item['edge_type']}: {item['via_edge']})"
+                )
+
+        elif args.command == "strength":
+            claim_id = args.claim_id
+            if not claim_id.startswith("claim:"):
+                claim_id = f"claim:{claim_id}"
+            result = kb.evidence_strength(claim_id)
+            print(json.dumps(result, indent=2))
+
+        elif args.command == "sprint-additions":
+            result = kb.sprint_additions(args.sprint_id)
+            print(
+                f"Sprint '{result['sprint']}': "
+                f"{result['vertex_count']} vertices, "
+                f"{result['edge_count']} edges"
+            )
+            if result["vertices"]:
+                print("\nVertices:")
+                for v in result["vertices"]:
+                    print(f"  - {v['id']} ({v['type']})")
+            if result["edges"]:
+                print("\nEdges:")
+                for e in result["edges"]:
+                    print(f"  - {e['id']} ({e['type']})")
+
+        elif args.command == "recent":
+            result = kb.recent_activity(days=args.days)
+            print(
+                f"Activity in last {result['period_days']} days: "
+                f"{result['vertex_count']} vertices, "
+                f"{result['edge_count']} edges"
+            )
+            if result["vertices"]:
+                print("\nVertices:")
+                for v in result["vertices"]:
+                    print(f"  - {v['id']} ({v['type']}) @ {v['created_at']}")
+            if result["edges"]:
+                print("\nEdges:")
+                for e in result["edges"]:
+                    print(f"  - {e['id']} ({e['type']}) @ {e['created_at']}")
 
         elif args.command == "coverage":
             report = kb.coverage_report()

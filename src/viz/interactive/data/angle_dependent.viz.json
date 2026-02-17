@@ -100,6 +100,8 @@
     "psiAngle": {
       "display_name": "State at Angle theta",
       "kind": "definition",
+      "tags": ["angle"],
+      "proof_role": "utility",
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 25,
       "L4_formal": "noncomputable def psiAngle (theta : Real) : Q := <0, Real.sin theta, 0, Real.cos theta>",
@@ -124,6 +126,8 @@
     "psiAngle_is_pure": {
       "display_name": "Angle State is Pure",
       "kind": "theorem",
+      "tags": ["angle"],
+      "proof_role": "lemma",
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 33,
       "L4_formal": "theorem psiAngle_is_pure (theta : Real) : isPureQuaternion (psiAngle theta) := rfl",
@@ -148,6 +152,8 @@
     "psiAngle_is_unit": {
       "display_name": "Angle State is Normalized",
       "kind": "theorem",
+      "tags": ["angle"],
+      "proof_role": "lemma",
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 39,
       "L4_formal": "theorem psiAngle_is_unit (theta : Real) : isUnitQuaternion (psiAngle theta) := by\n  unfold isUnitQuaternion psiAngle\n  simp [Quaternion.normSq]\n  ring_nf\n  exact Real.sin_sq_add_cos_sq theta",
@@ -160,6 +166,8 @@
     "expectation_angle": {
       "display_name": "Expectation = cos(theta)",
       "kind": "theorem",
+      "tags": ["angle"],
+      "proof_role": "lemma",
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 52,
       "L4_formal": "theorem expectation_angle (theta : Real) :\n    expectationValue (psiAngle theta) spinZObservable = Real.cos theta := by\n  unfold expectationValue psiAngle spinZObservable vecDot vecPart SPIN_Z\n  simp",
@@ -172,6 +180,8 @@
     "prob_up_angle": {
       "display_name": "P(+) = (1 + cos theta)/2",
       "kind": "theorem",
+      "tags": ["angle"],
+      "proof_role": "lemma",
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 62,
       "L4_formal": "theorem prob_up_angle (theta : Real) :\n    probUp (psiAngle theta) spinZObservable = (1 + Real.cos theta) / 2 := by\n  unfold probUp\n  rw [expectation_angle]",
@@ -184,6 +194,8 @@
     "prob_up_angle_cos_sq": {
       "display_name": "P(+) = cos^2(theta/2)",
       "kind": "theorem",
+      "tags": ["angle"],
+      "proof_role": "goal",
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 69,
       "L4_formal": "theorem prob_up_angle_cos_sq (theta : Real) :\n    probUp (psiAngle theta) spinZObservable = Real.cos (theta / 2) ^ 2 := by\n  rw [prob_up_angle]\n  rw [Real.cos_sq]\n  ring_nf",
@@ -196,6 +208,8 @@
     "prob_down_angle_sin_sq": {
       "display_name": "P(-) = sin^2(theta/2)",
       "kind": "theorem",
+      "tags": ["angle"],
+      "proof_role": "goal",
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 84,
       "L4_formal": "theorem prob_down_angle_sin_sq (theta : Real) :\n    probDown (psiAngle theta) spinZObservable = Real.sin (theta / 2) ^ 2 := by\n  rw [prob_down_angle]\n  have h : Real.sin (theta / 2) ^ 2 = (1 - Real.cos theta) / 2 := by\n    have h1 : Real.cos theta = Real.cos (2 * (theta / 2)) := by ring_nf\n    rw [h1, Real.cos_two_mul, Real.sin_sq]\n    ring\n  rw [h]",
@@ -208,6 +222,7 @@
     "prob_up_theta_zero": {
       "display_name": "theta=0: Aligned -> P(+)=1",
       "kind": "theorem",
+      "tags": ["angle"],
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 95,
       "L4_formal": "theorem prob_up_theta_zero : probUp (psiAngle 0) spinZObservable = 1 := by\n  rw [prob_up_angle]\n  simp [Real.cos_zero]",
@@ -220,6 +235,7 @@
     "prob_up_theta_pi": {
       "display_name": "theta=pi: Anti-aligned -> P(+)=0",
       "kind": "theorem",
+      "tags": ["angle"],
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 100,
       "L4_formal": "theorem prob_up_theta_pi : probUp (psiAngle Real.pi) spinZObservable = 0 := by\n  rw [prob_up_angle]\n  simp [Real.cos_pi]",
@@ -232,6 +248,7 @@
     "prob_up_theta_pi_div_two": {
       "display_name": "theta=pi/2: Perpendicular -> P(+)=1/2",
       "kind": "theorem",
+      "tags": ["angle"],
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 106,
       "L4_formal": "theorem prob_up_theta_pi_div_two :\n    probUp (psiAngle (Real.pi / 2)) spinZObservable = 1 / 2 := by\n  rw [prob_up_angle]\n  simp [Real.cos_pi_div_two]",
@@ -244,6 +261,8 @@
     "angle_consistent_with_stern_gerlach": {
       "display_name": "Matches Stern-Gerlach at theta=pi/2",
       "kind": "theorem",
+      "tags": ["angle"],
+      "proof_role": "goal",
       "source_file": "QBP/Experiments/AngleDependent.lean",
       "source_line": 115,
       "L4_formal": "theorem angle_consistent_with_stern_gerlach :\n    psiAngle (Real.pi / 2) = SPIN_X := by\n  unfold psiAngle SPIN_X\n  simp [Real.sin_pi_div_two, Real.cos_pi_div_two]",

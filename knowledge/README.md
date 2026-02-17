@@ -172,31 +172,8 @@ python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db export --format hif
 ## Visualization
 
 ```bash
-# D3.js interactive (recommended)
-python scripts/qbp_knowledge.py viz --d3 --output graph.html
-xdg-open graph.html
-
-# Static matplotlib
-python scripts/qbp_knowledge.py viz --output graph.png
-```
-
-Note: Hypergraph-DB's built-in web visualization has known issues (see issue #222). Use D3.js instead.
-
----
-
-## Migration
-
-### From Hypergraph-DB
-
-```bash
-python scripts/migrate_to_sqlite.py --source knowledge/qbp.hgdb --target knowledge/qbp.db
-```
-
-### From YAML (legacy)
-
-```bash
-python scripts/migrate_yaml_to_hypergraph.py --dry-run
-python scripts/migrate_yaml_to_hypergraph.py
+# Generate interactive visualization
+python scripts/qbp_knowledge_sqlite.py --db knowledge/qbp.db visualize
 ```
 
 ---
@@ -206,13 +183,11 @@ python scripts/migrate_yaml_to_hypergraph.py
 ```
 knowledge/
 ├── README.md               # This file
-├── qbp.db                  # SQLite hypergraph database (primary)
-├── qbp.hgdb               # Hypergraph-DB format (legacy)
-├── sources/               # Legacy YAML (deprecated)
-├── concepts/              # Legacy YAML (deprecated)
-├── claims/                # Legacy YAML (deprecated)
-└── questions/             # Legacy YAML (deprecated)
+├── qbp.db                  # SQLite hypergraph database (source of truth)
+└── schemas/                # JSON validation schemas
 ```
+
+> **Legacy files** (Hypergraph-DB, YAML, migration scripts) have been moved to `archive/hypergraph-db/`.
 
 ---
 
