@@ -76,14 +76,25 @@ def snap_to_nearest(value, allowed):
 
 
 def _clear_curves(curve_list):
-    """Hide and delete all gcurves in *curve_list*, then return an empty list.
+    """Blank out all gcurves in *curve_list*, then return an empty list.
 
-    Sets ``visible = False`` before ``delete()`` so the curve disappears
-    immediately even if VPython's rendering lags behind the deletion.
+    VPython's ``gcurve.delete()`` does NOT reliably remove curves from
+    the rendered graph.  Instead we blank the data and hide the object.
+    The empty gcurve objects accumulate harmlessly in memory.
     """
     for c in curve_list:
-        c.visible = False
-        c.delete()
+        try:
+            c.data = []  # Remove all plotted points
+        except Exception:
+            pass
+        try:
+            c.visible = False
+        except Exception:
+            pass
+        try:
+            c.delete()
+        except Exception:
+            pass
     return []
 
 
