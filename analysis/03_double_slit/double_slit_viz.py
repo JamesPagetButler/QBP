@@ -75,6 +75,18 @@ def snap_to_nearest(value, allowed):
     return min(allowed, key=lambda v: abs(v - value))
 
 
+def _clear_curves(curve_list):
+    """Hide and delete all gcurves in *curve_list*, then return an empty list.
+
+    Sets ``visible = False`` before ``delete()`` so the curve disappears
+    immediately even if VPython's rendering lags behind the deletion.
+    """
+    for c in curve_list:
+        c.visible = False
+        c.delete()
+    return []
+
+
 # ============================================================================
 # Data Loading
 # ============================================================================
@@ -613,9 +625,7 @@ class DoubleSlitDemo:
     # --------------------------------------------------- Panel 1a
     def _update_panel_1a(self):
         """Full-scale η(z): Adler, Std QM, BPM."""
-        for c in self.curves_1a:
-            c.delete()
-        self.curves_1a = []
+        self.curves_1a = _clear_curves(self.curves_1a)
 
         u1 = self.current_u1
         eta0 = self.current_eta0
@@ -667,9 +677,7 @@ class DoubleSlitDemo:
     # --------------------------------------------------- Panel 1b
     def _update_panel_1b(self):
         """Zoomed Δη = η(z) − η₀, with coupling region shading."""
-        for c in self.curves_1b:
-            c.delete()
-        self.curves_1b = []
+        self.curves_1b = _clear_curves(self.curves_1b)
 
         u1 = self.current_u1
         eta0 = self.current_eta0
@@ -724,9 +732,7 @@ class DoubleSlitDemo:
     # --------------------------------------------------- Panel 2
     def _update_panel_2(self):
         """Move the highlight marker to current U₁."""
-        for c in self.curves_2_dynamic:
-            c.delete()
-        self.curves_2_dynamic = []
+        self.curves_2_dynamic = _clear_curves(self.curves_2_dynamic)
 
         u1 = self.current_u1
         eta0_for_v = self.eta0_values[-1]  # V is η₀-independent
@@ -753,9 +759,7 @@ class DoubleSlitDemo:
         b. Standard QM: BPM at U₁=0 (full near-field fringes)
         c. QBP: BPM at current U₁ (fringes with reduced visibility)
         """
-        for c in self.curves_3:
-            c.delete()
-        self.curves_3 = []
+        self.curves_3 = _clear_curves(self.curves_3)
 
         u1 = self.current_u1
         eta0 = self.current_eta0
@@ -813,9 +817,7 @@ class DoubleSlitDemo:
         b. Standard QM: U₁=0 baseline fringes
         c. QBP: current U₁ fringes
         """
-        for c in self.curves_4:
-            c.delete()
-        self.curves_4 = []
+        self.curves_4 = _clear_curves(self.curves_4)
 
         u1 = self.current_u1
         eta0 = self.current_eta0
@@ -907,9 +909,7 @@ class DoubleSlitDemo:
         """
         if not hasattr(self, "curves_5"):
             self.curves_5 = []
-        for c in self.curves_5:
-            c.delete()
-        self.curves_5 = []
+        self.curves_5 = _clear_curves(self.curves_5)
 
         u1 = self.current_u1
         eta0 = self.current_eta0
