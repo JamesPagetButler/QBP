@@ -577,9 +577,9 @@ class DoubleSlitDemo:
         eta0_for_scatter = self.eta0_values[-1]
         c_data = gcurve(
             graph=self.g2,
-            color=to_vpy(COL_EXPECTED),
+            color=to_vpy(COL_QBP),
             dot=True,
-            dot_color=to_vpy(COL_EXPECTED),
+            dot_color=to_vpy(COL_QBP),
             label="QBP BPM visibility",
         )
         for u1 in self.u1_values:
@@ -654,9 +654,10 @@ class DoubleSlitDemo:
         self.curves_1a.append(c_std)
 
         # QBP BPM result
+        col = COL_EXPECTED if u1 == 0.0 else COL_QBP
         c_bpm = gcurve(
             graph=self.g1a,
-            color=to_vpy(COL_EXPECTED),
+            color=to_vpy(col),
             label=f"QBP BPM (U\u2081={u1:.0f} eV)",
         )
         for i in range(len(z_nm)):
@@ -695,7 +696,7 @@ class DoubleSlitDemo:
         delta_eta = eta_bpm - eta0
         c_bpm = gcurve(
             graph=self.g1b,
-            color=to_vpy(COL_EXPECTED) if u1 < max(self.u1_values) else to_vpy(COL_QBP),
+            color=to_vpy(COL_EXPECTED) if u1 == 0.0 else to_vpy(COL_QBP),
             label=f"QBP BPM \u0394\u03b7 (U\u2081={u1:.0f} eV)",
         )
         for i in range(len(z_nm)):
@@ -793,7 +794,7 @@ class DoubleSlitDemo:
         main_key = (u1, eta0)
         if main_key in self.fringe:
             x_main, I_main = self.fringe[main_key]
-            col = COL_EXPECTED if u1 < max(self.u1_values) else COL_QBP
+            col = COL_EXPECTED if u1 == 0.0 else COL_QBP
             c_main = gcurve(
                 graph=self.g3,
                 color=to_vpy(col),
@@ -858,7 +859,7 @@ class DoubleSlitDemo:
             mask = (x_all >= -zoom_half) & (x_all <= zoom_half)
             x_z, I_z = x_all[mask], I_all[mask]
             if len(x_z) > 0:
-                col = COL_EXPECTED if u1 < max(self.u1_values) else COL_QBP
+                col = COL_EXPECTED if u1 == 0.0 else COL_QBP
                 c_main = gcurve(
                     graph=self.g4,
                     color=to_vpy(col),
@@ -878,9 +879,11 @@ class DoubleSlitDemo:
         """
         # Plot the BPM+FFT Expected baseline (U₁=0) as static reference
         baseline_key = ("expected", 0.0, self.eta0_values[0])
+        self._ff_baseline_peak = 1.0  # fallback
         if self.farfield_qbp and baseline_key in self.farfield_qbp:
             x_mm, I_base = self.farfield_qbp[baseline_key]
             I_peak = I_base.max()
+            self._ff_baseline_peak = I_peak  # store for dynamic curve normalization
             I_norm = I_base / I_peak if I_peak > 0 else I_base
             mask = np.abs(x_mm) <= 1500
             x_clip = x_mm[mask]
@@ -928,8 +931,9 @@ class DoubleSlitDemo:
             return
 
         x_mm, I_qbp = self.farfield_qbp[qbp_key]
-        I_peak = I_qbp.max()
-        I_norm = I_qbp / I_peak if I_peak > 0 else I_qbp
+        # Normalize to BASELINE peak (not own peak) — preserves amplitude difference
+        ref_peak = getattr(self, "_ff_baseline_peak", I_qbp.max())
+        I_norm = I_qbp / ref_peak if ref_peak > 0 else I_qbp
 
         # Get far-field visibility from summary if available
         v_key = ("C", qbp_key[1], eta0)
