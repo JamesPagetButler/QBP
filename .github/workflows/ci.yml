@@ -7,8 +7,36 @@ on:
     branches: [master]
 
 jobs:
+  # Detect which file categories changed — all other jobs depend on this
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      lean: ${{ steps.filter.outputs.lean }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'src/**'
+              - 'tests/**'
+              - 'scripts/**'
+              - 'experiments/**'
+              - 'requirements.txt'
+              - '.pre-commit-config.yaml'
+              - '.github/workflows/**'
+            lean:
+              - 'proofs/**'
+              - 'libs/**'
+
   lint-and-type-check:
     name: Lint & Type Check
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,6 +62,8 @@ jobs:
 
   test:
     name: Run Tests
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -66,6 +96,8 @@ jobs:
 
   physics-validation:
     name: Physics Validation Tests
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -92,6 +124,8 @@ jobs:
 
   experiment-validation:
     name: Experiment Number Validation
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -129,6 +163,8 @@ jobs:
 
   libs-dependency-check:
     name: Library Independence Check
+    needs: changes
+    if: needs.changes.outputs.lean == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -163,6 +199,8 @@ jobs:
 
   code-quality:
     name: Code Quality Scan
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -178,3 +216,51 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:python"
+
+  # Single required check — passes if all triggered jobs passed, or if jobs were skipped (docs-only)
+  ci-gate:
+    name: CI Gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - changes
+      - lint-and-type-check
+      - test
+      - physics-validation
+      - experiment-validation
+      - libs-dependency-check
+      - code-quality
+    steps:
+      - name: Check job results
+        run: |
+          echo "=== CI Gate Summary ==="
+          echo "changes:              ${{ needs.changes.result }}"
+          echo "lint-and-type-check:  ${{ needs.lint-and-type-check.result }}"
+          echo "test:                 ${{ needs.test.result }}"
+          echo "physics-validation:   ${{ needs.physics-validation.result }}"
+          echo "experiment-validation:${{ needs.experiment-validation.result }}"
+          echo "libs-dependency-check:${{ needs.libs-dependency-check.result }}"
+          echo "code-quality:         ${{ needs.code-quality.result }}"
+          echo ""
+
+          # Fail if any job failed or was cancelled (skipped is OK — means path filter excluded it)
+          FAILED=false
+          for result in \
+            "${{ needs.changes.result }}" \
+            "${{ needs.lint-and-type-check.result }}" \
+            "${{ needs.test.result }}" \
+            "${{ needs.physics-validation.result }}" \
+            "${{ needs.experiment-validation.result }}" \
+            "${{ needs.libs-dependency-check.result }}" \
+            "${{ needs.code-quality.result }}"; do
+            if [[ "$result" == "failure" || "$result" == "cancelled" ]]; then
+              echo "FAIL: A required job reported '$result'"
+              FAILED=true
+            fi
+          done
+
+          if [[ "$FAILED" == "true" ]]; then
+            exit 1
+          fi
+
+          echo "All jobs passed or were correctly skipped. CI Gate: PASS"
