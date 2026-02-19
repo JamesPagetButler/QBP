@@ -59,6 +59,18 @@ This log records all process violations across sprints. Each entry documents wha
 | **Fixes applied** | 1. SPRINT_STATUS.md updated: #359 checked off, critical path corrected to #360. 2. This log entry. |
 | **Process update** | Rule added: When merging a PR that closes a critical-path issue, ALWAYS update SPRINT_STATUS.md in the same session — specifically the "Next Critical-Path Action" line and closure checklist. Herschel check should cross-reference the first unchecked item on the closure checklist, not just read the prose line. |
 
+### FAULT-S3-005: Proposing deferral for trivially-completable PR work (2026-02-19)
+
+| Field | Detail |
+|-------|--------|
+| **Date** | 2026-02-19 |
+| **Sprint/Phase** | Sprint 3 / Phase 4a (Formal Proof) |
+| **What happened** | During PR #373 review synthesis (Step 4), Herschel proposed deferring 2 items to housekeeping issues: (1) the V-η intermediate relationship and (2) 2 additional oracle test vectors. James challenged: "is there a specific reason to defer?" Item (1) was a legitimate deferral (requires PDE-level work beyond algebraic skeleton). Item (2) — adding 2 oracle test vectors — was trivially completable in the PR (~10 lines of code) and had no valid reason for deferral. |
+| **Root cause (technical)** | N/A — not a technical issue. The oracle test vectors required only copying an existing pattern and changing parameters. |
+| **Root cause (process)** | AI scope-minimization bias. When synthesizing review findings into "fix now vs. defer," the default AI heuristic is to minimize PR scope by pushing items to housekeeping. This is backwards: the correct heuristic is to complete everything that can be trivially done in the current PR, and only defer items with genuine complexity or risk. Creating a housekeeping issue has overhead (issue creation, board placement, sprint assignment, future context rebuilding) that exceeds the cost of just doing the work. |
+| **Fixes applied** | 1. Oracle test vectors added immediately to PR #373. 2. This log entry with root cause analysis. |
+| **Process update** | **RULE: During review synthesis, apply the "5-minute test" before proposing deferral.** If a finding can be resolved in ≤5 minutes of straightforward code changes, it MUST be fixed in the current PR — never deferred to a housekeeping issue. Deferral is reserved for items requiring: (a) new research or design decisions, (b) changes outside the PR's scope/files, or (c) non-trivial implementation risk. When in doubt, fix now. |
+
 ---
 
 ## Template

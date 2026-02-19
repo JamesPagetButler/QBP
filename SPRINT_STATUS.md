@@ -72,6 +72,7 @@ Original phases struck through; sprint restarts after research:
 - [ ] What assumption was wrong? (Unit systems were never compared)
 - [ ] What check would have caught it? (Dimensional analysis in ground truth review)
 - [ ] **Workflow Process Review (#346):** Evaluate new review tiers, session-based reviews, Human Visual Review gate, CONFLICT template. Did they improve quality? What needs refinement?
+- [ ] **Process Fault Analysis:** Review FAULT-S3-001 through FAULT-S3-005. Recurring theme: AI shortcuts (admin bypass, premature merge, scope minimization). Is the "5-minute test" rule (FAULT-S3-005) effective? Are process updates from earlier faults being followed?
 
 ---
 
@@ -261,6 +262,18 @@ Herschel check reported #342 (near-field Phase 3 Visualization) as the next crit
 - Herschel check should cross-reference the first unchecked closure checklist item, not just read the prose line.
 
 > Full entry: [`docs/process_violation_log.md`](docs/process_violation_log.md) — FAULT-S3-003
+
+### FAULT-S3-005: AI scope-minimization bias — deferring trivial work (2026-02-19)
+
+**What happened:**
+During PR #373 (Phase 4a formal proof) review synthesis, Herschel proposed deferring 2 oracle test vectors to a housekeeping issue. James challenged: "is there a specific reason to defer?" There wasn't — the vectors were ~10 lines of copy-paste code. The AI defaulted to minimizing PR scope when the correct action was to just do the work.
+
+**Root cause (process):** AI heuristic favors smaller PRs by pushing items to housekeeping. This is backwards when the deferral overhead (issue creation, board placement, future context rebuilding) exceeds the cost of the fix itself.
+
+**Process update:**
+- **RULE: "5-minute test" before deferral.** If a review finding can be resolved in ≤5 minutes of straightforward changes, fix it in the current PR. Only defer items requiring new research, cross-scope changes, or non-trivial implementation risk.
+
+> Full entry: [`docs/process_violation_log.md`](docs/process_violation_log.md) — FAULT-S3-005
 
 ---
 

@@ -61,4 +61,47 @@ def floatPsiGeneral (theta phi : Float) : QFloat :=
               (Float.sin theta * Float.sin phi)
               (Float.cos theta)
 
+/-- Symplectic form: construct quaternion from complex components ψ₀ = (re₀, im₀), ψ₁ = (re₁, im₁)
+    (mirrors QBP.Experiments.DoubleSlit.sympForm) -/
+def floatSympForm (re₀ im₀ re₁ im₁ : Float) : QFloat :=
+  { re := re₀, imI := im₀, imJ := re₁, imK := im₁ }
+
+/-- Norm squared of a quaternion viewed as symplectic form: |ψ₀|² + |ψ₁|²
+    (mirrors QBP.Experiments.DoubleSlit.normSq_sympForm) -/
+def floatNormSqSymp (q : QFloat) : Float :=
+  q.re * q.re + q.imI * q.imI + q.imJ * q.imJ + q.imK * q.imK
+
+/-- Visibility: V = (Imax - Imin) / (Imax + Imin)
+    (mirrors QBP.Experiments.DoubleSlit.visibility) -/
+def floatVisibility (imax imin : Float) : Float :=
+  (imax - imin) / (imax + imin)
+
+/-- Fraunhofer intensity: I₀ · cos²(π·d·x/(λ·L))
+    (mirrors QBP.Experiments.DoubleSlit.fraunhoferIntensity) -/
+def floatFraunhoferIntensity (i0 d lam l x : Float) : Float :=
+  let arg := Float.acos (-1.0) * d * x / (lam * l)
+  i0 * (Float.cos arg) * (Float.cos arg)
+
+/-- Fringe spacing: Δx = λ·L/d
+    (mirrors QBP.Experiments.DoubleSlit.fringeSpacing) -/
+def floatFringeSpacing (lam l d : Float) : Float :=
+  lam * l / d
+
+/-- Quaternionic fraction: η = |ψ₁|² / (|ψ₀|² + |ψ₁|²)
+    (mirrors QBP.Experiments.DoubleSlit.quatFraction) -/
+def floatQuatFraction (normSq0 normSq1 : Float) : Float :=
+  normSq1 / (normSq0 + normSq1)
+
+/-- Coupling decomposition: (U₀ + U₁j)(ψ₀ + ψ₁j) result
+    (mirrors QBP.Experiments.DoubleSlit.coupling_decomposition) -/
+def floatCouplingDecomposition (u0 u1 a0 b0 a1 b1 : Float) : QFloat :=
+  { re  := u0 * a0 - u1 * a1
+  , imI := u0 * b0 + u1 * b1
+  , imJ := u0 * a1 + u1 * a0
+  , imK := u0 * b1 - u1 * b0 }
+
+/-- Decay constant: κ = U₁ · d
+    (mirrors QBP.Experiments.DoubleSlit.decayConstant) -/
+def floatDecayConstant (u1 d : Float) : Float := u1 * d
+
 end QBP.Oracle
