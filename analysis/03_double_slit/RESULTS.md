@@ -256,8 +256,11 @@ propagation to the far field.
 **Caption:** Far-field detector pattern on mm-scale axes.
 Crimson (red): Expected baseline (U₁ = 0 eV, V_ff = 0.6554). Teal:
 QBP max coupling (U₁ = 602 eV, V_ff = 0.5996).
-Analytical A (plane-wave, 47 µm fringes) is at a fundamentally different
-scale and cannot be overlaid — see V(U₁) curve for quantitative comparison.
+Baseline V_ff < 1.0 because the BPM uses a finite Gaussian source, not an
+ideal plane wave — spatial coherence limits reduce fringe contrast even without
+quaternionic coupling. Analytical A (plane-wave, 47 µm fringes) is at a
+fundamentally different scale and cannot be overlaid — see V(U₁) curve for
+quantitative comparison.
 
 ### 9.4 Far-Field Comparison: Standard QM vs QBP
 
