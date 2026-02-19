@@ -107,9 +107,12 @@ jobs:
       - name: Validate CURRENT symlinks resolve
         run: |
           # Every results/*/CURRENT symlink must point to an existing directory
+          shopt -s nullglob
           FAIL=0
+          COUNT=0
           for link in results/*/CURRENT; do
             [ -L "$link" ] || continue
+            COUNT=$((COUNT + 1))
             if [ ! -d "$link" ]; then
               echo "BROKEN: $link -> $(readlink "$link")"
               FAIL=1
@@ -117,6 +120,11 @@ jobs:
               echo "OK: $link -> $(readlink "$link")"
             fi
           done
+          if [ "$COUNT" -eq 0 ]; then
+            echo "ERROR: No CURRENT symlinks found to validate"
+            exit 1
+          fi
+          echo "Validated $COUNT symlink(s)"
           exit $FAIL
 
   libs-dependency-check:

@@ -103,8 +103,9 @@ def _replot(curve, x_arr, y_arr, step=1):
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "../../results/03_double_slit")
 # Use CURRENT symlink if available, fall back to v3/ for backward compat
+# Note: os.path.isdir() follows symlinks, so this works for both symlinks and dirs
 _current = os.path.join(DATA_DIR, "CURRENT")
-V3_DIR = _current if os.path.isdir(_current) else os.path.join(DATA_DIR, "v3")
+VERSIONED_DIR = _current if os.path.isdir(_current) else os.path.join(DATA_DIR, "v3")
 
 
 def load_latest_data():
@@ -115,16 +116,18 @@ def load_latest_data():
 
     Returns ``(decay_df, nearfield_df, farfield_df, farfield_qbp_df, summary_df, metadata, timestamp)``.
 
-    For v3 format, ``nearfield_df`` contains BPM data with a ``regime``
+    For versioned format, ``nearfield_df`` contains BPM data with a ``regime``
     column (``"expected"`` or ``"qbp"``), ``farfield_df`` contains
     analytical scenarios A/B, and ``farfield_qbp_df`` contains BPM+FFT
     far-field predictions.  For legacy format, ``nearfield_df`` holds
     all fringe data (scenarios A+B+C) and ``farfield_df`` is ``None``.
     """
-    # --- Try v3 format first ---
-    v3_nearfield = sorted(glob.glob(os.path.join(V3_DIR, "results_nearfield_*.csv")))
-    if v3_nearfield:
-        latest = v3_nearfield[-1]
+    # --- Try versioned format first ---
+    versioned_nearfield = sorted(
+        glob.glob(os.path.join(VERSIONED_DIR, "results_nearfield_*.csv"))
+    )
+    if versioned_nearfield:
+        latest = versioned_nearfield[-1]
         timestamp = (
             os.path.basename(latest)
             .replace("results_nearfield_", "")
@@ -132,13 +135,13 @@ def load_latest_data():
         )
         nearfield_df = pd.read_csv(latest)
 
-        farfield_path = os.path.join(V3_DIR, f"results_farfield_{timestamp}.csv")
+        farfield_path = os.path.join(VERSIONED_DIR, f"results_farfield_{timestamp}.csv")
         farfield_df = (
             pd.read_csv(farfield_path) if os.path.exists(farfield_path) else None
         )
 
         farfield_qbp_path = os.path.join(
-            V3_DIR, f"results_farfield_qbp_{timestamp}.csv"
+            VERSIONED_DIR, f"results_farfield_qbp_{timestamp}.csv"
         )
         farfield_qbp_df = (
             pd.read_csv(farfield_qbp_path)
@@ -146,19 +149,19 @@ def load_latest_data():
             else None
         )
 
-        decay_path = os.path.join(V3_DIR, f"decay_{timestamp}.csv")
+        decay_path = os.path.join(VERSIONED_DIR, f"decay_{timestamp}.csv")
         decay_df = pd.read_csv(decay_path) if os.path.exists(decay_path) else None
 
-        summary_path = os.path.join(V3_DIR, f"summary_{timestamp}.csv")
+        summary_path = os.path.join(VERSIONED_DIR, f"summary_{timestamp}.csv")
         summary_df = pd.read_csv(summary_path) if os.path.exists(summary_path) else None
 
-        metadata_path = os.path.join(V3_DIR, f"metadata_{timestamp}.json")
+        metadata_path = os.path.join(VERSIONED_DIR, f"metadata_{timestamp}.json")
         metadata = {}
         if os.path.exists(metadata_path):
             with open(metadata_path) as f:
                 metadata = json.load(f)
 
-        print(f"Loaded v3 data (timestamp {timestamp})")
+        print(f"Loaded versioned data (timestamp {timestamp})")
         if farfield_qbp_df is not None:
             print(f"  Far-field QBP: {len(farfield_qbp_df)} rows")
         return (
@@ -228,7 +231,7 @@ class DoubleSlitDemo:
     def load_data(self):
         """Load and index all data into lookup dictionaries.
 
-        Supports both v3 format (regime column, separate nearfield/farfield)
+        Supports both versioned format (regime column, separate nearfield/farfield)
         and legacy v2 format (scenario column, single fringe_data CSV).
         """
         (
