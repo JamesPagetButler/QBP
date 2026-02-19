@@ -91,6 +91,7 @@ James can upgrade or downgrade any PR's tier.
 - [ ] Tests cover the change
 - [ ] No security vulnerabilities (OWASP top 10)
 - [ ] Code style consistent with codebase
+- [ ] **Scale compatibility check** — datasets on shared axes must not differ by >10× in characteristic scale (see [Known AI Blind Spots](#known-ai-blind-spots))
 - [ ] AC verification (if issue linked)
 - [ ] **Human Visual Review completed** (James inspects outputs)
 
@@ -131,6 +132,7 @@ James inspects these visually. His pattern recognition catches anomalies that se
 - [ ] Proofs correspond to ground truth claims
 - [ ] No simulation-steered proving (axiom-first principle)
 - [ ] Tests match ground truth within tolerance
+- [ ] **Scale compatibility check** — datasets on shared axes must not differ by >10× in characteristic scale
 - [ ] AC verification (if issue linked)
 - [ ] **Human Visual Review completed**
 - [ ] **Dimensional/unit consistency verified**
@@ -213,9 +215,29 @@ Prose explanation follows the visual summary, not the other way around. James sc
 
 ---
 
+## Known AI Blind Spots
+
+Documented cases where AI reviewers (Red Team and/or Gemini) missed an issue that a human caught. Reviewers should actively check for these patterns.
+
+| Category | Description | Caught by | Reference |
+|----------|-------------|-----------|-----------|
+| **Scale/unit incomparability** | Two datasets plotted on shared axes with >10× difference in characteristic scale (e.g. 47 µm vs 13 mm fringes). AI verified code correctness and captions but did not question whether the visual comparison was physically meaningful. | James (Human Visual Review) | FAULT-S3-003, PR #368 |
+
+### Scale Compatibility Check
+
+When reviewing plots that overlay or compare multiple datasets:
+
+1. **Identify the characteristic scale** of each dataset (fringe spacing, peak width, envelope scale)
+2. **Compare scales** — if they differ by more than 10×, the overlay is likely misleading
+3. **Check ACs** — if an AC specifies "plot X vs Y on same axes", verify the outputs are scale-compatible before accepting the AC as satisfiable
+4. **Flag incompatible overlays** as BLOCKING — the fix is usually separate panels at natural scales, with a quantitative metric (e.g. visibility curve) for comparison
+
+---
+
 ## References
 
 - [CONTRIBUTING.md — Review Process Details](../../CONTRIBUTING.md#review-process-details)
 - [Tiered Review System](../../CONTRIBUTING.md#tiered-review-system)
 - [Acceptance Criteria Verification Protocol](../../CONTRIBUTING.md#acceptance-criteria-verification-protocol)
 - [Issue #346](https://github.com/JamesPagetButler/QBP/issues/346) — Living issue for workflow refinement
+- [Process Violation Log](../process_violation_log.md) — All documented faults
