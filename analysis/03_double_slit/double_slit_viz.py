@@ -9,14 +9,20 @@ Presents three perspectives on the double-slit experiment:
   3. QBP BPM — discrete step-change in η at the coupling region
 
 Six graph panels:
-  1a — "Adler Prediction vs Reality": full-scale η(z)
-  1b — "Zoomed: Step-Change at Coupling Region": Δη(z) detail
-  2  — "Visibility vs Coupling Strength": V vs U₁ scatter
-  3  — "Near-Field BPM Fringe Pattern": I(x) in nm (full)
-  4  — "Zoomed: Individual Interference Fringes": ~12 fringes at center
-  5  — "Far-Field Comparison": Standard QM vs QBP (mm scale, actual BPM+FFT)
+  P1 — "Adler Prediction vs Reality": full-scale η(z)
+  P2 — "Zoomed: Step-Change at Coupling Region": Δη(z) detail
+  P3 — "Visibility vs Coupling Strength": V vs U₁ scatter
+  P4 — "Near-Field BPM Fringe Pattern": I(x) in nm (full)
+  P5 — "Zoomed: Individual Interference Fringes": ~12 fringes at center
+  P6 — "Far-Field Comparison": Standard QM vs QBP (mm scale, actual BPM+FFT)
 
 Controls: U₁ slider, η₀ buttons, live stats.
+
+Architecture note: ALL dynamic gcurve objects are pre-allocated once in
+setup_graphs().  Update methods NEVER create or delete gcurve objects —
+they clear data with ``c.data = []`` and re-plot with ``c.plot(x, y)``.
+This avoids VPython's unreliable gcurve.delete() and prevents ghost
+curves from accumulating.
 
 Design principles (Dev Team):
   Bret Victor  — Make it explorable; discover physics by interacting.
@@ -75,26 +81,17 @@ def snap_to_nearest(value, allowed):
     return min(allowed, key=lambda v: abs(v - value))
 
 
-def _clear_curves(curve_list):
-    """Blank out all gcurves in *curve_list*, then return an empty list.
+def _replot(curve, x_arr, y_arr, step=1):
+    """Clear a pre-allocated gcurve and re-plot new data.
 
-    VPython's ``gcurve.delete()`` does NOT reliably remove curves from
-    the rendered graph — it can also corrupt graph state for new curves.
-    Instead we blank the data and hide the object.  The empty gcurve
-    objects accumulate harmlessly in memory.
+    This is the ONLY way dynamic curves are updated.  Never create or
+    delete gcurve objects after setup — that causes ghost curves and
+    rendering corruption in VPython.
     """
-    for c in curve_list:
-        try:
-            c.data = []  # Remove all plotted points
-        except Exception:
-            pass
-        try:
-            c.visible = False
-        except Exception:
-            pass
-        # NOTE: do NOT call c.delete() — it corrupts the graph and
-        # prevents new curves from rendering on the same graph.
-    return []
+    curve.data = []
+    for i in range(0, len(x_arr), step):
+        curve.plot(x_arr[i], y_arr[i])
+    curve.visible = True
 
 
 # ============================================================================
@@ -332,7 +329,7 @@ class DoubleSlitDemo:
                     df_b["intensity_total_normalized"].values,
                 )
 
-        # --- Far-field QBP data: (u1, eta0) → (x_mm, I_norm) ---
+        # --- Far-field QBP data: (regime, u1, eta0) → (x_mm, I_norm) ---
         self.farfield_qbp = {}
         if farfield_qbp_df is not None:
             for regime in ("expected", "qbp"):
@@ -443,14 +440,22 @@ class DoubleSlitDemo:
 
     # ------------------------------------------------------------- graphs
     def setup_graphs(self):
-        """Create the four graph panels."""
+        """Create graph panels and pre-allocate ALL dynamic curves.
+
+        Every gcurve that changes when the slider moves is created here
+        ONCE.  Update methods only change ``.data``, ``.color``,
+        ``.label``, and ``.visible`` — they NEVER create or delete
+        gcurve objects.  This prevents VPython ghost-curve bugs.
+        """
 
         # z range for decay panels
         z_key = (self.u1_values[0], self.eta0_values[0])
         z_arr = self.decay[z_key][0]
         self.z_max = z_arr[-1]
 
-        # --- Panel 1a: Full-scale η(z) ---
+        # ==============================================================
+        # Panel P1 — Adler Prediction vs Reality: full-scale η(z)
+        # ==============================================================
         self.g1a = graph(
             title=(
                 "<b>P1 &mdash; Adler Prediction vs Reality</b>"
@@ -462,9 +467,28 @@ class DoubleSlitDemo:
             height=380,
             fast=False,
         )
-        self.curves_1a = []
+        # Pre-allocate 3 dynamic curves
+        self.p1_adler = gcurve(
+            graph=self.g1a,
+            color=to_vpy(COL_ADLER),
+            dot=True,
+            dot_color=to_vpy(COL_ADLER),
+            label="Adler prediction",
+        )
+        self.p1_stdqm = gcurve(
+            graph=self.g1a,
+            color=to_vpy(COL_STD_QM),
+            label="Standard QM (U\u2081=0)",
+        )
+        self.p1_bpm = gcurve(
+            graph=self.g1a,
+            color=to_vpy(COL_EXPECTED),
+            label="QBP BPM",
+        )
 
-        # --- Panel 1b: Zoomed Δη(z) ---
+        # ==============================================================
+        # Panel P2 — Zoomed: Step-Change at Coupling Region
+        # ==============================================================
         self.g1b = graph(
             title=(
                 "<b>P2 &mdash; Zoomed: Step-Change at Coupling Region</b>"
@@ -476,9 +500,31 @@ class DoubleSlitDemo:
             height=330,
             fast=False,
         )
-        self.curves_1b = []
+        # Pre-allocate 4 dynamic curves
+        self.p2_stdqm = gcurve(
+            graph=self.g1b,
+            color=to_vpy(COL_STD_QM),
+            label="Standard QM (\u0394\u03b7=0)",
+        )
+        self.p2_bpm = gcurve(
+            graph=self.g1b,
+            color=to_vpy(COL_EXPECTED),
+            label="QBP BPM",
+        )
+        self.p2_edge1 = gcurve(
+            graph=self.g1b,
+            color=to_vpy(COL_AMBER),
+            label="coupling region",
+        )
+        self.p2_edge2 = gcurve(
+            graph=self.g1b,
+            color=to_vpy(COL_AMBER),
+            label="",
+        )
 
-        # --- Panel 2: Visibility vs U₁ ---
+        # ==============================================================
+        # Panel P3 — Visibility vs Coupling Strength
+        # ==============================================================
         self.g2 = graph(
             title=(
                 "<b>P3 &mdash; Visibility vs Coupling Strength</b>"
@@ -490,10 +536,20 @@ class DoubleSlitDemo:
             height=280,
             fast=False,
         )
-        self._plot_panel2_static()
-        self.curves_2_dynamic = []
+        self._plot_panel3_static()
+        # Pre-allocate 1 dynamic curve (highlight dot)
+        self.p3_highlight = gcurve(
+            graph=self.g2,
+            color=to_vpy(COL_GOLD),
+            dot=True,
+            dot_color=to_vpy(COL_GOLD),
+            radius=6,
+            label="Current",
+        )
 
-        # --- Panel 3: Near-field fringe ---
+        # ==============================================================
+        # Panel P4 — Near-Field BPM Fringe Pattern
+        # ==============================================================
         self.g3 = graph(
             title=(
                 "<b>P4 &mdash; Near-Field BPM Fringe Pattern</b>"
@@ -506,9 +562,29 @@ class DoubleSlitDemo:
             height=280,
             fast=False,
         )
-        self.curves_3 = []
+        # Pre-allocate 3 dynamic curves
+        self.p4_adler = gcurve(
+            graph=self.g3,
+            color=to_vpy(COL_ADLER),
+            dot=True,
+            dot_color=to_vpy(COL_ADLER),
+            label="Adler: no fringes",
+            radius=0,
+        )
+        self.p4_stdqm = gcurve(
+            graph=self.g3,
+            color=to_vpy(COL_STD_QM),
+            label="Standard QM (U\u2081=0)",
+        )
+        self.p4_qbp = gcurve(
+            graph=self.g3,
+            color=to_vpy(COL_EXPECTED),
+            label="QBP",
+        )
 
-        # --- Panel 4: Zoomed near-field fringes ---
+        # ==============================================================
+        # Panel P5 — Zoomed: Individual Interference Fringes
+        # ==============================================================
         self.g4 = graph(
             title=(
                 "<b>P5 &mdash; Zoomed: Individual Interference Fringes</b>"
@@ -520,11 +596,31 @@ class DoubleSlitDemo:
             height=300,
             fast=False,
         )
-        self.curves_4 = []
+        # Pre-allocate 3 dynamic curves
+        self.p5_adler = gcurve(
+            graph=self.g4,
+            color=to_vpy(COL_ADLER),
+            dot=True,
+            dot_color=to_vpy(COL_ADLER),
+            label="Adler: no fringes",
+            radius=0,
+        )
+        self.p5_stdqm = gcurve(
+            graph=self.g4,
+            color=to_vpy(COL_STD_QM),
+            label="Standard QM (U\u2081=0)",
+        )
+        self.p5_qbp = gcurve(
+            graph=self.g4,
+            color=to_vpy(COL_EXPECTED),
+            label="QBP",
+        )
 
-        # --- Panel 5: Far-field comparison (A vs QBP) ---
+        # ==============================================================
+        # Panel P6 — Far-Field QBP: Expected vs Quaternionic Coupling
+        # ==============================================================
         has_qbp_ff = len(self.farfield_qbp) > 0
-        panel5_title = (
+        panel6_title = (
             "<b>P6 &mdash; Far-Field QBP: Expected vs Quaternionic Coupling</b>"
             " &mdash; <i>BPM + Fraunhofer FFT (mm scale)</i>"
             if has_qbp_ff
@@ -532,18 +628,25 @@ class DoubleSlitDemo:
             " &mdash; <i>classic mm-scale Fraunhofer diffraction</i>"
         )
         self.g5 = graph(
-            title=panel5_title,
+            title=panel6_title,
             xtitle="x (mm)",
             ytitle="I(x) normalized",
             width=900,
             height=300,
             fast=False,
         )
-        self._plot_panel5_static()
+        self._plot_panel6_static()
+        # Pre-allocate 1 dynamic curve (QBP far-field)
+        self.p6_qbp = gcurve(
+            graph=self.g5,
+            color=to_vpy(COL_QBP),
+            label="QBP coupling",
+        )
+        self.p6_qbp.visible = False  # hidden until U₁>0
 
-    # -------------------------------------------------- Panel 2 static parts
-    def _plot_panel2_static(self):
-        """Plot static elements on Panel 2 (plotted once, never redrawn).
+    # -------------------------------------------------- Panel P3 static parts
+    def _plot_panel3_static(self):
+        """Plot static elements on Panel P3 (plotted once, never redrawn).
 
         Three perspectives:
           a. Expected (Adler): V→0 (which-path, complete decoherence)
@@ -609,280 +712,8 @@ class DoubleSlitDemo:
             if key in self.summary:
                 c_data.plot(u1, self.summary[key]["visibility"])
 
-    # --------------------------------------------------- event handlers
-    def _on_u1_change(self, s):
-        self.current_u1 = snap_to_nearest(s.value, self.u1_values)
-        self.u1_text.text = (
-            f" <b style='color: {COLORS.COPPER.hex};'>" f"{self.current_u1:.1f} eV</b>"
-        )
-        self.update_all()
-
-    def _on_eta0_change(self, eta0):
-        self.current_eta0 = eta0
-        self.update_all()
-
-    # --------------------------------------------------- master update
-    def update_all(self):
-        """Redraw all dynamic curves and stats."""
-        self._update_panel_1a()
-        self._update_panel_1b()
-        self._update_panel_2()
-        self._update_panel_3()
-        self._update_panel_4()
-        self._update_panel_5()
-        self._update_stats()
-
-    # --------------------------------------------------- Panel 1a
-    def _update_panel_1a(self):
-        """Full-scale η(z): Adler, Std QM, BPM."""
-        self.curves_1a = _clear_curves(self.curves_1a)
-
-        u1 = self.current_u1
-        eta0 = self.current_eta0
-        key = (u1, eta0)
-
-        # Get z grid from BPM data
-        z_nm, eta_bpm = self.decay.get(
-            key,
-            self.decay.get(
-                min(self.decay.keys(), key=lambda k: abs(k[0] - u1) + abs(k[1] - eta0)),
-            ),
-        )
-
-        # Adler prediction
-        eta_adler = self.adler_eta(z_nm, u1, eta0)
-        c_adler = gcurve(
-            graph=self.g1a,
-            color=to_vpy(COL_ADLER),
-            dot=True,
-            dot_color=to_vpy(COL_ADLER),
-            label="Adler prediction",
-        )
-        for i in range(len(z_nm)):
-            c_adler.plot(z_nm[i], eta_adler[i])
-        self.curves_1a.append(c_adler)
-
-        # Standard QM: flat at η₀ (use U₁=0 control data)
-        z_ctrl, eta_ctrl = self.decay.get((0.0, eta0), (z_nm, np.full_like(z_nm, eta0)))
-        c_std = gcurve(
-            graph=self.g1a,
-            color=to_vpy(COL_STD_QM),
-            label="Standard QM (U\u2081=0)",
-        )
-        for i in range(len(z_ctrl)):
-            c_std.plot(z_ctrl[i], eta_ctrl[i])
-        self.curves_1a.append(c_std)
-
-        # QBP BPM result
-        col = COL_EXPECTED if u1 == 0.0 else COL_QBP
-        c_bpm = gcurve(
-            graph=self.g1a,
-            color=to_vpy(col),
-            label=f"QBP BPM (U\u2081={u1:.0f} eV)",
-        )
-        for i in range(len(z_nm)):
-            c_bpm.plot(z_nm[i], eta_bpm[i])
-        self.curves_1a.append(c_bpm)
-
-    # --------------------------------------------------- Panel 1b
-    def _update_panel_1b(self):
-        """Zoomed Δη = η(z) − η₀, with coupling region shading."""
-        self.curves_1b = _clear_curves(self.curves_1b)
-
-        u1 = self.current_u1
-        eta0 = self.current_eta0
-        key = (u1, eta0)
-
-        z_nm, eta_bpm = self.decay.get(
-            key,
-            self.decay.get(
-                min(self.decay.keys(), key=lambda k: abs(k[0] - u1) + abs(k[1] - eta0)),
-            ),
-        )
-
-        # Standard QM: Δη = 0
-        c_std = gcurve(
-            graph=self.g1b,
-            color=to_vpy(COL_STD_QM),
-            label="Standard QM (\u0394\u03b7=0)",
-        )
-        c_std.plot(0, 0)
-        c_std.plot(self.z_max, 0)
-        self.curves_1b.append(c_std)
-
-        # BPM Δη
-        delta_eta = eta_bpm - eta0
-        c_bpm = gcurve(
-            graph=self.g1b,
-            color=to_vpy(COL_EXPECTED) if u1 == 0.0 else to_vpy(COL_QBP),
-            label=f"QBP BPM \u0394\u03b7 (U\u2081={u1:.0f} eV)",
-        )
-        for i in range(len(z_nm)):
-            c_bpm.plot(z_nm[i], delta_eta[i])
-        self.curves_1b.append(c_bpm)
-
-        # Coupling region band (z ≈ 7.2–8.8 nm) — draw as two thin vertical lines
-        # VPython graphs don't support shaded regions, so we mark the boundaries
-        for z_edge in [7.2, 8.8]:
-            if z_edge <= self.z_max:
-                deta_min = float(np.min(delta_eta)) if len(delta_eta) > 0 else -1e-4
-                deta_max = float(np.max(delta_eta)) if len(delta_eta) > 0 else 1e-4
-                margin = (
-                    abs(deta_max - deta_min) * 0.2 if deta_max != deta_min else 1e-5
-                )
-                c_edge = gcurve(
-                    graph=self.g1b,
-                    color=to_vpy(COL_AMBER),
-                    label="coupling region" if z_edge == 7.2 else "",
-                )
-                c_edge.plot(z_edge, deta_min - margin)
-                c_edge.plot(z_edge, deta_max + margin)
-                self.curves_1b.append(c_edge)
-
-    # --------------------------------------------------- Panel 2
-    def _update_panel_2(self):
-        """Move the highlight marker to current U₁."""
-        self.curves_2_dynamic = _clear_curves(self.curves_2_dynamic)
-
-        u1 = self.current_u1
-        eta0_for_v = self.eta0_values[-1]  # V is η₀-independent
-        key = ("C", u1, eta0_for_v)
-        v_cur = self.summary.get(key, {}).get("visibility", 0.55)
-
-        # Large highlight dot at current position
-        c_hl = gcurve(
-            graph=self.g2,
-            color=to_vpy(COL_GOLD),
-            dot=True,
-            dot_color=to_vpy(COL_GOLD),
-            radius=6,
-            label=f"Current: U\u2081={u1:.0f}, V={v_cur:.4f}",
-        )
-        c_hl.plot(u1, v_cur)
-        self.curves_2_dynamic.append(c_hl)
-
-    # --------------------------------------------------- Panel 3
-    def _update_panel_3(self):
-        """Near-field BPM fringe pattern — three perspectives.
-
-        a. Adler predicted: η→0 ⇒ no fringes (flat at mean intensity)
-        b. Standard QM: BPM at U₁=0 (full near-field fringes)
-        c. QBP: BPM at current U₁ (fringes with reduced visibility)
-        """
-        self.curves_3 = _clear_curves(self.curves_3)
-
-        u1 = self.current_u1
-        eta0 = self.current_eta0
-
-        # (b) Standard QM: U₁=0 baseline at current η₀
-        ref_key = (0.0, eta0)
-        if ref_key in self.fringe:
-            x_ref, I_ref = self.fringe[ref_key]
-
-            # (a) Adler predicted: no interference → flat at mean intensity
-            I_mean = float(np.mean(I_ref))
-            c_adler = gcurve(
-                graph=self.g3,
-                color=to_vpy(COL_ADLER),
-                dot=True,
-                dot_color=to_vpy(COL_ADLER),
-                label=f"Adler: no fringes (\u03b7\u21920, flat at I\u0305={I_mean:.3f})",
-                radius=0,
-            )
-            c_adler.plot(x_ref[0], I_mean)
-            c_adler.plot(x_ref[-1], I_mean)
-            self.curves_3.append(c_adler)
-
-            # (b) QM baseline
-            c_ref = gcurve(
-                graph=self.g3,
-                color=to_vpy(COL_STD_QM),
-                label=f"Standard QM (U\u2081=0)",
-            )
-            step = max(1, len(x_ref) // 1000)
-            for i in range(0, len(x_ref), step):
-                c_ref.plot(x_ref[i], I_ref[i])
-            self.curves_3.append(c_ref)
-
-        # (c) QBP: current (U₁, η₀)
-        main_key = (u1, eta0)
-        if main_key in self.fringe:
-            x_main, I_main = self.fringe[main_key]
-            col = COL_EXPECTED if u1 == 0.0 else COL_QBP
-            c_main = gcurve(
-                graph=self.g3,
-                color=to_vpy(col),
-                label=f"QBP (U\u2081={u1:.0f} eV)",
-            )
-            step = max(1, len(x_main) // 1000)
-            for i in range(0, len(x_main), step):
-                c_main.plot(x_main[i], I_main[i])
-            self.curves_3.append(c_main)
-
-    # --------------------------------------------------- Panel 4
-    def _update_panel_4(self):
-        """Zoomed near-field fringes — three perspectives at ±0.05 nm.
-
-        a. Adler predicted: flat (no fringes)
-        b. Standard QM: U₁=0 baseline fringes
-        c. QBP: current U₁ fringes
-        """
-        self.curves_4 = _clear_curves(self.curves_4)
-
-        u1 = self.current_u1
-        eta0 = self.current_eta0
-        zoom_half = 0.05  # nm — shows ~12 fringes
-
-        # (b) Standard QM: U₁=0 baseline
-        ref_key = (0.0, eta0)
-        if ref_key in self.fringe:
-            x_all, I_all = self.fringe[ref_key]
-            mask = (x_all >= -zoom_half) & (x_all <= zoom_half)
-            x_z, I_z = x_all[mask], I_all[mask]
-            if len(x_z) > 0:
-                # (a) Adler: flat at mean
-                I_mean = float(np.mean(I_z))
-                c_adler = gcurve(
-                    graph=self.g4,
-                    color=to_vpy(COL_ADLER),
-                    dot=True,
-                    dot_color=to_vpy(COL_ADLER),
-                    label="Adler: no fringes",
-                    radius=0,
-                )
-                c_adler.plot(x_z[0], I_mean)
-                c_adler.plot(x_z[-1], I_mean)
-                self.curves_4.append(c_adler)
-
-                # (b) QM baseline
-                c_ref = gcurve(
-                    graph=self.g4,
-                    color=to_vpy(COL_STD_QM),
-                    label="Standard QM (U\u2081=0)",
-                )
-                for i in range(len(x_z)):
-                    c_ref.plot(x_z[i], I_z[i])
-                self.curves_4.append(c_ref)
-
-        # (c) QBP: current (U₁, η₀)
-        main_key = (u1, eta0)
-        if main_key in self.fringe:
-            x_all, I_all = self.fringe[main_key]
-            mask = (x_all >= -zoom_half) & (x_all <= zoom_half)
-            x_z, I_z = x_all[mask], I_all[mask]
-            if len(x_z) > 0:
-                col = COL_EXPECTED if u1 == 0.0 else COL_QBP
-                c_main = gcurve(
-                    graph=self.g4,
-                    color=to_vpy(col),
-                    label=f"QBP (U\u2081={u1:.0f} eV)",
-                )
-                for i in range(len(x_z)):
-                    c_main.plot(x_z[i], I_z[i])
-                self.curves_4.append(c_main)
-
-    # --------------------------------------------------- Panel 5
-    def _plot_panel5_static(self):
+    # -------------------------------------------------- Panel P6 static parts
+    def _plot_panel6_static(self):
         """Far-field static element: BPM+FFT baseline (U₁=0), plotted once.
 
         Analytical A/B are NOT shown here — they use a plane-wave source at
@@ -904,40 +735,263 @@ class DoubleSlitDemo:
             c_base = gcurve(
                 graph=self.g5,
                 color=to_vpy(COL_EXPECTED),
-                label="Expected baseline (U₁=0, BPM+FFT)",
+                label="Expected baseline (U\u2081=0, BPM+FFT)",
             )
             step = max(1, len(x_clip) // 2000)
             for i in range(0, len(x_clip), step):
                 c_base.plot(x_clip[i], I_clip[i])
+            print(
+                f"  P6 static baseline plotted: {len(range(0, len(x_clip), step))} pts, "
+                f"peak={I_peak:.6f}"
+            )
 
-    def _update_panel_5(self):
-        """Far-field QBP dynamic curve — actual BPM+FFT data.
+    # --------------------------------------------------- event handlers
+    def _on_u1_change(self, s):
+        self.current_u1 = snap_to_nearest(s.value, self.u1_values)
+        self.u1_text.text = (
+            f" <b style='color: {COLORS.COPPER.hex};'>" f"{self.current_u1:.1f} eV</b>"
+        )
+        self.update_all()
 
-        Static baseline (U₁=0, red) is plotted once in _plot_panel5_static().
-        This method adds the dynamic QBP coupling curve (teal) for current U₁.
-        At U₁=0, nothing to add (static baseline already shows it).
+    def _on_eta0_change(self, eta0):
+        self.current_eta0 = eta0
+        self.update_all()
+
+    # --------------------------------------------------- master update
+    def update_all(self):
+        """Redraw all dynamic curves and stats."""
+        self._update_p1()
+        self._update_p2()
+        self._update_p3()
+        self._update_p4()
+        self._update_p5()
+        self._update_p6()
+        self._update_stats()
+
+    # --------------------------------------------------- Panel P1
+    def _update_p1(self):
+        """Full-scale η(z): Adler, Std QM, BPM."""
+        u1 = self.current_u1
+        eta0 = self.current_eta0
+        key = (u1, eta0)
+
+        # Get z grid from BPM data
+        z_nm, eta_bpm = self.decay.get(
+            key,
+            self.decay.get(
+                min(
+                    self.decay.keys(),
+                    key=lambda k: abs(k[0] - u1) + abs(k[1] - eta0),
+                ),
+            ),
+        )
+
+        # Adler prediction
+        eta_adler = self.adler_eta(z_nm, u1, eta0)
+        _replot(self.p1_adler, z_nm, eta_adler)
+        self.p1_adler.label = f"Adler prediction (U\u2081={u1:.0f} eV)"
+
+        # Standard QM: flat at η₀ (use U₁=0 control data)
+        z_ctrl, eta_ctrl = self.decay.get((0.0, eta0), (z_nm, np.full_like(z_nm, eta0)))
+        _replot(self.p1_stdqm, z_ctrl, eta_ctrl)
+
+        # QBP BPM result — color depends on U₁
+        col = COL_EXPECTED if u1 == 0.0 else COL_QBP
+        self.p1_bpm.color = to_vpy(col)
+        self.p1_bpm.label = f"QBP BPM (U\u2081={u1:.0f} eV)"
+        _replot(self.p1_bpm, z_nm, eta_bpm)
+
+    # --------------------------------------------------- Panel P2
+    def _update_p2(self):
+        """Zoomed Δη = η(z) − η₀, with coupling region shading."""
+        u1 = self.current_u1
+        eta0 = self.current_eta0
+        key = (u1, eta0)
+
+        z_nm, eta_bpm = self.decay.get(
+            key,
+            self.decay.get(
+                min(
+                    self.decay.keys(),
+                    key=lambda k: abs(k[0] - u1) + abs(k[1] - eta0),
+                ),
+            ),
+        )
+
+        # Standard QM: Δη = 0
+        _replot(self.p2_stdqm, np.array([0, self.z_max]), np.array([0.0, 0.0]))
+
+        # BPM Δη
+        delta_eta = eta_bpm - eta0
+        col = COL_EXPECTED if u1 == 0.0 else COL_QBP
+        self.p2_bpm.color = to_vpy(col)
+        self.p2_bpm.label = f"QBP BPM \u0394\u03b7 (U\u2081={u1:.0f} eV)"
+        _replot(self.p2_bpm, z_nm, delta_eta)
+
+        # Coupling region band (z ≈ 7.2–8.8 nm) — vertical edge markers
+        deta_min = float(np.min(delta_eta)) if len(delta_eta) > 0 else -1e-4
+        deta_max = float(np.max(delta_eta)) if len(delta_eta) > 0 else 1e-4
+        margin = abs(deta_max - deta_min) * 0.2 if deta_max != deta_min else 1e-5
+
+        for z_edge, curve in [(7.2, self.p2_edge1), (8.8, self.p2_edge2)]:
+            if z_edge <= self.z_max:
+                _replot(
+                    curve,
+                    np.array([z_edge, z_edge]),
+                    np.array([deta_min - margin, deta_max + margin]),
+                )
+            else:
+                curve.data = []
+                curve.visible = False
+
+    # --------------------------------------------------- Panel P3
+    def _update_p3(self):
+        """Move the highlight marker to current U₁."""
+        u1 = self.current_u1
+        eta0_for_v = self.eta0_values[-1]  # V is η₀-independent
+        key = ("C", u1, eta0_for_v)
+        v_cur = self.summary.get(key, {}).get("visibility", 0.55)
+
+        self.p3_highlight.label = f"Current: U\u2081={u1:.0f}, V={v_cur:.4f}"
+        self.p3_highlight.data = []
+        self.p3_highlight.plot(u1, v_cur)
+        self.p3_highlight.visible = True
+
+    # --------------------------------------------------- Panel P4
+    def _update_p4(self):
+        """Near-field BPM fringe pattern — three perspectives.
+
+        a. Adler predicted: η→0 ⇒ no fringes (flat at mean intensity)
+        b. Standard QM: BPM at U₁=0 (full near-field fringes)
+        c. QBP: BPM at current U₁ (fringes with reduced visibility)
         """
-        if not hasattr(self, "curves_5"):
-            self.curves_5 = []
-        self.curves_5 = _clear_curves(self.curves_5)
-
         u1 = self.current_u1
         eta0 = self.current_eta0
 
-        # At U₁=0, the static baseline already covers it
-        if u1 == 0.0:
-            return
+        # (b) Standard QM: U₁=0 baseline at current η₀
+        ref_key = (0.0, eta0)
+        if ref_key in self.fringe:
+            x_ref, I_ref = self.fringe[ref_key]
 
-        if not self.farfield_qbp:
+            # (a) Adler predicted: no interference → flat at mean intensity
+            I_mean = float(np.mean(I_ref))
+            self.p4_adler.label = (
+                f"Adler: no fringes (\u03b7\u21920, flat at I\u0305={I_mean:.3f})"
+            )
+            _replot(
+                self.p4_adler,
+                np.array([x_ref[0], x_ref[-1]]),
+                np.array([I_mean, I_mean]),
+            )
+
+            # (b) QM baseline
+            step = max(1, len(x_ref) // 1000)
+            _replot(self.p4_stdqm, x_ref, I_ref, step=step)
+        else:
+            self.p4_adler.data = []
+            self.p4_adler.visible = False
+            self.p4_stdqm.data = []
+            self.p4_stdqm.visible = False
+
+        # (c) QBP: current (U₁, η₀)
+        main_key = (u1, eta0)
+        if main_key in self.fringe:
+            x_main, I_main = self.fringe[main_key]
+            col = COL_EXPECTED if u1 == 0.0 else COL_QBP
+            self.p4_qbp.color = to_vpy(col)
+            self.p4_qbp.label = f"QBP (U\u2081={u1:.0f} eV)"
+            step = max(1, len(x_main) // 1000)
+            _replot(self.p4_qbp, x_main, I_main, step=step)
+        else:
+            self.p4_qbp.data = []
+            self.p4_qbp.visible = False
+
+    # --------------------------------------------------- Panel P5
+    def _update_p5(self):
+        """Zoomed near-field fringes — three perspectives at ±0.05 nm.
+
+        a. Adler predicted: flat (no fringes)
+        b. Standard QM: U₁=0 baseline fringes
+        c. QBP: current U₁ fringes
+        """
+        u1 = self.current_u1
+        eta0 = self.current_eta0
+        zoom_half = 0.05  # nm — shows ~12 fringes
+
+        # (b) Standard QM: U₁=0 baseline
+        ref_key = (0.0, eta0)
+        if ref_key in self.fringe:
+            x_all, I_all = self.fringe[ref_key]
+            mask = (x_all >= -zoom_half) & (x_all <= zoom_half)
+            x_z, I_z = x_all[mask], I_all[mask]
+            if len(x_z) > 0:
+                # (a) Adler: flat at mean
+                I_mean = float(np.mean(I_z))
+                _replot(
+                    self.p5_adler,
+                    np.array([x_z[0], x_z[-1]]),
+                    np.array([I_mean, I_mean]),
+                )
+
+                # (b) QM baseline
+                _replot(self.p5_stdqm, x_z, I_z)
+            else:
+                self.p5_adler.data = []
+                self.p5_adler.visible = False
+                self.p5_stdqm.data = []
+                self.p5_stdqm.visible = False
+        else:
+            self.p5_adler.data = []
+            self.p5_adler.visible = False
+            self.p5_stdqm.data = []
+            self.p5_stdqm.visible = False
+
+        # (c) QBP: current (U₁, η₀)
+        main_key = (u1, eta0)
+        if main_key in self.fringe:
+            x_all, I_all = self.fringe[main_key]
+            mask = (x_all >= -zoom_half) & (x_all <= zoom_half)
+            x_z, I_z = x_all[mask], I_all[mask]
+            if len(x_z) > 0:
+                col = COL_EXPECTED if u1 == 0.0 else COL_QBP
+                self.p5_qbp.color = to_vpy(col)
+                self.p5_qbp.label = f"QBP (U\u2081={u1:.0f} eV)"
+                _replot(self.p5_qbp, x_z, I_z)
+            else:
+                self.p5_qbp.data = []
+                self.p5_qbp.visible = False
+        else:
+            self.p5_qbp.data = []
+            self.p5_qbp.visible = False
+
+    # --------------------------------------------------- Panel P6
+    def _update_p6(self):
+        """Far-field QBP dynamic curve — actual BPM+FFT data.
+
+        Static baseline (U₁=0, red) is plotted once in _plot_panel6_static().
+        This method updates the pre-allocated QBP curve (teal) for current U₁.
+        At U₁=0, the curve is hidden (static baseline already shows it).
+        """
+        u1 = self.current_u1
+        eta0 = self.current_eta0
+
+        # At U₁=0, hide the QBP curve (static baseline already covers it)
+        if u1 == 0.0 or not self.farfield_qbp:
+            self.p6_qbp.data = []
+            self.p6_qbp.visible = False
             return
 
         # Find closest U₁ in available QBP data
         qbp_keys = [k for k in self.farfield_qbp if k[0] == "qbp" and k[2] == eta0]
         if not qbp_keys:
+            self.p6_qbp.data = []
+            self.p6_qbp.visible = False
             return
         qbp_key = min(qbp_keys, key=lambda k: abs(k[1] - u1))
 
         if qbp_key not in self.farfield_qbp:
+            self.p6_qbp.data = []
+            self.p6_qbp.visible = False
             return
 
         x_mm, I_qbp = self.farfield_qbp[qbp_key]
@@ -945,24 +999,19 @@ class DoubleSlitDemo:
         ref_peak = getattr(self, "_ff_baseline_peak", I_qbp.max())
         I_norm = I_qbp / ref_peak if ref_peak > 0 else I_qbp
 
-        # Get far-field visibility from summary if available
+        # Get visibility from summary if available
         v_key = ("C", qbp_key[1], eta0)
         v_ff = self.summary.get(v_key, {}).get("visibility", None)
-        v_label = f", V_ff={v_ff:.3f}" if v_ff is not None else ""
+        v_label = f", V={v_ff:.3f}" if v_ff is not None else ""
 
-        c_qbp = gcurve(
-            graph=self.g5,
-            color=to_vpy(COL_QBP),
-            label=f"QBP coupling (U\u2081={qbp_key[1]:.0f} eV{v_label})",
-        )
+        # Update the pre-allocated curve
+        self.p6_qbp.label = f"QBP coupling (U\u2081={qbp_key[1]:.0f} eV{v_label})"
         # Clip to ±1500 mm to avoid FFT edge artifacts
         mask = np.abs(x_mm) <= 1500
         x_clip = x_mm[mask]
         I_clip = I_norm[mask]
         step = max(1, len(x_clip) // 2000)
-        for i in range(0, len(x_clip), step):
-            c_qbp.plot(x_clip[i], I_clip[i])
-        self.curves_5.append(c_qbp)
+        _replot(self.p6_qbp, x_clip, I_clip, step=step)
 
     # --------------------------------------------------- Stats
     def _update_stats(self):
@@ -1026,6 +1075,7 @@ class DoubleSlitDemo:
         print(f"  Data timestamp: {self.timestamp}")
         print(f"  Decay curves: {len(self.decay)} parameter combos")
         print(f"  Fringe patterns: {len(self.fringe)} parameter combos")
+        print(f"  Far-field QBP: {len(self.farfield_qbp)} curves")
         print(f"  U\u2081 values (eV): {[f'{v:.1f}' for v in self.u1_values]}")
         print(f"  \u03b7\u2080 values: {self.eta0_values}")
         print()
