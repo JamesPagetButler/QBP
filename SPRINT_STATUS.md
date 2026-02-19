@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
-- **Lifecycle Stage:** Phase 3 Rework (Far-Field Visualization) — near-field Phases 1-3 complete, far-field BPM+FFT complete (PR #361 merged). Far-field visualization remaining.
-- **Next Critical-Path Action:** Phase 3 Rework (#360, far-field visualization) → Phase 4 → Phase 5 → Theory Refinement → Retrospective
+- **Lifecycle Stage:** Phase 3 Rework complete. All near-field and far-field visualization done. Next: Phase 4 (Formal Verification).
+- **Next Critical-Path Action:** Phase 4: Formal Verification (#56) → Phase 5 → Theory Refinement → Retrospective
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -28,7 +28,7 @@
 - [x] Phase 2: Implementation (#36) — CLOSED. PR #287 (original), PR #333 (SI compliance redo), PR #343 (v3 results format rework). SI-compliant BPM with self-describing output. **Near-field only (~32 nm).**
 - [x] Phase 3: Visualization (#342, v3 rework) — CLOSED. PR #355 merged 2026-02-15. Near-field hero plots + RESULTS.md. PR #357 (Panel C normalization fix).
 - [x] **Phase 2 Rework: Far-Field (#359)** — CLOSED 2026-02-17. PR #361 merged. Hybrid BPM + Fraunhofer FFT. V(U₁=0)=0.655, V(U₁=max)=0.600 (~8.5% reduction).
-- [ ] **Phase 3 Rework: Far-Field Visualization (#360)** — Far-field fringe overlay, zoomed fringes, residual plots, V(U₁) at far-field. Comparison with analytical Fraunhofer baseline.
+- [x] **Phase 3 Rework: Far-Field Visualization (#360)** — CLOSED 2026-02-18. PR #368 merged. Far-field hero overlay, V(U₁) curve, residual, 3-panel comparison. VPython refactored (pre-allocated gcurves, debounced slider, P6 with actual BPM+FFT). FAULT-S3-003 (scale incomparability) caught by Human Visual Review.
 - [ ] Phase 4: Formal Verification (#56)
   - [ ] 4a: Formal Proof (#259)
   - [ ] 4b: Proof Review (#260)
@@ -63,7 +63,7 @@ Original phases struck through; sprint restarts after research:
 2. ~~Phase 2 (#36) — blocked by research~~
 3. ~~Phase 3 (#37) — PR #318 closed without merge~~
 
-**New critical path (post-PIVOT-S3-001):** #319 → #320 → #322 → Phase 2 → Phase 3 → ~~Phase 2 Rework (#359)~~ → **Phase 3 Rework (#360)** → Phase 4 → Phase 5 → Theory Refinement → Retrospective
+**New critical path (post-PIVOT-S3-001):** #319 → #320 → #322 → Phase 2 → Phase 3 → ~~Phase 2 Rework (#359)~~ → ~~Phase 3 Rework (#360)~~ → **Phase 4 (#56)** → Phase 5 → Theory Refinement → Retrospective
 
 > **Far-Field Rework (2026-02-16):** Near-field BPM propagates ~32 nm — far too short for Fraunhofer conditions. All Sprint 3 results so far are near-field only (V ≈ 0.553 baseline vs analytical V = 1.0). To produce experimentally comparable predictions, we're adding a hybrid approach: BPM through the slit region (where quaternionic coupling acts), then Fraunhofer FFT to the far-field detector plane. This is ~200 lines of new simulation code (#359) plus new visualization (#360). See `docs/Possible Future Experiments/001_far_field_double_slit.md` for the scientific motivation.
 
