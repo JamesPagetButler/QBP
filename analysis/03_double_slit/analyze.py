@@ -50,8 +50,8 @@ def load_data(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, Dict]:
     """Load latest summary, fringe, decay CSVs and metadata JSON.
 
-    Supports both v3 format (``results/03_double_slit/v3/``) and legacy
-    v2 format.  When v3 data is found, the nearfield and farfield CSVs
+    Discovers data via ``CURRENT/`` symlink (preferred) or ``v3/`` fallback.
+    When versioned data is found, the nearfield and farfield CSVs
     are combined into a single ``fringe_df`` with a ``scenario`` column
     for backward-compatible downstream consumption.
 
@@ -62,12 +62,19 @@ def load_data(
         Tuple of (summary_df, fringe_df, decay_df, metadata_dict)
         metadata_dict may contain key 'farfield_qbp_df' with the far-field QBP DataFrame.
     """
-    v3_dir = os.path.join(results_dir, "v3")
+    # Use CURRENT symlink if available, fall back to v3/ for backward compat
+    # Note: os.path.isdir() follows symlinks, so this works for both symlinks and dirs
+    current_dir = os.path.join(results_dir, "CURRENT")
+    versioned_dir = (
+        current_dir if os.path.isdir(current_dir) else os.path.join(results_dir, "v3")
+    )
 
-    # --- Try v3 format first ---
-    v3_nearfield = sorted(glob.glob(os.path.join(v3_dir, "results_nearfield_*.csv")))
-    if v3_nearfield:
-        latest_nf = max(v3_nearfield, key=os.path.getctime)
+    # --- Try versioned format first ---
+    versioned_nearfield = sorted(
+        glob.glob(os.path.join(versioned_dir, "results_nearfield_*.csv"))
+    )
+    if versioned_nearfield:
+        latest_nf = max(versioned_nearfield, key=os.path.getctime)
         timestamp = (
             os.path.basename(latest_nf)
             .replace("results_nearfield_", "")
@@ -78,7 +85,7 @@ def load_data(
         # Map regime → scenario for backward compat
         nf_df["scenario"] = "C"
 
-        farfield_path = os.path.join(v3_dir, f"results_farfield_{timestamp}.csv")
+        farfield_path = os.path.join(versioned_dir, f"results_farfield_{timestamp}.csv")
         if os.path.exists(farfield_path):
             ff_df = pd.read_csv(farfield_path)
             # farfield has 'scenario' column already (A/B)
@@ -93,12 +100,12 @@ def load_data(
         else:
             fringe_df = nf_df
 
-        decay_path = os.path.join(v3_dir, f"decay_{timestamp}.csv")
+        decay_path = os.path.join(versioned_dir, f"decay_{timestamp}.csv")
         decay_df = (
             pd.read_csv(decay_path) if os.path.exists(decay_path) else pd.DataFrame()
         )
 
-        summary_path = os.path.join(v3_dir, f"summary_{timestamp}.csv")
+        summary_path = os.path.join(versioned_dir, f"summary_{timestamp}.csv")
         summary_df = (
             pd.read_csv(summary_path)
             if os.path.exists(summary_path)
@@ -114,17 +121,19 @@ def load_data(
             }
             summary_df["scenario"] = summary_df["regime"].map(regime_to_scenario)
 
-        meta_path = os.path.join(v3_dir, f"metadata_{timestamp}.json")
+        meta_path = os.path.join(versioned_dir, f"metadata_{timestamp}.json")
         metadata = {}
         if os.path.exists(meta_path):
             with open(meta_path) as f:
                 metadata = json.load(f)
 
         # Far-field QBP (BPM + Fraunhofer FFT) — optional
-        ff_qbp_path = os.path.join(v3_dir, f"results_farfield_qbp_{timestamp}.csv")
+        ff_qbp_path = os.path.join(
+            versioned_dir, f"results_farfield_qbp_{timestamp}.csv"
+        )
         if os.path.exists(ff_qbp_path):
             metadata["farfield_qbp_df"] = pd.read_csv(ff_qbp_path)
-            print(f"Loaded v3 format from {v3_dir}")
+            print(f"Loaded versioned format from {versioned_dir}")
             print(f"  Nearfield:     {os.path.basename(latest_nf)}")
             print(f"  Farfield:      results_farfield_{timestamp}.csv")
             print(f"  Farfield QBP:  results_farfield_qbp_{timestamp}.csv")
@@ -132,7 +141,7 @@ def load_data(
             print(f"  Summary:       summary_{timestamp}.csv")
             print(f"  Metadata:      metadata_{timestamp}.json")
         else:
-            print(f"Loaded v3 format from {v3_dir}")
+            print(f"Loaded versioned format from {versioned_dir}")
             print(f"  Nearfield:  {os.path.basename(latest_nf)}")
             print(f"  Farfield:   results_farfield_{timestamp}.csv")
             print(f"  Decay:      decay_{timestamp}.csv")
