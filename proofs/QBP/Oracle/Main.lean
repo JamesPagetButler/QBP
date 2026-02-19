@@ -104,6 +104,18 @@ def generateTestCases : List String := Id.run do
     s!"\"re\": {floatToJson coupResult.re}, \"imI\": {floatToJson coupResult.imI}, " ++
     s!"\"imJ\": {floatToJson coupResult.imJ}, \"imK\": {floatToJson coupResult.imK}}"]
 
+  -- Coupling decomposition with purely real ψ₀, ψ₁ (mirrors coupling_decomposition_real)
+  let coupReal := floatCouplingDecomposition 2.0 3.0 1.0 0.0 0.7 0.0
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"coupling_decomp_real\", " ++
+    s!"\"re\": {floatToJson coupReal.re}, \"imI\": {floatToJson coupReal.imI}, " ++
+    s!"\"imJ\": {floatToJson coupReal.imJ}, \"imK\": {floatToJson coupReal.imK}}"]
+
+  -- Coupling with U₁ = 0 (mirrors coupling_decouples_U1_zero)
+  let coupDecoupled := floatCouplingDecomposition 2.0 0.0 1.0 0.5 0.7 0.3
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"coupling_decoupled\", " ++
+    s!"\"re\": {floatToJson coupDecoupled.re}, \"imI\": {floatToJson coupDecoupled.imI}, " ++
+    s!"\"imJ\": {floatToJson coupDecoupled.imJ}, \"imK\": {floatToJson coupDecoupled.imK}}"]
+
   -- Norm squared of symplectic form: ψ = (0.6, 0.8, 0.3, 0.4)
   let sympPsi := floatSympForm 0.6 0.8 0.3 0.4
   let nsq := floatNormSqSymp sympPsi
