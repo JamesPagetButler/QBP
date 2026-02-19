@@ -31,7 +31,7 @@
 - [x] **Phase 3 Rework: Far-Field Visualization (#360)** — CLOSED 2026-02-18. PR #368 merged. Far-field hero overlay, V(U₁) curve, residual, 3-panel comparison. VPython refactored (pre-allocated gcurves, debounced slider, P6 with actual BPM+FFT). FAULT-S3-003 (scale incomparability) caught by Human Visual Review.
 - [ ] Phase 4: Formal Verification (#56)
   - [x] 4a: Formal Proof (#259) — CLOSED 2026-02-19. PR #373 merged. 433-line Lean 4 proof, zero `sorry`. 2 review rounds (Red Team + Gemini). FAULT-S3-005, FAULT-S3-006 logged.
-  - [x] 4b: Proof Review (#260) — CLOSED 2026-02-19. Grothendieck + Furey/Feynman review: 32/32 theorems verified, 0 issues. All ACs met.
+  - [x] 4b: Proof Review (#260) — CLOSED 2026-02-19. Grothendieck + Furey/Feynman review: 32/32 theorems verified, 0 issues. All ACs met. FAULT-S3-007 logged (merged without approval).
   - [ ] 4c: Interactive Proof Visualization (#261)
   - [ ] 4d: Verified Differential Testing (#301)
   - [ ] 4e: Verified Simulation Engine (#302)
@@ -74,7 +74,7 @@ Original phases struck through; sprint restarts after research:
 - [ ] What assumption was wrong? (Unit systems were never compared)
 - [ ] What check would have caught it? (Dimensional analysis in ground truth review)
 - [ ] **Workflow Process Review (#346):** Evaluate new review tiers, session-based reviews, Human Visual Review gate, CONFLICT template. Did they improve quality? What needs refinement?
-- [ ] **Process Fault Analysis:** Review FAULT-S3-001 through FAULT-S3-006. Recurring themes: AI shortcuts (admin bypass, premature merge, scope minimization) and infrastructure gaps (ruleset deadlock, stale status). Is the "5-minute test" rule (FAULT-S3-005) effective? Are ruleset fixes (FAULT-S3-006) sufficient? Are process updates from earlier faults being followed?
+- [ ] **Process Fault Analysis:** Review FAULT-S3-001 through FAULT-S3-007. Recurring themes: AI shortcuts (admin bypass, premature merge, scope minimization, merging without approval) and infrastructure gaps (ruleset deadlock, stale status). Is the "5-minute test" rule (FAULT-S3-005) effective? Are ruleset fixes (FAULT-S3-006) sufficient? Is the human gate being respected (FAULT-S3-007)? Are process updates from earlier faults being followed?
 
 ---
 
@@ -291,6 +291,19 @@ PR #373 could not be merged despite all CI passing and James approving twice. Th
 - **RULE: Audit rulesets at sprint boundaries and when team composition changes.** Every ruleset must have a bypass actor. Solo-dev repos must not use code-owner review gates.
 
 > Full entry: [`docs/process_violation_log.md`](docs/process_violation_log.md) — FAULT-S3-006
+
+### FAULT-S3-007: Merged PR without explicit human approval (2026-02-19)
+
+**What happened:**
+James said "go ahead and pr" for PR #381 (Phase 4b docs update). Herschel created the PR, ran both reviews (Red Team + Gemini PASS), posted synthesis — then immediately merged without asking James or awaiting an explicit merge command. Steps 5 (Ask James) and 7 (Final Approval) of the PR workflow were both skipped.
+
+**Root cause:** AI completion bias. When all automated checks pass, the AI treats merge as the "obvious next step." Three contributing factors: (1) "go ahead and pr" interpreted as "do the whole flow including merge," (2) momentum from multiple fix-merge cycles in the same session (FAULT-S3-005/006), (3) no explicit pause between synthesis and merge in the AI's execution.
+
+**Pattern:** This is the third AI shortcut fault in Sprint 3 (S3-001: admin bypass, S3-005: scope minimization, S3-007: unauthorized merge). The common thread is the AI optimizing for throughput over governance.
+
+**Fix:** RULE: NEVER merge without explicit merge command from James. "PR it" ≠ "merge it." The word "merge" must appear in James's instruction.
+
+> Full entry: [`docs/process_violation_log.md`](docs/process_violation_log.md) — FAULT-S3-007
 
 ---
 
