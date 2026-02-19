@@ -39,7 +39,7 @@ import sys
 import glob
 import time
 
-VIZ_VERSION = "0.9.0"  # pre-allocated curves + debounced polling
+VIZ_VERSION = "0.9.1"  # + review fixes (init race, log rotation, error logging)
 
 import numpy as np
 import pandas as pd
@@ -759,9 +759,22 @@ class DoubleSlitDemo:
             )
 
     # --------------------------------------------------- event handlers
+    _LOG_PATH = "/tmp/vpython_slider.log"
+    _LOG_MAX_BYTES = 100_000  # truncate log if it exceeds ~100 KB
+
     def _log(self, msg):
-        """Append to file-based log (stdout is reserved for VPython IPC)."""
-        with open("/tmp/vpython_slider.log", "a") as f:
+        """Append to file-based log (stdout is reserved for VPython IPC).
+
+        Truncates when the log exceeds _LOG_MAX_BYTES to prevent unbounded growth.
+        """
+        try:
+            size = os.path.getsize(self._LOG_PATH)
+        except OSError:
+            size = 0
+        mode = "w" if size > self._LOG_MAX_BYTES else "a"
+        with open(self._LOG_PATH, mode) as f:
+            if mode == "w":
+                f.write(f"{time.time():.3f} LOG TRUNCATED (was {size} bytes)\n")
             f.write(f"{time.time():.3f} {msg}\n")
 
     def _on_u1_change(self, s):
