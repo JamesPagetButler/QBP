@@ -24,6 +24,7 @@ namespace QBP.Experiments.DoubleSlit
 
 open QBP Real
 
+-- TODO: Remove mkQ when Mathlib makes Quaternion an abbrev (or reducible).
 -- Quaternion is a `def` (not `abbrev`), so anonymous constructors ⟨a,b,0,0⟩ : Q
 -- elaborate to QuaternionAlgebra, breaking HMul Q Q resolution.
 -- This helper ensures the result type is Q.
@@ -63,8 +64,8 @@ complex numbers by conjugation: j·z = z*·j where z* is complex conjugation. -/
 /-- j² = -1 (fundamental quaternion identity) -/
 theorem qJ_sq : qJ * qJ = -(1 : Q) := by
   unfold qJ
-  ext <;> simp [Quaternion.mul_re, Quaternion.mul_imI,
-                Quaternion.mul_imJ, Quaternion.mul_imK] <;> ring
+  ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
+                Quaternion.imJ_mul, Quaternion.imK_mul]
 
 /-- j times a complex quaternion z = ⟨a, b, 0, 0⟩ gives ⟨0, 0, a, -b⟩.
     This is the quaternion representation of: j·z = z*·j
@@ -72,25 +73,26 @@ theorem qJ_sq : qJ * qJ = -(1 : Q) := by
 theorem j_mul_complex (a b : ℝ) :
     qJ * mkQ a b 0 0 = mkQ 0 0 a (-b) := by
   unfold qJ mkQ
-  ext <;> simp [Quaternion.mul_re, Quaternion.mul_imI,
-                Quaternion.mul_imJ, Quaternion.mul_imK] <;> ring
+  ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
+                Quaternion.imJ_mul, Quaternion.imK_mul]
 
 /-- Complex quaternion times j: ⟨a, b, 0, 0⟩ * j = ⟨0, 0, a, b⟩.
     Note: z·j ≠ j·z in general (quaternions are non-commutative). -/
 theorem complex_mul_j (a b : ℝ) :
     mkQ a b 0 0 * qJ = mkQ 0 0 a b := by
   unfold qJ mkQ
-  ext <;> simp [Quaternion.mul_re, Quaternion.mul_imI,
-                Quaternion.mul_imJ, Quaternion.mul_imK] <;> ring
+  ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
+                Quaternion.imJ_mul, Quaternion.imK_mul]
 
-/-- j·z·j = -z* for complex z. This is the quaternion conjugation action:
-    j ⟨a, b, 0, 0⟩ j = ⟨-a, b, 0, 0⟩ -/
+/-- Triple product j·z·j = -z* for complex z = a + bi.
+    Note: this is NOT the conjugation action j·z·j⁻¹ = z* (which has an extra
+    sign from j⁻¹ = -j). Here j·⟨a,b,0,0⟩·j = ⟨-a, b, 0, 0⟩ = -(a - bi) = -z*. -/
 theorem j_complex_j (a b : ℝ) :
     qJ * mkQ a b 0 0 * qJ = mkQ (-a) b 0 0 := by
   rw [j_mul_complex]
   unfold qJ mkQ
-  ext <;> simp [Quaternion.mul_re, Quaternion.mul_imI,
-                Quaternion.mul_imJ, Quaternion.mul_imK] <;> ring
+  ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
+                Quaternion.imJ_mul, Quaternion.imK_mul]
 
 /-! ## Section 3: Coupling Decomposition
 
@@ -126,8 +128,8 @@ theorem coupling_decomposition (U₀ U₁ a₀ b₀ a₁ b₁ : ℝ) :
        U₀ * b₀ + U₁ * b₁,
        U₀ * a₁ + U₁ * a₀,
        U₀ * b₁ - U₁ * b₀⟩ := by
-  ext <;> simp [Quaternion.mul_re, Quaternion.mul_imI,
-                Quaternion.mul_imJ, Quaternion.mul_imK] <;> ring
+  ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
+                Quaternion.imJ_mul, Quaternion.imK_mul]
 
 /-- Coupling decomposition specialized to purely real ψ₀ and ψ₁.
     When b₀ = b₁ = 0: result = ⟨U₀a₀ - U₁a₁, 0, U₀a₁ + U₁a₀, 0⟩ -/
@@ -135,8 +137,8 @@ theorem coupling_decomposition_real (U₀ U₁ a₀ a₁ : ℝ) :
     let potential : Q := ⟨U₀, 0, U₁, 0⟩
     let psi : Q := ⟨a₀, 0, a₁, 0⟩
     potential * psi = ⟨U₀ * a₀ - U₁ * a₁, 0, U₀ * a₁ + U₁ * a₀, 0⟩ := by
-  ext <;> simp [Quaternion.mul_re, Quaternion.mul_imI,
-                Quaternion.mul_imJ, Quaternion.mul_imK] <;> ring
+  ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
+                Quaternion.imJ_mul, Quaternion.imK_mul]
 
 /-! ## Section 3b: Norm Conservation (Coupling Cancellation)
 
@@ -230,7 +232,7 @@ theorem visibility_nonneg {Imax Imin : ℝ}
 
 /-- Visibility is at most 1 when Imax ≥ Imin ≥ 0 and Imax > 0 -/
 theorem visibility_le_one {Imax Imin : ℝ}
-    (hge : Imax ≥ Imin) (hmin : Imin ≥ 0) (hmax : Imax > 0) :
+    (_hge : Imax ≥ Imin) (hmin : Imin ≥ 0) (hmax : Imax > 0) :
     visibility Imax Imin ≤ 1 := by
   unfold visibility
   rw [div_le_one (by linarith : Imax + Imin > 0)]
@@ -244,7 +246,7 @@ theorem visibility_one {Imax : ℝ} (hmax : Imax > 0) :
   exact ne_of_gt hmax
 
 /-- Zero visibility (V = 0) when Imax = Imin > 0 (no interference, which-path) -/
-theorem visibility_zero {I : ℝ} (hI : I > 0) :
+theorem visibility_zero {I : ℝ} (_hI : I > 0) :
     visibility I I = 0 := by
   unfold visibility
   simp
@@ -325,8 +327,8 @@ theorem coupling_decouples_U1_zero (U₀ a₀ b₀ a₁ b₁ : ℝ) :
     let potential : Q := ⟨U₀, 0, 0, 0⟩   -- U₀ + 0·j
     let psi : Q := ⟨a₀, b₀, a₁, b₁⟩
     potential * psi = ⟨U₀ * a₀, U₀ * b₀, U₀ * a₁, U₀ * b₁⟩ := by
-  ext <;> simp [Quaternion.mul_re, Quaternion.mul_imI,
-                Quaternion.mul_imJ, Quaternion.mul_imK] <;> ring
+  ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
+                Quaternion.imJ_mul, Quaternion.imK_mul]
 
 /-- The symplectic form with ψ₁ = 0 is a complex wavefunction -/
 theorem sympForm_zero_psi1 (a₀ b₀ : ℝ) :
@@ -344,8 +346,11 @@ how quickly interference is lost with increasing U₁. -/
 noncomputable def quatFraction (normSq0 normSq1 : ℝ) : ℝ :=
   normSq1 / (normSq0 + normSq1)
 
-/-- Decay constant definition: κ relates U₁ to exponential decay of visibility.
-    κ must be positive for meaningful decay. -/
+/-- Dimensionless coupling proxy: product of potential strength and slit separation.
+    This is a simplified stand-in used for monotonicity and positivity proofs.
+    The physical decay constant κ = |U₁|/(ℏv) [m⁻¹] from the ground truth
+    has different dimensions; the full dimensional formula lives in the Python
+    simulation (Phase 2), not in this algebraic skeleton. -/
 noncomputable def decayConstant (U₁ d : ℝ) : ℝ := U₁ * d
 
 /-- Decay length: L_decay = 1/κ (distance over which visibility drops by 1/e) -/
@@ -372,14 +377,14 @@ theorem decayConstant_mono_U1 {U₁ U₁' d : ℝ}
 
 /-- Quaternionic fraction is non-negative when both norms are non-negative -/
 theorem quatFraction_nonneg {n₀ n₁ : ℝ}
-    (h₀ : n₀ ≥ 0) (h₁ : n₁ ≥ 0) (hsum : n₀ + n₁ > 0) :
+    (_h₀ : n₀ ≥ 0) (h₁ : n₁ ≥ 0) (hsum : n₀ + n₁ > 0) :
     quatFraction n₀ n₁ ≥ 0 := by
   unfold quatFraction
   exact div_nonneg h₁.le (le_of_lt hsum)
 
 /-- Quaternionic fraction is at most 1 -/
 theorem quatFraction_le_one {n₀ n₁ : ℝ}
-    (h₀ : n₀ ≥ 0) (h₁ : n₁ ≥ 0) (hsum : n₀ + n₁ > 0) :
+    (h₀ : n₀ ≥ 0) (_h₁ : n₁ ≥ 0) (hsum : n₀ + n₁ > 0) :
     quatFraction n₀ n₁ ≤ 1 := by
   unfold quatFraction
   rw [div_le_one hsum]

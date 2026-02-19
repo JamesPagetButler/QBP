@@ -96,7 +96,7 @@ def generateTestCases : List String := Id.run do
       (floatExpectationValue psi obs)]
 
   -- Experiment 03: Double-Slit test vectors
-  let pi := Float.acos (-1.0)
+  -- (pi already bound above on line 43)
 
   -- Coupling decomposition test: (2 + 3j)(1 + 0.5i + 0.7j + 0.3k)
   let coupResult := floatCouplingDecomposition 2.0 3.0 1.0 0.5 0.7 0.3
