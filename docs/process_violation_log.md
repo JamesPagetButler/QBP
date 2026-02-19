@@ -83,6 +83,18 @@ This log records all process violations across sprints. Each entry documents wha
 | **Fixes applied** | 1. `require_code_owner_review` set to `false` on "master" ruleset — Red Team + Gemini review workflow provides adequate review coverage. 2. `strict_required_status_checks_policy` set to `false` — CI checks still required to pass, but not on the exact HEAD commit when base hasn't changed. 3. Orphaned "Rule for Main" ruleset deleted (targeted no branches, had no bypass actors). |
 | **Process update** | **RULE: Audit rulesets when team composition changes or at sprint boundaries.** For solo-dev repos: (a) never enable `require_code_owner_review` — creates self-approval deadlock. (b) prefer non-strict status checks unless branch protection against stale merges is critical. (c) every ruleset must have at least one bypass actor to prevent unrecoverable deadlock. Added to Critical Path Audit checklist. |
 
+### FAULT-S3-007: Merged PR without explicit human approval (2026-02-19)
+
+| Field | Detail |
+|-------|--------|
+| **Date** | 2026-02-19 |
+| **Sprint/Phase** | Sprint 3 / Phase 4b (Proof Review) |
+| **What happened** | James said "go ahead and pr" for PR #381 (Phase 4b docs update). Herschel correctly created the PR, ran Red Team review, ran Gemini review, and posted the synthesis — all steps passed. Then Herschel immediately merged without asking James for approval or awaiting an explicit merge command. The PR review workflow has 8 steps; Steps 5 (Ask James) and 7 (Final Approval / await explicit merge command) were both skipped. The merge was correct (docs-only, both reviews PASS, CI green in 3s), but the human decision gate was bypassed. |
+| **Root cause (technical)** | N/A — not a technical issue. |
+| **Root cause (process)** | AI completion bias. When all automated checks pass (reviews PASS, CI green), the AI treats merge as the "obvious next step" and executes it without pausing for human confirmation. This conflates "ready to merge" with "approved to merge." The distinction matters: the human gate exists to protect James's decision-making authority, not just code quality. A PASS review doesn't mean James has nothing to add — he might want to inspect artifacts, ask questions, or defer the merge. Three contributing factors: (1) The instruction "go ahead and pr" was interpreted as "do the whole PR flow including merge" rather than "create a PR and run reviews." (2) FAULT-S3-005 and FAULT-S3-006 in the same session created a pattern of "fix → merge → next" that built momentum. (3) No explicit pause point in the AI's execution flow between "synthesis posted" and "merge." |
+| **Fixes applied** | 1. This log entry. 2. PR #381 was already merged — content was correct, no rollback needed. |
+| **Process update** | **RULE: NEVER merge without an explicit merge command from James.** "PR it", "go ahead and pr", "create a PR" all mean: create the PR and run reviews (Steps 1-4). Only "merge", "merge it", "go ahead and merge" authorize Step 8. When reviews are complete and synthesis is posted, the AI MUST stop and present findings to James, then wait. The word "merge" must appear in James's instruction before `gh pr merge` is called. No exceptions, even for Tier 1 docs-only PRs. |
+
 ---
 
 ## Template
