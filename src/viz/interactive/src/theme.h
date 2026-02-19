@@ -1,5 +1,5 @@
 /*
- * QBP Design System: Futuristic Steampunk Theme
+ * QBP Design System: Solarpunk Theme
  *
  * C/raylib port of src/viz/theme.py
  * Colors as raylib Color structs (RGBA 0-255).
@@ -19,7 +19,7 @@
 
 /* --- Secondary: The Elements --- */
 #define QBP_TEAL        (Color){  42, 157, 143, 255 }  /* #2A9D8F */
-#define QBP_VERDIGRIS   (Color){  74, 118, 110, 255 }  /* #4A766E */
+#define QBP_VERDIGRIS   (Color){  61, 122, 115, 255 }  /* #3D7A73 */
 #define QBP_AMBER       (Color){ 244, 162,  97, 255 }  /* #F4A261 */
 #define QBP_CRIMSON     (Color){ 155,  35,  53, 255 }  /* #9B2335 */
 #define QBP_IVORY       (Color){ 255, 254, 240, 255 }  /* #FFFEF0 */
