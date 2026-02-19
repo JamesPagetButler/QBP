@@ -210,6 +210,13 @@ class DoubleSlitDemo:
         self.current_u1 = 0.0
         self.current_eta0 = 0.5
 
+        # Debounce state — initialized here so callbacks are safe
+        # before run() is called (VPython can fire events during setup).
+        self._pending_u1_raw = None
+        self._pending_u1_time = 0.0
+        self._needs_update = False
+        self._last_polled_u1 = 0.0
+
         self.load_data()
         self.setup_controls()
         self.setup_graphs()
@@ -1093,9 +1100,8 @@ class DoubleSlitDemo:
         slider.value directly as fallback (callbacks can stop after
         graph updates in some VPython versions).
         """
-        # Debounce state
+        # Reset debounce state (initialized in __init__, reset here for clean start)
         self._pending_u1_raw = None
-        self._pending_u1_time = 0.0
         self._needs_update = False
         self._last_polled_u1 = self.current_u1
         DEBOUNCE_SEC = 0.15
@@ -1138,8 +1144,9 @@ class DoubleSlitDemo:
                         f"{self.current_u1:.1f} eV</b>"
                     )
                     self._needs_update = True
-            except Exception:
-                pass
+                    self._pending_u1_raw = None  # clear stale callback
+            except Exception as e:
+                self._log(f"POLL ERROR: {e}")
 
             # === Fallback: debounced callback processing ===
             if self._pending_u1_raw is not None:
