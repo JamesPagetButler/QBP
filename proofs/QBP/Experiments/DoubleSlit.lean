@@ -278,7 +278,10 @@ and visibility is preserved: **V = V₀** regardless of η.
 Which model applies depends on the measurement and coupling geometry.
 The experiment selection (research issue) determines the physical case. -/
 
-/-- Model A: Incoherent j-component as flat background.
+/-- Model A: Incoherent j-component as spatially flat background.
+    Assumes ψ₁ is approximately uniform across the fringe pattern — i.e.,
+    ψ₁ varies slowly compared to the ψ₀ interference frequency.
+
     When ψ₀ interferes perfectly (I_max_coh = 2·n₀, I_min_coh = 0) and
     ψ₁ adds flat background n₁, the observed visibility equals 1 - η
     where η = quatFraction(n₀, n₁).
@@ -303,8 +306,10 @@ theorem visibility_eta_zero {n₀ : ℝ} (h₀ : n₀ > 0) :
     visibility (2 * n₀ + 0) 0 = 1 - quatFraction n₀ 0 := by
   exact visibility_eq_one_sub_quatFraction h₀ (le_refl 0)
 
-/-- Model A corollary: η = 0 gives V = 1 (perfect fringes). -/
-theorem quatFraction_zero_gives_full_visibility {n₀ : ℝ} (_h₀ : n₀ > 0) :
+/-- Model A corollary: η = 0 gives V = 1 (perfect fringes).
+    The complementary perspective of visibility_eta_zero: that theorem shows
+    the visibility formula evaluates to 1-η; this one shows 1-η = 1 when η = 0. -/
+theorem visibility_full_when_eta_zero {n₀ : ℝ} (_h₀ : n₀ > 0) :
     1 - quatFraction n₀ 0 = 1 := by
   unfold quatFraction
   simp
@@ -333,6 +338,7 @@ theorem visibility_correlated {Imax Imin : ℝ} {r : ℝ}
   have h1r : (1 : ℝ) + r > 0 := by linarith
   have hIsum : Imax + Imin > 0 := by linarith
   have hscaled : (1 + r) * Imax + (1 + r) * Imin > 0 := by nlinarith
+  -- field_simp uses these nonzero proofs from the local context automatically
   have hIsum_ne : Imax + Imin ≠ 0 := ne_of_gt hIsum
   have hscaled_ne : (1 + r) * Imax + (1 + r) * Imin ≠ 0 := ne_of_gt hscaled
   field_simp
