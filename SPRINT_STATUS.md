@@ -30,7 +30,7 @@
 - [x] **Phase 2 Rework: Far-Field (#359)** — CLOSED 2026-02-17. PR #361 merged. Hybrid BPM + Fraunhofer FFT. V(U₁=0)=0.655, V(U₁=max)=0.600 (~8.5% reduction).
 - [x] **Phase 3 Rework: Far-Field Visualization (#360)** — CLOSED 2026-02-18. PR #368 merged. Far-field hero overlay, V(U₁) curve, residual, 3-panel comparison. VPython refactored (pre-allocated gcurves, debounced slider, P6 with actual BPM+FFT). FAULT-S3-003 (scale incomparability) caught by Human Visual Review.
 - [ ] Phase 4: Formal Verification (#56)
-  - [ ] 4a: Formal Proof (#259)
+  - [x] 4a: Formal Proof (#259) — CLOSED 2026-02-19. PR #373 merged. 433-line Lean 4 proof, zero `sorry`. 2 review rounds (Red Team + Gemini). FAULT-S3-005, FAULT-S3-006 logged.
   - [ ] 4b: Proof Review (#260)
   - [ ] 4c: Interactive Proof Visualization (#261)
 - [ ] Phase 5: Publication (#65)
@@ -72,7 +72,7 @@ Original phases struck through; sprint restarts after research:
 - [ ] What assumption was wrong? (Unit systems were never compared)
 - [ ] What check would have caught it? (Dimensional analysis in ground truth review)
 - [ ] **Workflow Process Review (#346):** Evaluate new review tiers, session-based reviews, Human Visual Review gate, CONFLICT template. Did they improve quality? What needs refinement?
-- [ ] **Process Fault Analysis:** Review FAULT-S3-001 through FAULT-S3-005. Recurring theme: AI shortcuts (admin bypass, premature merge, scope minimization). Is the "5-minute test" rule (FAULT-S3-005) effective? Are process updates from earlier faults being followed?
+- [ ] **Process Fault Analysis:** Review FAULT-S3-001 through FAULT-S3-006. Recurring themes: AI shortcuts (admin bypass, premature merge, scope minimization) and infrastructure gaps (ruleset deadlock, stale status). Is the "5-minute test" rule (FAULT-S3-005) effective? Are ruleset fixes (FAULT-S3-006) sufficient? Are process updates from earlier faults being followed?
 
 ---
 
@@ -274,6 +274,21 @@ During PR #373 (Phase 4a formal proof) review synthesis, Herschel proposed defer
 - **RULE: "5-minute test" before deferral.** If a review finding can be resolved in ≤5 minutes of straightforward changes, fix it in the current PR. Only defer items requiring new research, cross-scope changes, or non-trivial implementation risk.
 
 > Full entry: [`docs/process_violation_log.md`](docs/process_violation_log.md) — FAULT-S3-005
+
+### FAULT-S3-006: GitHub rulesets created merge deadlock (2026-02-19)
+
+**What happened:**
+PR #373 could not be merged despite all CI passing and James approving twice. Three ruleset issues combined: (1) `require_code_owner_review` blocked self-approval in a solo-dev repo, (2) `strict_required_status_checks_policy` required CI on the exact HEAD commit (a docs-only push didn't trigger checks), (3) an orphaned "Rule for Main" ruleset with no bypass actors was a latent deadlock risk.
+
+**Fixes applied:**
+1. `require_code_owner_review` → `false` (Red Team + Gemini provide review coverage)
+2. `strict_required_status_checks_policy` → `false` (CI still required, just not on exact HEAD)
+3. Orphaned "Rule for Main" ruleset deleted
+
+**Process update:**
+- **RULE: Audit rulesets at sprint boundaries and when team composition changes.** Every ruleset must have a bypass actor. Solo-dev repos must not use code-owner review gates.
+
+> Full entry: [`docs/process_violation_log.md`](docs/process_violation_log.md) — FAULT-S3-006
 
 ---
 
