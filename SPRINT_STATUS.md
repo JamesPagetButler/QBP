@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
-- **Lifecycle Stage:** Phase 3 Rework complete. All near-field and far-field visualization done. Next: Phase 4 (Formal Verification).
-- **Next Critical-Path Action:** Phase 4: Formal Verification (#56) → Phase 5 → Theory Refinement → Retrospective
+- **Lifecycle Stage:** Phase 4a (Formal Proof) complete. Next: Phase 4b (Proof Review).
+- **Next Critical-Path Action:** Phase 4b: Proof Review (#260) → 4c → 4d → 4e → Phase 5 → Theory Refinement → Retrospective
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -33,6 +33,8 @@
   - [x] 4a: Formal Proof (#259) — CLOSED 2026-02-19. PR #373 merged. 433-line Lean 4 proof, zero `sorry`. 2 review rounds (Red Team + Gemini). FAULT-S3-005, FAULT-S3-006 logged.
   - [ ] 4b: Proof Review (#260)
   - [ ] 4c: Interactive Proof Visualization (#261)
+  - [ ] 4d: Verified Differential Testing (#301)
+  - [ ] 4e: Verified Simulation Engine (#302)
 - [ ] Phase 5: Publication (#65)
 - [ ] Theory Refinement (#81)
 - [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`
