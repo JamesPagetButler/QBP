@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
-- **Lifecycle Stage:** Phase 4a (Formal Proof) complete. Next: Phase 4b (Proof Review).
-- **Next Critical-Path Action:** Phase 4b: Proof Review (#260) → 4c → 4d → 4e → Phase 5 → Theory Refinement → Retrospective
+- **Lifecycle Stage:** Phase 4b (Proof Review) complete. Next: Phase 4c (Interactive Proof Visualization).
+- **Next Critical-Path Action:** Phase 4c: Interactive Proof Visualization (#261) → 4d → 4e → Phase 5 → Theory Refinement → Retrospective
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -31,7 +31,7 @@
 - [x] **Phase 3 Rework: Far-Field Visualization (#360)** — CLOSED 2026-02-18. PR #368 merged. Far-field hero overlay, V(U₁) curve, residual, 3-panel comparison. VPython refactored (pre-allocated gcurves, debounced slider, P6 with actual BPM+FFT). FAULT-S3-003 (scale incomparability) caught by Human Visual Review.
 - [ ] Phase 4: Formal Verification (#56)
   - [x] 4a: Formal Proof (#259) — CLOSED 2026-02-19. PR #373 merged. 433-line Lean 4 proof, zero `sorry`. 2 review rounds (Red Team + Gemini). FAULT-S3-005, FAULT-S3-006 logged.
-  - [ ] 4b: Proof Review (#260)
+  - [x] 4b: Proof Review (#260) — CLOSED 2026-02-19. Grothendieck + Furey/Feynman review: 32/32 theorems verified, 0 issues. All ACs met.
   - [ ] 4c: Interactive Proof Visualization (#261)
   - [ ] 4d: Verified Differential Testing (#301)
   - [ ] 4e: Verified Simulation Engine (#302)
