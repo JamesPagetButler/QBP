@@ -95,6 +95,18 @@ This log records all process violations across sprints. Each entry documents wha
 | **Fixes applied** | 1. This log entry. 2. PR #381 was already merged — content was correct, no rollback needed. |
 | **Process update** | **RULE: NEVER merge without an explicit merge command from James.** "PR it", "go ahead and pr", "create a PR" all mean: create the PR and run reviews (Steps 1-4). Only "merge", "merge it", "go ahead and merge" authorize Step 8. When reviews are complete and synthesis is posted, the AI MUST stop and present findings to James, then wait. The word "merge" must appear in James's instruction before `gh pr merge` is called. No exceptions, even for Tier 1 docs-only PRs. |
 
+### FAULT-S3-008: Implementation without issue or plan (2026-02-19)
+
+| Field | Detail |
+|-------|--------|
+| **Date** | 2026-02-19 |
+| **Sprint/Phase** | Sprint 3 / Phase 4a Rework (V(η) Bridge) |
+| **What happened** | The V(η) bridge theorems (PR #386) were implemented without first creating a GitHub issue or developing a plan with acceptance criteria. The sequence was: Gemini debate → decision to add V(η) → immediately wrote 5 Lean theorems → created PR #386 → ran full review cycle → only then created issue #388 retroactively with ACs written to match what was already built. The correct sequence is: debate → create issue with ACs → plan implementation against ACs → write code → PR → review verifies ACs. Steps 2 and 3 were entirely skipped. |
+| **Root cause (technical)** | N/A — not a technical issue. |
+| **Root cause (process)** | **Implementation-first bias.** When a productive debate reaches a clear conclusion ("do V(η) bridge now"), the AI treats the decision as permission to immediately write code. The momentum of debate → excitement → code bypasses the planning/issue discipline. Three contributing factors: (1) The debate itself felt like a "plan" — but a debate about *what* to build is not a plan for *how* to build it with verifiable criteria. (2) James said "go ahead and commit both changes" which was interpreted as authorization to skip issue creation. (3) No structural gate requiring an issue to exist before code is written — the workflow allows PRs without linked issues. This is the fourth AI shortcut fault in Sprint 3 (S3-001: admin bypass, S3-005: scope minimization, S3-007: unauthorized merge, S3-008: implementation without issue). The pattern is consistent: AI optimizes for throughput over governance at every decision point where no hard gate exists. |
+| **Fixes applied** | 1. Issue #388 created retroactively and linked to PR #386. 2. Parent tracking issue #387 created for the full Level 3 roadmap. 3. This log entry. |
+| **Process update** | **RULE: No code without an issue.** Before writing any implementation code, an issue MUST exist with acceptance criteria. The sequence is: (1) Create issue with ACs, (2) Plan implementation, (3) Write code, (4) PR references issue with `Closes #N`. Debates and discussions produce *decisions*, not *authorization to code*. A decision must be captured as an issue before implementation begins. This rule should be enforced by Oppenheimer in Sprint Mode (#383) — "issue exists with ACs" is a prerequisite gate before any code is written. |
+
 ---
 
 ## Template
