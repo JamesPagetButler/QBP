@@ -50,8 +50,8 @@ def load_data(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, Dict]:
     """Load latest summary, fringe, decay CSVs and metadata JSON.
 
-    Supports both v3 format (``results/03_double_slit/v3/``) and legacy
-    v2 format.  When v3 data is found, the nearfield and farfield CSVs
+    Discovers data via ``CURRENT/`` symlink (preferred) or ``v3/`` fallback.
+    When versioned data is found, the nearfield and farfield CSVs
     are combined into a single ``fringe_df`` with a ``scenario`` column
     for backward-compatible downstream consumption.
 
@@ -62,9 +62,13 @@ def load_data(
         Tuple of (summary_df, fringe_df, decay_df, metadata_dict)
         metadata_dict may contain key 'farfield_qbp_df' with the far-field QBP DataFrame.
     """
-    v3_dir = os.path.join(results_dir, "v3")
+    # Use CURRENT symlink if available, fall back to v3/ for backward compat
+    current_dir = os.path.join(results_dir, "CURRENT")
+    v3_dir = (
+        current_dir if os.path.isdir(current_dir) else os.path.join(results_dir, "v3")
+    )
 
-    # --- Try v3 format first ---
+    # --- Try versioned format first ---
     v3_nearfield = sorted(glob.glob(os.path.join(v3_dir, "results_nearfield_*.csv")))
     if v3_nearfield:
         latest_nf = max(v3_nearfield, key=os.path.getctime)

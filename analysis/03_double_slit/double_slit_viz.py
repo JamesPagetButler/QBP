@@ -102,14 +102,16 @@ def _replot(curve, x_arr, y_arr, step=1):
 # ============================================================================
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "../../results/03_double_slit")
-V3_DIR = os.path.join(DATA_DIR, "v3")
+# Use CURRENT symlink if available, fall back to v3/ for backward compat
+_current = os.path.join(DATA_DIR, "CURRENT")
+V3_DIR = _current if os.path.isdir(_current) else os.path.join(DATA_DIR, "v3")
 
 
 def load_latest_data():
     """Load the most recent simulation data.
 
-    Tries v3 format first (``results/03_double_slit/v3/``), then falls
-    back to the legacy v2 format in the parent directory.
+    Discovers data via ``CURRENT/`` symlink (preferred) or ``v3/`` fallback,
+    then falls back to the legacy v2 format in the parent directory.
 
     Returns ``(decay_df, nearfield_df, farfield_df, farfield_qbp_df, summary_df, metadata, timestamp)``.
 

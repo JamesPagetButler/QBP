@@ -104,6 +104,21 @@ jobs:
       - name: Validate experiment numbers
         run: python scripts/validate_experiment_numbers.py
 
+      - name: Validate CURRENT symlinks resolve
+        run: |
+          # Every results/*/CURRENT symlink must point to an existing directory
+          FAIL=0
+          for link in results/*/CURRENT; do
+            [ -L "$link" ] || continue
+            if [ ! -d "$link" ]; then
+              echo "BROKEN: $link -> $(readlink "$link")"
+              FAIL=1
+            else
+              echo "OK: $link -> $(readlink "$link")"
+            fi
+          done
+          exit $FAIL
+
   libs-dependency-check:
     name: Library Independence Check
     runs-on: ubuntu-latest
