@@ -71,6 +71,18 @@ This log records all process violations across sprints. Each entry documents wha
 | **Fixes applied** | 1. Oracle test vectors added immediately to PR #373. 2. This log entry with root cause analysis. |
 | **Process update** | **RULE: During review synthesis, apply the "5-minute test" before proposing deferral.** If a finding can be resolved in ≤5 minutes of straightforward code changes, it MUST be fixed in the current PR — never deferred to a housekeeping issue. Deferral is reserved for items requiring: (a) new research or design decisions, (b) changes outside the PR's scope/files, or (c) non-trivial implementation risk. When in doubt, fix now. |
 
+### FAULT-S3-006: GitHub rulesets created merge deadlock for solo-dev repo (2026-02-19)
+
+| Field | Detail |
+|-------|--------|
+| **Date** | 2026-02-19 |
+| **Sprint/Phase** | Sprint 3 / Phase 4a (Formal Proof) |
+| **What happened** | PR #373 could not be merged despite all 8 CI checks passing and James explicitly approving twice. Two independent ruleset issues combined to create a deadlock: (1) `require_code_owner_review: true` prevents the PR author from self-approving, but James is both the only developer and the only code owner — deadlock. (2) `strict_required_status_checks_policy: true` requires CI to pass on the exact HEAD commit; a docs-only commit (FAULT-S3-005 log) was pushed but CI checks weren't associated with that commit, so GitHub reported "head branch is out of date" even though master was already an ancestor. An empty commit was needed to retrigger CI, and `--admin` was eventually required (with James's explicit approval). Additionally, an orphaned ruleset ("Rule for Main") with `include: []` and `required_approving_review_count: 1` with no bypass actors existed — if accidentally activated, it would have created a complete deadlock with no escape. |
+| **Root cause (technical)** | Three GitHub ruleset configuration issues: (a) `require_code_owner_review` + solo developer = self-approval deadlock. (b) `strict_required_status_checks_policy` + docs-only commits = CI association gap. (c) Orphaned ruleset with no bypass actors = potential unrecoverable deadlock. |
+| **Root cause (process)** | Rulesets were configured at project creation (2026-02-01) and never audited for solo-developer workflow compatibility. The combination of strict checks + code owner review was designed for team repos where author ≠ reviewer, not for a repo where one person fills both roles. No ruleset review was part of the sprint setup or critical path audit. |
+| **Fixes applied** | 1. `require_code_owner_review` set to `false` on "master" ruleset — Red Team + Gemini review workflow provides adequate review coverage. 2. `strict_required_status_checks_policy` set to `false` — CI checks still required to pass, but not on the exact HEAD commit when base hasn't changed. 3. Orphaned "Rule for Main" ruleset deleted (targeted no branches, had no bypass actors). |
+| **Process update** | **RULE: Audit rulesets when team composition changes or at sprint boundaries.** For solo-dev repos: (a) never enable `require_code_owner_review` — creates self-approval deadlock. (b) prefer non-strict status checks unless branch protection against stale merges is critical. (c) every ruleset must have at least one bypass actor to prevent unrecoverable deadlock. Added to Critical Path Audit checklist. |
+
 ---
 
 ## Template
