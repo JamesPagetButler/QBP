@@ -95,6 +95,63 @@ def generateTestCases : List String := Id.run do
       (floatProbDown psi obs)
       (floatExpectationValue psi obs)]
 
+  -- Experiment 03: Double-Slit test vectors
+  let pi := Float.acos (-1.0)
+
+  -- Coupling decomposition test: (2 + 3j)(1 + 0.5i + 0.7j + 0.3k)
+  let coupResult := floatCouplingDecomposition 2.0 3.0 1.0 0.5 0.7 0.3
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"coupling_decomp\", " ++
+    s!"\"re\": {floatToJson coupResult.re}, \"imI\": {floatToJson coupResult.imI}, " ++
+    s!"\"imJ\": {floatToJson coupResult.imJ}, \"imK\": {floatToJson coupResult.imK}}"]
+
+  -- Norm squared of symplectic form: ψ = (0.6, 0.8, 0.3, 0.4)
+  let sympPsi := floatSympForm 0.6 0.8 0.3 0.4
+  let nsq := floatNormSqSymp sympPsi
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"normSq_sympForm\", " ++
+    s!"\"normSq\": {floatToJson nsq}}"]
+
+  -- Visibility: perfect interference (Imin = 0), no interference (Imax = Imin)
+  let visA := floatVisibility 1.0 0.0
+  let visB := floatVisibility 1.0 1.0
+  let visPartial := floatVisibility 1.0 0.3
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"visibility_perfect\", " ++
+    s!"\"visibility\": {floatToJson visA}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"visibility_none\", " ++
+    s!"\"visibility\": {floatToJson visB}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"visibility_partial\", " ++
+    s!"\"visibility\": {floatToJson visPartial}}"]
+
+  -- Fraunhofer intensity at maximum and minimum
+  -- d=1e-6, λ=500e-9, L=1.0, I₀=1.0
+  let iAtMax := floatFraunhoferIntensity 1.0 1.0e-6 500.0e-9 1.0 0.0  -- x=0 is a maximum
+  let spacing := floatFringeSpacing 500.0e-9 1.0 1.0e-6
+  let iAtMin := floatFraunhoferIntensity 1.0 1.0e-6 500.0e-9 1.0 (spacing / 2.0)
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"fraunhofer_at_max\", " ++
+    s!"\"intensity\": {floatToJson iAtMax}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"fraunhofer_at_min\", " ++
+    s!"\"intensity\": {floatToJson iAtMin}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"fringe_spacing\", " ++
+    s!"\"spacing\": {floatToJson spacing}}"]
+
+  -- Quaternionic fraction
+  let eta0 := floatQuatFraction 1.0 0.0    -- pure complex: η = 0
+  let etaHalf := floatQuatFraction 0.5 0.5  -- equal split: η = 0.5
+  let eta1 := floatQuatFraction 0.0 1.0    -- pure quaternionic: η = 1
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"eta_zero\", " ++
+    s!"\"eta\": {floatToJson eta0}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"eta_half\", " ++
+    s!"\"eta\": {floatToJson etaHalf}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"eta_one\", " ++
+    s!"\"eta\": {floatToJson eta1}}"]
+
+  -- Decay constant scaling
+  let kappa1 := floatDecayConstant 1.0 1.0e-6
+  let kappa2 := floatDecayConstant 2.0 1.0e-6
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"decay_constant_1\", " ++
+    s!"\"kappa\": {floatToJson kappa1}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"decay_constant_2\", " ++
+    s!"\"kappa\": {floatToJson kappa2}}"]
+
   return cases
 
 /-- Join a list of strings with commas, outputting each on its own line -/
