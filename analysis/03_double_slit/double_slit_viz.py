@@ -37,6 +37,9 @@ import json
 import os
 import sys
 import glob
+import time
+
+VIZ_VERSION = "0.9.0"  # pre-allocated curves + debounced polling
 
 import numpy as np
 import pandas as pd
@@ -377,7 +380,8 @@ class DoubleSlitDemo:
         self.ctrl = canvas(
             title=(
                 '<div style="font-family: Georgia, serif; padding: 8px 0;">'
-                '<b style="font-size: 20px;">Double-Slit: Three Predictions Compared</b>'
+                f'<b style="font-size: 20px;">Double-Slit: Three Predictions Compared</b>'
+                f'<span style="font-size: 11px; color: #999; margin-left: 12px;">v{VIZ_VERSION}</span>'
                 '<br><span style="font-size: 14px; color: #71797E;">'
                 "Adler predicted exponential decay. Standard QM predicts nothing. "
                 "The BPM shows a discrete step.</span></div>"
@@ -728,7 +732,9 @@ class DoubleSlitDemo:
             I_peak = I_base.max()
             self._ff_baseline_peak = I_peak  # store for dynamic curve normalization
             I_norm = I_base / I_peak if I_peak > 0 else I_base
-            mask = np.abs(x_mm) <= 1500
+            # Clip to ±100mm to show ~12 fringes at ~13mm spacing
+            self._ff_zoom_mm = 100
+            mask = np.abs(x_mm) <= self._ff_zoom_mm
             x_clip = x_mm[mask]
             I_clip = I_norm[mask]
 
@@ -742,24 +748,34 @@ class DoubleSlitDemo:
                 c_base.plot(x_clip[i], I_clip[i])
             print(
                 f"  P6 static baseline plotted: {len(range(0, len(x_clip), step))} pts, "
-                f"peak={I_peak:.6f}"
+                f"peak={I_peak:.6f}, zoom=±{self._ff_zoom_mm}mm"
             )
 
     # --------------------------------------------------- event handlers
+    def _log(self, msg):
+        """Append to file-based log (stdout is reserved for VPython IPC)."""
+        with open("/tmp/vpython_slider.log", "a") as f:
+            f.write(f"{time.time():.3f} {msg}\n")
+
     def _on_u1_change(self, s):
-        self.current_u1 = snap_to_nearest(s.value, self.u1_values)
-        self.u1_text.text = (
-            f" <b style='color: {COLORS.COPPER.hex};'>" f"{self.current_u1:.1f} eV</b>"
-        )
-        self.update_all()
+        """Slider callback — just record the value; main loop debounces."""
+        self._pending_u1_raw = s.value
+        self._pending_u1_time = time.time()
 
     def _on_eta0_change(self, eta0):
+        """Button callback — immediate update (buttons don't flood)."""
+        self._log(f"BUTTON: eta0={eta0}")
         self.current_eta0 = eta0
-        self.update_all()
+        self._needs_update = True
 
     # --------------------------------------------------- master update
     def update_all(self):
-        """Redraw all dynamic curves and stats."""
+        """Redraw all dynamic curves and stats.
+
+        Uses pre-allocated gcurve objects — never creates or deletes
+        gcurve objects.  This keeps VPython's WebSocket alive.
+        """
+        t0 = time.time()
         self._update_p1()
         self._update_p2()
         self._update_p3()
@@ -767,6 +783,9 @@ class DoubleSlitDemo:
         self._update_p5()
         self._update_p6()
         self._update_stats()
+        self._log(
+            f"update_all: {time.time()-t0:.3f}s  U1={self.current_u1:.1f} eta0={self.current_eta0}"
+        )
 
     # --------------------------------------------------- Panel P1
     def _update_p1(self):
@@ -1006,8 +1025,9 @@ class DoubleSlitDemo:
 
         # Update the pre-allocated curve
         self.p6_qbp.label = f"QBP coupling (U\u2081={qbp_key[1]:.0f} eV{v_label})"
-        # Clip to ±1500 mm to avoid FFT edge artifacts
-        mask = np.abs(x_mm) <= 1500
+        # Clip to same zoom as static baseline
+        zoom = getattr(self, "_ff_zoom_mm", 100)
+        mask = np.abs(x_mm) <= zoom
         x_clip = x_mm[mask]
         I_clip = I_norm[mask]
         step = max(1, len(x_clip) // 2000)
@@ -1065,10 +1085,24 @@ class DoubleSlitDemo:
 
     # ----------------------------------------------------------------- run
     def run(self):
-        """Main event loop."""
+        """Main event loop with debounced slider polling.
+
+        VPython slider callbacks flood during drag (one per pixel).
+        We debounce: callback records the raw value, main loop waits
+        150ms of silence then snaps and updates.  We also poll
+        slider.value directly as fallback (callbacks can stop after
+        graph updates in some VPython versions).
+        """
+        # Debounce state
+        self._pending_u1_raw = None
+        self._pending_u1_time = 0.0
+        self._needs_update = False
+        self._last_polled_u1 = self.current_u1
+        DEBOUNCE_SEC = 0.15
+
         print()
         print("=" * 62)
-        print("  Double-Slit: Three Predictions Compared")
+        print(f"  Double-Slit: Three Predictions Compared  v{VIZ_VERSION}")
         print("  Sprint 3 Phase 3 -- QBP Project")
         print("=" * 62)
         print()
@@ -1084,8 +1118,49 @@ class DoubleSlitDemo:
         print("  Press Ctrl+C to exit.")
         print()
 
+        self._log(f"STARTED v{VIZ_VERSION}")
+
         while True:
             rate(30)
+
+            # === Primary: poll slider.value directly ===
+            try:
+                raw = self.u1_slider.value
+                new_u1 = snap_to_nearest(raw, self.u1_values)
+                if new_u1 != self._last_polled_u1:
+                    self._log(
+                        f"POLL: raw={raw:.1f} -> {new_u1:.1f} eV (was {self._last_polled_u1:.1f})"
+                    )
+                    self._last_polled_u1 = new_u1
+                    self.current_u1 = new_u1
+                    self.u1_text.text = (
+                        f" <b style='color: {COLORS.COPPER.hex};'>"
+                        f"{self.current_u1:.1f} eV</b>"
+                    )
+                    self._needs_update = True
+            except Exception:
+                pass
+
+            # === Fallback: debounced callback processing ===
+            if self._pending_u1_raw is not None:
+                elapsed = time.time() - self._pending_u1_time
+                if elapsed >= DEBOUNCE_SEC:
+                    new_u1 = snap_to_nearest(self._pending_u1_raw, self.u1_values)
+                    self._pending_u1_raw = None
+                    if new_u1 != self.current_u1:
+                        self._log(f"CALLBACK: {new_u1:.1f} eV")
+                        self.current_u1 = new_u1
+                        self._last_polled_u1 = new_u1
+                        self.u1_text.text = (
+                            f" <b style='color: {COLORS.COPPER.hex};'>"
+                            f"{self.current_u1:.1f} eV</b>"
+                        )
+                        self._needs_update = True
+
+            # === Process pending updates ===
+            if self._needs_update:
+                self._needs_update = False
+                self.update_all()
 
 
 # ============================================================================
