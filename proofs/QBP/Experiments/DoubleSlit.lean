@@ -212,6 +212,12 @@ theorem normSq_sympForm_nonneg (a₀ b₀ a₁ b₁ : ℝ) :
   rw [normSq_sympForm]
   nlinarith [sq_nonneg a₀, sq_nonneg b₀, sq_nonneg a₁, sq_nonneg b₁]
 
+/-- Quaternionic fraction: η = |ψ₁|² / (|ψ₀|² + |ψ₁|²).
+    Measures how much of the wavefunction lives in the j-subspace.
+    Defined here (after Born rule) for use in the V(η) bridge (Section 5b). -/
+noncomputable def quatFraction (normSq0 normSq1 : ℝ) : ℝ :=
+  normSq1 / (normSq0 + normSq1)
+
 /-! ## Section 5: Visibility Bounds
 
 Visibility V = (Imax - Imin)/(Imax + Imin) measures fringe contrast.
@@ -251,10 +257,100 @@ theorem visibility_zero {I : ℝ} (_hI : I > 0) :
   unfold visibility
   simp
 
-/-! ## Section 6: Fraunhofer Pattern
+/-! ## Section 5b: Visibility–Eta Bridge (QBP Prediction)
+
+The central QBP observational prediction: the quaternionic fraction η
+determines the observable fringe visibility V.
+
+The Born rule (Section 4) proves |ψ|² = |ψ₀|² + |ψ₁|² with NO cross-terms.
+This means the j-component contributes independently to the total intensity.
+
+**Model A (incoherent j-component):** If ψ₁ has no spatial fringe structure
+(flat background), the total intensity is I(x) = I_coh(x) + I_inc.
+For perfect coherent fringes: I_max = 2·A + B, I_min = B, where A is the
+spatial average of |ψ₀|² and B = |ψ₁|² (uniform).
+The visibility degrades: **V = 1 - η** where η = quatFraction(A, B).
+
+**Model B (correlated j-component):** If ψ₁ carries the same fringe pattern
+as ψ₀ (e.g., spatially uniform coupling U₁), then I(x) scales uniformly
+and visibility is preserved: **V = V₀** regardless of η.
+
+Which model applies depends on the measurement and coupling geometry.
+The experiment selection (research issue) determines the physical case. -/
+
+/-- Model A: Incoherent j-component as spatially flat background.
+    Assumes ψ₁ is approximately uniform across the fringe pattern — i.e.,
+    ψ₁ varies slowly compared to the ψ₀ interference frequency.
+
+    When ψ₀ interferes perfectly (I_max_coh = 2·n₀, I_min_coh = 0) and
+    ψ₁ adds flat background n₁, the observed visibility equals 1 - η
+    where η = quatFraction(n₀, n₁).
+
+    Derivation:
+      I_max = 2·n₀ + n₁, I_min = n₁
+      V = (I_max - I_min)/(I_max + I_min) = 2·n₀/(2·n₀ + 2·n₁) = n₀/(n₀ + n₁)
+      η = n₁/(n₀ + n₁)
+      V = 1 - η  ∎ -/
+theorem visibility_eq_one_sub_quatFraction {n₀ n₁ : ℝ}
+    (h₀ : n₀ > 0) (h₁ : n₁ ≥ 0) :
+    visibility (2 * n₀ + n₁) n₁ = 1 - quatFraction n₀ n₁ := by
+  unfold visibility quatFraction
+  have hsum : n₀ + n₁ ≠ 0 := ne_of_gt (by linarith : n₀ + n₁ > 0)
+  have hdenom : 2 * n₀ + n₁ + n₁ ≠ 0 := ne_of_gt (by linarith : 2 * n₀ + n₁ + n₁ > 0)
+  field_simp
+  ring
+
+/-- Model A corollary: When η = 0 (no j-component), visibility is perfect.
+    This recovers the standard QM result as a special case of QBP. -/
+theorem visibility_eta_zero {n₀ : ℝ} (h₀ : n₀ > 0) :
+    visibility (2 * n₀ + 0) 0 = 1 - quatFraction n₀ 0 := by
+  exact visibility_eq_one_sub_quatFraction h₀ (le_refl 0)
+
+/-- Model A corollary: η = 0 gives V = 1 (perfect fringes).
+    The complementary perspective of visibility_eta_zero: that theorem shows
+    the visibility formula evaluates to 1-η; this one shows 1-η = 1 when η = 0. -/
+theorem visibility_full_when_eta_zero {n₀ : ℝ} (_h₀ : n₀ > 0) :
+    1 - quatFraction n₀ 0 = 1 := by
+  unfold quatFraction
+  simp
+
+/-- Model A: Visibility is anti-monotone in background intensity.
+    More j-component background means less visible fringes. -/
+theorem visibility_antitone_background {n₀ B₁ B₂ : ℝ}
+    (h₀ : n₀ > 0) (hB₁ : B₁ ≥ 0) (_hB₂ : B₂ ≥ 0) (hle : B₁ ≤ B₂) :
+    visibility (2 * n₀ + B₂) B₂ ≤ visibility (2 * n₀ + B₁) B₁ := by
+  unfold visibility
+  -- After simplification: 2n₀/(2n₀ + 2B₂) ≤ 2n₀/(2n₀ + 2B₁)
+  -- Larger denominator = smaller fraction (both numerators simplify to 2n₀)
+  have hs₁ : 2 * n₀ + B₁ - B₁ = 2 * n₀ := by ring
+  have hs₂ : 2 * n₀ + B₂ - B₂ = 2 * n₀ := by ring
+  rw [hs₁, hs₂]
+  exact div_le_div_of_nonneg_left (by linarith) (by linarith) (by linarith)
+
+/-- Model B: Correlated spatial structure preserves visibility.
+    When both ψ₀ and ψ₁ carry the same fringe pattern (spatially uniform
+    coupling), the total intensity scales uniformly: I(x) = (1+r)·I₀(x).
+    The scaling factor cancels in the visibility ratio. -/
+theorem visibility_correlated {Imax Imin : ℝ} {r : ℝ}
+    (_hge : Imax ≥ Imin) (hmin : Imin ≥ 0) (hmax : Imax > 0) (hr : r > -1) :
+    visibility ((1 + r) * Imax) ((1 + r) * Imin) = visibility Imax Imin := by
+  unfold visibility
+  have h1r : (1 : ℝ) + r > 0 := by linarith
+  have hIsum : Imax + Imin > 0 := by linarith
+  have hscaled : (1 + r) * Imax + (1 + r) * Imin > 0 := by nlinarith
+  -- field_simp uses these nonzero proofs from the local context automatically
+  have hIsum_ne : Imax + Imin ≠ 0 := ne_of_gt hIsum
+  have hscaled_ne : (1 + r) * Imax + (1 + r) * Imin ≠ 0 := ne_of_gt hscaled
+  field_simp
+
+/-! ## Section 6: Fraunhofer Pattern (Standard Optics Reference)
 
 The far-field intensity pattern I(x) = I₀ · cos²(π·d·x/(λ·L)).
-We prove properties at maxima, minima, and parameter scaling of fringe spacing. -/
+These are standard wave optics results, NOT QBP-specific. They are retained
+as reference definitions for the Gap Theorem (Sprint 8): once we prove
+QBP → Standard Schrödinger, these formulas follow by classical optics.
+
+See Section 5b for the QBP-specific visibility predictions. -/
 
 /-- Fraunhofer intensity at position x with slit separation d, wavelength λ,
     propagation distance L, and peak intensity I₀.
@@ -341,10 +437,6 @@ theorem sympForm_zero_psi1 (a₀ b₀ : ℝ) :
 The quaternionic fraction eta = |ψ₁|²/|ψ|² measures how much of the
 wavefunction lives in the j-subspace. The decay constant κ controls
 how quickly interference is lost with increasing U₁. -/
-
-/-- Quaternionic fraction: η = |ψ₁|² / (|ψ₀|² + |ψ₁|²) -/
-noncomputable def quatFraction (normSq0 normSq1 : ℝ) : ℝ :=
-  normSq1 / (normSq0 + normSq1)
 
 /-- Dimensionless coupling proxy: product of potential strength and slit separation.
     This is a simplified stand-in used for monotonicity and positivity proofs.
