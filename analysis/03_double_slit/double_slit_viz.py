@@ -79,8 +79,9 @@ def _clear_curves(curve_list):
     """Blank out all gcurves in *curve_list*, then return an empty list.
 
     VPython's ``gcurve.delete()`` does NOT reliably remove curves from
-    the rendered graph.  Instead we blank the data and hide the object.
-    The empty gcurve objects accumulate harmlessly in memory.
+    the rendered graph — it can also corrupt graph state for new curves.
+    Instead we blank the data and hide the object.  The empty gcurve
+    objects accumulate harmlessly in memory.
     """
     for c in curve_list:
         try:
@@ -91,10 +92,8 @@ def _clear_curves(curve_list):
             c.visible = False
         except Exception:
             pass
-        try:
-            c.delete()
-        except Exception:
-            pass
+        # NOTE: do NOT call c.delete() — it corrupts the graph and
+        # prevents new curves from rendering on the same graph.
     return []
 
 
@@ -454,7 +453,7 @@ class DoubleSlitDemo:
         # --- Panel 1a: Full-scale η(z) ---
         self.g1a = graph(
             title=(
-                "<b>Adler Prediction vs Reality</b>"
+                "<b>P1 &mdash; Adler Prediction vs Reality</b>"
                 " &mdash; <i>the predicted exponential decay does NOT happen</i>"
             ),
             xtitle="z (nm)",
@@ -468,7 +467,7 @@ class DoubleSlitDemo:
         # --- Panel 1b: Zoomed Δη(z) ---
         self.g1b = graph(
             title=(
-                "<b>Zoomed: Step-Change at Coupling Region</b>"
+                "<b>P2 &mdash; Zoomed: Step-Change at Coupling Region</b>"
                 " &mdash; <i>the only change is a discrete step</i>"
             ),
             xtitle="z (nm)",
@@ -482,7 +481,7 @@ class DoubleSlitDemo:
         # --- Panel 2: Visibility vs U₁ ---
         self.g2 = graph(
             title=(
-                "<b>Visibility vs Coupling Strength</b>"
+                "<b>P3 &mdash; Visibility vs Coupling Strength</b>"
                 " &mdash; <i>visibility drops ~8% as coupling increases</i>"
             ),
             xtitle="U\u2081 (eV)",
@@ -497,7 +496,7 @@ class DoubleSlitDemo:
         # --- Panel 3: Near-field fringe ---
         self.g3 = graph(
             title=(
-                "<b>Near-Field BPM Fringe Pattern</b>"
+                "<b>P4 &mdash; Near-Field BPM Fringe Pattern</b>"
                 " &mdash; <i>near-field (nm scale); far-field patterns (mm) "
                 "are NOT shown to avoid misleading comparison</i>"
             ),
@@ -512,7 +511,7 @@ class DoubleSlitDemo:
         # --- Panel 4: Zoomed near-field fringes ---
         self.g4 = graph(
             title=(
-                "<b>Zoomed: Individual Interference Fringes</b>"
+                "<b>P5 &mdash; Zoomed: Individual Interference Fringes</b>"
                 " &mdash; <i>constructive/destructive peaks clearly resolved</i>"
             ),
             xtitle="x (nm)",
@@ -526,10 +525,10 @@ class DoubleSlitDemo:
         # --- Panel 5: Far-field comparison (A vs QBP) ---
         has_qbp_ff = len(self.farfield_qbp) > 0
         panel5_title = (
-            "<b>Far-Field QBP: Expected vs Quaternionic Coupling</b>"
+            "<b>P6 &mdash; Far-Field QBP: Expected vs Quaternionic Coupling</b>"
             " &mdash; <i>BPM + Fraunhofer FFT (mm scale)</i>"
             if has_qbp_ff
-            else "<b>Far-Field Reference: Standard QM vs Which-Path</b>"
+            else "<b>P6 &mdash; Far-Field Reference: Standard QM vs Which-Path</b>"
             " &mdash; <i>classic mm-scale Fraunhofer diffraction</i>"
         )
         self.g5 = graph(
