@@ -376,6 +376,7 @@ theorem visibility_correlated {Imax Imin : ℝ} {r : ℝ}
   field_simp
 
 /-! ## Section 7: Complex Subspace Reduction
+-- Note: §6 (Fraunhofer far-field) extracted to QBP.Optics.Fraunhofer
 
 When U₁ = 0 (no quaternionic coupling), the system decouples:
 the ψ₀ and ψ₁ equations become independent Schrödinger equations. -/
