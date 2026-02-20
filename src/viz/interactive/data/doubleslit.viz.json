@@ -192,7 +192,7 @@
       "L4_formal": "theorem coupling_decomposition (U0 U1 a0 b0 a1 b1 : R) :\n    (U0 + U1*j)(psi0 + psi1*j) =\n    (U0*a0 - U1*a1, U0*b0 + U1*b1, U0*a1 + U1*a0, U0*b1 - U1*b0)",
       "L3_math": "(U_0 + U_1 j)(psi_0 + psi_1 j) = (U_0 psi_0 - U_1 psi_1*) + (U_0 psi_1 + U_1 psi_0*) j",
       "L2_physical": "THE central algebraic result. When a quaternionic potential acts on a quaternionic wavefunction, it produces coupled equations: each complex component depends on both. This is how quantum gravity or new physics could couple the channels.",
-      "L1_intuitive": "This is the master equation. Multiply out the brackets using j^2=-1 and j*z=z**j, and you get two intertwined equations. The standard part mixes with the hidden part, and vice versa. They can no longer be separated \u2014 they're coupled.",
+      "L1_intuitive": "This is the master equation. Multiply out the brackets using j\u00b2 = \u22121 and j \u00b7 z = z\u0304 \u00b7 j (j conjugates complex numbers), and you get two intertwined equations. The standard part mixes with the hidden part, and vice versa. They can no longer be separated \u2014 they're coupled.",
       "key_insight": "The quaternionic potential couples the two complex channels.",
       "tags": [
         "coupling"
@@ -679,7 +679,7 @@
       "source_file": "QBP/Experiments/DoubleSlit.lean",
       "L4_formal": "theorem scenarioC_matches_scenarioA_at_detector {n0 : R}\n    (hn0 : n0 > 0) :\n    quatFraction n0 0 = 0",
       "L3_math": "eta(n_0, 0) = 0 (measurement projects to complex subspace)",
-      "L2_physical": "Scenario C: after measurement projects back to the complex subspace (psi_1 = 0), the quaternionic fraction is zero and the system matches Scenario A. Interference is recovered.",
+      "L2_physical": "Scenario C: when psi_1 = 0 (no quaternionic component remains), eta = 0 and the system matches Scenario A. Physically, the decay theorems (Section 8) show coupling vanishes at large distance, so at the detector the state is effectively complex and full interference is recovered.",
       "L1_intuitive": "Measure the particle and collapse its hidden channel to zero. Now it's back in standard QM territory, and interference returns. The fringes come back because the quaternionic contamination was removed.",
       "key_insight": "Projecting away psi_1 recovers standard QM interference.",
       "tags": [
