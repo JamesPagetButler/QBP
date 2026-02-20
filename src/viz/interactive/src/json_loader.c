@@ -108,8 +108,13 @@ int graph_load_json(ProofGraph *g, const char *json_path)
     /* Initialize graph */
     memset(g, 0, sizeof(*g));
 
-    /* Read file */
+    /* Read file — try as-is first (works for WASM where /data is mounted),
+       then try stripping the leading '/' for native builds where we run
+       from the interactive/ directory (data/foo.json). */
     char *json_str = read_file(json_path);
+    if (!json_str && json_path[0] == '/') {
+        json_str = read_file(json_path + 1);
+    }
     if (!json_str) {
         return -1;
     }

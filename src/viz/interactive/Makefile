@@ -54,7 +54,8 @@ wasm:
 
 data:
 	python3 export_data.py
-	@echo "Generated data/proof_graph_01.json"
+	python3 export_data.py --experiment double_slit
+	@echo "Generated data/proof_graph_01.json and data/doubleslit.viz.json"
 
 clean:
 	rm -rf build dist

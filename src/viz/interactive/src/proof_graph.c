@@ -967,14 +967,18 @@ void graph_draw(const ProofGraph *g)
     }
 }
 
-/* Helper to draw word-wrapped text, returns new y position */
-static float draw_wrapped_text(const char *text, float x, float y,
-                               float max_w, int font_size, Color color)
+/* Helper to draw word-wrapped text, returns new y position.
+ * use_mono: 1 = use monospace font (for Lean code), 0 = body font */
+static float draw_wrapped_text_ex(const char *text, float x, float y,
+                                  float max_w, int font_size, Color color,
+                                  int use_mono)
 {
-    int line_h = font_size + 4;
+    int line_h = font_size + 6;  /* +6 for 1.5x-ish line spacing (BDA) */
     int len = (int)strlen(text);
     int start = 0;
-    float chars_per_line = max_w / (font_size * 0.6f);
+    /* Account for wider letter spacing with Atkinson */
+    float char_w = use_mono ? (font_size * 0.65f) : (font_size * 0.55f);
+    float chars_per_line = max_w / char_w;
 
     while (start < len) {
         int end = start;
@@ -994,11 +998,28 @@ static float draw_wrapped_text(const char *text, float x, float y,
         buf[chunk] = '\0';
         /* Trim newline */
         if (chunk > 0 && buf[chunk-1] == '\n') buf[chunk-1] = '\0';
-        DrawTextQBP(buf, (int)x, (int)y, font_size, color);
+        if (use_mono)
+            DrawTextQBPMono(buf, (int)x, (int)y, font_size, color);
+        else
+            DrawTextQBP(buf, (int)x, (int)y, font_size, color);
         y += line_h;
         start = end;
     }
     return y;
+}
+
+/* Convenience wrapper: body font */
+static float draw_wrapped_text(const char *text, float x, float y,
+                               float max_w, int font_size, Color color)
+{
+    return draw_wrapped_text_ex(text, x, y, max_w, font_size, color, 0);
+}
+
+/* Convenience wrapper: mono font (for L4 Lean code) */
+static float draw_wrapped_text_mono(const char *text, float x, float y,
+                                    float max_w, int font_size, Color color)
+{
+    return draw_wrapped_text_ex(text, x, y, max_w, font_size, color, 1);
 }
 
 void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
@@ -1009,10 +1030,10 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
     DrawRectangleRec(panel, QBP_PANEL_BG);
     DrawRectangleLinesEx(panel, 2.0f, QBP_BRASS);
 
-    /* Use smaller fonts to fit more content */
-    int title_font = 20;
-    int header_font = 12;
-    int body_font = 13;
+    /* Font sizes — bumped +3px for readability (Atkinson Hyperlegible) */
+    int title_font = 23;
+    int header_font = 15;
+    int body_font = 16;
     int section_gap = 10;
 
     float x = panel.x + 12;
@@ -1029,14 +1050,14 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
     y += title_font + 6;
 
     /* Formal Lean name (smaller, dimmer) */
-    DrawTextQBP(n->name, (int)x, (int)y, 10, QBP_TEXT_DIM);
-    y += 14;
+    DrawTextQBPMono(n->name, (int)x, (int)y, 13, QBP_TEXT_DIM);
+    y += 17;
 
     /* Kind badge inline */
     const char *kind_str = (n->kind == NODE_AXIOM) ? "AXIOM" :
                            (n->kind == NODE_DEFINITION) ? "DEFINITION" : "THEOREM";
-    DrawTextQBP(kind_str, (int)x, (int)y, 14, kind_badge_color(n->kind));
-    y += 20;
+    DrawTextQBPBold(kind_str, (int)x, (int)y, 15, kind_badge_color(n->kind));
+    y += 22;
 
     /* Separator */
     DrawLineEx((Vector2){x, y}, (Vector2){x + max_w, y}, 1.0f, QBP_STEEL);
@@ -1061,9 +1082,9 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
     y += section_gap;
 
     /* ============ LEVEL 1: INTUITIVE ============ */
-    DrawRectangle((int)(x - 4), (int)y - 2, (int)(max_w + 8), 18, QBP_DARK_SLATE);
-    DrawTextQBP("INTUITIVE", (int)x, (int)y, 14, QBP_IVORY);
-    y += 20;
+    DrawRectangle((int)(x - 4), (int)y - 2, (int)(max_w + 8), 22, QBP_DARK_SLATE);
+    DrawTextQBPBold("INTUITIVE", (int)x, (int)y, 17, QBP_IVORY);
+    y += 24;
     y = draw_wrapped_text(n->level1_intuitive, x, y, max_w, body_font + 1, QBP_IVORY);
     y += section_gap;
 
@@ -1087,8 +1108,8 @@ void graph_draw_info_panel(const ProofGraph *g, Rectangle panel)
         for (int i = 0; i < n->dep_count; i++) {
             char dep_buf[256];
             snprintf(dep_buf, sizeof(dep_buf), "-> %s", g->nodes[n->deps[i]].display_name);
-            DrawTextQBP(dep_buf, (int)x, (int)y, 12, QBP_STEEL);
-            y += 14;
+            DrawTextQBP(dep_buf, (int)x, (int)y, 15, QBP_STEEL);
+            y += 18;
         }
         content_bottom = y;
     }

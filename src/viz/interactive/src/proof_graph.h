@@ -18,7 +18,7 @@
 #include "raylib.h"
 
 #define MAX_DEPS 6
-#define MAX_NODES 32
+#define MAX_NODES 128
 #define MAX_NAME_LEN 64
 #define MAX_DISPLAY_NAME_LEN 128
 #define MAX_FORMAL_LEN 256
