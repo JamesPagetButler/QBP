@@ -145,8 +145,16 @@ class TestStaticDependencies:
                 val = node.value
                 # If it looks like a file reference, it should be a .lean file
                 if any(ext in val for ext in [".py", ".csv", ".json", ".txt"]):
-                    # Allow the output .json file reference and self-references
-                    if "proof_graph" in val or "export_data" in val:
+                    # Allow the output .json file references and self-references
+                    if any(
+                        k in val
+                        for k in [
+                            "proof_graph",
+                            "export_data",
+                            "doubleslit",
+                            "viz.json",
+                        ]
+                    ):
                         continue
                     assert ".lean" in val or val.startswith(
                         "data/"
