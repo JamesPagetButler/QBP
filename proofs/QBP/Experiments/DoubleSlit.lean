@@ -311,8 +311,20 @@ Which model applies depends on the measurement and coupling geometry.
 The experiment selection (research issue) determines the physical case. -/
 
 /-- Model A: Incoherent j-component as spatially flat background.
-    Assumes ψ₁ is approximately uniform across the fringe pattern — i.e.,
-    ψ₁ varies slowly compared to the ψ₀ interference frequency.
+
+    **Key assumption:** |ψ₁(x)|² = n₁ = constant across the detector — i.e.,
+    ψ₁ does not form fringes (or its fringes are much broader than ψ₀'s,
+    so they appear constant at ψ₀'s interference scale). This is encoded by
+    using scalar n₁ rather than a position-dependent n₁(x).
+
+    **Physical caveat:** In a fully coherent BPM, ψ₁ satisfies the same
+    free Schrödinger equation as ψ₀ and originates from the same slit
+    geometry, so it may carry its own interference pattern. The general
+    visibility then depends on the spatial correlation between |ψ₀|² and
+    |ψ₁|² patterns. V = 1 - η is the incoherent-averaging limit.
+    See `visibility_correlated` for the fully-correlated limit (Model B).
+    The intermediate case (partially correlated ψ₁ fringes) is an open
+    question for Sprint 3 Rework — see issue #387.
 
     When ψ₀ interferes perfectly (I_max_coh = 2·n₀, I_min_coh = 0) and
     ψ₁ adds flat background n₁, the observed visibility equals 1 - η
