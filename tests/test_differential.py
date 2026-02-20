@@ -38,14 +38,19 @@ def load_oracle_cases() -> list[dict]:
         return json.load(f)
 
 
-# Parametrize over all oracle test cases
+# Parametrize over all oracle test cases, split by experiment type
 oracle_cases = load_oracle_cases()
+spin_cases = [c for c in oracle_cases if c.get("experiment") != "03"]
+doubleslit_cases = [c for c in oracle_cases if c.get("experiment") == "03"]
+
+
+# --- Spin measurement tests (Experiments 01, 01b, edge, 3d) ---
 
 
 @pytest.mark.parametrize(
     "case",
-    oracle_cases,
-    ids=[c["label"] for c in oracle_cases],
+    spin_cases,
+    ids=[c["label"] for c in spin_cases],
 )
 def test_prob_up_matches_oracle(case: dict) -> None:
     """P(+) from Python matches Lean oracle within tolerance."""
@@ -59,8 +64,8 @@ def test_prob_up_matches_oracle(case: dict) -> None:
 
 @pytest.mark.parametrize(
     "case",
-    oracle_cases,
-    ids=[c["label"] for c in oracle_cases],
+    spin_cases,
+    ids=[c["label"] for c in spin_cases],
 )
 def test_prob_down_matches_oracle(case: dict) -> None:
     """P(-) from Python matches Lean oracle within tolerance."""
@@ -74,8 +79,8 @@ def test_prob_down_matches_oracle(case: dict) -> None:
 
 @pytest.mark.parametrize(
     "case",
-    oracle_cases,
-    ids=[c["label"] for c in oracle_cases],
+    spin_cases,
+    ids=[c["label"] for c in spin_cases],
 )
 def test_expectation_matches_oracle(case: dict) -> None:
     """Expectation value from Python matches Lean oracle within tolerance."""
@@ -85,6 +90,26 @@ def test_expectation_matches_oracle(case: dict) -> None:
         f"expectation divergence for {case['label']}: "
         f"oracle={case['expectation']:.10f} python={python['expectation']:.10f}"
     )
+
+
+# --- DoubleSlit tests (Experiment 03) ---
+
+
+@pytest.mark.parametrize(
+    "case",
+    doubleslit_cases,
+    ids=[c["label"] for c in doubleslit_cases],
+)
+def test_doubleslit_matches_oracle(case: dict) -> None:
+    """DoubleSlit Python computation matches Lean oracle within tolerance."""
+    python = compute_python_prediction(case)
+
+    for field, python_val in python.items():
+        oracle_val = case[field]
+        assert abs(python_val - oracle_val) <= TOLERANCE, (
+            f"{field} divergence for {case['label']}: "
+            f"oracle={oracle_val:.10f} python={python_val:.10f}"
+        )
 
 
 class TestBugDetection:
@@ -139,3 +164,59 @@ class TestBugDetection:
         assert (
             divergences == 0
         ), f"Expected 0 divergences with correct code, got {divergences}/{total}"
+
+    # --- DoubleSlit bug detection (Experiment 03) ---
+
+    def test_harness_catches_coupling_sign_flip(self) -> None:
+        """Flip a sign in coupling_decomposition — harness must detect it."""
+        from differential_test import run_differential_tests
+
+        original = qphysics.coupling_decomposition
+
+        def buggy_coupling(U0, U1, a0, b0, a1, b1):
+            result = original(U0, U1, a0, b0, a1, b1)
+            result["re"] = U0 * a0 + U1 * a1  # Bug: + instead of -
+            return result
+
+        with patch.object(
+            qphysics, "coupling_decomposition", side_effect=buggy_coupling
+        ):
+            total, divergences, details = run_differential_tests(tolerance=1e-6)
+
+        coupling_divs = [d for d in details if "coupling" in d["label"]]
+        assert len(coupling_divs) > 0, (
+            "Harness failed to detect sign-flipped coupling_decomposition. "
+            f"Ran {total} comparisons but found 0 coupling divergences."
+        )
+
+    def test_harness_catches_visibility_inversion(self) -> None:
+        """Swap numerator terms in visibility — harness must detect it."""
+        from differential_test import run_differential_tests
+
+        def buggy_visibility(Imax, Imin):
+            return (Imin - Imax) / (Imax + Imin)  # Bug: swapped numerator
+
+        with patch.object(qphysics, "visibility", side_effect=buggy_visibility):
+            total, divergences, details = run_differential_tests(tolerance=1e-6)
+
+        vis_divs = [d for d in details if "visibility" in d["label"]]
+        assert len(vis_divs) > 0, (
+            "Harness failed to detect inverted visibility formula. "
+            f"Ran {total} comparisons but found 0 visibility divergences."
+        )
+
+    def test_harness_catches_decay_constant_wrong_op(self) -> None:
+        """Use addition instead of multiplication in decay_constant — harness must detect it."""
+        from differential_test import run_differential_tests
+
+        def buggy_decay(U1, d):
+            return U1 + d  # Bug: + instead of *
+
+        with patch.object(qphysics, "decay_constant", side_effect=buggy_decay):
+            total, divergences, details = run_differential_tests(tolerance=1e-6)
+
+        decay_divs = [d for d in details if "decay_constant" in d["label"]]
+        assert len(decay_divs) > 0, (
+            "Harness failed to detect wrong operator in decay_constant. "
+            f"Ran {total} comparisons but found 0 decay_constant divergences."
+        )

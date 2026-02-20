@@ -37,12 +37,8 @@ def load_oracle_predictions(path: Path | None = None) -> list[dict[str, Any]]:
         return json.load(f)
 
 
-def compute_python_prediction(case: dict[str, Any]) -> dict[str, float]:
-    """Compute predictions using qphysics.py for a given test case.
-
-    Supports both xz-plane cases (theta_rad field) and general 3D cases
-    (theta_s, phi_s, theta_o, phi_o fields).
-    """
+def compute_spin_prediction(case: dict[str, Any]) -> dict[str, float]:
+    """Compute spin measurement predictions for Experiments 01/01b/edge/3d."""
     if "theta_s" in case:
         # General 3D case (#211)
         psi = qphysics.create_general_state(case["theta_s"], case["phi_s"])
@@ -63,6 +59,68 @@ def compute_python_prediction(case: dict[str, Any]) -> dict[str, float]:
     }
 
 
+def compute_doubleslit_prediction(case: dict[str, Any]) -> dict[str, float]:
+    """Compute DoubleSlit scalar predictions for Experiment 03.
+
+    Dispatches by label prefix to the matching qphysics function.
+    Input fields are read from the oracle JSON case; output fields are returned.
+    """
+    label = case["label"]
+
+    if label.startswith("coupling"):
+        result = qphysics.coupling_decomposition(
+            case["U0"], case["U1"], case["a0"], case["b0"], case["a1"], case["b1"]
+        )
+        return {
+            "re": result["re"],
+            "imI": result["imI"],
+            "imJ": result["imJ"],
+            "imK": result["imK"],
+        }
+
+    elif label.startswith("normSq"):
+        return {
+            "normSq": qphysics.normSq_sympForm(
+                case["re0"], case["im0"], case["re1"], case["im1"]
+            )
+        }
+
+    elif label.startswith("visibility"):
+        return {"visibility": qphysics.visibility(case["Imax"], case["Imin"])}
+
+    elif label.startswith("fraunhofer"):
+        return {
+            "intensity": qphysics.fraunhofer_intensity(
+                case["I0"], case["d"], case["lam"], case["L"], case["x"]
+            )
+        }
+
+    elif label == "fringe_spacing":
+        return {"spacing": qphysics.fringe_spacing(case["lam"], case["L"], case["d"])}
+
+    elif label.startswith("eta"):
+        return {"eta": qphysics.quat_fraction(case["normSq0"], case["normSq1"])}
+
+    elif label.startswith("decay_constant"):
+        return {"kappa": qphysics.decay_constant(case["U1"], case["d_sep"])}
+
+    elif label.startswith("decay_length"):
+        return {"decay_length": qphysics.decay_length(case["kappa_in"])}
+
+    else:
+        raise ValueError(f"Unknown Exp 03 label: {label}")
+
+
+def compute_python_prediction(case: dict[str, Any]) -> dict[str, float]:
+    """Compute predictions using qphysics.py for a given test case.
+
+    Dispatches to experiment-specific handler based on experiment type.
+    """
+    if case.get("experiment") == "03":
+        return compute_doubleslit_prediction(case)
+    return compute_spin_prediction(case)
+
+
 def run_differential_tests(
     oracle_path: Path | None = None,
     tolerance: float = 1e-6,
@@ -81,7 +139,8 @@ def run_differential_tests(
     for case in predictions:
         python = compute_python_prediction(case)
 
-        for field in ["prob_up", "prob_down", "expectation"]:
+        # Compare all fields returned by the Python prediction
+        for field in sorted(python.keys()):
             total += 1
             oracle_val = case[field]
             python_val = python[field]

@@ -96,73 +96,86 @@ def generateTestCases : List String := Id.run do
       (floatExpectationValue psi obs)]
 
   -- Experiment 03: Double-Slit test vectors
+  -- All cases include input fields so the Python harness can reconstruct computations.
   -- (pi already bound above on line 43)
 
   -- Coupling decomposition test: (2 + 3j)(1 + 0.5i + 0.7j + 0.3k)
   let coupResult := floatCouplingDecomposition 2.0 3.0 1.0 0.5 0.7 0.3
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"coupling_decomp\", " ++
+    s!"\"U0\": 2.0, \"U1\": 3.0, \"a0\": 1.0, \"b0\": 0.5, \"a1\": 0.7, \"b1\": 0.3, " ++
     s!"\"re\": {floatToJson coupResult.re}, \"imI\": {floatToJson coupResult.imI}, " ++
     s!"\"imJ\": {floatToJson coupResult.imJ}, \"imK\": {floatToJson coupResult.imK}}"]
 
   -- Coupling decomposition with purely real ψ₀, ψ₁ (mirrors coupling_decomposition_real)
   let coupReal := floatCouplingDecomposition 2.0 3.0 1.0 0.0 0.7 0.0
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"coupling_decomp_real\", " ++
+    s!"\"U0\": 2.0, \"U1\": 3.0, \"a0\": 1.0, \"b0\": 0.0, \"a1\": 0.7, \"b1\": 0.0, " ++
     s!"\"re\": {floatToJson coupReal.re}, \"imI\": {floatToJson coupReal.imI}, " ++
     s!"\"imJ\": {floatToJson coupReal.imJ}, \"imK\": {floatToJson coupReal.imK}}"]
 
   -- Coupling with U₁ = 0 (mirrors coupling_decouples_U1_zero)
   let coupDecoupled := floatCouplingDecomposition 2.0 0.0 1.0 0.5 0.7 0.3
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"coupling_decoupled\", " ++
+    s!"\"U0\": 2.0, \"U1\": 0.0, \"a0\": 1.0, \"b0\": 0.5, \"a1\": 0.7, \"b1\": 0.3, " ++
     s!"\"re\": {floatToJson coupDecoupled.re}, \"imI\": {floatToJson coupDecoupled.imI}, " ++
     s!"\"imJ\": {floatToJson coupDecoupled.imJ}, \"imK\": {floatToJson coupDecoupled.imK}}"]
 
   -- Norm squared of symplectic form: ψ = (0.6, 0.8, 0.3, 0.4)
-  let sympPsi := floatSympForm 0.6 0.8 0.3 0.4
-  let nsq := floatNormSqSymp sympPsi
+  let nsq := floatNormSqSymp (floatSympForm 0.6 0.8 0.3 0.4)
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"normSq_sympForm\", " ++
+    s!"\"re0\": 0.6, \"im0\": 0.8, \"re1\": 0.3, \"im1\": 0.4, " ++
     s!"\"normSq\": {floatToJson nsq}}"]
 
-  -- Visibility: perfect interference (Imin = 0), no interference (Imax = Imin)
+  -- Visibility: perfect interference (Imin = 0), no interference (Imax = Imin), partial
   let visA := floatVisibility 1.0 0.0
   let visB := floatVisibility 1.0 1.0
   let visPartial := floatVisibility 1.0 0.3
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"visibility_perfect\", " ++
-    s!"\"visibility\": {floatToJson visA}}"]
+    s!"\"Imax\": 1.0, \"Imin\": 0.0, \"visibility\": {floatToJson visA}}"]
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"visibility_none\", " ++
-    s!"\"visibility\": {floatToJson visB}}"]
+    s!"\"Imax\": 1.0, \"Imin\": 1.0, \"visibility\": {floatToJson visB}}"]
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"visibility_partial\", " ++
-    s!"\"visibility\": {floatToJson visPartial}}"]
+    s!"\"Imax\": 1.0, \"Imin\": 0.3, \"visibility\": {floatToJson visPartial}}"]
 
   -- Fraunhofer intensity at maximum and minimum
   -- d=1e-6, λ=500e-9, L=1.0, I₀=1.0
-  let iAtMax := floatFraunhoferIntensity 1.0 1.0e-6 500.0e-9 1.0 0.0  -- x=0 is a maximum
+  let iAtMax := floatFraunhoferIntensity 1.0 1.0e-6 500.0e-9 1.0 0.0
   let spacing := floatFringeSpacing 500.0e-9 1.0 1.0e-6
   let iAtMin := floatFraunhoferIntensity 1.0 1.0e-6 500.0e-9 1.0 (spacing / 2.0)
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"fraunhofer_at_max\", " ++
+    s!"\"I0\": 1.0, \"d\": 0.000001, \"lam\": 5e-07, \"L\": 1.0, \"x\": 0.0, " ++
     s!"\"intensity\": {floatToJson iAtMax}}"]
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"fraunhofer_at_min\", " ++
+    s!"\"I0\": 1.0, \"d\": 0.000001, \"lam\": 5e-07, \"L\": 1.0, \"x\": {floatToJson (spacing / 2.0)}, " ++
     s!"\"intensity\": {floatToJson iAtMin}}"]
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"fringe_spacing\", " ++
+    s!"\"lam\": 5e-07, \"L\": 1.0, \"d\": 0.000001, " ++
     s!"\"spacing\": {floatToJson spacing}}"]
 
   -- Quaternionic fraction
-  let eta0 := floatQuatFraction 1.0 0.0    -- pure complex: η = 0
-  let etaHalf := floatQuatFraction 0.5 0.5  -- equal split: η = 0.5
-  let eta1 := floatQuatFraction 0.0 1.0    -- pure quaternionic: η = 1
+  let eta0 := floatQuatFraction 1.0 0.0
+  let etaHalf := floatQuatFraction 0.5 0.5
+  let eta1 := floatQuatFraction 0.0 1.0
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"eta_zero\", " ++
-    s!"\"eta\": {floatToJson eta0}}"]
+    s!"\"normSq0\": 1.0, \"normSq1\": 0.0, \"eta\": {floatToJson eta0}}"]
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"eta_half\", " ++
-    s!"\"eta\": {floatToJson etaHalf}}"]
+    s!"\"normSq0\": 0.5, \"normSq1\": 0.5, \"eta\": {floatToJson etaHalf}}"]
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"eta_one\", " ++
-    s!"\"eta\": {floatToJson eta1}}"]
+    s!"\"normSq0\": 0.0, \"normSq1\": 1.0, \"eta\": {floatToJson eta1}}"]
 
-  -- Decay constant scaling
+  -- Decay constant and decay length
   let kappa1 := floatDecayConstant 1.0 1.0e-6
   let kappa2 := floatDecayConstant 2.0 1.0e-6
+  let decayLen1 := floatDecayLength kappa1
+  let decayLen2 := floatDecayLength kappa2
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"decay_constant_1\", " ++
-    s!"\"kappa\": {floatToJson kappa1}}"]
+    s!"\"U1\": 1.0, \"d_sep\": 0.000001, \"kappa\": {floatToJson kappa1}}"]
   cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"decay_constant_2\", " ++
-    s!"\"kappa\": {floatToJson kappa2}}"]
+    s!"\"U1\": 2.0, \"d_sep\": 0.000001, \"kappa\": {floatToJson kappa2}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"decay_length_1\", " ++
+    s!"\"kappa_in\": {floatToJson kappa1}, \"decay_length\": {floatToJson decayLen1}}"]
+  cases := cases ++ [s!"  \{\"experiment\": \"03\", \"label\": \"decay_length_2\", " ++
+    s!"\"kappa_in\": {floatToJson kappa2}, \"decay_length\": {floatToJson decayLen2}}"]
 
   return cases
 

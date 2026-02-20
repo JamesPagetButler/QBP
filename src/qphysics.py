@@ -387,3 +387,82 @@ def angle_between_states(psi: np.quaternion, observable: np.quaternion) -> float
     # Clamp to [-1, 1] for numerical safety
     dot = max(-1.0, min(1.0, dot))
     return float(np.arccos(dot))
+
+
+# --- Experiment 03: Double-Slit Scalar Functions ---
+# These mirror the Lean Float oracle (QBP.Oracle.FloatCompute) exactly.
+# Used by Phase 4d differential testing to verify implementation correctness.
+
+import math as _math
+
+
+def coupling_decomposition(
+    U0: float, U1: float, a0: float, b0: float, a1: float, b1: float
+) -> dict[str, float]:
+    """Quaternionic coupling: (U₀ + U₁j)(ψ₀ + ψ₁j).
+
+    Mirrors QBP.Experiments.DoubleSlit.coupling_decomposition.
+    """
+    return {
+        "re": U0 * a0 - U1 * a1,
+        "imI": U0 * b0 + U1 * b1,
+        "imJ": U0 * a1 + U1 * a0,
+        "imK": U0 * b1 - U1 * b0,
+    }
+
+
+def normSq_sympForm(re0: float, im0: float, re1: float, im1: float) -> float:
+    """Norm squared of symplectic form: ||ψ₀||² + ||ψ₁||².
+
+    Mirrors QBP.Experiments.DoubleSlit.normSq_sympForm.
+    """
+    return re0**2 + im0**2 + re1**2 + im1**2
+
+
+def visibility(Imax: float, Imin: float) -> float:
+    """Fringe visibility: V = (Imax - Imin) / (Imax + Imin).
+
+    Mirrors QBP.Experiments.DoubleSlit.visibility.
+    """
+    return (Imax - Imin) / (Imax + Imin)
+
+
+def quat_fraction(normSq0: float, normSq1: float) -> float:
+    """Quaternionic fraction: η = ||ψ₁||² / (||ψ₀||² + ||ψ₁||²).
+
+    Mirrors QBP.Experiments.DoubleSlit.quatFraction.
+    """
+    return normSq1 / (normSq0 + normSq1)
+
+
+def fraunhofer_intensity(I0: float, d: float, lam: float, L: float, x: float) -> float:
+    """Fraunhofer intensity: I₀ · cos²(π·d·x/(λ·L)).
+
+    Mirrors QBP.Optics.Fraunhofer.fraunhoferIntensity.
+    """
+    arg = _math.pi * d * x / (lam * L)
+    return I0 * _math.cos(arg) ** 2
+
+
+def fringe_spacing(lam: float, L: float, d: float) -> float:
+    """Fringe spacing: Δx = λ·L/d.
+
+    Mirrors QBP.Optics.Fraunhofer.fringeSpacing.
+    """
+    return lam * L / d
+
+
+def decay_constant(U1: float, d: float) -> float:
+    """Decay constant: κ = U₁ · d.
+
+    Mirrors QBP.Experiments.DoubleSlit.decayConstant.
+    """
+    return U1 * d
+
+
+def decay_length(kappa: float) -> float:
+    """Decay length: L_decay = 1/κ.
+
+    Mirrors QBP.Experiments.DoubleSlit.decayLength.
+    """
+    return 1.0 / kappa

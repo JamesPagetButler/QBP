@@ -18,5 +18,22 @@
   {"experiment": "3d", "label": "3d_oblique_2", "theta_s": 0.785398, "phi_s": 3.141593, "theta_o": 2.356194, "phi_o": 0.000000, "prob_up": 0.000000, "prob_down": 1.000000, "expectation": -1.000000},
   {"experiment": "3d", "label": "3d_oblique_3", "theta_s": 2.094395, "phi_s": 0.785398, "theta_o": 0.523599, "phi_o": 3.926991, "prob_up": 0.066987, "prob_down": 0.933013, "expectation": -0.866025},
   {"experiment": "3d", "label": "3d_same_dir", "theta_s": 0.785398, "phi_s": 1.047198, "theta_o": 0.785398, "phi_o": 1.047198, "prob_up": 1.000000, "prob_down": 0.000000, "expectation": 1.000000},
-  {"experiment": "3d", "label": "3d_opposite", "theta_s": 1.047198, "phi_s": 0.785398, "theta_o": 2.094395, "phi_o": 3.926991, "prob_up": 0.000000, "prob_down": 1.000000, "expectation": -1.000000}
+  {"experiment": "3d", "label": "3d_opposite", "theta_s": 1.047198, "phi_s": 0.785398, "theta_o": 2.094395, "phi_o": 3.926991, "prob_up": 0.000000, "prob_down": 1.000000, "expectation": -1.000000},
+  {"experiment": "03", "label": "coupling_decomp", "U0": 2.0, "U1": 3.0, "a0": 1.0, "b0": 0.5, "a1": 0.7, "b1": 0.3, "re": -0.100000, "imI": 1.900000, "imJ": 4.400000, "imK": -0.900000},
+  {"experiment": "03", "label": "coupling_decomp_real", "U0": 2.0, "U1": 3.0, "a0": 1.0, "b0": 0.0, "a1": 0.7, "b1": 0.0, "re": -0.100000, "imI": 0.000000, "imJ": 4.400000, "imK": 0.000000},
+  {"experiment": "03", "label": "coupling_decoupled", "U0": 2.0, "U1": 0.0, "a0": 1.0, "b0": 0.5, "a1": 0.7, "b1": 0.3, "re": 2.000000, "imI": 1.000000, "imJ": 1.400000, "imK": 0.600000},
+  {"experiment": "03", "label": "normSq_sympForm", "re0": 0.6, "im0": 0.8, "re1": 0.3, "im1": 0.4, "normSq": 1.250000},
+  {"experiment": "03", "label": "visibility_perfect", "Imax": 1.0, "Imin": 0.0, "visibility": 1.000000},
+  {"experiment": "03", "label": "visibility_none", "Imax": 1.0, "Imin": 1.0, "visibility": 0.000000},
+  {"experiment": "03", "label": "visibility_partial", "Imax": 1.0, "Imin": 0.3, "visibility": 0.538462},
+  {"experiment": "03", "label": "fraunhofer_at_max", "I0": 1.0, "d": 0.000001, "lam": 5e-07, "L": 1.0, "x": 0.0, "intensity": 1.000000},
+  {"experiment": "03", "label": "fraunhofer_at_min", "I0": 1.0, "d": 0.000001, "lam": 5e-07, "L": 1.0, "x": 0.250000, "intensity": 0.000000},
+  {"experiment": "03", "label": "fringe_spacing", "lam": 5e-07, "L": 1.0, "d": 0.000001, "spacing": 0.500000},
+  {"experiment": "03", "label": "eta_zero", "normSq0": 1.0, "normSq1": 0.0, "eta": 0.000000},
+  {"experiment": "03", "label": "eta_half", "normSq0": 0.5, "normSq1": 0.5, "eta": 0.500000},
+  {"experiment": "03", "label": "eta_one", "normSq0": 0.0, "normSq1": 1.0, "eta": 1.000000},
+  {"experiment": "03", "label": "decay_constant_1", "U1": 1.0, "d_sep": 0.000001, "kappa": 0.000001},
+  {"experiment": "03", "label": "decay_constant_2", "U1": 2.0, "d_sep": 0.000001, "kappa": 0.000002},
+  {"experiment": "03", "label": "decay_length_1", "kappa_in": 0.000001, "decay_length": 1000000.000000},
+  {"experiment": "03", "label": "decay_length_2", "kappa_in": 0.000002, "decay_length": 500000.000000}
 ]

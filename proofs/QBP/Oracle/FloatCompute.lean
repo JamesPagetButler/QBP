@@ -104,4 +104,8 @@ def floatCouplingDecomposition (u0 u1 a0 b0 a1 b1 : Float) : QFloat :=
     (mirrors QBP.Experiments.DoubleSlit.decayConstant) -/
 def floatDecayConstant (u1 d : Float) : Float := u1 * d
 
+/-- Decay length: L_decay = 1/κ
+    (mirrors QBP.Experiments.DoubleSlit.decayLength) -/
+def floatDecayLength (κ : Float) : Float := 1.0 / κ
+
 end QBP.Oracle
