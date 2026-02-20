@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
-- **Lifecycle Stage:** Phase 4b (Proof Review) reopened — V(η) bridge needs contextual review.
-- **Next Critical-Path Action:** Phase 4b: Complete proof review (#260) with V(η) context → 4c (#261) → 4d → 4e → Phase 5 → Theory Refinement → Retrospective
+- **Lifecycle Stage:** Phase 4d (Verified Differential Testing) complete. Phase 4e in progress.
+- **Next Critical-Path Action:** Phase 4e: Verified Simulation Engine (#302) → Phase 5 → Theory Refinement → Retrospective
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -31,10 +31,10 @@
 - [x] **Phase 3 Rework: Far-Field Visualization (#360)** — CLOSED 2026-02-18. PR #368 merged. Far-field hero overlay, V(U₁) curve, residual, 3-panel comparison. VPython refactored (pre-allocated gcurves, debounced slider, P6 with actual BPM+FFT). FAULT-S3-003 (scale incomparability) caught by Human Visual Review.
 - [ ] Phase 4: Formal Verification (#56)
   - [x] 4a: Formal Proof (#259) — CLOSED 2026-02-19. PR #373 merged. 433-line Lean 4 proof, zero `sorry`. 2 review rounds (Red Team + Gemini). FAULT-S3-005, FAULT-S3-006 logged.
-  - [ ] 4b: Proof Review (#260) — REOPENED. Round 1: 32/32 verified. V(η) bridge (PR #386, +5 theorems) needs contextual review as part of full 37-theorem proof. FAULT-S3-007, FAULT-S3-008 logged.
-  - [ ] 4c: Interactive Proof Visualization (#261)
-  - [ ] 4d: Verified Differential Testing (#301)
-  - [ ] 4e: Verified Simulation Engine (#302)
+  - [x] 4b: Proof Review (#260) — CLOSED 2026-02-20. 3 review rounds. V(η) bridge (5 theorems) contextually reviewed. Fraunhofer extracted to QBP.Optics (PR #389). Model A spatial correlation caveat documented (#387). FAULT-S3-007, FAULT-S3-008 logged.
+  - [x] 4c: Interactive Proof Visualization (#261) — CLOSED 2026-02-20. PR #391 merged. 39-node proof graph, Atkinson Hyperlegible fonts, 3 review rounds (Red Team + Gemini + human visual).
+  - [x] 4d: Verified Differential Testing (#301) — CLOSED 2026-02-20. PR #392 merged. 86 comparisons, 0 divergences. 17 DoubleSlit test vectors, 3 bug detection mutations.
+  - [ ] 4e: Verified Simulation Engine (#302) — IN PROGRESS. Raylib + Kaiju bake-off prototypes built. AMDVLK driver installed for RX 9070 XT.
 - [ ] Phase 5: Publication (#65)
 - [ ] Theory Refinement (#81)
 - [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`

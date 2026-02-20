@@ -1,0 +1,21 @@
+# Kaiju engine (third-party, ~116MB) — clone separately
+# Layered ignore: block engine, unblock src/, block src contents, whitelist game files
+kaiju/engine/*
+!kaiju/engine/src/
+kaiju/engine/src/*
+!kaiju/engine/src/doubleslit_game.go
+!kaiju/engine/src/lab_game.go
+!kaiju/engine/src/ui_smoketest_game.go
+
+# Compiled binaries
+*.exe
+doubleslit
+ds-bakeoff
+qbp-sim
+
+# Benchmark output (regenerated)
+bench_results/
+bench_*.csv
+
+# Local libs (system-specific)
+kaiju/local_libs/
