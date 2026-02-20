@@ -1,14 +1,19 @@
 /-
   Double-Slit Experiment (Experiment 03) - Formal Proofs
 
-  Formalizes the algebraic skeleton of the coupled quaternionic BPM model:
-  - Quaternion j-structure and multiplication rules
-  - Coupling decomposition: (U₀ + U₁j)(ψ₀ + ψ₁j) expansion
-  - Norm conservation via coupling cancellation lemma
-  - Born rule for symplectic decomposition (no cross-terms)
-  - Visibility bounds and Fraunhofer pattern formulas
-  - Complex subspace reduction (U₁ = 0 decouples)
-  - Decay/eta parameter properties
+  Formalizes the QBP visibility derivation for the coupled quaternionic BPM model:
+  - §1: Complex subspace & basis (ℂ ↪ ℍ, symplectic form)
+  - §2: Quaternion algebra (j², j·z = z*·j)
+  - §3: Coupling decomposition: (U₀ + U₁j)(ψ₀ + ψ₁j) expansion
+  - §3b: Norm conservation via coupling cancellation
+  - §4: Born rule (no cross-terms) + quatFraction η definition & bounds
+  - §5: Visibility bounds (V ∈ [0,1])
+  - §5b: V(η) bridge — the central QBP prediction: V = 1-η (Model A), V preserved (Model B)
+  - §7: Complex subspace reduction (U₁ = 0 decouples → standard QM)
+  - §8: Decay constant & monotonicity
+  - §9: Edge cases & experimental scenario verification (A/B/C)
+
+  Standard optics (Fraunhofer far-field) is in QBP.Optics.Fraunhofer.
 
   Ground Truth: research/03_double_slit_expected_results.md
   Analysis: analysis/03_double_slit/
@@ -17,8 +22,6 @@
   results stay in Python (empirical, tested by CI).
 -/
 import QBP.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-import Mathlib.Analysis.InnerProductSpace.Basic
 
 namespace QBP.Experiments.DoubleSlit
 
@@ -218,6 +221,35 @@ theorem normSq_sympForm_nonneg (a₀ b₀ a₁ b₁ : ℝ) :
 noncomputable def quatFraction (normSq0 normSq1 : ℝ) : ℝ :=
   normSq1 / (normSq0 + normSq1)
 
+/-- Quaternionic fraction is non-negative when both norms are non-negative -/
+theorem quatFraction_nonneg {n₀ n₁ : ℝ}
+    (_h₀ : n₀ ≥ 0) (h₁ : n₁ ≥ 0) (hsum : n₀ + n₁ > 0) :
+    quatFraction n₀ n₁ ≥ 0 := by
+  unfold quatFraction
+  exact div_nonneg h₁.le (le_of_lt hsum)
+
+/-- Quaternionic fraction is at most 1 -/
+theorem quatFraction_le_one {n₀ n₁ : ℝ}
+    (h₀ : n₀ ≥ 0) (_h₁ : n₁ ≥ 0) (hsum : n₀ + n₁ > 0) :
+    quatFraction n₀ n₁ ≤ 1 := by
+  unfold quatFraction
+  rw [div_le_one hsum]
+  linarith
+
+/-- η = 0 iff ψ₁ = 0 (pure complex wavefunction) -/
+theorem quatFraction_zero_iff {n₀ n₁ : ℝ}
+    (h₀ : n₀ > 0) (h₁ : n₁ ≥ 0) :
+    quatFraction n₀ n₁ = 0 ↔ n₁ = 0 := by
+  unfold quatFraction
+  rw [div_eq_zero_iff]
+  constructor
+  · intro h
+    rcases h with h | h
+    · exact h
+    · linarith
+  · intro h
+    left; exact h
+
 /-! ## Section 5: Visibility Bounds
 
 Visibility V = (Imax - Imin)/(Imax + Imin) measures fringe contrast.
@@ -343,75 +375,6 @@ theorem visibility_correlated {Imax Imin : ℝ} {r : ℝ}
   have hscaled_ne : (1 + r) * Imax + (1 + r) * Imin ≠ 0 := ne_of_gt hscaled
   field_simp
 
-/-! ## Section 6: Fraunhofer Pattern (Standard Optics Reference)
-
-The far-field intensity pattern I(x) = I₀ · cos²(π·d·x/(λ·L)).
-These are standard wave optics results, NOT QBP-specific. They are retained
-as reference definitions for the Gap Theorem (Sprint 8): once we prove
-QBP → Standard Schrödinger, these formulas follow by classical optics.
-
-See Section 5b for the QBP-specific visibility predictions. -/
-
-/-- Fraunhofer intensity at position x with slit separation d, wavelength λ,
-    propagation distance L, and peak intensity I₀.
-    I(x) = I₀ · cos²(π·d·x / (λ·L)) -/
-noncomputable def fraunhoferIntensity (I₀ d wl L x : ℝ) : ℝ :=
-  I₀ * (Real.cos (Real.pi * d * x / (wl * L))) ^ 2
-
-/-- Fringe spacing: Δx = λ·L / d -/
-noncomputable def fringeSpacing (wl L d : ℝ) : ℝ := wl * L / d
-
-/-- At a maximum (x = n·λ·L/d for integer n), cos(nπ)² = 1, so I = I₀ -/
-theorem intensity_at_maximum (I₀ d wl L : ℝ) (n : ℤ)
-    (hwlL : wl * L ≠ 0) (hd : d ≠ 0) :
-    fraunhoferIntensity I₀ d wl L (n * (wl * L / d)) = I₀ := by
-  unfold fraunhoferIntensity
-  have hwl : wl ≠ 0 := left_ne_zero_of_mul hwlL
-  have hL : L ≠ 0 := right_ne_zero_of_mul hwlL
-  have h : Real.pi * d * (↑n * (wl * L / d)) / (wl * L) = ↑n * Real.pi := by
-    field_simp
-  rw [h]
-  have hcos2 : Real.cos (↑n * Real.pi) ^ 2 = 1 := by
-    have h1 := Real.sin_sq_add_cos_sq (↑n * Real.pi)
-    have h2 : Real.sin (↑n * Real.pi) = 0 := Real.sin_int_mul_pi n
-    nlinarith [sq_nonneg (Real.sin (↑n * Real.pi))]
-  rw [hcos2]; ring
-
-/-- At a minimum (x = (n + 1/2)·λ·L/d), cos((n+1/2)π)² = 0, so I = 0 -/
-theorem intensity_at_minimum (I₀ d wl L : ℝ) (n : ℤ)
-    (hwlL : wl * L ≠ 0) (hd : d ≠ 0) :
-    fraunhoferIntensity I₀ d wl L ((n + 1/2) * (wl * L / d)) = 0 := by
-  unfold fraunhoferIntensity
-  have hwl : wl ≠ 0 := left_ne_zero_of_mul hwlL
-  have hL : L ≠ 0 := right_ne_zero_of_mul hwlL
-  have h : Real.pi * d * ((↑n + 1 / 2) * (wl * L / d)) / (wl * L) =
-           (↑n + 1 / 2) * Real.pi := by
-    field_simp
-  rw [h]
-  have hcos : Real.cos ((↑n + 1 / 2) * Real.pi) = 0 := by
-    rw [show (↑n + 1 / 2) * Real.pi = ↑n * Real.pi + Real.pi / 2 by ring]
-    rw [Real.cos_add]
-    have h1 : Real.cos (Real.pi / 2) = 0 := Real.cos_pi_div_two
-    have h2 : Real.sin (↑n * Real.pi) = 0 := Real.sin_int_mul_pi n
-    rw [h1, h2]; ring
-  rw [hcos]; simp
-
-/-- Fringe spacing scales linearly with wavelength -/
-theorem fringeSpacing_linear_lambda (L d c : ℝ) (wl : ℝ) :
-    fringeSpacing (c * wl) L d = c * fringeSpacing wl L d := by
-  unfold fringeSpacing; ring
-
-/-- Fringe spacing scales linearly with propagation distance -/
-theorem fringeSpacing_linear_L (wl d c : ℝ) (L : ℝ) :
-    fringeSpacing wl (c * L) d = c * fringeSpacing wl L d := by
-  unfold fringeSpacing; ring
-
-/-- Fringe spacing scales inversely with slit separation -/
-theorem fringeSpacing_inverse_d (wl L d : ℝ) (hd : d ≠ 0) (c : ℝ) (hc : c ≠ 0) :
-    fringeSpacing wl L (c * d) = fringeSpacing wl L d / c := by
-  unfold fringeSpacing
-  field_simp
-
 /-! ## Section 7: Complex Subspace Reduction
 
 When U₁ = 0 (no quaternionic coupling), the system decouples:
@@ -432,11 +395,11 @@ theorem sympForm_zero_psi1 (a₀ b₀ : ℝ) :
   unfold sympForm isComplex
   exact ⟨rfl, rfl⟩
 
-/-! ## Section 8: Decay & Eta Parameter
+/-! ## Section 8: Decay Constant
 
-The quaternionic fraction eta = |ψ₁|²/|ψ|² measures how much of the
-wavefunction lives in the j-subspace. The decay constant κ controls
-how quickly interference is lost with increasing U₁. -/
+The decay constant κ controls how quickly interference is lost with
+increasing quaternionic coupling U₁. The quatFraction η definition
+and bounds are in Section 4 (near the Born rule). -/
 
 /-- Dimensionless coupling proxy: product of potential strength and slit separation.
     This is a simplified stand-in used for monotonicity and positivity proofs.
@@ -466,35 +429,6 @@ theorem decayConstant_mono_U1 {U₁ U₁' d : ℝ}
     decayConstant U₁ d < decayConstant U₁' d := by
   unfold decayConstant
   exact mul_lt_mul_of_pos_right h hd
-
-/-- Quaternionic fraction is non-negative when both norms are non-negative -/
-theorem quatFraction_nonneg {n₀ n₁ : ℝ}
-    (_h₀ : n₀ ≥ 0) (h₁ : n₁ ≥ 0) (hsum : n₀ + n₁ > 0) :
-    quatFraction n₀ n₁ ≥ 0 := by
-  unfold quatFraction
-  exact div_nonneg h₁.le (le_of_lt hsum)
-
-/-- Quaternionic fraction is at most 1 -/
-theorem quatFraction_le_one {n₀ n₁ : ℝ}
-    (h₀ : n₀ ≥ 0) (_h₁ : n₁ ≥ 0) (hsum : n₀ + n₁ > 0) :
-    quatFraction n₀ n₁ ≤ 1 := by
-  unfold quatFraction
-  rw [div_le_one hsum]
-  linarith
-
-/-- η = 0 iff ψ₁ = 0 (pure complex wavefunction) -/
-theorem quatFraction_zero_iff {n₀ n₁ : ℝ}
-    (h₀ : n₀ > 0) (h₁ : n₁ ≥ 0) :
-    quatFraction n₀ n₁ = 0 ↔ n₁ = 0 := by
-  unfold quatFraction
-  rw [div_eq_zero_iff]
-  constructor
-  · intro h
-    rcases h with h | h
-    · exact h
-    · linarith
-  · intro h
-    left; exact h
 
 /-! ## Section 9: Edge Cases & Consistency
 

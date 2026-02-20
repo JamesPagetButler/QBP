@@ -77,13 +77,13 @@ def floatVisibility (imax imin : Float) : Float :=
   (imax - imin) / (imax + imin)
 
 /-- Fraunhofer intensity: I₀ · cos²(π·d·x/(λ·L))
-    (mirrors QBP.Experiments.DoubleSlit.fraunhoferIntensity) -/
+    (mirrors QBP.Optics.Fraunhofer.fraunhoferIntensity) -/
 def floatFraunhoferIntensity (i0 d lam l x : Float) : Float :=
   let arg := Float.acos (-1.0) * d * x / (lam * l)
   i0 * (Float.cos arg) * (Float.cos arg)
 
 /-- Fringe spacing: Δx = λ·L/d
-    (mirrors QBP.Experiments.DoubleSlit.fringeSpacing) -/
+    (mirrors QBP.Optics.Fraunhofer.fringeSpacing) -/
 def floatFringeSpacing (lam l d : Float) : Float :=
   lam * l / d
 
