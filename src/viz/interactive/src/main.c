@@ -7,6 +7,7 @@
  * Scene selection:
  *   Press '1' for Experiment 01 (Stern-Gerlach)
  *   Press '2' for Experiment 01b (Angle-Dependent)
+ *   Press '3' for Experiment 03 (Double-Slit)
  */
 
 #include <stddef.h>
@@ -23,10 +24,12 @@
 /* --- Scene registry --- */
 extern Scene scene_stern_gerlach;
 extern Scene scene_angle_dependent;
+extern Scene scene_double_slit;
 
 static Scene *scenes[] = {
     &scene_stern_gerlach,
     &scene_angle_dependent,
+    &scene_double_slit,
 };
 static int scene_count = sizeof(scenes) / sizeof(scenes[0]);
 static int current_scene_idx = 0;
@@ -62,6 +65,9 @@ static void frame_loop(void)
     }
     if (IsKeyPressed(KEY_TWO) || IsKeyPressed(KEY_KP_2)) {
         switch_scene(1);  /* Angle-Dependent */
+    }
+    if (IsKeyPressed(KEY_THREE) || IsKeyPressed(KEY_KP_3)) {
+        switch_scene(2);  /* Double-Slit */
     }
 
     if (current_scene && current_scene->update) {
