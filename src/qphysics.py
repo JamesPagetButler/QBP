@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import math as _math
+
 import numpy as np
 import quaternion
 
@@ -392,8 +394,7 @@ def angle_between_states(psi: np.quaternion, observable: np.quaternion) -> float
 # --- Experiment 03: Double-Slit Scalar Functions ---
 # These mirror the Lean Float oracle (QBP.Oracle.FloatCompute) exactly.
 # Used by Phase 4d differential testing to verify implementation correctness.
-
-import math as _math
+# Naming convention: function names match the Lean definitions for traceability.
 
 
 def coupling_decomposition(
@@ -438,6 +439,9 @@ def quat_fraction(normSq0: float, normSq1: float) -> float:
 def fraunhofer_intensity(I0: float, d: float, lam: float, L: float, x: float) -> float:
     """Fraunhofer intensity: I₀ · cos²(π·d·x/(λ·L)).
 
+    Models the two-slit interference pattern only (cos² fringes from path
+    difference). Does not include the single-slit diffraction envelope (sinc²).
+
     Mirrors QBP.Optics.Fraunhofer.fraunhoferIntensity.
     """
     arg = _math.pi * d * x / (lam * L)
@@ -454,6 +458,10 @@ def fringe_spacing(lam: float, L: float, d: float) -> float:
 
 def decay_constant(U1: float, d: float) -> float:
     """Decay constant: κ = U₁ · d.
+
+    U₁ is the quaternionic coupling strength (dimensionless in code units),
+    d is the slit separation. The product κ is a dimensionless tunneling
+    exponent controlling the decay of quaternionic interference.
 
     Mirrors QBP.Experiments.DoubleSlit.decayConstant.
     """

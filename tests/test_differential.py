@@ -112,6 +112,31 @@ def test_doubleslit_matches_oracle(case: dict) -> None:
         )
 
 
+class TestDegenerateCases:
+    """Test degenerate inputs that produce division by zero.
+
+    These cases are physically meaningless (Lean proofs require positive
+    denominators). Python raises ZeroDivisionError; Lean Float would
+    return nan/inf per IEEE 754. The differential test oracle excludes
+    these cases since the Lean proofs require valid inputs.
+    """
+
+    def test_visibility_zero_zero_raises(self) -> None:
+        """visibility(0, 0) → ZeroDivisionError (denominator is zero)."""
+        with pytest.raises(ZeroDivisionError):
+            qphysics.visibility(0.0, 0.0)
+
+    def test_quat_fraction_zero_zero_raises(self) -> None:
+        """quat_fraction(0, 0) → ZeroDivisionError (denominator is zero)."""
+        with pytest.raises(ZeroDivisionError):
+            qphysics.quat_fraction(0.0, 0.0)
+
+    def test_decay_length_zero_raises(self) -> None:
+        """decay_length(0) → ZeroDivisionError (1/0)."""
+        with pytest.raises(ZeroDivisionError):
+            qphysics.decay_length(0.0)
+
+
 class TestBugDetection:
     """Verify the differential testing harness detects intentional bugs.
 
