@@ -30,7 +30,6 @@ dev = [
 ]
 knowledge = [
     "hypernetx>=2.4.0",
-    "matplotlib>=3.5.0",
     "pyyaml>=6.0",
 ]
 
