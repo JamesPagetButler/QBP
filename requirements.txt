@@ -1,3 +1,6 @@
+# DEPRECATED: Use `uv sync --extra dev` instead.
+# This file is kept for legacy compatibility only.
+# Canonical dependencies are in pyproject.toml + uv.lock.
 numpy
 pandas
 matplotlib

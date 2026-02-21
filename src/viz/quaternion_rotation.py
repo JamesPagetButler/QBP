@@ -14,10 +14,6 @@ Run: python src/viz/quaternion_rotation.py
 """
 
 import numpy as np
-from vpython import canvas, vector, arrow, sphere, ring, rate, label
-
-# Import our design system
-from .theme import COLORS, PALETTE
 
 
 def quaternion_multiply(q1, q2):
@@ -58,6 +54,8 @@ def axis_angle_to_quaternion(axis, angle_rad):
 
 def create_scene(dark_mode=False):
     """Create the vpython scene with steampunk-themed coordinate frame."""
+    from vpython import canvas, vector, arrow, label
+    from .theme import COLORS, PALETTE
 
     # Choose background based on mode
     if dark_mode:
@@ -145,6 +143,9 @@ def visualize_rotation(
         duration: Animation duration in seconds
         dark_mode: Use dark background (default: False)
     """
+    from vpython import vector, arrow, sphere, ring, rate, label
+    from .theme import COLORS, PALETTE
+
     scene, text_color = create_scene(dark_mode)
 
     # Object to rotate - a BRASS arrow (our primary color)

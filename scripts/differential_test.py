@@ -14,6 +14,7 @@ Exit codes:
     0 = All tests pass (0 divergences)
     1 = Divergences detected
 """
+
 from __future__ import annotations
 
 import argparse

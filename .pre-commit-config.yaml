@@ -10,7 +10,7 @@ repos:
     -   id: gitleaks
 
 -   repo: https://github.com/psf/black
-    rev: 24.4.2  # Updated stable version
+    rev: 26.1.0
     hooks:
     -   id: black
 

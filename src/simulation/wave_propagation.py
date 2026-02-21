@@ -26,7 +26,6 @@ import numpy as np
 from dataclasses import dataclass, field
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Try importing PyTorch; fall back to NumPy-only mode
 # ---------------------------------------------------------------------------

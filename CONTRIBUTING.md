@@ -1338,6 +1338,26 @@ The `master` branch is protected by rules configured on the Git hosting platform
 
 This project uses a variety of tools for different purposes. Adherence to this toolkit ensures our work remains consistent and reproducible.
 
+### Python Environment Setup
+
+We use **[uv](https://github.com/astral-sh/uv)** for fast, reproducible Python dependency management. Dependencies are declared in `pyproject.toml` and pinned in `uv.lock`.
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install all dependencies (including dev tools)
+uv sync --extra dev
+
+# Run a command in the managed environment
+uv run pytest tests/ -v
+
+# Install knowledge graph extras
+uv sync --extra knowledge
+```
+
+**Legacy fallback:** `pip install -r requirements.txt` still works but does not use the lockfile.
+
 ### Primary Toolkit
 *   **Version Control:** Git
 *   **Documentation:** Markdown
@@ -1362,6 +1382,15 @@ This project uses a variety of tools for different purposes. Adherence to this t
 *   **Publishing:** Quarto and/or LaTeX for professional typesetting of the final paper.
 *   **Design System:** The front-end assets and framework implemented by Claude.
 *   **Formal Proof Setup:** The setup and configuration for Lean 4 must be documented.
+
+### API Rate Limits & Resource Budget
+
+External API usage is tracked in **[#376 — Resource Log](https://github.com/JamesPagetButler/QBP/issues/376)**. Key limits:
+- GitHub GraphQL API: 5,000 req/hr (shared by all `gh` CLI operations)
+- GitHub Actions: 2,000 min/month (free tier)
+- Check rate limit: `gh api graphql -f query='{ rateLimit { remaining resetAt } }'`
+
+Before running batch operations (audits, board queries), verify sufficient budget remains. See #377 for the cache-first audit pattern.
 
 ### Multi-AI Integration (Claude + Gemini)
 
@@ -1431,7 +1460,7 @@ If CI fails due to formatting or type errors, follow these steps:
 | `black would reformat` | Code not formatted | Run `black .` or `pre-commit run black --all-files` |
 | `mypy: error` | Type annotation issues | Add/fix type hints per mypy output |
 | `pre-commit not found` | Hooks not installed | Run `pre-commit install` |
-| `ModuleNotFoundError` | Dependencies missing | Run `pip install -r requirements.txt` |
+| `ModuleNotFoundError` | Dependencies missing | Run `uv sync --extra dev` (or `pip install -r requirements.txt`) |
 
 ### Keeping Pre-commit Updated
 

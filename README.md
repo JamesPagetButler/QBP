@@ -25,27 +25,28 @@ Follow these instructions to set up a local development environment.
     cd QBP
     ```
 
-2.  **Create and activate a virtual environment:**
-    It is highly recommended to use a virtual environment to manage project-specific dependencies.
+2.  **Install dependencies with uv:**
+    We use [uv](https://github.com/astral-sh/uv) for fast, reproducible Python dependency management.
     ```bash
-    # Create the virtual environment
-    python3 -m venv venv
+    # Install uv (if not already installed)
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 
-    # Activate it (on Linux/macOS)
-    source venv/bin/activate
-    # On Windows, use: .\\venv\\Scripts\\activate
+    # Install all dependencies (creates .venv automatically)
+    uv sync --extra dev
     ```
 
-3.  **Install Python dependencies:**
-    With your virtual environment active, install the required packages.
+    <details><summary>Legacy fallback (pip)</summary>
+
     ```bash
+    python3 -m venv venv && source venv/bin/activate
     pip install -r requirements.txt
     ```
+    </details>
 
-4.  **Set up Git hooks:**
+3.  **Set up Git hooks:**
     This will install the pre-commit hooks defined in `.pre-commit-config.yaml`, which automatically format and check our code.
     ```bash
-    pre-commit install
+    uv run pre-commit install
     ```
 
 5.  **Run pre-commit on all files (recommended):**

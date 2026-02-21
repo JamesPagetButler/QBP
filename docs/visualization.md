@@ -18,10 +18,10 @@ This project uses visualization to:
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+uv sync --extra dev
 
 # Run quaternion rotation demo
-python src/viz/quaternion_rotation.py
+uv run python src/viz/quaternion_rotation.py
 ```
 
 Opens browser with interactive 3D visualization.
