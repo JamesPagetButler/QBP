@@ -24,7 +24,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from src.simulation.si_conversion import compute_scales
 from src.simulation.wave_propagation import SimulationConfig, SlitConfig
 
-
 # ---------------------------------------------------------------------------
 # Minimal BPM config for fast testing
 # ---------------------------------------------------------------------------

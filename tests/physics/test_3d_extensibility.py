@@ -17,7 +17,6 @@ Ground truth: research/03_double_slit_expected_results.md §3.3
 import numpy as np
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Test A: Symbolic Unitarity Proof
 # ---------------------------------------------------------------------------
