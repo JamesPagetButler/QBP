@@ -17,6 +17,7 @@ dependencies = [
     "numpy-quaternion",
     "vpython",
     "manim",
+    "setuptools",  # vpython uses pkg_resources but doesn't declare the dep
 ]
 
 [project.optional-dependencies]

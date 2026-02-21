@@ -4373,6 +4373,7 @@ dependencies = [
     { name = "pandas", version = "3.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "setuptools" },
     { name = "sympy" },
     { name = "vpython" },
 ]
@@ -4388,7 +4389,6 @@ dev = [
 ]
 knowledge = [
     { name = "hypernetx" },
-    { name = "matplotlib" },
     { name = "pyyaml" },
 ]
 
@@ -4400,7 +4400,6 @@ requires-dist = [
     { name = "jupyter" },
     { name = "manim" },
     { name = "matplotlib" },
-    { name = "matplotlib", marker = "extra == 'knowledge'", specifier = ">=3.5.0" },
     { name = "mypy", marker = "extra == 'dev'" },
     { name = "numpy" },
     { name = "numpy-quaternion" },
@@ -4410,6 +4409,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0" },
     { name = "pyyaml", marker = "extra == 'knowledge'", specifier = ">=6.0" },
     { name = "scipy" },
+    { name = "setuptools" },
     { name = "sympy" },
     { name = "vpython" },
 ]
