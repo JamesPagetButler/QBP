@@ -382,8 +382,8 @@ func (g *LabGame) buildPlatform(host *engine.Host) {
 	monitorZ := matrix.Float(deskZ + 0.4)
 
 	// Left and right centers (with gap between wings)
-	lCenterX := matrix.Float(-0.40) // Left wing center
-	rCenterX := matrix.Float(0.40)  // Right wing center
+	lCenterX := matrix.Float(-0.65) // Left wing center
+	rCenterX := matrix.Float(0.65)  // Right wing center
 
 	// === Left wing — 2 flat screens stacked ===
 	for _, cy := range []matrix.Float{botCenterY, topCenterY} {

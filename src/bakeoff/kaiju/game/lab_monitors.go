@@ -57,7 +57,7 @@ func NewMonitorContent(host *engine.Host) *MonitorContent {
 //   Two stacked — use bottom one for histogram
 
 func (mc *MonitorContent) buildHistogramMonitor(host *engine.Host) {
-	rCenterX := matrix.Float(0.40) // Match flat monitor layout
+	rCenterX := matrix.Float(0.65) // Match flat monitor layout
 	screenW := matrix.Float(0.50)
 	screenH := matrix.Float(0.35)
 	bottomEdgeY := matrix.Float(camStartY - 0.05 - screenH - screenH/2)

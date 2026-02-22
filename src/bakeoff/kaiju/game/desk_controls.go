@@ -16,6 +16,7 @@ import (
 	"kaiju/platform/hid"
 	"kaiju/registry/shader_data_registry"
 	"kaiju/rendering"
+	"math"
 )
 
 // ---------------------------------------------------------------------------
@@ -56,6 +57,7 @@ type LabControlCallbacks struct {
 	OnOracleToggle func()
 	OnPreset       func(id string)
 	OnSlitDial     func(delta float32) // delta in scroll units
+	OnCapCycle     func()              // Cycle particle cap
 }
 
 // ---------------------------------------------------------------------------
@@ -214,6 +216,45 @@ func (m *DeskControlManager) AddDial(
 	return ctrl
 }
 
+// AddLabel creates a 3D SDF text label on the desk surface.
+// Used for group labels above control zones.
+func (m *DeskControlManager) AddLabel(text string, posX, posZ, fontSize float32) {
+	host := m.host
+	labelY := matrix.Float(deskY + 0.08) // Above control buttons
+
+	entity := engine.NewEntity(host.WorkGroup())
+	entity.Transform.SetPosition(matrix.NewVec3(matrix.Float(posX), labelY, matrix.Float(posZ)))
+	entity.Transform.SetScale(matrix.NewVec3(1, 1, 1))
+	// Rotate 180° around Y so text faces -Z (toward scientist)
+	entity.Transform.SetRotation(matrix.NewVec3(0, matrix.Float(math.Pi), 0))
+
+	bgColor := matrix.NewColor(0, 0, 0, 0)
+	rootScale := matrix.NewVec3(-1, 1, 1)
+
+	drawings := host.FontCache().RenderMeshes(
+		host,
+		text,
+		0, 0, 0,
+		fontSize,
+		0, // no max width (single-line labels)
+		labColIvory(),
+		bgColor,
+		rendering.FontJustifyCenter,
+		rendering.FontBaselineBottom,
+		rootScale,
+		true,
+		true,
+		rendering.FontRegular,
+		0,
+		&host.Cameras.Primary,
+	)
+
+	for i := range drawings {
+		drawings[i].Transform = &entity.Transform
+	}
+	host.Drawings.AddDrawings(drawings)
+}
+
 // ---------------------------------------------------------------------------
 // Per-frame update
 // ---------------------------------------------------------------------------
@@ -292,48 +333,79 @@ func (m *DeskControlManager) Update(host *engine.Host) *DeskControl {
 // ---------------------------------------------------------------------------
 
 // SetupLabControls creates all the standard desk controls for the QBP lab.
+// Layout follows NASA/F-35 control panel design: controls grouped by function,
+// most critical (START/STOP) largest and leftmost, adjustment dials center,
+// presets right wing.
 func (m *DeskControlManager) SetupLabControls(callbacks LabControlCallbacks) {
-	const controlZ float32 = deskZ + 0.35 // -5.15
+	const controlZ float32 = deskZ + 0.25 // -5.25 (slightly back from old position)
 
-	// RESET
-	m.AddButton("reset", -0.30, controlZ, 0.05,
-		labColCopper(), callbacks.OnReset)
+	// ═══════════════════════════════════════════════════════════
+	// GROUP 1: EXPERIMENT (center-left)
+	// ═══════════════════════════════════════════════════════════
+	const expX float32 = -0.90
 
-	// SLIT DIAL (wider/flatter)
-	m.AddDial("slit_dial", -0.18, controlZ, 0.10, 0.06,
-		labColBrass(), callbacks.OnSlitDial)
+	// START/STOP — large green button (most important control)
+	m.AddButton("start_stop", expX, controlZ, 0.10,
+		matrix.NewColor(0.2, 0.85, 0.3, 1), callbacks.OnStartStop)
+
+	// RESET — medium red button
+	m.AddButton("reset", expX+0.18, controlZ, 0.06,
+		matrix.NewColor(0.85, 0.15, 0.15, 1), callbacks.OnReset)
+
+	// ORACLE — medium blue toggle
+	oracle := m.AddButton("oracle", expX+0.32, controlZ, 0.06,
+		matrix.NewColor(0.3, 0.5, 0.85, 1), callbacks.OnOracleToggle)
+	oracle.IsToggle = true
+
+	// ═══════════════════════════════════════════════════════════
+	// GROUP 2: PARAMETERS (center)
+	// ═══════════════════════════════════════════════════════════
+	const paramX float32 = -0.15
 
 	// RATE -
-	m.AddButton("rate_down", -0.06, controlZ, 0.04,
+	m.AddButton("rate_down", paramX, controlZ, 0.04,
 		labColBrass(), callbacks.OnRateDown)
 
 	// RATE +
-	m.AddButton("rate_up", 0.00, controlZ, 0.04,
+	m.AddButton("rate_up", paramX+0.08, controlZ, 0.04,
 		labColBrass(), callbacks.OnRateUp)
 
-	// START/STOP (green)
-	m.AddButton("start_stop", 0.10, controlZ, 0.08,
-		matrix.NewColor(0.3, 0.9, 0.4, 1), callbacks.OnStartStop)
+	// SLIT DIAL — wide/flat brass dial
+	m.AddDial("slit_dial", paramX+0.22, controlZ, 0.10, 0.06,
+		labColBrass(), callbacks.OnSlitDial)
 
-	// Preset buttons: Bach, Zeilinger, Tonomura
-	m.AddButton("bach_2013", 0.22, controlZ, 0.03,
+	// CAP — cycle particle cap
+	m.AddButton("cap_cycle", paramX+0.38, controlZ, 0.04,
+		labColBrass(), callbacks.OnCapCycle)
+
+	// ═══════════════════════════════════════════════════════════
+	// GROUP 3: PRESETS (right wing)
+	// ═══════════════════════════════════════════════════════════
+	const presetX float32 = 0.55
+
+	// Standard QM presets (steel colored)
+	m.AddButton("bach_2013", presetX, controlZ, 0.04,
 		labColSteel(), func() { callbacks.OnPreset("bach_2013") })
 
-	m.AddButton("zeilinger_1988", 0.26, controlZ, 0.03,
+	m.AddButton("zeilinger_1988", presetX+0.07, controlZ, 0.04,
 		labColSteel(), func() { callbacks.OnPreset("zeilinger_1988") })
 
-	m.AddButton("tonomura_1989", 0.30, controlZ, 0.03,
+	m.AddButton("tonomura_1989", presetX+0.14, controlZ, 0.04,
 		labColSteel(), func() { callbacks.OnPreset("tonomura_1989") })
 
-	// QBP preset buttons
-	m.AddButton("qbp_weak", 0.34, controlZ, 0.03,
+	// QBP presets (amber — "caution: quaternionic")
+	m.AddButton("qbp_weak", presetX+0.23, controlZ, 0.04,
 		labColAmber(), func() { callbacks.OnPreset("qbp_weak") })
 
-	m.AddButton("qbp_strong", 0.38, controlZ, 0.03,
+	m.AddButton("qbp_strong", presetX+0.30, controlZ, 0.04,
 		labColAmber(), func() { callbacks.OnPreset("qbp_strong") })
 
-	// ORACLE (toggle)
-	oracle := m.AddButton("oracle", 0.46, controlZ, 0.05,
-		matrix.NewColor(0.3, 0.5, 0.8, 1), callbacks.OnOracleToggle)
-	oracle.IsToggle = true
+	// ═══════════════════════════════════════════════════════════
+	// GROUP LABELS (3D SDF text above each zone)
+	// ═══════════════════════════════════════════════════════════
+	const labelZ float32 = controlZ - 0.08 // In front of controls (toward scientist)
+
+	m.AddLabel("EXPERIMENT", expX+0.16, labelZ, 0.015)
+	m.AddLabel("PARAMETERS", paramX+0.19, labelZ, 0.015)
+	m.AddLabel("PRESETS", presetX+0.15, labelZ, 0.015)
 }

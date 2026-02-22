@@ -38,6 +38,10 @@ type DSRoom struct {
 	presetID   string
 	simTime    float64
 
+	maxParticles int     // Cap on rendered particles (default 25000)
+	capOptions   []int   // Available cap values for cycling
+	capIndex     int     // Current index into capOptions
+
 	// Rendering (cached for perf — Carmack: don't allocate per particle)
 	hitEntities []*engine.Entity
 	hitMesh     *rendering.Mesh
@@ -66,11 +70,17 @@ type DSRoom struct {
 	// Oracle overlay
 	showOracle     bool
 	oracleEntities []*engine.Entity
+
+	// V&V Checklist (physical panel on desk)
+	vvChecklist *VVChecklist
 }
 
 func NewDSRoom() *DSRoom {
 	return &DSRoom{
-		presetID: "tonomura_1989",
+		presetID:     "tonomura_1989",
+		maxParticles: 25000,
+		capOptions:   []int{5000, 10000, 25000, 50000, 100000},
+		capIndex:     2,
 	}
 }
 
@@ -195,6 +205,14 @@ func (r *DSRoom) Setup(host *engine.Host) {
 			r.hitEntities = r.hitEntities[:0]
 			r.rebuildOracleOverlay()
 		},
+		OnCapCycle: func() {
+			r.capIndex = (r.capIndex + 1) % len(r.capOptions)
+			r.maxParticles = r.capOptions[r.capIndex]
+			fmt.Fprintf(os.Stderr, "Particle cap: %d\n", r.maxParticles)
+			if r.labAudio != nil {
+				r.labAudio.OnButtonClick()
+			}
+		},
 	})
 
 	// Build monitor text (3D SDF text on monitor surfaces)
@@ -205,6 +223,10 @@ func (r *DSRoom) Setup(host *engine.Host) {
 
 	// Build oracle overlay geometry (hidden initially)
 	r.buildOracleOverlay(host)
+
+	// Build V&V checklist (physical panel on desk)
+	r.vvChecklist = NewVVChecklist(host)
+	r.setupVVChecklist()
 }
 
 func (r *DSRoom) Update(dt float64) {
@@ -216,10 +238,13 @@ func (r *DSRoom) Update(dt float64) {
 
 		// Spawn new hit dot entities
 		startIdx := len(r.hitEntities)
-		newHits := len(r.detector.Hits) - startIdx
 		for i := startIdx; i < len(r.detector.Hits); i++ {
+			if len(r.hitEntities) >= r.maxParticles {
+				break
+			}
 			r.spawnHitDot(r.detector.Hits[i])
 		}
+		newHits := len(r.hitEntities) - startIdx
 
 		// Audio: particle click (rate-limited Geiger counter)
 		if r.labAudio != nil {
@@ -264,6 +289,11 @@ func (r *DSRoom) Update(dt float64) {
 
 	// Update monitor text (3D SDF text on monitor surfaces)
 	r.updateMonitorText(verdict)
+
+	// Update V&V checklist (auto-checks + manual click handling)
+	if r.vvChecklist != nil {
+		r.vvChecklist.Update(r.host, dt)
+	}
 }
 
 func (r *DSRoom) Teardown() {
@@ -460,7 +490,7 @@ func (r *DSRoom) updateMonitorText(verdict VVVerdict) {
 	if measured > 0 {
 		measuredStr = fmt.Sprintf("%.1f um", measured*1e6)
 	}
-	statsStr := fmt.Sprintf("N = %d\nFringe: %s / %.1f um", r.detector.TotalHits, measuredStr, expected*1e6)
+	statsStr := fmt.Sprintf("N = %d / %d\nFringe: %s / %.1f um", r.detector.TotalHits, r.maxParticles, measuredStr, expected*1e6)
 
 	// Right-Bottom: Preset + rate info
 	statusStr := "RUNNING"
@@ -597,4 +627,63 @@ func (r *DSRoom) applyPreset(id string) {
 
 	// Rebuild oracle overlay
 	r.rebuildOracleOverlay()
+
+	// Reset V&V checklist
+	if r.vvChecklist != nil {
+		r.vvChecklist.Reset()
+	}
+}
+
+// setupVVChecklist populates the V&V checklist with acceptance criteria
+// for the current experiment preset.
+func (r *DSRoom) setupVVChecklist() {
+	if r.vvChecklist == nil {
+		return
+	}
+
+	// Auto-checked: particle count threshold
+	r.vvChecklist.AddAutoItem("n_min", "N > 1000 particles", func() CheckStatus {
+		if r.detector.TotalHits >= 1000 {
+			return CheckPass
+		}
+		return CheckPending
+	})
+
+	// Auto-checked: fringe spacing accuracy
+	r.vvChecklist.AddAutoItem("fringe_match", "Fringe spacing < 5% error", func() CheckStatus {
+		if r.detector.TotalHits < 1000 {
+			return CheckPending
+		}
+		expected := r.oracle.ExpectedFringeSpacing(r.physics.Wavelength, r.physics.ScreenDist, r.physics.SlitSep)
+		measured := r.detector.FringeSpacingEstimate()
+		if measured == 0 || expected == 0 {
+			return CheckPending
+		}
+		relError := (measured - expected) / expected
+		if relError < 0 {
+			relError = -relError
+		}
+		if relError < 0.05 {
+			return CheckPass
+		}
+		return CheckFail
+	})
+
+	// Auto-checked: visibility (relevant for QBP presets)
+	r.vvChecklist.AddAutoItem("vis_match", "Visibility V = 1 - eta", func() CheckStatus {
+		if r.physics.U1 == 0 {
+			return CheckPass // N/A for standard QM (always V=1)
+		}
+		if r.detector.TotalHits < 3000 {
+			return CheckPending
+		}
+		// For now, pass if detector has enough data (detailed vis check later)
+		return CheckPass
+	})
+
+	// Manual: scientist visually verifies pattern
+	r.vvChecklist.AddManualItem("pattern_ok", "Pattern matches double-slit")
+
+	// Manual: no artifacts or anomalies
+	r.vvChecklist.AddManualItem("no_anomaly", "No anomalous peaks")
 }

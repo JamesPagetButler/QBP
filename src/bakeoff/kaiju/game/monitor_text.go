@@ -141,44 +141,52 @@ func NewMonitorTextSystem(host *engine.Host) *MonitorTextSystem {
 	botCenterY := bottomEdgeY + screenH/2
 	topCenterY := bottomEdgeY + screenH + gap + screenH/2
 
-	lCenterX := float32(-0.40) // Left wing center
-	rCenterX := float32(0.40)  // Right wing center
+	lCenterX := float32(-0.65) // Left wing center
+	rCenterX := float32(0.65)  // Right wing center
 
-	// Text rendering parameters
-	fontSize := float32(0.04)
-	maxWidth := screenW * 0.9 // Slight inset from screen edge
+	// Text rendering parameters — smaller font, tighter inset to avoid bezel overflow
+	fontSize := float32(0.028)
+	maxWidth := screenW * 0.85
+
+	// Text anchor: upper-left of each screen as seen by the scientist.
+	// The parent entity is rotated 180° Y and rootScale = (-1,1,1), so
+	// text expands "right" in screen space = toward -X in world space.
+	// Anchor at (screenCenter + screenW/2 * 0.85, topEdge, textZ) places
+	// text at the left edge (scientist's view) flowing right and down.
+	marginX := screenW * 0.425 // Half-width with slight inset
+	marginY := screenH * 0.45  // Near top edge
 
 	mts := &MonitorTextSystem{host: host}
 
 	// Left-Top: experiment title + mode
 	mts.leftTop = NewMonitorTextBlock(host,
 		matrix.NewVec3(
-			matrix.Float(lCenterX),
-			matrix.Float(topCenterY),
+			matrix.Float(lCenterX+marginX),
+			matrix.Float(topCenterY+marginY),
 			matrix.Float(textZ)),
 		fontSize, maxWidth, labColIvory())
 
 	// Left-Bottom: V&V verdict + QBP values (amber for emphasis)
 	mts.leftBottom = NewMonitorTextBlock(host,
 		matrix.NewVec3(
-			matrix.Float(lCenterX),
-			matrix.Float(botCenterY),
+			matrix.Float(lCenterX+marginX),
+			matrix.Float(botCenterY+marginY),
 			matrix.Float(textZ)),
 		fontSize, maxWidth, labColAmber())
 
 	// Right-Top: stats (particle count, fringe contrast)
 	mts.rightTop = NewMonitorTextBlock(host,
 		matrix.NewVec3(
-			matrix.Float(rCenterX),
-			matrix.Float(topCenterY),
+			matrix.Float(rCenterX+marginX),
+			matrix.Float(topCenterY+marginY),
 			matrix.Float(textZ)),
 		fontSize, maxWidth, labColIvory())
 
 	// Right-Bottom: preset name + emission rate info
 	mts.rightBottom = NewMonitorTextBlock(host,
 		matrix.NewVec3(
-			matrix.Float(rCenterX),
-			matrix.Float(botCenterY),
+			matrix.Float(rCenterX+marginX),
+			matrix.Float(botCenterY+marginY),
 			matrix.Float(textZ)),
 		fontSize, maxWidth, labColIvory())
 
