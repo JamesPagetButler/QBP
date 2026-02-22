@@ -50,7 +50,7 @@ type DSRoom struct {
 	// Desk Controls (physical buttons on desk surface)
 	deskControls *DeskControlManager
 
-	// Monitor Text (3D SDF text on monitor surfaces)
+	// Monitor Text (screen-space UI panels)
 	monitorText *MonitorTextSystem
 
 	// Monitors (3D histogram bars on desk screens)
@@ -71,7 +71,7 @@ type DSRoom struct {
 	showOracle     bool
 	oracleEntities []*engine.Entity
 
-	// V&V Checklist (physical panel on desk)
+	// V&V Checklist (screen-space UI panel)
 	vvChecklist *VVChecklist
 }
 
@@ -93,6 +93,9 @@ func (r *DSRoom) Devices() []Device {
 
 func (r *DSRoom) Setup(host *engine.Host) {
 	r.host = host
+
+	// Initialize UI manager first (shared by HUD, monitors, V&V)
+	r.uiMgr.Init(host)
 
 	// Physics
 	r.physics = NewLabPhysicsEngine()
@@ -215,8 +218,8 @@ func (r *DSRoom) Setup(host *engine.Host) {
 		},
 	})
 
-	// Build monitor text (3D SDF text on monitor surfaces)
-	r.monitorText = NewMonitorTextSystem(host)
+	// Build monitor text (screen-space UI panels)
+	r.monitorText = NewMonitorTextSystem(&r.uiMgr, host)
 
 	// Build minimal HUD (crosshair + toggleable help strip)
 	r.buildMinimalHUD(host)
@@ -224,8 +227,8 @@ func (r *DSRoom) Setup(host *engine.Host) {
 	// Build oracle overlay geometry (hidden initially)
 	r.buildOracleOverlay(host)
 
-	// Build V&V checklist (physical panel on desk)
-	r.vvChecklist = NewVVChecklist(host)
+	// Build V&V checklist (screen-space UI panel)
+	r.vvChecklist = NewVVChecklist(&r.uiMgr, host)
 	r.setupVVChecklist()
 }
 
@@ -412,7 +415,7 @@ func (r *DSRoom) rebuildOracleOverlay() {
 // ---------------------------------------------------------------------------
 
 func (r *DSRoom) buildMinimalHUD(host *engine.Host) {
-	r.uiMgr.Init(host)
+	// uiMgr already initialized in Setup()
 
 	tex, err := host.TextureCache().Texture(
 		assets.TextureSquare, rendering.TextureFilterLinear)
@@ -455,7 +458,7 @@ func (r *DSRoom) buildMinimalHUD(host *engine.Host) {
 	r.helpPanel.Base().Layout().SetPadding(10, 4, 10, 4)
 
 	helpLabel := r.uiMgr.Add().ToLabel()
-	helpLabel.Init("H:HUD | Enter:emitter | Space:freeze | +/-:rate | 5-9:presets | O:oracle | R:reset | Q:sit")
+	helpLabel.Init("H:HUD | Enter:emitter | Space:freeze | +/-:rate | 5-9:presets | O:oracle | V:verify | R:reset | Q:sit")
 	helpLabel.SetColor(labColSteel())
 	helpLabel.SetBGColor(matrix.NewColor(0, 0, 0, 0))
 	helpLabel.SetFontSize(12)
@@ -535,6 +538,14 @@ func (r *DSRoom) HandleInput(host *engine.Host) bool {
 	// Space: freeze/unfreeze time (simulation pauses, camera still moves)
 	if kb.KeyDown(hid.KeyboardKeySpace) {
 		r.timeFrozen = !r.timeFrozen
+		return true
+	}
+
+	// V: verify next manual V&V checklist item
+	if kb.KeyDown(hid.KeyboardKeyV) {
+		if r.vvChecklist != nil {
+			r.vvChecklist.ToggleNextManual()
+		}
 		return true
 	}
 

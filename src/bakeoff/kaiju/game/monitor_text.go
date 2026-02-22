@@ -1,190 +1,134 @@
 //go:build !editor
 
-// monitor_text.go — 3D SDF text rendering on virtual lab monitor surfaces.
+// monitor_text.go — Screen-space UI panels for lab data display.
 //
-// Each of the 4 desk monitors shows text content (experiment info, stats,
-// verdict, etc.) using dirty-flag updates: text only re-renders when
-// content actually changes.
+// Replaces the broken 3D SDF text approach with Kaiju's HTML/CSS UI system.
+// Four panels at screen corners show experiment info, verdict, stats, and
+// status — styled as translucent cockpit instruments over the 3D lab view.
 
 package main
 
 import (
 	"kaiju/engine"
+	"kaiju/engine/assets"
+	"kaiju/engine/ui"
 	"kaiju/matrix"
 	"kaiju/rendering"
-	"math"
 )
 
 // ---------------------------------------------------------------------------
-// MonitorTextBlock — a single monitor's text overlay
+// MonitorTextBlock — one screen-space info panel
 // ---------------------------------------------------------------------------
 
-// MonitorTextBlock manages SDF text rendering for one monitor surface.
-// It tracks the last-rendered string and only rebuilds geometry when the
-// content actually changes (dirty-flag pattern).
+// MonitorTextBlock manages a screen-space UI panel with a header label
+// and a content label. Text updates use a dirty-flag pattern — the label
+// only redraws when content actually changes.
 type MonitorTextBlock struct {
-	host     *engine.Host
-	entity   *engine.Entity // Parent entity positioned at monitor location
-	drawings []rendering.Drawing
+	header   *ui.Label
+	content  *ui.Label
 	lastText string
-	dirty    bool
-	position matrix.Vec3
-	fontSize float32
-	maxWidth float32
-	fgColor  matrix.Color
 }
 
-// NewMonitorTextBlock creates a text block anchored at the given world
-// position (the center of a monitor's XY slab face).
-func NewMonitorTextBlock(host *engine.Host, position matrix.Vec3, fontSize, maxWidth float32, fgColor matrix.Color) *MonitorTextBlock {
+// newMonitorTextBlock creates a panel with header and content labels.
+func newMonitorTextBlock(uiMgr *ui.Manager, tex *rendering.Texture,
+	x, y, w, h float32, headerText string, fgColor matrix.Color) *MonitorTextBlock {
+
+	// Background panel — dark translucent slate
+	panel := uiMgr.Add().ToPanel()
+	panel.Init(tex, ui.ElementTypePanel)
+	panel.DontFitContent()
+	panel.AllowClickThrough()
+	panel.SetColor(matrix.NewColor(0.05, 0.07, 0.12, 0.85))
+	panel.Base().Layout().SetPositioning(ui.PositioningAbsolute)
+	panel.Base().Layout().Scale(w, h)
+	panel.Base().Layout().SetOffset(x, y)
+	panel.Base().Layout().SetPadding(10, 8, 10, 8)
+
+	// Subtle border
+	bc := matrix.NewColor(0.25, 0.3, 0.4, 0.6)
+	panel.SetBorderSize(1, 1, 1, 1)
+	panel.SetBorderColor(bc, bc, bc, bc)
+
+	// Header label (small, amber)
+	header := uiMgr.Add().ToLabel()
+	header.Init(headerText)
+	header.SetColor(labColAmber())
+	header.SetBGColor(matrix.NewColor(0, 0, 0, 0))
+	header.SetFontSize(11)
+	panel.AddChild(header.Base())
+
+	// Content label
+	content := uiMgr.Add().ToLabel()
+	content.Init("")
+	content.SetColor(fgColor)
+	content.SetBGColor(matrix.NewColor(0, 0, 0, 0))
+	content.SetFontSize(14)
+	panel.AddChild(content.Base())
+
 	return &MonitorTextBlock{
-		host:     host,
-		position: position,
-		fontSize: fontSize,
-		maxWidth: maxWidth,
-		fgColor:  fgColor,
+		header:  header,
+		content: content,
 	}
 }
 
-// SetText updates the text to render. If the text is identical to the
-// last-rendered string, this is a no-op (dirty flag stays false).
+// SetText updates the content label. No-op if text hasn't changed.
 func (mt *MonitorTextBlock) SetText(text string) {
 	if text == mt.lastText {
 		return
 	}
 	mt.lastText = text
-	mt.dirty = true
-}
-
-// Flush rebuilds the SDF text geometry if (and only if) the content has
-// changed since the last Flush. Old text is hidden by deactivating its
-// parent entity; a new entity + drawing set is created for the updated
-// string.
-func (mt *MonitorTextBlock) Flush() {
-	if !mt.dirty {
-		return
-	}
-	mt.dirty = false
-
-	// Hide old text by deactivating the previous parent entity.
-	// Child drawings inherit the parent's active state, so they
-	// disappear without needing per-drawing removal.
-	if mt.entity != nil {
-		mt.entity.SetActive(false)
-	}
-
-	// Create a fresh parent entity at the monitor position.
-	mt.entity = engine.NewEntity(mt.host.WorkGroup())
-	mt.entity.Transform.SetPosition(mt.position)
-	mt.entity.Transform.SetScale(matrix.NewVec3(1, 1, 1))
-	// Rotate 180° around Y so text quads face -Z (toward scientist).
-	mt.entity.Transform.SetRotation(matrix.NewVec3(0, matrix.Float(math.Pi), 0))
-
-	// Render SDF text meshes.
-	// rootScale mirrors X so text reads left-to-right after Y rotation.
-	bgColor := matrix.NewColor(0, 0, 0, 0) // Transparent background
-	rootScale := matrix.NewVec3(-1, 1, 1)   // Mirror X (combined with Y rotation = correct reading order)
-
-	mt.drawings = mt.host.FontCache().RenderMeshes(
-		mt.host,
-		mt.lastText,
-		0, 0, 0,         // x, y, z offset
-		mt.fontSize,      // scale
-		mt.maxWidth,      // max width before wrap (0 = no wrap)
-		mt.fgColor,       // foreground color
-		bgColor,          // background color
-		rendering.FontJustifyCenter, // horizontal justify
-		rendering.FontBaselineTop,  // vertical baseline
-		rootScale,        // parent transform scale
-		true,             // instanced
-		true,             // is3D (world-space text)
-		rendering.FontRegular,      // font face
-		1.3,              // line height multiplier
-		&mt.host.Cameras.Primary,   // camera container for 3D text
-	)
-
-	// Attach every glyph drawing to the parent entity so they move
-	// together and can be deactivated as a group.
-	for i := range mt.drawings {
-		mt.drawings[i].Transform = &mt.entity.Transform
-	}
-	mt.host.Drawings.AddDrawings(mt.drawings)
+	mt.content.SetText(text)
 }
 
 // ---------------------------------------------------------------------------
-// MonitorTextSystem — manages all 4 desk monitors
+// MonitorTextSystem — manages the four cockpit-style info panels
 // ---------------------------------------------------------------------------
 
-// MonitorTextSystem owns the four MonitorTextBlocks that correspond to
-// the 2x2 monitor layout on the scientist's desk.
+// MonitorTextSystem owns the four MonitorTextBlocks positioned at the
+// screen corners, replacing the old 3D monitor text approach.
 type MonitorTextSystem struct {
-	host        *engine.Host
 	leftTop     *MonitorTextBlock // Experiment title + mode
 	leftBottom  *MonitorTextBlock // V&V verdict + QBP values
 	rightTop    *MonitorTextBlock // Stats (N, fringe contrast)
 	rightBottom *MonitorTextBlock // Preset + emission rate info
 }
 
-// NewMonitorTextSystem creates the four text blocks positioned at the
-// monitor surfaces defined in buildPlatform (lab_game.go).
-func NewMonitorTextSystem(host *engine.Host) *MonitorTextSystem {
-	// Match flat monitor geometry from buildPlatform (lab_game.go).
-	// Flat screens at monitorZ = deskZ + 0.4 = -5.1, facing -Z.
-	monitorZ := float32(deskZ + 0.4)
-	textZ := monitorZ - 0.02 // Slightly in front of screen surface
+// NewMonitorTextSystem creates the four UI panels at screen corners.
+func NewMonitorTextSystem(uiMgr *ui.Manager, host *engine.Host) *MonitorTextSystem {
+	tex, _ := host.TextureCache().Texture(
+		assets.TextureSquare, rendering.TextureFilterLinear)
 
-	screenH := float32(0.35)
-	screenW := float32(0.50)
-	gap := float32(0.03)
+	w := float32(host.Window.Width())
 
-	bottomEdgeY := float32(camStartY - 0.05 - screenH - screenH/2)
-	botCenterY := bottomEdgeY + screenH/2
-	topCenterY := bottomEdgeY + screenH + gap + screenH/2
+	// Layout: two columns at screen edges
+	panelW := float32(260)
+	panelH := float32(80)
+	margin := float32(15)
+	gap := float32(8)
 
-	lCenterX := float32(-0.65) // Left wing center
-	rCenterX := float32(0.65)  // Right wing center
+	mts := &MonitorTextSystem{}
 
-	// Text rendering parameters — smaller font for readability
-	fontSize := float32(0.028)
-	maxWidth := screenW * 0.85
+	mts.leftTop = newMonitorTextBlock(uiMgr, tex,
+		margin, margin, panelW, panelH,
+		"EXPERIMENT", labColIvory())
 
-	mts := &MonitorTextSystem{host: host}
+	mts.leftBottom = newMonitorTextBlock(uiMgr, tex,
+		margin, margin+panelH+gap, panelW, panelH,
+		"VERDICT", labColAmber())
 
-	// Place each text block at the screen center. FontJustifyCenter
-	// keeps text centered on the monitor regardless of rotation/mirror.
-	mts.leftTop = NewMonitorTextBlock(host,
-		matrix.NewVec3(
-			matrix.Float(lCenterX),
-			matrix.Float(topCenterY),
-			matrix.Float(textZ)),
-		fontSize, maxWidth, labColIvory())
+	mts.rightTop = newMonitorTextBlock(uiMgr, tex,
+		w-margin-panelW, margin, panelW, panelH,
+		"STATISTICS", labColIvory())
 
-	mts.leftBottom = NewMonitorTextBlock(host,
-		matrix.NewVec3(
-			matrix.Float(lCenterX),
-			matrix.Float(botCenterY),
-			matrix.Float(textZ)),
-		fontSize, maxWidth, labColAmber())
-
-	mts.rightTop = NewMonitorTextBlock(host,
-		matrix.NewVec3(
-			matrix.Float(rCenterX),
-			matrix.Float(topCenterY),
-			matrix.Float(textZ)),
-		fontSize, maxWidth, labColIvory())
-
-	mts.rightBottom = NewMonitorTextBlock(host,
-		matrix.NewVec3(
-			matrix.Float(rCenterX),
-			matrix.Float(botCenterY),
-			matrix.Float(textZ)),
-		fontSize, maxWidth, labColIvory())
+	mts.rightBottom = newMonitorTextBlock(uiMgr, tex,
+		w-margin-panelW, margin+panelH+gap, panelW, panelH,
+		"STATUS", labColIvory())
 
 	return mts
 }
 
-// UpdateAll sets text on all four monitors. Each block only marks itself
-// dirty if its text actually changed, so unchanged monitors cost nothing.
+// UpdateAll sets text on all four panels. Each block only updates the
+// label if its text actually changed.
 func (mts *MonitorTextSystem) UpdateAll(title, verdict, stats, info string) {
 	mts.leftTop.SetText(title)
 	mts.leftBottom.SetText(verdict)
@@ -192,11 +136,6 @@ func (mts *MonitorTextSystem) UpdateAll(title, verdict, stats, info string) {
 	mts.rightBottom.SetText(info)
 }
 
-// Flush is called once per frame. Only monitors whose text changed since
-// the last Flush will rebuild their SDF geometry.
-func (mts *MonitorTextSystem) Flush() {
-	mts.leftTop.Flush()
-	mts.leftBottom.Flush()
-	mts.rightTop.Flush()
-	mts.rightBottom.Flush()
-}
+// Flush is a no-op — UI labels update immediately via SetText.
+// Kept for API compatibility with the old 3D SDF approach.
+func (mts *MonitorTextSystem) Flush() {}

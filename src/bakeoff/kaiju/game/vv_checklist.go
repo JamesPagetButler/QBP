@@ -1,22 +1,21 @@
 //go:build !editor
 
-// vv_checklist.go — Physical V&V checklist panel on the scientist's desk.
+// vv_checklist.go — V&V checklist as screen-space UI panel.
 //
-// NASA go/no-go style verification: auto-checked criteria (fringe spacing,
-// particle count, visibility) plus manual checkboxes the scientist clicks.
-// Traffic-light summary (GREEN/AMBER/RED) shows overall experiment status.
+// NASA go/no-go style verification displayed as a cockpit-style panel
+// at the bottom of the screen. Auto-checked criteria (fringe spacing,
+// particle count, visibility) update at 2 Hz. Manual checkboxes are
+// toggled with the V key. Traffic-light title color shows overall status.
 
 package main
 
 import (
+	"fmt"
 	"kaiju/engine"
 	"kaiju/engine/assets"
-	"kaiju/engine/collision"
+	"kaiju/engine/ui"
 	"kaiju/matrix"
-	"kaiju/platform/hid"
-	"kaiju/registry/shader_data_registry"
 	"kaiju/rendering"
-	"math"
 )
 
 // ---------------------------------------------------------------------------
@@ -43,6 +42,17 @@ func CheckStatusColor(s CheckStatus) matrix.Color {
 	}
 }
 
+func checkStatusTag(s CheckStatus) string {
+	switch s {
+	case CheckPass:
+		return "PASS"
+	case CheckFail:
+		return "FAIL"
+	default:
+		return "PEND"
+	}
+}
+
 // ---------------------------------------------------------------------------
 // VVChecklistItem — one acceptance criterion
 // ---------------------------------------------------------------------------
@@ -51,125 +61,63 @@ type VVChecklistItem struct {
 	ID        string
 	Label     string
 	Status    CheckStatus
-	AutoCheck func() CheckStatus // nil = manual (scientist clicks to toggle)
-
-	// 3D entities
-	checkboxEntity *engine.Entity
-	checkboxSD     *shader_data_registry.ShaderDataUnlit
-	aabb           collision.AABB
+	AutoCheck func() CheckStatus // nil = manual (scientist presses V to toggle)
+	uiLabel   *ui.Label
 }
 
 // ---------------------------------------------------------------------------
-// VVChecklist — the physical checklist panel
+// VVChecklist — screen-space checklist panel
 // ---------------------------------------------------------------------------
 
 type VVChecklist struct {
-	host         *engine.Host
-	items        []*VVChecklistItem
-	summarySD    *shader_data_registry.ShaderDataUnlit
-	updateTimer  float64 // Throttle auto-checks to 2 Hz
-	panelCenterX float32
-	panelCenterZ float32
-	nextItemIdx  int // Tracks vertical stacking
+	host        *engine.Host
+	uiMgr       *ui.Manager
+	panel       *ui.Panel
+	titleLabel  *ui.Label
+	items       []*VVChecklistItem
+	updateTimer float64
 }
 
-// NewVVChecklist creates the V&V panel on the desk surface, centered in front
-// of the scientist's seated position.
-func NewVVChecklist(host *engine.Host) *VVChecklist {
-	vc := &VVChecklist{
-		host:         host,
-		panelCenterX: 0,
-		panelCenterZ: float32(deskZ) + 0.0, // Center of desk, front area
+// NewVVChecklist creates the V&V panel at the bottom-center of the screen.
+func NewVVChecklist(uiMgr *ui.Manager, host *engine.Host) *VVChecklist {
+	tex, _ := host.TextureCache().Texture(
+		assets.TextureSquare, rendering.TextureFilterLinear)
+
+	w := float32(host.Window.Width())
+	h := float32(host.Window.Height())
+
+	panelW := float32(320)
+	panelH := float32(150)
+
+	// Position: bottom-center, above the help strip
+	panel := uiMgr.Add().ToPanel()
+	panel.Init(tex, ui.ElementTypePanel)
+	panel.DontFitContent()
+	panel.AllowClickThrough()
+	panel.SetColor(matrix.NewColor(0.04, 0.06, 0.10, 0.88))
+	panel.Base().Layout().SetPositioning(ui.PositioningAbsolute)
+	panel.Base().Layout().Scale(panelW, panelH)
+	panel.Base().Layout().SetOffset(w/2-panelW/2, h-panelH-40)
+	panel.Base().Layout().SetPadding(12, 8, 12, 8)
+
+	bc := matrix.NewColor(0.25, 0.3, 0.4, 0.6)
+	panel.SetBorderSize(1, 1, 1, 1)
+	panel.SetBorderColor(bc, bc, bc, bc)
+
+	// Title label — color reflects overall status (traffic light)
+	title := uiMgr.Add().ToLabel()
+	title.Init("V&V CHECKLIST")
+	title.SetColor(CheckStatusColor(CheckPending))
+	title.SetBGColor(matrix.NewColor(0, 0, 0, 0))
+	title.SetFontSize(13)
+	panel.AddChild(title.Base())
+
+	return &VVChecklist{
+		host:       host,
+		uiMgr:      uiMgr,
+		panel:      panel,
+		titleLabel: title,
 	}
-	vc.buildPanel(host)
-	return vc
-}
-
-func (vc *VVChecklist) buildPanel(host *engine.Host) {
-	// Background panel — dark slate
-	panelW := matrix.Float(0.50)
-	panelD := matrix.Float(0.30)
-	panelY := matrix.Float(deskY + 0.005)
-
-	mesh := rendering.NewMeshCube(host.MeshCache())
-	entity := engine.NewEntity(host.WorkGroup())
-	entity.Transform.SetPosition(matrix.NewVec3(
-		matrix.Float(vc.panelCenterX), panelY, matrix.Float(vc.panelCenterZ)))
-	entity.Transform.SetScale(matrix.NewVec3(panelW, 0.005, panelD))
-
-	mat, _ := host.MaterialCache().Material(assets.MaterialDefinitionUnlit)
-	sd := &shader_data_registry.ShaderDataUnlit{
-		ShaderDataBase: rendering.NewShaderDataBase(),
-		Color:          matrix.NewColor(0.08, 0.10, 0.14, 1), // Dark slate
-		UVs:            matrix.NewVec4(0, 0, 1, 1),
-	}
-	drawing := rendering.Drawing{
-		Material:   mat,
-		Mesh:       mesh,
-		Transform:  &entity.Transform,
-		ShaderData: sd,
-		ViewCuller: &host.Cameras.Primary,
-	}
-	host.Drawings.AddDrawing(drawing)
-
-	// Traffic-light summary — cube at top of panel
-	lightEntity := engine.NewEntity(host.WorkGroup())
-	lightEntity.Transform.SetPosition(matrix.NewVec3(
-		matrix.Float(vc.panelCenterX-0.20),
-		panelY+0.02,
-		matrix.Float(vc.panelCenterZ)-panelD/2+0.03))
-	lightEntity.Transform.SetScale(matrix.NewVec3(0.03, 0.03, 0.03))
-
-	lightSD := &shader_data_registry.ShaderDataUnlit{
-		ShaderDataBase: rendering.NewShaderDataBase(),
-		Color:          CheckStatusColor(CheckPending),
-		UVs:            matrix.NewVec4(0, 0, 1, 1),
-	}
-	lightDrawing := rendering.Drawing{
-		Material:   mat,
-		Mesh:       mesh,
-		Transform:  &lightEntity.Transform,
-		ShaderData: lightSD,
-		ViewCuller: &host.Cameras.Primary,
-	}
-	host.Drawings.AddDrawing(lightDrawing)
-	vc.summarySD = lightSD
-
-	// Title text: "V&V CHECKLIST"
-	titleEntity := engine.NewEntity(host.WorkGroup())
-	titleEntity.Transform.SetPosition(matrix.NewVec3(
-		matrix.Float(vc.panelCenterX),
-		panelY+0.015,
-		matrix.Float(vc.panelCenterZ)-panelD/2+0.03))
-	titleEntity.Transform.SetScale(matrix.NewVec3(1, 1, 1))
-	// Text faces -Z (toward scientist) — rotate 180° around Y, rootScale (-1,1,1)
-	titleEntity.Transform.SetRotation(matrix.NewVec3(
-		0, matrix.Float(math.Pi), 0))
-
-	bgColor := matrix.NewColor(0, 0, 0, 0)
-	rootScale := matrix.NewVec3(-1, 1, 1)
-
-	titleDrawings := host.FontCache().RenderMeshes(
-		host,
-		"V&V CHECKLIST",
-		0, 0, 0,
-		0.018,
-		0,
-		labColIvory(),
-		bgColor,
-		rendering.FontJustifyCenter,
-		rendering.FontBaselineTop,
-		rootScale,
-		true,
-		true,
-		rendering.FontRegular,
-		0,
-		&host.Cameras.Primary,
-	)
-	for i := range titleDrawings {
-		titleDrawings[i].Transform = &titleEntity.Transform
-	}
-	host.Drawings.AddDrawings(titleDrawings)
 }
 
 // ---------------------------------------------------------------------------
@@ -177,100 +125,36 @@ func (vc *VVChecklist) buildPanel(host *engine.Host) {
 // ---------------------------------------------------------------------------
 
 // AddAutoItem adds an auto-checked criterion. The checker function is called
-// periodically (2 Hz) and its return value determines the checkbox color.
+// periodically (2 Hz) and its return value determines the status display.
 func (vc *VVChecklist) AddAutoItem(id, label string, checker func() CheckStatus) {
 	vc.addItem(id, label, checker)
 }
 
-// AddManualItem adds a manually-verified criterion. The scientist clicks the
-// checkbox to toggle between PENDING and PASS.
+// AddManualItem adds a manually-verified criterion. The scientist presses V
+// to toggle the next pending manual item to PASS.
 func (vc *VVChecklist) AddManualItem(id, label string) {
 	vc.addItem(id, label, nil)
 }
 
 func (vc *VVChecklist) addItem(id, label string, checker func() CheckStatus) {
-	host := vc.host
-	idx := vc.nextItemIdx
-	vc.nextItemIdx++
-
-	panelD := float32(0.30)
-	// Rows stack in Z: first item nearest to monitor, last nearest to scientist
-	rowZ := vc.panelCenterZ - panelD/2 + 0.06 + float32(idx)*0.045
-	checkboxX := vc.panelCenterX - 0.18
-	checkboxY := float32(deskY) + 0.015
-
-	// Checkbox cube
-	mesh := rendering.NewMeshCube(host.MeshCache())
-	entity := engine.NewEntity(host.WorkGroup())
-	entity.Transform.SetPosition(matrix.NewVec3(
-		matrix.Float(checkboxX), matrix.Float(checkboxY), matrix.Float(rowZ)))
-	entity.Transform.SetScale(matrix.NewVec3(0.015, 0.015, 0.015))
-
-	mat, _ := host.MaterialCache().Material(assets.MaterialDefinitionUnlit)
-	sd := &shader_data_registry.ShaderDataUnlit{
-		ShaderDataBase: rendering.NewShaderDataBase(),
-		Color:          CheckStatusColor(CheckPending),
-		UVs:            matrix.NewVec4(0, 0, 1, 1),
-	}
-	drawing := rendering.Drawing{
-		Material:   mat,
-		Mesh:       mesh,
-		Transform:  &entity.Transform,
-		ShaderData: sd,
-		ViewCuller: &host.Cameras.Primary,
-	}
-	host.Drawings.AddDrawing(drawing)
-
-	// AABB for raycast hit
-	aabb := collision.AABB{
-		Center: matrix.NewVec3(matrix.Float(checkboxX), matrix.Float(checkboxY), matrix.Float(rowZ)),
-		Extent: matrix.NewVec3(0.02, 0.04, 0.02),
+	text := fmt.Sprintf("[%s] %s", checkStatusTag(CheckPending), label)
+	if checker == nil {
+		text += "  (V)" // Hint: press V to verify
 	}
 
-	// Label: small 3D text standing up from desk, facing -Z (toward scientist)
-	// Same approach as monitor text — rotate pi around Y, rootScale (-1,1,1)
-	labelEntity := engine.NewEntity(host.WorkGroup())
-	labelEntity.Transform.SetPosition(matrix.NewVec3(
-		matrix.Float(checkboxX+0.03),
-		matrix.Float(checkboxY+0.005),
-		matrix.Float(rowZ)))
-	labelEntity.Transform.SetScale(matrix.NewVec3(1, 1, 1))
-	labelEntity.Transform.SetRotation(matrix.NewVec3(
-		0, matrix.Float(math.Pi), 0))
-
-	bgColor := matrix.NewColor(0, 0, 0, 0)
-	rootScale := matrix.NewVec3(-1, 1, 1)
-
-	labelDrawings := host.FontCache().RenderMeshes(
-		host,
-		label,
-		0, 0, 0,
-		0.010,
-		0.30,
-		labColIvory(),
-		bgColor,
-		rendering.FontJustifyLeft,
-		rendering.FontBaselineBottom,
-		rootScale,
-		true,
-		true,
-		rendering.FontRegular,
-		0,
-		&host.Cameras.Primary,
-	)
-	for i := range labelDrawings {
-		labelDrawings[i].Transform = &labelEntity.Transform
-	}
-	host.Drawings.AddDrawings(labelDrawings)
+	uiLabel := vc.uiMgr.Add().ToLabel()
+	uiLabel.Init(text)
+	uiLabel.SetColor(CheckStatusColor(CheckPending))
+	uiLabel.SetBGColor(matrix.NewColor(0, 0, 0, 0))
+	uiLabel.SetFontSize(12)
+	vc.panel.AddChild(uiLabel.Base())
 
 	item := &VVChecklistItem{
-		ID:             id,
-		Label:          label,
-		Status:         CheckPending,
-		AutoCheck:      checker,
-		checkboxEntity: entity,
-		checkboxSD:     sd,
-		aabb:           aabb,
+		ID:        id,
+		Label:     label,
+		Status:    CheckPending,
+		AutoCheck: checker,
+		uiLabel:   uiLabel,
 	}
 	vc.items = append(vc.items, item)
 }
@@ -279,10 +163,8 @@ func (vc *VVChecklist) addItem(id, label string, checker func() CheckStatus) {
 // Per-frame update
 // ---------------------------------------------------------------------------
 
-// Update runs auto-checkers (throttled to 2 Hz) and handles manual checkbox
-// clicks via raycast.
+// Update runs auto-checkers (throttled to 2 Hz).
 func (vc *VVChecklist) Update(host *engine.Host, dt float64) {
-	// Throttle auto-checks
 	vc.updateTimer += dt
 	if vc.updateTimer >= 0.5 {
 		vc.updateTimer = 0
@@ -291,46 +173,20 @@ func (vc *VVChecklist) Update(host *engine.Host, dt float64) {
 				newStatus := item.AutoCheck()
 				if newStatus != item.Status {
 					item.Status = newStatus
-					item.checkboxSD.Color = CheckStatusColor(newStatus)
+					item.uiLabel.SetText(fmt.Sprintf("[%s] %s",
+						checkStatusTag(newStatus), item.Label))
+					item.uiLabel.SetColor(CheckStatusColor(newStatus))
 				}
 			}
 		}
 		vc.updateTrafficLight()
 	}
-
-	// Manual checkbox click via raycast
-	mouse := &host.Window.Mouse
-	if mouse.Pressed(hid.MouseButtonLeft) {
-		cam := host.PrimaryCamera()
-		w, h := host.Window.Width(), host.Window.Height()
-		screenCenter := matrix.NewVec2(float32(w)/2, float32(h)/2)
-		ray := cam.RayCast(screenCenter)
-
-		for _, item := range vc.items {
-			if item.AutoCheck != nil {
-				continue // Don't allow manual toggle on auto items
-			}
-			_, hit := item.aabb.RayHit(ray)
-			if hit {
-				// Toggle between PENDING and PASS
-				if item.Status == CheckPass {
-					item.Status = CheckPending
-				} else {
-					item.Status = CheckPass
-				}
-				item.checkboxSD.Color = CheckStatusColor(item.Status)
-				vc.updateTrafficLight()
-				break
-			}
-		}
-	}
 }
 
 func (vc *VVChecklist) updateTrafficLight() {
-	if vc.summarySD == nil {
-		return
+	if vc.titleLabel != nil {
+		vc.titleLabel.SetColor(CheckStatusColor(vc.OverallStatus()))
 	}
-	vc.summarySD.Color = CheckStatusColor(vc.OverallStatus())
 }
 
 // OverallStatus returns the aggregate V&V status.
@@ -350,11 +206,42 @@ func (vc *VVChecklist) OverallStatus() CheckStatus {
 	return CheckPending
 }
 
+// ToggleNextManual toggles the first PENDING manual item to PASS.
+// If all manual items are already PASS, resets them all to PENDING.
+func (vc *VVChecklist) ToggleNextManual() {
+	// Find first pending manual item
+	for _, item := range vc.items {
+		if item.AutoCheck == nil && item.Status == CheckPending {
+			item.Status = CheckPass
+			item.uiLabel.SetText(fmt.Sprintf("[%s] %s  (V)",
+				checkStatusTag(CheckPass), item.Label))
+			item.uiLabel.SetColor(CheckStatusColor(CheckPass))
+			vc.updateTrafficLight()
+			return
+		}
+	}
+	// All manual items PASS — reset them to PENDING
+	for _, item := range vc.items {
+		if item.AutoCheck == nil {
+			item.Status = CheckPending
+			item.uiLabel.SetText(fmt.Sprintf("[%s] %s  (V)",
+				checkStatusTag(CheckPending), item.Label))
+			item.uiLabel.SetColor(CheckStatusColor(CheckPending))
+		}
+	}
+	vc.updateTrafficLight()
+}
+
 // Reset clears all checklist items (used when switching presets).
 func (vc *VVChecklist) Reset() {
 	for _, item := range vc.items {
 		item.Status = CheckPending
-		item.checkboxSD.Color = CheckStatusColor(CheckPending)
+		text := fmt.Sprintf("[%s] %s", checkStatusTag(CheckPending), item.Label)
+		if item.AutoCheck == nil {
+			text += "  (V)"
+		}
+		item.uiLabel.SetText(text)
+		item.uiLabel.SetColor(CheckStatusColor(CheckPending))
 	}
 	vc.updateTrafficLight()
 }
