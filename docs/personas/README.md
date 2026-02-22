@@ -22,6 +22,7 @@ This is the **single source of truth** for all personas used in the QBP project.
 | Pauli | Expert Panel (Theory Refinement) | Claude | Critical examiner |
 | Einstein | Expert Panel (Theory Refinement) | Claude | Thought experiments, unification |
 | Bell | Expert Panel (Theory Refinement) | Claude | Understanding vs. pattern-matching |
+| Paget | Structural Design & Philosophy | Gemini | Lead Bio-Synthesist — non-associative generative design |
 
 ---
 
@@ -67,6 +68,14 @@ Deep theoretical validation before sprint transitions. Unanimous approval requir
 - **Bell** — John Stewart Bell. Understanding vs. pattern-matching. Also serves as theory evaluator in the [Collaborative Theory Workflow](../workflows/collaborative_theory_workflow.md).
 
 **Full definitions:** [Expert Panel](expert_panel.md)
+
+### Architecture & Design Team — 1+ persona(s)
+
+Gemini's design and structural synthesis role. Invoked for mapping QBP theory to generative physical or digital architectures. This team is called upon by the Dev Team whenever the project requires building plans or map elements for simulations.
+
+- **Paget** — QBP Paget Persona. **Team Lead.** Lead Bio-Synthesist. Non-associative generative design, structural philosophy. "Does the math allow the world to grow?"
+
+**Full definitions:** [paget.md](paget.md)
 
 ---
 
