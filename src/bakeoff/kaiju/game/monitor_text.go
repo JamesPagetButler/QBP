@@ -6,6 +6,13 @@
 // into an RGBA image buffer, uploading as a GPU texture, and mapping
 // onto a flat quad mesh positioned at the monitor surface.
 // Dirty-flag updates: text only re-rasterizes when content changes.
+//
+// KEY INSIGHT: The standard Kaiju quad faces +Z with CCW winding.
+// Our camera sits at Z=-6.5 looking +Z — it sees the BACK of a +Z quad.
+// With CullMode="Back" in the basic shader pipeline, that back face is culled.
+// Rotating Pi around Y to face -Z reverses the winding order, so it's STILL
+// culled. Fix: create a custom quad with reversed index winding that faces -Z
+// with correct CCW winding from the camera's viewpoint.
 
 package main
 
@@ -13,7 +20,6 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"math"
 	"strings"
 
 	"golang.org/x/image/font"
@@ -22,6 +28,7 @@ import (
 
 	"kaiju/engine"
 	"kaiju/engine/assets"
+	"kaiju/engine/collision"
 	"kaiju/matrix"
 	"kaiju/registry/shader_data_registry"
 	"kaiju/rendering"
@@ -31,6 +38,13 @@ const (
 	monTexW = 512
 	monTexH = 256
 )
+
+// alwaysVisibleCuller is a ViewCuller that never culls — everything is in view.
+// Used for flat quads whose zero-depth AABBs fail the camera frustum test.
+type alwaysVisibleCuller struct{}
+
+func (alwaysVisibleCuller) IsInView(_ collision.AABB) bool { return true }
+func (alwaysVisibleCuller) ViewChanged() bool              { return false }
 
 // ---------------------------------------------------------------------------
 // MonitorTextBlock — one monitor's text-on-texture display
@@ -64,13 +78,35 @@ func newMonitorTextBlock(host *engine.Host, pos matrix.Vec3,
 	return mt
 }
 
+// newMeshQuadNegZ creates a quad mesh facing -Z with correct CCW winding.
+// The standard Kaiju quad faces +Z; this one is visible from -Z (camera side).
+func newMeshQuadNegZ(cache *rendering.MeshCache) *rendering.Mesh {
+	const key = "quad_neg_z"
+	if mesh, ok := cache.FindMesh(key); ok {
+		return mesh
+	}
+	// Same vertex positions as the standard center quad.
+	// Normal = (0,0,-1) so it faces -Z.
+	// UVs are horizontally mirrored so text reads left-to-right from -Z.
+	verts := []rendering.Vertex{
+		{Position: matrix.Vec3{-0.5, -0.5, 0}, Normal: matrix.Vec3{0, 0, -1}, UV0: matrix.Vec2{1, 1}, Color: matrix.ColorWhite()},
+		{Position: matrix.Vec3{-0.5, 0.5, 0}, Normal: matrix.Vec3{0, 0, -1}, UV0: matrix.Vec2{1, 0}, Color: matrix.ColorWhite()},
+		{Position: matrix.Vec3{0.5, 0.5, 0}, Normal: matrix.Vec3{0, 0, -1}, UV0: matrix.Vec2{0, 0}, Color: matrix.ColorWhite()},
+		{Position: matrix.Vec3{0.5, -0.5, 0}, Normal: matrix.Vec3{0, 0, -1}, UV0: matrix.Vec2{0, 1}, Color: matrix.ColorWhite()},
+	}
+	// Reversed winding: {0,1,2, 0,2,3} instead of standard {0,2,1, 0,3,2}.
+	// This makes the -Z facing side the CCW front face.
+	indices := []uint32{0, 1, 2, 0, 2, 3}
+	return cache.Mesh(key, verts, indices)
+}
+
 func (mt *MonitorTextBlock) initQuad() {
 	host := mt.host
 
-	// Rasterize blank initial texture (dark monitor "off" state)
+	// Initial blank texture (dark monitor "off" state)
 	blankImg := rasterizeMonitorText("", monTexW, monTexH, mt.fgColor)
 
-	// Create GPU texture from pixel data
+	// Create GPU texture from raw RGBA pixel data
 	var err error
 	mt.texture, err = rendering.NewTextureFromMemory(
 		rendering.GenerateUniqueTextureKey,
@@ -83,15 +119,13 @@ func (mt *MonitorTextBlock) initQuad() {
 	}
 	mt.texture.DelayedCreate(host.Window.Renderer)
 
-	// Create quad mesh positioned at monitor surface
-	mesh := rendering.NewMeshQuad(host.MeshCache())
+	// Custom quad mesh facing -Z (toward scientist at Z=-6.5)
+	mesh := newMeshQuadNegZ(host.MeshCache())
 	mt.entity = engine.NewEntity(host.WorkGroup())
 	mt.entity.Transform.SetPosition(mt.position)
 	mt.entity.Transform.SetScale(matrix.NewVec3(
 		matrix.Float(mt.quadW), matrix.Float(mt.quadH), 1))
-	// Rotate 180° around Y so quad faces -Z (toward scientist)
-	mt.entity.Transform.SetRotation(matrix.NewVec3(
-		0, matrix.Float(math.Pi), 0))
+	// No rotation needed — the mesh already faces -Z
 
 	// Create textured material instance
 	baseMat, _ := host.MaterialCache().Material(assets.MaterialDefinitionUnlit)
@@ -108,7 +142,7 @@ func (mt *MonitorTextBlock) initQuad() {
 		Mesh:       mesh,
 		Transform:  &mt.entity.Transform,
 		ShaderData: sd,
-		ViewCuller: &host.Cameras.Primary,
+		ViewCuller: alwaysVisibleCuller{}, // Flat quads have zero-depth AABBs
 	}
 	host.Drawings.AddDrawing(drawing)
 }
@@ -131,9 +165,7 @@ func (mt *MonitorTextBlock) Flush() {
 	mt.dirty = false
 
 	img := rasterizeMonitorText(mt.lastText, monTexW, monTexH, mt.fgColor)
-
-	// Mirror horizontally to compensate for the pi Y-rotation
-	mirrorImageH(img)
+	// No mirrorImageH needed — the -Z quad's UVs handle the orientation.
 
 	mt.texture.WritePixels(mt.host.Window.Renderer, []rendering.GPUImageWriteRequest{
 		{
@@ -163,7 +195,7 @@ func NewMonitorTextSystem(host *engine.Host) *MonitorTextSystem {
 	// Match flat monitor geometry from buildPlatform (lab_game.go).
 	// Flat screens at monitorZ = deskZ + 0.4, facing -Z.
 	monitorZ := float32(deskZ + 0.4)
-	textZ := monitorZ - 0.015 // Slightly in front of screen surface
+	textZ := monitorZ - 0.04 // In front of screen surface (enough gap to avoid Z-fighting)
 
 	screenH := float32(0.35)
 	screenW := float32(0.50)
@@ -265,23 +297,4 @@ func rasterizeMonitorText(text string, width, height int, fg color.RGBA) *image.
 	}
 
 	return img
-}
-
-// mirrorImageH flips an RGBA image horizontally in-place.
-// Needed because the quad is rotated pi around Y, which mirrors the texture.
-func mirrorImageH(img *image.RGBA) {
-	w := img.Bounds().Dx()
-	h := img.Bounds().Dy()
-	stride := img.Stride
-	for y := 0; y < h; y++ {
-		row := img.Pix[y*stride : y*stride+w*4]
-		for x := 0; x < w/2; x++ {
-			l := x * 4
-			r := (w - 1 - x) * 4
-			row[l], row[r] = row[r], row[l]
-			row[l+1], row[r+1] = row[r+1], row[l+1]
-			row[l+2], row[r+2] = row[r+2], row[l+2]
-			row[l+3], row[r+3] = row[r+3], row[l+3]
-		}
-	}
 }

@@ -9,6 +9,14 @@
 package main
 
 import (
+	"image"
+	"image/color"
+	"image/draw"
+
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/basicfont"
+	"golang.org/x/image/math/fixed"
+
 	"kaiju/engine"
 	"kaiju/engine/assets"
 	"kaiju/engine/collision"
@@ -16,7 +24,6 @@ import (
 	"kaiju/platform/hid"
 	"kaiju/registry/shader_data_registry"
 	"kaiju/rendering"
-	"math"
 )
 
 // ---------------------------------------------------------------------------
@@ -82,6 +89,31 @@ func NewDeskControlManager(host *engine.Host) *DeskControlManager {
 		host:     host,
 		controls: make([]*DeskControl, 0, 16),
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Mesh helpers
+// ---------------------------------------------------------------------------
+
+// newMeshQuadPosY creates a quad mesh in the XZ plane facing +Y (upward).
+// Used for labels that lay flat on the desk surface, visible from above.
+func newMeshQuadPosY(cache *rendering.MeshCache) *rendering.Mesh {
+	const key = "quad_pos_y"
+	if mesh, ok := cache.FindMesh(key); ok {
+		return mesh
+	}
+	// Quad in XZ plane, normal pointing +Y.
+	// UVs oriented so text reads left-to-right when viewed from -Z looking +Z:
+	//   v0 = far-left, v1 = near-left, v2 = near-right, v3 = far-right
+	verts := []rendering.Vertex{
+		{Position: matrix.Vec3{-0.5, 0, 0.5}, Normal: matrix.Vec3{0, 1, 0}, UV0: matrix.Vec2{0, 1}, Color: matrix.ColorWhite()},
+		{Position: matrix.Vec3{-0.5, 0, -0.5}, Normal: matrix.Vec3{0, 1, 0}, UV0: matrix.Vec2{0, 0}, Color: matrix.ColorWhite()},
+		{Position: matrix.Vec3{0.5, 0, -0.5}, Normal: matrix.Vec3{0, 1, 0}, UV0: matrix.Vec2{1, 0}, Color: matrix.ColorWhite()},
+		{Position: matrix.Vec3{0.5, 0, 0.5}, Normal: matrix.Vec3{0, 1, 0}, UV0: matrix.Vec2{1, 1}, Color: matrix.ColorWhite()},
+	}
+	// CCW winding from +Y (same as standard quad rotated -90° around X)
+	indices := []uint32{0, 2, 1, 0, 3, 2}
+	return cache.Mesh(key, verts, indices)
 }
 
 // ---------------------------------------------------------------------------
@@ -216,43 +248,78 @@ func (m *DeskControlManager) AddDial(
 	return ctrl
 }
 
-// AddLabel creates a 3D SDF text label on the desk surface.
-// Used for group labels above control zones.
+// AddLabel creates a texture-rasterized text label on the desk surface.
+// Uses a +Y facing quad (XZ plane) so labels lay flat and are visible
+// from the seated position looking down at the desk.
 func (m *DeskControlManager) AddLabel(text string, posX, posZ, fontSize float32) {
 	host := m.host
 	labelY := matrix.Float(deskY + 0.08) // Above control buttons
 
+	// Rasterize label text to small texture
+	const labelTexW, labelTexH = 256, 32
+	img := image.NewRGBA(image.Rect(0, 0, labelTexW, labelTexH))
+	// Opaque dark background — alpha must be 1.0 to survive the engine's
+	// aggressive alpha discard threshold (0.999) after linear minification.
+	draw.Draw(img, img.Bounds(), image.NewUniform(color.RGBA{20, 28, 38, 255}), image.Point{}, draw.Src)
+
+	face := basicfont.Face7x13
+	d := &font.Drawer{
+		Dst:  img,
+		Src:  image.NewUniform(color.RGBA{255, 250, 240, 255}), // ivory
+		Face: face,
+	}
+	// Center the text horizontally
+	textWidth := d.MeasureString(text).Ceil()
+	startX := (labelTexW - textWidth) / 2
+	if startX < 0 {
+		startX = 0
+	}
+	d.Dot = fixed.Point26_6{
+		X: fixed.Int26_6(startX * 64),
+		Y: fixed.Int26_6(20 * 64), // baseline near bottom
+	}
+	d.DrawString(text)
+
+	// Create GPU texture
+	tex, err := rendering.NewTextureFromMemory(
+		rendering.GenerateUniqueTextureKey,
+		img.Pix,
+		labelTexW, labelTexH,
+		rendering.TextureFilterLinear,
+	)
+	if err != nil {
+		return
+	}
+	tex.DelayedCreate(host.Window.Renderer)
+
+	// Quad dimensions: flat on desk, width in X, depth in Z.
+	// Texture is 8:1 aspect, so quadZ = quadW/8.
+	quadW := float32(0.25)
+	quadZ := float32(0.03)
+
+	mesh := newMeshQuadPosY(host.MeshCache())
 	entity := engine.NewEntity(host.WorkGroup())
 	entity.Transform.SetPosition(matrix.NewVec3(matrix.Float(posX), labelY, matrix.Float(posZ)))
-	entity.Transform.SetScale(matrix.NewVec3(1, 1, 1))
-	// Rotate 180° around Y so text faces -Z (toward scientist)
-	entity.Transform.SetRotation(matrix.NewVec3(0, matrix.Float(math.Pi), 0))
+	// Scale: X = width, Y = 1 (unused for XZ plane), Z = depth
+	entity.Transform.SetScale(matrix.NewVec3(matrix.Float(quadW), 1, matrix.Float(quadZ)))
 
-	bgColor := matrix.NewColor(0, 0, 0, 0)
-	rootScale := matrix.NewVec3(-1, 1, 1)
+	baseMat, _ := host.MaterialCache().Material(assets.MaterialDefinitionUnlit)
+	mat := baseMat.CreateInstance([]*rendering.Texture{tex})
 
-	drawings := host.FontCache().RenderMeshes(
-		host,
-		text,
-		0, 0, 0,
-		fontSize,
-		0, // no max width (single-line labels)
-		labColIvory(),
-		bgColor,
-		rendering.FontJustifyCenter,
-		rendering.FontBaselineBottom,
-		rootScale,
-		true,
-		true,
-		rendering.FontRegular,
-		0,
-		&host.Cameras.Primary,
-	)
-
-	for i := range drawings {
-		drawings[i].Transform = &entity.Transform
+	sd := &shader_data_registry.ShaderDataUnlit{
+		ShaderDataBase: rendering.NewShaderDataBase(),
+		Color:          matrix.NewColor(1, 1, 1, 1),
+		UVs:            matrix.NewVec4(0, 0, 1, 1),
 	}
-	host.Drawings.AddDrawings(drawings)
+
+	drawing := rendering.Drawing{
+		Material:   mat,
+		Mesh:       mesh,
+		Transform:  &entity.Transform,
+		ShaderData: sd,
+		ViewCuller: alwaysVisibleCuller{}, // Flat quads have zero-depth AABBs
+	}
+	host.Drawings.AddDrawing(drawing)
 }
 
 // ---------------------------------------------------------------------------
