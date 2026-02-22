@@ -50,7 +50,7 @@ type DSRoom struct {
 	// Desk Controls (physical buttons on desk surface)
 	deskControls *DeskControlManager
 
-	// Monitor Text (screen-space UI panels)
+	// Monitor Text (CPU-rasterized text on monitor surfaces)
 	monitorText *MonitorTextSystem
 
 	// Monitors (3D histogram bars on desk screens)
@@ -218,8 +218,8 @@ func (r *DSRoom) Setup(host *engine.Host) {
 		},
 	})
 
-	// Build monitor text (screen-space UI panels)
-	r.monitorText = NewMonitorTextSystem(&r.uiMgr, host)
+	// Build monitor text (CPU-rasterized text on monitor surfaces)
+	r.monitorText = NewMonitorTextSystem(host)
 
 	// Build minimal HUD (crosshair + toggleable help strip)
 	r.buildMinimalHUD(host)
