@@ -93,7 +93,7 @@ func (mt *MonitorTextBlock) Flush() {
 		mt.maxWidth,      // max width before wrap (0 = no wrap)
 		mt.fgColor,       // foreground color
 		bgColor,          // background color
-		rendering.FontJustifyLeft,  // horizontal justify
+		rendering.FontJustifyCenter, // horizontal justify
 		rendering.FontBaselineTop,  // vertical baseline
 		rootScale,        // parent transform scale
 		true,             // instanced
@@ -144,49 +144,39 @@ func NewMonitorTextSystem(host *engine.Host) *MonitorTextSystem {
 	lCenterX := float32(-0.65) // Left wing center
 	rCenterX := float32(0.65)  // Right wing center
 
-	// Text rendering parameters — smaller font, tighter inset to avoid bezel overflow
+	// Text rendering parameters — smaller font for readability
 	fontSize := float32(0.028)
 	maxWidth := screenW * 0.85
 
-	// Text anchor: upper-left of each screen as seen by the scientist.
-	// The parent entity is rotated 180° Y and rootScale = (-1,1,1), so
-	// text expands "right" in screen space = toward -X in world space.
-	// Anchor at (screenCenter + screenW/2 * 0.85, topEdge, textZ) places
-	// text at the left edge (scientist's view) flowing right and down.
-	marginX := screenW * 0.425 // Half-width with slight inset
-	marginY := screenH * 0.45  // Near top edge
-
 	mts := &MonitorTextSystem{host: host}
 
-	// Left-Top: experiment title + mode
+	// Place each text block at the screen center. FontJustifyCenter
+	// keeps text centered on the monitor regardless of rotation/mirror.
 	mts.leftTop = NewMonitorTextBlock(host,
 		matrix.NewVec3(
-			matrix.Float(lCenterX+marginX),
-			matrix.Float(topCenterY+marginY),
+			matrix.Float(lCenterX),
+			matrix.Float(topCenterY),
 			matrix.Float(textZ)),
 		fontSize, maxWidth, labColIvory())
 
-	// Left-Bottom: V&V verdict + QBP values (amber for emphasis)
 	mts.leftBottom = NewMonitorTextBlock(host,
 		matrix.NewVec3(
-			matrix.Float(lCenterX+marginX),
-			matrix.Float(botCenterY+marginY),
+			matrix.Float(lCenterX),
+			matrix.Float(botCenterY),
 			matrix.Float(textZ)),
 		fontSize, maxWidth, labColAmber())
 
-	// Right-Top: stats (particle count, fringe contrast)
 	mts.rightTop = NewMonitorTextBlock(host,
 		matrix.NewVec3(
-			matrix.Float(rCenterX+marginX),
-			matrix.Float(topCenterY+marginY),
+			matrix.Float(rCenterX),
+			matrix.Float(topCenterY),
 			matrix.Float(textZ)),
 		fontSize, maxWidth, labColIvory())
 
-	// Right-Bottom: preset name + emission rate info
 	mts.rightBottom = NewMonitorTextBlock(host,
 		matrix.NewVec3(
-			matrix.Float(rCenterX+marginX),
-			matrix.Float(botCenterY+marginY),
+			matrix.Float(rCenterX),
+			matrix.Float(botCenterY),
 			matrix.Float(textZ)),
 		fontSize, maxWidth, labColIvory())
 

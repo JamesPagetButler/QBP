@@ -142,12 +142,12 @@ func (vc *VVChecklist) buildPanel(host *engine.Host) {
 		panelY+0.015,
 		matrix.Float(vc.panelCenterZ)-panelD/2+0.03))
 	titleEntity.Transform.SetScale(matrix.NewVec3(1, 1, 1))
-	// Text faces +Y (up from desk) — rotate -90° around X
+	// Text faces -Z (toward scientist) — rotate 180° around Y, rootScale (-1,1,1)
 	titleEntity.Transform.SetRotation(matrix.NewVec3(
-		matrix.Float(-math.Pi/2), 0, 0))
+		0, matrix.Float(math.Pi), 0))
 
 	bgColor := matrix.NewColor(0, 0, 0, 0)
-	rootScale := matrix.NewVec3(1, 1, 1)
+	rootScale := matrix.NewVec3(-1, 1, 1)
 
 	titleDrawings := host.FontCache().RenderMeshes(
 		host,
@@ -194,8 +194,9 @@ func (vc *VVChecklist) addItem(id, label string, checker func() CheckStatus) {
 	vc.nextItemIdx++
 
 	panelD := float32(0.30)
-	rowZ := vc.panelCenterZ - panelD/2 + 0.08 + float32(idx)*0.04
-	checkboxX := vc.panelCenterX - 0.20
+	// Rows stack in Z: first item nearest to monitor, last nearest to scientist
+	rowZ := vc.panelCenterZ - panelD/2 + 0.06 + float32(idx)*0.045
+	checkboxX := vc.panelCenterX - 0.18
 	checkboxY := float32(deskY) + 0.015
 
 	// Checkbox cube
@@ -203,7 +204,7 @@ func (vc *VVChecklist) addItem(id, label string, checker func() CheckStatus) {
 	entity := engine.NewEntity(host.WorkGroup())
 	entity.Transform.SetPosition(matrix.NewVec3(
 		matrix.Float(checkboxX), matrix.Float(checkboxY), matrix.Float(rowZ)))
-	entity.Transform.SetScale(matrix.NewVec3(0.018, 0.018, 0.018))
+	entity.Transform.SetScale(matrix.NewVec3(0.015, 0.015, 0.015))
 
 	mat, _ := host.MaterialCache().Material(assets.MaterialDefinitionUnlit)
 	sd := &shader_data_registry.ShaderDataUnlit{
@@ -220,33 +221,36 @@ func (vc *VVChecklist) addItem(id, label string, checker func() CheckStatus) {
 	}
 	host.Drawings.AddDrawing(drawing)
 
-	// AABB for raycast hit (generous for steep viewing angles)
+	// AABB for raycast hit
 	aabb := collision.AABB{
 		Center: matrix.NewVec3(matrix.Float(checkboxX), matrix.Float(checkboxY), matrix.Float(rowZ)),
 		Extent: matrix.NewVec3(0.02, 0.04, 0.02),
 	}
 
-	// Label text (3D SDF, lying on desk surface)
+	// Label: small 3D text standing up from desk, facing -Z (toward scientist)
+	// Same approach as monitor text — rotate pi around Y, rootScale (-1,1,1)
 	labelEntity := engine.NewEntity(host.WorkGroup())
 	labelEntity.Transform.SetPosition(matrix.NewVec3(
-		matrix.Float(checkboxX+0.03), matrix.Float(checkboxY+0.005), matrix.Float(rowZ)))
+		matrix.Float(checkboxX+0.03),
+		matrix.Float(checkboxY+0.005),
+		matrix.Float(rowZ)))
 	labelEntity.Transform.SetScale(matrix.NewVec3(1, 1, 1))
 	labelEntity.Transform.SetRotation(matrix.NewVec3(
-		matrix.Float(-math.Pi/2), 0, 0))
+		0, matrix.Float(math.Pi), 0))
 
 	bgColor := matrix.NewColor(0, 0, 0, 0)
-	rootScale := matrix.NewVec3(1, 1, 1)
+	rootScale := matrix.NewVec3(-1, 1, 1)
 
 	labelDrawings := host.FontCache().RenderMeshes(
 		host,
 		label,
 		0, 0, 0,
-		0.012,
-		0.35,
+		0.010,
+		0.30,
 		labColIvory(),
 		bgColor,
 		rendering.FontJustifyLeft,
-		rendering.FontBaselineTop,
+		rendering.FontBaselineBottom,
 		rootScale,
 		true,
 		true,

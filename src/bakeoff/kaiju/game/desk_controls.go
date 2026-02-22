@@ -337,75 +337,57 @@ func (m *DeskControlManager) Update(host *engine.Host) *DeskControl {
 // most critical (START/STOP) largest and leftmost, adjustment dials center,
 // presets right wing.
 func (m *DeskControlManager) SetupLabControls(callbacks LabControlCallbacks) {
-	const controlZ float32 = deskZ + 0.25 // -5.25 (slightly back from old position)
+	const controlZ float32 = deskZ + 0.25
 
-	// ═══════════════════════════════════════════════════════════
-	// GROUP 1: EXPERIMENT (center-left)
-	// ═══════════════════════════════════════════════════════════
-	const expX float32 = -0.90
+	// ═══ GROUP 1: EXPERIMENT (center-left) ═══
+	const expX float32 = -0.55
 
-	// START/STOP — large green button (most important control)
-	m.AddButton("start_stop", expX, controlZ, 0.10,
+	m.AddButton("start_stop", expX, controlZ, 0.06,
 		matrix.NewColor(0.2, 0.85, 0.3, 1), callbacks.OnStartStop)
 
-	// RESET — medium red button
-	m.AddButton("reset", expX+0.18, controlZ, 0.06,
+	m.AddButton("reset", expX+0.12, controlZ, 0.04,
 		matrix.NewColor(0.85, 0.15, 0.15, 1), callbacks.OnReset)
 
-	// ORACLE — medium blue toggle
-	oracle := m.AddButton("oracle", expX+0.32, controlZ, 0.06,
+	oracle := m.AddButton("oracle", expX+0.22, controlZ, 0.04,
 		matrix.NewColor(0.3, 0.5, 0.85, 1), callbacks.OnOracleToggle)
 	oracle.IsToggle = true
 
-	// ═══════════════════════════════════════════════════════════
-	// GROUP 2: PARAMETERS (center)
-	// ═══════════════════════════════════════════════════════════
-	const paramX float32 = -0.15
+	// ═══ GROUP 2: PARAMETERS (center) ═══
+	const paramX float32 = -0.10
 
-	// RATE -
-	m.AddButton("rate_down", paramX, controlZ, 0.04,
+	m.AddButton("rate_down", paramX, controlZ, 0.03,
 		labColBrass(), callbacks.OnRateDown)
 
-	// RATE +
-	m.AddButton("rate_up", paramX+0.08, controlZ, 0.04,
+	m.AddButton("rate_up", paramX+0.06, controlZ, 0.03,
 		labColBrass(), callbacks.OnRateUp)
 
-	// SLIT DIAL — wide/flat brass dial
-	m.AddDial("slit_dial", paramX+0.22, controlZ, 0.10, 0.06,
+	m.AddDial("slit_dial", paramX+0.16, controlZ, 0.08, 0.04,
 		labColBrass(), callbacks.OnSlitDial)
 
-	// CAP — cycle particle cap
-	m.AddButton("cap_cycle", paramX+0.38, controlZ, 0.04,
+	m.AddButton("cap_cycle", paramX+0.28, controlZ, 0.03,
 		labColBrass(), callbacks.OnCapCycle)
 
-	// ═══════════════════════════════════════════════════════════
-	// GROUP 3: PRESETS (right wing)
-	// ═══════════════════════════════════════════════════════════
-	const presetX float32 = 0.55
+	// ═══ GROUP 3: PRESETS (right) ═══
+	const presetX float32 = 0.35
 
-	// Standard QM presets (steel colored)
-	m.AddButton("bach_2013", presetX, controlZ, 0.04,
+	m.AddButton("bach_2013", presetX, controlZ, 0.03,
 		labColSteel(), func() { callbacks.OnPreset("bach_2013") })
 
-	m.AddButton("zeilinger_1988", presetX+0.07, controlZ, 0.04,
+	m.AddButton("zeilinger_1988", presetX+0.06, controlZ, 0.03,
 		labColSteel(), func() { callbacks.OnPreset("zeilinger_1988") })
 
-	m.AddButton("tonomura_1989", presetX+0.14, controlZ, 0.04,
+	m.AddButton("tonomura_1989", presetX+0.12, controlZ, 0.03,
 		labColSteel(), func() { callbacks.OnPreset("tonomura_1989") })
 
-	// QBP presets (amber — "caution: quaternionic")
-	m.AddButton("qbp_weak", presetX+0.23, controlZ, 0.04,
+	m.AddButton("qbp_weak", presetX+0.20, controlZ, 0.03,
 		labColAmber(), func() { callbacks.OnPreset("qbp_weak") })
 
-	m.AddButton("qbp_strong", presetX+0.30, controlZ, 0.04,
+	m.AddButton("qbp_strong", presetX+0.26, controlZ, 0.03,
 		labColAmber(), func() { callbacks.OnPreset("qbp_strong") })
 
-	// ═══════════════════════════════════════════════════════════
-	// GROUP LABELS (3D SDF text above each zone)
-	// ═══════════════════════════════════════════════════════════
-	const labelZ float32 = controlZ - 0.08 // In front of controls (toward scientist)
-
-	m.AddLabel("EXPERIMENT", expX+0.16, labelZ, 0.015)
-	m.AddLabel("PARAMETERS", paramX+0.19, labelZ, 0.015)
-	m.AddLabel("PRESETS", presetX+0.15, labelZ, 0.015)
+	// ═══ GROUP LABELS ═══
+	const labelZ float32 = controlZ - 0.06
+	m.AddLabel("EXPERIMENT", expX+0.11, labelZ, 0.012)
+	m.AddLabel("PARAMETERS", paramX+0.14, labelZ, 0.012)
+	m.AddLabel("PRESETS", presetX+0.13, labelZ, 0.012)
 }
