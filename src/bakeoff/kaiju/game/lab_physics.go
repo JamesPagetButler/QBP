@@ -73,8 +73,8 @@ var presets = []Preset{
 		Mass:       electronMass,
 	},
 	// QBP test presets — non-zero U₁ demonstrates quaternionic effects.
-	// U₁ values calibrated against E_kinetic ≈ 8.0e-15 J (Tonomura-like electrons).
-	// η₀ = U₁²/(E_k² + U₁²): weak → η₀≈0.09, strong → η₀≈0.69.
+	// U₁ values calibrated against relativistic E_k ≈ 7.6e-15 J (Tonomura electrons).
+	// η₀ = U₁²/(E_k² + U₁²): weak → η₀≈0.09, strong → η₀≈0.68.
 	{
 		ID:         "qbp_weak",
 		Label:      "QBP: Weak coupling",
@@ -82,7 +82,7 @@ var presets = []Preset{
 		Wavelength: 5.5e-12,
 		ScreenDist: 1.0,
 		SlitWidth:  1.0e-7,
-		U1:         2.5e-15, // η₀≈0.09, V≈0.91 — subtle visibility reduction
+		U1:         2.4e-15, // η₀≈0.09, V≈0.91 — subtle visibility reduction
 		Mass:       electronMass,
 	},
 	{
@@ -92,7 +92,7 @@ var presets = []Preset{
 		Wavelength: 5.5e-12,
 		ScreenDist: 1.0,
 		SlitWidth:  1.0e-7,
-		U1:         1.2e-14, // η₀≈0.69, V≈0.31 — significant visibility loss
+		U1:         1.1e-14, // η₀≈0.68, V≈0.32 — significant visibility loss
 		Mass:       electronMass,
 	},
 }
@@ -175,13 +175,25 @@ func (e *LabPhysicsEngine) Eta() float64 {
 	// Simplified model: η₀ scales with U₁ relative to kinetic energy.
 	// η₀ = U₁² / (E_kinetic² + U₁²) — smooth saturation at 1.
 	//
-	// De Broglie: λ = h/(m·v), so v = h/(m·λ), E_k = ½mv² = h²/(2mλ²).
-	h := 6.62607015e-34 // Planck's constant (J·s)
-	v := h / (e.Mass * e.Wavelength)
-	eKinetic := 0.5 * e.Mass * v * v
+	// Relativistic kinetic energy from de Broglie momentum p = h/λ:
+	//   E_total = sqrt((pc)² + (mc²)²),  E_k = E_total - mc²
+	// Required because Bach/Tonomura electrons reach v ≈ 0.44c.
+	const (
+		h = 6.62607015e-34  // Planck's constant (J·s)
+		c = 299792458.0     // speed of light (m/s)
+	)
+	p := h / e.Wavelength              // momentum (kg·m/s)
+	mc2 := e.Mass * c * c              // rest energy (J)
+	eTotal := math.Sqrt(p*c*p*c + mc2*mc2)
+	eKinetic := eTotal - mc2
 	eta0 := e.U1 * e.U1 / (eKinetic*eKinetic + e.U1*e.U1)
 
-	// Decay during propagation: κ = |U₁| · d (simplified, mirrors Lean decayConstant)
+	// Decay during propagation: κ = |U₁| · d (simplified algebraic proxy,
+	// mirrors Lean decayConstant in DoubleSlit.lean §8).
+	// NOTE: κ has units [J·m], so exp(-κ·L) is not dimensionless in SI.
+	// The Lean proofs use abstract algebra without SI tracking. For all
+	// current presets exp(-κ·L) ≈ 1.0 (decay is negligible). A physically
+	// grounded decay model is tracked as future work.
 	kappa := QBPDecayConstant(math.Abs(e.U1), e.SlitSep)
 	eta := eta0 * math.Exp(-kappa*e.ScreenDist)
 
