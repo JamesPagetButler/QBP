@@ -21,6 +21,12 @@ import (
 	"math/rand"
 )
 
+// Particle masses (SI, kg).
+const (
+	electronMass = 9.1093837015e-31
+	neutronMass  = 1.67492749804e-27
+)
+
 // Experimental presets — grounded in real double-slit experiments.
 // U1 is the quaternionic coupling energy (QBP-specific parameter).
 // When U1=0, the simulation reduces to standard QM (proven: scenarioA_visibility).
@@ -32,6 +38,7 @@ type Preset struct {
 	ScreenDist float64 // L (meters)
 	SlitWidth  float64 // a (meters)
 	U1         float64 // Quaternionic coupling energy U₁ (Joules). 0 = standard QM.
+	Mass       float64 // Particle mass (kg). Use electronMass or neutronMass.
 }
 
 var presets = []Preset{
@@ -43,6 +50,7 @@ var presets = []Preset{
 		ScreenDist: 0.24,
 		SlitWidth:  62e-9,
 		U1:         0, // Standard QM baseline
+		Mass:       electronMass,
 	},
 	{
 		ID:         "zeilinger_1988",
@@ -52,6 +60,7 @@ var presets = []Preset{
 		ScreenDist: 5.0,
 		SlitWidth:  21.8e-6,
 		U1:         0, // Standard QM baseline
+		Mass:       neutronMass,
 	},
 	{
 		ID:         "tonomura_1989",
@@ -61,8 +70,11 @@ var presets = []Preset{
 		ScreenDist: 1.0,
 		SlitWidth:  1.0e-7,
 		U1:         0, // Standard QM baseline
+		Mass:       electronMass,
 	},
-	// QBP test presets — non-zero U₁ demonstrates quaternionic effects
+	// QBP test presets — non-zero U₁ demonstrates quaternionic effects.
+	// U₁ values calibrated against E_kinetic ≈ 8.0e-15 J (Tonomura-like electrons).
+	// η₀ = U₁²/(E_k² + U₁²): weak → η₀≈0.09, strong → η₀≈0.69.
 	{
 		ID:         "qbp_weak",
 		Label:      "QBP: Weak coupling",
@@ -70,7 +82,8 @@ var presets = []Preset{
 		Wavelength: 5.5e-12,
 		ScreenDist: 1.0,
 		SlitWidth:  1.0e-7,
-		U1:         1e-6, // Weak coupling → small η → slight visibility reduction
+		U1:         2.5e-15, // η₀≈0.09, V≈0.91 — subtle visibility reduction
+		Mass:       electronMass,
 	},
 	{
 		ID:         "qbp_strong",
@@ -79,7 +92,8 @@ var presets = []Preset{
 		Wavelength: 5.5e-12,
 		ScreenDist: 1.0,
 		SlitWidth:  1.0e-7,
-		U1:         1e-3, // Strong coupling → large η → significant visibility loss
+		U1:         1.2e-14, // η₀≈0.69, V≈0.31 — significant visibility loss
+		Mass:       electronMass,
 	},
 }
 
@@ -121,6 +135,7 @@ type LabPhysicsEngine struct {
 	ScreenDist float64
 	SlitWidth  float64
 	U1         float64 // Quaternionic coupling energy (QBP). 0 = standard QM.
+	Mass       float64 // Particle mass (kg). Per-preset: electron or neutron.
 	rng        *rand.Rand
 }
 
@@ -133,6 +148,7 @@ func NewLabPhysicsEngine() *LabPhysicsEngine {
 		ScreenDist: p.ScreenDist,
 		SlitWidth:  p.SlitWidth,
 		U1:         p.U1,
+		Mass:       p.Mass,
 		rng:        rand.New(rand.NewSource(42)),
 	}
 }
@@ -158,10 +174,11 @@ func (e *LabPhysicsEngine) Eta() float64 {
 	// Initial quaternionic fraction at the slit barrier.
 	// Simplified model: η₀ scales with U₁ relative to kinetic energy.
 	// η₀ = U₁² / (E_kinetic² + U₁²) — smooth saturation at 1.
-	hbar := 1.0545718e-34          // ℏ (J·s)
-	mass := 9.1093837e-31          // electron mass (kg)
-	v := hbar / (mass * e.Wavelength * 1e10) // velocity from de Broglie (simplified)
-	eKinetic := 0.5 * mass * v * v
+	//
+	// De Broglie: λ = h/(m·v), so v = h/(m·λ), E_k = ½mv² = h²/(2mλ²).
+	h := 6.62607015e-34 // Planck's constant (J·s)
+	v := h / (e.Mass * e.Wavelength)
+	eKinetic := 0.5 * e.Mass * v * v
 	eta0 := e.U1 * e.U1 / (eKinetic*eKinetic + e.U1*e.U1)
 
 	// Decay during propagation: κ = |U₁| · d (simplified, mirrors Lean decayConstant)
@@ -210,14 +227,17 @@ func (e *LabPhysicsEngine) Intensity(x float64) float64 {
 }
 
 // SampleHitPosition draws a hit position from I(x) via rejection sampling.
+// Guarded: returns center (x=0) after 10 000 failed attempts to prevent
+// infinite loops when intensity is near-zero everywhere (degenerate params).
 func (e *LabPhysicsEngine) SampleHitPosition() float64 {
 	halfWidth := 5.0 * e.FringeSpacing()
-	for {
+	for i := 0; i < 10_000; i++ {
 		x := (e.rng.Float64()*2 - 1) * halfWidth
 		if e.rng.Float64() < e.Intensity(x) {
 			return x
 		}
 	}
+	return 0 // Safety fallback: center of pattern
 }
 
 // ApplyPreset sets all physics parameters from a named preset.
@@ -231,6 +251,7 @@ func (e *LabPhysicsEngine) ApplyPreset(id string) bool {
 	e.ScreenDist = p.ScreenDist
 	e.SlitWidth = p.SlitWidth
 	e.U1 = p.U1
+	e.Mass = p.Mass
 	return true
 }
 
