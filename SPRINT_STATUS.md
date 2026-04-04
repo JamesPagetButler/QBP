@@ -34,7 +34,7 @@
   - [x] 4b: Proof Review (#260) — CLOSED 2026-02-20. 3 review rounds. V(η) bridge (5 theorems) contextually reviewed. Fraunhofer extracted to QBP.Optics (PR #389). Model A spatial correlation caveat documented (#387). FAULT-S3-007, FAULT-S3-008 logged.
   - [x] 4c: Interactive Proof Visualization (#261) — CLOSED 2026-02-20. PR #391 merged. 39-node proof graph, Atkinson Hyperlegible fonts, 3 review rounds (Red Team + Gemini + human visual).
   - [x] 4d: Verified Differential Testing (#301) — CLOSED 2026-02-20. PR #392 merged. 86 comparisons, 0 divergences. 17 DoubleSlit test vectors, 3 bug detection mutations.
-  - [ ] 4e: Verified Simulation Engine (#302) — IN PROGRESS. Raylib + Kaiju bake-off prototypes built. AMDVLK driver installed for RX 9070 XT.
+  - [ ] 4e: Verified Simulation Engine (#302) — IN PROGRESS. Kaiju prototype: desk controls, monitors, histogram, particle cap (25K), NASA control panel. Text rendering fixes pending James testing (opaque backgrounds, horizontal labels, Z-offset). See #302 comment 2026-02-22.
 - [ ] Phase 5: Publication (#65)
 - [ ] Theory Refinement (#81)
 - [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`

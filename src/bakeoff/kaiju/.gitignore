@@ -1,0 +1,17 @@
+# Kaiju engine (vendored git repo — not tracked in QBP repo)
+# Clone separately: see README.md for setup instructions.
+engine/
+
+# Build artifacts
+kaiju-ds
+*.o
+*.a
+
+# Shared libraries (platform-specific, symlinked at build time)
+local_libs/
+
+# Symlinks to engine content
+content
+
+# Runtime artifacts
+fps_log.txt

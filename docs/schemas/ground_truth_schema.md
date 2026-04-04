@@ -16,7 +16,17 @@ Ground truth documents establish the theoretical predictions for an experiment *
 - Key result (the main prediction)
 - Cross-references to theory documents
 
-### 2. Physical Situation
+### 2. Environmental Conditions (REQUIRED)
+- **Ambient baseline:** The standard facility conditions defined in `docs/design/facility_location.md`.
+  - **Atmosphere:** Old Growth Forest (21.5% $O_2$, 55% Humidity, trace phytoncides).
+  - **Temperature:** 295.15 K (22°C / 71.6°F).
+  - **Pressure:** 1.0 atm (101.325 kPa).
+  - **Gravity:** 1.0 g (9.81 m/s²).
+- **Lab-specific alterations:** Any deviations from these values required for the experiment.
+- **Airlock/Safety Protocols:** Specific procedures for entering the lab environment (e.g., mandatory protective gear, airlock cycles).
+- **Rationale:** Why these conditions are necessary for the quaternionic effects being tested.
+
+### 3. Physical Situation
 - Real-world setup being modeled
 - What question we're answering
 - Standard QM answer (if known)

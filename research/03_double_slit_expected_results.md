@@ -9,7 +9,21 @@ This document defines the quantitative predictions for the double-slit interfere
 
 ## 1. Experimental Setup
 
-### 1.1 Apparatus Parameters (SI)
+### 1.1 Environmental Conditions (REQUIRED)
+
+| Parameter | Ambient Baseline | Lab-Specific Alteration | Rationale |
+|-----------|------------------|-------------------------|-----------|
+| **Temperature** | 295.15 K (22°C) | 295.15 K (Standard) | Stability required for electron gun optics. |
+| **Pressure** | 1.0 atm | **1.0 × 10⁻⁷ Pa (High Vacuum)** | Crucial to prevent scattering by air molecules, which would decohere the wavefunction and wash out the interference pattern. |
+| **Atmosphere** | **Old Growth Forest** | **High Vacuum (None)** | Atmosphere must be completely evacuated for electron propagation. |
+| **Gravity** | 9.81 m/s² | 9.81 m/s² (Standard) | No significant impact on non-relativistic electron propagation at this scale. |
+
+**Airlock/Safety Protocols:**
+- **Access:** Mandatory entry via a three-cycle airlock system to maintain the high-vacuum environment.
+- **Protective Gear:** All personnel must wear full vacuum-rated suits with independent life support. Entering the lab without such gear results in immediate decompression and termination of the experiment.
+- **Protocol:** Pre-entry briefing includes a review of the "Ambient Baseline" vs. "Lab-Specific Alteration" status on the doorway LED panel.
+
+### 1.2 Apparatus Parameters (SI)
 
 | Parameter | Symbol | SI Value | Unit | Source |
 |-----------|--------|----------|------|--------|
