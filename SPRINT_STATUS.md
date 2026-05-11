@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
-- **Lifecycle Stage:** Phase 4d (Verified Differential Testing) complete. Phase 4e in progress.
-- **Next Critical-Path Action:** Phase 4e: Verified Simulation Engine (#302) → Phase 5 → Theory Refinement → Retrospective
+- **Lifecycle Stage:** Phase 4 (Formal Verification) complete. All 4 sub-phases (4a/4b/4c/4d/4e) closed.
+- **Next Critical-Path Action:** Phase 5: Publication (#65) → Theory Refinement (#81) → Retrospective (#192)
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -29,12 +29,12 @@
 - [x] Phase 3: Visualization (#342, v3 rework) — CLOSED. PR #355 merged 2026-02-15. Near-field hero plots + RESULTS.md. PR #357 (Panel C normalization fix).
 - [x] **Phase 2 Rework: Far-Field (#359)** — CLOSED 2026-02-17. PR #361 merged. Hybrid BPM + Fraunhofer FFT. V(U₁=0)=0.655, V(U₁=max)=0.600 (~8.5% reduction).
 - [x] **Phase 3 Rework: Far-Field Visualization (#360)** — CLOSED 2026-02-18. PR #368 merged. Far-field hero overlay, V(U₁) curve, residual, 3-panel comparison. VPython refactored (pre-allocated gcurves, debounced slider, P6 with actual BPM+FFT). FAULT-S3-003 (scale incomparability) caught by Human Visual Review.
-- [ ] Phase 4: Formal Verification (#56)
+- [x] Phase 4: Formal Verification (#56) — All 5 sub-phases closed.
   - [x] 4a: Formal Proof (#259) — CLOSED 2026-02-19. PR #373 merged. 433-line Lean 4 proof, zero `sorry`. 2 review rounds (Red Team + Gemini). FAULT-S3-005, FAULT-S3-006 logged.
   - [x] 4b: Proof Review (#260) — CLOSED 2026-02-20. 3 review rounds. V(η) bridge (5 theorems) contextually reviewed. Fraunhofer extracted to QBP.Optics (PR #389). Model A spatial correlation caveat documented (#387). FAULT-S3-007, FAULT-S3-008 logged.
   - [x] 4c: Interactive Proof Visualization (#261) — CLOSED 2026-02-20. PR #391 merged. 39-node proof graph, Atkinson Hyperlegible fonts, 3 review rounds (Red Team + Gemini + human visual).
   - [x] 4d: Verified Differential Testing (#301) — CLOSED 2026-02-20. PR #392 merged. 86 comparisons, 0 divergences. 17 DoubleSlit test vectors, 3 bug detection mutations.
-  - [ ] 4e: Verified Simulation Engine (#302) — IN PROGRESS. Kaiju prototype: desk controls, monitors, histogram, particle cap (25K), NASA control panel. Text rendering fixes pending James testing (opaque backgrounds, horizontal labels, Z-offset). See #302 comment 2026-02-22.
+  - [x] 4e: Verified Simulation Engine (#302) — CLOSED 2026-05-11. PR #401 merged 2026-04-04. Kaiju Virtual Lab with desk controls, 3D monitors, V&V checklist, QBP physics presets (relativistic E_k calibration). 10/10 Go differential tests pass vs Lean oracle. V&V sign-off completed in `docs/verification/vv_checklist_03.md`. Deferred follow-ups: #397 (GPU particle optim), #398 (deeper QBP physics, dimensional κ fix).
 - [ ] Phase 5: Publication (#65)
 - [ ] Theory Refinement (#81)
 - [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`
