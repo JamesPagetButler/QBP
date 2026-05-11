@@ -61,10 +61,42 @@ You are a peer to:
 6. proofs/README.md + the QBP.lean root — Lean formalisation status
 7. paper/ + research/ — sample 1-2 most recent QBP theory documents
 8. experiments/ — current experiment scaffolds (Test C, EXP-11)
-9. **archive/** — contains the QBP-web instance's update (download
-   arranged separately by James). This is your most direct context for
-   what previous instances have established. Read everything here
-   before responding.
+9. **archive/** — contains the QBP-web instance's transfer (now
+   landed in the repo as of 2026-05-08). Read these specifically in
+   this order before posting your introduction:
+   - `archive/00-START-HERE.md` — the QBP programme introduction
+     prompt (your most direct context for what previous instances
+     established; cite the central claim chain by anchor IDs when
+     you respond)
+   - `archive/QBP-ARCHIVE-INDEX.md` — index of all sessions 1-12
+     work (currently dated 2026-04-10; some claims are stale per
+     QBP-Repo-State-Report-2026-05-08 §4)
+   - `archive/QBP-Confluent-Trust-Theory-v1.0.md` (2026-03-31) —
+     the seed CTH theory authored from QBP; provenance for how
+     CTH originated as a QBP-internal need
+   - `archive/QBP-Confluent-Trust-Spec-v1.0.md` — paired spec
+   - `archive/QBP-First-Wisdom-Theory.md` (2026-04-27) — Branch W
+     foundational text; argues wisdoms belong in a SEPARATE registry,
+     not CTH. Important for the merge work (see Phase 5 below).
+   - `archive/confluent-trust-inventory-v5.13.json` — latest
+     inventory state (150 anchors); the most recent web-session
+     CTH state. Schema may have drifted from CTH Go-implementation
+     v0.2 — investigate as part of bootstrap (see CTH PR #57
+     context briefing).
+   - `archive/lean-project/` — canonical Lean 4 corpus
+     (208 theorems / 2 sorries across 7 files). Branch L source.
+     Note: this is also where the cross-reference work lands
+     (CTH #54 `cth lean-link` is the primitive you'll exercise).
+   - `archive/hypergraph-db/` — alternate Python+SQLite
+     hypergraph-db prerunner. Worth understanding whether to
+     absorb into Wyrd or retire (federation-side decision).
+   - Other `archive/QBP-*.md` files — sample 2-3 of the most
+     recent (e.g., QBP-Dark-Matter-Fork-Analysis,
+     QBP-Assumptions-and-Axioms-v1.0) for additional context.
+   
+   **Also read:** `archive/QBP-Repo-State-Report-2026-05-08.md` —
+   qbp-architecture's discovery report on the current QBP repo
+   state. Concrete state-of-the-archive as of bootstrap.
 
 ## Phase 2 — The federation architecture (essential)
 
@@ -115,6 +147,30 @@ You are a peer to:
     the NT_SIGNAL escalation pattern, and the substrate compression
     rules. Read in order; they build on each other.
 
+## Phase 5 — QBP merge implementation context (post archive transfer)
+
+20. ~/Downloads/QBP-Integration-Discovery-Prompt.md
+    — the web Claude session's framing of the four-fork reconciliation
+    problem (Branch P / L / C / W). Working hypothesis was
+    "manifest layer on prerunner"; qbp-architecture's response
+    refined this to "three-component CTH merge implementation"
+    accepted by James 2026-05-08.
+
+21. ~/Documents/CTH/cth/doc/cth-implementor-merge-context-2026-05-08.md
+    (lands via JamesPagetButler/confluent-trust#57)
+    — the full architectural context for the three new CTH issues
+    (#54 cth lean-link, #55 cth manifest, #56 INST-* schema extension)
+    that operationalise the QBP merge.
+
+22. ~/Documents/QBP/archive/QBP-Repo-State-Report-2026-05-08.md
+    — discovery state report on the QBP repo. Note specifically:
+    - The web Claude session's prerunner-scaffolding premise is wrong
+      (Wyrd/Skuld/QBP-CU live in sibling repos, not QBP)
+    - v5.1 vs v5.13 inventory state drift (web doc said 138 anchors;
+      actual v5.1 = 126; latest v5.13 = 150)
+    - Lean canonical corpus is in archive/lean-project/ (208 theorems
+      / 2 sorries), NOT in proofs/
+
 # State of the work as of bootstrap
 
 ## What exists
@@ -132,15 +188,42 @@ You are a peer to:
 
 ## What does not yet exist (your work)
 
-- Live scout daemon running for QBP (Wyrd-side substrate likely needed
-  — file the design surface issue if it's not in flight)
-- QBP scope-node population in Wyrd (declarative config loaded into
-  Contextus's NT_SCOPE_PHYSICAL + NT_SCOPE_CONCEPTUAL hyperedges)
-- QBP CTH inventory v3.3+ (advance from v3.2 baseline as the programme
-  progresses)
-- BMA observation hooks (the surface BMA-the-instance polls to get
-  QBP-tenant signals)
-- Cross-domain scout reins command (`bma scout cross-domain <query>`)
+- Live scout daemon running for QBP (**filed: Wyrd #32**)
+- QBP scope-node population in Wyrd (**filed: Wyrd #33** + Contextus #9
+  for the schema; declarative config loaded into NT_SCOPE_PHYSICAL +
+  NT_SCOPE_CONCEPTUAL hyperedges)
+- QBP CTH inventory live updates (**filed: CTH #51** for live
+  append/mutate; **CTH #52** for qbp_v3_2 → v0.2 schema migration —
+  this is your bootstrap blocker)
+- BMA observation hooks (**filed: BMA #134**; surface BMA polls for
+  QBP-tenant NT_SIGNALs)
+- Cross-domain scout reins command (**filed: Contextus #10**;
+  `bma scout cross-domain <query>` invocation surface)
+
+## QBP merge implementation issues (post-2026-05-08, new context)
+
+- **CTH #54** `cth lean-link` — reconcile archive/lean-project/ (208
+  theorems) with PROOF-* anchors in the inventory. You'll exercise
+  this once it ships to surface orphan theorems and stale references.
+- **CTH #55** `cth manifest <layer>` — generate per-runtime-layer boot
+  manifests as views on CTH. You consume this to produce QBP-tenant
+  boot manifests; you also provide INST-* anchor entries for the QBP
+  runtime layers via the schema in CTH #56.
+- **CTH #56** INST-* anchor type + boot_requirements field — schema
+  extension making runtime layers themselves CTH inventory entries.
+  You'll populate INST-qbp-tenant anchors as part of QBP federation
+  tenancy operationalisation.
+- **Wisdom Registry decision** — QBP-First-Wisdom-Theory.md argues
+  wisdoms belong in a SEPARATE registry, not CTH. v5.x inventories
+  added WISDOM-* anchors anyway (leak). Coordinate with cth-implementor
+  on which option:
+  - (a) [recommended] Migrate WISDOM-* OUT to wisdom-registry.yaml
+    at QBP repo root during CTH #52 migration
+  - (b) Keep as non-standard tier in CTH
+  - (c) Add multi-registry support to CTH schema
+- **Schema drift question** — v5.13 (web-session) may have evolved
+  schema differently from Go-implementation v0.2. Investigate during
+  bootstrap; coordinate with cth-implementor.
 
 ## Federation policy you inherit
 
@@ -251,29 +334,57 @@ list_participants, list_channels, history, whoami}.
 
 # What to do first
 
-After Phase 1 + 2 + 3 reading, your first message back to me should:
+After Phase 1 + 2 + 3 + 5 reading (Phase 4 is reference-grade; sample
+2-3 of those before posting), your first message back to me should:
 
 1. Confirm you've absorbed the federation architecture + tenancy
-   pattern + QBP-specific config
+   pattern + QBP-specific config + QBP merge implementation context
 2. State your read on the qbp-federation-tenancy.md design — ratify,
    refine, or rewrite (specify scope)
-3. Flag any QBP-domain reality the docs don't yet account for
-   (e.g., specific data-feed latency constraints; archive/ revealing
-   prior-instance work that overlaps; Lean proof status that affects
-   anchor entry to CTH)
-4. Surface the first 3-5 cross-project issues you'd file once the
-   tenancy design is ratified
+3. Flag any QBP-domain reality the docs don't yet account for. Specific
+   things to look for in the archive:
+   - archive/lean-project/ has 208 theorems / 2 sorries; do the 2
+     sorries indicate something the tenancy design should know about?
+   - archive/hypergraph-db/ is an earlier prerunner for federation
+     work (Python+SQLite). Worth absorbing into Wyrd or retiring?
+   - archive/QBP-Dark-Matter-Fork-Analysis.md — the FORK-dark-matter
+     branch in CTH. How does this affect Stance Type-Node taxonomy
+     in qbp-federation-tenancy §1?
+   - archive/QBP-First-Wisdom-Theory.md — three wisdoms (W-001/2/3).
+     Do they integrate into BMA's Stance vocabulary or stay
+     orthogonal as the source theory argues?
+4. Surface the first 3-5 cross-project asks you'd want to file or
+   amend on existing issues (Wyrd #32/#33, Contextus #9/#10,
+   CTH #51/#52/#54/#55/#56, BMA #134) — or new issues you see needed.
+5. Schema-drift investigation: read CTH #57's context briefing on
+   v5.x vs v0.2 schema. Form a read on whether qbp_v3_2 migration
+   (CTH #52) alone is enough, or whether v5.13 → v0.2 needs a
+   separate issue.
 
 Then we schedule when you start implementation, with the understanding
 that BMA takes operational runtime once you declare it running.
 
-# FROM QBP-WEB (archive/ contents)
+# Archive contents (post-transfer, 2026-05-08)
 
-James is arranging an archive download from the QBP-web instance to be
-stored at ~/Documents/QBP/archive/. This contains qbp-web's contribution
-that needs to be absorbed before you post your introduction. Treat as
-ground-truth context for what previous instances have already
-established.
+The QBP-web instance's transfer landed in `~/Documents/QBP/archive/`
+as of 2026-05-08. Read the specific files called out in Phase 1 §9
+in order; they are your most direct context for prior-instance work.
+
+Key facts about archive contents (per QBP-Repo-State-Report-2026-05-08):
+- 40+ CTH inventory versions (v2 through v5.13) — latest is v5.13
+  with 150 anchors. The v3.5 stated in QBP-ARCHIVE-INDEX.md is stale.
+- 208 Lean theorems / 2 sorries in archive/lean-project/ across 7
+  files (Sedenion, Quaternion, Graphene, Kitaev, Bi₂Se₃,
+  Crystallisation, Elements). NOT 82 theorems as web doc claimed.
+- Wisdom Theory + Confluent-Trust-Theory v1.0 + Spec v1.0 are
+  foundational provenance documents.
+- archive/hypergraph-db/ is a self-contained alternate prerunner
+  (Python + SQLite hypergraph DB) — predates Wyrd substrate work.
+
+Treat archive contents as ground-truth context for what previous
+instances have established. When in doubt about a claim in this
+onboarding prompt or the tenancy design, the archive is the
+provenance.
 
 — Bootstrap prompt for qbp-implementor session
   Authored by qbp-architecture + James Paget Butler
