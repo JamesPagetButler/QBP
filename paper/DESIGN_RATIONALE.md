@@ -1031,3 +1031,124 @@ Research Sprint 1R confirmed that the quaternion measurement formalism extends s
 - [x] Lean 4 proofs generalizing AngleDependent.lean
 - [x] Verification against standard QM rotation matrices (10⁻¹⁰ agreement)
 - [x] Documentation of limitations (none fundamental)
+
+## 12. Theory Refinement — Sprint 3 Analysis
+
+This section synthesizes the theoretical insights from Sprint 3 (Double-Slit) and prepares the foundation for Sprint 4 (Lamb Shift). The Double-Slit experiment was the first to test QBP in a regime where the framework predicts a *quantitative deviation* from standard QM — Model A's V = 1 − η bridge — rather than mere reproduction. The Sprint produced three novel findings beyond the headline V(U₁) curve, each with implications for the framework's next steps.
+
+### 12.1 The Three Sprint 3 Findings
+
+The full results are documented in `paper/quaternion_physics.md` §3 (Task 3) and `analysis/03_double_slit/RESULTS.md`. The theoretical implications synthesize as follows.
+
+#### 12.1.1 Standard QM exactly recovered at U₁ → 0
+
+The most important *negative* result. Scenario A (U₁ = 0) reproduces the analytical Fraunhofer pattern to machine precision; the formal proof `complex_subspace_reduces_to_QM` in `DoubleSlit.lean §7` certifies this algebraically. QBP is a strictly larger framework than standard QM, but its dynamics in the C(1, i) subspace are *exactly* the textbook Schrödinger evolution. This is non-trivial: a quaternionic generalization that produced different single-particle interference in the no-coupling limit would have been ruled out by every interference experiment ever performed. The fact that the algebra reduces cleanly is structural evidence that ℍ-physics is the right *extension*, not a *replacement*, of ℂ-physics.
+
+#### 12.1.2 Step-change in η, not exponential Adler decay
+
+Ground truth `research/03_double_slit_expected_results.md §4.3.2` registered two possible outcomes for the propagation of the quaternionic fraction η:
+
+- **Outcome (a):** Exponential Adler decay η(r) ∝ exp(−2κr) in free space (Adler 1988 prediction)
+- **Outcome (b):** Step-change in η localized at the coupling region, constant in free space
+
+The simulation produced outcome (b). The mechanism is now understood as the **sudden approximation**: U₁(z) is sharply localized at the slit barrier, so the coupling acts as an impulsive interaction that imprints a finite Δη and then "switches off." For wavefunctions propagating through a region where U₁(z) changes faster than the de Broglie wavelength, η is reset by the integrated coupling action and then preserved by the subsequent free evolution.
+
+The deeper insight: **Adler's exponential decay implicitly assumed environmental decoherence as the η-suppression mechanism.** The coherent unitary BPM has no decoherence channel — the coupled equations decouple in free space (U₁ = 0), and both components satisfy the same Schrödinger equation with no mechanism for differential decay. Reproducing Adler's exponential result would require either (i) extending the simulator with a decoherence model, or (ii) using a different propagator (e.g., a transfer-matrix formalism with complex wavevectors). Neither is currently in scope; both are flagged for future theory work (Issue #387).
+
+This is a textbook example of the project's "honest negative results" discipline: the ground truth anticipated both outcomes in advance, and the experiment selected one. The framework is not damaged; the *informational content of η dynamics* shifts from "where does it decay" to "what does the impulsive kick imprint." Both are theoretical questions, just different ones.
+
+#### 12.1.3 η₀-independence of observables
+
+Across η₀ ∈ {0.01, 0.1, 0.5}, the measured visibility differs by less than 8.33 × 10⁻¹⁵ (`analysis/03_double_slit/eta0_independence.png`). At ~14 decimal places, this is not "approximate" — it's machine precision. The *initial* quaternionic fraction has no effect on observables; only the coupling strength U₁ does.
+
+**Theoretical reading:** At initialization the simulation constructs ψ = √(1−η₀)·φ_c + √η₀·φ_q·j with φ_c and φ_q sharing identical spatial structure. Because both satisfy the same Schrödinger equation in free space and the same coupled equations at the slit, the η₀ scaling factors propagate through the dynamics without altering the relative spatial structure. The output visibility depends only on the *coupling-induced* mixing between sectors, not the *initial* admixture.
+
+This is an emergent simplification — the framework has fewer dynamically-relevant parameters than its formal degrees of freedom suggest. A natural follow-up question: is there a *symmetry* of the symplectic decomposition under η₀-rescaling that we have not made explicit? The Lean proof `visibility_eq_one_sub_quatFraction` operates on n₀ = ⟨|ψ₀|²⟩ and n₁ = ⟨|ψ₁|²⟩ at the *detector* (not at initialization), and is silent on η₀; the η₀-independence is observed empirically and is a candidate for future formalization (Issue #334 closed but the theoretical understanding remains shallow).
+
+#### 12.1.4 Persistence under Fraunhofer propagation
+
+The QBP signature in the near-field residual could plausibly have washed out under Fourier propagation to the far field. Fraunhofer propagation is a global integral transform — small near-field deviations could redistribute uniformly. Instead, the residual retains coherent oscillatory structure at mm scale (Fig. 11 in `paper/quaternion_physics.md`), with max +0.050 and RMS 0.0038.
+
+**Theoretical reading:** The QBP signature has a specific spatial-frequency content that is preserved by the FFT. The asymmetric residual (peak suppression exceeds trough elevation) is consistent with an *out-scattering* mechanism rather than a symmetric decoherence — the coupling preferentially redistributes intensity from fringe maxima to a diffuse background rather than uniformly smoothing the pattern. This is the experimentally observable shape predicted by Model A.
+
+**Practical consequence:** Searches for QBP signatures in real interferometric data should look for asymmetric residual structure at the fringe period — not uniform visibility loss. This shapes the experimental targeting (see §12.3).
+
+### 12.2 Guide Post Evaluation
+
+Sprint 3 Guide Post check:
+
+| Guide Post | Status | Evidence |
+|------------|--------|----------|
+| **Emergent Conservation Laws** | Confirmed | Total probability conserved to 2.33×10⁻¹² (vs. 10⁻⁶ threshold), 6 orders of magnitude better than required. The coupled equations preserve `∫(|ψ₀|² + |ψ₁|²) dx` exactly — proven `norm_decomposition`, `DoubleSlit.lean §3b`. |
+| **Emergent Symmetries** | Partial | η₀-independence (§12.1.3) suggests a symmetry we have not formalized. The U₁ → −U₁ symmetry of the coupled equations (the visibility V depends on \|U₁\|, not the sign) is a manifest discrete symmetry not noted in the original ground truth. |
+| **Probability from Geometry** | Confirmed | V = 1 − η_d emerges algebraically from the Born rule + spatial decomposition with no additional postulates. The "geometry" here is the symplectic structure of ℍ as a right C(1,i)-module. |
+| **Particle Equivalents** | N/A | This experiment does not introduce new particles. |
+| **Interaction Models** | New finding | The coupled equations themselves are a new *interaction model* not present in standard QM. They are not derived from a deeper principle here — they are introduced as a hypothesis (post-Adler 1988) and tested against data. Deriving them from a quaternionic Lagrangian is open (Issue #81 follow-up). |
+| **Collective Behavior** | N/A | Single-particle experiment. |
+
+**One unexpected emergent finding:** the η₀-independence is at machine precision rather than approximate. This is stronger than the framework predicts and warrants a formal proof or explanation.
+
+### 12.3 Theoretical Direction for Sprint 4 — The Lamb Shift
+
+Per the Eight-Fold Path of Verification (`paper/quaternion_physics.md`), the next experiment is the **Lamb Shift** — a precise QED prediction for an energy splitting in hydrogen between the 2S₁/₂ and 2P₁/₂ levels (~1057 MHz), arising from vacuum polarization and electron self-energy. It is the canonical test of QED's quantitative power.
+
+#### 12.3.1 Why the Lamb Shift is the right next test
+
+The Lamb Shift differs from Sprints 1–3 in three important ways:
+
+1. **Bound-state, not interferometric.** Lamb Shift is an *energy splitting* in a bound system, not a probability over alternative paths. Tests whether QBP can produce QED-level radiative corrections in a setting where the relevant geometry is the Coulomb potential, not the slit geometry.
+
+2. **Multi-loop precision required.** The measured value agrees with QED to ~10⁻⁹ relative precision after 2-loop and higher corrections. A weaker framework that gets the leading order right but predicts 10⁻² systematic deviation at 2-loop would already be falsified.
+
+3. **The vacuum is the protagonist.** Lamb Shift is generated by the *quantum vacuum's* response to the bound electron. The Session-13 Spectral Action programme has substantial new theory (§7 of `archive/QBP-Theory-v3_1.md`) about how the vacuum is structured in QBP — the f(u) profile, the f₂ ↔ G correspondence, the killed-but-still-required f₄ = 0 condition. Sprint 4 is the first experiment to make those theoretical commitments quantitatively binding.
+
+#### 12.3.2 Required theoretical inputs
+
+Sprint 4 cannot begin until at least the following are settled:
+
+| Input | Status | Required for |
+|-------|--------|--------------|
+| QBP Lagrangian for hydrogen | Not formalized | Setting up the bound-state problem |
+| QBP analog of QED's photon propagator | Open question | Computing self-energy |
+| Profile function f(u) shape at hydrogen energy scales | Constrained but not derived (Session-13 v3.1 §7.4) | Vacuum polarization |
+| Renormalization scheme | Open | Multi-loop computation |
+
+**Recommendation:** Sprint 4 Phase 0 (Ground Truth) must be a *deep* theoretical groundwork phase — comparable to Sprint 3 Pre-Sprint Research (Section 10) — before any computational ground truth can be stated. Estimate: 2–3 weeks of theory work before Phase 1 ground truth document can be drafted.
+
+#### 12.3.3 Open questions for the Pre-Sprint 4 Research phase
+
+1. **What is the QBP analog of QED's photon?** The Standard Model gauge bosons emerge from the spectral action (Session-13 §7.1 of theory doc), but the explicit photon propagator in a quaternionic Hilbert space has not been written down.
+
+2. **Does the symplectic decomposition (ψ = ψ₀ + ψ₁·j) survive in bound states?** Single-particle interference (Sprint 3) admits the decomposition cleanly. Bound states have additional structure (angular momentum quantum numbers, spin-orbit coupling) that may interact with the j-direction non-trivially.
+
+3. **Does the η-mechanism produce a hydrogen energy shift?** Specifically: does a nonzero U₁ at the proton (which is the coupling-active region) imprint η_d ≠ 0 on the bound electron, and if so, does that translate into an energy correction observable in spectroscopy?
+
+4. **What is the Sprint 4 falsifiable window for U₁?** Lamb Shift agreement with QED at 10⁻⁹ implies tight constraints on any QBP-induced corrections at the hydrogen energy scale. The Sprint 3 falsifiable window was 0 < U₁ ≲ 1 keV for electron-interferometry; the Lamb Shift window will be much narrower (potentially keV → eV).
+
+### 12.4 Session-13 Integration Touchpoints (forward references)
+
+The Sprint 3 findings connect to the broader Session-13 theoretical programme (per Issue #81 roadmap) in three places:
+
+1. **η₀-independence (§12.1.3)** — connects to W-002 ("the algebra is the schema, the boundary is the instance"). The η₀-independence is consistent with the wisdom that the *algebra* determines structure while the *boundary* determines scale: η₀ is a boundary condition that doesn't affect the algebraic outcome.
+
+2. **The sudden approximation framing (§12.1.2)** — connects to the spectral action programme's focus on the *profile function f(u)*. The step-change in η at the coupling region is structurally similar to a δ-function source in f(u); the relationship between the spatial profile of U₁ and the spectral profile of f(u) is a candidate Sprint 4+ theoretical bridge.
+
+3. **The V = 1 − η_d bridge (Model A) and the open Model A/B/intermediate question** — connects to the "Branch A vs Branch B" framing in the Session-13 gravitational anomaly section (§4.3 of theory doc). Branch A operates in the *no extra structure* regime; Branch B extends. Model A here is the no-extra-structure visibility regime; intermediate cases (partially correlated j-fringes) require extra structure. Both motifs reflect a deeper question about when QBP introduces genuinely new structure versus reducing to existing physics.
+
+Full integration of Session-13 material into the paper is tracked under #81 PR2–PR8.
+
+### 12.5 Summary
+
+Sprint 3 closed cleanly: the engine works, the Lean proofs verify, the Double-Slit results match Model A's structural prediction with a clean monotonic V(U₁) curve. **The headline finding is that QBP makes a quantitative, falsifiable prediction in single-particle interferometry that is within reach of existing experimental sensitivities.** The Sprint 4 target — the Lamb Shift — moves the framework from interferometric to bound-state physics, and requires substantial theoretical groundwork before experimental ground truth can be specified.
+
+**Deliverables:**
+- [x] Synthesis of Sprint 3 findings (this section)
+- [x] Guide Post evaluation
+- [x] Theoretical direction for Sprint 4 (Lamb Shift)
+- [x] Forward references to Session-13 integration (#81 roadmap)
+
+**Open theory questions seeded for follow-up:**
+- Formal proof or explanation for η₀-independence at machine precision (§12.1.3)
+- Derivation of the coupled equations from a quaternionic Lagrangian (§12.2)
+- QBP analog of the QED photon propagator (§12.3.3)
+- Behavior of the symplectic decomposition in bound states (§12.3.3)
