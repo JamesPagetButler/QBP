@@ -9,8 +9,8 @@
 ## Current Position
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
-- **Lifecycle Stage:** Phase 4 (Formal Verification) complete. All 4 sub-phases (4a/4b/4c/4d/4e) closed.
-- **Next Critical-Path Action:** Phase 5: Publication (#65) → Theory Refinement (#81) → Retrospective (#192)
+- **Lifecycle Stage:** Phase 5 (Publication) complete. Paper Task 3 section merged.
+- **Next Critical-Path Action:** Theory Refinement (#81) → Retrospective (#192)
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
@@ -35,7 +35,7 @@
   - [x] 4c: Interactive Proof Visualization (#261) — CLOSED 2026-02-20. PR #391 merged. 39-node proof graph, Atkinson Hyperlegible fonts, 3 review rounds (Red Team + Gemini + human visual).
   - [x] 4d: Verified Differential Testing (#301) — CLOSED 2026-02-20. PR #392 merged. 86 comparisons, 0 divergences. 17 DoubleSlit test vectors, 3 bug detection mutations.
   - [x] 4e: Verified Simulation Engine (#302) — CLOSED 2026-05-11. PR #401 merged 2026-04-04. Kaiju Virtual Lab with desk controls, 3D monitors, V&V checklist, QBP physics presets (relativistic E_k calibration). 10/10 Go differential tests pass vs Lean oracle. V&V sign-off completed in `docs/verification/vv_checklist_03.md`. Deferred follow-ups: #397 (GPU particle optim), #398 (deeper QBP physics, dimensional κ fix).
-- [ ] Phase 5: Publication (#65)
+- [x] Phase 5: Publication (#65) — CLOSED 2026-05-11. PR #405 merged. 240-line Task 3 section in `paper/quaternion_physics.md` (3.1 Standard QM, 3.2 QBP Hypothesis with Model A bridge, 3.3 Results with V(U₁) table + 7 figures, 3.4 Discussion + Theory refinement, References section with 9 DOIs). 3 review rounds (Red Team R2 PASS + Gemini R3 PASS). One algebraic CONFLICT resolved via Lean evidence (j_mul_complex theorem).
 - [ ] Theory Refinement (#81)
 - [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`
 - [ ] Retrospective (#192)
