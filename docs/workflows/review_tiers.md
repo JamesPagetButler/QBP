@@ -168,6 +168,10 @@ For PRs that go through multiple review rounds, Gemini reviews use `session_id` 
 - Test failure
 - Any unforeseen critical error not listed above — when in doubt, it's BLOCKING
 
+### Anchoring discipline (standing rule, effective 2026-05-13)
+
+Every BLOCKING-class claim in a Tier 2+ review must terminate at a verifiable artifact: a Lean theorem at file:line, a simulation output with numerical value + source, a published experimental citation, a pre-registered ground-truth document, or a formally derived dimensional/algebraic identity. Reviews containing unanchored blocking claims are **returned to the reviewer** and not read on merits until re-anchored. Full rule + examples + return mechanic: see [`docs/workflows/review_anchoring.md`](review_anchoring.md). Precedent incident: PR #407 Round 1 (three reviewers each missed three one-line check failures).
+
 ### NON-BLOCKING (note but don't block)
 
 - Style suggestions (naming, formatting preferences)
