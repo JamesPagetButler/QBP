@@ -10,7 +10,8 @@
 
 - **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
 - **Lifecycle Stage:** Phase 5 (Publication) complete. Paper Task 3 section merged.
-- **Next Critical-Path Action:** Theory Refinement (#81) → Retrospective (#192)
+- **Next Critical-Path Action:** Theory Refinement (#81, Thread A in PR #407) → Retrospective (#192) → **Pre-Sprint-4 Strategic Scoping (#408)** → Sprint 4 (target TBD)
+- **Sprint 4 status:** **NOT committed to Lamb Shift.** Per Oppenheimer Resolution on PR #407 (R6, 2026-05-13) and Strategic Review #001 R3 (2026-02-15), the Lamb Shift's prerequisites (QBP Lagrangian, photon propagator, f(u) at hydrogen scale, renormalization scheme) are not in hand and the bound-state η-mechanism is not formulated. Oppenheimer recommendation: re-scope Sprint 4 toward quaternionic tensor product foundations + Bell's Theorem preparation. Final Sprint 4 scope decided by #408.
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
