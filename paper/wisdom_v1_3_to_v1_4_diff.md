@@ -37,7 +37,7 @@ The CTH v5.3 baseline (141 anchors) is the Session-13 closeout snapshot now trac
 - **Chamseddine-Connes-van Suijlekom 2018** ("Entropy and the Spectral Action", *Commun. Math. Phys.* 373) — proves von Neumann entropy of fermionic 2nd-quantisation of a spectral triple equals the spectral action for a universal test function χ(x) = h(√x), h(x) = x/(1+eˣ) + log(1+e⁻ˣ).
 - **T1–T4 mp-arithmetic verification** (50-digit precision) confirms three findings:
   1. χ(u) is *not* QBP's f(u) — function-level identity fails; rescaling tests give inconsistent A values (0.69 from f₀, 1.80 from f₂).
-  2. CCvS γ(−a) coefficients for positive integer a contain the even-level Cayley-Dickson tower dim Im 𝒜_(2a) = 2^(2a) − 1 as a numerator factor (ℍ at a=1, 𝕊 at a=2, chingons at a=3, …) — **structural confluence in the coefficients**.
+  2. CCvS γ(−a) coefficients for positive integer a contain the even-level Cayley-Dickson tower dim Im 𝒜_(2a) = 2^(2a) − 1 as a numerator factor (𝒜_2 = ℍ at a=1, 𝒜_4 = 𝕊 [sedenions] at a=2, 𝒜_6 [64-dim hypercomplex algebra] at a=3, …) — **structural confluence in the coefficients**. Note: the *even* tower skips the odd Cayley-Dickson levels — in particular 𝒜_5 (chingons / trigintaduonions, 32-dim) does *not* appear in the γ(−a) factorisation. _(Labeling corrected per Gemini review F5; original v1.4 archive doc miscalled 𝒜_6 "chingons".)_
   3. χ and f are different test functions for different observables on the same spectral triple.
 
 **Revised wisdom statement (v1.4):** *There is only the spectrum. Test functions select observables.*
@@ -98,11 +98,22 @@ Every substantive claim in §9.7:
 | Claim | Anchor type | Anchor |
 |---|---|---|
 | CCvS proves "entropy = spectral action(χ)" | published experimental constraint | Chamseddine-Connes-van Suijlekom 2018, *Commun. Math. Phys.* 373 |
-| χ(u) ≠ QBP's f(u) at function-level identity | simulation output + provenance | T1–T4 mp-arithmetic, 50-digit precision |
-| Rescaling gives inconsistent A values (0.69 vs 1.80) | simulation output + provenance | T1–T4 mp-arithmetic |
-| CCvS γ(−a) contains Cayley-Dickson tower 2^(2a)−1 | derived dimensional / algebraic identity | even-level dim Im 𝒜_(2a) algebraic structure |
-| `KILLED-f4-info-theoretic-justification` status | pre-registered ground-truth doc | `archive/cth-inventory/confluent-trust-inventory-v5_3.json` (tracked baseline) |
+| χ(u) ≠ QBP's f(u) at function-level identity | simulation output + provenance | T1–T4 mp-arithmetic, 50-digit precision (results log: `archive/SESSION-13-WORKING-NOTES.md`; tracked-commit follow-up per S2) |
+| Rescaling gives inconsistent A values (0.69 vs 1.80) | simulation output + provenance | T1–T4 mp-arithmetic (same log) |
+| CCvS γ(−a) contains Cayley-Dickson tower 2^(2a)−1 | derived dimensional / algebraic identity | even-level dim Im 𝒜_(2a) algebraic structure (corrected label: 𝒜_2/ℍ, 𝒜_4/𝕊, 𝒜_6/64-dim; skips odd levels including 𝒜_5/chingons) |
+| **Both χ and f are valid test functions on the same triple** *(structural-claim anchor; added per Gemini F2 + Red Team G3)* | derived algebraic identity | **CCvS §1 spectral action principle** explicitly allows arbitrary test functions; the structural reading is forced by CCvS Definition 1.1 (spectral action = Tr(f(D/Λ))) being parameterised over arbitrary f, not by the χ ≠ f numerical disconfirmation alone |
+| `KILLED-f4-info-theoretic-justification` status | pre-registered ground-truth doc | `archive/cth-inventory/confluent-trust-inventory-v5_3.json` (tracked baseline; PR #422) |
 
-All five claims terminate at one of the five anchor types. No unanchored prose.
+All six claims terminate at one of the five anchor types. No unanchored prose.
+
+## Implications for the QBP programme (per Gemini F4)
+
+The shift from "f(u) is fundamental" to "the spectral triple is fundamental" implies, but does not yet state in this PR, three downstream consequences. We surface them here so future work tracks them:
+
+1. **The Lagrangian programme is demoted to asymptotics.** The Lagrangian is the heat-kernel expansion of the spectral action; the fundamental object is the spectrum, not the action principle.
+2. **"Forces as moments" maps cleanly.** Each heat-kernel coefficient is a moment of the test function weighted by the spectral density.
+3. **Sprint 4 direction pivots** from reverse-engineering effective Lagrangians to directly calculating the Dirac spectrum of the crystallised algebra. This is a re-orientation of Pre-Sprint-4 Strategic Scoping (#408), not a contradiction of it.
+
+These implications also land in `paper/wisdom_v1_4.md` §9.7 ("Implications for the rest of QBP") as an addition in this PR cycle.
 
 — @qbp-implementor (Integration role), 2026-05-14
