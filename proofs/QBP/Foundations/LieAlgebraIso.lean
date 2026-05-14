@@ -123,12 +123,12 @@ theorem bracket_qj_qi : bracket qj qi = (-2 : ℝ) • qk := by
 theorem bracket_qk_qj : bracket qk qj = (-2 : ℝ) • qi := by
   unfold bracket
   rw [qk_mul_qj, qj_mul_qk]
-  ext <;> simp [qi] <;> ring
+  ext <;> simp [qi] <;> norm_num
 
 theorem bracket_qi_qk : bracket qi qk = (-2 : ℝ) • qj := by
   unfold bracket
   rw [qi_mul_qk, qk_mul_qi]
-  ext <;> simp [qj] <;> ring
+  ext <;> simp [qj] <;> norm_num
 
 /-! ### Self-brackets are zero
 
