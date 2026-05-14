@@ -31,55 +31,62 @@ As our theoretical framework develops, we will not only be testing it against kn
 *   **Interaction Models:** Does the algebra itself suggest natural forms for particle interactions beyond the simple precession modeled in our initial tests?
 *   **Collective Behavior:** When we are able to model multi-particle systems, do we observe emergent phenomena analogous to states of matter, such as particles arranging in shell structures (a consequence of the Pauli Exclusion Principle)?
 
-## Axiomatic Framework (Version 0.1)
+## Axiomatic Framework
 
-In response to Grothendieck's required action, we establish the following minimal set of axioms before proceeding with any experiment. These are subject to revision as our understanding evolves.
+In this framework, we replace assumed phenomenological rules with fundamental algebraic constraints. The laws of quantum mechanics and standard symmetries are not postulated; they are derived from the strictures of division algebra and the necessity of information preservation.
 
-*   **Axiom 1: The Quaternionic State.** The state of a fundamental particle is represented by a unit quaternion, `ψ`, an element of Sp(1). This state encompasses all of the particle's intrinsic properties.
-    `ψ = a + bi + cj + dk`, where `a² + b² + c² + d² = 1`.
+### I. Information-Theoretic Foundations
 
-*   **Axiom 2: Quaternionic Observables.** Every measurable physical quantity (an observable) is represented by a pure quaternion operator, `O`. Pure quaternions are those with a scalar part of zero (e.g., `O = xi + yj + zk`).
+The architecture of this model rests on two fundamental pre-geometric principles [`archive/QBP-Theory-v3_1.md` §1.1]:
 
-*   **Axiom 3: Quaternionic Evolution.** The evolution of a state `ψ` over time `t` is described by a unitary transformation. For a system with Hamiltonian `H` (represented by a pure quaternion), the evolution is given by:
-    `ψ(t) = exp(-Ht) * ψ(0)`.
-    *(Note: This is a provisional form analogous to the Schrödinger equation and will be the first major point of investigation).*
+*   **Principle 1: Information is Preserved.** No physical process destroys information. In an algebraic encoding substrate, this mandates the use of a division algebra (an algebra with no zero divisors, where $ab = 0 \implies a = 0$ or $b = 0$). Hurwitz's Theorem (1898) restricts normed division algebras to exactly four: $\mathbb{R}$ (dimension 1), $\mathbb{C}$ (2), $\mathbb{H}$ (4), and $\mathbb{O}$ (8).
+*   **Principle 2: The Encoding is Maximal.** The universal boundary encoding operates on the largest possible normed division algebra, the octonions ($\mathbb{O}$).
 
-### Scope, Limitations, and Future Directions
+Because the octonions are non-associative, sequential computation within $\mathbb{O}$ is intrinsically ambiguous. The emergence of stable, causal physics requires associative closure, precipitating a structural phase transition ("crystallisation") from $\mathbb{O}$ to a selected quaternionic ($\mathbb{H}$) subalgebra. Our observable universe is the interior of this crystallisation.
 
-In response to Grothendieck's insightful critique, we explicitly acknowledge the following:
+### II. Algebraic Theorems (Formerly Axioms 1 & 2)
 
-*   **Sufficiency of Quaternions:** We recognize that quaternions alone are likely insufficient to encompass all symmetries of the Standard Model, particularly the SU(3) symmetry related to the strong force. Our current focus on quaternions is a deliberate strategy to address SU(2) and U(1) related phenomena (spin, electromagnetism).
-*   **Role of Octonions:** We hypothesize that an extension of this framework to include octonions will be necessary to incorporate SU(3) symmetries and provide a comprehensive description of one generation of fundamental particles, aligning with contemporary research in this area. This extension represents a future, but integral, phase of this project.
-*   **Relationship to Geometric Algebra (GA):** While GA offers a broader mathematical framework that subsumes quaternion algebra, our project maintains a specific focus on the 'Cayley-Dickson' sequence of division algebras (Real, Complex, Quaternion, Octonion). This provides a constrained, step-by-step approach to explore if fundamental physical properties emerge from these unique algebraic structures. Comparison with GA formulations and the potential for a unified GA-based description remains an important topic for future study.
+Within the crystallised $\mathbb{H}$ interior, the fundamental rules of quantum mechanics emerge mathematically as theorems rather than asserted axioms.
 
-### Measurement Postulate (Added Post-Sprint 1)
+*   **Theorem 1: The Quaternionic State.** The state of a fundamental particle is entirely described by a unit quaternion $\psi \in Sp(1)$. This is not a postulate, but a geometric necessity of mapping isotropic states within the associative $\mathbb{H}$ algebra.
+    $\psi = a + bi + cj + dk$, where $a^2 + b^2 + c^2 + d^2 = 1$.
 
-Based on the successful validation of the Stern-Gerlach experiment, we formalize the measurement postulate:
+*   **Theorem 2: Quaternionic Observables.** Every measurable physical quantity is represented by a pure quaternion operator $\mathbf{O}$ (where the scalar part is zero). This derives from the isomorphism between the Lie algebra of $SU(2)$ and the imaginary quaternions, anchored by the structure-constant theorems in `proofs/QBP/Foundations/LieAlgebraIso.lean:96–115` (bracket relations $[q_i, q_j] = 2q_k$ and cyclic permutations) and `proofs/QBP/Foundations/LieAlgebraIso.lean:170–174` (the `imH_structure_constants` packaging).
 
-*   **Expectation Value:** For a state `ψ` and observable `O` (both pure unit quaternions), the expectation value is the dot product of their vector parts:
-    `⟨O⟩ = vecDot(ψ, O) = ψ_i·O_i + ψ_j·O_j + ψ_k·O_k`
+**Measurement and Rotation Dynamics:**
+Because $\mathbf{O} \in \text{Im}(\mathbb{H})$, the expectation value mechanism emerges directly from the natural inner product space of the quaternion algebra. For a state $\psi$ and an observable $\mathbf{O}$ (both unit quaternions), the expectation value is uniquely defined by the dot product of their vector components:
+$\langle \mathbf{O} \rangle = \vec{\psi} \cdot \vec{\mathbf{O}} = \psi_i\mathbf{O}_i + \psi_j\mathbf{O}_j + \psi_k\mathbf{O}_k$
 
-*   **Measurement Probability:** The probability of measuring eigenvalue `+1` is:
-    `P(+) = (1 + ⟨O⟩) / 2`
+This naturally constrains $\langle \mathbf{O} \rangle \in [-1, 1]$. The associated measurement probabilities for eigenvalues $\pm 1$ necessarily follow:
+$P(+) = \frac{1 + \langle \mathbf{O} \rangle}{2}, \quad P(-) = \frac{1 - \langle \mathbf{O} \rangle}{2}$
 
-    And for eigenvalue `-1`:
-    `P(-) = (1 - ⟨O⟩) / 2`
+Rotations of observables at arbitrary angles ($\theta$) about a unit axis ($\hat{n}$) are naturally handled by quaternion conjugation, an inherent property of $Sp(1)$:
+$\mathbf{O}' = q \mathbf{O} q^{-1}, \quad \text{where } q = \cos(\frac{\theta}{2}) + \sin(\frac{\theta}{2})(n_x i + n_y j + n_z k)$
 
-*   **Constraint:** For unit quaternion states and observables, `⟨O⟩ ∈ [-1, 1]`, ensuring valid probabilities.
+### III. Associative Dynamics (Formerly Axiom 3)
 
-*Note: The original formula included a factor of 2, which was corrected during Sprint 2 development. See `DESIGN_RATIONALE.md` Section 5.2 for details.*
+The arrow of time and sequential state evolution are products of the algebra's associativity. Within the $\mathbb{H}$ interior, state evolution is necessarily a unitary transformation. For a system with Hamiltonian $\mathbf{H}$ (a pure quaternion), the continuous-time evolution is:
+$\psi(t) = \exp(-\mathbf{H}t)\psi(0)$
 
-### Rotation of Observables (Sprint 2 Extension)
+#### Crucial Caveat: Friction A (The Breakdown of Associativity)
+We must explicitly define the domain of validity for this continuous-time Schrödinger evolution. It is **not** universally applicable. At the Genesis boundary, where the structural information capacity reaches $S_{BH} = \ln(7) \approx 1.95$ nats, we reach the limit of the $\mathbb{O} \to \mathbb{H}$ phase transition [`archive/QBP-Theory-v3_1.md` §2.2].
 
-To handle measurements at arbitrary angles, we introduce the rotation formalism:
+At this boundary, associativity breaks down. If $(ab)c \neq a(bc)$, then sequential time steps $t_1, t_2, t_3$ cannot be strictly ordered, and $\psi(t) = \exp(-\mathbf{H}t)\psi(0)$ becomes mathematically undefined.
 
-*   **Rotation Quaternion:** A rotation by angle `θ` about unit axis `n̂` is represented by:
-    `q = cos(θ/2) + sin(θ/2)(n_x·i + n_y·j + n_z·k)`
+This is an intentional, surfaced incompatibility. The classical framing of forces and continuous time fails here because *there is only $f(u)$* (Wisdom W-003). All interactions at the boundary are moments of the spectral action's profile function $f(u)$, encoding how the $\mathbb{O} \to \mathbb{H}$ crystallisation settles. Continuous-time Schrödinger evolution is strictly the post-crystallisation, low-energy limit.
 
-*   **Rotated Observable:** The observable `O` rotated by quaternion `q` is:
-    `O' = q · O · q⁻¹`
+### IV. Boundary Conditions & Backward Compatibility
 
-This extension enables prediction of angle-dependent measurement probabilities, to be validated in Sprint 2.
+**The Octonionic Boundary and $SU(3)$:**
+Earlier iterations of this paper claimed quaternions were "insufficient" to describe the $SU(3)$ symmetry of the strong force. We must correct this framing: $SU(3)$ is not missing; it is managed at the boundary.
+
+The full automorphism group of the octonions is $G_2$ (14-dimensional). The $\mathbb{O} \to \mathbb{H}$ crystallisation process selects exactly one of the seven quaternionic subalgebras (represented by the 7 lines of the Fano plane). The mathematical selection of this subgroup fundamentally breaks $G_2 \to SU(3)$.
+[`archive/QBP_FanoGenesis.lean` - Theorem 10: $G_2$ transitivity over Fano lines].
+
+Under this subgroup reduction, the 14-dimensional adjoint representation of $G_2$ breaks down as $\mathbf{14} \to \mathbf{8} \oplus \mathbf{3} \oplus \mathbf{\bar{3}}$ [`archive/QBP_FanoGenesis.lean` - Theorem 14]. This yields exactly the $SU(3)$ colour symmetry ($\mathbf{8}$), an oriented triplet ($\mathbf{3}$), and an anti-triplet ($\mathbf{\bar{3}}$). The dimensional gap between $\mathbb{O}$ and $\mathbb{H}$ is what generates the Standard Model symmetries; the $\mathbb{H}$ framework inside the interior does not lack $SU(3)$, it is constructed from its breaking.
+
+**Backward Compatibility Statement:**
+The transition from assumed axioms to derived algebraic theorems involves no breaking changes to the computational mechanics of the interior $\mathbb{H}$-space. All numerical derivations and experimental validations completed in Sprints 1 through 3 (including the Stern-Gerlach Experiment, Angle-Dependent Spin validations, and Double-Slit interference) remain fully computationally valid. Future documentation sweeps will update specific nomenclature mappings in external documents (e.g., `DESIGN_RATIONALE.md` §§6, 9, 12) from "by Axiom 1" to "by Theorem 1" as required.
 
 ## The Revised Eight-Fold Path of Verification
 
