@@ -1181,6 +1181,8 @@ The Sprint 3 findings connect to the broader Session-13 theoretical programme (p
 
 3. **The V = 1 − η_d bridge (Model A) and the open Model A/B/intermediate question** — connects to the "Branch A vs Branch B" framing in the Session-13 gravitational anomaly section (§4.3 of theory doc). Branch A operates in the *no extra structure* regime; Branch B extends. Model A here is the no-extra-structure visibility regime; intermediate cases (partially correlated j-fringes) require extra structure. Both motifs reflect a deeper question about when QBP introduces genuinely new structure versus reducing to existing physics.
 
+4. **The spectral profile f(u) as the Sprint 4+ candidate (§12.1.2)** — connects to the **W-003 wisdom revision** landed in `paper/wisdom_v1_4.md` §9.7. The CCvS 2018 result ("entropy = spectral action(χ)") sharpens the W-003 statement from *"there is only f(u)"* to *"the spectral triple is the invariant; test functions select observables."* The Sprint 3 step-change-in-η-as-δ-function-source intuition (§12.1.2 above) recasts naturally under the v1.4 framing: the spatial profile of U₁ at the coupling region is one observable; the gravity-matter spectral action's f(u) is another; both probe the same underlying spectrum via different test functions. See `paper/wisdom_v1_4.md` §9.7 for the full revision, and `paper/wisdom_v1_3_to_v1_4_diff.md` for the diff summary against v1.3.
+
 Full integration of Session-13 material into the paper is tracked under #81 PR2–PR8.
 
 ### 12.5 Summary
