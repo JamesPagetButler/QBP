@@ -51,13 +51,13 @@ Within the crystallised $\mathbb{H}$ interior, the fundamental rules of quantum 
 *   **Theorem 1: The Quaternionic State.** The state of a fundamental particle is entirely described by a unit quaternion $\psi \in Sp(1)$. This is not a postulate, but a geometric necessity of mapping isotropic states within the associative $\mathbb{H}$ algebra.
     $\psi = a + bi + cj + dk$, where $a^2 + b^2 + c^2 + d^2 = 1$.
 
-*   **Theorem 2: Quaternionic Observables.** Every measurable physical quantity is represented by a pure quaternion operator $\mathbf{O}$ (where the scalar part is zero). This derives from the isomorphism between the Lie algebra of $SU(2)$ and the imaginary quaternions, anchored by the structure-constant theorems in `proofs/QBP/Foundations/LieAlgebraIso.lean:96–115` (bracket relations $[q_i, q_j] = 2q_k$ and cyclic permutations) and `proofs/QBP/Foundations/LieAlgebraIso.lean:170–174` (the `imH_structure_constants` packaging).
+*   **Theorem 2: Quaternionic Observables.** Every measurable physical quantity is represented by a pure quaternion operator $\mathbf{O}$ (where the scalar part is zero; equivalently, $\mathbf{O} \in \text{Im}(\mathbb{H})$ — the skew-Hermitian generators of $Sp(1)$ rotations, with real-valued expectation values recovered via the vector dot product below). This derives from the isomorphism between the Lie algebra of $SU(2)$ and the imaginary quaternions, anchored by the structure-constant theorems in `proofs/QBP/Foundations/LieAlgebraIso.lean:96–115` (bracket relations $[q_i, q_j] = 2q_k$ and cyclic permutations) and `proofs/QBP/Foundations/LieAlgebraIso.lean:170–174` (the `imH_structure_constants` packaging).
 
 **Measurement and Rotation Dynamics:**
 Because $\mathbf{O} \in \text{Im}(\mathbb{H})$, the expectation value mechanism emerges directly from the natural inner product space of the quaternion algebra. For a state $\psi$ and an observable $\mathbf{O}$ (both unit quaternions), the expectation value is uniquely defined by the dot product of their vector components:
 $\langle \mathbf{O} \rangle = \vec{\psi} \cdot \vec{\mathbf{O}} = \psi_i\mathbf{O}_i + \psi_j\mathbf{O}_j + \psi_k\mathbf{O}_k$
 
-This naturally constrains $\langle \mathbf{O} \rangle \in [-1, 1]$. The associated measurement probabilities for eigenvalues $\pm 1$ necessarily follow:
+This naturally constrains $\langle \mathbf{O} \rangle \in [-1, 1]$. As the *unique* affine map carrying $[-1, 1]$ into probability space $[0, 1]$ while preserving $\pm 1$ eigenvalue assignments, the measurement probabilities necessarily follow:
 $P(+) = \frac{1 + \langle \mathbf{O} \rangle}{2}, \quad P(-) = \frac{1 - \langle \mathbf{O} \rangle}{2}$
 
 Rotations of observables at arbitrary angles ($\theta$) about a unit axis ($\hat{n}$) are naturally handled by quaternion conjugation, an inherent property of $Sp(1)$:
@@ -78,7 +78,7 @@ This is an intentional, surfaced incompatibility. The classical framing of force
 ### IV. Boundary Conditions & Backward Compatibility
 
 **The Octonionic Boundary and $SU(3)$:**
-Earlier iterations of this paper claimed quaternions were "insufficient" to describe the $SU(3)$ symmetry of the strong force. We must correct this framing: $SU(3)$ is not missing; it is managed at the boundary.
+While the $\mathbb{H}$ interior alone is insufficient to describe $SU(3)$ strong-force dynamics, this symmetry is natively managed at the octonionic boundary.
 
 The full automorphism group of the octonions is $G_2$ (14-dimensional). The $\mathbb{O} \to \mathbb{H}$ crystallisation process selects exactly one of the seven quaternionic subalgebras (represented by the 7 lines of the Fano plane). The mathematical selection of this subgroup fundamentally breaks $G_2 \to SU(3)$.
 [`archive/QBP_FanoGenesis.lean` - Theorem 10: $G_2$ transitivity over Fano lines].
