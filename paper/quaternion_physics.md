@@ -158,7 +158,7 @@ This framework fundamentally alters our view of Dark Energy. In standard Quantum
 
 We must be explicit here: **the 120-orders-of-magnitude problem is completely dissolved in this model because $\Lambda$ is structurally misidentified in standard QFT.**
 
-In our framework, the vacuum energy component ($f_4 \Lambda^4$ of the spectral action) is required to vanish on the consistency grounds developed below (discussed in more depth in a forthcoming §VIII Spectral Action). The vacuum does not gravitate in the QFT sense. What we observe as the cosmological constant ($\Lambda$) is actually a classical interference term.
+In our framework, the vacuum energy component ($f_4 \Lambda^4$ of the spectral action) is required to vanish on algebraic consistency grounds (developed rigorously in the forthcoming §VIII Spectral Action). The vacuum does not gravitate in the QFT sense. What we observe as the cosmological constant ($\Lambda$) is actually a classical interference term.
 
 The accretion rate $\dot{M}$ consists of two fundamental modes: a constant steady-state flow ($A$) and a dynamical Bondi-Hoyle accretion flow ($B$) dependent on the parent environment [`archive/QBP-Theory-v3_1.md:93`]. The effective driving term for the late-time acceleration is the cross-term between these modes:
 
