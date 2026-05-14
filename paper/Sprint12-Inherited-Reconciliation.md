@@ -72,6 +72,40 @@ The following are recognised but **explicitly deferred** to a separate housekeep
 
 The dedup work is **not load-bearing for this PR's "force incompatibilities to surface" deliverable** (Beekeeper directive 2026-05-13). The 7-file canonical corpus is what BMA will re-audit; duplicates can be removed cleanly post-merge without changing the build state.
 
+## Housekeeping closeout (added post-PR-#414-merge, 2026-05-14)
+
+Per `toddle-design` seq=21 closeout action item ("FanoGenesis dup cleanup + 208 counting-methodology corrections (3 locations) + Hessian content-drop logging"), the following has been landed or scoped:
+
+### B-13 (METHODOLOGY) — Hessian content-drop logging
+
+**Architect's seq=29 audit finding** flagged a verbal-hedge instance in the historical/lean-standalone README: *"presumably absorbed into Sedenion."* This phrasing was used to explain why the standalone `QBP_HessianTheorem.lean` + `QBP_HessianTheorem_v2.lean` are not in the canonical `archive/lean-project/` — the assumption being that their content was absorbed during the lean-project reorganization.
+
+**Audit result** (cross-checked 2026-05-14 against `archive/lean-project/Sedenion.lean`):
+
+| File | Status | Anchor |
+|---|---|---|
+| `archive/historical/lean-standalone/QBP_HessianTheorem.lean` | v1 standalone; 18 theorems; pre-lean-project structure | `grep -c "^theorem " archive/historical/lean-standalone/QBP_HessianTheorem.lean` |
+| `archive/historical/lean-standalone/QBP_HessianTheorem_v2.lean` | v2 standalone; revision of v1 | (same grep on v2) |
+| `archive/lean-project/Sedenion.lean` Hessian-related theorems | `hessianEntry`, `hessianTrace`, `hessianTraceSq`, `hessianTraceCube`, `checkAllHessianTraces128`, `checkAllHessianTracesSq1152`, `checkFirstZDTraceCube` — 7 theorems exposing the Hessian computation pipeline | `proofs/Sprint12-Inherited/Sedenion.lean` post-this-PR; grep-verified |
+
+**Finding:** the Sedenion-internal Hessian theorems give a *computational pipeline* (matrix-trace identities for the 32×32 Hessian at zero divisors), not a port of the v1/v2 standalones' specific theorem statements. The phrasing "presumably absorbed" is a verbal hedge — the content has *evolved*, not been *literally absorbed*. Per PR #413 anchor rule type #5 (derived dimensional/algebraic identity with substitution chain shown), the README phrasing should be replaced with: *"The HessianTheorem standalones (v1/v2) are historical preludes to the Sedenion.lean Hessian computation pipeline (`hessianEntry` and related theorems). The standalones use a different theorem-statement style (eigenvalue-spectrum identities); the lean-project canonical uses a trace-computation style. The two are related-but-not-identical formulations of the same physical content (sedenion zero-divisor Hessian structure)."*
+
+**Disposition for this PR:** logged here (paper/Sprint12-Inherited-Reconciliation.md). The actual `archive/historical/README.md` correction is deferred to the larger archive-transfer commit (see §B-12).
+
+### B-12 follow-up — 208 corrections at source-of-error docs
+
+The 3 source-of-error docs (`archive/historical/README.md`, `archive/QBP-Repo-State-Report-2026-05-08.md` §4, and any other consumer doc citing "208 theorems") remain untracked locally. The "208 → 69 corrected per qbp-architecture seq=27 audit" correction is **scoped but not committed** in this housekeeping PR, because the housekeeping PR can only modify tracked files; the source-of-error docs are part of the broader archive-transfer commit (deferred to #81 follow-on work per James 2026-05-11 policy: *"archive transfer integration belongs in Theory Refinement, not chore commits"*). The corrected text for each location is staged locally and will land when the archive transfer is committed in scope.
+
+### Local-only dedup cleanup performed
+
+The 16 byte-identical duplicates listed in the "Out of scope" section above are eligible for local-only `rm` cleanup (untracked across both locations). Status:
+
+- `archive/QBP_FanoGenesis.lean` — eligible (md5 7750e1753ffa6cbe217f6f42cbe8b540 matches `archive/historical/lean-standalone/QBP_FanoGenesis.lean`)
+- `archive/qbp-lean/QBP/*.lean` — 7 files; eligible (all md5-match canonical `archive/lean-project/`)
+- `archive/lean-project-*.lean` — 8 files (7 .lean + lakefile); eligible (all md5-match canonical)
+
+These deletions are working-tree-only operations (no git effect on tracked files; no commit needed). May land at any time post-this-PR-merge.
+
 ## Final build result
 
 ```
