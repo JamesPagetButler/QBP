@@ -327,6 +327,29 @@ def stream_only_section(
         "CONV-cd-tower-in-zeta-moments",
         "CONV-spectral-entropy-zeta",
     }
+    # Per-prefix adjudicator routing (per Gemini Feynman finding F7: every
+    # unclassified entry needs a NAMED adjudicator to avoid stalling Cycle 3).
+    # Prefix semantics:
+    #   PRED-, PROOF-, OBS-, COMP-, CONV-, CONJ-, KILLED-, MEAS-, Q-/Q##- →
+    #     scientific content → @qbp-oppenheimer
+    #   META-, INSIGHT- → cross-cutting commentary → still scientific by default;
+    #     pre-suggested INCLUDE per the existing rule below
+    #   INST- → instance/instantiation metadata → @cth-implementor (schema)
+    #   WISDOM- → defer to wisdom-registry per Beekeeper D2
+    SCIENTIFIC_PREFIXES = (
+        "PRED-",
+        "PROOF-",
+        "OBS-",
+        "COMP-",
+        "CONV-",
+        "CONJ-",
+        "KILLED-",
+        "MEAS-",
+        "FLAG-",
+        "OPEN-",
+        "Q",  # Q28-, Q42- etc — research questions
+    )
+    SCHEMA_PREFIXES = ("INST-",)
     for aid, a in anchors[:max_render]:
         name = a.get("name", "<unnamed>")[:60]
         tier = a.get("tier", "?")
@@ -337,9 +360,13 @@ def stream_only_section(
         elif aid.startswith("WISDOM-"):
             action = "DEFER to wisdom-registry migration (per Beekeeper D2)"
         elif aid.startswith(("META-", "INSIGHT-")):
-            action = "INCLUDE (suggested; META/INSIGHT class)"
+            action = "INCLUDE-PROPOSED → @qbp-oppenheimer co-sign (META/INSIGHT class)"
+        elif aid.startswith(SCHEMA_PREFIXES):
+            action = "→ @cth-implementor decides on inclusion (instance schema)"
+        elif aid.startswith(SCIENTIFIC_PREFIXES):
+            action = "→ @qbp-oppenheimer decides on inclusion (scientific content)"
         else:
-            action = "→ adjudicator decides on inclusion"
+            action = "→ adjudicator unnamed (escalate to bridge)"
         lines.append(f"| `{aid}` | {name} | {tier} | {status} | {prov} | {action} |")
     if len(anchors) > max_render:
         lines.append(
@@ -630,10 +657,13 @@ def main():
         "2. **@cth-implementor batch resolution of SCHEMA_AXIS bucket** (23 v0.1 → 30 v0.2 after extension). Schema rule defaults are deterministic where noted; cases needing schema-lock discussion route via the `cth-design` channel."
     )
     lines.append(
-        "3. **@qbp-oppenheimer per-anchor theory-axis adjudication for TWO_AXIS bucket** (19 anchors) — schema fields land first per (2); theory fields land next using the v5_3 (Session-13) closeout default where Oppenheimer concurs."
+        "2.5. **Cross-axis enum-drift interlock** (per Gemini Furey/Feynman finding, PR #423 review). When @cth-implementor resolves any SCHEMA_AXIS field whose values constrain theoretical expression — specifically `physical_mapping_type`, `physical_mapping_status`, `lean_scope`, `lean_migration_status`, or any newly-added enum field — they post to `pr407-conflict-resolution` BEFORE landing the resolution, naming the affected TWO_AXIS anchors. @qbp-oppenheimer has one cycle to flag anchors whose physics interpretation depends on the enum value being preserved. Net: schema can rename or refine but cannot silently drop a value used in an in-flight TWO_AXIS theory adjudication."
     )
     lines.append(
-        "4. **Stream-only inclusion decisions** (§4): KILLED-/CONV-/CONJ- Session-13 closeout findings → INCLUDE by default; WISDOM-* defer to the wisdom-registry migration per Beekeeper D2; META-/INSIGHT- from federation-tenancy → INCLUDE by default; everything else → adjudicator."
+        "3. **@qbp-oppenheimer per-anchor theory-axis adjudication for TWO_AXIS bucket** (19 anchors) — schema fields land first per (2); theory fields land next using the v5_3 (Session-13) closeout default where Oppenheimer concurs. Theory adjudications operate against the post-(2.5) schema state."
+    )
+    lines.append(
+        "4. **Stream-only inclusion decisions** (§4): every entry now has a named adjudicator per the prefix routing rules in the renderer. Session-13 closeouts auto-INCLUDE; PRED-/PROOF-/OBS-/COMP-/CONV-/CONJ-/KILLED-/MEAS-/Q* → @qbp-oppenheimer; INST- → @cth-implementor; META-/INSIGHT- → @qbp-oppenheimer co-sign; WISDOM-* defer to wisdom-registry migration per Beekeeper D2."
     )
     lines.append(
         "5. **qbp-implementor produces unified vNext JSON** — `archive/cth-inventory/confluent-trust-inventory-vNext.json` — with full provenance trail (which fields came from which stream, which adjudicator signed off)."

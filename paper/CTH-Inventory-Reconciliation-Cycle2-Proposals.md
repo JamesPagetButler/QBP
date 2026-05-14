@@ -809,19 +809,19 @@ Each of these anchors exists in one stream only. Proposed inclusion in unified v
 
 | Anchor ID | Name | Tier | Status | Provenance | Proposed action |
 |---|---|---|---|---|---|
-| `COMP-sm-non-unification-at-1loop` | SM gauge couplings do NOT unify at 1-loop: spectral action u | 1 | coherent | I | → adjudicator decides on inclusion |
+| `COMP-sm-non-unification-at-1loop` | SM gauge couplings do NOT unify at 1-loop: spectral action u | 1 | coherent | I | → @qbp-oppenheimer decides on inclusion (scientific content) |
 | `CONV-cd-tower-in-zeta-moments` | MATHEMATICS: Even-level Cayley-Dickson tower (dim Im H, S, c | 4 | coherent | T | **INCLUDE** (Session-13 closeout finding) |
 | `CONV-spectral-entropy-zeta` | MATHEMATICS: Chamseddine-Connes-van Suijlekom 2018 derives u | 4 | marginal | T | **INCLUDE** (Session-13 closeout finding) |
-| `INSIGHT-bcc-iron-fano-cube` | BCC iron coordination 8 = dim(𝕆): Fano cube geometry in the  | 4 | untested | T | INCLUDE (suggested; META/INSIGHT class) |
-| `INSIGHT-fano-cube-universal-compute-cell` | Fano cube as universal compute cell: Locale, BMA, holographi | 2 | untested | T | INCLUDE (suggested; META/INSIGHT class) |
+| `INSIGHT-bcc-iron-fano-cube` | BCC iron coordination 8 = dim(𝕆): Fano cube geometry in the  | 4 | untested | T | INCLUDE-PROPOSED → @qbp-oppenheimer co-sign (META/INSIGHT class) |
+| `INSIGHT-fano-cube-universal-compute-cell` | Fano cube as universal compute cell: Locale, BMA, holographi | 2 | untested | T | INCLUDE-PROPOSED → @qbp-oppenheimer co-sign (META/INSIGHT class) |
 | `KILLED-f4-info-theoretic-justification` | KILLED: 'f_4 = 0 follows from Axiom 1 (information preserved | 3 | incoherent | T | **INCLUDE** (Session-13 closeout finding) |
-| `OBS-nist-big-G-2026` | NIST G measurement: 6.67387×10⁻¹¹, 0.0235% below BIPM, compo | 2 | coherent | E | → adjudicator decides on inclusion |
-| `PRED-cutoff-scale-0p04-Planck` | Crystallisation cutoff Λ ≈ 0.04 M_Pl ≈ 5×10¹⁷ GeV from f₂ =  | 1 | marginal | I | → adjudicator decides on inclusion |
-| `PRED-f4-zero-vacuum-energy` | Spectral action vacuum energy f₄ = 0: information-theoretic  | 1 | marginal | T | → adjudicator decides on inclusion |
-| `PRED-inv-alpha-GUT-16pi` | 1/α_GUT ≈ 16π = 50.3: candidate algebraic expression (2.9% f | 2 | untested | T | → adjudicator decides on inclusion |
-| `PRED-profile-function-f0-f2-ratio` | Profile function f₀/f₂ = 1/dim(Im ℍ) = 1/3: gravity-gauge ra | 1 | marginal | T | → adjudicator decides on inclusion |
-| `PROOF-beta-function-3-times-7` | SU(3) β-function numerator 21 = dim(Im ℍ) × dim(Im 𝕆) = 3×7: | 1 | coherent | T | → adjudicator decides on inclusion |
-| `Q28-alpha-GUT-from-stabiliser` | Q28: Is α_GUT = 1/(|Stab|+1) = 1/25? The missing link for de | 2 | incoherent | T | → adjudicator decides on inclusion |
+| `OBS-nist-big-G-2026` | NIST G measurement: 6.67387×10⁻¹¹, 0.0235% below BIPM, compo | 2 | coherent | E | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-cutoff-scale-0p04-Planck` | Crystallisation cutoff Λ ≈ 0.04 M_Pl ≈ 5×10¹⁷ GeV from f₂ =  | 1 | marginal | I | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-f4-zero-vacuum-energy` | Spectral action vacuum energy f₄ = 0: information-theoretic  | 1 | marginal | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-inv-alpha-GUT-16pi` | 1/α_GUT ≈ 16π = 50.3: candidate algebraic expression (2.9% f | 2 | untested | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-profile-function-f0-f2-ratio` | Profile function f₀/f₂ = 1/dim(Im ℍ) = 1/3: gravity-gauge ra | 1 | marginal | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PROOF-beta-function-3-times-7` | SU(3) β-function numerator 21 = dim(Im ℍ) × dim(Im 𝕆) = 3×7: | 1 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `Q28-alpha-GUT-from-stabiliser` | Q28: Is α_GUT = 1/(|Stab|+1) = 1/25? The missing link for de | 2 | incoherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
 | `WISDOM-003-there-is-only-f-u` | W-003: Forces are moments of a spectrum. The spectrum is the | 1 | coherent | T | DEFER to wisdom-registry migration (per Beekeeper D2) |
 | `WISDOM-schema-vs-instance` | WISDOM: The algebra is the schema, the boundary is the insta | 1 | coherent | T | DEFER to wisdom-registry migration (per Beekeeper D2) |
 
@@ -831,30 +831,30 @@ Each of these anchors exists in one stream only. Proposed inclusion in unified v
 
 | Anchor ID | Name | Tier | Status | Provenance | Proposed action |
 |---|---|---|---|---|---|
-| `FLAG-tov-eos-shape-underdetermined` | TOV integration with QBP-only EOS inputs gives M_max = 3.3 M | 2 | resolved | I | → adjudicator decides on inclusion |
-| `INSIGHT-cross-platform-per-feature-class` | Cross-platform Γ-test works within feature class, not across | 3 | coherent | I | INCLUDE (suggested; META/INSIGHT class) |
-| `INSIGHT-eos-integration-shifts-tov-by-30pct` | Robust QBP TOV prediction: M_TOV ∈ [2.6, 2.8] M_☉ from algeb | 2 | coherent | I | INCLUDE (suggested; META/INSIGHT class) |
-| `INSIGHT-gamma-needs-cross-platform` | Γ-universality test needs cross-platform pooling for multi-σ | 3 | untested | I | INCLUDE (suggested; META/INSIGHT class) |
-| `META-physical-mapping-status-field` | CTH schema extension: physical_mapping_status field on PRED- | 4 | coherent | P | INCLUDE (suggested; META/INSIGHT class) |
-| `META-regime-of-validity-field` | CTH schema extension: regime_of_validity field | 4 | coherent | P | INCLUDE (suggested; META/INSIGHT class) |
-| `OBS-btfr-z-range-validity` | BTFR (1+z) correction supported at 1<z<10, possibly breaks a | 2 | resolved | E | → adjudicator decides on inclusion |
-| `OBS-jades-gs-z14-0-vrot-lower-100` | JADES-GS-z14-0 ALMA tentative rotation: v_rot > 100 km/s (Sc | 2 | marginal | E | → adjudicator decides on inclusion |
-| `OPEN-Q-parent-bh-retardation-derivation` | Open: rigorous derivation of parent-BH retardation kernel | 3 | untested | T | → adjudicator decides on inclusion |
-| `PRED-a0-redshift-linear` | a₀(z) = a₀(today)·(1+z) from M(a) = M₀·a | 3 | marginal | T | → adjudicator decides on inclusion |
-| `PRED-a0-saturating-Fmax-7` | Matter-era a₀(z) saturates with F_max = dim(Im 𝕆) = 7 | 1 | coherent | T+L | → adjudicator decides on inclusion |
-| `PRED-a0-saturating-matter-era` | a₀(z) saturates at high z due to matter-era parent-BH dynami | 2 | marginal | I | → adjudicator decides on inclusion |
-| `PRED-a0-saturation-factor-fano` | Matter-era a₀(z) saturation factor F_max = dim(Im 𝕆) = 7 | 2 | marginal | I | → adjudicator decides on inclusion |
-| `PRED-btfr-mass-correction` | BTFR mass-inference correction at high z: M_b(z) = M_b(0)/(1 | 3 | coherent | T | → adjudicator decides on inclusion |
-| `PRED-hypergraph-cmb-camb-rerun` | Branch A CMB matches Planck under hypergraph (multi-party) b | 3 | untested | T | → adjudicator decides on inclusion |
-| `PRED-jwst-kinematics-z14` | JWST/ALMA z>10 IFU rotation curves: v_rot 25-30% lower than  | 2 | untested | I | → adjudicator decides on inclusion |
-| `PRED-tov-mass-at-bump-peak` | M(NS with ρ_c at algebraic bump peak) = 2.20 M_☉ | 2 | coherent | I | → adjudicator decides on inclusion |
-| `PROOF-alpha-particle-quaternion` | α-particle (⁴He) mass number = dim ℍ = 4 | 1 | coherent | T | → adjudicator decides on inclusion |
-| `PROOF-fano-choice-information` | Fano line selection requires exactly ln 7 nats | 1 | coherent | T | → adjudicator decides on inclusion |
-| `PROOF-iron-56-double-octet` | Iron-56 mass number = dim(Im 𝕆) × dim 𝕆 = 7 × 8 | 1 | coherent | T | → adjudicator decides on inclusion |
-| `PROOF-iron-to-ns-bridge` | Iron-56 → neutron-star mass bridge through dim(Im 𝕆) = 7 | 1 | coherent | T | → adjudicator decides on inclusion |
-| `PROOF-oxygen-16-sedenion` | O-16 mass number = (dim ℍ)² = dim 𝕊 = 16 | 1 | coherent | T | → adjudicator decides on inclusion |
-| `PROOF-seed-mass-from-ln7` | Seed mass M_seed = sqrt(ln 7 · ℏc / 4πG) | 1 | coherent | T | → adjudicator decides on inclusion |
-| `PROOF-silicon-28-fano-ladder` | Si-28 mass number = dim(Im 𝕆) × dim ℍ = 7 × 4 | 1 | coherent | T | → adjudicator decides on inclusion |
+| `FLAG-tov-eos-shape-underdetermined` | TOV integration with QBP-only EOS inputs gives M_max = 3.3 M | 2 | resolved | I | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `INSIGHT-cross-platform-per-feature-class` | Cross-platform Γ-test works within feature class, not across | 3 | coherent | I | INCLUDE-PROPOSED → @qbp-oppenheimer co-sign (META/INSIGHT class) |
+| `INSIGHT-eos-integration-shifts-tov-by-30pct` | Robust QBP TOV prediction: M_TOV ∈ [2.6, 2.8] M_☉ from algeb | 2 | coherent | I | INCLUDE-PROPOSED → @qbp-oppenheimer co-sign (META/INSIGHT class) |
+| `INSIGHT-gamma-needs-cross-platform` | Γ-universality test needs cross-platform pooling for multi-σ | 3 | untested | I | INCLUDE-PROPOSED → @qbp-oppenheimer co-sign (META/INSIGHT class) |
+| `META-physical-mapping-status-field` | CTH schema extension: physical_mapping_status field on PRED- | 4 | coherent | P | INCLUDE-PROPOSED → @qbp-oppenheimer co-sign (META/INSIGHT class) |
+| `META-regime-of-validity-field` | CTH schema extension: regime_of_validity field | 4 | coherent | P | INCLUDE-PROPOSED → @qbp-oppenheimer co-sign (META/INSIGHT class) |
+| `OBS-btfr-z-range-validity` | BTFR (1+z) correction supported at 1<z<10, possibly breaks a | 2 | resolved | E | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `OBS-jades-gs-z14-0-vrot-lower-100` | JADES-GS-z14-0 ALMA tentative rotation: v_rot > 100 km/s (Sc | 2 | marginal | E | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `OPEN-Q-parent-bh-retardation-derivation` | Open: rigorous derivation of parent-BH retardation kernel | 3 | untested | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-a0-redshift-linear` | a₀(z) = a₀(today)·(1+z) from M(a) = M₀·a | 3 | marginal | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-a0-saturating-Fmax-7` | Matter-era a₀(z) saturates with F_max = dim(Im 𝕆) = 7 | 1 | coherent | T+L | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-a0-saturating-matter-era` | a₀(z) saturates at high z due to matter-era parent-BH dynami | 2 | marginal | I | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-a0-saturation-factor-fano` | Matter-era a₀(z) saturation factor F_max = dim(Im 𝕆) = 7 | 2 | marginal | I | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-btfr-mass-correction` | BTFR mass-inference correction at high z: M_b(z) = M_b(0)/(1 | 3 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-hypergraph-cmb-camb-rerun` | Branch A CMB matches Planck under hypergraph (multi-party) b | 3 | untested | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-jwst-kinematics-z14` | JWST/ALMA z>10 IFU rotation curves: v_rot 25-30% lower than  | 2 | untested | I | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PRED-tov-mass-at-bump-peak` | M(NS with ρ_c at algebraic bump peak) = 2.20 M_☉ | 2 | coherent | I | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PROOF-alpha-particle-quaternion` | α-particle (⁴He) mass number = dim ℍ = 4 | 1 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PROOF-fano-choice-information` | Fano line selection requires exactly ln 7 nats | 1 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PROOF-iron-56-double-octet` | Iron-56 mass number = dim(Im 𝕆) × dim 𝕆 = 7 × 8 | 1 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PROOF-iron-to-ns-bridge` | Iron-56 → neutron-star mass bridge through dim(Im 𝕆) = 7 | 1 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PROOF-oxygen-16-sedenion` | O-16 mass number = (dim ℍ)² = dim 𝕊 = 16 | 1 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PROOF-seed-mass-from-ln7` | Seed mass M_seed = sqrt(ln 7 · ℏc / 4πG) | 1 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
+| `PROOF-silicon-28-fano-ladder` | Si-28 mass number = dim(Im 𝕆) × dim ℍ = 7 × 4 | 1 | coherent | T | → @qbp-oppenheimer decides on inclusion (scientific content) |
 
 ---
 
@@ -864,8 +864,9 @@ Sequencing:
 
 1. **Beekeeper sign-off on rubric v0.2 extension** (§2) — collapses UNCLASSIFIABLE → SCHEMA_AXIS.
 2. **@cth-implementor batch resolution of SCHEMA_AXIS bucket** (23 v0.1 → 30 v0.2 after extension). Schema rule defaults are deterministic where noted; cases needing schema-lock discussion route via the `cth-design` channel.
-3. **@qbp-oppenheimer per-anchor theory-axis adjudication for TWO_AXIS bucket** (19 anchors) — schema fields land first per (2); theory fields land next using the v5_3 (Session-13) closeout default where Oppenheimer concurs.
-4. **Stream-only inclusion decisions** (§4): KILLED-/CONV-/CONJ- Session-13 closeout findings → INCLUDE by default; WISDOM-* defer to the wisdom-registry migration per Beekeeper D2; META-/INSIGHT- from federation-tenancy → INCLUDE by default; everything else → adjudicator.
+2.5. **Cross-axis enum-drift interlock** (per Gemini Furey/Feynman finding, PR #423 review). When @cth-implementor resolves any SCHEMA_AXIS field whose values constrain theoretical expression — specifically `physical_mapping_type`, `physical_mapping_status`, `lean_scope`, `lean_migration_status`, or any newly-added enum field — they post to `pr407-conflict-resolution` BEFORE landing the resolution, naming the affected TWO_AXIS anchors. @qbp-oppenheimer has one cycle to flag anchors whose physics interpretation depends on the enum value being preserved. Net: schema can rename or refine but cannot silently drop a value used in an in-flight TWO_AXIS theory adjudication.
+3. **@qbp-oppenheimer per-anchor theory-axis adjudication for TWO_AXIS bucket** (19 anchors) — schema fields land first per (2); theory fields land next using the v5_3 (Session-13) closeout default where Oppenheimer concurs. Theory adjudications operate against the post-(2.5) schema state.
+4. **Stream-only inclusion decisions** (§4): every entry now has a named adjudicator per the prefix routing rules in the renderer. Session-13 closeouts auto-INCLUDE; PRED-/PROOF-/OBS-/COMP-/CONV-/CONJ-/KILLED-/MEAS-/Q* → @qbp-oppenheimer; INST- → @cth-implementor; META-/INSIGHT- → @qbp-oppenheimer co-sign; WISDOM-* defer to wisdom-registry migration per Beekeeper D2.
 5. **qbp-implementor produces unified vNext JSON** — `archive/cth-inventory/confluent-trust-inventory-vNext.json` — with full provenance trail (which fields came from which stream, which adjudicator signed off).
 6. **BMA re-audit hook** — once vNext lands, BMA (when ready) re-runs the audit per Capability #6 against the unified ledger; ρ_net trajectory shows continuous (no schema breaks).
 
