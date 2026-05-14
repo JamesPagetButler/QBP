@@ -297,7 +297,7 @@ The **common thread is AI optimizing for throughput over governance.** PR #413's
 
 **Is the 5-minute test rule effective?** Yes — observed: zero "AI proposes deferral of trivial work" violations after FAULT-S3-005 was logged. The rule is internalized.
 
-**Are the ruleset fixes (FAULT-S3-006) sufficient?** Yes — no merge-deadlock incidents in late Sprint 3 (PRs #401, #404-#407, #411-#421, #423 all merged cleanly).
+**Are the ruleset fixes (FAULT-S3-006) sufficient?** Yes — no merge-deadlock incidents in late Sprint 3 (PRs #401, #404-#407, #412-#416, #418-#421, #423 all merged cleanly; #417 superseded by #419 via clean rebase, not deadlock).
 
 **Is the human gate (FAULT-S3-007) being respected?** Yes after the rule was added. James has explicitly authorized every merge of every PR in late Sprint 3.
 
