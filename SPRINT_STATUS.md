@@ -8,9 +8,9 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit)
-- **Lifecycle Stage:** Phase 5 (Publication) complete. Paper Task 3 section merged.
-- **Next Critical-Path Action:** Theory Refinement (#81, Thread A in PR #407) → Retrospective (#192) → **Pre-Sprint-4 Strategic Scoping (#408)** → Sprint 4 (target TBD)
+- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit) — **CLOSED 2026-05-14**
+- **Lifecycle Stage:** Retrospective (#192) complete. Sprint 4 scope ratification next.
+- **Next Critical-Path Action:** **Pre-Sprint-4 Strategic Scoping (#408)** → Sprint 4 (target TBD; current recommendation: re-scope toward quaternionic tensor product foundations + Bell's Theorem preparation)
 - **Sprint 4 status:** **NOT committed to Lamb Shift.** Per Oppenheimer Resolution on PR #407 (R6, 2026-05-13) and Strategic Review #001 R3 (2026-02-15), the Lamb Shift's prerequisites (QBP Lagrangian, photon propagator, f(u) at hydrogen scale, renormalization scheme) are not in hand and the bound-state η-mechanism is not formulated. Oppenheimer recommendation: re-scope Sprint 4 toward quaternionic tensor product foundations + Bell's Theorem preparation. Final Sprint 4 scope decided by #408.
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
@@ -37,9 +37,9 @@
   - [x] 4d: Verified Differential Testing (#301) — CLOSED 2026-02-20. PR #392 merged. 86 comparisons, 0 divergences. 17 DoubleSlit test vectors, 3 bug detection mutations.
   - [x] 4e: Verified Simulation Engine (#302) — CLOSED 2026-05-11. PR #401 merged 2026-04-04. Kaiju Virtual Lab with desk controls, 3D monitors, V&V checklist, QBP physics presets (relativistic E_k calibration). 10/10 Go differential tests pass vs Lean oracle. V&V sign-off completed in `docs/verification/vv_checklist_03.md`. Deferred follow-ups: #397 (GPU particle optim), #398 (deeper QBP physics, dimensional κ fix).
 - [x] Phase 5: Publication (#65) — CLOSED 2026-05-11. PR #405 merged. 240-line Task 3 section in `paper/quaternion_physics.md` (3.1 Standard QM, 3.2 QBP Hypothesis with Model A bridge, 3.3 Results with V(U₁) table + 7 figures, 3.4 Discussion + Theory refinement, References section with 9 DOIs). 3 review rounds (Red Team R2 PASS + Gemini R3 PASS). One algebraic CONFLICT resolved via Lean evidence (j_mul_complex theorem).
-- [ ] Theory Refinement (#81)
+- [x] Theory Refinement (#81) — CLOSED 2026-05-13. PR2 Axiomatic-Framework refactor merged (PR #412); foundational Lean theorem `imH_structure_constants` landed in `proofs/QBP/Foundations/LieAlgebraIso.lean` (PR #415/#419); Sprint-12-inherited Lean fold (PR #414); CTH inventory reconciliation cycles 1+2 (PRs #418, #423); anchoring rule standing PR #413; PR3/PR4/PR5 proposals staged in `prompts/` awaiting Beekeeper D5-D20 sign-off.
 - [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`
-- [ ] Retrospective (#192)
+- [x] Retrospective (#192) — CLOSED 2026-05-14. Full retrospective documented above ("Sprint 3 Retrospective" section, this file).
 
 ## Pivot Log
 
@@ -207,6 +207,136 @@ Sprint 2 (Experiment 01b: Angle-Dependent Measurement) completed successfully in
 4. Document lessons immediately
 
 **Full retrospective:** Issue #191
+
+## Sprint 3 Retrospective
+
+**Completed:** 2026-05-14
+
+### Summary
+
+Sprint 3 (Experiment 03: Double-Slit) was the longest and most consequential sprint to date. All 5 phases + Theory Refinement (#81) closed, plus extensive process-maturation work that doesn't fit neatly into "sprint deliverables" — the Empirical Anchor framework, the V&V workflow with Lean integration, the Tier 1/2/3 review system, the CONFLICT template, the anchoring rule (PR #413), the 7-file Sprint-12-inherited Lean fold (PR #414), the CTH inventory reconciliation cycles (PRs #418/#423), the federation tenancy + role split (Beekeeper decision 2026-05-13), and the multi-instance coordination via sessionbridge MCP. Sprint 3 also surfaced **PIVOT-S3-001** (the unit-mismatch incident that became the canonical institutional reference for methodology-error patterns) and **8 process FAULTS** (S3-001 through S3-008), which became the empirical input for PR #413's standing anchoring rule.
+
+### Key achievements
+
+**Experimental:**
+- Phase 1: Quaternionic dynamics with Adler decay, full ground-truth (#22, PR #285)
+- Phase 2: SI-compliant BPM (#36, PR #287/#333/#343); far-field rework via hybrid BPM + Fraunhofer FFT (#359, PR #361)
+- Phase 3: Hero plots + V(U₁) curve (#342, PR #355); far-field visualization rework (#360, PR #368)
+- Phase 4: 5 sub-phases, all closed (#56, #259-#261, #301, #302)
+  - 4a: 433-line Lean 4 proof, zero sorry (PR #373)
+  - 4b: V(η) bridge, 5 theorems contextually reviewed, Fraunhofer extracted to QBP.Optics
+  - 4c: Interactive proof visualization (39-node graph, PR #391)
+  - 4d: Verified differential testing — 86 comparisons, 0 divergences (PR #392)
+  - 4e: Kaiju Virtual Lab — 10/10 Go differential tests pass vs Lean oracle (PR #401, V&V checklist closeout)
+- Phase 5: 240-line Task 3 paper section, 7 figures, 9 DOIs, V(U₁) table (PR #405)
+- Theory Refinement (#81): PR2 Axiomatic-Framework refactor (PR #412), foundational Lean theorem `Wyrd.LieAlgebraIso.imH_structure_constants` landed in `proofs/QBP/Foundations/LieAlgebraIso.lean`, 7-file inherited Lean fold landed in `proofs/Sprint12-Inherited/` (PR #414), CTH reconciliation Cycle 1 (PR #418) + Cycle 2 (PR #423)
+
+**Process:**
+- **Empirical Anchor framework** — required section in ground-truth schema across sprints
+- **V&V workflow** — Lean-as-oracle for differential testing; verified by Phase 4d/4e
+- **Review Tier system** (Tier 0/1/2/3, `docs/workflows/review_tiers.md`) — explicit tier ladder with persona assignments
+- **CONFLICT template** — formalised disagreement adjudication (Red Team vs Gemini)
+- **Anchoring Rule** (PR #413, blocking standing rule effective 2026-05-13) — 5 anchor types; every claim terminates at a verified anchor
+- **Multi-instance coordination** — sessionbridge MCP active across qbp-implementor, qbp-architecture, qbp-cu-implementor, bma, bma-implementor, contextus-impl, wyrd-implementor, cth-implementor
+- **Role split locked** (Beekeeper 2026-05-13) — qbp-oppenheimer = project progression (PR2-5, Gemini coord); qbp-implementor = integration (PR6/7/8)
+
+**Federation governance (landed late-sprint):**
+- Federation tenancy v0.1 doc (PR #403, currently DRAFT pending v0.2 trigger)
+- Toddle-design meeting (2026-05-14, channel-of-record handoff to per-PR threads)
+- Cart-model architecture (Theory Cart on Opus 4.7 + Gemini 3-Pro HIGH effort)
+
+### Diversions
+
+| Diversion | Outcome | Net assessment |
+|---|---|---|
+| Phase 2/3 SI redo (PIVOT-S3-001) | Near-field results invalidated; ~3-day rework | **Value-positive** — established Pivot Protocol (#321); the discipline now scales |
+| Far-field rework (#359, #360) | Hybrid BPM + Fraunhofer FFT; V(U₁=0)=0.655, V(U₁=max)=0.600 (~8.5% reduction) | **Value-positive** — experimentally comparable predictions; canonical now |
+| Phase 4e Kaiju Virtual Lab (#302) | Full 3D V&V environment with physics presets | **Value-positive** — but expensive; deferred GPU optim (#397) + deeper QBP physics (#398) |
+| Sprint-12-inherited Lean fold (#414) | 7 files, 69 theorems, 21 mechanical + 1 semantic fix, all build clean | **Value-positive** — folded an inherited corpus that future sprints depend on |
+| 208/69 counting-methodology incident (B-12) | 3 source-of-error docs flagged; corrections deferred to archive-transfer commit | **Value-positive** — exposed pattern that motivated the PR #413 anchoring rule |
+| Federation governance work (channels, roles, tenancy) | Toddle-design closeout; per-PR threads now active | **Value-positive** — unblocks BMA program engagement (Capabilities #1-#7) |
+| CTH inventory reconciliation cycles 1+2 | 39 anchors routed to named adjudicators; rubric v0.2 | **Value-positive** — unblocks the BMA re-audit capability (#6) at Toddle Phase 1 |
+
+### Commitment for Sprint 4
+
+Per Oppenheimer Resolution on PR #407 (R6, 2026-05-13) and Strategic Review #001 R3 (2026-02-15): **NOT committed to Lamb Shift.** Final scope decided by **#408 Pre-Sprint-4 Strategic Scoping** — current recommendation is to re-scope toward **quaternionic tensor product foundations + Bell's Theorem preparation** (where prerequisites ARE in hand). Sprint 4 scope ratification is the next critical-path action after this retrospective closes.
+
+In parallel: the **#81 PR2-PR5 theory-refinement train** continues — PR3 (Genesis + Cosmology + Gravitational Anomaly), PR4 (Spectral Action + CCvS + W-003 revision), PR5 (CKM + Nuclear Physics) — proposals staged in `prompts/`, awaiting Beekeeper D5-D20 sign-off.
+
+### Workflow Process Review (per #346)
+
+The new review tiers + Human Visual Review gate + CONFLICT template were exercised heavily across Sprint 3 and matured under pressure:
+
+- **Tier system** (`docs/workflows/review_tiers.md`): clear ladder — Tier 0 pre-impl critique, Tier 1 single-AI light review, Tier 2 sequential Red Team + Gemini, Tier 3 deep review. Worked well; James can upgrade/downgrade. **Refinement made:** PR #421 (Tier 1) skipped Gemini cleanly per the tier policy; PR #423 was upgraded by James to Tier 2 mid-flight; both transitions worked.
+- **Sequential reviews (Red Team → Gemini):** the "Gemini sees Red Team context" pattern caught real cross-axis issues (e.g., PR #423 Gemini F6/F8 enum-drift interlock, which Red Team didn't surface). Order matters. **Keep.**
+- **HVR gate:** James's pattern recognition caught issues AI reviewers missed (e.g., PIVOT-S3-001 unit mismatch; PR #346 dimensional check; PR #423 final architectural sign-off). **Promoted to BLOCKING for Tier 2+** mid-sprint; that promotion was correct. **Keep.**
+- **CONFLICT template:** used twice — PR #407 R1/A1/R2 chain (Furey-MAJOR resolved via Lean evidence on `j_mul_complex`) and PR #423 (no conflict needed; both reviewers concurred). **Keep.**
+- **Acceptance Criteria Verification protocol:** added to both Red Team and Gemini review templates. Caught at least 3 unmet ACs that would have shipped without the protocol. **Keep.**
+
+The single most impactful process artifact from Sprint 3 is **PR #413's anchoring standing rule** — it codifies the discipline that PIVOT-S3-001 + the 208/69 audit + the Furey-MAJOR algebraic claim all surfaced separately. It is now the gating rule for every review.
+
+### Pivot Analysis (PIVOT-S3-001, mandatory per pivot protocol)
+
+- **What was the assumption that was wrong?** Sprint 3 Phase 1 ground-truth assumed natural-unit conventions for the quaternionic decay coefficients. Sprint 3 Phase 2 implementation used SI units throughout. The two were never dimensionally cross-checked at the ground-truth-to-implementation handoff.
+- **Visible symptom:** James caught the unit mismatch by visual inspection of the V(U₁=0) baseline result, which was off by orders of magnitude from analytical expectation. AI reviewers had passed the implementation.
+- **What check would have caught it?** **Dimensional analysis in ground-truth review** — a required dimensional-consistency check between the ground-truth-document's quantities and the implementation's quantities, written into the review protocol. (This is now anchor type #5 — "derived dimensional/algebraic identity with substitution chain shown" — in PR #413's anchoring rule.)
+- **Was the check added?** Yes — via PR #413 anchor type #5. Plus institutional reference under PIVOT-S3-001 in `docs/workflows/pivot_protocol.md` and `docs/workflows/review_anchoring.md:107`.
+- **Cost of the deviation:** ~3 days rework (Phase 1 redo #322; Phase 2 redo PR #333; Phase 3 redo PR #355). Recovered cleanly.
+
+### Process Fault Analysis (FAULT-S3-001 through S3-008)
+
+All 8 faults categorize into 3 recurring themes:
+
+| Theme | Faults | Disposition |
+|---|---|---|
+| **AI shortcuts** (admin bypass, premature merge, scope minimization, unauthorized merge) | S3-001, S3-005, S3-007, S3-008 | "Never bypass CI"; "Step 7 requires explicit merge command"; "5-minute test" — all standing rules now |
+| **Infrastructure gaps** (ruleset deadlock, stale SPRINT_STATUS) | S3-004, S3-006 | "When merging a PR that closes a critical-path issue, update SPRINT_STATUS in the same session" — standing rule |
+| **Review-discipline gaps** (scale incomparability missed, direct commit to master) | S3-002, S3-003 | Human Visual Review promoted to BLOCKING for Tier 2+ — standing rule |
+
+The **common thread is AI optimizing for throughput over governance.** PR #413's anchoring rule is the structural corrective: by making every claim terminate at a verified anchor, the throughput-vs-governance trade-off is removed at the review boundary (claims either have anchors or they don't; no judgment call about "is this rigorous enough"). This is **the** load-bearing institutional change from Sprint 3.
+
+**Is the 5-minute test rule effective?** Yes — observed: zero "AI proposes deferral of trivial work" violations after FAULT-S3-005 was logged. The rule is internalized.
+
+**Are the ruleset fixes (FAULT-S3-006) sufficient?** Yes — no merge-deadlock incidents in late Sprint 3 (PRs #401, #404-#407, #412-#416, #418-#421, #423 all merged cleanly; #417 superseded by #419 via clean rebase, not deadlock).
+
+**Is the human gate (FAULT-S3-007) being respected?** Yes after the rule was added. James has explicitly authorized every merge of every PR in late Sprint 3.
+
+**Are process updates from earlier faults being followed?** Yes — SPRINT_STATUS.md is updated in the same session as PR merges (no S3-004 recurrence); merge command always explicit (no S3-007 recurrence); admin/force flags not used (no S3-001 recurrence).
+
+### Documentation updates needed
+
+| Doc | Update needed | Issue |
+|---|---|---|
+| `paper/quaternion_physics.md` | PR3 Genesis/Cosmology sections, PR4 Spectral Action section, PR5 CKM/Nuclear sections | #81 (theory train) |
+| `archive/historical/README.md` + `archive/QBP-Repo-State-Report-2026-05-08.md` | 208→69 corrections + B-13 Hessian content-drop logging | Done as working-tree-only edits today (PR #421 housekeeping closeout); will land via archive-transfer commit |
+| `docs/workflows/review_anchoring.md` | None — standing rule effective 2026-05-13 (PR #413) | — |
+| `SPRINT_STATUS.md` Sprint 3 closeout checklist | Mark "Theory Refinement (#81)" and "Retrospective (#192)" complete after this commit lands | This commit |
+
+### Process refinements
+
+| Refinement | Rationale | Status |
+|---|---|---|
+| **Anchoring rule (PR #413)** — every claim terminates at a verified anchor | PIVOT-S3-001 + 208/69 audit + Furey-MAJOR all stem from unanchored-claim pattern | ✅ Standing rule effective 2026-05-13 |
+| **Human Visual Review BLOCKING for Tier 2+** | James's pattern recognition catches what AI reviewers miss (units, results anomalies, "something's off") | ✅ Promoted mid-sprint per #346 |
+| **CONFLICT template for Red Team vs Gemini disagreement** | Furey-MAJOR algebraic claim on PR #407 needed adjudication mechanism | ✅ Formalized in `docs/workflows/review_tiers.md` |
+| **Role split: qbp-oppenheimer (theory-axis) vs qbp-implementor (integration)** | Surfaces incompatibilities cleanly; both axes have named owners | ✅ Locked by Beekeeper 2026-05-13 |
+| **Cross-axis enum-drift interlock** (Cycle 3 §5 step 2.5) | PR #423 Gemini F6/F8 finding: schema renames could silently break theory adjudications | ✅ Codified in PR #423 |
+
+### Housekeeping backlog health (Q8, per workflow update)
+
+- **Open issues with `housekeeping` label:** 14 (down from peak; not a number to chase)
+- **Stale items (>2 sprints old):** TBD — Herschel aged-backlog check pending; surface only if any exist
+- **Items closed this sprint:** #228, #229, #238 (PR #363 batch); #321 (Pivot Protocol); #325 (SI units in physics); #346 (workflow process review) — partial; multiple PIVOT-S3-001 follow-ups
+
+### Acceptance Criteria
+
+- [x] All 7 (+ 1 housekeeping) questions answered with concrete examples
+- [x] Documentation updates from §6 completed (or scoped to follow-up PRs)
+- [x] Process refinements from §7 applied
+- [x] SPRINT_STATUS.md updated with retrospective summary (this commit)
+- [x] Ready to begin Sprint 4 — final scope decided by #408 Pre-Sprint-4 Strategic Scoping
+
+**Full retrospective:** this file (above). Issue #192 references this section.
 
 ## Sprint 3 Process Fault Log
 
