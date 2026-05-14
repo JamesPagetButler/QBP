@@ -231,7 +231,7 @@ def checkKramersDegeneracy : Bool :=
     
     We verify for general 2-component sums: |（e_a + e_b)(e_c + e_d)|² = |e_a+e_b|²·|e_c+e_d|²
     within the quaternion subalgebra. -/
-def quaternionNormSqProduct (a b c d : Nat) : Int :=
+def quaternionNormSqProduct (a b c d : Nat) : Int := Id.run do
   -- Compute |(e_a + e_b)(e_c + e_d)|² within quaternion indices {0,1,2,3}
   let mut total : Int := 0
   for p in List.range 4 do
@@ -241,7 +241,7 @@ def quaternionNormSqProduct (a b c d : Nat) : Int :=
     if mulIdx b c == p then comp := comp + mulSign b c
     if mulIdx b d == p then comp := comp + mulSign b d
     total := total + comp * comp
-  total
+  return total
 
 /-- |e_a + e_b|² = 2 when a ≠ b (both in {0,1,2,3}) -/
 def checkQuaternionNormSum (a b : Nat) : Bool :=
@@ -253,7 +253,7 @@ def checkQuaternionNormSum (a b : Nat) : Bool :=
 
 /-- Verify Hurwitz: for ALL pairs of quaternion basis sums,
     |ab|² = |a|²·|b|² = 2·2 = 4. -/
-def checkHurwitzQuaternion : Bool :=
+def checkHurwitzQuaternion : Bool := Id.run do
   -- Check all pairs (a,b) and (c,d) with a<b, c<d, all in {0,1,2,3}
   let mut allGood := true
   for a in List.range 4 do
@@ -264,13 +264,13 @@ def checkHurwitzQuaternion : Bool :=
             if c < d then
               if quaternionNormSqProduct a b c d != 4 then
                 allGood := false
-  allGood
+  return allGood
 
 /-- Verify Hurwitz FAILS for sedenions: there exist basis sums
     (e_i + e_j)(e_k + e_l) = 0 with |e_i+e_j|²·|e_k+e_l|² = 4 ≠ 0.
     This is precisely the zero divisor property (T4 in Sedenion.lean).
     The Hurwitz property holds for ℝ, ℂ, ℍ but NOT for 𝕆, 𝕊. -/
-def checkHurwitzFailsSedenion : Bool :=
+def checkHurwitzFailsSedenion : Bool := Id.run do
   -- We already know there are 42 ZDs from T4
   -- Just need ONE example: (e₁+e₁₀) × (e₅+e₁₄) = 0
   -- (First ZD from enumeration)
@@ -282,7 +282,7 @@ def checkHurwitzFailsSedenion : Bool :=
     if mulIdx 10 5 == p then comp := comp + mulSign 10 5
     if mulIdx 10 14 == p then comp := comp + mulSign 10 14
     total := total + comp * comp
-  total == 0  -- zero product norm = zero divisor
+  return total == 0  -- zero product norm = zero divisor
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 5: TOPOLOGICAL INVARIANT STRUCTURE

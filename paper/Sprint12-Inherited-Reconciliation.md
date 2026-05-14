@@ -36,7 +36,50 @@
 
 **Net first-pass build result on v4.30.0-rc2:** 6 of 7 files build clean. Sedenion.lean has 1 real syntactic incompatibility (B-2: `let mut` requires `Id.run do` wrapper) + 1 orphan-doc-comment issue (B-3); everything else is cascade or lint.
 
-<!-- placeholder for follow-up build runs -->
+## Second pass — after applying Sedenion B-2/B-3 fixes
+
+Once Sedenion was fixed and the build advanced, the SAME class of issues surfaced in other files:
+
+| ID | Incompatibility | Files affected | Status |
+|---|---|---|---|
+| B-8 | `let mut` outside `do` block — same as B-2 | Elements.lean (4 defs: shellCapacitySum, aufbauOrder, cumulativeElectrons, checkNobleGases); Quaternion.lean (3 defs: quaternionNormSqProduct, checkHurwitzQuaternion, checkHurwitzFailsSedenion) | RESOLVED — Id.run do wrapping |
+| B-9 | Orphan `/--` doc comments — same as B-3 | Bi2Se3.lean (3: lines 102, 125, 136); Elements.lean (line 162); Graphene.lean (line 250) | RESOLVED — `/--` → `/-` for section-explainer blocks |
+
+## Third pass — `List.get?` removed in v4.30
+
+| ID | Incompatibility | Location | Status |
+|---|---|---|---|
+| B-10 | `List.get?` no longer exists in v4.30.0-rc2 stdlib. Replacement: `xs[i]?` (Option-returning indexer). | Elements.lean:130, 144 (in `cumulativeElectrons` + `checkNobleGases`) | RESOLVED — replaced `order.get? i` with `order[i]?` |
+
+## Fourth pass — real theorem-content failure (theory-axis per D4)
+
+| ID | Incompatibility | Location | Status |
+|---|---|---|---|
+| **B-11 (THEORY-AXIS)** | Crystallisation.lean `theorem variation_correlation` failed `native_decide` because `checkCorrelationConstraint` evaluates to `false`, not `true`. Root cause: `let a_check := 1 - 2 * 1 + 1` was inferred as `Nat`, where truncated subtraction `1 - 2 = 0` makes `a_check = 1` (NOT `0` as the inline comment claims). The author's stated intent (C3 correlation constraint with signed exponent arithmetic) requires `Int`. | Crystallisation.lean:112 (def), Crystallisation.lean:232 (theorem) | RESOLVED — added explicit `: Int` annotations matching the author's stated intent. **Note: this means the inherited claim "208 theorems / 0 sorries" was misleading; at least one theorem (variation_correlation) silently relied on a buggy `native_decide` evaluation that should have failed on v4.18 too.** Escalation to qbp-oppenheimer (theory-axis) recommended for verification that the corrected proof preserves the intended C3 claim. |
+
+## Final build result
+
+```
+Build completed successfully (9 jobs).
+Exit: 0
+```
+
+All 7 files build clean on Lean 4.30.0-rc2 within the `«QBPProofs»` Lake project. Remaining: 16 unused-variable warnings (`h1`, `h2` in pattern matches; B-6-class, non-blocking).
+
+## Summary of changes by file
+
+| File | Theorems | Changes applied | Build status (v4.30.0-rc2) |
+|---|---|---|---|
+| Bi2Se3.lean | 6 | 3 orphan-doc → /- | ✅ clean |
+| Crystallisation.lean | 6 | 1 type annotation (Nat → Int) for C3 correctness | ✅ clean **(content fix; theory-axis review recommended)** |
+| Elements.lean | 12 | 4 Id.run do; 2 List.get? → xs[i]?; 1 orphan-doc → /- | ✅ clean |
+| Graphene.lean | 11 | 1 orphan-doc → /- | ✅ clean |
+| Kitaev.lean | 13 | none | ✅ clean (built clean as-is) |
+| Quaternion.lean | 11 | 3 Id.run do | ✅ clean |
+| Sedenion.lean | 10 | 9 Id.run do; 1 orphan-doc → /- | ✅ clean |
+| **TOTAL** | **69** | **21 mechanical + 1 semantic (B-11)** | **✅ 9 jobs build clean** |
+
+<!-- placeholder for any follow-up build runs -->
 
 ---
 

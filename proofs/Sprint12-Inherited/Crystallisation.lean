@@ -117,9 +117,14 @@ def checkCorrelationConstraint : Bool :=
   -- f₄ depends on A with exponent 1, σ with exponent 2
   --
   -- The constraint: A_exp(f₄) - 2×A_exp(f₂) + A_exp(f₀) for A:
-  let a_check := 1 - 2 * 1 + 1  -- = 0 ✓ (A cancels)
+  -- NOTE (PR8 Sprint12-Inherited fix 2026-05-14): explicit `: Int` annotation
+  -- required. Original code (without annotation) inferred Nat, where
+  -- truncated subtraction `1 - 2 = 0` made a_check = 1 (not 0) and the
+  -- whole `native_decide` proof failed silently. The author's intent was
+  -- signed arithmetic; that is now made explicit.
+  let a_check : Int := 1 - 2 * 1 + 1  -- = 0 ✓ (A cancels)
   -- For σ: σ_exp(f₄) - 2×σ_exp(f₂) + σ_exp(f₀):
-  let s_check := 2 - 2 * 1 + 0  -- = 0 ✓ (σ cancels too!)
+  let s_check : Int := 2 - 2 * 1 + 0  -- = 0 ✓ (σ cancels too!)
   -- Both vanish → the constraint ΔΛ/Λ - 2(ΔG/G) + Δα/α = 0 is exact
   a_check == 0 && s_check == 0
 

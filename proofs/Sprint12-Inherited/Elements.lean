@@ -28,11 +28,11 @@
 
 /-- Compute the electron capacity of shell n by summing subshells:
     Σ_{l=0}^{n-1} 2(2l+1) -/
-def shellCapacitySum (n : Nat) : Nat :=
+def shellCapacitySum (n : Nat) : Nat := Id.run do
   let mut total := 0
   for l in List.range n do
     total := total + 2 * (2 * l + 1)
-  total
+  return total
 
 /-- Check that shellCapacitySum(n) = 2n² for n = 1 to 100 -/
 def checkShellFormula : Bool :=
@@ -109,7 +109,7 @@ theorem subshell_counts : checkSubshellCounts = true := by
 
 /-- The Aufbau filling order: subshells sorted by (n+l), then n.
     Returns a list of (n, l) pairs in filling order. -/
-def aufbauOrder : List (Nat × Nat) :=
+def aufbauOrder : List (Nat × Nat) := Id.run do
   -- Generate all (n, l) with n ≥ 1, 0 ≤ l < n, ordered by (n+l, n)
   let mut pairs : List (Nat × Nat) := []
   -- For n+l from 1 to 12 (covers all elements up to 118+)
@@ -120,35 +120,36 @@ def aufbauOrder : List (Nat × Nat) :=
       let l := s - n
       if l < n then  -- valid: l must be < n
         pairs := pairs ++ [(n, l)]
-  pairs
+  return pairs
 
 /-- Compute cumulative electron count after filling k subshells in Aufbau order -/
-def cumulativeElectrons (k : Nat) : Nat :=
+def cumulativeElectrons (k : Nat) : Nat := Id.run do
   let order := aufbauOrder
   let mut total := 0
   for i in List.range k do
-    match order.get? i with
+    match order[i]? with
     | some (_, l) => total := total + electronsInSubshell l
     | none => total := total
-  total
+  return total
 
 /-- Find the indices where noble gases occur (completed shell groups).
     Noble gases are at Z = 2, 10, 18, 36, 54, 86, 118. -/
-def checkNobleGases : Bool :=
+def checkNobleGases : Bool := Id.run do
   let order := aufbauOrder
   let mut total := 0
   let mut noble_idx := 0
   let nobles := #[2, 10, 18, 36, 54, 86, 118]
   let mut ok := true
   for i in List.range (min order.length 30) do
-    match order.get? i with
+    match order[i]? with
     | some (_, l) =>
       total := total + electronsInSubshell l
       if noble_idx < nobles.size then
         if total == nobles[noble_idx]! then
           noble_idx := noble_idx + 1
     | none => ok := false
-  noble_idx == 7  -- found all 7 noble gases
+  let _ := ok  -- suppress unused-variable warning; preserves original semantics
+  return noble_idx == 7  -- found all 7 noble gases
 
 /-- T14. The Aufbau filling order produces noble gases at Z = 2, 10, 18, 36, 54, 86, 118 -/
 theorem noble_gas_atomic_numbers : checkNobleGases = true := by
@@ -158,7 +159,7 @@ theorem noble_gas_atomic_numbers : checkNobleGases = true := by
 -- SECTION 5: HYDROGEN ENERGY SPECTRUM
 -- ═══════════════════════════════════════════════════════════
 
-/-- The hydrogen energy levels satisfy E_n = E_1/n² (Coulomb spectrum).
+/- The hydrogen energy levels satisfy E_n = E_1/n² (Coulomb spectrum).
     We verify this as: n² × E_n = E_1 for all n.
     Since E_n = -α²m_e/(2n²), we check that the RATIO is exact. -/
 

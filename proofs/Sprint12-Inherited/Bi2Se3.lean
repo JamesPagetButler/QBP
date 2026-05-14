@@ -99,7 +99,7 @@ def checkSlaterSe : Bool :=
 -- SECTION 2: SPIN-ORBIT COUPLING
 -- ═══════════════════════════════════════════════════════════
 
-/-- Spin-orbit coupling strength scales as:
+/- Spin-orbit coupling strength scales as:
     λ_SOC ∝ Z_eff⁴ / n³
     
     For hydrogen-like atoms:
@@ -122,7 +122,7 @@ def checkSlaterSe : Bool :=
     We proceed with Clementi values.
 -/
 
-/-- Compute SOC parameter: Z_eff^4 / n^3 (all ×10000 for the Z_eff part) 
+/- Compute SOC parameter: Z_eff^4 / n^3 (all ×10000 for the Z_eff part)
     Returns value ×10000⁴/1 = very large, so we normalise differently.
     
     Instead, compute the RATIO of Bi SOC to Se SOC:
@@ -133,7 +133,7 @@ def checkSlaterSe : Bool :=
     Z_eff_Se = 82870, n_Se = 4
 -/
 
-/-- The band inversion criterion:
+/- The band inversion criterion:
     A topological insulator forms when SOC is strong enough to
     INVERT the band ordering at the Γ point.
     

@@ -109,7 +109,7 @@ def checkAntiCommute : Bool :=
       else mulIdx i j == mulIdx j i && mulSign i j + mulSign j i == 0
 
 /-- Count the anti-commuting pairs (should be 105 = C(15,2)) -/
-def countAntiCommutingPairs : Nat :=
+def countAntiCommutingPairs : Nat := Id.run do
   let mut count := 0
   for ii in List.range 15 do
     for jj in List.range ii do
@@ -117,7 +117,7 @@ def countAntiCommutingPairs : Nat :=
       let j := jj + 1
       if mulIdx i j == mulIdx j i && mulSign i j + mulSign j i == 0 then
         count := count + 1
-  count
+  return count
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 3: ZERO DIVISOR COMPUTATION
@@ -126,7 +126,7 @@ def countAntiCommutingPairs : Nat :=
 /-- Compute |ab|² for a = e_i + e_j, b = e_k + e_l.
     |ab|² = Σ_p (component_p of ab)²
     where (ab)_p = Σ contributions from each basis product. -/
-def normSqProduct (i j k l : Nat) : Int :=
+def normSqProduct (i j k l : Nat) : Int := Id.run do
   let mut total : Int := 0
   for p in List.range 16 do
     -- Component p of (e_i + e_j)(e_k + e_l)
@@ -138,7 +138,7 @@ def normSqProduct (i j k l : Nat) : Int :=
     if mulIdx j k == p then comp := comp + mulSign j k
     if mulIdx j l == p then comp := comp + mulSign j l
     total := total + comp * comp
-  total
+  return total
 
 /-- Check if (e_i + e_j, e_k + e_l) is a zero divisor -/
 def isZD (i j k l : Nat) : Bool :=
@@ -146,7 +146,7 @@ def isZD (i j k l : Nat) : Bool :=
 
 /-- Enumerate all cross-copy basis-sum zero divisors.
     i ∈ {1..7}, j ∈ {9..15}, k ∈ {1..7}, l ∈ {9..15}, (i,j) < (k,l). -/
-def countZeroDivisors : Nat :=
+def countZeroDivisors : Nat := Id.run do
   let mut count := 0
   for i in List.range 7 do
     for j in List.range 7 do
@@ -160,7 +160,7 @@ def countZeroDivisors : Nat :=
           if ii < kk || (ii == kk && jj < ll) then
             if isZD ii jj kk ll then
               count := count + 1
-  count
+  return count
 
 /-- Check that the ZD count is exactly 42 -/
 def checkZDCount42 : Bool := countZeroDivisors == 42
@@ -174,7 +174,7 @@ def checkZDCount42 : Bool := countZeroDivisors == 42
     
     H_mn = 2 Σ_p (∂(ab)_p/∂x_m)(∂(ab)_p/∂x_n)
     where x = (a_0,...,a_15, b_0,...,b_15). -/
-def hessianEntry (capI capJ capK capL : Nat) (m n : Nat) : Int :=
+def hessianEntry (capI capJ capK capL : Nat) (m n : Nat) : Int := Id.run do
   let mut total : Int := 0
   for p in List.range 16 do
     -- Gradient component for x_m
@@ -202,26 +202,26 @@ def hessianEntry (capI capJ capK capL : Nat) (m n : Nat) : Int :=
         let c2 : Int := if mulIdx capJ n2 == p then mulSign capJ n2 else 0
         c1 + c2
     total := total + grad_m * grad_n
-  2 * total
+  return 2 * total
 
 /-- Trace of the Hessian at a ZD: Tr(H) = Σ_m H[m][m] -/
-def hessianTrace (capI capJ capK capL : Nat) : Int :=
+def hessianTrace (capI capJ capK capL : Nat) : Int := Id.run do
   let mut total : Int := 0
   for m in List.range 32 do
     total := total + hessianEntry capI capJ capK capL m m
-  total
+  return total
 
 /-- Trace of H² at a ZD: Tr(H²) = Σ_{m,n} H[m][n] * H[n][m] -/
-def hessianTraceSq (capI capJ capK capL : Nat) : Int :=
+def hessianTraceSq (capI capJ capK capL : Nat) : Int := Id.run do
   let mut total : Int := 0
   for m in List.range 32 do
     for n in List.range 32 do
       total := total + hessianEntry capI capJ capK capL m n *
                        hessianEntry capI capJ capK capL n m
-  total
+  return total
 
 /-- Check that Tr(H) = 128 at ALL 42 ZDs -/
-def checkAllHessianTraces128 : Bool :=
+def checkAllHessianTraces128 : Bool := Id.run do
   let mut ok := true
   for i in List.range 7 do
     for j in List.range 7 do
@@ -232,10 +232,10 @@ def checkAllHessianTraces128 : Bool :=
             if isZD ii jj kk ll then
               if hessianTrace ii jj kk ll != 128 then
                 ok := false
-  ok
+  return ok
 
 /-- Check that Tr(H²) = 1152 at ALL 42 ZDs -/
-def checkAllHessianTracesSq1152 : Bool :=
+def checkAllHessianTracesSq1152 : Bool := Id.run do
   let mut ok := true
   for i in List.range 7 do
     for j in List.range 7 do
@@ -246,24 +246,24 @@ def checkAllHessianTracesSq1152 : Bool :=
             if isZD ii jj kk ll then
               if hessianTraceSq ii jj kk ll != 1152 then
                 ok := false
-  ok
+  return ok
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 5: EIGENVALUE SPECTRUM VERIFICATION
 -- ═══════════════════════════════════════════════════════════
 
-/-- Compute Tr(H^3) to verify the full eigenvalue spectrum.
+/- Compute Tr(H^3) to verify the full eigenvalue spectrum.
     If the spectrum is {0(×16), 4(×4), 8(×8), 12(×4)} then:
       Tr(H)  = 4·4 + 8·8 + 12·4 = 16+64+48 = 128
       Tr(H²) = 4²·4 + 8²·8 + 12²·4 = 64+512+576 = 1152
       Tr(H³) = 4³·4 + 8³·8 + 12³·4 = 256+4096+6912 = 11264
       Tr(H⁴) = 4⁴·4 + 8⁴·8 + 12⁴·4 = 1024+32768+82944 = 116736
-    
+
     With 4 independent trace equations for 4 unknowns (d_0, d_4, d_8, d_12)
     subject to d_0 + d_4 + d_8 + d_12 = 32, we can determine all degeneracies. -/
 
 /-- Compute Σ_{m,n,p} H[m][n] * H[n][p] * H[p][m] (trace of H³) -/
-def hessianTraceCube (capI capJ capK capL : Nat) : Int :=
+def hessianTraceCube (capI capJ capK capL : Nat) : Int := Id.run do
   let mut total : Int := 0
   -- For efficiency, precompute a row of H×H
   for m in List.range 32 do
@@ -273,7 +273,7 @@ def hessianTraceCube (capI capJ capK capL : Nat) : Int :=
         hn := hn + hessianEntry capI capJ capK capL m n *
                    hessianEntry capI capJ capK capL n p
       total := total + hn * hessianEntry capI capJ capK capL p m
-  total
+  return total
 
 /-- Check Tr(H³) = 11264 at the first ZD.
     Combined with Tr(H) = 128, Tr(H²) = 1152, and dim = 32,

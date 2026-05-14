@@ -247,7 +247,7 @@ def checkMoireHelicity : Bool :=
 -- SECTION 5: MAGIC ANGLE PARAMETER OBSERVATION
 -- ═══════════════════════════════════════════════════════════
 
-/-- The BM magic angle parameter α ≈ 0.586.
+/- The BM magic angle parameter α ≈ 0.586.
     The closest QBP algebraic ratio is 1/√3 ≈ 0.5774 (1.5% off).
     
     1/√3 appears naturally in the honeycomb geometry:
