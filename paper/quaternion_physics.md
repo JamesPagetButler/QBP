@@ -368,11 +368,11 @@ When the $G_2 \to SU(3)$ breakdown splits the 7 imaginary units of the octonions
 
 To understand the origin of CP violation, we must abandon parameter-fitting and look strictly at the algebraic geometry of the fundamental fermions. Drawing upon the non-associative algebraic formulations of the Standard Model — specifically the foundational work of Furey on octonion-Standard-Model embeddings, the $\mathbb{R} \otimes \mathbb{C} \otimes \mathbb{H} \otimes \mathbb{O}$ algebra of physics by Dixon, and the 27-dimensional exceptional Jordan algebra utilized by Boyle — we recognize that electroweak symmetry breaking is fundamentally tied to the octonionic structure.
 
-As established in §V.B, the dynamic breaking of the automorphism group $G_2 \to SU(3)$ decomposes the 14-dimensional adjoint representation into $8 \oplus 3 \oplus \bar{3}$. More crucially, this symmetry reduction enforces a specific splitting of the 7 imaginary units of the octonions ($\text{Im } \mathbb{O}$) into a singlet and two triplets: $1 \oplus 3 \oplus \bar{3}$. This decomposition is not a phenomenological choice; it is a rigid topological consequence of identifying a complex structure within $\mathbb{O}$, a mapping extensively leveraged in the octonion-quaternion split framework of Dray and Manogue.
+As established in §V.B, the dynamic breaking of the automorphism group $G_2 \to SU(3)$ decomposes the 14-dimensional adjoint representation into $8 \oplus 3 \oplus \bar{3}$. More crucially, this symmetry reduction enforces a specific splitting of the 7 imaginary units of the octonions ($\text{Im } \mathbb{O}$) into a singlet and two triplets: $1 \oplus 3 \oplus \bar{3}$ (within $\text{Im } \mathbb{O}$). This decomposition is not a phenomenological choice; it is a rigid topological consequence of identifying a complex structure within $\mathbb{O}$, a mapping extensively leveraged in the octonion-quaternion split framework of Dray and Manogue.
 
-Geometrically, this 7-dimensional imaginary space stands orthogonal to the single real axis of the octonions. The complete $\mathbb{O}$ algebra thus spans 8 dimensions. If we map the CP-violating phase transition to the intrinsic geometry of this algebra, it manifests as an orientation angle derived from the ratio of the imaginary degrees of freedom to the real singlet.
+Orthogonal to this entire 7D imaginary topology lies the single real axis of $\mathbb{O}$ (the $\mathbb{R}$ in the $\mathbb{O} = \mathbb{R} \oplus \text{Im } \mathbb{O}$ decomposition). The complete $\mathbb{O}$ algebra thus spans 8 dimensions: $\mathbb{R}^8 \cong \mathbb{R} \oplus \mathbb{R}^7$.
 
-We define a right triangle whose sides correspond directly to this structural decomposition: an opposite leg spanning the 7 imaginary units ($\sqrt{7}$), an adjacent leg comprising the 1 real unit ($1$), yielding a hypotenuse for the complete algebraic space ($\sqrt{8}$).
+We construct the CP-violating phase angle as the angle between the real axis and the main diagonal of this full 8D algebraic space. Looking at the unit vector $(1, 1, 1, 1, 1, 1, 1, 1) \in \mathbb{R} \oplus \mathbb{R}^7$, the magnitude of its imaginary components is $\sqrt{7}$, the magnitude of its real component is $1$, and the total magnitude is $\sqrt{8}$. This defines a right triangle with legs $\sqrt{7}$ and $1$, and hypotenuse $\sqrt{8}$.
 
 The intrinsic phase angle $\delta_{CP}$ dictated by this geometry is exactly determined:
 
@@ -412,7 +412,7 @@ Theoretical predictions derived from QCD sum rules by Jido, Nagahiro, and Hirenz
 
 Why would an electroweak invariant solve a QCD anomaly? Because chiral symmetry breaking is mathematically blind to the force carrying it out; it responds only to the underlying algebraic structure of the vacuum.
 
-If we take the electroweak chiral invariant $\cos^2(\delta_{CP}) = 1/8$ and project it into the 3D physical space of the nuclear medium — mathematically represented by taking the trace over the imaginary quaternions, $1/\text{dim}(\text{Im } \mathbb{H}) = 1/3$ — we obtain a universal fractional shift:
+If we take the electroweak chiral invariant $\cos^2(\delta_{CP}) = 1/8$ and project it into an isotropic 3D physical space of the nuclear medium — mathematically represented by taking the per-dimension spatial average via the trace over the imaginary quaternions, yielding a factor of $1/\text{dim}(\text{Im } \mathbb{H}) = 1/3$ — we obtain a universal fractional shift:
 
 $$ \frac{\cos^2(\delta_{CP})}{\text{dim}(\text{Im } \mathbb{H})} = \frac{1}{8} \cdot \frac{1}{3} = \frac{1}{24} \approx 0.041667 $$
 
@@ -513,9 +513,9 @@ This cross-scale synthesis sets a non-negotiable boundary condition for the next
 
 In Sprint 4, we will transition from static symmetries to dynamic kinematics, deriving the Dirac spectrum directly on the $\mathbb{H} \otimes \mathbb{H}$ tensor product space. We state the falsification criterion *now*, before the spectrum is calculated:
 
-The emergent Dirac spectrum on $\mathbb{H} \otimes \mathbb{H}$ **must** inherently preserve the $\cos^2(\delta_{CP}) = 1/8$ invariant.
+The emergent Dirac spectrum on $\mathbb{H} \otimes \mathbb{H}$ **must** yield eigenvalues or phase shifts that intrinsically preserve the $\cos^2(\delta_{CP}) = 1/8$ invariant.
 
-If the dynamical spectrum produced in Sprint 4 violates this established geometric orientation, it will mean the geometry is physically inconsistent with kinematics, and the model fails before it begins. Nature does not negotiate with mathematically "pretty" geometries that fail to preserve their invariants under dynamics. Sprint 4 will either computationally vindicate the Orientation Triad or decisively kill it.
+If the dynamical spectrum produced in Sprint 4 violates this established geometric orientation — i.e., if the computed Dirac eigenvalues do not naturally factor into a structure consistent with the $\sqrt{7} : 1 : \sqrt{8}$ phase triangle — it will mean the geometry is physically inconsistent with kinematics, and the model fails before it begins. Nature does not negotiate with mathematically "pretty" geometries that fail to preserve their invariants under dynamics. Sprint 4 will either computationally vindicate the Orientation Triad or decisively kill it.
 
 ## The Revised Eight-Fold Path of Verification
 
