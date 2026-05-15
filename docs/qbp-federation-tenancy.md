@@ -66,10 +66,10 @@ The Stance defines what's "interesting in QBP terms." Per A18 v0.2 §2.1, these 
 - `qbp:topological-materials-q1-q10` — Bi₂Se₃, MATBG, α-RuCl₃ (per CTH `archive/cth-inventory/confluent-trust-inventory-v5_3.json` 141-anchor baseline)
 - `qbp:kitaev-z2-gauge` — non-abelian braid statistics + Majorana central charge
 - **`qbp:spectral-action-entropy`** *(new in v0.2 per R16; W-003 revision)* — CCvS 2018 "entropy = spectral action(χ)" connection; the entropy spectral action selects test function χ(x) = h(√x) on the same spectral triple as QBP's f(u)
-- **DM-fork branches** *(replaces `qbp:dark-matter-fork` per R15)*:
+- **DM-fork branches** *(replaces `qbp:dark-matter-fork` per R15; sub-types extended per Gemini Round-2 F3)*:
   - `qbp:dm-branch-a-modified-gravity` — Branch A: modified-gravity / no-extra-particle regime (per `archive/QBP-Dark-Matter-Fork-Analysis.md`)
-  - `qbp:dm-branch-b-algebra-extension` — Branch B: algebra-extension / extra-structure regime
-  - Branch-specific sub-Type-Nodes: `qbp:dm-axion`, `qbp:dm-pbh`, `qbp:dm-sterile-neutrino`, `qbp:dm-fimp` — promoted from Stance when their prediction lands in CTH `archive/cth-inventory/` as a PRED-* anchor
+  - `qbp:dm-branch-b-particle-or-field-extension` — Branch B: any particle / field / cosmological-history extension beyond Standard Model + GR. The original v0.2 label "algebra-extension" was QBP-internal framing; Gemini Round-2 F3 flagged this as misleading for sub-types that don't depend on the algebra extension specifically (e.g., PBH operates on standard SM/GR foundations). Renamed for literature alignment.
+  - Branch-specific sub-Type-Nodes: `qbp:dm-axion`, `qbp:dm-wimp`, `qbp:dm-sidm`, `qbp:dm-pbh`, `qbp:dm-sterile-neutrino`, `qbp:dm-fimp` — promoted from Stance when their prediction lands in CTH `archive/cth-inventory/` as a PRED-* anchor. **Note on `qbp:dm-pbh`:** PBH is a cosmological-history candidate that operates on standard SM/GR foundations without requiring an algebra extension; included under Branch B for taxonomy completeness, not because PBH is algebra-driven.
   - **Stance composition supercategory** *(per Round-2 G3)*: all `qbp:dm-*` Type-Nodes (branches + sub-types) are treated as belonging to the DM-fork supercategory; Stance queries can match either by individual Type-Node or by `qbp:dm-*` prefix glob
 
 ### 1.3 Predictive bridges (anchors with ρ_net contribution)
