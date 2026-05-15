@@ -61,7 +61,7 @@
 
 ## Sprint 4 Closure Checklist *(active sprint, launching)*
 
-- [ ] **Pre-flight (COMPLETE)** — Sprint 4 scope ratified by Beekeeper 2026-05-14 (Dirac spectrum on ℍ⊗ℍ + tensor-product machinery preparing Sprint 5 Bell). #408 closed 2026-05-15. Framework basis (Dixon/Furey, $\mathcal{A} = \mathbb{H} \otimes_{\mathbb{R}} \mathbb{H} \cong M_4(\mathbb{R})$) selected via `research/quaternionic_tensor_product_survey.md`. Falsification criterion inherited from PR #435 §XIII.D: emergent Dirac spectrum must preserve $\cos^2(\delta_{CP}) = 1/8$ invariant.
+- [x] **Pre-flight (COMPLETE)** — Sprint 4 scope ratified by Beekeeper 2026-05-14 (Dirac spectrum on ℍ⊗ℍ + tensor-product machinery preparing Sprint 5 Bell). #408 closed 2026-05-15. Framework basis (Dixon/Furey, $\mathcal{A} = \mathbb{H} \otimes_{\mathbb{R}} \mathbb{H} \cong M_4(\mathbb{R})$) selected via `research/quaternionic_tensor_product_survey.md`. Falsification criterion inherited from PR #435 §XIII.D: emergent Dirac spectrum must preserve $\cos^2(\delta_{CP}) = 1/8$ invariant.
 - [ ] **Phase 1: Ground Truth** — Define exact Dirac operator $D$ on $M_4(\mathbb{R})$; state primitive idempotent $P$ for minimal-left-ideal Hilbert space; specify how the cos²(δ_CP)=1/8 boundary condition from the octonionic sector constrains matrix elements of $D$. Tracking issue TBD.
 - [ ] **Phase 2: Implementation** — Numerical Dirac spectrum diagonalisation on $M_4(\mathbb{R})$ + spectral action $\text{Tr}(f(D²/Λ²))$ moment extraction. Tracking issue TBD.
 - [ ] **Phase 3: Visualization** — Spectrum plot + chirality-invariant verification chart. Tracking issue TBD.
