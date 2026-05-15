@@ -209,6 +209,9 @@ At the start of sessions involving Gemini, check for relevant prior context:
 
 ## 6. Prescriptive Collaboration Patterns
 
+> **Cross-reference:** For the operational decision of *which pattern activates at which review tier*, with trigger conditions, tool configuration, and escalation thresholds, see the [Activation Matrix in `review_tiers.md`](review_tiers.md#activation-matrix-pattern--tier). The patterns below define the *what* and *how*; the Activation Matrix defines the *when*.
+
+
 ### Pattern 1: Pre-Implementation Critique
 
 **When:** Before implementing any non-trivial design decision.

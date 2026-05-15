@@ -450,6 +450,30 @@ The status file must always reflect current mode:
 
 ---
 
+## Review System & Collaboration Patterns
+
+Per the review tier system and Claude-Gemini collaboration patterns:
+
+| Operational mode | Tier(s) typically active | Patterns most commonly invoked |
+|---|---|---|
+| **Focus Mode** (current default) | Tier 1 (docs), Tier 2 (code) | Pattern 1 (pre-impl critique), Pattern 5 (questions) |
+| **Sprint Mode** | Tier 0 (phase plans) → Tier 2/3 (impl + theory) | Patterns 1, 3, 4, 5 |
+| **Project Mode** | Tier 0 (portfolio decisions) | Patterns 1, 2, 4 |
+
+**Authoritative references:**
+- [Review Tiers + Activation Matrix](../workflows/review_tiers.md) — single source of truth for tier selection, the Pattern × Tier activation matrix, tool configuration per intersection, escalation thresholds, BLOCKING criteria.
+- [Claude-Gemini Communication Protocol](../workflows/claude_gemini_communication.md) — pattern definitions, disagreement resolution protocol, communication templates.
+- [Review Anchoring Rule](../workflows/review_anchoring.md) — blocking standing rule: every BLOCKING-class claim must terminate at a verifiable anchor.
+
+**Quick-reference activation summary** (full matrix in `review_tiers.md`):
+
+- **Pattern 1 (Pre-Impl Critique):** Default at Tier 0; recommended at Tier 2/3 for non-trivial implementations. Routine — no human required.
+- **Pattern 3 (Session-Based Reviews):** Required at Tier 2/3 for multi-round PRs. Routine — no human required.
+- **Pattern 4 (Human Tie-Breaking):** Escalation only — after 3 unconvergent Pattern 2 rounds, or when a finding affects sprint direction, or when an AC is contested. **James in the loop by definition.**
+- **Pattern 5 (Interactive Questions):** As needed at any tier. **James in the loop by definition.**
+
+---
+
 ## Summary
 
 | Aspect | Focus Mode | Sprint Mode | Project Mode |

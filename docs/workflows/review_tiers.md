@@ -27,6 +27,57 @@ James can upgrade or downgrade any PR's tier.
 
 ---
 
+## Activation Matrix (Pattern × Tier)
+
+Cross-walks the 5 prescriptive [collaboration patterns](claude_gemini_communication.md#6-prescriptive-collaboration-patterns) against the 4 review tiers. Tells you "for tier X, which patterns activate, and when."
+
+| Pattern | Tier 0 | Tier 1 | Tier 2 | Tier 3 | Trigger | Human in loop? |
+|---|---|---|---|---|---|---|
+| **1. Pre-Implementation Critique** | ✅ **default** | optional | recommended for non-trivial impl | recommended for non-trivial impl | Non-trivial design decision before code | No (routine) |
+| **2. Structured Debate** | n/a | n/a | on contested BLOCKING finding | on contested BLOCKING finding | Reviewers disagree on whether a finding is BLOCKING | Tie-break only (after 3 unconvergent rounds) |
+| **3. Session-Based Reviews** | n/a | optional | ✅ **required** if multi-round | ✅ **required** if multi-round | PR Round 2+ where Gemini previously reviewed | No (routine) |
+| **4. Human Tie-Breaking** | rare | rare | escalation | escalation | (a) Pattern 2 doesn't converge, (b) finding affects sprint direction, (c) AC contested | **YES** (by definition) |
+| **5. Interactive Questions** | as needed | as needed | as needed | as needed | Claude needs James's input on a decision | **YES** (by definition) |
+
+### Tool configuration per Pattern × Tier intersection
+
+| Pattern | Gemini tool | Thinking mode | Session ID | Notes |
+|---|---|---|---|---|
+| 1. Pre-Implementation Critique | `critique_my_approach` | `thinking=true` | new session | Advisory only — no PR comment unless flaw blocks impl |
+| 2. Structured Debate | `debate_turn` | `thinking=true` | continue session across rounds | Max 3 rounds before Pattern 4 escalation |
+| 3. Session-Based Reviews (Tier 2) | `review_document` | `thinking=true` | continue session across rounds | Persist session_id in PR comment for next round |
+| 3. Session-Based Reviews (Tier 3) | `review_document` | `thinking=true`, `thinking_budget=16000` | continue session across rounds | Higher budget for theory-paper sections |
+| 4. Human Tie-Breaking | `record_decision` (post-resolution) | n/a | n/a | Decision recorded for cross-session continuity |
+| 5. Interactive Questions | `AskUserQuestion` (Claude-native) | n/a | n/a | James may reject framing → reformulate |
+
+### Quick reference: "What do I need for this PR?"
+
+| Situation | Tier | Patterns to invoke |
+|---|---|---|
+| Docs-only change | 1 | Pattern 1 optional + Pattern 5 if scope ambiguous |
+| Bug fix or new test | 2 | Pattern 1 (if non-trivial), Pattern 3 (Round 2+) |
+| Refactor with behavior change | 2 | Patterns 1 + 3, possibly Pattern 2 on contested findings |
+| New experiment phase | 3 | Patterns 1 + 3, almost always Pattern 5 at scope decisions |
+| Theory-paper section | 3 | Patterns 1 + 3, Pattern 2 on algebraic/physical disagreements |
+| Plan or architecture decision | 0 → 2/3 | Pattern 1 (before impl), then per impl tier |
+| Disputed BLOCKING finding | (carries from impl tier) | Pattern 2 → Pattern 4 if unconvergent |
+| Routine sprint phase work | 2 | Patterns 1 + 3; Patterns 4 + 5 if scope or direction is contested |
+
+### Escalation thresholds (Pattern 4 trigger detail)
+
+Pattern 4 (Human Tie-Breaking) is the escape hatch from Pattern 2's debate loop, and it has strict triggers to avoid becoming a routine bottleneck:
+
+| Trigger | Threshold | Example |
+|---|---|---|
+| Pattern 2 unconvergent | **3 debate rounds** with no agreement on BLOCKING status | "Furey says CCvS coefficient is X; Feynman says X' — neither persona budges after 3 rounds" |
+| Finding affects sprint direction | Any finding that would change the next phase's scope or acceptance criteria | "Reviewer flags that Sprint 4 cannot start without solving Y" |
+| AC contested | Reviewers disagree on whether an AC is satisfied | "Red Team says AC #3 PASS via evidence Z; Gemini says PARTIAL because Z doesn't address sub-condition Z'" |
+| Anchor unavailable | Pattern 1-3 cannot resolve because the required anchor (per [`review_anchoring.md`](review_anchoring.md)) doesn't exist | "Both reviewers agree we need a Lean theorem for claim Y, but no theorem exists yet" |
+
+**Anti-bottleneck principle:** if a finding doesn't match a trigger above, the reviewers must resolve via Pattern 2 (debate) or accept the finding as NON-BLOCKING. Pattern 4 is not a substitute for thinking.
+
+---
+
 ## Tier 0: Pre-Implementation Critique
 
 **When:** Before implementing any non-trivial design decision.
