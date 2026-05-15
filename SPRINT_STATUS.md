@@ -8,9 +8,11 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit) — **CLOSED 2026-05-14**; Sprint 4 scope ratified by Beekeeper 2026-05-14; formal Sprint 4 launch pending #408 closure.
-- **Lifecycle Stage:** Sprint 3 fully closed (all 5 phases + Theory Refinement #81 + Retrospective #192). Sprint 4 direction ratified.
-- **Next Critical-Path Action:** **#408 Pre-Sprint-4 Strategic Scoping** (close with the ratified Sprint 4 scope below) → Sprint 4 launch (Dirac spectrum direct calculation).
+- **Active Sprint:** **Sprint 4 (launching) — Dirac spectrum direct calculation on ℍ ⊗ ℍ.** Sprint 3 closed 2026-05-14; #81 theory-refinement train 8/8 complete; #408 closed 2026-05-15 (all 4 ACs satisfied: prerequisite-dependency tree + tensor-product literature survey + Beekeeper ratification + SPRINT_STATUS update).
+- **Lifecycle Stage:** Sprint 3 fully closed. Sprint 4 pre-flight complete (scope ratified, literature survey landed, framework basis selected). Awaiting Phase 1 (Ground Truth) issue creation + research gate trigger.
+- **Next Critical-Path Action:** **Sprint 4 Phase 1 (Ground Truth) launch** — open Phase 1 issue defining the Dirac spectrum calculation on $\mathcal{A} = \mathbb{H} \otimes_{\mathbb{R}} \mathbb{H} \cong M_4(\mathbb{R})$ per Dixon/Furey framework (`research/quaternionic_tensor_product_survey.md` §9 recommendation); trigger `python scripts/research_gate.py --scope sprint-4` per closure-checklist convention.
+- **Sprint 4 inherited falsification criterion:** the emergent Dirac spectrum on $\mathbb{H} \otimes \mathbb{H}$ MUST yield eigenvalues or phase shifts that intrinsically preserve $\cos^2(\delta_{CP}) = 1/8$ (per `paper/quaternion_physics.md` §XIII.D, merged via PR #435). This is the Orientation Triad invariant from the #81 theory train; falsification of this constraint by the computed spectrum kills the model before Sprint 4 results phase.
+- **Framework basis (selected 2026-05-15):** Dixon/Furey algebraic-spectral framework — $\mathcal{A} = \mathbb{H} \otimes_{\mathbb{R}} \mathbb{H} \cong M_4(\mathbb{R})$ with states as minimal left ideals $\mathcal{A}P$ (P primitive idempotent). Adler 1995 + Horwitz-Biedenharn 1984 rejected (force privileged $i$-direction → contaminate $\cos^2(\delta_{CP}) = 1/8$ invariant). See `research/quaternionic_tensor_product_survey.md` §9 + §10 (open questions: fermion doubling, Bell observables on ideals, octonionic coupling boundary conditions).
 - **Sprint 4 scope (RATIFIED by Beekeeper 2026-05-14):** **Dirac spectrum direct calculation on crystallised ℍ**, with quaternionic tensor-product machinery (ℍ ⊗ ℍ) laid down as a Sprint-4 deliverable that explicitly prepares **Sprint 5's Bell's Theorem test**. This unifies what previously appeared as two competing candidate directions:
   - **PR6 wisdom §9.7** ("Sprint 4 = Dirac spectrum direct calculation") — the *foundational step*
   - **Oppenheimer R6** (PR #407, 2026-05-13) ("quaternionic tensor product foundations + Bell's Theorem preparation") — the *forward-looking goal*
@@ -53,9 +55,26 @@
   - [x] 4d: Verified Differential Testing (#301) — CLOSED 2026-02-20. PR #392 merged. 86 comparisons, 0 divergences. 17 DoubleSlit test vectors, 3 bug detection mutations.
   - [x] 4e: Verified Simulation Engine (#302) — CLOSED 2026-05-11. PR #401 merged 2026-04-04. Kaiju Virtual Lab with desk controls, 3D monitors, V&V checklist, QBP physics presets (relativistic E_k calibration). 10/10 Go differential tests pass vs Lean oracle. V&V sign-off completed in `docs/verification/vv_checklist_03.md`. Deferred follow-ups: #397 (GPU particle optim), #398 (deeper QBP physics, dimensional κ fix).
 - [x] Phase 5: Publication (#65) — CLOSED 2026-05-11. PR #405 merged. 240-line Task 3 section in `paper/quaternion_physics.md` (3.1 Standard QM, 3.2 QBP Hypothesis with Model A bridge, 3.3 Results with V(U₁) table + 7 figures, 3.4 Discussion + Theory refinement, References section with 9 DOIs). 3 review rounds (Red Team R2 PASS + Gemini R3 PASS). One algebraic CONFLICT resolved via Lean evidence (j_mul_complex theorem).
-- [x] Theory Refinement (#81) — CLOSED 2026-05-13. PR2 Axiomatic-Framework refactor merged (PR #412); foundational Lean theorem `imH_structure_constants` landed in `proofs/QBP/Foundations/LieAlgebraIso.lean` (PR #415/#419); Sprint-12-inherited Lean fold (PR #414); CTH inventory reconciliation cycles 1+2 (PRs #418, #423); anchoring rule standing PR #413; PR3/PR4/PR5 proposals staged in `prompts/` awaiting Beekeeper D5-D20 sign-off.
-- [ ] Research Gate: `python scripts/research_gate.py --scope sprint-4 experiment-04`
+- [x] Theory Refinement (#81) — CLOSED 2026-05-13. **#81 train 8/8 COMPLETE (2026-05-15):** PR2 Axiomatic-Framework refactor (PR #412); PR3 Genesis+Cosmology+GravAnom (PR #428); PR4 Spectral Action+CCvS+W-003 (PR #430); PR5 CKM+Nuclear+Orientation Triad (PR #435); PR6 Wisdom v1.4 (PR #424); PR7 cycles 1+2 (PRs #418, #423); PR8 Sprint-12-inherited Lean fold (PR #414); foundational Lean theorem `imH_structure_constants` (PR #415/#419); anchoring rule standing PR #413.
+- [x] Research Gate (Sprint 3 closure form) — **CLOSED 2026-05-15 by #408 closure.** Sprint 4 framework basis selected (Dixon/Furey algebraic-spectral); literature survey landed (`research/quaternionic_tensor_product_survey.md` via PR #436). The Sprint-4-specific research-gate trigger (`python scripts/research_gate.py --scope sprint-4`) moves to Sprint 4 Phase 1 launch as the kickoff step.
 - [x] Retrospective (#192) — CLOSED 2026-05-14. Full retrospective documented above ("Sprint 3 Retrospective" section, this file).
+
+## Sprint 4 Closure Checklist *(active sprint, launching)*
+
+- [x] **Pre-flight (COMPLETE)** — Sprint 4 scope ratified by Beekeeper 2026-05-14 (Dirac spectrum on ℍ⊗ℍ + tensor-product machinery preparing Sprint 5 Bell). #408 closed 2026-05-15. Framework basis (Dixon/Furey, $\mathcal{A} = \mathbb{H} \otimes_{\mathbb{R}} \mathbb{H} \cong M_4(\mathbb{R})$) selected via `research/quaternionic_tensor_product_survey.md`. Falsification criterion inherited from PR #435 §XIII.D: emergent Dirac spectrum must preserve $\cos^2(\delta_{CP}) = 1/8$ invariant.
+- [ ] **Phase 1: Ground Truth** — Define exact Dirac operator $D$ on $M_4(\mathbb{R})$; state primitive idempotent $P$ for minimal-left-ideal Hilbert space; specify how the cos²(δ_CP)=1/8 boundary condition from the octonionic sector constrains matrix elements of $D$. Tracking issue TBD.
+- [ ] **Phase 2: Implementation** — Numerical Dirac spectrum diagonalisation on $M_4(\mathbb{R})$ + spectral action $\text{Tr}(f(D²/Λ²))$ moment extraction. Tracking issue TBD.
+- [ ] **Phase 3: Visualization** — Spectrum plot + chirality-invariant verification chart. Tracking issue TBD.
+- [ ] **Phase 4: Formal Verification** — Lean theorems for the algebraic identities (ℍ⊗_ℝ ℍ ≅ M₄(ℝ); idempotent structure; chirality-invariant preservation conditions). Tracking issue TBD.
+- [ ] **Phase 5: Publication** — Paper section §XIV (or appropriate Roman numeral) documenting Sprint 4 results. Tracking issue TBD.
+- [ ] **Theory Refinement** — Sprint 4 implications for #81-equivalent theory train.
+- [ ] **Research Gate (Sprint 4 form):** `python scripts/research_gate.py --scope sprint-4`
+- [ ] **Retrospective** — Sprint 4 retrospective issue TBD (created at Sprint 4 close).
+
+**Open questions inherited from `research/quaternionic_tensor_product_survey.md` §10 to track during Sprint 4:**
+- Fermion doubling on ℍ⊗ℍ — does PR #435 chirality invariant provide a grading operator γ, or must orientability be axiomatised?
+- Bell observables on algebraic ideals (Sprint 5 risk) — translating CHSH inequality framework from complex Hilbert space vectors to $\mathcal{A}P$ ideals
+- Octonionic coupling boundary conditions — how the $1 \oplus 3 \oplus \bar{3}$ breaking from PR #435 §V.B restricts matrix elements of $D$ strictly within the ℍ⊗ℍ sector
 
 ## Pivot Log
 
