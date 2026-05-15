@@ -48,6 +48,29 @@ labels: tier-3-review
 - **Affects experimental predictions:** Yes / No
 - **Breaking changes:** Yes / No
 
+## CTH anchor impact (per `docs/workflows/review_anchoring.md`)
+
+<!--
+Tier 3 PRs almost always touch CTH anchors. Be specific.
+Tracked baseline: archive/cth-inventory/confluent-trust-inventory-v5_3.json
+Routing rubric: docs/workflows/pr7_conflict_routing_rubric.md (v0.2)
+-->
+
+- **New anchors minted:** <!-- list AXIOM-/DERIV-/PRED-/CONJ-/CONV-/OBS-... IDs with one-line description -->
+- **Anchors revised:** <!-- list anchor IDs with old → new state -->
+- **Anchors retired / killed:** <!-- list KILLED-* IDs with falsification basis -->
+- **Anchor-rule terminations** (per the 5 anchor types):
+  - [ ] Lean file:line
+  - [ ] simulation output + provenance
+  - [ ] published experimental constraint
+  - [ ] pre-registered ground-truth doc
+  - [ ] derived dimensional / algebraic identity
+- **Routing axis** (per `docs/workflows/pr7_conflict_routing_rubric.md` v0.2):
+  - [ ] theory-axis → co-sign by @qbp-oppenheimer needed (default for Tier 3)
+  - [ ] schema-axis → co-sign by @cth-implementor needed
+  - [ ] two-axis → both co-signs needed (schema first, then theory)
+  - [ ] N/A — purely structural/notation change with no anchor impact
+
 ## Test Plan
 
 - [ ] Formal proofs pass
@@ -60,6 +83,8 @@ labels: tier-3-review
 - [ ] Notation is consistent with existing documentation
 - [ ] DESIGN_RATIONALE.md updated (if applicable)
 - [ ] quaternion_physics.md updated (if applicable)
+- [ ] CTH anchor impact declared above
+- [ ] Every substantive claim terminates at one of the 5 anchor types
 
 ---
 *Tier 3: Full panel review required (Red Team + Blue Team, sequential)*
