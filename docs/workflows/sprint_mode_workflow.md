@@ -179,6 +179,62 @@ For each phase:
 | Phase 5: Publication | Tier 2 | Red Team + Gemini |
 | Theory Refinement | Tier 3 | Red Team + Gemini |
 
+### Oppenheimer AI Gate (Sprint Mode autonomy hardening)
+
+Per #383, Sprint Mode uses an AI-gate pattern to enable autonomous PR review for rework cycles where the territory is familiar. The gate is the **Oppenheimer Strategic Lead persona** ([`prompts/project_lead.md`](../../prompts/project_lead.md)) operating alongside Red Team + Gemini reviewers.
+
+**Authority scope of Oppenheimer in Sprint Mode:**
+
+| Action | Oppenheimer authority | Escalation trigger |
+|---|---|---|
+| Accept Red Team + Gemini PASS verdicts | ✅ may approve merge | n/a — routine |
+| Adjudicate CONTESTED findings (Pattern 2 / CONFLICT block) | ✅ may resolve per anchor-rule (`docs/workflows/review_anchoring.md`) | If unconvergent after 3 debate rounds → Pattern 4 (James) |
+| Accept BORDERLINE findings (caveated) | ✅ may approve if anchor-rule-compliant + non-blocking | Substantive theory change → defer to James |
+| Modify acceptance criteria | ❌ must escalate | Always escalate |
+| Change sprint scope or experiment selection | ❌ must escalate | Always escalate |
+| Approve new axiom or theory revision | ❌ must escalate | Always escalate |
+
+**Per-PR review flow under Oppenheimer AI Gate:**
+
+1. PR opened by Dev Team (any sprint-phase artifact)
+2. CI runs; Red Team review per [Activation Matrix](review_tiers.md#activation-matrix-pattern--tier) Pattern × Tier
+3. Gemini review per Activation Matrix (Pattern 3 with session_id for multi-round)
+4. **Oppenheimer review** (this gate): synthesises Red Team + Gemini findings, applies anchor-rule discipline, classifies CONTESTED items
+5. If all reviewers concur PASS → Oppenheimer may merge (skip James explicit-merge step)
+6. If any reviewer FAILS or CONTESTS → fix-iterate-cycle until PASS, OR escalate per the table above
+7. If escalation triggered → Pattern 4 (James-in-the-loop) per Activation Matrix
+
+**Entry criteria for Sprint Mode with Oppenheimer Gate:**
+
+- [ ] Sprint scope ratified by Beekeeper (e.g., #408 closure 2026-05-15)
+- [ ] Anchoring rule in effect (`docs/workflows/review_anchoring.md`)
+- [ ] Activation Matrix in effect (`review_tiers.md`)
+- [ ] Oppenheimer persona instantiated (prompt loaded)
+- [ ] James acknowledges entry: *"Sprint Mode with Oppenheimer Gate engaged."*
+
+**Exit criteria:**
+
+- Sprint complete (all phases CLOSED) → return to Focus Mode default
+- James halts at any point with a single command: *"Halt Sprint Mode."*
+- Escalation event resolved → Sprint Mode resumes (James re-confirms)
+
+**Decision logging:**
+
+Every Oppenheimer-approved merge under the AI Gate logs:
+- PR number + summary
+- Reviewer verdicts (Red Team + Gemini)
+- Anchor-rule compliance check
+- Any CONTESTED items + their resolution
+- Logged via Gemini MCP `record_decision` tool OR as a sticky PR comment with header `oppenheimer-gate-log`
+
+**Git revert safety (deferred AC from #383):**
+
+The "test revert path on a dummy branch" AC is **deferred to a follow-up issue**. Justification: documentation alone doesn't validate the revert path; a small focused exercise on a throwaway branch is the right verification mechanism, separate from this docs PR. Tracking the deferral.
+
+**Precedent operational use (2026-05-13 through 2026-05-15):**
+
+The Oppenheimer Strategic Lead persona was de-facto operational during the #81 PR2-PR8 theory-refinement train (PRs #412, #428, #430, #435, #424, #418, #423, #414 + #415/#419 + #413). The R6 Resolution on PR #407 (Sprint 4 scope re-frame) is the canonical precedent for Oppenheimer's strategic-review authority. The 2026-05-15 ratification of #408 Pre-Sprint-4 Strategic Scoping is the canonical precedent for sprint-boundary coherence-brief work. Sprint Mode formalises and documents this de-facto pattern.
+
 ---
 
 ## Phase 3: Human Checkpoints
