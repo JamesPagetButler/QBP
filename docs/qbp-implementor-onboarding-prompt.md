@@ -140,12 +140,20 @@ You are a peer to:
     — substrate decision for M1 (CSR-bound + QW8 surface +
     goroutine-pair dispatch). Affects how Cascadia + scoring loop
     primitives compose.
-19. ~/Documents/BMA/theory/BMA-Theory-Addendum-15_0-Reciprocal-Focus.md
-    + Addendum 16 (Cognitive Honing) + Addendum 17 (Proactive
-    Curiosity) + Addendum 11 (Topological Cognition).
-    These define the relevance-threshold mechanism, the Honing Loop,
-    the NT_SIGNAL escalation pattern, and the substrate compression
-    rules. Read in order; they build on each other.
+19. ~/Documents/BMA/theory/hypergraph-inference/A18-v0.2-design-surface.md
+    + ~/Documents/Contextus/Contextus-Spec-v1.3.md §4.4 (InsightSignal
+    Emission Pipeline) + §4.6 (Scope Nodes).
+    These cover the relevance-threshold mechanism (A18 v0.2 §P12 Seam
+    threshold formalization), the NT_SIGNAL escalation pattern
+    (Contextus v1.3 §4.4), and scope-node config (Contextus v1.3 §4.6).
+    Honing Loop confidence thresholds are inlined in
+    `docs/qbp-federation-tenancy.md` §6.2 (origin: `addendum-18-walk`
+    seq=33 closeout 2026-05-06).
+
+    *(v0.2 note: the v0.1 prompt referenced BMA Theory Addenda
+    11/15/16/17, none of which are authored on disk. Re-scoped to
+    A18-only canonical per joint-reply 2026-05-13. Re-add Addendum 16
+    citation here when authored.)*
 
 ## Phase 5 — QBP merge implementation context (post archive transfer)
 
@@ -268,9 +276,14 @@ usage data. Cross-domain scout is reins-invoked, not autonomous:
 
 # Insight escalation (Q3 from beekeeper walk)
 
-Use the existing process. NT_SIGNAL per Spec v1.2 §11.1 + Addendum 17
-§3 (Surfacing); Honing Loop per Addendum 16 §2 if the beekeeper wants
-to refine an insight before NT_ISSUE assignment. Don't reinvent.
+Use the existing process. NT_SIGNAL per **Contextus Spec v1.3 §2.3 +
+§4.4 (InsightSignal Emission Pipeline)**; Honing Loop confidence
+thresholds are inlined in `docs/qbp-federation-tenancy.md` §6.2 (≥0.85
+auto-surface; 0.6-0.85 Honing Loop; <0.6 archive). Don't reinvent.
+
+*(v0.2: replaces the v0.1 references to Addendum 17 §3 and Addendum
+16 §2, which are not yet authored on disk. See v0.2 re-scope per
+joint-reply 2026-05-13.)*
 
 # Relevance threshold τ (open architectural question)
 
