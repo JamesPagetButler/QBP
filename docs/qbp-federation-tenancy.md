@@ -70,6 +70,7 @@ The Stance defines what's "interesting in QBP terms." Per A18 v0.2 §2.1, these 
   - `qbp:dm-branch-a-modified-gravity` — Branch A: modified-gravity / no-extra-particle regime (per `archive/QBP-Dark-Matter-Fork-Analysis.md`)
   - `qbp:dm-branch-b-algebra-extension` — Branch B: algebra-extension / extra-structure regime
   - Branch-specific sub-Type-Nodes: `qbp:dm-axion`, `qbp:dm-pbh`, `qbp:dm-sterile-neutrino`, `qbp:dm-fimp` — promoted from Stance when their prediction lands in CTH `archive/cth-inventory/` as a PRED-* anchor
+  - **Stance composition supercategory** *(per Round-2 G3)*: all `qbp:dm-*` Type-Nodes (branches + sub-types) are treated as belonging to the DM-fork supercategory; Stance queries can match either by individual Type-Node or by `qbp:dm-*` prefix glob
 
 ### 1.3 Predictive bridges (anchors with ρ_net contribution)
 
@@ -485,9 +486,9 @@ Day-30 (steady-state):
 
 | Issue | AC summary | Tracking |
 |---|---|---|
-| ⊕ **Housekeeping: source Locale-noise-floor table for τ refactor** | Source noise-floor data for 13+ Locales (LIGO O4, PNSN Cascadia, trapped-ion fidelity, JWST per-band, ALMA per-band, Fermi GBM, NICER, NuSTAR, CBELSA/TAPS, KATRIN) — to anchor R12 τ_Locale refactor in §4.4 | To be filed on QBP repo (label: `housekeeping`, `type: research`) |
-| ⊕ **Housekeeping: re-cite Addendum 16 once authored** | When BMA Theory Addendum 16 (Cognitive Honing) is authored on BMA repo, replace inline §6.2 thresholds with proper citation | To be filed on QBP repo (label: `housekeeping`) |
-| ⊕ **Housekeeping: cross-reference linter for tenancy doc** | CI check that all `~/Documents/.../*.md` references in `docs/qbp-federation-tenancy.md` exist | To be filed on QBP repo (label: `type: infra`, `housekeeping`) |
+| ⊕ **Housekeeping: source per-Locale noise-floor data for τ refactor** | Produce per-Locale candidate-Seam distribution analyses (not a single calibrated τ); source noise-floor data for 13+ Locales (LIGO O4, PNSN Cascadia, trapped-ion fidelity, JWST per-band, ALMA per-band, Fermi GBM, NICER, NuSTAR, CBELSA/TAPS, KATRIN) — to anchor R12 τ_Locale refactor in §4.4 | [QBP #431](https://github.com/JamesPagetButler/QBP/issues/431) (`housekeeping`, `type: research`) |
+| ⊕ **Housekeeping: re-cite Addendum 16 once authored** | When BMA Theory Addendum 16 (Cognitive Honing) is authored on BMA repo, replace inline §6.2 thresholds with proper citation | [QBP #432](https://github.com/JamesPagetButler/QBP/issues/432) (`housekeeping`) |
+| ⊕ **Housekeeping: cross-reference linter for tenancy doc** | CI check that all filesystem references in `docs/qbp-federation-tenancy.md` exist | [QBP #433](https://github.com/JamesPagetButler/QBP/issues/433) (`type: infra`, `housekeeping`) |
 
 ---
 
