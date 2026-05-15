@@ -1,0 +1,80 @@
+# .github/workflows/cth-anchor-impact.yml
+# CTH Anchor Impact Lint — Layer 2 of CTH tracking discipline.
+# Per docs/workflows/review_anchoring.md (PR #413) and
+# docs/workflows/pr7_conflict_routing_rubric.md v0.2 (PR #423).
+#
+# Runs on every PR touching anchor-bearing paths. Enforces that the
+# PR body declares a "## CTH anchor impact" section with a routing-
+# axis checkbox marked. Also posts an informational comment with
+# per-anchor diff details when archive/cth-inventory/*.json changes.
+
+name: CTH Anchor Impact
+
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    paths:
+      - 'paper/**'
+      - 'proofs/**'
+      - 'analysis/**'
+      - 'archive/**'
+
+jobs:
+  cth-anchor-impact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history for git show base:path
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compute changed files
+        id: changed
+        run: |
+          # Base = merge-base of PR base + head; covers force-pushes.
+          BASE_REF="${{ github.event.pull_request.base.sha }}"
+          HEAD_REF="${{ github.event.pull_request.head.sha }}"
+          echo "base=$BASE_REF" >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD_REF" >> "$GITHUB_OUTPUT"
+          git diff --name-only "$BASE_REF" "$HEAD_REF" > /tmp/changed_files.txt
+          echo "Files changed:"
+          cat /tmp/changed_files.txt
+
+      - name: Write PR body to file
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          echo "${PR_BODY}" > /tmp/pr_body.md
+
+      - name: Run anchor-impact lint
+        id: lint
+        run: |
+          set +e
+          python3 scripts/check_cth_anchor_impact.py \
+            --changed-files /tmp/changed_files.txt \
+            --pr-body-file /tmp/pr_body.md \
+            --base-ref "${{ steps.changed.outputs.base }}" \
+            --head-ref "${{ steps.changed.outputs.head }}" \
+            --summary-out /tmp/cth_anchor_summary.md
+          EXIT=$?
+          echo "lint_exit=$EXIT" >> "$GITHUB_OUTPUT"
+          cat /tmp/cth_anchor_summary.md
+          exit $EXIT
+
+      - name: Post / update PR comment with anchor summary
+        if: always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: /tmp/cth_anchor_summary.md
+          header: cth-anchor-impact-lint
+
+      - name: Fail if lint blocked
+        if: steps.lint.outputs.lint_exit != '0'
+        run: |
+          echo "CTH Anchor Impact lint failed; see PR comment for details."
+          exit 1
