@@ -8,10 +8,26 @@
 
 ## Current Position
 
-- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit) — **CLOSED 2026-05-14**
-- **Lifecycle Stage:** Retrospective (#192) complete. Sprint 4 scope ratification next.
-- **Next Critical-Path Action:** **Pre-Sprint-4 Strategic Scoping (#408)** → Sprint 4 (target TBD; current recommendation: re-scope toward quaternionic tensor product foundations + Bell's Theorem preparation)
-- **Sprint 4 status:** **NOT committed to Lamb Shift.** Per Oppenheimer Resolution on PR #407 (R6, 2026-05-13) and Strategic Review #001 R3 (2026-02-15), the Lamb Shift's prerequisites (QBP Lagrangian, photon propagator, f(u) at hydrogen scale, renormalization scheme) are not in hand and the bound-state η-mechanism is not formulated. Oppenheimer recommendation: re-scope Sprint 4 toward quaternionic tensor product foundations + Bell's Theorem preparation. Final Sprint 4 scope decided by #408.
+- **Active Sprint:** Sprint 3 (Experiment 03: Double-Slit) — **CLOSED 2026-05-14**; Sprint 4 scope ratified by Beekeeper 2026-05-14; formal Sprint 4 launch pending #408 closure.
+- **Lifecycle Stage:** Sprint 3 fully closed (all 5 phases + Theory Refinement #81 + Retrospective #192). Sprint 4 direction ratified.
+- **Next Critical-Path Action:** **#408 Pre-Sprint-4 Strategic Scoping** (close with the ratified Sprint 4 scope below) → Sprint 4 launch (Dirac spectrum direct calculation).
+- **Sprint 4 scope (RATIFIED by Beekeeper 2026-05-14):** **Dirac spectrum direct calculation on crystallised ℍ**, with quaternionic tensor-product machinery (ℍ ⊗ ℍ) laid down as a Sprint-4 deliverable that explicitly prepares **Sprint 5's Bell's Theorem test**. This unifies what previously appeared as two competing candidate directions:
+  - **PR6 wisdom §9.7** ("Sprint 4 = Dirac spectrum direct calculation") — the *foundational step*
+  - **Oppenheimer R6** (PR #407, 2026-05-13) ("quaternionic tensor product foundations + Bell's Theorem preparation") — the *forward-looking goal*
+
+  These are sequential phases of one programme, not competing candidates. The reading was ratified by James 2026-05-14: Bell's Theorem *can* be tested using the Theorem 2 framework alone, but the spectral-triple foundation gives the Bell test first-principles legitimacy rather than a phenomenological shortcut. Dirac spectrum work in Sprint 4 defines *which* observables count as physically realised; Bell's Theorem in Sprint 5 applies those observables to entangled tensor-product states.
+
+  **Sprint 4 → Sprint 5 sequence:**
+
+  | Stage | Work | Output |
+  |---|---|---|
+  | **Sprint 4** | Compute Dirac spectrum on crystallised ℍ; identify physical observables via test-function moments per W-003 v1.4 (`paper/wisdom_v1_4.md` §9.7) | Foundation: which observables count as physically realised, grounded in first principles |
+  | **Sprint 4 deliverable** | Quaternionic tensor-product machinery (ℍ ⊗ ℍ) for entangled states; verify spectral-triple-compatibility | Multi-particle state formalism with spectral-triple legitimacy |
+  | **Sprint 5** | Apply spectral-triple-derived observables to entangled tensor-product states; compute CHSH correlation; compare to standard QM + classical bound | Falsifiable Bell test grounded in QBP's full framework |
+
+  **NOT Lamb Shift.** Lamb Shift's prerequisites (QBP Lagrangian, photon propagator, f(u) at hydrogen scale, renormalization scheme) remain not in hand. The PR6 wisdom §9.7 framing also demotes the Lagrangian programme to asymptotics — making Lamb Shift specifically problematic until the spectral triple is computed.
+
+  **Theory-paper integration:** PR4 (Spectral Action + CCvS + W-003 revision) is the theory-paper §VIII that frames this whole direction. PR4 Round 2 prose generation is unblocked by this ratification; Beekeeper D10-D15 sign-off on the staged structural proposal (`prompts/pr4-structural-proposal-round1.md`) is the next gate before PR4 opens.
 
 > **Sprint 3 Phase 1 Complete:** PR #285 merged 2026-02-13 after 5 review rounds (10 total reviews). Full quaternionic dynamics with Adler decay. Empirical Anchor framework introduced. Issue #22 closed.
 
