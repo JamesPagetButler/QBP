@@ -19,6 +19,14 @@ on:
       - 'analysis/**'
       - 'archive/**'
 
+# Required for marocchino/sticky-pull-request-comment@v2 to post the
+# anchor-summary sticky comment. Without `pull-requests: write` the
+# action fails with "Resource not accessible by integration" even when
+# the lint logic itself passes — observed on PR #454, 2026-05-15.
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   cth-anchor-impact:
     runs-on: ubuntu-latest

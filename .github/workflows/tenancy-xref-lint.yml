@@ -1,0 +1,35 @@
+# .github/workflows/tenancy-xref-lint.yml
+# Lints the QBP federation tenancy doc for stale filesystem cross-references.
+# Closes QBP #433 — adds CI check that catches broken in-repo refs.
+name: "Tenancy XRef Lint"
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "docs/qbp-federation-tenancy.md"
+      - "scripts/tenancy_xref_linter.py"
+      - ".github/workflows/tenancy-xref-lint.yml"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "docs/qbp-federation-tenancy.md"
+      - "scripts/tenancy_xref_linter.py"
+      - ".github/workflows/tenancy-xref-lint.yml"
+
+jobs:
+  tenancy-xref-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Lint tenancy doc cross-references"
+        run: python3 scripts/tenancy_xref_linter.py
