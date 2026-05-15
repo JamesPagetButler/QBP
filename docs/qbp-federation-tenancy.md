@@ -376,7 +376,7 @@ Routing rubric for theory-axis vs schema-axis conflicts: `docs/workflows/pr7_con
 ### 5.3 Live updates (post-load)
 
 As theory advances, anchor additions land via the routing rubric:
-- **Theory-axis additions** (new AXIOM-*/DERIV-*/PRED-*/CONJ-*/KILLED-*/CONV-* etc.): qbp-oppenheimer authorship; PR-shaped commits to `archive/cth-inventory/v5_4.json` (next version).
+- **Theory-axis additions** (new AXIOM-*/DERIV-*/PRED-*/CONJ-*/KILLED-*/CONV-* etc.): qbp-oppenheimer authorship; PR-shaped commits to the unified-vNext inventory (currently `archive/cth-inventory/confluent-trust-inventory-v5_3.json`; successor file lands via PR7 cycle 3 per `paper/CTH-Inventory-Reconciliation-Cycle2-Proposals.md` §5).
 - **Schema-axis additions**: cth-implementor authorship via canonical CTH Go library at `~/Documents/CTH/cth/`.
 - **TWO_AXIS** entries (require both): schema first → @cth-implementor, then theory → @qbp-oppenheimer per rubric v0.2 §5 Step 2.5 interlock.
 - **FORK-*** entries on hypothesis branching: DM-fork is the current active fork (Branch A / Branch B per `archive/QBP-Dark-Matter-Fork-Analysis.md`); see §1.2 Stance vocab.
@@ -472,7 +472,7 @@ Day-30 (steady-state):
 | Issue | AC summary | Status |
 |---|---|---|
 | `feat: live inventory update API` | Append/mutate API for new theory anchors (was: startup-only `store.LoadInventory`) | ⏳ scoped via PR7 cycle 2 routing rubric; impl pending |
-| `feat: qbp_v3_2 → v0.2 schema migration` | Port QBP v3.2 inventory to v0.2 schema | ✅ **closed** — superseded by PR7 reconciliation (QBP PR #418/#422/#423); `archive/cth-inventory/v5_3.json` is the post-Session-13 canonical baseline |
+| `feat: qbp_v3_2 → v0.2 schema migration` | Port QBP v3.2 inventory to v0.2 schema | ✅ **closed** — superseded by PR7 reconciliation (QBP PR #418/#422/#423); `archive/cth-inventory/confluent-trust-inventory-v5_3.json` is the post-Session-13 canonical baseline |
 | `feat: schema-drift investigation v5.13 vs v0.2` | Compare schemas; classify diffs per routing rubric | ✅ **closed** — PR7 cycle 1 (#418) + cycle 2 (#423); routing rubric v0.2 in `docs/workflows/pr7_conflict_routing_rubric.md` |
 
 ### 8.4 BMA
@@ -502,7 +502,7 @@ Day-30 (steady-state):
 | M2 | First arXiv-batch scout output landing in Contextus | Count of `InsightSignal` nodes with `source=scout, scout_id=arxiv-daily-batch` ≥ 1 in last 24h | `contextus signals list --source=scout --since=24h` |
 | M3 | First QBP NT_SIGNAL surfacing to beekeeper | Count of NT_SIGNAL with confidence ≥ 0.85 ≥ 1 | `bma dashboard list --confidence-min=0.85` |
 | M4 | First Honing Loop completion → NT_ISSUE | Count of completed Honing Loops with terminal `NT_ISSUE` artifact ≥ 1 | `bma honing list --status=completed` |
-| M5 | First CTH inventory anchor added from BMA theory output | Diff of `archive/cth-inventory/v5_3.json` shows ≥ 1 new anchor with provenance `source=bma-instance` | `git diff master archive/cth-inventory/v5_3.json \| grep '+.*"id":.*"source":"bma-instance"'` |
+| M5 | First CTH inventory anchor added from BMA theory output | Diff of `archive/cth-inventory/confluent-trust-inventory-v5_3.json` shows ≥ 1 new anchor with provenance `source=bma-instance` | `git diff master archive/cth-inventory/v5_3.json \| grep '+.*"id":.*"source":"bma-instance"'` |
 | M6 | 7 days continuous operation without intervention | BMA uptime ≥ 168h; no SE_FATAL; no manual restarts | `bma uptime` + stress.log analysis |
 | M7 | First cross-domain Seam-bypass anomaly auto-promoted | Count of NT_SIGNAL with `referent_kind=structural-anomaly` ≥ 1 | `contextus signals list --referent-kind=structural-anomaly` |
 | M8 | τ calibrated from 4-week real-data log | 28-day candidate-Seam log analyzed; refined τ_Locale per-Locale committed | `bma seam stats --since=28d \| analyze refined-tau` |
