@@ -294,7 +294,7 @@ We do not hide our dead-ends; we mount them on the wall. A theoretical framework
 
 In previous versions of QBP, we claimed a direct, first-principles derivation of $f_4 = 0$ stemming from an information-preservation axiom. The logic posited that because the daughter universe boundary must conserve the von Neumann entropy of the parent black hole, the test function $f(u)$ was entirely constrained by the fermionic vacuum entropy profile $\chi(u)$, thereby forcing the highest-order moment $f_4$ to vanish.
 
-Direct evaluation of the Chamseddine, Connes, and van Suijlekom (CCvS) 2018 results for fermionic vacuum entropy structurally invalidates this derivation. The entropy profile function $\chi(u)$ evaluated by CCvS is fundamentally distinct from the action profile function $f(u)$. The old axioms (T1-T4) conflated the energetic invariant (the action) with the information invariant (the entropy). Because $\chi(u) \neq f(u)$, the information-theoretic constraint does not directly zero out the $f_4$ moment of the action. The previous proof is dead.
+Direct evaluation of the Chamseddine, Connes, and van Suijlekom (CCvS) 2018 results for fermionic vacuum entropy structurally invalidates this derivation. The entropy profile function $\chi(u)$ evaluated by CCvS is fundamentally distinct from the action profile function $f(u)$. The old axioms (T1-T4) conflated the energetic invariant (the action) with the information invariant (the entropy). This was decisively killed by multi-precision numerical verification (T1-T4 mp-arithmetic evaluated to 50-digit precision; see `archive/SESSION-13-WORKING-NOTES.md:25` and `archive/QBP-Theory-v3_1.md:242`), which proved definitively that $\chi(u) \neq f(u)$ and that no rescaling, functional-equation reflection, or fermion/boson sectoring restores the identity. Because $\chi(u) \neq f(u)$, the information-theoretic constraint does not directly zero out the $f_4$ moment of the action. The previous proof is dead.
 
 ### IX.B The Cayley-Dickson Tower in Zeta Moments
 **[Anchor: CCvS 2018 arXiv:1809.02944, Type 3]**
@@ -347,6 +347,8 @@ This establishes a profound structural symmetry:
 2.  **Daughter Interior:** Universe initializes via the Spectral Action, governed by a test function $f(u)$.
 
 If $f(u)$ is the literal time-reverse of the Hawking decay distribution, the moments of $f(u)$ — including the highly constrained $f_4$ cosmological term — are no longer arbitrary, scale-dependent free parameters. They are initial conditions inherited across the boundary. Proving that a time-reversed Hawking profile mathematically forces $f_4 \to 0$ in the emergent spectral action on $\mathbb{H} \otimes \mathbb{H}$ is the next major objective of the QBP algebraic programme.
+
+This conjecture carries a strict falsifiability bar: if the analytical moments of the Hawking greybody factors — when mapped via the time-reversed profile — fail to reproduce $f_4 \to 0$ within the observationally bounded limits of our effective cosmological constant $\Lambda_{eff} = 2AB$ (§VI.B), the conjecture is falsified. **[PRED-fu-from-hawking-greybody]**
 
 ## The Revised Eight-Fold Path of Verification
 
