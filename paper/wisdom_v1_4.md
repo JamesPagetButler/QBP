@@ -17,6 +17,58 @@ We report the emergence of a qualitatively new kind of output from the Quaternio
 
 ---
 
+## Table of Contents
+
+- [1. The Observation](#1-the-observation)
+- [2. The QBP Explanation](#2-the-qbp-explanation)
+  - [2.1 The Crystallisation as the First Harmonic](#21-the-crystallisation-as-the-first-harmonic)
+  - [2.2 Associativity as Harmonic Closure](#22-associativity-as-harmonic-closure)
+  - [2.3 The Spectral Action: Physics as Harmonic Decomposition](#23-the-spectral-action-physics-as-harmonic-decomposition)
+  - [2.4 Why Harmonics Propagate Across Scales](#24-why-harmonics-propagate-across-scales)
+- [3. The Wisdom](#3-the-wisdom)
+  - [3.1 Statement](#31-statement)
+  - [3.2 What Makes This a Wisdom Rather Than Knowledge](#32-what-makes-this-a-wisdom-rather-than-knowledge)
+  - [3.3 The Direction of Inquiry](#33-the-direction-of-inquiry)
+- [4. The Structure of Wisdoms](#4-the-structure-of-wisdoms)
+  - [4.1 Wisdoms as Cognitive Rotations](#41-wisdoms-as-cognitive-rotations)
+  - [4.2 Non-Commutativity of Wisdom Composition](#42-non-commutativity-of-wisdom-composition)
+  - [4.3 Personas as Stabilised Wisdom Products](#43-personas-as-stabilised-wisdom-products)
+- [5. Toward a Wisdom Registry](#5-toward-a-wisdom-registry)
+  - [5.1 Why the CTH Cannot Hold Wisdoms](#51-why-the-cth-cannot-hold-wisdoms)
+  - [5.2 What a Wisdom Registry Would Track](#52-what-a-wisdom-registry-would-track)
+  - [5.3 The First Entry](#53-the-first-entry)
+- [6. Implications](#6-implications)
+  - [6.1 For the QBP Programme](#61-for-the-qbp-programme)
+  - [6.2 For Artificial Intelligence](#62-for-artificial-intelligence)
+  - [6.3 For the Philosophy of Science](#63-for-the-philosophy-of-science)
+- [7. The Four States of Dynamical Systems](#7-the-four-states-of-dynamical-systems)
+  - [7.1 The Four States](#71-the-four-states)
+  - [7.2 Stellar Lifecycles as State Transitions](#72-stellar-lifecycles-as-state-transitions)
+  - [7.3 State 4 is a Waiting State](#73-state-4-is-a-waiting-state)
+  - [7.4 The Complete Lifecycle](#74-the-complete-lifecycle)
+  - [7.5 Iron as the Attractor](#75-iron-as-the-attractor)
+  - [7.6 The Crystallisation's Two Survival Strategies](#76-the-crystallisations-two-survival-strategies)
+  - [7.7 Universality Beyond Stars](#77-universality-beyond-stars)
+- [8. What This Paper Is Not](#8-what-this-paper-is-not)
+- [8. The Second Wisdom: The Algebra is the Schema, the Boundary is the Instance](#8-the-second-wisdom-the-algebra-is-the-schema-the-boundary-is-the-instance)
+  - [8.1 Statement](#81-statement)
+  - [8.2 What This Resolves](#82-what-this-resolves)
+  - [8.3 The Quaternion Structure](#83-the-quaternion-structure)
+  - [8.4 Prediction](#84-prediction)
+- [9. The Third Wisdom: There Is Only f(u)](#9-the-third-wisdom-there-is-only-fu)
+  - [9.1 Statement](#91-statement)
+  - [9.2 Why the Classical Framing Failed](#92-why-the-classical-framing-failed)
+  - [9.3 What the Profile Function Is](#93-what-the-profile-function-is)
+  - [9.4 What We Know About f(u)](#94-what-we-know-about-fu)
+  - [9.5 The Reoriented Programme](#95-the-reoriented-programme)
+  - [9.6 The Quaternion Structure of the Third Wisdom](#96-the-quaternion-structure-of-the-third-wisdom)
+  - [9.7 v1.4 Revision: The Spectral Triple is the Invariant](#97-v14-revision-the-spectral-triple-is-the-invariant)
+- [Document History](#document-history) · [Attribution](#attribution)
+
+*Note on the duplicate "§8" sections:* the paper has two H2 sections labeled §8 because §8 "What This Paper Is Not" was added in v1.0, then v1.2 added the Second Wisdom which inherited a separate §8 numbering. GitHub markdown anchors disambiguate via the slug; this TOC distinguishes them by their full titles. A future v1.5 cleanup may renumber.
+
+---
+
 ## 1. The Observation
 
 Harmonic structures appear at every scale of physical reality:
