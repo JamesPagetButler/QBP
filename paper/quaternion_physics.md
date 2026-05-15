@@ -434,7 +434,7 @@ $$ M_{TOV} = M_{Ch} \times \sqrt{\frac{\text{dim}(\text{Im } \mathbb{O})}{\text{
 
 This is an audacious structural target. Observational constraints on maximum neutron star masses have tightened significantly, with heavy pulsars such as PSR J0740+6620 measured at $\sim 2.07\, M_\odot$ and the extreme PSR J0952-0607 observed at $\sim 2.35\, M_\odot$. Our geometric prediction of $2.20\, M_\odot$ sits perfectly within this narrow physical envelope.
 
-Let us be perfectly clear: we do not yet have a thermodynamic Lagrangian to justify this derivation. While the empirical match is stunning and the geometric mapping is clean, we present this explicitly as a structural bound awaiting a first-principles derivation from the spectral action flow models established in §VIII.
+Let us be perfectly clear: we do not yet have a thermodynamic Lagrangian to justify this derivation. While the empirical match is stunning and the geometric mapping is clean, we present this explicitly as a structural bound awaiting a first-principles derivation from the spectral action machinery established in §VIII.
 
 ### XII.K The Graveyard of Coincidences: Killed Predictions
 
