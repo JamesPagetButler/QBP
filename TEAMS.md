@@ -81,13 +81,28 @@ Conducts systematic research during Research Sprints, producing knowledge graph 
 
 ---
 
-## Project Management
+## Project Management — The Leadership Triad
 
-| Persona | Role | Specialty |
-|---------|------|-----------|
-| **Herschel** | Project Coordinator | Sprint planning, process enforcement, cross-team coordination |
+| Persona | Role | Specialty | Authority scope |
+|---------|------|-----------|-----------------|
+| **James Paget Butler** | Human Program Lead | Final authority on all decisions | Strategic direction, axiom changes, experiment selection, merge auth |
+| **Oppenheimer** | Strategic AI Project Lead | Intellectual coherence, axiomatic risk, experimental prioritisation | Strategic review (R-series Resolutions on PR #407, #429); pre-sprint scoping; Sprint Mode AI gate per `docs/workflows/sprint_mode_workflow.md` |
+| **Herschel** | Process Coordinator | Sprint planning, process enforcement, cross-team coordination | Critical-path discipline; Herschel Check; aged-backlog audit |
 
-**Shared between:** Claude and Gemini
+**Shared between:** Claude and Gemini (Herschel + Oppenheimer are persona-instances orthogonal to model).
+
+**Persona instantiation prompt:** [`docs/personas/project_lead.md`](docs/personas/project_lead.md) — defines Oppenheimer's mandate, escalation protocol (4 severity levels), and interaction with Herschel.
+
+**When to invoke which:**
+
+| Need | Persona |
+|---|---|
+| "Where are we on the critical path?" | Herschel |
+| "Is this finding load-bearing?" | Oppenheimer |
+| "Should Sprint N go in direction A or B?" | Oppenheimer → strategic review (R-series) |
+| "Did we miss a phase closure step?" | Herschel |
+| "Does our trajectory still match the programme's intellectual coherence?" | Oppenheimer → Coherence Brief |
+| "Is this PR ready for merge?" | Herschel (process check) + Oppenheimer (anchor-rule check per `docs/workflows/review_anchoring.md`) |
 
 ---
 
@@ -107,8 +122,18 @@ All Claude–Gemini exchanges must follow the [Communication Protocol](docs/work
 ```
                          ┌─────────────────┐
                          │   James (Human) │
-                         │   Final Authority│
+                         │  Final Authority│
                          └────────┬────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │                           │
+            ┌───────┴────────┐         ┌────────┴────────┐
+            │  OPPENHEIMER   │◄───────►│    HERSCHEL     │
+            │ Strategic Lead │         │  Process Coord  │
+            │  "Why & What"  │         │  "How & When"   │
+            └───────┬────────┘         └────────┬────────┘
+                    │                           │
+                    └─────────────┬─────────────┘
                                   │
          ┌────────────────┬───────┴───────┬────────────────┐
          │                │               │                │
@@ -127,12 +152,6 @@ All Claude–Gemini exchanges must follow the [Communication Protocol](docs/work
         │                │               │  Bret Victor   │
         │                │               │  Tufte         │
         │                │               │  Papert        │
-        └────────────────┴───────┬───────┴────────────────┘
-                                 │
-                          ┌──────┴──────┐
-                          │  Herschel   │
-                          │ (Coordinator)│
-                          └─────────────┘
 ```
 
 ---
@@ -146,6 +165,9 @@ All Claude–Gemini exchanges must follow the [Communication Protocol](docs/work
 | Building visualizations | Dev Team | Implementation |
 | Research sprints, literature review | Research | Systematic investigation |
 | Planning sprints, tracking issues | Herschel | Process management |
+| Sprint scope ratification, strategic reviews | Oppenheimer | Programme coherence (R-series Resolutions) |
+| Pre-sprint scoping (e.g., #408) | Oppenheimer + James | Coherence Brief → Beekeeper sign-off |
+| Anchor-rule enforcement during reviews | Oppenheimer | Per [`docs/workflows/review_anchoring.md`](docs/workflows/review_anchoring.md) |
 
 ### Research Team Activation
 
