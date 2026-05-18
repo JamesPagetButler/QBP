@@ -237,7 +237,7 @@ This is the "Herschel Check." It exists because all three collaborators have dem
 - Pre-sprint scoping (e.g., #408 Pre-Sprint-4 Strategic Scoping ratification 2026-05-15).
 - Anchor-rule enforcement during Tier 2/3 reviews — co-reviewer alongside Red Team.
 - Shared between Claude and Gemini — either can wear the hat.
-- **Persona instantiation prompt:** [`prompts/project_lead.md`](prompts/project_lead.md) (defines the Leadership Triad, escalation protocol).
+- **Persona instantiation prompt:** [`docs/personas/project_lead.md`](docs/personas/project_lead.md) (defines the Leadership Triad, escalation protocol).
 
 ---
 

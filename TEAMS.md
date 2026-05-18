@@ -91,7 +91,7 @@ Conducts systematic research during Research Sprints, producing knowledge graph 
 
 **Shared between:** Claude and Gemini (Herschel + Oppenheimer are persona-instances orthogonal to model).
 
-**Persona instantiation prompt:** [`prompts/project_lead.md`](prompts/project_lead.md) — defines Oppenheimer's mandate, escalation protocol (4 severity levels), and interaction with Herschel.
+**Persona instantiation prompt:** [`docs/personas/project_lead.md`](docs/personas/project_lead.md) — defines Oppenheimer's mandate, escalation protocol (4 severity levels), and interaction with Herschel.
 
 **When to invoke which:**
 

@@ -181,7 +181,7 @@ For each phase:
 
 ### Oppenheimer AI Gate (Sprint Mode autonomy hardening)
 
-Per #383, Sprint Mode uses an AI-gate pattern to enable autonomous PR review for rework cycles where the territory is familiar. The gate is the **Oppenheimer Strategic Lead persona** ([`prompts/project_lead.md`](../../prompts/project_lead.md)) operating alongside Red Team + Gemini reviewers.
+Per #383, Sprint Mode uses an AI-gate pattern to enable autonomous PR review for rework cycles where the territory is familiar. The gate is the **Oppenheimer Strategic Lead persona** ([`docs/personas/project_lead.md`](../personas/project_lead.md)) operating alongside Red Team + Gemini reviewers.
 
 **Authority scope of Oppenheimer in Sprint Mode:**
 
