@@ -6,7 +6,9 @@ This directory holds the vendored canonical CTH schema and the QBP-local extensi
 
 | File | Purpose | Update cadence |
 |---|---|---|
-| `inventory.schema.v0.3.json` | Vendored copy of `confluent-trust/schema/inventory.schema.json` at the v0.3 release. Used by `.github/workflows/cth-schema-lint.yml` to validate any change to `archive/cth-inventory/*.json` at PR time. | When upstream CTH schema bumps (rare; v0.3 is the stable canonical) |
+| `inventory.schema.v0.3.json` | Vendored copy of `confluent-trust/schema/inventory.schema.json` at the v0.3 release. The CI workflow reads it indirectly via the `inventory.schema.current.json` symlink. | When upstream CTH schema bumps (rare; v0.3 is the stable canonical) |
+| `inventory.schema.v0.3.meta.json` | Provenance metadata for the vendored schema: upstream commit SHA, vendoring date, sha256 of schema file, QBP PR that vendored it. Re-checked on each refresh. | Bumped at refresh time |
+| `inventory.schema.current.json` (symlink → `.v0.3.json`) | Stable pointer the CI workflow targets. Future v0.4 refresh = retarget the symlink, no CI edit needed. | Retargeted when schema version bumps |
 | `qbp-local-extensions.md` | Canonical mapping of QBP-local provenance/status/etc. values to their CTH v0.3 equivalents, with rationale + upstream-extension issue links | When QBP introduces new local extensions; each new extension requires an upstream proposal |
 
 ## Why vendor the schema instead of fetching it from upstream
@@ -17,12 +19,16 @@ This directory holds the vendored canonical CTH schema and the QBP-local extensi
 
 ## Refresh procedure
 
-When upstream CTH ratifies a new schema version:
+When upstream CTH ratifies a new schema version (e.g., v0.4):
 
-1. `cp <upstream>/cth/schema/inventory.schema.json docs/cth/inventory.schema.v0.3.json` (or rename for new version)
-2. Update `qbp-local-extensions.md` if new extensions land upstream
-3. Run `.github/workflows/cth-schema-lint.yml` locally against `archive/cth-inventory/*.json` to verify QBP still passes
-4. Open a Tier-2 PR with `@cth-implementor` as required reviewer (per `docs/workflows/pr7_conflict_routing_rubric.md` schema-axis routing)
+1. `cp <upstream>/cth/schema/inventory.schema.json docs/cth/inventory.schema.v0.4.json` (new versioned filename)
+2. Retarget symlink: `ln -sf inventory.schema.v0.4.json docs/cth/inventory.schema.current.json`
+3. Write `docs/cth/inventory.schema.v0.4.meta.json` (provenance metadata; copy v0.3.meta.json shape, update fields)
+4. Update `qbp-local-extensions.md` if new extensions land upstream
+5. Run `.github/workflows/cth-schema-lint.yml` locally against `archive/cth-inventory/*.json` to verify QBP still passes
+6. Open a Tier-2 PR with `@cth-implementor` as required reviewer (per `docs/workflows/pr7_conflict_routing_rubric.md` schema-axis routing)
+
+The CI workflow targets `inventory.schema.current.json` (not `.v0.3.json`) so step 2 is the only file the workflow cares about. Old versioned schemas (`.v0.3.json`, etc.) remain in-repo for audit.
 
 ## Why this exists (drift-prevention triad)
 

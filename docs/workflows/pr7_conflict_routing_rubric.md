@@ -73,6 +73,24 @@ A separate sub-case of schema-axis routing surfaced during foundations rebuild P
 | **b** | This routing rule forces conversation with cth-implementor when extension IS warranted |
 | **c** | `docs/cth/qbp-local-extensions.md` is the canonical mapping table; institutional memory |
 
+### Worked example: enum-extension lifecycle
+
+To make this concrete: imagine a future QBP author wants to add `provenance: "M"` (meaning "modelled prediction") to a new anchor in a future inventory `v6_0.json`. The lifecycle plays out like this:
+
+1. **Author commits inventory edit on a QBP feature branch** with one new anchor carrying `provenance: "M"`.
+2. **CI runs `cth-schema-lint`** — workflow validates against `docs/cth/inventory.schema.current.json`; the canonical enum is `["T", "E", "H"]` (post-Phase-0-C migration); `"M"` is not in the enum → CI fails with `::error file=archive/cth-inventory/v6_0.json::1 schema violation(s)` annotation on the offending anchor field.
+3. **Author cannot merge** until CI is green. Two paths:
+   - **(i)** the new value was a mistake — fix the inventory to use a canonical value (e.g., `T` with appropriate `provenance_kind`)
+   - **(ii)** the new value is genuinely warranted — open an upstream proposal:
+     - File a confluent-trust issue (parallel to #88) proposing `M` → CTH v0.3 ProvenanceKind extension (e.g., `modelled`)
+     - Tag `@cth-implementor` for schema-axis co-sign per this rubric
+     - Update `docs/cth/qbp-local-extensions.md` in the QBP PR with the proposed mapping + upstream issue link
+     - Wait for upstream schema PR to land; refresh vendored schema in QBP via the procedure in `docs/cth/README.md`
+     - QBP PR then passes CI because `"M"` is now in the enum
+4. **Audit trail**: the upstream issue + the canonical mapping doc + the schema refresh PR together form the change record. Future readers can trace why `"M"` exists.
+
+This is the **same lifecycle the Phase 0 discovery (confluent-trust #88) followed**: D/I/P legacy values triggered exactly this conversation, and the upstream extension landed before QBP's Phase 0 C migration could complete. The difference: pre-CI, the drift accumulated silently; post-CI, every extension is forced through this lifecycle from the moment it's authored.
+
 ---
 
 ## Provenance + change history
@@ -82,5 +100,6 @@ A separate sub-case of schema-axis routing surfaced during foundations rebuild P
 | 2026-05-14 | qbp-oppenheimer | v0.1 drafted on bridge seq=11 |
 | 2026-05-14 | qbp-implementor | committed to docs/workflows/ as Integration deliverable |
 | 2026-05-22 | qbp-implementor | v0.2 — added schema-axis enum-value-extension sub-rule + drift-prevention triad references (foundations rebuild Phase 0 discovery) |
+| 2026-05-22 | qbp-implementor | v0.2 fix-delta — added worked example "M" enum-extension lifecycle (Red Team G2 follow-up on PR #459) |
 
 *v0.2; will continue calibrating against actual conflicts as they surface.*
