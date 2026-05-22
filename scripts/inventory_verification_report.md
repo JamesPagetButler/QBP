@@ -201,6 +201,36 @@ CTH `proof_file` is conventionally a path string, but in v5_3.json it carries 3 
 6. **Phase 1 anchor back-fill** — for the 18 orphan PROOF-* anchors, locate actual Lean theorems and populate `proof_file` + `lean_theorem` + `theorems[]`.
 7. **Phase 6 inverse audit** — per-theorem orphan resolution against the 254 corpus; produce `analysis/foundations-orphan-resolutions.md`.
 
+### 6.1 Discovery-response §10 action-item accounting
+
+For traceability against the 9 housekeeping items enumerated in `prompts/qbp-implementor-discovery-response.md` "Action items I propose filing as housekeeping issues":
+
+| # | Action item | Disposition |
+|---|---|---|
+| 1 | PROOF-* anchor re-grading audit (`scripts/audit_proof_anchors.py`) | **RESOLVED** — superseded by `cth migrate` (Phase 0 C) |
+| 2 | Mathlib version pin | **RESOLVED** — this PR pins to lake-manifest SHA in `proofs/lakefile.lean` |
+| 3 | Fano orientation convention doc | **FILED** as QBP #460 |
+| 4 | Sedenion indexing convention doc | **FILED** as QBP #461 |
+| 5 | Anchor prefix policy doc | **FILED** as QBP #462 |
+| 6 | CTH inventory JSON Schema | **RESOLVED** — schema landed at CTH v0.3; vendored in QBP PR #459 |
+| 7 | `status: untested` ⟺ `provenance: T` lint extension | **FILED** as QBP #463 |
+| 8 | `QBP-Foundations-Architecture-v0_1.md` retrieval | **RESOLVED** — file located in `archive/QBP-Foundations-Architecture-v0_1.md` |
+| 9 | Inverse anchor audit | **FILED** as QBP #464 |
+| + | GaugeBosons.lean migration tracking | **FILED** as QBP #465 (Phase 0 deliverable #5) |
+
+Net: 4 RESOLVED + 5 FILED + 1 additional (GaugeBosons tracker) = full coverage of the 9-item action list plus the Phase 0 deliverable #5 GaugeBosons tracker.
+
+### 6.2 Phase 1 priority targets (per Gemini-Feynman review note)
+
+When Phase 1 authoring begins, two orphan-class anchors should be attacked first because they unblock substantial downstream physics work:
+
+| Priority anchor cluster | Why first |
+|---|---|
+| **PROOF-eigenratios + PROOF-3gen + PROOF-cl6** (the GaugeBosons.lean phantom set per §3.2) | These ground Standard Model symmetries — Cl6 algebra → gauge boson masses + 3-generation structure. Lost-on-disk status threatens downstream physics anchor integrity until resolved. Tracker #465 carries the forensics work. |
+| **PROOF-stelle-no-linear** (orphan from §3.5; provenance `P`) | Anchors the partial-verification result on nonlinear gravity term boundedness. Resolving its `proof_file` (or accepting partial-signal loss via Phase 0 C decisions override per confluent-trust #88) unblocks gravity-side downstream chains. |
+
+These are the "high-fan-out" orphans; resolving them yields disproportionate downstream clarity. Other 16 orphans can be triaged in batches during Phase 1.
+
 ---
 
 ## 7. Closing note on report shape
