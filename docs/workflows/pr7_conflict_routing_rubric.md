@@ -47,11 +47,40 @@ Unclassifiable conflict → post to `pr407-conflict-resolution` (or successor ch
 
 ---
 
+---
+
+## Schema-axis enum-value extensions (v0.2 addition — drift prevention)
+
+A separate sub-case of schema-axis routing surfaced during foundations rebuild Phase 0 (2026-05-22) when `archive/cth-inventory/confluent-trust-inventory-v5_3.json` was found to contain 5 distinct provenance values (`T`, `E`, `D`, `I`, `P`), 3 of which (`D`/`I`/`P`) are not in the upstream CTH v0.3 schema enum. The mismatch had accumulated silently because no CI step validated QBP's inventory against the canonical schema, and was discovered only when `cth migrate --check` ran during Phase 0 prep.
+
+**Rule:** Any PR that adds a value to a CTH-tracked enum (`anchor.provenance`, `anchor.status`, `derived_principles[].layer` discrete values, anchor ID prefixes, etc.) in `archive/cth-inventory/*.json` MUST:
+
+1. **Be routed to cth-implementor** as a required co-signer (this is a schema-axis change, not a theory-axis one — even if the underlying claim is a theory-axis matter)
+2. **Have an upstream proposal issue** open on `confluent-trust` BEFORE the QBP-side PR lands. The proposal extends the canonical schema enum to accept the new value
+3. **Update `docs/cth/qbp-local-extensions.md`** in the same PR — add a row to the relevant section with the upstream issue link, the mapping to canonical v0.3 values, and rationale
+4. **Pass `.github/workflows/cth-schema-lint.yml`** — validates the inventory against the vendored CTH v0.3 schema (`docs/cth/inventory.schema.v0.3.json`). Will reject the PR if the new value isn't yet in the schema enum
+
+**Why a separate rule:** the §"→ cth-implementor (schema-axis)" sub-case above already lists `provenance` as a schema-axis field, but doesn't distinguish between (a) routing a rename/restructure (the original case) and (b) routing an enum-value extension (the new case). Both go to cth-implementor, but (b) additionally requires the canonical mapping doc update AND the upstream extension proposal — without which the value can never round-trip cleanly through `cth migrate`.
+
+**Trigger for invocation:** any of:
+- `git diff` on `archive/cth-inventory/*.json` shows a new value in an enum field that isn't already in `docs/cth/inventory.schema.v0.3.json`
+- CI workflow `cth-schema-lint` fails with "value must be one of [list]" — the failure message names exactly the field + offending value
+
+**Drift prevention triad (already in place; this rule is the gate):**
+| Layer | Mechanism |
+|---|---|
+| **a** | CI schema-lint (`.github/workflows/cth-schema-lint.yml`) catches drift at PR time |
+| **b** | This routing rule forces conversation with cth-implementor when extension IS warranted |
+| **c** | `docs/cth/qbp-local-extensions.md` is the canonical mapping table; institutional memory |
+
+---
+
 ## Provenance + change history
 
 | Date | Author | Change |
 |---|---|---|
 | 2026-05-14 | qbp-oppenheimer | v0.1 drafted on bridge seq=11 |
 | 2026-05-14 | qbp-implementor | committed to docs/workflows/ as Integration deliverable |
+| 2026-05-22 | qbp-implementor | v0.2 — added schema-axis enum-value-extension sub-rule + drift-prevention triad references (foundations rebuild Phase 0 discovery) |
 
-*v0.1; will calibrate against first 5-10 actual conflicts surfaced during PR7 reconciliation.*
+*v0.2; will continue calibrating against actual conflicts as they surface.*
