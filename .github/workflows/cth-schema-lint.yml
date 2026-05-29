@@ -68,7 +68,8 @@ jobs:
           except SchemaError as e:
               print(f'::error file=$SCHEMA::vendored schema fails Draft 2020-12 meta-schema validation: {e.message}')
               sys.exit(1)
-          print(f'✓ vendored schema {schema.get(\"\\\$id\", \"$SCHEMA\")} is valid Draft 2020-12 JSON Schema')
+          schema_id = schema.get(\"\$id\", \"$SCHEMA\")
+          print(f'✓ vendored schema {schema_id} is valid Draft 2020-12 JSON Schema')
           "
 
       - name: Validate CTH inventories against vendored schema

@@ -30,6 +30,8 @@ When upstream CTH ratifies a new schema version (e.g., v0.4):
 
 The CI workflow targets `inventory.schema.current.json` (not `.v0.3.json`) so step 2 is the only file the workflow cares about. Old versioned schemas (`.v0.3.json`, etc.) remain in-repo for audit.
 
+**Windows contributors:** `inventory.schema.current.json` is a Git symlink. On Windows, Git may check it out as a plain text file containing the target path unless `core.symlinks=true` is enabled. Run `git config core.symlinks true` and re-checkout the file before running local schema validation. This does not affect the `ubuntu-latest` CI runner.
+
 ## Why this exists (drift-prevention triad)
 
 Three layered preventions catch schema drift at PR time rather than migration time:
