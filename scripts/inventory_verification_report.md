@@ -101,6 +101,8 @@ These need only path-prefix normalisation (`lean4/QBP/` → actual current locat
 
 `GaugeBosons.lean` does not exist anywhere in `proofs/` or `archive/`. `Cl6.lean` was likely a refactor/rename of `GaugeBosons.lean` at the Sprint 12 → current architecture transition. PROOF-cl6 obviously maps to `Cl6.lean`; the other two need theorem-level audit to determine where their proofs migrated to (or whether the proofs were lost).
 
+**Manual grep check (Red Team S4 response):** `grep -rni "eigenratio\|3.gen\|3gen" proofs/QBP/Cosmo/ proofs/Sprint12-Inherited/` returned no obvious theorem-name matches. A partial match (`Q_fund = 2/3 mixing × 1/3 generations` in a comment in `AlgebraicIdentities.lean:67`) does not identify the theorem body. This confirms the investigation is theorem-content forensics, not a simple name search. Tracker #465 carries this work; manual search does not resolve the gap.
+
 **Action:** open the GaugeBosons.lean tracking issue (per v1.0 prompt Phase 0 deliverable #5) and assign anchor-level forensics work.
 
 ### 3.3 Citation-style references (theory-external candidates)
@@ -152,6 +154,8 @@ These claim PROOF-* status but cite no file. Per discovery response §6: foundat
 ## 4. Inverse audit — theorems lacking anchors
 
 A full Lean-theorem-by-theorem inverse audit (254 theorems × anchor lookup) is Phase 6 scope per the foundations-rebuild instantiation prompt §5. This Phase 0 report establishes the population (254) and surfaces the structural shape; per-theorem orphan resolution is deferred.
+
+**Scope note (Grothendieck G3 response):** this report focuses exclusively on PROOF-* anchors and their Lean coverage. Non-PROOF anchors (PRED-* 33, OBS-* 21, MEAS-* 20, REF-* 7, COMP-* 4, and others) are not assessed here — questions such as "do PRED-* anchors cite real data sources?" and "are predicted values populated for all OBS-* anchors?" are Phase 6 scope. This scoping decision is intentional: foundations rebuild Phase 0 targets the PROOF-* ↔ Lean boundary; non-PROOF anchor coverage belongs to the full inverse audit cycle.
 
 Spot-check, however: only 4 anchors currently cite a Lean file that exists, so **at minimum 250 of 254 theorems are anchor-orphaned today**. Phase 6 will systematically:
 
