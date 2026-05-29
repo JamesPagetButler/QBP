@@ -1,0 +1,131 @@
+# .github/workflows/cth-schema-lint.yml
+#
+# Validates archive/cth-inventory/*.json against the vendored CTH v0.3 schema
+# (docs/cth/inventory.schema.current.json → docs/cth/inventory.schema.v0.3.json
+# via symlink, so future v0.4 bumps only retarget the symlink). Catches schema
+# drift at PR time — prevents the foundations-rebuild Phase 0 discovery pattern
+# (5 distinct legacy provenance values surfaced only at `cth migrate --check`
+# time).
+#
+# Authored: foundations rebuild Phase 0 (drift prevention). Pairs with
+# docs/cth/qbp-local-extensions.md (canonical mapping doc) and
+# docs/workflows/pr7_conflict_routing_rubric.md (routing rubric schema-axis).
+#
+# Round-2 hardening (per Gemini R1 on PR #459):
+#   - Symlink pointer so v0.4 refresh is a single file change, not 3
+#   - Empty-directory guard so an empty archive/cth-inventory/ doesn't silently pass
+#   - Schema self-validation step so a malformed vendored schema fails fast
+
+name: CTH Schema Lint
+
+on:
+  pull_request:
+    paths:
+      - 'archive/cth-inventory/**.json'
+      - 'docs/cth/inventory.schema.current.json'  # symlink retarget triggers
+      - 'docs/cth/inventory.schema.v0.3.json'     # also lint on schema vendor refresh
+      - 'docs/cth/inventory.schema.v*.json'       # future v0.4+ targets
+      - '.github/workflows/cth-schema-lint.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install jsonschema
+        run: pip install --no-cache-dir jsonschema==4.21.1
+
+      - name: Pre-flight — validate the vendored schema itself is valid JSON Schema
+        # Round-2 hardening: confirm the validator artefact is itself well-formed
+        # before using it to validate inventories. A malformed vendored schema
+        # could otherwise silently accept invalid inventories.
+        run: |
+          set -euo pipefail
+          SCHEMA="docs/cth/inventory.schema.current.json"
+          if [ ! -e "$SCHEMA" ]; then
+            echo "::error::Vendored CTH schema not found at $SCHEMA — refresh per docs/cth/README.md"
+            exit 1
+          fi
+          python3 -c "
+          import json, sys
+          from jsonschema import Draft202012Validator, SchemaError
+          try:
+              schema = json.load(open('$SCHEMA'))
+          except json.JSONDecodeError as e:
+              print(f'::error file=$SCHEMA::vendored schema is not valid JSON: {e}')
+              sys.exit(1)
+          try:
+              Draft202012Validator.check_schema(schema)
+          except SchemaError as e:
+              print(f'::error file=$SCHEMA::vendored schema fails Draft 2020-12 meta-schema validation: {e.message}')
+              sys.exit(1)
+          schema_id = schema.get(\"\$id\", \"$SCHEMA\")
+          print(f'✓ vendored schema {schema_id} is valid Draft 2020-12 JSON Schema')
+          "
+
+      - name: Validate CTH inventories against vendored schema
+        run: |
+          set -euo pipefail
+          SCHEMA="docs/cth/inventory.schema.current.json"
+
+          # Round-2 hardening: explicit count check before the loop so an empty
+          # archive/cth-inventory/ doesn't silently exit 0 (false positive).
+          shopt -s nullglob
+          INVENTORIES=(archive/cth-inventory/*.json)
+          if [ "${#INVENTORIES[@]}" -eq 0 ]; then
+            echo "::warning::archive/cth-inventory/*.json matched 0 files — nothing to validate."
+            echo "This is unexpected; the foundations rebuild relies on these inventories."
+            echo "If this is intentional (e.g., directory restructure), update the workflow path filter."
+            exit 0
+          fi
+          echo "Validating ${#INVENTORIES[@]} inventory file(s) against $SCHEMA..."
+
+          FAILED=0
+          for f in "${INVENTORIES[@]}"; do
+            echo ""
+            echo "::group::Validating $f"
+            if python3 -c "
+          import json, sys
+          from jsonschema import Draft202012Validator
+          schema = json.load(open('$SCHEMA'))
+          doc = json.load(open('$f'))
+          v = Draft202012Validator(schema)
+          errors = sorted(v.iter_errors(doc), key=lambda e: (e.absolute_path, e.message))
+          if not errors:
+              print(f'✓ $f passes CTH v0.3 schema')
+              sys.exit(0)
+          for e in errors:
+              path = '/'.join(str(p) for p in e.absolute_path)
+              print(f'  ✗ at /{path}: {e.message}')
+          print(f'::error file=$f::{len(errors)} schema violation(s) — see docs/cth/qbp-local-extensions.md before adding new local values')
+          sys.exit(1)
+          "; then
+              echo "::endgroup::"
+            else
+              echo "::endgroup::"
+              FAILED=1
+            fi
+          done
+
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "::error::One or more CTH inventories failed v0.3 schema validation."
+            echo "If this is a legitimate QBP-local extension:"
+            echo "  1. Open an upstream issue at confluent-trust to propose the extension"
+            echo "  2. Update docs/cth/qbp-local-extensions.md with the mapping + issue link"
+            echo "  3. Tag @cth-implementor on this PR per docs/workflows/pr7_conflict_routing_rubric.md"
+            echo "If this is a data-quality issue: fix the inventory file."
+            exit 1
+          fi
+
+          echo ""
+          echo "All ${#INVENTORIES[@]} CTH inventories pass v0.3 schema validation."

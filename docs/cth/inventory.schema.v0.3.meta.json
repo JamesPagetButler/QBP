@@ -1,0 +1,15 @@
+{
+  "_comment_1": "Provenance metadata for the vendored CTH v0.3 schema (sibling file inventory.schema.v0.3.json). See docs/cth/README.md §Refresh procedure for how to update both files in tandem.",
+  "_comment_2": "JSON has no inline comment support, so this metadata lives in a sibling .meta.json file rather than as a header in the schema file itself. The CI workflow (.github/workflows/cth-schema-lint.yml) only reads the schema file; this meta file is purely informational for audit + refresh purposes.",
+  "vendored_from_repo": "JamesPagetButler/confluent-trust",
+  "vendored_from_path": "schema/inventory.schema.json",
+  "vendored_at_local_clone": "/home/prime/Documents/CTH/cth/schema/inventory.schema.json",
+  "vendored_on_date_utc": "2026-05-22",
+  "vendored_by_pr": "QBP #459",
+  "vendored_sha256_of_schema_file": "1bfc3a5792425ee23483f2da28de853afb8946cab7ef84e4cc50f11d494e81f5",
+  "vendored_upstream_commit_sha": "TODO: populate at refresh time via `git -C ~/Documents/CTH rev-parse HEAD` once that working tree is on a clean tracked commit",
+  "vendored_upstream_commit_url_template": "https://github.com/JamesPagetButler/confluent-trust/blob/<sha>/schema/inventory.schema.json",
+  "cth_schema_version": "v0.3",
+  "lean_toolchain_compatible_with": "leanprover/lean4:v4.30.0-rc2 (compatible — schema is toolchain-independent; this field documents the QBP-side compatibility check at vendoring time)",
+  "refresh_procedure": "See docs/cth/README.md §Refresh procedure. On each refresh: (1) re-copy schema, (2) re-compute sha256 and update this file, (3) update vendored_on_date_utc, (4) update vendored_upstream_commit_sha, (5) verify .github/workflows/cth-schema-lint.yml still passes against current archive/cth-inventory/*.json, (6) update QBP PR number that performed the refresh."
+}
