@@ -1,0 +1,147 @@
+{
+  "anchors": [
+    {
+      "id": "MEAS-udd",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-delta",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-jd",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-tolfac",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "FLAG-J",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "FLAG-Tc",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "FLAG-xi",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "FLAG-Hc2",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "FLAG-postd-IE",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "PRED-3episode",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "PRED-willow-j",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "CONSTRAINT-ynu",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-bi2se3-topo",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-matbg-fragile",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-rucl3-jeff",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "INST-ckm",
+      "provenance_kind": "internal-compute"
+    },
+    {
+      "id": "EXT-dm-particle-mass",
+      "provenance_kind": "internal-compute"
+    },
+    {
+      "id": "EXT-dm-cross-section",
+      "provenance_kind": "internal-compute"
+    },
+    {
+      "id": "REF-algebraic-crystallisation-paper",
+      "provenance_kind": "internal-compute"
+    },
+    {
+      "id": "COMP-cmb-power-spectrum-accretion",
+      "provenance_kind": "internal-compute"
+    },
+    {
+      "id": "COMP-branch-A-cmb-boundary-analysis",
+      "provenance_kind": "internal-compute"
+    },
+    {
+      "id": "PRED-cutoff-scale-0p04-Planck",
+      "provenance_kind": "internal-compute"
+    },
+    {
+      "id": "COMP-sm-non-unification-at-1loop",
+      "provenance_kind": "internal-compute"
+    },
+    {
+      "id": "PROOF-stelle-no-linear",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Stelle 1977 (Phys.Rev.D 16, 953); Stelle 1978 (Gen.Rel.Grav. 9, 353)"
+    },
+    {
+      "id": "CONV-flow-fragmentalism",
+      "provenance_kind": "philosophy"
+    },
+    {
+      "id": "MEAS-alpha",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-sin2tw",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-alphas",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "MEAS-koide",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "OBS-f0-2alpha",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "OBS-cbt-koide",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "OBS-alpha-invsqrt3",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "OBS-desi-4thirds",
+      "provenance_kind": "theory"
+    },
+    {
+      "id": "PROOF-hurwitz",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Hurwitz 1898"
+    },
+    {
+      "id": "PROOF-born",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Hurwitz 1898, corollary"
+    }
+  ]
+}
