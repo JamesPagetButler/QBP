@@ -1,8 +1,15 @@
 import Lake
 open Lake DSL
 
+-- Mathlib pin (foundations rebuild Phase 0, housekeeping item §2 in discovery
+-- response action items): pinned to the SHA already resolved in
+-- proofs/lake-manifest.json so `lake update` is reproducible across machines.
+-- This SHA corresponds to Mathlib at a state compatible with toolchain
+-- `leanprover/lean4:v4.30.0-rc2` (see proofs/lean-toolchain). To bump:
+-- 1. update this @ "<sha>" to a known-good Mathlib commit on the same
+--    Lean major version, 2. run `lake update`, 3. verify zero-sorry rebuild.
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4.git"
+  "https://github.com/leanprover-community/mathlib4.git" @ "215c5f44e65f6e8431452880ebf0d433a3c00747"
 
 package «QBPProofs» where
   -- Package configuration
