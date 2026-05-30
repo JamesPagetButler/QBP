@@ -2549,6 +2549,111 @@
       "provenance": "T",
       "status": "incoherent",
       "provenance_kind": "theory"
+    },
+    {
+      "id": "DEFN-cayley-dickson-doubling",
+      "name": "Cayley-Dickson doubling construction",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "description": "The generic doubling construction CD(A) from a *-algebra A. Multiplication: (a₁,a₂)(b₁,b₂) = (a₁b₁ − conj(b₂)·a₂, b₂·a₁ + a₂·conj(b₁)). Parametric in level n; supports Aₙ = CD(Aₙ₋₁) for n ≥ 0. See docs/conventions/cd-doubling.md (F3) for the canonical form and Baez 2002 §1.1 citation.",
+      "prediction_chain": [],
+      "notes": "Lean targets: QBP.Foundations.CayleyDickson.CD.mul (not_started)"
+    },
+    {
+      "id": "DEFN-real-structural-trivial",
+      "name": "ℝ structural object — trivial (no imaginary units)",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "description": "ℝ = A₀ has no imaginary units. Conjugation is identity. Included for level-0 completeness in the parametric account. Convention: docs/conventions/algebra-naming.md (F1).",
+      "prediction_chain": [],
+      "notes": "Lean targets: QBP.Foundations.CayleyDickson.Real.trivialStructure (not_started)"
+    },
+    {
+      "id": "DEFN-complex-structural-i",
+      "name": "ℂ structural object — single imaginary unit i, i²=−1",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "description": "ℂ = CD(ℝ) = A₁. The single imaginary unit i = (0,1) satisfies i² = −1. Convention: docs/conventions/algebra-naming.md (F1).",
+      "prediction_chain": [
+        "DEFN-real-structural-trivial"
+      ],
+      "notes": "Lean targets: QBP.Foundations.CayleyDickson.Complex.imaginaryUnitSquare (not_started); QBP.Foundations.CayleyDickson.Complex.imaginaryUnitNotReal (not_started)"
+    },
+    {
+      "id": "DEFN-quaternion-structural-triad",
+      "name": "ℍ structural object — {i,j,k} triad with ij=k, i²=j²=k²=−1",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "description": "ℍ = CD(ℂ) = A₂. Three imaginary units {e₁,e₂,e₃} = {i,j,k} satisfying ij=k, jk=i, ki=j (cyclic) and i²=j²=k²=−1. Convention: docs/conventions/algebra-naming.md (F1).",
+      "prediction_chain": [
+        "DEFN-complex-structural-i",
+        "PROOF-quat-closure"
+      ],
+      "notes": "Lean targets: QBP.Foundations.CayleyDickson.Quaternion.triadRelations (not_started)"
+    },
+    {
+      "id": "DEFN-octonion-structural-fano",
+      "name": "𝕆 structural object — Fano plane with 7 imaginary units",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "description": "𝕆 = CD(ℍ) = A₃. Seven imaginary units e₁..e₇ with multiplication encoded by the Fano plane (7 points, 7 lines, each line a quaternionic triple). Canonical orientation: Baez/Furey standard — see docs/conventions/fano-orientation.md (F4, ratified 2026-05-29). 7 positive triples: {1,2,3}, {1,4,5}, {1,6,7}, {2,4,6}, {2,5,7}, {3,4,7}, {3,5,6}.",
+      "prediction_chain": [
+        "DEFN-quaternion-structural-triad",
+        "PROOF-fano"
+      ],
+      "notes": "Lean targets: QBP.Foundations.Octonion.canonicalFanoLines_card (not_started); QBP.Foundations.Octonion.quaternionLine_is_first_fanoLine (not_started)"
+    },
+    {
+      "id": "DEFN-sedenion-structural-box-kite",
+      "name": "𝕊 structural object — box-kite / assessor structure (de Marrais 2000)",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "description": "𝕊 = CD(𝕆) = A₄. Fifteen imaginary units e₁..e₁₅ (see docs/conventions/sedenion-indexing.md, F5). The zero-divisor structure is captured by the de Marrais box-kite / assessor framework. 42 zero-divisor pairs (PROOF-42zd); Hessian spectrum (PROOF-hessian).",
+      "prediction_chain": [
+        "DEFN-octonion-structural-fano",
+        "PROOF-42zd",
+        "PROOF-hessian"
+      ],
+      "notes": "Lean targets: QBP.Foundations.Sedenion.sedenion_has_42_zero_divisors (not_started); QBP.Foundations.Sedenion.sedenion_hessian (not_started)"
+    },
+    {
+      "id": "PROOF-loss-of-order-R-to-C",
+      "name": "ℂ admits no total order compatible with field operations",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "description": "ℂ cannot be given a total order compatible with its field operations. Witness: i² = −1 < 0 is impossible in a totally ordered field (squares are non-negative). Convention-independent.",
+      "prediction_chain": [
+        "DEFN-complex-structural-i"
+      ],
+      "notes": "Lean targets: QBP.Foundations.Breakdown.Complex.noTotalOrder (not_started)"
+    },
+    {
+      "id": "PROOF-loss-of-commutativity-C-to-H",
+      "name": "ℍ has nonzero commutator: [i,j] = 2k ≠ 0",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "description": "ℍ is non-commutative. Witness: [i,j] = ij − ji = k − (−k) = 2k ≠ 0. Convention-independent. Refs PROOF-su2-lie for the Lie algebra structure (Im ℍ ≅ 𝔰𝔲(2)).",
+      "prediction_chain": [
+        "DEFN-quaternion-structural-triad",
+        "PROOF-su2-lie"
+      ],
+      "notes": "Lean targets: QBP.Foundations.Breakdown.Quaternion.nonCommutativity (not_started); QBP.Foundations.Breakdown.Quaternion.commutator_ij (not_started)"
     }
   ],
   "inputs": [
@@ -3014,6 +3119,21 @@
       "version": "5.3",
       "date": "2026-05-11T01:29:09Z",
       "note": "CONV-spectral-entropy-zeta: status 'untested' -> 'marginal'. T1-T4 results embed"
+    },
+    {
+      "version": "5.3.1",
+      "date": "2026-05-29T00:00:00Z",
+      "note": "Phase 1 foundations rebuild: 8 planning-stage DEFN-*/PROOF-* anchors minted",
+      "changes": [
+        "Added DEFN-cayley-dickson-doubling (Category A, planning stage)",
+        "Added DEFN-real-structural-trivial (Category B, planning stage)",
+        "Added DEFN-complex-structural-i (Category B, planning stage)",
+        "Added DEFN-quaternion-structural-triad (Category B, planning stage)",
+        "Added DEFN-octonion-structural-fano (Category B, F4-dependent, planning stage)",
+        "Added DEFN-sedenion-structural-box-kite (Category B, F5-dependent, planning stage)",
+        "Added PROOF-loss-of-order-R-to-C (Category D, convention-independent, planning stage)",
+        "Added PROOF-loss-of-commutativity-C-to-H (Category D, convention-independent, planning stage)"
+      ]
     }
   ]
 }
