@@ -33,7 +33,7 @@ def canonicalFanoLines : List FanoTriple := [
   (⟨0, by omega⟩, ⟨3, by omega⟩, ⟨4, by omega⟩),  -- e₁e₄ = e₅
   (⟨0, by omega⟩, ⟨5, by omega⟩, ⟨6, by omega⟩),  -- e₁e₆ = e₇
   (⟨1, by omega⟩, ⟨3, by omega⟩, ⟨5, by omega⟩),  -- e₂e₄ = e₆
-  (⟨1, by omega⟩, ⟨4, by omega⟩, ⟨6, by omega⟩),  -- e₂e₅ = e₇
+  (⟨1, by omega⟩, ⟨4, by omega⟩, ⟨6, by omega⟩),  -- {e₂,e₅,e₇}: e₂e₇ = e₅ (note e₂e₅ = −e₇ per octonionMul)
   (⟨2, by omega⟩, ⟨3, by omega⟩, ⟨6, by omega⟩),  -- e₃e₄ = e₇
   (⟨2, by omega⟩, ⟨4, by omega⟩, ⟨5, by omega⟩)   -- e₃e₅ = e₆
 ]
