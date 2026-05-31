@@ -17,13 +17,15 @@ The 7 positive triples (lines of the Fano plane) with their canonical multiplica
 |--------|-------------|
 | {1, 2, 3} | e₁e₂ = e₃ |
 | {1, 4, 5} | e₁e₄ = e₅ |
-| {1, 6, 7} | e₁e₆ = e₇ |
+| {1, 6, 7} | e₁e₇ = e₆ |
 | {2, 4, 6} | e₂e₄ = e₆ |
-| {2, 5, 7} | e₂e₇ = e₅ (positive cycle 2→7→5; note e₂e₅ = −e₇) |
+| {2, 5, 7} | e₂e₅ = e₇ |
 | {3, 4, 7} | e₃e₄ = e₇ |
-| {3, 5, 6} | e₃e₅ = e₆ |
+| {3, 5, 6} | e₃e₆ = e₅ |
 
 In each triple {a, b, c}, the product eₐeᵦ = eᵧ holds cyclically: eₐeᵦ = eᵧ, eᵦeᵧ = eₐ, eᵧeₐ = eᵦ. The reverse product picks up a sign: eᵦeₐ = −eᵧ.
+
+**Provenance note (Tier-3 review finding, 2026-05-31):** the orientation above is the one *induced by the ratified F3 Cayley-Dickson construction* (`docs/conventions/cd-doubling.md`) applied to the standard quaternion embedding e₁=i, e₂=j, e₃=k. It is **not** independently chosen — once F3 and the ℍ-triad are fixed, the full octonion table is determined. This CD-induced table has been verified to be a genuine octonion (every eᵢ²=−1, norm-multiplicative, and **alternative**). The earlier "Baez 2002 Table 1" citation and the inherited `archive/QBP_Octonion.lean` `octonionMul` table both disagree with the F3-induced orientation (the archive table is non-alternative — see escalation in the F4 review thread / tracking issue). Until the architect reconciles the citation, F3 is the authority: the table below is what F3 produces.
 
 ## Full imaginary multiplication table
 
@@ -31,15 +33,15 @@ The complete 7×7 antisymmetric multiplication table for Im 𝕆 = {e₁, ..., e
 
 |   | e₁ | e₂ | e₃ | e₄ | e₅ | e₆ | e₇ |
 |---|----|----|----|----|----|----|-----|
-| **e₁** | −1 | e₃ | −e₂ | e₅ | −e₄ | e₇ | −e₆ |
-| **e₂** | −e₃ | −1 | e₁ | e₆ | −e₇ | −e₄ | e₅ |
-| **e₃** | e₂ | −e₁ | −1 | e₇ | e₆ | −e₅ | −e₄ |
+| **e₁** | −1 | e₃ | −e₂ | e₅ | −e₄ | −e₇ | e₆ |
+| **e₂** | −e₃ | −1 | e₁ | e₆ | e₇ | −e₄ | −e₅ |
+| **e₃** | e₂ | −e₁ | −1 | e₇ | −e₆ | e₅ | −e₄ |
 | **e₄** | −e₅ | −e₆ | −e₇ | −1 | e₁ | e₂ | e₃ |
-| **e₅** | e₄ | e₇ | −e₆ | −e₁ | −1 | e₃ | −e₂ |
-| **e₆** | −e₇ | e₄ | e₅ | −e₂ | −e₃ | −1 | e₁ |
-| **e₇** | e₆ | −e₅ | e₄ | −e₃ | e₂ | −e₁ | −1 |
+| **e₅** | e₄ | −e₇ | e₆ | −e₁ | −1 | −e₃ | e₂ |
+| **e₆** | e₇ | e₄ | −e₅ | −e₂ | e₃ | −1 | −e₁ |
+| **e₇** | −e₆ | e₅ | e₄ | −e₃ | −e₂ | e₁ | −1 |
 
-Each eₐ² = −1. Off-diagonal entries are read as eₐeᵦ (row a, column b). This table is transcribed directly from the `decide`-verified `octonionMul` definition in `archive/QBP_Octonion.lean` (lines 53–121), not hand-derived — see the verification note below.
+Each eₐ² = −1. Off-diagonal entries are read as eₐeᵦ (row a, column b). This table is **computed from the F3 Cayley-Dickson construction** (octonions built by doubling ℍ via the ratified F3 formula) and verified programmatically to be alternative and norm-multiplicative — it is the orientation F3 forces, not a hand-transcription. The inherited `archive/QBP_Octonion.lean` `octonionMul` table differs from this on 18 of 42 entries and is non-alternative (its `octonionMul_alternative_left` is a `True := by trivial` stub); correcting it is tracked separately.
 
 The quaternion subalgebra ℍ ⊂ 𝕆 is spanned by {e₀, e₁, e₂, e₃}, where e₁e₂ = e₃ matches the standard quaternion convention i·j = k.
 
