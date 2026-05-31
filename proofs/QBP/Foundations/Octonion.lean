@@ -31,11 +31,11 @@ def FanoTriple := Fin 7 × Fin 7 × Fin 7
 def canonicalFanoLines : List FanoTriple := [
   (⟨0, by omega⟩, ⟨1, by omega⟩, ⟨2, by omega⟩),  -- e₁e₂ = e₃
   (⟨0, by omega⟩, ⟨3, by omega⟩, ⟨4, by omega⟩),  -- e₁e₄ = e₅
-  (⟨0, by omega⟩, ⟨5, by omega⟩, ⟨6, by omega⟩),  -- e₁e₆ = e₇
+  (⟨0, by omega⟩, ⟨5, by omega⟩, ⟨6, by omega⟩),  -- {e₁,e₆,e₇}: e₁e₇ = e₆ (F3-induced orientation)
   (⟨1, by omega⟩, ⟨3, by omega⟩, ⟨5, by omega⟩),  -- e₂e₄ = e₆
-  (⟨1, by omega⟩, ⟨4, by omega⟩, ⟨6, by omega⟩),  -- {e₂,e₅,e₇}: e₂e₇ = e₅ (note e₂e₅ = −e₇ per octonionMul)
+  (⟨1, by omega⟩, ⟨4, by omega⟩, ⟨6, by omega⟩),  -- e₂e₅ = e₇
   (⟨2, by omega⟩, ⟨3, by omega⟩, ⟨6, by omega⟩),  -- e₃e₄ = e₇
-  (⟨2, by omega⟩, ⟨4, by omega⟩, ⟨5, by omega⟩)   -- e₃e₅ = e₆
+  (⟨2, by omega⟩, ⟨4, by omega⟩, ⟨5, by omega⟩)   -- {e₃,e₅,e₆}: e₃e₆ = e₅ (F3-induced orientation)
 ]
 
 /-- There are exactly 7 lines in the Fano plane. -/
