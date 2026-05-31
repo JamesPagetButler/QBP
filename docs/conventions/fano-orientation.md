@@ -19,7 +19,7 @@ The 7 positive triples (lines of the Fano plane) with their canonical multiplica
 | {1, 4, 5} | e₁e₄ = e₅ |
 | {1, 6, 7} | e₁e₆ = e₇ |
 | {2, 4, 6} | e₂e₄ = e₆ |
-| {2, 5, 7} | e₂e₅ = e₇ |
+| {2, 5, 7} | e₂e₇ = e₅ (positive cycle 2→7→5; note e₂e₅ = −e₇) |
 | {3, 4, 7} | e₃e₄ = e₇ |
 | {3, 5, 6} | e₃e₅ = e₆ |
 
@@ -32,14 +32,14 @@ The complete 7×7 antisymmetric multiplication table for Im 𝕆 = {e₁, ..., e
 |   | e₁ | e₂ | e₃ | e₄ | e₅ | e₆ | e₇ |
 |---|----|----|----|----|----|----|-----|
 | **e₁** | −1 | e₃ | −e₂ | e₅ | −e₄ | e₇ | −e₆ |
-| **e₂** | −e₃ | −1 | e₁ | e₆ | e₇ | −e₄ | −e₅ |
-| **e₃** | e₂ | −e₁ | −1 | e₇ | −e₆ | e₅ | −e₄ |
+| **e₂** | −e₃ | −1 | e₁ | e₆ | −e₇ | −e₄ | e₅ |
+| **e₃** | e₂ | −e₁ | −1 | e₇ | e₆ | −e₅ | −e₄ |
 | **e₄** | −e₅ | −e₆ | −e₇ | −1 | e₁ | e₂ | e₃ |
-| **e₅** | e₄ | −e₇ | e₆ | −e₁ | −1 | −e₃ | e₂ |
-| **e₆** | −e₇ | e₄ | −e₅ | −e₂ | e₃ | −1 | e₁ |
-| **e₇** | e₆ | e₅ | e₄ | −e₃ | −e₂ | −e₁ | −1 |
+| **e₅** | e₄ | e₇ | −e₆ | −e₁ | −1 | e₃ | −e₂ |
+| **e₆** | −e₇ | e₄ | e₅ | −e₂ | −e₃ | −1 | e₁ |
+| **e₇** | e₆ | −e₅ | e₄ | −e₃ | e₂ | −e₁ | −1 |
 
-Each eₐ² = −1. Off-diagonal entries are read as eₐeᵦ (row a, column b).
+Each eₐ² = −1. Off-diagonal entries are read as eₐeᵦ (row a, column b). This table is transcribed directly from the `decide`-verified `octonionMul` definition in `archive/QBP_Octonion.lean` (lines 53–121), not hand-derived — see the verification note below.
 
 The quaternion subalgebra ℍ ⊂ 𝕆 is spanned by {e₀, e₁, e₂, e₃}, where e₁e₂ = e₃ matches the standard quaternion convention i·j = k.
 
@@ -77,18 +77,19 @@ Starting from one signed orientation (choice of cyclic direction for each line),
 
 ## Lean implementation
 
-The canonical orientation is implemented in `archive/QBP_Octonion.lean` as `FanoLine`, with the comment explicitly identifying this as "the 'common' convention used in most physics literature (matching Baez, Furey, etc.)":
+The canonical orientation is implemented in `archive/QBP_Octonion.lean`. The ground truth is the explicit `octonionMul` table (a total function `Fin 8 → Fin 8 → ℤ × Fin 8`, lines 53–121), whose header comment identifies this as "the 'common' convention used in most physics literature (matching Baez, Furey, etc.)" and lists the 7 positive triples. The Fano lines are then **derived** from the table, not posited independently:
 
 ```lean
--- The 7 lines of the Fano plane (positive triples)
-def FanoLines : Finset (Fin 7 × Fin 7 × Fin 7) := {
-  (0, 1, 2),  -- e₁e₂ = e₃ (indices shifted: 0→1, 1→2, 2→3)
-  (0, 3, 4),  -- e₁e₄ = e₅
-  ...
-}
+def octonionMul : Fin 8 → Fin 8 → ℤ × Fin 8 := ...   -- the full signed table
+
+-- A Fano line is derived: {a,b,c} with e_a · e_b = ±e_c
+def IsPositiveFanoTriple (a b c : Fin 7) : Prop := ...
+def FanoLine : Fin 7 → Fin 3 → Fin 7 := ...           -- the 7 derived lines
 ```
 
-Note: `archive/QBP_Octonion.lean` uses 0-based indexing internally (Fin 7: 0..6 for the 7 imaginary units e₁..e₇). The Lean index k corresponds to eₖ₊₁ in the prose convention.
+The table's correctness is machine-checked: `octonionMul_imaginary_sq` (every eᵢ²=−1), `octonionMul_left/right_identity`, and the Fano-derivation theorems (`fanoLine_isLine`, `fanoLine_count_eq_seven`, `fano_unique_line`) all close by `decide`/`fin_cases`.
+
+Note: `octonionMul` uses `Fin 8` with index 0 = the real unit and indices 1..7 = the imaginary units e₁..e₇ (so the prose eₖ corresponds directly to Lean index k, **not** 0-based). The 7×7 table above is transcribed from this definition.
 
 ## Sedenion multiplication table
 
