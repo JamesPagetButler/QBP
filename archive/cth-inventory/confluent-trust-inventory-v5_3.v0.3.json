@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "5.3",
+  "version": "5.3.1",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -2266,8 +2266,10 @@
       "prediction_chain": [],
       "tier": 1,
       "provenance": "T",
-      "status": "untested",
-      "provenance_kind": "theory"
+      "status": "incoherent",
+      "provenance_kind": "theory",
+      "killed_by": "QBP/analysis/HQM-MMI-derive-or-die-report.md",
+      "killed_note": "Tested (derive-or-die) and failed — no longer 'untested.' Same falsification as PROOF-division-algebra-entropy-cone-mapping."
     },
     {
       "predicted_value": 7,
@@ -2294,8 +2296,10 @@
       "prediction_chain": [],
       "tier": 1,
       "provenance": "T",
-      "status": "coherent",
-      "provenance_kind": "theory"
+      "status": "incoherent",
+      "provenance_kind": "theory",
+      "killed_by": "QBP/analysis/HQM-MMI-derive-or-die-report.md",
+      "killed_note": "Falsified (beekeeper-ratified). The 'ℂ→ℍ shrinks the entropy cone' mechanism is dead: multipartite ℍ-QM has no canonical tensor product; every definable repair builds on the complex projection (q=z+jz') so the achievable cone equals ℂ-QM's, and ℂ-QM's MMI violation (GHZ₄→I₃=+1>0) transports verbatim. Moretti-Oppio independently forces ℍ→ℂ under Poincaré+m²≥0. The genuinely-quaternionic regime gives super-Tsirelson (PR-box) correlations — a LARGER cone, opposite of the claim. Kept as a witnessed negative result. tier-1 flagged for review."
     },
     {
       "predicted_value": 5.36,
@@ -2315,7 +2319,8 @@
       "tier": 1,
       "provenance": "T",
       "status": "untested",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "review_flag": "prediction_chain depends on PROOF-division-algebra-entropy-cone-mapping which is now incoherent (2026-06-01). Re-evaluate basis; do not treat as 'untested' with a dead dependency. @cth-implementor judgment."
     },
     {
       "last_tested_at": "2026-04-30T00:00:00Z",
@@ -2522,7 +2527,7 @@
       "predicted_unit": "dim Im A_(2a) = 2^(2a) - 1 (integer)",
       "notes": "This is the surviving piece of the candidate CCvS convergence (the f(u) <-> chi(u) function-level match was disconfirmed; the algebraic-structure convergence at the coefficient level is confirmed). Tier 4 because it is an external (non-QBP-internal) mathematical convergence with a peer-reviewed result.\n\nNEXT MOVES (priority order):\n1. Compute gamma(+/-1/2), gamma(+/-3/2), gamma(+/-5/2) from CCvS Proposition 4.6 table values and search for ODD-level Cayley-Dickson algebra dimensions (dim Im C = 1, dim Im O = 7, dim Im pathions = 31, ...). If found, the full tower is encoded with functional-equation parity.\n2. Derive WHY the even levels appear and odd levels do not, from the structure of the entropy functional. Candidates: Z_2 grading of the fermionic Fock space; even/odd parity under the Dirac operator; doubling structure of Cayley-Dickson at every other step.\n3. Investigate whether the (2a+1)!/(a-1)! combinatorial factor has a Cayley-Dickson interpretation (counting basis elements of some derived structure, perhaps).\n4. If the structural confluence holds up after deeper investigation, this promotes from Tier 4 (external structural analogy) to a Tier 1 proof candidate: the Cayley-Dickson tower is the natural algebraic substrate for the information-theoretic spectral action.",
       "measured_source": "Derived from Chamseddine A.H., Connes A., van Suijlekom W.D. (2020) 'Entropy and the Spectral Action', Commun. Math. Phys. 373, 457-471 (arXiv:1809.02944), Proposition 4.6 and Lemma 4.5. Pattern verified numerically and symbolically 2026-05-10.",
-      "description": "The CCvS 2018 closed form gamma(-a) = (2^(2a) - 1)/(a*2^(2a)) * (2a+1)!/(a-1)! * zeta(2a+1) for positive integer a contains the numerator factor 2^(2a) - 1, which is exactly dim(Im A_(2a)) where A_(2a) is the Cayley-Dickson algebra at level 2a.\n\nEVEN-LEVEL TOWER (appears in integer-a coefficients):\n  a=1: 2^2 - 1 = 3   = dim Im H (quaternions)         [QBP daughter universe]\n  a=2: 2^4 - 1 = 15  = dim Im S (sedenions)            [QBP inter-cell topology]\n  a=3: 2^6 - 1 = 63  = dim Im (chingons, dim 64)      [deeper boundary]\n  a=4: 2^8 - 1 = 255 = dim Im (dim 256)               [...]\n\nODD-LEVEL ALGEBRAS (R, C, O, pathions) do NOT appear in integer-a coefficients. OPEN: do they appear in half-integer-a coefficients gamma(+/-1/2), gamma(+/-3/2), ...? If yes, the full Cayley-Dickson tower is encoded in CCvS's universal function with the xi functional equation as the parity map between odd and even levels.\n\nSTRUCTURAL SIGNIFICANCE: CCvS derived chi(x) = h(sqrt(x)) from a first-principles requirement (the spectral action should compute von Neumann entropy of the fermionic Fock-space KMS state). The result was independent of QBP. That the even-level Cayley-Dickson tower appears as the dim-Im factor in each zeta-weighted moment is independent first-principles support for QBP's algebraic foundation. ℍ at level 2 (where the daughter universe lives) and 𝕊 at level 4 (where the inter-cell topology / information-loss seams live) are exactly the two algebras QBP treats as physically realised.",
+      "description": "The CCvS 2018 closed form gamma(-a) = (2^(2a) - 1)/(a*2^(2a)) * (2a+1)!/(a-1)! * zeta(2a+1) for positive integer a contains the numerator factor 2^(2a) - 1, which is exactly dim(Im A_(2a)) where A_(2a) is the Cayley-Dickson algebra at level 2a.\n\nEVEN-LEVEL TOWER (appears in integer-a coefficients):\n  a=1: 2^2 - 1 = 3   = dim Im H (quaternions)         [QBP daughter universe]\n  a=2: 2^4 - 1 = 15  = dim Im S (sedenions)            [QBP inter-cell topology]\n  a=3: 2^6 - 1 = 63  = dim Im (chingons, dim 64)      [deeper boundary]\n  a=4: 2^8 - 1 = 255 = dim Im (dim 256)               [...]\n\nODD-LEVEL ALGEBRAS (R, C, O, pathions) do NOT appear in integer-a coefficients. OPEN: do they appear in half-integer-a coefficients gamma(+/-1/2), gamma(+/-3/2), ...? If yes, the full Cayley-Dickson tower is encoded in CCvS's universal function with the xi functional equation as the parity map between odd and even levels.\n\nSTRUCTURAL SIGNIFICANCE: CCvS derived chi(x) = h(sqrt(x)) from a first-principles requirement (the spectral action should compute von Neumann entropy of the fermionic Fock-space KMS state). The result was independent of QBP. That the even-level Cayley-Dickson tower appears as the dim-Im factor in each zeta-weighted moment is independent first-principles support for QBP's algebraic foundation. ℍ at level 2 (where the daughter universe lives) and 𝕊 at level 4 (where the inter-cell topology / information-loss seams live) are exactly the two algebras QBP treats as physically realised.\n\nCORRECTION (2026-06-01): the 'even levels privileged / odd levels absent' structural claim is WITHDRAWN. dim(Im A_n)=2^n−1 for every level n; the factor 2^(2a)−1 = dim(Im A_{2a}) is a CONTINUOUS family, not a parity selection. Integer-a sampling yields even levels (a=1→3=Im ℍ, a=2→15=Im 𝕊); half-integer a recovers the odd levels (a=½→1=Im ℂ, a=3/2→7=Im 𝕆, a=5/2→31=Im pathions), with γ finite/smooth there. The arithmetic identity stands; the structural over-claim does not. See QBP/analysis/HQM-MMI-derive-or-die-report.md.",
       "name": "MATHEMATICS: Even-level Cayley-Dickson tower (dim Im H, S, chingons, ...) embedded as dim-Im factors in CCvS entropy-function coefficients",
       "id": "CONV-cd-tower-in-zeta-moments",
       "prediction_chain": [],
@@ -2549,6 +2554,16 @@
       "provenance": "T",
       "status": "incoherent",
       "provenance_kind": "theory"
+    },
+    {
+      "id": "WISDOM-algebra-restricts-state-class-not-scalar-field",
+      "name": "Algebraic structure restricts the entropy cone via STATE-CLASS, not via the scalar field",
+      "tier": 3,
+      "status": "coherent",
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "prediction_chain": [],
+      "description": "WISDOM (from the killed entropy-cone inversion hypothesis). The intuition that 'more algebraic structure restricts the achievable entropy cone' is correct in MECHANISM but was mis-located. Changing the SCALAR FIELD up the Cayley-Dickson tower (ℂ→ℍ) does NOT shrink the cone: multipartite ℍ-QM either collapses to ℂ-QM (complex projection / Moretti-Oppio) and violates MMI like ℂ-QM, or in its genuinely-quaternionic regime reaches super-Tsirelson (PR-box) correlations and ENLARGES the cone. Where entropy-cone restriction (MMI / I₃≤0) genuinely arises — holographic and stabilizer states — it comes from a restricted STATE CLASS (graph/hypergraph structure, RT geometry, stabilizer formalism), not the underlying number system. Redirect: aim 'algebra restricts the cone' energy at state-class structure, not the division-algebra tower. Killed hypothesis + derivation: QBP/analysis/HQM-MMI-derive-or-die-report.md."
     }
   ],
   "inputs": [
@@ -3014,6 +3029,18 @@
       "version": "5.3",
       "date": "2026-05-11T01:29:09Z",
       "note": "CONV-spectral-entropy-zeta: status 'untested' -> 'marginal'. T1-T4 results embed"
+    },
+    {
+      "version": "5.3.1",
+      "date": "2026-06-01",
+      "changes": [
+        "Entropy-cone INVERSION hypothesis ruled DEAD (beekeeper-ratified; derivation QBP/analysis/HQM-MMI-derive-or-die-report.md).",
+        "PROOF-division-algebra-entropy-cone-mapping: coherent -> incoherent + killed_by/killed_note (ID kept; tier-1 flagged for review).",
+        "INSIGHT-entropy-cone-division-algebra-inversion: untested -> incoherent + killed_by/killed_note.",
+        "CONV-cd-tower-in-zeta-moments: kept coherent; even-level-privileged structural claim withdrawn (continuous 2^(2a)-1 family).",
+        "INSIGHT-branch-A-hypergraph-boundary: review_flag added (incoherent dependency; no auto-flip).",
+        "Added WISDOM-algebra-restricts-state-class-not-scalar-field (E-3 redirect)."
+      ]
     }
   ]
 }
