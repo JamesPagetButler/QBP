@@ -145,6 +145,13 @@ jobs:
       - name: Lint CTH cross-field invariants (#463)
         # INV1: untested => no proof artifact; INV2/INV3: verified => pinned
         # toolchain + library SHAs + all theorems verified (rebuild rules #14-#16).
+        #
+        # SCOPE: the CANONICAL working inventory only, NOT every archived snapshot.
+        # Older frozen snapshots (e.g. v5.13.json) legitimately carry pre-fix
+        # inconsistencies and must not be retro-gated — they are historical records,
+        # not the live inventory. (schema-lint validates all files; invariants gate
+        # only the canonical one.)
+        #
         # Default mode (no --strict-provenance): the #463 AC's
         # "untested => provenance_kind == theory" clause is intentionally NOT
         # enforced — it is too strict for real data (experiment/internal-compute
@@ -153,4 +160,5 @@ jobs:
         # --strict-provenance.
         run: |
           set -euo pipefail
-          python3 scripts/check_cth_invariants.py 'archive/cth-inventory/*.json'
+          python3 scripts/check_cth_invariants.py \
+            'archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json'
