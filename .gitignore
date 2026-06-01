@@ -101,3 +101,8 @@ workspace/*.html
 workspace/*.hif.json
 # NOTE: reviews/ifu-data/ (~200 MB real JWST/IFU data) is intentionally NOT ignored.
 #       Decide explicitly: Git LFS, external store, or ignore.
+
+# PhysLean differential-test bridge (#490): build artifacts only — source committed.
+# .lake holds a full PhysLean+Mathlib build (~8 GB) + a 191 MB native exe; rebuildable.
+proofs-physlean-bridge/.lake/
+proofs-physlean-bridge/**/*.olean
