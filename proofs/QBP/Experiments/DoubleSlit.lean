@@ -68,7 +68,9 @@ complex numbers by conjugation: j·z = z*·j where z* is complex conjugation. -/
 theorem qJ_sq : qJ * qJ = -(1 : Q) := by
   unfold qJ
   ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
-                Quaternion.imJ_mul, Quaternion.imK_mul]
+                Quaternion.imJ_mul, Quaternion.imK_mul,
+                Quaternion.re_one, Quaternion.imI_one,
+                Quaternion.imJ_one, Quaternion.imK_one]
 
 /-- j times a complex quaternion z = ⟨a, b, 0, 0⟩ gives ⟨0, 0, a, -b⟩.
     This is the quaternion representation of: j·z = z*·j
