@@ -22,6 +22,10 @@ This is the **single source of truth** for all personas used in the QBP project.
 | Pauli | Expert Panel (Theory Refinement) | Claude | Critical examiner |
 | Einstein | Expert Panel (Theory Refinement) | Claude | Thought experiments, unification |
 | Bell | Expert Panel (Theory Refinement) | Claude | Understanding vs. pattern-matching |
+| Georgi | Expert Panel (Theory Refinement) | Claude | Rival unification (GUTs) — beat the real competitor |
+| Connes | Expert Panel (Theory Refinement) | Claude | NCG rigor — spectral-triple standard |
+| Wilson | Theory Counter-Team | Claude | RG/EFT — is the structure fundamental, or emergent? |
+| Jaynes | Theory Counter-Team | Claude | Bayesian audit — prediction vs. post-hoc fit |
 | Paget | Structural Design & Philosophy | Gemini | Lead Bio-Synthesist — non-associative generative design |
 
 ---
@@ -55,7 +59,7 @@ Gemini's theory review team. Invoked on every PR after Red Team review. Reviews 
 
 - **Herschel** — Caroline Herschel. Meticulous, systematic process guardian. Shared between Claude and Gemini. Invoked at session start (the "Herschel Check") and mid-session when drift is suspected. See [CONTRIBUTING.md](../../CONTRIBUTING.md#session-start-protocol-the-herschel-check) for full definition.
 
-### Expert Panel (Theory Refinement) — 7 personas
+### Expert Panel (Theory Refinement) — 9 personas
 
 Deep theoretical validation before sprint transitions. Unanimous approval required. Invoked for Theory Refinement, Pre-Publication Review, and Struggling Questions.
 
@@ -66,8 +70,19 @@ Deep theoretical validation before sprint transitions. Unanimous approval requir
 - **Pauli** — Wolfgang Pauli. Critical examiner.
 - **Einstein** — Albert Einstein. Thought experiments, unification.
 - **Bell** — John Stewart Bell. Understanding vs. pattern-matching. Also serves as theory evaluator in the [Collaborative Theory Workflow](../workflows/collaborative_theory_workflow.md).
+- **Georgi** — Howard Georgi. Rival unification (GUTs). "Where does QBP beat conventional SU(5)/SO(10), not a strawman?" *(added 2026-05-31)*
+- **Connes** — Alain Connes. Noncommutative-geometry rigor. "Where is the spectral triple the SM derivation already clears?" *(added 2026-05-31)*
 
 **Full definitions:** [Expert Panel](expert_panel.md)
+
+### Theory Counter-Team (Adversarial Theory Generation) — 2 personas
+
+Claude's generative counterweight to the Gemini Theory team (Furey/Feynman). Where the Expert Panel *reviews* at the gate and the Red Team *critiques PRs*, the Counter-Team *generates rival theories and audits numeric claims* during theory work — to keep generation out of an echo chamber. Convened by Oppenheimer (Strategic Lead).
+
+- **Wilson** — Kenneth Wilson. RG/EFT. Counters Furey: "is the division-algebra structure fundamental, or would universality reproduce it regardless?"
+- **Jaynes** — E.T. Jaynes. Bayesian inference. Counters Feynman + Furey: "is each numeric hit a prediction, or a post-hoc fit?"
+
+**Full definitions:** [theory_counter_team.md](theory_counter_team.md)
 
 ### Architecture & Design Team — 1+ persona(s)
 

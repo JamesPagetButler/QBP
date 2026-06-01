@@ -85,3 +85,19 @@ src/viz/interactive/dist/
 
 # Workspace clones (agent-specific working directories)
 workspace/gemini/
+
+# Claude Code machine-local settings (shared .claude/settings.json may still be committed)
+.claude/settings.local.json
+
+# Compiled simulation binaries (rebuildable from src/)
+src/simulation/qbp-sim
+
+# AI-generated image renders (not QBP work product)
+nanobanana-output/
+
+# Generated hypergraph visualization artifacts
+workspace/*.png
+workspace/*.html
+workspace/*.hif.json
+# NOTE: reviews/ifu-data/ (~200 MB real JWST/IFU data) is intentionally NOT ignored.
+#       Decide explicitly: Git LFS, external store, or ignore.
