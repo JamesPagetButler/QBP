@@ -17,6 +17,7 @@
   Ground Truth: research/03_double_slit_expected_results.md (Section 5)
 -/
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Sinc
 
 namespace QBP.Optics.Fraunhofer
 
@@ -81,5 +82,91 @@ theorem fringeSpacing_inverse_d (wl L d : ℝ) (hd : d ≠ 0) (c : ℝ) (hc : c 
     fringeSpacing wl L (c * d) = fringeSpacing wl L d / c := by
   unfold fringeSpacing
   field_simp
+
+/-! ## Single-slit diffraction envelope (sinc²)
+
+The intensity formula `fraunhoferIntensity` above models only the two-slit
+*interference* term `cos²(πdx/λL)`, valid in the limit of infinitely narrow
+slits. For slits of finite width `a`, each slit also produces a single-slit
+*diffraction* envelope `sinc²(πax/λL)` that modulates the fringe pattern,
+suppressing fringes at large off-axis angles. The full Fraunhofer intensity is
+the product of the two:
+
+  I(x) = I₀ · cos²(πdx/λL) · sinc²(πax/λL)
+
+We reuse Mathlib's `Real.sinc x = sin x / x` (with the removable singularity
+filled as `sinc 0 = 1`), so the envelope is well-defined at `x = 0` where the
+naive `sin/x` would be `0/0`. Issue #374. -/
+
+/-- Full Fraunhofer double-slit intensity for slits of finite width `a`:
+    the interference term `cos²(πdx/λL)` modulated by the single-slit
+    diffraction envelope `sinc²(πax/λL)`.
+
+    I(x) = I₀ · cos²(π·d·x / (λ·L)) · sinc²(π·a·x / (λ·L))
+
+    `a` is the slit width, `d` the slit separation, `wl` the wavelength,
+    `L` the propagation distance, `I₀` the peak intensity. -/
+noncomputable def fraunhoferIntensityFull (I₀ d a wl L x : ℝ) : ℝ :=
+  I₀ * (Real.cos (Real.pi * d * x / (wl * L))) ^ 2
+     * (Real.sinc (Real.pi * a * x / (wl * L))) ^ 2
+
+/-- The full intensity factorises as the narrow-slit interference intensity
+    `fraunhoferIntensity` times the single-slit envelope `sinc²(πax/λL)`.
+    This is the precise sense in which the new definition *extends* the old
+    one without changing it: dropping the envelope (or setting it to 1)
+    recovers `fraunhoferIntensity`. -/
+theorem fraunhoferIntensityFull_factor (I₀ d a wl L x : ℝ) :
+    fraunhoferIntensityFull I₀ d a wl L x =
+      fraunhoferIntensity I₀ d wl L x *
+        (Real.sinc (Real.pi * a * x / (wl * L))) ^ 2 := by
+  unfold fraunhoferIntensityFull fraunhoferIntensity
+  ring
+
+/-- On-axis (`x = 0`) the diffraction envelope is `sinc²(0) = 1`, so the full
+    intensity reduces exactly to the interference-only intensity, which is the
+    peak `I₀`. This is the limiting consistency check between the two models. -/
+theorem fraunhoferIntensityFull_at_zero (I₀ d a wl L : ℝ) :
+    fraunhoferIntensityFull I₀ d a wl L 0 = fraunhoferIntensity I₀ d wl L 0 := by
+  rw [fraunhoferIntensityFull_factor]
+  have hsinc : Real.pi * a * 0 / (wl * L) = 0 := by ring
+  rw [hsinc, Real.sinc_zero]
+  ring
+
+/-- When the slit width `a = 0` (idealised infinitely narrow slits), the
+    envelope argument is identically zero, `sinc²(0) = 1`, and the full model
+    collapses to the original narrow-slit `fraunhoferIntensity` for every `x`.
+    This recovers the exact pre-existing definition as the `a → 0` limit. -/
+theorem fraunhoferIntensityFull_slit_width_zero (I₀ d wl L x : ℝ) :
+    fraunhoferIntensityFull I₀ d 0 wl L x = fraunhoferIntensity I₀ d wl L x := by
+  rw [fraunhoferIntensityFull_factor]
+  have hsinc : Real.pi * 0 * x / (wl * L) = 0 := by ring
+  rw [hsinc, Real.sinc_zero]
+  ring
+
+/-- The single-slit envelope only attenuates: for non-negative peak intensity
+    `I₀ ≥ 0`, the full intensity never exceeds the interference-only intensity,
+    because `0 ≤ sinc² ≤ 1` and `cos² ≥ 0`. Physically, finite slit width can
+    only suppress fringe brightness off-axis, never amplify it. -/
+theorem fraunhoferIntensityFull_le (I₀ d a wl L x : ℝ) (hI₀ : 0 ≤ I₀) :
+    fraunhoferIntensityFull I₀ d a wl L x ≤ fraunhoferIntensity I₀ d wl L x := by
+  rw [fraunhoferIntensityFull_factor]
+  have hbase : 0 ≤ fraunhoferIntensity I₀ d wl L x := by
+    unfold fraunhoferIntensity
+    exact mul_nonneg hI₀ (sq_nonneg _)
+  have hsinc_le : (Real.sinc (Real.pi * a * x / (wl * L))) ^ 2 ≤ 1 := by
+    rw [sq_le_one_iff_abs_le_one, abs_le]
+    exact ⟨Real.neg_one_le_sinc _, Real.sinc_le_one _⟩
+  calc fraunhoferIntensity I₀ d wl L x *
+          (Real.sinc (Real.pi * a * x / (wl * L))) ^ 2
+        ≤ fraunhoferIntensity I₀ d wl L x * 1 := by
+          exact mul_le_mul_of_nonneg_left hsinc_le hbase
+    _ = fraunhoferIntensity I₀ d wl L x := mul_one _
+
+/-- The full Fraunhofer intensity is non-negative for non-negative peak
+    intensity `I₀ ≥ 0` (it is a product of `I₀ ≥ 0`, `cos² ≥ 0`, `sinc² ≥ 0`). -/
+theorem fraunhoferIntensityFull_nonneg (I₀ d a wl L x : ℝ) (hI₀ : 0 ≤ I₀) :
+    0 ≤ fraunhoferIntensityFull I₀ d a wl L x := by
+  unfold fraunhoferIntensityFull
+  exact mul_nonneg (mul_nonneg hI₀ (sq_nonneg _)) (sq_nonneg _)
 
 end QBP.Optics.Fraunhofer
