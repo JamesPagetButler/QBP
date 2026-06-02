@@ -1,0 +1,65 @@
+# Lean foundations gate — issue #481.
+#
+# Enforces the foundations proof standard mechanically (it was human-discipline-only;
+# FAULT-S4-001 + the archive octonionMul `True := by trivial` stub are what this prevents).
+# Policy: inter/lean-proof-best-practices.md Rule 4 + docs/foundations/scope-deliberation-2026-05-31.md.
+#
+# Two jobs:
+#   foundations-standard (fast, no toolchain) — hard-ban native_decide + `: True := by trivial`;
+#     ratchet sorry + vacuous-`: True :=` theorems against proofs/QBP/Foundations/.lean-gate-baseline.json.
+#     This is the core gate and always runs.
+#   lake-build (heavy) — `lake build` must succeed (zero errors) with the pinned toolchain + Mathlib cache.
+#
+# Same shape as cth-schema-lint.yml (PR #459): workflow + script + fail-on-violation.
+
+name: Lean Foundations Gate
+
+on:
+  pull_request:
+    paths:
+      - 'proofs/**/*.lean'
+      - 'proofs/lakefile.lean'
+      - 'proofs/lean-toolchain'
+      - 'proofs/QBP/Foundations/.lean-gate-baseline.json'
+      - 'scripts/check_lean_foundations.py'
+      - '.github/workflows/lean-foundations.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  foundations-standard:
+    name: Foundations standard (no-sorry-increase / no native_decide / no vacuous stubs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Enforce the foundations proof standard
+        run: python3 scripts/check_lean_foundations.py --dir proofs/QBP/Foundations
+
+  lake-build:
+    name: lake build (zero errors)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan (pinned toolchain from proofs/lean-toolchain)
+        run: |
+          set -euo pipefail
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain "$(cat proofs/lean-toolchain | sed 's#leanprover/lean4:##')"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Fetch Mathlib cache (avoid building Mathlib from source)
+        working-directory: proofs
+        run: |
+          set -euo pipefail
+          lake exe cache get || echo "::warning::lake exe cache get incomplete — build may compile more from source"
+      - name: lake build
+        working-directory: proofs
+        run: lake build
+      # NOTE: #print axioms audit — activates when a Foundations theorem is first claimed
+      # `proof_state: verified` in the CTH inventory. At that point this job adds a step that
+      # runs `#print axioms <thm>` and asserts the axiom set ⊆ {propext, Classical.choice,
+      # Quot.sound}. No verified Foundations theorem exists yet, so the step is a no-op today;
+      # wired here so the obligation is visible (issue #481 AC).
