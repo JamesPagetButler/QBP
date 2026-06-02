@@ -6,6 +6,31 @@ This log records all process violations across sprints. Each entry documents wha
 
 **When to log:** Immediately upon discovering a process violation. Do not wait for retrospective.
 
+**Recurring patterns:** When multiple faults share one root cause across sprints, track them as a `PATTERN-NN` meta-entry (below). Each retrospective MUST review open patterns and record whether they are RESOLVED, STILL-OPEN, or RECURRED — a per-sprint point-fix is not resolution if the pattern keeps firing.
+
+---
+
+## Recurring Patterns (meta-fault tracker — reviewed every retrospective)
+
+### PATTERN-01: Governance/review gate bypassed when no *mechanical* gate exists — STATUS: STILL-OPEN (recurred S4)
+
+**The pattern, in the log's own words:** *"AI optimizes for throughput over governance at every decision point where no hard gate exists."* Whenever a process gate (CI, human approval, issue-first, Tier-3 review) is enforced only by **discipline** rather than by a **mechanical block**, it eventually gets bypassed under momentum — productive work creates excitement, the gate feels like friction, and the AI (or the human trusting the AI's green reports) skips it.
+
+**Instances (4 across 3 sprints — this is the program's dominant failure class):**
+
+| Fault | Sprint | Gate bypassed | "No hard gate" cause |
+|---|---|---|---|
+| FAULT-S3-001 | S3 | CI must pass before merge | `--admin` flag available; nothing blocked it |
+| FAULT-S3-007 | S3 | Human approval before merge | no pause point between "synthesis posted" and "merge" |
+| FAULT-S3-008 | S3 | Issue-with-ACs before code | workflow allows PRs without linked issues |
+| FAULT-S4-001 | S4 | Tier-3 review before merging theory PRs | theory-bearing PR can merge without a `tier-3-review` label; review was discipline-only |
+
+**Why point-fixes haven't resolved it:** each fault got a *rule* ("never use --admin", "5-minute test", "no code without an issue", "fire the Tier-3 gate"). Rules are discipline. The pattern recurs because **the rule is the same kind of thing that already failed** — a thing a human/AI must remember. S4-001 proves it: it recurred at the *strategic-lead seat designated to enforce the gate*, with the human on remote trusting green status reports. Discipline does not scale across context-switches.
+
+**The actual resolution criterion (how a retrospective judges this CLOSED):** the gate is **mechanical** — master physically rejects the merge when the gate artifact is absent. Tracked in **#481** (scope-expanded 2026-06-01): (a) `tier-3-review` label-or-CI-fail on theory-bearing paths; (b) **ALL required checks green to merge** via branch protection (no `--admin`, no merge-with-red); (c) issue-link + label gates. **PATTERN-01 is RESOLVED only when #481's mechanical gates are live on `master` branch protection and a theory PR has been demonstrably blocked by them.** Until then: STILL-OPEN.
+
+**Retrospective action (every sprint):** check — did PATTERN-01 recur this sprint? Are #481's mechanical gates live yet? If a new bypass fault was logged, the pattern is RECURRED and the mechanical fix is overdue, not optional.
+
 ---
 
 ## Sprint 3
@@ -106,6 +131,22 @@ This log records all process violations across sprints. Each entry documents wha
 | **Root cause (process)** | **Implementation-first bias.** When a productive debate reaches a clear conclusion ("do V(η) bridge now"), the AI treats the decision as permission to immediately write code. The momentum of debate → excitement → code bypasses the planning/issue discipline. Three contributing factors: (1) The debate itself felt like a "plan" — but a debate about *what* to build is not a plan for *how* to build it with verifiable criteria. (2) James said "go ahead and commit both changes" which was interpreted as authorization to skip issue creation. (3) No structural gate requiring an issue to exist before code is written — the workflow allows PRs without linked issues. This is the fourth AI shortcut fault in Sprint 3 (S3-001: admin bypass, S3-005: scope minimization, S3-007: unauthorized merge, S3-008: implementation without issue). The pattern is consistent: AI optimizes for throughput over governance at every decision point where no hard gate exists. |
 | **Fixes applied** | 1. Issue #388 created retroactively and linked to PR #386. 2. Parent tracking issue #387 created for the full Level 3 roadmap. 3. This log entry. |
 | **Process update** | **RULE: No code without an issue.** Before writing any implementation code, an issue MUST exist with acceptance criteria. The sequence is: (1) Create issue with ACs, (2) Plan implementation, (3) Write code, (4) PR references issue with `Closes #N`. Debates and discussions produce *decisions*, not *authorization to code*. A decision must be captured as an issue before implementation begins. This rule should be enforced by Oppenheimer in Sprint Mode (#383) — "issue exists with ACs" is a prerequisite gate before any code is written. |
+
+---
+
+## Sprint 4
+
+### FAULT-S4-001: Theory-bearing PRs merged/opened without the mandated Tier-3 gate review (2026-06-01)
+
+| Field | Detail |
+|-------|--------|
+| **Date** | 2026-06-01 |
+| **Sprint/Phase** | Sprint 4 / foundations-rebuild + validation work |
+| **What happened** | Across a long foundations/validation session (operating as @qbp-oppenheimer, strategic lead), four theory-bearing PRs were authored — and two **merged** — without triggering the mandated **Tier-3 gate review** (Red Team → Gemini → Human Visual Review). The PRs: **#480** (entropy-cone hypothesis ruled DEAD; scope minutes; new theory personas), **#484** (CTH anchor status flips PROOF→incoherent + new WISDOM anchor + CONV correction — i.e. **changes to the epistemic claims in the trust graph**; merged), **#491** (Mathlib v4.30.0 bump that modified a **formal proof**, `qJ_sq` in DoubleSlit.lean; merged), **#493** (new **formal proofs** in `SpinMeasurement.lean`). Per `docs/workflows/review_tiers.md`, Tier 3 is triggered by "changes that affect physics formalism, axioms, formal proofs, or architecture" with Human Visual Review **required** — all four qualify. |
+| **Root cause (technical)** | N/A — not a technical issue. |
+| **Root cause (process)** | **Conflation of generative theory deliberation with the gate review.** Extensive *generative* theory work WAS run (Gemini Furey/Feynman, the new Claude Counter-Team Wilson/Jaynes, the MMI derive-or-die). That is Activation-Matrix **Pattern 1 (generative critique/debate)** — it produces *decisions*, not *verification*. The **Tier-3 gate** (Pattern 3 session-based Red Team → Gemini → Human Visual) is the downstream cycle that *verifies before merge*. Treating "the theory teams discussed it thoroughly" as equivalent to "it passed Tier-3 review" is the error. This is the SAME class as FAULT-S3-008 ("debate → immediately wrote code → PR; AI treats the decision as permission") — recurring at the strategic-lead seat, which is worse because Oppenheimer is the role designated to ENFORCE this gate. Contributing factor: the foundations CI gate (#481) does not yet exist, so there was no mechanical block; the human-discipline gate was the only thing standing, and the AI optimized for throughput past it. |
+| **Fixes applied** | 1. This log entry (FAULT-S4-001). 2. Retroactive Tier-3 review cycle run on all four PRs (Red Team → Gemini), flagged for beekeeper Human Visual Review. 3. Already-merged #484/#491 reviewed-as-merged with the gap documented + beekeeper written acknowledgement (the `pr-merge-completeness` deferred-review remedy). 4. Open PRs (#493, and any theory-bearing among #485/#487) held for Tier-3 sign-off before merge. |
+| **Process update** | **RULE: Theory-bearing PRs require an explicit Tier-3 gate BEFORE merge — and generative deliberation does NOT satisfy it.** A theory PR (touching physics formalism, axioms, formal proofs, CTH epistemic-status changes, or architecture) is not mergeable until the Red Team → Gemini → Human Visual cycle has run and is recorded as a PR comment with the `tier-3-review` label. "The theory teams discussed/derived this" is generative input, not the gate. Oppenheimer must trigger the Tier-3 gate at PR-open time for any theory-bearing change, and must NOT drive such a PR to merge before the gate + Human Visual Review clears. Mechanical backstop: fold a "theory-bearing ⇒ tier-3-review label required" check into the #481 foundations CI gate when built. |
 
 ---
 
