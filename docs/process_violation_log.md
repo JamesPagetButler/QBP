@@ -148,6 +148,24 @@ This log records all process violations across sprints. Each entry documents wha
 | **Fixes applied** | 1. This log entry (FAULT-S4-001). 2. Retroactive Tier-3 review cycle run on all four PRs (Red Team → Gemini), flagged for beekeeper Human Visual Review. 3. Already-merged #484/#491 reviewed-as-merged with the gap documented + beekeeper written acknowledgement (the `pr-merge-completeness` deferred-review remedy). 4. Open PRs (#493, and any theory-bearing among #485/#487) held for Tier-3 sign-off before merge. |
 | **Process update** | **RULE: Theory-bearing PRs require an explicit Tier-3 gate BEFORE merge — and generative deliberation does NOT satisfy it.** A theory PR (touching physics formalism, axioms, formal proofs, CTH epistemic-status changes, or architecture) is not mergeable until the Red Team → Gemini → Human Visual cycle has run and is recorded as a PR comment with the `tier-3-review` label. "The theory teams discussed/derived this" is generative input, not the gate. Oppenheimer must trigger the Tier-3 gate at PR-open time for any theory-bearing change, and must NOT drive such a PR to merge before the gate + Human Visual Review clears. Mechanical backstop: fold a "theory-bearing ⇒ tier-3-review label required" check into the #481 foundations CI gate when built. |
 
+#### RCA — Why were there sorries in `Foundations/*.lean`? (beekeeper-requested, 2026-06-02)
+
+**Provenance (verified, not assumed).** The 16 sorries were introduced by commit `7ab2fd2` (the #480/#471 **Phase-1 skeleton merge**), NOT by the `lean-prover` subagent. The subagent's three real deliverables this session — Fraunhofer (#374), DoubleSlit migration (#491), PhysLean bridge (#490) — contain **0 sorries**, all `#print axioms`-clean. **Correction to the initial framing: the tooling/subagent evaluation did NOT reveal the subagent writing bad Lean. It passed.** The sorries are older human-orchestrated scaffolding.
+
+**So the breakdown is not "sorries exist" — it is THREE stacked failures:**
+
+1. **Legitimate-but-unbounded scaffolding (not itself the fault).** Phase-1 deliberately created skeleton files with `sorry` placeholders for theorems-not-yet-proven. A *tracked, visible* "proof pending" sorry is normal foundation-building. Fine in principle.
+
+2. **The vacuous-`True` stub anti-pattern recurred (real fault).** Several are not honest typed sorries but `theorem Octonion.nonAssociativity : True := by sorry; trivial` — **doubly broken**: the statement is `True` (proves nothing even when completed) AND the body is a hole. This is the EXACT `#472` octonionMul defect pattern — and it reappeared in the very files meant to anchor the *rebuilt* foundation. The #472 lesson did not propagate into Phase-1 authoring. A `: True := by sorry` is strictly worse than an honest sorry: it will one day "complete" (the `trivial` closes `True`) and falsely read as proven.
+
+3. **They were INVISIBLE — the systemic root cause.** `proofs/QBP.lean` (build root) does not `import QBP.Foundations.*`, so `lake build` never compiles them; nothing — build, CI, reviewer — ever counted them. Combined with the Tier-3 gate not firing (FAULT-S4-001 above), bad scaffolding reached `master` with zero friction.
+
+**Deepest root cause (ties to PATTERN-01):** "zero-sorry" was a *claimed property verified by humans remembering to check*, never a *measured, enforced invariant*. `#print axioms` is used **zero** times in the repo; `lake build` only **warns** on sorry (exits 0); orphaned files aren't built at all. Three independent holes, same class: the no-sorry rule was **discipline, not measurement**.
+
+**Path back to zero-sorry:** (1) inventory every sorry + every `: True := by` stub across the WHOLE tree (not just what builds); (2) triage each — honest-pending → track against the operations-complete matrix (#474); vacuous-`True` stub → delete or replace with a real statement+proof; orphaned → wire-into-build or quarantine; (3) prove-or-quarantine via the lean-prover team; (4) lock the floor with the #481 CI gate as a ratchet (count can't rise).
+
+**CAN CI catch sorry? Yes — and the gate MUST build orphaned files or it inherits the exact invisibility that caused this.** A naive `grep sorry` over imported files would NOT have caught these 16 (CI never looks at unbuilt files). Required gate behavior (flagged to #481): (a) `#print axioms` shows `sorryAx` → fail [the real check]; (b) **compile `Foundations/**` even when the root doesn't import it**; (c) ban the `: True := by` stub pattern by grep; (d) `set_option warningAsError true` so `lake build` itself fails on sorry rather than warns. qbp-implementor is building #481 now; the orphaned-file-build requirement is the non-obvious must-have.
+
 ---
 
 ## Template
