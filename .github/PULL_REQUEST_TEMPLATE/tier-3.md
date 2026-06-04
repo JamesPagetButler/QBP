@@ -19,11 +19,14 @@ labels: tier-3-review
      UNITS RULE (enforced): ALL quantities in every pillar are stated in QBP
      canonical format. Conversions happen ONCE at ingestion via QBP/Units
      (Constants / ScaleFactors / gen_test_vectors) and the conversion is LINKED.
-     Hand-converted or mixed-unit rows are a review-blocking defect — unit
-     mismatch is a historically human-caught error class; exclude it
-     structurally. -->
+     Dimensionless or natively-canonical quantities (probabilities, ratios,
+     visibilities): write "no conversion required — dimensionless" on the
+     provenance line rather than leaving it blank. Hand-converted or
+     mixed-unit rows are a review-blocking defect — unit mismatch is a
+     historically human-caught error class; exclude it structurally. -->
 
 **Claim under test:** <!-- one sentence -->
+**Dataset choice (look-elsewhere guard):** <!-- cite the pre-registered ground-truth doc, or give a one-line justification why THIS dataset is the consensus ground truth — the author does not get to silently pick the friendliest data -->
 
 | Pillar | Value (QBP canonical units) | Evidence (link, not assertion) |
 |---|---|---|
