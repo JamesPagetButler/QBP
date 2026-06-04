@@ -1,0 +1,89 @@
+# PR check-status notifier — posts ONE upserted comment per PR with the final
+# check verdict for the current head SHA, timestamped.
+#
+# Why (2026-06-04, two incidents in one day): humans and agents kept acting on
+# STALE check states — a "ready to merge" claim made without re-querying, and a
+# red verdict read after the gate had already re-run green. This makes the PR
+# conversation itself carry a machine-stamped verdict for the current head, so
+# "CI green" claims have a canonical artifact to link (evidence-first rule,
+# docs/workflows/review_tiers.md).
+#
+# Behavior:
+#   - fires when any check suite completes
+#   - if other suites for the same SHA are still running -> exits quietly
+#   - else upserts (edit-in-place, never spam) a single marked comment:
+#       ALL GREEN (N checks) @ timestamp for sha
+#       or FAILED: <names + links> @ timestamp for sha
+#   - new push -> next completion updates the comment for the new SHA
+
+name: PR check-status notifier
+
+on:
+  check_suite:
+    types: [completed]
+
+permissions:
+  pull-requests: write
+  checks: read
+  contents: read
+
+jobs:
+  notify:
+    # only suites attached to a PR
+    if: ${{ github.event.check_suite.pull_requests[0] != null }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compose and upsert verdict comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.check_suite.pull_requests[0].number }}
+          SHA: ${{ github.event.check_suite.head_sha }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- pr-check-status-notifier -->"
+
+          # All check runs for this SHA (across suites)
+          RUNS=$(gh api "repos/$REPO/commits/$SHA/check-runs?per_page=100" --paginate \
+                 --jq '[.check_runs[] | {name, status, conclusion, html_url}]')
+
+          PENDING=$(echo "$RUNS" | jq '[.[] | select(.status != "completed")] | length')
+          if [ "$PENDING" -gt 0 ]; then
+            echo "$PENDING check(s) still running for $SHA — not posting yet."
+            exit 0
+          fi
+
+          TOTAL=$(echo "$RUNS" | jq 'length')
+          # neutral/skipped don't count as failures
+          FAILED=$(echo "$RUNS" | jq '[.[] | select(.conclusion as $c
+                    | ["failure","timed_out","cancelled","action_required"] | index($c))]')
+          NFAIL=$(echo "$FAILED" | jq 'length')
+          TS=$(date -u +"%Y-%m-%d %H:%M UTC")
+
+          if [ "$NFAIL" -eq 0 ]; then
+            BODY="$MARKER
+          ## ✅ All checks green — \`$TOTAL\` checks @ $TS
+
+          Head: \`$SHA\`. This comment is machine-posted and updates per head SHA; it is the canonical \"CI green\" evidence link for this PR (evidence-first rule, \`docs/workflows/review_tiers.md\`)."
+          else
+            LIST=$(echo "$FAILED" | jq -r '.[] | "- ❌ [\(.name)](\(.html_url)) — \(.conclusion)"')
+            BODY="$MARKER
+          ## ❌ Checks FAILED — $NFAIL of $TOTAL @ $TS
+
+          Head: \`$SHA\`
+
+          $LIST
+
+          Machine-posted; updates per head SHA."
+          fi
+
+          # Upsert: find existing marked comment, edit it; else create.
+          CID=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
+                --jq "[.[] | select(.body | startswith(\"$MARKER\"))] | (first // {}) | .id // empty")
+          if [ -n "$CID" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$CID" -f body="$BODY" > /dev/null
+            echo "updated comment $CID"
+          else
+            gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$BODY" > /dev/null
+            echo "created comment"
+          fi
