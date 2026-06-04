@@ -103,8 +103,9 @@ scope for Foundations. The physical moves (`Cosmo/ → Physics/Cosmo/` etc.), th
 Physics aggregator, and lakefile root updates are a separate housekeeping PR —
 mechanical, reviewable in isolation, gated by the same linter.
 
-**Quarantine note:** `Foundations/{Breakdown,Sedenion,CayleyDickson,Octonion}.lean`
-(the #471 skeletons: 16 sorries, 8 vacuous-True; shipped orphaned via #480) are
-NOT imported by the aggregator pending the beekeeper's HVR wire-or-quarantine
-decision (480-B). They remain visible to the ratchet gate (which globs
-`Foundations/**` directly), so their counts cannot regress silently.
+**480-B resolution (beekeeper ruling 2026-06-04, option c):**
+`Foundations/{Breakdown,Sedenion,CayleyDickson,Octonion}.lean` (the #471
+skeletons shipped orphaned via #480) were DELETED; their intended-theorem
+inventory is preserved as the rebuild plan of record in issue #503. The ratchet
+baseline is zeroed in the same change — the Foundations gate enforces
+ZERO sorry / ZERO vacuous-True permanently.
