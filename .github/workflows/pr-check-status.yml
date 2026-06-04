@@ -18,6 +18,11 @@
 
 name: PR check-status notifier
 
+# KNOWN LIMITATION: check_suite payloads carry an empty pull_requests[] for
+# FORK PRs, so fork PRs get no verdict comment (acceptable for this repo:
+# solo maintainer + agent sessions, same-repo branches only — documented per
+# review finding #3 so a future external PR's silence isn't a mystery).
+
 on:
   check_suite:
     types: [completed]
@@ -27,8 +32,18 @@ permissions:
   checks: read
   contents: read
 
+# collapse simultaneous firings for the same head SHA; keep only the latest
+concurrency:
+  group: pr-check-status-${{ github.event.check_suite.head_sha }}
+  cancel-in-progress: true
+
 jobs:
   notify:
+    # IMPORTANT: this job name is the notifier's own check-run name; the query
+    # below excludes it by name so the notifier never counts itself as pending
+    # (review finding #1 — without the self-filter, PENDING never reaches 0
+    # and the notifier structurally never posts).
+    name: pr-check-status-notify
     # only suites attached to a PR
     if: ${{ github.event.check_suite.pull_requests[0] != null }}
     runs-on: ubuntu-latest
@@ -43,9 +58,16 @@ jobs:
           set -euo pipefail
           MARKER="<!-- pr-check-status-notifier -->"
 
-          # All check runs for this SHA (across suites)
+          # All check runs for this SHA (across suites — per-SHA scoping is
+          # deliberate: the verdict covers ALL checks, not one suite), EXCLUDING
+          # the notifier's own run (self-filter, review finding #1).
+          # NOTE on pagination (review finding #8): `gh api --paginate --jq`
+          # emits one JSON array PER PAGE (concatenated docs), so we slurp and
+          # flatten to a single array before counting.
+          SELF="pr-check-status-notify"
           RUNS=$(gh api "repos/$REPO/commits/$SHA/check-runs?per_page=100" --paginate \
-                 --jq '[.check_runs[] | {name, status, conclusion, html_url}]')
+                 --jq '[.check_runs[] | {name, status, conclusion, html_url}]' \
+                 | jq -s 'add | map(select(.name != "'"$SELF"'"))')
 
           PENDING=$(echo "$RUNS" | jq '[.[] | select(.status != "completed")] | length')
           if [ "$PENDING" -gt 0 ]; then
@@ -73,8 +95,10 @@ jobs:
           fi
 
           # Upsert: find existing marked comment, edit it; else create.
+          # (slurp-flatten across pages, same pagination caveat as above)
           CID=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
-                --jq "[.[] | select(.body | startswith(\"$MARKER\"))] | (first // {}) | .id // empty")
+                --jq "[.[] | select(.body | startswith(\"$MARKER\"))]" \
+                | jq -s 'add | (first // {}) | .id // empty' -r)
           if [ -n "$CID" ]; then
             gh api -X PATCH "repos/$REPO/issues/comments/$CID" -f body="$BODY" > /dev/null
             echo "updated comment $CID"
