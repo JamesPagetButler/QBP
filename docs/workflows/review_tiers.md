@@ -223,6 +223,54 @@ For PRs that go through multiple review rounds, Gemini reviews use `session_id` 
 
 Every BLOCKING-class claim in a Tier 2+ review must terminate at a verifiable artifact: a Lean theorem at file:line, a simulation output with numerical value + source, a published experimental citation, a pre-registered ground-truth document, or a formally derived dimensional/algebraic identity. Reviews containing unanchored blocking claims are **returned to the reviewer** and not read on merits until re-anchored. Full rule + examples + return mechanic: see [`docs/workflows/review_anchoring.md`](review_anchoring.md). Precedent incident: PR #407 Round 1 (three reviewers each missed three one-line check failures).
 
+### Evidence-first discipline (standing rule, effective 2026-06-04)
+
+The anchoring rule's mirror image, applied to the PR **author's** claims:
+
+1. **Body claims are not evidence.** Before content review, the reviewer checks
+   each box in the PR's "Mechanical verification evidence" section against its
+   link. A claim without a link (or with a link to a dirty-working-dir run
+   rather than a clean-checkout CI run) is marked **UNVERIFIED** in the review
+   and the corresponding AC cannot be assessed PASS on the author's word.
+2. **The theory-element headline is a review object.** For Tier-3 theory PRs the
+   three-way comparison table (Experimental evidence | QBP | PhysLean baseline)
+   must be present, complete, and in **QBP canonical units with linked
+   conversion provenance**. Missing pillar, silently-blank baseline, or
+   mixed/hand-converted units = BLOCKING.
+3. **Differential-test rows are review objects.** When the PhysLean↔QBP
+   differential oracle reports FAIL or BOUNDARY rows, the review must reproduce
+   the table and classify each row: *physics discrepancy* / *rounding artifact*
+   / *fixture drift*. "The test ran" is not "the review consumed the test."
+   Precedent: the #492 1-ULP finding (differential run caught what three
+   reviewers reading content could not).
+4. **AC items asserting numerical correctness cite the differential run**, not
+   the author.
+5. **External-comparator rule (beekeeper-ratified 2026-06-04):** external
+   physics libraries (PhysLean/physlib or any successor) are **never premises,
+   only comparators**. No QBP theorem may import them or cite their theorems as
+   proof steps; they appear exclusively as the baseline pillar of the three-way
+   headline and in the differential harness, touching QBP only at the JSON
+   boundary. Mechanically backstopped: external libraries are absent from
+   QBP's lake manifest, so a smuggled import fails the build. Reviewers treat
+   any external-library citation inside a `proofs/` derivation as BLOCKING
+   epistemic smuggling. (Mirror sentence lands in `layer-architecture.md` §2
+   once PR #497 merges — tracked in the migration plan.)
+6. **Truth-in-labelling extends to prose surfaces:** PR titles, commit
+   messages, and review summaries are held to the same standard as Lean
+   identifiers (layer-architecture §3.4) — they state what is established,
+   not what is hoped. An overclaiming title ("proves X" when the kernel
+   proves a weaker Y) is a reviewer-flagged BLOCKING finding: titles and
+   commit messages enter the immutable git log, where they outlive their
+   caveats.
+
+Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
+checkout (missing root aggregator; both Tier-3 reviews read content only);
+`LieAlgebraIso.lean` never compiled since authoring (caught by aggregator
+wiring, not review); #492 (caught by differential run, not review).
+
+**Rationalization-prevention addition:** "The PR body says the build is green"
+→ body claims are assertions; only a clean-checkout CI link is evidence.
+
 ### NON-BLOCKING (note but don't block)
 
 - Style suggestions (naming, formatting preferences)

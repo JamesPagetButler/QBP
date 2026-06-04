@@ -8,6 +8,45 @@ labels: tier-3-review
 
 <!-- What theoretical or architectural change does this PR introduce? -->
 
+## Theory-element headline: three-way evidence comparison
+
+<!-- REQUIRED for any PR introducing or modifying a theory element that makes a
+     quantitative claim. This is the program's critical-path question in table
+     form: is QBP more predictive of the evidence than the incumbent?
+     Delete this section ONLY for pure-infrastructure / pure-math PRs with no
+     physical claim (state why in Summary).
+
+     UNITS RULE (enforced): ALL quantities in every pillar are stated in QBP
+     canonical format. Conversions happen ONCE at ingestion via QBP/Units
+     (Constants / ScaleFactors / gen_test_vectors) and the conversion is LINKED.
+     Dimensionless or natively-canonical quantities (probabilities, ratios,
+     visibilities): write "no conversion required — dimensionless" on the
+     provenance line rather than leaving it blank. Hand-converted or
+     mixed-unit rows are a review-blocking defect — unit mismatch is a
+     historically human-caught error class; exclude it structurally. -->
+
+**Claim under test:** <!-- one sentence -->
+**Dataset choice (look-elsewhere guard):** <!-- cite the pre-registered ground-truth doc. REQUIRED for any verdict-grade claim — no free-text justification substitutes. Exploratory work without pre-registration must state "exploratory — no verdict claimed" and the Verdict line stays empty -->
+
+| Pillar | Value (QBP canonical units) | Free params | Data status | Evidence (link, not assertion) |
+|---|---|---|---|---|
+| **Experimental evidence** (ground truth) | value ± σ | n/a | n/a | dataset + supporting papers |
+| **1. QBP prediction** | value | count tuned on THIS dataset | in-sample fit / out-of-sample prediction | Lean theorem / oracle run **with exact input fixture/config linked** (same premise standard as theorems — undocumented config is a smuggled premise) |
+| **2. PhysLean baseline** (QM/SM incumbent) | value | count | in-sample / out-of-sample | bridge derivation; if PhysLean cannot produce this number (its SM layer is structure-only), use a PUBLISHED SM prediction with citation and say so — never leave blank, never let QBP grade its own homework |
+
+**Verdict:** QBP closer / equal / farther than baseline w.r.t. experiment, by <Δ in σ or relative error> — **valid only with parameter counts disclosed; an in-sample fit may never be scored against an out-of-sample prediction without saying so** (a theory with more knobs can always sit closer; Δ without the Occam columns is not evidence)
+**Unit conversion provenance:** <!-- link to the QBP/Units conversion used. Dimensionless means genuinely unit-free (probabilities, ratios); natural/Planck-unit nondimensionalization (c=ħ=1) does NOT qualify — those quantities still convert via QBP/Units -->
+
+## Mechanical verification evidence (links, not assertions)
+
+<!-- Body claims are not evidence. Every box needs a pointer a reviewer can click.
+     A claim without a link is treated by reviewers as UNVERIFIED. -->
+
+- [ ] Clean-checkout build: <!-- CI run link — a green run from YOUR working dir does not count -->
+- [ ] Gate scripts (foundations ratchet / layer imports / anchor impact): <!-- CI link -->
+- [ ] Differential oracle (PhysLean↔QBP): PASS / FAIL+table / N-A: <!-- run output or link -->
+- [ ] `#print axioms` audit (Lean-bearing PRs): <!-- output location in file or CI log -->
+
 ## Type of Change
 
 - [ ] New axiom or postulate
