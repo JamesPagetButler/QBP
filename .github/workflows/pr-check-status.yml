@@ -1,57 +1,97 @@
-# PR check-status notifier — posts ONE upserted comment per PR with the final
-# check verdict for the current head SHA, timestamped.
+# PR check-status notifier + two-phase review trigger.
 #
-# Why (2026-06-04, two incidents in one day): humans and agents kept acting on
-# STALE check states — a "ready to merge" claim made without re-querying, and a
-# red verdict read after the gate had already re-run green. This makes the PR
-# conversation itself carry a machine-stamped verdict for the current head, so
-# "CI green" claims have a canonical artifact to link (evidence-first rule,
-# docs/workflows/review_tiers.md).
+# Phase model (beekeeper-ratified design, 2026-06-04):
 #
-# Behavior:
-#   - fires when any check suite completes
-#   - if other suites for the same SHA are still running -> exits quietly
-#   - else upserts (edit-in-place, never spam) a single marked comment:
-#       ALL GREEN (N checks) @ timestamp for sha
-#       or FAILED: <names + links> @ timestamp for sha
-#   - new push -> next completion updates the comment for the new SHA
+#   PR opened/synced ──► tier label auto-applied from changed paths (job: tier-label)
+#   checks run       ──► TECH-GREEN: all checks green EXCLUDING review-completeness
+#                        gates ──► `review-ready` label + review checklist posted
+#                        (reviews are dispatched by the orchestrator; initiation is
+#                        now mechanical, not memory)
+#   reviews posted   ──► review gates turn green ──► ALL-GREEN + review-freshness
+#                        check (patch-id) ──► MERGE-READY verdict (merge stays the
+#                        beekeeper's call)
+#   fix breaks CI    ──► RED verdict, `review-ready` REVOKED, cycle re-arms
+#
+# Review freshness: review/fix comments include a machine-readable marker
+#   <!-- reviewed-sha: <full-sha> -->
+# The ALL-GREEN verdict compares git patch-id of the last reviewed SHA vs head:
+# identical patch-id (rebases / empty retrigger commits) keeps reviews fresh;
+# a content change demands a delta round. No marker -> freshness UNVERIFIABLE
+# (warned, not blocked — grandfathers pre-convention PRs).
+#
+# Why two thresholds: "trigger reviews when ALL checks pass" deadlocks — the
+# tier-3 review-label gate is itself a check that stays red until reviews
+# exist. TECH-GREEN excludes review gates; ALL-GREEN includes them.
+#
+# KNOWN LIMITATION: check_suite payloads carry an empty pull_requests[] for
+# FORK PRs, so fork PRs get no verdict comment (acceptable: solo maintainer +
+# agent sessions, same-repo branches only).
 
 name: PR check-status notifier
-
-# KNOWN LIMITATION: check_suite payloads carry an empty pull_requests[] for
-# FORK PRs, so fork PRs get no verdict comment (acceptable for this repo:
-# solo maintainer + agent sessions, same-repo branches only — documented per
-# review finding #3 so a future external PR's silence isn't a mystery).
 
 on:
   check_suite:
     types: [completed]
+  pull_request:
+    types: [opened, reopened, synchronize]
 
 permissions:
   pull-requests: write
+  issues: write
   checks: read
   contents: read
 
-# collapse simultaneous firings per PR (not per SHA: PR-keying also cancels a
-# stale in-flight run for an OLD head SHA when a new push's suites complete,
-# so an outdated verdict can never overwrite a newer one — review concurrency
-# finding, round 1)
 concurrency:
-  group: pr-check-status-${{ github.event.check_suite.pull_requests[0].number || github.event.check_suite.head_sha }}
+  group: pr-check-status-${{ github.event.check_suite.pull_requests[0].number || github.event.pull_request.number || github.event.check_suite.head_sha }}
   cancel-in-progress: true
 
 jobs:
-  notify:
-    # IMPORTANT: this job name is the notifier's own check-run name; the query
-    # below excludes it by name so the notifier never counts itself as pending
-    # (review finding #1 — without the self-filter, PENDING never reaches 0
-    # and the notifier structurally never posts).
-    name: pr-check-status-notify
-    # only suites attached to a PR
-    if: ${{ github.event.check_suite.pull_requests[0] != null }}
+  # ── Phase 0: tier label from changed paths (instant, deterministic) ─────────
+  tier-label:
+    name: pr-tier-label
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Compose and upsert verdict comment
+      - name: Classify tier from changed paths and apply label if absent
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          LABELS=$(gh pr view "$PR" --repo "$REPO" --json labels --jq '[.labels[].name]')
+          # never override a human/orchestrator tier choice
+          if echo "$LABELS" | jq -e 'map(select(test("^tier-[123]-review$"))) | length > 0' > /dev/null; then
+            echo "tier label already present — leaving as-is"; exit 0
+          fi
+          FILES=$(gh pr view "$PR" --repo "$REPO" --json files --jq '.files[].path')
+          # theory-bearing globs mirror scripts/check_tier3_label.py THEORY_GLOBS
+          TIER="tier-1-review"
+          while IFS= read -r f; do
+            case "$f" in
+              proofs/*.lean|archive/cth-inventory/*.json|paper/*|docs/foundations/*)
+                TIER="tier-3-review"; break ;;
+              *.py|*.lean|*.yml|*.yaml|*.json|*.sh|*.toml|tests/*|scripts/*|proofs/*|src/*)
+                TIER="tier-2-review" ;;
+            esac
+          done <<< "$FILES"
+          gh pr edit "$PR" --repo "$REPO" --add-label "$TIER"
+          echo "applied $TIER"
+
+  # ── Phases 1–3: verdict + review-ready + merge-ready ────────────────────────
+  notify:
+    # IMPORTANT: this job name is the notifier's own check-run name; the query
+    # below excludes it by name (self-counting fix, #508 review finding #1).
+    name: pr-check-status-notify
+    if: ${{ github.event_name == 'check_suite' && github.event.check_suite.pull_requests[0] != null }}
+    runs-on: ubuntu-latest
+    steps:
+      # full history so patch-ids can be computed for both head and the
+      # last-reviewed SHA (review-freshness check)
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compose and upsert verdict; manage review-ready label
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -60,17 +100,16 @@ jobs:
         run: |
           set -euo pipefail
           MARKER="<!-- pr-check-status-notifier -->"
-
-          # All check runs for this SHA (across suites — per-SHA scoping is
-          # deliberate: the verdict covers ALL checks, not one suite), EXCLUDING
-          # the notifier's own run (self-filter, review finding #1).
-          # NOTE on pagination (review finding #8): `gh api --paginate --jq`
-          # emits one JSON array PER PAGE (concatenated docs), so we slurp and
-          # flatten to a single array before counting.
           SELF="pr-check-status-notify"
+          # review-completeness gates excluded from TECH-GREEN (they cannot be
+          # green before reviews exist — the deadlock this design dissolves).
+          # Single source of truth for the excluded list:
+          REVIEW_GATES='["Tier-3 review-label required on theory-bearing diffs"]'
+
+          # Per-SHA check runs minus self (pagination: one array per page -> slurp+add)
           RUNS=$(gh api "repos/$REPO/commits/$SHA/check-runs?per_page=100" --paginate \
                  --jq '[.check_runs[] | {name, status, conclusion, html_url}]' \
-                 | jq -s 'add | map(select(.name != "'"$SELF"'"))')
+                 | jq -s 'add // [] | map(select(.name != "'"$SELF"'"))')
 
           PENDING=$(echo "$RUNS" | jq '[.[] | select(.status != "completed")] | length')
           if [ "$PENDING" -gt 0 ]; then
@@ -78,30 +117,63 @@ jobs:
             exit 0
           fi
 
+          TECH=$(echo "$RUNS" | jq --argjson rg "$REVIEW_GATES" 'map(select(.name as $n | $rg | index($n) | not))')
+          GATES=$(echo "$RUNS" | jq --argjson rg "$REVIEW_GATES" 'map(select(.name as $n | $rg | index($n)))')
+          isfail='map(select(.conclusion as $c | ["failure","timed_out","cancelled","action_required"] | index($c)))'
+          TECH_FAILED=$(echo "$TECH" | jq "$isfail")
+          GATES_NFAIL=$(echo "$GATES" | jq "$isfail | length")
+          NTECHFAIL=$(echo "$TECH_FAILED" | jq 'length')
           TOTAL=$(echo "$RUNS" | jq 'length')
-          # neutral/skipped don't count as failures
-          FAILED=$(echo "$RUNS" | jq '[.[] | select(.conclusion as $c
-                    | ["failure","timed_out","cancelled","action_required"] | index($c))]')
-          NFAIL=$(echo "$FAILED" | jq 'length')
           TS=$(date -u +"%Y-%m-%d %H:%M UTC")
 
-          # NOTE: bodies are assembled with printf, not multi-line literals —
-          # YAML run-block indentation inside a quoted string becomes leading
-          # spaces that GitHub markdown renders as code blocks.
-          if [ "$NFAIL" -eq 0 ]; then
-            BODY=$(printf '%s\n## ✅ All checks green — `%s` checks @ %s\n\nHead: `%s`. Machine-posted; updates per head SHA. Canonical "CI green" evidence link for this PR (evidence-first rule, `docs/workflows/review_tiers.md`).' \
-              "$MARKER" "$TOTAL" "$TS" "$SHA")
+          add_label()    { gh pr edit "$PR" --repo "$REPO" --add-label    review-ready 2>/dev/null || true; }
+          remove_label() { gh pr edit "$PR" --repo "$REPO" --remove-label review-ready 2>/dev/null || true; }
+
+          # bodies via printf (YAML indentation inside literals renders as code blocks)
+          if [ "$NTECHFAIL" -gt 0 ]; then
+            # ── RED: revoke review-ready ──
+            remove_label
+            LIST=$(echo "$TECH_FAILED" | jq -r '.[] | "- ❌ [\(.name)](\(.html_url)) — \(.conclusion)"')
+            BODY=$(printf '%s\n## ❌ Checks FAILED — %s of %s @ %s\n\nHead: `%s`\n\n%s\n\n`review-ready` revoked: not reviewable until tech-green again. Machine-posted; updates per head SHA.' \
+              "$MARKER" "$NTECHFAIL" "$TOTAL" "$TS" "$SHA" "$LIST")
+          elif [ "$GATES_NFAIL" -gt 0 ]; then
+            # ── TECH-GREEN: reviews owed ──
+            add_label
+            BODY=$(printf '%s\n## 🟢 Tech-green — review-ready @ %s\n\nHead: `%s`. All non-review checks pass; review-completeness gates await artifacts.\n\n**Review checklist (sequential; each post must include `<!-- reviewed-sha: %s -->`):**\n- [ ] Red Team review (Sabine/Grothendieck/Knuth)\n- [ ] Gemini review (Furey/Feynman, real API)\n- [ ] Synthesis + fix rounds as needed (each fix push re-runs this cycle)\n- [ ] Human Visual Review (beekeeper)\n\nMachine-posted; updates per head SHA.' \
+              "$MARKER" "$TS" "$SHA" "$SHA")
           else
-            LIST=$(echo "$FAILED" | jq -r '.[] | "- ❌ [\(.name)](\(.html_url)) — \(.conclusion)"')
-            BODY=$(printf '%s\n## ❌ Checks FAILED — %s of %s @ %s\n\nHead: `%s`\n\n%s\n\nMachine-posted; updates per head SHA.' \
-              "$MARKER" "$NFAIL" "$TOTAL" "$TS" "$SHA" "$LIST")
+            # ── ALL-GREEN: review-freshness check (patch-id via marker) ──
+            LASTREV=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
+                      --jq '[.[] | .body]' | jq -s 'add // []' \
+                      | jq -r '[.[] | capture("<!-- reviewed-sha: (?<s>[0-9a-f]{7,40}) -->").s] | last // empty')
+            FRESH="⚠️ review freshness UNVERIFIABLE — no `reviewed-sha` marker found in review comments; confirm reviews cover this head before merging."
+            if [ -n "$LASTREV" ]; then
+              if [ "$LASTREV" = "$SHA" ]; then
+                FRESH="✔️ reviews stamped for this exact head."
+              else
+                # patch-id comparison: identical content (rebase / empty
+                # retrigger commits) keeps reviews fresh; content change
+                # demands a delta round. Stable patch-id ignores hunk offsets.
+                BASEREF=$(gh pr view "$PR" --repo "$REPO" --json baseRefName --jq .baseRefName)
+                git fetch -q origin "$BASEREF" "$SHA" "$LASTREV" 2>/dev/null || true
+                pid() { git diff "$(git merge-base "origin/$BASEREF" "$1")".."$1" 2>/dev/null \
+                        | git patch-id --stable | cut -d' ' -f1; }
+                P_HEAD=$(pid "$SHA" || echo head-err)
+                P_REV=$(pid "$LASTREV" || echo rev-err)
+                if [ -n "$P_HEAD" ] && [ "$P_HEAD" = "$P_REV" ]; then
+                  FRESH="✔️ reviews stamped for \`$LASTREV\`; patch-id identical to head (cosmetic motion only — rebase/retrigger). Reviews remain fresh."
+                else
+                  FRESH="🔶 **DELTA ROUND REQUIRED** — reviews stamped for \`$LASTREV\` but the diff content has changed since (patch-id mismatch). Do not merge on these reviews."
+                fi
+              fi
+            fi
+            BODY=$(printf '%s\n## ✅ ALL GREEN — merge-ready pending beekeeper — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\nMachine-posted; canonical "CI green" evidence link (evidence-first rule, `docs/workflows/review_tiers.md`). Merge remains the beekeeper'"'"'s call.' \
+              "$MARKER" "$TOTAL" "$TS" "$SHA" "$FRESH")
           fi
 
-          # Upsert: find existing marked comment, edit it; else create.
-          # (slurp-flatten across pages, same pagination caveat as above)
           CID=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
                 --jq "[.[] | select(.body | startswith(\"$MARKER\"))]" \
-                | jq -s 'add | (first // {}) | .id // empty' -r)
+                | jq -s 'add // [] | (first // {}) | .id // empty' -r)
           if [ -n "$CID" ]; then
             gh api -X PATCH "repos/$REPO/issues/comments/$CID" -f body="$BODY" > /dev/null
             echo "updated comment $CID"
