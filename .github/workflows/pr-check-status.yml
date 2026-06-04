@@ -32,9 +32,12 @@ permissions:
   checks: read
   contents: read
 
-# collapse simultaneous firings for the same head SHA; keep only the latest
+# collapse simultaneous firings per PR (not per SHA: PR-keying also cancels a
+# stale in-flight run for an OLD head SHA when a new push's suites complete,
+# so an outdated verdict can never overwrite a newer one — review concurrency
+# finding, round 1)
 concurrency:
-  group: pr-check-status-${{ github.event.check_suite.head_sha }}
+  group: pr-check-status-${{ github.event.check_suite.pull_requests[0].number || github.event.check_suite.head_sha }}
   cancel-in-progress: true
 
 jobs:
