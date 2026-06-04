@@ -1,3 +1,8 @@
+import QBP.Foundations.LieAlgebraIso
+import QBP.Foundations.Operations
+import QBP.Foundations.SedenionOctonionCount
+import QBP.Foundations.Octonion32Count
+
 /-!
 # QBP.Foundations — aggregator root for the foundation layer
 
@@ -22,8 +27,3 @@ globs `Foundations/**` directly), so their counts cannot regress silently.
 | `QBP.Foundations.CayleyDickson` | 480-B |
 | `QBP.Foundations.Octonion`      | 480-B |
 -/
-
-import QBP.Foundations.LieAlgebraIso
-import QBP.Foundations.Operations
-import QBP.Foundations.SedenionOctonionCount
-import QBP.Foundations.Octonion32Count
