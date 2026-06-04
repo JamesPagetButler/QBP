@@ -22,6 +22,7 @@ on:
       - 'proofs/lean-toolchain'
       - 'proofs/QBP/Foundations/.lean-gate-baseline.json'
       - 'scripts/check_lean_foundations.py'
+      - 'scripts/check_layer_imports.py'
       - '.github/workflows/lean-foundations.yml'
 
 permissions:
@@ -38,6 +39,8 @@ jobs:
           python-version: '3.11'
       - name: Enforce the foundations proof standard
         run: python3 scripts/check_lean_foundations.py --dir proofs/QBP/Foundations
+      - name: Enforce layer-import DAG + aggregator completeness
+        run: python3 scripts/check_layer_imports.py
 
   lake-build:
     name: lake build (zero errors)
