@@ -2,6 +2,7 @@
 -- Root module that imports all submodules
 
 import QBP.Basic
+import QBP.Foundations
 import QBP.Experiments.SternGerlach
 import QBP.Experiments.DoubleSlit
 import QBP.Optics.Fraunhofer

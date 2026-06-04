@@ -59,7 +59,7 @@ def qk : Q := ⟨0, 0, 0, 1⟩
     ambiguous. Either notation reduces to the same value (commutator
     of the ring), so we standardise on the explicit function form
     here for unambiguous parsing. -/
-def bracket (p q : Q) : Q := p * q - q * p
+noncomputable def bracket (p q : Q) : Q := p * q - q * p
 
 /-! ### Pure-quaternion predicate
 
