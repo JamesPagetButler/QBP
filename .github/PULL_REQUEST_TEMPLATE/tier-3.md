@@ -8,6 +8,42 @@ labels: tier-3-review
 
 <!-- What theoretical or architectural change does this PR introduce? -->
 
+## Theory-element headline: three-way evidence comparison
+
+<!-- REQUIRED for any PR introducing or modifying a theory element that makes a
+     quantitative claim. This is the program's critical-path question in table
+     form: is QBP more predictive of the evidence than the incumbent?
+     Delete this section ONLY for pure-infrastructure / pure-math PRs with no
+     physical claim (state why in Summary).
+
+     UNITS RULE (enforced): ALL quantities in every pillar are stated in QBP
+     canonical format. Conversions happen ONCE at ingestion via QBP/Units
+     (Constants / ScaleFactors / gen_test_vectors) and the conversion is LINKED.
+     Hand-converted or mixed-unit rows are a review-blocking defect — unit
+     mismatch is a historically human-caught error class; exclude it
+     structurally. -->
+
+**Claim under test:** <!-- one sentence -->
+
+| Pillar | Value (QBP canonical units) | Evidence (link, not assertion) |
+|---|---|---|
+| **Experimental evidence** (ground truth) | value ± σ | dataset + supporting papers |
+| **1. QBP prediction** | value | Lean theorem / oracle run |
+| **2. PhysLean baseline** (QM/SM incumbent) | value | bridge derivation; if PhysLean cannot produce this number (its SM layer is structure-only), use a PUBLISHED SM prediction with citation and say so — never leave blank, never let QBP grade its own homework |
+
+**Verdict:** QBP closer / equal / farther than baseline w.r.t. experiment, by <Δ in σ or relative error>
+**Unit conversion provenance:** <!-- link to the QBP/Units conversion used -->
+
+## Mechanical verification evidence (links, not assertions)
+
+<!-- Body claims are not evidence. Every box needs a pointer a reviewer can click.
+     A claim without a link is treated by reviewers as UNVERIFIED. -->
+
+- [ ] Clean-checkout build: <!-- CI run link — a green run from YOUR working dir does not count -->
+- [ ] Gate scripts (foundations ratchet / layer imports / anchor impact): <!-- CI link -->
+- [ ] Differential oracle (PhysLean↔QBP): PASS / FAIL+table / N-A: <!-- run output or link -->
+- [ ] `#print axioms` audit (Lean-bearing PRs): <!-- output location in file or CI log -->
+
 ## Type of Change
 
 - [ ] New axiom or postulate

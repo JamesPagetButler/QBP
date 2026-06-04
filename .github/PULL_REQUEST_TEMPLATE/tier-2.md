@@ -34,6 +34,17 @@ labels: tier-2-review
 - [ ] New tests added (if applicable)
 - [ ] Manual testing performed
 
+## Mechanical verification evidence (links, not assertions)
+
+<!-- Body claims are not evidence. Every applicable box needs a pointer a
+     reviewer can click; a claim without a link is treated as UNVERIFIED.
+     If this PR makes a quantitative physical claim, use the Tier-3 template
+     instead (theory-element headline required there). -->
+
+- [ ] Clean-checkout build/tests: <!-- CI run link -->
+- [ ] Gate scripts touched by this PR's paths: <!-- CI link -->
+- [ ] Differential oracle (if oracle-relevant paths touched): PASS / FAIL+table / N-A: <!-- link -->
+
 ## CTH anchor impact (per `docs/workflows/review_anchoring.md`)
 
 <!--

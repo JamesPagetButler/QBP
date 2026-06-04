@@ -223,6 +223,37 @@ For PRs that go through multiple review rounds, Gemini reviews use `session_id` 
 
 Every BLOCKING-class claim in a Tier 2+ review must terminate at a verifiable artifact: a Lean theorem at file:line, a simulation output with numerical value + source, a published experimental citation, a pre-registered ground-truth document, or a formally derived dimensional/algebraic identity. Reviews containing unanchored blocking claims are **returned to the reviewer** and not read on merits until re-anchored. Full rule + examples + return mechanic: see [`docs/workflows/review_anchoring.md`](review_anchoring.md). Precedent incident: PR #407 Round 1 (three reviewers each missed three one-line check failures).
 
+### Evidence-first discipline (standing rule, effective 2026-06-04)
+
+The anchoring rule's mirror image, applied to the PR **author's** claims:
+
+1. **Body claims are not evidence.** Before content review, the reviewer checks
+   each box in the PR's "Mechanical verification evidence" section against its
+   link. A claim without a link (or with a link to a dirty-working-dir run
+   rather than a clean-checkout CI run) is marked **UNVERIFIED** in the review
+   and the corresponding AC cannot be assessed PASS on the author's word.
+2. **The theory-element headline is a review object.** For Tier-3 theory PRs the
+   three-way comparison table (Experimental evidence | QBP | PhysLean baseline)
+   must be present, complete, and in **QBP canonical units with linked
+   conversion provenance**. Missing pillar, silently-blank baseline, or
+   mixed/hand-converted units = BLOCKING.
+3. **Differential-test rows are review objects.** When the PhysLean↔QBP
+   differential oracle reports FAIL or BOUNDARY rows, the review must reproduce
+   the table and classify each row: *physics discrepancy* / *rounding artifact*
+   / *fixture drift*. "The test ran" is not "the review consumed the test."
+   Precedent: the #492 1-ULP finding (differential run caught what three
+   reviewers reading content could not).
+4. **AC items asserting numerical correctness cite the differential run**, not
+   the author.
+
+Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
+checkout (missing root aggregator; both Tier-3 reviews read content only);
+`LieAlgebraIso.lean` never compiled since authoring (caught by aggregator
+wiring, not review); #492 (caught by differential run, not review).
+
+**Rationalization-prevention addition:** "The PR body says the build is green"
+→ body claims are assertions; only a clean-checkout CI link is evidence.
+
 ### NON-BLOCKING (note but don't block)
 
 - Style suggestions (naming, formatting preferences)
