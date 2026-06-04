@@ -17,24 +17,53 @@ def floatToJson (f : Float) : String :=
   if s.contains '.' then s
   else s ++ ".0"
 
-/-- Generate a single test case as a JSON object string (xz-plane, 1 angle) -/
+/-- Round a Float to the 6-decimal value it is emitted as (half-up at the
+    6th place, matching the magnitude rounding used by the PhysLean-bridge
+    formatter). The result is a Float whose `toString` representation is the
+    exact 6-dp decimal, so subsequent decimal arithmetic on emitted values is
+    exact. Used to make `expectation` a single-source-of-truth derivation of the
+    SAME values emitted for `prob_up` / `prob_down` (QBP #492). -/
+def round6 (x : Float) : Float :=
+  let neg := x < 0.0
+  let a := if neg then -x else x
+  let scaled := (a * 1000000.0 + 0.5).floor
+  let r := scaled / 1000000.0
+  if neg then -r else r
+
+/-- Generate a single test case as a JSON object string (xz-plane, 1 angle).
+
+    `expectation` is NOT supplied by the caller: it is derived here as
+    `prob_up − prob_down` from the SAME 6-dp-rounded values emitted for the
+    probabilities, eliminating the dual-float-path inconsistency of #492 (the
+    independent `vecDot` expectation path rounded differently from the
+    probabilities at 1-ULP boundary angles). The cos-θ expectation lemmas in the
+    proofs are unaffected — this is the Float EMISSION path only. -/
 def testCaseJson (experiment : String) (label : String) (theta : Float)
-    (probUp probDown expectation : Float) : String :=
+    (probUp probDown : Float) : String :=
+  let pUp := round6 probUp
+  let pDown := round6 probDown
+  let expectation := pUp - pDown
   s!"  \{\"experiment\": \"{experiment}\", \"label\": \"{label}\", " ++
   s!"\"theta_rad\": {floatToJson theta}, " ++
-  s!"\"prob_up\": {floatToJson probUp}, " ++
-  s!"\"prob_down\": {floatToJson probDown}, " ++
+  s!"\"prob_up\": {floatToJson pUp}, " ++
+  s!"\"prob_down\": {floatToJson pDown}, " ++
   s!"\"expectation\": {floatToJson expectation}}"
 
-/-- Generate a 3D test case as a JSON object string (arbitrary directions) -/
+/-- Generate a 3D test case as a JSON object string (arbitrary directions).
+
+    As `testCaseJson`, `expectation := prob_up − prob_down` is derived from the
+    emitted 6-dp-rounded probabilities (single source of truth, #492). -/
 def testCase3DJson (experiment : String) (label : String)
     (theta_s phi_s theta_o phi_o : Float)
-    (probUp probDown expectation : Float) : String :=
+    (probUp probDown : Float) : String :=
+  let pUp := round6 probUp
+  let pDown := round6 probDown
+  let expectation := pUp - pDown
   s!"  \{\"experiment\": \"{experiment}\", \"label\": \"{label}\", " ++
   s!"\"theta_s\": {floatToJson theta_s}, \"phi_s\": {floatToJson phi_s}, " ++
   s!"\"theta_o\": {floatToJson theta_o}, \"phi_o\": {floatToJson phi_o}, " ++
-  s!"\"prob_up\": {floatToJson probUp}, " ++
-  s!"\"prob_down\": {floatToJson probDown}, " ++
+  s!"\"prob_up\": {floatToJson pUp}, " ++
+  s!"\"prob_down\": {floatToJson pDown}, " ++
   s!"\"expectation\": {floatToJson expectation}}"
 
 /-- Generate all test cases -/
@@ -47,8 +76,7 @@ def generateTestCases : List String := Id.run do
   let psi01 := floatPsiAngle theta01
   cases := cases ++ [testCaseJson "01" "stern_gerlach_spin_x_on_z" theta01
     (floatProbUp psi01 floatSpinZ)
-    (floatProbDown psi01 floatSpinZ)
-    (floatExpectationValue psi01 floatSpinZ)]
+    (floatProbDown psi01 floatSpinZ)]
 
   -- Experiment 01b: Angle-Dependent (9 angles from 0° to 180°)
   let angles := #[0.0, 22.5, 45.0, 67.5, 90.0, 112.5, 135.0, 157.5, 180.0]
@@ -58,8 +86,7 @@ def generateTestCases : List String := Id.run do
     let label := s!"angle_dep_{floatToJson deg}deg"
     cases := cases ++ [testCaseJson "01b" label theta
       (floatProbUp psi floatSpinZ)
-      (floatProbDown psi floatSpinZ)
-      (floatExpectationValue psi floatSpinZ)]
+      (floatProbDown psi floatSpinZ)]
 
   -- Edge cases: exact 0, π, and 2π
   let edgeCases := #[("edge_theta_0", 0.0),
@@ -69,8 +96,7 @@ def generateTestCases : List String := Id.run do
     let psi := floatPsiAngle theta
     cases := cases ++ [testCaseJson "edge" label theta
       (floatProbUp psi floatSpinZ)
-      (floatProbDown psi floatSpinZ)
-      (floatExpectationValue psi floatSpinZ)]
+      (floatProbDown psi floatSpinZ)]
 
   -- General 3D test cases (#211): arbitrary state and observable directions
   let cases3D := #[
@@ -92,8 +118,7 @@ def generateTestCases : List String := Id.run do
     let obs := floatPsiGeneral to_ po
     cases := cases ++ [testCase3DJson "3d" label ts ps to_ po
       (floatProbUp psi obs)
-      (floatProbDown psi obs)
-      (floatExpectationValue psi obs)]
+      (floatProbDown psi obs)]
 
   -- Experiment 03: Double-Slit test vectors
   -- All cases include input fields so the Python harness can reconstruct computations.
