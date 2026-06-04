@@ -26,16 +26,16 @@ labels: tier-3-review
      historically human-caught error class; exclude it structurally. -->
 
 **Claim under test:** <!-- one sentence -->
-**Dataset choice (look-elsewhere guard):** <!-- cite the pre-registered ground-truth doc, or give a one-line justification why THIS dataset is the consensus ground truth — the author does not get to silently pick the friendliest data -->
+**Dataset choice (look-elsewhere guard):** <!-- cite the pre-registered ground-truth doc. REQUIRED for any verdict-grade claim — no free-text justification substitutes. Exploratory work without pre-registration must state "exploratory — no verdict claimed" and the Verdict line stays empty -->
 
-| Pillar | Value (QBP canonical units) | Evidence (link, not assertion) |
-|---|---|---|
-| **Experimental evidence** (ground truth) | value ± σ | dataset + supporting papers |
-| **1. QBP prediction** | value | Lean theorem / oracle run |
-| **2. PhysLean baseline** (QM/SM incumbent) | value | bridge derivation; if PhysLean cannot produce this number (its SM layer is structure-only), use a PUBLISHED SM prediction with citation and say so — never leave blank, never let QBP grade its own homework |
+| Pillar | Value (QBP canonical units) | Free params | Data status | Evidence (link, not assertion) |
+|---|---|---|---|---|
+| **Experimental evidence** (ground truth) | value ± σ | n/a | n/a | dataset + supporting papers |
+| **1. QBP prediction** | value | count tuned on THIS dataset | in-sample fit / out-of-sample prediction | Lean theorem / oracle run **with exact input fixture/config linked** (same premise standard as theorems — undocumented config is a smuggled premise) |
+| **2. PhysLean baseline** (QM/SM incumbent) | value | count | in-sample / out-of-sample | bridge derivation; if PhysLean cannot produce this number (its SM layer is structure-only), use a PUBLISHED SM prediction with citation and say so — never leave blank, never let QBP grade its own homework |
 
-**Verdict:** QBP closer / equal / farther than baseline w.r.t. experiment, by <Δ in σ or relative error>
-**Unit conversion provenance:** <!-- link to the QBP/Units conversion used -->
+**Verdict:** QBP closer / equal / farther than baseline w.r.t. experiment, by <Δ in σ or relative error> — **valid only with parameter counts disclosed; an in-sample fit may never be scored against an out-of-sample prediction without saying so** (a theory with more knobs can always sit closer; Δ without the Occam columns is not evidence)
+**Unit conversion provenance:** <!-- link to the QBP/Units conversion used. Dimensionless means genuinely unit-free (probabilities, ratios); natural/Planck-unit nondimensionalization (c=ħ=1) does NOT qualify — those quantities still convert via QBP/Units -->
 
 ## Mechanical verification evidence (links, not assertions)
 

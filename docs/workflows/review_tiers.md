@@ -255,6 +255,13 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    any external-library citation inside a `proofs/` derivation as BLOCKING
    epistemic smuggling. (Mirror sentence lands in `layer-architecture.md` §2
    once PR #497 merges — tracked in the migration plan.)
+6. **Truth-in-labelling extends to prose surfaces:** PR titles, commit
+   messages, and review summaries are held to the same standard as Lean
+   identifiers (layer-architecture §3.4) — they state what is established,
+   not what is hoped. An overclaiming title ("proves X" when the kernel
+   proves a weaker Y) is a reviewer-flagged BLOCKING finding: titles and
+   commit messages enter the immutable git log, where they outlive their
+   caveats.
 
 Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
 checkout (missing root aggregator; both Tier-3 reviews read content only);
