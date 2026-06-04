@@ -60,21 +60,16 @@ jobs:
           NFAIL=$(echo "$FAILED" | jq 'length')
           TS=$(date -u +"%Y-%m-%d %H:%M UTC")
 
+          # NOTE: bodies are assembled with printf, not multi-line literals —
+          # YAML run-block indentation inside a quoted string becomes leading
+          # spaces that GitHub markdown renders as code blocks.
           if [ "$NFAIL" -eq 0 ]; then
-            BODY="$MARKER
-          ## ✅ All checks green — \`$TOTAL\` checks @ $TS
-
-          Head: \`$SHA\`. This comment is machine-posted and updates per head SHA; it is the canonical \"CI green\" evidence link for this PR (evidence-first rule, \`docs/workflows/review_tiers.md\`)."
+            BODY=$(printf '%s\n## ✅ All checks green — `%s` checks @ %s\n\nHead: `%s`. Machine-posted; updates per head SHA. Canonical "CI green" evidence link for this PR (evidence-first rule, `docs/workflows/review_tiers.md`).' \
+              "$MARKER" "$TOTAL" "$TS" "$SHA")
           else
             LIST=$(echo "$FAILED" | jq -r '.[] | "- ❌ [\(.name)](\(.html_url)) — \(.conclusion)"')
-            BODY="$MARKER
-          ## ❌ Checks FAILED — $NFAIL of $TOTAL @ $TS
-
-          Head: \`$SHA\`
-
-          $LIST
-
-          Machine-posted; updates per head SHA."
+            BODY=$(printf '%s\n## ❌ Checks FAILED — %s of %s @ %s\n\nHead: `%s`\n\n%s\n\nMachine-posted; updates per head SHA.' \
+              "$MARKER" "$NFAIL" "$TOTAL" "$TS" "$SHA" "$LIST")
           fi
 
           # Upsert: find existing marked comment, edit it; else create.
