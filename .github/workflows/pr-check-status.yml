@@ -1,0 +1,111 @@
+# PR check-status notifier — posts ONE upserted comment per PR with the final
+# check verdict for the current head SHA, timestamped.
+#
+# Why (2026-06-04, two incidents in one day): humans and agents kept acting on
+# STALE check states — a "ready to merge" claim made without re-querying, and a
+# red verdict read after the gate had already re-run green. This makes the PR
+# conversation itself carry a machine-stamped verdict for the current head, so
+# "CI green" claims have a canonical artifact to link (evidence-first rule,
+# docs/workflows/review_tiers.md).
+#
+# Behavior:
+#   - fires when any check suite completes
+#   - if other suites for the same SHA are still running -> exits quietly
+#   - else upserts (edit-in-place, never spam) a single marked comment:
+#       ALL GREEN (N checks) @ timestamp for sha
+#       or FAILED: <names + links> @ timestamp for sha
+#   - new push -> next completion updates the comment for the new SHA
+
+name: PR check-status notifier
+
+# KNOWN LIMITATION: check_suite payloads carry an empty pull_requests[] for
+# FORK PRs, so fork PRs get no verdict comment (acceptable for this repo:
+# solo maintainer + agent sessions, same-repo branches only — documented per
+# review finding #3 so a future external PR's silence isn't a mystery).
+
+on:
+  check_suite:
+    types: [completed]
+
+permissions:
+  pull-requests: write
+  checks: read
+  contents: read
+
+# collapse simultaneous firings per PR (not per SHA: PR-keying also cancels a
+# stale in-flight run for an OLD head SHA when a new push's suites complete,
+# so an outdated verdict can never overwrite a newer one — review concurrency
+# finding, round 1)
+concurrency:
+  group: pr-check-status-${{ github.event.check_suite.pull_requests[0].number || github.event.check_suite.head_sha }}
+  cancel-in-progress: true
+
+jobs:
+  notify:
+    # IMPORTANT: this job name is the notifier's own check-run name; the query
+    # below excludes it by name so the notifier never counts itself as pending
+    # (review finding #1 — without the self-filter, PENDING never reaches 0
+    # and the notifier structurally never posts).
+    name: pr-check-status-notify
+    # only suites attached to a PR
+    if: ${{ github.event.check_suite.pull_requests[0] != null }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compose and upsert verdict comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.check_suite.pull_requests[0].number }}
+          SHA: ${{ github.event.check_suite.head_sha }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- pr-check-status-notifier -->"
+
+          # All check runs for this SHA (across suites — per-SHA scoping is
+          # deliberate: the verdict covers ALL checks, not one suite), EXCLUDING
+          # the notifier's own run (self-filter, review finding #1).
+          # NOTE on pagination (review finding #8): `gh api --paginate --jq`
+          # emits one JSON array PER PAGE (concatenated docs), so we slurp and
+          # flatten to a single array before counting.
+          SELF="pr-check-status-notify"
+          RUNS=$(gh api "repos/$REPO/commits/$SHA/check-runs?per_page=100" --paginate \
+                 --jq '[.check_runs[] | {name, status, conclusion, html_url}]' \
+                 | jq -s 'add | map(select(.name != "'"$SELF"'"))')
+
+          PENDING=$(echo "$RUNS" | jq '[.[] | select(.status != "completed")] | length')
+          if [ "$PENDING" -gt 0 ]; then
+            echo "$PENDING check(s) still running for $SHA — not posting yet."
+            exit 0
+          fi
+
+          TOTAL=$(echo "$RUNS" | jq 'length')
+          # neutral/skipped don't count as failures
+          FAILED=$(echo "$RUNS" | jq '[.[] | select(.conclusion as $c
+                    | ["failure","timed_out","cancelled","action_required"] | index($c))]')
+          NFAIL=$(echo "$FAILED" | jq 'length')
+          TS=$(date -u +"%Y-%m-%d %H:%M UTC")
+
+          # NOTE: bodies are assembled with printf, not multi-line literals —
+          # YAML run-block indentation inside a quoted string becomes leading
+          # spaces that GitHub markdown renders as code blocks.
+          if [ "$NFAIL" -eq 0 ]; then
+            BODY=$(printf '%s\n## ✅ All checks green — `%s` checks @ %s\n\nHead: `%s`. Machine-posted; updates per head SHA. Canonical "CI green" evidence link for this PR (evidence-first rule, `docs/workflows/review_tiers.md`).' \
+              "$MARKER" "$TOTAL" "$TS" "$SHA")
+          else
+            LIST=$(echo "$FAILED" | jq -r '.[] | "- ❌ [\(.name)](\(.html_url)) — \(.conclusion)"')
+            BODY=$(printf '%s\n## ❌ Checks FAILED — %s of %s @ %s\n\nHead: `%s`\n\n%s\n\nMachine-posted; updates per head SHA.' \
+              "$MARKER" "$NFAIL" "$TOTAL" "$TS" "$SHA" "$LIST")
+          fi
+
+          # Upsert: find existing marked comment, edit it; else create.
+          # (slurp-flatten across pages, same pagination caveat as above)
+          CID=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
+                --jq "[.[] | select(.body | startswith(\"$MARKER\"))]" \
+                | jq -s 'add | (first // {}) | .id // empty' -r)
+          if [ -n "$CID" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$CID" -f body="$BODY" > /dev/null
+            echo "updated comment $CID"
+          else
+            gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$BODY" > /dev/null
+            echo "created comment"
+          fi
