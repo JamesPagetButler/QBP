@@ -29,7 +29,29 @@
 
 name: PR check-status notifier
 
+# TRIGGER DESIGN (post-#508 live-test finding): check_suite:completed events
+# from ACTIONS-CREATED suites never trigger workflows (GitHub's recursion
+# guard) — on its first live PR the #508 notifier only fired on CodeQL's
+# suites and structurally could not see the last Actions check finish.
+# workflow_run:completed is the supported channel for Actions workflows; the
+# check_suite trigger is kept for non-Actions apps (CodeQL etc.).
+# MAINTENANCE: a NEW workflow added to the repo must be appended to the
+# workflow_run list below, or its completion won't re-evaluate the verdict
+# (a later-finishing unlisted workflow = missed final event).
 on:
+  workflow_run:
+    workflows:
+      - Lean Foundations Gate
+      - CTH Schema Lint
+      - Link Checker
+      - CTH Anchor Impact
+      - CI
+      - Tier-3 Review Gate
+      - Differential Test (Phase 4d)
+      - Lint
+      - Tenancy XRef Lint
+      - Validate JSON
+    types: [completed]
   check_suite:
     types: [completed]
   pull_request:
@@ -42,7 +64,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: pr-check-status-${{ github.event.check_suite.pull_requests[0].number || github.event.pull_request.number || github.event.check_suite.head_sha }}
+  group: pr-check-status-${{ github.event.check_suite.pull_requests[0].number || github.event.workflow_run.pull_requests[0].number || github.event.pull_request.number || github.event.check_suite.head_sha || github.event.workflow_run.head_sha }}
   cancel-in-progress: true
 
 jobs:
@@ -83,7 +105,7 @@ jobs:
     # IMPORTANT: this job name is the notifier's own check-run name; the query
     # below excludes it by name (self-counting fix, #508 review finding #1).
     name: pr-check-status-notify
-    if: ${{ github.event_name == 'check_suite' && github.event.check_suite.pull_requests[0] != null }}
+    if: ${{ (github.event_name == 'check_suite' && github.event.check_suite.pull_requests[0] != null) || (github.event_name == 'workflow_run' && github.event.workflow_run.pull_requests[0] != null) }}
     runs-on: ubuntu-latest
     steps:
       # full history so patch-ids can be computed for both head and the
@@ -95,8 +117,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          PR: ${{ github.event.check_suite.pull_requests[0].number }}
-          SHA: ${{ github.event.check_suite.head_sha }}
+          PR: ${{ github.event.check_suite.pull_requests[0].number || github.event.workflow_run.pull_requests[0].number }}
+          SHA: ${{ github.event.check_suite.head_sha || github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
           MARKER="<!-- pr-check-status-notifier -->"
