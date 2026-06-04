@@ -129,3 +129,36 @@ jobs:
 
           echo ""
           echo "All ${#INVENTORIES[@]} CTH inventories pass v0.3 schema validation."
+
+  invariants:
+    # Issue #463: cross-field invariants the JSON Schema cannot express
+    # (status/proof_state consistency). Runs alongside schema validation.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Lint CTH cross-field invariants (#463)
+        # INV1: untested => no proof artifact; INV2/INV3: verified => pinned
+        # toolchain + library SHAs + all theorems verified (rebuild rules #14-#16).
+        #
+        # SCOPE: the CANONICAL working inventory only, NOT every archived snapshot.
+        # Older frozen snapshots (e.g. v5.13.json) legitimately carry pre-fix
+        # inconsistencies and must not be retro-gated — they are historical records,
+        # not the live inventory. (schema-lint validates all files; invariants gate
+        # only the canonical one.)
+        #
+        # Default mode (no --strict-provenance): the #463 AC's
+        # "untested => provenance_kind == theory" clause is intentionally NOT
+        # enforced — it is too strict for real data (experiment/internal-compute
+        # anchors can legitimately be untested). See scripts/check_cth_invariants.py
+        # docstring + the PR description; beekeeper to confirm whether to enable
+        # --strict-provenance.
+        run: |
+          set -euo pipefail
+          python3 scripts/check_cth_invariants.py \
+            'archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json'
