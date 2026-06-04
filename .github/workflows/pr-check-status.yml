@@ -63,15 +63,23 @@ permissions:
   checks: read
   contents: read
 
-concurrency:
-  group: pr-check-status-${{ github.event.check_suite.pull_requests[0].number || github.event.workflow_run.pull_requests[0].number || github.event.pull_request.number || github.event.check_suite.head_sha || github.event.workflow_run.head_sha }}
-  cancel-in-progress: true
+# CONCURRENCY (review round-1, Gemini blocking finding): the two jobs are
+# separate AXES and must never share a cancellation group — a slow OLD-SHA
+# suite completion firing notify could cancel a NEW-SHA tier-label run (the
+# new commit would silently miss its tier classification). Job-level groups
+# (below) separate the axes; within each axis, stale runs still cancel.
+# (Job-level rather than event_name-keyed: after the workflow_run trigger fix,
+# notify fires from TWO event types — event_name keying would let two notify
+# instances race the comment upsert.)
 
 jobs:
   # ── Phase 0: tier label from changed paths (instant, deterministic) ─────────
   tier-label:
     name: pr-tier-label
     if: ${{ github.event_name == 'pull_request' }}
+    concurrency:
+      group: pr-tier-label-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - name: Classify tier from changed paths and apply label if absent
@@ -106,6 +114,9 @@ jobs:
     # below excludes it by name (self-counting fix, #508 review finding #1).
     name: pr-check-status-notify
     if: ${{ (github.event_name == 'check_suite' && github.event.check_suite.pull_requests[0] != null) || (github.event_name == 'workflow_run' && github.event.workflow_run.pull_requests[0] != null) }}
+    concurrency:
+      group: pr-notify-${{ github.event.check_suite.pull_requests[0].number || github.event.workflow_run.pull_requests[0].number }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       # full history so patch-ids can be computed for both head and the
