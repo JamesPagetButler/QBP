@@ -245,6 +245,16 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    reviewers reading content could not).
 4. **AC items asserting numerical correctness cite the differential run**, not
    the author.
+5. **External-comparator rule (beekeeper-ratified 2026-06-04):** external
+   physics libraries (PhysLean/physlib or any successor) are **never premises,
+   only comparators**. No QBP theorem may import them or cite their theorems as
+   proof steps; they appear exclusively as the baseline pillar of the three-way
+   headline and in the differential harness, touching QBP only at the JSON
+   boundary. Mechanically backstopped: external libraries are absent from
+   QBP's lake manifest, so a smuggled import fails the build. Reviewers treat
+   any external-library citation inside a `proofs/` derivation as BLOCKING
+   epistemic smuggling. (Mirror sentence lands in `layer-architecture.md` §2
+   once PR #497 merges — tracked in the migration plan.)
 
 Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
 checkout (missing root aggregator; both Tier-3 reviews read content only);
