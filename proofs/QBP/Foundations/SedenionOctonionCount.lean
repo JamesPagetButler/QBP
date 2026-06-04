@@ -135,17 +135,20 @@ def isAlternative (H : List (Fin 16)) : Prop :=
 instance (H : List (Fin 16)) : Decidable (isAlternative H) := by
   unfold isAlternative; infer_instance
 
-/-- The number of the 15 hyperplanes whose subalgebra is alternative
-    (= isomorphic to 𝕆). -/
-def octonionCount : Nat :=
+/-- The number of the 15 hyperplanes whose subalgebra is alternative.
+    (Each such 8-dim alternative subalgebra is ≅ 𝕆 by Hurwitz/Zorn — cited,
+    not proved in Lean; this identifier names only the kernel-checked fact,
+    the alternativity count.) -/
+def alternativeHyperplaneCount : Nat :=
   (List.finRange 15).countP (fun n => decide (isAlternative (hyperIdx n)))
 
 /-! ## 4. Main results -/
 
 /-- **Main theorem.** Exactly 8 of the 15 hyperplane subalgebras of the
-    Cayley–Dickson sedenion frame are alternative — i.e. ≅ 𝕆. So `k = 8`,
+    Cayley–Dickson sedenion frame are alternative. (Each such 8-dim alternative
+    subalgebra is ≅ 𝕆 by Hurwitz/Zorn, cited not proved in Lean.) So `k = 8`,
     not 15: the threshold-ladder factor `ln k` uses `k = 8`. -/
-theorem octonion_count_eq_eight : octonionCount = 8 := by
+theorem alternative_hyperplane_count_eq_eight : alternativeHyperplaneCount = 8 := by
   decide
 
 /-- The 8 PASSING hyperplanes are exactly the normals 1..8 (`Fin 15` indices
@@ -260,5 +263,23 @@ theorem partition_8_7 :
     (List.finRange 15).countP (fun n => decide (isAlternative (hyperIdx n))) = 8 ∧
     (List.finRange 15).countP (fun n => decide (¬ isAlternative (hyperIdx n))) = 7 := by
   refine ⟨?_, ?_⟩ <;> decide
+
+/-! ## 7. Completeness audit — `#print axioms` on every main theorem
+
+    Each must depend only on the three standard axioms
+    `{propext, Classical.choice, Quot.sound}` (no `sorryAx`, no native/reduceBool
+    axiom). Reported in the build log. -/
+
+#print axioms alternative_hyperplane_count_eq_eight
+#print axioms alternative_passes
+#print axioms alternative_fails
+#print axioms partition_8_7
+#print axioms zero_divisor_normal9
+#print axioms zero_divisor_normal10
+#print axioms zero_divisor_normal11
+#print axioms zero_divisor_normal12
+#print axioms zero_divisor_normal13
+#print axioms zero_divisor_normal14
+#print axioms zero_divisor_normal15
 
 end QBP.Foundations.SedenionOctonionCount

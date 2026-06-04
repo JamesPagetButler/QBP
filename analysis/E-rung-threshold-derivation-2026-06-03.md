@@ -38,7 +38,7 @@ hyperplanes (all XOR-closed, all spanning 8-dim subalgebras), only the 8 with
 normal n ≤ 8 are octonion copies; the 7 with normal n ≥ 9 (those mixing the two
 doubling halves) contain explicit zero divisors — e.g. (e₂+e₉)(e₄+e₁₅) = 0.
 Lean: `proofs/QBP/Foundations/SedenionOctonionCount.lean`, branch
-`foundations/o1a-sedenion-octonion-count`, theorems `octonion_count_eq_eight`,
+`foundations/o1a-sedenion-octonion-count`, theorems `alternative_hyperplane_count_eq_eight`,
 `partition_8_7`, `zero_divisor_normal9..15`; axioms ⊆ {propext, Classical.choice,
 Quot.sound}; independent Python cross-check agrees. Caveats: alternativity
 checked on basis triples (closed by trilinearity, standard); the

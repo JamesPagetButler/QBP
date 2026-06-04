@@ -51,7 +51,7 @@ kernel-checked theorem. The algebra must build standalone, forever.
 ## 3. The Foundations → Physics interface contract
 
 1. Physics consumes Foundations theorems **by name** (e.g.
-   `octonion_count_eq_eight`, `crossing_pass_iff_discriminator`). Physics never
+   `alternative_hyperplane_count_eq_eight`, `crossing_pass_iff_discriminator`). Physics never
    states an `axiom` about a foundation object — any algebraic fact it needs is
    proven in Foundations first, then cited (the claim→lemma map).
 2. Foundations never mentions energy, mass, time, temperature, or crystallisation

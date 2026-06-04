@@ -15,8 +15,9 @@
   Results (all kernel-checked below; independently Python-verified against the
   genuine CD doubling recursion (a,b)(c,d) = (ac − d*b, da + bc*)):
 
-  • D3 — `octonion_count_32_eq_fifty`: exactly **50** of the 155 are octonion
-    copies, split **8 + 42** (`base_plus_crossing_eq_fifty`): 8 lie inside the
+  • D3 — `alternative_subspace_count_32_eq_fifty`: exactly **50** of the 155 are
+    alternative 8-dim subalgebras (≅ 𝕆 by Hurwitz/Zorn, cited not proved in
+    Lean), split **8 + 42** (`base_plus_crossing_eq_fifty`): 8 lie inside the
     base sedenion (all indices < 16; these are the O1a result restated in 𝕋),
     42 cross into the doubled half.
 
@@ -611,8 +612,10 @@ theorem forty_two_split :
 /-! ## 9. Theorem 1 (D3) — exactly 50 of the 155 subspaces are octonion copies -/
 
 /-- The number of the 155 candidate 8-dim frame subalgebras (with `e₀` adjoined)
-    that are alternative — i.e. octonion copies. -/
-def octonionCount : Nat :=
+    that are alternative. (Each such 8-dim alternative subalgebra is ≅ 𝕆 by
+    Hurwitz/Zorn — cited, not proved in Lean; this identifier names only the
+    kernel-checked fact, the alternativity count.) -/
+def alternativeSubspaceCount : Nat :=
   subspaces.countP (fun H => decide (isAlternative (withUnit H)))
 
 /-- The number of the 155 that are alternative AND lie entirely inside the base
@@ -625,10 +628,11 @@ def crossAlternativeCount : Nat :=
   subspaces.countP (fun H => H.any (·.val ≥ 16) && decide (isAlternative (withUnit H)))
 
 /-- **D3 — the count.** Exactly **50** of the 155 candidate 8-dim frame
-    subalgebras of the 32-dim Cayley–Dickson algebra 𝕋 = CD(𝕊) are octonion
-    copies (alternative). So k(5) = 50, not 2⁵−1 = 31 and not 155. -/
-theorem octonion_count_32_eq_fifty : octonionCount = 50 := by
-  unfold octonionCount
+    subalgebras of the 32-dim Cayley–Dickson algebra 𝕋 = CD(𝕊) are alternative.
+    (Each such 8-dim alternative subalgebra is ≅ 𝕆 by Hurwitz/Zorn, cited not
+    proved in Lean.) So k(5) = 50, not 2⁵−1 = 31 and not 155. -/
+theorem alternative_subspace_count_32_eq_fifty : alternativeSubspaceCount = 50 := by
+  unfold alternativeSubspaceCount
   decide +kernel
 
 /-- **The 8 + 42 split of the 50.** Of the 50 octonion copies, 8 lie inside the
@@ -637,11 +641,11 @@ theorem octonion_count_32_eq_fifty : octonionCount = 50 := by
 theorem base_plus_crossing_eq_fifty :
     baseAlternativeCount = 8 ∧
     crossAlternativeCount = 42 ∧
-    baseAlternativeCount + crossAlternativeCount = octonionCount := by
+    baseAlternativeCount + crossAlternativeCount = alternativeSubspaceCount := by
   have hbase : baseAlternativeCount = 8 := by unfold baseAlternativeCount; decide +kernel
   have hcross : crossAlternativeCount = 42 := by unfold crossAlternativeCount; decide +kernel
   refine ⟨hbase, hcross, ?_⟩
-  rw [hbase, hcross, octonion_count_32_eq_fifty]
+  rw [hbase, hcross, alternative_subspace_count_32_eq_fifty]
 
 /-! ## 10. Completeness audit — `#print axioms` on every main theorem
 
@@ -649,7 +653,7 @@ theorem base_plus_crossing_eq_fifty :
     `{propext, Classical.choice, Quot.sound}` (no `sorryAx`, no native/reduceBool
     axiom). Reported in the build log. -/
 
-#print axioms octonion_count_32_eq_fifty
+#print axioms alternative_subspace_count_32_eq_fifty
 #print axioms base_plus_crossing_eq_fifty
 #print axioms base_copies_persist
 #print axioms base_copies_inside_sedenion
