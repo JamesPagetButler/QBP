@@ -69,7 +69,11 @@
 - [ ] **Phase 5: Publication** — Paper section §XIV (or appropriate Roman numeral) documenting Sprint 4 results. Tracking issue TBD.
 - [ ] **Theory Refinement** — Sprint 4 implications for #81-equivalent theory train.
 - [ ] **Research Gate (Sprint 4 form):** `python scripts/research_gate.py --scope sprint-4`
-- [ ] **Retrospective** — Sprint 4 retrospective issue TBD (created at Sprint 4 close).
+- [ ] **Retrospective** — Sprint 4 retrospective issue TBD (created at Sprint 4 close). **MUST include Process Fault Analysis + recurring-pattern review (below).**
+
+**Sprint 4 Retrospective — Process Fault Analysis (REQUIRED):**
+- [ ] Review FAULT-S4-001 (theory PRs #480/#484/#491 merged without the Tier-3 gate firing; human on remote trusting green status reports).
+- [ ] **Review PATTERN-01 (governance gate bypassed when no *mechanical* gate exists) — `docs/process_violation_log.md`.** This is the program's **dominant recurring** failure class: FAULT-S3-001 (admin-bypass CI), S3-007 (merge w/o human approval), S3-008 (code w/o issue), **S4-001 (merge w/o Tier-3 review)** — 4 faults / 3 sprints / 1 root cause. Record the verdict: **RESOLVED / STILL-OPEN / RECURRED.** Resolution criterion: #481's mechanical gates (tier-3-label-or-fail + all-checks-green branch protection) live on `master` AND a theory PR demonstrably blocked by them. **Do NOT mark RESOLVED on the strength of another point-fix rule — only mechanical enforcement closes it.** If a new bypass fault was logged this sprint → RECURRED, and #481 is overdue.
 
 **Open questions inherited from `research/quaternionic_tensor_product_survey.md` §10 to track during Sprint 4:**
 - Fermion doubling on ℍ⊗ℍ — does PR #435 chirality invariant provide a grading operator γ, or must orientability be axiomatised?

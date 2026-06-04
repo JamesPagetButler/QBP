@@ -1,0 +1,52 @@
+# Tier-3 review-label gate — issue #481 Addition 1 (beekeeper-directed, FAULT-S4-001 fix).
+#
+# Theory-bearing PRs (proofs/**.lean, archive/cth-inventory/*.json, paper/**, docs/foundations/**)
+# must carry the `tier-3-review` label, backed by posted Red Team / Gemini review comments.
+# Makes "the Tier-3 review fired" a mechanical merge precondition — removes Oppenheimer AND the
+# beekeeper as single points of failure (theory PRs #480/#484/#491 merged review-less because the
+# gate was discipline-only and the human was remote).
+#
+# Pairs with branch protection: this check must be REQUIRED on master (beekeeper applies the
+# protection setting; this workflow provides the check).
+
+name: Tier-3 Review Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  tier-3-label:
+    name: Tier-3 review-label required on theory-bearing diffs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Collect changed files
+        run: |
+          git diff --name-only "${{ github.event.pull_request.base.sha }}" \
+            "${{ github.event.pull_request.head.sha }}" > /tmp/changed.txt
+          echo "changed files:"; cat /tmp/changed.txt
+      - name: Collect labels + comments
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh api "repos/${{ github.repository }}/issues/${PR}/labels" --jq '.[].name' > /tmp/labels.txt || true
+          gh api "repos/${{ github.repository }}/issues/${PR}/comments" --jq '.[].body' > /tmp/comments.txt || true
+          # include the PR body itself (review verdicts are sometimes posted there)
+          gh api "repos/${{ github.repository }}/pulls/${PR}" --jq '.body' >> /tmp/comments.txt || true
+      - name: Enforce Tier-3 review label
+        run: |
+          python3 scripts/check_tier3_label.py \
+            --changed-files /tmp/changed.txt \
+            --labels-file /tmp/labels.txt \
+            --comments-file /tmp/comments.txt
