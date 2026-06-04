@@ -60,6 +60,13 @@ kernel-checked theorem. The algebra must build standalone, forever.
 3. Boundary rule of thumb settled by (2): `ln 7` as combinatorics (selection
    count) is Foundations; `M_seed` (the S_BH bridge to mass) is Physics.
    (`FanoChoiceInformation` splits accordingly when next touched.)
+4. **Truth-in-labelling (no name-smuggling):** Foundations identifiers (defs,
+   theorems) must state exactly what the kernel proves. Cited-but-unproved
+   classifications (e.g. Hurwitz/Zorn "alternative + 8-dim + positive norm ⟹ 𝕆")
+   may appear in docstrings WITH the explicit "cited, not proved in Lean" caveat,
+   but never in identifiers — a name is an interface, and an unproven claim in a
+   name crosses the Foundations→Physics boundary with credibility it hasn't
+   earned. (Added per PR #497 Tier-3 Gemini review, finding G2.)
 
 ## 4. Crystallisation is configuration, not conditional mathematics
 

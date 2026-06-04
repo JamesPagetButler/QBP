@@ -13,17 +13,16 @@ in types or theorem statements (doc-comments only).
 
 Build: `lake build QBP.Foundations`
 
-## Quarantine table (NOT imported; pending beekeeper HVR decision 480-B)
+## Deletion record (480-B resolved: beekeeper ruling 2026-06-04, option c)
 
-The #471 skeleton files shipped orphaned via #480 (16 sorries, 8 vacuous-True
-between them). They stay out of the aggregator until the wire-or-quarantine
-ruling, but remain visible to the ratchet gate (`scripts/check_lean_foundations.py`
-globs `Foundations/**` directly), so their counts cannot regress silently.
+The #471 skeleton files (shipped orphaned via #480's squash; sorries +
+vacuous-True stubs; pre-dating the re-derive-native scope ratification) were
+DELETED in this PR rather than wired or quarantined. Their intended-theorem
+inventory is preserved as the rebuild plan of record in issue #503, with
+per-claim dispositions (done / superseded / rebuild-under-conventions).
+The ratchet baseline (`.lean-gate-baseline.json`) is zeroed in the same
+change: the Foundations gate now enforces ZERO sorry / ZERO vacuous-True,
+permanently.
 
-| Quarantined module | Tracking |
-|---|---|
-| `QBP.Foundations.Breakdown`     | 480-B |
-| `QBP.Foundations.Sedenion`      | 480-B |
-| `QBP.Foundations.CayleyDickson` | 480-B |
-| `QBP.Foundations.Octonion`      | 480-B |
+Deleted: Breakdown, Sedenion, CayleyDickson, Octonion (see #503).
 -/
