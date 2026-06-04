@@ -1,3 +1,4 @@
+import QBP.Foundations.FanoOrientationF3
 import QBP.Foundations.LieAlgebraIso
 import QBP.Foundations.Operations
 import QBP.Foundations.SedenionOctonionCount
