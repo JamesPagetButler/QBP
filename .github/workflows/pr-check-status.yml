@@ -143,15 +143,29 @@ jobs:
 
           # PR resolution: payload first, API fallback (payload pull_requests[]
           # is unreliable — empty for real same-repo PRs; observed on #512).
+          # EXACT head-SHA match only (review #517 blocking #1): the endpoint
+          # returns every open PR whose branch CONTAINS the commit, so a loose
+          # `first` can post the verdict to the wrong PR in stacked branches.
+          # Verdicts are per-head — a SHA that heads no open PR gets none.
           if [ -z "${PR:-}" ]; then
             PR=$(gh api "repos/$REPO/commits/$SHA/pulls" \
-                 --jq '[.[] | select(.state == "open")] | (first // {}) | .number // empty')
+                 --jq '[.[] | select(.state == "open" and .head.sha == "'"$SHA"'")] | (first // {}) | .number // empty')
           fi
           if [ -z "${PR:-}" ]; then
-            echo "no open PR found for $SHA — not a PR head; nothing to do."
+            echo "no open PR headed by $SHA — nothing to do."
             exit 0
           fi
-          echo "resolved PR #$PR for $SHA"
+          # Stale-verdict guard (review #517 blocking #2): per-SHA concurrency
+          # means an old-SHA run is not cancelled by a new push; without this
+          # guard it could PATCH the marker comment with an outdated verdict
+          # AFTER the correct one. If the PR head has advanced past our event
+          # SHA, this run is history — exit.
+          HEADNOW=$(gh pr view "$PR" --repo "$REPO" --json headRefOid --jq .headRefOid)
+          if [ "$HEADNOW" != "$SHA" ]; then
+            echo "stale event: PR #$PR head is $HEADNOW, event SHA $SHA — exiting."
+            exit 0
+          fi
+          echo "resolved PR #$PR for $SHA (current head)"
           # review-completeness gates excluded from TECH-GREEN (they cannot be
           # green before reviews exist — the deadlock this design dissolves).
           # Single source of truth for the excluded list:
@@ -248,7 +262,10 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -u
+          # exact head-SHA match, same rule as the main resolver (review #517)
           PR=$(gh api "repos/$REPO/commits/$SHA/pulls" \
-               --jq '[.[] | select(.state == "open")] | (first // {}) | .number // empty' || true)
+               --jq '[.[] | select(.state == "open" and .head.sha == "'"$SHA"'")] | (first // {}) | .number // empty' || true)
           [ -z "${PR:-}" ] && { echo "no PR to warn"; exit 0; }
-          gh pr comment "$PR" --repo "$REPO" --body "⚠️ **pr-check-status notifier ERRORED** on \\\`$SHA\\\` — no verdict was posted for this head. Check the run: $RUN_URL. Do not trust any older verdict comment above." || true
+          # single-quoted printf — no hand-escaped backticks anywhere (127 class)
+          WARN=$(printf '⚠️ **pr-check-status notifier ERRORED** on `%s` — no verdict was posted for this head. Check the run: %s. Do not trust any older verdict comment above.' "$SHA" "$RUN_URL")
+          gh pr comment "$PR" --repo "$REPO" --body "$WARN" || true
