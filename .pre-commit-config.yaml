@@ -32,3 +32,19 @@ repos:
         language: python
         files: ^knowledge/
         pass_filenames: false
+    # PhysLean<->QBP differential guard: bit-exact cross-backend check of the
+    # oracle ground truth against the (out-of-tree, prebuilt) PhysLean bridge.
+    # Skips loudly + exits 0 when the ~8 GB bridge is absent (never builds it).
+    -   id: physlean-differential
+        name: PhysLean<->QBP differential guard
+        entry: python scripts/check_physlean_differential.py
+        language: python
+        pass_filenames: false
+        files: >-
+            (?x)^(
+              proofs/QBP/Oracle/|
+              tests/oracle_predictions\.json$|
+              proofs-physlean-bridge/(?!\.lake)|
+              proofs/lean-toolchain$|
+              proofs/lake-manifest\.json$
+            )

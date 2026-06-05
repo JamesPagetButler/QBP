@@ -52,8 +52,27 @@ def probUp (θ : Float) : Float := (Float.cos (θ / 2)) ^ 2
 /-- prob_down evaluated from the PROVEN closed form `sin²(θ/2)` (`probDown_eq`). -/
 def probDown (θ : Float) : Float := (Float.sin (θ / 2)) ^ 2
 
-/-- expectation evaluated from the PROVEN closed form `cos θ` (`expectation_eq`). -/
-def expectation (θ : Float) : Float := Float.cos θ
+/-- Round a `Float` to the 6-decimal value it is emitted as (half-up at the 6th
+    place). The result is the exact 6-dp decimal as a `Float`, so subsequent
+    decimal arithmetic on emitted values is exact. Identical rounding to QBP's
+    `round6` in `proofs/QBP/Oracle/Main.lean` and to the magnitude rounding in
+    `fmt6` below — this is the single rule both backends share (#492). -/
+def round6 (x : Float) : Float :=
+  let neg := x < 0.0
+  let a := if neg then -x else x
+  let scaled := (a * 1000000.0 + 0.5).floor
+  let r := scaled / 1000000.0
+  if neg then -r else r
+
+/-- `expectation` is a DERIVED field: both backends emit
+    `round6(prob_up) − round6(prob_down)` by convention (#492); the physics
+    comparison lives in the independently-derived probabilities. This replaces
+    the previous independent `Float.cos θ` path, which rounded differently from
+    the emitted probabilities at 1-ULP boundary angles (e.g. 45°). The PROVEN
+    cos-θ law (`expectation_eq` in `SpinMeasurement.lean`) is unaffected — this
+    is the Float EMISSION path only. -/
+def expectation (θ : Float) : Float :=
+  round6 (probUp θ) - round6 (probDown θ)
 
 /-- Format a Float to 6 decimal places (matching the oracle's `%f` formatting). -/
 def fmt6 (x : Float) : String :=
@@ -67,7 +86,12 @@ def fmt6 (x : Float) : String :=
   let pad := String.mk (List.replicate (6 - fracStr.length) '0')
   (if neg && n != 0 then "-" else "") ++ toString intPart ++ "." ++ pad ++ fracStr
 
-/-- One JSON object row in QBP's schema. -/
+/-- One JSON object row in QBP's schema.
+
+    `expectation` is emitted from `round6(prob_up) − round6(prob_down)` — the
+    SAME 6-dp-rounded probability values emitted for `prob_up` / `prob_down`,
+    making it a single-source-of-truth derivation (#492) rather than an
+    independent cos-θ float path. -/
 def rowJson (label : String) (θ : Float) : String :=
   "  {\"experiment\": \"01b\", \"label\": \"" ++ label ++
   "\", \"theta_rad\": " ++ fmt6 θ ++

@@ -5,14 +5,25 @@ PhysLean <-> QBP differential test (QBP issue #490, AC-T3 / AC-T4).
 Compares the JSON emitted by the `physlean_oracle` Lean executable against
 QBP's ground-truth oracle (`tests/oracle_predictions.json`), Exp-01b rows.
 
-INDEPENDENCE CLAIM
+INDEPENDENCE CLAIM (rescoped 2026-06-04, #492 convention -- PR #510 review)
 ------------------
-The PhysLean side derives prob_up = cos^2(theta/2), prob_down = sin^2(theta/2),
-expectation = cos(theta) from PhysLean's OWN QuantumInfo Born-rule machinery
-(`POVM.measure` of `MState.pure` at the z-basis projectors) -- proven in
-`PhysleanBridge/SpinMeasurement.lean`, axiom-audited to {propext, Classical.choice,
-Quot.sound}. The QBP side computes the same quantities from QBP's quaternion
-formalism. A match is therefore UNCORRELATED agreement of two independent backends.
+The INDEPENDENT quantities are prob_up = cos^2(theta/2) and prob_down =
+sin^2(theta/2): the PhysLean side derives them from PhysLean's OWN QuantumInfo
+Born-rule machinery (`POVM.measure` of `MState.pure` at the z-basis
+projectors) -- proven in `PhysleanBridge/SpinMeasurement.lean`, axiom-audited
+to {propext, Classical.choice, Quot.sound} -- while the QBP side computes them
+from QBP's quaternion formalism. A match on those 10 comparisons is
+UNCORRELATED agreement of two independent backends.
+
+`expectation` is NOT independent: by the #492 single-source convention BOTH
+backends emit expectation := round6(prob_up) - round6(prob_down) (the
+independent cos-theta float path caused 1-ULP cross-backend disagreement and
+was eliminated on both sides). The 5 expectation comparisons are therefore
+CONSISTENCY CHECKS of the shared derived-field convention -- they carry ZERO
+independence weight. Genuine cross-backend independence = the 10
+prob_up/prob_down comparisons. (The PROVEN law expectation = cos(theta),
+`SpinMeasurement.lean: expectation_eq`, is about the real-number physics and
+is untouched by this Float emission convention.)
 
 FALSIFICATION CONDITION (explicit)
 ----------------------------------
@@ -24,9 +35,15 @@ three fields {prob_up, prob_down, expectation}:
 
 TOL = 1e-6 (matches the 6-decimal precision of both JSON sources).
 
-A FAIL means the two independent derivations disagree -> the bridge has detected
-a real discrepancy (or a bug in one side). This is the falsification the harness
-exists to surface. AC-T4 deliberately corrupts one value to confirm FAIL fires.
+All 15 are enforced strictly, but they mean different things: a FAIL on the 10
+independent rows = the two physics derivations disagree (the falsification
+this harness exists to surface); a FAIL on the 5 expectation rows = one
+backend broke the shared derived-field convention (a consistency regression,
+not a physics discrepancy). AC-T4 deliberately corrupts one value to confirm
+FAIL fires. NOTE: the --corrupt self-test requires the bridge to be BUILT
+(the ~8GB .lake); on a bridgeless checkout the pre-commit wrapper SKIPS with
+a loud warning rather than failing (see scripts/check_physlean_differential.py
+and #504).
 """
 
 import json
