@@ -130,9 +130,18 @@ def stale_pointer_pass(a: dict, lean_index: dict[str, str]) -> None:
                     f"`{old}` → `{live}` via theorem-name `{thm}`",
                 )
             return
-    # No theorem name resolved — stale
+    # No theorem name resolved — stale. review_flag is a REASON STRING per
+    # v0.3.1 typing + cth co-sign (boolean true is exactly the green-looking
+    # opacity the R2/R3 rule exists to prevent).
     a["lean_migration_status"] = "stale-pointer"
-    a["review_flag"] = True
+    reason = (
+        f"proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): "
+        f"theorem `{thm or '(none)'}` / file `{a.get('proof_file', '(absent)')}`"
+    )
+    prior = a.get("review_flag")
+    a["review_flag"] = (
+        f"{prior}; {reason}" if isinstance(prior, str) and prior else reason
+    )
     log(
         a["id"],
         "stale-pointer flagged",
@@ -258,7 +267,10 @@ def main() -> None:
                 "id": rl["new_id"],
                 "id_history": [aid],
                 "lean_migration_status": "stale-pointer",
-                "review_flag": True,
+                "review_flag": (
+                    f"relabelled {aid} → {rl['new_id']} (truth-in-labelling, "
+                    f"#509 Batch C): {rl['reason']}"
+                ),
                 "intake_note": rl["reason"],
             },
             f"RELABEL → {rl['new_id']}",
@@ -367,6 +379,25 @@ def main() -> None:
         raise SystemExit("TIER GATE FAILED post-apply")
 
     # ---- Write -------------------------------------------------------------------
+    # Inventory CONTENT version bumps when anchors change (three-version
+    # separation, schema-change-propagation §4; cth co-sign nit on PR #512).
+    canon["version"] = "5.4.0"
+    canon.setdefault("changelog", []).append(
+        {
+            "version": "5.4.0",
+            "date": "2026-06-04T00:00:00Z",
+            "note": (
+                "QBP #509 unified vNext apply: +52 anchors (Batch A: 24 v5.13 "
+                "fold-in incl. 1 include-as-killed + TOV falsified-as-global "
+                "side-effect; Batch C: 28 v5_24 intake incl. 19 NASCENT+substrate, "
+                "3 truth-in-labelling relabels). 74 provenance_kind backfilled "
+                "(Convention D). 122 §3 field adoptions; kill metadata inviolable; "
+                "5 tier-4 CLAMPs (napkin #514); 13 stale-pointer review_flags. "
+                "Zero unreconciled streams. Trail: "
+                "analysis/509-apply-provenance-trail.md"
+            ),
+        }
+    )
     canon["last_updated"] = "2026-06-04"
     canon["update_provenance"] = (
         "QBP #509 unified vNext apply — batches A (24) + B (74) + C (28+55); "
