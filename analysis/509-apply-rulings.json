@@ -1,0 +1,197 @@
+{
+  "_meta": {
+    "title": "QBP #509 apply rulings — structured encoding of the adjudication record",
+    "encoded_by": "qbp-implementor (Integration role), 2026-06-04",
+    "sources": {
+      "batch_A": "QBP#509 issuecomment-4627495414 (@qbp-oppenheimer) + analysis/batch-A-v513-adjudication-worksheet.md",
+      "batch_B": "QBP#509 issuecomment-4627533376 (@qbp-oppenheimer); decisions at analysis/batch-B-decisions-draft.json",
+      "schema_1": "QBP#509 issuecomment-4627480904 (@cth-implementor) — R1-R3 + rubric v0.2 co-sign",
+      "schema_2": "QBP#509 issuecomment-4627520669 (@cth-implementor) — REF posture, INST-ckm, tier gate",
+      "batch_C": "QBP#509 issuecomment-4627540950 (@qbp-oppenheimer) + analysis/batch-C-v524-intake-worksheet.md"
+    },
+    "convention_D": "Strip QBP's framing — if a standalone external proposition remains as the core claim -> theory-external; if the external result is only a reproduction target of a QBP-native derivation -> theory. (RATIFIED, standing provenance discriminator.)",
+    "empty_substrate_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+    "tier_domain": [1, 3],
+    "stale_pointer_rule": "every proof_file entering vNext resolves mechanically by lean_theorem-name match in the live proofs tree, or gets lean_migration_status=stale-pointer + review_flag=true"
+  },
+  "batch_A": {
+    "source_stream": "archive/cth-inventory/confluent-trust-inventory-v5.13.json",
+    "anchors": {
+      "FLAG-tov-eos-shape-underdetermined": {"ruling": "include"},
+      "INSIGHT-cross-platform-per-feature-class": {"ruling": "include", "class": "co-sign"},
+      "INSIGHT-eos-integration-shifts-tov-by-30pct": {"ruling": "include", "class": "co-sign"},
+      "INSIGHT-gamma-needs-cross-platform": {"ruling": "include", "class": "co-sign"},
+      "META-physical-mapping-status-field": {"ruling": "include", "class": "co-sign"},
+      "META-regime-of-validity-field": {"ruling": "include", "class": "co-sign"},
+      "OBS-btfr-z-range-validity": {"ruling": "include"},
+      "OBS-jades-gs-z14-0-vrot-lower-100": {"ruling": "include"},
+      "OPEN-Q-parent-bh-retardation-derivation": {"ruling": "include"},
+      "PRED-a0-redshift-linear": {"ruling": "include"},
+      "PRED-a0-saturating-Fmax-7": {
+        "ruling": "include",
+        "set": {"status": "marginal"},
+        "ruling_note": "DOWNGRADED coherent->marginal by Oppenheimer: own Session-22 note records IFU best-fit F_max=13.4 vs claimed 7; coherent against 2x tension with own data is the self-deception pattern the rebuild kills. Reopens via OPEN-Q-parent-bh-retardation-derivation."
+      },
+      "PRED-a0-saturating-matter-era": {"ruling": "include"},
+      "PRED-a0-saturation-factor-fano": {
+        "ruling": "include",
+        "set": {"status": "marginal"},
+        "ruling_note": "Reconciled to match PRED-a0-saturating-Fmax-7 downgrade (7-vs-13.4 tension recorded)."
+      },
+      "PRED-btfr-mass-correction": {"ruling": "include"},
+      "PRED-hypergraph-cmb-camb-rerun": {
+        "ruling": "include-as-killed",
+        "set": {
+          "status": "incoherent",
+          "killed_by": "QBP/analysis/HQM-MMI-derive-or-die-report.md (#484)",
+          "killed_note": "Prediction chain rests on PROOF-division-algebra-entropy-cone-mapping (EC-DEAD, #484). Same standard as the original kill: derive or die. Revival path: exhibit a chain-independent derivation of the multi-party hypergraph correlator and the nu=6.333 / Omega_m/Omega_b prediction returns to live untested."
+        }
+      },
+      "PRED-jwst-kinematics-z14": {"ruling": "include"},
+      "PRED-tov-mass-at-bump-peak": {"ruling": "include"},
+      "PROOF-alpha-particle-quaternion": {
+        "ruling": "include",
+        "set": {"physical_mapping_status": "conjectural"},
+        "ruling_note": "Nuclear-identity cluster rider: the kernel proves 4 = dim H; it does not prove helium knows that."
+      },
+      "PROOF-fano-choice-information": {"ruling": "include"},
+      "PROOF-iron-56-double-octet": {
+        "ruling": "include",
+        "set": {"physical_mapping_status": "conjectural"},
+        "ruling_note": "Nuclear-identity cluster rider (see PROOF-alpha-particle-quaternion)."
+      },
+      "PROOF-iron-to-ns-bridge": {
+        "ruling": "include",
+        "set": {"physical_mapping_status": "conjectural"},
+        "ruling_note": "The (M_TOV/M_Ch)^2=7/3 Lean identity stands (sorry 0); the global-physical reading rides the falsified claim and may not borrow the theorem's credibility."
+      },
+      "PROOF-oxygen-16-sedenion": {
+        "ruling": "include",
+        "set": {"physical_mapping_status": "conjectural"},
+        "ruling_note": "Nuclear-identity cluster rider."
+      },
+      "PROOF-seed-mass-from-ln7": {"ruling": "include"},
+      "PROOF-silicon-28-fano-ladder": {
+        "ruling": "include",
+        "set": {"physical_mapping_status": "conjectural"},
+        "ruling_note": "Nuclear-identity cluster rider."
+      }
+    },
+    "canonical_side_effects": {
+      "PRED-TOV-limit-sqrt-7-over-3": {
+        "set": {
+          "physical_mapping_status": "falsified-as-global",
+          "regime_of_validity": "bump-peak rho_c only — see PRED-tov-mass-at-bump-peak (the regime-specific re-scope that survives). Global M_max reading falsified by the stream's own EOS-integration results (INSIGHT-eos-integration-shifts-tov-by-30pct: robust QBP TOV in [2.6, 2.8] M_sun, mutually exclusive with 2.20)."
+        },
+        "ruling_note": "Batch-A contested call #1 (TOV cluster): the stream falsified its own global prediction; recorded honestly."
+      }
+    }
+  },
+  "batch_B": {
+    "decisions_file": "analysis/batch-B-decisions-draft.json",
+    "note": "74 provenance_kind classifications (58 theory / 16 theory-external) under Convention D; PROOF-hurwitz-quat override to theory-external (Hurwitz 1898) already present in the decisions file."
+  },
+  "batch_C_s2": {
+    "source_stream": "archive/cth-inventory/baselines/confluent-trust-inventory-v5_24.json",
+    "substrate_nascent": [
+      "REF-brink-condensed-group-cohomology",
+      "REF-capoferri-dirac-lorentzian",
+      "REF-clausen-scholze-condensed",
+      "REF-condensed-categorical-foundations-mathlib",
+      "REF-continuous-six-functor-lch",
+      "REF-ecker-grumiller-spacetime-crystal",
+      "REF-fargues-scholze-geometrization",
+      "REF-internal-hom-condensed-prismatic-reals",
+      "REF-internal-locales-toposes",
+      "REF-islam-strohmaier-feynman-propagators",
+      "REF-jubin-schapira-lorentzian",
+      "REF-liquid-tensor-experiment",
+      "REF-pyknotic-condensed-topos-status",
+      "REF-sanchez-globally-hyperbolic-slicings",
+      "REF-schapira-causal-propagation",
+      "REF-vaidya-accreting-horizon",
+      "CONJ-condensed-math-for-transition-state",
+      "INSIGHT-condensed-math-deferred",
+      "INSIGHT-locale-condensed-chain"
+    ],
+    "nascent_insight": [
+      "INSIGHT-echo-harmony-z2",
+      "INSIGHT-resonance-vs-amplification-scale-invariance",
+      "INSIGHT-threshold-transition-new-stable-state"
+    ],
+    "relabel": {
+      "PROOF-s2-dirac-eta-vanishes": {
+        "new_id": "INSIGHT-s2-dirac-eta-vanishes",
+        "reason": "route-elimination result; cites type-1 termination at phantom files (zero cited theorems resolve); self-labelled 'written pending verification' = hypothesis, not termination. Anchor-ID extension of layer-architecture 3.4 (truth-in-labelling), RATIFIED standing policy."
+      },
+      "PROOF-vaidya-accreting-horizon-spacelike": {
+        "new_id": "DERIV-vaidya-accreting-horizon-spacelike",
+        "reason": "derivation, not kernel-verified proof; phantom file citations (QBPHorizonFoundations.lean does not exist)."
+      },
+      "PROOF-hubble-half-entropy-factor": {
+        "new_id": "DERIV-hubble-half-entropy-factor",
+        "reason": "derivation, not kernel-verified proof; phantom file citations (lean4/QBP/SpectralAction/ does not exist)."
+      }
+    },
+    "standard_include": [
+      "FIT-zeta-modulated-profile",
+      "FLAG-ngc2683-mass-discrepancy",
+      "FLAG-seam-dynamics-open"
+    ]
+  },
+  "batch_C_s3": {
+    "default": "adopt-clean",
+    "exceptions": {
+      "PROOF-division-algebra-entropy-cone-mapping": {
+        "rule": "null-fills-only",
+        "protected_fields": ["status", "killed_by", "killed_note", "review_flag"],
+        "reason": "EC-DEAD; kill metadata inviolable; no status revival (#484 stands)."
+      },
+      "INSIGHT-entropy-cone-division-algebra-inversion": {
+        "rule": "null-fills-only",
+        "protected_fields": ["status", "killed_by", "killed_note", "review_flag"],
+        "reason": "EC-DEAD; kill metadata inviolable."
+      },
+      "KILLED-f4-info-theoretic-justification": {
+        "rule": "null-fills-only",
+        "protected_fields": ["status", "killed_by", "killed_note", "review_flag"],
+        "reason": "null-fills harmless, kill intact."
+      },
+      "CONV-cd-tower-in-zeta-moments": {
+        "rule": "adopt-except",
+        "protected_fields": ["description"],
+        "reason": "REJECT description revert — canonical's #484 even-level correction is post-fork knowledge v5_24 lacks."
+      },
+      "INST-ckm": {
+        "rule": "adopt-except",
+        "protected_fields": ["tier"],
+        "reason": "cth seq=100 ruling 2: REJECT theirs tier 0 (Axiom layer); anchor-tier domain is [1,3]; keep ancestor tier 1."
+      }
+    },
+    "tier_clamp": {
+      "domain": [1, 3],
+      "action": "clamp-to-3",
+      "napkin_issue": "tier-domain-extension design surface (files in the apply PR)"
+    }
+  },
+  "conditional_riders": {
+    "Q27-TOV-limit-from-Fano": {
+      "criterion": "if its description asserts the global sqrt(7/3) M_max -> apply physical_mapping_status=falsified-as-global + regime pointer (same as Batch-A TOV ruling); if it states the Fano-derivation only -> enters untouched",
+      "decided_by": "qbp-implementor applies mechanically from description text (criterion written by Oppenheimer, judgment done)"
+    }
+  },
+  "ref_transform": {
+    "applies_to_prefix": "REF-",
+    "set": {"provenance_kind": "theory-external"},
+    "lift_citation_fields": ["theory_citation", "theory_doi", "theory_url"],
+    "semantics_note": "coherent on a REF = citation integrity, not endorsement; the claim lives in the converging CONJ-/INSIGHT- anchors."
+  },
+  "provenance_kind_mechanical_map": {
+    "comment": "mirrors cth migrate v0.3-impl-2 observed behavior",
+    "by_provenance": {"E": "experiment", "I": "internal-compute", "D": "theory", "T": "theory", "P": "theory", "H": "hypothesis"},
+    "overrides": [
+      {"if_proof_system_in": ["lean4", "python_exhaustive"], "then": "proof"},
+      {"if_proof_system_in": ["established_mathematics"], "then": "theory-external"}
+    ]
+  }
+}

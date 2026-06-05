@@ -709,7 +709,8 @@
       "tier": 2,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2013; Aydemir et al. 2018"
     },
     {
       "testable_when": "Hyper-K (2027+), DUNE (2028+)",
@@ -723,7 +724,8 @@
       "tier": 2,
       "provenance": "T",
       "status": "untested",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2013; Aydemir et al. 2018 (NCG Pati-Salam, via MEAS-proton-stable)"
     },
     {
       "testable_when": "Vienna nanorotor platform, 1-3 years (Troyer et al. 2026 next goal)",
@@ -891,7 +893,8 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Hurwitz, A. (1898), Ueber die Composition der quadratischen Formen von beliebig vielen Variabeln — Lean re-verification of the H case is the evidence record; the claim originates externally (consistency with sibling PROOF-hurwitz)."
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -949,7 +952,8 @@
       "tier": 2,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Schnyder, Ryu, Furusaki & Ludwig 2008 (Altland-Zirnbauer tenfold way)"
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1106,7 +1110,8 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "CITATION-NEEDED (Majorana/Ising-CFT central charge c=1/2) -- Oppenheimer ruling (borderline; native ratio reading)"
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1163,7 +1168,8 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Kitaev 2006 (Ann. Phys. 321, 2)"
     },
     {
       "predicted_value": 0.5,
@@ -1184,7 +1190,8 @@
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Kasahara et al. 2018 (Nature); Yokoi et al. 2021 (Science)"
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1492,7 +1499,8 @@
       "tier": 3,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Pfeifer, Voicu et al. 2025 (JCAP)"
     },
     {
       "last_tested_at": "2026-04-12T00:00:00Z",
@@ -1508,7 +1516,8 @@
       "tier": 3,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Luu, Qiu & Tye 2025 (JCAP)"
     },
     {
       "predicted_value": 0.26,
@@ -1789,7 +1798,8 @@
       "tier": 3,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "CITATION-NEEDED (external birefringence measurement, e.g. Minami & Komatsu 2020 PRL) -- Oppenheimer ruling"
     },
     {
       "last_tested_at": "2026-04-14T00:00:00Z",
@@ -1935,7 +1945,8 @@
       "tier": 2,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Jido, Nagahiro & Hirenzaki 2011/2012 (Kyoto/Nara)"
     },
     {
       "last_tested_at": "2026-04-27T00:00:00Z",
@@ -2024,7 +2035,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "physical_mapping_status": "falsified-as-global",
+      "regime_of_validity": "bump-peak rho_c only — see PRED-tov-mass-at-bump-peak (the regime-specific re-scope that survives). Global M_max reading falsified by the stream's own EOS-integration results (INSIGHT-eos-integration-shifts-tov-by-30pct: robust QBP TOV in [2.6, 2.8] M_sun, mutually exclusive with 2.20)."
     },
     {
       "predicted_value": 3,
@@ -2057,7 +2070,8 @@
       "tier": 2,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "CITATION-NEEDED (standard QCD conformal limit c_s^2=1/3 for massless quarks) -- Oppenheimer ruling"
     },
     {
       "predicted_value": 0.6667,
@@ -2137,7 +2151,8 @@
       "tier": 2,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "CITATION-NEEDED (direct-URCA threshold, e.g. Lattimer, Pethick, Prakash & Haensel 1991 PRL 66, 2701) -- Oppenheimer ruling"
     },
     {
       "predicted_value": 3,
@@ -2172,7 +2187,8 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Milgrom 1983 (ApJ 270, 365)"
     },
     {
       "last_tested_at": "2026-04-27T00:00:00Z",
@@ -2520,7 +2536,8 @@
       "tier": 3,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2018"
     },
     {
       "last_tested_at": "2026-05-10T00:00:00Z",
@@ -2534,7 +2551,8 @@
       "tier": 3,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory-external",
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2018"
     },
     {
       "predicted_value": 0,
@@ -2669,6 +2687,1348 @@
       "provenance_kind": "theory",
       "prediction_chain": [],
       "description": "WISDOM (from the killed entropy-cone inversion hypothesis). The intuition that 'more algebraic structure restricts the achievable entropy cone' is correct in MECHANISM but was mis-located. Changing the SCALAR FIELD up the Cayley-Dickson tower (ℂ→ℍ) does NOT shrink the cone: multipartite ℍ-QM either collapses to ℂ-QM (complex projection / Moretti-Oppio) and violates MMI like ℂ-QM, or in its genuinely-quaternionic regime reaches super-Tsirelson (PR-box) correlations and ENLARGES the cone. Where entropy-cone restriction (MMI / I₃≤0) genuinely arises — holographic and stabilizer states — it comes from a restricted STATE CLASS (graph/hypergraph structure, RT geometry, stabilizer formalism), not the underlying number system. Redirect: aim 'algebra restricts the cone' energy at state-class structure, not the division-algebra tower. Killed hypothesis + derivation: QBP/analysis/HQM-MMI-derive-or-die-report.md."
+    },
+    {
+      "id": "FLAG-tov-eos-shape-underdetermined",
+      "name": "TOV integration with QBP-only EOS inputs gives M_max = 3.3 M_☉, not 2.2 M_☉",
+      "tier": 2,
+      "provenance": "I",
+      "status": "coherent",
+      "description": "TOV solver with peak c_s²=2/3, asymptote 1/3, chiral at 3ρ₀ produces M_max=3.28 M_☉ and R=16.2 km — 49% above the QBP √(7/3) prediction and 5.5σ above PSR J0952-0607. Either the bump shape needs additional QBP constraint not yet identified, or M_TOV/M_Ch is a chosen normalisation rather than a derived physical ratio.",
+      "discrepancy_pct": 49.0,
+      "predicted_value": 2.2,
+      "measured_value": 3.28,
+      "predicted_unit": "M_☉ (TOV maximum)",
+      "prediction_chain": [
+        "PRED-TOV-limit-sqrt-7-over-3"
+      ],
+      "notes": "Lean theorem tov_ratio_squared_decomposition (algebraic identity 7/3) stands — that is the rational identity, not the physical claim. The physical mapping from algebra → EOS → TOV has at least one unconstrained parameter (bump shape). Resolution: tighten the bump shape ansatz with additional QBP-derived constraints, or admit M_TOV/M_Ch is a chosen normalisation. Computation in reviews/tov_fano_eos.py.\n[Session 18] Diagnosis complete (reviews/tov_failure_diagnosis.md). The two QBP claims (M_TOV/M_Ch = √(7/3) and asymptotic c_s² = 1/3) are over-determined in TOV. Bump shape alone cannot reconcile them. Three honest interpretations: (a) √(7/3) numerical coincidence, (b) c_s²=1/3 only at higher density than 3ρ₀, (c) missing constraint. Each is testable.\n[Session 19] RESOLVED via regime-of-validity reinterpretation. Both QBP claims (TOV ratio and conformal asymptote) are exact in their respective regimes (bump peak and post-chiral). The apparent contradiction was treating them as competing claims for the same physical observable.",
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "provenance_kind": "internal-compute",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "INSIGHT-cross-platform-per-feature-class",
+      "name": "Cross-platform Γ-test works within feature class, not across mixed shapes",
+      "tier": 3,
+      "provenance": "I",
+      "status": "coherent",
+      "description": "Per-feature-class discrimination across 7 platforms: revival 6.5σ, Gaussian 5.3σ, oscillation 3.4σ, power-law 1.9σ, pressure 1.5σ. Combined cross-class mixing gives only 0.5σ because the variance metric is dominated by inter-shape differences, not by Γ-position differences. The right test design pools by feature class.",
+      "prediction_chain": [
+        "PRED-gamma-universality",
+        "INSIGHT-gamma-needs-cross-platform"
+      ],
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "provenance_kind": "internal-compute",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "INSIGHT-eos-integration-shifts-tov-by-30pct",
+      "name": "Robust QBP TOV prediction: M_TOV ∈ [2.6, 2.8] M_☉ from algebra-only EOS",
+      "tier": 2,
+      "provenance": "I",
+      "status": "coherent",
+      "description": "TOV integration with QBP-locked algebraic inputs (peak c_s² = Q = 2/3, asymptote = 1/3, chiral at 3 ρ₀) produces M_max in [2.6, 2.8] M_☉ across the bump-shape range. This is the ROBUST QBP prediction, distinct from the published \"M_TOV = M_Ch · √(7/3) = 2.20 M_☉\" which requires an asymptote contradicting the conformal-sound-speed theorem. PSR J0952-0607 = 2.35 ± 0.17 M_☉ sits between the two: within 1σ of 2.20, within 1.5σ of the robust [2.6, 2.8] envelope.",
+      "predicted_value_lo": 2.6,
+      "predicted_value_hi": 2.8,
+      "predicted_unit": "M_☉",
+      "measured_source": "PSR J0952-0607 = 2.35 ± 0.17 M_☉",
+      "prediction_chain": [
+        "PRED-conformal-sound-speed-1-over-3",
+        "PRED-peak-sound-speed-Q",
+        "PRED-chiral-restoration-3rho0"
+      ],
+      "notes": "Pre-registered. If a future NS observation establishes M_max > 2.4 M_☉ (e.g., from BNS merger-remnant analysis or pulsar mass measurements), this anchor becomes coherent and PRED-TOV-limit-sqrt-7-over-3 stays falsified. The two predictions are now mutually exclusive, providing a cleaner discriminator than either alone.\n[Session 19] Now CONFIRMED as a separate regime-specific prediction: M_max in [2.6, 2.8] M_☉ for stars with cores in the post-chiral conformal regime. PSR J0952-0607 = 2.35 M_☉ sits between the bump-peak (2.20) and post-chiral max (2.6-2.8) predictions, consistent with both.",
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "provenance_kind": "internal-compute",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "INSIGHT-gamma-needs-cross-platform",
+      "name": "Γ-universality test needs cross-platform pooling for multi-σ detection",
+      "tier": 3,
+      "provenance": "I",
+      "status": "untested",
+      "description": "Six-rotor Γ-reparameterisation test (synthetic, 1000 trials per hypothesis) has 0.60σ discrimination under realistic noise. The within-system noise floor is comparable to the between-system universality signal at this sample size. Multi-platform pooling (qubits + ions + NV centres + nanorotors) is the path to multi-σ detection. The universality claim itself argues for the test: Γ-rescaling should work across platforms, not just one.",
+      "prediction_chain": [
+        "PRED-gamma-universality"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "synthetic_separation_sigma": 6.7,
+      "notes": "\n[Session 17, cross-platform Γ test] Synthetic 7-platform test with platform-specific non-exponential bumps gives 6.7σ separation between QBP (universal Γ) and null (platform-specific Γ) medians. 100% of QBP trials below null 5%-threshold. Pipeline characterised; real-data extension awaits IBM/NIST/Lukin/PHAIDRA curves (not just T_decay summaries).\n[Session 21] Refined: cross-platform pooling works WITHIN a feature class, not ACROSS. The variance metric washes out when feature shapes vary between platforms. Right design: group by feature class (revival/oscillation, gaussian/Lorentzian, power-law) and test universality within each.",
+      "provenance_kind": "internal-compute",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "META-physical-mapping-status-field",
+      "name": "CTH schema extension: physical_mapping_status field on PRED-* anchors",
+      "tier": 3,
+      "provenance": "P",
+      "status": "coherent",
+      "description": "Distinguishes algebraic identity (Lean-formal rational fact) from physical-claim status (does the algebra → mapping → observation chain hold). Three values: verified, conjectural, falsified. First applied this session: PRED-TOV-limit-sqrt-7-over-3 = falsified. Same pattern likely applies to PROOF-cl6 (algebra real, physical chain has caveats) and the CKM-chain anchors (algebra real, trials-factor mitigates).",
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "prediction_chain": [],
+      "provenance_kind": "theory",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "META-regime-of-validity-field",
+      "name": "CTH schema extension: regime_of_validity field",
+      "tier": 3,
+      "provenance": "P",
+      "status": "coherent",
+      "description": "Each PRED-* anchor that wraps an algebraic identity has an implicit regime of validity (bump_peak, virial_saturation, de_era, etc.). The regime is what makes the prediction a precise statement about a specific configuration rather than a vague universal claim. Adding this field makes the regime explicit and lets the engine test predictions in their proper context.",
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "prediction_chain": [],
+      "provenance_kind": "theory",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "OBS-btfr-z-range-validity",
+      "name": "BTFR (1+z) correction supported at 1<z<10, possibly breaks at z≥10",
+      "tier": 2,
+      "provenance": "E",
+      "status": "coherent",
+      "description": "Literature compilation of 10 galaxies. Mean log-v residual after QBP correction: +0.02 (z<1), +0.01 (1<z<5), +0.03 (5<z<10), -0.12 (z≥10). The intermediate-z collapse is strong; the z>10 overshoot may be real physics or velocity-estimate noise. Direct ALMA+JWST kinematics at z>10 is the decisive next observation.",
+      "prediction_chain": [
+        "PRED-btfr-mass-correction",
+        "PRED-a0-redshift-linear"
+      ],
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "notes": "\n[Session 21] Resolved: with the QBP-derived saturating form (F_max=7) the z>10 residual is -0.006 dex, indistinguishable from zero. The (1+z) form was the late-time asymptote; the saturating form covers matter-era z>10.",
+      "provenance_kind": "experiment",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "OBS-jades-gs-z14-0-vrot-lower-100",
+      "name": "JADES-GS-z14-0 ALMA tentative rotation: v_rot > 100 km/s (Schouws+ 2025)",
+      "tier": 2,
+      "provenance": "E",
+      "status": "marginal",
+      "description": "ALMA [OIII]88μm detection at 6.6σ (Schouws+ 2024 arXiv:2409.20549) with tentative velocity gradient at 3σ (Schouws+ 2025 arXiv:2503.10751). log(M_dyn/M_☉) = 9.4 (+0.8/-0.4); σ < 40 km/s upper limit; v_rot/σ > 2.5 ⇒ v_rot > 100 km/s as a one-sided lower bound. This sits ABOVE the QBP saturating prediction (88 km/s at z=14.32) and BELOW the QBP linear prediction (118 km/s). Preliminary directional indication: linear (1+z) form marginally favoured at this single galaxy. Definitive verdict awaits cube-level analysis.",
+      "predicted_value_lo": 100.0,
+      "predicted_unit": "km/s (lower bound)",
+      "prediction_chain": [
+        "PRED-a0-redshift-linear",
+        "PRED-a0-saturating-Fmax-7",
+        "PRED-jwst-kinematics-z14"
+      ],
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "partial",
+      "experimental_backing": {
+        "test_type": "literature_kinematic_constraint",
+        "ref": "Schouws+2025 arXiv:2503.10751 + 2409.20549",
+        "v_rot_lower_kms": 100.0,
+        "v_lin_predicted_kms": 118,
+        "v_sat_predicted_kms": 88,
+        "preliminary_verdict": "linear marginally favoured"
+      },
+      "last_tested_at": "2026-05-04",
+      "notes": "Caveats: (1) σ < 40 is itself an upper limit (MCMC ran into prior); (2) M_dyn has ±0.6 dex uncertainty from inclination degeneracy; (3) 3σ velocity-gradient detection is 'tentative' per Schouws+ 2025 themselves. The authors call for deeper ALMA or NIRSpec IFS follow-up. This anchor holds the literature-derived lower bound; the cube-level verdict will replace it when the data is fetched.",
+      "provenance_kind": "experiment",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "OPEN-Q-parent-bh-retardation-derivation",
+      "name": "Open: rigorous derivation of parent-BH retardation kernel",
+      "tier": 3,
+      "provenance": "T",
+      "status": "untested",
+      "description": "The matter-era a₀(z) saturation form 1/(1+(1+z)/F_max) is physically motivated by parent-BH dynamical retardation (t_BH = GM/c³ comparable to t_cosmic) but not derived rigorously from a single QBP equation. The open task is to derive the retardation kernel K(t-t'), convolve with M(t'), and show that the long-time limit gives F_max = dim(Im 𝕆) = 7. Effort: 2-4 weeks of theory work.",
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "unverified",
+      "prediction_chain": [
+        "PRED-a0-saturating-matter-era",
+        "PRED-a0-saturation-factor-fano"
+      ],
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "provenance_kind": "theory",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "PRED-a0-redshift-linear",
+      "name": "a₀(z) = a₀(today)·(1+z) from M(a) = M₀·a",
+      "tier": 3,
+      "provenance": "T",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/RedshiftEvolution.lean",
+      "sorry_count": 0,
+      "status": "marginal",
+      "description": "The holographic acceleration scale a₀ = κ_BH = c⁴/(4GM) combined with PROOF-M-proportional-to-a (M(a) = M₀·a) gives a₀(z) = a₀(0)·(1+z) — a sharp, falsifiable redshift dependence. Numerically: a₀(z=14) = 15·a₀(0) = 1.8×10⁻⁹ m/s². This is the Stage-5/Stage-7 bridge of the walking-the-chain audit and the cleanest JWST discriminator currently in the CTH.",
+      "predicted_unit": "a₀(z)/a₀(0) = (1+z), exact",
+      "prediction_chain": [
+        "PROOF-M-proportional-to-a",
+        "PRED-holographic-boundary-gravity"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "notes": "Lean theorem name: a0_redshift_evolution. Companion lemma kappa_inverse_mass also Lean-proven. Promote to coherent (with experimental backing) once a JWST BTFR-collapse test confirms the (1+z) scaling.\n[Session 22, IFU rotation-curve test, 2026-05-04] IFU verdict: saturating favoured at Δχ² = +72.89. Linear (1+z) form is the late-time asymptote only; matter-era physics imposes saturation.",
+      "lean_theorem": "a0_redshift_evolution",
+      "lean_companion_theorems": [
+        "a0_inverse_scale_factor",
+        "kappa_inverse_mass"
+      ],
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "verified",
+      "regime_of_validity": {
+        "configuration": "z < z_eq (DE-era only)",
+        "asymptotic_or_exact": "asymptotic_late_time",
+        "transition_scale": "z_eq ≈ 0.7-1.0",
+        "description": "Late-time DE-dominated asymptote where parent-BH accretion is steady-state Bondi. Saturates in matter era (z > z_eq). BTFR data shows linear (1+z) form has 0.074 dex RMS; saturating form has 0.051 dex RMS (31.7% improvement). Matter-era saturation is the right interpretation."
+      },
+      "experimental_backing": {
+        "test_type": "IFU_rotation_curve_BTFR",
+        "results_file": "reviews/ifu_rotation_curve_results.json",
+        "decision_doc": "reviews/ifu_rotation_curve_decision_2026-05-04.md",
+        "n_galaxies": 5,
+        "joint_chi2_linear": 87.43902886166809,
+        "joint_chi2_saturating": 14.544398121536048,
+        "delta_chi2_total": 72.89463074013204,
+        "verdict": "saturating",
+        "F_max_best_fit": 13.378362945392563,
+        "F_max_best_fit_err": 2.3796611591297623,
+        "pipeline_version": "0.1.0",
+        "date": "2026-05-04"
+      },
+      "provenance_kind": "proof",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "PRED-a0-saturating-Fmax-7",
+      "name": "Matter-era a₀(z) saturates with F_max = dim(Im 𝕆) = 7",
+      "tier": 1,
+      "provenance": "T",
+      "status": "marginal",
+      "description": "a₀(z) = a₀(0)·(1+z)/(1+(1+z)/F_max) with F_max=7. Predicts v_rot at z=10–14 lower than the linear (1+z) form by 21–30%. Tested by IFU rotation curves on GN-z11, JADES-GS-z14-0/-1, JADES-GS-z11-0, UHZ1.",
+      "predicted_value": 7.0,
+      "prediction_chain": [
+        "PRED-a0-redshift-linear",
+        "DERIV-sedenion",
+        "PROOF-fano"
+      ],
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "verified",
+      "regime_of_validity": {
+        "configuration": "matter_era",
+        "asymptotic_or_exact": "exact_in_QBP",
+        "transition_scale": "z_eq",
+        "description": "Matter-era saturation. F_max=7 from dim(Im 𝕆); algebraic, not fitted."
+      },
+      "experimental_backing": {
+        "test_type": "IFU_rotation_curve_BTFR",
+        "results_file": "reviews/ifu_rotation_curve_results.json",
+        "decision_doc": "reviews/ifu_rotation_curve_decision_2026-05-04.md",
+        "n_galaxies": 5,
+        "joint_chi2_linear": 87.43902886166809,
+        "joint_chi2_saturating": 14.544398121536048,
+        "delta_chi2_total": 72.89463074013204,
+        "verdict": "saturating",
+        "F_max_best_fit": 13.378362945392563,
+        "F_max_best_fit_err": 2.3796611591297623,
+        "pipeline_version": "0.1.0",
+        "date": "2026-05-04"
+      },
+      "last_tested_at": "2026-05-04",
+      "notes": "[Session 22, IFU rotation-curve test, 2026-05-04] IFU verdict: saturating favoured at Δχ² = +72.89. F_max best-fit = 13.378362945392563.",
+      "provenance_kind": "theory",
+      "intake_note": "DOWNGRADED coherent->marginal by Oppenheimer: own Session-22 note records IFU best-fit F_max=13.4 vs claimed 7; coherent against 2x tension with own data is the self-deception pattern the rebuild kills. Reopens via OPEN-Q-parent-bh-retardation-derivation.",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "PRED-a0-saturating-matter-era",
+      "name": "a₀(z) saturates at high z due to matter-era parent-BH dynamics",
+      "tier": 2,
+      "provenance": "I",
+      "status": "marginal",
+      "description": "The (1+z) form for a₀(z) is the late-time DE-era asymptote. In the matter era (z > z_eq), parent-BH accretion does not maintain steady-state Bondi, and a₀(z) saturates. Empirical fit to BTFR data: a saturating form (1+z)/(1 + (1+z)/10) with RMS 0.051 dex beats linear (RMS 0.074) by 31.7%. The matter-era saturation mechanism is not yet derived from QBP first principles; it is a phenomenological regime extension.",
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "verified-as-empirical-best-fit",
+      "predicted_value": 0.051,
+      "predicted_unit": "dex (RMS BTFR residual at z=0..14)",
+      "measured_value": 0.051,
+      "discrepancy_pct": 0.0,
+      "prediction_chain": [
+        "PRED-a0-redshift-linear",
+        "PRED-btfr-mass-correction"
+      ],
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "functional_form": "a₀(0) · (1+z) / (1 + (1+z)/F_max)",
+      "F_max_value": 7,
+      "F_max_interpretation": "dim(Im 𝕆) = number of Fano lines",
+      "prediction_at_z_14": 4.69,
+      "notes": "\n[Session 20] First-principles derivation attempt: parent-BH dynamical retardation gives saturation form 1/(1+(1+z)/F_max). Empirical best-fit F_max = 7 = dim(Im 𝕆) (number of Fano lines). BTFR RMS sensitivity table: F_max=7 gives 0.047 dex (best), F_max=10 gives 0.051 dex, F_max=14 gives 0.054 dex. The number of Fano lines is the empirically-best AND cleanest QBP-algebraic saturation factor. Pre-registered: a₀(14)/a₀(0) = 4.69.",
+      "provenance_kind": "internal-compute",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "PRED-a0-saturation-factor-fano",
+      "name": "Matter-era a₀(z) saturation factor F_max = dim(Im 𝕆) = 7",
+      "tier": 2,
+      "provenance": "I",
+      "status": "marginal",
+      "description": "The empirical best-fit a₀(z) saturation factor matches dim(Im 𝕆) = 7 (number of Fano lines, the foundational QBP algebraic input). BTFR RMS minimised at F_max=7. This is the cleanest QBP-algebraic saturation factor — same integer as the seed-mass entropy ln(7), Fano-line cardinality, and stabiliser-orbit count. The connection from parent-BH retardation kernel to F_max=7 specifically is the open derivation.",
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "partial",
+      "predicted_value": 7,
+      "measured_value": 7,
+      "prediction_chain": [
+        "PROOF-fano-choice-information",
+        "PRED-a0-saturating-matter-era"
+      ],
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "provenance_kind": "internal-compute",
+      "intake_note": "Reconciled to match PRED-a0-saturating-Fmax-7 downgrade (7-vs-13.4 tension recorded).",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "PRED-btfr-mass-correction",
+      "name": "BTFR mass-inference correction at high z: M_b(z) = M_b(0)/(1+z)",
+      "tier": 3,
+      "provenance": "T",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/RedshiftEvolution.lean",
+      "sorry_count": 0,
+      "status": "coherent",
+      "description": "In the deep-MOND regime v⁴ = G·M_b·a₀. With a₀(z) = a₀(0)·(1+z), observers reading v but assuming z=0 a₀ over-estimate baryonic mass by factor (1+z). At z=14 this is a factor 15 — comparable to the magnitude of the JWST \"impossibly early massive galaxy\" overshoot. Quantitative resolution of OBS-jwst-early-galaxies awaits the BTFR-collapse test against JADES UV-LF.",
+      "predicted_unit": "M_inferred / M_true = (1+z), exact in deep-MOND",
+      "prediction_chain": [
+        "PRED-a0-redshift-linear",
+        "OBS-rotation-anomaly"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "notes": "Lean theorem name: btfr_mass_correction. TEST: divide JADES/CEERS UV-LF inferred-mass axes at z = 4, 7, 10, 12, 14 by (1+z) and check whether they collapse onto the z = 0 SPARC baryonic Tully-Fisher relation. ~1 day computation.\n[Session 17, BTFR-collapse on JADES] Mid-z (1<z<10) collapse to ~0.02 dex residual after (1+z) correction; z>10 overshoots by -0.12 dex. Strong support for the (1+z) form at intermediate z; ambiguous at z>10 (real physics signal vs velocity-estimate uncertainty).\n[Session 21] Z≥10 reapproach with QBP-saturating form (F_max=dim(Im 𝕆)=7): residual at z≥10 collapses from -0.121 dex (linear) to -0.006 dex (saturating). Failure mode \"regime-of-validity unspecified\" is RESOLVED. The matter-era saturation plus the linear DE-era form together cover all observed z.",
+      "lean_theorem": "btfr_mass_correction",
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "verified",
+      "regime_of_validity": {
+        "configuration": "de_era",
+        "asymptotic_or_exact": "asymptotic_late_time",
+        "description": "The (1+z) mass-correction factor inherits the regime of validity from PRED-a0-redshift-linear. At z>10 the correction over-corrects because matter-era saturation reduces the effective a₀(z) below the linear extrapolation."
+      },
+      "experimental_backing": {
+        "test_type": "IFU_rotation_curve_BTFR",
+        "results_file": "reviews/ifu_rotation_curve_results.json",
+        "decision_doc": "reviews/ifu_rotation_curve_decision_2026-05-04.md",
+        "n_galaxies": 5,
+        "joint_chi2_linear": 87.43902886166809,
+        "joint_chi2_saturating": 14.544398121536048,
+        "delta_chi2_total": 72.89463074013204,
+        "verdict": "saturating",
+        "F_max_best_fit": 13.378362945392563,
+        "F_max_best_fit_err": 2.3796611591297623,
+        "pipeline_version": "0.1.0",
+        "date": "2026-05-04"
+      },
+      "provenance_kind": "proof",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "PRED-hypergraph-cmb-camb-rerun",
+      "name": "Branch A CMB matches Planck under hypergraph (multi-party) boundary",
+      "tier": 3,
+      "provenance": "T",
+      "status": "incoherent",
+      "description": "The 2-party (graph) boundary potential gave ν−1 ∝ 1/√k (52% spread across acoustic peaks 1-3, vs Planck 1% tolerance — COMP-branch-A-cmb-boundary-analysis incoherent). A multi-party (hypergraph) correlator dominated by the parent-BH horizon scale gives a k-flat ν enhancement with magnitude ν = 1 + dim(𝕆)·Q = 6.333. Required: Ω_m/Ω_b = 6.377. Mismatch: 0.68% — comparable to Planck Ω_b systematic. Three-test analytic verdict (cmb_hypergraph_rescue_test.py): PASSES the three failure modes the graph model failed. Pending CAMB rerun for definitive verification.",
+      "prediction_chain": [
+        "COMP-branch-A-cmb-boundary-analysis",
+        "INSIGHT-branch-A-hypergraph-boundary",
+        "PROOF-division-algebra-entropy-cone-mapping"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "notes": "NEW ANCHOR (Session 13). Names the falsifiable form of the rescue. Closes the Stage-6 narrowest-pinch problem from walking_the_chain_2026-04-30.md if the CAMB rerun succeeds; kills Branch A definitively if it fails.",
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "unverified",
+      "provenance_kind": "theory",
+      "killed_by": "QBP/analysis/HQM-MMI-derive-or-die-report.md (#484)",
+      "killed_note": "Prediction chain rests on PROOF-division-algebra-entropy-cone-mapping (EC-DEAD, #484). Same standard as the original kill: derive or die. Revival path: exhibit a chain-independent derivation of the multi-party hypergraph correlator and the nu=6.333 / Omega_m/Omega_b prediction returns to live untested.",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "PRED-jwst-kinematics-z14",
+      "name": "JWST/ALMA z>10 IFU rotation curves: v_rot 25-30% lower than linear-(1+z) prediction",
+      "tier": 2,
+      "provenance": "I",
+      "status": "untested",
+      "description": "Pre-registered predictions for direct kinematic measurements: GN-z11 v_rot = 77 km/s (QBP-sat) vs 98 km/s (linear); JADES-GS-z14-0 v_rot = 88 km/s vs 118 km/s; JADES-GS-z11-0 v_rot = 92 km/s vs 118 km/s; UHZ1 v_rot = 86 km/s vs 109 km/s. Difference is 25-30% in v_rot, well within current spectrograph resolution (~10-20 km/s).",
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "unverified",
+      "predicted_values": {
+        "GN-z11": {
+          "v_qbp_kms": 77,
+          "v_linear_kms": 98,
+          "z": 10.6
+        },
+        "JADES-GS-z14-0": {
+          "v_qbp_kms": 88,
+          "v_linear_kms": 118,
+          "z": 14.32
+        },
+        "JADES-GS-z11-0": {
+          "v_qbp_kms": 92,
+          "v_linear_kms": 118,
+          "z": 11.0
+        },
+        "UHZ1": {
+          "v_qbp_kms": 86,
+          "v_linear_kms": 109,
+          "z": 10.3
+        },
+        "JADES-GS-z14-1": {
+          "v_qbp_kms": 70,
+          "v_linear_kms": 93,
+          "z": 13.9
+        }
+      },
+      "discriminator": "25-30% difference in v_rot at z>10",
+      "prediction_chain": [
+        "PRED-a0-saturating-matter-era",
+        "PRED-a0-saturation-factor-fano",
+        "PRED-btfr-mass-correction"
+      ],
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "literature_constraints": {
+        "JADES-GS-z14-0": {
+          "v_rot_lower_kms": 100.0,
+          "sigma_upper_kms": 40.0,
+          "M_dyn_log10": 9.4,
+          "M_dyn_log10_err": [
+            -0.4,
+            0.8
+          ],
+          "detection_significance": 6.6,
+          "velocity_gradient_significance": 3.0,
+          "ref": "Schouws+2025 arXiv:2503.10751 (MNRAS Letters)",
+          "preliminary_verdict": "linear marginally favoured",
+          "caveats": "lower bound only; one-sided constraint not a measurement"
+        },
+        "GN-z11": {
+          "ALMA_CII_status": "non-detected",
+          "ref": "Fudamoto+2024 MNRAS 530:340; Bakx+2021/2022",
+          "best_kinematic_line": "NIRSpec [OIII]5007"
+        },
+        "JADES-GS-z14-1": {
+          "kinematic_status": "inaccessible",
+          "ref": "Witstok+2025 ApJ 992:212 (56-hr PRISM gives no rest-UV emission > 3σ)"
+        }
+      },
+      "notes": "\n[Session 23, 2026-05-04] Literature search added: Schouws+ 2025 ALMA [OIII]88μm rotation on JADES-GS-z14-0 gives v_rot > 100 km/s (lower bound from σ<40 + v_rot/σ>2.5). Sits ABOVE saturating prediction (88) and BELOW linear prediction (118) — preliminary directional indication: linear marginally favoured. Decisive cube-level adjudication awaits actual ALMA cube fetch + pipeline run.",
+      "provenance_kind": "internal-compute",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "PRED-tov-mass-at-bump-peak",
+      "name": "M(NS with ρ_c at algebraic bump peak) = 2.20 M_☉",
+      "tier": 2,
+      "provenance": "I",
+      "status": "coherent",
+      "description": "The QBP √(7/3) prediction applied to its actual regime: NS with central density at the algebraic peak (where c_s² = Q = 2/3). Verified by TOV integration: with soft crust (P(ρ₀) = 1 MeV/fm³) and narrow bump (width 0.3 ρ₀), M(ρ_c=peak) = 2.194 M_☉ — within 0.3% of M_Ch · √(7/3) = 2.200 M_☉.",
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "verified",
+      "predicted_value": 2.2,
+      "measured_value": 2.194,
+      "discrepancy_pct": 0.27,
+      "predicted_unit": "M_☉",
+      "regime_of_validity": {
+        "configuration": "bump_peak",
+        "asymptotic_or_exact": "exact_in_regime",
+        "description": "Mass of NS whose central density sits at the algebraic peak (ρ_c ≈ ρ_peak = 2 ρ₀ where c_s² = Q). NOT the global M_max. Verified empirically: with soft crust (P(ρ₀) = 1 MeV/fm³) and narrow bump (width 0.3 ρ₀), M(ρ_c=peak) = 2.194 M_☉ — within 0.3% of QBP target 2.200."
+      },
+      "prediction_chain": [
+        "PRED-TOV-limit-sqrt-7-over-3",
+        "PRED-conformal-sound-speed-1-over-3"
+      ],
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "provenance_kind": "internal-compute",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)"
+    },
+    {
+      "id": "PROOF-alpha-particle-quaternion",
+      "name": "α-particle (⁴He) mass number = dim ℍ = 4",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/Nucleosynthesis.lean",
+      "lean_theorem": "alpha_particle_is_quaternionic",
+      "sorry_count": 0,
+      "description": "The α-particle's mass number equals the dimension of the quaternion algebra. This is the algebraic origin of α-particle stability and the alpha-process ladder (4n nuclei): 2 protons + 2 neutrons fill ℍ exactly.",
+      "prediction_chain": [
+        "PROOF-quat-closure"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "physical_mapping_type": "type_1_direct",
+      "provenance_kind": "proof",
+      "physical_mapping_status": "conjectural",
+      "intake_note": "Nuclear-identity cluster rider: the kernel proves 4 = dim H; it does not prove helium knows that.",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "PROOF-fano-choice-information",
+      "name": "Fano line selection requires exactly ln 7 nats",
+      "tier": 1,
+      "provenance": "T",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/FanoChoiceInformation.lean",
+      "sorry_count": 0,
+      "status": "coherent",
+      "description": "Information-cost identity: log(numFanoLines) = log 7. Bridges the combinatorial Fano result (FanoGenesis.lean T1: 7 lines) to the entropic interpretation used in M_seed (S_BH = ln 7). The crystallisation threshold and the Shannon information of a uniform 7-way choice are the same number BY CONSTRUCTION.",
+      "prediction_chain": [
+        "PROOF-hurwitz",
+        "AXIOM-1"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "notes": "Lean theorem name: fano_choice_information. Resolves the entropy/algebra coincidence at Stage 2 (crossing S = ln 7) — the threshold equals the cost of the choice.",
+      "lean_theorem": "fano_choice_information",
+      "physical_mapping_type": "type_1_direct",
+      "provenance_kind": "proof",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "PROOF-iron-56-double-octet",
+      "name": "Iron-56 mass number = dim(Im 𝕆) × dim 𝕆 = 7 × 8",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/Nucleosynthesis.lean",
+      "lean_theorem": "iron_56_double_octet",
+      "lean_companion_theorems": [
+        "iron_56_g2_alpha_ladder",
+        "iron_56_is_fourteen_alphas",
+        "iron_decomposition_consistency"
+      ],
+      "sorry_count": 0,
+      "description": "Iron-56, the most stable nucleus (binding-energy peak), has mass number 56 = 7 × 8 = dim(Im 𝕆) × dim 𝕆. Equivalently 56 = 14 × 4 = dim G₂ × dim ℍ (fourteen α-particles, where 14 is the dimension of Aut(𝕆)). The end of stellar nucleosynthesis is algebraically the product of the two octonionic dimensions. Formal version of `INSIGHT-iron-handoff-...`.",
+      "prediction_chain": [
+        "PROOF-alpha-particle-quaternion",
+        "PROOF-fano"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "physical_mapping_type": "type_1_direct",
+      "provenance_kind": "proof",
+      "physical_mapping_status": "conjectural",
+      "intake_note": "Nuclear-identity cluster rider (see PROOF-alpha-particle-quaternion).",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "PROOF-iron-to-ns-bridge",
+      "name": "Iron-56 → neutron-star mass bridge through dim(Im 𝕆) = 7",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/DenseMatter.lean",
+      "lean_theorem": "iron_to_ns_dim_im_octonion_link",
+      "sorry_count": 0,
+      "description": "Both the iron-56 mass number (end of stellar fusion) and the TOV limit (max neutron-star mass) depend on dim(Im 𝕆) = 7. Specifically: iron_56 / dim 𝕆 = dim(Im 𝕆), and (M_TOV / M_Ch)² = dim(Im 𝕆) / dim(Im ℍ). The seven Fano lines control where fusion ends AND how heavy a collapsed remnant can be.",
+      "prediction_chain": [
+        "PROOF-iron-56-double-octet",
+        "PRED-TOV-limit-sqrt-7-over-3"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "physical_mapping_type": "type_2_integrated",
+      "integration_test_status": "verified",
+      "provenance_kind": "proof",
+      "physical_mapping_status": "conjectural",
+      "intake_note": "The (M_TOV/M_Ch)^2=7/3 Lean identity stands (sorry 0); the global-physical reading rides the falsified claim and may not borrow the theorem's credibility.",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "PROOF-oxygen-16-sedenion",
+      "name": "O-16 mass number = (dim ℍ)² = dim 𝕊 = 16",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/Nucleosynthesis.lean",
+      "lean_theorem": "oxygen_16_is_sedenion",
+      "lean_companion_theorems": [
+        "oxygen_16_equals_sedenion_dim"
+      ],
+      "sorry_count": 0,
+      "description": "Oxygen-16 has mass number 16 = 4² = dim ℍ × dim ℍ = dim 𝕊. O-16 is four α-particles (each filling ℍ); together they fill the sedenion algebra. The next Cayley-Dickson step beyond ℍ.",
+      "prediction_chain": [
+        "PROOF-alpha-particle-quaternion"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "physical_mapping_type": "type_1_direct",
+      "provenance_kind": "proof",
+      "physical_mapping_status": "conjectural",
+      "intake_note": "Nuclear-identity cluster rider.",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "PROOF-seed-mass-from-ln7",
+      "name": "Seed mass M_seed = sqrt(ln 7 · ℏc / 4πG)",
+      "tier": 1,
+      "provenance": "T",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/SeedMass.lean",
+      "sorry_count": 0,
+      "status": "coherent",
+      "description": "M_seed solves S_BH(M) = ln 7 where S_BH = 4πGM²/(ℏc). Numerically M_seed ≈ 0.39 M_Planck ≈ 8.6×10⁻⁹ kg. The seed mass is uniquely determined by the Fano-line cardinality and the universal constants. Lean theorems: S_BH_at_M_seed, S_BH_at_M_seed_log_seven, M_seed_pos.",
+      "prediction_chain": [
+        "PROOF-fano-choice-information"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "notes": "Implies the parent body is NOT a stellar-collapse remnant (no associativity in 𝕆-physics → no QFT → no hydrostatic stars). Natural framing: primordial Planck-scale relic crossing the S = ln 7 threshold.",
+      "lean_theorem": "S_BH_at_M_seed_log_seven",
+      "lean_companion_theorems": [
+        "S_BH_at_M_seed",
+        "M_seed_pos",
+        "M_seed_arg_nonneg"
+      ],
+      "physical_mapping_type": "type_1_direct",
+      "provenance_kind": "proof",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "PROOF-silicon-28-fano-ladder",
+      "name": "Si-28 mass number = dim(Im 𝕆) × dim ℍ = 7 × 4",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "proof_system": "lean4",
+      "proof_file": "QBP/Cosmo/Nucleosynthesis.lean",
+      "lean_theorem": "silicon_28_alpha_ladder",
+      "lean_companion_theorems": [
+        "fano_alpha_ladder",
+        "silicon_to_cpu_bridge"
+      ],
+      "sorry_count": 0,
+      "description": "Silicon-28 (the dominant Si isotope, 92% terrestrial abundance) has mass number 28 = 7 × 4 = dim(Im 𝕆) × dim ℍ. Seven α-particles, one per Fano line. The alpha-process ladder ¹²C→¹⁶O→²⁰Ne→²⁴Mg→²⁸Si exhausts the seven Fano lines exactly. CPU silicon traces back to this structure.",
+      "prediction_chain": [
+        "PROOF-alpha-particle-quaternion",
+        "PROOF-fano"
+      ],
+      "last_tested_at": "2026-04-30T00:00:00Z",
+      "physical_mapping_type": "type_1_direct",
+      "provenance_kind": "proof",
+      "physical_mapping_status": "conjectural",
+      "intake_note": "Nuclear-identity cluster rider.",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "REF-brink-condensed-group-cohomology",
+      "name": "Brink (2025): Condensed Group Cohomology (arXiv:2512.03648)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Emma Brink, 'Condensed Group Cohomology' (arXiv:2512.03648, Dec 2025). Cohomology of condensed objects equipped with a group action. Identified as the MOST APPLICABLE recent building block for the H(t)=Mdot/M derivation idea, which needs cohomology of condensed objects with a time-evolution group action.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Most directly applicable condensed-math building block for the horizon-growth derivation.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-capoferri-dirac-lorentzian",
+      "name": "Capoferri (2025): Global and microlocal aspects of Dirac operators (Math. Nachr.)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Constructs the Cauchy evolution operator for the Lorentzian Dirac operator on globally hyperbolic 4-manifolds. Matters for QBP because the spectral action is built on the Dirac operator D — the object whose growth across the horizon the obstruction calculation tracks is one the literature already knows how to evolve.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Lorentzian Dirac Cauchy evolution; the QBP-relevant operator on the right class of spacetimes.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-clausen-scholze-condensed",
+      "name": "Clausen-Scholze: Condensed Mathematics (Lectures 2019; Complex Geometry 2022)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Clausen, D. & Scholze, P. Foundational condensed-mathematics corpus: 'Lectures on Condensed Mathematics' (Scholze 2019, Bonn lecture notes) and 'Condensed Mathematics and Complex Geometry' (Clausen-Scholze 2022). Replaces topological spaces with sheaves on the proetale site of profinite sets; condensed abelian groups form an ABELIAN category (unlike topological abelian groups), restoring homological algebra (Ext, derived categories, six-functor formalisms) on objects classical functional analysis cannot handle cleanly. The complex-geometry text gives the liquid tensor product and analysis-free Serre duality / Riemann-Roch — the closest existing application to 'doing geometry with condensed sheaves'.",
+      "prediction_chain": [],
+      "converges_with": [
+        "INSIGHT-condensed-math-deferred",
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Core theoretical foundation for the condensed-math direction. No GR/black-hole application exists in this corpus.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-condensed-categorical-foundations-mathlib",
+      "name": "Categorical Foundations of Formalized Condensed Mathematics (J. Symbolic Logic 2024; now in Mathlib)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Incorporates the categorical foundations of condensed mathematics into Mathlib in an organic, reusable form (Condensed.Ab, the category of condensed abelian groups as sheaves on the proetale site valued in Ab). Plus supporting formalisations: Asgeirsson 'A formal characterization of discrete condensed objects' (arXiv:2410.17847) and the Noebeling theorem formalisation (arXiv:2309.07252). Makes Ext computations in Cond(Ab) tractable in QBP's Lean environment.",
+      "prediction_chain": [],
+      "converges_with": [
+        "INSIGHT-condensed-math-deferred",
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "The infrastructure that would make the Step 1-2 Ext-walk calculations runnable in Lean.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-continuous-six-functor-lch",
+      "name": "Universal continuous six-functor formalism on light condensed anima (arXiv:2511.17944); Heyer-Mann setup",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Establishes a six-functor formalism on LOCALLY COMPACT HAUSDORFF spaces (X |-> Shv(X; Sp) promotes to a six-functor formalism on LCH spaces with all morphisms), built via the Heyer-Mann geometric-setup framework (HM24). CRUCIAL for the GR-applicability question: a spacetime manifold IS locally compact Hausdorff, so condensed math's six-functor machinery already covers spacetime's underlying topology — no profinite-site reconstruction needed. Corrects the earlier (v5.8) wrong obstruction framing.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "The 'World 2' foundation. Shows the condensed six-functor formalism already covers spacetime topology; the gap is only the causal structure.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-ecker-grumiller-spacetime-crystal",
+      "name": "Ecker, Ecker & Grumiller (2026): Analytic Discrete Self-Similar Solutions of Einstein-Klein-Gordon at Large D ('spacetime crystal' critical collapse)",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Ecker (Goethe U. Frankfurt), Ecker & Grumiller (TU Wien), Phys. Rev. Lett. 2026, arXiv:2601.14358. Constructs in CLOSED ANALYTIC FORM an infinite family of discretely self-similar (DSS) solutions of the Einstein-massless-Klein-Gordon system using the large-D expansion — the first analytic capture of Choptuik's 1993 critical-collapse solution, which had been known only numerically for 33 years. The critical solution is the threshold between black-hole formation and dispersal; DSS = 'echoing', periodic self-similarity in logarithmic spacetime scales (Choptuik 4D scaling factor ~30 in radius). The authors and press describe the intermediate critical state as a 'spacetime crystal': an unstable intermediate that either dissolves back into ordinary spacetime with free particles, or — with a tiny added energy — collapses into a black hole. Believed relevant to primordial black holes in the early universe. Key structure: a SELF-SIMILAR HORIZON (SSH), a null ingoing hypersurface where the DSS lattice vector becomes null, terminating in a naked singularity.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state",
+        "WISDOM-001-stability-as-alignment",
+        "REF-algebraic-crystallisation-paper",
+        "AXIOM-1"
+      ],
+      "last_tested_at": "2026-05-22T00:00:00Z",
+      "notes": "INDEPENDENT CONFLUENCE WITH QBP, multiple levels:\n\n(1) VOCABULARY/CONCEPT (strong, independent): Grumiller's group, working in pure GR with no knowledge of QBP, independently calls the critical-collapse intermediate state a 'spacetime crystal' and uses the identical ice-freezing analogy QBP uses for 𝕆→ℍ crystallization (W-001: 'stability as alignment with the crystallization'). The 'crystallization' framing of black-hole formation is natural enough that independent serious GR theorists reach for the same metaphor. Confluence of language and concept; does not by itself confirm QBP.\n\n(2) TRANSITION-STATE MATHEMATICS (strong, technical): critical collapse with DSS is a rigorous, now-ANALYTIC description of exactly the transition state the condensed-math thread was hunting (the freezing pond, not the duck). The discrete self-similarity (echoing at logarithmic scale period Δ) is a concrete realization of the higher-order-harmonics idea (CONJ sub-conjecture d): self-similar structure repeating at progressively smaller scales = harmonics as scales of crystallization; the DSS scaling factor IS the harmonic ratio. This gives the harmonic-coupling sub-conjecture a concrete GR-native object to attach to — possibly an ALTERNATIVE to the condensed-math route, or a target the condensed-math route should reproduce.\n\n(3) HORIZON-TYPE TENSION (honest technical flag): the EEG self-similar horizon is a NULL ingoing hypersurface terminating in a naked singularity. QBP's accretion-driven horizon (PROOF-vaidya-accreting-horizon-spacelike) is SPACELIKE. These are different surfaces for different regimes: critical collapse is the threshold/naked-singularity case; QBP accretion is the super-critical case where a real horizon forms and grows. They are NOT contradictory — the critical solution is the BOUNDARY between dissolution and the QBP horizon-growth regime (Grumiller's 'two directions'). But anyone connecting them must track that SSH (null) and apparent horizon (spacelike) are distinct objects.\n\n(4) LARGE-D / CD-TOWER (speculative, worth checking): the method is the large-D expansion (solve in high dimensions, expand back to 4). QBP's structure is a dimensional ladder (CD tower 1,2,4,8,16). Whether the large-D analytic critical solutions have a clean octonionic/sedenionic reading — 'large D' ~ high up the CD tower — is an open question. If real, it would tie critical collapse directly to the CD-tower foundations. SPECULATIVE; not a claim.\n\nACTION: when the transition-state work resumes post-foundations, EEG is a primary reference and possibly a competing/complementary framework to the causal-condensed-six-functor route. The cheapest cross-check: does the QBP H = ½Ṡ/S relation hold (or acquire a correction) in the EEG analytic critical solution near the SSH?\n\n===== FULL-PAPER REVIEW & CORRECTIONS (added 2026-05-22, after reading arXiv:2601.14358 in full) =====\n\nThree earlier claims (from the press-summary-based v5.14 entry) are corrected after reading the actual equations:\n\nCORRECTION 1 — H = 1/2 Sdot/S is NOT evaluable in the critical solution. The EEG self-similar horizon (SSH) is a NULL hypersurface at x=1 (f(tau,1)=1) terminating in a NAKED SINGULARITY; there is no finite-area trapped horizon in the critical solution. Hence there is no Bekenstein-Hawking entropy S to test the relation against. The v5.14 cross-check ('does H=1/2 Sdot/S hold near the SSH?') was ILL-POSED. The relation could in principle be tested only on EEG's SUPERCRITICAL branch (Supplemental Material: fLO = f0*sqrt(beta^2 x^2 - 1), with beta^2 x^2 = 1 as apparent-horizon proxy), which 'resembles supercritical solutions above the threshold of black hole formation' — but EEG leave that branch unanalyzed. Status: test is possible in principle on the supercritical branch (unworked by EEG and by us); impossible on the critical solution.\n\nCORRECTION 2 — the gamma = 1/2 FALSE FRIEND. EEG note lim_{D->inf} gamma = 1/2, where gamma is the CHOPTUIK MASS-SCALING exponent (M_BH ~ (p - p*)^gamma near threshold). This 1/2 has NOTHING to do with QBP's 1/2 in H = 1/2 Sdot/S (which comes from horizon area ∝ radius^2). Two unrelated halves. Recording explicitly to prevent a spurious-pattern identification.\n\nCORRECTION 3 — large-D <-> CD-tower is a CATEGORY ERROR as originally stated, downgraded to a METHOD ANALOGY. EEG's D is the SPACETIME MANIFOLD dimension (coordinate count; they reach D=300, 500). QBP's CD-tower dims (1,2,4,8,16) are dimensions of the INTERNAL DIVISION ALGEBRA, not spacetime coordinate count. 'Large D = high CD rung' conflates two meanings of 'dimension'. What survives: EEG's epsilon=1/(D-1) is a discrete ladder parameter that makes transition-state PDEs tractable in a limit, analogous in METHOD (not dimension) to QBP's CD-tower ladder. Also: their minimal viable D=52 is set by the convexity constraint (eq.20) and the choice of beta, NOT by any algebraic dimension (checked: 52 has no clean CD-tower decomposition).\n\nSTRENGTHENED / DURABLE CONFLUENCES (these survive and are the real content):\n\n(A) ONE-FUNCTION GENERATION = W-003 instantiated. EEG's ENTIRE infinite family of DSS solutions is generated by a SINGLE periodic function beta(tau) with beta(tau+Delta)=beta(tau). All four solution fields (Omega, f, Pi, Psi) follow from beta algebraically + by the SSH boundary condition. This is exactly QBP's W-003 wisdom 'there is only f(u)' — one waveform generates the crystallization — realized in rigorous GR by authors with no knowledge of QBP. Stronger than the 'spacetime crystal' vocabulary match.\n\n(B) ODD-INTEGER HARMONIC STRUCTURE. EEG's example beta(tau) = cos(2*pi*tau) + sin(6*pi*tau)/A uses the 3x frequency, and they state numerical finite-D solutions have higher-mode frequencies at ODD INTEGER MULTIPLES of the fundamental. Odd-integer harmonics are exactly what a parity-structured system produces. This gives the higher-order-harmonics sub-conjecture (CONJ sub-conjecture d) a concrete, GR-validated structure: harmonics = Fourier modes of beta(tau) at odd multiples of the fundamental echoing frequency; the echoing period Delta is the harmonic ladder step.\n\n(C) NULL ENERGY CONDITION (NEC) LINES. EEG identify 'NEC lines' (loci where the null energy condition saturates = lines of vanishing Ricci scalar) emanating from NEC vertices at zeros of beta. These encode the local geometry of the crystal lattice. A candidate QBP object: the NEC lines may be where the crystallization transition is locally sharpest (zero Ricci = boundary between curvature concentration regions). Worth examining when the transition-state work resumes.\n\n===== ODD-HARMONIC STRUCTURE IS FORCED (added 2026-05-22, sympy-checked) =====\n\nPushed on confluence (B). EEG's prototypical beta satisfies a half-period antisymmetry beta(tau + Delta/2) = -beta(tau). Testing every Fourier mode cos/sin(2*pi*n*tau/Delta) against this condition (sympy, 2026-05-22): ONLY ODD n satisfy it; even modes are symmetric under the half-shift and are therefore EXCLUDED. So the odd-integer harmonic content is FORCED by the antisymmetry, not a modeling convenience. EEG's example cos(2*pi*tau)+sin(6*pi*tau)/A uses n=1,3 precisely because n=2 is forbidden.\n\nSTRUCTURAL READING: beta(tau+Delta/2) = -beta(tau) is a Z_2 (parity-like) grading on the crystallization waveform; the odd-only spectrum is the fingerprint of that Z_2.\n\nHONEST BOUNDARY ON THE QBP CONNECTION: this is a RESONANCE, not a derivation. The odd-harmonic-from-antisymmetry fact is rigorous (pure Fourier analysis). The link to QBP's parity content (oriented Fano plane, parity-violating CMB birefringence ~0.35 deg, G2-orientation chiral asymmetry) is SUGGESTIVE ONLY: EEG's Z_2 is an antisymmetry of a scalar self-similar profile in time, while QBP's parity structures concern Fano orientation and CMB polarization. Both are 'a Z_2 in a crystallization-like process', which rhymes, but no derivation links the specific Z_2's. Calling them the same parity would overstate it. Logged as a structural lead to examine when transition-state work resumes, NOT as an established correspondence.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-fargues-scholze-geometrization",
+      "name": "Fargues-Scholze: Geometrization of the local Langlands correspondence (arXiv:2102.13459)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Existence proof that condensed sheaf cohomology can carry serious bulk/boundary (local/global) structure at scale. Relevant to QBP only as a proof-of-concept that the machinery handles hard bulk/boundary problems — its domain (Langlands) is unrelated, but the harmonics-as-sheaf-stalks and horizon bulk/boundary framings borrow its structural template.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Scaling proof-of-concept for condensed sheaf cohomology on bulk/boundary problems; domain unrelated to QBP.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-internal-hom-condensed-prismatic-reals",
+      "name": "Internal Hom of condensed sets / prismatic construction of the reals (arXiv:2109.07816)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Provides the explicit R_disc -> R motivating example and RHom computations in locally compact abelian groups — the exact machinery the horizon-growth Ext^1 calculation would use. The discrete-vs-condensed distinction here is the toy model for 'tame vs structured' transitions in the CD-tower Ext walk.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Machinery reference for the Ext/RHom computations in the condensed setting.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-internal-locales-toposes",
+      "name": "Internal locales in a topos; externalisation dictionary; internal nuclei <-> sublocale embeddings",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Every Grothendieck topos has a rich internal language and a theory of INTERNAL LOCALES (objects behaving as locales in the internal logic), with a developed externalisation dictionary (e.g. arXiv:2301.00961 'Some Properties of Internal Locale Morphisms Externalised'; Joyal-Tierney; Johnstone). Internal nuclei correspond bijectively to internal sublocale embeddings. Internal points of an internal locale L are internal frame-homs O(L) -> Omega (the subobject classifier), NOT -> 2; in a non-Boolean topos Omega is richer than 2, so internal points can exist where external (Set) points do not. This is the precise mechanism by which a topos 'supplies points internally'.",
+      "prediction_chain": [],
+      "converges_with": [
+        "INSIGHT-locale-condensed-chain"
+      ],
+      "last_tested_at": "2026-05-22T00:00:00Z",
+      "notes": "The internal-points-valued-in-Omega vs external-points-valued-in-2 distinction is the formal core of 'the topos supplies missing points'.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-islam-strohmaier-feynman-propagators",
+      "name": "Islam-Strohmaier: Microlocalisation and Feynman Propagators (arXiv:2012.09767); Baer-Strohmaier Lorentzian index theorem",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Microlocal Feynman propagators for Dirac-type operators on globally hyperbolic spacetimes, with positivity reflecting Hadamard states. Together with the Baer-Strohmaier Lorentzian index theorem (index(D) = bulk A-hat + boundary eta-terms), this is the index-theoretic frame in which the horizon-growth obstruction was analysed. The S^2 eta-invariant vanishing (PROOF-s2-dirac-eta-vanishes) relocates the obstruction to the bulk A-hat integral within exactly this framework.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state",
+        "PROOF-s2-dirac-eta-vanishes"
+      ],
+      "notes": "Index-theoretic frame for the obstruction analysis; links to the eta-vanishing result.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-jubin-schapira-lorentzian",
+      "name": "Jubin-Schapira: Sheaves and D-modules on Lorentzian manifolds (arXiv:1510.01499)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Introduces causal manifolds (containing globally hyperbolic spacetimes) and proves global propagation theorems for sheaves whose microsupport lies in the polar (causal) cone; solves the global Cauchy problem for hyperbolic systems. The 'World 1' foundation: causality encoded sheaf-theoretically via microsupport. On a globally hyperbolic spacetime with Cauchy time function, causal diamonds are compact. This is the machinery the nested-Schwarzschild propagation-obstruction calculation runs in (no condensed math required).",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "The 'World 1' foundation and the core tool for the World-1-first obstruction calculation.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-liquid-tensor-experiment",
+      "name": "Liquid Tensor Experiment (Commelin-Topaz et al., Lean formalisation 2022)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Lean 4 / mathlib formalisation of the central condensed-math result (Ext^i vanishing for liquid real vector spaces against p-measure spaces), completed 2022. ~90,000 lines of Lean for the proof plus the abelian-category prerequisites. Demonstrates the condensed machinery is formally verifiable and now partly resident in Mathlib. Relevant to QBP because it puts the tooling inside QBP's own verification environment.",
+      "prediction_chain": [],
+      "converges_with": [
+        "INSIGHT-condensed-math-deferred",
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Establishes Lean-verifiability of condensed math; the cost figure (~90k lines) is the verification-debt warning for importing it into foundations.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-pyknotic-condensed-topos-status",
+      "name": "Barwick-Haine pyknotic sets vs Clausen-Scholze condensed sets: topos vs infinitary pretopos",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Barwick-Haine (arXiv:1904.09966, 'Pyknotic objects'). Condensed sets do NOT form a topos — they form an infinitary pretopos (a cocomplete locally small pretopos = small sheaves on a large site, filtered by regular cardinals into Grothendieck toposes; each kappa-condensed category IS a Grothendieck topos). PYKNOTIC sets (sheaves on tiny profinite sets valued in small sets, using a tiny/small universe pair) DO form a coherent topos — the difference is set-theoretic, pyknotic admits pathological objects (e.g. indiscrete {0,1}) to secure topos-hood. For internal-locale theory the correct arena is pyknotic / kappa-condensed (an actual topos), not 'condensed' loosely.",
+      "prediction_chain": [],
+      "converges_with": [
+        "INSIGHT-locale-condensed-chain",
+        "REF-clausen-scholze-condensed"
+      ],
+      "last_tested_at": "2026-05-22T00:00:00Z",
+      "notes": "Corrects prior loose use of 'the condensed topos'. Use pyknotic or kappa-condensed when topos structure is needed (internal locales, subobject classifier, internal logic).",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-sanchez-globally-hyperbolic-slicings",
+      "name": "Sanchez et al.: Globally hyperbolic spacetimes — slicings, boundaries, counterexamples (arXiv:2110.13672); Geroch 1970; Bernal-Sanchez 2005",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Establishes that globally hyperbolic spacetimes split as R x S (Cauchy time function; Geroch 1970) with smooth spacelike slicing (Bernal-Sanchez 2005), and that the region between two Cauchy slices is itself globally hyperbolic (arXiv:2110.13672). This is PRECISELY the 'spacetime between mass M and mass M+dM' nested object the horizon-growth calculation needs. Underpins the World-1 calculation's well-posedness.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Provides the nested-globally-hyperbolic-region structure (the M -> M+dM slab) and the Cauchy-slicing theorems.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-schapira-causal-propagation",
+      "name": "Schapira: Hyperbolic systems and propagation on causal manifolds (arXiv:1305.3535)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "Survey of the Cauchy-problem-via-microlocal-sheaves method on causal manifolds. Companion/precursor to Jubin-Schapira; gives the propagation results in the form used to argue the obstruction localises at the horizon.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Method survey supporting the microlocal propagation argument.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "REF-vaidya-accreting-horizon",
+      "name": "Ingoing Vaidya metric and apparent-horizon causal character (standard GR)",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "description": "The ingoing Vaidya metric ds^2 = -(1-2M(v)/r)dv^2 + 2 dv dr + r^2 dOmega^2 is the standard description of a black hole accreting null dust; M(v) increasing for accretion. The apparent horizon r_H = 2M(v) is spacelike when dM/dv>0 (the diagnostic g^{mu nu} n_mu n_nu = -4M' on the horizon). Established GR; the geometric basis for PROOF-vaidya-accreting-horizon-spacelike and the microlocal obstruction setup.",
+      "prediction_chain": [],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state",
+        "PROOF-vaidya-accreting-horizon-spacelike"
+      ],
+      "notes": "Standard-GR geometry underpinning the spacelike-horizon proof and the obstruction calculation.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "coherence_semantics": "citation-integrity (not endorsement)"
+    },
+    {
+      "id": "CONJ-condensed-math-for-transition-state",
+      "name": "CONJECTURE: Condensed mathematics provides the natural framework for QBP's transition-state regimes (crystallization in-flight, event horizon formation, higher-order harmonic coupling)",
+      "tier": 3,
+      "provenance": "T",
+      "status": "marginal",
+      "description": "QBP has a structural asymmetry: the post-crystallization regime (stable ℍ algebra, stable spacetime, stable spectral triple) is describable with classical noncommutative geometry, but the transition regime is not. The transition states include:\n\n1. CRYSTALLIZATION IN-FLIGHT: the 𝕆→ℍ transformation, when the algebra is neither cleanly non-associative nor cleanly associative.\n2. EVENT HORIZON FORMATION: the moment a Schwarzschild-radius surface appears, when the spacetime topology is changing from connected to horizon-bounded.\n3. HIGHER-ORDER HARMONICS: cross-scale coupling between the primary 𝕆→ℍ harmonic and derivative harmonics at chemical / nuclear / atomic scales (per W-001).\n\nCONJECTURE: Each of these transition regimes admits a clean description in the category of condensed objects, with the transition itself as a morphism whose cokernel or Ext¹ is a new physical quantity not present in classical NCG.\n\nSPECIFIC SUB-CONJECTURES:\n  (a) The 𝕆→ℍ crystallization is an inverse system of finite-dim approximations in the category of condensed real algebras; ℍ is the inverse limit, 𝕆 is the parent.\n  (b) Ext¹(ℍ_condensed, 𝕆_condensed) is non-zero during crystallization and zero at the limit; the non-zero value parameterizes a measurable physical quantity (candidate: the entropy of the in-flight state, the spectral 'thickness' of the transition, or the coupling to the next harmonic).\n  (c) Event horizon formation is a topology change describable in the condensed sheaf category but not in the classical manifold category. The 'horizon-zero to horizon-positive' transition has finite Ext¹ parameterising the formation rate.\n  (d) Higher-order harmonics are stalks of a single condensed sheaf on a site of scales; cross-harmonic effects are computed by H¹ of the sheaf, which provides the first-principles route to higher-order corrections to f(u).",
+      "predicted_unit": "Ext¹ groups computed in condensed abelian-group category",
+      "independent": true,
+      "prediction_chain": [
+        "INSIGHT-condensed-math-deferred"
+      ],
+      "converges_with": [
+        "DERIV-sedenion",
+        "DERIV-holographic",
+        "CONJ-fu-from-hawking-time-reverse",
+        "WISDOM-001-stability-as-alignment",
+        "WISDOM-003-there-is-only-f-u",
+        "AXIOM-1"
+      ],
+      "last_tested_at": "2026-05-21T00:00:00Z",
+      "notes": "===== POINTER (added 2026-05-22): see INSIGHT-locale-condensed-chain for the verified spatial-case calculation (Cantor set), the graded dependency chain (links 1-5), and the single gating question — whether a POINTLESS locale is expressible as an INTERNAL locale in the condensed topos. That gating question is the correct next target for this whole thread, ahead of any black-hole/crystallization construction. =====\n\n===== LOCALE CORRECTION TO THE v5.17 BRIDGE (added 2026-05-22) =====\n\nThe v5.17 bridge committed a CATEGORY ERROR of the exact kind this project keeps catching: it fed a CLASSICAL, POINT-BASED object (the EEG manifold with coordinate tau, and the shift tau -> tau+Delta as a coordinate translation) into POINT-FREE (condensed) machinery. EEG's tau = -ln(-t) is a logarithmic relabel of an ordinary global time coordinate on a smooth Lorentzian manifold — still the classical continuum, points primary. Reaching to condensed sets while standing on classical-time ground is incoherent at the seam. Flagged by James 2026-05-22.\n\nWHY IT IS THE SAME MOVE TWICE. Condensed mathematics replaces topological spaces with sheaves on profinite sets precisely to DE-EMPHASIZE POINTS — probes (test objects) are primary, the space is reconstructed from maps into it. Locale theory (pointless topology; Johnstone, Joyal-Tierney) does the identical thing from the order-theoretic side — the frame of opens is primary, points are derived and possibly absent. Condensed sets and locales are two formalizations of the SAME instinct: stop privileging points. (There are known adjunctions between locales and sheaf-topos constructions; this part is solid mathematics.) QBP's quaternion-valued Locale Lambda is already committed to the point-free side. So the bridge input must be the LOCALE of the crystallization, not the manifold-with-coordinate.\n\nWHY THE TRANSITION STATE FORCES THE LOCALE VIEW (strong heuristic, not yet a theorem). The whole motivation for reaching to condensed math was that in the transition the Hilbert space is still forming, the algebra is mid-transition O->H, the inner product is not fixed. A regime where structure is forming is exactly a regime where POINTS ARE NOT YET AVAILABLE — which is precisely when one must work with the locale (lattice of regions/opens) rather than points and coordinates. Standard time presupposes points exist to be coordinatized; the transition state is the regime where that presupposition fails. Corroboration from EEG itself: their coordinate system (5) BREAKS DOWN and they need a different chart to reach the Cauchy horizon — the classical shadow of 'points are not globally available here', which is the locale statement.\n\nCORRECTED BRIDGE (replaces v5.17 Steps 1-3 framing):\n  - The crystallization is a LOCALE (frame of opens primary).\n  - beta(tau) is a PRESENTATION of that locale's structure IN A CHART where     points happen to be available (the settled part of the past-patch); it     is not the object itself.\n  - The DSS is an AUTOMORPHISM OF THE LOCALE, not a shift of a coordinate.     The tau -> tau+Delta translation is the chart-image of that locale     automorphism.\n  - The condensed / locale-theoretic invariant is the OBSTRUCTION TO THAT     LOCALE AUTOMORPHISM BEING TRIVIAL. Both input and machinery are now     point-free; the seam is coherent.\n  - (The earlier H^1(Z, F_condensed) idea survives only if reinterpreted:     Z is generated by the locale automorphism, F is a sheaf ON THE LOCALE,     not on the coordinatized manifold. And the obstruction more likely     lives on the sheaf of DEFORMATIONS of the locale than on the solution     sheaf — carried over from the v5.17 reach-flag.)\n\nCORRECTED CHEAPEST FIRST TEST (replaces the v5.17 test; now coordinate-independent):\n  v5.17 asked: 'is the admissible-beta space a condensed set?' — but that   still references beta, a chart object. The corrected, coordinate-free   question: does EEG's echoing-period QUANTIZATION CONSTRAINT (eq.20, the   convexity condition that forces specific Delta) have a LOCALE-THEORETIC /   CONDENSED reading stated PURELY in terms of the frame of opens, with NO   reference to the tau-coordinate?\n    - If the quantization condition can be stated purely on the frame of       opens (e.g. as a closedness/compactness condition on the locale of       crystallizations), the locale conception is doing real work and       condensed math is the native language of the transition state.\n    - If it can only be stated via the tau-coordinate, the locale framing       is empty here and we have merely redescribed a coordinate in fancier       language. This is the honest failure mode and the test is designed to       expose it.\n\nCONFIDENCE LEDGER:\n  SOLID: locale and condensed are the same point-free instinct (known     locale<->sheaf-topos adjunctions). EEG's tau is a classical coordinate.     EEG's chart (5) demonstrably breaks down near the Cauchy horizon.\n  STRONG HEURISTIC (not a theorem): the transition state forces the locale     view because points are not yet available where structure is forming.     Consistent with QBP's stated Locale-Lambda motivation; needs the actual     construction to confirm.\n  OPEN: whether EEG's beta/tau is genuinely a chart ON A LOCALE vs just a     coordinate being redescribed — exactly what the corrected first test     settles.\n\n===== EEG AS THE BRIDGE TO CONDENSED SETS (added 2026-05-22) =====\n\nREFRAME: the EEG paper's value to QBP is NOT primarily as a confluence (crystallization vocabulary, W-003, odd harmonics — those are real but secondary). Its PRIMARY value is that it provides the FIRST CLOSED-FORM ANALYTIC transition-state solution, which is exactly the explicit raw material the condensed-math program needs. Until now the condensed program was schematic: machinery (microlocal sheaves, condensed LCH six-functor formalism) and a target (the transition state) but NO explicit solution to run the machinery on — the microlocal sketch had to use Vaidya as a phenomenological stand-in. EEG eq.(5) is an explicit closed-form metric for the in-flight crystallization. You can only build an explicit sheaf on an explicit space; EEG provides the explicit space.\n\nTHE CHAIN TO CONDENSED SETS (now concrete):\n\nStep 1 — EEG metric (5) defines an explicit causal manifold on the past-patch domain tau in R, x in [0,1], with SSH at x=1. This is exactly the locally-compact-Hausdorff-with-causal-structure input the condensed six-functor program needs (REF-continuous-six-functor-lch + REF-jubin-schapira-lorentzian), now written down rather than hypothetical.\n\nStep 2 — the DSS is a literal Z-ACTION. tau -> tau + Delta (shift by the echoing period) is a Z-action on the manifold. The solution sheaf descended to the quotient (one fundamental domain) is a sheaf on a space with a Z-action, whose cohomology is precisely what CONDENSED GROUP COHOMOLOGY computes (REF-brink-condensed-group-cohomology — this is where that anchor earns its place).\n\nStep 3 — the obstruction RELOCATES from the (vanished) horizon eta-invariant to the Z-EQUIVARIANT cohomology of the crystallization sheaf. The microlocal eta route died (PROOF-s2-dirac-eta-vanishes: horizon-sphere eta = 0 by symmetry). EEG offers an obstruction that need NOT vanish: the obstruction to the solution sheaf being Z-equivariantly trivial across one echo period. The DSS structure (form preserved, scale changed by e^{-Delta} each period) IS a non-trivial Z-equivariant structure. Candidate obstruction: H^1(Z, F_condensed), not forced to vanish the way the eta-invariant was.\n\nTHE DEEPEST HANDHOLD — beta(tau) as the condensed test function / solution space as a condensed set:\nEEG's entire solution family is parameterized by ONE periodic function beta(tau) (periodic, zero-average, half-period-antisymmetric, satisfying the convexity constraint eq.20 that QUANTIZES Delta). The space of admissible beta's, with these constraints, is plausibly a CONDENSED SET in its own right, and the convexity constraint that forces specific Delta is plausibly a condensed-theoretic CLOSEDNESS condition. If so, the condensed structure is not imposed on EEG from outside — it is LATENT in their solution space, and the echoing-period quantization is a shadow of it. QBP's 'reach to condensed sets' then goes THROUGH the EEG solution space, not through the abstract Vaidya sketch.\n\nSOLID vs REACH:\n  SOLID: EEG eq.(5) is an explicit closed-form transition-state metric; DSS is a literal Z-action; condensed group cohomology is the right tool for a condensed object under a group action; the past-patch is LCH so the condensed six-functor formalism applies.\n  REACH (not computed): that H^1(Z, F_condensed) is non-zero and relates to a physical quantity (Delta, gamma, or H=½Ṡ/S on the supercritical branch); that F (solution sheaf) vs the sheaf of DEFORMATIONS is the right object (deformations more likely carry the obstruction); that the admissible-beta space is genuinely a condensed set.\n\nCHEAPEST FIRST TEST (replaces the dead eta route and the ill-posed H=½Ṡ/S-near-SSH test): determine whether the space of admissible beta(tau) — periodic, zero-average, half-period-antisymmetric, convexity-constrained — is a condensed set, and whether EEG's echoing-period quantization (eq.20) is a condensed closedness condition. This is a structural question about EEG's own solution space, answerable without first building the full causal-condensed six-functor formalism. If yes, it is the cleanest possible demonstration that condensed math is the native language of the transition state.\n\n===== EXTERNAL CONFLUENCE: EEG SPACETIME CRYSTAL (added 2026-05-22) =====\n\nEcker-Ecker-Grumiller (Phys. Rev. Lett. 2026, arXiv:2601.14358) gave the first CLOSED-FORM ANALYTIC solution for Choptuik critical collapse — discretely self-similar 'spacetime crystal' solutions of Einstein-Klein-Gordon, via the large-D expansion. This is an independent, GR-NATIVE description of the transition state this conjecture targets. See REF-ecker-grumiller-spacetime-crystal for the four-level confluence analysis (vocabulary, transition-state math, horizon-type tension, large-D/CD-tower). KEY IMPLICATION: critical collapse + DSS may be an ALTERNATIVE route to the transition-state mathematics, complementary or competing with the causal-condensed-six-functor route. The discrete self-similarity gives the higher-order-harmonics sub-conjecture (d) a concrete object. CORRECTED 2026-05-22 after full-paper review (see REF-ecker-grumiller-spacetime-crystal): the previously-proposed cross-check (H=½Ṡ/S near the SSH) is ILL-POSED — the EEG critical solution's SSH is null and ends in a naked singularity, so there is no horizon entropy S to test against. The relation could only be tested on EEG's SUPERCRITICAL branch (unworked). The durable confluences are instead: (A) EEG's whole solution family is generated by ONE periodic function beta(tau) — W-003 'there is only f(u)' realized in GR; (B) higher harmonics are Fourier modes of beta at ODD-INTEGER multiples of the fundamental echoing frequency, giving sub-conjecture (d) a concrete GR-validated structure. The large-D <-> CD-tower idea is downgraded to a method analogy (D is spacetime-coordinate count, not algebra dimension).\n\n===== WORLD-1 CALCULATION FINDINGS (added 2026-05-21) =====\n\nTwo pieces of the World-1 calculation were attempted by Red Team in chat. One rigorous positive result, one rigorous negative result.\n\nFINDING 1 (RIGOROUS, POSITIVE): The accreting apparent horizon is SPACELIKE — the good case for global hyperbolicity.\n\nDiagnostic: compute the causal character of the apparent horizon from the norm of its normal covector. In ingoing Vaidya (G=c=1), metric ds² = -(1-2M(v)/r)dv² + 2 dv dr + r²dΩ², the inverse (v,r) block has g^vv=0, g^vr=1, g^rr=(1-2M/r). The apparent horizon φ = r - 2M(v) = 0 has normal n_μ = (-2M', 1). Its norm:\n  g^{μν}n_μ n_ν = -4M' + (1 - 2M/r), and on the horizon r=2M this is\n  g^{μν}n_μ n_ν = -4M'.\nSign of M' determines character:\n  - Accretion (M'>0): norm<0, normal timelike, AH SPACELIKE.\n  - Static (M'=0): null AH.\n  - Evaporation (M'<0): timelike AH.\n\nThe QBP-relevant accretion case gives a SPACELIKE apparent horizon, which is the GOOD case for global hyperbolicity: a spacelike hypersurface is a candidate Cauchy surface, whereas a static black hole's NULL event horizon is a Cauchy horizon (bad). The slab between two spacelike AH cross-sections, not reaching the r=0 singularity, is the candidate globally hyperbolic region.\n\nCOHERENCE BONUS (consistency check QBP passes): a spacelike hypersurface IS a moment of time. The accreting horizon being spacelike means horizon growth can be consistently interpreted as time evolution — exactly QBP's claim that horizon growth = cosmic time = daughter-universe expansion. Had the accreting horizon come out timelike, the 'horizon growth is time' interpretation would have been geometrically inconsistent. It came out spacelike. Equivalences: spacelike AH ⟺ M'>0 ⟺ area increasing ⟺ H = ½Ṡ/S > 0 ⟺ expansion. All the same condition.\n\nCAVEATS: (a) The event horizon is null and lies outside the apparent horizon; if the obstruction needs the region out to the EH, that boundary is null and we are back in the hard case. Whether the obstruction localises on the (spacelike) AH or needs the (null) EH is the thing to verify — not yet verified. (b) Spherical symmetry of Vaidya makes the AH the unique spherically-symmetric marginally-trapped tube, so the usual AH-foliation-dependence ambiguity does not bite.\n\nFINDING 2 (RIGOROUS, NEGATIVE): The S² Dirac eta-invariant is identically ZERO by spectral symmetry. Naive Route 2 gives zero.\n\nThe Dirac operator on the round S² of radius r has spectrum λ = ±(n+1)/r, n≥0, multiplicity 2(n+1). On any EVEN-dimensional manifold the chirality operator γ anticommutes with D (γD = -Dγ), so Dψ=λψ implies D(γψ) = -λ(γψ); γ invertible ⟹ +λ and -λ eigenspaces have equal multiplicity ⟹ spectrum symmetric ⟹ η(s) ≡ 0. S² is even-dimensional, so η(S² Dirac) = 0. (Round spheres in ALL dimensions have vanishing Dirac eta by the same kind of symmetry argument.)\n\nCONSEQUENCE: Route 2 (sketch v0.1) proposed obstruction = difference of horizon eta-invariants η(v+dv) - η(v). Each horizon cross-section is a round S² with η=0, so this difference is exactly 0. THE PROPAGATION OBSTRUCTION IS NOT CARRIED BY THE HORIZON ETA-INVARIANT.\n\nRELOCATION (within Bär-Strohmaier Lorentzian index theorem): index(D) = ∫_M Â(M,∇) + boundary-η-terms. The boundary η-terms vanish for round-sphere cross-sections, so the obstruction — if it exists — lives in the BULK Â-genus curvature integral, not the boundary. For a thin slab, ∫_M Â ~ (Riemann²)·volume·dv. A rough scaling attempt gave ~dM/M² (Kretschmann ~1/M⁴ at horizon × area ~M² × dr_H ~dM), NOT the hoped dM/M — but this rough estimate is NOT trusted without careful computation and may be wrong.\n\nDIMENSIONAL HONESTY CORRECTION: the v0.1 sketch conflated dimensions. The horizon cross-section is 2D (S²), but Bär-Strohmaier's boundary η is the eta-invariant of the 3D spacelike Cauchy boundary. The 2D η=0 result is rigorous and kills the most naive version. The dimensionally-correct object is the 3D Cauchy-slice Dirac eta-invariant. For a round S³ slice it is ALSO zero (sphere symmetry); but the actual Schwarzschild/Vaidya interior spatial slices are anisotropic (Kantowski-Sachs, topology ℝ×S²), and the eta-invariant there — with its non-compact direction — is not obviously zero and was not computed (beyond chat-scale).\n\nNET STATE AFTER WORLD-1 ATTEMPT:\n  - The eta route (called 'cleanest rigorous route' in v0.1) VANISHES     by symmetry for the horizon sphere. Eliminated as the mechanism.\n  - Remaining candidates: (i) the bulk Â-integral (specific target,     scaling uncertain — rough attempt gave dM/M² not dM/M, untrusted);     (ii) the anisotropic 3D-slice eta-invariant (uncomputed);     (iii) Route 1 mode-counting (untouched, now leading candidate by     elimination — uncomfortable because it is the least rigorous     route).\n  - Global hyperbolicity: accreting AH spacelike = good case     (Finding 1), modulo the AH-vs-EH localisation question.\n  - UNTOUCHED and still solid: the geometric result H = ½Ṡ/S     (independent of eta-invariant), and the consistency of the     spacelike-horizon-as-moment-of-time interpretation.\n\n===== WORLD-1-FIRST CALCULATION PATH (added 2026-05-21, post-search) =====\n\nKEY REALISATION: the first physically-meaningful calculation can be done in PURE microlocal sheaf theory (Kashiwara-Schapira / Jubin-Schapira) WITHOUT building the causal-condensed six-functor formalism first. The condensed math is an UPGRADE, not a PREREQUISITE.\n\nWORLD-1 TOOLKIT IS MORE DEVELOPED THAN v5.9 ASSUMED. Search (2026-05-21) confirms:\n  - Jubin-Schapira (arXiv:1510.01499) prove global propagation theorems     for sheaves on causal manifolds (incl. globally hyperbolic     spacetimes) and solve the global Cauchy problem; causality encoded     via microsupport in the polar cone.\n  - On globally hyperbolic spacetimes with Cauchy time function, causal     diamonds are COMPACT — the technical fact that makes sheaf     operations well-defined. The parent BH exterior has this structure.\n  - NESTED globally hyperbolic regions are already studied: the region     between two time-slices I⁺(S_{t−}) ∩ I⁻(S_{t+}) is itself globally     hyperbolic (arXiv:2110.13672, Sánchez slicings/boundaries). THIS IS     PRECISELY the 'spacetime between mass M and mass M+dM' object the     horizon-growth calculation needs.\n  - The Lorentzian Dirac operator on globally hyperbolic 4-manifolds is     handled: Capoferri 2025 (Math. Nachr.) constructs the Cauchy     evolution operator; Islam-Strohmaier (arXiv:2012.09767) build     microlocal Feynman propagators for Dirac-type operators with     Hadamard positivity. Matters because the spectral action lives on     the Dirac operator — the object whose growth we'd track is one the     literature already knows how to handle.\n\nREVISED CALCULATION SEQUENCE (cheapest falsification first — workshop discipline):\n  1. WORLD-1 CALCULATION (no condensed math): compute the microlocal      propagation obstruction for a sheaf pushed from the smaller      Schwarzschild exterior (mass M) to the larger (mass M+dM), using      existing Jubin-Schapira machinery. QUESTION: does the obstruction      scale as dM/M? If yes, that is a derivation of the Hubble relation      H·dt from sheaf propagation, checkable because H(t) is measured.\n  2. IF YES: the condensed upgrade (build causal-condensed six-functor      formalism) becomes worth the investment — it makes a CONFIRMED      physical result categorically rigorous and generalisable, and      promotes the pointwise obstruction to a continuous invariant.\n  3. IF NO: the condensed-math direction is likely a dead end for QBP      cosmology, learned CHEAPLY without building any new formalism.\n\nThis ordering replaces the v5.9 plan (which front-loaded building the causal-condensed formalism). The physics test now comes first and is bounded.\n\nMATH-GAP / PREDICTION-GAP ALIGNMENT (the reason this direction matters for predictive utility, per James 2026-05-21):\n\nQBP's empirically riskiest content and its mathematically least-complete content are THE SAME content — both concentrated in the transition space (crystallization in-flight, horizon growth). The CD tower itself (ℝ,ℂ,ℍ,𝕆,𝕊 as completed algebras) is true-by-proof — it cannot be wrong against the world, and it is not where empirical risk lives. The risk lives in H(t), Hubble tension, sign-changing Λ_eff, accretion history — all transition-space quantities, all currently POSTULATED rather than DERIVED (QBP postulates H = Ṁ/M; the f(u) crystallization dynamics are an open problem).\n\nCONSEQUENCE: closing the transition-space MATH gap simultaneously turns QBP's postulates into derivations — which makes the framework's predictions sharper and less tunable, hence MORE falsifiable, hence more scientifically valuable whether or not the framework is ultimately true.\n\nTHE PREDICTIVE PAYOFF IS THE CORRECTION TERM. A theory that DERIVES H = Ṁ/M from sheaf propagation makes a riskier claim than one that postulates it, because the derivation may force a correction: H = Ṁ/M + (something). Postulates have no correction terms; derivations do. The goal of the transition-space work is not to confirm H = Ṁ/M — it's to find the correction the derivation forces and check THAT against the Hubble-tension data. (The Hubble tension itself — the ~8% local-vs-CMB discrepancy — is a candidate home for such a correction.)\n\nBUILDING-BLOCK PAPERS for the World-1 calculation (add to toolkit):\n  - Jubin-Schapira, 'Sheaves and D-modules on Lorentzian manifolds'     (arXiv:1510.01499) — the core propagation machinery.\n  - Schapira, 'Hyperbolic systems and propagation on causal manifolds'     (arXiv:1305.3535) — survey of the Cauchy-problem-via-microlocal-    sheaves method.\n  - Sánchez et al., 'Globally hyperbolic spacetimes: slicings,     boundaries and counterexamples' (arXiv:2110.13672) — nested     globally hyperbolic regions; the M → M+dM object.\n  - Capoferri, 'Global and microlocal aspects of Dirac operators'     (Math. Nachr. 2025) — Lorentzian Dirac Cauchy evolution.\n  - Islam-Strohmaier (arXiv:2012.09767) — microlocal Feynman     propagators for Dirac-type operators, Hadamard positivity.\n\n===== GR-APPLICABILITY FINDING (added 2026-05-21, post-search) =====\n\nThe gating question 'does condensed math extend cleanly to GR-style sheaves?' was investigated. RESULT: the v5.8 framing of the obstruction was WRONG, and the real situation is more tractable.\n\nv5.8 claimed the obstruction was 'the proétale-site-of-profinite-sets foundation has no Lorentzian analogue.' This is not the right obstruction. You do NOT need to rebuild spacetime as a profinite-set site.\n\nTWO ESTABLISHED BODIES OF MATHEMATICS, EACH INDEPENDENT OF THE OTHER:\n\nWorld 1 — Sheaves on Lorentzian/causal manifolds ALREADY EXIST. Kashiwara-Schapira microlocal sheaf theory applied to causal manifolds (arXiv:1510.01499, 'Sheaves and D-modules on Lorentzian manifolds'). On a globally hyperbolic spacetime with a Cauchy time function, causal diamonds are compact and microlocal sheaf theory gives propagation results respecting the causal cone. Causality is encoded by constraining the MICROSUPPORT of sheaves to lie in the causal cone. Predates and is independent of condensed math. (Globally hyperbolic ⟹ Cauchy time function: Geroch 1970, Bernal-Sánchez 2005.)\n\nWorld 2 — Condensed math gives a six-functor formalism on LOCALLY COMPACT HAUSDORFF SPACES. The assignment X ↦ Shv(X; Sp) (spectrum-valued sheaves) promotes to a six-functor formalism on the category of LCH spaces with all morphisms (arXiv:2511.17944, 'The universal continuous six functor formalism on light condensed anima'; cf. Heyer-Mann geometric-setup framework). CRUCIAL: a spacetime manifold IS a locally compact Hausdorff space. So condensed math's six-functor machinery ALREADY covers the underlying point-set topology of spacetime — no profinite-site reconstruction needed.\n\nWHERE THE ACTUAL DIFFICULTY IS: not the topology (handled by World 2), but the CAUSAL STRUCTURE. The LCH six-functor formalism treats spacetime as undirected topology; it doesn't know about the causal preorder (light cones, time-direction). To do GR you need pushforwards along the time direction to differ from pushforwards against it. That extra constraint is exactly what World 1 (microlocal causality) provides.\n\nTHE BRIDGE THAT WOULD NEED BUILDING: combine the condensed-math six-functor formalism on LCH spaces (World 2) with the microlocal-causality constraint from Kashiwara-Schapira (World 1) — i.e., construct a 'causal condensed six-functor formalism.' Neither piece is speculative; the COMBINATION does not exist in the literature.\n\nREVISED DIFFICULTY ASSESSMENT (correcting v5.8):\n  - v5.8 said: 'may genuinely require NEW mathematics.' OVERSTATED.\n  - Correct: requires COMBINING two existing bodies of established     mathematics. Hard — probably a serious paper or thesis-scale     research program — but qualitatively different from inventing new     foundations. The pieces are citable and proven; the join is the     open work.\n\nREVISED FIRST CALCULATION (replaces the horizon-sheaf sketch with a concrete, literature-grounded version):\n  Take the Schwarzschild exterior at two nearby masses M and M+dM. Both   are globally hyperbolic (well-defined exterior physics), both are LCH   spaces with causal structure, both have Cauchy time functions. Compute   the exceptional pushforward f_! (or exceptional pullback f^!) for the   inclusion of the smaller-horizon spacetime into the larger-horizon   spacetime, in the causal-condensed six-functor formalism. CLAIM: the   'defect' of this functor (its failure to be an equivalence) is   parameterised by dM/M = (Ṁ/M)·dt = H(t)·dt.\n\n  This requires the causal-condensed formalism to exist first (the   bridge above). So the dependency chain is: build causal-condensed   six-functor formalism → compute f_! defect for Schwarzschild M → M+dM   → check it equals H·dt.\n\nBUILDING-BLOCK PAPERS for the GR side (add to the toolkit list):\n  - 'Sheaves and D-modules on Lorentzian manifolds' (arXiv:1510.01499) —     microlocal causality, the World 1 foundation.\n  - 'The universal continuous six functor formalism on light condensed     anima' (arXiv:2511.17944) — LCH six-functor formalism, the World 2     foundation.\n  - 'Functors in Lorentzian geometry: three variations on a theme'     (Gen. Rel. Grav. 2023) — functorial approaches to causal structure,     conformal boundaries, black-hole definitions via asymptotic     simplicity. Relevant for how horizons/boundaries are functorially     encoded.\n  - Heyer-Mann geometric-setup framework (HM24) — the abstract     machinery for building new six-functor formalisms; the toolkit for     constructing the causal-condensed combination.\n\nNET: the conjecture is MORE viable than v5.8 concluded, but the viable path runs through 'build a causal condensed six-functor formalism by joining Kashiwara-Schapira microlocal causality to the condensed LCH six-functor formalism' — a defined, hard, citable research program rather than either a quick calculation or a foundational impossibility.\n\n===== LITERATURE STATUS (added 2026-05-21, post-search) =====\n\nDIRECT BRIDGE: EMPTY. A targeted search (2026-05-21) for any work connecting condensed mathematics (Clausen-Scholze) to black holes or general relativity returned ZERO results. The intersection does not exist in the literature. (Note the terminology trap: GR papers use 'condensed' to mean matter condensation / collapse, entirely unrelated to condensed mathematics. The word collision is total and accidental.)\n\nCondensed mathematics' applications to date are entirely within pure mathematics: number theory, p-adic geometry, complex analytic geometry, geometrization of local Langlands (Fargues-Scholze), homological algebra of topological groups. The closest approach to physics is Scholze's SPECULATION (Quanta Magazine interview, 2026-05-20) that QFT is 'by its nature very analytic and topological' and condensed mathematics 'gives a possible framework' to mix those worlds — a hope expressed in an interview, not a result. No QFT-via-condensed-math paper exists, let alone a GR or black-hole one.\n\nIMPLICATION: CONJ-condensed-math-for-transition-state is genuinely novel territory with zero literature support AND zero literature contradiction. Nobody has tried this connection.\n\nCORRECTION TO EARLIER CHARACTERISATION: Prior notes (v5.4-v5.7) described this work as 'apply existing machinery to a new domain, not develop new mathematics.' This was TOO OPTIMISTIC. The existing theory is built on the proétale site of profinite sets, which has no obvious Lorentzian analogue. Extending condensed math to spacetimes with causal structure may genuinely require NEW mathematics, not just application of existing tools. Re-graded as HIGH-RISK / HIGH-NOVELTY, not low-risk application.\n\nBUILDING-BLOCK PAPERS (the toolkit one would need to BUILD the bridge, since no bridge exists):\n  - Clausen-Scholze, 'Lectures on Condensed Mathematics' (Scholze 2019,     Bonn lecture notes) — core theory.\n  - Clausen-Scholze, 'Condensed Mathematics and Complex Geometry' (2022)     — closest existing application to 'doing geometry with condensed     sheaves'; includes liquid tensor product, analysis-free Serre duality     and Riemann-Roch.\n  - Emma Brink, 'Condensed Group Cohomology' (arXiv:2512.03648, Dec 2025)     — MOST APPLICABLE recent building block; the H(t)=Ṁ/M derivation     needs cohomology of condensed objects with a time-evolution group     action, which is exactly this paper's subject.\n  - 'The internal Hom of condensed sets... and a prismatic construction     of the real numbers' (arXiv:2109.07816) — has the explicit     ℝ_disc → ℝ motivating example and RHom computations in locally     compact abelian groups; the exact machinery the horizon-growth Ext¹     calculation would use.\n  - Fargues-Scholze, 'Geometrization of the local Langlands     correspondence' (arXiv:2102.13459) — existence proof that condensed     sheaf cohomology carries serious bulk/boundary (local/global)     structure; relevant as scaling proof-of-concept, not by domain.\n  - Lean formalisations: Liquid Tensor Experiment; Asgeirsson 'A formal     characterization of discrete condensed objects' (arXiv:2410.17847);     Nöbeling's theorem formalisation (arXiv:2309.07252) — why the toolkit     is available in QBP's verification environment.\n\nOPEN QUESTION ELEVATED TO ITS OWN INVESTIGATION: 'Does condensed mathematics extend cleanly to GR-style sheaves (sheaves over Lorentzian spacetimes with causal structure), or does the proétale-site-of-profinite-sets foundation break when causality is introduced?' This is now the GATING question for the whole conjecture — it must be answered before any H(t)=Ṁ/M derivation attempt. See investigation notes appended to this anchor and (if it grows) a dedicated child anchor.\n\nMAJOR REFRAMING (2026-05-21, end-of-session): James pointed out that we are CURRENTLY in horizon-formation, not waiting for it. Universe 2's expansion (observed H₀, the Hubble constant) is the time-derivative of horizon growth on the parent BH in Universe 1. Whenever Ṁ_in > C/M² (Hawking term), the Schwarzschild radius r_s = 2GM/c² is monotonically increasing — i.e., the horizon is actively forming. For SMBHs in their current cosmic environment, this condition holds essentially always. So the 'changing topology of spacetime' regime isn't a one-time historical event or far-future possibility — it's the active regime sampled by every measurement of H(t) across cosmic history.\n\nThis strengthens the case for condensed math considerably. The previous v5.6 framing weakened the conjecture because classical Hochschild cohomology handles the CD-tower breakdown adequately. But Hochschild cohomology handles the DISCRETE, one-time algebraic obstructions. The continuous horizon growth — which is the actual regime QBP cosmology describes — is exactly the kind of 'changing-topology continuously parameterised by M(t)' problem that condensed math is built for and classical NCG is not.\n\nREVISED CENTRAL TEST: If the framing is right, the condensed-categorical invariant of horizon growth should be a function of Ṁ(t)/M(t). The Ext¹ class in the appropriate condensed sheaf category — sheaves over the parent BH's spacetime, parameterised by M(t) — would measure the obstruction to smoothly extending the spacetime sheaf across the growing horizon sphere. Non-zero Ext¹ parameterises the rate of horizon growth.\n\nThe physical claim: this Ext¹ class, derived from first principles in condensed math, equals H(t) = Ṁ/M. Currently QBP POSTULATES H = Ṁ/M (it's an axiom of the accretion cosmology). If condensed math DERIVES it from the categorical structure of horizon growth, that's a major physical result — turning a QBP axiom into a theorem.\n\nREFINED PRIORITY MAP (post James's reframing):\n  - HIGHEST PRIORITY: derive H(t) = Ṁ/M from condensed-categorical     structure. Specifically: set up the condensed sheaf category     over a spacetime with a growing horizon, compute Ext¹ between     'spacetime sheaf at time t' and 'spacetime sheaf at time     t+dt', show this Ext¹ class equals (Ṁ/M)·dt.\n  - HIGH PRIORITY: classical HH² for the CD-tower breakdown     (Step 2'-2'' of previous notes). This is independent and     still worth doing — it tells us whether condensed math is     needed for the algebraic side too, or only for the     cosmological / topological side.\n  - LOWER PRIORITY: the in-flight crystallization 𝕆→ℍ     framing. May connect to the horizon-growth picture (since     each new bit of in-falling matter triggers a local     crystallization), but the cleaner test is horizon growth     itself.\n\nWORKSHOP NOTE: this is the second major refinement of the conjecture in one session. v5.4 had Ext¹-in-Cond(Ab); v5.6 moved to HH² after the hand-calculation showed Ext¹ was the wrong invariant; v5.7 (this entry) moves the focus from CD-tower-breakdown to horizon-growth after James pointed out we are inside that regime. The conjecture is getting sharper with each refinement, not collapsing — which is a sign that the underlying intuition (condensed math for QBP's transition regimes) has merit, but the specific operationalisation was wrong twice. Future investigations should treat condensed math as a strong candidate for the cosmological side and a weaker candidate for the algebraic side.\n\n===== PRIOR NOTES BELOW (v5.6, retained for continuity) =====\n\nConjecture authored 2026-05-21 in response to James's identification of the transition-state gap in QBP. Refined 2026-05-21 (same day) after Red Team attempted the test calculation and discovered the original Ext¹ framing was the wrong invariant.\n\nSTATUS: MARGINAL (the conjecture survives in refined form; the original Ext¹ specification was wrong).\n\nFINDINGS FROM HAND-CALCULATION (2026-05-21):\n\nStep 0 (sanity): CONFIRMED. ℝ, ℂ, ℍ each express as condensed real algebras via the standard topological-space-to-condensed-set functor (quasi-separated condensed sets via the underlying ℝⁿ). 𝕆 and 𝕊 same argument applies; non-associativity is fine at the level of underlying spaces (encoded in the multiplication being a morphism of condensed sets, not in the category requiring associativity).\n\nStep 1 (warm-up): CONFIRMED. Ext¹_{Cond(Ab)}(ℂ_cond, ℝ_cond) = 0. The argument: for finite-dim ℝ-vector spaces, Ext¹ in Cond(Ab) agrees with Ext¹ in classical ℝ-Mod, which vanishes (every short exact sequence of finite-dim real vector spaces splits because ℝ-Mod is semisimple). The forgetful functor Cond(ℝ-Mod) → ℝ-Mod is exact on finite-dim inputs.\n\nStep 2 (discriminating test): ORIGINAL FRAMING WRONG; REFINED.\n\n  Attempt 1 — Ext¹_{Cond(Ab)}(ℍ_cond, ℂ_cond): = 0 by the same argument   as Step 1. TOO CHEAP: ℍ as an abelian group is just ℝ⁴; the interesting   structure lives in the multiplication, which Cond(Ab) discards.\n\n  Attempt 2 — Ext¹_{Cond(ℂ-Bimod)}(ℍ_cond, ℂ_cond): the natural quotient   ℍ/ℂ ≅ ℝj ⊕ ℝk carries a non-trivial ℂ-bimodule structure (left and   right multiplication by i differ: i·j = k but j·i = -k). The short   exact sequence 0 → ℂ → ℍ → ℍ/ℂ → 0 SPLITS as ℂ-bimodules — the obvious   splitting s(cj+dk) = cj+dk ∈ ℍ checks out for both left and right   ℂ-actions. So Ext¹ in Cond(ℂ-Bimod) = 0. STILL TOO CHEAP.\n\n  Attempt 3 — the actual obstruction is at the ALGEBRA level, not the   module level. A retraction r: ℍ → ℂ of ℝ-ALGEBRAS would require   r(jk) = r(j)·r(k). Since jk = i, r(i) = i. Then r(j), r(k) must be   square roots of -1 in ℂ, so r(j), r(k) ∈ {+i, -i}. But then   r(j)·r(k) = ±1 ≠ i. CONTRADICTION. No ℝ-algebra retraction exists.   The sequence is NON-SPLIT as ℝ-algebras.\n\nREVISED DISCRIMINATING INVARIANT: The right invariant is HOCHSCHILD COHOMOLOGY HH²(ℍ, ℂ), NOT Ext¹ in Cond(Ab). Hochschild cohomology classifies algebra extensions; HH²(A, M) for an algebra A and an A-bimodule M parameterises the non-split extensions of A by M. The obstruction demonstrated in Attempt 3 (no ℝ-algebra retraction ℍ → ℂ) is exactly what HH² measures.\n\n  Open question: is HH² in condensed algebras / condensed bimodules   meaningfully different from classical HH² for these examples? If   classical HH²(ℍ, ℂ) already detects the obstruction, condensed math   may not be necessary for the CD-tower-breakdown story — classical   Hochschild cohomology would suffice.\n\n  However: condensed math may still be the right framework for the   TRANSITION STATE itself (the in-flight crystallization), even if   classical HH² handles the discrete breakdown structure. The   distinction matters: classical HH² gives a yes/no obstruction;   condensed Hochschild cohomology might parameterise an obstruction   CONTINUOUSLY along the transition, giving the in-flight invariant.\n\nREFINED TEST PLAN:\n  Step 2': Compute HH²(ℍ, ℂ) in CLASSICAL Hochschild cohomology first.     This is a standard calculation with known machinery (Cartan-    Eilenberg resolution, etc.). Expected: HH²(ℍ, ℂ) ≠ 0 with     dimension capturing the algebra extension class of ℍ over ℂ.\n  Step 2'': If Step 2' is non-zero, repeat in CONDENSED Hochschild     cohomology. The question is whether the condensed version     differs — specifically, whether it produces a continuous     parameter family rather than a discrete obstruction class.\n  Step 3-4: Same protocol for HH²(𝕆, ℍ) and HH²(𝕊, 𝕆). The 𝕊 step     is particularly interesting: classical HH² should detect the     failure of 𝕊 to be a division algebra (the 42 ZD obstruction     should show up as an HH² class).\n\nDOWNSTREAM IMPLICATIONS:\n  - If classical HH² fully captures the CD-breakdown story: the     'condensed math is needed for transition state' argument weakens     significantly. Classical Hochschild cohomology + standard NCG     suffices for the algebraic breakdown chain. Condensed math may     still help with horizon-formation / harmonic-coupling but the     case is narrower.\n  - If condensed Hochschild adds something classical doesn't (e.g.,     continuous parameterisation of the in-flight transition): the     full conjecture stands.\n\nPROCESS NOTE: This is a workshop-discipline moment. The original Ext¹-in-Cond(Ab) framing felt clean and testable but was the wrong invariant. The hand-calculation found this by trying, not by argument-from-first-principles. The lesson: pre-test framings of speculative directions are often wrong; the test itself reveals which invariant matters. Future post-foundations work on CONJ-condensed-math-for-transition-state should begin with classical HH² for the CD steps before invoking the heavier condensed-math machinery.\n\nWORKSHOP NOTE: Author (Red Team) is aware this conjecture is still pre-publication speculation. The corrected framing (Hochschild cohomology over Ext¹) brings it slightly closer to standard noncommutative-geometry vocabulary (HH² is well-studied; condensed HH² is fringe), but the QBP-specific physical interpretation remains speculative.\n\nEXPLICIT DEPENDENCY: The classical HH² calculations (Step 2') can be done at any time and don't require foundations-rebuild to be complete. They're independent scouting. Condensed HH² (Step 2'') requires Mathlib infrastructure that may or may not exist; needs verification before committing.",
+      "provenance_kind": "theory",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "INSIGHT-condensed-math-deferred",
+      "name": "MATHEMATICS: Condensed mathematics (Clausen-Scholze) as a candidate framework for QBP's transition-state regimes — formally deferred until foundations stabilise",
+      "tier": 3,
+      "provenance": "T",
+      "status": "marginal",
+      "description": "Condensed mathematics, developed by Dustin Clausen and Peter Scholze from 2018 onward, replaces topological spaces with sheaves on the site of profinite sets. Its primary motivation is that topological abelian groups do not form an abelian category, so homological algebra on them is broken — condensed abelian groups DO form an abelian category, enabling Ext groups, derived categories, and six-functor formalisms on objects that classical functional analysis cannot handle cleanly.\n\nRELEVANCE TO QBP: Classical noncommutative geometry (Connes' spectral triples) requires (A, H, D) to be fully formed — the algebra fixed, the Hilbert space complete, the Dirac operator self-adjoint. This describes the POST-crystallization regime well but provides no machinery for the TRANSITION state where:\n  - The algebra is in flux between 𝕆 (non-associative) and ℍ (associative)\n  - The Hilbert space is forming (no fixed inner product)\n  - The Dirac operator has not yet stabilized as self-adjoint\n  - Spacetime topology is changing (event horizon formation)\n\nCondensed math provides three relevant mechanisms:\n  1. LIQUID VECTOR SPACES contain Banach spaces as a full subcategory but also contain 'becoming-Banach' objects — a candidate framework for the Hilbert-space-in-formation regime.\n  2. PROFINITE-SET SITES are the natural language for 'partial formation' via inverse systems — the crystallization is an inverse limit of finite approximations.\n  3. EXT GROUPS in condensed abelian groups compute obstructions to forming. Ext¹(ℍ_condensed, 𝕆_condensed) would be a new physical quantity measuring algebraic obstruction to clean crystallization.\n\nSTATUS: Marginal because the machinery exists, is Lean-formalized (Liquid Tensor Experiment + Mathlib condensed-math infrastructure), and addresses pathologies QBP genuinely has — BUT no published work bridges condensed mathematics to noncommutative geometry or spectral triples. The bridge is speculative pending concrete investigation.",
+      "measured_source": "Clausen, D. & Scholze, P. (2018-2022). Multiple references: 'Lectures on Condensed Mathematics' (Scholze 2019, Bonn), 'Condensed Mathematics and Complex Geometry' (Clausen-Scholze 2022), Liquid Tensor Experiment (Commelin-Topaz et al., Lean formalization completed 2022), 'Categorical Foundations of Formalized Condensed Mathematics' (Journal of Symbolic Logic 2024, now in Mathlib).",
+      "independent": true,
+      "prediction_chain": [],
+      "converges_with": [
+        "AXIOM-1",
+        "CONV-spectral-entropy-zeta",
+        "CONV-cd-tower-in-zeta-moments",
+        "DERIV-holographic",
+        "DERIV-sedenion",
+        "WISDOM-001-stability-as-alignment",
+        "WISDOM-003-there-is-only-f-u"
+      ],
+      "last_tested_at": "2026-05-21T00:00:00Z",
+      "notes": "Tracking anchor added 2026-05-21 in response to James's question about condensed sets in the foundations-rebuild context.\n\nEXPLICITLY NOT IN FOUNDATIONS-REBUILD SCOPE: The current foundations rebuild (Cayley-Dickson construction, structural objects, breakdown chain, operations matrix, Hurwitz boundary) is purely algebraic and topology-trivial. ℝ, ℂ, ℍ, 𝕆, 𝕊 are finite-dimensional real algebras with standard topology; classical algebraic machinery suffices. Importing condensed math into foundations would multiply verification work by ~order of magnitude (Liquid Tensor Experiment was ~90,000 lines of Lean for one theorem) with zero payoff for the algebra-of-CD-tower proofs.\n\nWHERE IT MAY GENUINELY MATTER (post-foundations work):\n  - Formalising the CCvS comparison work (CONV-spectral-entropy-zeta) —     liquid vector spaces give cleaner machinery for the heat kernel     expansion's coefficient structure\n  - Formalising CONJ-fu-from-hawking-time-reverse — the parent-daughter     duality the CCvS functional equation encodes is exactly the kind     of bulk/boundary duality condensed math is good at\n  - The TRANSITION STATE of crystallization and horizon formation —     see CONJ-condensed-math-for-transition-state\n\nWhen the foundations rebuild concludes and post-foundations work begins, this anchor should be re-evaluated for promotion to active research track.",
+      "provenance_kind": "theory",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "INSIGHT-locale-condensed-chain",
+      "name": "Locale-from-condensed compatibility: verified for spatial locales (Cantor-set calc); the pointless case gates the whole QBP physics path",
+      "tier": 3,
+      "provenance": "I",
+      "provenance_kind": "internal-compute",
+      "status": "coherent",
+      "description": "Tests James's proposed path: locales-from-condensed-sets => black-hole formation => crystallization => CD tower => particular physics. The FIRST LINK was computed concretely (2026-05-22).\n\nVERIFIED (spatial case): for profinite / compact-Hausdorff spaces, the locale IS expressible from the condensed set. Demonstrated on the Cantor set C = 2^N = lim 2^n: clopen Boolean algebras B_n = P(2^n) computed at each stage; the projection pullback B_n -> B_(n+1) verified (exhaustively, small n) to be an injective Boolean homomorphism that doubles cardinality, so the colimit B (countable atomless Boolean algebra) is well-defined; frame axioms verified exhaustively on the truncation P(2^2) (4096 instances of finite-meet-over-join distributivity); and O(C) = Idl(B) by Stone duality. The condensed-set data (maps from test objects 2^n into C) determines the clopen algebra, hence the frame, hence the locale. Rests on the foundational Clausen-Scholze embedding CompHaus -> Cond and Stone duality, both solid.\n\nTHE STRUCTURAL CATCH: this works because the Cantor set is SPATIAL (has points) and the condensed test objects (profinite sets) are themselves POINT-HAVING (inverse limits of finite sets). The locales expressible this way are the SPATIAL ones (compact-regular = compact Hausdorff). But the transition state needs POINTLESS locales — the crystallization in flight is the regime where points are not yet available. Condensed math de-emphasizes points in the ambient object but its PROBES are point-having. Whether the condensed topos can faithfully express genuinely pointless locales (as INTERNAL locales) is unsettled, and it is exactly the case QBP needs.",
+      "prediction_chain": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state",
+        "REF-clausen-scholze-condensed",
+        "REF-ecker-grumiller-spacetime-crystal",
+        "AXIOM-1"
+      ],
+      "last_tested_at": "2026-05-22T00:00:00Z",
+      "notes": "GRADED DEPENDENCY CHAIN (James's path, each link marked):\n\nLink 1 — locales expressible from condensed sets. SPATIAL CASE: VERIFIED (Cantor-set calc above). POINTLESS CASE: OPEN, and structural (point-having probes), and it is the case the transition state needs.\n\nLink 2 — express black-hole formation. REACHABLE-WITH-WORK, but BLOCKED on link 1's pointless case. EEG's explicit transition-state metric gives the locale and the DSS gives the automorphism, but near the SSH/naked singularity (where EEG's own chart breaks down) points fail and the pointless case is required. Not independently reachable.\n\nLink 3 — express crystallization. SAME STATUS AS LINK 2: in QBP, black-hole formation in Universe 1 IS the O->H crystallization seeding Universe 2. No new obstruction; link 2 viewed from the algebra side.\n\nLink 4 — express the CD tower. SPLITS: (4a) the tower as a STATIC object is finite-dim algebra, captured by CLASSICAL Hochschild cohomology (per v5.6), needs no condensed math — effectively the foundations-rebuild work. (4b) the tower as the OUTPUT of the crystallization (the tower EMERGING from the transition) needs links 2-3.\n\nLink 5 — particular physics. NOT YET FORMULABLE. Needs the spectral action on the emerged algebra (CCvS thread) -> needs link 4b -> needs links 2-3 -> needs link 1's pointless case.\n\nVERDICT: the path is CLEAR (every link well-defined, dependencies explicit) but not WALKABLE today, because link 1's pointless case is a single load-bearing gap everything downstream rests on.\n\nTHE ONE GATING CALCULATION (sharply identified): can a genuinely POINTLESS locale be expressed as an INTERNAL locale in the condensed topos? This is a specific, answerable topos-theory question, not a vague 'more research'. Conjecture (Red Team): the resolution runs through the INTERNAL locale notion — locales inside the condensed topos, where the topos's own intuitionistic logic supplies the missing points internally exactly where the classical manifold cannot. If so, the condensed topos supplies points internally precisely in the regime the transition state needs them, and the whole chain becomes a research program with no conceptual blocker (only hard work). If pointless locales are NOT faithfully expressible even internally, the chain breaks at link 1 and QBP needs a different point-free framework or a hybrid.\n\nCONFIDENCE: the spatial-case calculation is solid (sympy-verified + standard duality). The 'internal locale supplies points intuition' is a Red Team conjecture, not established. The gating question is well-posed and is the correct next target for the condensed thread, ahead of any black-hole / crystallization construction.\n\n===== GATING QUESTION — FORCING MECHANISM (added 2026-05-22) =====\n\nThe gating question ('can a pointless locale be expressed as an internal locale in the condensed topos, supplying the missing points?') was investigated. Verified facts + the rigorous mechanism + the open part:\n\nCORRECTION: 'condensed topos' is loose. Condensed sets form an infinitary PRETOPOS, not a topos; the topos arena is PYKNOTIC sets (coherent topos) or kappa-condensed sets (each a Grothendieck topos). See REF-pyknotic-condensed-topos-status. Internal-locale theory needs an actual topos, so use pyknotic/kappa-condensed.\n\nLAYER 1 (trivial, supplies nothing): any external locale L pulls back to a CONSTANT internal locale Delta(L) in any topos. So 'expressible' is trivially yes — but constant, uses no condensed structure, supplies no points. Not what is wanted.\n\nLAYER 2 (rigorous mechanism — FORCING): the prototype of a pointless locale acquiring a point INTERNALLY is forcing. Take an atomless complete Boolean algebra B (e.g. the measure algebra of [0,1], Borel mod null) — genuinely POINTLESS as a locale (every singleton is null = 0, so no completely prime filter). Pass to Sh(B) = the Boolean-valued model V^B. INTERNALLY B acquires a generic point (the random real) that does NOT exist externally in Set. Formal core (REF-internal-locales-toposes): internal points are frame-homs O(L)->Omega, and Omega is richer than 2 in a non-Boolean topos, so internal points exist where external O(L)->2 points do not. This is EXACTLY 'the topos supplies the missing points'. Rigorous, not speculative.\n\nLAYER 3 (is pyknotic the right host?): ENCOURAGING verified fact — the pyknotic/condensed topos is NON-LOCALIC (a gros topos of generalized spaces; objects like R are not subterminal-generated). A localic topos can only host internal locales that are ~sublocales of its defining locale ('thin'); a NON-localic topos has room for richer non-constant internal locales. So pyknotic is the KIND of topos that CAN host nontrivial internal locales — necessary condition, and it holds. A localic host would have been a dead end; it is not one.\n\nVERIFIED PROTOTYPE (sympy, 2026-05-22): the Cantor profinite tower 2^0 <- 2^1 <- ... — the SAME tower used to show spatial-locale<->condensed (Step 1-4 above) — IS the Cohen forcing poset (finite binary strings ordered by extension). Its points (= locale points = completely prime filters = frame-homs O(C)->2 = infinite branches) exist ONLY in the completed inverse limit, never at any finite stage: (1) every finite stage 2^n is a finite antichain with no branch inside it — point invisible at every finite resolution; (2) a point is a compatible thread through ALL stages = an inverse-limit element, supplied only by completion; (3) branches <-> points verified on truncations. So the two halves of the question meet in ONE object: the Cantor tower is simultaneously the condensed test object AND the Cohen forcing poset whose generic is the prototype internally-supplied point.\n\nSHARPENED CONJECTURE (now attackable): the crystallization locale L_cryst is pointless externally (points = settled spacetime events, absent mid-transition). It embeds as a NON-CONSTANT internal locale in the kappa-condensed/pyknotic topos. The profinite probes — the SCALE HIERARCHY of the crystallization, each finite quotient a resolution level / harmonic — play the forcing-poset role and supply, internally, a generic point = the settled spacetime event that exists once one passes to the topos's internal logic but not before. Forcing (Layer 2) is the rigorous template; the profinite scale-tower is the forcing poset; the Cohen/Cantor case is the verified prototype.\n\nSTATUS LEDGER:\n  ESTABLISHED: pretopos-vs-topos correction; pyknotic non-localic (has room); internal-locale theory exists; forcing supplies points internally (rigorous); Cantor tower = Cohen poset, points only in the limit (verified).\n  CONJECTURE (open): that L_cryst specifically embeds as a non-constant internal locale in pyknotic; that the crystallization scale-tower is a forcing poset whose generic is the settled spacetime event. The Cohen/Cantor case is the TEMPLATE, not the crystallization. This makes the gating question precise and attackable; it does NOT confirm it.\n\nNEXT CONCRETE STEP: identify the crystallization's analogue of the binary-string tree — what are the 'finite conditions' (partial crystallizations / coarse resolution levels) and what generic do they force? If the EEG echoing levels (tau mod Delta resolution tower) form a forcing poset, its generic branch is a candidate 'settled event', directly linking the EEG bridge (v5.17/5.18) to the forcing mechanism.",
+      "maturity": "nascent",
+      "layer_tag": "substrate",
+      "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "INSIGHT-echo-harmony-z2",
+      "name": "Echo vs harmony: the Cantor set is the simplest echo (monophonic); echo + a Z2 parity grading is the simplest harmony (odd-harmonic series)",
+      "tier": 3,
+      "provenance": "I",
+      "provenance_kind": "internal-compute",
+      "status": "coherent",
+      "description": "Sharpening of James's observation that 'the Cantor set is the simplest object that echoes / makes a harmony'. Made precise and verified (sympy, 2026-05-22):\n\nECHO != HARMONY, separated by exactly one Z2. The bare Cantor set is MONOPHONIC: it repeats at a single scale ratio 3^-n (equally spaced in log-scale, spacing log3), one fundamental log-frequency, NO overtones. A pure echo. (Universal/terminal self-similar object on a binary choice: C = C/3 + (2/3 + C/3), the unique compact attractor of two contractions — Hutchinson fixed point. So 'simplest thing that echoes' has a theorem behind it.)\n\nHARMONY = echo + Z2. Imposing the half-period antisymmetry f(tau + Delta/2) = -f(tau) on the log-periodic self-similar tower selects EXACTLY the ODD harmonics k=1,3,5,7,... of the fundamental 1/Delta (verified: even modes killed, odd modes survive, k=1..12 checked). Odd overtones over a fundamental in integer ratio is a harmonic SERIES — literally harmony (the overtone content of a square/odd wave). So: simplest echo = Cantor set; simplest harmony = self-similar tower + Z2 parity grading; the two are separated by precisely one Z2.",
+      "prediction_chain": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "converges_with": [
+        "CONJ-condensed-math-for-transition-state",
+        "INSIGHT-locale-condensed-chain",
+        "REF-ecker-grumiller-spacetime-crystal",
+        "WISDOM-001-stability-as-alignment",
+        "AXIOM-1"
+      ],
+      "last_tested_at": "2026-05-22T00:00:00Z",
+      "notes": "THREE-WAY Z2 CONVERGENCE (the interesting part). The SAME 'self-similar carrier + parity grading -> odd harmonics' structure was reached by three independent routes in this work:\n  (1) EEG's crystallization waveform beta(tau): odd harmonics FORCED by       the half-period antisymmetry beta(tau+Delta/2) = -beta(tau)       (verified earlier; pure GR, no knowledge of QBP).\n  (2) The Cantor/Cohen tower: the self-similar echo carrier (the       forcing poset / condensed test object) the harmony lives on       (this turn).\n  (3) QBP's parity content: oriented Fano plane (octonion       multiplication) and parity-violating CMB birefringence (~0.35       deg) — a Z2/parity grading on the algebraic structure.\n\nHONEST BOUNDARY — resonance, not derivation. VERIFIED: Cantor is monophonic; Z2 on a log-periodic tower yields exactly the odd harmonics; this is the same antisymmetry that forced EEG's beta. RESONANCE ONLY (not shown): that EEG's time-antisymmetry Z2, the Cantor-tower structure, and QBP's Fano/CMB parity are the SAME Z2. All three are 'a parity grading on a self-similar process' — a real structural rhyme, but no proof they are one group acting for one reason. Three rhymes is a strong hint to seek a common cause; it is NOT the common cause. Failure mode guarded against: 'everything is parity' becoming unfalsifiable.\n\nDERIVATION TEST (sharp, falsifiable): show that the SAME Z2 generator (a) grades the crystallization waveform (giving odd harmonics), (b) orients the Fano plane (giving octonion multiplication / the F4 convention), and (c) produces the CMB birefringence angle. If ONE parity generator does all three, that is a derivation and a genuine prediction — it would fix the birefringence angle in terms of the harmonic structure (a number to check against data). If they are three independent Z2's that co-occur, it is a coincidence of vocabulary. This test directly links the harmonics sub-conjecture (CONJ sub-conjecture d) to QBP's existing parity-violation predictions (cosmic birefringence ~0.35 deg) and to the F4 Fano-orientation convention the foundations rebuild must ratify.\n\nCONNECTION TO THE GATING WORK: the Cantor/Cohen tower is BOTH the carrier of this harmony (self-similar echo) AND the forcing poset whose generic is the internally-supplied point (INSIGHT-locale-condensed-chain). So 'the settled spacetime event' (generic point) and 'the harmonic structure of the crystallization' (odd overtones) live on the same self-similar tower, graded by the same candidate Z2. If the derivation test passes, the forcing-generic and the harmonic series are two faces of one graded self-similar object.",
+      "maturity": "nascent",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "INSIGHT-resonance-vs-amplification-scale-invariance",
+      "name": "Self-similar structure gives scale-invariant RESONANCE, not amplification; gain requires the crystallization's nonlinearity (criticality)",
+      "tier": 3,
+      "provenance": "I",
+      "provenance_kind": "internal-compute",
+      "status": "coherent",
+      "description": "Addresses James's two-stones-in-a-pond question: can the Cantor / self-similar structure enable AMPLIFICATION, and is 'harmonic resonance' a cross-cutting all-scales property?\n\nSOLID (exact, from energy conservation):\n  - Two-source interference does NOT amplify. Two equal sources give a 4x PEAK intensity on the perpendicular bisector but the SPATIAL MEAN is exactly 2x (= sum of sources); bright fringes borrow exactly what dark fringes lose. Energy conserved; the pattern rings and decays. The 'more peaks as waves connect' is the hyperbolic two-source fringe family — redistribution, not gain.\n  - Amplification needs an ingredient interference lacks: FEEDBACK (in-phase re-injection over many cycles) or NONLINEARITY (super-proportional response). Linear superposition has neither. So the Cantor set does NOT amplify by itself — linear self-similar structure conserves energy like any linear system.\n\nTHE REAL CROSS-CUTTING PROPERTY (this is what the intuition correctly points at): a SELF-SIMILAR resonator has the SAME resonance at EVERY SCALE. An ordinary resonator (string, pipe) has one fundamental + integer overtones — one scale. A self-similar resonator's reinforcement condition RECURS at a geometric ladder of frequencies — the same resonance at the fundamental, again at the scale-factor multiple, scale after scale. No gain, but scale-invariant SELECTIVITY. That scale-invariance IS why 'harmonic resonance feels cross-cutting at all scales': the same resonant condition holds at every magnification.",
+      "prediction_chain": [
+        "INSIGHT-echo-harmony-z2"
+      ],
+      "converges_with": [
+        "INSIGHT-echo-harmony-z2",
+        "INSIGHT-echo-harmony-z2",
+        "REF-ecker-grumiller-spacetime-crystal",
+        "WISDOM-001-stability-as-alignment",
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "last_tested_at": "2026-05-22T00:00:00Z",
+      "notes": "WHERE AMPLIFICATION ACTUALLY ENTERS QBP (the synthesis): the crystallization is NOT linear. Water->ice, the spacetime crystal forming, Mdot>0 accretion driving horizon growth — these are phase-transition systems with feedback. A phase transition at criticality is PRECISELY the regime where a tiny perturbation amplifies (diverging susceptibility; the EEG threshold where a sliver of added energy tips dissolution into black-hole formation). So:\n  - LINEAR self-similar structure (Cantor / the carrier): scale-invariant resonance, NO gain.\n  - + NONLINEARITY of the phase transition (crystallization): the scale-invariant resonance becomes scale-invariant AMPLIFICATION — the same instability at every scale, the signature of criticality.\nThe EEG critical solution is exactly this: discrete self-similarity (scale-invariant resonance) AT the threshold of collapse (the nonlinearity that amplifies). The Cantor structure supplies the scale-invariant resonant skeleton; the crystallization's criticality supplies the gain; together = amplification that looks the same at every scale = the defining feature of a critical phase transition.\n\nOPEN NUMERICAL QUESTION (flagged honestly): whether a Cantor-spaced source array actually has its resonances on a GEOMETRIC (3^n) ladder — a 'fractal comb' — was NOT established. The crude far-field numerics (depth-5 Cantor array, |S(k)| revival counting) resolved only the trivial k->0 peak and did NOT demonstrate the geometric ladder claimed in interpretation text. Fractal/Cantor-spectrum resonators are a real studied phenomenon so the ladder is PLAUSIBLE, but it must be computed properly (finer k-resolution, proper structure-factor analysis, or the known multifractal-spectrum results for Cantor arrays) before being asserted. Do NOT claim the 3^n comb until computed. This is the specific next calculation if the resonance-spectrum structure matters.\n\nRELATION TO HARMONY (INSIGHT-echo-harmony-z2): that anchor showed echo + Z2 -> odd-harmonic series (harmony). This anchor adds the dynamical layer: harmony (the mode structure) + criticality (the nonlinearity) -> amplification at every scale. Harmony is the spectrum; amplification is what the spectrum does when the medium goes critical. Both live on the same self-similar carrier.",
+      "maturity": "nascent",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "INSIGHT-threshold-transition-new-stable-state",
+      "name": "Reaching critical energy x relocates the system to a NEW STABLE STATE (first-order transition / latent heat), not amplification; CD-tower thresholds are geometrically spaced",
+      "tier": 2,
+      "provenance": "I",
+      "provenance_kind": "internal-compute",
+      "status": "coherent",
+      "description": "James's reframe: at an energy level x, do you actually rise to a NEW STABLE STATE (rather than amplify the old one)? YES — and this is a better fit for QBP than amplification.\n\nPRECISE NAME: a FIRST-ORDER (discontinuous) transition to a new stable branch, triggered at a critical energy. The system sits stably in state A; below threshold x it rattles in its well and returns; at x the barrier is cleared / A loses stability; above x the system is on a NEW stable branch B and STAYS there. Energy does not grow the old state — it pays the cost of relocating to a new one. Bistability with a barrier; the new state is as stable as the old (its own potential well). Energy-conserving, not runaway gain.\n\nMATCHES (not coincidentally):\n  - water -> ice at freezing: x = LATENT HEAT, the fixed energy cost to     relocate to the crystalline state.\n  - EEG spacetime crystal: 'a tiny added energy turns the crystal into     a black hole' — threshold tips dissolution-branch to collapse-    branch; the EEG critical solution sits AT the tipping point.\n  - QBP O->H crystallization: transition to a new stable ALGEBRA, not a     deformation of the old.",
+      "prediction_chain": [
+        "INSIGHT-resonance-vs-amplification-scale-invariance"
+      ],
+      "converges_with": [
+        "INSIGHT-resonance-vs-amplification-scale-invariance",
+        "INSIGHT-echo-harmony-z2",
+        "REF-ecker-grumiller-spacetime-crystal",
+        "WISDOM-001-stability-as-alignment",
+        "DERIV-sedenion",
+        "AXIOM-1"
+      ],
+      "last_tested_at": "2026-05-22T00:00:00Z",
+      "notes": "CD-TOWER GEOMETRIC THRESHOLD SPACING (exact arithmetic, trustworthy): the CD tower dims 1,2,4,8,16 are a factor-2 GEOMETRIC ladder. So 'reaching energy x to climb to a new stable state' on the CD tower means each rung costs more by a fixed FACTOR (geometric spacing), not a fixed amount (equal spacing as in a harmonic oscillator). Geometric threshold spacing is the signature of a SCALE ladder, and it ties this mechanism to the self-similar resonance (INSIGHT-resonance-vs-amplification): the SAME scale factor governing the resonance governs the energy thresholds.\n\nTHE COMPLETE LAYERED MECHANISM (assembled across the session, each layer one ingredient):\n  1. ECHO — Cantor carrier, self-similar, monophonic.\n  2. + Z2 parity -> HARMONY (odd-harmonic series). [INSIGHT-echo-harmony-z2]\n  3. + self-similar resonance -> same resonant condition at EVERY scale. [INSIGHT-resonance-vs-amplification]\n  4. + nonlinear bistability at threshold x -> TRANSITION TO A NEW STABLE STATE, with geometrically-spaced thresholds on the CD tower. [this anchor]\nRoles: self-similar resonance selects WHICH modes; bistable nonlinearity provides the NEW STABLE STATE; threshold x is the latent-heat / barrier energy.\n\nHONESTY FLAG: the Part A washboard-potential numerics were BUGGY — the minima-finder double-counted degenerate points and reported a spurious zero energy-drop. The specific barrier-height numbers from that toy are NOT trustworthy and are not used. The mechanism (bistability, barriers, first-order transitions) is textbook and independent of that toy; the CD-tower geometric-vs-equal threshold spacing is exact arithmetic (factor-2 ladder = the CD dimensions). Standing behind the mechanism and the geometric-spacing observation, NOT the buggy barrier heights.\n\nTESTABLE CONSEQUENCE (candidate): if QBP crystallization transitions are first-order with geometrically-spaced thresholds on the CD tower, the energy/temperature scales of successive transitions (O->H, and any sub-crystallizations) should stand in fixed RATIOS set by the tower scale factor, not fixed differences. This is a structural prediction distinct from amplitude-based pictures and worth checking against any QBP energy-scale hierarchy (e.g. the crystallization cutoff Lambda_c vs subsequent scales).",
+      "maturity": "nascent",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "INSIGHT-s2-dirac-eta-vanishes",
+      "name": "S^2 Dirac eta-invariant vanishes by spectral symmetry (route eliminated)",
+      "tier": 2,
+      "provenance": "T",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
+      "sorry_count": 0,
+      "provenance_kind": "proof",
+      "proof_state": "written",
+      "proof_language": "lean4",
+      "theorems": [
+        {
+          "name": "QBP.HorizonFoundations.eta_symmetric_spectrum_zero",
+          "status": "written"
+        }
+      ],
+      "status": "coherent",
+      "description": "A spectrum symmetric under lambda -> -lambda with equal multiplicities has vanishing signed sum, exactly and without regularisation. This is why the round-S^2 Dirac eta-invariant is zero (even-dimensional chirality operator pairs +lambda and -lambda eigenspaces). NEGATIVE World-1 finding: it eliminates the naive 'propagation obstruction = difference of horizon eta-invariants' route (Route 2 of the microlocal sketch), relocating any obstruction to the bulk A-hat curvature integral.",
+      "prediction_chain": [
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Lean source: eta_symmetric_spectrum_zero in proofs/QBP/Foundations/QBPHorizonFoundations.lean (finite exact-cancellation model of the signed eta total; the full S^2 Dirac spectrum +-(n+1)/r has this symmetry at every truncation, so eta = 0 with no zeta-regularisation subtlety). Independently verified via sympy 2026-05-22. proof_state=written pending local lake verification. Recorded as a first-class NEGATIVE result: eliminates a candidate mechanism, which is as valuable to track as a positive one (workshop discipline).",
+      "provenance_original": "PWL",
+      "id_history": [
+        "PROOF-s2-dirac-eta-vanishes"
+      ],
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true,
+      "intake_note": "route-elimination result; cites type-1 termination at phantom files (zero cited theorems resolve); self-labelled 'written pending verification' = hypothesis, not termination. Anchor-ID extension of layer-architecture 3.4 (truth-in-labelling), RATIFIED standing policy.",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "DERIV-vaidya-accreting-horizon-spacelike",
+      "name": "Vaidya accreting apparent horizon is spacelike (causal-character table)",
+      "tier": 2,
+      "provenance": "T",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
+      "sorry_count": 0,
+      "provenance_kind": "proof",
+      "proof_state": "written",
+      "proof_language": "lean4",
+      "theorems": [
+        {
+          "name": "QBP.HorizonFoundations.vaidya_horizon_normSq_eq",
+          "status": "written"
+        },
+        {
+          "name": "QBP.HorizonFoundations.accreting_horizon_spacelike",
+          "status": "written"
+        },
+        {
+          "name": "QBP.HorizonFoundations.static_horizon_null",
+          "status": "written"
+        },
+        {
+          "name": "QBP.HorizonFoundations.evaporating_horizon_timelike",
+          "status": "written"
+        }
+      ],
+      "status": "coherent",
+      "description": "On the ingoing Vaidya apparent horizon r = 2M, the squared norm of the horizon normal covector equals -4*Mdot. Hence accretion (Mdot>0) gives a timelike normal and a SPACELIKE horizon (the good case for global hyperbolicity); Mdot=0 gives null; Mdot<0 gives timelike. Positive World-1 finding underpinning CONJ-condensed-math-for-transition-state, and a consistency check QBP passes: a spacelike horizon is a moment of time, corroborating the 'horizon growth = cosmic time' reading.",
+      "prediction_chain": [
+        "AXIOM-1",
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Lean source exists at proofs/QBP/Foundations/QBPHorizonFoundations.lean (theorems vaidya_horizon_normSq_eq, accreting_horizon_spacelike, static_horizon_null, evaporating_horizon_timelike). Mathematics independently verified via sympy 2026-05-22. proof_state=written pending local lake verification by James on leanprover/lean4:v4.30.0-rc2 + Mathlib v4.30.0; promote to verified and populate the verification record on a clean build. First PROOF-* anchor minted under CTH v0.3 schema.",
+      "provenance_original": "PWL",
+      "id_history": [
+        "PROOF-vaidya-accreting-horizon-spacelike"
+      ],
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true,
+      "intake_note": "derivation, not kernel-verified proof; phantom file citations (QBPHorizonFoundations.lean does not exist).",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "DERIV-hubble-half-entropy-factor",
+      "name": "Hubble half-entropy identity H = (1/2) Sdot/S (the factor of 1/2)",
+      "tier": 2,
+      "provenance": "T",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
+      "sorry_count": 0,
+      "provenance_kind": "proof",
+      "proof_state": "written",
+      "proof_language": "lean4",
+      "theorems": [
+        {
+          "name": "QBP.HorizonFoundations.hubble_half_area",
+          "status": "written"
+        }
+      ],
+      "status": "coherent",
+      "description": "Given horizon area A = c*rH^2 (c != 0) and the chain-rule relation Adot = 2*c*rH*rHdot, the logarithmic rate of the horizon radius is half the logarithmic rate of the area: rHdot/rH = (1/2)*(Adot/A). With Bekenstein-Hawking S proportional to A, this is H = (1/2)*Sdot/S. The factor of 1/2 (from area proportional to radius squared) is the content — it sharpens QBP's postulated H = Mdot/M into a more specific relation to parent-horizon entropy growth.",
+      "prediction_chain": [
+        "AXIOM-1",
+        "CONJ-condensed-math-for-transition-state"
+      ],
+      "notes": "Lean source: hubble_half_area in proofs/QBP/Foundations/QBPHorizonFoundations.lean. Chain rule taken as hypothesis (standard calculus; the content is the 1/2, not the derivative). Independently verified via sympy 2026-05-22, including the S=A/4 corollary H = 1/2 Sdot/S. proof_state=written pending local lake verification. Candidate refinement of QBP's H = Mdot/M axiom toward a theorem; the correction term (if any) beyond the 1/2 is the falsifiable payoff per CONJ-condensed-math-for-transition-state.",
+      "provenance_original": "PWL",
+      "id_history": [
+        "PROOF-hubble-half-entropy-factor"
+      ],
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true,
+      "intake_note": "derivation, not kernel-verified proof; phantom file citations (lean4/QBP/SpectralAction/ does not exist).",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "FIT-zeta-modulated-profile",
+      "name": "Profile function f(u) consistency fit (constraint solve, not derivation)",
+      "tier": 2,
+      "provenance": "T",
+      "status": "marginal",
+      "description": "Phenomenological constraint-solve on the family f(u)=(1-Au+Bu^2)e^{-u}. Imposing f2/f0=3 and f4=0 uniquely isolates A=-7, B=-5/2 (verified symbolically and by a Lean linarith theorem on the gamma-reduced moments). This is an interpolative consistency fit. It is NOT a forward derivation: the Connes-Moscovici / odd-zeta story does no computational work, and the coefficients come from the two constraints, not from zeta(3)/zeta(5).",
+      "predicted_value": 3.0,
+      "predicted_unit": "f2/f0 ratio (dimensionless)",
+      "measured_value": 3.0,
+      "measured_source": "Symbolic (sympy) + Lean profile_uniqueness theorem",
+      "discrepancy_pct": 0.0,
+      "prediction_chain": [
+        "AXIOM-1",
+        "PRED-profile-function-f0-f2-ratio"
+      ],
+      "provenance_kind": "proof",
+      "proof_state": "written",
+      "proof_language": "lean4",
+      "proof_system": "lean4",
+      "proof_file": "lean4/QBP/SpectralAction/ProfileFit.lean",
+      "sorry_count": 0,
+      "lean_theorem": "profile_uniqueness",
+      "theorems": [
+        {
+          "name": "profile_uniqueness",
+          "status": "written",
+          "blockers": "Awaiting a recorded verification run (toolchain+Mathlib SHA). Scope: proves only the 2x2 linear solve given gamma-reduced moment polynomials as definitions; does NOT prove the integral reduction or any physics."
+        }
+      ],
+      "last_tested_at": "2026-05-26T12:30:00Z",
+      "notes": "Supersedes/clarifies PRED-profile-function-f0-f2-ratio (kept marginal). independent=false: 'measured'=3.0 is the solved-for target, so it is not an independent confirmation. f4=0 remains a CONSISTENCY requirement (Lambda_eff=2AB), contradicted as a zeta-derivation by CCvS gamma(-2)=225 zeta(5)/4 != 0 (see KILLED-f4-info-theoretic-justification). Bump proof_state to 'verified' only with a VerificationRecord after a local lake build.",
+      "independent": false,
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "lean_migration_status": "stale-pointer",
+      "review_flag": true
+    },
+    {
+      "id": "FLAG-ngc2683-mass-discrepancy",
+      "name": "NGC 2683 deep-MOND asymptote vs observed curve: discrepancy + retraction of fabricated table",
+      "tier": 2,
+      "provenance": "E",
+      "status": "incoherent",
+      "description": "Using the stated baryonic inputs (M_star=2.69e10, M_gas=1.15e9 Msun) with a0=1.2e-10 m/s^2, the deep-MOND asymptote V_f=(G M a0)^{1/4}~145 km/s. The published HI/Halpha curve peaks ~215 km/s near 3 kpc then DECLINES (NGC 2683 is barred, ~78-80 deg inclined, with figure-of-eight non-circular motions). A flat 214 km/s plateau to 20 kpc would need ~4.7x more baryonic mass. The prior 'out-of-sample verification' table (V_obs 179.4..214.6, chi2_nu=0.24) was fabricated, not a SPARC lookup, and is retracted.",
+      "predicted_value": 145.2,
+      "predicted_unit": "km/s deep-MOND asymptote (G M a0)^1/4",
+      "measured_value": 215.0,
+      "measured_error": 0.0,
+      "measured_source": "Literature inner-peak: Kuzio de Naray, Zagursky & McGaugh 2009 (arXiv:0908.0741); Vollmer et al. A&A 2016 (curve peaks ~215 km/s then declines)",
+      "discrepancy_pct": 48.0,
+      "prediction_chain": [
+        "PRED-holographic-boundary-gravity",
+        "PRED-no-dm-particle"
+      ],
+      "testable_when": "Re-test only with a raw SPARC mass-model file for a non-barred, Q>=3 galaxy with a genuinely extended flat HI envelope, pre-registered before lookup",
+      "notes": "Honest replacement for the never-committed 'PRED-ngc2683-out-of-sample'. Exposes a live threat to Branch A: the 4.7x mass gap must be met by the boundary-gravity mechanism or Branch A weakens.",
+      "last_tested_at": "2026-05-26T12:30:00Z",
+      "provenance_kind": "experiment",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "FLAG-seam-dynamics-open",
+      "name": "Sedenion seam current conservation: open (Bogoliubov placeholder, no proof)",
+      "tier": 2,
+      "provenance": "T",
+      "status": "incoherent",
+      "description": "Proposed Bogoliubov-style seam scattering matrix to conserve probability current across the sedenion zero-divisor locus, with information loss scaled by the stabilizer fraction 1-1/24. Conceptual placeholder only: no compiled Lean 4 wave-transport theorem exists. Replaces the over-claimed 'PROOF-seam-current-conservation' framing.",
+      "predicted_value": 0.041666666666666664,
+      "predicted_unit": "1/|Stab| coherence floor (|Stab|=24)",
+      "prediction_chain": [
+        "DERIV-sedenion",
+        "PROOF-42zd"
+      ],
+      "testable_when": "When a continuous current-conservation theorem across non-associative zero divisors is formalized in Lean 4",
+      "notes": "|Stab|=168/7=24 is correct; the dynamics are not established. Open high-priority item (see QBP-Theory v3.1 sec 9).",
+      "provenance_kind": "theory",
+      "intake_batch": "509-C",
+      "intake_source": "v5_24 (QBP-web continued lineage)"
     }
   ],
   "inputs": [
@@ -3155,5 +4515,7 @@
       "date": "2026-06-01T00:00:00Z",
       "note": "Entropy-cone inversion hypothesis ruled DEAD (beekeeper-ratified). PROOF-division-algebra-entropy-cone-mapping coherent->incoherent (+killed_by); INSIGHT-entropy-cone-division-algebra-inversion untested->incoherent (+killed_by); CONV-cd-tower-in-zeta-moments description corrected (even-privilege claim withdrawn, arithmetic stands); INSIGHT-branch-A-hypergraph-boundary review_flag (incoherent dependency); added WISDOM-algebra-restricts-state-class-not-scalar-field. Basis: HQM-MMI-derive-or-die-report.md."
     }
-  ]
+  ],
+  "last_updated": "2026-06-04",
+  "update_provenance": "QBP #509 unified vNext apply — batches A (24) + B (74) + C (28+55); see analysis/509-apply-provenance-trail.md"
 }
