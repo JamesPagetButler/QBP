@@ -1,0 +1,374 @@
+{
+  "anchors": [
+    {
+      "id": "PRED-gw-em",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-lambda",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-no-gup",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-born-exact",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "MEAS-mult-threshold",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "MEAS-proton-stable",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2013; Aydemir et al. 2018"
+    },
+    {
+      "id": "PRED-proton-decay-null",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2013; Aydemir et al. 2018 (NCG Pati-Salam, via MEAS-proton-stable)"
+    },
+    {
+      "id": "PRED-revival-exact",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-gamma-universality",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "OBS-cmb-314",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-quat-closure",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-su2-lie",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-kramers",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-hurwitz-quat",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Hurwitz, A. (1898), Ueber die Composition der quadratischen Formen von beliebig vielen Variabeln — Lean re-verification of the H case is the evidence record; the claim originates externally (consistency with sibling PROOF-hurwitz)."
+    },
+    {
+      "id": "PROOF-z2-cover",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "OBS-tenfold-division",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Schnyder, Ryu, Furusaki & Ludwig 2008 (Altland-Zirnbauer tenfold way)"
+    },
+    {
+      "id": "PROOF-z3-cyclic",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-c2zt-square",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-helicity-obstruction",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "OBS-mott-parallel",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-plaquette-z2",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-clifford-majorana",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-nonabelian-braid",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-majorana-charge",
+      "provenance_kind": "theory-external",
+      "theory_citation": "CITATION-NEEDED (Majorana/Ising-CFT central charge c=1/2) -- Oppenheimer ruling (borderline; native ratio reading)"
+    },
+    {
+      "id": "PROOF-bond-complete",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "MEAS-kitaev-z2gauge",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Kitaev 2006 (Ann. Phys. 321, 2)"
+    },
+    {
+      "id": "OBS-thermal-hall-half",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Kasahara et al. 2018 (Nature); Yokoi et al. 2021 (Science)"
+    },
+    {
+      "id": "PRED-no-dm-particle",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "FLAG-inflation",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PARTIAL-qgp",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-correlated-alpha-G",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "FLAG-profile-underdetermined",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "OBS-finsler-gravity",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Pfeifer, Voicu et al. 2025 (JCAP)"
+    },
+    {
+      "id": "OBS-big-crunch",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Luu, Qiu & Tye 2025 (JCAP)"
+    },
+    {
+      "id": "PRED-conformal-profile",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-holographic-boundary-gravity",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-H-equals-Mdot-over-M",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-cosmic-birefringence",
+      "provenance_kind": "theory-external",
+      "theory_citation": "CITATION-NEEDED (external birefringence measurement, e.g. Minami & Komatsu 2020 PRL) -- Oppenheimer ruling"
+    },
+    {
+      "id": "INSIGHT-info-paradox-resolution",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-koide-phase-2-over-9",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-wolfenstein-A-sqrt-Q",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-ckm-cp-phase-arctan-sqrt7",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "REF-jido-eta-prime-chiral-2012",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Jido, Nagahiro & Hirenzaki 2011/2012 (Kyoto/Nara)"
+    },
+    {
+      "id": "PRED-eta-prime-mass-shift-1-over-24",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "Q27-TOV-limit-from-Fano",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-TOV-limit-sqrt-7-over-3",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-chiral-restoration-3rho0",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-conformal-sound-speed-1-over-3",
+      "provenance_kind": "theory-external",
+      "theory_citation": "CITATION-NEEDED (standard QCD conformal limit c_s^2=1/3 for massless quarks) -- Oppenheimer ruling"
+    },
+    {
+      "id": "PRED-peak-sound-speed-Q",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "INSIGHT-iron-handoff-nuclear-to-magnetic",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-proton-fraction-1-over-8",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-magnetar-energy-fraction-1-over-3",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "INSIGHT-urca-threshold-dim-O",
+      "provenance_kind": "theory-external",
+      "theory_citation": "CITATION-NEEDED (direct-URCA threshold, e.g. Lattimer, Pethick, Prakash & Haensel 1991 PRL 66, 2701) -- Oppenheimer ruling"
+    },
+    {
+      "id": "PRED-urca-onset-3rho0",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-interpolation-function-derived",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Milgrom 1983 (ApJ 270, 365)"
+    },
+    {
+      "id": "PROOF-M-proportional-to-a",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-lambda-as-cross-term",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-w-not-minus-1",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "INSIGHT-entropy-cone-division-algebra-inversion",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-fano-associativity-7beam",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-division-algebra-entropy-cone-mapping",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "INSIGHT-branch-A-hypergraph-boundary",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "INSIGHT-bcc-iron-fano-cube",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "INSIGHT-fano-cube-universal-compute-cell",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PROOF-beta-function-3-times-7",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "Q28-alpha-GUT-from-stabiliser",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "WISDOM-schema-vs-instance",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-f4-zero-vacuum-energy",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "WISDOM-003-there-is-only-f-u",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-profile-function-f0-f2-ratio",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "PRED-inv-alpha-GUT-16pi",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    },
+    {
+      "id": "CONV-spectral-entropy-zeta",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2018"
+    },
+    {
+      "id": "CONV-cd-tower-in-zeta-moments",
+      "provenance_kind": "theory-external",
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2018"
+    },
+    {
+      "id": "KILLED-f4-info-theoretic-justification",
+      "provenance_kind": "theory",
+      "theory_citation": ""
+    }
+  ]
+}
