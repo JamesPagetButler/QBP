@@ -113,9 +113,15 @@ jobs:
     # IMPORTANT: this job name is the notifier's own check-run name; the query
     # below excludes it by name (self-counting fix, #508 review finding #1).
     name: pr-check-status-notify
-    if: ${{ (github.event_name == 'check_suite' && github.event.check_suite.pull_requests[0] != null) || (github.event_name == 'workflow_run' && github.event.workflow_run.pull_requests[0] != null) }}
+    # Fire on any suite/run completion that carries a head SHA; the PR is
+    # resolved via API inside the job. The event payload's pull_requests[] is
+    # NOT trusted: GitHub populates it unreliably (observed empty for real
+    # same-repo PR #512 → the notifier silently skipped a red verdict).
+    if: ${{ github.event_name == 'check_suite' || github.event_name == 'workflow_run' }}
     concurrency:
-      group: pr-notify-${{ github.event.check_suite.pull_requests[0].number || github.event.workflow_run.pull_requests[0].number }}
+      # group by SHA (PR number unavailable pre-resolution); same-PR pushes get
+      # fresh groups per SHA — acceptable, the upsert is idempotent per comment
+      group: pr-notify-${{ github.event.check_suite.head_sha || github.event.workflow_run.head_sha }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
@@ -134,6 +140,32 @@ jobs:
           set -euo pipefail
           MARKER="<!-- pr-check-status-notifier -->"
           SELF="pr-check-status-notify"
+
+          # PR resolution: payload first, API fallback (payload pull_requests[]
+          # is unreliable — empty for real same-repo PRs; observed on #512).
+          # EXACT head-SHA match only (review #517 blocking #1): the endpoint
+          # returns every open PR whose branch CONTAINS the commit, so a loose
+          # `first` can post the verdict to the wrong PR in stacked branches.
+          # Verdicts are per-head — a SHA that heads no open PR gets none.
+          if [ -z "${PR:-}" ]; then
+            PR=$(gh api "repos/$REPO/commits/$SHA/pulls" \
+                 --jq '[.[] | select(.state == "open" and .head.sha == "'"$SHA"'")] | (first // {}) | .number // empty')
+          fi
+          if [ -z "${PR:-}" ]; then
+            echo "no open PR headed by $SHA — nothing to do."
+            exit 0
+          fi
+          # Stale-verdict guard (review #517 blocking #2): per-SHA concurrency
+          # means an old-SHA run is not cancelled by a new push; without this
+          # guard it could PATCH the marker comment with an outdated verdict
+          # AFTER the correct one. If the PR head has advanced past our event
+          # SHA, this run is history — exit.
+          HEADNOW=$(gh pr view "$PR" --repo "$REPO" --json headRefOid --jq .headRefOid)
+          if [ "$HEADNOW" != "$SHA" ]; then
+            echo "stale event: PR #$PR head is $HEADNOW, event SHA $SHA — exiting."
+            exit 0
+          fi
+          echo "resolved PR #$PR for $SHA (current head)"
           # review-completeness gates excluded from TECH-GREEN (they cannot be
           # green before reviews exist — the deadlock this design dissolves).
           # Single source of truth for the excluded list:
@@ -179,10 +211,14 @@ jobs:
             LASTREV=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
                       --jq '[.[] | .body]' | jq -s 'add // []' \
                       | jq -r '[.[] | capture("<!-- reviewed-sha: (?<s>[0-9a-f]{7,40}) -->").s] | last // empty')
-            FRESH="⚠️ review freshness UNVERIFIABLE — no `reviewed-sha` marker found in review comments; confirm reviews cover this head before merging."
+            # NOTE: FRESH strings are built with single-quoted printf formats
+            # ONLY — markdown backticks inside double-quoted bash are command
+            # substitution (the exit-127 incident: bash tried to EXECUTE
+            # `reviewed-sha` at the notifier's first live ALL-GREEN).
+            FRESH=$(printf '⚠️ review freshness UNVERIFIABLE — no `reviewed-sha` marker found in review comments; confirm reviews cover this head before merging.')
             if [ -n "$LASTREV" ]; then
               if [ "$LASTREV" = "$SHA" ]; then
-                FRESH="✔️ reviews stamped for this exact head."
+                FRESH=$(printf '✔️ reviews stamped for this exact head.')
               else
                 # patch-id comparison: identical content (rebase / empty
                 # retrigger commits) keeps reviews fresh; content change
@@ -194,9 +230,9 @@ jobs:
                 P_HEAD=$(pid "$SHA" || echo head-err)
                 P_REV=$(pid "$LASTREV" || echo rev-err)
                 if [ -n "$P_HEAD" ] && [ "$P_HEAD" = "$P_REV" ]; then
-                  FRESH="✔️ reviews stamped for \`$LASTREV\`; patch-id identical to head (cosmetic motion only — rebase/retrigger). Reviews remain fresh."
+                  FRESH=$(printf '✔️ reviews stamped for `%s`; patch-id identical to head (cosmetic motion only — rebase/retrigger). Reviews remain fresh.' "$LASTREV")
                 else
-                  FRESH="🔶 **DELTA ROUND REQUIRED** — reviews stamped for \`$LASTREV\` but the diff content has changed since (patch-id mismatch). Do not merge on these reviews."
+                  FRESH=$(printf '🔶 **DELTA ROUND REQUIRED** — reviews stamped for `%s` but the diff content has changed since (patch-id mismatch). Do not merge on these reviews.' "$LASTREV")
                 fi
               fi
             fi
@@ -214,3 +250,22 @@ jobs:
             gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$BODY" > /dev/null
             echo "created comment"
           fi
+      # Who watches the watcher: a notifier crash must never be silent (the
+      # exit-127 incident produced no verdict and no visible signal anywhere
+      # except a failed Actions run nobody was reading).
+      - name: Report notifier failure on the PR
+        if: ${{ failure() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.check_suite.head_sha || github.event.workflow_run.head_sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -u
+          # exact head-SHA match, same rule as the main resolver (review #517)
+          PR=$(gh api "repos/$REPO/commits/$SHA/pulls" \
+               --jq '[.[] | select(.state == "open" and .head.sha == "'"$SHA"'")] | (first // {}) | .number // empty' || true)
+          [ -z "${PR:-}" ] && { echo "no PR to warn"; exit 0; }
+          # single-quoted printf — no hand-escaped backticks anywhere (127 class)
+          WARN=$(printf '⚠️ **pr-check-status notifier ERRORED** on `%s` — no verdict was posted for this head. Check the run: %s. Do not trust any older verdict comment above.' "$SHA" "$RUN_URL")
+          gh pr comment "$PR" --repo "$REPO" --body "$WARN" || true
