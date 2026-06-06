@@ -42,11 +42,16 @@
 
     * THE 42 STRUCTURE — `sedenion_basis_zero_divisor_plane_count_eq_42`: exactly
         42 of the basis planes {eₐ, e_b} (a ∈ 1..7, b ∈ 9..15) are LEFT
-        zero-divisor planes (∃ partner & signs with vanishing product), computed
-        by kernel `decide` over the sedenion product.  This is the genuine
-        Moreno-grid count (cross-checked in Python: 7×7 − 7 = 42, and equal to the
-        combinatorial `b ≠ a+8` count), tying "42" to the actual zero-divisor
-        property rather than a lattice-point tally.
+        zero-divisor planes (∃ partner & signs with vanishing GENUINE `CDAlg ℝ 4`
+        product `(eₐ + s_b•e_b)·(e_c + s_d•e_d) = 0`).  The counted predicate is
+        the real Cayley–Dickson product; its per-plane decidability is routed
+        through the FORMAL BRIDGE `prodIsZero_iff_cdAlg_mul_eq_zero` (per-coordinate
+        core `cdAlg_mul_coord_eq_prodCoeff`, resting on the provenance pin
+        `CDAlg.mulCoeff_four_eq_sgnTable`), so the kernel `decide` evaluates the
+        verified sign table while the STATEMENT is about the genuine product — no
+        docstring over-claim.  This is the Moreno-grid count (cross-checked in
+        Python: 7×7 − 7 = 42, equal to the combinatorial `b ≠ a+8` count), tying
+        "42" to the actual zero-divisor property rather than a lattice-point tally.
 
   Completeness: zero `sorry`, zero `native_decide`, zero vacuous `True`.
   `#print axioms` audit at the bottom — every result depends only on a subset of
@@ -160,7 +165,7 @@ theorem quaternion_not_commutative :
   refine ⟨⟨0, 1, 0, 0⟩, ⟨0, 0, 1, 0⟩, ?_⟩
   intro h
   have hk := congrArg QuaternionAlgebra.imK h
-  simp only [QuaternionAlgebra.mk_mul_mk] at hk
+  simp only at hk
   norm_num at hk
 
 /-- Generic CDAlg basis-pair non-commutativity, driven by a `decide`d coefficient
@@ -344,19 +349,115 @@ theorem sedenion_norm_not_multiplicative :
 The genuine Moreno-grid count.  A basis plane {eₐ, e_b} with `a ∈ {1..7}`,
 `b ∈ {9..15}` is a LEFT zero-divisor plane iff some `(e_a ± e_b)·(e_c ± e_d) = 0`
 for partner indices `c ∈ {1..7}`, `d ∈ {9..15}` and signs in `{±1}`.  Exactly 42
-of the 49 planes qualify (the 7 excluded are `b = a + 8`).  The product is
-computed via the kernel-verified `SedenionOctonionCount.prodIsZero` over the CD
-sedenion sign table; the count is closed by kernel `decide`.
+of the 49 planes qualify (the 7 excluded are `b = a + 8`).
+
+Truth-in-labelling: the STATEMENT counted (`zdPlaneCount`, §6b) is about the
+GENUINE `CDAlg ℝ 4` product `(e_a + s_b•e_b)·(e_c + s_d•e_d) = 0`.  The kernel
+`decide` that evaluates the count goes through the formal bridge §6a
+(`prodIsZero_iff_cdAlg_mul_eq_zero`), whose per-coordinate core
+(`cdAlg_mul_coord_eq_prodCoeff`) identifies the real product's coordinates with
+the `Int`-cast of `SedenionOctonionCount.prodCoeff` USING the kernel-checked
+provenance pin `CDAlg.mulCoeff_four_eq_sgnTable` (`mulCoeff 4 = sgnTable` on all
+256 pairs).  So the `Bool` actually computed is the sign-table proxy, but it is a
+THEOREM-certified stand-in for the real Cayley–Dickson product — not an unbacked
+comment claim.
 
 Python cross-check (genuine semantic count, not a lattice tally):
 `|{(a,b) : a∈1..7, b∈9..15, ∃ partner & signs with product 0}| = 42`, equal to
 `|{(a,b) : a∈1..7, b∈9..15, b ≠ a+8}| = 7×7 − 7 = 42`. -/
 
+/-! ### 6a. The formal bridge: `prodIsZero` proxy ⟺ genuine `CDAlg ℝ 4` product
+
+`SedenionOctonionCount.prodIsZero` is a `Bool`/`Prop` predicate over the integer
+sign table `sgnTable`; it is NOT, by its type, a statement about the genuine
+`CDAlg ℝ 4` multiplication.  The lemma `prodIsZero_iff_cdAlg_mul_eq_zero` below
+makes the connection a *theorem*: for any basis indices `a,b,c,d` and integer
+signs `sb,sd`, the proxy `prodIsZero [(1,a),(sb,b)] [(1,c),(sd,d)]` holds iff the
+GENUINE product `(e a + sb•e b)·(e c + sd•e d)` vanishes in `CDAlg ℝ 4`.
+
+The proof is structural, NOT a `decide` over index tuples: it expands the genuine
+product bilinearly (`mul_add_left/right`, `mul_smul_left/right`, `e_mul_e`) into
+the four basis products, reads off coordinate `k`, and identifies that real number
+with the `Int`-cast of `prodCoeff` — using `mulCoeff_four_eq_sgnTable` to pin
+`mulCoeff 4 = sgnTable`.  Hence the bridge is general over all signs and indices,
+and the `42`-count below is, via this lemma, a count of genuine zero-divisor
+planes.  (Cast `(m : ℝ) = 0 ↔ m = 0` for `m : Int` closes the per-coordinate
+equivalence; a `CDAlg` element is `0` iff every coordinate is `0`.) -/
+
 open QBP.Foundations.SedenionOctonionCount in
-/-- `(e_a + s_b·e_b)·(e_c + s_d·e_d) = 0` as a sedenion product (Bool), via the
-    kernel-verified sparse-element product `prodIsZero`. -/
-def planeProdZeroB (a b c d : Fin 16) (sb sd : Int) : Bool :=
-  decide (prodIsZero [(1, a), (sb, b)] [(1, c), (sd, d)])
+/-- Per-coordinate bridge: the `k`-coordinate of the genuine product
+    `(e a + sb•e b)·(e c + sd•e d)` in `CDAlg ℝ 4` equals the `Int`-cast of the
+    sign-table proxy coefficient `prodCoeff [(1,a),(sb,b)] [(1,c),(sd,d)] k`. -/
+theorem cdAlg_mul_coord_eq_prodCoeff
+    (a b c d : Fin 16) (sb sd : Int) (k : Fin 16) :
+    (((e a + (sb : ℝ) • e b) * (e c + (sd : ℝ) • e d) : CDAlg ℝ 4)).coord k
+      = ((prodCoeff [(1, a), (sb, b)] [(1, c), (sd, d)] k : Int) : ℝ) := by
+  -- expand the genuine product bilinearly into the four basis products
+  simp only [mul_add_left, mul_add_right, mul_smul_left, mul_smul_right,
+    e_mul_e (R := ℝ) (n := 4)]
+  -- read coordinate k of each basis product
+  simp only [add_coord, smul_coord, e_coord]
+  -- the proxy side: unfold prodCoeff over the four term-pairs
+  simp only [prodCoeff, List.flatMap_cons, List.flatMap_nil, List.map_cons,
+    List.map_nil, List.append_nil, ixor, sgn]
+  -- pin mulCoeff 4 = sgnTable on the four index pairs
+  rw [mulCoeff_four_eq_sgnTable a c, mulCoeff_four_eq_sgnTable a d,
+      mulCoeff_four_eq_sgnTable b c, mulCoeff_four_eq_sgnTable b d]
+  -- match term by term.  The genuine side's `if`s read `k = i⊕j` (from `e_coord`),
+  -- the proxy's read `i⊕j = k`; flip the proxy conditions to the genuine
+  -- orientation (`eq_comm`, applied to the four specific atoms so it cannot loop),
+  -- then case on the four conditions (16 branches) and close each by `ring`.
+  push_cast
+  simp only [List.map_cons, List.map_nil, List.cons_append,
+    List.nil_append, List.sum_cons, List.sum_nil,
+    show ((a ^^^ c : Fin 16) = k) = (k = a ^^^ c) from propext eq_comm,
+    show ((a ^^^ d : Fin 16) = k) = (k = a ^^^ d) from propext eq_comm,
+    show ((b ^^^ c : Fin 16) = k) = (k = b ^^^ c) from propext eq_comm,
+    show ((b ^^^ d : Fin 16) = k) = (k = b ^^^ d) from propext eq_comm]
+  -- both sides now carry the SAME four conditions `k = i⊕j`, so `split_ifs` dedups
+  -- to 16 branches; each is a `ring` identity.
+  split_ifs <;> push_cast <;> ring
+
+open QBP.Foundations.SedenionOctonionCount in
+/-- **THE FORMAL BRIDGE.**  The integer sign-table proxy `prodIsZero` is logically
+    equivalent to vanishing of the GENUINE `CDAlg ℝ 4` product: for all basis
+    indices `a,b,c,d : Fin 16` and signs `sb,sd : Int`,
+    `prodIsZero [(1,a),(sb,b)] [(1,c),(sd,d)]` ⟺
+    `(e a + sb•e b) * (e c + sd•e d) = 0` in `CDAlg ℝ 4`.
+    This is what licenses reading the combinatorial `42`-count as a count of
+    genuine sedenion zero-divisor planes.  Proven structurally via
+    `cdAlg_mul_coord_eq_prodCoeff` (which rests on `mulCoeff_four_eq_sgnTable`),
+    NOT by `decide` over index tuples. -/
+theorem prodIsZero_iff_cdAlg_mul_eq_zero
+    (a b c d : Fin 16) (sb sd : Int) :
+    prodIsZero [(1, a), (sb, b)] [(1, c), (sd, d)]
+      ↔ ((e a + (sb : ℝ) • e b) * (e c + (sd : ℝ) • e d) : CDAlg ℝ 4) = 0 := by
+  rw [prodIsZero]
+  constructor
+  · intro h
+    ext k
+    rw [cdAlg_mul_coord_eq_prodCoeff, h k, Int.cast_zero, zero_coord]
+  · intro h k
+    have hk := congrArg (fun z => z.coord k) h
+    simp only [zero_coord] at hk
+    rw [cdAlg_mul_coord_eq_prodCoeff] at hk
+    exact_mod_cast hk
+
+/-- **Genuine** vanishing of the plane product in `CDAlg ℝ 4`:
+    `(e a + sb•e b)·(e c + sd•e d) = 0`.  This is a statement about the real
+    Cayley–Dickson multiplication, NOT the sign-table proxy. -/
+def planeProdZeroℝ (a b c d : Fin 16) (sb sd : Int) : Prop :=
+  ((e a + (sb : ℝ) • e b) * (e c + (sd : ℝ) • e d) : CDAlg ℝ 4) = 0
+
+open QBP.Foundations.SedenionOctonionCount in
+/-- `planeProdZeroℝ` is decidable — through the formal bridge
+    `prodIsZero_iff_cdAlg_mul_eq_zero`, its `Decidable` instance REDUCES to the
+    proxy `decide (prodIsZero …)`, so kernel `decide` over the genuine product is
+    well-defined and computes via the kernel-checked sign table.  (The transported
+    proof is proof-irrelevant to the resulting `Bool`; the `Bool` itself is the
+    proxy evaluation, now a THEOREM-certified stand-in for the real product.) -/
+instance (a b c d : Fin 16) (sb sd : Int) : Decidable (planeProdZeroℝ a b c d sb sd) :=
+  decidable_of_iff _ (prodIsZero_iff_cdAlg_mul_eq_zero a b c d sb sd)
 
 /-- Left index range `a ∈ {1..7}`. -/
 def aRange : List (Fin 16) := [1, 2, 3, 4, 5, 6, 7]
@@ -366,24 +467,32 @@ def bRange : List (Fin 16) := [9, 10, 11, 12, 13, 14, 15]
 def signs : List Int := [1, -1]
 
 /-- `{eₐ, e_b}` (a ∈ 1..7, b ∈ 9..15) is a LEFT zero-divisor plane: some partner
-    `c ∈ 1..7`, `d ∈ 9..15` and signs `s_b, s_d ∈ {±1}` give a vanishing product. -/
-def isLeftZDplane (a b : Fin 16) : Bool :=
-  signs.any (fun sb => signs.any (fun sd =>
-    aRange.any (fun c => bRange.any (fun d =>
-      planeProdZeroB a b c d sb sd))))
+    `c ∈ 1..7`, `d ∈ 9..15` and signs `s_b, s_d ∈ {±1}` give a vanishing GENUINE
+    `CDAlg ℝ 4` product.  Decidable via the per-plane instance above. -/
+def isLeftZDplane (a b : Fin 16) : Prop :=
+  ∃ sb ∈ signs, ∃ sd ∈ signs, ∃ c ∈ aRange, ∃ d ∈ bRange,
+    planeProdZeroℝ a b c d sb sd
 
-/-- The count of basis planes `{eₐ, e_b}` (a ∈ 1..7, b ∈ 9..15) that are left
-    zero-divisor planes. -/
+instance (a b : Fin 16) : Decidable (isLeftZDplane a b) := by
+  unfold isLeftZDplane; infer_instance
+
+/-- The count of basis planes `{eₐ, e_b}` (a ∈ 1..7, b ∈ 9..15) that are GENUINE
+    left zero-divisor planes of `CDAlg ℝ 4`. -/
 def zdPlaneCount : Nat :=
   (aRange.flatMap (fun a => bRange.map (fun b => (a, b)))).countP
-    (fun p => isLeftZDplane p.1 p.2)
+    (fun p => decide (isLeftZDplane p.1 p.2))
 
 set_option maxHeartbeats 1000000 in
 /-- **THE 42 STRUCTURE** (`sedenion_zero_divisor_42`).  Exactly 42 of the 49 basis
     planes `{eₐ, e_b}` (a ∈ 1..7, b ∈ 9..15) of the Cayley–Dickson sedenion frame
-    are LEFT zero-divisor planes — kernel `decide` over the genuine sedenion
-    product.  This is the Moreno count: the 7 non-planes are exactly those with
-    `b = a + 8`. -/
+    are LEFT zero-divisor planes — i.e. for exactly 42 of the pairs there exist a
+    partner plane `{e_c, e_d}` and signs `s_b, s_d ∈ {±1}` with the GENUINE
+    `CDAlg ℝ 4` product `(eₐ + s_b·e_b)·(e_c + s_d·e_d) = 0`.  The count is a kernel
+    `decide`; its per-plane decidability is routed through the formal bridge
+    `prodIsZero_iff_cdAlg_mul_eq_zero` (which rests on `mulCoeff_four_eq_sgnTable`),
+    so the `decide` evaluates the kernel-checked sign table while the STATEMENT is
+    about the real Cayley–Dickson product.  This is the Moreno count: the 7
+    non-planes are exactly those with `b = a + 8`. -/
 theorem sedenion_basis_zero_divisor_plane_count_eq_42 : zdPlaneCount = 42 := by decide
 
 /-! ## 7. Completeness audit — `#print axioms`
@@ -407,6 +516,8 @@ axiom).  Reported in the build log. -/
 #print axioms sedenion_not_alternative
 #print axioms sedenion_zero_divisors
 #print axioms sedenion_norm_not_multiplicative
+#print axioms cdAlg_mul_coord_eq_prodCoeff
+#print axioms prodIsZero_iff_cdAlg_mul_eq_zero
 #print axioms sedenion_basis_zero_divisor_plane_count_eq_42
 
 end QBP.Foundations.Breakdown
