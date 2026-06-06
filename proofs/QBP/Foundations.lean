@@ -1,5 +1,6 @@
 import QBP.Foundations.CDAlg
 import QBP.Foundations.CDLifting
+import QBP.Foundations.OctonionLaws
 import QBP.Foundations.FanoOrientationF3
 import QBP.Foundations.LieAlgebraIso
 import QBP.Foundations.Operations
