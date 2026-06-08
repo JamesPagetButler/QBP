@@ -20,10 +20,11 @@
   merged quadraticity lemma, valid for generic `n` (not just `n = 3`).
 
   Route note (reported for the record).  The strategy's §4 lemma table grades L3 as
-  "M, bilinear → decide 8×8 + lift_bilinear_eq".  The cheaper polarization route is
-  taken instead (strategy §5 explicitly permits "prefer it if cleanest"): it needs
-  no `decide`, generalizes in `n`, and reuses the already-merged `cdAlg_sq_eq` and
-  `bil` machinery directly.  The pure-element specialization C2c's span-closure
+  "M, bilinear → decide 8×8 + lift_bilinear_eq".  This file takes a cheaper route
+  the strategy did not specify — polarization of the merged `cdAlg_sq_eq` — which
+  needs no `decide`, generalizes in `n`, and reuses `cdAlg_sq_eq` + `bil` directly.
+  (Deviation from the strategy's specified route, reported here per its own W1
+  honest-route-attribution discipline; the orchestrator/reviewers ratified it.)  The pure-element specialization C2c's span-closure
   consumes (`x*y + y*x` for imaginary `x,y` collapsing to a scalar) is recovered as
   the corollary `cdAlg_mul_add_swap_pure` below.
 
