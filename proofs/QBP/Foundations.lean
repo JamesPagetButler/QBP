@@ -1,4 +1,5 @@
 import QBP.Foundations.ArtinCore
+import QBP.Foundations.ArtinSpan
 import QBP.Foundations.ArtinTrace
 import QBP.Foundations.CDAlg
 import QBP.Foundations.CDBridge
