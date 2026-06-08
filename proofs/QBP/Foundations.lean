@@ -1,6 +1,7 @@
 import QBP.Foundations.CDAlg
 import QBP.Foundations.CDBridge
 import QBP.Foundations.CDLifting
+import QBP.Foundations.Exp
 import QBP.Foundations.Breakdown
 import QBP.Foundations.OctonionLaws
 import QBP.Foundations.FanoOrientationF3
