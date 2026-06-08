@@ -33,8 +33,14 @@ REGISTER = (
 ROW_RE = re.compile(r"issue:\s*#(\d+)\s*\|\s*status:\s*(pending|resolved)", re.I)
 
 
-def gh_issue_state(num: str) -> str | None:
-    """OPEN / CLOSED, or None if gh can't answer."""
+def gh_issue_state(num: str) -> str:
+    """OPEN / CLOSED / NOT_FOUND / TRANSIENT.
+
+    Distinguishes a genuinely-missing issue (a typo'd register number — must be
+    a loud violation, else the row silently never guards: the exact silent-rot
+    this whole guard exists to kill, review #526 probe-5) from a transient gh
+    failure (network/auth — lenient, CI is authoritative).
+    """
     try:
         out = subprocess.run(
             ["gh", "issue", "view", num, "--json", "state", "--jq", ".state"],
@@ -43,10 +49,14 @@ def gh_issue_state(num: str) -> str | None:
             timeout=30,
         )
     except (OSError, subprocess.SubprocessError):
-        return None
-    if out.returncode != 0:
-        return None
-    return out.stdout.strip().upper() or None
+        return "TRANSIENT"
+    if out.returncode == 0:
+        return out.stdout.strip().upper() or "TRANSIENT"
+    # gh ran but failed — is it "no such issue" (typo, our fault) or infra?
+    err = (out.stderr or "").lower()
+    if "could not resolve" in err or "not found" in err or "no issue" in err:
+        return "NOT_FOUND"
+    return "TRANSIENT"
 
 
 def main() -> int:
@@ -65,9 +75,14 @@ def main() -> int:
     violations: list[str] = []
     for num in pending:
         state = gh_issue_state(num)
-        if state is None:
-            print(
-                f"  #{num}: state UNKNOWN (gh could not resolve) — not failing on this"
+        if state == "TRANSIENT":
+            print(f"  #{num}: gh transient failure — lenient (CI authoritative)")
+            continue
+        if state == "NOT_FOUND":
+            violations.append(
+                f"#{num} does not exist — a pending register row points at a "
+                f"non-existent issue (typo?). A row that can never resolve is "
+                f"silent-rot; fix the number or remove the row"
             )
             continue
         if state == "CLOSED":

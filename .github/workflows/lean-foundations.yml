@@ -23,8 +23,6 @@ on:
       - 'proofs/QBP/Foundations/.lean-gate-baseline.json'
       - 'scripts/check_lean_foundations.py'
       - 'scripts/check_layer_imports.py'
-      - 'scripts/check_pending_upgrades.py'
-      - 'docs/foundations/pending-upgrades.md'
       - '.github/workflows/lean-foundations.yml'
 
 permissions:
@@ -43,10 +41,6 @@ jobs:
         run: python3 scripts/check_lean_foundations.py --dir proofs/QBP/Foundations
       - name: Enforce layer-import DAG + aggregator completeness
         run: python3 scripts/check_layer_imports.py
-      - name: Pending-upgrade guard (closed unblocking issue ⇒ owed upgrade must land)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 scripts/check_pending_upgrades.py
 
   lake-build:
     name: lake build (zero errors)

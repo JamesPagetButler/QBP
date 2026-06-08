@@ -1,0 +1,30 @@
+# Pending-upgrade guard — runs on EVERY PR (review #526 probe-6).
+#
+# The guard must trip on ANY pull request once a registered unblocking issue
+# closes — not only on foundations-touching PRs. A foundations-scoped trigger
+# would let the owed upgrade be skipped by any non-foundations PR merging first,
+# undercutting the "un-skippable the moment #NNN closes" guarantee. So it lives
+# in its own all-paths workflow.
+name: Pending-upgrade guard
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  issues: read        # gh issue view — explicit (review #526 probe-7: survives
+                      # the repo ever going private; not inherited from contents)
+
+jobs:
+  pending-upgrades:
+    name: Pending-upgrade guard (closed unblocking issue ⇒ owed upgrade must land)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Enforce pending-upgrade register
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/check_pending_upgrades.py
