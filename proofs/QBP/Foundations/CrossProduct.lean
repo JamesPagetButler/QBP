@@ -437,13 +437,17 @@ theorem quaternion_cross_norm_identity (x y : CDAlg ℝ 2)
 /-! ## 5. Why the row stops at 𝕆 — no sedenion cross product
 
 A cross product `×` satisfying `N(x×y) = N x·N y − ⟨x,y⟩²` (the Lagrange identity
-above) forces a normed composition algebra of the ambient space: the existence of
-such a vector product is equivalent to a composition algebra structure (Hurwitz),
-which exists only in dimensions 1, 2, 4, 8 — i.e. only at ℝ, ℂ, ℍ, 𝕆.  At 𝕊 the
-norm form is NOT multiplicative (`Breakdown.sedenion_norm_not_multiplicative`):
-there are zero divisors with `N(x·y) = 0 ≠ N x · N y`, so no composition structure
-and hence no 7-D-style cross product survives.  This file therefore defines NO
-sedenion cross product; the matrix row is `—/—/✓/✓/—`. -/
+above) forces a normed composition algebra of the ambient space; by Hurwitz such
+algebras exist only in dimensions 1, 2, 4, 8 — i.e. only at ℝ, ℂ, ℍ, 𝕆.
+
+WHAT THIS FILE WITNESSES (truth-in-labelling): the kernel-proved obstruction
+below is the *composition-algebra* failure at 𝕊 — the norm form is NOT
+multiplicative (`Breakdown.sedenion_norm_not_multiplicative`: zero divisors with
+`N(x·y) = 0 ≠ N x · N y`), so the half-commutator construction used here cannot
+satisfy the Lagrange identity at 𝕊.  The stronger *topological* statement — that
+NO 15-D bilinear cross product of any form exists (Adams 1960, vector-fields-on-
+spheres) — is CITED, not formalized here; it is not needed for the matrix row.
+This file therefore defines NO sedenion cross product; the row is `—/—/✓/✓/—`. -/
 
 /-- The structural OBSTRUCTION witness for "no 𝕊 cross product": the norm form fails
     to compose at 𝕊.  (Statement-level cite; the cross product needs exactly this
