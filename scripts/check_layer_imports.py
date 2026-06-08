@@ -64,7 +64,20 @@ def main() -> int:
     aggregator = PROOFS / "QBP" / "Foundations.lean"
     if aggregator.is_file():
         text = aggregator.read_text(encoding="utf-8")
-        imported = set(IMPORT_RE.findall(text))
+        all_imports = IMPORT_RE.findall(text)
+        # Duplicate-import guard: the aggregator uses git merge=union (append-only,
+        # order-independent), whose one failure mode is a duplicated import line
+        # when two branches add the same module. `lake build` tolerates duplicate
+        # imports, so this is the only place that catch can live.
+        seen: set[str] = set()
+        for imp in all_imports:
+            if imp in seen:
+                errors.append(
+                    f"QBP/Foundations.lean: duplicate import {imp} "
+                    f"(union-merge artifact — dedupe the aggregator)"
+                )
+            seen.add(imp)
+        imported = set(all_imports)
         quarantined = set(QUARANTINE_RE.findall(text))
         for lean in sorted((PROOFS / FOUNDATIONS_DIR).rglob("*.lean")):
             mod = module_of(lean)
