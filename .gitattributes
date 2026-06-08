@@ -1,3 +1,12 @@
 results/**/*.csv filter=lfs diff=lfs merge=lfs -text
 *.db filter=lfs diff=lfs merge=lfs -text
 *.hgdb filter=lfs diff=lfs merge=lfs -text
+
+# Foundations aggregator is an order-independent, append-only import list — every
+# foundation PR adds a line, so naive merge conflicts every sibling on it (bit us
+# 3×: #520, #522/#524, #524-again). Union merge concatenates both sides' additions
+# instead of conflicting. Lean imports are order-independent, so union is safe; a
+# rare duplicate-line (both sides add the same import) is caught by `lake build`
+# and check_layer_imports.py. CI is the backstop; the merge stops being a serial
+# conflict point.
+proofs/QBP/Foundations.lean merge=union
