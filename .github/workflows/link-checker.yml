@@ -1,5 +1,15 @@
 # .github/workflows/link-checker.yml
-# This workflow checks all markdown files for broken links.
+# Link checking, scoped to avoid flaky-external-link noise blocking unrelated PRs.
+#
+# Recurring incident (3x: #515 webaim, #529/#532 github.com): a PR scanning ALL
+# repo .md files fails on a transient timeout (Status 0 / ESOCKETTIMEDOUT) of an
+# external link in a file the PR never touched. A YAML-only or Lean-only PR has
+# no business being blocked by link-rot elsewhere.
+#
+# Fix (issue #530): on PRs, check ONLY the .md files the PR changed
+# (check-modified-files-only). A weekly scheduled full-repo scan catches rot in
+# untouched files, so nothing is lost — link-rot is surfaced on a cadence, not
+# imposed as a flaky tax on every unrelated PR.
 name: "Link Checker"
 
 on:
@@ -9,6 +19,9 @@ on:
   pull_request:
     branches:
       - master
+  schedule:
+    # weekly full-repo sweep (Mondays 06:00 UTC) — catches rot in untouched files
+    - cron: '0 6 * * 1'
 
 jobs:
   markdown-link-check:
@@ -23,3 +36,7 @@ jobs:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
           config-file: 'mlc_config.json'
+          # PRs: only the files they changed (kills unrelated-flake blocking).
+          # push-to-master / scheduled: full repo (modified-only is a no-op there,
+          # so the cron sweep still scans everything).
+          check-modified-files-only: ${{ github.event_name == 'pull_request' && 'yes' || 'no' }}
