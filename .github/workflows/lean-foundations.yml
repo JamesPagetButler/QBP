@@ -55,11 +55,23 @@ jobs:
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Fetch Mathlib cache (avoid building Mathlib from source)
         working-directory: proofs
+        # GH_TOKEN authenticates the cache's GitHub API calls. Unauthenticated,
+        # the runner shares a 60-req/hr limit that heavy CI days exhaust -> the
+        # API returns a rate-limit body instead of a release tag -> the opaque
+        # "failed to parse latest release tag" error (root cause of #531's
+        # cache-fetch failures: earlier PRs passed, later ones failed as quota
+        # drained). Authenticated = 5000/hr, so it does not exhaust.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           lake exe cache get || echo "::warning::lake exe cache get incomplete — build may compile more from source"
       - name: lake build
         working-directory: proofs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: lake build
       # NOTE: #print axioms audit — activates when a Foundations theorem is first claimed
       # `proof_state: verified` in the CTH inventory. At that point this job adds a step that
