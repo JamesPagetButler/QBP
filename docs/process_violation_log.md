@@ -183,3 +183,13 @@ This log records all process violations across sprints. Each entry documents wha
 | **Fixes applied** | ... |
 | **Process update** | ... |
 ```
+
+### FAULT-S4-002: Box-tick reliance on a fragile per-PR watcher tail (2026-06-08)
+
+| Field | Detail |
+|---|---|
+| **What happened** | The "CI green" evidence checkbox on PR #533 stayed unchecked after the PR went genuinely green (non-passing=0, mergeable, double-APPROVE). The beekeeper caught it. |
+| **Was there a process that should have fired?** | YES. Each PR got a bespoke background watcher of the shape `until [checks settle]; do sleep; done; <tick the box>` — the box-tick was the designed FINAL step. It should have fired when CI went green. |
+| **Root cause (process)** | The box-tick was **coupled to per-PR watcher survival**, and the watcher pattern was fragile: its trailing diagnostic `[ "$np" -gt 0 ] && gh pr checks ...` short-circuits to a falsy exit when `np=0` (all green), so under `set`-less bash the script's exit status went 1 and, in the failing case, the tick step was never reached / the script was reported failed before ticking. Deeper: there was **no durable, uniform box-tick mechanism** — each PR had a hand-written watcher that may or may not tick, competing for attention against proving/orchestration on the main thread. Bookkeeping bolted to a fragile, non-uniform tail is the class. This is **box-state family** (cf. the earlier "comically unchecked box" on #513, and #507 §5 the notifier-self-tick item) — a governance/bookkeeping step left to a fragile per-instance mechanism instead of a structural one (PATTERN-01 shape). |
+| **Fixes applied** | 1. This log entry. 2. #533's box ticked after explicit green-verification (decoupled from the watcher). 3. Behavioral: box-ticking is now a deliberate, decoupled step — never the tail of a watcher that can die; the `[ test ] && cmd` trailing-exit pattern abandoned. 4. Structural (the real fix): prioritize #507 §5 — the **notifier self-ticks its own "CI green" evidence box at ALL-GREEN**, so the box's truth never depends on the orchestrator or a watcher. 5. Strategic: evaluate a QBP-Herschel box-keeper subagent (sweep open PRs, tick only VALIDLY-completed *evidence* boxes with verified evidence; NEVER sign-off/HVR boxes — those stay the hand's, per auto-nudge-not-auto-tick). |
+| **Retrospective tie-in** | Folds into the box-gate / evidence-box hardening already scoped in #507 (§4 box-gate, §5 self-tick + delete-unselected). FAULT-S4-002 is the reliability case for §5's self-tick being built, not just scoped. |
