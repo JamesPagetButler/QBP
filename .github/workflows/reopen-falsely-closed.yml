@@ -1,0 +1,38 @@
+# Post-merge backstop (FAULT-S4-004 layer 2): auto-reopen any issue this push
+# closed via a closing keyword while it still has unchecked acceptance criteria.
+# Independent of branch protection — heals the false-complete signal even if the
+# PR-time guard (closing-ac-guard.yml) was bypassed or a fresh closing keyword was
+# typed in the squash-merge box at merge time.
+name: Reopen falsely-closed issues
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  backstop:
+    name: reopen-if-closed-with-open-ACs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect this push's commit messages
+        run: |
+          set -euo pipefail
+          # messages of the commits in this push (before..after); fall back to HEAD
+          if [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ] \
+             && git cat-file -e "${{ github.event.before }}" 2>/dev/null; then
+            git log --format='%B' "${{ github.event.before }}..${{ github.sha }}" > /tmp/commits.txt
+          else
+            git log --format='%B' -1 "${{ github.sha }}" > /tmp/commits.txt
+          fi
+          echo "commit messages collected:"; cat /tmp/commits.txt
+      - name: Reopen any issue closed with unchecked ACs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/reopen_falsely_closed.py --commits-file /tmp/commits.txt

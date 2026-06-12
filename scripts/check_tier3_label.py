@@ -38,10 +38,27 @@ THEORY_GLOBS = [
     "docs/foundations/**",
 ]
 TIER3_LABEL = "tier-3-review"
-# review-artifact signatures — a real Red Team / Gemini §I4 review leaves one of these.
-REVIEW_ARTIFACT = re.compile(
-    r"Red Team|Gemini|§I4|APPROVE|REQUEST CHANGES|Sabine|Furey|Feynman", re.IGNORECASE
+# A real review leaves TWO marks: a reviewer SIGNATURE (who) and a VERDICT (judgment).
+# Requiring both defeats FAULT-S4-003: the notifier's TECH-GREEN "review checklist"
+# comment and the PR template body both *name* the reviewers ("Red Team review
+# (Sabine/...)", "Gemini review (Furey/Feynman)") — a SIGNATURE without a VERDICT.
+# A bare label backed only by those names is a rubber-stamp, not a review.
+REVIEW_SIGNATURE = re.compile(
+    r"Red Team|Gemini|§I4|Sabine|Grothendieck|Knuth|Furey|Feynman", re.IGNORECASE
 )
+# A rendered verdict — the thing only an actual review produces. The notifier's
+# own verdicts ("ALL GREEN", "Tech-green", "Checks FAILED") deliberately contain
+# none of these, so the notifier's comments can never satisfy the gate.
+REVIEW_VERDICT = re.compile(
+    r"\bAPPROVE\b|APPROVE-WITH-CONCERN|REQUEST\s+CHANGES|\bBLOCKING\b|\bDEFER\b",
+    re.IGNORECASE,
+)
+# Notifier-authored comments carry this marker; they are stripped before matching
+# so the notifier's reviewer-naming checklist cannot stand in for a real review.
+NOTIFIER_MARKER = "<!-- pr-check-status-notifier -->"
+# The workflow joins individual comment bodies with this boundary so the gate can
+# evaluate each comment separately (signature + verdict must co-occur in ONE).
+COMMENT_BOUNDARY = "===TIER3-COMMENT-BOUNDARY==="
 
 
 def is_theory(path):
@@ -92,15 +109,39 @@ def main():
         )
         return 1
 
-    if not REVIEW_ARTIFACT.search(comments_blob):
+    # A real review = ONE comment carrying BOTH a reviewer signature AND a rendered
+    # verdict. Splitting per-comment (boundary emitted by the workflow) prevents a
+    # signature in one comment and a stray verdict in another from combining into a
+    # false pass. Notifier-authored comments are skipped: their checklist names the
+    # reviewers (signature) but never renders a verdict, so they cannot stand in.
+    #
+    # DIVISION OF LABOUR (do not drop one half): this gate checks a review
+    # EXISTS. Review FRESHNESS (review on the current head, not a stale commit) is
+    # checked separately by the notifier's ALL-GREEN patch-id comparison
+    # (pr-check-status.yml). Gate = exists; notifier = fresh. If either is edited,
+    # preserve both — together they make green→self-tick→merge trustworthy.
+    blocks = comments_blob.split(COMMENT_BOUNDARY)
+    real_review = False
+    for block in blocks:
+        if NOTIFIER_MARKER in block:
+            continue  # notifier checklist / verdict — not a review
+        if REVIEW_SIGNATURE.search(block) and REVIEW_VERDICT.search(block):
+            real_review = True
+            break
+
+    if not real_review:
         print(
-            f"::error::Tier-3 gate — `{TIER3_LABEL}` is present but no Red Team / Gemini review "
-            f"artifact was found in the PR comments. A bare label is a finding, not a pass "
-            f"(anti-gaming). Post the Tier-3 review comments before labeling."
+            f"::error::Tier-3 gate — `{TIER3_LABEL}` is present but no real review was found. "
+            f"A review must be a single comment carrying BOTH a reviewer signature "
+            f"(Red Team / Gemini / Sabine / Furey / ...) AND a rendered verdict "
+            f"(APPROVE / APPROVE-WITH-CONCERN / REQUEST CHANGES / BLOCKING / DEFER). "
+            f"The notifier's reviewer-naming checklist and the PR template do NOT count "
+            f"(FAULT-S4-003 — a named-but-unrendered review is a rubber-stamp). "
+            f"Run the Red Team → Gemini review and post the verdicts before merge."
         )
         return 1
 
-    print(f"PASS: `{TIER3_LABEL}` present + review artifact found in comments.")
+    print(f"PASS: `{TIER3_LABEL}` present + a real review (signature + verdict) found.")
     return 0
 
 

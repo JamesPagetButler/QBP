@@ -59,3 +59,21 @@ tracked issue closes, then flips it. (Example: #474 AC6 held pending #525.)
 | # | Date | Scope | Result |
 |---|------|-------|--------|
 | 1 | 2026-06-11 | #474 AC-verification sweep (full-rigor `#print axioms`) | AC1/3/4/5 ticked (26 theorems clean); AC2 re-confirmed; AC6 held MET-pending-#525; AC7 open. Evidence comment on #474. |
+
+## 5. Autonomous CI-failure fix-pass discipline (beekeeper 2026-06-11)
+
+A red CI check on an open PR is **not** a status to report and wait on — it is work to do:
+
+- **Routine red** (lint, link-check, format, stale-base link/diff failures, flaky
+  reruns, import guards) → **fix it autonomously via a fix pass** (diagnose →
+  refresh/fix → push). The beekeeper should never be the one to discover a routine
+  red check.
+- **Substantive red** (a proof break, a failing physics/differential test signalling
+  a real defect, anything changing scope or correctness, a theory-level blocker)
+  → **surface to the beekeeper** through the normal channels — do not silently fix.
+
+Triage on every red: *routine artifact, or substantive signal?* Routine → fix pass;
+substantive → surface. A self-ticked CI-green box (notifier #534) only means
+something if reds are actively driven to green. Memory:
+`feedback-ci-failure-autonomous-fix-pass`. Origin: FAULT-S4-003 + the #529
+stale-link-check the beekeeper had to track down.

@@ -41,8 +41,16 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           gh api "repos/${{ github.repository }}/issues/${PR}/labels" --jq '.[].name' > /tmp/labels.txt || true
-          gh api "repos/${{ github.repository }}/issues/${PR}/comments" --jq '.[].body' > /tmp/comments.txt || true
-          # include the PR body itself (review verdicts are sometimes posted there)
+          # Join comment bodies with an explicit boundary so the gate can evaluate
+          # each comment separately — a real review = ONE comment with both a
+          # reviewer signature AND a verdict (FAULT-S4-003 fix). The notifier's
+          # reviewer-naming checklist carries a signature but no verdict, so it
+          # cannot satisfy the gate.
+          gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
+            --jq '[.[].body] | join("\n===TIER3-COMMENT-BOUNDARY===\n")' > /tmp/comments.txt || true
+          # include the PR body as its own block (a verdict posted there still counts;
+          # the template's reviewer *names* alone do not, since they carry no verdict)
+          printf '\n===TIER3-COMMENT-BOUNDARY===\n' >> /tmp/comments.txt || true
           gh api "repos/${{ github.repository }}/pulls/${PR}" --jq '.body' >> /tmp/comments.txt || true
       - name: Enforce Tier-3 review label
         run: |

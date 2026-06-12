@@ -1,0 +1,40 @@
+# Guard against auto-closing an issue that still has unchecked acceptance criteria.
+# FAULT-S4-004: `closes #474 AC2` closed the parent (GitHub ignores the "AC2").
+# This fails the PR before merge so the author uses `Refs #N (satisfies ACn)`.
+name: Closing-keyword AC guard
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  guard:
+    name: no-close-with-unchecked-ACs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect PR body + commit messages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          # SCOPE = what becomes the SQUASH-merge commit message that GitHub
+          # actually parses for auto-close: the PR title + body (author-controlled,
+          # editable at merge). Individual commit messages are squashed away and do
+          # NOT reach master, so scanning them over-flags PRs that merely *document*
+          # a closing keyword in a commit (e.g. a FAULT-S4-004 fault description).
+          # Merge-commit edge case (non-squash) is covered by the layer-2 backstop
+          # (reopen-falsely-closed.yml), which scans pushed commits on master.
+          gh api "repos/${REPO}/pulls/${PR}" --jq '(.title // "") + "\n" + (.body // "")' > /tmp/prtext.txt
+      - name: Enforce no-close-with-unchecked-ACs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/check_closing_acs.py --text-file /tmp/prtext.txt
