@@ -4046,7 +4046,7 @@
     {
       "id": "REF-shulman-real-cohesive-hott",
       "name": "Shulman (2015-2017): Real-Cohesive Homotopy Type Theory",
-      "description": "M. Shulman, arXiv:1509.07584. Founds real-cohesive HoTT: the cohesive modal triple (shape/flat/sharp) + crisp type theory + the real-cohesion axiom, giving synthetic geometry on HoTT. AXIOMATIC (does NOT require cubical) -> postulatable on any HoTT setting. VERIFIED REAL (fetch 2026-06-12). The COHESIVE axis of the QBP substrate (#555) -- the synthetic spacetime Strategy C (#539) needs.",
+      "description": "M. Shulman, arXiv:1509.07584. Founds real-cohesive HoTT: the cohesive modal triple (shape/flat/sharp) + crisp type theory + the real-cohesion axiom, giving synthetic geometry on HoTT. AXIOMATIC (does NOT require cubical) -> postulatable on any HoTT setting. VERIFIED REAL (fetch 2026-06-12). The COHESIVE axis of the QBP substrate (#555) -- the synthetic SPACE / differential geometry Strategy C (#539) needs. PRECISION (Gemini #558 review): real-cohesion gives synthetic SPACE (continuous paths, smooth structure), NOT Lorentzian SPACETIME -- no metric, no signature, no dynamics. The spacetime/metric layer is downstream physics, not supplied by this citation.",
       "tier": 2,
       "provenance": "E",
       "provenance_kind": "theory-external",
@@ -4072,7 +4072,7 @@
     {
       "id": "REF-gratzer-weinberger-buchholtz-directed",
       "name": "Gratzer-Weinberger-Buchholtz: Directed/Simplicial Type Theory (2024-2026)",
-      "description": "Directed univalence (arXiv:2407.09146), Yoneda in simplicial TT (arXiv:2501.13229), the inf-category of inf-categories (arXiv:2602.02218). Simplicial/directed type theory adds a DIRECTED path type (morphisms native) -- distinct from symmetric and cohesive HoTT. VERIFIED REAL (fetch 2026-06-12). The DIRECTED axis of the QBP substrate (#555 AC4): the crystallisation O->H transition is intrinsically directed (Gamma-arrow, causal=directed) -> a native directed functor. Tooling: Rzk (simplicial), separate from Cubical Agda.",
+      "description": "Directed univalence (arXiv:2407.09146), Yoneda in simplicial TT (arXiv:2501.13229), the inf-category of inf-categories (arXiv:2602.02218). Simplicial/directed type theory adds a DIRECTED path type (morphisms native) -- distinct from symmetric and cohesive HoTT. VERIFIED REAL (fetch 2026-06-12). The DIRECTED axis of the QBP substrate (#555 AC4): a directed morphism encodes the IRREVERSIBILITY / non-invertibility of the crystallisation O->H transition (the Gamma-arrow as a non-invertible structural fact). PRECISION (Gemini #558 review): directed-TT records irreversibility, it does NOT generate physical causality -- conflating logical morphism-direction with physical causal/temporal direction is a category error. Use as the structural ledger of irreversibility, not a derivation of the arrow of time. Tooling: Rzk (simplicial), separate from Cubical Agda.",
       "tier": 2,
       "provenance": "E",
       "provenance_kind": "theory-external",
@@ -4589,6 +4589,11 @@
       "version": "5.4.1",
       "date": "2026-06-12T00:00:00Z",
       "note": "qbp-oppenheimer: +5 REF-* substrate type-theory citation anchors (cohesive/directed/CD-HoTT/Lean-HoTT + 1 refuted phantom) for #554/#555/#556. Four web-verified 2026-06-12; phantom recorded incoherent per kill-history discipline."
+    },
+    {
+      "version": "5.4.2",
+      "date": "2026-06-12T00:00:00Z",
+      "note": "qbp-oppenheimer: precision pass on 2 substrate REF anchors per Gemini #558 review (APPROVE-WITH-CONCERN) -- (1) directed axis records irreversibility/non-invertibility, NOT physical causality (category-error guard); (2) real-cohesion gives synthetic SPACE/geometry, NOT Lorentzian spacetime. Citations unchanged; only the interpretive framing tightened."
     }
   ],
   "last_updated": "2026-06-12T00:00:00Z",
