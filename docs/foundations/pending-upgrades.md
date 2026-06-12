@@ -22,4 +22,4 @@ only an un-mergeable state holds.)
 
 | item | ruled | upgrade owed | unblocking issue | status |
 |---|---|---|---|---|
-| #474 AC6 exp/log cell | MET-pending (beekeeper, 2026-06-08) — exp total + log on dense domain + exp∘log=id clears "well-defined"; full-ℝ group law & left-inverse are enhancements | flip AC6 exp/log cell pending→full in #474 tracking + matrix index (PR-G) annotation | issue: #525 | status: pending |
+| #474 AC6 exp/log cell | RESOLVED (2026-06-11) — full-ℝ one-parameter group law (`exp_smul_add_real`) + left-inverse on the principal strip (`log_exp`, `imNorm<π` tight) proved, kernel-clean | AC6 exp/log cell now FULLY met; #474 AC6 tick on merge; matrix-index annotation lands with the AC7 manifest | issue: #525 | status: resolved |
