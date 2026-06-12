@@ -10,6 +10,7 @@ Legend: **✓** = proven theorem · **✗** = witnessed counterexample term · *
 
 | Property | ℝ | ℂ | ℍ | 𝕆 | 𝕊 |
 |---|---|---|---|---|---|
+| **Multiplication (total)** | ✓ | ✓ | ✓ | ✓ | ✓ — *total by construction* (`CDAlg.mul`, the Cayley-Dickson product; defined at every level, no partiality) |
 | **Associativity** | ✓ `real_associative` | ✓ `complex_associative` | ✓ `quaternion_associative` | **✗** `octonion_not_associative` | **✗** `sedenion_not_associative` |
 | **Commutativity** | ✓ `real_mul_comm` | ✓ `complex_mul_comm` | **✗** `quaternion_not_commutative` | **✗** `octonion_not_commutative` | **✗** `sedenion_not_commutative` |
 | **Alternativity** | ✓ `real_alternative` | ✓ `complex_alternative` | ✓ `quaternion_alternative` | ✓ `octonion_flexible` (+ polarized alt.) | **✗** `sedenion_not_alternative` |
