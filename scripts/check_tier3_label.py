@@ -114,6 +114,12 @@ def main():
     # signature in one comment and a stray verdict in another from combining into a
     # false pass. Notifier-authored comments are skipped: their checklist names the
     # reviewers (signature) but never renders a verdict, so they cannot stand in.
+    #
+    # DIVISION OF LABOUR (do not drop one half): this gate checks a review
+    # EXISTS. Review FRESHNESS (review on the current head, not a stale commit) is
+    # checked separately by the notifier's ALL-GREEN patch-id comparison
+    # (pr-check-status.yml). Gate = exists; notifier = fresh. If either is edited,
+    # preserve both — together they make green→self-tick→merge trustworthy.
     blocks = comments_blob.split(COMMENT_BOUNDARY)
     real_review = False
     for block in blocks:
