@@ -45,6 +45,7 @@
   only on `{propext, Classical.choice, Quot.sound}`.
 -/
 import QBP.Foundations.CDLifting
+import QBP.Foundations.CDBridge
 
 /- The multilinearity-instance proofs below are ~24 structurally identical field
    discharges (`simp only [<map>, mul_add_*, mul_smul_*, smul_sub, smul_add]; abel`).
@@ -654,7 +655,126 @@ theorem octonion_power_associative_4 (x : CDAlg ℝ 3) :
   -- [x, x, x*x] = 0 by left-alternativity (assoc_diag_left x (x*x))
   have := assoc_diag_left x (x * x); rwa [assoc, sub_eq_zero] at this
 
-/-! ## 5. Completeness audit — `#print axioms` -/
+/-! ## 5. Sedenion structural laws (𝕊 = `CDAlg ℝ 4`)
+
+The sedenions LOSE alternativity and associativity (`sedenion_not_alternative`),
+but they REMAIN **flexible** and **power-associative** — both are preserved by the
+Cayley–Dickson doubling at every level (flexibility because the flexor is the
+*symmetric-in-(1,3)* part of the associator, which vanishes; power-associativity
+because every power of a single element lives in `span{1, x} ≅ ℂ` via the
+quadratic identity `cdAlg_sq_eq`).  These two ✓-cells complete the 𝕊 row of the
+operations-complete matrix.
+
+The flexibility route exactly mirrors the octonion one at `n = 4`:  the polarized
+flexibility map `flMap` (already general in `R, n`, §1) is trilinear; its basis
+vanishing `[eᵢ,e_j,e_k] + [e_k,e_j,eᵢ] = 0` is a kernel `decide` over the 16³ =
+4096 sedenion basis triples; the trilinear keystone lifts it; diagonalize `z := x`,
+÷2 confined to ℝ. -/
+
+/-- Multiplication distributes over subtraction on the right (from bilinearity). -/
+theorem mul_sub_right (a b c : CDAlg R n) : a * (b - c) = a * b - a * c := by
+  rw [sub_eq_add_neg, mul_add_right, sub_eq_add_neg]
+  congr 1
+  rw [show (-c : CDAlg R n) = (-1 : R) • c by
+        ext i; simp only [neg_coord, smul_coord]; ring,
+    mul_smul_right]
+  ext i; simp only [smul_coord, neg_coord]; ring
+
+/-- Multiplication distributes over subtraction on the left (from bilinearity). -/
+theorem mul_sub_left (a b c : CDAlg R n) : (a - b) * c = a * c - b * c := by
+  rw [sub_eq_add_neg, mul_add_left, sub_eq_add_neg]
+  congr 1
+  rw [show (-b : CDAlg R n) = (-1 : R) • b by
+        ext i; simp only [neg_coord, smul_coord]; ring,
+    mul_smul_left]
+  ext i; simp only [smul_coord, neg_coord]; ring
+
+/-- **Integer basis fact (kernel `decide`, 4096 cases).**  The sedenion associator
+    is flexible-alternating on all 16³ = 4096 basis triples:
+    `[eᵢ,e_j,e_k] + [e_k,e_j,eᵢ] = 0` at the integer-coefficient level.  (This is
+    the `n = 4` analogue of `octonion_assocCoeffZ_flex`; flexibility, unlike
+    alternativity, survives the loss at 𝕊.) -/
+theorem sedenion_assocCoeffZ_flex :
+    ∀ i j k : Fin (2^4), assocCoeffZ 4 i j k + assocCoeffZ 4 k j i = 0 := by decide
+
+theorem sedenion_flMap_basis (i j k : Fin (2^4)) :
+    (flMap (e i) (e j) (e k) : CDAlg ℝ 4) = 0 := by
+  rw [flMap, assoc_e, assoc_e]
+  have h1 : (k ^^^ j ^^^ i : Fin (2^4)) = (i ^^^ j ^^^ k : Fin (2^4)) := by
+    apply Fin.ext; simp only [Fin.xor_val_of_two_pow]; ac_rfl
+  rw [h1, ← add_smul]
+  rw [show ((assocCoeffZ 4 i j k : ℝ) + (assocCoeffZ 4 k j i : ℝ))
+        = (((assocCoeffZ 4 i j k + assocCoeffZ 4 k j i : Int)) : ℝ) by push_cast; ring,
+     sedenion_assocCoeffZ_flex i j k]
+  simp
+
+/-- **Sedenion flexibility, polarized form** (lifted): `[x,y,z] + [z,y,x] = 0`. -/
+theorem sedenion_flexible_polarized (x y z : CDAlg ℝ 4) :
+    assoc x y z + assoc z y x = 0 :=
+  lift_trilinear_eq flMap_trilinear sedenion_flMap_basis x y z
+
+theorem sed_assoc_diag_flex (x y : CDAlg ℝ 4) : assoc x y x = 0 := by
+  have h2 : (2 : ℝ) • assoc x y x = 0 := by
+    rw [two_smul]; exact sedenion_flexible_polarized x y x
+  rcases smul_eq_zero.mp h2 with hz | hz
+  · exact absurd hz two_ne_zero
+  · exact hz
+
+/-- **PAYOFF: sedenion flexibility.**  𝕊 = `CDAlg ℝ 4` is flexible:
+    for all `x y`, `(x·y)·x = x·(y·x)`.  (Equivalently the associator
+    `[x,y,x] = 0`.)  Lifted from `sedenion_assocCoeffZ_flex` via the trilinear
+    keystone, ÷2 confined to ℝ.  Flexibility, unlike alternativity, is preserved by
+    the Cayley–Dickson construction at every level — this is the genuine ✓-cell at
+    𝕊, NOT a vacuous restatement. -/
+theorem sedenion_flexible (x y : CDAlg ℝ 4) : (x * y) * x = x * (y * x) := by
+  have := sed_assoc_diag_flex x y; rwa [assoc, sub_eq_zero] at this
+
+/-! ### Sedenion power-associativity
+
+Power-associativity at the bounded forms the operations-complete matrix records.
+At 𝕊 alternativity is GONE, so the octonion route (`assoc_diag_left`) is
+unavailable.  The degree-3 form is the flexibility diagonal (`y := x`).  The
+degree-4 form is proven *structurally* from the quadratic identity `cdAlg_sq_eq`
+(`x·x = (2 Re x)•x − N x•1`), which forces every power of `x` into `span{1,x}`
+where multiplication is commutative-associative — both sides reduce to the common
+scalar combination `(r³ − 2rs)•x − (r²s − s²)•1` with `r = 2 Re x`, `s = N x`.
+This is the honest power-associativity mechanism, valid at every CD level. -/
+
+/-- **Sedenion power-associativity, degree-3 form.**  `x²·x = x·x²` for all `x`.
+    The `y := x` diagonal of `sedenion_flexible` (`(x·x)·x = x·(x·x)`).  Note: this
+    does NOT use alternativity (which fails at 𝕊) — only flexibility, which holds. -/
+theorem sedenion_power_associative (x : CDAlg ℝ 4) : (x * x) * x = x * (x * x) := by
+  have := sed_assoc_diag_flex x x; rwa [assoc, sub_eq_zero] at this
+
+/-- **Sedenion power-associativity, degree-4 form.**  `(x·x)·(x·x) = x·(x·(x·x))`.
+    Proven structurally from the quadratic identity `cdAlg_sq_eq`: writing
+    `x·x = r•x − s•1` (`r = 2 Re x`, `s = N x ∈ ℝ`), both sides reduce by the unit
+    laws and bilinearity to `(r³ − 2rs)•x − (r²s − s²)•1`.  No alternativity is used
+    (it is absent at 𝕊) — power-associativity survives via `span{1,x} ≅ ℂ`. -/
+theorem sedenion_power_associative_4 (x : CDAlg ℝ 4) :
+    (x * x) * (x * x) = x * (x * (x * x)) := by
+  set r : ℝ := 2 * x.coord 0 with hr
+  set s : ℝ := N x with hs
+  have hsq : x * x = r • x - s • 1 := cdAlg_sq_eq x
+  -- x*(x*x): eliminate the inner x*x, then the outer x*x, landing in span{1,x}.
+  have hxxx : x * (x * x) = (r ^ 2 - s) • x - (r * s) • 1 := by
+    rw [hsq, mul_sub_right, mul_smul_right, mul_smul_right, cdAlg_mul_one, hsq]
+    module
+  -- x*(x*(x*x)): one more left-multiplication by x.
+  have hRHS : x * (x * (x * x)) = (r ^ 3 - 2 * (r * s)) • x - (r ^ 2 * s - s ^ 2) • 1 := by
+    rw [hxxx, mul_sub_right, mul_smul_right, mul_smul_right, cdAlg_mul_one, hsq]
+    module
+  -- (x*x)*(x*x): expand both factors, all four products land in span{1,x}.
+  have hLHS : (x * x) * (x * x) = (r ^ 3 - 2 * (r * s)) • x - (r ^ 2 * s - s ^ 2) • 1 := by
+    -- Replace the SECOND factor `x*x` by hxxx-style; keep first factor as x*x = hsq.
+    conv_lhs => rw [show (x * x) * (x * x) = (x * x) * (x * x) from rfl]
+    -- outer: (x*x) * (x*x) → r•(x*(x*x)) − s•(1*(x*x)) via hsq on the FIRST factor
+    nth_rewrite 1 [hsq]
+    rw [mul_sub_left, mul_smul_left, mul_smul_left, cdAlg_one_mul, hxxx, hsq]
+    module
+  rw [hLHS, hRHS]
+
+/-! ## 6. Completeness audit — `#print axioms` -/
 
 #print axioms octonion_flexible
 #print axioms octonion_flexible_polarized
@@ -668,5 +788,10 @@ theorem octonion_power_associative_4 (x : CDAlg ℝ 3) :
 #print axioms octonion_mRightCoeffZ_zero
 #print axioms octonion_mMidCoeffZ_zero
 #print axioms octonion_normCoeffZ_zero
+#print axioms sedenion_flexible
+#print axioms sedenion_flexible_polarized
+#print axioms sedenion_power_associative
+#print axioms sedenion_power_associative_4
+#print axioms sedenion_assocCoeffZ_flex
 
 end QBP.Foundations.CDAlg
