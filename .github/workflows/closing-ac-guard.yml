@@ -25,9 +25,14 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
-          gh api "repos/${REPO}/pulls/${PR}" --jq '.body // ""' > /tmp/prtext.txt
-          # commit messages on the PR (closing keywords in commits also auto-close)
-          gh api "repos/${REPO}/pulls/${PR}/commits" --jq '.[].commit.message' >> /tmp/prtext.txt
+          # SCOPE = what becomes the SQUASH-merge commit message that GitHub
+          # actually parses for auto-close: the PR title + body (author-controlled,
+          # editable at merge). Individual commit messages are squashed away and do
+          # NOT reach master, so scanning them over-flags PRs that merely *document*
+          # a closing keyword in a commit (e.g. a FAULT-S4-004 fault description).
+          # Merge-commit edge case (non-squash) is covered by the layer-2 backstop
+          # (reopen-falsely-closed.yml), which scans pushed commits on master.
+          gh api "repos/${REPO}/pulls/${PR}" --jq '(.title // "") + "\n" + (.body // "")' > /tmp/prtext.txt
       - name: Enforce no-close-with-unchecked-ACs
         env:
           GH_TOKEN: ${{ github.token }}
