@@ -79,6 +79,24 @@ def main() -> int:
             seen.add(imp)
         imported = set(all_imports)
         quarantined = set(QUARANTINE_RE.findall(text))
+        # Stale-import guard (Gemini #527 point-5): union-merge's OTHER failure
+        # mode is a divergent same-line edit (two branches rename the same
+        # import differently) → union keeps BOTH lines, one possibly pointing at
+        # a deleted/renamed module. The duplicate guard above only catches
+        # *identical* doubled lines, so it misses this; without the check below
+        # the only net is a slow `lake build` missing-module error. Here we
+        # verify every QBP.Foundations.* import the aggregator names resolves to
+        # an existing file — a fast, deterministic companion catch.
+        for imp in sorted(imported):
+            if not imp.startswith("QBP.Foundations."):
+                continue
+            target = PROOFS / Path(*imp.split(".")).with_suffix(".lean")
+            if not target.is_file():
+                errors.append(
+                    f"QBP/Foundations.lean: import {imp} resolves to no file "
+                    f"({target.relative_to(PROOFS)} missing — stale/renamed import, "
+                    f"possibly a union-merge divergent-edit artifact)"
+                )
         for lean in sorted((PROOFS / FOUNDATIONS_DIR).rglob("*.lean")):
             mod = module_of(lean)
             if mod not in imported and mod not in quarantined:
