@@ -272,6 +272,57 @@ theorem exp_unit_axis_add {u : CDAlg ℝ n} (hu : re u = 0) (hN : N u = 1)
   congr 1
   rw [rotor_mul hu hN]
 
+/-! ### 7′. The all-real unit-axis form (negative angles allowed)
+
+The `θ ≥ 0` hypothesis in `exp_unit_axis` comes only from `Real.sqrt_sq`, which
+computes `imNorm (θ•u) = √(θ²) = |θ|`.  For general `θ : ℝ` the closed form picks up
+`cos |θ|` and `sinc |θ|`.  Since `cos` and `sinc` are EVEN, and `sinc |θ| · θ = sin θ`
+(`sinc_neg` + `sinc_mul_self`), the normal form `cos θ•1 + sin θ•u` survives for ALL
+real `θ`.  This is the genuine `span{1,u} ≅ ℂ` one-parameter group with no sign
+restriction. -/
+
+/-- `Real.cos |θ| = Real.cos θ` (cosine is even). -/
+theorem cos_abs (θ : ℝ) : Real.cos |θ| = Real.cos θ := by
+  rcases abs_choice θ with h | h
+  · rw [h]
+  · rw [h, Real.cos_neg]
+
+/-- `Real.sinc |θ| · θ = Real.sin θ` for all real `θ` (sinc is even, then
+    `sinc_mul_self`). -/
+theorem sinc_abs_mul_self (θ : ℝ) : Real.sinc |θ| * θ = Real.sin θ := by
+  rcases abs_choice θ with h | h
+  · rw [h]; exact sinc_mul_self θ
+  · rw [h, Real.sinc_neg]; exact sinc_mul_self θ
+
+/-- **`exp` on a unit imaginary axis, all real angles.**
+    `exp (r•1 + θ•u) = exp r • (cos θ•1 + sin θ•u)` for a unit imaginary `u` and
+    ANY `θ : ℝ`.  Extends `exp_unit_axis` past the nonnegative cone via the evenness
+    of `cos`/`sinc` (the imaginary norm contributes `|θ|`, which the trig functions
+    fold back to `θ`). -/
+theorem exp_unit_axis_real {u : CDAlg ℝ n} (hu : re u = 0) (hN : N u = 1) (r θ : ℝ) :
+    exp (r • (1 : CDAlg ℝ n) + θ • u) = Real.exp r • (Real.cos θ • 1 + Real.sin θ • u) := by
+  have hθu : re (θ • u) = 0 := by
+    simp only [re_def, smul_coord]; simp only [re_def] at hu; rw [hu]; ring
+  have hre : re (r • (1 : CDAlg ℝ n) + θ • u) = r := re_real_add_imag hθu r
+  have him : imPart (r • (1 : CDAlg ℝ n) + θ • u) = θ • u := imPart_real_add_imag hθu r
+  -- here the imaginary norm is |θ|, not θ
+  have hin : imNorm (r • (1 : CDAlg ℝ n) + θ • u) = |θ| := by
+    rw [imNorm, him, N_smul, hN, mul_one, Real.sqrt_sq_eq_abs]
+  rw [exp_def, hre, him, hin, smul_smul, cos_abs, sinc_abs_mul_self]
+
+/-- **One-parameter group law along a unit imaginary axis, all real angles.**
+    Scaled rotors compose for ANY real `s, t`:
+    `exp(r•1 + s•u) * exp(r'•1 + t•u) = exp((r+r')•1 + (s+t)•u)`. -/
+theorem exp_unit_axis_add_real {u : CDAlg ℝ n} (hu : re u = 0) (hN : N u = 1)
+    (r r' s t : ℝ) :
+    exp (r • (1 : CDAlg ℝ n) + s • u) * exp (r' • 1 + t • u)
+      = exp ((r + r') • 1 + (s + t) • u) := by
+  rw [exp_unit_axis_real hu hN r s, exp_unit_axis_real hu hN r' t,
+      exp_unit_axis_real hu hN (r + r') (s + t),
+      mul_smul_left, mul_smul_right, smul_smul, ← Real.exp_add]
+  congr 1
+  rw [rotor_mul hu hN]
+
 /-! ## 8. The fully-general one-parameter group law `exp((s+t)•x) = exp(s•x)*exp(t•x)`
 
 We reduce to the unit-axis law.  Write `x = (re x)•1 + Im x`; for `s, t ≥ 0`,
@@ -327,6 +378,47 @@ theorem exp_smul_add {x : CDAlg ℝ n} (s t : ℝ) (hs : 0 ≤ s) (ht : 0 ≤ t)
         show (s + t) * m = s * m + t * m from by ring]
     exact (exp_unit_axis_add hu_re hu_N (s * re x) (t * re x) (s * m) (t * m) hsm htm
       (by rw [← add_mul]; exact mul_nonneg (by linarith) (le_of_lt hmpos))).symm
+
+/-- **One-parameter group law (general), all real parameters.**  For ALL `s, t : ℝ`
+    and any `x : CDAlg ℝ n`, `exp((s+t)•x) = exp(s•x) * exp(t•x)`.
+
+    Identical reduction to `exp_smul_add`, but the unit-axis decomposition
+    `q•x = (q re x)•1 + (q ‖Im x‖)•u` and `exp_unit_axis_add_real` impose no sign
+    restriction: the imaginary-norm `|q·‖Im x‖|` ambiguity is absorbed by the evenness
+    of `cos`/`sinc`.  This is the full one-parameter subgroup `ℝ → span{1,Im x}ˣ`. -/
+theorem exp_smul_add_real {x : CDAlg ℝ n} (s t : ℝ) :
+    exp ((s + t) • x) = exp (s • x) * exp (t • x) := by
+  by_cases hx : imPart x = 0
+  · -- real case: x = (re x)•1 ; signs irrelevant (scalar Real.exp_add)
+    have hxr : x = (re x) • (1 : CDAlg ℝ n) := by
+      have := re_smul_one_add_imPart x; rw [hx, add_zero] at this; exact this.symm
+    rw [hxr,
+        show (s + t) • ((re x) • (1 : CDAlg ℝ n)) = ((s + t) * re x) • 1 from by rw [smul_smul],
+        show s • ((re x) • (1 : CDAlg ℝ n)) = (s * re x) • 1 from by rw [smul_smul],
+        show t • ((re x) • (1 : CDAlg ℝ n)) = (t * re x) • 1 from by rw [smul_smul],
+        exp_re_smul_one, exp_re_smul_one, exp_re_smul_one,
+        mul_smul_left, mul_smul_right, smul_smul, ← Real.exp_add, cdAlg_one_mul]
+    congr 2; ring
+  · -- non-real case: build the unit axis (no sign hypotheses needed)
+    set m : ℝ := imNorm x with hm
+    have hmpos : 0 < m := by
+      rw [hm, imNorm, Real.sqrt_pos]
+      exact lt_of_le_of_ne (N_nonneg _) (fun h => hx ((N_eq_zero_iff _).mp h.symm))
+    set u : CDAlg ℝ n := m⁻¹ • imPart x with hu_def
+    have hmne : m ≠ 0 := ne_of_gt hmpos
+    have hu_re : re u = 0 := by rw [hu_def, re_smul, re_imPart, mul_zero]
+    have hu_N : N u = 1 := by
+      rw [hu_def, N_smul, ← imNorm_sq x, ← hm]; field_simp
+    have hdecomp : ∀ q : ℝ, q • x = (q * re x) • (1 : CDAlg ℝ n) + (q * m) • u := by
+      intro q
+      rw [hu_def, smul_smul, show q * m * m⁻¹ = q from by field_simp,
+          ← smul_smul, ← imPart_smul]
+      conv_lhs => rw [← re_smul_one_add_imPart x]
+      rw [smul_add, smul_smul, imPart_smul]
+    rw [hdecomp (s + t), hdecomp s, hdecomp t]
+    rw [show (s + t) * re x = s * re x + t * re x from by ring,
+        show (s + t) * m = s * m + t * m from by ring]
+    exact (exp_unit_axis_add_real hu_re hu_N (s * re x) (t * re x) (s * m) (t * m)).symm
 
 /-! ## 9. `exp(-x) * exp(x) = 1` and the norm of the exponential -/
 
@@ -601,6 +693,92 @@ theorem exp_log {x : CDAlg ℝ n} (hN : 0 < N x) (him : imPart x ≠ 0) : exp (l
   rw [hu_def, smul_smul, show mIm * mIm⁻¹ = 1 from by field_simp, one_smul]
   exact re_smul_one_add_imPart x
 
+/-! ### 11′. Components of `exp x`, and the left-inverse `log (exp x) = x`
+
+We compute the real part, imaginary part and imaginary norm of `exp x` from the
+closed form, then run the principal logarithm.  The strip condition `imNorm x < π`
+is exactly what makes `arccos (cos (imNorm x)) = imNorm x` (so the angle is
+recovered) AND `sin (imNorm x) ≥ 0` with `sinc (imNorm x) > 0` for non-real `x` (so
+the imaginary axis keeps its orientation — at `imNorm x = π` the imaginary part of
+`exp x` collapses and the axis information is lost). -/
+
+/-- The decomposition of `exp x` into scalar + imaginary parts:
+    `exp x = (exp(re x)·cos‖Im x‖)•1 + (exp(re x)·sinc‖Im x‖)•Im x`. -/
+theorem exp_eq_re_add_imag (x : CDAlg ℝ n) :
+    exp x = (Real.exp (re x) * Real.cos (imNorm x)) • (1 : CDAlg ℝ n)
+            + (Real.exp (re x) * Real.sinc (imNorm x)) • imPart x := by
+  rw [exp_def, smul_add, smul_smul, smul_smul]
+
+/-- **Real part of `exp x`.**  `re (exp x) = exp(re x)·cos‖Im x‖`. -/
+theorem re_exp (x : CDAlg ℝ n) :
+    re (exp x) = Real.exp (re x) * Real.cos (imNorm x) := by
+  have hv : re ((Real.exp (re x) * Real.sinc (imNorm x)) • imPart x) = 0 := by
+    rw [re_smul, re_imPart, mul_zero]
+  rw [exp_eq_re_add_imag, re_real_add_imag hv]
+
+/-- **Imaginary part of `exp x`.**  `imPart (exp x) = (exp(re x)·sinc‖Im x‖)•Im x`. -/
+theorem imPart_exp (x : CDAlg ℝ n) :
+    imPart (exp x) = (Real.exp (re x) * Real.sinc (imNorm x)) • imPart x := by
+  have hv : re ((Real.exp (re x) * Real.sinc (imNorm x)) • imPart x) = 0 := by
+    rw [re_smul, re_imPart, mul_zero]
+  rw [exp_eq_re_add_imag, imPart_real_add_imag hv]
+
+/-- **Left-inverse property of the principal logarithm.**  On the principal strip
+    `imNorm x < π`, `log (exp x) = x`.
+
+    Sketch: `N (exp x) = exp(2 re x)` so the recovered real part is `½·2 re x = re x`.
+    The recovered angle is `arccos (re(exp x)/√(N(exp x))) = arccos (cos‖Im x‖) = ‖Im x‖`
+    (this is where `‖Im x‖ < π` is used).  For non-real `x`, `sin‖Im x‖ > 0` hence
+    `sinc‖Im x‖ > 0`, so the imaginary axis of `exp x` points along `+Im x` and the
+    coefficient bookkeeping returns exactly `Im x`.  For real `x` the imaginary part of
+    `exp x` is `0` and the axis term vanishes, leaving `re x•1 = x`. -/
+theorem log_exp {x : CDAlg ℝ n} (hstrip : imNorm x < π) : log (exp x) = x := by
+  set m : ℝ := imNorm x with hm
+  have hm0 : 0 ≤ m := imNorm_nonneg x
+  -- real part of log(exp x): ½ log (N (exp x)) = re x
+  have hNexp : N (exp x) = Real.exp (2 * re x) := N_exp x
+  have hlogN : (1/2 : ℝ) * Real.log (N (exp x)) = re x := by
+    rw [hNexp, Real.log_exp]; ring
+  -- the recovered angle is m
+  have hsqrtN : Real.sqrt (N (exp x)) = Real.exp (re x) := by
+    rw [hNexp, show (2 : ℝ) * re x = re x + re x from by ring, Real.exp_add,
+        Real.sqrt_mul_self (le_of_lt (Real.exp_pos _))]
+  have hcosarg : re (exp x) / Real.sqrt (N (exp x)) = Real.cos m := by
+    rw [re_exp, hsqrtN, ← hm, mul_comm, mul_div_assoc,
+        div_self (ne_of_gt (Real.exp_pos _)), mul_one]
+  have hAngle : logAngle (exp x) = m := by
+    rw [logAngle, hcosarg, Real.arccos_cos hm0 (le_of_lt hstrip)]
+  -- now split on real vs non-real x
+  by_cases hx : imPart x = 0
+  · -- real: imPart (exp x) = 0, so the axis term of log vanishes
+    have himexp : imPart (exp x) = 0 := by
+      rw [imPart_exp, hx, smul_zero]
+    rw [log_def, hlogN, himexp, smul_zero, add_zero]
+    -- ½ log N • 1 = re x • 1 = x  (since imPart x = 0 ⇒ x = re x•1)
+    have hxr : (re x) • (1 : CDAlg ℝ n) = x := by
+      have := re_smul_one_add_imPart x; rwa [hx, add_zero] at this
+    exact hxr
+  · -- non-real: m > 0, sinc m > 0, axis orientation preserved
+    have hmpos : 0 < m := by
+      rw [hm, imNorm, Real.sqrt_pos]
+      exact lt_of_le_of_ne (N_nonneg _) (fun h => hx ((N_eq_zero_iff _).mp h.symm))
+    have hsinpos : 0 < Real.sin m := Real.sin_pos_of_pos_of_lt_pi hmpos (hm ▸ hstrip)
+    have hsincpos : 0 < Real.sinc m := by
+      rw [Real.sinc_of_ne_zero (ne_of_gt hmpos)]; positivity
+    -- imNorm (exp x) = exp(re x)·sinc m · m  (a positive multiple of m)
+    have hcoeffpos : 0 < Real.exp (re x) * Real.sinc m := by positivity
+    have himNexp : imNorm (exp x) = (Real.exp (re x) * Real.sinc m) * m := by
+      rw [imNorm, imPart_exp, ← hm, N_smul, ← imNorm_sq x, ← hm,
+          Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq (le_of_lt hcoeffpos),
+          Real.sqrt_sq hm0]
+    -- the axis coefficient logAngle/imNorm collapses to 1/(exp(re x)·sinc m)
+    rw [log_def, hAngle, himNexp, imPart_exp, ← hm, smul_smul]
+    have hcollapse : m / ((Real.exp (re x) * Real.sinc m) * m)
+                       * (Real.exp (re x) * Real.sinc m) = 1 := by
+      field_simp
+    rw [hcollapse, one_smul, hlogN]
+    exact re_smul_one_add_imPart x
+
 /-! ## 12. The 𝕆 (n = 3) and 𝕊 (n = 4) operations-complete matrix cells
 
 The exp/log cells of the operations-complete matrix at the octonion and sedenion
@@ -642,6 +820,22 @@ theorem sedenion_N_exp (x : CDAlg ℝ 4) : N (exp x) = Real.exp (2 * re x) := N_
 theorem sedenion_exp_log {x : CDAlg ℝ 4} (hN : 0 < N x) (him : imPart x ≠ 0) :
     exp (log x) = x := exp_log hN him
 
+/-- **𝕆 full-ℝ group-law cell.** Octonion one-parameter group law for ALL `s,t : ℝ`. -/
+theorem octonion_exp_smul_add_real (x : CDAlg ℝ 3) (s t : ℝ) :
+    exp ((s + t) • x) = exp (s • x) * exp (t • x) := exp_smul_add_real s t
+
+/-- **𝕆 log left-inverse cell.** `log (exp x) = x` on the principal strip `‖Im x‖ < π`. -/
+theorem octonion_log_exp {x : CDAlg ℝ 3} (hstrip : imNorm x < π) :
+    log (exp x) = x := log_exp hstrip
+
+/-- **𝕊 full-ℝ group-law cell.** Sedenion one-parameter group law for ALL `s,t : ℝ`. -/
+theorem sedenion_exp_smul_add_real (x : CDAlg ℝ 4) (s t : ℝ) :
+    exp ((s + t) • x) = exp (s • x) * exp (t • x) := exp_smul_add_real s t
+
+/-- **𝕊 log left-inverse cell.** `log (exp x) = x` on the principal strip `‖Im x‖ < π`. -/
+theorem sedenion_log_exp {x : CDAlg ℝ 4} (hstrip : imNorm x < π) :
+    log (exp x) = x := log_exp hstrip
+
 /-! ## 13. Completeness audit — `#print axioms`
 
 Every theorem below must show ONLY `{propext, Classical.choice, Quot.sound}`.  The
@@ -657,14 +851,23 @@ built from ordinary `def`s and contributes no extra axioms. -/
 #print axioms exp_unit_axis
 #print axioms exp_unit_axis_add
 #print axioms exp_smul_add
+#print axioms exp_unit_axis_real
+#print axioms exp_unit_axis_add_real
+#print axioms exp_smul_add_real
 #print axioms exp_neg_mul_exp
 #print axioms N_exp
 #print axioms N_eq_re_sq_add_N_imPart
 #print axioms exp_log
+#print axioms re_exp
+#print axioms imPart_exp
+#print axioms log_exp
 #print axioms cdAlg2Equiv_imPart
 #print axioms cdAlg2Equiv_imNorm
 #print axioms exp_eq_quaternion
 #print axioms octonion_exp_smul_add
+#print axioms octonion_exp_smul_add_real
+#print axioms octonion_log_exp
 #print axioms sedenion_exp_log
+#print axioms sedenion_log_exp
 
 end QBP.Foundations.CDAlg
