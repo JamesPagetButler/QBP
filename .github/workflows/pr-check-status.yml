@@ -51,6 +51,7 @@ on:
       - Lint
       - Tenancy XRef Lint
       - Validate JSON
+      - Closing-keyword AC guard
     types: [completed]
   check_suite:
     types: [completed]
