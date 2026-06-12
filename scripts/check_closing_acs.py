@@ -34,10 +34,23 @@ CLOSING = re.compile(
 )
 UNCHECKED_AC = re.compile(r"^\s*-\s*\[\s\]\s*\*\*AC", re.MULTILINE)
 
+# Markdown code spans/blocks: GitHub does NOT honour a closing keyword inside
+# inline code or a fenced block (it won't auto-close from `closes #N`), so a PR
+# that merely *documents* the keyword (e.g. a FAULT-S4-004 fault description
+# quoting `closes #474 AC2`) must not trip the guard. Strip code before matching
+# to mirror GitHub's real auto-close behaviour.
+FENCED_CODE = re.compile(r"```.*?```", re.DOTALL)
+INLINE_CODE = re.compile(r"`[^`]*`")
+
+
+def strip_code(text):
+    return INLINE_CODE.sub(" ", FENCED_CODE.sub(" ", text or ""))
+
 
 def closing_refs(text):
-    """Return the set of issue numbers referenced with a closing keyword."""
-    return {int(m) for m in CLOSING.findall(text)}
+    """Return the set of issue numbers referenced with a closing keyword,
+    ignoring keywords inside markdown code (mirrors GitHub auto-close)."""
+    return {int(m) for m in CLOSING.findall(strip_code(text))}
 
 
 def count_unchecked_acs(body):
