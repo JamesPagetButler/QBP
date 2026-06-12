@@ -5,7 +5,7 @@
   "vendored_from_path": "schema/inventory.schema.json",
   "vendored_at_local_clone": "/home/prime/Documents/CTH/cth/schema/inventory.schema.json",
   "vendored_on_date_utc": "2026-06-12",
-  "vendored_by_pr": "QBP refresh/cth-schema-0.3.1 (PR # assigned on open)",
+  "vendored_by_pr": "QBP #549",
   "synced_from_upstream_pr": "confluent-trust#97",
   "vendored_sha256_of_schema_file": "9710cef8447bccf23fefaf4a6fe67d5fd3b83530c34b32fc4558fc679b7f5f11",
   "vendored_upstream_commit_sha": "7a226c7059604cfbd437e658064c2a3e11218dfe",
