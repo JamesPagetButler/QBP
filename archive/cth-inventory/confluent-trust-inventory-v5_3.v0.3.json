@@ -4586,9 +4586,9 @@
       "note": "QBP #509 unified vNext apply: +52 anchors (Batch A: 24 v5.13 fold-in incl. 1 include-as-killed + TOV falsified-as-global side-effect; Batch C: 28 v5_24 intake incl. 19 NASCENT+substrate, 3 truth-in-labelling relabels). 74 provenance_kind backfilled (Convention D). 122 §3 field adoptions; kill metadata inviolable; 5 tier-4 CLAMPs (napkin #514); 13 stale-pointer review_flags. Zero unreconciled streams. Trail: analysis/509-apply-provenance-trail.md"
     },
     {
-      "date": "2026-06-12",
-      "change": "+5 REF-* substrate type-theory citations (cohesive/directed/CD-HoTT/Lean-HoTT + 1 refuted phantom) for #554/#555/#556",
-      "by": "qbp-oppenheimer"
+      "version": "5.4.1",
+      "date": "2026-06-12T00:00:00Z",
+      "note": "qbp-oppenheimer: +5 REF-* substrate type-theory citation anchors (cohesive/directed/CD-HoTT/Lean-HoTT + 1 refuted phantom) for #554/#555/#556. Four web-verified 2026-06-12; phantom recorded incoherent per kill-history discipline."
     }
   ],
   "last_updated": "2026-06-12T00:00:00Z",
