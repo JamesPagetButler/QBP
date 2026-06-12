@@ -194,10 +194,46 @@ jobs:
           add_label()    { gh pr edit "$PR" --repo "$REPO" --add-label    review-ready 2>/dev/null || true; }
           remove_label() { gh pr edit "$PR" --repo "$REPO" --remove-label review-ready 2>/dev/null || true; }
 
+          # ── CI-green evidence-box self-tick (#507 §8a, FAULT-S4-002 fix) ──
+          # The notifier owns the "CI green" EVIDENCE box on the PR body: tick at
+          # ALL-GREEN, un-tick at RED. This removes the orchestrator/watcher
+          # dependency that failed on #533 (a green CI whose box never got ticked
+          # because the watcher tail short-circuited). Deterministic, idempotent.
+          #
+          # GUARDRAIL (bma#245 / box-keeper spec): touches ONLY a checkbox line
+          # whose text contains "CI green"; the exclusion regex hard-blocks any
+          # review / sign-off / Human-Visual-Review box. Evidence boxes only —
+          # never a judgment box. Ticks at most ONE box (the first match).
+          set_ci_box() {  # $1 = mark: "x" (tick) or " " (untick)
+            local mark="$1" body newbody tmp
+            body=$(gh pr view "$PR" --repo "$REPO" --json body --jq .body) || return 0
+            newbody=$(printf '%s' "$body" | awk -v m="$mark" '
+              BEGIN { done = 0 }
+              {
+                line = $0
+                if (!done \
+                    && line ~ /^[[:space:]]*-[[:space:]]\[[ xX]\]/ \
+                    && tolower(line) ~ /ci green/ \
+                    && tolower(line) !~ /review|sign.?off|visual|hvr|red team|gemini|approve/) {
+                  sub(/\[[ xX]\]/, "[" m "]", line)
+                  done = 1
+                }
+                print line
+              }')
+            if [ "$newbody" != "$body" ]; then
+              tmp=$(mktemp)
+              printf '%s' "$newbody" > "$tmp"
+              gh pr edit "$PR" --repo "$REPO" --body-file "$tmp" 2>/dev/null \
+                && echo "CI-green evidence box set to [$mark]" || true
+              rm -f "$tmp"
+            fi
+          }
+
           # bodies via printf (YAML indentation inside literals renders as code blocks)
           if [ "$NTECHFAIL" -gt 0 ]; then
-            # ── RED: revoke review-ready ──
+            # ── RED: revoke review-ready + withdraw CI-green evidence box ──
             remove_label
+            set_ci_box " "
             LIST=$(echo "$TECH_FAILED" | jq -r '.[] | "- ❌ [\(.name)](\(.html_url)) — \(.conclusion)"')
             BODY=$(printf '%s\n## ❌ Checks FAILED — %s of %s @ %s\n\nHead: `%s`\n\n%s\n\n`review-ready` revoked: not reviewable until tech-green again. Machine-posted; updates per head SHA.' \
               "$MARKER" "$NTECHFAIL" "$TOTAL" "$TS" "$SHA" "$LIST")
@@ -207,7 +243,11 @@ jobs:
             BODY=$(printf '%s\n## 🟢 Tech-green — review-ready @ %s\n\nHead: `%s`. All non-review checks pass; review-completeness gates await artifacts.\n\n**Review checklist (sequential; each post must include `<!-- reviewed-sha: %s -->`):**\n- [ ] Red Team review (Sabine/Grothendieck/Knuth)\n- [ ] Gemini review (Furey/Feynman, real API)\n- [ ] Synthesis + fix rounds as needed (each fix push re-runs this cycle)\n- [ ] Human Visual Review (beekeeper)\n\nMachine-posted; updates per head SHA.' \
               "$MARKER" "$TS" "$SHA" "$SHA")
           else
-            # ── ALL-GREEN: review-freshness check (patch-id via marker) ──
+            # ── ALL-GREEN: tick the CI-green evidence box, then review-freshness ──
+            # Every check (incl. review gates) passed → the "CI green" evidence
+            # box is now machine-true. Review FRESHNESS is reported separately
+            # below; it does not gate this box (CI-green ≠ reviews-fresh).
+            set_ci_box "x"
             LASTREV=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
                       --jq '[.[] | .body]' | jq -s 'add // []' \
                       | jq -r '[.[] | capture("<!-- reviewed-sha: (?<s>[0-9a-f]{7,40}) -->").s] | last // empty')
