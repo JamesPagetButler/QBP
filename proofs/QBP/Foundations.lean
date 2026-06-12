@@ -10,6 +10,7 @@ import QBP.Foundations.Exp
 import QBP.Foundations.Breakdown
 import QBP.Foundations.OctonionLaws
 import QBP.Foundations.FanoOrientationF3
+import QBP.Foundations.FanoSubalgebras
 import QBP.Foundations.TowerLaws
 import QBP.Foundations.LieAlgebraIso
 import QBP.Foundations.NormForm
