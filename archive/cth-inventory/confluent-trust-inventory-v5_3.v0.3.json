@@ -4029,6 +4029,71 @@
       "provenance_kind": "theory",
       "intake_batch": "509-C",
       "intake_source": "v5_24 (QBP-web continued lineage)"
+    },
+    {
+      "id": "REF-buchholtz-rijke-cd-hott",
+      "name": "Buchholtz-Rijke (2016): The Cayley-Dickson Construction in Homotopy Type Theory",
+      "description": "Buchholtz & Rijke, arXiv:1610.01134 (2016). H-space structure on S^3 in HoTT + the quaternionic Hopf fibration, homotopy-invariantly. VERIFIED REAL (direct fetch 2026-06-12). Prior art for the QBP Agda foundation layer (#556): synthetic S^1/S^3/S^7 as HITs + Hopf fibrations, the coordinate-free side of the Lean<->Agda bridge.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "Buchholtz & Rijke, 'The Cayley-Dickson Construction in Homotopy Type Theory', arXiv:1610.01134 (2016)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-12T00:00:00Z",
+      "notes": "Citation for substrate epic #554 / foundation sub-issue #556."
+    },
+    {
+      "id": "REF-shulman-real-cohesive-hott",
+      "name": "Shulman (2015-2017): Real-Cohesive Homotopy Type Theory",
+      "description": "M. Shulman, arXiv:1509.07584. Founds real-cohesive HoTT: the cohesive modal triple (shape/flat/sharp) + crisp type theory + the real-cohesion axiom, giving synthetic geometry on HoTT. AXIOMATIC (does NOT require cubical) -> postulatable on any HoTT setting. VERIFIED REAL (fetch 2026-06-12). The COHESIVE axis of the QBP substrate (#555) -- the synthetic SPACE / differential geometry Strategy C (#539) needs. PRECISION (Gemini #558 review): real-cohesion gives synthetic SPACE (continuous paths, smooth structure), NOT Lorentzian SPACETIME -- no metric, no signature, no dynamics. The spacetime/metric layer is downstream physics, not supplied by this citation.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "M. Shulman, 'Brouwer's fixed-point theorem in real-cohesive homotopy type theory', arXiv:1509.07584 (2015, rev. 2017)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-12T00:00:00Z",
+      "notes": "Cohesive axis for substrate #554/#555. nLab confirms axiomatic; no proof-assistant implementation exists."
+    },
+    {
+      "id": "REF-ground-zero-lean-hott",
+      "name": "rzrn/ground_zero: Lean 4 HoTT library (code)",
+      "description": "github.com/rzrn/ground_zero -- a real Lean 4 HoTT library (HITs via quotients + a custom large-eliminator checker, no kernel mods). VERIFIED REAL (fetch 2026-06-12). Evidence HoTT-on-Lean is feasible. CAVEATS: archived 2026-03; NO cohesive modalities, NO cubical, NO Cayley-Dickson. Informs substrate architecture decision (#555 AC1): Lean-HoTT is real but the cohesive substrate is greenfield.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "github.com/rzrn/ground_zero (Lean 4 HoTT, archived 2026-03)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-12T00:00:00Z",
+      "notes": "Code citation for substrate #555. Archived + no modalities."
+    },
+    {
+      "id": "REF-gratzer-weinberger-buchholtz-directed",
+      "name": "Gratzer-Weinberger-Buchholtz: Directed/Simplicial Type Theory (2024-2026)",
+      "description": "Directed univalence (arXiv:2407.09146), Yoneda in simplicial TT (arXiv:2501.13229), the inf-category of inf-categories (arXiv:2602.02218). Simplicial/directed type theory adds a DIRECTED path type (morphisms native) -- distinct from symmetric and cohesive HoTT. VERIFIED REAL (fetch 2026-06-12). The DIRECTED axis of the QBP substrate (#555 AC4): a directed morphism encodes the IRREVERSIBILITY / non-invertibility of the crystallisation O->H transition (the Gamma-arrow as a non-invertible structural fact). PRECISION (Gemini #558 review): directed-TT records irreversibility, it does NOT generate physical causality -- conflating logical morphism-direction with physical causal/temporal direction is a category error. Use as the structural ledger of irreversibility, not a derivation of the arrow of time. Tooling: Rzk (simplicial), separate from Cubical Agda.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "Gratzer-Weinberger-Buchholtz: arXiv:2407.09146, 2501.13229, 2602.02218 (2024-2026)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-12T00:00:00Z",
+      "notes": "Directed axis for substrate #555 AC4-AC6, folded in per beekeeper 2026-06-12."
+    },
+    {
+      "id": "REF-phantom-cohesion-before-computation",
+      "name": "PHANTOM (refuted): 'Real-Cohesive HoTT Substrate in Lean 4' -- does not exist",
+      "description": "A claimed 'Cohesion Before Computation: A Real-Cohesive HoTT Substrate in Lean 4 (May 2026)' paper, cited by Gemini Spark as the basis for a Lean cohesive substrate. REFUTED 2026-06-12: targeted search returns NO results; unreferenced anywhere local. The f(0)/#535 fabricated-citation pattern. Kept as REFUTED for the forensic provenance trail (kill-history discipline). The real foundations (REF-shulman-real-cohesive-hott + REF-ground-zero-lean-hott) support the path WITHOUT this phantom.",
+      "tier": 3,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "incoherent",
+      "measured_source": "(none -- paper does not exist; web search 2026-06-12 returned no results)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-12T00:00:00Z",
+      "notes": "Refuted citation kept for forensic trail. Do NOT build on it. AC0 of #555."
     }
   ],
   "inputs": [
@@ -4519,8 +4584,18 @@
       "version": "5.4.0",
       "date": "2026-06-04T00:00:00Z",
       "note": "QBP #509 unified vNext apply: +52 anchors (Batch A: 24 v5.13 fold-in incl. 1 include-as-killed + TOV falsified-as-global side-effect; Batch C: 28 v5_24 intake incl. 19 NASCENT+substrate, 3 truth-in-labelling relabels). 74 provenance_kind backfilled (Convention D). 122 §3 field adoptions; kill metadata inviolable; 5 tier-4 CLAMPs (napkin #514); 13 stale-pointer review_flags. Zero unreconciled streams. Trail: analysis/509-apply-provenance-trail.md"
+    },
+    {
+      "version": "5.4.1",
+      "date": "2026-06-12T00:00:00Z",
+      "note": "qbp-oppenheimer: +5 REF-* substrate type-theory citation anchors (cohesive/directed/CD-HoTT/Lean-HoTT + 1 refuted phantom) for #554/#555/#556. Four web-verified 2026-06-12; phantom recorded incoherent per kill-history discipline."
+    },
+    {
+      "version": "5.4.2",
+      "date": "2026-06-12T00:00:00Z",
+      "note": "qbp-oppenheimer: precision pass on 2 substrate REF anchors per Gemini #558 review (APPROVE-WITH-CONCERN) -- (1) directed axis records irreversibility/non-invertibility, NOT physical causality (category-error guard); (2) real-cohesion gives synthetic SPACE/geometry, NOT Lorentzian spacetime. Citations unchanged; only the interpretive framing tightened."
     }
   ],
-  "last_updated": "2026-06-04",
-  "update_provenance": "QBP #509 unified vNext apply — batches A (24) + B (74) + C (28+55); see analysis/509-apply-provenance-trail.md"
+  "last_updated": "2026-06-12T00:00:00Z",
+  "update_provenance": "qbp-oppenheimer 2026-06-12: substrate citation anchors per beekeeper 'update CTH as we go'"
 }
