@@ -51,38 +51,39 @@ My first-pass claim that the (2,2) is "internal, therefore spacetime stays 4D" *
 
 The generator→DOF map fixes *which* DOF, not the nature of Γ. AC3 remains open; nothing here forces discrete or continuous Γ. Flagged honestly — this map does not close Fork 2.
 
-## 4b. The dynamics probe — there is NO Mexican hat in the algebra (rigorous)
+## 4b. The dynamics probe — the no-go was OVERCLAIMED; the algebra DOES offer SSB ingredients (corrected after RT+Gemini review of PR #561)
 
-Taking the adversary's mandate directly: *does the octonion algebra source a symmetry-breaking potential V(y) for the (2,2) complement?* (`dynamics_probe.py`). **Answer: no.**
+> **Correction.** My first cut (`dynamics_probe.py`) claimed "no Mexican hat in the algebra." The RT and Gemini reviews (PR #561) both flagged this as **overclaimed**, and they were right. The probe only showed the *trivial* fact that **positive sum-of-squares actions are single-well** — it (i) assumed positive mass coefficients (rep-theory allows a wrong-sign V(|y|²) = −μ²|y|²+λ|y|⁴, which *is* a Mexican hat), and (ii) ignored cross-couplings to the retained sector. The follow-up `crosscoupling_probe.py` settles it.
 
-- **(A) Rep-theory no-go (exact):** the only SO(4)-invariant polynomials of a single (2,2)-vector y are polynomials in |y|². So any SO(4)-invariant self-potential is V(|y|²) — and any *positive* algebra-norm gives a **single well** (minimum at y=0). SSB needs a wrong-sign mass term the positive norm cannot supply.
-- **(B) Associator-squared action:** the natural non-associativity action Σ|[g_i, y·e₄, g_j]|² is an **isotropic positive** quadratic form (eigenvalues all = 96) → single-well, no tachyon.
-- **(C) No tachyon anywhere:** every |associator|² form is a sum of squares ⇒ positive-semidefinite ⇒ never sign-indefinite. No algebra-natural quadratic destabilises y=0.
+**What the rep-theory actually fixes (correct, narrow):** the only SO(4)-invariant of a *single* (2,2)-vector y is |y|² — so any single-field self-potential has the *form* V(|y|²). Rep-theory does **not** fix the *sign* of the mass term.
 
-**∴ The octonion algebra alone provides no spontaneous-symmetry-breaking potential.** The Mexican hat the adversary (correctly) demanded for an SSB story is *not in the multiplication table*.
+**The cross-coupling computation (`crosscoupling_probe.py`) — the algebra supplies BOTH signs:**
+- Norm and same-handed products (|y|², |X·y|², |y·X|²) are **positive-definite** (Euclidean octonion norm — the #474 D10 guardrail).
+- **But the non-commutative cross form Re⟨X·(y e₄), (y e₄)·X⟩ is NEGATIVE-definite for imaginary backgrounds** (eigenvalues all −1 for X=e₁; −6.37 for generic imaginary X). Reason (clean): for an imaginary unit, left- and right-multiplication on the complement *anticommute*, so ⟨e₁(ye₄),(ye₄)e₁⟩ = −|y|².
 
-### Why this is a result, not a dead end — convergence with #548
-- **#548** proved the 7 quaternionic subalgebras form **one G₂ orbit** → "which ℍ" is **pure gauge** (S=ln 7 is gauge-fixing, not physical entropy).
-- **#559** now finds the algebra has **no potential preferring any subalgebra** (single-well / degenerate).
-- **Together:** crystallisation 𝕆→ℍ is **not energy-driven SSB** — it is a **Γ-directed process** selecting one of a gauge-equivalent, energetically-degenerate family of subalgebras. The lost e₄…e₇ do not "fall into a vacuum"; their physical fate is fixed by the **dynamics of Γ (the process)**, not by a static potential.
+**∴ Corrected conclusion: an SSB potential is NOT excluded — it is algebraically *available*.** A potential combining the positive norm with the negative non-commutative cross-coupling (switched on by an imaginary background in the retained sector) can be **sign-indefinite / tachyonic**. The octonion algebra carries the ingredients for spontaneous symmetry breaking; what it does *not* hand us for free is *which* combination the crystallisation dynamics selects (the coefficients).
 
-> **HYPOTHESIS (flagged, not adopted):** crystallisation = a Γ-directed *process* over gauge-equivalent subalgebras, not potential-SSB. This is *consistent with* #548 + the §4b no-go, but it is not yet a derived mechanism — it relocates the keystone from "find the potential" (now shown not to exist) to "characterise the Γ-process." That ties #559 directly to **Fork 2 (the nature of Γ)** and to the **direct-Γ observable (#539)**.
+### Relation to #548 (corrected)
+- **#548:** the 7 quaternionic subalgebras are one G₂ orbit → *which* ℍ is **gauge** (the angular/orbit direction is redundancy, not physics). ✔ stands.
+- **#559 (corrected):** the *radial* direction (crystallised vs not — the magnitude of the order parameter) is **physical** and *can* be driven by a genuine (sign-indefinite) potential the algebra supplies. So the Mexican-hat picture is *available*: a flat gauge rim (the G₂ orbit, #548) + a physical radial breaking. The earlier "no potential, therefore pure Γ-process" inference was **withdrawn** — it conflated gauge redundancy with vacuum degeneracy (Gemini's point).
 
-## 5. Net result of this pass (honest)
+> **Status:** the dynamics question is **OPEN and more promising than the no-go suggested.** The algebra has tachyon-capable couplings; the keystone is now to determine which coefficients the crystallisation selects (and whether the selected potential reproduces the observed spectrum). A *full* indefinite signature — should one combination dominate — also points at the split-octonion / sedenion (zero-divisor) level, where the positive-definite norm is lost; flagged for later, not claimed.
 
-**What survives (solid, anchorable):** the verified kinematic skeleton (𝟕=(𝟑,𝟏)⊕(𝟐,𝟐), lost = (2,2)); **and a rigorous negative** — the octonion algebra has **no SSB potential** (§4b).
+## 5. Net result of this pass (honest, corrected)
 
-**What was killed:** the physical interpretation (internal-DOF / Higgs / ρ=1) — numerology, three-for-three (§3).
+**Solid, anchorable:** the verified kinematic skeleton (𝟕=(𝟑,𝟏)⊕(𝟐,𝟐), lost = (2,2)); **and the corrected dynamics finding** — the algebra supplies *both* positive (norm) and **negative (non-commutative cross-coupling)** quadratic forms, so an SSB potential is **algebraically available** (the no-go is retracted).
 
-**What it sharpened:** #559 is not a rep-theory problem *and not a potential problem* (the potential provably doesn't exist). Combined with #548, the answer to "where do e₄…e₇ go?" is reframed: **not into a vacuum — through a Γ-process over a gauge-degenerate family.** The genuine open work moves to **characterising the Γ-dynamics** (Fork 2 / #539), not hunting a Mexican hat.
+**Killed:** the Higgs/ρ=1 interpretation (numerology, §3) — stays dead.
+
+**The genuine open keystone:** not "is there a potential" (yes, ingredients exist) and not rep-labelling — but **which potential the crystallisation dynamics selects**, i.e. the coefficients of {positive norm, negative cross-coupling} and whether the resulting VEV/spectrum is physical. That is the real #559 continuation.
 
 ## 6. AC status (#559)
 | AC | Scope | Status |
 |----|-------|--------|
-| AC1 | generator→DOF map (𝕆→ℍ) | 🟡 **kinematic map established** (lost = (2,2) SO(4)-vector); physical mechanism reframed (§4b) — not potential-SSB |
-| AC2 | Fork 1 (internal vs KK) | ⏳ **OPEN** — (2,2)=SO(4)-vector; the Γ-process (not the algebra) must decide (§2/§4b) |
-| AC3 | Fork 2 (discrete vs continuous Γ) | ⏳ **open & now central** — the keystone relocated *to* Γ-dynamics (§4b) |
-| AC4 | dimensionless falsifiable consequence | ❌ ρ=1 killed as numerology (§3); **and** the SSB-potential route is closed (§4b no-go) — a falsifiable number must come from the Γ-process / direct-Γ observable (#539), not a potential |
-| AC5 | record as CTH anchors + update doc §4 | ⏳ anchor: verified skeleton, interpretation-kill, the §4b no-go, the Γ-process reframe |
+| AC1 | generator→DOF map (𝕆→ℍ) | 🟡 **kinematic map established** (lost = (2,2)); the SSB potential is **algebraically available** (§4b corrected), coefficients open |
+| AC2 | Fork 1 (internal vs KK) | ⏳ **OPEN** — (2,2)=SO(4)-vector; decided by the selected potential / dynamics, not yet fixed |
+| AC3 | Fork 2 (discrete vs continuous Γ) | ⏳ **open** — untouched by this pass |
+| AC4 | dimensionless falsifiable consequence | ❌ ρ=1 killed (§3); a number must come from the **selected** potential's VEV/spectrum (open) or the direct-Γ observable (#539) |
+| AC5 | record as CTH anchors + update doc §4 | ⏳ anchor: verified skeleton, interpretation-kill, the corrected SSB-ingredient finding |
 
-**∴ The honest headline:** the kinematics of 𝕆→ℍ are nailed down from first principles, the Higgs interpretation is dead, **and the algebra provably has no SSB potential** — so crystallisation is not vacuum-selection but a **Γ-directed process over a gauge-degenerate (#548) family.** The keystone relocates from "find the potential" to "characterise the Γ-dynamics" — which is exactly the direct-Γ thread (#539), where (2) now points.
+**∴ The honest headline:** the kinematics of 𝕆→ℍ are nailed down from first principles; the Higgs interpretation is dead; my "no SSB potential" no-go was **overclaimed and is retracted** — the cross-coupling computation shows the octonion algebra **does** supply sign-indefinite (tachyon-capable) couplings, so an SSB potential is *available*. The genuine keystone is now **which potential the crystallisation dynamics selects** (coefficients + resulting spectrum) — a real, well-posed continuation of #559.
