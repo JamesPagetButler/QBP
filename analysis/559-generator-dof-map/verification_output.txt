@@ -1,0 +1,11 @@
+e_i^2 = -1 for i=1..7: True
+gamma(a,b) is an octonion automorphism (2000 random trials): True
+span{e1,e2,e3} invariant under SO(4): True
+span{e4,e5,e6,e7} invariant under SO(4): True
+SU(2)_b acts trivially on {e1,e2,e3} (=> b-singlet): True
+SU(2)_a acts NONtrivially on {e1,e2,e3} (=> a-triplet): True
+SU(2)_a acts NONtrivially on {e4..e7}: True
+SU(2)_b acts NONtrivially on {e4..e7}: True
+a-action on {e1,e2,e3}: orthogonal: True det=+1: True => spin-1 (vector=3) of SU(2)_a
+orbit-span rank on {e4..e7} (4 => irreducible (2,2)): 4
+orbit-span rank on {e1,e2,e3} (3 => irreducible triplet): 3
