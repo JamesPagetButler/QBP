@@ -4094,6 +4094,193 @@
       "prediction_chain": [],
       "last_tested_at": "2026-06-12T00:00:00Z",
       "notes": "Refuted citation kept for forensic trail. Do NOT build on it. AC0 of #555."
+    },
+    {
+      "id": "INSIGHT-octonion-quaternion-branching",
+      "name": "𝕆→ℍ crystallisation: 7 = (3,1) ⊕ (2,2), lost generators = (2,2) bi-doublet (verified)",
+      "description": "When 𝕆 crystallises to a quaternion subalgebra ℍ, G₂=Aut(𝕆) breaks to SO(4)=(SU(2)_a×SU(2)_b)/ℤ₂ (stabilizer of ℍ) via γ(a,b): x+y·e₄ ↦ axā+(byā)e₄. The 7 imaginary octonions branch 7=(3,1)⊕(2,2): retained Im(ℍ)={e₁,e₂,e₃}=(3,1) unbroken SU(2); lost {e₄,e₅,e₆,e₇}=(2,2) irreducible bi-doublet. VERIFIED computationally from raw octonion structure constants (2000-trial automorphism + invariance + irreducibility), matches Conway-Smith/Baez. The kinematic skeleton of the generator→DOF map (#559).",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result, 2026-06-13/14 (#559/#539/#560)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "analysis/559-generator-dof-map/verify_g2_so4_branching.py. The (2,2) is the SO(4)-VECTOR rep."
+    },
+    {
+      "id": "INSIGHT-crystallisation-ssb-ingredients",
+      "name": "Octonion algebra DOES supply symmetry-breaking ingredients (no-go retracted)",
+      "description": "An earlier 'no Mexican hat in the algebra' no-go was OVERCLAIMED (it only showed positive sum-of-squares actions are single-well). Corrected (#559 fix-pass, RT+Gemini): the non-commutative cross form Re⟨X·(y e₄),(y e₄)·X⟩ is NEGATIVE-definite for imaginary backgrounds (eig all −1 for X=e₁) — left/right multiplication anticommute on the complement. So the algebra supplies BOTH positive (norm) and negative (cross-coupling) quadratic forms ⇒ a sign-indefinite/tachyonic SSB potential is ALGEBRAICALLY AVAILABLE. Open: which coefficients the dynamics selects.",
+      "tier": 2,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result, 2026-06-13/14 (#559/#539/#560)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "analysis/559-generator-dof-map/crosscoupling_probe.py. Replaces the retracted no-go."
+    },
+    {
+      "id": "INSIGHT-crystallisation-gauge-vs-physical",
+      "name": "Crystallisation: which-subalgebra = gauge (angular), order-parameter magnitude = physical (radial)",
+      "description": "Combining #548 (the 7 quaternionic subalgebras are one G₂ orbit ⇒ WHICH ℍ is pure gauge, S=ln7 is gauge-fixing) with #559 (the algebra supplies an SSB potential): the ANGULAR direction (which gauge-equivalent subalgebra) is redundancy; the RADIAL direction (magnitude of the (2,2) order-parameter VEV, = crystallisation progress Γ) is PHYSICAL and can be driven by the sign-indefinite potential. Γ is the gauge-invariant radial magnitude.",
+      "tier": 2,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result, 2026-06-13/14 (#559/#539/#560)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "#548 FanoSubalgebras.lean gauge result + #559. Corrects the earlier 'pure Γ-process, no potential' inference (which conflated gauge redundancy with vacuum degeneracy)."
+    },
+    {
+      "id": "INSIGHT-octonion-higgs-killed",
+      "name": "REFUTED: the lost (2,2) is NOT the custodial Higgs; ρ=1 is not predicted",
+      "description": "The interpretation 'lost (2,2) = custodial-SU(2) Higgs ⇒ predicts ρ=M_W²/(M_Z²cos²θ_W)=1' was adversarially killed (Gemini Furey/Feynman, #559), 3-for-3 numerology: (i) (2,2) is the SO(4)-vector, not forced internal; (ii) γ(a,b) asymmetry makes SU(2)_a the SPATIAL rotation group ⇒ the (2,2) carries spatial-rotation charge ⇒ NOT a Lorentz scalar ⇒ cannot be the Higgs (Coleman-Mandula); (iii) ρ=1 needs a potential the algebra-norm doesn't supply. Kept as kill-history.",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "incoherent",
+      "measured_source": "QBP internal result, 2026-06-13/14 (#559/#539/#560)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "Forensic trail. Do NOT revive without the dynamics. #559 §3."
+    },
+    {
+      "id": "CONJ-vconstants-keystone",
+      "name": "THE convergence keystone: derive α(v), μ(v), Λ_QCD(v) from the (2,2)-VEV magnitude",
+      "description": "The adversarial passes on #559 ('which potential/spectrum does crystallisation select') and #539 ('what is the value of the drift-ratio R_αμ') reduce to ONE computation: the dependence of the SM dimensionless residues on the crystallisation order-parameter magnitude v=|the (2,2) VEV|. From α(v),μ(v),Λ_QCD(v): R_αμ=(dlnα/dv)/(dlnμ/dv) is a parameter-free number (the only genuine QBP fingerprint), and the #559 spectrum follows from the same v-dependence. This is the well-posed next move for the whole crystallisation program.",
+      "tier": 3,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "untested",
+      "measured_source": "QBP internal result, 2026-06-13/14 (#559/#539/#560)",
+      "prediction_chain": [
+        "INSIGHT-octonion-quaternion-branching",
+        "INSIGHT-crystallisation-ssb-ingredients"
+      ],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "Shared #559+#539 keystone. 'Derive or die' (Gemini #539)."
+    },
+    {
+      "id": "INSIGHT-direct-gamma-fixed-ratio-generic",
+      "name": "Direct-Γ fixed-ratio drift is GENERIC single-field calculus, not a QBP signature",
+      "description": "If a single Γ drives all dimensionless constants, their fractional drifts are proportional (chain rule) so every pairwise ratio R_αμ=(α̇/α)/(μ̇/μ) is fixed in time. Adversarially DEFLATED (Gemini #539): this is necessary-not-sufficient — every single-field model (Bekenstein/dilaton/quintessence) predicts it; and it is dormant until a non-zero drift is detected (0/0). The ONLY QBP-specific fingerprint is the DERIVED VALUE of R (the CONJ-vconstants-keystone), plus monotone-in-Γ/accretion-correlated morphology (distinguishes from oscillatory DM, not from quintessence).",
+      "tier": 2,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result, 2026-06-13/14 (#559/#539/#560)",
+      "prediction_chain": [
+        "CONJ-vconstants-keystone"
+      ],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "#539 §3a. The instrument (Th-229 clock network) exists; QBP must supply the number."
+    },
+    {
+      "id": "QBP-POS-emergent-time",
+      "name": "QBP position: time is emergent from observed rates of change (Γ primary, t derived)",
+      "description": "Canonized position (beekeeper, 2026-06-13): time is not fundamental — it is constructed by observers internal to this universe from observed RATES OF CHANGE between things. Crystallisation progress Γ is primary; clock-time t is derived. Resolves the 'space vs spacetime' and directed-axis concerns by removing the demand for a Lorentzian/temporal primitive. CANDIDATE formal lineage: relational/thermal time (Barbour relational mechanics, Rovelli-Connes thermal time) — committed only once the open discrete-vs-continuous-Γ tension is resolved (causal-set-discrete vs Barbour-continuous).",
+      "tier": 2,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result, 2026-06-13/14 (#559/#539/#560)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "#560 §3. The position holds; its formal lineage is gated on Fork 2 (Γ discrete vs continuous)."
+    },
+    {
+      "id": "REF-th229-nuclear-clock",
+      "name": "Th-229 nuclear clock — first laser/comb excitation & frequency measurement (2024)",
+      "description": "The thorium-229 nuclear isomer (~8.4 eV / 148 nm) was directly excited and its frequency measured to ~kHz in 2024 — the nuclear clock became real. The sharpest prospective probe of crystallisation drift Γ̇ (#539). VERIFIED REAL.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "Zhang, C. …Ye, J. et al., Nature 633, 63 (2024), doi:10.1038/s41586-024-07839-6; Tiedau/Okhapkin/Schumm et al., PRL 132, 182501 (2024)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "Direct-Γ instrument (#539 §4)."
+    },
+    {
+      "id": "REF-th229-alpha-sensitivity",
+      "name": "Th-229 clock α-sensitivity: measured enhancement K_α = 5900(2300)",
+      "description": "The Th-229 nuclear transition's sensitivity to δα/α: the 2024 experimentally-grounded value is K_α = 5900 ± 2300 (~10³× electronic optical clocks), revised down from the older ~10⁴ theory estimate. Plus a uniquely large K_QCD lever (the strong-force scale axis), because the isomer energy is a near-cancellation of nuclear + EM. Use the MEASURED value with its error bar.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "Beeks, K. …Ye, Safronova et al., arXiv:2407.17300 (2024); Fadeev/Berengut/Flambaum, PRA 102, 052833 (2020)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "The lever that makes the direct-Γ test sharp (#539 §4). Honesty flag: measured 5900(2300), not the ~10⁴ theory value."
+    },
+    {
+      "id": "REF-clock-drift-bounds",
+      "name": "Best lab bounds on drift of α and μ (Yb⁺ E2/E3, 2021)",
+      "description": "Current best laboratory limits on a smooth linear drift of fundamental constants: (α̇/α)=1.0(1.1)×10⁻¹⁸/yr and (μ̇/μ)=−8(36)×10⁻¹⁸/yr — both consistent with zero. The sensitivity ceiling a QBP-derived R_αμ would have to be tested against.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "Lange, R. …Peik, E. et al., PRL 126, 011102 (2021), arXiv:2010.06620; BACON Collaboration, Nature 591, 564 (2021)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "The 0/0 caveat: the fixed-ratio test is dormant until a non-zero drift is seen (#539)."
+    },
+    {
+      "id": "REF-barbour-rovelli-relational-time",
+      "name": "Relational / thermal time (Barbour, Rovelli-Connes) — emergent-time lineage",
+      "description": "The candidate formal lineage for QBP's emergent-time position: Barbour's relational mechanics (time as a parameter tracking configuration change; Platonia; 'The End of Time', 1999) and the Rovelli-Connes thermal time hypothesis (physical time = modular flow of a statistical state). Both: time emergent from relational change, not fundamental. VERIFIED REAL (web 2026-06-13).",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "J. Barbour, 'The End of Time' (1999), relational mechanics; A. Connes & C. Rovelli, 'Von Neumann algebra automorphisms and time-thermodynamics relation...', Class. Quantum Grav. 11, 2899 (1994)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "Lineage for QBP-POS-emergent-time; commitment gated on discrete-vs-continuous Γ (Fork 2)."
+    },
+    {
+      "id": "REF-borsten-division-algebra-sym",
+      "name": "Super-Yang-Mills, division algebras and triality (ℝ,ℂ,ℍ,𝕆 ↔ D=3,4,6,10)",
+      "description": "Division algebras govern minimal-spinor SYM in D=3,4,6,10. Proposed as a crystallisation-tower map for QBP and ADVERSARIALLY KILLED AS A DIRECT MAP (#559 §2a / #560 §2a): algebraic truncation ≠ dimensional reduction (it would force QBP into 10D→4D KK compactification, with a unitarity question). Kept as kill-history; the citation is real, the QBP direct-map identification is refuted.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "Anastasiou, Borsten, Duff, Hughes, Nagy, arXiv:1309.0546, JHEP 08(2014)080",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "Citation real; QBP 'crystallisation = dimensional reduction' direct-map REFUTED. Do not adopt as the lift path."
+    },
+    {
+      "id": "REF-causal-sets-domain-spacetime",
+      "name": "Causal sets / domain theory of spacetime (order primitive, metric derived)",
+      "description": "The rigorous 'order primitive, time/metric derived' tradition: Sorkin causal sets ('Order + Number = Geometry') and Martin-Panangaden domain theory (causal order fixes topology + metric up to conformal factor). Proposed as the home for QBP's Γ-arrow and KILLED AS A DIRECT MAP (#560 §2b): causal sets are strictly DISCRETE; QBP's G₂→SO(4) is continuous. QBP's emergent-time is relational (Barbour/Rovelli), not causal-set — unless Γ turns out discrete (Fork 2, open).",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "Martin & Panangaden, Comm. Math. Phys. (2006), arXiv:gr-qc/0407094; Wüthrich, arXiv:2005.10873 (causal sets review)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "Citation real; direct-map for QBP Γ refuted pending the discrete-Γ question."
+    },
+    {
+      "id": "REF-huerta-schreiber-superpoint",
+      "name": "Emergent Lorentzian spacetime from the superpoint (Huerta-Schreiber)",
+      "description": "Super-Minkowski spacetime with its Lorentz metric + spin structure is DERIVED from the superpoint via iterated super-L∞ central extensions — a real precedent that 'spacetime is emergent, not fundamental.' Cited as QBP precedent and DOWNGRADED (#560 §2c): super-L∞ runs on NILPOTENCY (Grassmann, x²=0 = zero divisors); division algebras are DEFINED by having no zero divisors — opposite machinery, zero shared apparatus. Borrowed authority, not a foundation.",
+      "tier": 2,
+      "provenance": "E",
+      "provenance_kind": "theory-external",
+      "status": "coherent",
+      "measured_source": "Huerta & Schreiber, 'How Space-Times Emerge from the Superpoint', arXiv:1903.02822; 'M-Theory from the Superpoint', arXiv:1702.01774",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-14T00:00:00Z",
+      "notes": "Citation real; QBP-relevance is precedent only, not shared machinery. Not load-bearing."
     }
   ],
   "inputs": [
@@ -4594,8 +4781,13 @@
       "version": "5.4.2",
       "date": "2026-06-12T00:00:00Z",
       "note": "qbp-oppenheimer: precision pass on 2 substrate REF anchors per Gemini #558 review (APPROVE-WITH-CONCERN) -- (1) directed axis records irreversibility/non-invertibility, NOT physical causality (category-error guard); (2) real-cohesion gives synthetic SPACE/geometry, NOT Lorentzian spacetime. Citations unchanged; only the interpretive framing tightened."
+    },
+    {
+      "version": "5.5.0",
+      "date": "2026-06-14T00:00:00Z",
+      "note": "qbp-oppenheimer: +14 anchors from the 2026-06-13/14 crystallisation work — #559 generator→DOF map (verified 7=(3,1)⊕(2,2); SSB ingredients; Higgs-interp killed), #539 direct-Γ observable (fixed-ratio deflated to generic; Th-229 instrument refs), the v→constants convergence keystone, QBP emergent-time position, and the three adversarially-killed-as-direct-map citations (Borsten SYM, causal sets, superpoint). AC5 of #559."
     }
   ],
-  "last_updated": "2026-06-12T00:00:00Z",
-  "update_provenance": "qbp-oppenheimer 2026-06-12: substrate citation anchors per beekeeper 'update CTH as we go'"
+  "last_updated": "2026-06-14T00:00:00Z",
+  "update_provenance": "qbp-oppenheimer 2026-06-14: #559/#539/#560 findings + citation anchors (AC5)"
 }
