@@ -21,28 +21,34 @@ Built from the #559-verified ingredients: V(y) = a|y|² + b·Re⟨X(y e₄),(y e
 ## B. v → constants — the genuine open frontier
 How does each dimensionless residue depend on v? This is **QBP-specific and not the SM**: in the SM, α is *not* a function of the Higgs VEV (it's a gauge coupling). QBP must supply its own mechanism by which α (the U(1)/EM sector), μ = m_p/m_e, and Λ_QCD/m_q arise from / couple to the crystallisation (2,2). **This is the hard, unsolved part** (AC-B1/B2). No claim made here.
 
-## C. R_αμ reduces to a RATIO OF EXPONENTS (scale-independent) — the tractability win
-R_αμ is a ratio of logarithmic derivatives. If each constant couples to the VEV as a **power law** f(v) = f₀·v^p, then d ln f/d ln v = p (constant — independent of v and of all potential coefficients), so
+## C. The "scale-independent R" shortcut — ❌ BLOCKED (illusory)
 
-$$R_{\alpha\mu} = \frac{d\ln\alpha/d\ln v}{d\ln\mu/d\ln v} = \frac{p_\alpha}{p_\mu}\quad(\text{a pure ratio of exponents, scale-free}).$$
+The attempted shortcut: if each constant couples to the VEV as a **power law** f(v)=f₀·v^p, then R_αμ = p_α/p_μ — a ratio of exponents, independent of the absolute scale and the potential coefficients. **The adversarial gate (Gemini Furey/Feynman) BLOCKED this, correctly:**
 
-**Consequence:** the falsifiable number is **independent of the absolute VEV scale AND of the (undetermined) potential coefficients** — it reduces to the **coupling exponents** (p_α, p_μ, p_QCD). So "derive R" no longer requires solving the hard absolute-scale problem (A's crux); it requires only Sub-problem B's *exponents*. This drops the hardest piece — *provided* the couplings are power laws (flagged assumption — logarithmic/running couplings would make R scale-dependent).
+1. **The power-law premise is broken for α.** α is a **gauge coupling** — in QFT it runs **logarithmically** (α⁻¹ ~ ln(v/Λ)), *not* as a power law. Substituting a log dependence makes R_αμ **scale-dependent** after all. Scale-independence holds only if *both* couplings are power-law; α almost certainly isn't. The "win" is dead on arrival for the gauge channel.
+2. **Relocation, not progress.** The unknown functional dependence was merely bundled into "constants" p_α, p_μ. Computing them *is* the full crystallisation→constants mechanism (Sub-problem B) — all the intractable complexity, just renamed.
+3. **The math is trivial** (power law ⇒ constant log-derivative); celebrating it as a structural win is a distraction from the broken premise.
 
-## Net (honest)
-- **A:** the algebra gives a concrete SSB Mexican hat (negative mass² from non-commutativity, triggered by an imaginary background). ✅ mechanism shown; absolute scale open.
-- **C:** R_αμ = p_α/p_μ, scale- and coefficient-independent under power-law coupling. ✅ the falsifiable number is reduced to exponents.
-- **B:** deriving the exponents p_α, p_μ, p_QCD (QBP's mechanism for how the constants couple to the (2,2)) is the **genuine remaining frontier** — untouched, hard, QBP-specific.
+**Verdict: the C-reduction is illusory.** It does NOT drop the hardest piece. (The earlier "tractability win" framing is retracted.)
 
-> **The keystone is now sharply localised:** not "solve the dynamics + the scale + the map" but **"derive the three coupling exponents."** That is the single thing standing between QBP and a parameter-free, falsifiable drift-ratio testable on the Th-229 clock network (#539).
+## A (revisited) — demoted: SSB is *possible*, the potential is *not* parameter-free
+The adversary also fairly hit Sub-problem A: choosing exactly the cross-coupling term that yields the convenient isotropic (|X_re|²−|X_im|²) mass matrix, and invoking an "imaginary background" to force the negative mass², is **model-building, not a parameter-free consequence** of the algebra. Honest demotion: §A demonstrates that the octonion non-commutativity **can** source a Mexican hat (existence — SSB is not forbidden, strengthening #559), but it is **not** "the canonical crystallisation potential." The specific term + background are inputs.
+
+## Net (honest) — the keystone is opened and its real difficulty mapped; no shortcut exists
+- **A:** SSB is *possible* (the algebra contains a negative cross-coupling) — existence only; the specific potential is model-building, scale open.
+- **C:** the scale-independent-R shortcut is **BLOCKED** (α runs logarithmically; R is not generically scale-free).
+- **B:** the full crystallisation→constants mechanism is the **irreducible frontier** — no shortcut bypasses it.
+
+> **The sharpened crux (the adversary's mandate):** the real prior question is *does QBP's crystallisation give α a power-law or a logarithmic dependence on the VEV?* — i.e. does QBP **reproduce standard QFT gauge-coupling running, or replace it?** Until that is answered, neither R nor the spectrum is derivable. This is the genuine, deep next question — and it is bigger than #564 alone.
 
 ## AC status (#564)
 | AC | Status |
 |----|--------|
-| A1 (build V, show Mexican hat) | ✅ done — explicit, algebra-sourced negative mass² |
+| A1 (build V, show Mexican hat) | 🟡 existence shown (SSB *possible*); demoted — specific potential is model-building, not parameter-free |
 | A2 (canonical coefficients / parameter-free v) | ⏳ open (the absolute-scale crux) |
-| B1/B2 (α, μ, Λ_QCD coupling to the VEV) | ⏳ **open frontier** — the real remaining work |
-| C1 (is R scale-independent?) | ✅ **yes, under power-law coupling** — R = ratio of exponents |
-| C2 (derive R) | ⏳ reduces to B (the exponents) |
+| B1/B2 (α, μ, Λ_QCD coupling to the VEV) | ⏳ **irreducible frontier** — no shortcut |
+| C1 (is R scale-independent?) | ❌ **NO** — fails for log-running gauge couplings (α). Shortcut blocked |
+| C2 (derive R) | ⏳ requires the full B mechanism; gated on the power-law-vs-log question |
 
 ## Provenance
-Continuation of #559 (the SSB ingredients) + #539 (the drift observable), per the #563 `CONJ-vconstants-keystone`. The imaginary-background SSB trigger and the R=ratio-of-exponents reduction are this pass's results. Recorded by @qbp-oppenheimer; the C-reduction adversarially tested before adoption (see PR thread).
+Continuation of #559 (the SSB ingredients) + #539 (the drift observable), per the #563 `CONJ-vconstants-keystone`. This pass: built the explicit Mexican-hat potential (existence of algebra-sourced SSB), attempted the scale-independent-R shortcut, and the adversarial gate (Gemini Furey/Feynman) **BLOCKED the shortcut** as illusory (α runs logarithmically, not power-law). The honest residue: the keystone has no shortcut; the real prior question is power-law-vs-log running of α under crystallisation. Recorded by @qbp-oppenheimer.
