@@ -1,0 +1,36 @@
+Testing natural algebra-derived quadratic forms on y for SIGN-INDEFINITENESS:
+(an indefinite form => a tachyonic direction => SSB possible)
+
+--- background x0=1 ---
+  norm |y e4|^2                              eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+  |X*(y e4)|^2                               eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+  |(y e4)*X|^2                               eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+  |[X, y e4]|^2 (commutator)                 eig=[0. 0. 0. 0.]  sig(+,-,0)=(0,0,4)
+  |[X, y e4, X]|^2 (assoc)                   eig=[0. 0. 0. 0.]  sig(+,-,0)=(0,0,4)
+  Re<X*(ye4), (ye4)*X> (cross, NOT a norm)   eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+  Re( conj(ye4) * X * (ye4) ) scalar part    eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+
+--- background x0=e1 ---
+  norm |y e4|^2                              eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+  |X*(y e4)|^2                               eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+  |(y e4)*X|^2                               eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+  |[X, y e4]|^2 (commutator)                 eig=[4. 4. 4. 4.]  sig(+,-,0)=(4,0,0)
+  |[X, y e4, X]|^2 (assoc)                   eig=[0. 0. 0. 0.]  sig(+,-,0)=(0,0,4)
+  Re<X*(ye4), (ye4)*X> (cross, NOT a norm)   eig=[-1. -1. -1. -1.]  sig(+,-,0)=(0,4,0)
+  Re( conj(ye4) * X * (ye4) ) scalar part    eig=[0. 0. 0. 0.]  sig(+,-,0)=(0,0,4)
+
+--- background x0=generic ---
+  norm |y e4|^2                              eig=[1. 1. 1. 1.]  sig(+,-,0)=(4,0,0)
+  |X*(y e4)|^2                               eig=[6.440392 6.440392 6.440392 6.440392]  sig(+,-,0)=(4,0,0)
+  |(y e4)*X|^2                               eig=[6.440392 6.440392 6.440392 6.440392]  sig(+,-,0)=(4,0,0)
+  |[X, y e4]|^2 (commutator)                 eig=[25.618602 25.618602 25.618602 25.618602]  sig(+,-,0)=(4,0,0)
+  |[X, y e4, X]|^2 (assoc)                   eig=[-0.  0.  0.  0.]  sig(+,-,0)=(0,0,4)
+  Re<X*(ye4), (ye4)*X> (cross, NOT a norm)   eig=[-6.368909 -6.368909 -6.368909 -6.368909]  sig(+,-,0)=(0,4,0)
+  Re( conj(ye4) * X * (ye4) ) scalar part    eig=[0.189053 0.189053 0.189053 0.189053]  sig(+,-,0)=(4,0,0)
+
+ANY sign-indefinite (tachyon-capable) natural form found: False
+
+Interpretation: if ALL natural forms are positive-(semi)definite, the EUCLIDEAN
+octonion norm forbids a tachyonic mass even WITH background cross-coupling ->
+SSB requires an INDEFINITE-signature structure (split-octonions / loss of the
+positive-definite norm at the sedenion level), OR an externally-imposed wrong-sign mass.
