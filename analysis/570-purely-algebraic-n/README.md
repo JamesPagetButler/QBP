@@ -46,6 +46,16 @@ With n = CD-dimension, the footprint asymmetry ΔF ∝ (n_A − n_B):
 >
 > This is not the degeneracy of #568 — it is a clean, gate-passing, falsifiable footprint. Its honest price is **coarseness**: it predicts null in every easy venue and a hard-to-access signal in the one venue where it's nonzero. QBP's footprint has *content distinct from standard physics*, but only at the cross-level boundary.
 
+## 5b. Adversarial confirmation (Gemini Furey/Feynman) — confirmed gate-pass, but PYRRHIC
+
+The adversarial gate **confirms the core claim** and sharpens the cost:
+- **g1 (derived):** "not a mere relabeling… a pristine, non-fitted derivation. The first footprint that genuinely satisfies g1." ✅
+- **g2 (mass-orthogonal):** "You legitimately pass g2" — n decouples from mass *magnitude* ("a Hydrogen atom and a Lead atom both sit flatly at n=4"); the global massless→ℂ / massive→ℍ correlation does not reintroduce the recoil degeneracy (which needs mass magnitude). ✅
+- **APC adjudication:** "correct: you must purge the 'spin DOF' and 'n∝m' interpretations — n = CD-dimension is the unique gate-passing algebraic quantity." ✅
+- **The concern — a PYRRHIC pass:** because n=4 for *all* matter, ΔF ∝ (n_A−n_B) = **exactly 0 for every matter-matter experiment** (ion-ion, isotope, atom-atom). QBP's gate-passing footprint thus predicts a **flat null across all near-term tabletop tests**; its only nonzero signal is cross-level (atom-photon) at relativistic γ — an "experimental desert." It is a *strictly falsifiable null prediction*, but it expects zero anomalous signal anywhere currently reachable.
+
+**Verdict (Gemini): (b) passes but pyrrhic — genuine, correctly-scoped gate-pass; the price of algebraic purity is a flat null for accessible experiments.** This is recorded as-is: the first surviving result *is* a real positive (a gate-passing quantity + the APC adjudication), and it is honestly modest (no accessible distinct signal).
+
 ## 6. Next under #570
 - Correct QBP-APC to n = CD-dimension; retire the line-181/193 readings (a clean-up PR against the APC doc).
 - The remaining #570 targets (the #564 potential coefficients; the triangle loop-closure) are *not* resolved by this — they need their own purely-algebraic derivations.
