@@ -1,0 +1,15 @@
+species    A    I  2I+1  nA(~mass)  nB(=4+2I+1)
+9Be+       9  1.5     4         13          8
+25Mg+     25  2.5     6         29         10
+40Ca+     40  0.0     1         44          5
+43Ca+     43  3.5     8         47         12
+88Sr+     88  0.0     1         92          5
+87Sr+     87  4.5    10         91         14
+
+=== isotope discriminator (mass~equal, internal DOF very different) ===
+40Ca+/43Ca+: mass ratio=1.075
+   Reading A (n~mass): footprint ratio=0.936 -> tracks mass -> DEGENERATE
+   Reading B (n~spin): footprint ratio=0.417 -> diverges from mass -> TESTABLE
+88Sr+/87Sr+: mass ratio=0.989
+   Reading A (n~mass): footprint ratio=1.011 -> tracks mass -> DEGENERATE
+   Reading B (n~spin): footprint ratio=0.357 -> diverges from mass -> TESTABLE
