@@ -35,17 +35,23 @@ To reach the ~10⁻³ technical floor at v=100 m/s needs **α·(n_A−n_B) ~ 1.8
 
 There **is** a standard, mass/species-dependent, velocity-correlated fidelity effect: **photon recoil**, ω_R ∝ k²/m (lighter ⇒ larger error; Be⁺ ~5% vs Sr⁺ ~0.18% under Doppler cooling — Yu et al., arXiv:2503.19818). This has the **same qualitative signature** QBP predicts. So a QBP footprint asymmetry is **degenerate with photon recoil** unless QBP's footprint n scales **differently from k²/m** — i.e. QBP must specify n as a function of *algebraic encoding distinct from mass*. Without that, "species-dependent velocity-correlated asymmetry" is just recoil.
 
-## 4. The bound, and what a real test needs
+## 4. No usable bound; what a real test needs
 
-- **Loose bound:** published error budgets close to ~10⁻³ with no role-swap-controlled residual → any anomalous *velocity-independent footprint* asymmetry is bounded only to ~**10⁻³** (very loose; far above where a sub-technical signal would live).
-- **A clean trapped-ion test would require:** hold the mass ratio fixed (near-equal-mass isotope pairs, or a **role-swap** control) so all known technical asymmetries cancel, benchmark per-role fidelity at **≲10⁻⁴** with full error-budget closure — *and* QBP must predict n distinct from recoil's k²/m. No existing paper does this control.
-- **For the boost mechanism:** move to relativistic γ (§2) — not ions.
+- **There is no meaningful bound from this venue.** A "velocity-independent footprint" limit (~10⁻³) is *physically vacuous*: QBP's effect is velocity-*dependent* (∝ 1−1/γ), so a static-asymmetry bound constrains nothing QBP predicts. (Removed as a participation trophy per the adversarial pass — it artificially softened a completely uninformative test.)
+- **An accessible high-γ venue is required for the boost mechanism** — and "relativistic γ" must be made concrete: the candidates are **relativistic particle-physics data** (e.g. **kaon/B-meson oscillation correlations**, **high-energy Bell tests**), not trapped ions and not any near-term macroscopic-entanglement apparatus. Until QBP identifies an accessible high-γ system that *sustains and measures entanglement*, the boost prediction is **untestable anywhere** — a real unfalsifiability risk, not just a venue inconvenience.
+- **For any footprint (non-boost) test:** QBP must predict n distinct from recoil's k²/m, *and* a role-swap / fixed-mass-ratio control at ≲10⁻⁴ would be needed. But this is moot until §5's degeneracy is broken.
 
-## 5. Verdict & strategic implication
+## 5. Verdict & strategic implication (hardened)
 
-**Test C (the zero-cost literature review) is complete.** Outcome: a **clean null** that neither validates nor kills QBP, plus three actionable results — (1) **venue mismatch**: trapped ions are blind to the EXP-10 boost mechanism (the (1−1/γ) suppression); (2) the **photon-recoil degeneracy**: QBP's footprint must be specified distinct from k²/m to be distinguishable; (3) a **loose ~10⁻³ bound** + the controlled-experiment design (role-swap / fixed-mass, ≲10⁻⁴).
+**Test C is complete, and the honest verdict is harder than "clean null":**
 
-> **Strategic implication (the recurring theme):** QBP's "most distinctive prediction" is *not* already sitting in the data — and to become a real test it bottlenecks, again, on QBP **specifying the algebraic footprint n quantitatively** (here, distinct from mass/recoil; in #564, the v→constants exponents). The empirical thread and the theory keystone meet at the same requirement: *compute the footprint.* And the boost-form test should be re-homed to a relativistic venue, not trapped ions.
+1. **QBP's distinctive prediction is currently untestable in standard quantum venues.** The (1−1/γ) suppression buries the boost effect (~10⁻¹²) far beneath the technical floor (§2); and no accessible high-γ entanglement venue has been identified (§4). This is an **unfalsifiability risk**, not merely a null.
+2. **QBP is analytically degenerate with standard kinematics (photon recoil).** Recoil fidelity loss ∝ k²/m has the same species+velocity signature. **This is the fatal flaw**: if the algebraic footprint n scales with mass, QBP's asymmetry is *identical* to standard inertial/recoil physics — "classical inertia in algebraic vocabulary."
+3. **The sharp falsifier (the prize of this review):**
+
+> **Derive n from the algebra WITHOUT reference to mass.** If n_A/n_B demonstrably **diverges** from the mass ratio m_A/m_B, QBP has a genuinely distinct, testable prediction. If n_A/n_B **= m_A/m_B**, QBP's asymmetry is degenerate with standard QM and **the prediction is dead.** This is a clean, near-term, *theory-side* falsification test — computable now, no experiment required.
+
+> **Strategic implication:** the empirical thread (Test C) and the theory keystone (#564) converge on the **same** requirement — *compute the algebraic footprint n* — but Test C adds a sharper, immediately-decidable criterion: **n must decouple from mass, or QBP is degenerate with QM.** That is the single most important next computation for QBP's empirical viability, and unlike the v→constants keystone it needs only the algebra (n for given species), not the full dynamics.
 
 ## 6. Honesty flags
 - Nature pages (Be/Mg, Ca/Ca, Ca/Sr) were paywalled; all numbers from the matching arXiv full texts (consistent with published abstracts).
