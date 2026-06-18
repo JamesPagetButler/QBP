@@ -1,0 +1,22 @@
+name: Agda Substrate (Cubical type-check)
+on:
+  pull_request:
+    paths:
+      - 'proofs/agda/**'
+      - '.github/workflows/agda-substrate.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'proofs/agda/**'
+      - '.github/workflows/agda-substrate.yml'
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Agda (prebuilt)
+        uses: wenkokke/setup-agda@v2.5.0
+        with:
+          agda-version: '2.6.4.3'
+      - name: Type-check the QBP substrate (executable-binary V&V)
+        run: agda --safe proofs/agda/QBPSubstrate.agda
