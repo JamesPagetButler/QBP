@@ -14,9 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Agda (prebuilt)
-        uses: wenkokke/setup-agda@v2.5.0
-        with:
-          agda-version: '2.8.0'
+      - name: Install Agda 2.8.0 (official prebuilt static linux bindist — matches local toolchain #576)
+        run: |
+          curl -fsSL https://github.com/agda/agda/releases/download/v2.8.0/Agda-v2.8.0-linux.tar.xz -o /tmp/agda.tar.xz
+          mkdir -p "$HOME/agda-2.8.0"
+          tar -xJf /tmp/agda.tar.xz -C "$HOME/agda-2.8.0"
+          echo "$HOME/agda-2.8.0" >> "$GITHUB_PATH"
       - name: Type-check the QBP substrate (executable-binary V&V)
-        run: cd proofs/agda && agda --safe QBPSubstrate.agda
+        run: |
+          agda --version
+          cd proofs/agda && agda --safe QBPSubstrate.agda
