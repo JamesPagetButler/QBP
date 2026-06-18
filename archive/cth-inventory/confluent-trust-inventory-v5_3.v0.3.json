@@ -4281,6 +4281,76 @@
       "prediction_chain": [],
       "last_tested_at": "2026-06-14T00:00:00Z",
       "notes": "Citation real; QBP-relevance is precedent only, not shared machinery. Not load-bearing."
+    },
+    {
+      "id": "DEFN-purely-algebraic-derivation-gate",
+      "name": "The #570 gate: every QBP prediction must derive its bridge quantities purely from the algebra",
+      "description": "Governing principle (issue #570). A QBP bridge quantity counts as a real prediction only if (g1) derived from the algebra not fitted/borrowed, (g2) orthogonal to the standard-physics parameter it would be confused with (mass, spin, the SM constants), (g3) yields a dimensionless number/relation. Fitted, borrowed, or embedding-tautological quantities are degenerate-by-construction and are NOT predictions.",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result 2026-06-17/18 (#570-#573)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-18T00:00:00Z",
+      "notes": "The standing gate for all QBP prediction work. Adjudicated the APC line-181/193 inconsistency (#571)."
+    },
+    {
+      "id": "INSIGHT-footprint-cd-dimension-pyrrhic",
+      "name": "Footprint n = Cayley-Dickson dimension: first gate-passing quantity, but pyrrhic",
+      "description": "n = CD-dimension (ℝ1/ℂ2/ℍ4/𝕆8 = 2^k) is the unique gate-passing reading of the algebraic footprint (adversary-confirmed: real derivation, mass-orthogonal to mass MAGNITUDE; the 'n∝mass' and 'n=4+spin DOF' readings FAIL the gate). PYRRHIC: n=4 for all matter => ΔF∝(n_A−n_B)=0 for every matter-matter experiment (trapped-ion Test C predicted cleanly null); the only nonzero distinct prediction is cross-level atom-photon (n=4 vs 2) at relativistic γ. #571.",
+      "tier": 2,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result 2026-06-17/18 (#570-#573)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-18T00:00:00Z",
+      "notes": "First content-distinct gate-pass; coarse/pyrrhic. analysis/570-purely-algebraic-n/."
+    },
+    {
+      "id": "INSIGHT-constants-no-content-distinct",
+      "name": "On the SM constants, QBP derives nothing content-distinct from standard physics",
+      "description": "Applying the #570 gate to QBP's existing constant work (f0/spectral-action, Koide): the 'relations' it gets (sin²θ_W=3/8, multiplicity ratios) are STANDARD GROUP-THEORY tautologies of the embedding (any SU(5)-flavoured model gives them, not QBP-novel); the one QBP-specific relation δ₁=δ₃ FAILS the gate on look-elsewhere (best of 12 models, 9%); and NO continuous value (α, masses, m_H) derives — all value-attempts import a fitted/measured magnitude. #572.",
+      "tier": 2,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result 2026-06-17/18 (#570-#573)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-18T00:00:00Z",
+      "notes": "Proven invariants C=12, the 42 are real math but predict no physical constant. analysis/570-constants-target/."
+    },
+    {
+      "id": "INSIGHT-loop-closure-structural-obstruction",
+      "name": "The triangle loop-closure 'generator' machine is 0% built; the obstruction is structural",
+      "description": "The only path from organization to generator (deriving constant VALUES) is triangle loop-closure over-determining the free data. Built the DOF framework (minimal ℍ→𝕆 truncation); result: edge 3 (Physics→Substrate, RT entropy=area) is the SOLE channel by which closure can touch the values (the loop is otherwise kinematic/value-blind), and edge 3 is NON-CONSTRUCTIVE and CIRCULAR (it needs the substrate geometry that the potential it should determine deforms). N_constraint uncountable (and likely rank-degenerate); the bootstrap cannot be posed. 0% built as a generator. #573.",
+      "tier": 2,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result 2026-06-17/18 (#570-#573)",
+      "prediction_chain": [],
+      "last_tested_at": "2026-06-18T00:00:00Z",
+      "notes": "Formally isolates the boundary between QBP's kinematic successes and its dynamical void. analysis/566-loop-closure-machine/."
+    },
+    {
+      "id": "QBP-POS-organization-not-generator",
+      "name": "QBP is a verified division-algebra ORGANIZATION of SM kinematics, not (yet) a GENERATOR of new physics",
+      "description": "Consolidated verdict of the #570→#573 investigation (option 1, purely-algebraic derivations, exhausted). QBP's kinematic core is real and Lean-verified (CD tower #474, G₂ gauge result #548, the 42, sin²θ_W=3/8) — a rigorous organization of SM group-theoretic structure. But with the current algebra it derives NO content-distinct physical prediction: no constant value, no novel relation beyond standard group theory, only the pyrrhic footprint. The generator path is structurally obstructed (loop-closure edge 3 non-constructive+circular). The kinematic/dynamic boundary is formally isolated; the algebra fixes the menu of states but has no intrinsic scale for the weights.",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "measured_source": "QBP internal result 2026-06-17/18 (#570-#573)",
+      "prediction_chain": [
+        "DEFN-purely-algebraic-derivation-gate",
+        "INSIGHT-footprint-cd-dimension-pyrrhic",
+        "INSIGHT-constants-no-content-distinct",
+        "INSIGHT-loop-closure-structural-obstruction"
+      ],
+      "last_tested_at": "2026-06-18T00:00:00Z",
+      "notes": "The honest endpoint. Path to 'generator' requires solving the self-referential dynamical-closure problem (a concrete substrate + constructive RT edge)."
     }
   ],
   "inputs": [
@@ -4786,8 +4856,13 @@
       "version": "5.5.0",
       "date": "2026-06-14T00:00:00Z",
       "note": "qbp-oppenheimer: +14 anchors from the 2026-06-13/14 crystallisation work — #559 generator→DOF map (verified 7=(3,1)⊕(2,2); SSB ingredients; Higgs-interp killed), #539 direct-Γ observable (fixed-ratio deflated to generic; Th-229 instrument refs), the v→constants convergence keystone, QBP emergent-time position, and the three adversarially-killed-as-direct-map citations (Borsten SYM, causal sets, superpoint). AC5 of #559."
+    },
+    {
+      "version": "5.6.0",
+      "date": "2026-06-18T00:00:00Z",
+      "note": "qbp-oppenheimer: +5 anchors from the #570-#573 purely-algebraic-derivation investigation — the #570 gate (DEFN), footprint=CD-dimension (pyrrhic pass), constants (nothing content-distinct), loop-closure (0% built / structural obstruction), and the consolidated 'organization not generator' verdict. Brings CTH current with the option-1 result (V&V remediation: 'update CTH as we go')."
     }
   ],
-  "last_updated": "2026-06-14T00:00:00Z",
-  "update_provenance": "qbp-oppenheimer 2026-06-14: #559/#539/#560 findings + citation anchors (AC5)"
+  "last_updated": "2026-06-18T00:00:00Z",
+  "update_provenance": "qbp-oppenheimer 2026-06-18: #570-#573 option-1 findings (CTH-currency remediation)"
 }
