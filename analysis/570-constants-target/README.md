@@ -8,43 +8,43 @@
 
 ## 1. Gate-check of QBP's existing constant attempts
 
-| Attempt | What it is | g1 derived? | g3 value or relation? | Gate verdict |
-|---|---|---|---|---|
-| **sin²θ_W = 3/8** | Hessian eigenvalue ratio (the SU(5)-GUT value) | ✅ group-theoretic | a **rational relation** | ✅ **PASS** (structural; not unique to QBP) |
-| **δ₁ ≈ δ₃** | U(1) & SU(3) threshold corrections equal, because sedenion-Hessian eigenspaces have equal multiplicity (mult(4)=mult(12)=4) | ✅ "nobody chose these; they follow from the algebra" | **zero-parameter relation**, verified to 9.4% | ✅ **PASS** (the strongest; a genuine zero-parameter algebraic prediction) |
-| **C = 12, the 42 ZD-planes, uniform Hessian** | proven algebraic invariants (`QBP_HessianTheorem.lean`) | ✅ proven | exact integers | ✅ **PASS** (structural invariants) |
-| **Koide Q → 2/3** | charged-lepton ratio = 2/3 to 6×10⁻⁶; runs *toward* 2/3 at high E | ⚠️ QBP *tests* it; does **not** derive the 2/3 democratic structure from the algebra | a relation | ⚠️ **PARTIAL** — the *relation* is sharp and real, but QBP notes it, doesn't derive it (the "3 generations" may be algebraic à la Furey; the specific 2/3 is not shown derived) |
-| **f(0) = 2/α_unif** (→ α value) | the spectral cutoff matched to α | ❌ f(0) was **chosen** to match α_em (partial circularity); magnitude from measurement | a **value**, fitted | ❌ **FAIL** as a derivation of α's value (passes only as a relation among already-measured couplings) |
-| **Higgs mass** (λ_H=g² → m_H) | spectral-action prediction | ❌ gives 170 GeV; 125 needs a **free parameter** (Chamseddine-Connes singlet) | a value | ❌ **FAIL** |
-| **absolute α_em, α_s magnitudes** | the coupling values | ❌ "ε is determined by the RGE… almost tautological — the magnitude comes from the measurements" | values | ❌ **FAIL** |
+**(corrected after the adversarial BLOCK — my first-draft "PASS" marks were too generous.)**
 
-## 2. The verdict — RELATIONS pass, VALUES fail (the same boundary as the footprint)
+| Attempt | What it is | Gate verdict (corrected) |
+|---|---|---|
+| **sin²θ_W = 3/8** | Hessian eigenvalue ratio = the **SU(5)-GUT value** (Georgi–Glashow 1974) | ❌ **NOT a derivation** — a *tautology of the embedding*: once the SM/GUT group structure is hosted in the algebra, 3/8 follows automatically. Recovery of standard GUT kinematics; **not content-distinct**, not a QBP constant. |
+| **δ₁ ≈ δ₃** | U(1)/SU(3) threshold corrections equal, from equal sedenion-Hessian multiplicity | ❌ **FAILS g1 (look-elsewhere)** — selected as **best of 12 models** (χ²=0.006): a model choice fitted post-hoc. Not zero-parameter; agreement only 9%. The multiplicities are algebra-fixed, but the *map* "δ ∝ multiplicity" was chosen after seeing the data. |
+| **C=12, the 42 ZD-planes, uniform Hessian** | proven invariants (`QBP_HessianTheorem.lean`) | ✅ proven **algebraic invariants** — real mathematics, but *internal structural facts*, **not predictions of any physical constant** (value or content-distinct relation). |
+| **Koide Q → 2/3** | charged-lepton ratio = 2/3 to 6×10⁻⁶ | ⚠️ a sharp empirical relation QBP **tests, does not derive** (the 2/3 democratic structure is not shown to follow from the algebra). Not a QBP derivation. |
+| **f(0)=2/α_unif · absolute α,α_s · Higgs mass** | value attempts | ❌ **FAIL** — f(0) *chosen* to match α_em (circular); ε *from the RGE* (tautological); m_H needs a *free parameter*. No value derived. |
 
-> **QBP's algebra gate-passingly derives STRUCTURE and RELATIONS among the constants — rational group-theoretic ratios (sin²θ_W = 3/8) and zero-parameter multiplicity relations (δ₁ = δ₃, the strongest, verified to ~9%) — but it does NOT gate-passingly derive the absolute continuous VALUES (α, masses, m_H).** Every value-attempt requires a fitted or measured magnitude: f(0) is *chosen* to match α_em (circular), the threshold magnitude ε *comes from the RGE/measurements* (tautological), the Higgs mass *needs a free parameter*.
+## 2. The verdict (hardened) — nothing content-distinct passes
 
-This is **exactly the boundary the footprint hit (#571)**: the algebra gives gate-passing *structure* (CD-level n; multiplicities; rational relations) and *not* gate-passing *values* (within-level n; α; masses). Two independent threads, one boundary.
+My first draft said "relations pass, values fail." **The adversarial gate BLOCKED that as face-saving, correctly.** Corrected:
 
-## 3. What this means (honest, and it gives QBP real credit)
+> **On the constants, QBP produces nothing content-distinct from standard physics.** The "relations" it gets — sin²θ_W=3/8, the multiplicity ratios — are **standard group-theory consequences of embedding the SM structure in the algebra** (any SU(5)/SO(10)-flavoured model gives the same); they are *tautologies of the embedding*, not QBP-novel. The one QBP-specific relation (δ₁=δ₃) **fails the gate** on the look-elsewhere effect. And **no continuous value** (α, masses, m_H) is derived — every attempt imports a fitted/measured magnitude.
 
-- **The positive (real, but appropriately humbled):**
-  - **sin²θ_W = 3/8 is the standard SU(5)-GUT value** (Georgi-Glashow, 1974) — QBP *reproduces* it from the Hessian eigenvalue ratios, it does **not** derive something new. Gate-passing but **not content-distinct from GUT/group theory.** Credit: consistency, not novelty.
-  - **δ₁ = δ₃ is QBP-specific but must carry a look-elsewhere caveat:** the f0 report selected the multiplicity model as best of **12 models tested** (χ²=0.006), so "zero-parameter" applies to the *winning* model, not to the search — the look-elsewhere effect weakens it, and the agreement is only **9.4%**. It is *suggestive* (the sedenion eigenspace dims 4,8,4 were genuinely not chosen to fit, and δ₁=δ₃ follows), **not decisive.**
-  - **C=12, the 42 ZD-planes, uniform Hessian** are proven algebraic invariants (`QBP_HessianTheorem.lean`) — solid, but structural, not constant *values*.
-  So QBP's gate-passing constant content is **real but modest**: it reproduces the standard GUT relation (not novel) plus one suggestive-but-loose QBP-specific multiplicity relation (δ₁=δ₃, 9%, look-elsewhere-caveated). It is **not** a derivation of any constant *value*.
-- **The limit (decisive for option 1):** the continuous **values** do not yield. The fine layer (α to its digits, the mass spectrum, m_H) needs a magnitude-generating mechanism (dynamics/RGE) that **imports measured inputs**, so it fails the gate — and #564 already showed the dynamical route has free coefficients. QBP's own f0 report reached this conclusion independently ("predicts the PATTERN but the MAGNITUDE comes from the measurements").
+So the honest position is **harder** than "structure passes": the structure that "passes" is **borrowed group theory, not QBP content**, and QBP adds **no content-distinct constant prediction** — neither a value nor a novel relation. On the constants, QBP is "**a kinematic classification scheme devoid of the dynamical machinery needed to generate a real universe**" (adversary). Its genuinely-proven invariants (C=12, the 42) are real mathematics but predict no physical constant.
 
-## 4. The consolidated diagnosis (now robust across three threads)
+## 3. What genuinely holds (very little)
 
-| Layer | Footprint (#571) | Constants (here) | Verdict |
-|---|---|---|---|
-| **Structure / relations** | n = CD-dimension (gate-pass) | sin²θ_W=3/8, δ₁=δ₃, C=12, the 42 (gate-pass) | ✅ QBP derives these purely-algebraically |
-| **Continuous values** | within-level n (fails) | α, masses, m_H (fail) | ❌ need fitted/measured magnitude |
+- **No content-distinct constant** — no value, and no relation that isn't already a standard group-theory consequence of the embedding. The "successes" (3/8, the multiplicity ratios) are recovered standard kinematics; δ₁=δ₃ fails look-elsewhere; Koide is tested-not-derived.
+- **Proven algebraic invariants** (C=12, the 42 ZD-planes) are solid mathematics but predict **no physical constant.**
+- **All continuous values fail** — f(0)→α (circular), absolute couplings (RGE-tautological), m_H (free parameter). QBP's own honest f0 report already reached this ("predicts the PATTERN but the MAGNITUDE comes from the measurements").
 
-> **QBP is a sound theory of ALGEBRAIC STRUCTURE that gate-passingly predicts RELATIONS (multiplicities, rational group-theoretic ratios, level structure) — but, with the current algebra, it does not derive the continuous constant VALUES.** That is its honest predictive reach. The values are not merely underived; the gate analysis (across footprint + constants + the #564 no-shortcut + the #566 ∞−∞) indicates they are **beyond the finite algebra** without a magnitude-generating mechanism that imports physics.
+## 4. The consolidated diagnosis (corrected, robust across the threads)
 
-## 5. Next under #570 / the honest resting point
-- **Strengthen the real positives:** the δ₁=δ₃ prediction deserves a tighter test (current 9.4%) and a Lean-backed derivation of the multiplicity structure; sin²θ_W=3/8 and Koide deserve a *derivation* of the rational (does the octonion 3-generation structure force Koide's 2/3?). These are where QBP's gate-passing content can be **sharpened**.
-- **The values are the wall.** Unless the triangle loop-closure (#566) genuinely over-determines (the open, hard, regularization-gated question), the continuous values do not come from the algebra. This is the coarse-algebraic resting point the footprint already suggested, now confirmed by the constants.
+| Thread | Genuinely QBP-content & gate-passing? |
+|---|---|
+| **Footprint (#571)** | ✅ *one* genuine pass — n = CD-dimension (adversary-confirmed) — but **pyrrhic** (predicts null in every accessible venue) |
+| **Constants (here)** | ❌ **nothing content-distinct** — recovered GUT kinematics (tautology) + δ₁=δ₃ (look-elsewhere) + no value |
+| **v→constants #564 / triangle #566** | ❌ free coefficients / ∞−∞ until truncation |
+
+> **Corrected verdict:** QBP's only genuine, content-distinct, gate-passing result is the **coarse CD-level footprint (#571), and it is pyrrhic.** On the **constants** it adds nothing standard group theory doesn't already give, and it derives **no value**. So QBP is **a kinematic classification scheme** — it organizes the SM's group-theoretic structure in division-algebra language (a real, if not novel, organizing achievement) but, with the current algebra, it **generates no content-distinct physical prediction** beyond the one pyrrhic footprint. The "structure passes" comfort of the first draft is withdrawn: most of that "structure" is borrowed GUT kinematics, not QBP content.
+
+## 5. The honest resting point (option-1 result)
+
+Option 1 (the purely-algebraic derivations) has now been pushed on its two sharpest targets — the footprint and the constants — and the result is decisive: **the gate is passable only by coarse, mostly-borrowed structure; no content-distinct value or novel relation survives it.** Unless the triangle loop-closure (#566) genuinely over-determines (open, hard, regularization-gated), the continuous values are **beyond the current algebra**. This is the honest resting point: **QBP is a sound division-algebra *organization* of known SM kinematics, not (yet) a *generator* of new physics** — and saying otherwise requires either the (unbuilt) loop-closure machine or a richer algebra.
 
 ## 6. Provenance
-Option 1, #570 target 2, 2026-06-17. The gate-application to QBP's existing f0/Koide work, and the relations-pass/values-fail verdict consolidating the footprint boundary, are this deliverable's synthesis — built on QBP's own (commendably honest) f0 investigation. `archive/QBP-f0-investigation-report-v1.0.md`. Recorded by @qbp-oppenheimer; adversarially tested before adoption (see PR thread).
+Option 1, #570 target 2, 2026-06-17. Gate-application to QBP's existing f0/Koide work, built on QBP's own (commendably honest) f0 investigation (`archive/QBP-f0-investigation-report-v1.0.md`). The first draft's "relations pass, values fail" framing was **adversarially BLOCKED** (Gemini Furey/Feynman) as face-saving — the "relations" are borrowed GUT kinematics, δ₁=δ₃ fails look-elsewhere, no value derived. Hardened to: QBP is a division-algebra *organization* of SM kinematics with no content-distinct constant prediction (only the pyrrhic #571 footprint survives). Recorded by @qbp-oppenheimer.
