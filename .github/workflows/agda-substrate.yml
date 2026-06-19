@@ -23,4 +23,5 @@ jobs:
       - name: Type-check the QBP substrate (executable-binary V&V)
         run: |
           agda --version
-          cd proofs/agda && agda --safe QBPSubstrate.agda
+          cd proofs/agda
+          for f in *.agda; do echo "== $f =="; agda --safe "$f"; done
