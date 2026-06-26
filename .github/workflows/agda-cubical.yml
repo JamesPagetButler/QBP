@@ -25,6 +25,7 @@ jobs:
           git -C "$HOME/cubical" checkout 7b9019b2993535d6931991d87f5c762aee87a67a
           mkdir -p "$HOME/.agda"
           echo "$HOME/cubical/cubical.agda-lib" > "$HOME/.agda/libraries"
+          echo "cubical-0.9" > "$HOME/.agda/defaults"
       - name: Type-check the Buchholtz–Rijke S³ port (--safe, against cubical)
         run: |
           agda --version
