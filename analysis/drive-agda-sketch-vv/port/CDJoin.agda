@@ -73,3 +73,26 @@ module _ {A : Type ℓ} (S : CDStr A) where
   push a b i *J inl c'      = push (a · c') (b · c c') i
   push a b i *J inr d       = sym (push (n (b · c d)) (d · a)) i
   push a b i *J push c' d k = {! THE abstract BR coherence SQUARE !}
+
+------------------------------------------------------------------------
+-- THE SQUARE: what it needs (found by adapting the library's template).
+--
+-- The remaining push×push square is TWISTED (corners alternate inl/inr/inr/inl,
+-- forced by the unit laws), so it needs a genuine nested hcomp, not a term.
+--
+-- The library fills exactly this kind of twisted join square (Cubical.Homotopy.Hopf,
+-- the section/retract proofs, ~lines 93-122) with a NESTED hcomp whose tube faces
+-- use `compPath-filler` together with the EQUIVALENCE laws secEq/retEq of the
+-- map `μ-eq' a = (a ·_)`. I.e. the filler relies on "multiplication by an element
+-- is an EQUIVALENCE" (cancellation structure).
+--
+-- CDStr as defined carries only raw ⊗/conj/neg — it LACKS that invertibility
+-- structure. So completing the square requires:
+--   (1) extend CDStr with: (a ⊗_) is an equivalence (or explicit cancellation
+--       laws), plus the conj/neg compatibility laws (anti-hom, involution);
+--   (2) a nested-hcomp filler mirroring Hopf.agda's section/retract proof.
+-- This is BR's irreducible core — a substantial nested-cubical construction of
+-- the same character as the library's 703-line Hopf development. Multiple direct
+-- hcomp attempts confirm the faces must cohere via that equivalence structure.
+-- NOT faked: the square stays an open hole; the path to close it is now exact.
+------------------------------------------------------------------------
