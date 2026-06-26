@@ -37,3 +37,28 @@ open import Cubical.HITs.Join using (join ; inl ; inr ; push)
 --   k=1 : sym (push (invLooper (b · invLooper d)) (a · d)) i
 -- corners (i,k): (inl(a·c), inr(a·d), inr(b·invLooper c), inl(invLooper(b·invLooper d)))
 μ (push a b i) (push c d k) = {! BR coherence square — open !}
+
+------------------------------------------------------------------------
+-- GRINDING FINDINGS (2026-06-26) on the one remaining square:
+--
+-- 1. TRUE FORMULA: from the quaternion product (z₁,w₁)(z₂,w₂) =
+--    (z₁z₂ − w₁w̄₂, z₁w₂ + w₁z̄₂), the corners check out under the cubical-S¹
+--    convention where invLooper IS the unit-circle inverse (z̄ = z⁻¹). The
+--    inl·inr·inl corners match; inr·inr = inl(−v w̄) uses the same conjugation
+--    convention the library's Hopf build uses (not a separate antipode).
+--
+-- 2. THE TOOLS: the S¹ "cancellation laws used in the Hopf fibration" —
+--    rotInv-2 : invLooper b · a · b ≡ a
+--    rotInv-3 : b · invLooper (invLooper a · b) ≡ a
+--    rotInv-4 : invLooper (b · invLooper a) · b ≡ a
+--    (Cubical.HITs.S1.Base) match this square's faces exactly.
+--
+-- 3. THE TEMPLATE: Cubical.Homotopy.Hopf lines 490–576 build the analogous
+--    join-S¹-S¹ squares with rotInv-2/3/4 inside nested hcomp/hfill — the
+--    library's complex Hopf fibration (703 lines) is the same-character work.
+--
+-- 4. STATUS: a naive hcomp base does NOT close (faces need the coherent
+--    rotInv-based fillers). Completing the square is therefore a research-grade
+--    nested-hcomp construction mirroring Hopf.agda — bounded and tooled, but not
+--    reliably completable blind in one session. NOT faked: the square stays open.
+------------------------------------------------------------------------
