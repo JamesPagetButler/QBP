@@ -62,3 +62,30 @@ open import Cubical.HITs.Join using (join ; inl ; inr ; push)
 --    nested-hcomp construction mirroring Hopf.agda — bounded and tooled, but not
 --    reliably completable blind in one session. NOT faked: the square stays open.
 ------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+-- THE OBSTRUCTION FOUND BY "GOING FOR IT" (2026-06-26):
+--
+-- The naive corner formula above is NOT the SU(2) quaternion product. The true
+-- product needs the inr·inr corner = inl(−(v·w̄)) — a NEGATION on S¹. But:
+--   * invLooper is CONJUGATION (base↦base, loop i↦loop(~i)), not negation;
+--   * NEGATION is not definable on the S¹ HIT by direct construction — any
+--     pattern-defined f : S¹→S¹ sends base to a closed point, and the only
+--     closed point is base; negation sends base to −1 (the antipode), which is
+--     not a constructor. So −z is not a constructible function on cubical S¹.
+-- Hence the conjugation-corners square likely does not bound, and grinding it
+-- directly is the wrong path.
+--
+-- THE CORRECT CONSTRUCTION (BR's actual method):
+--   Build the tower via an abstract Cayley-Dickson join-step
+--     CD : Structured A → Structured (join A A)
+--   starting from S⁰ = Bool, where negation = `not` IS definable. The step
+--   carries (mult, conjugation, negation) up each join: Bool→S¹→S³→S⁷. The
+--   "negation on S¹" emerges from CD applied to Bool's `not` — never defined on
+--   S¹ directly. This is why it is a general construction (a paper), and why the
+--   cubical library (needing only the join≃Hopf EQUIVALENCE) never built it.
+--
+-- REMAINING WORK = implement the abstract CD-join step once + apply it twice.
+-- A substantial, principled development. The verified reduction
+-- (QBPS3HSpace.agda: HSpace (join∙ S¹ S¹) → HSpace (S₊∙ 3)) stands regardless.
+------------------------------------------------------------------------
