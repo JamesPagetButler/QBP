@@ -13,3 +13,4 @@ Loop invariant: CDJoin.agda type-checks with N holes, postulate-free. Ratchet: c
 - **Phase A: DONE** (iter 1) — CDStr extended with the invertibility/compatibility structure the filler needs. Ratcheted + committed.
 - **Phase C: IDENTIFIED** (iter 3) — the square closes via a nested hcomp whose tube faces morph the boundary using the equivalence laws secEq/retEq of (a⊗_), per the Hopf.agda §93-122 template. This is a genuine interactive nested-cubical construction (multi-session).
 - **TERMINATE**: escalated per loop design (identified-but-not-yet-built nested construction). Structure, goal, template, and required laws are all now in place around the one hole.
+| 4 | my inl·inr corner had a convention error (d·a); true CD gives a·d | fix 3 sites: inl·inr = inr(a·d) | PASS type-checks, 1 hole. Now μ'(inl a)=joinMap(a·_)(a·_) is an EQUIVALENCE; true CD product ⇒ filler EXISTS | 1 | yes |

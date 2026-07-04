@@ -74,15 +74,15 @@ module _ {A : Type ℓ} (S : CDStr A) where
   -- (so it has a two-sided unit inl 1A; see the unit laws below):
   _*J_ : JA → JA → JA
   inl a *J inl c'      = inl (a · c')
-  inl a *J inr d       = inr (d · a)
+  inl a *J inr d       = inr (a · d)
   inr b *J inl c'      = inr (b · c c')
   inr b *J inr d       = inl (n (b · c d))
   -- 1-cells (second-arg push, first-arg push):
-  inl a *J push c' d j = push (a · c') (d · a) j
+  inl a *J push c' d j = push (a · c') (a · d) j
   inr b *J push c' d j = sym (push (n (b · c d)) (b · c c')) j
   -- first-arg push: inner induction on the second argument
   push a b i *J inl c'      = push (a · c') (b · c c') i
-  push a b i *J inr d       = sym (push (n (b · c d)) (d · a)) i
+  push a b i *J inr d       = sym (push (n (b · c d)) (a · d)) i
   push a b i *J push c' d k = {! THE abstract BR coherence SQUARE !}
 
 ------------------------------------------------------------------------
