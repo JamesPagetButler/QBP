@@ -14,3 +14,9 @@ Loop invariant: CDJoin.agda type-checks with N holes, postulate-free. Ratchet: c
 - **Phase C: IDENTIFIED** (iter 3) — the square closes via a nested hcomp whose tube faces morph the boundary using the equivalence laws secEq/retEq of (a⊗_), per the Hopf.agda §93-122 template. This is a genuine interactive nested-cubical construction (multi-session).
 - **TERMINATE**: escalated per loop design (identified-but-not-yet-built nested construction). Structure, goal, template, and required laws are all now in place around the one hole.
 | 4 | my inl·inr corner had a convention error (d·a); true CD gives a·d | fix 3 sites: inl·inr = inr(a·d) | PASS type-checks, 1 hole. Now μ'(inl a)=joinMap(a·_)(a·_) is an EQUIVALENCE; true CD product ⇒ filler EXISTS | 1 | yes |
+| 5 | filler with corrected formula, nested hcomp | hcomp, morph inr-side via ∨/∧ tube | FAIL: same base/tube coherence — base must already carry the edges | 1 | no |
+| 5b | REFORMULATE: express _*J_ via joinMap + join-commFun | μ'(inl a)=joinMap(a·_)(a·_); μ'(inr b)=commFun∘joinMap(b·conj_)(neg∘(b·conj_)) — verified reproduces all inr cases | insight (not yet coded) | 1 | — |
+
+## Loop status after iters 4-5b
+- **iter 4 (RATCHET, committed):** corrected the CD convention (inl·inr = a·d). Consequence: μ'(inl a) is now a genuine EQUIVALENCE (diagonal left-mult), and the true CD product means the twisted square's filler PROVABLY EXISTS (SU(2) is a group) — earlier attempts may have chased a non-existent filler.
+- **iter 5b (insight):** the whole multiplication is `joinMap`/`join-commFun`-structured. The remaining hole = a homotopy `joinMap(a·_)(a·_) ⟹ join-commFun∘joinMap(b·conj_)(neg∘(b·conj_))` along push a b. This is the cleaner form of BR's core 2-cell; the recommended next iteration is to build it via join-functoriality lemmas rather than raw hcomp.
