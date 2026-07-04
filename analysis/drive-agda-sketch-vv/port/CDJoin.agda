@@ -18,8 +18,15 @@ module CDJoin where
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv using (isEquiv ; invEq ; secEq ; retEq)
 open import Cubical.HITs.Join using (join ; inl ; inr ; push)
+open import Cubical.HITs.Join.Properties using (join-commFun)
 
 private variable ℓ : Level
+
+-- functoriality of the join (defined here; the library has no general joinMap):
+joinMap : {A B C D : Type ℓ} → (A → C) → (B → D) → join A B → join C D
+joinMap f g (inl a)      = inl (f a)
+joinMap f g (inr b)      = inr (g b)
+joinMap f g (push a b i) = push (f a) (g b) i
 
 -- A Cayley–Dickson structure on A: the data the join-step needs.
 record CDStr (A : Type ℓ) : Type ℓ where
@@ -73,17 +80,12 @@ module _ {A : Type ℓ} (S : CDStr A) where
   -- lifted MULTIPLICATION — corners from the CD formula expressed via ·, conj, neg
   -- (so it has a two-sided unit inl 1A; see the unit laws below):
   _*J_ : JA → JA → JA
-  inl a *J inl c'      = inl (a · c')
-  inl a *J inr d       = inr (a · d)
-  inr b *J inl c'      = inr (b · c c')
-  inr b *J inr d       = inl (n (b · c d))
-  -- 1-cells (second-arg push, first-arg push):
-  inl a *J push c' d j = push (a · c') (a · d) j
-  inr b *J push c' d j = sym (push (n (b · c d)) (b · c c')) j
-  -- first-arg push: inner induction on the second argument
-  push a b i *J inl c'      = push (a · c') (b · c c') i
-  push a b i *J inr d       = sym (push (n (b · c d)) (a · d)) i
-  push a b i *J push c' d k = {! THE abstract BR coherence SQUARE !}
+  -- recursion on the FIRST argument; z is a variable ⇒ corners & 1-cells are handled
+  -- uniformly by joinMap/join-commFun, and the ONLY hole is a single function-level
+  -- homotopy (BR's core 2-cell), no longer a pointwise square:
+  inl a      *J z = joinMap (a ·_) (a ·_) z
+  inr b      *J z = join-commFun (joinMap (λ c' → b · c c') (λ d → n (b · c d)) z)
+  push a b i *J z = {! Hmul : joinMap(a·_)(a·_) ⟹ commFun∘joinMap(b·conj_)(neg∘b·conj_) !}
 
 ------------------------------------------------------------------------
 -- THE SQUARE: what it needs (found by adapting the library's template).
