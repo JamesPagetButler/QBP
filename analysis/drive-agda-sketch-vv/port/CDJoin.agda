@@ -16,6 +16,7 @@
 ------------------------------------------------------------------------
 module CDJoin where
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Equiv using (isEquiv ; invEq ; secEq ; retEq)
 open import Cubical.HITs.Join using (join ; inl ; inr ; push)
 
 private variable ℓ : Level
@@ -31,6 +32,16 @@ record CDStr (A : Type ℓ) : Type ℓ where
     ⊗-unitˡ : (a : A) → e ⊗ a ≡ a
     ⊗-unitʳ : (a : A) → a ⊗ e ≡ a
     conj-e  : conj e ≡ e
+    -- Phase-A extension: the invertibility structure the square's filler needs.
+    -- (Left multiplication is an equivalence — the cancellation the Hopf-template
+    --  nested hcomp relies on, via secEq/retEq of (a ⊗_).)
+    ⊗-isEquivˡ : (a : A) → isEquiv (a ⊗_)
+    -- conjugation compatibility: involution + anti-homomorphism.
+    conj-conj  : (a : A) → conj (conj a) ≡ a
+    conj-⊗     : (a b : A) → conj (a ⊗ b) ≡ conj b ⊗ conj a
+    -- negation compatibility: involution + interaction with ⊗.
+    neg-neg    : (a : A) → neg (neg a) ≡ a
+    neg-⊗ˡ     : (a b : A) → neg (a ⊗ b) ≡ neg a ⊗ b
 
 open CDStr
 
