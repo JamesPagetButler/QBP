@@ -21,3 +21,9 @@ Loop invariant: CDJoin.agda type-checks with N holes, postulate-free. Ratchet: c
 - **iter 4 (RATCHET, committed):** corrected the CD convention (inl·inr = a·d). Consequence: μ'(inl a) is now a genuine EQUIVALENCE (diagonal left-mult), and the true CD product means the twisted square's filler PROVABLY EXISTS (SU(2) is a group) — earlier attempts may have chased a non-existent filler.
 - **iter 5b (insight):** the whole multiplication is `joinMap`/`join-commFun`-structured. The remaining hole = a homotopy `joinMap(a·_)(a·_) ⟹ join-commFun∘joinMap(b·conj_)(neg∘(b·conj_))` along push a b. This is the cleaner form of BR's core 2-cell; the recommended next iteration is to build it via join-functoriality lemmas rather than raw hcomp.
 | 6 | implement joinMap reformulation as code | define joinMap; _*J_ via joinMap/join-commFun, z as variable | PASS type-checks, 1 hole. Corners+1-cells now UNIFORM (joinMap); hole collapsed to a single function-level homotopy | 1 | yes |
+| 7 | isolate square in a pushMul helper (maximally clean) | pushMul with inl/inr filled, push,push = square; _*J_ = 3 lines | PASS type-checks, 1 hole (the pushMul push,push square) | 1 | yes |
+
+## Session summary (iters 0-7): 5 committed ratchets, construction maximally clean
+- Phase-A extension (iter1) · formula correction ⇒ filler EXISTS (iter4) · joinMap reformulation (iter6) · pushMul isolation (iter7).
+- `_*J_` is now 3 clean lines; the ENTIRE remaining obligation = ONE twisted coherence square (pushMul push,push), corners inl(a·x)/inr(b·conj x)/inr(a·y)/inl(neg(b·conj y)).
+- This square is BR's irreducible core 2-cell. It is now: (a) provably fillable (true CD product), (b) maximally isolated, (c) with the exact tools (⊗-isEquivˡ, rotInv-2/3/4) and template (Hopf.agda §93-122) in hand. Closing it = an interactive nested-cubical construction (multi-session), tracked in #578.

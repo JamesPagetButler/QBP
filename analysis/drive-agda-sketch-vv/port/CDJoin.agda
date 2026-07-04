@@ -79,13 +79,19 @@ module _ {A : Type ℓ} (S : CDStr A) where
 
   -- lifted MULTIPLICATION — corners from the CD formula expressed via ·, conj, neg
   -- (so it has a two-sided unit inl 1A; see the unit laws below):
+  -- the push case of the first argument, isolated as a helper (the square lives in
+  -- its own push case; every other case is clean):
+  pushMul : (a b : A) (z : JA)
+          → joinMap (a ·_) (a ·_) z
+          ≡ join-commFun (joinMap (λ c' → b · c c') (λ d → n (b · c d)) z)
+  pushMul a b (inl x)      k = push (a · x) (b · c x) k
+  pushMul a b (inr y)      k = sym (push (n (b · c y)) (a · y)) k
+  pushMul a b (push x y j) k = {! THE square (pushMul push,push) — BR core 2-cell !}
+
   _*J_ : JA → JA → JA
-  -- recursion on the FIRST argument; z is a variable ⇒ corners & 1-cells are handled
-  -- uniformly by joinMap/join-commFun, and the ONLY hole is a single function-level
-  -- homotopy (BR's core 2-cell), no longer a pointwise square:
   inl a      *J z = joinMap (a ·_) (a ·_) z
   inr b      *J z = join-commFun (joinMap (λ c' → b · c c') (λ d → n (b · c d)) z)
-  push a b i *J z = {! Hmul : joinMap(a·_)(a·_) ⟹ commFun∘joinMap(b·conj_)(neg∘b·conj_) !}
+  push a b i *J z = pushMul a b z i
 
 ------------------------------------------------------------------------
 -- THE SQUARE: what it needs (found by adapting the library's template).
