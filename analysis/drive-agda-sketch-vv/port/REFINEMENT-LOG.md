@@ -28,3 +28,12 @@ Loop invariant: CDJoin.agda type-checks with N holes, postulate-free. Ratchet: c
 - `_*J_` is now 3 clean lines; the ENTIRE remaining obligation = ONE twisted coherence square (pushMul push,push), corners inl(a·x)/inr(b·conj x)/inr(a·y)/inl(neg(b·conj y)).
 - This square is BR's irreducible core 2-cell. It is now: (a) provably fillable (true CD product), (b) maximally isolated, (c) with the exact tools (⊗-isEquivˡ, rotInv-2/3/4) and template (Hopf.agda §93-122) in hand. Closing it = an interactive nested-cubical construction (multi-session), tracked in #578.
 | 8 | build interactive scaffold for the square | SquareScaffold.agda: tools (Rᵉ/Rsec/Rret) + goal wired + named `seed` obligation + filler skeleton + obligation menu | PASS type-checks, ONE named typed hole (seed); interactive entry point for #578 | 1 | yes |
+
+## Definitive finding on the seed square (2026-07-06, after ~7 distinct attempts)
+Attempts: constant-tube hcomp · morphing-tube hcomp · nested hcomp · routing-through-inr(a·y).
+EVERY attempt fails on the same geometric fact — Agda: `neg (b · conj y) != a · x`. The square's
+two inl-corners (inl(a·x) at [0,0], inl(neg(b·conj y)) at [1,1]) are genuinely distinct points;
+the filler must navigate all four distinct corners via the exact CD/equivalence structure. This
+is BR's irreducible 2-cell. It is NOT closable by blind batch iteration — it needs either the
+BR paper's explicit nested-hcomp transcribed, or a live interactive Agda session (goal-by-goal
+in an editor). The scaffold (SquareScaffold.agda) is the correct handoff for either.
