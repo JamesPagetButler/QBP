@@ -27,3 +27,4 @@ Loop invariant: CDJoin.agda type-checks with N holes, postulate-free. Ratchet: c
 - Phase-A extension (iter1) · formula correction ⇒ filler EXISTS (iter4) · joinMap reformulation (iter6) · pushMul isolation (iter7).
 - `_*J_` is now 3 clean lines; the ENTIRE remaining obligation = ONE twisted coherence square (pushMul push,push), corners inl(a·x)/inr(b·conj x)/inr(a·y)/inl(neg(b·conj y)).
 - This square is BR's irreducible core 2-cell. It is now: (a) provably fillable (true CD product), (b) maximally isolated, (c) with the exact tools (⊗-isEquivˡ, rotInv-2/3/4) and template (Hopf.agda §93-122) in hand. Closing it = an interactive nested-cubical construction (multi-session), tracked in #578.
+| 8 | build interactive scaffold for the square | SquareScaffold.agda: tools (Rᵉ/Rsec/Rret) + goal wired + named `seed` obligation + filler skeleton + obligation menu | PASS type-checks, ONE named typed hole (seed); interactive entry point for #578 | 1 | yes |
