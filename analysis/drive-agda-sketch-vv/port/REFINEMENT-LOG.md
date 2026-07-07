@@ -77,3 +77,34 @@ per quaternionic_hopf.hlean, vendored) → `HSpace (join S¹ S¹)` → feed the 
 **Deviations from BR (honest):** normˡ taken as a field (BR derive it from star_mul/star_star);
 ⊗-unit-coh field added (cubical HSpace needs μₗᵣ; BR's h_space record doesn't). Both are
 obligations pushed to the Bool/S¹ instantiation, where they are directly provable.
+
+---
+
+## Iteration 10 — AC2: THE BOOL INSTANTIATION (2026-07-06, "proceed")
+
+Port of `quaternionic_hopf.hlean` (vendored). `A₀ = Bool`, `neg₀ = not`, mult = circle
+multiplication conjugated along the library's `S¹IsoSuspBool`:
+`x ⊗ y = S¹→SuspBool (SuspBool→S¹ x · SuspBool→S¹ y)`.
+
+Every deferred obligation from iteration 9 discharges here, exactly as predicted:
+
+| CDLaws field | Discharge | Notes |
+|---|---|---|
+| ⊗-unitˡ | `= sec'` (iso round-trip), verbatim | `to north ≐ base`, `base · z ≐ z` definitional |
+| ⊗-unitʳ | `cong fr (rUnitS¹ (to x)) ∙ sec' x` | `rUnitS¹` is a 2-clause pattern refl (`rotLoop base = loop`) |
+| **⊗-unit-coh** (the added field) | `= rUnit refl` | at north: LHS ≐ refl, RHS ≐ refl ∙ refl — one groupoid law |
+| ⊗-negʳ | via `negS-id : negS ~ id` (BR circle_neg_id) | endpoints `sym (merid false)` / `merid true`; merid-true case = `degSquare` (Diamond.agda), merid-false case = `compPath→Square (lCancel ∙ sym lCancel)` |
+| normʳ | `star-to` + `rotInv-1 base b` | `star-to` (starS ↦ invLooper across the iso): poles refl / sym loop, meridians are single connections `loop (~(i∧j))`, `loop (i∧~j)` |
+| **normˡ** (the field BR derive) | `star-to` + `rotInv-2 base b` | directly provable, as predicted |
+| ⊗-assoc | `ret'` conjugation + `μ-assoc S1-AssocHSpace` | library wedge-connectivity proof; `S₊ 1 ≐ S¹` definitional |
+
+| Iter | Attempt | Gate | Holes | Ratchet |
+|---|---|---|---|---|
+| 10 | `CDLawsBool.agda`: negS-id, star-to, 8 CDLaws fields, `SuspBool-CDLaws : CDLaws not`, **`JoinSuspBool-HSpace : HSpace (join SuspBool SuspBool , inl north)`** | **PASS `--safe`, first try, 0 holes** | 0 | yes |
+
+**AC2 COMPLETE.** The concrete quaternionic H-space exists, postulate-free.
+
+**Remaining for #578:** AC3 — the join-equivalence wiring:
+`join SuspBool SuspBool ≃ join S¹ S¹` (joinMap of S¹IsoSuspBool both sides; check
+Cubical.HITs.Join.Properties for an existing lemma), then `HSpace≃` (QBPS3HSpace.agda) →
+`HSpace (join∙ (S₊∙ 1) (S₊∙ 1))` → `S³-HSpace-from-join` → **`HSpace (S₊∙ 3)`**.
