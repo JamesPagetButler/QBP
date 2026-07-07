@@ -163,3 +163,38 @@ H-space is an *input* (via S¹IsoSuspBool conjugation), not an output to sanity-
 The AC2/AC3 *targets* (concrete laws at Bool; `HSpace (join∙ S¹ S¹)`; `HSpace (S₊∙ 3)`)
 are all delivered. Optional extra cell if wanted: CDLaws at A₀ = ⊥ (Susp ⊥ ≃ S⁰) would
 reproduce the S¹ level as a CD output — cute confluence cell, not on the critical path.
+
+---
+
+## Iteration 13 — AC5: cross-validation vs Lean #474 + literature (2026-07-06)
+
+**Finding (substantive, non-blocking, now on record): the two formalizations use two
+DIFFERENT standard Cayley-Dickson conventions.**
+
+| Side | Convention | Source |
+|---|---|---|
+| Lean #474 (`CDAlg.lean` §3 mulCoeff, `FanoOrientationF3.lean` Cmul/Hmul/Omul) | `(a,b)(c,d) = (ac − d̄b, da + bc̄)` | Schafer 1966, p.45 |
+| Agda port (`CDJoinBR.agda` cd-mul, faithful to BR imaginaroid.hlean:212) | `(a,b)(c,d) = (ac − db*, a*d + cb)` | Baez 2002 "The Octonions" §2.2; BR arXiv:1610.01134 |
+
+Corner-by-corner check of the Agda `cd-mul` against Baez: `(inl a)(inl c) = inl (a⊗c)` [ac],
+`(inl a)(inr d) = inr (a*⊗d)` [a*d], `(inr b)(inl c) = inr (c⊗b)` [cb],
+`(inr b)(inr d) = inl (−(d⊗b*))` [−db*] — exact match ✅. The Lean `mulCoeff` branch comments
+match Schafer verbatim ✅.
+
+**Reconciliation (explicit intertwiner):** φ(a,b) = (a, b*) maps Baez-CD → Schafer-CD.
+Proof (two lines, using star-involution and the anti-automorphism (xy)* = y*x*):
+```
+φ(a,b) ⊗Schafer φ(c,d) = (a,b*)(c,d*) = (ac − (d*)*b*, d*a + b*c*) = (ac − db*, d*a + b*c*)
+φ((a,b) ⊙Baez (c,d))   = φ(ac − db*, a*d + cb) = (ac − db*, (a*d + cb)*) = (ac − db*, d*a + b*c*)  ✓
+```
+So the two ℍ's (and hence the S³ H-space vs `CDBridge`'s `CDAlg ℝ 2 ≃ ℍ[ℝ]`) agree up to
+this canonical isomorphism. Consistency spot-check on pure components: Lean `(a,0)(0,d) = (0,da)`
+vs Agda `(inl a)(inr d) = inr (a*d)` — intertwined: φ(0, a*d) = (0, (a*d)*) = (0, d*a) = (a,0)(0,d*) ✓.
+
+**Verdict: PASS with recorded deviation.** No mathematical discrepancy — both conventions are
+literature-standard and canonically isomorphic. But the convention split is now DOCUMENTED so
+future cross-instance work (e.g. mapping S³-H-space paths to CDAlg ℝ 2 elements) must route
+through φ, not identify components naively. Machine-checking φ itself (in either prover) is an
+optional follow-up cell — beekeeper's call.
+
+**AC5 PASS** (discrepancy = convention only, reconciled explicitly; nothing blocking).
