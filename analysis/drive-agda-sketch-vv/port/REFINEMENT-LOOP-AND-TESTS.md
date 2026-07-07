@@ -79,3 +79,50 @@ They are the CHT trust chain made testable: **Test 1** = the proof is real (mach
 
 ## Provenance
 Refinement loop designed + executed (Phase A committed; Phase C identified) and the three CHT-alignment tests specified, 2026-07-03, at beekeeper direction. Recorded by @qbp-oppenheimer.
+
+---
+
+## Part 3 — Test execution record (2026-07-06, tower complete)
+
+The gate condition ("gated on the square") is lifted: the full chain
+`Diamond → CDJoinBR → CDLawsBool → S3FromCD` delivers `S³-HSpace : HSpace (S₊∙ 3)`,
+`--safe`, 0 holes, 0 postulates (REFINEMENT-LOG.md iters 9–14; #578 AC1–AC6).
+
+### TEST 1 — Formalization Integrity: ✅ PASS
+- All five files (incl. QBPS3HSpace) `--safe`; Agda's transitive `--safe` import rule
+  certifies the whole closure ⊆ cubical primitives (hcomp/transp/Glue).
+- Negative control executed: a `postulate` under `--safe` is rejected by this exact toolchain.
+- Evidence: #578 AC4 (REFINEMENT-LOG.md iter 12); CI `agda-cubical.yml` on PR #575.
+- **CHT record to file: tier-1 PROOF anchor** — "S³ is an H-space, cubical-axioms-only".
+
+### TEST 2 — Mathematical Cross-Validation: ⚠ PARTIAL PASS (honest checkpoint split)
+1. **Quaternionic Hopf fibration:** the H-space precondition is delivered — but the cubical
+   library's general `Hopf` module (`Cubical.Homotopy.Hopf`) additionally requires
+   `AssocHSpace S³-HSpace`, which the CD construction does NOT provide (and BR never prove;
+   their hopf.hlean builds the fibration from h_space + 0-connectedness only). So
+   S³↪S⁷↠S⁴ is **NOT free** with the current library interface. Follow-up cell (either
+   port BR's weaker hopf.hlean construction, or prove `AssocHSpace` for cd-mul — the
+   quaternion level IS associative, so this is provable, just new work). Hopf invariant 1:
+   literature+BR-anchored, not machine-checked here. **Verdict: precondition ✅, fibration ⏳.**
+2. **G₂ = Aut(𝕆) branching 𝟕 = (𝟑,𝟏)⊕(𝟐,𝟐):** NOT independently reproduced in Agda —
+   remains a Lean (#548/#571) ⊕ literature confluence. Open cell, recorded, not claimed.
+3. **Operations matrix / shared facts vs #474:** convention cross-check EXECUTED (#578 AC5):
+   Lean = Schafer, Agda/BR = Baez, canonically isomorphic via φ(a,b) = (a,b*) — no
+   mathematical discrepancy (nothing BLOCKING). Structural consistency: CD-join consumes
+   `⊗-assoc` of the level below to build the level above, matching the matrix's
+   assoc-lost-at-𝕆 shape (S⁷ would need 𝕆-assoc — unavailable, as it must be).
+- **CHT record to file: one cross-programme confluence point** (Agda ⊕ Lean ⊕ literature on
+  the quaternion CD step + the convention intertwiner), plus two open cells (2.1 fibration,
+  2.2 G₂) — filed as obligations, not anchors.
+
+### TEST 3 — Physics Alignment: ✅ STRUCTURAL / ❌ VALUES (inherited verdict, unchanged)
+The substrate completion is pure mathematics; it does not move the physics-alignment
+needle by itself. The verdict of Part 2 stands exactly as designed: structural anchors
+(generations, gauge group, sin²θ_W = 3/8 at unification, Koide tested-not-derived, rep
+content) ALIGN; continuous values remain underived (#570, flagged). No new claim.
+
+### CTH ledger handoff
+Filing the Test-1 PROOF anchor + Test-2 confluence point into the confluent-trust
+inventory (latest archived: v5.13) is a **cross-tenant write** (@cth-implementor /
+beekeeper direction required per tenancy rules) — flagged in the #578 thread, not
+executed unilaterally here.
