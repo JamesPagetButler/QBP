@@ -108,3 +108,27 @@ Every deferred obligation from iteration 9 discharges here, exactly as predicted
 `join SuspBool SuspBool ≃ join S¹ S¹` (joinMap of S¹IsoSuspBool both sides; check
 Cubical.HITs.Join.Properties for an existing lemma), then `HSpace≃` (QBPS3HSpace.agda) →
 `HSpace (join∙ (S₊∙ 1) (S₊∙ 1))` → `S³-HSpace-from-join` → **`HSpace (S₊∙ 3)`**.
+
+---
+
+## Iteration 11 — AC3: S³ IS AN H-SPACE (2026-07-06, "continue")
+
+The final wiring, `S3FromCD.agda`:
+
+| Step | Tool | Notes |
+|---|---|---|
+| `join SuspBool SuspBool ≃ join S¹ S¹` | library `Iso→joinIso` (Join/Properties.agda:484) on `invIso S¹IsoSuspBool` both sides | no hand-built join congruence needed; basepoint `inl north ↦ inl base` definitional, so `p = refl` |
+| `HSpace (join∙ (S₊∙ 1) (S₊∙ 1))` | `HSpace≃` (restated verbatim from CI-green QBPS3HSpace.agda) | BR's core obligation — now CONCRETE, not hypothetical |
+| **`S³-HSpace : HSpace (S₊∙ 3)`** | `S³-HSpace-from-join` = `IsoSphereJoin 1 1` + `IsoSphereJoinPres∙ 1 1` | |
+
+| Iter | Attempt | Gate | Holes | Ratchet |
+|---|---|---|---|---|
+| 11 | `S3FromCD.agda`: joinBool≃joinS¹, JoinS¹-HSpace, **S³-HSpace** | **PASS `--safe`, first try, 0 holes** | 0 | yes |
+
+**THE PORT IS COMPLETE.** Full chain, every file `--safe`, 0 holes, 0 postulates:
+`Diamond.agda` → `CDJoinBR.agda` → `CDLawsBool.agda` → `S3FromCD.agda` ⇒
+**S³ is an H-space** (Buchholtz–Rijke arXiv:1610.01134, machine-checked in Cubical Agda).
+
+**Remaining for #578:** AC4 axiom-cleanliness audit (grep + flag infectivity already enforce
+it; document), AC5 cross-validation vs Lean #474, AC6 move the four files into
+proofs/agda-cubical/ + CI wiring.
