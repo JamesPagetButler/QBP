@@ -132,3 +132,34 @@ The final wiring, `S3FromCD.agda`:
 **Remaining for #578:** AC4 axiom-cleanliness audit (grep + flag infectivity already enforce
 it; document), AC5 cross-validation vs Lean #474, AC6 move the four files into
 proofs/agda-cubical/ + CI wiring.
+
+---
+
+## Iteration 12 — AC4: axiom-cleanliness audit (2026-07-06)
+
+Agda has no `#print axioms`; the equivalent guarantee is the `--safe` flag, which is
+**transitively enforced**: a `--safe` module may only import modules that are themselves
+`--safe` (Agda rejects the import otherwise). Successful type-checking of `S3FromCD.agda`
+therefore certifies the ENTIRE dependency closure — all four port files AND every imported
+cubical-library module — free of `postulate`, `primTrustMe`, `REWRITE`, and
+positivity/termination escapes. Only the cubical primitives (hcomp/transp/Glue, the
+interval) remain, which is exactly the AC4 target set.
+
+| Evidence | Result |
+|---|---|
+| `OPTIONS` line of all 4 files | `--cubical --safe --no-import-sorts --guardedness` ✅ |
+| grep postulate/primTrustMe/REWRITE/NO_POSITIVITY/NON_TERMINATING across the 4 files | 0 hits (1 comment-only match in S3FromCD.agda header) ✅ |
+| Negative control: `--safe` file with `postulate bad : Set` | REJECTED — "Cannot postulate bad with safe flag" ✅ |
+| Transitive closure | enforced by Agda's --safe import rule + successful check ✅ |
+
+**AC4 PASS.**
+
+### Honest deviation from the AC text as written (for the beekeeper)
+AC2 as written asked for the CDStr *tower* route (CDStr Bool → HSpace S¹, sanity-check vs
+S1-HSpace; then CDStr S¹ → join). The BR construction (ground truth) is a ONE-step
+imaginaroid instantiation: CDLaws at A₀ = Bool directly yields the quaternion mult on
+join (Susp Bool)² — there is no intermediate `HSpace (join S⁰ S⁰)` artifact, and the S¹
+H-space is an *input* (via S¹IsoSuspBool conjugation), not an output to sanity-check.
+The AC2/AC3 *targets* (concrete laws at Bool; `HSpace (join∙ S¹ S¹)`; `HSpace (S₊∙ 3)`)
+are all delivered. Optional extra cell if wanted: CDLaws at A₀ = ⊥ (Susp ⊥ ≃ S⁰) would
+reproduce the S¹ level as a CD output — cute confluence cell, not on the critical path.
