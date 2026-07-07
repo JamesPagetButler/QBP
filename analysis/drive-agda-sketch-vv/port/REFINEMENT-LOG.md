@@ -198,3 +198,18 @@ through φ, not identify components naively. Machine-checking φ itself (in eith
 optional follow-up cell — beekeeper's call.
 
 **AC5 PASS** (discrepancy = convention only, reconciled explicitly; nothing blocking).
+
+---
+
+## Iteration 14 — AC6: promotion to proofs/agda-cubical/ + CI (2026-07-06)
+
+Diamond/CDJoinBR/CDLawsBool copied verbatim; S3FromCD adapted to import QBPS3HSpace
+(dropping the port-dir restatements of HSpace≃/S³-HSpace-from-join); QBPS3HSpace's
+"remaining obligation" comment updated to DISCHARGED; README rewritten (chain table,
+AC4 audit note, AC5 convention note). All five files re-checked from clean interfaces
+with the exact CI loop (`for f in *.agda; agda --safe $f`): **PASS**. The existing
+`agda-cubical.yml` workflow picks the new files up automatically (`*.agda` glob,
+paths-filter on `proofs/agda-cubical/**`).
+
+**AC6 COMPLETE — #578 AC1–AC6 all delivered.** Port-dir originals retained as the
+working/provenance copies alongside this log and the vendored BR sources.

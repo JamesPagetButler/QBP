@@ -40,9 +40,8 @@ S³-HSpace-from-join : HSpace (join∙ (S₊∙ 1) (S₊∙ 1)) → HSpace (S₊
 S³-HSpace-from-join =
   HSpace≃ (isoToEquiv (IsoSphereJoin 1 1)) (IsoSphereJoinPres∙ 1 1)
 
--- REMAINING OBLIGATION (Buchholtz–Rijke's core, NOT postulated here):
---     HSpace (join∙ (S₊∙ 1) (S₊∙ 1))
--- the Cayley-Dickson (quaternion) multiplication on the join. With it,
--- S³-HSpace-from-join yields HSpace (S₊∙ 3) — and the library's general Hopf
--- module then gives the quaternionic Hopf fibration S³ ↪ S⁷ ↠ S⁴ for free.
+-- The obligation HSpace (join∙ (S₊∙ 1) (S₊∙ 1)) — Buchholtz–Rijke's core,
+-- the Cayley-Dickson (quaternion) multiplication on the join — is DISCHARGED
+-- in this directory: Diamond.agda → CDJoinBR.agda → CDLawsBool.agda →
+-- S3FromCD.agda, whose S³-HSpace : HSpace (S₊∙ 3) is the theorem.
 ------------------------------------------------------------------------
