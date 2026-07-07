@@ -37,3 +37,43 @@ the filler must navigate all four distinct corners via the exact CD/equivalence 
 is BR's irreducible 2-cell. It is NOT closable by blind batch iteration — it needs either the
 BR paper's explicit nested-hcomp transcribed, or a live interactive Agda session (goal-by-goal
 in an editor). The scaffold (SquareScaffold.agda) is the correct handoff for either.
+
+---
+
+## Iteration 9 — THE SQUARE IS CLOSED (2026-07-06, "one more attempt, be creative, think through the fundamental goal")
+
+**The creative move: stop constructing, start transcribing.** All ~7 prior attempts were blind
+hcomp engineering. But BR's paper was FORMALIZED (Lean-2 HoTT, machine-checked, Apache 2.0) —
+the explicit square construction exists as code. Fetched it: `leanprover/lean2`
+`hott/homotopy/{imaginaroid,hopf,join,quaternionic_hopf}.hlean` (vendored in `br-lean2-source/`).
+
+**Why every direct attempt failed — and BR's resolution.** The four corners ARE genuinely
+distinct (iters 0-8's finding was correct); BR never fill that square directly. Instead
+(imaginaroid.hlean:229-242):
+1. **Lemmas 1-4** rewrite the corners as images of ONE point `w = ((c*·a*)·d)·b*` (and ±1)
+   under two maps `f x = (a·c)·(−x)`, `g y = (c·y)·b` — pure equational algebra.
+2. **`ap_diamond f g`** exhibits the goal as the join-functorial image of a UNIVERSAL
+   one-variable diamond `(−1, w, 1, w)`.
+3. **Suspension induction on `w`**: poles → degenerate diamonds; meridian → `twist_diamond`,
+   a pure path-induction (J) lemma. **The carrier must be `Susp A₀`** — the deep reason the
+   abstract-CDStr-on-arbitrary-A attempt could never close it. Negation on `Susp A₀` swaps
+   poles (definable!), dissolving the S¹-negation obstruction of MulProbe.agda.
+
+| Iter | Hypothesis | Attempt | Gate | Holes | Ratchet |
+|---|---|---|---|---|---|
+| 9a | port the diamond machinery (join.hlean) | `Diamond.agda`: or/and/deg/hdeg squares (J), diamond, v/hdiamond, symmDiamond, twistDiamond, apDiamond (one-liner — push is a binary constructor), pushCong | **PASS `--safe`, 0 holes** | 0 | yes |
+| 9b | port the imaginaroid CD step (imaginaroid.hlean) | `CDJoinBR.agda`: negS/starS on Susp A₀, CDLaws record, lemmas 1-4, genDiamond, pushMulSquare, cd-mul, unit laws, **`CDJoin-HSpace : HSpace (join S S , inl oneS)`** | **PASS `--safe`, 0 holes** | **0** | yes |
+
+**TERMINATE: N = 0.** The seed square is closed — not by filling SquareScaffold's hole
+(my corner convention differed from BR's; theirs is ground truth) but by the BR-faithful
+construction that supersedes CDJoin.agda/SquareScaffold.agda. Postulate-free, hole-free,
+`--safe`, checked with local Agda 2.8.0 against cubical-0.9.
+
+**Remaining for #578:** AC2 — instantiate `A₀ = Bool`, `neg₀ = not`: build CDLaws for
+`Susp Bool` (transport the S¹ multiplication along S¹ ≃ Susp Bool; laws via rotInv-1..4,
+per quaternionic_hopf.hlean, vendored) → `HSpace (join S¹ S¹)` → feed the already-verified
+`S³-HSpace-from-join` (QBPS3HSpace.agda) → **`HSpace (S₊∙ 3)`**.
+
+**Deviations from BR (honest):** normˡ taken as a field (BR derive it from star_mul/star_star);
+⊗-unit-coh field added (cubical HSpace needs μₗᵣ; BR's h_space record doesn't). Both are
+obligations pushed to the Bool/S¹ instantiation, where they are directly provable.
