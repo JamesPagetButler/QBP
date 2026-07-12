@@ -1,0 +1,23 @@
+=== Sealed parameter space (ℍ→𝕆 truncation) ===
+  octonion product : FIXED (Cayley-Dickson) -> 0 free
+  metric/norm form : FIXED (Euclidean, #474 D10) -> 0 free (overall scale = units)
+  potential V(y)=a|y|^2 + b Re<Xy,yX> + c(|y|^2)^2, background |X|
+  raw potential coeffs: ['a', 'b', 'c', '|X|']  (4)
+  remove overall scale (units) -> dimensionless dynamical content:
+    ~ {m^2/scale (m^2=a-b|X|^2),  quartic depth}  => N_free ≈ 2
+
+N_free ≈ 2 (dimensionless dynamical)
+
+=== N_constraint sources per edge ===
+  edge1 Substrate->Foundation (hosting): constrains the SUBSTRATE, not V's coeffs -> 0 on N_free
+  edge2 Foundation->Physics (rigid metric): geometry fixed -> 0 free, but no constraint on V either
+  edge3 Physics->Substrate (RT: entropy(partition)=area): the ONLY source of constraints on the
+        dynamics -- and ONLY because V's VEV deforms the geometry/areas as 𝕆->ℍ proceeds.
+        At a finite truncation #partitions is finite but >2 -> plausibly N_constraint >> N_free.
+
+=== GATE ===
+  edge3 is NON-CONSTRUCTIVE (no RT map in QBP; substrate #554/#556 not yet concrete).
+  => N_constraint UNCOUNTABLE => sign(N_constraint - N_free) UNEVALUABLE => bootstrap UNPOSABLE.
+  Structural: edge3 is the SOLE channel by which loop-closure touches the values
+  (the loop is otherwise kinematic/value-blind). So the generator question reduces to
+  constructing edge3 (RT in a concrete substrate). Until then: organization, not generator.
