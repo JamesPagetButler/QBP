@@ -1,0 +1,12 @@
+n = CD dimension 2^k: {'ℝ': 1, 'ℂ': 2, 'ℍ': 4, '𝕆': 8}
+
+reading                    g1   g2  verdict
+line193 n∝mass          FalseFalse  DEGENERATE w/ QM
+line181 n=4+spin DOF    FalseFalse  DEGENERATE by construction (#568)
+PURE n=CD-dim 2^k        True True  GATE-PASSING
+
+Only the CD-dimension reading passes g1+g2 -> APC must adopt n=CD-dim.
+
+ΔF ∝ (n_A - n_B):
+  same level (ion-ion): 4-4 = 0  -> QBP predicts ZERO algebraic asymmetry (clean null)
+  atom(4)-photon(2):    4-2 = 2  -> mass-independent cross-level prediction
