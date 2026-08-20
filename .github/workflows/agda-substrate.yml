@@ -1,0 +1,27 @@
+name: Agda Substrate (Cubical type-check)
+on:
+  pull_request:
+    paths:
+      - 'proofs/agda/**'
+      - '.github/workflows/agda-substrate.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'proofs/agda/**'
+      - '.github/workflows/agda-substrate.yml'
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Agda 2.8.0 (official prebuilt static linux bindist — matches local toolchain #576)
+        run: |
+          curl -fsSL https://github.com/agda/agda/releases/download/v2.8.0/Agda-v2.8.0-linux.tar.xz -o /tmp/agda.tar.xz
+          mkdir -p "$HOME/agda-2.8.0"
+          tar -xJf /tmp/agda.tar.xz -C "$HOME/agda-2.8.0"
+          echo "$HOME/agda-2.8.0" >> "$GITHUB_PATH"
+      - name: Type-check the QBP substrate (executable-binary V&V)
+        run: |
+          agda --version
+          cd proofs/agda
+          for f in *.agda; do echo "== $f =="; agda --safe "$f"; done

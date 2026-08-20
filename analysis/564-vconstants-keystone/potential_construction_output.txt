@@ -1,0 +1,22 @@
+=== M(X) signature for various backgrounds (the negative-mass source) ===
+  X=e1 (imag unit)           eig=[-1. -1. -1. -1.]  (|X|^2=1.000)  -> isotropic=True
+  X=1 (real unit)            eig=[1. 1. 1. 1.]  (|X|^2=1.000)  -> isotropic=True
+  X=(1+e1)/sqrt2 (mixed)     eig=[0. 0. 0. 0.]  (|X|^2=1.000)  -> isotropic=True
+  X=imag generic             eig=[-10.8716 -10.8716 -10.8716 -10.8716]  (|X|^2=10.872)  -> isotropic=True
+
+=== V(y) is a Mexican hat iff the negative cross-coupling dominates ===
+  a=1.0,b=0.5,|X|^2=1.0,c=0.1: mass^2=+0.500 -> no SSB (v=0)
+  a=1.0,b=2.0,|X|^2=1.0,c=0.1: mass^2=-1.000 -> MEXICAN HAT, v=2.2361
+  a=0.5,b=1.0,|X|^2=3.0,c=0.2: mass^2=-2.500 -> MEXICAN HAT, v=2.5000
+
+=== Sub-problem C: R_ab structure ===
+If alpha(v)=a0*v^p_alpha and mu(v)=m0*v^p_mu (power-law coupling to the VEV),
+then R_alpha,mu = (dln alpha/dln v)/(dln mu/dln v) = p_alpha/p_mu :
+   p_alpha=+1, p_mu=-1  ->  R = -1.0000   (scale-INDEPENDENT)
+   p_alpha=+2, p_mu=-1  ->  R = -2.0000   (scale-INDEPENDENT)
+   p_alpha=+1, p_mu=+1  ->  R = +1.0000   (scale-INDEPENDENT)
+   p_alpha=-1, p_mu=+2  ->  R = -0.5000   (scale-INDEPENDENT)
+
+=> R is independent of the absolute VEV v AND of the potential coefficients (a,b,c,|X|)
+   IFF the couplings are power laws. The falsifiable number reduces to the EXPONENTS,
+   i.e. to Sub-problem B (how each constant couples to the (2,2)) -- NOT the hard scale.

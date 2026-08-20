@@ -106,3 +106,7 @@ workspace/*.hif.json
 # .lake holds a full PhysLean+Mathlib build (~8 GB) + a 191 MB native exe; rebuildable.
 proofs-physlean-bridge/.lake/
 proofs-physlean-bridge/**/*.olean
+
+# Agda build artifacts
+*.agdai
+_build/

@@ -1,0 +1,4 @@
+name: qbp-cubical
+include: .
+depend: cubical-0.9
+flags: --cubical --safe --no-import-sorts --guardedness
