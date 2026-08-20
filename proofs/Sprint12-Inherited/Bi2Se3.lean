@@ -247,18 +247,18 @@ def checkFullChainSummary : Bool :=
 /-- B1. Slater screening for Bi (Z=83) is self-consistent:
     sigma < Z and Z_eff > 0. -/
 theorem bi_screening_valid : checkBiScreening = true := by
-  native_decide
+  decide
 
 /-- B2. Slater screening for Se (Z=34) is self-consistent. -/
 theorem se_screening_valid : checkSeScreening = true := by
-  native_decide
+  decide
 
 /-- B3. The Slater screening computations are arithmetically correct. -/
 theorem slater_bi_correct : checkSlaterBi = true := by
-  native_decide
+  decide
 
 theorem slater_se_correct : checkSlaterSe = true := by
-  native_decide
+  decide
 
 /-- B4. The band inversion criterion is satisfied:
     λ_SOC(Bi) = 1.25 eV > E_gap(trivial) = 0.50 eV.
@@ -269,12 +269,12 @@ theorem slater_se_correct : checkSlaterSe = true := by
     symmetry, which itself derives from the quaternion structure of
     the λ=8 Hessian eigenspace. -/
 theorem band_inversion_satisfied : checkBandInversion = true := by
-  native_decide
+  decide
 
 /-- B5. The full chain from axioms to topological insulator is 
     self-consistent at the level of integer arithmetic checks. -/
 theorem full_chain_consistent : checkFullChainSummary = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 5: WHAT REMAINS TO PROVE

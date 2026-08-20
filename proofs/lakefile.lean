@@ -25,6 +25,12 @@ lean_lib «QBP» where
 -- These files were authored on toolchain v4.18.0; this Lake project is v4.30.0.
 -- Toolchain migration is the work — see paper/Sprint12-Inherited-Reconciliation.md.
 -- Original package: «qbp»; renamed to «QBPSprint12» to avoid collision with «QBP» above.
+-- #482: promoted to @[default_target] so the CI `lake build` actually compiles this
+-- corpus — it previously did NOT (only «QBP» was default), which is why native_decide
+-- survived un-gated here. Now CI-verified. NOTE: the sedenion kernel `decide`s add
+-- ~1–2 min to the build (Sedenion ~77s); one theorem (Tr(H²)) retains native_decide
+-- per the documented #582 exception.
+@[default_target]
 lean_lib «QBPSprint12» where
   srcDir := "Sprint12-Inherited"
   roots := #[`Bi2Se3, `Crystallisation, `Elements, `Graphene, `Kitaev, `Quaternion, `Sedenion]

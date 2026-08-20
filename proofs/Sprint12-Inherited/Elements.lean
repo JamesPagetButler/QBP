@@ -5,7 +5,7 @@
   Machine-verified theorems establishing the chain from the sedenion
   algebraic structure to the quantum numbers governing atomic physics.
   
-  All proofs use `native_decide` on Bool computations — zero `sorry`.
+  All proofs use kernel `decide` on Bool computations — zero `sorry`.
   
   Verified results:
     T10. Shell capacity: 2n² = Σ_{l=0}^{n-1} 2(2l+1) for n = 1..100
@@ -42,7 +42,7 @@ def checkShellFormula : Bool :=
 
 /-- T10. The shell capacity formula: 2n² = Σ 2(2l+1) for n = 1..100 -/
 theorem shell_capacity_formula : checkShellFormula = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 2: QUATERNIONIC STRUCTURE → QUANTUM NUMBERS
@@ -70,20 +70,20 @@ def checkDimensions : Bool :=
   2^4 == 16          -- dim(𝕊) = 16
 
 /-- T11. dim(Im ℍ) = 3, giving three SO(3) generators -/
-theorem dimImH_eq_3 : dimImH = 3 := by native_decide
+theorem dimImH_eq_3 : dimImH = 3 := by decide
 
 /-- T18. Three generations from dim(Im ℍ) = dim(ℍ) - 1 = 3 -/
-theorem generation_count : dimH - 1 = 3 := by native_decide
+theorem generation_count : dimH - 1 = 3 := by decide
 
 /-- The dimension of the fundamental representation of SU(2) -/
 def dimFundSU2 : Nat := 2  -- spin-1/2: two states (up, down)
 
 /-- T12. Spin-1/2 from SU(2) fundamental representation -/
-theorem spin_half_states : dimFundSU2 = 2 := by native_decide
+theorem spin_half_states : dimFundSU2 = 2 := by decide
 
 /-- T11+T12 combined: The algebra determines quantum number structure -/
 theorem quantum_number_structure : checkDimensions = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 3: SUBSHELL ELECTRON COUNTS
@@ -101,7 +101,7 @@ def checkSubshellCounts : Bool :=
 
 /-- T13. Subshell electron counts: s=2, p=6, d=10, f=14 -/
 theorem subshell_counts : checkSubshellCounts = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 4: NOBLE GAS ATOMIC NUMBERS (AUFBAU ORDER)
@@ -153,7 +153,7 @@ def checkNobleGases : Bool := Id.run do
 
 /-- T14. The Aufbau filling order produces noble gases at Z = 2, 10, 18, 36, 54, 86, 118 -/
 theorem noble_gas_atomic_numbers : checkNobleGases = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 5: HYDROGEN ENERGY SPECTRUM
@@ -184,7 +184,7 @@ def checkHydrogenRatios : Bool :=
 
 /-- T15. Hydrogen energy ratios: n²E_n = E_1 for n = 1..20 -/
 theorem hydrogen_energy_ratios : checkHydrogenRatios = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 6: CABIBBO ANGLE FROM THE FANO PLANE
@@ -224,7 +224,7 @@ def checkFanoConnection : Bool :=
 /-- T16. The Cabibbo angle matches sin(π/14) to < 2%,
     where 14 = 2 × 7 (CD-doubled Fano plane). -/
 theorem cabibbo_fano_match : checkCabibboMatch && checkFanoConnection = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 7: KOIDE RATIO
@@ -254,7 +254,7 @@ def checkZ3FromQuaternion : Bool :=
 /-- T17. The Koide ratio Q = 2/3 is forced by the quaternionic Z₃ symmetry:
     6/9 = 2/3 where 6 = 3 + 2×(3/2) and 9 = 3². -/
 theorem koide_ratio_two_thirds : checkKoideAlgebraic && checkZ3FromQuaternion = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 8: THE FULL CHAIN (integration theorem)
@@ -288,7 +288,7 @@ def checkFullChain : Bool :=
 /-- The integration theorem: the QBP algebraic structure determines
     the quantum number framework for atomic physics. -/
 theorem algebraic_chain_to_atoms : checkFullChain = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 9: ELEMENT COUNTS
@@ -312,7 +312,7 @@ def checkPeriodFormula : Bool :=
 /-- T: The periodic table has 118 elements in 7 periods with lengths 2,8,8,18,18,32,32 -/
 theorem periodic_table_structure :
     checkElementCount && checkPeriodFormula = true := by
-  native_decide
+  decide
 
 -- ═══════════════════════════════════════════════════════════
 -- SECTION 10: #eval CHECKS

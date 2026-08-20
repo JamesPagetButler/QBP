@@ -373,76 +373,76 @@ def checkFullKitaevChain : Bool :=
     This IS the Kitaev plaquette flux W_p = σ_xσ_yσ_z = -1.
     The Z₂ gauge structure follows directly. -/
 theorem plaquette_flux_z2 : checkTripleProduct = true := by
-  native_decide
+  decide
 
 /-- K2. (e₁e₂e₃)² = +e₀ → W_p² = 1 → eigenvalues ±1 → Z₂ gauge group. -/
 theorem flux_squared_identity : checkTripleProductSquared = true := by
-  native_decide
+  decide
 
 /-- K3. All six orderings of the triple product yield ±e₀ with signs
     determined by permutation parity. Even → -1, Odd → +1.
     This gives the plaquette flux sign for each traversal direction. -/
 theorem triple_product_all_orderings : checkAllTripleProducts = true := by
-  native_decide
+  decide
 
 /-- K4. The Clifford anticommutation {e_i, e_j} = -2δ_ij·e₀
     is verified for all 9 pairs. This IS the Majorana fermion algebra
     Cl(0,3) that the Kitaev model decomposes spins into. -/
 theorem clifford_anticommutation : checkCliffordAnticommutation = true := by
-  native_decide
+  decide
 
 /-- K5. The Clifford algebra collapses: bivectors = vectors.
     e₁e₂ = e₃, e₂e₃ = e₁, e₃e₁ = e₂, e₁e₂e₃ = -e₀.
     This gives Cl(0,3) ≅ ℍ ⊕ ℍ: the MATTER and GAUGE 
     Majorana sectors of the Kitaev model. -/
 theorem clifford_collapse_to_quaternion : checkCliffordCollapse = true := by
-  native_decide
+  decide
 
 /-- K6. Quaternion non-commutativity: e₁e₂ = +e₃ ≠ e₂e₁ = -e₃.
     This is the algebraic origin of NON-ABELIAN anyons in the
     Kitaev B-phase. Braiding in opposite orders gives different results. -/
 theorem non_abelian_braiding : checkNonCommutativity = true := by
-  native_decide
+  decide
 
 /-- K7. The Majorana central charge c = 1/2 = dim(ℝ)/dim(ℂ).
     This determines the half-quantized thermal Hall conductivity.
     The division algebra hierarchy ℝ ⊂ ℂ ⊂ ℍ forces c = 1/2
     for Majorana edge modes. -/
 theorem majorana_central_charge : checkMajoranaCentralCharge = true := by
-  native_decide
+  decide
 
 /-- K8. The three bond types exhaust all non-commuting observables
     for spin-1/2 (dim(Im ℍ) = 3). The Kitaev model is the MOST GENERAL
     bond-dependent Ising model on a honeycomb — there is no fourth
     independent spin interaction. -/
 theorem bond_completeness : checkBondCompleteness = true := by
-  native_decide
+  decide
 
 -- MATERIAL-SPECIFIC (α-RuCl₃)
 
 /-- R1. Slater screening for Ru (Z=44) is arithmetically correct. -/
 theorem ru_screening_correct : checkSlaterRu = true := by
-  native_decide
+  decide
 
 /-- R2. Slater screening for Cl (Z=17) is arithmetically correct. -/
 theorem cl_screening_correct : checkSlaterCl = true := by
-  native_decide
+  decide
 
 /-- R3. SOC regime: 10Dq >> λ_SOC for Ru³⁺, validating the 
     t₂g manifold and j_eff=1/2 description. -/
 theorem soc_regime_valid : checkSOCRegime = true := by
-  native_decide
+  decide
 
 /-- R4. The j_eff = 1/2 Kramers doublet is half-filled in Ru³⁺ (4d⁵).
     Combined with Kramers protection (Q5-Q7), this establishes that
     α-RuCl₃ has a magnetically active j_eff=1/2 moment suitable
     for Kitaev interactions. -/
 theorem jeff_half_filling : checkJeffHalfFilling = true := by
-  native_decide
+  decide
 
 /-- R5. The full derivation chain is self-consistent. -/
 theorem full_kitaev_chain : checkFullKitaevChain = true := by
-  native_decide
+  decide
 
 
 -- ═══════════════════════════════════════════════════════════
