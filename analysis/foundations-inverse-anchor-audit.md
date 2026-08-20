@@ -15,6 +15,8 @@
 | anchor side phantoms | 18 |
 | stale path citations | 8 |
 
+> **Note — `lean_side_orphans` is a LOWER BOUND.** A theorem counts as *anchored* if any anchor cites its **file** (or its name), so a theorem in a file some anchor references is counted anchored even if no anchor addresses *that* theorem. True per-theorem orphans are ≥ this count; the exact figure lands in Phase B (per-theorem classification, #464).
+
 ## 2. Lean-side orphans by directory
 
 | Directory | Orphan theorems |
