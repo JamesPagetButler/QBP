@@ -16,6 +16,11 @@
   Date: 2026-04-08
 -/
 
+-- #482 native_decide→decide migration: deep kernel reduction over the sedenion table
+-- exceeds default maxRecDepth (512); bumped so axiom-clean `decide` replaces native_decide.
+set_option maxRecDepth 10000
+set_option maxHeartbeats 2000000
+
 -- We import the sedenion multiplication table functions directly
 -- (In a full project, this would be `import QBP.Sedenion`)
 -- For self-containment, we redefine the lookup functions.
@@ -369,31 +374,31 @@ def checkEigenspaceDimensions : Bool :=
   4 * 1 == 4 && 4 * 2 == 8 && 4 * 3 == 12
 
 -- ═══════════════════════════════════════════════════════════
--- SECTION 7: THEOREMS — ALL PROVEN BY native_decide
+-- SECTION 7: THEOREMS — ALL PROVEN BY kernel `decide`
 -- ═══════════════════════════════════════════════════════════
 
 /-- Q1. The quaternion subalgebra {e₀, e₁, e₂, e₃} is closed under multiplication. -/
 theorem quaternion_closure : checkQuaternionClosure = true := by
-  native_decide
+  decide
 
 /-- Q2. The quaternion multiplication table is exactly ij=k, jk=i, ki=j (Hamilton). -/
 theorem quaternion_table : checkQuaternionTable = true := by
-  native_decide
+  decide
 
 /-- Q3. The imaginary quaternion units satisfy the su(2) Lie algebra:
     [e_i, e_j] = 2ε_{ijk} e_k -/
 theorem su2_commutation : checkSU2CommutationRelations = true := by
-  native_decide
+  decide
 
 /-- Q4. The su(2) Casimir: e₁² + e₂² + e₃² = -3·e₀ -/
 theorem su2_casimir : checkSU2Casimir = true := by
-  native_decide
+  decide
 
 /-- Q5. Time-reversal T (as quaternion left-multiplication) satisfies T² = -1
     for ALL three choices of imaginary unit. This is the algebraic
     foundation of Kramers' theorem. -/
 theorem time_reversal_square_minus_one : checkTimeReversalSquare = true := by
-  native_decide
+  decide
 
 /-- Q6. Kramers orthogonality: ⟨ψ|Tψ⟩ = 0 for all quaternion basis states ψ
     and all choices of T ∈ {e₁, e₂, e₃}.
@@ -401,7 +406,7 @@ theorem time_reversal_square_minus_one : checkTimeReversalSquare = true := by
     Physical meaning: every energy eigenstate has an orthogonal partner
     related by time-reversal. States are at least doubly degenerate. -/
 theorem kramers_orthogonality : checkKramersOrthogonality = true := by
-  native_decide
+  decide
 
 /-- Q7. Kramers degeneracy: Tψ is ALWAYS a different state from ψ.
     The Kramers partner is linearly independent.
@@ -409,7 +414,7 @@ theorem kramers_orthogonality : checkKramersOrthogonality = true := by
     Physical meaning: the degeneracy is protected — it cannot be
     lifted by any perturbation that preserves time-reversal symmetry. -/
 theorem kramers_degeneracy : checkKramersDegeneracy = true := by
-  native_decide
+  decide
 
 /-- Q8. Hurwitz property: |ab|² = |a|²|b|² = 4 for ALL pairs of 
     quaternion basis sums (a,b with a≠b, c,d with c≠d).
@@ -420,7 +425,7 @@ theorem kramers_degeneracy : checkKramersDegeneracy = true := by
     - Berry phase = π (the quaternion norm determines the geometric phase)
     - The Z₂ topological invariant (mod 2 from the SU(2)/Z₂ = SO(3) double cover) -/
 theorem hurwitz_quaternion : checkHurwitzQuaternion = true := by
-  native_decide
+  decide
 
 /-- Q9. Hurwitz FAILS for sedenions: there exist zero divisors.
     This proves that the quaternion is the LARGEST algebra where
@@ -429,20 +434,20 @@ theorem hurwitz_quaternion : checkHurwitzQuaternion = true := by
     Physical meaning: within our universe (ℍ), topology is exact.
     At the boundary (𝕊), topology can break — this is where seams form. -/
 theorem hurwitz_fails_sedenion : checkHurwitzFailsSedenion = true := by
-  native_decide
+  decide
 
 /-- Q10. The SU(2)/Z₂ double cover: conjugation by u and -u give the 
     same inner automorphism. This establishes the Z₂ kernel of
     SU(2) → SO(3), which is the topological invariant of the
     Z₂ classification of topological insulators. -/
 theorem double_cover_z2 : checkDoubleCover = true := by
-  native_decide
+  decide
 
 /-- Q11. Eigenspace dimensions match gauge group structure:
     mult(λ=4) = 4 → U(1), mult(λ=8) = 8 → SU(2), mult(λ=12) = 4 → SU(3),
     with λ_i = 4 × C₂(adj, G_i). -/
 theorem eigenspace_gauge_match : checkEigenspaceDimensions = true := by
-  native_decide
+  decide
 
 
 -- ═══════════════════════════════════════════════════════════

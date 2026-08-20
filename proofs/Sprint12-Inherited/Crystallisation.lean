@@ -221,37 +221,37 @@ def checkHalfRatio : Bool :=
     Exponents: f₀ → σ⁰ (invariant), f₂ → σ¹, f₄ → σ².
     Higher moments are more sensitive to width changes. -/
 theorem moment_scaling_hierarchy : checkMomentExponents = true := by
-  native_decide
+  decide
 
 /-- C2. Convergence ordering: f₀ fastest, f₂ middle, f₄ slowest.
     f₄ is 2× as sensitive as f₂ to width changes.
     This explains why Λ (from f₄) is the most puzzling observable. -/
 theorem convergence_ordering : checkConvergenceOrdering = true := by
-  native_decide
+  decide
 
 /-- C3. Correlation constraint: ΔΛ/Λ - 2(ΔG/G) + Δα/α = 0.
     Three observable variations satisfy ONE linear constraint.
     Measuring any two determines the third.
     Violating this constraint falsifies the model. -/
 theorem variation_correlation : checkCorrelationConstraint = true := by
-  native_decide
+  decide
 
 /-- C4. Growth factor enhancement: structure formation rate 
     scales as G^{1/2}. The exponent 1/2 equals f₂/f₄ width ratio. -/
 theorem growth_enhancement : checkGrowthExponent = true := by
-  native_decide
+  decide
 
 /-- C5. Three independent moments = dim(Im ℍ) = 3.
     The same quaternion dimension gives three gauge groups,
     three eigenvalues, and three spectral action moments. -/
 theorem three_moments_dim_imH : checkThreeMoments = true := by
-  native_decide
+  decide
 
 /-- C6. The ratio 1/2 = f₂_exp/f₄_exp = dim(ℝ)/dim(ℂ) = c_Majorana.
     The convergence rate ratio, the growth exponent, and the
     Majorana central charge are the same algebraic number. -/
 theorem half_ratio_universal : checkHalfRatio = true := by
-  native_decide
+  decide
 
 
 -- ═══════════════════════════════════════════════════════════

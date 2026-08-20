@@ -320,61 +320,61 @@ def checkMottStructure : Bool :=
     e₁·e₂ = e₃, e₂·e₃ = e₁, e₃·e₁ = e₂.
     This is the algebraic structure of the honeycomb lattice. -/
 theorem honeycomb_z3_cyclic : checkCyclicProduct = true := by
-  native_decide
+  decide
 
 /-- G2. The anti-cyclic products encode chirality:
     e₂·e₁ = -e₃, e₃·e₂ = -e₁, e₁·e₃ = -e₂.
     K and K' valleys have opposite chirality. -/
 theorem honeycomb_chirality : checkAntiCyclicProduct = true := by
-  native_decide
+  decide
 
 /-- G3. The full Z₃ × Z₂ structure of graphene's Dirac equation. -/
 theorem graphene_z3z2 : checkZ3Z2Structure = true := by
-  native_decide
+  decide
 
 /-- G4. C₂z (sublattice exchange) squares to -1 as a spinor operation.
     This is the SAME double-cover as Q10 — spatial 360° = spinor -1. -/
 theorem c2z_square_minus_one : checkC2zSquare = true := by
-  native_decide
+  decide
 
 /-- G5. C₂z conjugation reverses in-plane pseudospin components:
     e₂ → -e₂, e₃ → -e₃ (momentum reversal in the Dirac equation). -/
 theorem c2z_reverses_momentum : checkC2zAction = true := by
-  native_decide
+  decide
 
 /-- G6. (C₂zT)² = +1: the combined symmetry squares to PLUS one.
     This is fundamentally different from pure T² = -1 (Kramers).
     C₂zT gives FRAGILE topology (Z-classified, not Z₂). -/
 theorem c2zt_square_plus_one : checkC2zTSquare = true := by
-  native_decide
+  decide
 
 /-- G7. The protection type distinguishes MATBG from Bi₂Se₃:
     MATBG: (C₂zT)² = +1 → real class → fragile Z topology
     Bi₂Se₃: T² = -1 → quaternionic class → robust Z₂ topology -/
 theorem protection_type_differs : checkProtectionType = true := by
-  native_decide
+  decide
 
 /-- G8. Dirac cone helicity: K valley = +1, K' valley = -1.
     Encoded in the sign of the quaternion cyclic product. -/
 theorem dirac_helicity : checkHelicity = true := by
-  native_decide
+  decide
 
 /-- G9. Moiré BZ has nonzero total helicity (2 from same-valley cones).
     This is the topological obstruction preventing symmetric Wannier functions.
     If cones came from opposite valleys, total = 0 → trivial. -/
 theorem moire_fragile_topology : checkMoireHelicity = true := by
-  native_decide
+  decide
 
 /-- G10. The magic angle parameter α ≈ 0.586 is within 1.5% of 1/√3.
     1/√3 is the honeycomb geometric normalisation factor.
     OBSERVATION, not derivation. -/
 theorem alpha_near_inv_sqrt3 : checkAlphaObservation = true := by
-  native_decide
+  decide
 
 /-- G11. The Mott physics structure: both U (from α_em/U(1)/λ=4) and
     t (from orbital overlap/SU(2)/λ=8) derive from the same Hessian. -/
 theorem mott_from_hessian : checkMottStructure = true := by
-  native_decide
+  decide
 
 
 -- ═══════════════════════════════════════════════════════════
