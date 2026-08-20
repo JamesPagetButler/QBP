@@ -1,8 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/JamesPagetButler/confluent-trust/schema/inventory.schema.json",
+  "$id": "https://github.com/JamesPagetButler/confluent-trust/schema/inventory.schema.v0.3.2.json",
+  "x-schema-semver": "0.3.2",
   "title": "CTH Inventory",
-  "description": "Confluent Trust Hypergraph inventory document. Conforms to Theory v0.2 §4.1 plus the §2.9 fork extension. Both v0.1 (path_a/path_b) and v0.2 (paths[]) confluence shapes are accepted; the Go store normalizes to N-ary on load.",
+  "description": "Confluent Trust Hypergraph inventory document. Conforms to Theory v0.2 §4.1 plus the §2.9 fork extension. Both v0.1 (path_a/path_b) and v0.2 (paths[]) confluence shapes are accepted; the Go store normalizes to N-ary on load. The schema-document semver (x-schema-semver, mirrored in $id) is distinct from both the programme content version and the schema_version generation — see doc/design/schema-change-propagation.md §4. 0.3.1 (minor, additive): killed_by/killed_note/review_flag (#93), foundation_batch (#96), class_floors (contextus PR #32 Q1). 0.3.2 (minor, additive): axis_trust/locale_domain/cluster_state (sheaf trust, #95/inter#41 Decision 2).",
   "type": "object",
   "required": ["programme", "version", "axioms", "anchors", "chains"],
   "additionalProperties": true,
@@ -43,6 +44,11 @@
     "confluence_points":  { "type": "array", "items": { "$ref": "#/$defs/ConfluencePoint" } },
     "fork_points":        { "type": "array", "items": { "$ref": "#/$defs/ForkPoint" } },
     "health":             { "$ref": "#/$defs/Health" },
+    "class_floors": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/ClassFloor" },
+      "description": "Per-anchor-class evaluation config, keyed by anchor-class prefix (e.g. \"PRED\", \"MEAS\"). Set by the anchor-class owner as a governance act, witnessed by this inventory's change control; read by the evaluator at evaluation time (contextus NT_SIGNAL measurement addendum §4.1). A class with no entry is fail-closed: no automated status change is permitted for it."
+    },
     "changelog":          { "type": "array", "items": { "$ref": "#/$defs/ChangelogEntry" } }
   },
   "$defs": {
@@ -187,6 +193,10 @@
         "testable_when":             { "type": "string" },
         "notes":                     { "type": "string" },
         "branch_id":                 { "type": "string" },
+        "killed_by":                 { "type": "string", "description": "Reference to the artifact (analysis report, disposition record, WISDOM anchor) that killed/falsified this anchor. Formalized from QBP catch-all usage (#93)." },
+        "killed_note":               { "type": "string", "description": "Free-text rationale for the kill/falsification disposition (#93)." },
+        "review_flag":               { "type": "string", "description": "Free-text flag that this anchor needs re-evaluation (e.g. a dependency went incoherent), with the reason (#93)." },
+        "foundation_batch":          { "type": "string", "description": "QBP #474 property-matrix row id for proven-foundation-theorem anchors (#96 Q1). Marks the anchor as foundation-proving-stream output and names the batch sign-off that covers it." },
         "provenance_kind":           { "$ref": "#/$defs/ProvenanceKind" },
         "proof_state":               { "$ref": "#/$defs/ProofState" },
         "proof_language":            { "type": "string" },
@@ -195,7 +205,10 @@
         "theory_citation":           { "type": "string" },
         "theory_doi":                { "type": "string" },
         "theory_url":                { "type": "string" },
-        "additional_verifications":  { "type": "array", "items": { "$ref": "#/$defs/AdditionalVerification" } }
+        "additional_verifications":  { "type": "array", "items": { "$ref": "#/$defs/AdditionalVerification" } },
+        "axis_trust":                { "$ref": "#/$defs/AxisTrust" },
+        "locale_domain":             { "type": "string", "description": "Locale-topology domain identifier (v0.3.2 sheaf trust, inter#41 Decision 2; Sprint 3 minimum-viable — Walk-α full sheaf schema via wyrd)." },
+        "cluster_state":             { "$ref": "#/$defs/ClusterState" }
       },
       "additionalProperties": true,
       "allOf": [
@@ -206,20 +219,17 @@
           },
           "then": {
             "properties": {
+              "proof_state":    { "not": {} },
               "proof_language": { "not": {} },
               "theorems":       { "not": {} },
               "verification":   { "not": {} }
-            },
-            "description": "proof_state is permitted on non-proof anchors (e.g. theory+partial for QBP-local P legacy per CTH #88); proof_language, theorems, and verification remain proof-only."
+            }
           }
         },
         {
           "if": {
-            "properties": {
-              "provenance_kind": { "const": "proof" },
-              "proof_state": { "enum": ["verified", "partial"] }
-            },
-            "required": ["provenance_kind", "proof_state"]
+            "properties": { "proof_state": { "enum": ["verified", "partial"] } },
+            "required": ["proof_state"]
           },
           "then": {
             "required": ["verification"],
@@ -227,8 +237,7 @@
               "verification": {
                 "required": ["toolchain", "libraries", "verified_at", "verifier", "result"]
               }
-            },
-            "description": "For proof-kind anchors only, proof_state verified/partial requires a verification record. Non-proof anchors may carry proof_state informally (CTH #88 QBP-local P legacy)."
+            }
           }
         }
       ]
@@ -376,6 +385,36 @@
         "tier_breakdown":       { "type": "object", "additionalProperties": { "type": "integer" } },
         "top_bridge":           { "type": "string" },
         "highest_value_eddy":   { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "AxisTrust": {
+      "type": "object",
+      "description": "Per-axis sheaf trust scores for an anchor (v0.3.2, inter#41 Decision 2). Each axis is optional and in [0.0, 1.0]; absent axes are unscored. Gluing semantics (compute.GlueAxisTrust): meet for reproducibility/stats/method/independence, join for theory.",
+      "properties": {
+        "reproducibility": { "type": "number", "minimum": 0, "maximum": 1 },
+        "theory":          { "type": "number", "minimum": 0, "maximum": 1 },
+        "stats":           { "type": "number", "minimum": 0, "maximum": 1 },
+        "method":          { "type": "number", "minimum": 0, "maximum": 1 },
+        "independence":    { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "ClusterState": {
+      "type": "string",
+      "enum": ["nascent", "developing", "confluent"],
+      "description": "Coverage-based trust-cluster state (v0.3.2, inter#41 Decision 2): nascent (one perspective; independence weak) → developing (multiple independent labs) → confluent (global section, all axes above threshold). Coverage-based, not member-count-based."
+    },
+    "ClassFloor": {
+      "type": "object",
+      "required": ["floor"],
+      "properties": {
+        "floor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum measurement-signal confidence required for an automated status change on anchors of this class."
+        }
       },
       "additionalProperties": true
     },
