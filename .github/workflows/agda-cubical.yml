@@ -1,0 +1,32 @@
+name: Agda Cubical (library-dependent, --safe)
+on:
+  pull_request:
+    paths:
+      - 'proofs/agda-cubical/**'
+      - '.github/workflows/agda-cubical.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'proofs/agda-cubical/**'
+      - '.github/workflows/agda-cubical.yml'
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Agda 2.8.0 (official prebuilt static bindist)
+        run: |
+          curl -fsSL https://github.com/agda/agda/releases/download/v2.8.0/Agda-v2.8.0-linux.tar.xz -o /tmp/agda.tar.xz
+          mkdir -p "$HOME/agda-2.8.0" && tar -xJf /tmp/agda.tar.xz -C "$HOME/agda-2.8.0"
+          echo "$HOME/agda-2.8.0" >> "$GITHUB_PATH"
+      - name: Install agda/cubical library (pinned)
+        run: |
+          git clone https://github.com/agda/cubical.git "$HOME/cubical"
+          git -C "$HOME/cubical" checkout 7b9019b2993535d6931991d87f5c762aee87a67a
+          mkdir -p "$HOME/.agda"
+          echo "$HOME/cubical/cubical.agda-lib" > "$HOME/.agda/libraries"
+          echo "cubical-0.9" > "$HOME/.agda/defaults"
+      - name: Type-check the Buchholtz–Rijke S³ port (--safe, against cubical)
+        run: |
+          agda --version
+          cd proofs/agda-cubical && for f in *.agda; do echo "== $f =="; agda --safe "$f"; done

@@ -1,0 +1,14 @@
+(B) Associator-squared action quadratic form on y:
+    eigenvalues: [96. 96. 96. 96.]
+    positive-semidefinite (no tachyon): True
+    => single-well: y=0 is a MINIMUM, no SSB from associator-squared action
+
+(A) Rep-theory no-go check (SO(4)-invariants of one (2,2) vector):
+    Q4(y)=|[y,e1,y]|^2 / (|y|^2)^2 across random y: [0. 0. 0. 0. 0. 0. 0. 0.]
+    constant ratio => the only quartic invariant is (|y|^2)^2 (no independent Mexican-hat quartic)
+
+(C) Any sign-indefinite (tachyonic) associator quadratic form found: False
+    (each |associator|^2 form is a sum of squares => PSD => never tachyonic)
+
+CONCLUSION: the octonion algebra's natural actions (norm, associator-squared) are
+positive / single-well. No Mexican-hat SSB potential arises from the algebra ALONE.
