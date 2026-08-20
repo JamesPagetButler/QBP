@@ -1,0 +1,41 @@
+# Inverse anchor audit gate — issue #464 Phase A.
+#
+# Makes the Lean-theorem ↔ CTH-anchor audit RE-RUNNABLE (it was a hand-authored
+# snapshot: scripts/inventory_verification_report.md, 2026-05-22, now stale) and
+# RATCHETED: the count of Lean-side orphans / anchor-side phantoms / stale-path
+# citations may not INCREASE beyond the committed baseline. New un-anchored
+# theorems fail the gate → anchors ship with the theorems that need them.
+# Phase B/C then ratchet the baseline DOWN as orphans are resolved.
+#
+# Same shape as lean-foundations.yml (ratchet + baseline JSON).
+
+name: Inverse Anchor Audit
+
+on:
+  pull_request:
+    paths:
+      - 'proofs/**/*.lean'
+      - 'archive/cth-inventory/*.json'
+      - 'scripts/anchor_inverse_audit.py'
+      - 'analysis/.inverse-anchor-audit-baseline.json'
+      - '.github/workflows/inverse-anchor-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inverse-anchor-audit:
+    name: Inverse anchor audit (no-orphan-increase ratchet)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run the inverse anchor audit (ratchet against baseline)
+        run: |
+          python3 scripts/anchor_inverse_audit.py \
+            --check \
+            --out-md /tmp/audit.md \
+            --out-json /tmp/audit.json \
+            --stamp "CI"
