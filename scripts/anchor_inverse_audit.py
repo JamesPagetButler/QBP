@@ -29,15 +29,55 @@ import os
 import re
 import sys
 
+# Name capture is delimiter-based (stops at whitespace/`:`/`(`/`{`/`[`) rather than an
+# ASCII character class, so unicode-named theorems (Lean allows them: `theorem φ_iso …`)
+# are NOT missed (Gemini #584 review). Comments/`example`/`def` still excluded: the line
+# must start (after optional attr/modifiers) with the `theorem`/`lemma` keyword.
 THM_RE = re.compile(
-    r"^\s*(?:@\[[^\]]*\]\s*)?(?:private\s+|protected\s+|noncomputable\s+)*(theorem|lemma)\s+([A-Za-z_][A-Za-z0-9_'.]*)"
+    r"^\s*(?:@\[[^\]]*\]\s*)?(?:private\s+|protected\s+|noncomputable\s+)*(theorem|lemma)\s+([^\s:({\[]+)"
 )
 LEAN_PATH_RE = re.compile(r"[\w./-]+\.lean")
 DEFAULT_LEDGER = "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
 
 
+def strip_comments_by_line(raw_lines):
+    """Yield (lineno, code) with Lean comments removed, preserving line numbers.
+
+    Handles nested `/- ... -/` block comments and `-- ...` line comments so that
+    prose mentioning "theorem `foo`" inside a docstring is NOT mistaken for a
+    declaration (Gemini #584 false-positive class). Does not model string literals
+    (theorem-declaration lines don't contain comment-like string content in practice).
+    """
+    depth = 0
+    for i, raw in enumerate(raw_lines, 1):
+        code = []
+        k, n = 0, len(raw)
+        while k < n:
+            two = raw[k : k + 2]
+            if depth > 0:
+                if two == "-/":
+                    depth -= 1
+                    k += 2
+                    continue
+                if two == "/-":
+                    depth += 1
+                    k += 2
+                    continue
+                k += 1
+                continue
+            if two == "/-":
+                depth += 1
+                k += 2
+                continue
+            if two == "--":
+                break  # rest of line is a line comment
+            code.append(raw[k])
+            k += 1
+        yield i, "".join(code)
+
+
 def collect_theorems(proofs_dir):
-    """Return list of (name, relpath, lineno) for every theorem/lemma."""
+    """Return list of (name, relpath, lineno) for every theorem/lemma (comment-aware)."""
     out = []
     for path in sorted(
         glob.glob(os.path.join(proofs_dir, "**", "*.lean"), recursive=True)
@@ -45,10 +85,11 @@ def collect_theorems(proofs_dir):
         if "/.lake/" in path:
             continue
         with open(path, encoding="utf-8") as f:
-            for i, line in enumerate(f, 1):
-                m = THM_RE.match(line)
-                if m:
-                    out.append((m.group(2), os.path.normpath(path), i))
+            raw_lines = f.readlines()
+        for i, code in strip_comments_by_line(raw_lines):
+            m = THM_RE.match(code)
+            if m:
+                out.append((m.group(2), os.path.normpath(path), i))
     return out
 
 
@@ -233,7 +274,11 @@ def main():
         "*anchored* if any anchor cites its **file** (or its name), so a theorem in a "
         "file some anchor references is counted anchored even if no anchor addresses "
         "*that* theorem. True per-theorem orphans are ≥ this count; the exact figure "
-        "lands in Phase B (per-theorem classification, #464)."
+        "lands in Phase B (per-theorem classification, #464). The CI gate closes the "
+        "resulting ratchet loophole with a **per-file theorem-count ratchet**: new "
+        "theorems added to an already-file-anchored file are caught (they can't hide "
+        "behind the coarse global count), forcing a deliberate baseline bump that "
+        "confirms the new theorems are anchored."
     )
     lines.append("\n## 2. Lean-side orphans by directory\n")
     lines.append("| Directory | Orphan theorems |")
@@ -267,6 +312,15 @@ def main():
     )
     print(f"wrote {args.out_md} + {args.out_json}")
 
+    # Per-file theorem counts — closes the file-level-anchoring ratchet loophole
+    # (Gemini #584): a new theorem added to an already-file-anchored file does NOT
+    # raise the global orphan count, so the scalar ratchet alone would miss it. This
+    # per-file count catches new theorems in ANY baselined file, forcing a deliberate
+    # baseline bump (at which point the reviewer confirms the new theorems are anchored).
+    per_file = {}
+    for _n, p, _ln in theorems:
+        per_file[p] = per_file.get(p, 0) + 1
+
     ratchet = {
         "lean_side_orphans": stats["lean_side_orphans"],
         "anchor_side_phantoms": stats["anchor_side_phantoms"],
@@ -274,9 +328,14 @@ def main():
     }
     if args.update_baseline:
         with open(args.baseline, "w", encoding="utf-8") as f:
-            json.dump(ratchet, f, indent=2, sort_keys=True)
+            json.dump(
+                {**ratchet, "per_file_theorems": per_file},
+                f,
+                indent=2,
+                sort_keys=True,
+            )
             f.write("\n")
-        print(f"baseline updated: {ratchet}")
+        print(f"baseline updated: {ratchet} + per_file({len(per_file)} files)")
         return 0
     if args.check:
         try:
@@ -289,6 +348,15 @@ def main():
             if v > base.get(k, 0):
                 print(
                     f"::error::inverse-audit ratchet violated — {k}: {v} > baseline {base.get(k, 0)}"
+                )
+                bad = True
+        base_pf = base.get("per_file_theorems", {})
+        for f_path, cnt in sorted(per_file.items()):
+            if cnt > base_pf.get(f_path, 0):
+                print(
+                    f"::error::per-file ratchet violated — {f_path}: {cnt} theorems > "
+                    f"baseline {base_pf.get(f_path, 0)}. New theorems must ship with a CTH "
+                    f"anchor; then run --update-baseline to record the anchored growth."
                 )
                 bad = True
         return 1 if bad else 0

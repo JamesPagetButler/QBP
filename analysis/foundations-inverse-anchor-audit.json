@@ -342,11 +342,6 @@
     },
     {
       "file": "proofs/QBP/Foundations/Artin.lean",
-      "line": 6,
-      "name": "L5"
-    },
-    {
-      "file": "proofs/QBP/Foundations/Artin.lean",
       "line": 77,
       "name": "octonion_artin"
     },
@@ -447,11 +442,6 @@
     },
     {
       "file": "proofs/QBP/Foundations/ArtinSpan.lean",
-      "line": 6,
-      "name": "L4"
-    },
-    {
-      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
       "line": 80,
       "name": "cdAlg_mul_zero"
     },
@@ -549,11 +539,6 @@
       "file": "proofs/QBP/Foundations/ArtinSpan.lean",
       "line": 353,
       "name": "mem_span4_of_mem_adjoin"
-    },
-    {
-      "file": "proofs/QBP/Foundations/ArtinTrace.lean",
-      "line": 6,
-      "name": "L3"
     },
     {
       "file": "proofs/QBP/Foundations/ArtinTrace.lean",
@@ -929,11 +914,6 @@
       "file": "proofs/QBP/Foundations/CDAlg.lean",
       "line": 457,
       "name": "cdAlg_sq_eq"
-    },
-    {
-      "file": "proofs/QBP/Foundations/CDBridge.lean",
-      "line": 6,
-      "name": "rather"
     },
     {
       "file": "proofs/QBP/Foundations/CDBridge.lean",
@@ -1884,11 +1864,6 @@
       "file": "proofs/QBP/Foundations/NormForm.lean",
       "line": 157,
       "name": "sedenion_norm_form_not_composition"
-    },
-    {
-      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
-      "line": 359,
-      "name": "recompute"
     },
     {
       "file": "proofs/QBP/Foundations/Octonion32Count.lean",
@@ -3019,8 +2994,8 @@
     "anchors_total": 226,
     "anchors_with_proof_file": 20,
     "anchors_with_theorems_list": 4,
-    "lean_side_orphans": 581,
+    "lean_side_orphans": 576,
     "stale_path_citations": 8,
-    "theorems_total": 620
+    "theorems_total": 614
   }
 }
