@@ -4,10 +4,16 @@ import QBP.Foundations.ArtinSpan
 import QBP.Foundations.ArtinTrace
 import QBP.Foundations.CDAlg
 import QBP.Foundations.CDBridge
+import QBP.Foundations.CDDimension
+import QBP.Foundations.CPPhase
 import QBP.Foundations.CDLifting
 import QBP.Foundations.CrossProduct
 import QBP.Foundations.Exp
 import QBP.Foundations.Breakdown
+import QBP.Foundations.FanoGenesis
+import QBP.Foundations.Hurwitz
+import QBP.Foundations.SpectralMoments
+import QBP.Foundations.UnitQuaternion
 import QBP.Foundations.OctonionLaws
 import QBP.Foundations.FanoOrientationF3
 import QBP.Foundations.FanoSubalgebras

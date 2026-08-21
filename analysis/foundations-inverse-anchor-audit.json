@@ -1026,6 +1026,56 @@
       "name": "cdAlg2EquivQuaternion_basis"
     },
     {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 56,
+      "name": "cdBasis_eq_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 64,
+      "name": "finrank_cdAlg"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 75,
+      "name": "e_linearIndependent"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 85,
+      "name": "e_im_linearIndependent"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 91,
+      "name": "card_im_index"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 98,
+      "name": "finrank_imSubmodule"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 111,
+      "name": "even_tower_imDim"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 116,
+      "name": "imDim_quaternion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 120,
+      "name": "imDim_sedenion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDDimension.lean",
+      "line": 124,
+      "name": "imDim_level_six"
+    },
+    {
       "file": "proofs/QBP/Foundations/CDLifting.lean",
       "line": 75,
       "name": "IsBilinear.sum_left"
@@ -1159,6 +1209,31 @@
       "file": "proofs/QBP/Foundations/CDLifting.lean",
       "line": 353,
       "name": "sedenion_not_alternative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CPPhase.lean",
+      "line": 27,
+      "name": "tan_delta_CP"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CPPhase.lean",
+      "line": 32,
+      "name": "sin_sq_delta_CP"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CPPhase.lean",
+      "line": 39,
+      "name": "cos_sq_delta_CP"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CPPhase.lean",
+      "line": 46,
+      "name": "sin_sq_add_cos_sq_delta_CP"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CPPhase.lean",
+      "line": 51,
+      "name": "tan_sq_delta_CP"
     },
     {
       "file": "proofs/QBP/Foundations/CrossProduct.lean",
@@ -1731,6 +1806,31 @@
       "name": "archiveTable_disagrees_cd"
     },
     {
+      "file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "line": 90,
+      "name": "real_case"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "line": 95,
+      "name": "complex_case"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "line": 101,
+      "name": "quaternion_case"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "line": 112,
+      "name": "quaternion_instantiates_axiom"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "line": 125,
+      "name": "known_members_in_dimension_set"
+    },
+    {
       "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
       "line": 73,
       "name": "qi_pure"
@@ -2236,6 +2336,66 @@
       "name": "partition_8_7"
     },
     {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 63,
+      "name": "profileMoment_dilate"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 84,
+      "name": "f4_scaling"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 92,
+      "name": "f2_scaling"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 100,
+      "name": "f0_invariant"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 106,
+      "name": "moment_scaling_ratio"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 121,
+      "name": "ccvsPrefactor_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 127,
+      "name": "ccvsPrefactor_two"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 133,
+      "name": "ccvsPrefactor_three"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 146,
+      "name": "ccvsGamma_two"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 153,
+      "name": "ccvsGamma_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 160,
+      "name": "ccvsGamma_three"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SpectralMoments.lean",
+      "line": 175,
+      "name": "ccvsPrefactor_eq_imDim_mul"
+    },
+    {
       "file": "proofs/QBP/Foundations/TowerLaws.lean",
       "line": 44,
       "name": "real_add_comm"
@@ -2479,6 +2639,41 @@
       "file": "proofs/QBP/Foundations/TowerLaws.lean",
       "line": 184,
       "name": "quaternion_is_cayley_dickson_level2"
+    },
+    {
+      "file": "proofs/QBP/Foundations/UnitQuaternion.lean",
+      "line": 52,
+      "name": "mem_Sp1_iff_norm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/UnitQuaternion.lean",
+      "line": 64,
+      "name": "norm_mul_of_unit"
+    },
+    {
+      "file": "proofs/QBP/Foundations/UnitQuaternion.lean",
+      "line": 69,
+      "name": "norm_one_quat"
+    },
+    {
+      "file": "proofs/QBP/Foundations/UnitQuaternion.lean",
+      "line": 72,
+      "name": "norm_inv_of_unit"
+    },
+    {
+      "file": "proofs/QBP/Foundations/UnitQuaternion.lean",
+      "line": 77,
+      "name": "star_mul_self_of_unit"
+    },
+    {
+      "file": "proofs/QBP/Foundations/UnitQuaternion.lean",
+      "line": 87,
+      "name": "mul_star_self_of_unit"
+    },
+    {
+      "file": "proofs/QBP/Foundations/UnitQuaternion.lean",
+      "line": 110,
+      "name": "norm_preserving_iff_unit"
     },
     {
       "file": "proofs/QBP/Optics/Fraunhofer.lean",
@@ -2907,10 +3102,6 @@
       "cited": "QBP/Cosmo/RedshiftEvolution.lean"
     },
     {
-      "anchor": "PRED-eta-prime-mass-shift-1-over-24",
-      "cited": "FanoGenesis.lean"
-    },
-    {
       "anchor": "PROOF-3gen",
       "cited": "lean4/QBP/GaugeBosons.lean"
     },
@@ -2925,10 +3116,6 @@
     {
       "anchor": "PROOF-eigenratios",
       "cited": "lean4/QBP/GaugeBosons.lean"
-    },
-    {
-      "anchor": "PROOF-fano-choice-information",
-      "cited": "FanoGenesis.lean"
     },
     {
       "anchor": "PROOF-fano-choice-information",
@@ -2990,12 +3177,12 @@
     }
   ],
   "stats": {
-    "anchor_side_phantoms": 18,
+    "anchor_side_phantoms": 16,
     "anchors_total": 226,
     "anchors_with_proof_file": 20,
     "anchors_with_theorems_list": 4,
-    "lean_side_orphans": 576,
+    "lean_side_orphans": 615,
     "stale_path_citations": 8,
-    "theorems_total": 614
+    "theorems_total": 682
   }
 }
