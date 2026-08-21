@@ -1,0 +1,3001 @@
+{
+  "orphans": [
+    {
+      "file": "proofs/QBP/Basic.lean",
+      "line": 16,
+      "name": "pure_has_zero_re"
+    },
+    {
+      "file": "proofs/QBP/Basic.lean",
+      "line": 24,
+      "name": "spin_x_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Basic.lean",
+      "line": 27,
+      "name": "spin_y_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Basic.lean",
+      "line": 30,
+      "name": "spin_z_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Basic.lean",
+      "line": 56,
+      "name": "expectation_orthogonal_is_zero"
+    },
+    {
+      "file": "proofs/QBP/Basic.lean",
+      "line": 63,
+      "name": "prob_up_orthogonal_is_half"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 33,
+      "name": "psiAngle_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 36,
+      "name": "spinZObservable_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 39,
+      "name": "psiAngle_is_unit"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 52,
+      "name": "expectation_angle"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 62,
+      "name": "prob_up_angle"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 69,
+      "name": "prob_up_angle_cos_sq"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 76,
+      "name": "prob_down_angle"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 83,
+      "name": "prob_down_angle_sin_sq"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 95,
+      "name": "prob_up_theta_zero"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 100,
+      "name": "prob_up_theta_pi"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 106,
+      "name": "prob_up_theta_pi_div_two"
+    },
+    {
+      "file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "line": 115,
+      "name": "angle_consistent_with_stern_gerlach"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 50,
+      "name": "coeComplex_isComplex"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 68,
+      "name": "qJ_sq"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 78,
+      "name": "j_mul_complex"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 86,
+      "name": "complex_mul_j"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 95,
+      "name": "j_complex_j"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 128,
+      "name": "coupling_decomposition"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 141,
+      "name": "coupling_decomposition_real"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 172,
+      "name": "coupling_cancellation"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 186,
+      "name": "coupling_cancellation_inner"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 201,
+      "name": "normSq_sympForm"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 209,
+      "name": "normSq_sympForm_zero_psi1"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 215,
+      "name": "normSq_sympForm_nonneg"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 227,
+      "name": "quatFraction_nonneg"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 234,
+      "name": "quatFraction_le_one"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 242,
+      "name": "quatFraction_zero_iff"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 265,
+      "name": "visibility_nonneg"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 274,
+      "name": "visibility_le_one"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 282,
+      "name": "visibility_one"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 289,
+      "name": "visibility_zero"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 340,
+      "name": "visibility_eq_one_sub_quatFraction"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 351,
+      "name": "visibility_eta_zero"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 358,
+      "name": "visibility_full_when_eta_zero"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 365,
+      "name": "visibility_antitone_background"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 380,
+      "name": "visibility_correlated"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 400,
+      "name": "coupling_decouples_U1_zero"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 408,
+      "name": "sympForm_zero_psi1"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 430,
+      "name": "decayConstant_pos"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 436,
+      "name": "decayLength_pos"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 442,
+      "name": "decayConstant_mono_U1"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 457,
+      "name": "scenarioA_visibility"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 463,
+      "name": "scenarioB_visibility"
+    },
+    {
+      "file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "line": 470,
+      "name": "scenarioC_matches_scenarioA_at_detector"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 43,
+      "name": "psiGeneral_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 46,
+      "name": "obsGeneral_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 50,
+      "name": "psiGeneral_is_unit"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 61,
+      "name": "psiGeneral_phi_zero"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 73,
+      "name": "expectation_general"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 85,
+      "name": "prob_up_general"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 95,
+      "name": "prob_up_same_direction"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 104,
+      "name": "prob_up_z_on_z"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 110,
+      "name": "prob_up_antiz_on_z"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 116,
+      "name": "prob_up_x_on_z"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 122,
+      "name": "prob_up_y_on_z"
+    },
+    {
+      "file": "proofs/QBP/Experiments/General3D.lean",
+      "line": 131,
+      "name": "expectation_azimuthal_invariance"
+    },
+    {
+      "file": "proofs/QBP/Experiments/SternGerlach.lean",
+      "line": 31,
+      "name": "spinXState_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Experiments/SternGerlach.lean",
+      "line": 34,
+      "name": "spinZObservable_is_pure"
+    },
+    {
+      "file": "proofs/QBP/Experiments/SternGerlach.lean",
+      "line": 42,
+      "name": "x_z_orthogonal"
+    },
+    {
+      "file": "proofs/QBP/Experiments/SternGerlach.lean",
+      "line": 52,
+      "name": "expectation_x_measured_z_is_zero"
+    },
+    {
+      "file": "proofs/QBP/Experiments/SternGerlach.lean",
+      "line": 62,
+      "name": "prob_up_x_measured_z_is_half"
+    },
+    {
+      "file": "proofs/QBP/Experiments/SternGerlach.lean",
+      "line": 71,
+      "name": "prob_down_x_measured_z_is_half"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Artin.lean",
+      "line": 77,
+      "name": "octonion_artin"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Artin.lean",
+      "line": 99,
+      "name": "octonion_artin_assoc"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Artin.lean",
+      "line": 115,
+      "name": "octonion_artin_gen"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 54,
+      "name": "assoc_one_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 58,
+      "name": "assoc_one_mid"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 62,
+      "name": "assoc_one_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 74,
+      "name": "assoc_x_xy_y"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 100,
+      "name": "assoc_xy_survivor"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 118,
+      "name": "trilinear_vanish_on_span"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 165,
+      "name": "assoc_span4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 178,
+      "name": "assoc_yx_survivor"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 187,
+      "name": "assoc_xy_x_y"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 196,
+      "name": "assoc_xy_y_x"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 205,
+      "name": "assoc_y_xy_x"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 219,
+      "name": "assoc_gen4_inner_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 226,
+      "name": "assoc_gen4_inner_x"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 255,
+      "name": "assoc_gen4_inner_y"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 282,
+      "name": "assoc_gen4_inner_xy"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 328,
+      "name": "assoc_gen4_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinCore.lean",
+      "line": 349,
+      "name": "assoc_vanishes_on_span4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 80,
+      "name": "cdAlg_mul_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 85,
+      "name": "cdAlg_zero_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 134,
+      "name": "bilinear_mem_span"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 173,
+      "name": "one_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 177,
+      "name": "x_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 181,
+      "name": "y_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 185,
+      "name": "xy_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 190,
+      "name": "xx_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 197,
+      "name": "yy_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 207,
+      "name": "yx_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 218,
+      "name": "x_xy_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 229,
+      "name": "xy_y_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 241,
+      "name": "xy_x_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 253,
+      "name": "y_xy_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 264,
+      "name": "xyxy_mem_span_gen4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 276,
+      "name": "gen4_mul_mem_span"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 312,
+      "name": "span4_mul_closed"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 324,
+      "name": "mem_span4Subalgebra"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 340,
+      "name": "adjoin_pair_le_span4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinSpan.lean",
+      "line": 353,
+      "name": "mem_span4_of_mem_adjoin"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinTrace.lean",
+      "line": 51,
+      "name": "reCoord_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinTrace.lean",
+      "line": 57,
+      "name": "N_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinTrace.lean",
+      "line": 69,
+      "name": "mul_self_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinTrace.lean",
+      "line": 86,
+      "name": "cdAlg_mul_add_swap"
+    },
+    {
+      "file": "proofs/QBP/Foundations/ArtinTrace.lean",
+      "line": 120,
+      "name": "cdAlg_mul_add_swap_pure"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 81,
+      "name": "no_linear_strict_order_of_sq_eq_neg_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 94,
+      "name": "complex_no_linear_order"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 100,
+      "name": "quaternion_no_linear_order"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 109,
+      "name": "e_imaginary_sq_eq_neg_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 129,
+      "name": "cdAlg_no_order"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 143,
+      "name": "octonion_no_order"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 152,
+      "name": "sedenion_no_order"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 163,
+      "name": "quaternion_not_commutative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 173,
+      "name": "cdAlg_basis_not_commute"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 184,
+      "name": "octonion_not_commutative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 192,
+      "name": "sedenion_not_commutative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 205,
+      "name": "cdAlg_basis_not_associate"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 217,
+      "name": "octonion_not_associative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 225,
+      "name": "sedenion_not_associative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 238,
+      "name": "sedenion_not_alternative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 255,
+      "name": "zdX_ne_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 262,
+      "name": "zdY_ne_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 271,
+      "name": "zdX_mul_zdY_eq_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 309,
+      "name": "sedenion_zero_divisors"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 314,
+      "name": "N_e_add_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 331,
+      "name": "N_zdX"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 334,
+      "name": "N_zdY"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 340,
+      "name": "sedenion_norm_not_multiplicative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 391,
+      "name": "cdAlg_mul_coord_eq_prodCoeff"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 431,
+      "name": "prodIsZero_iff_cdAlg_mul_eq_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Breakdown.lean",
+      "line": 496,
+      "name": "sedenion_basis_zero_divisor_plane_count_eq_42"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 47,
+      "name": "ext"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 55,
+      "name": "add_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 56,
+      "name": "zero_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 57,
+      "name": "neg_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 58,
+      "name": "smul_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 77,
+      "name": "sub_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 85,
+      "name": "e_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 88,
+      "name": "sum_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 97,
+      "name": "basis_expansion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 137,
+      "name": "mulCoeff_four_eq_sgnTable"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 145,
+      "name": "mulCoeff_three_eq_fano"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 154,
+      "name": "one_def"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 156,
+      "name": "one_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 163,
+      "name": "mul_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 168,
+      "name": "e_mul_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 188,
+      "name": "mul_add_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 195,
+      "name": "mul_add_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 202,
+      "name": "mul_smul_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 209,
+      "name": "mul_smul_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 221,
+      "name": "conj_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 232,
+      "name": "N_def"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 242,
+      "name": "lo_val"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 244,
+      "name": "zero_mk_eq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 246,
+      "name": "div_lt_two"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 251,
+      "name": "div_zero_or_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 257,
+      "name": "conjSign_zero_of"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 260,
+      "name": "conjSign_neg_of"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 263,
+      "name": "lt_two_pow_of_div_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 270,
+      "name": "mod_eq_self_of_div_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 274,
+      "name": "val_eq_zero_iff"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 283,
+      "name": "eq_of_hi_lo"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 294,
+      "name": "mulCoeff_props"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 382,
+      "name": "mulCoeff_zero_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 385,
+      "name": "mulCoeff_zero_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 388,
+      "name": "mulCoeff_self"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 392,
+      "name": "mulCoeff_antisymm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 404,
+      "name": "xor_zero_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 408,
+      "name": "xor_zero_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 412,
+      "name": "xor_self_eq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 416,
+      "name": "xor_xor_cancel"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 421,
+      "name": "xor_left_injective"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 432,
+      "name": "xor_eq_iff"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 443,
+      "name": "mul_coord_single"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDAlg.lean",
+      "line": 457,
+      "name": "cdAlg_sq_eq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 52,
+      "name": "cdAlg_two_assocCoeffZ_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 57,
+      "name": "cdAlg_two_assoc_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 68,
+      "name": "cdAlg_two_assoc"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 86,
+      "name": "mul_isBilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 93,
+      "name": "one_mul_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 97,
+      "name": "e_mul_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 102,
+      "name": "cdAlg_one_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 110,
+      "name": "cdAlg_mul_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 181,
+      "name": "toQuat_ofQuat"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 184,
+      "name": "ofQuat_toQuat"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 188,
+      "name": "toQuat_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 191,
+      "name": "toQuat_smul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 196,
+      "name": "toQuat_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 200,
+      "name": "toQuat_e0"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 201,
+      "name": "toQuat_e1"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 202,
+      "name": "toQuat_e2"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 203,
+      "name": "toQuat_e3"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 210,
+      "name": "toQuat_mul_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 221,
+      "name": "quat_smul_mul_smul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 229,
+      "name": "toQuat_sum"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 239,
+      "name": "toQuat_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDBridge.lean",
+      "line": 274,
+      "name": "cdAlg2EquivQuaternion_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 75,
+      "name": "IsBilinear.sum_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 83,
+      "name": "IsBilinear.sum_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 91,
+      "name": "IsTrilinear.sum_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 99,
+      "name": "IsTrilinear.sum_mid"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 108,
+      "name": "IsTrilinear.sum_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 116,
+      "name": "IsQuadrilinear.sum_1"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 124,
+      "name": "IsQuadrilinear.sum_2"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 133,
+      "name": "IsQuadrilinear.sum_3"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 142,
+      "name": "IsQuadrilinear.sum_4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 157,
+      "name": "lift_bilinear_eq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 170,
+      "name": "lift_trilinear_eq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 184,
+      "name": "lift_quadrilinear_eq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 205,
+      "name": "assoc_trilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 218,
+      "name": "assoc_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 234,
+      "name": "laMap_trilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 251,
+      "name": "raMap_trilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 267,
+      "name": "octonion_assocCoeffZ_left_alt"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 272,
+      "name": "octonion_assocCoeffZ_right_alt"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 275,
+      "name": "octonion_laMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 286,
+      "name": "octonion_raMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 300,
+      "name": "octonion_left_alternative_polarized"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 305,
+      "name": "octonion_right_alternative_polarized"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 309,
+      "name": "assoc_diag_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 316,
+      "name": "assoc_diag_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 328,
+      "name": "octonion_alternative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 347,
+      "name": "sed_assocCoeffZ_witness"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CDLifting.lean",
+      "line": 353,
+      "name": "sedenion_not_alternative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 63,
+      "name": "bil_sub_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 68,
+      "name": "bil_sub_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 79,
+      "name": "N_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 88,
+      "name": "N_sub"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 97,
+      "name": "N_smul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 105,
+      "name": "cdAlg_polar_sq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 133,
+      "name": "cross_def"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 139,
+      "name": "commutator_reCoord_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 147,
+      "name": "cross_reCoord_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 151,
+      "name": "cross_antisymm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 155,
+      "name": "cross_self"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 170,
+      "name": "crossOrthMap_trilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 205,
+      "name": "crossOrthMap_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 220,
+      "name": "octonion_crossOrthCoeffZ_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 225,
+      "name": "quaternion_crossOrthCoeffZ_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 228,
+      "name": "octonion_crossOrthMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 232,
+      "name": "quaternion_crossOrthMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 238,
+      "name": "octonion_crossOrthMap_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 241,
+      "name": "quaternion_crossOrthMap_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 246,
+      "name": "crossOrth_scalar_octonion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 253,
+      "name": "crossOrth_scalar_quaternion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 261,
+      "name": "commutator_orth_octonion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 265,
+      "name": "commutator_orth_quaternion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 270,
+      "name": "octonion_cross_orthogonal_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 274,
+      "name": "octonion_cross_orthogonal_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 280,
+      "name": "quaternion_cross_orthogonal_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 284,
+      "name": "quaternion_cross_orthogonal_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 305,
+      "name": "bil_eq_coord0_mul_conj"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 318,
+      "name": "reCoord_mul_pure"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 335,
+      "name": "octonion_cross_norm_identity"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 369,
+      "name": "normMap_e2"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 380,
+      "name": "quaternion_normCoeffZ_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 383,
+      "name": "normMap2_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 387,
+      "name": "cdAlg2_normMap_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 396,
+      "name": "cdAlg2_norm_composition"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 414,
+      "name": "quaternion_cross_norm_identity"
+    },
+    {
+      "file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "line": 455,
+      "name": "no_sedenion_composition_for_cross"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 53,
+      "name": "sinc_mul_self"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 66,
+      "name": "re_def"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 72,
+      "name": "imPart_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 77,
+      "name": "re_smul_one_add_imPart"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 82,
+      "name": "re_imPart"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 86,
+      "name": "imPart_of_re_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 90,
+      "name": "imPart_imPart"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 94,
+      "name": "N_nonneg"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 99,
+      "name": "N_eq_zero_iff"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 113,
+      "name": "imNorm_nonneg"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 116,
+      "name": "imNorm_eq_zero_iff"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 120,
+      "name": "imNorm_sq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 124,
+      "name": "N_smul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 137,
+      "name": "imag_mul_self"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 143,
+      "name": "imPart_mul_imPart"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 157,
+      "name": "exp_def"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 166,
+      "name": "exp_re_smul_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 178,
+      "name": "exp_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 183,
+      "name": "exp_of_re_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 194,
+      "name": "span_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 210,
+      "name": "unit_span_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 223,
+      "name": "rotor_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 233,
+      "name": "re_real_add_imag"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 240,
+      "name": "imPart_real_add_imag"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 252,
+      "name": "exp_unit_axis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 265,
+      "name": "exp_unit_axis_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 285,
+      "name": "cos_abs"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 292,
+      "name": "sinc_abs_mul_self"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 302,
+      "name": "exp_unit_axis_real"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 316,
+      "name": "exp_unit_axis_add_real"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 332,
+      "name": "re_smul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 336,
+      "name": "imPart_smul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 345,
+      "name": "exp_smul_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 389,
+      "name": "exp_smul_add_real"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 426,
+      "name": "re_neg"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 429,
+      "name": "imPart_neg"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 433,
+      "name": "imNorm_neg"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 443,
+      "name": "exp_neg_mul_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 471,
+      "name": "N_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 513,
+      "name": "cdAlg2Equiv_re"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 519,
+      "name": "cdAlg2Equiv_imI"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 523,
+      "name": "cdAlg2Equiv_imJ"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 527,
+      "name": "cdAlg2Equiv_imK"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 533,
+      "name": "cdAlg2Equiv_imPart"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 545,
+      "name": "cdAlg2Equiv_imNorm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 572,
+      "name": "exp_eq_quaternion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 600,
+      "name": "N_eq_re_sq_add_N_imPart"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 622,
+      "name": "log_def"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 634,
+      "name": "exp_log"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 707,
+      "name": "exp_eq_re_add_imag"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 713,
+      "name": "re_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 720,
+      "name": "imPart_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 735,
+      "name": "log_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 793,
+      "name": "octonion_exp_smul_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 797,
+      "name": "octonion_exp_neg_mul_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 800,
+      "name": "octonion_N_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 803,
+      "name": "octonion_exp_log"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 809,
+      "name": "sedenion_exp_smul_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 814,
+      "name": "sedenion_exp_neg_mul_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 817,
+      "name": "sedenion_N_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 820,
+      "name": "sedenion_exp_log"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 824,
+      "name": "octonion_exp_smul_add_real"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 828,
+      "name": "octonion_log_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 832,
+      "name": "sedenion_exp_smul_add_real"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Exp.lean",
+      "line": 836,
+      "name": "sedenion_log_exp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 150,
+      "name": "fanoTableF4_eq_cayleyDickson"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 156,
+      "name": "cayleyDickson8_sq_neg_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 166,
+      "name": "cayleyDickson8_alternative_on_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 173,
+      "name": "fanoTriple_oriented_123"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 175,
+      "name": "fanoTriple_oriented_145"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 177,
+      "name": "fanoTriple_oriented_167"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 179,
+      "name": "fanoTriple_oriented_246"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 181,
+      "name": "fanoTriple_oriented_257"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 183,
+      "name": "fanoTriple_oriented_347"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 185,
+      "name": "fanoTriple_oriented_356"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 190,
+      "name": "fanoTriples_oriented"
+    },
+    {
+      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "line": 213,
+      "name": "archiveTable_disagrees_cd"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 73,
+      "name": "qi_pure"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 74,
+      "name": "qj_pure"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 75,
+      "name": "qk_pure"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 84,
+      "name": "qi_mul_qj"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 85,
+      "name": "qj_mul_qi"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 86,
+      "name": "qj_mul_qk"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 87,
+      "name": "qk_mul_qj"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 88,
+      "name": "qk_mul_qi"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 89,
+      "name": "qi_mul_qk"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 102,
+      "name": "bracket_qi_qj"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 107,
+      "name": "bracket_qj_qk"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 112,
+      "name": "bracket_qk_qi"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 118,
+      "name": "bracket_qj_qi"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 123,
+      "name": "bracket_qk_qj"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 128,
+      "name": "bracket_qi_qk"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 138,
+      "name": "bracket_self"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "line": 170,
+      "name": "imH_structure_constants"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 62,
+      "name": "bil_symm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 67,
+      "name": "norm_form_eq_bil_diag"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 84,
+      "name": "bil_eq_reCoord_mul_conj"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 100,
+      "name": "octonion_bilinear_form"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 106,
+      "name": "sedenion_bilinear_form"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 115,
+      "name": "N_nonneg"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 123,
+      "name": "N_eq_zero_iff"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 137,
+      "name": "bil_self_eq_zero_iff"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 149,
+      "name": "octonion_norm_form_composition"
+    },
+    {
+      "file": "proofs/QBP/Foundations/NormForm.lean",
+      "line": 157,
+      "name": "sedenion_norm_form_not_composition"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "line": 508,
+      "name": "all_sedenion_lines_associative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "line": 532,
+      "name": "base_copies_persist"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "line": 538,
+      "name": "base_copies_inside_sedenion"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "line": 551,
+      "name": "crossing_pass_iff_discriminator"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "line": 583,
+      "name": "crossingAlternativeCount_eq_predCount"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "line": 598,
+      "name": "forty_two_split"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "line": 634,
+      "name": "alternative_subspace_count_32_eq_fifty"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "line": 641,
+      "name": "base_plus_crossing_eq_fifty"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 72,
+      "name": "flMap_trilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 89,
+      "name": "octonion_assocCoeffZ_flex"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 92,
+      "name": "octonion_flMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 104,
+      "name": "octonion_flexible_polarized"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 108,
+      "name": "assoc_diag_flex"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 119,
+      "name": "octonion_flexible"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 140,
+      "name": "mLeftMap_quadrilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 168,
+      "name": "mRightMap_quadrilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 196,
+      "name": "mMidMap_quadrilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 227,
+      "name": "e3_LL"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 233,
+      "name": "e3_LR"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 242,
+      "name": "e4_LLL"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 249,
+      "name": "e4_RRR"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 261,
+      "name": "e4_LLRR"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 271,
+      "name": "e4_LRLL"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 293,
+      "name": "mLeftMap_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 337,
+      "name": "mRightMap_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 382,
+      "name": "mMidMap_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 420,
+      "name": "octonion_mLeftCoeffZ_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 425,
+      "name": "octonion_mRightCoeffZ_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 430,
+      "name": "octonion_mMidCoeffZ_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 433,
+      "name": "mLeftMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 437,
+      "name": "mRightMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 441,
+      "name": "mMidMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 446,
+      "name": "octonion_mLeftMap_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 450,
+      "name": "octonion_mRightMap_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 454,
+      "name": "octonion_mMidMap_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 464,
+      "name": "octonion_moufang_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 478,
+      "name": "octonion_moufang_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 491,
+      "name": "octonion_moufang_middle"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 513,
+      "name": "bil_def"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 515,
+      "name": "N_eq_bil"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 519,
+      "name": "bil_add_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 524,
+      "name": "bil_add_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 529,
+      "name": "bil_smul_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 534,
+      "name": "bil_smul_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 539,
+      "name": "bil_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 553,
+      "name": "normMap_quadrilinear"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 587,
+      "name": "normMap_e"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 601,
+      "name": "octonion_normCoeffZ_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 604,
+      "name": "normMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 609,
+      "name": "octonion_normMap_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 613,
+      "name": "normMap_coord0"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 623,
+      "name": "octonion_norm_composition"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 642,
+      "name": "octonion_power_associative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 653,
+      "name": "octonion_power_associative_4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 675,
+      "name": "mul_sub_right"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 684,
+      "name": "mul_sub_left"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 697,
+      "name": "sedenion_assocCoeffZ_flex"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 700,
+      "name": "sedenion_flMap_basis"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 712,
+      "name": "sedenion_flexible_polarized"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 716,
+      "name": "sed_assoc_diag_flex"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 729,
+      "name": "sedenion_flexible"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 746,
+      "name": "sedenion_power_associative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "line": 754,
+      "name": "sedenion_power_associative_4"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 151,
+      "name": "alternative_hyperplane_count_eq_eight"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 156,
+      "name": "alternative_passes"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 162,
+      "name": "alternative_fails"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 226,
+      "name": "zero_divisor_normal9"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 230,
+      "name": "zero_divisor_normal10"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 234,
+      "name": "zero_divisor_normal11"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 238,
+      "name": "zero_divisor_normal12"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 242,
+      "name": "zero_divisor_normal13"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 246,
+      "name": "zero_divisor_normal14"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 250,
+      "name": "zero_divisor_normal15"
+    },
+    {
+      "file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "line": 262,
+      "name": "partition_8_7"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 44,
+      "name": "real_add_comm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 46,
+      "name": "real_add_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 48,
+      "name": "real_neg_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 50,
+      "name": "real_smul_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 52,
+      "name": "real_one_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 55,
+      "name": "real_conj_antiAut"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 58,
+      "name": "real_norm_form"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 61,
+      "name": "real_bilinear_form"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 63,
+      "name": "real_mul_comm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 65,
+      "name": "real_associative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 67,
+      "name": "real_alternative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 69,
+      "name": "real_flexible"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 71,
+      "name": "real_norm_composition"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 73,
+      "name": "real_division"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 75,
+      "name": "real_exp_exists"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 77,
+      "name": "real_log_exists"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 82,
+      "name": "complex_add_comm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 84,
+      "name": "complex_add_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 86,
+      "name": "complex_neg_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 88,
+      "name": "complex_smul_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 90,
+      "name": "complex_one_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 93,
+      "name": "complex_conj_antiAut"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 96,
+      "name": "complex_norm_form"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 99,
+      "name": "complex_re_im"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 102,
+      "name": "complex_bilinear_form"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 106,
+      "name": "complex_mul_comm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 108,
+      "name": "complex_associative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 110,
+      "name": "complex_alternative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 112,
+      "name": "complex_flexible"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 115,
+      "name": "complex_norm_composition"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 119,
+      "name": "complex_division"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 121,
+      "name": "complex_exp_exists"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 123,
+      "name": "complex_log_exists"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 128,
+      "name": "quaternion_add_comm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 130,
+      "name": "quaternion_add_zero"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 132,
+      "name": "quaternion_neg_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 134,
+      "name": "quaternion_smul_add"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 136,
+      "name": "quaternion_one_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 139,
+      "name": "quaternion_conj_antiAut"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 142,
+      "name": "quaternion_norm_form"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 145,
+      "name": "quaternion_re_im"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 149,
+      "name": "quaternion_bilinear_form"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 155,
+      "name": "quaternion_associative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 157,
+      "name": "quaternion_alternative"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 159,
+      "name": "quaternion_flexible"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 162,
+      "name": "quaternion_norm_composition"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 166,
+      "name": "quaternion_division"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 169,
+      "name": "quaternion_exp_exists"
+    },
+    {
+      "file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "line": 184,
+      "name": "quaternion_is_cayley_dickson_level2"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 36,
+      "name": "intensity_at_maximum"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 52,
+      "name": "intensity_at_minimum"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 71,
+      "name": "fringeSpacing_linear_lambda"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 76,
+      "name": "fringeSpacing_linear_L"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 81,
+      "name": "fringeSpacing_inverse_d"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 118,
+      "name": "fraunhoferIntensityFull_factor"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 128,
+      "name": "fraunhoferIntensityFull_at_zero"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 139,
+      "name": "fraunhoferIntensityFull_slit_width_zero"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 150,
+      "name": "fraunhoferIntensityFull_le"
+    },
+    {
+      "file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "line": 167,
+      "name": "fraunhoferIntensityFull_nonneg"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 67,
+      "name": "v_z_code_eq_40"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 72,
+      "name": "v_z_code_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 82,
+      "name": "h_SI_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 87,
+      "name": "e_SI_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 92,
+      "name": "eV_in_J_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 97,
+      "name": "hbar_code_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 101,
+      "name": "m_code_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 105,
+      "name": "k0_code_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/Constants.lean",
+      "line": 109,
+      "name": "hbar_SI_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 77,
+      "name": "L0_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 88,
+      "name": "E0_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 105,
+      "name": "T0_def"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 110,
+      "name": "T0_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 116,
+      "name": "k_si_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 121,
+      "name": "v_z_si_pos"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 128,
+      "name": "position_round_trip"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 136,
+      "name": "energy_round_trip"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 145,
+      "name": "position_linear"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 153,
+      "name": "energy_linear"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 161,
+      "name": "position_scaling"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 167,
+      "name": "position_zero"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 171,
+      "name": "energy_zero"
+    },
+    {
+      "file": "proofs/QBP/Units/ScaleFactors.lean",
+      "line": 176,
+      "name": "energy_scaling"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Bi2Se3.lean",
+      "line": 249,
+      "name": "bi_screening_valid"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Bi2Se3.lean",
+      "line": 253,
+      "name": "se_screening_valid"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Bi2Se3.lean",
+      "line": 257,
+      "name": "slater_bi_correct"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Bi2Se3.lean",
+      "line": 260,
+      "name": "slater_se_correct"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Bi2Se3.lean",
+      "line": 271,
+      "name": "band_inversion_satisfied"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Bi2Se3.lean",
+      "line": 276,
+      "name": "full_chain_consistent"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Crystallisation.lean",
+      "line": 223,
+      "name": "moment_scaling_hierarchy"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Crystallisation.lean",
+      "line": 229,
+      "name": "convergence_ordering"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Crystallisation.lean",
+      "line": 236,
+      "name": "variation_correlation"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Crystallisation.lean",
+      "line": 241,
+      "name": "growth_enhancement"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Crystallisation.lean",
+      "line": 247,
+      "name": "three_moments_dim_imH"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Crystallisation.lean",
+      "line": 253,
+      "name": "half_ratio_universal"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 322,
+      "name": "honeycomb_z3_cyclic"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 328,
+      "name": "honeycomb_chirality"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 332,
+      "name": "graphene_z3z2"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 337,
+      "name": "c2z_square_minus_one"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 342,
+      "name": "c2z_reverses_momentum"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 348,
+      "name": "c2zt_square_plus_one"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 354,
+      "name": "protection_type_differs"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 359,
+      "name": "dirac_helicity"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 365,
+      "name": "moire_fragile_topology"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 371,
+      "name": "alpha_near_inv_sqrt3"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "line": 376,
+      "name": "mott_from_hessian"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 375,
+      "name": "plaquette_flux_z2"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 379,
+      "name": "flux_squared_identity"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 385,
+      "name": "triple_product_all_orderings"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 391,
+      "name": "clifford_anticommutation"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 398,
+      "name": "clifford_collapse_to_quaternion"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 404,
+      "name": "non_abelian_braiding"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 411,
+      "name": "majorana_central_charge"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 418,
+      "name": "bond_completeness"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 424,
+      "name": "ru_screening_correct"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 428,
+      "name": "cl_screening_correct"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 433,
+      "name": "soc_regime_valid"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 440,
+      "name": "jeff_half_filling"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "line": 444,
+      "name": "full_kitaev_chain"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 381,
+      "name": "quaternion_closure"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 385,
+      "name": "quaternion_table"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 390,
+      "name": "su2_commutation"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 394,
+      "name": "su2_casimir"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 400,
+      "name": "time_reversal_square_minus_one"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 408,
+      "name": "kramers_orthogonality"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 416,
+      "name": "kramers_degeneracy"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 427,
+      "name": "hurwitz_quaternion"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 436,
+      "name": "hurwitz_fails_sedenion"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 443,
+      "name": "double_cover_z2"
+    },
+    {
+      "file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "line": 449,
+      "name": "eigenspace_gauge_match"
+    }
+  ],
+  "phantoms": [
+    {
+      "anchor": "DERIV-hubble-half-entropy-factor",
+      "cited": "proofs/QBP/Foundations/QBPHorizonFoundations.lean"
+    },
+    {
+      "anchor": "DERIV-vaidya-accreting-horizon-spacelike",
+      "cited": "proofs/QBP/Foundations/QBPHorizonFoundations.lean"
+    },
+    {
+      "anchor": "FIT-zeta-modulated-profile",
+      "cited": "lean4/QBP/SpectralAction/ProfileFit.lean"
+    },
+    {
+      "anchor": "INSIGHT-s2-dirac-eta-vanishes",
+      "cited": "proofs/QBP/Foundations/QBPHorizonFoundations.lean"
+    },
+    {
+      "anchor": "PRED-a0-redshift-linear",
+      "cited": "QBP/Cosmo/RedshiftEvolution.lean"
+    },
+    {
+      "anchor": "PRED-btfr-mass-correction",
+      "cited": "QBP/Cosmo/RedshiftEvolution.lean"
+    },
+    {
+      "anchor": "PRED-eta-prime-mass-shift-1-over-24",
+      "cited": "FanoGenesis.lean"
+    },
+    {
+      "anchor": "PROOF-3gen",
+      "cited": "lean4/QBP/GaugeBosons.lean"
+    },
+    {
+      "anchor": "PROOF-alpha-particle-quaternion",
+      "cited": "QBP/Cosmo/Nucleosynthesis.lean"
+    },
+    {
+      "anchor": "PROOF-cl6",
+      "cited": "lean4/QBP/GaugeBosons.lean"
+    },
+    {
+      "anchor": "PROOF-eigenratios",
+      "cited": "lean4/QBP/GaugeBosons.lean"
+    },
+    {
+      "anchor": "PROOF-fano-choice-information",
+      "cited": "FanoGenesis.lean"
+    },
+    {
+      "anchor": "PROOF-fano-choice-information",
+      "cited": "QBP/Cosmo/FanoChoiceInformation.lean"
+    },
+    {
+      "anchor": "PROOF-iron-56-double-octet",
+      "cited": "QBP/Cosmo/Nucleosynthesis.lean"
+    },
+    {
+      "anchor": "PROOF-iron-to-ns-bridge",
+      "cited": "QBP/Cosmo/DenseMatter.lean"
+    },
+    {
+      "anchor": "PROOF-oxygen-16-sedenion",
+      "cited": "QBP/Cosmo/Nucleosynthesis.lean"
+    },
+    {
+      "anchor": "PROOF-seed-mass-from-ln7",
+      "cited": "QBP/Cosmo/SeedMass.lean"
+    },
+    {
+      "anchor": "PROOF-silicon-28-fano-ladder",
+      "cited": "QBP/Cosmo/Nucleosynthesis.lean"
+    }
+  ],
+  "stale": [
+    {
+      "anchor": "FIT-zeta-modulated-profile",
+      "cited": "lean4/QBP/SpectralAction/ProfileFit.lean"
+    },
+    {
+      "anchor": "PROOF-3gen",
+      "cited": "lean4/QBP/GaugeBosons.lean"
+    },
+    {
+      "anchor": "PROOF-42zd",
+      "cited": "lean4/QBP/Sedenion.lean"
+    },
+    {
+      "anchor": "PROOF-cl6",
+      "cited": "lean4/QBP/GaugeBosons.lean"
+    },
+    {
+      "anchor": "PROOF-eigenratios",
+      "cited": "lean4/QBP/GaugeBosons.lean"
+    },
+    {
+      "anchor": "PROOF-fano",
+      "cited": "lean4/QBP/Sedenion.lean"
+    },
+    {
+      "anchor": "PROOF-hessian",
+      "cited": "lean4/QBP/Sedenion.lean"
+    },
+    {
+      "anchor": "PROOF-shells",
+      "cited": "lean4/QBP/Elements.lean"
+    }
+  ],
+  "stats": {
+    "anchor_side_phantoms": 18,
+    "anchors_total": 226,
+    "anchors_with_proof_file": 20,
+    "anchors_with_theorems_list": 4,
+    "lean_side_orphans": 576,
+    "stale_path_citations": 8,
+    "theorems_total": 614
+  }
+}
