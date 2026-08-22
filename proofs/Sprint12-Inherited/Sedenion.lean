@@ -4,7 +4,12 @@
   
   Machine-verified theorems about the sedenion algebra S = CD(O).
   All proofs use kernel `decide` on Bool computations — zero `sorry`.
-  
+
+  Basis-indexing convention (F5, RATIFIED): the 16 basis elements are indexed
+  e₀..e₁₅ as `Fin 16` (0..15), with e₀ = 1 (identity) and e₁..e₁₅ the imaginary
+  units. `mulSign`/`mulIdx` below are indexed by these `Fin 16`/`Nat` values.
+  Canonical reference: `docs/conventions/sedenion-indexing.md` (#461).
+
   Verified results:
     T1. Identity element (e_0 is the identity)
     T2. Imaginary units square to -e_0
