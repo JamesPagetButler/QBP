@@ -1,6 +1,6 @@
 {
   "anchor_side_phantoms": 16,
-  "lean_side_orphans": 615,
+  "lean_side_orphans": 618,
   "per_file_theorems": {
     "proofs/QBP/Basic.lean": 6,
     "proofs/QBP/Experiments/AngleDependent.lean": 12,
@@ -22,7 +22,7 @@
     "proofs/QBP/Foundations/FanoGenesis.lean": 29,
     "proofs/QBP/Foundations/FanoOrientationF3.lean": 12,
     "proofs/QBP/Foundations/FanoSubalgebras.lean": 16,
-    "proofs/QBP/Foundations/Hurwitz.lean": 5,
+    "proofs/QBP/Foundations/Hurwitz.lean": 8,
     "proofs/QBP/Foundations/LieAlgebraIso.lean": 17,
     "proofs/QBP/Foundations/NormForm.lean": 10,
     "proofs/QBP/Foundations/Octonion32Count.lean": 8,
