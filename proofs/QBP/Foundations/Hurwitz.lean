@@ -1,146 +1,108 @@
 /-
-  QBP.Foundations.Hurwitz — the {ℝ, ℂ, ℍ, 𝕆} classification (external axiom)
-  ==========================================================================
+  QBP.Foundations.Hurwitz — the ℝ, ℂ, ℍ, 𝕆 normed-division tower: EXISTENCE + TERMINATION
+  =======================================================================================
 
-  Anchor for #466 item 6: the normed-division-algebra classification —
-  every finite-dimensional normed division algebra over ℝ is one of
-  ℝ, ℂ, ℍ, 𝕆; in particular its real dimension is 1, 2, 4 or 8.
+  Anchor for #466 item 6 (paper §I.1). The real normed division algebras are ℝ, ℂ, ℍ, 𝕆,
+  of dimensions 1, 2, 4, 8, and the Cayley–Dickson tower terminates at 𝕆 (𝕊 is not a
+  composition algebra).
 
-  ── STATUS: EXTERNAL-REFERENCE AXIOM, NOT A QBP-PROVED THEOREM ──────────────
-  Mathlib (pin c5ea0035, v4.30.0) contains NO Hurwitz/Albert classification
-  (search performed 2026-08-21: only Hurwitz *zeta* functions exist).  Per the
-  federation Lean standard, the classification is therefore stated as a
-  clearly-marked Type-3 published-reference axiom, with the dimension-only
-  conclusion (the full isomorphism statement would require fixing concrete
-  models of 𝕆, which Mathlib also lacks).
+  ── RETIREMENT NOTE (#589, 2026-08-22): the general Hurwitz UNIQUENESS axiom is GONE ──
+  This file PREVIOUSLY stated the general Hurwitz/Albert *classification* — "ℝ,ℂ,ℍ,𝕆 are
+  the ONLY finite-dim normed division algebras over ℝ" — as an external `axiom`
+  (`hurwitz_classification`), the sole non-{propext, Classical.choice, Quot.sound} axiom in
+  Foundations. A systematic literature review (#589) established that **uniqueness is NOT
+  deductively load-bearing** in any division-algebra physics program (Furey, Dixon, the F₄
+  exceptional-Jordan gauge-group result): every construction uses only the EXISTENCE and
+  specific multiplication structure of ℝ,ℂ,ℍ,𝕆 — never "nothing else exists." (Tell: if a
+  non-normed division algebra were exhibited, none of those constructions would change.)
 
-  References (Type 3):
-  * A. Hurwitz, "Über die Composition der quadratischen Formen von beliebig
-    vielen Variabeln", Nachr. Ges. Wiss. Göttingen (1898) 309–316 —
-    composition algebras over ℝ have dimension 1, 2, 4, 8.
-  * A. A. Albert, "Absolute valued real algebras", Ann. of Math. 48 (1947)
-    495–501 — every finite-dimensional absolute-valued unital real algebra
-    is ℝ, ℂ, ℍ or 𝕆 (exactly the hypotheses used below: bilinear
-    multiplication, unit, and a norm with ‖xy‖ = ‖x‖·‖y‖; associativity is
-    NOT assumed).
-  * K. Urbanik & F. B. Wright, "Absolute valued algebras", Proc. AMS 11
-    (1960) 861–866 — removes even the finite-dimensionality hypothesis.
-
-  Statement discipline (why this axiom is safe to assume):
-  * The hypotheses are exactly Albert's: `A` is a (possibly non-associative)
-    unital real algebra — `NonAssocRing` + `Module ℝ` + bilinearity via
-    `IsScalarTower`/`SMulCommClass` — that is nontrivial, finite-dimensional,
-    and carries an absolute value: a positive-definite, absolutely
-    homogeneous, subadditive `N : A → ℝ` with `N (x*y) = N x * N y`.  Under
-    these hypotheses the conclusion `dim ∈ {1,2,4,8}` is the published
-    classification.  (The norm is passed as an explicit function with its
-    axioms as hypotheses, NOT as `[NormedAddCommGroup A]`, to avoid the
-    `AddCommGroup` instance diamond with `NonAssocRing` — Mathlib has no
-    non-associative normed-ring class.)
-  * We do NOT assume associativity (`Ring`) — that would exclude 𝕆 and
-    change the theorem (Frobenius' {1,2,4} instead).
-  * The three sanity theorems at the bottom verify (with genuine Mathlib
-    proofs, no axiom) that the three associative members ℝ, ℂ, ℍ do satisfy
-    the hypothesis pattern and land in the dimension set — a consistency
-    check that the axiom's statement is well-typed and correctly oriented.
-
-  `#print axioms` on any consumer of `hurwitz_classification` will show the
-  axiom by name — that is intended and must be surfaced in audits.
+  So the axiom is **RETIRED**. This file now anchors ONLY the existence + termination that
+  QBP has actually PROVEN, and is fully axiom-clean (⊆ {propext, Classical.choice, Quot.sound}).
+  The uniqueness / "closed-menu" claim is demoted to:
+    * a published EXTERNAL result cited, not axiomatized — Hurwitz, Nachr. Ges. Wiss.
+      Göttingen (1898) [composition]; Zorn (1930s) [alternative]; Bott–Milnor–Kervaire,
+      Ann. of Math. (1958) [division — but DIMENSION-ONLY and NON-unique: many
+      non-isomorphic real division algebras exist in dims 2,4,8], and
+    * an OPEN QBP question — **#589**: is the substrate menu CLOSED at 4 (normed-division
+      required) or OPEN past 𝕆 (division optional — the branch QBP's own 𝕊/𝕋 zero-divisor
+      work commits to)? The axiom silently pre-decided "closed"; QBP has not, so it should
+      not stand as foundational truth.
 -/
 import Mathlib.Analysis.Quaternion
 import Mathlib.LinearAlgebra.Complex.FiniteDimensional
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
+import QBP.Foundations.OctonionLaws
+import QBP.Foundations.Breakdown
+import QBP.Foundations.CDDimension
 
 namespace QBP.Foundations.Hurwitz
 
-open Module
+open Module QBP.Foundations.CDAlg
 
-/-- **[EXTERNAL AXIOM — Hurwitz 1898 / Albert 1947 / Urbanik–Wright 1960.]**
+/-! ## 1. Existence: ℝ, ℂ, ℍ, 𝕆 ARE normed division algebras of dims 1, 2, 4, 8 -/
 
-    Every nontrivial finite-dimensional real algebra (unital, possibly
-    non-associative) whose norm is strictly multiplicative — a normed
-    division algebra — has real dimension 1, 2, 4 or 8 (and is in fact
-    isomorphic to ℝ, ℂ, ℍ or 𝕆, a statement we cannot express until a
-    Mathlib octonion model exists).
-
-    This is a published classification result NOT yet available in Mathlib;
-    it is stated here as a clearly-marked Type-3 external-reference axiom,
-    not a QBP-proved theorem.  Do not add hypotheses-weakening variants:
-    dropping `Nontrivial` (dim 0), dropping positive-definiteness, or
-    strengthening to associativity (Frobenius, {1,2,4}) changes the
-    theorem. -/
-axiom hurwitz_classification
-    (A : Type) [NonAssocRing A] [Module ℝ A]
-    [IsScalarTower ℝ A A] [SMulCommClass ℝ A A]
-    [Nontrivial A] [FiniteDimensional ℝ A]
-    (N : A → ℝ)
-    (h_definite : ∀ x : A, N x = 0 ↔ x = 0)
-    (h_homog : ∀ (r : ℝ) (x : A), N (r • x) = |r| * N x)
-    (h_triangle : ∀ x y : A, N (x + y) ≤ N x + N y)
-    (h_mul : ∀ x y : A, N (x * y) = N x * N y) :
-    finrank ℝ A = 1 ∨ finrank ℝ A = 2 ∨ finrank ℝ A = 4 ∨ finrank ℝ A = 8
-
-/-! ## Sanity anchors (proved, no axiom): the known members land in {1,2,4,8}
-
-These check the axiom's statement pattern against the three associative
-members that Mathlib has concrete models for.  Each proves both the
-multiplicative-norm hypothesis and the dimension conclusion. -/
-
-/-- ℝ satisfies the normed-division-algebra hypotheses with dimension 1. -/
+/-- ℝ: multiplicative norm, dimension 1. -/
 theorem real_case :
     (∀ x y : ℝ, ‖x * y‖ = ‖x‖ * ‖y‖) ∧ finrank ℝ ℝ = 1 :=
   ⟨fun x y => norm_mul x y, finrank_self ℝ⟩
 
-/-- ℂ satisfies the normed-division-algebra hypotheses with dimension 2. -/
+/-- ℂ: multiplicative norm, dimension 2. -/
 theorem complex_case :
     (∀ x y : ℂ, ‖x * y‖ = ‖x‖ * ‖y‖) ∧ finrank ℝ ℂ = 2 :=
   ⟨fun x y => norm_mul x y, Complex.finrank_real_complex⟩
 
-/-- ℍ satisfies the normed-division-algebra hypotheses with dimension 4.
-    (The quaternion norm is exactly multiplicative: `NormedDivisionRing ℍ`.) -/
+/-- ℍ: multiplicative norm, dimension 4. -/
 theorem quaternion_case :
-    (∀ x y : Quaternion ℝ, ‖x * y‖ = ‖x‖ * ‖y‖) ∧
-      finrank ℝ (Quaternion ℝ) = 4 :=
+    (∀ x y : Quaternion ℝ, ‖x * y‖ = ‖x‖ * ‖y‖) ∧ finrank ℝ (Quaternion ℝ) = 4 :=
   ⟨fun x y => norm_mul x y, Quaternion.finrank_eq_four⟩
 
-/-- **Non-vacuity witness:** the axiom's full hypothesis list is satisfiable —
-    ℍ discharges every hypothesis, and the axiom then yields a (true)
-    conclusion.  This guards against the failure mode of an axiom whose
-    hypotheses are inconsistent (which would make it silently vacuous).
-    NOTE: this theorem intentionally depends on `hurwitz_classification`;
-    its `#print axioms` lists the axiom by design. -/
-theorem quaternion_instantiates_axiom :
-    finrank ℝ (Quaternion ℝ) = 1 ∨ finrank ℝ (Quaternion ℝ) = 2 ∨
-    finrank ℝ (Quaternion ℝ) = 4 ∨ finrank ℝ (Quaternion ℝ) = 8 :=
-  hurwitz_classification (Quaternion ℝ) (fun q => ‖q‖)
-    (fun x => norm_eq_zero)
-    (fun r x => by
-      show ‖r • x‖ = |r| * ‖x‖
-      rw [norm_smul, Real.norm_eq_abs])
-    (fun x y => norm_add_le x y)
-    (fun x y => norm_mul x y)
+/-- 𝕆 = `CDAlg ℝ 3`: the norm form `N` is MULTIPLICATIVE — 𝕆 is a composition algebra.
+    (Re-exports `OctonionLaws.octonion_norm_composition`, kernel-proved.) -/
+theorem octonion_norm_multiplicative (x y : CDAlg ℝ 3) : N (x * y) = N x * N y :=
+  octonion_norm_composition x y
 
-/-- The dimensions of the three verified members are among {1, 2, 4, 8} —
-    the axiom's conclusion is realized on every associative instance. -/
-theorem known_members_in_dimension_set :
+/-- 𝕆 has dimension 8 = 2³ (from `CDDimension.finrank_cdAlg`). -/
+theorem octonion_dim_eight : finrank ℝ (CDAlg ℝ 3) = 8 := by
+  rw [CDDimension.finrank_cdAlg]; norm_num
+
+/-! ## 2. Termination: the tower stops at 𝕆 — 𝕊 is NOT a composition algebra -/
+
+/-- 𝕊 = `CDAlg ℝ 4` (dim 16): its norm form is NOT multiplicative — there are `x, y`
+    with `N (x*y) ≠ N x · N y`. So 𝕊 is not a normed division algebra; the tower
+    terminates at 𝕆. (Re-exports `Breakdown.sedenion_norm_not_multiplicative`, which is
+    backed by an explicit zero-divisor witness; and see the `42` in `Breakdown`.) -/
+theorem sedenion_not_composition : ∃ x y : CDAlg ℝ 4, N (x * y) ≠ N x * N y :=
+  QBP.Foundations.Breakdown.sedenion_norm_not_multiplicative
+
+/-- 𝕊 has dimension 16 = 2⁴. -/
+theorem sedenion_dim_sixteen : finrank ℝ (CDAlg ℝ 4) = 16 := by
+  rw [CDDimension.finrank_cdAlg]; norm_num
+
+/-! ## 3. The four normed-division dimensions land in {1, 2, 4, 8} -/
+
+/-- The dimensions of the four real normed division algebras ℝ, ℂ, ℍ, 𝕆 are exactly
+    the Hurwitz set {1, 2, 4, 8}. (Existence direction — NOT the uniqueness converse,
+    which is the external/#589 open question above.) -/
+theorem tower_dims_in_1248 :
     (finrank ℝ ℝ ∈ ({1, 2, 4, 8} : Set ℕ)) ∧
     (finrank ℝ ℂ ∈ ({1, 2, 4, 8} : Set ℕ)) ∧
-    (finrank ℝ (Quaternion ℝ) ∈ ({1, 2, 4, 8} : Set ℕ)) := by
-  refine ⟨?_, ?_, ?_⟩
+    (finrank ℝ (Quaternion ℝ) ∈ ({1, 2, 4, 8} : Set ℕ)) ∧
+    (finrank ℝ (CDAlg ℝ 3) ∈ ({1, 2, 4, 8} : Set ℕ)) := by
+  refine ⟨?_, ?_, ?_, ?_⟩
   · rw [finrank_self]; simp
   · rw [Complex.finrank_real_complex]; simp
   · rw [Quaternion.finrank_eq_four]; simp
+  · rw [octonion_dim_eight]; simp
 
-/-! ## Completeness audit — `#print axioms`
+/-! ## Completeness audit — `#print axioms` (now fully clean; the axiom is retired) -/
 
-`hurwitz_classification` is an axiom by design (documented above).  The
-sanity theorems must be clean. -/
-
-#print axioms hurwitz_classification
 #print axioms real_case
 #print axioms complex_case
 #print axioms quaternion_case
-#print axioms known_members_in_dimension_set
-#print axioms quaternion_instantiates_axiom  -- lists the axiom, by design
+#print axioms octonion_norm_multiplicative
+#print axioms octonion_dim_eight
+#print axioms sedenion_not_composition
+#print axioms sedenion_dim_sixteen
+#print axioms tower_dims_in_1248
 
 end QBP.Foundations.Hurwitz

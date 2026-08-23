@@ -1807,28 +1807,43 @@
     },
     {
       "file": "proofs/QBP/Foundations/Hurwitz.lean",
-      "line": 90,
+      "line": 45,
       "name": "real_case"
     },
     {
       "file": "proofs/QBP/Foundations/Hurwitz.lean",
-      "line": 95,
+      "line": 50,
       "name": "complex_case"
     },
     {
       "file": "proofs/QBP/Foundations/Hurwitz.lean",
-      "line": 101,
+      "line": 55,
       "name": "quaternion_case"
     },
     {
       "file": "proofs/QBP/Foundations/Hurwitz.lean",
-      "line": 112,
-      "name": "quaternion_instantiates_axiom"
+      "line": 61,
+      "name": "octonion_norm_multiplicative"
     },
     {
       "file": "proofs/QBP/Foundations/Hurwitz.lean",
-      "line": 125,
-      "name": "known_members_in_dimension_set"
+      "line": 65,
+      "name": "octonion_dim_eight"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "line": 74,
+      "name": "sedenion_not_composition"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "line": 78,
+      "name": "sedenion_dim_sixteen"
+    },
+    {
+      "file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "line": 86,
+      "name": "tower_dims_in_1248"
     },
     {
       "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
@@ -3181,8 +3196,8 @@
     "anchors_total": 226,
     "anchors_with_proof_file": 20,
     "anchors_with_theorems_list": 4,
-    "lean_side_orphans": 615,
+    "lean_side_orphans": 618,
     "stale_path_citations": 8,
-    "theorems_total": 682
+    "theorems_total": 685
   }
 }

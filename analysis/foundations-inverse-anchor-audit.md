@@ -1,17 +1,17 @@
 # Foundations Inverse Anchor Audit (#464)
 
-**Generated:** 2026-08-21 · **Tool:** `scripts/anchor_inverse_audit.py` (re-runnable; replaces the hand-authored `scripts/inventory_verification_report.md`)
+**Generated:** 2026-08-23 · **Tool:** `scripts/anchor_inverse_audit.py` (re-runnable; replaces the hand-authored `scripts/inventory_verification_report.md`)
 **Inputs:** `proofs/` Lean corpus · `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json`
 
 ## 1. Summary
 
 | Metric | Count |
 |---|---|
-| theorems total | 682 |
+| theorems total | 685 |
 | anchors total | 226 |
 | anchors with theorems list | 4 |
 | anchors with proof file | 20 |
-| lean side orphans | 615 |
+| lean side orphans | 618 |
 | anchor side phantoms | 16 |
 | stale path citations | 8 |
 
@@ -21,7 +21,7 @@
 
 | Directory | Orphan theorems |
 |---|---|
-| `proofs/QBP/Foundations` | 467 |
+| `proofs/QBP/Foundations` | 470 |
 | `proofs/QBP/Experiments` | 62 |
 | `proofs/QBP/Units` | 23 |
 | `proofs/Sprint12-Inherited/Kitaev.lean` | 13 |
@@ -64,4 +64,4 @@
 
 ## 5. Full orphan list
 
-See `analysis/foundations-inverse-anchor-audit.json` for the machine-readable per-theorem list (615 orphans). Classification (back-fill vs unanchored-by-design) is Phase B (#464).
+See `analysis/foundations-inverse-anchor-audit.json` for the machine-readable per-theorem list (618 orphans). Classification (back-fill vs unanchored-by-design) is Phase B (#464).
