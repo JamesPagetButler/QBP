@@ -1,0 +1,64 @@
+# Drift guard for the fanoTableF4 cross-repo snapshot (#59 / qbp-cu #65).
+# Regenerates the snapshot + axiom attestation from the KERNEL-PROVEN
+# QBP.Foundations.FanoOrientationF3.fanoTableF4 and fails if the committed
+# files drifted (hand-edit / stale). This is the QBP-side producer guard that
+# makes the exported artifact tamper-evident; qbp-cu #65 is the consumer gate.
+name: Fano Snapshot Drift Guard
+
+on:
+  pull_request:
+    paths:
+      - 'proofs/QBP/Foundations/fanoTableF4.snapshot'
+      - 'proofs/QBP/Foundations/fanoTableF4.axioms.txt'
+      - 'proofs/FanoSnapshotGen.lean'
+      - 'proofs/QBP/Foundations/FanoOrientationF3.lean'
+      - 'proofs/QBP/Foundations/CDAlg.lean'
+      - 'scripts/regen_fano_snapshot.sh'
+      - '.github/workflows/fano-snapshot-drift.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'proofs/QBP/Foundations/fanoTableF4.snapshot'
+      - 'proofs/QBP/Foundations/fanoTableF4.axioms.txt'
+      - 'proofs/FanoSnapshotGen.lean'
+      - 'proofs/QBP/Foundations/FanoOrientationF3.lean'
+      - 'proofs/QBP/Foundations/CDAlg.lean'
+      - 'scripts/regen_fano_snapshot.sh'
+
+jobs:
+  fano-snapshot-drift:
+    name: fanoTableF4 snapshot <-> kernel-proof drift guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan (pinned toolchain from proofs/lean-toolchain)
+        run: |
+          set -euo pipefail
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain "$(cat proofs/lean-toolchain | sed 's#leanprover/lean4:##')"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Fetch Mathlib cache
+        working-directory: proofs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          lake exe cache get || echo "::warning::lake exe cache get incomplete — will compile more from source"
+      - name: Build the Foundations modules the generator imports
+        working-directory: proofs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: lake build QBP.Foundations.FanoOrientationF3 QBP.Foundations.CDAlg
+      - name: Regenerate snapshot + attestation from the kernel-proven table
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash scripts/regen_fano_snapshot.sh
+      - name: Assert no drift (committed == regenerated)
+        run: |
+          git diff --exit-code \
+            proofs/QBP/Foundations/fanoTableF4.snapshot \
+            proofs/QBP/Foundations/fanoTableF4.axioms.txt \
+          || { echo "::error::fanoTableF4 snapshot/attestation drifted from the kernel-proven table — regenerate via scripts/regen_fano_snapshot.sh, do not hand-edit"; exit 1; }
