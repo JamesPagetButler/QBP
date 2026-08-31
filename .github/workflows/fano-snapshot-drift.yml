@@ -45,6 +45,12 @@ jobs:
         run: |
           set -euo pipefail
           lake exe cache get || echo "::warning::lake exe cache get incomplete — will compile more from source"
+      - name: Build the Foundations modules the generator imports
+        working-directory: proofs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: lake build QBP.Foundations.FanoOrientationF3 QBP.Foundations.CDAlg
       - name: Regenerate snapshot + attestation from the kernel-proven table
         env:
           GH_TOKEN: ${{ github.token }}
