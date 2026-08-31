@@ -1,0 +1,6 @@
+# fanoTableF4 axiom-closure attestation (#59, qbp-cu #65)
+# Kernel `#print axioms` for the provenance theorems tying the exported snapshot
+# to the octonion Cayley-Dickson product. Closure subset of
+# {propext, Classical.choice, Quot.sound}: no sorry, no native_decide, no ofReduce*.
+'QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson' depends on axioms: [propext]
+'QBP.Foundations.CDAlg.mulCoeff_three_eq_fano' depends on axioms: [propext, Classical.choice, Quot.sound]
