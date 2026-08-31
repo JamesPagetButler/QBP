@@ -1846,6 +1846,116 @@
       "name": "tower_dims_in_1248"
     },
     {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 63,
+      "name": "octonion_bil_comp"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 87,
+      "name": "octonionLeftMul_apply"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 92,
+      "name": "mul_e_coord"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 108,
+      "name": "octonionLeftMul_mulVec"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 132,
+      "name": "octonionLeftMul_transpose_mul"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 146,
+      "name": "octonionLeftMul_det_sq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 154,
+      "name": "octonionLeftMul_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 160,
+      "name": "N_one"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 184,
+      "name": "octLeftMulPoly_map_eval"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 200,
+      "name": "octNormPoly_eval"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 208,
+      "name": "octDetPoly_sq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 217,
+      "name": "unitCoord_mk"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 224,
+      "name": "octDetPoly_eq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 256,
+      "name": "octLeftMulPolyZ_map"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 271,
+      "name": "octNormPolyZ_map"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 279,
+      "name": "octDetPolyZ_eq"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 286,
+      "name": "octLeftMulPolyZ_eval\u2082"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 303,
+      "name": "octNormPolyZ_eval\u2082"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 312,
+      "name": "octonionLeftMul_det_comm"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 325,
+      "name": "octonionLeftMul_det"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 331,
+      "name": "octonionLeftMul_det_rat"
+    },
+    {
+      "file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "line": 339,
+      "name": "octonionLeftMul_det_eq_zero_iff"
+    },
+    {
       "file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
       "line": 73,
       "name": "qi_pure"
@@ -3196,8 +3306,8 @@
     "anchors_total": 226,
     "anchors_with_proof_file": 20,
     "anchors_with_theorems_list": 4,
-    "lean_side_orphans": 618,
+    "lean_side_orphans": 640,
     "stale_path_citations": 8,
-    "theorems_total": 685
+    "theorems_total": 707
   }
 }
