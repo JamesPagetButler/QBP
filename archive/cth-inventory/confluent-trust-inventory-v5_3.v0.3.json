@@ -2672,65 +2672,14 @@
       "name": "𝕆 structural object — Fano plane with 7 imaginary units",
       "tier": 1,
       "provenance": "T",
-      "provenance_kind": "proof",
       "status": "coherent",
-      "description": "𝕆 = CD(ℍ) = A₃. Seven imaginary units e₁..e₇, Fano-plane multiplication (7 points/lines, quaternionic triples), Baez/Furey orientation (F4). [PROMOTED 2026-09-01, C5] Structure kernel-verified in Lean (FanoGenesis): eᵢ²=−1, Fano-line consistency, anticommutative, non-associative.",
+      "provenance_kind": "theory",
       "prediction_chain": [
         "DEFN-quaternion-structural-triad",
         "PROOF-fano"
       ],
-      "notes": "PROMOTED untested->coherent (theory->proof) per #466 item 1 — FanoGenesis proves the properties this DEFN asserts. Old not_started targets SUPERSEDED by the landed FanoGenesis theorems. axioms: primary/non_assoc/anticomm subset [propext,Classical.choice,Quot.sound]; lines_units_consistent subset [propext]. chain preserved. #96 AC3.",
-      "proof_system": "lean4",
-      "proof_file": "proofs/QBP/Foundations/FanoGenesis.lean",
-      "proof_state": "verified",
-      "sorry_count": 0,
-      "lean_theorem": "QBP.Foundations.FanoGenesis.imaginary_units_square_neg_one",
-      "lean_companion_theorems": [
-        "QBP.Foundations.FanoGenesis.lines_units_consistent",
-        "QBP.Foundations.FanoGenesis.octonion_non_associative",
-        "QBP.Foundations.FanoGenesis.fano_anticommutative"
-      ],
-      "theorems": [
-        {
-          "name": "QBP.Foundations.FanoGenesis.imaginary_units_square_neg_one",
-          "status": "verified"
-        },
-        {
-          "name": "QBP.Foundations.FanoGenesis.lines_units_consistent",
-          "status": "verified"
-        },
-        {
-          "name": "QBP.Foundations.FanoGenesis.octonion_non_associative",
-          "status": "verified"
-        },
-        {
-          "name": "QBP.Foundations.FanoGenesis.fano_anticommutative",
-          "status": "verified"
-        }
-      ],
-      "foundation_batch": "#466",
-      "verification": {
-        "toolchain": "leanprover/lean4:v4.30.0",
-        "libraries": {
-          "mathlib": {
-            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
-            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
-          },
-          "batteries": {
-            "ref": "main",
-            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
-          }
-        },
-        "verified_at": "2026-08-21T23:35:01Z",
-        "verifier": "tier-3 (Red Team + Gemini) + CI #print axioms; re-verified 2026-09-01 (oppenheimer 955)",
-        "result": "verified",
-        "axiom_closure": [
-          "propext",
-          "Classical.choice",
-          "Quot.sound"
-        ]
-      },
-      "last_tested_at": "2026-08-21T23:35:01Z"
+      "description": "𝕆 = CD(ℍ) = A₃. Seven imaginary units e₁..e₇, Fano-plane multiplication (7 points/lines, quaternionic triples), Baez/Furey orientation (F4). 7 positive triples {1,2,3},{1,4,5},{1,6,7},{2,4,6},{2,5,7},{3,4,7},{3,5,6}. Well-formedness machine-verified (FanoGenesis); proven properties at PROOF-fano-genesis.",
+      "notes": "Promoted untested->coherent 2026-09-01: lines_units_consistent (decide) machine-checks the table well-formed/non-contradictory -> definition realized, not merely asserted. Per Gemini §I4 on #612, a DEFN is a stipulation and STAYS provenance_kind:theory — proofs of its properties (e_i^2=-1, non-assoc, anticomm, line-consistency) live at PROOF-fano-genesis, not here. Old not_started targets superseded. #96 AC3 / #466 item 1."
     },
     {
       "id": "DEFN-sedenion-structural-box-kite",
@@ -4624,6 +4573,70 @@
       "last_tested_at": "2026-08-21T23:35:01Z",
       "description": "Dilation u -> f(u/Λ²) scales the m-th moment by Λ^(2(m+1)): f₄↔Λ⁴, f₂↔Λ², f₀ invariant — genuine analytic scaling theorem. status:marginal by scoping (see notes). #466 item 7.",
       "notes": "Lean proves the convention-robust Λ-scaling of profileMoment (explicit exponent m) — the machine-verified backbone. The Chamseddine-Connes spectral-action identification is a CC-dictionary mapping, NOT Lean-derived; and paper VIII.B f_k k-indexing is inconsistent with its own scaling (OPEN erratum, ESCALATE-flagged in #466 report). status stays MARGINAL — no PROVEN flip. axioms subset [propext,Classical.choice,Quot.sound]. chain PROOF-cd-algebra-finrank-2n. #96 AC3."
+    },
+    {
+      "id": "PROOF-fano-genesis",
+      "name": "Octonion structure constants proven: eᵢ²=−1, Fano-line consistent, non-associative, anticommutative",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/FanoGenesis.lean",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "QBP.Foundations.FanoGenesis.imaginary_units_square_neg_one",
+      "lean_companion_theorems": [
+        "QBP.Foundations.FanoGenesis.lines_units_consistent",
+        "QBP.Foundations.FanoGenesis.octonion_non_associative",
+        "QBP.Foundations.FanoGenesis.fano_anticommutative"
+      ],
+      "theorems": [
+        {
+          "name": "QBP.Foundations.FanoGenesis.imaginary_units_square_neg_one",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.FanoGenesis.lines_units_consistent",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.FanoGenesis.octonion_non_associative",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.FanoGenesis.fano_anticommutative",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#466",
+      "prediction_chain": [
+        "DEFN-octonion-structural-fano"
+      ],
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-08-21T23:35:01Z",
+        "verifier": "tier-3 (Red Team + Gemini) + CI #print axioms; re-verified 2026-09-01 (oppenheimer 955)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "last_tested_at": "2026-08-21T23:35:01Z",
+      "description": "Proven properties of the octonion multiplication table (CD level 3, mulCoeff/octSign): 7 imaginary units square to −1, 7 Fano-line triples multiplication-consistent, non-associative + anticommutative on imaginaries — kernel-verified. Properties of the structure defined at DEFN-octonion-structural-fano. #466 item 1.",
+      "notes": "Split from the DEFN per Gemini §I4 on #612. axioms: primary/non_assoc/anticomm subset [propext,Classical.choice,Quot.sound]; lines_units_consistent subset [propext]. Inv-2 clean -> PROVEN. chain DEFN-octonion-structural-fano (properties OF the defined object). #96 AC3."
     }
   ],
   "inputs": [
