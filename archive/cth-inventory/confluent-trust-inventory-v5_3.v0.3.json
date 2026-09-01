@@ -1898,7 +1898,7 @@
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory",
+      "provenance_kind": "proof",
       "proof_system": "lean4",
       "proof_file": "proofs/QBP/Foundations/CPPhase.lean",
       "proof_state": "verified",
