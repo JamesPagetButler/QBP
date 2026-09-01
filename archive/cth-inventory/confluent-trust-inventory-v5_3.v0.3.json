@@ -1889,7 +1889,7 @@
       "measured_error": 2,
       "measured_value": 68,
       "predicted_unit": "degrees (CKM CP-violating phase)",
-      "notes": "Shared prefix. The prediction tan(δ_CP) = √7 uses ONLY dim(Im 𝕆) = 7, which is the number of Fano lines (Lean-proven) and the number of quaternionic subalgebras in the octonion. The mechanism (why sin² = imaginary/total fraction) is heuristic, not derived from the spectral action. STATUS: MARGINAL because the match is within 1σ but the mechanism is not proven. The prediction is FALSIFIABLE: future precision measurements of γ at LHCb Upgrade II (expected ±0.4° by ~2035) will test arctan(√7) = 69.295° definitively.",
+      "notes": "Shared prefix. The prediction tan(δ_CP) = √7 uses ONLY dim(Im 𝕆) = 7, which is the number of Fano lines (Lean-proven) and the number of quaternionic subalgebras in the octonion. The mechanism (why sin² = imaginary/total fraction) is heuristic, not derived from the spectral action. STATUS: MARGINAL because the match is within 1σ but the mechanism is not proven. The prediction is FALSIFIABLE: future precision measurements of γ at LHCb Upgrade II (expected ±0.4° by ~2035) will test arctan(√7) = 69.295° definitively. [FAULT-S4-005 / C5 remediation, 2026-09-01] Lean 4 verifies the trig identity of the DEFINED angle delta_CP := arctan(sqrt 7) (cos^2=1/8, sin^2=7/8, tan=sqrt 7), axiom-clean. The physical link 7/8 = dim(Im O)/dim O is prose-only, NOT Lean-derived, so status stays MARGINAL and this does NOT flip the anchor to PROVEN (AC3 needs provenance_kind=proof AND status=coherent). Verbatim #print axioms per qbp-oppenheimer 2026-09-01.",
       "measured_source": "PDG 2024 global CKM fit; direct γ measurement 65.7±3.4° (Belle+LHCb)",
       "description": "CONJECTURE (Session 12): sin²(δ_CP) = dim(Im 𝕆)/dim(𝕆) = 7/8, giving δ_CP = arctan(√7) ≈ 69.3°. Measured: 68° ± 2° (PDG global fit), within 0.6σ. The algebraic identity sin²(δ) = 7/8 ⟹ tan(δ) = √7 = √(number of Fano lines). Physical interpretation: the CP phase measures the fraction of the parent 𝕆 algebra's structure that is anti-commutative (CP-odd). The imaginary part (7 units) anti-commutes; the real part (1 unit) commutes. The ratio 7:1 sets sin²:cos² = 7:1. COMPLETES the CKM chain: all 8 flavour parameters now have algebraic candidates, all matching observations within 3%. The chain: Q=2/3 → δ_Koide=2/9 → mass ratios → λ=sin(π/14) → A=√Q → θ₂₃ → δ_CP=arctan(√7).",
       "name": "CKM CP phase δ_CP = arctan(√7) ≈ 69.3° from octonion dimensionality",
@@ -1898,7 +1898,52 @@
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CPPhase.lean",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "QBP.Foundations.CPPhase.cos_sq_delta_CP",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CPPhase.tan_delta_CP",
+        "QBP.Foundations.CPPhase.sin_sq_delta_CP"
+      ],
+      "theorems": [
+        {
+          "name": "QBP.Foundations.CPPhase.cos_sq_delta_CP",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.CPPhase.tan_delta_CP",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.CPPhase.sin_sq_delta_CP",
+          "status": "verified"
+        }
+      ],
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-08-21T23:35:01Z",
+        "verifier": "tier-3 review (Red Team + Gemini) + CI: lake build + #print axioms; re-verified 2026-09-01 (qbp-oppenheimer)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "foundation_batch": "#466"
     },
     {
       "last_tested_at": "2026-04-18T00:00:00Z",
