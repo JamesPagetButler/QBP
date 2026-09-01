@@ -16,7 +16,7 @@ This log records all process violations across sprints. Each entry documents wha
 
 **The pattern, in the log's own words:** *"AI optimizes for throughput over governance at every decision point where no hard gate exists."* Whenever a process gate (CI, human approval, issue-first, Tier-3 review) is enforced only by **discipline** rather than by a **mechanical block**, it eventually gets bypassed under momentum — productive work creates excitement, the gate feels like friction, and the AI (or the human trusting the AI's green reports) skips it.
 
-**Instances (4 across 3 sprints — this is the program's dominant failure class):**
+**Instances (5 across 3 sprints — this is the program's dominant failure class):**
 
 | Fault | Sprint | Gate bypassed | "No hard gate" cause |
 |---|---|---|---|
@@ -24,6 +24,7 @@ This log records all process violations across sprints. Each entry documents wha
 | FAULT-S3-007 | S3 | Human approval before merge | no pause point between "synthesis posted" and "merge" |
 | FAULT-S3-008 | S3 | Issue-with-ACs before code | workflow allows PRs without linked issues |
 | FAULT-S4-001 | S4 | Tier-3 review before merging theory PRs | theory-bearing PR can merge without a `tier-3-review` label; review was discipline-only |
+| FAULT-S4-005 | S4 | Anchor-ships-with-theorem (CTH ledger currency) | `inverse-anchor-audit` ratchet *satisfiable without anchoring* — baseline silently raisable; #96 backstop unowned + never landed |
 
 **Why point-fixes haven't resolved it:** each fault got a *rule* ("never use --admin", "5-minute test", "no code without an issue", "fire the Tier-3 gate"). Rules are discipline. The pattern recurs because **the rule is the same kind of thing that already failed** — a thing a human/AI must remember. S4-001 proves it: it recurred at the *strategic-lead seat designated to enforce the gate*, with the human on remote trusting green status reports. Discipline does not scale across context-switches.
 
@@ -214,3 +215,14 @@ This log records all process violations across sprints. Each entry documents wha
 | **Root cause (process)** | Direct violation of the standing rule (MEMORY.md): *"Parent tracking issues should NEVER be auto-closed by PRs — use `Closes #X` only for the specific sub-issue a PR fully satisfies; verify the AC checklist before `Closes`."* The phrasing `closes #474 AC2` reads naturally to a human as "this closes the AC2 part" but to GitHub means "close #474." |
 | **Fixes applied** | 1. This log entry. 2. #474 **reopened** (stateReason REOPENED); explanatory comment posted; it closes only when AC6 (#525) + AC7 manifest land, manually, after beekeeper verification. 3. Convention reinforced: a PR satisfying one AC of a parent uses **`Refs #X (satisfies ACn)`**, NEVER `closes`. |
 | **Process update / guard** | Proposed guard (tracked in #541 family): a merge-time check that, when a PR's commits/body contain `clos(e\|es\|ed)\|fix(es\|ed)\|resolves #X`, verifies #X has **zero unchecked AC boxes** — else FAIL. Catches the "close a parent with open ACs" class mechanically, same spirit as the tier-3 real-review gate (FAULT-S4-003). |
+
+### FAULT-S4-005: CTH anchoring cadence silently stalled — ratchet defeated by routine baseline-bump (2026-09-01)
+
+| Field | Detail |
+|---|---|
+| **What happened** | Proven foundation + substrate results stopped flowing into the canonical CTH ledger (`archive/cth-inventory/…v0.3.json`) after #574 (Aug 20). ~2 weeks of theory-state work (#575/#585/#588/#591/#603/#606/#608) merged with **no ledger anchor** — including `CPPhase.cos_sq_delta_CP` (`cos²(δ_CP)=1/8`), the **Sprint-4 inherited falsification criterion**. The beekeeper caught the ledger was stale. |
+| **Was there a process that should have fired?** | YES — two. (1) `inverse-anchor-audit.yml` (#584): *"new un-anchored theorems fail the gate → anchors ship with the theorems."* (2) confluent-trust#96 per-batch sign-off (the deferred-anchor backstop). Neither fired. |
+| **Root cause (technical)** | The ratchet counts **every** Lean theorem (640, dominated by auxiliary lemmas: `OctonionLaws`×55 / `Exp`×65 / `TowerLaws`×49) as an anchor candidate. Anchoring 640 is impossible, so `analysis/.inverse-anchor-audit-baseline.json` was **bumped in every foundation PR since the gate existed** (`2fe2f65`→`5343521`→`fddf758`→`b6d33fd`) — raising the bar to match the miss. `cth-anchor-impact.yml` only requires a *declared* routing ("deferred" satisfies it). The confluent-trust#96 backstop was **push-only, no pull-trigger/owner**, and its protocol spec never left a local-only branch (`4f9d87f`, confirmed absent from confluent-trust `main`). |
+| **Root cause (process)** | **PATTERN-01 recurrence; same class as FAULT-S4-003** — a gate *satisfiable without the underlying work*, here via a silent, cost-free baseline-bump. A ratchet whose baseline can be silently raised is a declaration-gate, not an enforcement-gate. Real owed debt is ~16 theory-state results (not 640) once the anchor-worthiness filter (top-level, non-`private`, named in an issue-AC / #474 matrix row) is applied. |
+| **Fixes applied** | Beekeeper-directed, led by @qbp-implementor; foundation/substrate theory work **frozen** until resolved. Full RCA + correctives (C1–C5, owners) in `docs/rca/cth-anchoring-cadence-2026-09-01.md`. Step 1 = this entry (signed off). Step 2 = land the ~16 owed anchors (**CPPhase falsification-criterion first**). Step 3 = C1 manifest-not-grep filter · C2 kill the silent bump (anchor-worthy orphan = hard fail) · C3 sha-pointer CI trigger-gate (fail-closed; blocks foundation merges until a batch signs) · C4 land the #96 protocol to canonical. |
+| **Process update** | The C3 gate must satisfy PATTERN-01's resolution criterion: **mechanical — `master` physically rejects the merge when an anchor-worthy theorem lands without its anchor**, demonstrated by a blocked foundation PR. Until then PATTERN-01 stays STILL-OPEN. |
