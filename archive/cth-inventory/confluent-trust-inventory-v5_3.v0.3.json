@@ -4637,6 +4637,270 @@
       "last_tested_at": "2026-08-21T23:35:01Z",
       "description": "Proven properties of the octonion multiplication table (CD level 3, mulCoeff/octSign): 7 imaginary units square to −1, 7 Fano-line triples multiplication-consistent, non-associative + anticommutative on imaginaries — kernel-verified. Properties of the structure defined at DEFN-octonion-structural-fano. #466 item 1.",
       "notes": "Split from the DEFN per Gemini §I4 on #612. axioms: primary/non_assoc/anticomm subset [propext,Classical.choice,Quot.sound]; lines_units_consistent subset [propext]. Inv-2 clean -> PROVEN. chain DEFN-octonion-structural-fano (properties OF the defined object). #96 AC3."
+    },
+    {
+      "id": "PROOF-normed-division-tower-existence",
+      "name": "Normed composition tower — existence + termination: ℝ,ℂ,ℍ,𝕆 compose (dims 1/2/4/8); 𝕊 does not",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "QBP.Foundations.Hurwitz.octonion_norm_multiplicative",
+      "lean_companion_theorems": [
+        "QBP.Foundations.Hurwitz.sedenion_not_composition",
+        "QBP.Foundations.Hurwitz.tower_dims_in_1248"
+      ],
+      "theorems": [
+        {
+          "name": "QBP.Foundations.Hurwitz.octonion_norm_multiplicative",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.Hurwitz.sedenion_not_composition",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.Hurwitz.tower_dims_in_1248",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#466",
+      "prediction_chain": [
+        "PROOF-cd-algebra-finrank-2n"
+      ],
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-08-23T23:09:55Z",
+        "verifier": "tier-3 (Red Team + Gemini) + CI #print axioms; re-verified 2026-09-01 bounded (oppenheimer 973)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "last_tested_at": "2026-08-23T23:09:55Z",
+      "description": "ℝ,ℂ,ℍ,𝕆 are normed composition algebras (N(xy)=N(x)N(y)) of dims 1/2/4/8; 𝕊 is NOT (composition terminates at 𝕆). EXISTENCE + TERMINATION ONLY — explicitly NOT the uniqueness converse ('only 4 exist'). Distinct from PROOF-hurwitz (classical 1898 uniqueness citation). #466 item 6.",
+      "notes": "SCOPING GUARD (oppenheimer 973): #589 retired the uniqueness axiom — QBP does not commit to the closed menu (explores 𝕊/𝕋 zero-divisor branch), so 'only 4' is OPEN. MUST NOT be read as proving uniqueness. Do NOT fold into PROOF-hurwitz. axioms all 8 subset [propext,Classical.choice,Quot.sound]. #96 AC3."
+    },
+    {
+      "id": "PROOF-octonion-zd-hypersurface-empty",
+      "name": "Octonion left-mult determinant det Lₓ = N(x)⁴; ZD-hypersurface empty (𝕆 has no zero divisors)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "QBP.Foundations.LeftMulDet.octonionLeftMul_det",
+      "lean_companion_theorems": [
+        "QBP.Foundations.LeftMulDet.octonionLeftMul_det_eq_zero_iff",
+        "QBP.Foundations.LeftMulDet.octonionLeftMul_det_comm"
+      ],
+      "theorems": [
+        {
+          "name": "QBP.Foundations.LeftMulDet.octonionLeftMul_det",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.LeftMulDet.octonionLeftMul_det_eq_zero_iff",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.LeftMulDet.octonionLeftMul_det_comm",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#594",
+      "prediction_chain": [
+        "PROOF-normed-division-tower-existence"
+      ],
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-08-31T13:29:00Z",
+        "verifier": "tier-3 (Red Team + Gemini) + CI #print axioms; re-verified 2026-09-01 bounded (oppenheimer 973)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "last_tested_at": "2026-08-31T13:29:00Z",
+      "description": "det Lₓ = N(x)⁴ and det Lₓ = 0 ⟺ x = 0 → octonion zero-divisor hypersurface EMPTY (𝕆 has no zero divisors); det=N⁴ over every CommRing (ℤ-descent). #594 VML-ladder rung 1.",
+      "notes": "axioms all 10 subset [propext,Classical.choice,Quot.sound]. chain PROOF-normed-division-tower-existence (det polarizes #591's composition law) — within-batch, order #591 first. CONTRAST (note, NOT a chain edge): 𝕆 ZD-empty vs sedenion 42-assessor ZD cone (PROOF-42zd). Distinct from PROOF-42zd/PROOF-g2. #96 AC3."
+    },
+    {
+      "id": "PROOF-s3-hspace",
+      "name": "S³ H-space: HSpace (S₊∙ 3) constructed from Cayley-Dickson multiplication",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "agda",
+      "proof_file": "proofs/agda-cubical/S3FromCD.agda",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "S3FromCD.S³-HSpace",
+      "lean_companion_theorems": [],
+      "theorems": [
+        {
+          "name": "S3FromCD.S³-HSpace",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#575",
+      "prediction_chain": [
+        "DEFN-quaternion-structural-triad"
+      ],
+      "verification": {
+        "toolchain": "Agda-2.8.0",
+        "libraries": {
+          "cubical": {
+            "ref": "7b9019b2993535d6931991d87f5c762aee87a67a",
+            "sha": "7b9019b2993535d6931991d87f5c762aee87a67a"
+          }
+        },
+        "verified_at": "2026-08-20T04:24:30Z",
+        "verifier": "tier-3 (Red Team + Gemini) + Agda Cubical --safe CI; bounded re-attest 2026-09-01 (oppenheimer 975)",
+        "result": "verified",
+        "axiom_closure": [
+          "--safe transitive (Agda 2.8.0; rejects postulate/primTrustMe/REWRITE/holes/termination+positivity escapes)"
+        ]
+      },
+      "last_tested_at": "2026-08-20T04:24:30Z",
+      "description": "Genuine library HSpace record on S³ (HSpace (S₊∙ 3)) via transporting the concrete CD multiplication through S³-HSpace-from-join (not a refl stub); product = unit-quaternion mult. #575; #608's ⋆ instantiates this.",
+      "notes": "--safe transitive, exit 0, peak 0.39GB (oppenheimer 975) -> coherent/PROVEN. chain DEFN-quaternion-structural-triad (S³ H-space = unit-quaternion mult). #96 AC3."
+    },
+    {
+      "id": "PROOF-skyrmion-baryon-complete-invariant",
+      "name": "Skyrmion baryon number is a complete homotopy invariant: ∥S³→S³∥₂ ≅ ℤ",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "agda",
+      "proof_file": "proofs/agda-cubical/SkyrmionCharge.agda",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "SkyrmionCharge.baryonNumber-complete",
+      "lean_companion_theorems": [
+        "SkyrmionCharge.skyrmionSectorsIso",
+        "SkyrmionCharge.baryonNumber-hedgehog-correct",
+        "SkyrmionCharge.baryonNumber-skyrmionℤ-correct"
+      ],
+      "theorems": [
+        {
+          "name": "SkyrmionCharge.baryonNumber-complete",
+          "status": "verified"
+        },
+        {
+          "name": "SkyrmionCharge.skyrmionSectorsIso",
+          "status": "verified"
+        },
+        {
+          "name": "SkyrmionCharge.baryonNumber-hedgehog-correct",
+          "status": "verified"
+        },
+        {
+          "name": "SkyrmionCharge.baryonNumber-skyrmionℤ-correct",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#595",
+      "prediction_chain": [],
+      "verification": {
+        "toolchain": "Agda-2.8.0",
+        "libraries": {
+          "cubical": {
+            "ref": "7b9019b2993535d6931991d87f5c762aee87a67a",
+            "sha": "7b9019b2993535d6931991d87f5c762aee87a67a"
+          }
+        },
+        "verified_at": "2026-09-01T17:08:00Z",
+        "verifier": "tier-3 (Red Team + Gemini) + Agda Cubical --safe CI; bounded re-attest 2026-09-01 (oppenheimer 975)",
+        "result": "verified",
+        "axiom_closure": [
+          "--safe transitive (Agda 2.8.0; rejects postulate/primTrustMe/REWRITE/holes/termination+positivity escapes)"
+        ]
+      },
+      "last_tested_at": "2026-09-01T17:08:00Z",
+      "description": "baryonNumber := degree 3; COMPLETE invariant ∥S³→S³∥₂≅ℤ (skyrmionSectorsIso), realized by baryonNumber. Non-vacuity: hedgehog->1, every ℤ-sector inhabited. #595.",
+      "notes": "GUARD RESOLVED (oppenheimer VERIFIED not asserted, 975): completeness is library-PROVEN not postulated — (a) --safe transitive incl pi3 machinery; (b) syntax grep zero forbidden constructs; (c) pi3S3=Z=Cubical PinSn + degree iso. -> coherent/PROVEN, NOT marginal. peak 0.55GB. chain [] (foundational homotopy, library-rooted). #96 AC3."
+    },
+    {
+      "id": "PROOF-substrate-baryon-additive",
+      "name": "Substrate baryon number additive under the quaternion product: B(f⋆g) = Bf + Bg",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "agda",
+      "proof_file": "proofs/agda-cubical/SubstrateCharge.agda",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "SubstrateCharge.baryonNumber-quaternionProduct-correct",
+      "lean_companion_theorems": [
+        "SubstrateCharge.baryonNumber-leftTranslation-correct"
+      ],
+      "theorems": [
+        {
+          "name": "SubstrateCharge.baryonNumber-quaternionProduct-correct",
+          "status": "verified"
+        },
+        {
+          "name": "SubstrateCharge.baryonNumber-leftTranslation-correct",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#595",
+      "prediction_chain": [
+        "PROOF-s3-hspace"
+      ],
+      "verification": {
+        "toolchain": "Agda-2.8.0",
+        "libraries": {
+          "cubical": {
+            "ref": "7b9019b2993535d6931991d87f5c762aee87a67a",
+            "sha": "7b9019b2993535d6931991d87f5c762aee87a67a"
+          }
+        },
+        "verified_at": "2026-09-01T17:16:48Z",
+        "verifier": "tier-3 (Red Team + Gemini) + Agda Cubical --safe CI; bounded re-attest 2026-09-01 (oppenheimer 975)",
+        "result": "verified",
+        "axiom_closure": [
+          "--safe transitive (Agda 2.8.0; rejects postulate/primTrustMe/REWRITE/holes/termination+positivity escapes)"
+        ]
+      },
+      "last_tested_at": "2026-09-01T17:16:48Z",
+      "description": "baryonNumber additive under the substrate quaternion product ⋆: B(f⋆g)≡Bf+ℤBg = SubstrateLink.⋆∙-additive at the concrete S3FromCD.S³-HSpace (⋆ = HSpace.μ, pointwise quaternion mult). #595.",
+      "notes": "chain PROOF-s3-hspace (#575 — ⋆ IS its H-space mu), within-batch order #575 first. Scoping: plain HSpace only, NO AssocHSpace (S⁷/G₂-forward per #575/#579). Non-vacuity quaternionProduct-pointwise=refl. --safe transitive exit 0 peak 0.63GB -> coherent/PROVEN. #96 AC3."
     }
   ],
   "inputs": [
