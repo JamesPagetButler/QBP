@@ -1894,7 +1894,7 @@
       "description": "CONJECTURE (Session 12): sin²(δ_CP) = dim(Im 𝕆)/dim(𝕆) = 7/8, giving δ_CP = arctan(√7) ≈ 69.3°. Measured: 68° ± 2° (PDG global fit), within 0.6σ. The algebraic identity sin²(δ) = 7/8 ⟹ tan(δ) = √7 = √(number of Fano lines). Physical interpretation: the CP phase measures the fraction of the parent 𝕆 algebra's structure that is anti-commutative (CP-odd). The imaginary part (7 units) anti-commutes; the real part (1 unit) commutes. The ratio 7:1 sets sin²:cos² = 7:1. COMPLETES the CKM chain: all 8 flavour parameters now have algebraic candidates, all matching observations within 3%. The chain: Q=2/3 → δ_Koide=2/9 → mass ratios → λ=sin(π/14) → A=√Q → θ₂₃ → δ_CP=arctan(√7).",
       "name": "CKM CP phase δ_CP = arctan(√7) ≈ 69.3° from octonion dimensionality",
       "id": "PRED-ckm-cp-phase-arctan-sqrt7",
-      "prediction_chain": [],
+      "prediction_chain": ["PROOF-cd-algebra-finrank-2n"],
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
@@ -4396,6 +4396,65 @@
       ],
       "last_tested_at": "2026-06-18T00:00:00Z",
       "notes": "The honest endpoint. Path to 'generator' requires solving the self-referential dynamical-closure problem (a concrete substrate + constructive RT edge)."
+    },
+    {
+      "id": "PROOF-cd-algebra-finrank-2n",
+      "name": "Cayley-Dickson algebra dimension: finrank ℝ (CDAlg ℝ n) = 2ⁿ (Im part = 2ⁿ−1)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CDDimension.lean",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "QBP.Foundations.CDDimension.finrank_cdAlg",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDDimension.even_tower_imDim",
+        "QBP.Foundations.CDDimension.finrank_imSubmodule"
+      ],
+      "theorems": [
+        {
+          "name": "QBP.Foundations.CDDimension.finrank_cdAlg",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.CDDimension.even_tower_imDim",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.CDDimension.finrank_imSubmodule",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#466",
+      "prediction_chain": [
+        "DEFN-cayley-dickson-doubling"
+      ],
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-08-21T23:35:01Z",
+        "verifier": "tier-3 review (Red Team + Gemini) + CI: lake build + #print axioms; re-verified 2026-09-01 (qbp-oppenheimer seq=950)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "last_tested_at": "2026-08-21T23:35:01Z",
+      "description": "finrank ℝ (CDAlg ℝ n) = 2ⁿ, Im submodule = 2ⁿ−1, via explicit basis/coordEquiv. Foundation: dim 𝕆=8, dim(Im 𝕆)=7 (n=3) — the 7 underlying the CKM CP-phase prediction. FAULT-S4-005 C5; resolves CPPhase's prediction_chain root.",
+      "notes": "Verbatim #print axioms (oppenheimer seq=950): finrank_cdAlg / even_tower_imDim / finrank_imSubmodule all subset [propext,Classical.choice,Quot.sound], Invariant-2 clean. status:coherent -> genuine structural theorem, not definitional. Specific-level instances (imDim quaternion=3/sedenion=15/level_six=63) verified & available, excluded as corollary instantiations. prediction_chain root DEFN-cayley-dickson-doubling is status:untested; does NOT gate this theorem's coherence (Lean proof stands alone). confluent-trust #96 AC3 / #466 item 2."
     }
   ],
   "inputs": [
