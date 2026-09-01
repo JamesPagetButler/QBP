@@ -4637,6 +4637,124 @@
       "last_tested_at": "2026-08-21T23:35:01Z",
       "description": "Proven properties of the octonion multiplication table (CD level 3, mulCoeff/octSign): 7 imaginary units square to −1, 7 Fano-line triples multiplication-consistent, non-associative + anticommutative on imaginaries — kernel-verified. Properties of the structure defined at DEFN-octonion-structural-fano. #466 item 1.",
       "notes": "Split from the DEFN per Gemini §I4 on #612. axioms: primary/non_assoc/anticomm subset [propext,Classical.choice,Quot.sound]; lines_units_consistent subset [propext]. Inv-2 clean -> PROVEN. chain DEFN-octonion-structural-fano (properties OF the defined object). #96 AC3."
+    },
+    {
+      "id": "PROOF-normed-division-tower-existence",
+      "name": "Normed composition tower — existence + termination: ℝ,ℂ,ℍ,𝕆 compose (dims 1/2/4/8); 𝕊 does not",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Hurwitz.lean",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "QBP.Foundations.Hurwitz.octonion_norm_multiplicative",
+      "lean_companion_theorems": [
+        "QBP.Foundations.Hurwitz.sedenion_not_composition",
+        "QBP.Foundations.Hurwitz.tower_dims_in_1248"
+      ],
+      "theorems": [
+        {
+          "name": "QBP.Foundations.Hurwitz.octonion_norm_multiplicative",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.Hurwitz.sedenion_not_composition",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.Hurwitz.tower_dims_in_1248",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#466",
+      "prediction_chain": [
+        "PROOF-cd-algebra-finrank-2n"
+      ],
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-08-23T23:09:55Z",
+        "verifier": "tier-3 (Red Team + Gemini) + CI #print axioms; re-verified 2026-09-01 bounded (oppenheimer 973)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "last_tested_at": "2026-08-23T23:09:55Z",
+      "description": "ℝ,ℂ,ℍ,𝕆 are normed composition algebras (N(xy)=N(x)N(y)) of dims 1/2/4/8; 𝕊 is NOT (composition terminates at 𝕆). EXISTENCE + TERMINATION ONLY — explicitly NOT the uniqueness converse ('only 4 exist'). Distinct from PROOF-hurwitz (classical 1898 uniqueness citation). #466 item 6.",
+      "notes": "SCOPING GUARD (oppenheimer 973): #589 retired the uniqueness axiom — QBP does not commit to the closed menu (explores 𝕊/𝕋 zero-divisor branch), so 'only 4' is OPEN. MUST NOT be read as proving uniqueness. Do NOT fold into PROOF-hurwitz. axioms all 8 subset [propext,Classical.choice,Quot.sound]. #96 AC3."
+    },
+    {
+      "id": "PROOF-octonion-zd-hypersurface-empty",
+      "name": "Octonion left-mult determinant det Lₓ = N(x)⁴; ZD-hypersurface empty (𝕆 has no zero divisors)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_file": "proofs/QBP/Foundations/LeftMulDet.lean",
+      "proof_state": "verified",
+      "sorry_count": 0,
+      "lean_theorem": "QBP.Foundations.LeftMulDet.octonionLeftMul_det",
+      "lean_companion_theorems": [
+        "QBP.Foundations.LeftMulDet.octonionLeftMul_det_eq_zero_iff",
+        "QBP.Foundations.LeftMulDet.octonionLeftMul_det_comm"
+      ],
+      "theorems": [
+        {
+          "name": "QBP.Foundations.LeftMulDet.octonionLeftMul_det",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.LeftMulDet.octonionLeftMul_det_eq_zero_iff",
+          "status": "verified"
+        },
+        {
+          "name": "QBP.Foundations.LeftMulDet.octonionLeftMul_det_comm",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#594",
+      "prediction_chain": [
+        "PROOF-normed-division-tower-existence"
+      ],
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-08-31T13:29:00Z",
+        "verifier": "tier-3 (Red Team + Gemini) + CI #print axioms; re-verified 2026-09-01 bounded (oppenheimer 973)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "last_tested_at": "2026-08-31T13:29:00Z",
+      "description": "det Lₓ = N(x)⁴ and det Lₓ = 0 ⟺ x = 0 → octonion zero-divisor hypersurface EMPTY (𝕆 has no zero divisors); det=N⁴ over every CommRing (ℤ-descent). #594 VML-ladder rung 1.",
+      "notes": "axioms all 10 subset [propext,Classical.choice,Quot.sound]. chain PROOF-normed-division-tower-existence (det polarizes #591's composition law) — within-batch, order #591 first. CONTRAST (note, NOT a chain edge): 𝕆 ZD-empty vs sedenion 42-assessor ZD cone (PROOF-42zd). Distinct from PROOF-42zd/PROOF-g2. #96 AC3."
     }
   ],
   "inputs": [
