@@ -48,10 +48,13 @@ jobs:
           # cannot satisfy the gate.
           gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
             --jq '[.[].body] | join("\n===TIER3-COMMENT-BOUNDARY===\n")' > /tmp/comments.txt || true
-          # include the PR body as its own block (a verdict posted there still counts;
-          # the template's reviewer *names* alone do not, since they carry no verdict)
-          printf '\n===TIER3-COMMENT-BOUNDARY===\n' >> /tmp/comments.txt || true
-          gh api "repos/${{ github.repository }}/pulls/${PR}" --jq '.body' >> /tmp/comments.txt || true
+          # FAULT-S4-006 fix: the PR body is DELIBERATELY NOT included. It is authored by
+          # the PR author, not a reviewer — a signature-word + verdict-word co-occurring in
+          # body prose (e.g. "clears the Red Team follow-up" next to "§I4 APPROVE") satisfied
+          # the gate with ZERO real review (a FAULT-S4-003 regression, caught on PR #612/#614).
+          # A review is a dedicated reviewer COMMENT carrying signature + verdict; the author's
+          # own PR body can never stand in for one. Only issue/PR comments (minus the notifier)
+          # are evaluated below.
       - name: Enforce Tier-3 review label
         run: |
           python3 scripts/check_tier3_label.py \

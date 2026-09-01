@@ -16,7 +16,7 @@ This log records all process violations across sprints. Each entry documents wha
 
 **The pattern, in the log's own words:** *"AI optimizes for throughput over governance at every decision point where no hard gate exists."* Whenever a process gate (CI, human approval, issue-first, Tier-3 review) is enforced only by **discipline** rather than by a **mechanical block**, it eventually gets bypassed under momentum — productive work creates excitement, the gate feels like friction, and the AI (or the human trusting the AI's green reports) skips it.
 
-**Instances (5 across 3 sprints — this is the program's dominant failure class):**
+**Instances (6 across 3 sprints — this is the program's dominant failure class):**
 
 | Fault | Sprint | Gate bypassed | "No hard gate" cause |
 |---|---|---|---|
@@ -25,6 +25,7 @@ This log records all process violations across sprints. Each entry documents wha
 | FAULT-S3-008 | S3 | Issue-with-ACs before code | workflow allows PRs without linked issues |
 | FAULT-S4-001 | S4 | Tier-3 review before merging theory PRs | theory-bearing PR can merge without a `tier-3-review` label; review was discipline-only |
 | FAULT-S4-005 | S4 | Anchor-ships-with-theorem (CTH ledger currency) | `inverse-anchor-audit` ratchet *satisfiable without anchoring* — baseline silently raisable; #96 backstop unowned + never landed |
+| FAULT-S4-006 | S4 | Tier-3 review before merging theory PRs (S4-003 regression) | the gate fed the **PR body** as a review block → author's own prose (a signature-word next to a verdict-word) satisfied it with zero real review |
 
 **Why point-fixes haven't resolved it:** each fault got a *rule* ("never use --admin", "5-minute test", "no code without an issue", "fire the Tier-3 gate"). Rules are discipline. The pattern recurs because **the rule is the same kind of thing that already failed** — a thing a human/AI must remember. S4-001 proves it: it recurred at the *strategic-lead seat designated to enforce the gate*, with the human on remote trusting green status reports. Discipline does not scale across context-switches.
 
@@ -226,3 +227,14 @@ This log records all process violations across sprints. Each entry documents wha
 | **Root cause (process)** | **PATTERN-01 recurrence; same class as FAULT-S4-003** — a gate *satisfiable without the underlying work*, here via a silent, cost-free baseline-bump. A ratchet whose baseline can be silently raised is a declaration-gate, not an enforcement-gate. Real owed debt is ~16 theory-state results (not 640) once the anchor-worthiness filter (top-level, non-`private`, named in an issue-AC / #474 matrix row) is applied. |
 | **Fixes applied** | Beekeeper-directed, led by @qbp-implementor; foundation/substrate theory work **frozen** until resolved. Full RCA + correctives (C1–C5, owners) in `docs/rca/cth-anchoring-cadence-2026-09-01.md`. Step 1 = this entry (signed off). Step 2 = land the ~16 owed anchors (**CPPhase falsification-criterion first**). Step 3 = C1 manifest-not-grep filter · C2 kill the silent bump (anchor-worthy orphan = hard fail) · C3 sha-pointer CI trigger-gate (fail-closed; blocks foundation merges until a batch signs) · C4 land the #96 protocol to canonical. |
 | **Process update** | The C3 gate must satisfy PATTERN-01's resolution criterion: **mechanical — `master` physically rejects the merge when an anchor-worthy theorem lands without its anchor**, demonstrated by a blocked foundation PR. Until then PATTERN-01 stays STILL-OPEN. |
+
+### FAULT-S4-006: Tier-3 review gate satisfiable by PR-body prose — a FAULT-S4-003 regression (2026-09-01)
+
+| Field | Detail |
+|---|---|
+| **What happened** | On PRs #612/#614 (theory-bearing CTH anchor updates, during the FAULT-S4-005 remediation) the `Tier-3 review-label` gate went GREEN **before any review comment existed**. It passed because the PR *body* incidentally contained a reviewer signature-word ("Red Team", in "clears the Red Team follow-up") next to a verdict-word ("APPROVE", in "§I4 APPROVE"). Caught by @qbp-implementor distrusting the green and running the real Red Team + Gemini review anyway; confirmed by @cth-implementor + @qbp-oppenheimer. Had the green been trusted, a 3-PROVEN-flip batch would have merged unreviewed. |
+| **Was there a process that should have fired?** | This IS the gate (`tier-3-review-gate.yml` + `check_tier3_label.py`) — the FAULT-S4-003 fix itself. It fired but passed on non-review text. |
+| **Root cause (technical)** | The workflow's "Collect labels + comments" step **appended the PR body as its own review block** (`gh api …/pulls/${PR} --jq '.body' >> comments.txt`). The gate accepts a signature-word + verdict-word co-occurring in one non-notifier block — and the PR body, authored by the PR author, can contain both incidentally. |
+| **Root cause (process)** | **PATTERN-01 / same class as FAULT-S4-003** — a review gate *satisfiable without a real review*. The S4-003 fix removed the notifier-checklist and template-name false-positives but left the PR body itself as an accepted block; the escape merely moved. |
+| **Fixes applied** | 1. This entry + PATTERN-01 row (6th instance). 2. `tier-3-review-gate.yml`: **PR body no longer fed to the gate** — a review must be a dedicated reviewer *comment* (signature + verdict); the author's body can never stand in. 3. `scripts/test_check_tier3_label.py`: unit matrix + a **regression guard** that fails if the workflow ever re-feeds the PR body. 4. Convention (feeds pr-merge-completeness): named-reviewer §I4 sign-offs are posted as PR comments, so a merged PR's thread shows every written APPROVE. |
+| **Process update** | Lands in the FAULT-S4-005 **Step 3** process-hardening PR alongside C1–C3. Reinforces the invariant: a gate that accepts author-authored text is a declaration gate, not an enforcement gate. |
