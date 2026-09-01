@@ -5,10 +5,17 @@
 --
 -- Physics (mandate B): in the Skyrme model a static configuration is a map
 -- U : ℝ³ ∪ {∞} ≅ S³ → SU(2) ≅ S³ (unit quaternions), with the boundary
--- condition U(∞) = 1 making it pointed. Derrick's theorem forbids a stable
--- localized lump on geometry alone; what traps the "ducky in the water" is
--- the conserved TOPOLOGICAL charge: the degree of the map, i.e. its class
--- in π₃(S³) = ℤ. That integer is the baryon number B.
+-- condition U(∞) = 1 making it pointed. Two DIFFERENT facts make the
+-- "ducky in the water" a stable particle: (i) TOPOLOGY gives it a conserved
+-- IDENTITY — the degree of the map, its class in π₃(S³) = ℤ (the baryon
+-- number B), unchangeable by continuous deformation, so a B≠0 lump can never
+-- decay to the vacuum; (ii) but topology does NOT fix its SIZE — with only
+-- gradient (sigma-model) energy, Derrick's theorem collapses the lump to a
+-- point in 3D. A stable finite size needs the SKYRME (higher-derivative)
+-- term, which scales oppositely under x ↦ λx and gives a Faddeev–Bogomolny
+-- bound E ≥ c·|B| with a minimum at finite size. This file formalizes (i),
+-- the topological identity B; (ii), the energetics, is a separate layer
+-- (per the Furey/Feynman #606 review).
 --
 -- What is proved here (plain math), all on the S₊∙ 3 presentation — the
 -- same pointed sphere that carries the quaternionic H-space of the #575
@@ -225,8 +232,10 @@ baryonNumber∥₂-correct f = refl
 
 -- … and classifies them completely: sectors ↔ ℤ. Deforming a configuration
 -- (a path f ≡ g IS a homotopy, cubically) cannot change B, and equal B
--- means deformable into one another. This is the topological trap that
--- Derrick's theorem demands.
+-- means deformable into one another — the CONSERVATION of the baryon
+-- identity B (the sector cannot change under any deformation). (Stability
+-- of the lump's SIZE against Derrick collapse is the separate Skyrme-term
+-- energetics layer — see the header.)
 skyrmionSectorsIso : Iso ∥ SkyrmeConfig ∥₂ ℤ
 skyrmionSectorsIso = degree∥₂Iso 2
 
