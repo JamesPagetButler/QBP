@@ -19,6 +19,8 @@ on:
       - 'scripts/anchor_inverse_audit.py'
       - 'analysis/.inverse-anchor-audit-baseline.json'
       - '.github/workflows/inverse-anchor-audit.yml'
+      - 'docs/cth/anchor-worthy-manifest.json'
+      - 'scripts/check_anchor_manifest.py'
 
 permissions:
   contents: read
@@ -32,10 +34,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Run the inverse anchor audit (ratchet against baseline)
+      - name: Run the inverse anchor audit (ratchet against baseline — legacy grep candidate set)
         run: |
           python3 scripts/anchor_inverse_audit.py \
             --check \
             --out-md /tmp/audit.md \
             --out-json /tmp/audit.json \
             --stamp "CI"
+      - name: C1/C2 — declared anchor-worthiness enforcement (FAULT-S4-005, supersedes the grep ratchet)
+        run: |
+          # FAULT-S4-005 fix: the candidate set is the DECLARED manifest
+          # (docs/cth/anchor-worthy-manifest.json), not `grep theorem` (640->~dozen). A declared
+          # anchor-worthy deliverable absent from the ledger is a HARD FAIL that CANNOT be
+          # baselined away — this kills the silent baseline-bump escape that defeated the
+          # grep ratchet. (C3 witnesses-resolve rides qbp-cu #66 Step-1 + qbp-architecture §5.)
+          python3 scripts/check_anchor_manifest.py
