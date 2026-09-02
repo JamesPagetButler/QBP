@@ -36,7 +36,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Run the inverse anchor audit (ratchet against baseline — legacy grep candidate set)
+      - name: Inverse anchor audit — UNDER-claim (orphan) ratchet only; over-claim gaps retired to the C3-FULL evidence bar (FAULT-S4-007)
         run: |
           python3 scripts/anchor_inverse_audit.py \
             --check \
