@@ -3,8 +3,11 @@
 
 C1/C2: a declared anchor-worthy deliverable absent from the ledger is a HARD FAIL
 (cannot be baselined away); the candidate set is the manifest, not `grep theorem`.
-C3: a declared anchor whose witnesses don't resolve in source is a HARD FAIL
-(#613/#615 class). Run: python3 scripts/test_check_anchor_manifest.py
+C3: a declared anchor whose witnesses don't resolve in source is a HARD FAIL.
+C3-FULL (evidence bar): every provenance_kind:proof anchor must CARRY its proof —
+proof_state:verified + language-clean axiom_closure + sorry_count:0 + a resolving,
+sorry-free source — or be a tracked, shrink-only register entry (#613/#615/#617 class).
+Run: python3 scripts/test_check_anchor_manifest.py
 """
 
 import json
@@ -153,20 +156,45 @@ def main():
             )
             failures += not ok
 
-    # ---- C3-FULL (full-ledger proof_file resolution + shrink-only register) ----
+    # ---- C3-FULL (full-ledger EVIDENCE BAR + shrink-only register) ----
     with tempfile.TemporaryDirectory() as root:
         os.makedirs(os.path.join(root, "proofs"), exist_ok=True)
-        real = os.path.join("proofs", "Real.lean")
-        open(os.path.join(root, real), "w").write("theorem t : True := trivial\n")
+        clean = os.path.join("proofs", "Clean.lean")
+        open(os.path.join(root, clean), "w").write("theorem t : True := trivial\n")
+        withsorry = os.path.join("proofs", "Sorry.lean")
+        open(os.path.join(root, withsorry), "w").write("theorem t : True := by sorry\n")
+        withnd = os.path.join("proofs", "Nd.lean")
+        open(os.path.join(root, withnd), "w").write(
+            "theorem t : True := by native_decide\n"
+        )
+        commented = os.path.join("proofs", "Commented.lean")
+        open(os.path.join(root, commented), "w").write(
+            "-- Completeness: zero sorry, zero native_decide.\ntheorem t : True := trivial\n"
+        )
+        agda = os.path.join("proofs", "S.agda")
+        open(os.path.join(root, agda), "w").write(
+            "t : Set\nt = ?\n"
+        )  # body irrelevant to closure
 
-        def pledger(*anchors):
-            # anchors: (id, provenance_kind, proof_file)
-            return {
-                "anchors": [
-                    {"id": a[0], "provenance_kind": a[1], "proof_file": a[2]}
-                    for a in anchors
-                ]
-            }
+        LEAN_CLEAN = ["propext", "Classical.choice", "Quot.sound"]
+
+        def anc(aid, **kw):
+            d = {"id": aid, "provenance_kind": "proof"}
+            d.update(kw)
+            return d
+
+        def verified(pf, closure=LEAN_CLEAN, system="lean4"):
+            # a fully-evidenced proof anchor
+            return dict(
+                proof_file=pf,
+                proof_state="verified",
+                sorry_count=0,
+                proof_system=system,
+                verification={"result": "pass", "axiom_closure": closure},
+            )
+
+        def led2(*anchors):
+            return {"anchors": list(anchors)}
 
         def reg(*items):  # items: (id, issue) or id
             out = []
@@ -179,44 +207,125 @@ def main():
 
         cf = [
             (
-                "C3-FULL: proof anchor resolves -> PASS",
-                pledger(("A", "proof", real)),
+                "evidence: verified+clean+sorry-free (Lean) -> PASS",
+                led2(anc("A", **verified(clean))),
                 reg(),
                 0,
             ),
             (
-                "C3-FULL: non-proof anchor with 404 file is ignored -> PASS",
-                pledger(("A", "theory", "proofs/nope.lean")),
+                "evidence: verified+--safe (Agda) -> PASS",
+                led2(
+                    anc(
+                        "A",
+                        **verified(
+                            agda,
+                            closure=["--safe transitive (Agda 2.8.0)"],
+                            system="agda",
+                        ),
+                    )
+                ),
                 reg(),
                 0,
             ),
             (
-                "C3-FULL: proof anchor 404 + registered -> PASS",
-                pledger(("A", "proof", "proofs/nope.lean")),
-                reg(("A", "#615")),
+                "evidence: comment says 'zero sorry' but proof is real -> PASS (comment-stripped)",
+                led2(anc("A", **verified(commented))),
+                reg(),
                 0,
             ),
             (
-                "C3-FULL: proof anchor 404 NOT registered -> HARD FAIL (new over-claim)",
-                pledger(("A", "proof", "proofs/nope.lean")),
+                "non-proof anchor is ignored -> PASS",
+                led2(
+                    {
+                        "id": "A",
+                        "provenance_kind": "theory",
+                        "proof_file": "proofs/nope.lean",
+                    }
+                ),
+                reg(),
+                0,
+            ),
+            (
+                "no verification block, off-register -> HARD FAIL",
+                led2(anc("A", proof_file=clean, proof_state="written")),
                 reg(),
                 1,
             ),
             (
-                "C3-FULL: registered anchor now resolves -> HARD FAIL (stale, shrink-only)",
-                pledger(("A", "proof", real)),
+                "proof_state written (not verified) -> HARD FAIL",
+                led2(
+                    anc(
+                        "A",
+                        proof_file=clean,
+                        sorry_count=0,
+                        verification={"result": "pass", "axiom_closure": LEAN_CLEAN},
+                    )
+                ),
+                reg(),
+                1,
+            ),
+            (
+                "dirty axiom closure (extra axiom) -> HARD FAIL",
+                led2(
+                    anc(
+                        "A",
+                        **verified(clean, closure=LEAN_CLEAN + ["Lean.ofReduceBool"]),
+                    )
+                ),
+                reg(),
+                1,
+            ),
+            (
+                "source contains sorry -> HARD FAIL",
+                led2(anc("A", **verified(withsorry))),
+                reg(),
+                1,
+            ),
+            (
+                "source contains native_decide -> HARD FAIL",
+                led2(anc("A", **verified(withnd))),
+                reg(),
+                1,
+            ),
+            (
+                "proof_file 404 -> HARD FAIL",
+                led2(anc("A", **verified("proofs/nope.lean"))),
+                reg(),
+                1,
+            ),
+            (
+                "sorry_count != 0 -> HARD FAIL",
+                led2(anc("A", **{**verified(clean), "sorry_count": 2})),
+                reg(),
+                1,
+            ),
+            (
+                "failing anchor but registered -> PASS",
+                led2(anc("A", proof_file="proofs/nope.lean", proof_state="written")),
+                reg(("A", "#615")),
+                0,
+            ),
+            (
+                "registered anchor now MEETS the bar -> HARD FAIL (stale, shrink-only)",
+                led2(anc("A", **verified(clean))),
                 reg(("A", "#615")),
                 1,
             ),
             (
-                "C3-FULL: registered anchor reclassified to theory -> HARD FAIL (stale)",
-                pledger(("A", "theory", "proofs/nope.lean")),
+                "registered anchor reclassified to theory -> HARD FAIL (stale)",
+                led2(
+                    {
+                        "id": "A",
+                        "provenance_kind": "theory",
+                        "proof_file": "proofs/nope.lean",
+                    }
+                ),
                 reg(("A", "#615")),
                 1,
             ),
             (
-                "C3-FULL: register entry missing issue -> HARD FAIL",
-                pledger(("A", "proof", "proofs/nope.lean")),
+                "register entry missing issue -> HARD FAIL",
+                led2(anc("A", proof_file="proofs/nope.lean", proof_state="written")),
                 reg(("A", "")),
                 1,
             ),

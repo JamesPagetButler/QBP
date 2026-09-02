@@ -19,19 +19,32 @@ The fix — ONE manifest (docs/cth/anchor-worthy-manifest.json), three clauses:
       fetch-conditional — N/A here, C3 is intra-QBP, no cross-repo fetch; per
       qbp-cu-implementor seq=1021. #68 persistent-infra escalation inherited later.)
 
-C3-FULL (full-ledger, "extend C3 to full-ledger audit" — beekeeper-directed):
-  C3 above only checks the manifest-DECLARED anchors. C3-FULL generalises it to the
-  WHOLE ledger: EVERY `provenance_kind:proof` anchor's `proof_file` must resolve on
-  this head. A proof anchor pointing at a file that does not exist is an over-claim
-  (the #613/#615 class). The first run found 21 of 31 proof anchors citing a 404.
-  The known-legacy set lives in a SHRINK-ONLY, issue-linked register
+C3-FULL (full-ledger EVIDENCE BAR — beekeeper-directed: "if you're claiming it's proven,
+you have to have the evidence that it's proven to submit it"):
+  C3 above only checks the manifest-DECLARED anchors. C3-FULL generalises it to the WHOLE
+  ledger AND raises the bar from file-existence to proof-EVIDENCE. EVERY
+  `provenance_kind:proof` anchor must CARRY its proof:
+    - proof_state == "verified";
+    - a `verification` block whose `axiom_closure` is clean FOR ITS LANGUAGE
+      (Lean: closure ⊆ {propext, Classical.choice, Quot.sound} — native_decide/sorryAx are
+       NOT clean; Agda: closure attests `--safe`);
+    - sorry_count == 0;
+    - a `proof_file` that RESOLVES on this head AND is sorry-free (comment-stripped scan for
+      the language's hole tokens: Lean sorry/admit/sorryAx/native_decide; Agda postulate/holes;
+      Coq Admitted/admit).
+  Miss any → the anchor does not carry its proof and the gate HARD-FAILS. The first run found
+  only 10 of 31 proof anchors carry strong evidence; 21 do not (17 phantom-file + 4 written/
+  no-verification). The known-legacy set lives in a SHRINK-ONLY, issue-linked register
   (docs/cth/proof-anchor-remediation.json). C3-FULL HARD-FAILS if:
-    (a) a proof anchor's proof_file 404s and is NOT in the register — a NEW over-claim; or
-    (b) a register entry's proof_file now RESOLVES (or the anchor is gone / no longer a
-        proof) — the entry is stale and must be removed (the register can only shrink); or
+    (a) a proof anchor FAILS the evidence bar and is NOT in the register — a NEW over-claim; or
+    (b) a register entry now MEETS the bar (or the anchor is gone / no longer a proof) — the
+        entry is stale and must be removed (the register can only SHRINK as debt burns down); or
     (c) a register entry has no tracking issue.
   Adding a register entry is a visible, reviewed commit — NOT a silent CI baseline-raise
-  (that silent raise is exactly what defeated the FAULT-S4-005 ratchet).
+  (that silent raise is exactly what defeated the FAULT-S4-005 ratchet). NOTE: the JSON+source
+  check is a strong NECESSARY gate but a hand-authored verification block is still data; the
+  AIRTIGHT layer (re-run #print axioms / agda --safe in CI and diff against the claim) rides on
+  the existing Lean/Agda foundations CI — tracked as the authoritative follow-on.
 
 Usage: check_anchor_manifest.py [--manifest F] [--ledger F] [--root DIR]
                                 [--register F] [--skip-witnesses] [--skip-full-ledger]
@@ -42,6 +55,7 @@ or C3-FULL (a proof anchor's proof_file 404s off-register, or a stale register e
 import argparse
 import json
 import os
+import re
 import sys
 
 DEFAULT_MANIFEST = "docs/cth/anchor-worthy-manifest.json"
@@ -85,19 +99,103 @@ def check_witnesses_resolve(entries, ledger_by_id, root="."):
     return unresolved
 
 
-def _proof_file_resolves(anchor, root):
-    """True iff the anchor's proof_file exists on this head."""
+# Lean kernel axiom-clean set; a proof whose #print axioms closure is a subset is clean.
+_CLEAN_LEAN = {"propext", "Classical.choice", "Quot.sound"}
+# Per-language "not actually proven" source tokens (hard) — scanned comment-stripped.
+_HARD_TOKENS = {
+    "lean": [r"\bsorry\b", r"\badmit\b", r"\bsorryAx\b", r"\bnative_decide\b"],
+    "agda": [r"\bpostulate\b", r"\{!"],
+    "coq": [r"\bAdmitted\b", r"\badmit\b"],
+}
+
+
+def _lang_of(pf, proof_system):
+    ps = (proof_system or "").lower()
+    if pf and pf.endswith(".agda") or "agda" in ps:
+        return "agda"
+    if pf and pf.endswith(".v") or "coq" in ps:
+        return "coq"
+    return "lean"  # default; .lean and lean4
+
+
+def _strip_comments(src, lang):
+    if lang in ("lean", "agda"):
+        opn, cls = (r"/-", r"-/") if lang == "lean" else (r"\{-", r"-\}")
+        src = re.sub(opn + r".*?" + cls, " ", src, flags=re.S)
+        src = re.sub(r"--[^\n]*", " ", src)
+    elif lang == "coq":
+        src = re.sub(r"\(\*.*?\*\)", " ", src, flags=re.S)
+    return src
+
+
+def _source_holes(anchor, root):
+    """Return a list of real (comment-stripped) 'not-proven' tokens in the proof_file,
+    or None if the file does not resolve. [] means the source is hole-free."""
     pf = anchor.get("proof_file")
-    return bool(pf) and os.path.exists(os.path.join(root, pf))
+    if not pf:
+        return None
+    path = os.path.join(root, pf)
+    if not os.path.exists(path):
+        return None
+    lang = _lang_of(pf, anchor.get("proof_system"))
+    with open(path, encoding="utf-8", errors="replace") as f:
+        s = _strip_comments(f.read(), lang)
+    return sorted(
+        {m.group(0) for p in _HARD_TOKENS.get(lang, []) for m in re.finditer(p, s)}
+    )
+
+
+def _axiom_closure_clean(anchor):
+    """(clean: bool, reason: str) — is the recorded verification axiom_closure clean for
+    the anchor's language? Lean: subset of the kernel-clean set. Agda: attests --safe.
+    """
+    v = anchor.get("verification") or {}
+    ac = v.get("axiom_closure")
+    if ac is None:
+        return False, "verification has no axiom_closure"
+    items = ac if isinstance(ac, list) else [ac]
+    lang = _lang_of(anchor.get("proof_file"), anchor.get("proof_system"))
+    if lang == "agda":
+        ok = any("--safe" in str(x) for x in items)
+        return ok, ("--safe attested" if ok else "agda closure does not attest --safe")
+    # lean / coq: every element must be in the kernel-clean set
+    extra = [x for x in items if x not in _CLEAN_LEAN]
+    return (not extra), ("axiom-clean" if not extra else f"non-clean axioms: {extra}")
+
+
+def _evidence_reasons(anchor, root):
+    """The evidence bar for a provenance_kind:proof anchor. Returns [] if the anchor
+    CARRIES its proof (verified + clean axiom audit + sorry-free resolving source), else a
+    list of the ways it falls short. This is the 'you must submit the evidence' contract.
+    """
+    reasons = []
+    holes = _source_holes(anchor, root)
+    if holes is None:
+        reasons.append(
+            f"proof_file does not resolve: {anchor.get('proof_file') or '(none)'}"
+        )
+    elif holes:
+        reasons.append(f"source is not discharged (found {holes})")
+    if anchor.get("proof_state") != "verified":
+        reasons.append(f"proof_state is {anchor.get('proof_state')!r}, not 'verified'")
+    if not anchor.get("verification"):
+        reasons.append("no verification block")
+    else:
+        clean, why = _axiom_closure_clean(anchor)
+        if not clean:
+            reasons.append(why)
+    if anchor.get("sorry_count") not in (0,):
+        reasons.append(f"sorry_count is {anchor.get('sorry_count')!r}, not 0")
+    return reasons
 
 
 def check_full_ledger_proofs(ledger_by_id, register, root="."):
-    """C3-FULL: every provenance_kind:proof anchor's proof_file must resolve on this
-    head, unless the anchor is a known-legacy entry in the shrink-only register.
-    Returns (new_over_claims, stale_register, register_no_issue):
-      new_over_claims   — proof anchor with a 404 proof_file that is NOT registered (fail)
-      stale_register    — registered anchor whose proof_file now resolves, or which is no
-                          longer a provenance_kind:proof anchor: the entry must be removed
+    """C3-FULL (evidence bar): every provenance_kind:proof anchor must CARRY its proof —
+    verified + axiom-clean audit + sorry-free resolving source — unless it is a known-legacy
+    entry in the shrink-only register. Returns (new_over_claims, stale_register, register_no_issue):
+      new_over_claims   — proof anchor that fails the evidence bar and is NOT registered (fail)
+      stale_register    — registered anchor that now MEETS the bar (or is gone / no longer a
+                          proof): resolved, entry must be removed (register can only shrink)
       register_no_issue — register entries lacking a tracking issue (fail)
     """
     reg_ids = {e["anchor_id"] for e in register}
@@ -106,10 +204,11 @@ def check_full_ledger_proofs(ledger_by_id, register, root="."):
     for aid, a in ledger_by_id.items():
         if a.get("provenance_kind") != "proof":
             continue
-        if _proof_file_resolves(a, root):
+        if aid in reg_ids:
             continue
-        if aid not in reg_ids:
-            new_over_claims.append((aid, a.get("proof_file") or "(no proof_file)"))
+        reasons = _evidence_reasons(a, root)
+        if reasons:
+            new_over_claims.append((aid, "; ".join(reasons)))
 
     stale_register = []
     for e in register:
@@ -124,9 +223,9 @@ def check_full_ledger_proofs(ledger_by_id, register, root="."):
                     "anchor is no longer provenance_kind:proof — resolved, remove entry",
                 )
             )
-        elif _proof_file_resolves(a, root):
+        elif not _evidence_reasons(a, root):
             stale_register.append(
-                (aid, "proof_file now resolves — resolved, remove entry")
+                (aid, "anchor now carries its proof evidence — resolved, remove entry")
             )
 
     register_no_issue = [
@@ -194,7 +293,8 @@ def main():
             return 1
         print("PASS (C3): every declared anchor's witnesses resolve in source.")
 
-    # C3-FULL: every provenance_kind:proof anchor's proof_file must resolve (whole ledger).
+    # C3-FULL: every provenance_kind:proof anchor must CARRY its proof evidence (verified +
+    # axiom-clean audit + sorry-free resolving source), else be a tracked, shrink-only legacy.
     if not args.skip_full_ledger:
         register = []
         if os.path.exists(args.register):
@@ -207,27 +307,28 @@ def main():
             1 for a in ledger_by_id.values() if a.get("provenance_kind") == "proof"
         )
         print(
-            f"C3-FULL: {n_proof} provenance_kind:proof anchor(s); "
+            f"C3-FULL (evidence bar): {n_proof} provenance_kind:proof anchor(s); "
             f"{len(register)} on the remediation register."
         )
         fail = False
         if new_over:
             fail = True
             print(
-                "::error::C3-FULL — proof anchor(s) cite a proof_file that does NOT resolve "
-                "on this head and are NOT on the remediation register (a NEW over-claim — a "
-                "provenance_kind:proof anchor with a phantom proof_file, #613/#615 class). "
-                "Write+verify the proof, reclassify the anchor, or (legacy only) add it to "
+                "::error::C3-FULL — proof anchor(s) do NOT carry their proof evidence and are "
+                "NOT on the remediation register. A provenance_kind:proof anchor MUST ship the "
+                "evidence: proof_state:verified + a verification block with a language-clean "
+                "axiom_closure + sorry_count:0 + a resolving, sorry-free proof_file. Supply the "
+                "evidence, reclassify the anchor, or (legacy only) add it to "
                 "docs/cth/proof-anchor-remediation.json with a tracking issue:"
             )
-            for aid, pf in new_over:
-                print(f"  - {aid}: proof_file 404 -> {pf}")
+            for aid, why in new_over:
+                print(f"  - {aid}: {why}")
         if stale_reg:
             fail = True
             print(
-                "::error::C3-FULL — remediation register is SHRINK-ONLY, but entr(ies) are "
-                "now resolved (proof_file resolves, or the anchor is gone / no longer a proof). "
-                "Remove the stale entr(ies) from docs/cth/proof-anchor-remediation.json:"
+                "::error::C3-FULL — remediation register is SHRINK-ONLY, but entr(ies) now MEET "
+                "the evidence bar (or the anchor is gone / no longer a proof). Remove the "
+                "resolved entr(ies) from docs/cth/proof-anchor-remediation.json:"
             )
             for aid, why in stale_reg:
                 print(f"  - {aid}: {why}")
@@ -242,14 +343,18 @@ def main():
         if fail:
             return 1
         print(
-            "PASS (C3-FULL): every proof anchor resolves or is a tracked, shrink-only "
-            "register entry."
+            "PASS (C3-FULL): every proof anchor carries its evidence or is a tracked, "
+            "shrink-only register entry."
         )
 
     print(
         "PASS: every declared anchor-worthy deliverable is anchored (C1/C2)"
         + ("" if args.skip_witnesses else ", its witnesses resolve (C3)")
-        + ("" if args.skip_full_ledger else ", every proof anchor resolves (C3-FULL)")
+        + (
+            ""
+            if args.skip_full_ledger
+            else ", every proof anchor carries its evidence (C3-FULL)"
+        )
         + "."
     )
     return 0

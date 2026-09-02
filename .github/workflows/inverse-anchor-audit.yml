@@ -52,9 +52,13 @@ jobs:
           #   C3 each declared anchor's witnesses must RESOLVE in source (proof_file + theorem
           #      names on this head) — hard-fail on real drift (#613/#615 class). Intra-QBP, no
           #      cross-repo fetch (qbp-cu #66 clauses a+b; clause-c infra-soft-pass N/A here).
-          #   C3-FULL EVERY provenance_kind:proof anchor's proof_file must resolve on this head;
-          #      the known-legacy set is a SHRINK-ONLY, issue-linked register
-          #      (docs/cth/proof-anchor-remediation.json). A NEW proof anchor with a 404 file is
-          #      blocked; the register can only shrink (#617). Source is checked out here, so
-          #      proof_file paths resolve — full-ledger runs (no --skip-full-ledger).
+          #   C3-FULL (EVIDENCE BAR) EVERY provenance_kind:proof anchor must CARRY its proof —
+          #      proof_state:verified + a language-clean verification.axiom_closure (Lean subset of
+          #      {propext,Classical.choice,Quot.sound}; Agda --safe) + sorry_count:0 + a resolving,
+          #      sorry-free proof_file (comment-stripped scan). "If you claim proven, you must submit
+          #      the evidence." The 21 known-legacy over-claims are a SHRINK-ONLY, issue-linked
+          #      register (docs/cth/proof-anchor-remediation.json; #613/#615/#617); a NEW off-register
+          #      over-claim is blocked, the register only shrinks. Source is checked out here so the
+          #      source scan + resolution run (no --skip-full-ledger). Airtight #print-axioms/--safe
+          #      re-derivation is the authoritative follow-on on the foundations CI.
           python3 scripts/check_anchor_manifest.py
