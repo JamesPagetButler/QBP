@@ -35,6 +35,38 @@ def run(manifest, ledger, *, skip_witnesses=True, root=None):
         ]
         if skip_witnesses:
             cmd.append("--skip-witnesses")
+        # No register on disk in this temp dir -> register empty -> C3-FULL trivially
+        # passes for the C1/C2/C3 fixtures (their anchors carry no provenance_kind:proof).
+        cmd += ["--register", os.path.join(d, "no-register.json")]
+        return subprocess.run(cmd, capture_output=True, text=True).returncode
+
+
+def run_full_ledger(ledger, register, *, root):
+    """Exercise C3-FULL: empty manifest, witnesses skipped, given ledger + register."""
+    with tempfile.TemporaryDirectory() as d:
+        mf = os.path.join(d, "m.json")
+        open(mf, "w", encoding="utf-8").write(
+            json.dumps({"manifest_version": "t", "entries": []})
+        )
+        lf = os.path.join(d, "l.json")
+        open(lf, "w", encoding="utf-8").write(json.dumps(ledger, ensure_ascii=False))
+        rf = os.path.join(d, "r.json")
+        open(rf, "w", encoding="utf-8").write(
+            json.dumps({"entries": register}, ensure_ascii=False)
+        )
+        cmd = [
+            sys.executable,
+            SCRIPT,
+            "--manifest",
+            mf,
+            "--ledger",
+            lf,
+            "--register",
+            rf,
+            "--root",
+            root,
+            "--skip-witnesses",
+        ]
         return subprocess.run(cmd, capture_output=True, text=True).returncode
 
 
@@ -121,10 +153,86 @@ def main():
             )
             failures += not ok
 
+    # ---- C3-FULL (full-ledger proof_file resolution + shrink-only register) ----
+    with tempfile.TemporaryDirectory() as root:
+        os.makedirs(os.path.join(root, "proofs"), exist_ok=True)
+        real = os.path.join("proofs", "Real.lean")
+        open(os.path.join(root, real), "w").write("theorem t : True := trivial\n")
+
+        def pledger(*anchors):
+            # anchors: (id, provenance_kind, proof_file)
+            return {
+                "anchors": [
+                    {"id": a[0], "provenance_kind": a[1], "proof_file": a[2]}
+                    for a in anchors
+                ]
+            }
+
+        def reg(*items):  # items: (id, issue) or id
+            out = []
+            for it in items:
+                if isinstance(it, tuple):
+                    out.append({"anchor_id": it[0], "issue": it[1]})
+                else:
+                    out.append({"anchor_id": it, "issue": "#1"})
+            return out
+
+        cf = [
+            (
+                "C3-FULL: proof anchor resolves -> PASS",
+                pledger(("A", "proof", real)),
+                reg(),
+                0,
+            ),
+            (
+                "C3-FULL: non-proof anchor with 404 file is ignored -> PASS",
+                pledger(("A", "theory", "proofs/nope.lean")),
+                reg(),
+                0,
+            ),
+            (
+                "C3-FULL: proof anchor 404 + registered -> PASS",
+                pledger(("A", "proof", "proofs/nope.lean")),
+                reg(("A", "#615")),
+                0,
+            ),
+            (
+                "C3-FULL: proof anchor 404 NOT registered -> HARD FAIL (new over-claim)",
+                pledger(("A", "proof", "proofs/nope.lean")),
+                reg(),
+                1,
+            ),
+            (
+                "C3-FULL: registered anchor now resolves -> HARD FAIL (stale, shrink-only)",
+                pledger(("A", "proof", real)),
+                reg(("A", "#615")),
+                1,
+            ),
+            (
+                "C3-FULL: registered anchor reclassified to theory -> HARD FAIL (stale)",
+                pledger(("A", "theory", "proofs/nope.lean")),
+                reg(("A", "#615")),
+                1,
+            ),
+            (
+                "C3-FULL: register entry missing issue -> HARD FAIL",
+                pledger(("A", "proof", "proofs/nope.lean")),
+                reg(("A", "")),
+                1,
+            ),
+        ]
+        for name, l, r, exp in cf:
+            got = run_full_ledger(l, r, root=root)
+            ok = got == exp
+            print(
+                f"  [{'PASS' if ok else 'FAIL'}] {name}  (exit {got}, expected {exp})"
+            )
+            failures += not ok
+
     if failures:
         print(f"\n{failures} test(s) FAILED")
         return 1
-    print("\nAll manifest-gate tests passed (C1/C2/C3).")
+    print("\nAll manifest-gate tests passed (C1/C2/C3/C3-FULL).")
     return 0
 
 

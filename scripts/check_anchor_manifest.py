@@ -19,8 +19,24 @@ The fix — ONE manifest (docs/cth/anchor-worthy-manifest.json), three clauses:
       fetch-conditional — N/A here, C3 is intra-QBP, no cross-repo fetch; per
       qbp-cu-implementor seq=1021. #68 persistent-infra escalation inherited later.)
 
-Usage: check_anchor_manifest.py [--manifest F] [--ledger F] [--root DIR] [--skip-witnesses]
-Exit 0 = clean; 1 = a declared-but-unanchored (C1/C2) or a witness that fails to resolve (C3).
+C3-FULL (full-ledger, "extend C3 to full-ledger audit" — beekeeper-directed):
+  C3 above only checks the manifest-DECLARED anchors. C3-FULL generalises it to the
+  WHOLE ledger: EVERY `provenance_kind:proof` anchor's `proof_file` must resolve on
+  this head. A proof anchor pointing at a file that does not exist is an over-claim
+  (the #613/#615 class). The first run found 21 of 31 proof anchors citing a 404.
+  The known-legacy set lives in a SHRINK-ONLY, issue-linked register
+  (docs/cth/proof-anchor-remediation.json). C3-FULL HARD-FAILS if:
+    (a) a proof anchor's proof_file 404s and is NOT in the register — a NEW over-claim; or
+    (b) a register entry's proof_file now RESOLVES (or the anchor is gone / no longer a
+        proof) — the entry is stale and must be removed (the register can only shrink); or
+    (c) a register entry has no tracking issue.
+  Adding a register entry is a visible, reviewed commit — NOT a silent CI baseline-raise
+  (that silent raise is exactly what defeated the FAULT-S4-005 ratchet).
+
+Usage: check_anchor_manifest.py [--manifest F] [--ledger F] [--root DIR]
+                                [--register F] [--skip-witnesses] [--skip-full-ledger]
+Exit 0 = clean; 1 = C1/C2 (declared-but-unanchored), C3 (declared witness unresolved),
+or C3-FULL (a proof anchor's proof_file 404s off-register, or a stale register entry).
 """
 
 import argparse
@@ -30,6 +46,7 @@ import sys
 
 DEFAULT_MANIFEST = "docs/cth/anchor-worthy-manifest.json"
 DEFAULT_LEDGER = "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
+DEFAULT_REGISTER = "docs/cth/proof-anchor-remediation.json"
 
 
 def load_ledger(path):
@@ -68,10 +85,61 @@ def check_witnesses_resolve(entries, ledger_by_id, root="."):
     return unresolved
 
 
+def _proof_file_resolves(anchor, root):
+    """True iff the anchor's proof_file exists on this head."""
+    pf = anchor.get("proof_file")
+    return bool(pf) and os.path.exists(os.path.join(root, pf))
+
+
+def check_full_ledger_proofs(ledger_by_id, register, root="."):
+    """C3-FULL: every provenance_kind:proof anchor's proof_file must resolve on this
+    head, unless the anchor is a known-legacy entry in the shrink-only register.
+    Returns (new_over_claims, stale_register, register_no_issue):
+      new_over_claims   — proof anchor with a 404 proof_file that is NOT registered (fail)
+      stale_register    — registered anchor whose proof_file now resolves, or which is no
+                          longer a provenance_kind:proof anchor: the entry must be removed
+      register_no_issue — register entries lacking a tracking issue (fail)
+    """
+    reg_ids = {e["anchor_id"] for e in register}
+
+    new_over_claims = []
+    for aid, a in ledger_by_id.items():
+        if a.get("provenance_kind") != "proof":
+            continue
+        if _proof_file_resolves(a, root):
+            continue
+        if aid not in reg_ids:
+            new_over_claims.append((aid, a.get("proof_file") or "(no proof_file)"))
+
+    stale_register = []
+    for e in register:
+        aid = e["anchor_id"]
+        a = ledger_by_id.get(aid)
+        if a is None:
+            stale_register.append((aid, "anchor no longer in ledger — remove entry"))
+        elif a.get("provenance_kind") != "proof":
+            stale_register.append(
+                (
+                    aid,
+                    "anchor is no longer provenance_kind:proof — resolved, remove entry",
+                )
+            )
+        elif _proof_file_resolves(a, root):
+            stale_register.append(
+                (aid, "proof_file now resolves — resolved, remove entry")
+            )
+
+    register_no_issue = [
+        e["anchor_id"] for e in register if not str(e.get("issue", "")).strip()
+    ]
+    return new_over_claims, stale_register, register_no_issue
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", default=DEFAULT_MANIFEST)
     ap.add_argument("--ledger", default=DEFAULT_LEDGER)
+    ap.add_argument("--register", default=DEFAULT_REGISTER)
     ap.add_argument(
         "--root", default=".", help="repo root for resolving proof_file paths"
     )
@@ -79,6 +147,11 @@ def main():
         "--skip-witnesses",
         action="store_true",
         help="skip C3 (witnesses-resolve) — e.g. when source is not checked out",
+    )
+    ap.add_argument(
+        "--skip-full-ledger",
+        action="store_true",
+        help="skip C3-FULL (every proof anchor's proof_file resolves) — source not checked out",
     )
     args = ap.parse_args()
 
@@ -121,9 +194,62 @@ def main():
             return 1
         print("PASS (C3): every declared anchor's witnesses resolve in source.")
 
+    # C3-FULL: every provenance_kind:proof anchor's proof_file must resolve (whole ledger).
+    if not args.skip_full_ledger:
+        register = []
+        if os.path.exists(args.register):
+            with open(args.register, encoding="utf-8") as f:
+                register = json.load(f).get("entries", [])
+        new_over, stale_reg, no_issue = check_full_ledger_proofs(
+            ledger_by_id, register, args.root
+        )
+        n_proof = sum(
+            1 for a in ledger_by_id.values() if a.get("provenance_kind") == "proof"
+        )
+        print(
+            f"C3-FULL: {n_proof} provenance_kind:proof anchor(s); "
+            f"{len(register)} on the remediation register."
+        )
+        fail = False
+        if new_over:
+            fail = True
+            print(
+                "::error::C3-FULL — proof anchor(s) cite a proof_file that does NOT resolve "
+                "on this head and are NOT on the remediation register (a NEW over-claim — a "
+                "provenance_kind:proof anchor with a phantom proof_file, #613/#615 class). "
+                "Write+verify the proof, reclassify the anchor, or (legacy only) add it to "
+                "docs/cth/proof-anchor-remediation.json with a tracking issue:"
+            )
+            for aid, pf in new_over:
+                print(f"  - {aid}: proof_file 404 -> {pf}")
+        if stale_reg:
+            fail = True
+            print(
+                "::error::C3-FULL — remediation register is SHRINK-ONLY, but entr(ies) are "
+                "now resolved (proof_file resolves, or the anchor is gone / no longer a proof). "
+                "Remove the stale entr(ies) from docs/cth/proof-anchor-remediation.json:"
+            )
+            for aid, why in stale_reg:
+                print(f"  - {aid}: {why}")
+        if no_issue:
+            fail = True
+            print(
+                "::error::C3-FULL — every remediation-register entry MUST carry a tracking "
+                "issue (a register add is a visible, tracked act, not a silent baseline-raise):"
+            )
+            for aid in no_issue:
+                print(f"  - {aid}: missing 'issue'")
+        if fail:
+            return 1
+        print(
+            "PASS (C3-FULL): every proof anchor resolves or is a tracked, shrink-only "
+            "register entry."
+        )
+
     print(
         "PASS: every declared anchor-worthy deliverable is anchored (C1/C2)"
-        + ("" if args.skip_witnesses else " and its witnesses resolve (C3)")
+        + ("" if args.skip_witnesses else ", its witnesses resolve (C3)")
+        + ("" if args.skip_full_ledger else ", every proof anchor resolves (C3-FULL)")
         + "."
     )
     return 0

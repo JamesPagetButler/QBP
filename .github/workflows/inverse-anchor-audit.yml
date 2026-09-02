@@ -20,6 +20,7 @@ on:
       - 'analysis/.inverse-anchor-audit-baseline.json'
       - '.github/workflows/inverse-anchor-audit.yml'
       - 'docs/cth/anchor-worthy-manifest.json'
+      - 'docs/cth/proof-anchor-remediation.json'
       - 'scripts/check_anchor_manifest.py'
       - 'proofs/agda-cubical/**'
 
@@ -42,13 +43,18 @@ jobs:
             --out-md /tmp/audit.md \
             --out-json /tmp/audit.json \
             --stamp "CI"
-      - name: C1/C2/C3 — declared anchor-worthiness enforcement (FAULT-S4-005, supersedes the grep ratchet)
+      - name: C1/C2/C3/C3-FULL — declared anchor-worthiness + full-ledger proof enforcement (FAULT-S4-005, supersedes the grep ratchet)
         run: |
-          # FAULT-S4-005 fix — one manifest (docs/cth/anchor-worthy-manifest.json), three clauses:
+          # FAULT-S4-005 fix — one manifest (docs/cth/anchor-worthy-manifest.json), clauses:
           #   C1 candidate set = the DECLARED manifest, not `grep theorem` (640->~dozen).
           #   C2 a declared deliverable absent from the ledger is a HARD FAIL that CANNOT be
           #      baselined away — kills the silent baseline-bump escape that defeated the ratchet.
           #   C3 each declared anchor's witnesses must RESOLVE in source (proof_file + theorem
           #      names on this head) — hard-fail on real drift (#613/#615 class). Intra-QBP, no
           #      cross-repo fetch (qbp-cu #66 clauses a+b; clause-c infra-soft-pass N/A here).
+          #   C3-FULL EVERY provenance_kind:proof anchor's proof_file must resolve on this head;
+          #      the known-legacy set is a SHRINK-ONLY, issue-linked register
+          #      (docs/cth/proof-anchor-remediation.json). A NEW proof anchor with a 404 file is
+          #      blocked; the register can only shrink (#617). Source is checked out here, so
+          #      proof_file paths resolve — full-ledger runs (no --skip-full-ledger).
           python3 scripts/check_anchor_manifest.py
