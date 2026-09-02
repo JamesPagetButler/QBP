@@ -21,6 +21,7 @@ on:
       - '.github/workflows/inverse-anchor-audit.yml'
       - 'docs/cth/anchor-worthy-manifest.json'
       - 'scripts/check_anchor_manifest.py'
+      - 'proofs/agda-cubical/**'
 
 permissions:
   contents: read
@@ -41,11 +42,13 @@ jobs:
             --out-md /tmp/audit.md \
             --out-json /tmp/audit.json \
             --stamp "CI"
-      - name: C1/C2 — declared anchor-worthiness enforcement (FAULT-S4-005, supersedes the grep ratchet)
+      - name: C1/C2/C3 — declared anchor-worthiness enforcement (FAULT-S4-005, supersedes the grep ratchet)
         run: |
-          # FAULT-S4-005 fix: the candidate set is the DECLARED manifest
-          # (docs/cth/anchor-worthy-manifest.json), not `grep theorem` (640->~dozen). A declared
-          # anchor-worthy deliverable absent from the ledger is a HARD FAIL that CANNOT be
-          # baselined away — this kills the silent baseline-bump escape that defeated the
-          # grep ratchet. (C3 witnesses-resolve rides qbp-cu #66 Step-1 + qbp-architecture §5.)
+          # FAULT-S4-005 fix — one manifest (docs/cth/anchor-worthy-manifest.json), three clauses:
+          #   C1 candidate set = the DECLARED manifest, not `grep theorem` (640->~dozen).
+          #   C2 a declared deliverable absent from the ledger is a HARD FAIL that CANNOT be
+          #      baselined away — kills the silent baseline-bump escape that defeated the ratchet.
+          #   C3 each declared anchor's witnesses must RESOLVE in source (proof_file + theorem
+          #      names on this head) — hard-fail on real drift (#613/#615 class). Intra-QBP, no
+          #      cross-repo fetch (qbp-cu #66 clauses a+b; clause-c infra-soft-pass N/A here).
           python3 scripts/check_anchor_manifest.py
