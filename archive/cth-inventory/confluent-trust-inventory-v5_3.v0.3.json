@@ -145,7 +145,7 @@
     {
       "sorry_count": 0,
       "last_tested_at": "2026-03-28T00:00:00Z",
-      "proof_file": "proofs/Sprint12-Inherited/Sedenion.lean",
+      "proof_file": "lean4/QBP/Sedenion.lean",
       "description": "Exhaustive enumeration of all 14,400 basis-sum pairs. 42 have product norm = 0.",
       "proof_system": "lean4",
       "name": "Exactly 42 basis-sum zero divisors in sedenions",
@@ -164,7 +164,7 @@
     {
       "sorry_count": 0,
       "last_tested_at": "2026-03-28T00:00:00Z",
-      "proof_file": "proofs/Sprint12-Inherited/Sedenion.lean",
+      "proof_file": "lean4/QBP/Sedenion.lean",
       "description": "The 32x32 Hessian of the product norm at each ZD has identical eigenvalue spectrum. Verified 42/42.",
       "proof_system": "lean4",
       "name": "Hessian spectrum {0(x16), 4(x4), 8(x8), 12(x4)} at all 42 ZDs",
@@ -218,7 +218,7 @@
     {
       "sorry_count": 0,
       "last_tested_at": "2026-03-27T00:00:00Z",
-      "proof_file": "proofs/Sprint12-Inherited/Sedenion.lean",
+      "proof_file": "lean4/QBP/Sedenion.lean",
       "description": "The Fano plane structure governs octonion multiplication and the ZD topology.",
       "proof_system": "lean4",
       "name": "Fano mediator theorem",
@@ -292,7 +292,7 @@
     {
       "sorry_count": 0,
       "last_tested_at": "2026-03-28T00:00:00Z",
-      "proof_file": "proofs/Sprint12-Inherited/Elements.lean",
+      "proof_file": "lean4/QBP/Elements.lean",
       "description": "Electron shell capacity = 2n^2 follows from dim of SU(2) fundamental rep = 2.",
       "proof_system": "lean4",
       "name": "2n^2 shell capacity from SU(2) fundamental dimension",
