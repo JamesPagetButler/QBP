@@ -34,7 +34,15 @@ you have to have the evidence that it's proven to submit it"):
       Coq Admitted/admit).
   Miss any → the anchor does not carry its proof and the gate HARD-FAILS. The first run found
   only 10 of 31 proof anchors carry strong evidence; 21 do not (17 phantom-file + 4 written/
-  no-verification). The known-legacy set lives in a SHRINK-ONLY, issue-linked register
+  no-verification).
+
+  G1 (FAULT-S4-007, cth schema ruling seq=1041): the SAME clean bar applies to a `derivation`
+  anchor that SHOWS verification (carries any of proof_file/verification/proof_state/theorems) —
+  a derivation shows either CLEAN Lean or none, so a dirty proof can't be laundered as a
+  derivation to dodge the bar. `proof` is REQUIRED to carry evidence; a `derivation` is not, but
+  if it shows a footing that footing must be clean. (G2: a `derivation` never flips inter#57 to
+  PROVEN — that needs `proof` AND `coherent`. G3: derivations are not manifest deliverables; the
+  C1/C2 manifest candidate set stays proof-only.) The known-legacy set lives in a SHRINK-ONLY, issue-linked register
   (docs/cth/proof-anchor-remediation.json). C3-FULL HARD-FAILS if:
     (a) a proof anchor FAILS the evidence bar and is NOT in the register — a NEW over-claim; or
     (b) a register entry now MEETS the bar (or the anchor is gone / no longer a proof) — the
@@ -189,20 +197,48 @@ def _evidence_reasons(anchor, root):
     return reasons
 
 
+# Verification/proof fields the schema (post-S4-007 relaxed C1) allows on {proof, derivation}.
+_PROOF_FIELDS = ("proof_file", "verification", "proof_state", "theorems")
+
+
+def _shows_verification(anchor):
+    """True if the anchor carries any verification/proof field — i.e. it CLAIMS a
+    machine-checked footing. A bare anchor (none of these) shows no proof."""
+    return any(anchor.get(f) for f in _PROOF_FIELDS)
+
+
+def _requires_evidence(anchor):
+    """Which anchors the clean-evidence bar applies to (FAULT-S4-007 G1):
+      - `proof`      — MUST carry the evidence (the verified thing IS the claim);
+      - `derivation` — only IF it SHOWS verification (a derivation shows either clean Lean
+                       or none — a shown footing must meet the same clean bar as a proof).
+    A bare derivation / theory / experiment / etc. is exempt (no proof shown)."""
+    pk = anchor.get("provenance_kind")
+    return pk == "proof" or (pk == "derivation" and _shows_verification(anchor))
+
+
+def _evidence_reasons_for_kind(anchor, root):
+    """[] if the anchor is honest for its kind, else the ways it falls short. `proof` and
+    `derivation`-showing-verification get the full clean bar; everything else is exempt.
+    """
+    return _evidence_reasons(anchor, root) if _requires_evidence(anchor) else []
+
+
 def check_full_ledger_proofs(ledger_by_id, register, root="."):
-    """C3-FULL (evidence bar): every provenance_kind:proof anchor must CARRY its proof —
-    verified + axiom-clean audit + sorry-free resolving source — unless it is a known-legacy
-    entry in the shrink-only register. Returns (new_over_claims, stale_register, register_no_issue):
-      new_over_claims   — proof anchor that fails the evidence bar and is NOT registered (fail)
-      stale_register    — registered anchor that now MEETS the bar (or is gone / no longer a
-                          proof): resolved, entry must be removed (register can only shrink)
+    """C3-FULL (evidence bar): every anchor to which the bar applies — a `proof` (required),
+    or a `derivation` that SHOWS verification (G1) — must CARRY clean evidence (verified +
+    axiom-clean audit + sorry-free resolving source), unless it is a known-legacy entry in the
+    shrink-only register. Returns (new_over_claims, stale_register, register_no_issue):
+      new_over_claims   — a bar-applicable anchor that fails and is NOT registered (fail)
+      stale_register    — registered anchor now HONEST for its kind (clean proof / clean
+                          derivation / reclassified) or gone: resolved, remove entry (shrink-only)
       register_no_issue — register entries lacking a tracking issue (fail)
     """
     reg_ids = {e["anchor_id"] for e in register}
 
     new_over_claims = []
     for aid, a in ledger_by_id.items():
-        if a.get("provenance_kind") != "proof":
+        if not _requires_evidence(a):
             continue
         if aid in reg_ids:
             continue
@@ -216,16 +252,13 @@ def check_full_ledger_proofs(ledger_by_id, register, root="."):
         a = ledger_by_id.get(aid)
         if a is None:
             stale_register.append((aid, "anchor no longer in ledger — remove entry"))
-        elif a.get("provenance_kind") != "proof":
+        elif not _evidence_reasons_for_kind(a, root):
             stale_register.append(
                 (
                     aid,
-                    "anchor is no longer provenance_kind:proof — resolved, remove entry",
+                    "anchor now honest for its kind (clean proof / clean derivation / "
+                    "reclassified) — resolved, remove entry",
                 )
-            )
-        elif not _evidence_reasons(a, root):
-            stale_register.append(
-                (aid, "anchor now carries its proof evidence — resolved, remove entry")
             )
 
     register_no_issue = [
@@ -306,8 +339,14 @@ def main():
         n_proof = sum(
             1 for a in ledger_by_id.values() if a.get("provenance_kind") == "proof"
         )
+        n_deriv = sum(
+            1
+            for a in ledger_by_id.values()
+            if a.get("provenance_kind") == "derivation" and _shows_verification(a)
+        )
         print(
-            f"C3-FULL (evidence bar): {n_proof} provenance_kind:proof anchor(s); "
+            f"C3-FULL (evidence bar): {n_proof} proof + {n_deriv} verification-showing "
+            f"derivation anchor(s) under the clean bar (G1); "
             f"{len(register)} on the remediation register."
         )
         fail = False
