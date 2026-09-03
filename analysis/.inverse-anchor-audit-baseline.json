@@ -1,5 +1,4 @@
 {
-  "anchor_side_phantoms": 16,
   "lean_side_orphans": 640,
   "per_file_theorems": {
     "proofs/QBP/Basic.lean": 6,
@@ -42,6 +41,5 @@
     "proofs/Sprint12-Inherited/Kitaev.lean": 13,
     "proofs/Sprint12-Inherited/Quaternion.lean": 11,
     "proofs/Sprint12-Inherited/Sedenion.lean": 10
-  },
-  "stale_path_citations": 8
+  }
 }

@@ -11,9 +11,15 @@ anchored, and does its anchor cite a real file?". Surfaces three gap sets:
                              instead of the live `proofs/` tree.
 
 This is the INVERSE of `cth migrate` (which walks anchors forward). Emits a
-markdown report + a machine-readable JSON. With --check it exits non-zero when
-the orphan/phantom counts exceed a committed baseline (ratchet), so the audit
-stays current (issue #464 AC5).
+markdown report + a machine-readable JSON with all three gap sets (discovery).
+
+ENFORCEMENT (--check), post-FAULT-S4-007: only the UNDER-claim direction
+(lean_side_orphans + per-file) is ratcheted here. The OVER-claim gaps (phantoms,
+stale-path) are RETIRED from enforcement — superseded, strictly better, by the
+ABSOLUTE C3-FULL evidence bar + the itemised shrink-only register in
+scripts/check_anchor_manifest.py (a scalar "16 phantoms tolerated" green-lights the
+debt; PATTERN-02). They remain in the JSON report for discovery only. The orphan
+ratchet is itself slated to become an absolute manifest-based under-claim gate (#619).
 
 Usage:
   anchor_inverse_audit.py [--proofs-dir proofs] [--ledger <path>]
@@ -321,21 +327,31 @@ def main():
     for _n, p, _ln in theorems:
         per_file[p] = per_file.get(p, 0) + 1
 
-    ratchet = {
-        "lean_side_orphans": stats["lean_side_orphans"],
-        "anchor_side_phantoms": stats["anchor_side_phantoms"],
-        "stale_path_citations": stats["stale_path_citations"],
-    }
+    # FAULT-S4-007 (PATTERN-02): the OVER-claim ratchets (anchor_side_phantoms,
+    # stale_path_citations) are RETIRED here. They are superseded — strictly better —
+    # by the ABSOLUTE C3-FULL evidence bar + the itemised, issue-linked, shrink-only
+    # register (docs/cth/proof-anchor-remediation.json): 0 tolerated, each item named,
+    # no silent baseline-bump. A scalar tolerance ("anchor_side_phantoms: 16") green-lights
+    # the debt; that is the bug this whole remediation exists for. phantoms/stale are still
+    # COMPUTED and emitted in the JSON report (discovery), just no longer ENFORCED here.
+    # Only the UNDER-claim direction is enforced by this ratchet — the evidence bar does not
+    # cover proof->anchor. (lean_side_orphans is itself a ratchet, tracked for conversion to
+    # an absolute manifest-based under-claim gate — #619.)
+    ENFORCED_KEYS = ("lean_side_orphans",)
+    enforced_ratchet = {k: stats[k] for k in ENFORCED_KEYS}
     if args.update_baseline:
         with open(args.baseline, "w", encoding="utf-8") as f:
             json.dump(
-                {**ratchet, "per_file_theorems": per_file},
+                {**enforced_ratchet, "per_file_theorems": per_file},
                 f,
                 indent=2,
                 sort_keys=True,
             )
             f.write("\n")
-        print(f"baseline updated: {ratchet} + per_file({len(per_file)} files)")
+        print(
+            f"baseline updated: {enforced_ratchet} + per_file({len(per_file)} files) "
+            f"[over-claim ratchets retired → C3-FULL evidence bar]"
+        )
         return 0
     if args.check:
         try:
@@ -344,7 +360,7 @@ def main():
             print(f"::error::baseline {args.baseline} missing — run --update-baseline")
             return 1
         bad = False
-        for k, v in ratchet.items():
+        for k, v in enforced_ratchet.items():
             if v > base.get(k, 0):
                 print(
                     f"::error::inverse-audit ratchet violated — {k}: {v} > baseline {base.get(k, 0)}"
