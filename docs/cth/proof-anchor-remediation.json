@@ -1,0 +1,28 @@
+{
+  "register_version": "1.0",
+  "description": "FAULT-S4-005 Step-3 full-ledger EVIDENCE-BAR audit — shrink-only remediation register for pre-existing provenance_kind:proof anchors that do NOT carry their proof evidence (proof_state:verified + a language-clean verification.axiom_closure + sorry_count:0 + a resolving, sorry-free proof_file). Enumerated by the audit's first run: 10 of 31 proof anchors carry strong evidence; the 21 below do not. Two classes: 'phantom' (no proof_file on master) and 'no-audit' (file resolves but written/no verification block, some on native_decide). Resolution (per entry, theory-state — oppenheimer + cth, 1x1): PROVE (supply a verified, axiom-clean proof) or RECLASSIFY (provenance_kind proof -> theory|derivation). Either resolution REMOVES the entry from this register.",
+  "policy": "SHRINK-ONLY. The full-ledger evidence-bar audit (scripts/check_anchor_manifest.py) HARD-FAILS if: (1) any provenance_kind:proof anchor FAILS the evidence bar and is NOT listed here (a NEW over-claim — blocked immediately: you cannot claim proven without submitting the evidence); or (2) a listed anchor now MEETS the bar (it was proved/verified — remove the stale entry). The register can only lose entries. Adding an entry is a visible, reviewed commit to this file with a tracking issue — NOT a silent CI-driven baseline raise (that silent-raise is exactly what defeated the FAULT-S4-005 ratchet). This register is a burn-down list on the clock, not a permanent allowlist.",
+  "entries": [
+    { "anchor_id": "PROOF-fano", "class": "no-audit", "cited_proof_file": "lean4/QBP/Sedenion.lean", "issue": "#613" },
+    { "anchor_id": "PROOF-42zd", "class": "no-audit", "cited_proof_file": "lean4/QBP/Sedenion.lean", "issue": "#613" },
+    { "anchor_id": "PROOF-hessian", "class": "no-audit", "cited_proof_file": "lean4/QBP/Sedenion.lean", "issue": "#613" },
+    { "anchor_id": "PROOF-shells", "class": "no-audit", "cited_proof_file": "lean4/QBP/Elements.lean", "issue": "#613" },
+    { "anchor_id": "INSIGHT-s2-dirac-eta-vanishes", "class": "phantom", "cited_proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean", "issue": "#615" },
+    { "anchor_id": "DERIV-vaidya-accreting-horizon-spacelike", "class": "phantom", "cited_proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean", "issue": "#615" },
+    { "anchor_id": "DERIV-hubble-half-entropy-factor", "class": "phantom", "cited_proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean", "issue": "#615" },
+    { "anchor_id": "PROOF-eigenratios", "class": "phantom", "cited_proof_file": "lean4/QBP/GaugeBosons.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-cl6", "class": "phantom", "cited_proof_file": "lean4/QBP/GaugeBosons.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-3gen", "class": "phantom", "cited_proof_file": "lean4/QBP/GaugeBosons.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-g2", "class": "phantom", "cited_proof_file": "QBP-boundary-cell-model.py", "issue": "#617" },
+    { "anchor_id": "PROOF-alpha-particle-quaternion", "class": "phantom", "cited_proof_file": "QBP/Cosmo/Nucleosynthesis.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-iron-56-double-octet", "class": "phantom", "cited_proof_file": "QBP/Cosmo/Nucleosynthesis.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-oxygen-16-sedenion", "class": "phantom", "cited_proof_file": "QBP/Cosmo/Nucleosynthesis.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-silicon-28-fano-ladder", "class": "phantom", "cited_proof_file": "QBP/Cosmo/Nucleosynthesis.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-iron-to-ns-bridge", "class": "phantom", "cited_proof_file": "QBP/Cosmo/DenseMatter.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-seed-mass-from-ln7", "class": "phantom", "cited_proof_file": "QBP/Cosmo/SeedMass.lean", "issue": "#617" },
+    { "anchor_id": "PROOF-fano-choice-information", "class": "phantom", "cited_proof_file": "QBP/Cosmo/FanoChoiceInformation.lean", "issue": "#617" },
+    { "anchor_id": "PRED-btfr-mass-correction", "class": "phantom", "cited_proof_file": "QBP/Cosmo/RedshiftEvolution.lean", "issue": "#617" },
+    { "anchor_id": "PRED-a0-redshift-linear", "class": "phantom", "cited_proof_file": "QBP/Cosmo/RedshiftEvolution.lean", "issue": "#617" },
+    { "anchor_id": "FIT-zeta-modulated-profile", "class": "phantom", "cited_proof_file": "lean4/QBP/SpectralAction/ProfileFit.lean", "issue": "#617" }
+  ]
+}

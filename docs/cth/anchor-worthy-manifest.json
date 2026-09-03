@@ -1,0 +1,16 @@
+{
+  "manifest_version": "0.1.0",
+  "description": "FAULT-S4-005 C1/C2: the DECLARED set of anchor-worthy theory-state deliverables (top-level, non-private, named in an issue-AC / #474-row). The inverse-anchor-audit ratchet counts orphans against THIS manifest, not `grep theorem` (the 640->~dozen fix). Maintained by cth-implementor (schema authority); the merging PR that lands a new theory-state deliverable adds its entry. Each entry joins: declared_by (deliverable) -> witnesses (source theorem qualified-names) -> anchor_id (CTH ledger). One manifest, three clauses: C1 declared->anchored, C2 no-baselining-declared, C3 anchored->witnesses-resolve.",
+  "entries": [
+    {"anchor_id": "PRED-ckm-cp-phase-arctan-sqrt7", "proof_system": "lean4", "declared_by": "#585", "witnesses": ["QBP.Foundations.CPPhase.cos_sq_delta_CP", "QBP.Foundations.CPPhase.tan_delta_CP", "QBP.Foundations.CPPhase.sin_sq_delta_CP"]},
+    {"anchor_id": "PROOF-cd-algebra-finrank-2n", "proof_system": "lean4", "declared_by": "#585", "witnesses": ["QBP.Foundations.CDDimension.finrank_cdAlg", "QBP.Foundations.CDDimension.even_tower_imDim", "QBP.Foundations.CDDimension.finrank_imSubmodule"]},
+    {"anchor_id": "PROOF-sp1-unit-quaternion-group", "proof_system": "lean4", "declared_by": "#466", "witnesses": ["QBP.Foundations.UnitQuaternion.norm_preserving_iff_unit", "QBP.Foundations.UnitQuaternion.norm_mul_of_unit", "QBP.Foundations.UnitQuaternion.mem_Sp1_iff_norm"]},
+    {"anchor_id": "PROOF-spectral-action-moment-scaling", "proof_system": "lean4", "declared_by": "#466", "witnesses": ["QBP.Foundations.SpectralMoments.f4_scaling", "QBP.Foundations.SpectralMoments.f2_scaling", "QBP.Foundations.SpectralMoments.profileMoment_dilate"]},
+    {"anchor_id": "PROOF-fano-genesis", "proof_system": "lean4", "declared_by": "#466", "witnesses": ["QBP.Foundations.FanoGenesis.imaginary_units_square_neg_one", "QBP.Foundations.FanoGenesis.lines_units_consistent", "QBP.Foundations.FanoGenesis.octonion_non_associative", "QBP.Foundations.FanoGenesis.fano_anticommutative"]},
+    {"anchor_id": "PROOF-normed-division-tower-existence", "proof_system": "lean4", "declared_by": "#466", "witnesses": ["QBP.Foundations.Hurwitz.octonion_norm_multiplicative", "QBP.Foundations.Hurwitz.sedenion_not_composition", "QBP.Foundations.Hurwitz.tower_dims_in_1248"]},
+    {"anchor_id": "PROOF-octonion-zd-hypersurface-empty", "proof_system": "lean4", "declared_by": "#594", "witnesses": ["QBP.Foundations.LeftMulDet.octonionLeftMul_det", "QBP.Foundations.LeftMulDet.octonionLeftMul_det_eq_zero_iff", "QBP.Foundations.LeftMulDet.octonionLeftMul_det_comm"]},
+    {"anchor_id": "PROOF-s3-hspace", "proof_system": "agda", "declared_by": "#575", "witnesses": ["S3FromCD.S³-HSpace"]},
+    {"anchor_id": "PROOF-skyrmion-baryon-complete-invariant", "proof_system": "agda", "declared_by": "#595", "witnesses": ["SkyrmionCharge.baryonNumber-complete", "SkyrmionCharge.skyrmionSectorsIso", "SkyrmionCharge.baryonNumber-hedgehog-correct", "SkyrmionCharge.baryonNumber-skyrmionℤ-correct"]},
+    {"anchor_id": "PROOF-substrate-baryon-additive", "proof_system": "agda", "declared_by": "#595", "witnesses": ["SubstrateCharge.baryonNumber-quaternionProduct-correct", "SubstrateCharge.baryonNumber-leftTranslation-correct"]}
+  ]
+}

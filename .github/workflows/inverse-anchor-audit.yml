@@ -19,6 +19,10 @@ on:
       - 'scripts/anchor_inverse_audit.py'
       - 'analysis/.inverse-anchor-audit-baseline.json'
       - '.github/workflows/inverse-anchor-audit.yml'
+      - 'docs/cth/anchor-worthy-manifest.json'
+      - 'docs/cth/proof-anchor-remediation.json'
+      - 'scripts/check_anchor_manifest.py'
+      - 'proofs/agda-cubical/**'
 
 permissions:
   contents: read
@@ -32,10 +36,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Run the inverse anchor audit (ratchet against baseline)
+      - name: Inverse anchor audit — UNDER-claim (orphan) ratchet only; over-claim gaps retired to the C3-FULL evidence bar (FAULT-S4-007)
         run: |
           python3 scripts/anchor_inverse_audit.py \
             --check \
             --out-md /tmp/audit.md \
             --out-json /tmp/audit.json \
             --stamp "CI"
+      - name: C1/C2/C3/C3-FULL — declared anchor-worthiness + full-ledger proof enforcement (FAULT-S4-005, supersedes the grep ratchet)
+        run: |
+          # FAULT-S4-005 fix — one manifest (docs/cth/anchor-worthy-manifest.json), clauses:
+          #   C1 candidate set = the DECLARED manifest, not `grep theorem` (640->~dozen).
+          #   C2 a declared deliverable absent from the ledger is a HARD FAIL that CANNOT be
+          #      baselined away — kills the silent baseline-bump escape that defeated the ratchet.
+          #   C3 each declared anchor's witnesses must RESOLVE in source (proof_file + theorem
+          #      names on this head) — hard-fail on real drift (#613/#615 class). Intra-QBP, no
+          #      cross-repo fetch (qbp-cu #66 clauses a+b; clause-c infra-soft-pass N/A here).
+          #   C3-FULL (EVIDENCE BAR) EVERY provenance_kind:proof anchor must CARRY its proof —
+          #      proof_state:verified + a language-clean verification.axiom_closure (Lean subset of
+          #      {propext,Classical.choice,Quot.sound}; Agda --safe) + sorry_count:0 + a resolving,
+          #      sorry-free proof_file (comment-stripped scan). "If you claim proven, you must submit
+          #      the evidence." The 21 known-legacy over-claims are a SHRINK-ONLY, issue-linked
+          #      register (docs/cth/proof-anchor-remediation.json; #613/#615/#617); a NEW off-register
+          #      over-claim is blocked, the register only shrinks. Source is checked out here so the
+          #      source scan + resolution run (no --skip-full-ledger). Airtight #print-axioms/--safe
+          #      re-derivation is the authoritative follow-on on the foundations CI.
+          python3 scripts/check_anchor_manifest.py
