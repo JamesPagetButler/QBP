@@ -32,6 +32,14 @@
   Those are QBP physical hypotheses; the dimension counts are a necessary
   numerical coincidence, not a derivation of the nuclear/GR physics.
 
+  ── QBP ANSATZ, not textbook astrophysics ───────────────────────────────────
+  The `(M_TOV/M_Ch)² = 7/3` premise is a **QBP-specific algebraic ansatz**, NOT
+  a standard General-Relativity result: standard GR yields no universal
+  dimensionless `7/3` neutron-star mass ratio (the Buchdahl bound is a `4/9`
+  compactness limit, and the TOV limit is equation-of-state dependent). The Lean
+  proves only the *arithmetic consequence* of the ansatz (`M_TOV = M_Ch·√(7/3)`),
+  never the ansatz itself. Do not read it as a textbook TOV input.
+
   Completeness: zero `sorry`, zero `native_decide`, zero vacuous `True`.
   `#print axioms` audit at the bottom.
 -/

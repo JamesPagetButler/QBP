@@ -26,6 +26,14 @@
   crystallisation threshold.  Those are QBP hypotheses; here they are the
   definition of `S_BH` and the constant on the right-hand side.
 
+  ── QBP ANSATZ, not textbook black-hole thermodynamics ──────────────────────
+  The `S_BH = ln 7` threshold is a **QBP-specific crystallisation-entropy
+  ansatz**, NOT a standard Bekenstein–Hawking result: textbook BH thermodynamics
+  has no `ln 7` (nor any privileged) entropy threshold. The Lean proves only the
+  *real-analysis identity* that the stated `M_seed` solves `S_BH(M)=ln 7` for the
+  QBP-posited threshold; it does not derive the threshold. Do not read `ln 7` as
+  a textbook value.
+
   Completeness: zero `sorry`, zero `native_decide`, zero vacuous `True`.
   `#print axioms` audit at the bottom.
 -/
