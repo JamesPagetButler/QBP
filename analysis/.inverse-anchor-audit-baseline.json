@@ -49,6 +49,7 @@
     "proofs/Sprint12-Inherited/Graphene.lean": 11,
     "proofs/Sprint12-Inherited/Kitaev.lean": 13,
     "proofs/Sprint12-Inherited/Quaternion.lean": 11,
-    "proofs/Sprint12-Inherited/Sedenion.lean": 10
+    "proofs/Sprint12-Inherited/Sedenion.lean": 9,
+    "proofs/Sprint12-Inherited/SedenionHessianTraceSq.lean": 1
   }
 }
