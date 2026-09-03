@@ -7,7 +7,7 @@
   "vendored_on_date_utc": "2026-09-03",
   "vendored_by_pr": "QBP #621 (0.3.3 derivation delta; prior 0.3.2 vendoring: #549)",
   "synced_from_upstream_pr": "0.3.3: pending canonical derivation-delta PR (confluent-trust) — vendored-first per R16 minor same-day sync (cth-implementor authored the delta content, qbp-implementor committed it on QBP #621; canonical follows same-day, byte-identical). Prior 0.3.2 sync: confluent-trust#98.",
-  "vendored_sha256_of_schema_file": "7759b1c2f2470cfca53ee698962de7bd7a7bbd2a84abb750695d87e772b4a267",
+  "vendored_sha256_of_schema_file": "555a9d2823d21ac8a976817abd9bb7558758ec5f7704136a4292be7818802b0e",
   "vendored_upstream_commit_sha": "18c91db67ad12efe8907ba0f5e745408c9db6260",
   "vendored_upstream_commit_url_template": "https://github.com/JamesPagetButler/confluent-trust/blob/<sha>/schema/inventory.schema.json",
   "cth_schema_version": "v0.3",

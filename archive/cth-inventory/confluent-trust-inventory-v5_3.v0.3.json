@@ -3284,13 +3284,13 @@
       "proof_file": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
       "lean_theorem": "QBP.Cosmo.Nucleosynthesis.alpha_particle_is_quaternionic",
       "sorry_count": 0,
-      "description": "The α-particle's mass number equals the dimension of the quaternion algebra. This is the algebraic origin of α-particle stability and the alpha-process ladder (4n nuclei): 2 protons + 2 neutrons fill ℍ exactly.",
+      "description": "The α-particle's mass number equals the dimension of the quaternion algebra. This is the algebraic origin of α-particle stability and the alpha-process ladder (4n nuclei): 2 protons + 2 neutrons fill ℍ exactly. Verified: the arithmetic identity 4 = dim ℍ (`alpha_particle_is_quaternionic`); the physical identification with helium-4 stability is a derivation/interpretation, NOT a proven physics theorem.",
       "prediction_chain": [
         "PROOF-quat-closure"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
       "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "Nuclear-identity cluster rider: the kernel proves 4 = dim H; it does not prove helium knows that.",
@@ -3357,14 +3357,14 @@
         "iron_decomposition_consistency"
       ],
       "sorry_count": 0,
-      "description": "Iron-56, the most stable nucleus (binding-energy peak), has mass number 56 = 7 × 8 = dim(Im 𝕆) × dim 𝕆. Equivalently 56 = 14 × 4 = dim G₂ × dim ℍ (fourteen α-particles, where 14 is the dimension of Aut(𝕆)). The end of stellar nucleosynthesis is algebraically the product of the two octonionic dimensions. Formal version of `INSIGHT-iron-handoff-...`.",
+      "description": "Iron-56, the most stable nucleus (binding-energy peak), has mass number 56 = 7 × 8 = dim(Im 𝕆) × dim 𝕆. Equivalently 56 = 14 × 4 = dim G₂ × dim ℍ (fourteen α-particles, where 14 is the dimension of Aut(𝕆)). The end of stellar nucleosynthesis is algebraically the product of the two octonionic dimensions. Formal version of `INSIGHT-iron-handoff-...`. Verified: the arithmetic identity 56 = 7 × 8 = dim(Im 𝕆) × dim 𝕆 (`iron_56_double_octet`); the identification with Iron-56 nuclear stability (the binding-energy peak) is a derivation/interpretation, NOT a proven physics theorem.",
       "prediction_chain": [
         "PROOF-alpha-particle-quaternion",
         "PROOF-fano"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
       "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "Nuclear-identity cluster rider (see PROOF-alpha-particle-quaternion).",
@@ -3392,7 +3392,7 @@
       "proof_file": "proofs/QBP/Cosmo/DenseMatter.lean",
       "lean_theorem": "QBP.Cosmo.DenseMatter.iron_to_ns_dim_im_octonion_link",
       "sorry_count": 0,
-      "description": "Both the iron-56 mass number (end of stellar fusion) and the TOV limit (max neutron-star mass) depend on dim(Im 𝕆) = 7. Specifically: iron_56 / dim 𝕆 = dim(Im 𝕆), and (M_TOV / M_Ch)² = dim(Im 𝕆) / dim(Im ℍ). The seven Fano lines control where fusion ends AND how heavy a collapsed remnant can be.",
+      "description": "Both the iron-56 mass number (end of stellar fusion) and the TOV limit (max neutron-star mass) depend on dim(Im 𝕆) = 7. Specifically: iron_56 / dim 𝕆 = dim(Im 𝕆), and (M_TOV / M_Ch)² = dim(Im 𝕆) / dim(Im ℍ). The seven Fano lines control where fusion ends AND how heavy a collapsed remnant can be. NB: the TOV mass ratio 7/3 = dim(Im 𝕆)/dim(Im ℍ) is a QBP ansatz (the octonionic identification) — standard GR / the TOV equation does not derive this ratio; the verified Lean is the arithmetic of the ansatz, not a derivation from general relativity.",
       "prediction_chain": [
         "PROOF-iron-56-double-octet",
         "PRED-TOV-limit-sqrt-7-over-3"
@@ -3431,13 +3431,13 @@
         "oxygen_16_equals_sedenion_dim"
       ],
       "sorry_count": 0,
-      "description": "Oxygen-16 has mass number 16 = 4² = dim ℍ × dim ℍ = dim 𝕊. O-16 is four α-particles (each filling ℍ); together they fill the sedenion algebra. The next Cayley-Dickson step beyond ℍ.",
+      "description": "Oxygen-16 has mass number 16 = 4² = dim ℍ × dim ℍ = dim 𝕊. O-16 is four α-particles (each filling ℍ); together they fill the sedenion algebra. The next Cayley-Dickson step beyond ℍ. Verified: the arithmetic identity 16 = 4² = dim 𝕊 (`oxygen_16_is_sedenion`); the identification with Oxygen-16 nuclear structure is a derivation/interpretation, NOT a proven physics theorem.",
       "prediction_chain": [
         "PROOF-alpha-particle-quaternion"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
       "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "Nuclear-identity cluster rider.",
@@ -3464,7 +3464,7 @@
       "proof_file": "proofs/QBP/Cosmo/SeedMass.lean",
       "sorry_count": 0,
       "status": "coherent",
-      "description": "M_seed solves S_BH(M) = ln 7 where S_BH = 4πGM²/(ℏc). Numerically M_seed ≈ 0.39 M_Planck ≈ 8.6×10⁻⁹ kg. The seed mass is uniquely determined by the Fano-line cardinality and the universal constants. Lean theorems: S_BH_at_M_seed, S_BH_at_M_seed_log_seven, M_seed_pos.",
+      "description": "M_seed solves S_BH(M) = ln 7 where S_BH = 4πGM²/(ℏc). Numerically M_seed ≈ 0.39 M_Planck ≈ 8.6×10⁻⁹ kg. The seed mass is uniquely determined by the Fano-line cardinality and the universal constants. NB: setting the Bekenstein–Hawking entropy S_BH = ln 7 (the Fano-line-cardinality identification) is a QBP ansatz — standard Bekenstein–Hawking thermodynamics does not single out ln 7; the verified Lean is the arithmetic of the ansatz, not a derivation from black-hole thermodynamics. Lean theorems: S_BH_at_M_seed, S_BH_at_M_seed_log_seven, M_seed_pos.",
       "prediction_chain": [
         "PROOF-fano-choice-information"
       ],
@@ -3507,14 +3507,14 @@
         "silicon_to_cpu_bridge"
       ],
       "sorry_count": 0,
-      "description": "Silicon-28 (the dominant Si isotope, 92% terrestrial abundance) has mass number 28 = 7 × 4 = dim(Im 𝕆) × dim ℍ. Seven α-particles, one per Fano line. The alpha-process ladder ¹²C→¹⁶O→²⁰Ne→²⁴Mg→²⁸Si exhausts the seven Fano lines exactly. CPU silicon traces back to this structure.",
+      "description": "Silicon-28 (the dominant Si isotope, 92% terrestrial abundance) has mass number 28 = 7 × 4 = dim(Im 𝕆) × dim ℍ. Seven α-particles, one per Fano line. The alpha-process ladder ¹²C→¹⁶O→²⁰Ne→²⁴Mg→²⁸Si exhausts the seven Fano lines exactly. CPU silicon traces back to this structure. Verified: the arithmetic identity 28 = 7 × 4 = dim(Im 𝕆) × dim ℍ (`silicon_28_alpha_ladder`); the identification with Silicon-28 abundance/nuclear structure is a derivation/interpretation, NOT a proven physics theorem.",
       "prediction_chain": [
         "PROOF-alpha-particle-quaternion",
         "PROOF-fano"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
       "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "Nuclear-identity cluster rider.",
