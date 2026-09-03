@@ -182,7 +182,7 @@
     {
       "sorry_count": 0,
       "last_tested_at": "2026-03-28T00:00:00Z",
-      "proof_file": "lean4/QBP/GaugeBosons.lean",
+      "proof_file": "proofs/QBP/GaugeBosons.lean",
       "description": "Three non-zero eigenspaces with dimensions 4, 8, 4 and eigenvalues 12, 8, 4 in ratio 3:2:1.",
       "proof_system": "lean4",
       "name": "Eigenvalue ratios 3:2:1 (12:8:4)",
@@ -194,16 +194,28 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "proof",
-      "proof_state": "written"
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.GaugeBosons.eigenvalue_ratios",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "sorry_count": 0,
       "last_tested_at": "2026-03-26T00:00:00Z",
-      "proof_file": "QBP-boundary-cell-model.py",
-      "description": "All 7 quaternionic subalgebras of O are equivalent under G2 automorphisms. Computationally confirmed.",
+      "proof_file": "proofs/QBP/Foundations/G2Transitivity.lean",
+      "description": "Verified: Aut(𝕆) acts transitively on the 7 Fano (quaternionic) subalgebras of O (`g2_transitive_genuine_automorphisms`). The identification Aut(𝕆) ≅ G₂ and the ZD-locus labels are UNFORMALIZED (follow-up #622) — the G₂ identification is NOT claimed as proven.",
       "proof_system": "python_exhaustive",
-      "name": "G2 acts transitively on ZD locus",
+      "name": "Aut(𝕆) transitive on the 7 Fano subalgebras",
       "id": "PROOF-g2",
       "proof_language": "python_exhaustive",
       "prediction_chain": [
@@ -212,8 +224,20 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "proof",
-      "proof_state": "written"
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.G2Transitivity.g2_transitive_genuine_automorphisms",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "sorry_count": 0,
@@ -236,7 +260,7 @@
     {
       "sorry_count": 0,
       "last_tested_at": "2026-03-28T00:00:00Z",
-      "proof_file": "lean4/QBP/GaugeBosons.lean",
+      "proof_file": "proofs/QBP/GaugeBosons.lean",
       "description": "Cl(6) acting on C tensor O gives charge quantisation matching SM. After Furey 2015.",
       "proof_system": "lean4",
       "name": "Cl(6) charge quantisation in 1/3",
@@ -249,16 +273,28 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "proof",
-      "proof_state": "written"
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.GaugeBosons.charge_quantisation",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "sorry_count": 0,
       "last_tested_at": "2026-03-28T00:00:00Z",
-      "proof_file": "lean4/QBP/GaugeBosons.lean",
-      "description": "dim(Im H) = 3 gives exactly three fermion generations.",
+      "proof_file": "proofs/QBP/GaugeBosons.lean",
+      "description": "dim(Im H) = 3, interpreted as three fermion generations. Verified: dim(Im ℍ) = 3 (`im_quaternion_dim_three`). The identification with 3 fermion generations is an interpretation (derivation), NOT a proven theorem.",
       "proof_system": "lean4",
-      "name": "Exactly three generations",
+      "name": "dim(Im ℍ) = 3 (interpreted as 3 generations)",
       "id": "PROOF-3gen",
       "proof_language": "lean4",
       "prediction_chain": [
@@ -268,8 +304,20 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "proof",
-      "proof_state": "written"
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.GaugeBosons.im_quaternion_dim_three",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "sorry_count": 0,
@@ -2905,7 +2953,7 @@
       "tier": 3,
       "provenance": "T",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/RedshiftEvolution.lean",
+      "proof_file": "proofs/QBP/Cosmo/RedshiftEvolution.lean",
       "sorry_count": 0,
       "status": "marginal",
       "description": "The holographic acceleration scale a₀ = κ_BH = c⁴/(4GM) combined with PROOF-M-proportional-to-a (M(a) = M₀·a) gives a₀(z) = a₀(0)·(1+z) — a sharp, falsifiable redshift dependence. Numerically: a₀(z=14) = 15·a₀(0) = 1.8×10⁻⁹ m/s². This is the Stage-5/Stage-7 bridge of the walking-the-chain audit and the cleanest JWST discriminator currently in the CTH.",
@@ -2916,7 +2964,7 @@
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "notes": "Lean theorem name: a0_redshift_evolution. Companion lemma kappa_inverse_mass also Lean-proven. Promote to coherent (with experimental backing) once a JWST BTFR-collapse test confirms the (1+z) scaling.\n[Session 22, IFU rotation-curve test, 2026-05-04] IFU verdict: saturating favoured at Δχ² = +72.89. Linear (1+z) form is the late-time asymptote only; matter-era physics imposes saturation.",
-      "lean_theorem": "a0_redshift_evolution",
+      "lean_theorem": "QBP.Cosmo.RedshiftEvolution.a0_redshift_evolution",
       "lean_companion_theorems": [
         "a0_inverse_scale_factor",
         "kappa_inverse_mass"
@@ -2943,11 +2991,21 @@
         "pipeline_version": "0.1.0",
         "date": "2026-05-04"
       },
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `a0_redshift_evolution` / file `QBP/Cosmo/RedshiftEvolution.lean`"
+      "proof_state": "verified",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "PRED-a0-saturating-Fmax-7",
@@ -3045,7 +3103,7 @@
       "tier": 3,
       "provenance": "T",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/RedshiftEvolution.lean",
+      "proof_file": "proofs/QBP/Cosmo/RedshiftEvolution.lean",
       "sorry_count": 0,
       "status": "coherent",
       "description": "In the deep-MOND regime v⁴ = G·M_b·a₀. With a₀(z) = a₀(0)·(1+z), observers reading v but assuming z=0 a₀ over-estimate baryonic mass by factor (1+z). At z=14 this is a factor 15 — comparable to the magnitude of the JWST \"impossibly early massive galaxy\" overshoot. Quantitative resolution of OBS-jwst-early-galaxies awaits the BTFR-collapse test against JADES UV-LF.",
@@ -3056,7 +3114,7 @@
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "notes": "Lean theorem name: btfr_mass_correction. TEST: divide JADES/CEERS UV-LF inferred-mass axes at z = 4, 7, 10, 12, 14 by (1+z) and check whether they collapse onto the z = 0 SPARC baryonic Tully-Fisher relation. ~1 day computation.\n[Session 17, BTFR-collapse on JADES] Mid-z (1<z<10) collapse to ~0.02 dex residual after (1+z) correction; z>10 overshoots by -0.12 dex. Strong support for the (1+z) form at intermediate z; ambiguous at z>10 (real physics signal vs velocity-estimate uncertainty).\n[Session 21] Z≥10 reapproach with QBP-saturating form (F_max=dim(Im 𝕆)=7): residual at z≥10 collapses from -0.121 dex (linear) to -0.006 dex (saturating). Failure mode \"regime-of-validity unspecified\" is RESOLVED. The matter-era saturation plus the linear DE-era form together cover all observed z.",
-      "lean_theorem": "btfr_mass_correction",
+      "lean_theorem": "QBP.Cosmo.RedshiftEvolution.btfr_mass_correction",
       "physical_mapping_type": "type_2_integrated",
       "integration_test_status": "verified",
       "regime_of_validity": {
@@ -3078,11 +3136,21 @@
         "pipeline_version": "0.1.0",
         "date": "2026-05-04"
       },
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `btfr_mass_correction` / file `QBP/Cosmo/RedshiftEvolution.lean`"
+      "proof_state": "verified",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "PRED-hypergraph-cmb-camb-rerun",
@@ -3213,22 +3281,32 @@
       "provenance": "T",
       "status": "coherent",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/Nucleosynthesis.lean",
-      "lean_theorem": "alpha_particle_is_quaternionic",
+      "proof_file": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
+      "lean_theorem": "QBP.Cosmo.Nucleosynthesis.alpha_particle_is_quaternionic",
       "sorry_count": 0,
-      "description": "The α-particle's mass number equals the dimension of the quaternion algebra. This is the algebraic origin of α-particle stability and the alpha-process ladder (4n nuclei): 2 protons + 2 neutrons fill ℍ exactly.",
+      "description": "The α-particle's mass number equals the dimension of the quaternion algebra. This is the algebraic origin of α-particle stability and the alpha-process ladder (4n nuclei): 2 protons + 2 neutrons fill ℍ exactly. Verified: the arithmetic identity 4 = dim ℍ (`alpha_particle_is_quaternionic`); the physical identification with helium-4 stability is a derivation/interpretation, NOT a proven physics theorem.",
       "prediction_chain": [
         "PROOF-quat-closure"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "Nuclear-identity cluster rider: the kernel proves 4 = dim H; it does not prove helium knows that.",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `alpha_particle_is_quaternionic` / file `QBP/Cosmo/Nucleosynthesis.lean`"
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "PROOF-fano-choice-information",
@@ -3236,7 +3314,7 @@
       "tier": 1,
       "provenance": "T",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/FanoChoiceInformation.lean",
+      "proof_file": "proofs/QBP/Cosmo/FanoChoiceInformation.lean",
       "sorry_count": 0,
       "status": "coherent",
       "description": "Information-cost identity: log(numFanoLines) = log 7. Bridges the combinatorial Fano result (FanoGenesis.lean T1: 7 lines) to the entropic interpretation used in M_seed (S_BH = ln 7). The crystallisation threshold and the Shannon information of a uniform 7-way choice are the same number BY CONSTRUCTION.",
@@ -3246,13 +3324,23 @@
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "notes": "Lean theorem name: fano_choice_information. Resolves the entropy/algebra coincidence at Stage 2 (crossing S = ln 7) — the threshold equals the cost of the choice.",
-      "lean_theorem": "fano_choice_information",
+      "lean_theorem": "QBP.Cosmo.FanoChoiceInformation.fano_choice_information",
       "physical_mapping_type": "type_1_direct",
       "provenance_kind": "proof",
+      "proof_state": "verified",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `fano_choice_information` / file `QBP/Cosmo/FanoChoiceInformation.lean`"
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "PROOF-iron-56-double-octet",
@@ -3261,28 +3349,38 @@
       "provenance": "T",
       "status": "coherent",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/Nucleosynthesis.lean",
-      "lean_theorem": "iron_56_double_octet",
+      "proof_file": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
+      "lean_theorem": "QBP.Cosmo.Nucleosynthesis.iron_56_double_octet",
       "lean_companion_theorems": [
         "iron_56_g2_alpha_ladder",
         "iron_56_is_fourteen_alphas",
         "iron_decomposition_consistency"
       ],
       "sorry_count": 0,
-      "description": "Iron-56, the most stable nucleus (binding-energy peak), has mass number 56 = 7 × 8 = dim(Im 𝕆) × dim 𝕆. Equivalently 56 = 14 × 4 = dim G₂ × dim ℍ (fourteen α-particles, where 14 is the dimension of Aut(𝕆)). The end of stellar nucleosynthesis is algebraically the product of the two octonionic dimensions. Formal version of `INSIGHT-iron-handoff-...`.",
+      "description": "Iron-56, the most stable nucleus (binding-energy peak), has mass number 56 = 7 × 8 = dim(Im 𝕆) × dim 𝕆. Equivalently 56 = 14 × 4 = dim G₂ × dim ℍ (fourteen α-particles, where 14 is the dimension of Aut(𝕆)). The end of stellar nucleosynthesis is algebraically the product of the two octonionic dimensions. Formal version of `INSIGHT-iron-handoff-...`. Verified: the arithmetic identity 56 = 7 × 8 = dim(Im 𝕆) × dim 𝕆 (`iron_56_double_octet`); the identification with Iron-56 nuclear stability (the binding-energy peak) is a derivation/interpretation, NOT a proven physics theorem.",
       "prediction_chain": [
         "PROOF-alpha-particle-quaternion",
         "PROOF-fano"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "Nuclear-identity cluster rider (see PROOF-alpha-particle-quaternion).",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `iron_56_double_octet` / file `QBP/Cosmo/Nucleosynthesis.lean`"
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "PROOF-iron-to-ns-bridge",
@@ -3291,10 +3389,10 @@
       "provenance": "T",
       "status": "coherent",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/DenseMatter.lean",
-      "lean_theorem": "iron_to_ns_dim_im_octonion_link",
+      "proof_file": "proofs/QBP/Cosmo/DenseMatter.lean",
+      "lean_theorem": "QBP.Cosmo.DenseMatter.iron_to_ns_dim_im_octonion_link",
       "sorry_count": 0,
-      "description": "Both the iron-56 mass number (end of stellar fusion) and the TOV limit (max neutron-star mass) depend on dim(Im 𝕆) = 7. Specifically: iron_56 / dim 𝕆 = dim(Im 𝕆), and (M_TOV / M_Ch)² = dim(Im 𝕆) / dim(Im ℍ). The seven Fano lines control where fusion ends AND how heavy a collapsed remnant can be.",
+      "description": "Both the iron-56 mass number (end of stellar fusion) and the TOV limit (max neutron-star mass) depend on dim(Im 𝕆) = 7. Specifically: iron_56 / dim 𝕆 = dim(Im 𝕆), and (M_TOV / M_Ch)² = dim(Im 𝕆) / dim(Im ℍ). The seven Fano lines control where fusion ends AND how heavy a collapsed remnant can be. NB: the TOV mass ratio 7/3 = dim(Im 𝕆)/dim(Im ℍ) is a QBP ansatz (the octonionic identification) — standard GR / the TOV equation does not derive this ratio; the verified Lean is the arithmetic of the ansatz, not a derivation from general relativity.",
       "prediction_chain": [
         "PROOF-iron-56-double-octet",
         "PRED-TOV-limit-sqrt-7-over-3"
@@ -3302,13 +3400,23 @@
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_2_integrated",
       "integration_test_status": "verified",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "The (M_TOV/M_Ch)^2=7/3 Lean identity stands (sorry 0); the global-physical reading rides the falsified claim and may not borrow the theorem's credibility.",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `iron_to_ns_dim_im_octonion_link` / file `QBP/Cosmo/DenseMatter.lean`"
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "PROOF-oxygen-16-sedenion",
@@ -3317,25 +3425,35 @@
       "provenance": "T",
       "status": "coherent",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/Nucleosynthesis.lean",
-      "lean_theorem": "oxygen_16_is_sedenion",
+      "proof_file": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
+      "lean_theorem": "QBP.Cosmo.Nucleosynthesis.oxygen_16_is_sedenion",
       "lean_companion_theorems": [
         "oxygen_16_equals_sedenion_dim"
       ],
       "sorry_count": 0,
-      "description": "Oxygen-16 has mass number 16 = 4² = dim ℍ × dim ℍ = dim 𝕊. O-16 is four α-particles (each filling ℍ); together they fill the sedenion algebra. The next Cayley-Dickson step beyond ℍ.",
+      "description": "Oxygen-16 has mass number 16 = 4² = dim ℍ × dim ℍ = dim 𝕊. O-16 is four α-particles (each filling ℍ); together they fill the sedenion algebra. The next Cayley-Dickson step beyond ℍ. Verified: the arithmetic identity 16 = 4² = dim 𝕊 (`oxygen_16_is_sedenion`); the identification with Oxygen-16 nuclear structure is a derivation/interpretation, NOT a proven physics theorem.",
       "prediction_chain": [
         "PROOF-alpha-particle-quaternion"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "Nuclear-identity cluster rider.",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `oxygen_16_is_sedenion` / file `QBP/Cosmo/Nucleosynthesis.lean`"
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "PROOF-seed-mass-from-ln7",
@@ -3343,27 +3461,37 @@
       "tier": 1,
       "provenance": "T",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/SeedMass.lean",
+      "proof_file": "proofs/QBP/Cosmo/SeedMass.lean",
       "sorry_count": 0,
       "status": "coherent",
-      "description": "M_seed solves S_BH(M) = ln 7 where S_BH = 4πGM²/(ℏc). Numerically M_seed ≈ 0.39 M_Planck ≈ 8.6×10⁻⁹ kg. The seed mass is uniquely determined by the Fano-line cardinality and the universal constants. Lean theorems: S_BH_at_M_seed, S_BH_at_M_seed_log_seven, M_seed_pos.",
+      "description": "M_seed solves S_BH(M) = ln 7 where S_BH = 4πGM²/(ℏc). Numerically M_seed ≈ 0.39 M_Planck ≈ 8.6×10⁻⁹ kg. The seed mass is uniquely determined by the Fano-line cardinality and the universal constants. NB: setting the Bekenstein–Hawking entropy S_BH = ln 7 (the Fano-line-cardinality identification) is a QBP ansatz — standard Bekenstein–Hawking thermodynamics does not single out ln 7; the verified Lean is the arithmetic of the ansatz, not a derivation from black-hole thermodynamics. Lean theorems: S_BH_at_M_seed, S_BH_at_M_seed_log_seven, M_seed_pos.",
       "prediction_chain": [
         "PROOF-fano-choice-information"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "notes": "Implies the parent body is NOT a stellar-collapse remnant (no associativity in 𝕆-physics → no QFT → no hydrostatic stars). Natural framing: primordial Planck-scale relic crossing the S = ln 7 threshold.",
-      "lean_theorem": "S_BH_at_M_seed_log_seven",
+      "lean_theorem": "QBP.Cosmo.SeedMass.S_BH_at_M_seed_log_seven",
       "lean_companion_theorems": [
         "S_BH_at_M_seed",
         "M_seed_pos",
         "M_seed_arg_nonneg"
       ],
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `S_BH_at_M_seed_log_seven` / file `QBP/Cosmo/SeedMass.lean`"
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "PROOF-silicon-28-fano-ladder",
@@ -3372,27 +3500,37 @@
       "provenance": "T",
       "status": "coherent",
       "proof_system": "lean4",
-      "proof_file": "QBP/Cosmo/Nucleosynthesis.lean",
-      "lean_theorem": "silicon_28_alpha_ladder",
+      "proof_file": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
+      "lean_theorem": "QBP.Cosmo.Nucleosynthesis.silicon_28_alpha_ladder",
       "lean_companion_theorems": [
         "fano_alpha_ladder",
         "silicon_to_cpu_bridge"
       ],
       "sorry_count": 0,
-      "description": "Silicon-28 (the dominant Si isotope, 92% terrestrial abundance) has mass number 28 = 7 × 4 = dim(Im 𝕆) × dim ℍ. Seven α-particles, one per Fano line. The alpha-process ladder ¹²C→¹⁶O→²⁰Ne→²⁴Mg→²⁸Si exhausts the seven Fano lines exactly. CPU silicon traces back to this structure.",
+      "description": "Silicon-28 (the dominant Si isotope, 92% terrestrial abundance) has mass number 28 = 7 × 4 = dim(Im 𝕆) × dim ℍ. Seven α-particles, one per Fano line. The alpha-process ladder ¹²C→¹⁶O→²⁰Ne→²⁴Mg→²⁸Si exhausts the seven Fano lines exactly. CPU silicon traces back to this structure. Verified: the arithmetic identity 28 = 7 × 4 = dim(Im 𝕆) × dim ℍ (`silicon_28_alpha_ladder`); the identification with Silicon-28 abundance/nuclear structure is a derivation/interpretation, NOT a proven physics theorem.",
       "prediction_chain": [
         "PROOF-alpha-particle-quaternion",
         "PROOF-fano"
       ],
       "last_tested_at": "2026-04-30T00:00:00Z",
       "physical_mapping_type": "type_1_direct",
-      "provenance_kind": "proof",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
       "physical_mapping_status": "conjectural",
       "intake_note": "Nuclear-identity cluster rider.",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `silicon_28_alpha_ladder` / file `QBP/Cosmo/Nucleosynthesis.lean`"
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "REF-brink-condensed-group-cohomology",
@@ -3889,13 +4027,14 @@
       "proof_system": "lean4",
       "proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
       "sorry_count": 0,
-      "provenance_kind": "proof",
-      "proof_state": "written",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.QBPHorizonFoundations.eta_symmetric_spectrum_zero",
       "proof_language": "lean4",
       "theorems": [
         {
           "name": "QBP.HorizonFoundations.eta_symmetric_spectrum_zero",
-          "status": "written"
+          "status": "verified"
         }
       ],
       "status": "coherent",
@@ -3908,11 +4047,20 @@
       "id_history": [
         "PROOF-s2-dirac-eta-vanishes"
       ],
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "relabelled PROOF-s2-dirac-eta-vanishes → INSIGHT-s2-dirac-eta-vanishes (truth-in-labelling, #509 Batch C): route-elimination result; cites type-1 termination at phantom files (zero cited theorems resolve); self-labelled 'written pending verification' = hypothesis, not termination. Anchor-ID extension of layer-architecture 3.4 (truth-in-labelling), RATIFIED standing policy.; proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `(none)` / file `proofs/QBP/Foundations/QBPHorizonFoundations.lean`",
       "intake_note": "route-elimination result; cites type-1 termination at phantom files (zero cited theorems resolve); self-labelled 'written pending verification' = hypothesis, not termination. Anchor-ID extension of layer-architecture 3.4 (truth-in-labelling), RATIFIED standing policy.",
       "intake_batch": "509-C",
-      "intake_source": "v5_24 (QBP-web continued lineage)"
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "DERIV-vaidya-accreting-horizon-spacelike",
@@ -3922,25 +4070,26 @@
       "proof_system": "lean4",
       "proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
       "sorry_count": 0,
-      "provenance_kind": "proof",
-      "proof_state": "written",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.QBPHorizonFoundations.accreting_horizon_spacelike",
       "proof_language": "lean4",
       "theorems": [
         {
           "name": "QBP.HorizonFoundations.vaidya_horizon_normSq_eq",
-          "status": "written"
+          "status": "verified"
         },
         {
           "name": "QBP.HorizonFoundations.accreting_horizon_spacelike",
-          "status": "written"
+          "status": "verified"
         },
         {
           "name": "QBP.HorizonFoundations.static_horizon_null",
-          "status": "written"
+          "status": "verified"
         },
         {
           "name": "QBP.HorizonFoundations.evaporating_horizon_timelike",
-          "status": "written"
+          "status": "verified"
         }
       ],
       "status": "coherent",
@@ -3954,11 +4103,20 @@
       "id_history": [
         "PROOF-vaidya-accreting-horizon-spacelike"
       ],
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "relabelled PROOF-vaidya-accreting-horizon-spacelike → DERIV-vaidya-accreting-horizon-spacelike (truth-in-labelling, #509 Batch C): derivation, not kernel-verified proof; phantom file citations (QBPHorizonFoundations.lean does not exist).; proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `(none)` / file `proofs/QBP/Foundations/QBPHorizonFoundations.lean`",
       "intake_note": "derivation, not kernel-verified proof; phantom file citations (QBPHorizonFoundations.lean does not exist).",
       "intake_batch": "509-C",
-      "intake_source": "v5_24 (QBP-web continued lineage)"
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "DERIV-hubble-half-entropy-factor",
@@ -3968,13 +4126,14 @@
       "proof_system": "lean4",
       "proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
       "sorry_count": 0,
-      "provenance_kind": "proof",
-      "proof_state": "written",
+      "provenance_kind": "derivation",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.QBPHorizonFoundations.hubble_half_entropy",
       "proof_language": "lean4",
       "theorems": [
         {
           "name": "QBP.HorizonFoundations.hubble_half_area",
-          "status": "written"
+          "status": "verified"
         }
       ],
       "status": "coherent",
@@ -3988,11 +4147,20 @@
       "id_history": [
         "PROOF-hubble-half-entropy-factor"
       ],
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "relabelled PROOF-hubble-half-entropy-factor → DERIV-hubble-half-entropy-factor (truth-in-labelling, #509 Batch C): derivation, not kernel-verified proof; phantom file citations (lean4/QBP/SpectralAction/ does not exist).; proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `(none)` / file `proofs/QBP/Foundations/QBPHorizonFoundations.lean`",
       "intake_note": "derivation, not kernel-verified proof; phantom file citations (lean4/QBP/SpectralAction/ does not exist).",
       "intake_batch": "509-C",
-      "intake_source": "v5_24 (QBP-web continued lineage)"
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "FIT-zeta-modulated-profile",
@@ -4011,16 +4179,16 @@
         "PRED-profile-function-f0-f2-ratio"
       ],
       "provenance_kind": "proof",
-      "proof_state": "written",
+      "proof_state": "verified",
       "proof_language": "lean4",
       "proof_system": "lean4",
-      "proof_file": "lean4/QBP/SpectralAction/ProfileFit.lean",
+      "proof_file": "proofs/QBP/SpectralAction/ProfileFit.lean",
       "sorry_count": 0,
-      "lean_theorem": "profile_uniqueness",
+      "lean_theorem": "QBP.SpectralAction.ProfileFit.profile_uniqueness",
       "theorems": [
         {
           "name": "profile_uniqueness",
-          "status": "written",
+          "status": "verified",
           "blockers": "Awaiting a recorded verification run (toolchain+Mathlib SHA). Scope: proves only the 2x2 linear solve given gamma-reduced moment polynomials as definitions; does NOT prove the integral reduction or any physics."
         }
       ],
@@ -4029,8 +4197,17 @@
       "independent": false,
       "intake_batch": "509-C",
       "intake_source": "v5_24 (QBP-web continued lineage)",
-      "lean_migration_status": "stale-pointer",
-      "review_flag": "proof_file unresolved against live tree (R2 stale-pointer rule, #509 apply): theorem `profile_uniqueness` / file `lean4/QBP/SpectralAction/ProfileFit.lean`"
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
+          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+        },
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "result": "verified",
+        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+      }
     },
     {
       "id": "FLAG-ngc2683-mass-discrepancy",

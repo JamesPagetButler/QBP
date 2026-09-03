@@ -329,6 +329,56 @@ def main():
                 reg(("A", "")),
                 1,
             ),
+            # ---- G1: derivation-showing-verification under the same clean bar ----
+            (
+                "G1: clean derivation (verified+clean+sorry-free) -> PASS",
+                led2(anc("A", provenance_kind="derivation", **verified(clean))),
+                reg(),
+                0,
+            ),
+            (
+                "G1: bare derivation (no proof-fields) -> PASS (exempt)",
+                led2({"id": "A", "provenance_kind": "derivation"}),
+                reg(),
+                0,
+            ),
+            (
+                "G1: derivation SHOWS verification but source has sorry -> HARD FAIL",
+                led2(anc("A", provenance_kind="derivation", **verified(withsorry))),
+                reg(),
+                1,
+            ),
+            (
+                "G1: derivation with proof_file but NO verification block -> HARD FAIL",
+                led2(
+                    anc(
+                        "A",
+                        provenance_kind="derivation",
+                        proof_file=clean,
+                        proof_state="written",
+                    )
+                ),
+                reg(),
+                1,
+            ),
+            (
+                "G1: dirty derivation-showing-verification but registered -> PASS",
+                led2(anc("A", provenance_kind="derivation", **verified(withsorry))),
+                reg(("A", "#617")),
+                0,
+            ),
+            (
+                "G1: registered anchor reclassified to CLEAN derivation -> stale FAIL",
+                led2(anc("A", provenance_kind="derivation", **verified(clean))),
+                reg(("A", "#617")),
+                1,
+            ),
+            (
+                "G1: registered anchor reclassified to BARE derivation -> stale FAIL (resolved)",
+                led2({"id": "A", "provenance_kind": "derivation"}),
+                reg(("A", "#617")),
+                1,
+            ),
         ]
         for name, l, r, exp in cf:
             got = run_full_ledger(l, r, root=root)
