@@ -378,19 +378,12 @@ theorem zero_divisor_count_42 : checkZDCount42 = true := by
 theorem hessian_trace_128_universal : checkAllHessianTraces128 = true := by
   decide
 
-/-- T6. The Hessian trace Tr(H²) = 1152 at ALL 42 zero divisors.
-    This is the spectral invariant a₄ = 1152. -/
--- #482 EXCEPTION (documented, tracked #582): this is the ONLY theorem in the
--- Sprint12-Inherited corpus that retains `native_decide` after the #482
--- native_decide→kernel-`decide` migration. Kernel `decide` is impractical here:
--- squaring the 16×16 Hessian for each of the 42 zero divisors (`Id.run do`,
--- O(16³·42)) reduces pathologically — measured >3.5 min + >5 GB RAM without
--- converging. The sibling Tr(H) theorem (`hessian_trace_128_universal`) migrated
--- cleanly; only the SQUARED trace is heavy. Consequence: this one theorem retains
--- `Lean.ofReduceBool` in its axiom set. Refactor to kernel-feasible form
--- (Hessian symmetry: Tr(H²)=Σ H[i][j]²; de-monadify) is tracked in #582.
-theorem hessian_traceSq_1152_universal : checkAllHessianTracesSq1152 = true := by
-  native_decide
+-- T6. The Hessian trace Tr(H²) = 1152 (a₄) — `hessian_traceSq_1152_universal` —
+-- was MOVED to `SedenionHessianTraceSq.lean` (#613): it is the corpus's only
+-- `native_decide` theorem (kernel `decide` impractical; #582), so isolating it
+-- keeps THIS file native_decide-free and its kernel-clean theorems (e.g.
+-- `zero_divisor_count_42` → `PROOF-42zd`) anchorable under the file-level
+-- evidence-bar scan. The def `checkAllHessianTracesSq1152` (below) stays here.
 
 /-- T7a. The spectrum {0(×16), 4(×4), 8(×8), 12(×4)} satisfies all 
     trace equations AND is the unique non-negative integer solution

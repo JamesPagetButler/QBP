@@ -33,7 +33,7 @@ lean_lib «QBP» where
 @[default_target]
 lean_lib «QBPSprint12» where
   srcDir := "Sprint12-Inherited"
-  roots := #[`Bi2Se3, `Crystallisation, `Elements, `Graphene, `Kitaev, `Quaternion, `Sedenion]
+  roots := #[`Bi2Se3, `Crystallisation, `Elements, `Graphene, `Kitaev, `Quaternion, `Sedenion, `SedenionHessianTraceSq]
 
 -- Phase 4d: Float oracle executable for differential testing
 lean_exe «oracle» where
