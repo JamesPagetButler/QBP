@@ -1,7 +1,7 @@
-"""#473 AC1 v0.1 — the G₂ orbit space of S¹⁴ ⊂ Im𝕊 and the descent of the δ-landscape.
+"""#473 AC1 v0.2 — the G₂ orbit space of S¹⁴ ⊂ Im𝕊 and the descent of the δ-landscape.
 
-Checks (numerically; the committed evidence behind Props 5–6 of
-docs/foundations/473-ac1-first-link-v0.1.md):
+Checks (numerically; the committed evidence behind Props 5–6 and 9–10 of
+docs/foundations/473-ac1-first-link-2026-09-04.md):
 
   (1) the 21 standard derivations D_{e_i,e_j} of 𝕆 span a 14-dim space (= 𝔤₂) and are
       derivations of the octonion product;
@@ -9,7 +9,11 @@ docs/foundations/473-ac1-first-link-v0.1.md):
       orbit dimension 11, so the orbit space S¹⁴/G₂ is 3-dimensional;
   (3) the landscape potential V(s) = δ² = ‖[a,b]‖² equals 4(|a|²|Im b|² − ⟨a,Im b⟩²),
       i.e. a function of the three invariants (|a|², b₀, ⟨a,Im b⟩) only — so the
-      gradient flow of #629 descends to the orbit space.
+      gradient flow of #629 descends to the orbit space;
+  (4) on the vacuum manifold V = 0 the orbit dimension is 6 (0 only at ±ℓ), so the
+      vacuum orbit space is 2-dimensional — the residual the flow leaves free;
+  (5) Fix(G₂) on Im𝕊 is the line ℝℓ, so Fix ∩ S¹⁴ = {±ℓ} — the no-tower theorem's
+      only input beyond "G₂ is connected".
 
 Also writes hvr_orbit_space.png: V over the orbit space (slices in ⟨a,Im b⟩), with the
 vacuum locus and the zero-divisor ridge marked.  Numerical flashlight only.
@@ -78,6 +82,42 @@ for _ in range(2000):
     worst = max(worst, abs(d2 - 4 * (a @ a * (imb @ imb) - (a @ imb) ** 2)))
 print(
     f"(3) max |delta^2 - 4(|a|^2|Im b|^2 - <a,Im b>^2)| over 2000 Haar samples: {worst:.1e}"
+)
+
+
+# (4) orbit dimension on the vacuum manifold V = 0 (a ∥ Im b, or a = 0, or Im b = 0):
+#     expect 6 everywhere except at ±ℓ, so the vacuum orbit space is 8 - 6 = 2-dim.
+def orbit_dim(a, b):
+    vecs = np.array([np.concatenate([d @ a, d @ b]) for d in ders])
+    return int(np.linalg.matrix_rank(vecs, 1e-9))
+
+
+u = np.concatenate([[0.0], rng.normal(size=7)])
+u /= np.linalg.norm(u)
+ell = np.zeros(8)
+ell[0] = 1.0
+vac = {
+    "a≠0, b=0": (u, np.zeros(8)),
+    "a=0, Im b≠0": (np.zeros(8), u),
+    "a ∥ Im b, b0≠0": (0.6 * u, 0.5 * ell + 0.4 * u),
+    "±ℓ": (np.zeros(8), ell),
+}
+print("(4) G2 orbit dim on the vacuum manifold V=0:")
+for name, (a, b) in vac.items():
+    print(f"      {name:16s} -> {orbit_dim(a, b)}")
+
+# (5) Fix(G2) on Im S: common kernel of the 14 derivations acting diagonally on
+#     Im O ⊕ O.  Expect a 1-dim kernel spanned by ℓ (Im O irreducible ⇒ no fixed
+#     vector there; on O only the real part 1·ℓ survives).  So Fix ∩ S^14 = {±ℓ}.
+D15 = np.array(
+    [np.block([[d[1:, 1:], np.zeros((7, 8))], [np.zeros((8, 7)), d]]) for d in ders]
+)  # each (15,15): acts on (Im a | b)
+stack = D15.reshape(-1, 15)
+_, sv, vt = np.linalg.svd(stack)
+kern = vt[np.sum(sv > 1e-9) :]
+print(
+    f"(5) dim Fix(G2) on Im S = {kern.shape[0]} (expect 1); "
+    f"kernel vector = {np.round(np.abs(kern[0]), 6).tolist()} (expect e_ℓ = index 7)"
 )
 
 # ---------- HVR plot: V on the orbit space ----------
