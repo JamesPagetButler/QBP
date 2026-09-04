@@ -213,3 +213,103 @@ paths-filter on `proofs/agda-cubical/**`).
 
 **AC6 COMPLETE — #578 AC1–AC6 all delivered.** Port-dir originals retained as the
 working/provenance copies alongside this log and the vendored BR sources.
+
+---
+
+## Iteration 15+ — #579: AssocHSpace S³-HSpace + the quaternionic Hopf fibration (2026-09-03/04)
+
+Environment: Agda 2.8.0, agda/cubical @ 7b9019b (cubical-0.9); every check via
+`run-bounded 8G 1800 agda --safe <file>` from `proofs/agda-cubical/`. Scoping constraint
+(#575 review, binding): `CDLaws` / `CDJoin-HSpace` untouched — associativity lives in a
+separate downstream module over the concrete instance only.
+
+### Iteration 15 — Step A: associativity transports along HSpace≃ (PASS)
+
+`AssocTransport.agda`: `AssocHSpace-subst : (P : A ≡ B) (H : HSpace A) → AssocHSpace H
+→ AssocHSpace (subst HSpace P H)` by J on P with H generic (at refl, `substRefl`), and
+`AssocHSpace≃ e p = AssocHSpace-subst (ua∙ e p)`. No H-space field is ever projected —
+the transported S³ μ is never unfolded (README performance discipline). 5.5 s / 379 MB.
+Consequence: `AssocHSpace S³-HSpace ⇐ AssocHSpace JoinSuspBool-HSpace` (two applications;
+`QuaternionicHopf.S³-AssocHSpace-from-join`).
+
+### Step C (fallback form, done before B was exhausted): the fibration itself
+
+Library `Cubical.Homotopy.Hopf.Hopf` takes `e-ass : AssocHSpace e` up front but consumes it
+only at `ua-lem` (~l.206) / `Push→TotalSpaceHopf-equiv` (~l.252) — the join-of-joins
+`joinIso₂`. Lines 36–198 (`isEquiv-μ`, `μ-eq`, `Hopf`, `TotalSpaceHopfPush`, `joinIso₁`,
+`IsoTotalSpaceJoin`) are assoc-free. `HopfNoAssoc.agda` = verbatim MIT-attributed extraction
+as `module HopfNA (e : HSpace A) (conA : …)`; `QuaternionicHopf.agda` instantiates it at
+`S³-HSpace` (+ `S³-connected` via `sphereElim2`), giving `HopfS³ : S₊ 4 → Type`,
+`HopfS³-fibre : HopfS³ north ≡ S₊ 3` (refl), `TotalHopfS³ ≃ S₊ 7`, and `WithAssoc` — the full
+library module instantiated once an `AssocHSpace S³-HSpace` is supplied, with
+`Hopf≡HopfS³`. All green.
+
+### Iteration 16 — Step B: the 27-clause join induction, 20 clauses proved (PARTIAL)
+
+Analysis. `μ-assoc x y z` on `join S S` (S = Susp Bool) is a triple join induction: 8 corner
+clauses (`inl/inr` only), 12 one-push clauses (squares), 6 two-push clauses (cubes), 1
+three-push clause (4-cube). The corner clauses need, beyond `CDLaws`, base commutativity and
+its consequences — exactly what makes the CD double of ℂ associative but not that of ℍ:
+
+| extra law (new record `CDCommLaws`, NOT in `CDLaws`) | Bool proof |
+|---|---|
+| `⊗-comm : x ⊗ y ≡ y ⊗ x` | `·-comm` on S¹ via `wedgeconFun 0 0` (targets are sets: `isGroupoidS¹`); no point-level `·-comm` exists in the pinned library (only `comm-ΩS¹`) |
+| `star-⊗ : starS (x ⊗ y) ≡ starS x ⊗ starS y` | `star-to` + `invLooper-·` (also `wedgeconFun 0 0`) + `ret'` |
+| `star-star : starS (starS x) ≡ x` | 4 refl clauses (`not (not a) ≐ a` per constructor) |
+| `⊗-negˡ : negS x ⊗ y ≡ negS (x ⊗ y)` | `negS-id` both sides |
+| `star-neg : starS (negS x) ≡ negS (starS x)` | generic, 3 refl clauses |
+
+Derived corner paths eq₁…eq₈ (in `CDAssocReduction.Reduction`), e.g.
+eq₄ : `−(f (a*d)*) ≡ a(−(f d*))`, eq₈ : `(−(d b*))* f ≡ (−(f d*)) b`. The key consistency
+fact: the 12 one-push squares are each `push (eqᵢ k) (eqⱼ k) (±i)` reusing the SAME 8 corner
+paths (e.g. `assocₓ (push a b i) (cl c) (cr f) k = push (eq₆ k) (eq₂ k) (~ i)`), so they
+assemble into three lemmas `assocₓ` / `assoc-y` / `assoc-z` (one free argument, two corners)
+sharing `assoc-corner`. All 20 clauses check: `CDAssocReduction.agda` 7.3 s / 403 MB,
+`CDAssocBool.agda` (the `CDCommLaws not SuspBool-CDLaws` instance) 5.7 s / 395 MB.
+
+The remaining 7 clauses are stated as TYPES with their boundaries pinned to the proved
+squares (`Cube-xy-L-at … Cube-yz-R-at`, `Cube-xyz-at`) and `AssumingCubes.μ-assoc` assembles
+the full associator from them, so `CDJoin-AssocHSpace : Filler → AssocHSpace CDJoin-HSpace`
+and (Bool) `JoinSuspBool-AssocHSpace-from-cubes`, and at S³
+`QuaternionicHopf.S³-AssocHSpace-from-cubes : (7 cubes) → Filler → AssocHSpace S³-HSpace`
+are checked implications. Iteration-16 attempts at the two-push cube `Cube-yz-L` directly:
+- Attempt 16a (pattern-match the cube as a `push`-square-of-squares like the one-push cases):
+  fails structurally — LHS is `pushMulSquare (a⊗c) (a*⊗d) e f`, RHS is
+  `joinMap (a⊗_) (a*⊗_) (pushMulSquare c d e f)`; both are `transport`s of `apDiamond … (genDiamond w)`
+  at different universal points `w₁ = w (a⊗c) (a*⊗d) e f`, `w₂ = w c d e f`, not constructors.
+- Attempt 16b (reduce by naturality): needs (i) `joinMap` commutes with the 4-corner `transport`
+  (4-fold J), (ii) `apDiamond` composition (`joinMap-comp`, join induction), (iii)
+  `cong genDiamond (pw : w₁ ≡ w₂)` (pw exists under `CDCommLaws`: w₁ = (a*·w₂)·a = w₂), and
+  then (iv) an equality of two *paths in (Susp Bool)⁴* (the 4 corner parameters) — a prop, since
+  (S¹)⁴ is a groupoid, but a genuine winding-number identity between composites of `assocS¹`
+  (itself `wedgeconFun`-built) — plus (v) re-aligning the result with the specific boundary
+  squares `assoc-y`/`assoc-z`. Steps (i)–(iii) are routine but (iv)+(v) are a multi-day cubical
+  development; NOT completed. Recorded as the precise shape of the two-push obligation.
+
+### Iteration 17 — existence status of the 7 open cubes (connectivity), and why it stops there
+
+`CDAssocCubesStatus.agda` (5.9 s / 401 MB): `J₂-connected : isConnected 4 (join SuspBool SuspBool)`
+(via `joinBool≃joinS¹`, `IsoSphereJoin 1 1`, `sphereConnected 3`), then for each two-push cube
+`Cube-··-·-exists : ∀ … → ∥ Cube-··-·-at … ∥₁` by `isConnectedPathP 1 ∘ isConnectedPathP 2 ∘ isConnectedPath 3`
+(a 3-fold path type in a 2-connected type is 0-connected — this is π₂(S³)=0), and, given the
+cubes, `Filler-exists : ∀ y z → ∥ Filler-at y z ∥₁`. Honest limits:
+- mere existence never yields a term (fillers of a two-push cube form a torsor over Ω³S³,
+  π₃(S³)=ℤ — no canonical choice, no prop to eliminate into), and pointwise ∥·∥₁ does not
+  give ∥ ∀ ∥₁ (no choice);
+- the three-push 4-cube `Cube-xyz-at` is a 4-fold path type — the same argument would need
+  `isConnected 5`, i.e. π₃(S³)=0, which is FALSE. Its boundary is a map S³ → S³ that must have
+  degree 0 (true for ℍ, but a computation), and its fillers form a torsor over Ω⁴S³ (π₄(S³)=ℤ/2).
+  This 4-cube is the irreducible content of #579 AC1 — the "genuinely new work" the issue
+  flagged — and is exactly what BR (vendored `br-lean2-source/`) never prove either.
+
+**Step B verdict: PARTIAL.** Fallback per task rule invoked after 3 documented iterations
+(15/16/17). Remaining obligation, as a single typed goal (Bool instance, in scope after
+`open import CDAssocBool` / `open BoolRed`):
+
+```
+Σ[ cxyL ∈ Cube-xy-L ] Σ[ cxyR ∈ Cube-xy-R ] Σ[ cxzL ∈ Cube-xz-L ] Σ[ cxzR ∈ Cube-xz-R ]
+Σ[ cyzL ∈ Cube-yz-L ] Σ[ cyzR ∈ Cube-yz-R ]
+Σ[ cxyz ∈ Cube-xyz cxyL cxyR cxzL cxzR cyzL cyzR ]
+  AssumingCubes.Filler cxyL cxyR cxzL cxzR cyzL cyzR cxyz
+```
+whose inhabitant `S³-AssocHSpace-from-cubes` turns into `AssocHSpace S³-HSpace`.
