@@ -1,3 +1,4 @@
+import QBP.Foundations.Alternator
 import QBP.Foundations.Artin
 import QBP.Foundations.ArtinCore
 import QBP.Foundations.ArtinSpan
