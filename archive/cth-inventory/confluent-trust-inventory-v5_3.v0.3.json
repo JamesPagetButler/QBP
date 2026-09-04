@@ -147,7 +147,7 @@
       "last_tested_at": "2026-03-28T00:00:00Z",
       "proof_file": "proofs/Sprint12-Inherited/Sedenion.lean",
       "lean_theorem": "zero_divisor_count_42",
-      "description": "Exhaustive enumeration of all 14,400 basis-sum pairs. 42 have product norm = 0. Genuinely kernel-proven: `zero_divisor_count_42` is [propext]-clean (kernel `decide`). Recovered from the register (#613) once Sedenion.lean was made native_decide-free (hessian's native_decide theorem split to SedenionHessianTraceSq.lean, #613 option a).",
+      "description": "Exhaustive enumeration of all 14,400 basis-sum pairs. 42 have product norm = 0. Genuinely kernel-proven: `zero_divisor_count_42` is [propext]-clean (kernel `decide`). Recovered from the register (#613) once Sedenion.lean was made native_decide-free (hessian's native_decide theorem split to SedenionHessianTraceSq.lean, #613 option a). #619: the same 42 planes are also witnessed by a distinct Breakdown/CDAlg construction — sedenion_basis_zero_divisor_plane_count_eq_42 and prodIsZero_iff_cdAlg_mul_eq_zero (proofs/QBP/Foundations/Breakdown.lean), folded here as companions rather than a separate anchor.",
       "proof_system": "lean4",
       "name": "Exactly 42 basis-sum zero divisors in sedenions",
       "id": "PROOF-42zd",
@@ -164,14 +164,36 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-03T00:00:00Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #613 register burn-down + Sedenion split); encoded by qbp-implementor; pending cth/oppenheimer §I4",
         "result": "verified",
-        "axiom_closure": ["propext"]
-      }
+        "axiom_closure": [
+          "propext"
+        ]
+      },
+      "lean_companion_theorems": [
+        "QBP.Foundations.Breakdown.sedenion_basis_zero_divisor_plane_count_eq_42",
+        "QBP.Foundations.Breakdown.prodIsZero_iff_cdAlg_mul_eq_zero"
+      ],
+      "theorems": [
+        {
+          "name": "sedenion_basis_zero_divisor_plane_count_eq_42",
+          "status": "verified"
+        },
+        {
+          "name": "prodIsZero_iff_cdAlg_mul_eq_zero",
+          "status": "verified"
+        }
+      ]
     },
     {
       "sorry_count": 0,
@@ -211,13 +233,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -241,13 +273,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -288,13 +330,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -319,13 +371,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -367,13 +429,21 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-03T00:00:00Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #613 register burn-down); encoded by qbp-implementor; pending cth/oppenheimer §I4",
         "result": "verified",
-        "axiom_closure": ["propext"]
+        "axiom_closure": [
+          "propext"
+        ]
       }
     },
     {
@@ -924,8 +994,8 @@
       "provenance_kind": "theory"
     },
     {
-      "last_tested_at": "2026-04-08T00:00:00Z",
-      "description": "Lean Q3-Q4: [eᵢ,eⱼ] = 2εᵢⱼₖeₖ verified for all cyclic permutations. Casimir e₁²+e₂²+e₃² = -3e₀ verified. The Hessian λ=8 eigenspace IS the su(2) algebra.",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "description": "Lean Q3-Q4: [eᵢ,eⱼ]=2εᵢⱼₖeₖ verified for all cyclic permutations (imH_structure_constants), and the Casimir e₁²+e₂²+e₃²=−3e₀ verified (imH_casimir, LieAlgebraIso.lean). The Hessian λ=8 eigenspace IS the su(2) algebra. #619: the Casimir over-claim (previously asserted with no witness) is now witnessed and the anchor promoted theory→proof with a captured axiom_closure.",
       "name": "su(2) Lie algebra from imaginary quaternion commutators",
       "id": "PROOF-su2-lie",
       "prediction_chain": [
@@ -935,7 +1005,44 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.imH_structure_constants",
+      "lean_companion_theorems": [
+        "QBP.Foundations.imH_casimir"
+      ],
+      "theorems": [
+        {
+          "name": "imH_structure_constants",
+          "status": "verified"
+        },
+        {
+          "name": "imH_casimir",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1963,7 +2070,9 @@
       "description": "CONJECTURE (Session 12): sin²(δ_CP) = dim(Im 𝕆)/dim(𝕆) = 7/8, giving δ_CP = arctan(√7) ≈ 69.3°. Measured: 68° ± 2° (PDG global fit), within 0.6σ. The algebraic identity sin²(δ) = 7/8 ⟹ tan(δ) = √7 = √(number of Fano lines). Physical interpretation: the CP phase measures the fraction of the parent 𝕆 algebra's structure that is anti-commutative (CP-odd). The imaginary part (7 units) anti-commutes; the real part (1 unit) commutes. The ratio 7:1 sets sin²:cos² = 7:1. COMPLETES the CKM chain: all 8 flavour parameters now have algebraic candidates, all matching observations within 3%. The chain: Q=2/3 → δ_Koide=2/9 → mass ratios → λ=sin(π/14) → A=√Q → θ₂₃ → δ_CP=arctan(√7).",
       "name": "CKM CP phase δ_CP = arctan(√7) ≈ 69.3° from octonion dimensionality",
       "id": "PRED-ckm-cp-phase-arctan-sqrt7",
-      "prediction_chain": ["PROOF-cd-algebra-finrank-2n"],
+      "prediction_chain": [
+        "PROOF-cd-algebra-finrank-2n"
+      ],
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
@@ -3019,13 +3128,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -3164,13 +3283,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -3320,13 +3449,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -3354,13 +3493,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -3394,13 +3543,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -3430,13 +3589,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -3467,13 +3636,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -3505,13 +3684,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -3544,13 +3733,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -4074,13 +4273,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -4130,13 +4339,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -4174,13 +4393,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -4221,13 +4450,23 @@
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
         "libraries": {
-          "mathlib": { "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f", "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f" },
-          "batteries": { "ref": "main", "sha": "32dc18cde3684679f3c003de608743b57498c56f" }
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
         },
         "verified_at": "2026-09-02T23:46:49Z",
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
-        "axiom_closure": ["propext", "Classical.choice", "Quot.sound"]
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
       }
     },
     {
@@ -5099,6 +5338,2303 @@
       "last_tested_at": "2026-09-01T17:16:48Z",
       "description": "baryonNumber additive under the substrate quaternion product ⋆: B(f⋆g)≡Bf+ℤBg = SubstrateLink.⋆∙-additive at the concrete S3FromCD.S³-HSpace (⋆ = HSpace.μ, pointwise quaternion mult). #595.",
       "notes": "chain PROOF-s3-hspace (#575 — ⋆ IS its H-space mu), within-batch order #575 first. Scoping: plain HSpace only, NO AssocHSpace (S⁷/G₂-forward per #575/#579). Non-vacuity quaternionProduct-pointwise=refl. --safe transitive exit 0 peak 0.63GB -> coherent/PROVEN. #96 AC3."
+    },
+    {
+      "id": "PROOF-ops-order-ladder",
+      "name": "Operations matrix: linear-order breakdown ℝ→𝕊",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#474 operations matrix (order row): ℂ/ℍ/𝕆/𝕊 admit no compatible linear order (the tower loses orderability past ℝ). Kernel-verified counterexamples in Breakdown.lean. See also PROOF-normed-division-tower-existence, PROOF-42zd.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Breakdown.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.Breakdown.complex_no_linear_order",
+      "lean_companion_theorems": [
+        "QBP.Foundations.Breakdown.quaternion_no_linear_order",
+        "QBP.Foundations.Breakdown.octonion_no_order",
+        "QBP.Foundations.Breakdown.sedenion_no_order"
+      ],
+      "theorems": [
+        {
+          "name": "complex_no_linear_order",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_no_linear_order",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_no_order",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_no_order",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-ops-commutativity-ladder",
+      "name": "Operations matrix: commutativity ✓ℝℂ ✗ℍ𝕆𝕊",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#474 operations matrix (commutativity row): mul is commutative for ℝ,ℂ (TowerLaws) and fails for ℍ,𝕆,𝕊 (witnessed counterexamples, Breakdown). Kernel-verified.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.TowerLaws.real_mul_comm",
+      "lean_companion_theorems": [
+        "QBP.Foundations.TowerLaws.complex_mul_comm",
+        "QBP.Foundations.Breakdown.quaternion_not_commutative",
+        "QBP.Foundations.Breakdown.octonion_not_commutative",
+        "QBP.Foundations.Breakdown.sedenion_not_commutative"
+      ],
+      "theorems": [
+        {
+          "name": "real_mul_comm",
+          "status": "verified"
+        },
+        {
+          "name": "complex_mul_comm",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_not_commutative",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_not_commutative",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_not_commutative",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-ops-associativity-ladder",
+      "name": "Operations matrix: associativity ✓ℝℂℍ ✗𝕆𝕊",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#474 operations matrix (associativity row): mul is associative for ℝ,ℂ,ℍ (TowerLaws) and fails for 𝕆,𝕊 (Breakdown). octonion_not_associative overlaps the fact anchored as octonion_non_associative in PROOF-fano-genesis (distinct theorem/file) — see also PROOF-fano-genesis. Kernel-verified.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.TowerLaws.real_associative",
+      "lean_companion_theorems": [
+        "QBP.Foundations.TowerLaws.complex_associative",
+        "QBP.Foundations.TowerLaws.quaternion_associative",
+        "QBP.Foundations.Breakdown.octonion_not_associative",
+        "QBP.Foundations.Breakdown.sedenion_not_associative"
+      ],
+      "theorems": [
+        {
+          "name": "real_associative",
+          "status": "verified"
+        },
+        {
+          "name": "complex_associative",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_associative",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_not_associative",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_not_associative",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-ops-alternativity-ladder",
+      "name": "Operations matrix: alternativity ✓ℝℂℍ𝕆 ✗𝕊",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#474 operations matrix (alternativity row): the algebra is alternative through 𝕆 (TowerLaws + CDLifting.octonion_alternative) and first fails at 𝕊 (Breakdown.sedenion_not_alternative). Kernel-verified.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.TowerLaws.real_alternative",
+      "lean_companion_theorems": [
+        "QBP.Foundations.TowerLaws.complex_alternative",
+        "QBP.Foundations.TowerLaws.quaternion_alternative",
+        "QBP.Foundations.CDAlg.octonion_alternative",
+        "QBP.Foundations.Breakdown.sedenion_not_alternative"
+      ],
+      "theorems": [
+        {
+          "name": "real_alternative",
+          "status": "verified"
+        },
+        {
+          "name": "complex_alternative",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_alternative",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_alternative",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_not_alternative",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-ops-norm-composition-ladder",
+      "name": "Operations matrix: norm composition (Hurwitz) ✓ℝℂℍ𝕆 ✗𝕊",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#474 operations matrix (norm-composition / Hurwitz row): N(xy)=N(x)N(y) holds through 𝕆 (TowerLaws + OctonionLaws.octonion_norm_composition) and fails at 𝕊 (Breakdown.sedenion_norm_not_multiplicative). This is the per-level ℝ/ℂ/ℍ/𝕆 cell view; the tower-existence pair octonion_norm_multiplicative/sedenion_not_composition is anchored separately — see also PROOF-normed-division-tower-existence (distinct theorems/files). Kernel-verified. FLAG for cth: intentional content overlap, cross-referenced not suppressed.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.TowerLaws.real_norm_composition",
+      "lean_companion_theorems": [
+        "QBP.Foundations.TowerLaws.complex_norm_composition",
+        "QBP.Foundations.TowerLaws.quaternion_norm_composition",
+        "QBP.Foundations.CDAlg.octonion_norm_composition",
+        "QBP.Foundations.Breakdown.sedenion_norm_not_multiplicative"
+      ],
+      "theorems": [
+        {
+          "name": "real_norm_composition",
+          "status": "verified"
+        },
+        {
+          "name": "complex_norm_composition",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_norm_composition",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_norm_composition",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_norm_not_multiplicative",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-ops-division-ladder",
+      "name": "Operations matrix: division algebra ✓ℝℂℍ𝕆 ✗𝕊",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#474 operations matrix (division row): ℝ,ℂ,ℍ are division algebras (TowerLaws); 𝕊 has zero divisors (Breakdown.sedenion_zero_divisors). See also PROOF-42zd (the 42-plane count of 𝕊 zero divisors) and PROOF-normed-division-tower-existence. Kernel-verified.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.TowerLaws.real_division",
+      "lean_companion_theorems": [
+        "QBP.Foundations.TowerLaws.complex_division",
+        "QBP.Foundations.TowerLaws.quaternion_division",
+        "QBP.Foundations.Breakdown.sedenion_zero_divisors"
+      ],
+      "theorems": [
+        {
+          "name": "real_division",
+          "status": "verified"
+        },
+        {
+          "name": "complex_division",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_division",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_zero_divisors",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-ops-flexibility-ladder",
+      "name": "Operations matrix: flexibility ✓ all levels",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#474 operations matrix (flexibility row): x(yx)=(xy)x holds at every level ℝ,ℂ,ℍ,𝕆,𝕊 (TowerLaws + OctonionLaws). Flexibility is the one identity that survives the whole Cayley-Dickson tower. Kernel-verified.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.TowerLaws.real_flexible",
+      "lean_companion_theorems": [
+        "QBP.Foundations.TowerLaws.complex_flexible",
+        "QBP.Foundations.TowerLaws.quaternion_flexible",
+        "QBP.Foundations.CDAlg.octonion_flexible",
+        "QBP.Foundations.CDAlg.sedenion_flexible"
+      ],
+      "theorems": [
+        {
+          "name": "real_flexible",
+          "status": "verified"
+        },
+        {
+          "name": "complex_flexible",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_flexible",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_flexible",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_flexible",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-sedenion-zero-divisor-witnesses",
+      "name": "Seven witnessed failing sedenion hyperplanes",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "Seven explicit basis-normal sedenion hyperplanes (normal9..15) carrying zero-divisor pairs — the witnessed failures behind the 8/15 alternative-hyperplane split. Kernel-verified (SedenionOctonionCount.lean). See also PROOF-42zd, PROOF-sedenion-alternative-hyperplane-count.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal9",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal10",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal11",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal12",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal13",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal14",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal15"
+      ],
+      "theorems": [
+        {
+          "name": "zero_divisor_normal9",
+          "status": "verified"
+        },
+        {
+          "name": "zero_divisor_normal10",
+          "status": "verified"
+        },
+        {
+          "name": "zero_divisor_normal11",
+          "status": "verified"
+        },
+        {
+          "name": "zero_divisor_normal12",
+          "status": "verified"
+        },
+        {
+          "name": "zero_divisor_normal13",
+          "status": "verified"
+        },
+        {
+          "name": "zero_divisor_normal14",
+          "status": "verified"
+        },
+        {
+          "name": "zero_divisor_normal15",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-octonion-moufang",
+      "name": "Octonion Moufang identities (left/right/middle)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "The three Moufang identities hold in 𝕆 — the alternative-algebra substitute for associativity. Kernel-verified (OctonionLaws.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.octonion_moufang_left",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.octonion_moufang_right",
+        "QBP.Foundations.CDAlg.octonion_moufang_middle"
+      ],
+      "theorems": [
+        {
+          "name": "octonion_moufang_left",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_moufang_right",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_moufang_middle",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-power-associativity",
+      "name": "Power-associativity of 𝕆 and 𝕊 (deg 3 and 4)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "𝕆 and 𝕊 are power-associative at degrees 3 and 4: x(xx)=(xx)x and the degree-4 associations agree, even though 𝕊 is neither alternative nor a division algebra. Kernel-verified (OctonionLaws.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/OctonionLaws.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.octonion_power_associative",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.octonion_power_associative_4",
+        "QBP.Foundations.CDAlg.sedenion_power_associative",
+        "QBP.Foundations.CDAlg.sedenion_power_associative_4"
+      ],
+      "theorems": [
+        {
+          "name": "octonion_power_associative",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_power_associative_4",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_power_associative",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_power_associative_4",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-octonion-cross-product",
+      "name": "7D / G₂ octonion cross product laws",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "The 7-dimensional cross product from Im 𝕆 (the G₂ structure): reCoord vanishing, antisymmetry, self-annihilation, orthogonality (both sides, ℍ and 𝕆), the norm identity, and the non-existence of a composition cross product on 𝕊. Kernel-verified (CrossProduct.lean). Cross-ref Breakdown.sedenion_norm_not_multiplicative.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CrossProduct.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CrossProduct.cross_reCoord_zero",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CrossProduct.cross_antisymm",
+        "QBP.Foundations.CrossProduct.cross_self",
+        "QBP.Foundations.CrossProduct.octonion_cross_orthogonal_left",
+        "QBP.Foundations.CrossProduct.octonion_cross_orthogonal_right",
+        "QBP.Foundations.CrossProduct.quaternion_cross_orthogonal_left",
+        "QBP.Foundations.CrossProduct.quaternion_cross_orthogonal_right",
+        "QBP.Foundations.CrossProduct.octonion_cross_norm_identity",
+        "QBP.Foundations.CrossProduct.quaternion_cross_norm_identity",
+        "QBP.Foundations.CrossProduct.no_sedenion_composition_for_cross"
+      ],
+      "theorems": [
+        {
+          "name": "cross_reCoord_zero",
+          "status": "verified"
+        },
+        {
+          "name": "cross_antisymm",
+          "status": "verified"
+        },
+        {
+          "name": "cross_self",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_cross_orthogonal_left",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_cross_orthogonal_right",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_cross_orthogonal_left",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_cross_orthogonal_right",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_cross_norm_identity",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_cross_norm_identity",
+          "status": "verified"
+        },
+        {
+          "name": "no_sedenion_composition_for_cross",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-artin-theorem",
+      "name": "Artin's theorem for octonions",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "Artin: any subalgebra of 𝕆 generated by two elements is associative (octonion_artin), with the associativity and generation witnesses. Kernel-verified (Artin.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Artin.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.octonion_artin",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.octonion_artin_assoc",
+        "QBP.Foundations.CDAlg.octonion_artin_gen"
+      ],
+      "theorems": [
+        {
+          "name": "octonion_artin",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_artin_assoc",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_artin_gen",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-cd-product-formula",
+      "name": "General-n Cayley-Dickson product formula",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "The general-level Cayley-Dickson basis product e_i*e_j (mulCoeff), its basis expansion, coefficient properties, and the square law. The computational core of the CD construction. Kernel-verified (CDAlg.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CDAlg.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.e_mul_e",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.basis_expansion",
+        "QBP.Foundations.CDAlg.mulCoeff_props",
+        "QBP.Foundations.CDAlg.cdAlg_sq_eq"
+      ],
+      "theorems": [
+        {
+          "name": "e_mul_e",
+          "status": "verified"
+        },
+        {
+          "name": "basis_expansion",
+          "status": "verified"
+        },
+        {
+          "name": "mulCoeff_props",
+          "status": "verified"
+        },
+        {
+          "name": "cdAlg_sq_eq",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-cd-structure-constant-tables",
+      "name": "Cayley-Dickson structure-constant tables (F3/F4) + orientation",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "The level-3/4 CD structure-constant tables and their Fano-orientation provenance: mulCoeff_three_eq_fano, mulCoeff_four_eq_sgnTable (CDAlg), and the FanoOrientationF3 pins (fanoTableF4_eq_cayleyDickson, cayleyDickson8_sq_neg_one, cayleyDickson8_alternative_on_basis, fanoTriples_oriented, archiveTable_disagrees_cd). cayleyDickson8_sq_neg_one is a distinct theorem from PROOF-fano-genesis.imaginary_units_square_neg_one — see also PROOF-fano-genesis. Kernel-verified.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CDAlg.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.mulCoeff_three_eq_fano",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.mulCoeff_four_eq_sgnTable",
+        "QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson",
+        "QBP.Foundations.FanoOrientationF3.cayleyDickson8_sq_neg_one",
+        "QBP.Foundations.FanoOrientationF3.cayleyDickson8_alternative_on_basis",
+        "QBP.Foundations.FanoOrientationF3.fanoTriples_oriented",
+        "QBP.Foundations.FanoOrientationF3.archiveTable_disagrees_cd"
+      ],
+      "theorems": [
+        {
+          "name": "mulCoeff_three_eq_fano",
+          "status": "verified"
+        },
+        {
+          "name": "mulCoeff_four_eq_sgnTable",
+          "status": "verified"
+        },
+        {
+          "name": "fanoTableF4_eq_cayleyDickson",
+          "status": "verified"
+        },
+        {
+          "name": "cayleyDickson8_sq_neg_one",
+          "status": "verified"
+        },
+        {
+          "name": "cayleyDickson8_alternative_on_basis",
+          "status": "verified"
+        },
+        {
+          "name": "fanoTriples_oriented",
+          "status": "verified"
+        },
+        {
+          "name": "archiveTable_disagrees_cd",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-cd-associativity-level2",
+      "name": "Cayley-Dickson level-2 (ℍ) associativity over any CommRing",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "CDAlg R 2 (the quaternion level) is associative over any commutative ring, with the unit laws. Kernel-verified (CDBridge.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CDBridge.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.cdAlg_two_assoc",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.cdAlg_one_mul",
+        "QBP.Foundations.CDAlg.cdAlg_mul_one"
+      ],
+      "theorems": [
+        {
+          "name": "cdAlg_two_assoc",
+          "status": "verified"
+        },
+        {
+          "name": "cdAlg_one_mul",
+          "status": "verified"
+        },
+        {
+          "name": "cdAlg_mul_one",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-cd-associator-formula",
+      "name": "General-level Cayley-Dickson associator formula",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "The closed-form associator for the Cayley-Dickson doubling at general level (assoc_e). Kernel-verified (CDLifting.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CDLifting.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.assoc_e",
+      "lean_companion_theorems": [],
+      "theorems": [
+        {
+          "name": "assoc_e",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-octonion-sedenion-exp-log",
+      "name": "exp/log on 𝕆 and 𝕊: Euler, one-parameter group, inverses",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "The exponential/logarithm theory on 𝕆 and 𝕊: Euler's formula on a unit axis, the one-parameter group law, exp(-x)exp(x)=1, the norm law N(exp x), and exp/log inverse pairs, plus the ℍ reduction and the per-algebra 𝕆/𝕊 cells. Kernel-verified (Exp.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Exp.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.exp_unit_axis_real",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.exp_smul_add_real",
+        "QBP.Foundations.CDAlg.exp_neg_mul_exp",
+        "QBP.Foundations.CDAlg.N_exp",
+        "QBP.Foundations.CDAlg.exp_log",
+        "QBP.Foundations.CDAlg.log_exp",
+        "QBP.Foundations.CDAlg.exp_eq_quaternion",
+        "QBP.Foundations.CDAlg.octonion_exp_smul_add",
+        "QBP.Foundations.CDAlg.octonion_exp_neg_mul_exp",
+        "QBP.Foundations.CDAlg.octonion_N_exp",
+        "QBP.Foundations.CDAlg.octonion_exp_log",
+        "QBP.Foundations.CDAlg.octonion_exp_smul_add_real",
+        "QBP.Foundations.CDAlg.octonion_log_exp",
+        "QBP.Foundations.CDAlg.sedenion_exp_smul_add",
+        "QBP.Foundations.CDAlg.sedenion_exp_neg_mul_exp",
+        "QBP.Foundations.CDAlg.sedenion_N_exp",
+        "QBP.Foundations.CDAlg.sedenion_exp_log",
+        "QBP.Foundations.CDAlg.sedenion_exp_smul_add_real",
+        "QBP.Foundations.CDAlg.sedenion_log_exp"
+      ],
+      "theorems": [
+        {
+          "name": "exp_unit_axis_real",
+          "status": "verified"
+        },
+        {
+          "name": "exp_smul_add_real",
+          "status": "verified"
+        },
+        {
+          "name": "exp_neg_mul_exp",
+          "status": "verified"
+        },
+        {
+          "name": "N_exp",
+          "status": "verified"
+        },
+        {
+          "name": "exp_log",
+          "status": "verified"
+        },
+        {
+          "name": "log_exp",
+          "status": "verified"
+        },
+        {
+          "name": "exp_eq_quaternion",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_exp_smul_add",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_exp_neg_mul_exp",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_N_exp",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_exp_log",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_exp_smul_add_real",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_log_exp",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_exp_smul_add",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_exp_neg_mul_exp",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_N_exp",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_exp_log",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_exp_smul_add_real",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_log_exp",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-norm-form-bilinear",
+      "name": "Norm form and polar bilinear form (Euclidean signature)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "The polar/bilinear form of the CD norm: bil = reCoord(x * conj y), symmetry, the 𝕆/𝕊 bilinear forms, non-negativity, N(x)=0 iff x=0 (Euclidean signature, D10), and composition holding for 𝕆 but not 𝕊. Kernel-verified (NormForm.lean). Cross-ref PROOF-ops-norm-composition-ladder.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/NormForm.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.NormForm.bil_eq_reCoord_mul_conj",
+      "lean_companion_theorems": [
+        "QBP.Foundations.NormForm.bil_symm",
+        "QBP.Foundations.NormForm.octonion_bilinear_form",
+        "QBP.Foundations.NormForm.sedenion_bilinear_form",
+        "QBP.Foundations.NormForm.N_nonneg",
+        "QBP.Foundations.NormForm.N_eq_zero_iff",
+        "QBP.Foundations.NormForm.octonion_norm_form_composition",
+        "QBP.Foundations.NormForm.sedenion_norm_form_not_composition"
+      ],
+      "theorems": [
+        {
+          "name": "bil_eq_reCoord_mul_conj",
+          "status": "verified"
+        },
+        {
+          "name": "bil_symm",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_bilinear_form",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_bilinear_form",
+          "status": "verified"
+        },
+        {
+          "name": "N_nonneg",
+          "status": "verified"
+        },
+        {
+          "name": "N_eq_zero_iff",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_norm_form_composition",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_norm_form_not_composition",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-sedenion-alternative-hyperplane-count",
+      "name": "O1a: 8 of 15 sedenion basis hyperplanes are alternative",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "Exactly 8 of the 15 basis-normal sedenion hyperplanes are alternative (alternative_hyperplane_count_eq_eight), with the pass/fail discriminators. Kernel-verified (SedenionOctonionCount.lean). See also PROOF-sedenion-zero-divisor-witnesses.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SedenionOctonionCount.alternative_hyperplane_count_eq_eight",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SedenionOctonionCount.alternative_passes",
+        "QBP.Foundations.SedenionOctonionCount.alternative_fails"
+      ],
+      "theorems": [
+        {
+          "name": "alternative_hyperplane_count_eq_eight",
+          "status": "verified"
+        },
+        {
+          "name": "alternative_passes",
+          "status": "verified"
+        },
+        {
+          "name": "alternative_fails",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-octonion-32dim-alternative-count",
+      "name": "D3: 50 of 155 alternative subspaces; 42=35+7, 50=8+42",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "The 32-dimensional (𝕊) alternative-subspace count k(5)=50 of 155, with the arithmetic bridges 42=35+7 and 50=8+42 and the base-copies / crossing discriminator lemmas. Kernel-verified (Octonion32Count.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Octonion32Count.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.Octonion32Count.alternative_subspace_count_32_eq_fifty",
+      "lean_companion_theorems": [
+        "QBP.Foundations.Octonion32Count.all_sedenion_lines_associative",
+        "QBP.Foundations.Octonion32Count.base_copies_persist",
+        "QBP.Foundations.Octonion32Count.crossing_pass_iff_discriminator",
+        "QBP.Foundations.Octonion32Count.forty_two_split",
+        "QBP.Foundations.Octonion32Count.base_plus_crossing_eq_fifty"
+      ],
+      "theorems": [
+        {
+          "name": "alternative_subspace_count_32_eq_fifty",
+          "status": "verified"
+        },
+        {
+          "name": "all_sedenion_lines_associative",
+          "status": "verified"
+        },
+        {
+          "name": "base_copies_persist",
+          "status": "verified"
+        },
+        {
+          "name": "crossing_pass_iff_discriminator",
+          "status": "verified"
+        },
+        {
+          "name": "forty_two_split",
+          "status": "verified"
+        },
+        {
+          "name": "base_plus_crossing_eq_fifty",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-bpm-si-round-trip",
+      "name": "BPM↔SI conversion round-trip invertibility",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "Position and energy convert BPM↔SI invertibly (round-trip identities) — a dimensionless correctness fact about the scale-factor maps, independent of the chosen numeric constants. Kernel-verified (ScaleFactors.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Units/ScaleFactors.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Units.position_round_trip",
+      "lean_companion_theorems": [
+        "QBP.Units.energy_round_trip"
+      ],
+      "theorems": [
+        {
+          "name": "position_round_trip",
+          "status": "verified"
+        },
+        {
+          "name": "energy_round_trip",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-doubleslit-quaternion-algebra",
+      "name": "Double-slit quaternion algebra identities",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "Pure quaternion algebra behind the double-slit model: qJ², j·complex commutation, the coupling decomposition and its cancellation, and normSq of the symplectic form. Model-independent ℝ/ℍ identities. Kernel-verified (DoubleSlit.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Experiments.DoubleSlit.qJ_sq",
+      "lean_companion_theorems": [
+        "QBP.Experiments.DoubleSlit.j_mul_complex",
+        "QBP.Experiments.DoubleSlit.complex_mul_j",
+        "QBP.Experiments.DoubleSlit.j_complex_j",
+        "QBP.Experiments.DoubleSlit.coupling_decomposition",
+        "QBP.Experiments.DoubleSlit.coupling_decomposition_real",
+        "QBP.Experiments.DoubleSlit.coupling_cancellation",
+        "QBP.Experiments.DoubleSlit.coupling_cancellation_inner",
+        "QBP.Experiments.DoubleSlit.normSq_sympForm"
+      ],
+      "theorems": [
+        {
+          "name": "qJ_sq",
+          "status": "verified"
+        },
+        {
+          "name": "j_mul_complex",
+          "status": "verified"
+        },
+        {
+          "name": "complex_mul_j",
+          "status": "verified"
+        },
+        {
+          "name": "j_complex_j",
+          "status": "verified"
+        },
+        {
+          "name": "coupling_decomposition",
+          "status": "verified"
+        },
+        {
+          "name": "coupling_decomposition_real",
+          "status": "verified"
+        },
+        {
+          "name": "coupling_cancellation",
+          "status": "verified"
+        },
+        {
+          "name": "coupling_cancellation_inner",
+          "status": "verified"
+        },
+        {
+          "name": "normSq_sympForm",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-doubleslit-visibility-bounds",
+      "name": "Double-slit visibility real-analysis bounds 0≤V≤1",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "Real-analysis bounds on the double-slit visibility and quaternionic fraction: 0≤η≤1, 0≤V≤1, the endpoint values, and monotone correlation. Bounds on the defined quantities, not a physics claim. Kernel-verified (DoubleSlit.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Experiments.DoubleSlit.quatFraction_nonneg",
+      "lean_companion_theorems": [
+        "QBP.Experiments.DoubleSlit.quatFraction_le_one",
+        "QBP.Experiments.DoubleSlit.quatFraction_zero_iff",
+        "QBP.Experiments.DoubleSlit.visibility_nonneg",
+        "QBP.Experiments.DoubleSlit.visibility_le_one",
+        "QBP.Experiments.DoubleSlit.visibility_one",
+        "QBP.Experiments.DoubleSlit.visibility_zero",
+        "QBP.Experiments.DoubleSlit.visibility_correlated"
+      ],
+      "theorems": [
+        {
+          "name": "quatFraction_nonneg",
+          "status": "verified"
+        },
+        {
+          "name": "quatFraction_le_one",
+          "status": "verified"
+        },
+        {
+          "name": "quatFraction_zero_iff",
+          "status": "verified"
+        },
+        {
+          "name": "visibility_nonneg",
+          "status": "verified"
+        },
+        {
+          "name": "visibility_le_one",
+          "status": "verified"
+        },
+        {
+          "name": "visibility_one",
+          "status": "verified"
+        },
+        {
+          "name": "visibility_zero",
+          "status": "verified"
+        },
+        {
+          "name": "visibility_correlated",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-fraunhofer-optics",
+      "name": "Fraunhofer diffraction intensity facts",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "Diffraction-intensity facts for the Fraunhofer model: value at maxima/minima, fringe-spacing linearity in λ and L and inverse in d, and the full single-slit envelope factorisation with its bounds. Real-analysis facts about the defined intensity. Kernel-verified (Fraunhofer.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Optics/Fraunhofer.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Optics.Fraunhofer.intensity_at_maximum",
+      "lean_companion_theorems": [
+        "QBP.Optics.Fraunhofer.intensity_at_minimum",
+        "QBP.Optics.Fraunhofer.fringeSpacing_linear_lambda",
+        "QBP.Optics.Fraunhofer.fringeSpacing_linear_L",
+        "QBP.Optics.Fraunhofer.fringeSpacing_inverse_d",
+        "QBP.Optics.Fraunhofer.fraunhoferIntensityFull_factor",
+        "QBP.Optics.Fraunhofer.fraunhoferIntensityFull_slit_width_zero",
+        "QBP.Optics.Fraunhofer.fraunhoferIntensityFull_le",
+        "QBP.Optics.Fraunhofer.fraunhoferIntensityFull_nonneg"
+      ],
+      "theorems": [
+        {
+          "name": "intensity_at_maximum",
+          "status": "verified"
+        },
+        {
+          "name": "intensity_at_minimum",
+          "status": "verified"
+        },
+        {
+          "name": "fringeSpacing_linear_lambda",
+          "status": "verified"
+        },
+        {
+          "name": "fringeSpacing_linear_L",
+          "status": "verified"
+        },
+        {
+          "name": "fringeSpacing_inverse_d",
+          "status": "verified"
+        },
+        {
+          "name": "fraunhoferIntensityFull_factor",
+          "status": "verified"
+        },
+        {
+          "name": "fraunhoferIntensityFull_slit_width_zero",
+          "status": "verified"
+        },
+        {
+          "name": "fraunhoferIntensityFull_le",
+          "status": "verified"
+        },
+        {
+          "name": "fraunhoferIntensityFull_nonneg",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "DERIV-sterngerlach-qbp",
+      "name": "Stern-Gerlach x-in-z predictions (QBP Born ansatz)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the QBP Born/measurement ansatz (probUp/expectationValue defs). Given that ansatz, an x-prepared spin measured along z gives ⟨x⟩=0 and P(up)=P(down)=1/2. True GIVEN the QBP ansatz — NOT a model-independent result. Lean backbone kernel-verified (SternGerlach.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Experiments/SternGerlach.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Experiments.SternGerlach.expectation_x_measured_z_is_zero",
+      "lean_companion_theorems": [
+        "QBP.Experiments.SternGerlach.prob_up_x_measured_z_is_half",
+        "QBP.Experiments.SternGerlach.prob_down_x_measured_z_is_half"
+      ],
+      "theorems": [
+        {
+          "name": "expectation_x_measured_z_is_zero",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_x_measured_z_is_half",
+          "status": "verified"
+        },
+        {
+          "name": "prob_down_x_measured_z_is_half",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "DERIV-angle-dependent-qbp",
+      "name": "Angle-dependent spin predictions (QBP ansatz)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the QBP measurement ansatz. Given it, the angle-dependent expectation and P(up)=cos²(θ/2), P(down)=sin²(θ/2), with the θ=0,π,π/2 special cases. True GIVEN the QBP ansatz, not model-independent. Lean backbone kernel-verified (AngleDependent.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Experiments/AngleDependent.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Experiments.AngleDependent.expectation_angle",
+      "lean_companion_theorems": [
+        "QBP.Experiments.AngleDependent.prob_up_angle",
+        "QBP.Experiments.AngleDependent.prob_down_angle",
+        "QBP.Experiments.AngleDependent.prob_up_angle_cos_sq",
+        "QBP.Experiments.AngleDependent.prob_down_angle_sin_sq",
+        "QBP.Experiments.AngleDependent.prob_up_theta_zero",
+        "QBP.Experiments.AngleDependent.prob_up_theta_pi",
+        "QBP.Experiments.AngleDependent.prob_up_theta_pi_div_two"
+      ],
+      "theorems": [
+        {
+          "name": "expectation_angle",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_angle",
+          "status": "verified"
+        },
+        {
+          "name": "prob_down_angle",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_angle_cos_sq",
+          "status": "verified"
+        },
+        {
+          "name": "prob_down_angle_sin_sq",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_theta_zero",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_theta_pi",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_theta_pi_div_two",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "DERIV-general3d-qbp",
+      "name": "General-3D spin predictions (QBP ansatz)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the QBP measurement ansatz. Given it, the general-direction expectation and probabilities, same-direction and axis special cases, and azimuthal invariance. True GIVEN the QBP ansatz, not model-independent. Lean backbone kernel-verified (General3D.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Experiments/General3D.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Experiments.General3D.expectation_general",
+      "lean_companion_theorems": [
+        "QBP.Experiments.General3D.prob_up_general",
+        "QBP.Experiments.General3D.prob_up_same_direction",
+        "QBP.Experiments.General3D.prob_up_z_on_z",
+        "QBP.Experiments.General3D.prob_up_antiz_on_z",
+        "QBP.Experiments.General3D.prob_up_x_on_z",
+        "QBP.Experiments.General3D.prob_up_y_on_z",
+        "QBP.Experiments.General3D.expectation_azimuthal_invariance"
+      ],
+      "theorems": [
+        {
+          "name": "expectation_general",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_general",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_same_direction",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_z_on_z",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_antiz_on_z",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_x_on_z",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_y_on_z",
+          "status": "verified"
+        },
+        {
+          "name": "expectation_azimuthal_invariance",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "DERIV-doubleslit-visibility-model",
+      "name": "Double-slit visibility law V=1−η (Model A)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: Model A, visibility = 1 − quaternionic-fraction. Given that model, V = 1−η and V is antitone in the background. True GIVEN Model A; the model choice itself is open (#387). Lean backbone kernel-verified (DoubleSlit.lean). See also PROOF-doubleslit-visibility-bounds (model-independent bounds).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Experiments/DoubleSlit.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Experiments.DoubleSlit.visibility_eq_one_sub_quatFraction",
+      "lean_companion_theorems": [
+        "QBP.Experiments.DoubleSlit.visibility_antitone_background"
+      ],
+      "theorems": [
+        {
+          "name": "visibility_eq_one_sub_quatFraction",
+          "status": "verified"
+        },
+        {
+          "name": "visibility_antitone_background",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "DERIV-measurement-ansatz-basic",
+      "name": "QBP measurement ansatz basic identities",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the QBP measurement ansatz (probUp / expectationValue definitions). Given the ansatz, orthogonal expectation is 0 and P(up)=1/2. True GIVEN the ansatz definitions, not a model-independent theorem. Lean backbone kernel-verified (Basic.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Basic.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.expectation_orthogonal_is_zero",
+      "lean_companion_theorems": [
+        "QBP.prob_up_orthogonal_is_half"
+      ],
+      "theorems": [
+        {
+          "name": "expectation_orthogonal_is_zero",
+          "status": "verified"
+        },
+        {
+          "name": "prob_up_orthogonal_is_half",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "DERIV-code-si-constants",
+      "name": "BPM code / SI constant positivity facts",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the chosen BPM code-unit and SI numeric constants. Given those constant choices, v_z=40 and the positivity of the SI/code constants hold. True GIVEN the chosen constants (definitional), not physical predictions. Lean backbone kernel-verified (Constants.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Units/Constants.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Units.v_z_code_eq_40",
+      "lean_companion_theorems": [
+        "QBP.Units.v_z_code_pos",
+        "QBP.Units.h_SI_pos",
+        "QBP.Units.e_SI_pos",
+        "QBP.Units.eV_in_J_pos",
+        "QBP.Units.hbar_code_pos",
+        "QBP.Units.m_code_pos",
+        "QBP.Units.k0_code_pos",
+        "QBP.Units.hbar_SI_pos"
+      ],
+      "theorems": [
+        {
+          "name": "v_z_code_eq_40",
+          "status": "verified"
+        },
+        {
+          "name": "v_z_code_pos",
+          "status": "verified"
+        },
+        {
+          "name": "h_SI_pos",
+          "status": "verified"
+        },
+        {
+          "name": "e_SI_pos",
+          "status": "verified"
+        },
+        {
+          "name": "eV_in_J_pos",
+          "status": "verified"
+        },
+        {
+          "name": "hbar_code_pos",
+          "status": "verified"
+        },
+        {
+          "name": "m_code_pos",
+          "status": "verified"
+        },
+        {
+          "name": "k0_code_pos",
+          "status": "verified"
+        },
+        {
+          "name": "hbar_SI_pos",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "DERIV-kitaev-model",
+      "name": "Kitaev honeycomb / α-RuCl₃ model facts (chosen model)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the Kitaev honeycomb Hamiltonian plus α-RuCl₃ material constants. Given that model, plaquette ℤ₂ flux, triple-product orderings, Clifford anticommutation and collapse to quaternions, non-abelian braiding, the Ru/Cl screening and SOC/j_eff regime checks hold. True GIVEN the Kitaev model + constants, not a model-independent claim. K7/K8 numerology excluded as auxiliary. Lean backbone kernel-verified (Kitaev.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/Sprint12-Inherited/Kitaev.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "plaquette_flux_z2",
+      "lean_companion_theorems": [
+        "triple_product_all_orderings",
+        "clifford_anticommutation",
+        "clifford_collapse_to_quaternion",
+        "non_abelian_braiding",
+        "ru_screening_correct",
+        "cl_screening_correct",
+        "soc_regime_valid",
+        "jeff_half_filling"
+      ],
+      "theorems": [
+        {
+          "name": "plaquette_flux_z2",
+          "status": "verified"
+        },
+        {
+          "name": "triple_product_all_orderings",
+          "status": "verified"
+        },
+        {
+          "name": "clifford_anticommutation",
+          "status": "verified"
+        },
+        {
+          "name": "clifford_collapse_to_quaternion",
+          "status": "verified"
+        },
+        {
+          "name": "non_abelian_braiding",
+          "status": "verified"
+        },
+        {
+          "name": "ru_screening_correct",
+          "status": "verified"
+        },
+        {
+          "name": "cl_screening_correct",
+          "status": "verified"
+        },
+        {
+          "name": "soc_regime_valid",
+          "status": "verified"
+        },
+        {
+          "name": "jeff_half_filling",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": []
+      }
+    },
+    {
+      "id": "DERIV-graphene-model",
+      "name": "Graphene honeycomb / moiré model facts (chosen model)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the honeycomb / moiré tight-binding model. Given it, honeycomb ℤ₃ cyclicity and chirality, C2z momentum reversal, Dirac helicity, moiré fragile topology, and α≈ 1/√3 hold. True GIVEN the model, not model-independent. mott_from_hessian (G11) left as auxiliary (file-anchored). Lean backbone kernel-verified (Graphene.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/Sprint12-Inherited/Graphene.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "honeycomb_z3_cyclic",
+      "lean_companion_theorems": [
+        "honeycomb_chirality",
+        "c2z_reverses_momentum",
+        "dirac_helicity",
+        "moire_fragile_topology",
+        "alpha_near_inv_sqrt3"
+      ],
+      "theorems": [
+        {
+          "name": "honeycomb_z3_cyclic",
+          "status": "verified"
+        },
+        {
+          "name": "honeycomb_chirality",
+          "status": "verified"
+        },
+        {
+          "name": "c2z_reverses_momentum",
+          "status": "verified"
+        },
+        {
+          "name": "dirac_helicity",
+          "status": "verified"
+        },
+        {
+          "name": "moire_fragile_topology",
+          "status": "verified"
+        },
+        {
+          "name": "alpha_near_inv_sqrt3",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": []
+      }
+    },
+    {
+      "id": "DERIV-bi2se3-ti",
+      "name": "Bi₂Se₃ topological-insulator model facts (measured constants)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: Bi₂Se₃ measured material constants. Given them, Bi/Se screening validity, the Slater checks, and band inversion hold. True GIVEN the measured constants, not a first-principles prediction. Lean backbone kernel-verified (Bi2Se3.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/Sprint12-Inherited/Bi2Se3.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "bi_screening_valid",
+      "lean_companion_theorems": [
+        "se_screening_valid",
+        "slater_bi_correct",
+        "slater_se_correct",
+        "band_inversion_satisfied"
+      ],
+      "theorems": [
+        {
+          "name": "bi_screening_valid",
+          "status": "verified"
+        },
+        {
+          "name": "se_screening_valid",
+          "status": "verified"
+        },
+        {
+          "name": "slater_bi_correct",
+          "status": "verified"
+        },
+        {
+          "name": "slater_se_correct",
+          "status": "verified"
+        },
+        {
+          "name": "band_inversion_satisfied",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": []
+      }
+    },
+    {
+      "id": "DERIV-crystallisation-spectral-moments",
+      "name": "Crystallisation spectral-moment law (chosen model)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the spectral-action moment law. Given it, the moment-scaling hierarchy, convergence ordering, variation correlation and growth enhancement hold. True GIVEN the spectral-action model, not model-independent. Lean backbone kernel-verified (Crystallisation.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/Sprint12-Inherited/Crystallisation.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "moment_scaling_hierarchy",
+      "lean_companion_theorems": [
+        "convergence_ordering",
+        "variation_correlation",
+        "growth_enhancement"
+      ],
+      "theorems": [
+        {
+          "name": "moment_scaling_hierarchy",
+          "status": "verified"
+        },
+        {
+          "name": "convergence_ordering",
+          "status": "verified"
+        },
+        {
+          "name": "variation_correlation",
+          "status": "verified"
+        },
+        {
+          "name": "growth_enhancement",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": []
+      }
+    },
+    {
+      "id": "DERIV-quaternion-physics-kramers",
+      "name": "Kramers degeneracy from quaternion structure (physical identification)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "GATING PREMISE: the physical identification of the quaternionic structure with time-reversal. Given it, Kramers orthogonality and degeneracy and the eigenspace gauge match hold. True GIVEN that identification, not model-independent. The quaternion-algebra basics used here are SEE-ALSO the Foundations anchors (PROOF-ops-* ladders, PROOF-42zd) — not re-anchored. Lean backbone kernel-verified (Quaternion.lean).",
+      "prediction_chain": [],
+      "provenance_kind": "derivation",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/Sprint12-Inherited/Quaternion.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "kramers_orthogonality",
+      "lean_companion_theorems": [
+        "kramers_degeneracy",
+        "eigenspace_gauge_match"
+      ],
+      "theorems": [
+        {
+          "name": "kramers_orthogonality",
+          "status": "verified"
+        },
+        {
+          "name": "kramers_degeneracy",
+          "status": "verified"
+        },
+        {
+          "name": "eigenspace_gauge_match",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#619",
+      "last_tested_at": "2026-09-03T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-09-03T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": []
+      }
     }
   ],
   "inputs": [
