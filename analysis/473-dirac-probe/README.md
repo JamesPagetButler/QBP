@@ -97,14 +97,18 @@ No closed form found for 0.146; not pursued further (see firewall reading).
 
 Firewall reading: these numbers are forced by (ℝ + doubling) + (gradient-flow law) + (Haar initial measure). The last two are inputs — and the initial measure on S¹⁴ is precisely what the substrate is supposed to supply. So the flow gives Strategy C a coupling-free order parameter and a dynamics-to-vacuum map, but does not by itself produce an AC2-grade forced number.
 
-## 9. Descent to the orbit space (AC1 v0.2 follow-up, 2026-09-04)
+## 9. Descent to the orbit space (AC1 v0.3, 2026-09-04)
 
 V = δ² = 4(|a|²|Im b|² − ⟨a,Im b⟩²) is G₂-invariant, so the whole landscape above lives on the
-3-dimensional orbit space S¹⁴/G₂ (invariants |a|², b₀, ⟨a,Im b⟩); the Haar initial measure of §8
-is one point in a family the algebra leaves free. The flow ends on the vacuum manifold V = 0, where
-the G₂ orbit dimension is 6, so what the algebra leaves undetermined is a probability measure on a
-**2-dimensional** vacuum orbit space; the ⟨b₀²⟩ ≈ 0.146 of §8 is Haar's answer, not the algebra's.
-The only G₂-fixed points of S¹⁴ are ±ℓ, which is the input to the no-tower theorem that closes the
-condensed/locale route (Prop 10 of the ladder). `orbit_space.py` checks all of this (orbit
-dimensions 11 / 6 / 0, the descent identity, Fix(G₂) = ℝℓ) and draws `hvr_orbit_space.png`.
+3-dimensional orbit space S¹⁴/G₂ (invariants |a|², b₀, ⟨a,Im b⟩). The flow ends on the vacuum
+manifold V = 0, where the G₂ orbit dimension is 6, so the endpoints live on a **2-dimensional**
+vacuum orbit space (θ = direction in the (a, Im b) plane mod 180°, b₀) — topologically a 2-sphere.
+The Haar initial measure of §8 is *not* a free input: it is the surface measure of the CD norm
+N = s s̄ (still positive-definite at dim 16; only multiplicativity breaks), and the S₃ factor of
+Aut(𝕊) = G₂ × S₃ leaves exactly one Aut-invariant alternative, Q_μ = |a|² + |Im b|² + μb₀².
+`orbit_space.py` checks orbit dimensions 11 / 6 / 0, the descent identity and Fix(G₂) = ℝℓ and
+draws `hvr_orbit_space.png`; `aut_s3.py` solves for the six automorphisms commuting with G₂
+(dihedral: ±120° rotations of the (a, Im b) plane, reflections flipping b₀) and shows the ZD ridge
+is one 11-dim G₂-orbit; `s3_check.py` re-runs the §8 flow and confirms the endpoints are
+60°-periodic in θ and even in b₀, as S₃ predicts (a-type and c-type vacua are Aut-equivalent).
 Ladder and consequences: `docs/foundations/473-ac1-first-link-2026-09-04.md`.
