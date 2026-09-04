@@ -376,7 +376,7 @@
       ]
     },
     {
-      "anchor_id": "PROOF-fraunhofer-optics",
+      "anchor_id": "DERIV-fraunhofer-optics",
       "proof_system": "lean4",
       "declared_by": "#619",
       "witnesses": [

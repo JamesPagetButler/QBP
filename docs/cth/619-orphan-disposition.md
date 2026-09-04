@@ -4,15 +4,17 @@
 
 The under-claim mirror of the over-claim burn-down (#617/#615/#613). The inverse-anchor audit found **576 orphan theorems** — proven in `proofs/**/*.lean`, cited by **no** CTH anchor, every one `sorry`-free and `native_decide`-free (real kernel-verified proof). This is the honest per-theorem disposition of all 576, and the ledger encode that recovers the anchor-worthy work.
 
-**No silent skips.** Every orphan is either anchored (with a `provenance_kind` and witnessed evidence) or marked auxiliary with a stated per-cluster reason.
+**No silent skips.** Every theorem is either anchored (with a `provenance_kind` and witnessed evidence) or marked auxiliary with a stated reason. This file gives the cluster-level disposition; the **exhaustive per-theorem table** (every one of the 748 in-scope declarations → anchor id or reason) is in [`619-orphan-disposition-full.md`](619-orphan-disposition-full.md).
+
+**Review-driven revisions (#628, Furey/Feynman):** `PROOF-fraunhofer-optics` was reclassified **proof → `DERIV-fraunhofer-optics`** — the intensity function encodes the far-field diffraction model, so its properties are true *given that model*, matching how the QBP spin-prediction anchors are treated. `PROOF-octonion-sedenion-exp-log` had its description sharpened (the group law is the **single-axis one-parameter** law, valid in 𝕊 via power-associativity; the full `exp(x+y)=exp(x)exp(y)` is neither claimed nor true in 𝕊). `PROOF-bpm-si-round-trip` confirmed **proof** (the scale factor is a free parameter → pure invertibility, no constant baked in).
 
 ## Result summary
 
 | | Count |
 |---|---:|
 | Orphans dispositioned | **576 / 576** (15 clusters, 30 files) |
-| → new **proof** anchors' witnesses | 24 deliverables |
-| → new **derivation** anchors' witnesses (model/ansatz/constant-gated) | 11 deliverables |
+| → new **proof** anchors' witnesses | 23 deliverables |
+| → new **derivation** anchors' witnesses (model/ansatz/constant-gated) | 12 deliverables |
 | → existing anchors extended | PROOF-su2-lie (theory→proof, +Casimir), PROOF-42zd (+42-plane construction) |
 | → **auxiliary** (stated reason, no anchor) | ~378 theorems |
 | Ledger anchors | 235 → **270** |
@@ -44,8 +46,8 @@ Each row: the anchor-worthy witnesses (→ their deliverable anchor) and the cou
 
 | Cluster (file) | Orphans | Anchor deliverable(s) | Aux |
 |---|---:|---|---:|
-| `DoubleSlit` + `Fraunhofer` | (in 72) | **proof:** `PROOF-doubleslit-quaternion-algebra`, `PROOF-doubleslit-visibility-bounds`, `PROOF-fraunhofer-optics` | |
-| `SternGerlach`/`AngleDependent`/`General3D`/`DoubleSlit`(visibility model) | (in 72) | **derivation:** `DERIV-sterngerlach-qbp`, `DERIV-angle-dependent-qbp`, `DERIV-general3d-qbp`, `DERIV-doubleslit-visibility-model` (premise: QBP Born ansatz / Model A) | 25 |
+| `DoubleSlit` (pure quaternion algebra + bounds) | (in 72) | **proof:** `PROOF-doubleslit-quaternion-algebra`, `PROOF-doubleslit-visibility-bounds` (bounds on the defined ratio, no ansatz) | |
+| `SternGerlach`/`AngleDependent`/`General3D`/`DoubleSlit`(visibility model)/`Fraunhofer` | (in 72) | **derivation:** `DERIV-sterngerlach-qbp`, `DERIV-angle-dependent-qbp`, `DERIV-general3d-qbp`, `DERIV-doubleslit-visibility-model` (Model A), `DERIV-fraunhofer-optics` (far-field model — reclassified proof→derivation in the #628 review) | 25 |
 | `Basic.lean` + `Units/Constants.lean` | 15 | **derivation:** `DERIV-measurement-ansatz-basic`, `DERIV-code-si-constants`. **0 proof** (all ansatz/constant-gated) | 4 |
 | Sprint-12 materials (`Kitaev`/`Graphene`/`Quaternion`/`Bi2Se3`/`Crystallisation`) | 47 | **derivation:** `DERIV-kitaev-model`, `DERIV-graphene-model`, `DERIV-bi2se3-ti`, `DERIV-crystallisation-spectral-moments`, `DERIV-quaternion-physics-kramers`. **0 new proof** (4 pure-math items Q2/Q3/Q8/Q9 are see-also dedups to Foundations anchors) | 15 |
 
