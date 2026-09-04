@@ -96,3 +96,11 @@ Endpoint statistics from Haar initial data on S¹⁴ (Haar: ⟨b₀²⟩ = ⟨|a
 No closed form found for 0.146; not pursued further (see firewall reading).
 
 Firewall reading: these numbers are forced by (ℝ + doubling) + (gradient-flow law) + (Haar initial measure). The last two are inputs — and the initial measure on S¹⁴ is precisely what the substrate is supposed to supply. So the flow gives Strategy C a coupling-free order parameter and a dynamics-to-vacuum map, but does not by itself produce an AC2-grade forced number.
+
+## 9. Descent to the orbit space (AC1 v0.1 follow-up, 2026-09-04)
+
+V = δ² = 4(|a|²|Im b|² − ⟨a,Im b⟩²) is G₂-invariant, so the whole landscape above lives on the
+3-dimensional orbit space S¹⁴/G₂ (invariants |a|², b₀, ⟨a,Im b⟩); the Haar initial measure of §8
+is one point in a 3-parameter-function family the algebra leaves free. `orbit_space.py` checks the
+orbit dimension (11) and the identity, and draws `hvr_orbit_space.png`. Ladder and consequences:
+`docs/foundations/473-ac1-first-link-v0.1.md`.
