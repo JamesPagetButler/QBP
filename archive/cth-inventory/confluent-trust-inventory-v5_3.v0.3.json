@@ -7635,6 +7635,404 @@
         "result": "verified",
         "axiom_closure": []
       }
+    },
+    {
+      "id": "PROOF-sedenion-dirac-sum-kill",
+      "name": "D = i·L_{Σeₐ} is scalar on 𝕊: s(sx) = −15x",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 AC2 first pass, step 1 of the lit path. For s = Σ_{a=1}^{15} eₐ in the sedenions (CDAlg ℝ 4, Schafer convention): s·(s·x) = −15•x for every x, i.e. the candidate algebraic Dirac operator D = i·Σₐ L_{eₐ} = i·L_s satisfies D² = 15·I — Tr f(D/Λ) = 16·f(√15/Λ) carries no spectral information. (The analogous ℍ/𝕆 scalars 3 and 7 are numerical only — not encoded here.) Kernel `decide` on the integer 16×16 left-multiplication matrix (sAllLZ_sq) + ℝ-linearity transfer; companions give s·s = −15, the vanishing left-associator [s,s,x] = 0, N(s) = 15, and an independent re-derivation via the alternator identity. Scope of the PROOF: this one operator at 𝕊. The generalisation to every finite Aut(𝕊)-covariant D over one CD copy (envelope M₁₆(ℝ) + Schur) is numerical/structural, README §3 — the #473 AC2 first-pass KILL rests on that flashlight, not on this anchor alone (see #473 comment 5535630651).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Alternator.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.sAll_left_mul_sq",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.sAll_sq",
+        "QBP.Foundations.CDAlg.sAll_assoc_zero",
+        "QBP.Foundations.CDAlg.sAllLZ_sq",
+        "QBP.Foundations.CDAlg.sAll_mul_coord",
+        "QBP.Foundations.CDAlg.sAll_coord",
+        "QBP.Foundations.CDAlg.sAll_coord_zero",
+        "QBP.Foundations.CDAlg.sAll_components_commute",
+        "QBP.Foundations.CDAlg.N_sAll",
+        "QBP.Foundations.CDAlg.sAll_left_mul_sq_via_T2c",
+        "QBP.Foundations.CDAlg.mul_coord_matrix"
+      ],
+      "theorems": [
+        {
+          "name": "sAll_left_mul_sq",
+          "status": "verified"
+        },
+        {
+          "name": "sAll_sq",
+          "status": "verified"
+        },
+        {
+          "name": "sAll_assoc_zero",
+          "status": "verified"
+        },
+        {
+          "name": "sAllLZ_sq",
+          "status": "verified"
+        },
+        {
+          "name": "sAll_mul_coord",
+          "status": "verified"
+        },
+        {
+          "name": "sAll_coord",
+          "status": "verified"
+        },
+        {
+          "name": "sAll_coord_zero",
+          "status": "verified"
+        },
+        {
+          "name": "sAll_components_commute",
+          "status": "verified"
+        },
+        {
+          "name": "N_sAll",
+          "status": "verified"
+        },
+        {
+          "name": "sAll_left_mul_sq_via_T2c",
+          "status": "verified"
+        },
+        {
+          "name": "mul_coord_matrix",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473",
+      "last_tested_at": "2026-09-04T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-04T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 alternator anchors, PR #629); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-alternator-vanishes-iff-commute",
+      "name": "δ-landscape vacua: T_s = 0 ⟺ the CD components of s commute",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 δ-landscape (T2a). Left-alternator T_s x := (s·s)·x − s·(s·x). At 𝕆: for imaginary a, (∀y, [a,y,b] = 0) ⟺ a·b = b·a (via octonion_commutant: an imaginary a ≠ 0 commuting with b forces b ∈ span{1,a}, from the polarised CD square identity, norm composition and positive-definiteness of N). At 𝕊: for s with s.coord 0 = 0, (∀x, T_s x = 0) ⟺ cdLo s · cdHi s = cdHi s · cdLo s. This is the algebraic characterisation of the vacuum manifold {δ(s) = 0} of V(s) = ‖[a,b]‖² on S¹⁴ (the octonion subalgebra directions). Non-vacuity: sedenion_not_alternative_via_commutator re-derives 𝕊's non-alternativity from the criterion with a constructed witness (e₁e₂ ≠ e₂e₁).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Alternator.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.sedenion_alternator_vanishes_iff_components_commute",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.octonion_assoc_vanishes_iff_commute",
+        "QBP.Foundations.CDAlg.octonion_commutant",
+        "QBP.Foundations.CDAlg.mul_add_mul_comm",
+        "QBP.Foundations.CDAlg.anticomm_of_orthogonal_imaginary",
+        "QBP.Foundations.CDAlg.alt_assoc_one_right",
+        "QBP.Foundations.CDAlg.assoc_self_eq_laMap",
+        "QBP.Foundations.CDAlg.laMap_lo_hi_antisym",
+        "QBP.Foundations.CDAlg.laMap_loOf_hiOne",
+        "QBP.Foundations.CDAlg.laMap_loOf_hiOf_self",
+        "QBP.Foundations.CDAlg.sedenion_not_alternative_via_commutator",
+        "QBP.Foundations.CDAlg.sedWitX_alternator_ne_zero",
+        "QBP.Foundations.CDAlg.sedWitX_cdLo",
+        "QBP.Foundations.CDAlg.sedWitX_cdHi",
+        "QBP.Foundations.CDAlg.sedWitX_coord_zero",
+        "QBP.Foundations.CDAlg.octonion_e1_e2_not_commute"
+      ],
+      "theorems": [
+        {
+          "name": "sedenion_alternator_vanishes_iff_components_commute",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_assoc_vanishes_iff_commute",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_commutant",
+          "status": "verified"
+        },
+        {
+          "name": "mul_add_mul_comm",
+          "status": "verified"
+        },
+        {
+          "name": "anticomm_of_orthogonal_imaginary",
+          "status": "verified"
+        },
+        {
+          "name": "alt_assoc_one_right",
+          "status": "verified"
+        },
+        {
+          "name": "assoc_self_eq_laMap",
+          "status": "verified"
+        },
+        {
+          "name": "laMap_lo_hi_antisym",
+          "status": "verified"
+        },
+        {
+          "name": "laMap_loOf_hiOne",
+          "status": "verified"
+        },
+        {
+          "name": "laMap_loOf_hiOf_self",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_not_alternative_via_commutator",
+          "status": "verified"
+        },
+        {
+          "name": "sedWitX_alternator_ne_zero",
+          "status": "verified"
+        },
+        {
+          "name": "sedWitX_cdLo",
+          "status": "verified"
+        },
+        {
+          "name": "sedWitX_cdHi",
+          "status": "verified"
+        },
+        {
+          "name": "sedWitX_coord_zero",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_e1_e2_not_commute",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473",
+      "last_tested_at": "2026-09-04T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-04T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 alternator anchors, PR #629); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-associator-contraction-identity",
+      "name": "Σᵢ eᵢ·[a,eᵢ,b] = −4·[a,b] on 𝕆, and its sedenion lift",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 δ-landscape. Bilinear contraction identity relating the associator to the commutator: Σ_{i=0}^{7} eᵢ·[a,eᵢ,b] = (−4)•(a·b − b·a) on the octonions (64 basis cases by kernel decide + bilinearity), and for EVERY sedenion s (imaginary or not): cdHi(Σ_t e_{8+t}·[s,s,e_{8+t}]) = 4•(cdLo s·cdHi s − cdHi s·cdLo s). Gives an algebraic (rather than norm-based) definition of the alternativity defect δ(s) = ‖[a,b]‖ and is the ⇒ direction of PROOF-alternator-vanishes-iff-commute.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Alternator.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.octonion_assoc_contract",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.sedenion_alternator_contract",
+        "QBP.Foundations.CDAlg.contractMap_bilinear",
+        "QBP.Foundations.CDAlg.contractMap_e",
+        "QBP.Foundations.CDAlg.contractMap_zero",
+        "QBP.Foundations.CDAlg.contractCoeffZ_zero",
+        "QBP.Foundations.CDAlg.sedContractZ",
+        "QBP.Foundations.CDAlg.sedContract_basis",
+        "QBP.Foundations.CDAlg.laCoeffZ_lo_lo",
+        "QBP.Foundations.CDAlg.laCoeffZ_hi_hi",
+        "QBP.Foundations.CDAlg.laCoeffZ_lo_hi0",
+        "QBP.Foundations.CDAlg.laCoeffZ_lo_hi_sym",
+        "QBP.Foundations.CDAlg.laMap_e",
+        "QBP.Foundations.CDAlg.laMap_e_e_zero",
+        "QBP.Foundations.CDAlg.laMap_expand_sums",
+        "QBP.Foundations.CDAlg.laMap_loPart_loPart",
+        "QBP.Foundations.CDAlg.laMap_hiPart_hiPart"
+      ],
+      "theorems": [
+        {
+          "name": "octonion_assoc_contract",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_alternator_contract",
+          "status": "verified"
+        },
+        {
+          "name": "contractMap_bilinear",
+          "status": "verified"
+        },
+        {
+          "name": "contractMap_e",
+          "status": "verified"
+        },
+        {
+          "name": "contractMap_zero",
+          "status": "verified"
+        },
+        {
+          "name": "contractCoeffZ_zero",
+          "status": "verified"
+        },
+        {
+          "name": "sedContractZ",
+          "status": "verified"
+        },
+        {
+          "name": "sedContract_basis",
+          "status": "verified"
+        },
+        {
+          "name": "laCoeffZ_lo_lo",
+          "status": "verified"
+        },
+        {
+          "name": "laCoeffZ_hi_hi",
+          "status": "verified"
+        },
+        {
+          "name": "laCoeffZ_lo_hi0",
+          "status": "verified"
+        },
+        {
+          "name": "laCoeffZ_lo_hi_sym",
+          "status": "verified"
+        },
+        {
+          "name": "laMap_e",
+          "status": "verified"
+        },
+        {
+          "name": "laMap_e_e_zero",
+          "status": "verified"
+        },
+        {
+          "name": "laMap_expand_sums",
+          "status": "verified"
+        },
+        {
+          "name": "laMap_loPart_loPart",
+          "status": "verified"
+        },
+        {
+          "name": "laMap_hiPart_hiPart",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473",
+      "last_tested_at": "2026-09-04T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-04T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 alternator anchors, PR #629); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-left-mul-sq-alternator",
+      "name": "−L_s² = N(s)·id + T_s for imaginary s (T2c, scalar half)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 δ-landscape (T2c). For imaginary s in any CD algebra level covered: s·(s·x) = −N(s)•x − [s,s,x], i.e. −L_s² = N(s)·id + T_s (sign fixed per Red Team PR #629 finding 1), so the spectrum of −L_s² is N(s) shifted by the alternator spectrum ({1−δ ×4, 1 ×8, 1+δ ×4} for unit s — the spectral multiplicities are NOT yet Lean-proved; only the operator identity is). Convention-explicit: T_s := (s·s)·x − s·(s·x); the unit-normalised form −L_s² = id + T_s holds iff N(s) = 1. The symmetry of T_s and the minimal polynomial T_s³ = ‖[a,b]‖²·T_s remain flashlight-only (see PR #629).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/Alternator.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.left_mul_sq_imaginary",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.imaginary_sq"
+      ],
+      "theorems": [
+        {
+          "name": "left_mul_sq_imaginary",
+          "status": "verified"
+        },
+        {
+          "name": "imaginary_sq",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473",
+      "last_tested_at": "2026-09-04T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-04T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 alternator anchors, PR #629); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
     }
   ],
   "inputs": [
