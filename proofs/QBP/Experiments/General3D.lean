@@ -88,6 +88,7 @@ theorem prob_up_general (θ φ α β : ℝ) :
      Real.cos θ * Real.cos α) / 2 := by
   unfold probUp
   rw [expectation_general]
+  ring
 
 -- ### EDGE CASES ###
 

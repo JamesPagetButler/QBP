@@ -2,15 +2,539 @@
   "manifest_version": "0.1.0",
   "description": "FAULT-S4-005 C1/C2: the DECLARED set of anchor-worthy theory-state deliverables (top-level, non-private, named in an issue-AC / #474-row). The inverse-anchor-audit ratchet counts orphans against THIS manifest, not `grep theorem` (the 640->~dozen fix). Maintained by cth-implementor (schema authority); the merging PR that lands a new theory-state deliverable adds its entry. Each entry joins: declared_by (deliverable) -> witnesses (source theorem qualified-names) -> anchor_id (CTH ledger). One manifest, three clauses: C1 declared->anchored, C2 no-baselining-declared, C3 anchored->witnesses-resolve.",
   "entries": [
-    {"anchor_id": "PRED-ckm-cp-phase-arctan-sqrt7", "proof_system": "lean4", "declared_by": "#585", "witnesses": ["QBP.Foundations.CPPhase.cos_sq_delta_CP", "QBP.Foundations.CPPhase.tan_delta_CP", "QBP.Foundations.CPPhase.sin_sq_delta_CP"]},
-    {"anchor_id": "PROOF-cd-algebra-finrank-2n", "proof_system": "lean4", "declared_by": "#585", "witnesses": ["QBP.Foundations.CDDimension.finrank_cdAlg", "QBP.Foundations.CDDimension.even_tower_imDim", "QBP.Foundations.CDDimension.finrank_imSubmodule"]},
-    {"anchor_id": "PROOF-sp1-unit-quaternion-group", "proof_system": "lean4", "declared_by": "#466", "witnesses": ["QBP.Foundations.UnitQuaternion.norm_preserving_iff_unit", "QBP.Foundations.UnitQuaternion.norm_mul_of_unit", "QBP.Foundations.UnitQuaternion.mem_Sp1_iff_norm"]},
-    {"anchor_id": "PROOF-spectral-action-moment-scaling", "proof_system": "lean4", "declared_by": "#466", "witnesses": ["QBP.Foundations.SpectralMoments.f4_scaling", "QBP.Foundations.SpectralMoments.f2_scaling", "QBP.Foundations.SpectralMoments.profileMoment_dilate"]},
-    {"anchor_id": "PROOF-fano-genesis", "proof_system": "lean4", "declared_by": "#466", "witnesses": ["QBP.Foundations.FanoGenesis.imaginary_units_square_neg_one", "QBP.Foundations.FanoGenesis.lines_units_consistent", "QBP.Foundations.FanoGenesis.octonion_non_associative", "QBP.Foundations.FanoGenesis.fano_anticommutative"]},
-    {"anchor_id": "PROOF-normed-division-tower-existence", "proof_system": "lean4", "declared_by": "#466", "witnesses": ["QBP.Foundations.Hurwitz.octonion_norm_multiplicative", "QBP.Foundations.Hurwitz.sedenion_not_composition", "QBP.Foundations.Hurwitz.tower_dims_in_1248"]},
-    {"anchor_id": "PROOF-octonion-zd-hypersurface-empty", "proof_system": "lean4", "declared_by": "#594", "witnesses": ["QBP.Foundations.LeftMulDet.octonionLeftMul_det", "QBP.Foundations.LeftMulDet.octonionLeftMul_det_eq_zero_iff", "QBP.Foundations.LeftMulDet.octonionLeftMul_det_comm"]},
-    {"anchor_id": "PROOF-s3-hspace", "proof_system": "agda", "declared_by": "#575", "witnesses": ["S3FromCD.S³-HSpace"]},
-    {"anchor_id": "PROOF-skyrmion-baryon-complete-invariant", "proof_system": "agda", "declared_by": "#595", "witnesses": ["SkyrmionCharge.baryonNumber-complete", "SkyrmionCharge.skyrmionSectorsIso", "SkyrmionCharge.baryonNumber-hedgehog-correct", "SkyrmionCharge.baryonNumber-skyrmionℤ-correct"]},
-    {"anchor_id": "PROOF-substrate-baryon-additive", "proof_system": "agda", "declared_by": "#595", "witnesses": ["SubstrateCharge.baryonNumber-quaternionProduct-correct", "SubstrateCharge.baryonNumber-leftTranslation-correct"]}
+    {
+      "anchor_id": "PRED-ckm-cp-phase-arctan-sqrt7",
+      "proof_system": "lean4",
+      "declared_by": "#585",
+      "witnesses": [
+        "QBP.Foundations.CPPhase.cos_sq_delta_CP",
+        "QBP.Foundations.CPPhase.tan_delta_CP",
+        "QBP.Foundations.CPPhase.sin_sq_delta_CP"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-cd-algebra-finrank-2n",
+      "proof_system": "lean4",
+      "declared_by": "#585",
+      "witnesses": [
+        "QBP.Foundations.CDDimension.finrank_cdAlg",
+        "QBP.Foundations.CDDimension.even_tower_imDim",
+        "QBP.Foundations.CDDimension.finrank_imSubmodule"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-sp1-unit-quaternion-group",
+      "proof_system": "lean4",
+      "declared_by": "#466",
+      "witnesses": [
+        "QBP.Foundations.UnitQuaternion.norm_preserving_iff_unit",
+        "QBP.Foundations.UnitQuaternion.norm_mul_of_unit",
+        "QBP.Foundations.UnitQuaternion.mem_Sp1_iff_norm"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-spectral-action-moment-scaling",
+      "proof_system": "lean4",
+      "declared_by": "#466",
+      "witnesses": [
+        "QBP.Foundations.SpectralMoments.f4_scaling",
+        "QBP.Foundations.SpectralMoments.f2_scaling",
+        "QBP.Foundations.SpectralMoments.profileMoment_dilate"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-fano-genesis",
+      "proof_system": "lean4",
+      "declared_by": "#466",
+      "witnesses": [
+        "QBP.Foundations.FanoGenesis.imaginary_units_square_neg_one",
+        "QBP.Foundations.FanoGenesis.lines_units_consistent",
+        "QBP.Foundations.FanoGenesis.octonion_non_associative",
+        "QBP.Foundations.FanoGenesis.fano_anticommutative"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-normed-division-tower-existence",
+      "proof_system": "lean4",
+      "declared_by": "#466",
+      "witnesses": [
+        "QBP.Foundations.Hurwitz.octonion_norm_multiplicative",
+        "QBP.Foundations.Hurwitz.sedenion_not_composition",
+        "QBP.Foundations.Hurwitz.tower_dims_in_1248"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-octonion-zd-hypersurface-empty",
+      "proof_system": "lean4",
+      "declared_by": "#594",
+      "witnesses": [
+        "QBP.Foundations.LeftMulDet.octonionLeftMul_det",
+        "QBP.Foundations.LeftMulDet.octonionLeftMul_det_eq_zero_iff",
+        "QBP.Foundations.LeftMulDet.octonionLeftMul_det_comm"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-s3-hspace",
+      "proof_system": "agda",
+      "declared_by": "#575",
+      "witnesses": [
+        "S3FromCD.S³-HSpace"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-skyrmion-baryon-complete-invariant",
+      "proof_system": "agda",
+      "declared_by": "#595",
+      "witnesses": [
+        "SkyrmionCharge.baryonNumber-complete",
+        "SkyrmionCharge.skyrmionSectorsIso",
+        "SkyrmionCharge.baryonNumber-hedgehog-correct",
+        "SkyrmionCharge.baryonNumber-skyrmionℤ-correct"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-substrate-baryon-additive",
+      "proof_system": "agda",
+      "declared_by": "#595",
+      "witnesses": [
+        "SubstrateCharge.baryonNumber-quaternionProduct-correct",
+        "SubstrateCharge.baryonNumber-leftTranslation-correct"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-ops-order-ladder",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.Breakdown.complex_no_linear_order",
+        "QBP.Foundations.Breakdown.quaternion_no_linear_order",
+        "QBP.Foundations.Breakdown.octonion_no_order",
+        "QBP.Foundations.Breakdown.sedenion_no_order"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-ops-commutativity-ladder",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.TowerLaws.real_mul_comm",
+        "QBP.Foundations.TowerLaws.complex_mul_comm"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-ops-associativity-ladder",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.TowerLaws.real_associative",
+        "QBP.Foundations.TowerLaws.complex_associative",
+        "QBP.Foundations.TowerLaws.quaternion_associative"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-ops-alternativity-ladder",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.TowerLaws.real_alternative",
+        "QBP.Foundations.TowerLaws.complex_alternative",
+        "QBP.Foundations.TowerLaws.quaternion_alternative"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-ops-norm-composition-ladder",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.TowerLaws.real_norm_composition",
+        "QBP.Foundations.TowerLaws.complex_norm_composition",
+        "QBP.Foundations.TowerLaws.quaternion_norm_composition"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-ops-division-ladder",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.TowerLaws.real_division",
+        "QBP.Foundations.TowerLaws.complex_division",
+        "QBP.Foundations.TowerLaws.quaternion_division"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-ops-flexibility-ladder",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.TowerLaws.real_flexible",
+        "QBP.Foundations.TowerLaws.complex_flexible",
+        "QBP.Foundations.TowerLaws.quaternion_flexible"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-sedenion-zero-divisor-witnesses",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal9",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal10",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal11",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal12",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal13",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal14",
+        "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal15"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-octonion-moufang",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.octonion_moufang_left",
+        "QBP.Foundations.CDAlg.octonion_moufang_right",
+        "QBP.Foundations.CDAlg.octonion_moufang_middle"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-power-associativity",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.octonion_power_associative",
+        "QBP.Foundations.CDAlg.octonion_power_associative_4",
+        "QBP.Foundations.CDAlg.sedenion_power_associative",
+        "QBP.Foundations.CDAlg.sedenion_power_associative_4"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-octonion-cross-product",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CrossProduct.cross_reCoord_zero",
+        "QBP.Foundations.CrossProduct.cross_antisymm",
+        "QBP.Foundations.CrossProduct.cross_self",
+        "QBP.Foundations.CrossProduct.octonion_cross_orthogonal_left",
+        "QBP.Foundations.CrossProduct.octonion_cross_orthogonal_right",
+        "QBP.Foundations.CrossProduct.quaternion_cross_orthogonal_left",
+        "QBP.Foundations.CrossProduct.quaternion_cross_orthogonal_right",
+        "QBP.Foundations.CrossProduct.octonion_cross_norm_identity",
+        "QBP.Foundations.CrossProduct.quaternion_cross_norm_identity",
+        "QBP.Foundations.CrossProduct.no_sedenion_composition_for_cross"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-artin-theorem",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.octonion_artin",
+        "QBP.Foundations.CDAlg.octonion_artin_assoc",
+        "QBP.Foundations.CDAlg.octonion_artin_gen"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-cd-product-formula",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.e_mul_e",
+        "QBP.Foundations.CDAlg.basis_expansion",
+        "QBP.Foundations.CDAlg.mulCoeff_props",
+        "QBP.Foundations.CDAlg.cdAlg_sq_eq"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-cd-structure-constant-tables",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.mulCoeff_three_eq_fano",
+        "QBP.Foundations.CDAlg.mulCoeff_four_eq_sgnTable"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-cd-associativity-level2",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.cdAlg_two_assoc",
+        "QBP.Foundations.CDAlg.cdAlg_one_mul",
+        "QBP.Foundations.CDAlg.cdAlg_mul_one"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-cd-associator-formula",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.assoc_e"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-octonion-sedenion-exp-log",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.exp_unit_axis_real",
+        "QBP.Foundations.CDAlg.exp_smul_add_real",
+        "QBP.Foundations.CDAlg.exp_neg_mul_exp",
+        "QBP.Foundations.CDAlg.N_exp",
+        "QBP.Foundations.CDAlg.exp_log",
+        "QBP.Foundations.CDAlg.log_exp",
+        "QBP.Foundations.CDAlg.exp_eq_quaternion",
+        "QBP.Foundations.CDAlg.octonion_exp_smul_add",
+        "QBP.Foundations.CDAlg.octonion_exp_neg_mul_exp",
+        "QBP.Foundations.CDAlg.octonion_N_exp",
+        "QBP.Foundations.CDAlg.octonion_exp_log",
+        "QBP.Foundations.CDAlg.octonion_exp_smul_add_real",
+        "QBP.Foundations.CDAlg.octonion_log_exp",
+        "QBP.Foundations.CDAlg.sedenion_exp_smul_add",
+        "QBP.Foundations.CDAlg.sedenion_exp_neg_mul_exp",
+        "QBP.Foundations.CDAlg.sedenion_N_exp",
+        "QBP.Foundations.CDAlg.sedenion_exp_log",
+        "QBP.Foundations.CDAlg.sedenion_exp_smul_add_real",
+        "QBP.Foundations.CDAlg.sedenion_log_exp"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-norm-form-bilinear",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.NormForm.bil_eq_reCoord_mul_conj",
+        "QBP.Foundations.NormForm.bil_symm",
+        "QBP.Foundations.NormForm.octonion_bilinear_form",
+        "QBP.Foundations.NormForm.sedenion_bilinear_form",
+        "QBP.Foundations.NormForm.N_nonneg",
+        "QBP.Foundations.NormForm.N_eq_zero_iff",
+        "QBP.Foundations.NormForm.octonion_norm_form_composition",
+        "QBP.Foundations.NormForm.sedenion_norm_form_not_composition"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-sedenion-alternative-hyperplane-count",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.SedenionOctonionCount.alternative_hyperplane_count_eq_eight",
+        "QBP.Foundations.SedenionOctonionCount.alternative_passes",
+        "QBP.Foundations.SedenionOctonionCount.alternative_fails"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-octonion-32dim-alternative-count",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.Octonion32Count.alternative_subspace_count_32_eq_fifty",
+        "QBP.Foundations.Octonion32Count.all_sedenion_lines_associative",
+        "QBP.Foundations.Octonion32Count.base_copies_persist",
+        "QBP.Foundations.Octonion32Count.crossing_pass_iff_discriminator",
+        "QBP.Foundations.Octonion32Count.forty_two_split",
+        "QBP.Foundations.Octonion32Count.base_plus_crossing_eq_fifty"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-bpm-si-round-trip",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Units.position_round_trip",
+        "QBP.Units.energy_round_trip"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-doubleslit-quaternion-algebra",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Experiments.DoubleSlit.qJ_sq",
+        "QBP.Experiments.DoubleSlit.j_mul_complex",
+        "QBP.Experiments.DoubleSlit.complex_mul_j",
+        "QBP.Experiments.DoubleSlit.j_complex_j",
+        "QBP.Experiments.DoubleSlit.coupling_decomposition",
+        "QBP.Experiments.DoubleSlit.coupling_decomposition_real",
+        "QBP.Experiments.DoubleSlit.coupling_cancellation",
+        "QBP.Experiments.DoubleSlit.coupling_cancellation_inner",
+        "QBP.Experiments.DoubleSlit.normSq_sympForm"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-doubleslit-visibility-bounds",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Experiments.DoubleSlit.quatFraction_nonneg",
+        "QBP.Experiments.DoubleSlit.quatFraction_le_one",
+        "QBP.Experiments.DoubleSlit.quatFraction_zero_iff",
+        "QBP.Experiments.DoubleSlit.visibility_nonneg",
+        "QBP.Experiments.DoubleSlit.visibility_le_one",
+        "QBP.Experiments.DoubleSlit.visibility_one",
+        "QBP.Experiments.DoubleSlit.visibility_zero",
+        "QBP.Experiments.DoubleSlit.visibility_correlated"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-fraunhofer-optics",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Optics.Fraunhofer.intensity_at_maximum",
+        "QBP.Optics.Fraunhofer.intensity_at_minimum",
+        "QBP.Optics.Fraunhofer.fringeSpacing_linear_lambda",
+        "QBP.Optics.Fraunhofer.fringeSpacing_linear_L",
+        "QBP.Optics.Fraunhofer.fringeSpacing_inverse_d",
+        "QBP.Optics.Fraunhofer.fraunhoferIntensityFull_factor",
+        "QBP.Optics.Fraunhofer.fraunhoferIntensityFull_slit_width_zero",
+        "QBP.Optics.Fraunhofer.fraunhoferIntensityFull_le",
+        "QBP.Optics.Fraunhofer.fraunhoferIntensityFull_nonneg"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-sterngerlach-qbp",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Experiments.SternGerlach.expectation_x_measured_z_is_zero",
+        "QBP.Experiments.SternGerlach.prob_up_x_measured_z_is_half",
+        "QBP.Experiments.SternGerlach.prob_down_x_measured_z_is_half"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-angle-dependent-qbp",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Experiments.AngleDependent.expectation_angle",
+        "QBP.Experiments.AngleDependent.prob_up_angle",
+        "QBP.Experiments.AngleDependent.prob_down_angle",
+        "QBP.Experiments.AngleDependent.prob_up_angle_cos_sq",
+        "QBP.Experiments.AngleDependent.prob_down_angle_sin_sq",
+        "QBP.Experiments.AngleDependent.prob_up_theta_zero",
+        "QBP.Experiments.AngleDependent.prob_up_theta_pi",
+        "QBP.Experiments.AngleDependent.prob_up_theta_pi_div_two"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-general3d-qbp",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Experiments.General3D.expectation_general",
+        "QBP.Experiments.General3D.prob_up_general",
+        "QBP.Experiments.General3D.prob_up_same_direction",
+        "QBP.Experiments.General3D.prob_up_z_on_z",
+        "QBP.Experiments.General3D.prob_up_antiz_on_z",
+        "QBP.Experiments.General3D.prob_up_x_on_z",
+        "QBP.Experiments.General3D.prob_up_y_on_z",
+        "QBP.Experiments.General3D.expectation_azimuthal_invariance"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-doubleslit-visibility-model",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Experiments.DoubleSlit.visibility_eq_one_sub_quatFraction",
+        "QBP.Experiments.DoubleSlit.visibility_antitone_background"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-measurement-ansatz-basic",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.expectation_orthogonal_is_zero",
+        "QBP.prob_up_orthogonal_is_half"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-code-si-constants",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Units.v_z_code_eq_40",
+        "QBP.Units.v_z_code_pos",
+        "QBP.Units.h_SI_pos",
+        "QBP.Units.e_SI_pos",
+        "QBP.Units.eV_in_J_pos",
+        "QBP.Units.hbar_code_pos",
+        "QBP.Units.m_code_pos",
+        "QBP.Units.k0_code_pos",
+        "QBP.Units.hbar_SI_pos"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-kitaev-model",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "plaquette_flux_z2",
+        "triple_product_all_orderings",
+        "clifford_anticommutation",
+        "clifford_collapse_to_quaternion",
+        "non_abelian_braiding",
+        "ru_screening_correct",
+        "cl_screening_correct",
+        "soc_regime_valid",
+        "jeff_half_filling"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-graphene-model",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "honeycomb_z3_cyclic",
+        "honeycomb_chirality",
+        "c2z_reverses_momentum",
+        "dirac_helicity",
+        "moire_fragile_topology",
+        "alpha_near_inv_sqrt3"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-bi2se3-ti",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "bi_screening_valid",
+        "se_screening_valid",
+        "slater_bi_correct",
+        "slater_se_correct",
+        "band_inversion_satisfied"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-crystallisation-spectral-moments",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "moment_scaling_hierarchy",
+        "convergence_ordering",
+        "variation_correlation",
+        "growth_enhancement"
+      ]
+    },
+    {
+      "anchor_id": "DERIV-quaternion-physics-kramers",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "kramers_orthogonality",
+        "kramers_degeneracy",
+        "eigenspace_gauge_match"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-su2-lie",
+      "proof_system": "lean4",
+      "declared_by": "#619",
+      "witnesses": [
+        "QBP.Foundations.imH_structure_constants",
+        "QBP.Foundations.imH_casimir"
+      ]
+    }
   ]
 }

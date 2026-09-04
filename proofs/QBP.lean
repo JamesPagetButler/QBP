@@ -5,6 +5,8 @@ import QBP.Basic
 import QBP.Foundations
 import QBP.Experiments.SternGerlach
 import QBP.Experiments.DoubleSlit
+import QBP.Experiments.AngleDependent
+import QBP.Experiments.General3D
 import QBP.Optics.Fraunhofer
 import QBP.Units.Constants
 import QBP.Units.ScaleFactors

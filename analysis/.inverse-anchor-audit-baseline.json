@@ -1,5 +1,5 @@
 {
-  "lean_side_orphans": 576,
+  "lean_side_orphans": 49,
   "per_file_theorems": {
     "proofs/QBP/Basic.lean": 6,
     "proofs/QBP/Cosmo/DenseMatter.lean": 6,
@@ -29,7 +29,7 @@
     "proofs/QBP/Foundations/G2Transitivity.lean": 23,
     "proofs/QBP/Foundations/Hurwitz.lean": 8,
     "proofs/QBP/Foundations/LeftMulDet.lean": 22,
-    "proofs/QBP/Foundations/LieAlgebraIso.lean": 17,
+    "proofs/QBP/Foundations/LieAlgebraIso.lean": 21,
     "proofs/QBP/Foundations/NormForm.lean": 10,
     "proofs/QBP/Foundations/Octonion32Count.lean": 8,
     "proofs/QBP/Foundations/OctonionLaws.lean": 55,
