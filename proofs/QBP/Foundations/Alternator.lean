@@ -54,7 +54,8 @@
     (`sedWitX_alternator_ne_zero`, `sedenion_not_alternative_via_commutator`).
 
   * **T2c (scalar part).**  For imaginary `s`, `s·(s·x) = −N(s)•x − [s,s,x]`,
-    i.e. `−L_s² = N(s)·id − T_s`.  (`left_mul_sq_imaginary`.)
+    i.e. `−L_s² = N(s)·id + T_s` (with `T_s x := (s·s)·x − s·(s·x)`).
+    (`left_mul_sq_imaginary`.)
 
   NOT proved here (tracked, honest gap): the cubic landscape identity
   **T2b**, `T_s³ = ‖a·b − b·a‖² · T_s`.  It reduces (see the derivation notes in
@@ -964,7 +965,8 @@ theorem imaginary_sq (s : CDAlg ℝ n) (hs : s.coord 0 = 0) :
   rw [cdAlg_sq_eq, hs, mul_zero, zero_smul, zero_sub, neg_smul]
 
 /-- **T2c (scalar part).**  For imaginary `s`,
-    `s·(s·x) = −N(s)·x − [s, s, x]`, i.e. `−L_s² = N(s)·id − T_s`.
+    `s·(s·x) = −N(s)·x − [s, s, x]`, i.e. `−L_s² = N(s)·id + T_s` for
+    `T_s x := [s, s, x] = (s·s)·x − s·(s·x)`.
     So the alternator is precisely the failure of `L_s²` to be the scalar
     `−N(s)`. -/
 theorem left_mul_sq_imaginary (s x : CDAlg ℝ n) (hs : s.coord 0 = 0) :

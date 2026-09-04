@@ -54,14 +54,14 @@ For a generic imaginary unit s ∈ Im𝕊: spec(−L_s²) = {1−δ (×4), 1 (×
 
 ## 6. δ closed form, minimal polynomial, Haar mean (2026-09-04, `delta_formula.py`, `minpoly.py`)
 
-Write an imaginary sedenion as s = a + bℓ, a ∈ Im𝕆 (coords 1..7), b ∈ 𝕆 (coords 8..15, b₀ = coord 8 = ℓ-component), and the left-alternator T_s x := (ss)x − s(sx). Then −L_s² = |s|²·I − T_s and (numerically, exact to 1e-12, 20+ random samples each):
+Write an imaginary sedenion as s = a + bℓ, a ∈ Im𝕆 (coords 1..7), b ∈ 𝕆 (coords 8..15, b₀ = coord 8 = ℓ-component), and the left-alternator T_s x := (ss)x − s(sx). Then −L_s² = |s|²·I + T_s (sign per this convention; spec T_s is ±δ-symmetric so the spectrum of −L_s² is unaffected) and (numerically, exact to 1e-12, 20+ random samples each):
 
 | Identity | Scope |
 |---|---|
 | spec(T_s) = {+δ ×4, 0 ×8, −δ ×4}, rank 8 generically | unit imaginary s |
 | **δ(s) = ‖[a,b]‖ = ‖ab − ba‖ = 2‖a × Im b‖** | unit imaginary s |
 | **T_s³ = ‖[a,b]‖²·T_s** (polynomial identity, no unit normalisation) | every imaginary s |
-| T_s = 0 ⟺ ab = ba ⟺ s in an octonion subalgebra | |
+| T_s = 0 ⟺ ab = ba (Lean); "⟺ s lies in an octonion subalgebra" is prose/folklore, not proved or tested here | |
 | Haar mean over S¹⁴: ⟨δ²⟩ = 4·E‖a × c‖² = 4·(49−7)/255 = **56/85** (numerical 0.6585 vs 0.6588) | the "42" appears here as 49−7 = 42 incidence terms — again a count, not physics |
 
 ## 7. Landscape Hessians and the ledger cross-link (`landscape.py`, `ledgerhess.py`)
@@ -76,7 +76,7 @@ V(s) = ‖[a,b]‖² on S¹⁴ is Aut(𝕊) = G₂×S₃ invariant, has no coupl
 | vacuum s = ℓ = e₈ | {0 ×16} | fully flat point |
 | ZD ridge {δ = 1}, e.g. (e₁+e₁₀)/√2 and generic | {**−8 ×2, −4 ×2**, 0 ×12} | two unstable doublets (residual SU(2)); curvature ratio exactly 2:1 |
 
-**Ledger cross-link (verified exactly):** the Sprint-12 ledger Hessian (`proofs/Sprint12-Inherited/Sedenion.lean:hessianEntry`, Hessian of |xy|² at the zero-divisor pair x = e₁+e₁₀, y = e₄−e₁₅, spectrum {0,4,8,12}×{16,4,8,4}, Tr = 128, Tr H² = 1152) is H = 2JᵀJ with J = [R_y | L_x], and its diagonal 16×16 blocks are **exactly −2R_y² and −2L_x²**, each with spectrum {0 ×4, 4 ×8, 8 ×4} = 2·(δ=1 alternator spectrum {0,1,2}×{4,8,4}). The ledger's 4/8/4 multiplicities *are* the alternator spectrum at a zero-divisor direction. Structural, not new physics.
+**Ledger cross-link (verified at spectrum/trace level against one ZD pair, not entrywise against `hessianEntry`):** the Sprint-12 ledger Hessian (`proofs/Sprint12-Inherited/Sedenion.lean:hessianEntry`, Hessian of |xy|² at the zero-divisor pair x = e₁+e₁₀, y = e₄−e₁₅, spectrum {0,4,8,12}×{16,4,8,4}, Tr = 128, Tr H² = 1152) is H = 2JᵀJ with J = [R_y | L_x], and its diagonal 16×16 blocks are **exactly −2R_y² and −2L_x²**, each with spectrum {0 ×4, 4 ×8, 8 ×4} = 2·(δ=1 alternator spectrum {0,1,2}×{4,8,4}). The ledger's 4/8/4 multiplicities *are* the alternator spectrum at a zero-divisor direction. Structural, not new physics.
 
 ## 8. Gradient-flow dynamics on S¹⁴ (`flow.py`, `flow_big.py`)
 
@@ -86,7 +86,7 @@ Endpoint statistics from Haar initial data on S¹⁴ (Haar: ⟨b₀²⟩ = ⟨|a
 
 | Quantity | Haar start | Flow endpoint (N=24 000, dt=0.02, 5000 steps) |
 |---|---|---|
-| ⟨b₀²⟩ | 1/15 = 0.0667 | **0.1462 ± 0.0011** (1/7 = 0.1429 excluded at 3σ — the "1:3:3" guess from the 3000-sample run is dead) |
+| ⟨b₀²⟩ | 1/15 = 0.0667 | **0.1462 ± 0.0011** (1/7 = 0.1429 disfavoured at 3σ *statistical only* — no systematics budget for dt = 0.02 / step count / convergence tolerance; the "1:3:3" guess from the 3000-sample run is not supported, and the number is non-load-bearing anyway: the flow law and the Haar initial measure are inputs) |
 | ⟨\|a\|²⟩, ⟨\|Im b\|²⟩ | 7/15 each | 0.4315, 0.4223 (difference 0.009 ± 0.004 — consistent with the exact a↔Im b symmetry) |
 | ⟨8(1−b₀²)⟩ (mean 6-mode mass²) | — | 6.83 |
 | b₀² quantiles 10/25/50/75/90 % | — | 0.003 / 0.018 / 0.078 / 0.216 / 0.397 |

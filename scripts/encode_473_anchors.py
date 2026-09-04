@@ -37,16 +37,18 @@ BATTERIES = "32dc18cde3684679f3c003de608743b57498c56f"
 # id -> (name, description, [witnesses: primary first])
 ANCHORS = {
     "PROOF-sedenion-dirac-sum-kill": (
-        "D = i·L_{Σeₐ} has no spectrum: s(sx) = −15x on 𝕊",
+        "D = i·L_{Σeₐ} is scalar on 𝕊: s(sx) = −15x",
         "#473 AC2 first pass, step 1 of the lit path. For s = Σ_{a=1}^{15} eₐ in the "
         "sedenions (CDAlg ℝ 4, Schafer convention): s·(s·x) = −15•x for every x, i.e. the "
         "candidate algebraic Dirac operator D = i·Σₐ L_{eₐ} = i·L_s satisfies D² = 15·I — "
-        "Tr f(D/Λ) = 16·f(√15/Λ) carries no spectral information at any CD level (3, 7, 15 "
-        "on ℍ, 𝕆, 𝕊). Kernel `decide` on the integer 16×16 left-multiplication matrix "
+        "Tr f(D/Λ) = 16·f(√15/Λ) carries no spectral information. (The analogous ℍ/𝕆 "
+        "scalars 3 and 7 are numerical only — not encoded here.) Kernel `decide` on the integer 16×16 left-multiplication matrix "
         "(sAllLZ_sq) + ℝ-linearity transfer; companions give s·s = −15, the vanishing "
         "left-associator [s,s,x] = 0, N(s) = 15, and an independent re-derivation via the "
-        "alternator identity. KILLS the finite background-free spectral-action route over "
-        "one CD copy (see #473 comment 5535630651 and analysis/473-dirac-probe/README.md).",
+        "alternator identity. Scope of the PROOF: this one operator at 𝕊. The generalisation "
+        "to every finite Aut(𝕊)-covariant D over one CD copy (envelope M₁₆(ℝ) + Schur) is "
+        "numerical/structural, README §3 — the #473 AC2 first-pass KILL rests on that "
+        "flashlight, not on this anchor alone (see #473 comment 5535630651).",
         [
             "sAll_left_mul_sq",
             "sAll_sq",
@@ -121,13 +123,14 @@ ANCHORS = {
         ],
     ),
     "PROOF-left-mul-sq-alternator": (
-        "−L_s² = N(s)·id − T_s for imaginary s (T2c, scalar half)",
+        "−L_s² = N(s)·id + T_s for imaginary s (T2c, scalar half)",
         "#473 δ-landscape (T2c). For imaginary s in any CD algebra level covered: "
-        "s·(s·x) = −N(s)•x − [s,s,x], i.e. −L_s² = N(s)·id − T_s, so the spectrum of "
+        "s·(s·x) = −N(s)•x − [s,s,x], i.e. −L_s² = N(s)·id + T_s (sign fixed per Red Team "
+        "PR #629 finding 1), so the spectrum of "
         "−L_s² is N(s) shifted by the alternator spectrum ({1−δ ×4, 1 ×8, 1+δ ×4} for unit "
         "s — the spectral multiplicities are NOT yet Lean-proved; only the operator identity "
         "is). Convention-explicit: T_s := (s·s)·x − s·(s·x); the unit-normalised form "
-        "−L_s² = id − T_s holds iff N(s) = 1. The symmetry of T_s and the minimal polynomial "
+        "−L_s² = id + T_s holds iff N(s) = 1. The symmetry of T_s and the minimal polynomial "
         "T_s³ = ‖[a,b]‖²·T_s remain flashlight-only (see PR #629).",
         ["left_mul_sq_imaginary", "imaginary_sq"],
     ),
