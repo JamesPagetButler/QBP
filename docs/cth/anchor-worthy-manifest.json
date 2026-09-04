@@ -535,6 +535,80 @@
         "QBP.Foundations.imH_structure_constants",
         "QBP.Foundations.imH_casimir"
       ]
+    },
+    {
+      "anchor_id": "PROOF-sedenion-dirac-sum-kill",
+      "proof_system": "lean4",
+      "declared_by": "#473",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.sAll_left_mul_sq",
+        "QBP.Foundations.CDAlg.sAll_sq",
+        "QBP.Foundations.CDAlg.sAll_assoc_zero",
+        "QBP.Foundations.CDAlg.sAllLZ_sq",
+        "QBP.Foundations.CDAlg.sAll_mul_coord",
+        "QBP.Foundations.CDAlg.sAll_coord",
+        "QBP.Foundations.CDAlg.sAll_coord_zero",
+        "QBP.Foundations.CDAlg.sAll_components_commute",
+        "QBP.Foundations.CDAlg.N_sAll",
+        "QBP.Foundations.CDAlg.sAll_left_mul_sq_via_T2c",
+        "QBP.Foundations.CDAlg.mul_coord_matrix"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-alternator-vanishes-iff-commute",
+      "proof_system": "lean4",
+      "declared_by": "#473",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.sedenion_alternator_vanishes_iff_components_commute",
+        "QBP.Foundations.CDAlg.octonion_assoc_vanishes_iff_commute",
+        "QBP.Foundations.CDAlg.octonion_commutant",
+        "QBP.Foundations.CDAlg.mul_add_mul_comm",
+        "QBP.Foundations.CDAlg.anticomm_of_orthogonal_imaginary",
+        "QBP.Foundations.CDAlg.alt_assoc_one_right",
+        "QBP.Foundations.CDAlg.assoc_self_eq_laMap",
+        "QBP.Foundations.CDAlg.laMap_lo_hi_antisym",
+        "QBP.Foundations.CDAlg.laMap_loOf_hiOne",
+        "QBP.Foundations.CDAlg.laMap_loOf_hiOf_self",
+        "QBP.Foundations.CDAlg.sedenion_not_alternative_via_commutator",
+        "QBP.Foundations.CDAlg.sedWitX_alternator_ne_zero",
+        "QBP.Foundations.CDAlg.sedWitX_cdLo",
+        "QBP.Foundations.CDAlg.sedWitX_cdHi",
+        "QBP.Foundations.CDAlg.sedWitX_coord_zero",
+        "QBP.Foundations.CDAlg.octonion_e1_e2_not_commute"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-associator-contraction-identity",
+      "proof_system": "lean4",
+      "declared_by": "#473",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.octonion_assoc_contract",
+        "QBP.Foundations.CDAlg.sedenion_alternator_contract",
+        "QBP.Foundations.CDAlg.contractMap_bilinear",
+        "QBP.Foundations.CDAlg.contractMap_e",
+        "QBP.Foundations.CDAlg.contractMap_zero",
+        "QBP.Foundations.CDAlg.contractCoeffZ_zero",
+        "QBP.Foundations.CDAlg.sedContractZ",
+        "QBP.Foundations.CDAlg.sedContract_basis",
+        "QBP.Foundations.CDAlg.laCoeffZ_lo_lo",
+        "QBP.Foundations.CDAlg.laCoeffZ_hi_hi",
+        "QBP.Foundations.CDAlg.laCoeffZ_lo_hi0",
+        "QBP.Foundations.CDAlg.laCoeffZ_lo_hi_sym",
+        "QBP.Foundations.CDAlg.laMap_e",
+        "QBP.Foundations.CDAlg.laMap_e_e_zero",
+        "QBP.Foundations.CDAlg.laMap_expand_sums",
+        "QBP.Foundations.CDAlg.laMap_loPart_loPart",
+        "QBP.Foundations.CDAlg.laMap_hiPart_hiPart"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-left-mul-sq-alternator",
+      "proof_system": "lean4",
+      "declared_by": "#473",
+      "witnesses": [
+        "QBP.Foundations.CDAlg.left_mul_sq_imaginary",
+        "QBP.Foundations.CDAlg.imaginary_sq"
+      ]
     }
   ]
 }

@@ -11,6 +11,7 @@
     "proofs/QBP/Experiments/DoubleSlit.lean": 32,
     "proofs/QBP/Experiments/General3D.lean": 12,
     "proofs/QBP/Experiments/SternGerlach.lean": 6,
+    "proofs/QBP/Foundations/Alternator.lean": 88,
     "proofs/QBP/Foundations/Artin.lean": 3,
     "proofs/QBP/Foundations/ArtinCore.lean": 17,
     "proofs/QBP/Foundations/ArtinSpan.lean": 20,
