@@ -173,6 +173,36 @@ theorem imH_structure_constants :
     bracket qk qi = (2 : ℝ) • qj :=
   ⟨bracket_qi_qj, bracket_qj_qk, bracket_qk_qi⟩
 
+/-! ### The su(2) Casimir on Im(ℍ)
+
+The quadratic Casimir of 𝔰𝔲(2) in the imaginary-quaternion realisation is
+the sum of squares of the three generators. Since qi² = qj² = qk² = −1
+(Hamilton), this sum equals the scalar −3 (i.e. −3·e₀). This is the
+companion identity to `imH_structure_constants` (the bracket half): together
+the bracket relations and the Casimir value pin the 𝔰𝔲(2) structure used
+by the PROOF-su2-lie anchor. -/
+
+theorem qi_mul_qi : qi * qi = (-1 : Q) := by
+  ext <;> simp [qi, Quaternion.re_one, Quaternion.imI_one, Quaternion.imJ_one,
+    Quaternion.imK_one]
+theorem qj_mul_qj : qj * qj = (-1 : Q) := by
+  ext <;> simp [qj, Quaternion.re_one, Quaternion.imI_one, Quaternion.imJ_one,
+    Quaternion.imK_one]
+theorem qk_mul_qk : qk * qk = (-1 : Q) := by
+  ext <;> simp [qk, Quaternion.re_one, Quaternion.imI_one, Quaternion.imJ_one,
+    Quaternion.imK_one]
+
+/-- The su(2) quadratic Casimir on Im(ℍ): the sum of squares of the three
+    imaginary quaternion units equals the scalar −3 (= −3·e₀), because
+    qi² = qj² = qk² = −1.
+
+    This is the Casimir companion to `imH_structure_constants` for the
+    PROOF-su2-lie anchor: the structure-constant theorem records the bracket
+    relations [qi,qj] = 2qk (and cyclic), while this records the value of the
+    quadratic Casimir C₂ = qi² + qj² + qk² = −3 in the same basis. -/
+theorem imH_casimir : qi * qi + qj * qj + qk * qk = (-3 : Q) := by
+  rw [qi_mul_qi, qj_mul_qj, qk_mul_qk]; norm_num
+
 /-! ### TODO — full Mathlib LieEquiv construction
 
 A complete `LieEquiv Im(ℍ) 𝔰𝔲(2)` requires:

@@ -104,29 +104,41 @@ def checkTripleProduct : Bool :=
   -- Should be: idx=0, sign=-1
   e123_idx == 0 && e123_sign == -1
 
-/-- The triple product squared: (e₁e₂e₃)² = (-e₀)² = +e₀.
-    This proves W_p² = 1, establishing that W_p has eigenvalues ±1.
-    The gauge group is Z₂ = {+1, -1}. -/
-def checkTripleProductSquared : Bool :=
-  -- (e₁e₂e₃) = -e₀, so (e₁e₂e₃)² = (-e₀)·(-e₀) = +e₀·e₀ = +e₀
-  -- Equivalently: (-1)² × e₀·e₀ = 1 × +e₀ = +e₀
-  mulIdx 0 0 == 0 && mulSign 0 0 == 1  -- e₀² = +e₀ ✓
-  -- And (-1)² = +1 ✓
-
-/-- ALL six orderings of the triple product yield ±e₀.
-    The sign alternates with permutation parity:
-    Even permutations: e₁e₂e₃ = e₂e₃e₁ = e₃e₁e₂ = -e₀
-    Odd permutations:  e₂e₁e₃ = e₁e₃e₂ = e₃e₂e₁ = +e₀
-    This gives the SIGN of the plaquette flux for each 
-    traversal direction around the hexagon. -/
+/-- Signed value of the ordered triple product e_a·e_b·e_c: returns the
+    coefficient sign (±1) landing on basis element `tripleProductIdx a b c`.
+    Used by K2 (flux²) and K3 (all orderings). -/
 def tripleProductSign (a b c : Nat) : Int :=
   let ab_idx := mulIdx a b
   let ab_sign := mulSign a b
   ab_sign * mulSign ab_idx c
 
+/-- Basis index of the ordered triple product e_a·e_b·e_c = (e_a·e_b)·e_c. -/
 def tripleProductIdx (a b c : Nat) : Nat :=
   mulIdx (mulIdx a b) c
 
+/-- The triple product squared: (e₁e₂e₃)² = (-e₀)² = +e₀.
+    This proves W_p² = 1, establishing that W_p has eigenvalues ±1.
+    The gauge group is Z₂ = {+1, -1}.
+
+    This GENUINELY computes w = e₁e₂e₃ (via the same `tripleProduct*`
+    helpers used by K1/K3), then squares that value w·w from the
+    multiplication table — it does NOT merely assert e₀² = +e₀. -/
+def checkTripleProductSquared : Bool :=
+  -- w = e₁e₂e₃: index and sign from the table (K1 shows w = -e₀, i.e. idx 0, sign -1)
+  let w_idx := tripleProductIdx 1 2 3      -- = 0
+  let w_sign := tripleProductSign 1 2 3    -- = -1
+  -- w² = w·w: multiply w by itself, carrying both signs and the table sign
+  let sq_idx := mulIdx w_idx w_idx         -- = mulIdx 0 0 = 0
+  let sq_sign := w_sign * w_sign * mulSign w_idx w_idx  -- = (-1)·(-1)·(+1) = +1
+  -- (e₁e₂e₃)² = +e₀: index 0, sign +1
+  sq_idx == 0 && sq_sign == 1
+
+/-- ALL six orderings of the triple product yield ±e₀.
+    The sign alternates with permutation parity:
+    Even permutations: e₁e₂e₃ = e₂e₃e₁ = e₃e₁e₂ = -e₀
+    Odd permutations:  e₂e₁e₃ = e₁e₃e₂ = e₃e₂e₁ = +e₀
+    This gives the SIGN of the plaquette flux for each
+    traversal direction around the hexagon. -/
 def checkAllTripleProducts : Bool :=
   -- All orderings land on e₀ (idx=0)
   tripleProductIdx 1 2 3 == 0 &&
