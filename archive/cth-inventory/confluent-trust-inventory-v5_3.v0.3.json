@@ -8033,6 +8033,145 @@
           "Quot.sound"
         ]
       }
+    },
+    {
+      "id": "PROOF-delta-landscape-descent",
+      "name": "‖[a,b]‖² = 4(|a|²|Im b|² − ⟨a,Im b⟩²): the δ-landscape descends to the G₂-invariants",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 AC1 v0.3.1 Prop 6 (PR #631), research-thread evidence anchoring the #629 δ-landscape. For an imaginary sedenion s ∈ CDAlg ℝ 4 (s.coord 0 = 0) with Cayley–Dickson octonion components a = cdLo s, b = cdHi s and c = b − b₀•1 = Im b: N(a·b − b·a) = 4·(N a · N c − (bil a c)²). Hence the landscape potential V(s) = ‖[a,b]‖² is a function of the three G₂-invariants (|a|², |Im b|², ⟨a,Im b⟩) only, so the #629 gradient flow descends to the 3-dimensional orbit space S¹⁴/G₂. Structural proof (no decide): real multiples of 1 are central for the commutator, [x,y] = 2·(x ×ₙ y), N(2•v) = 4·N v, and the 𝕆 Lagrange identity CrossProduct.octonion_cross_norm_identity. Workhorse octonion_commutator_norm_im has the second argument arbitrary (only a imaginary is used). Companions: V ≥ 0 and the Cauchy–Schwarz consequence ⟨a,Im b⟩² ≤ |a|²|Im b|² on the orbit space. Numerical counterpart: analysis/473-dirac-probe/orbit_space.py check (3), residual 7e-16. Not a substrate claim; #473 stays open.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/DeltaLandscape.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.DeltaLandscape.sedenion_landscape_descends",
+      "lean_companion_theorems": [
+        "QBP.Foundations.DeltaLandscape.octonion_commutator_norm_im",
+        "QBP.Foundations.DeltaLandscape.octonion_commutator_norm",
+        "QBP.Foundations.DeltaLandscape.commutator_eq_two_smul_cross",
+        "QBP.Foundations.DeltaLandscape.commutator_sub_central",
+        "QBP.Foundations.DeltaLandscape.im_coord_zero",
+        "QBP.Foundations.DeltaLandscape.sedenion_landscape_nonneg",
+        "QBP.Foundations.DeltaLandscape.sedenion_gram_nonneg"
+      ],
+      "theorems": [
+        {
+          "name": "sedenion_landscape_descends",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_commutator_norm_im",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_commutator_norm",
+          "status": "verified"
+        },
+        {
+          "name": "commutator_eq_two_smul_cross",
+          "status": "verified"
+        },
+        {
+          "name": "commutator_sub_central",
+          "status": "verified"
+        },
+        {
+          "name": "im_coord_zero",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_landscape_nonneg",
+          "status": "verified"
+        },
+        {
+          "name": "sedenion_gram_nonneg",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473-ac1",
+      "last_tested_at": "2026-09-04T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-04T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 δ-landscape descent anchors, PR #631); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-rot120-invariant-form-scalar",
+      "name": "A quadratic form on ℝ² invariant under a 120° rotation is scalar (order 2 is not enough)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 AC1 v0.3.1 Prop 7′ (PR #631), the algebraic step of the S₃ reduction: the G₂-invariant quadratic forms on Im𝕊 = 7 ⊕ 1 ⊕ 7 restricted to the (a, Im b) multiplicity plane are |a|² + λ|Im b|² + ν⟨a,Im b⟩, i.e. a symmetric form (p q; q r) on ℝ²; invariance under the order-3 rotation R (entries (−1/2, −√3/2; √3/2, −1/2), the ±120° rotations in Aut(𝕊) = G₂ × S₃ commuting with G₂) forces q = 0 and p = r, so the form is scalar (λ = 1, ν = 0) and the Aut-invariant quadratic-form family collapses to Q_μ = |a|² + |Im b|² + μb₀². Stated with the explicit RᵀQR entries as hypotheses; proved by linear_combination over √3² = 3. Companions: the ₂₂ invariance equation is redundant given the ₁₁ one (trace preservation), and a constructed witness (p,q,r) = (1,1,0) shows a 180° rotation admits a non-scalar invariant form — order 2 would NOT suffice. SCOPE: this is the quadratic-form class only; a general Aut-invariant measure is any S₃-invariant density on the orbit space (doc Prop 7′ / Prop 12 crux). Research-thread evidence; #473 stays open.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/DeltaLandscape.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.DeltaLandscape.rot120_invariant_form_scalar",
+      "lean_companion_theorems": [
+        "QBP.Foundations.DeltaLandscape.rot120_h22_of_h11",
+        "QBP.Foundations.DeltaLandscape.rot180_admits_nonscalar"
+      ],
+      "theorems": [
+        {
+          "name": "rot120_invariant_form_scalar",
+          "status": "verified"
+        },
+        {
+          "name": "rot120_h22_of_h11",
+          "status": "verified"
+        },
+        {
+          "name": "rot180_admits_nonscalar",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473-ac1",
+      "last_tested_at": "2026-09-04T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-04T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 δ-landscape descent anchors, PR #631); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
     }
   ],
   "inputs": [

@@ -609,6 +609,31 @@
         "QBP.Foundations.CDAlg.left_mul_sq_imaginary",
         "QBP.Foundations.CDAlg.imaginary_sq"
       ]
+    },
+    {
+      "anchor_id": "PROOF-delta-landscape-descent",
+      "proof_system": "lean4",
+      "declared_by": "#473-ac1",
+      "witnesses": [
+        "QBP.Foundations.DeltaLandscape.sedenion_landscape_descends",
+        "QBP.Foundations.DeltaLandscape.octonion_commutator_norm_im",
+        "QBP.Foundations.DeltaLandscape.octonion_commutator_norm",
+        "QBP.Foundations.DeltaLandscape.commutator_eq_two_smul_cross",
+        "QBP.Foundations.DeltaLandscape.commutator_sub_central",
+        "QBP.Foundations.DeltaLandscape.im_coord_zero",
+        "QBP.Foundations.DeltaLandscape.sedenion_landscape_nonneg",
+        "QBP.Foundations.DeltaLandscape.sedenion_gram_nonneg"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-rot120-invariant-form-scalar",
+      "proof_system": "lean4",
+      "declared_by": "#473-ac1",
+      "witnesses": [
+        "QBP.Foundations.DeltaLandscape.rot120_invariant_form_scalar",
+        "QBP.Foundations.DeltaLandscape.rot120_h22_of_h11",
+        "QBP.Foundations.DeltaLandscape.rot180_admits_nonscalar"
+      ]
     }
   ]
 }
