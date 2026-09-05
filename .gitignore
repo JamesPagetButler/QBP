@@ -110,3 +110,4 @@ proofs-physlean-bridge/**/*.olean
 # Agda build artifacts
 *.agdai
 _build/
+analysis/473-dirac-probe/*.npy
