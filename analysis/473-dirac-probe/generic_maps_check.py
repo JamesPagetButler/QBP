@@ -10,6 +10,10 @@ only H-space substructures (Adams' theorem in algebraic dress)" — is FALSE; th
       order and drive every start to the ZERO-DIVISOR RIDGE V = 1 (the landscape maximum), not to the
       vacuum; (x+t)/‖·‖ attracts to t; x·(x·t) leaves Im𝕊.
   Several independent t are tested (round-15 condition (2) asked for more than one).
+Runtime ≈ 4 min under `run-bounded 2G 600` (5 t × 40 starts × 120 iterations). Round-4 confirmer: the (2) maps are LINEAR (R_t, L_t, ad_t; skew for
+imaginary t); normalised iteration is power iteration onto the top-singular plane (on V = 1), then period 2 up to
+sign — 120 iterations are needed for the period test to settle (at 60 the residual ≈ (σ₅/σ₁)⁶⁰ straddles 1e-8).
+Section (3) prints the mechanism: skewness, Σσ² = 16·N(t), top-plane V, and R_ℓ orthogonal.
 Numerical flashlight only.
 """
 
@@ -73,7 +77,7 @@ print(
 )
 
 print(
-    "(2) maps from (x, t), t generic unforced; 5 independent t, 100 starts each, 60 iterations:"
+    "(2) maps from (x, t), t generic unforced; 5 independent t, 40 starts each, 120 iterations:"
 )
 for name, mk in {
     "x·t": lambda t: (lambda x: nz(cd_mul(x, t))),
@@ -87,10 +91,10 @@ for name, mk in {
         t = rand_imag()
         f = mk(t)
         ends, leaves, per = [], 0, []
-        for _ in range(100):
+        for _ in range(40):
             x = rand_imag()
             traj = [x]
-            for _ in range(60):
+            for _ in range(120):
                 x = f(x)
                 traj.append(x)
             leaves += abs(traj[-1][0]) > 1e-9
@@ -121,6 +125,22 @@ for name, mk in {
     sp = [r[2] for r in rows]
     nf = [r[3] for r in rows]
     print(
-        f"    {name:10s} leaves Im {min(lv)}–{max(lv)}/100 | mean V at end {min(mv):.3f}–{max(mv):.3f} | endpoint spread {min(sp):.2f}–{max(sp):.2f} | not finite-order(≤6) {min(nf)}–{max(nf)}/100"
+        f"    {name:10s} leaves Im {min(lv)}–{max(lv)}/40 | mean V at end {min(mv):.3f}–{max(mv):.3f} | endpoint spread {min(sp):.2f}–{max(sp):.2f} | not finite-order(≤6) {min(nf)}–{max(nf)}/40"
     )
 print("    (V = 1 is the zero-divisor ridge, the landscape maximum; V = 0 the vacuum)")
+
+print("(3) mechanism: x ↦ x·t is the linear map R_t (matrix on coordinates)")
+for _ in range(3):
+    t = rand_imag()
+    Rt = np.array([cd_mul(e[k], t) for k in range(16)]).T
+    sv = np.linalg.svd(Rt, compute_uv=False)
+    _, _, Wt = np.linalg.svd(Rt)
+    top = Wt[:4]
+    vtop = np.mean([Vs(nz(top.T @ rng.normal(size=4))) for _ in range(5)])
+    print(
+        f"    skew |R+Rᵀ|max {np.abs(Rt + Rt.T).max():.1e} | σmax {sv[0]:.3f} (mult {int(np.sum(np.isclose(sv, sv[0], atol=1e-9)))}) σmin {sv[-1]:.3f} | Σσ² {np.sum(sv**2):.3f} = 16·N(t) | V on top plane {vtop:.6f}"
+    )
+Rl = np.array([cd_mul(e[k], e[8]) for k in range(16)]).T
+print(
+    f"    R_ℓ orthogonal (all σ = 1): {np.allclose(np.linalg.svd(Rl, compute_uv=False), 1)}  → no transient for the forced element"
+)

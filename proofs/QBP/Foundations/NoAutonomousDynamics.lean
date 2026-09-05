@@ -6,7 +6,7 @@ import QBP.Foundations.CrossProduct
 
 **Research-thread evidence for #473 AC1 v0.4 (PR #631), Proposition 16**
 (`docs/foundations/473-ac1-first-link-2026-09-04.md`): *the algebra generates
-symmetries, never dynamics.*  This file is ordinary `QBP.Foundations` material —
+symmetries, never dynamics toward the vacuum.*  This file is ordinary `QBP.Foundations` material —
 pure `CDAlg`/ℝ algebra with no substrate semantics.  Per Prop 2 (Lean policy) it
 does **NOT** open `proofs/QBP/Substrate/`, and nothing here authorises such a file.
 
@@ -63,6 +63,14 @@ operations never leave `ℍ_s`.  The "only `±ℓ` are reachable" half of the do
 16(ii) rests on the shape invariant `σ`, which is not formalised here.
 
 ## Completeness
+
+Third layer (NOT formalised; `analysis/473-dirac-probe/generic_maps_check.py`, Red Team round-4 confirmer):
+  with an UNFORCED second element t, the maps x ↦ x·t, t·x, [x,t] are linear and skew (R_t, L_t, ad_t);
+  their normalised iteration is power iteration onto the top-singular plane — which lies on the zero-divisor
+  ridge V = 1 — followed by a period-2 symmetry. Σσ²(R_t) = 16·N(t), so the dominant plane exists exactly
+  because the norm is not multiplicative at dim 16; for ℓ, R_ℓ is orthogonal (`N_ell_mul`) and no transient
+  exists. So: no autonomous algebraic dynamics toward the vacuum; the only non-symmetric behaviour is a
+  linear transient onto the zero-divisor locus.
 
 Zero `sorry`, zero `native_decide`, zero vacuous `True`.  `#print axioms` audit at
 the bottom: every result depends only on `{propext, Classical.choice, Quot.sound}`.

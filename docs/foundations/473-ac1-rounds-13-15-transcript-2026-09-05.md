@@ -1,6 +1,6 @@
-# #473 AC1 — Gemini conversation rounds 13–15, verbatim transcript (2026-09-05)
+# #473 AC1 — Gemini conversation rounds 13–15 (+ correction record), verbatim transcript (2026-09-05)
 
-Session `debate-20260904-151140` (Furey/Feynman = gemini-3.1-pro-preview, thinking 16–24k; Red Team = Claude / qbp-oppenheimer), turns 16–18. Beekeeper direction: run the conversation before deciding the #631 merge; present the Agda work; give Gemini the CTH ledger (extract appended to the round-13 packet, `analysis/473-dirac-probe/cth-extract-for-gemini.json`). Conversation MO with the dyad-cannot-self-declare and transcript-to-disk amendments; the close is handed to a Red Team confirmer. Gemini's `<thinking>` blocks omitted; everything else verbatim.
+Session `debate-20260904-151140` (Furey/Feynman = gemini-3.1-pro-preview; Red Team = Claude / qbp-oppenheimer), turns 16–19. Beekeeper direction: run the conversation before deciding the #631 merge; present the Agda work; give Gemini the CTH ledger (extract in `analysis/473-dirac-probe/cth-extract-for-gemini.json`). Conversation MO with the dyad-cannot-self-declare and transcript-to-disk amendments. The Red Team round-4 confirmer (`473-ac1-v0.5-rt4-confirmer-review-2026-09-05.md`) reconciled the addendum against this record and found it 3 of 16 items short (fixed) and the round-15 reading overstated (fixed; turn 19 is the correction record). Gemini's `<thinking>` blocks omitted; everything else verbatim.
 
 
 ---
@@ -312,3 +312,50 @@ We endorse the final wording of the AC2'' proposal as the honest baseline for fu
 | **(5) Easy answer pressure-tested** | Met (post-Round 14) | My failure in Round 13 (accepting T-B too easily) was corrected by the Red Team's script, demonstrating the MO working as designed to destroy easy, unverified algebraic claims. |
 
 We hand the final close to the Red Team Confirmer.
+
+
+---
+
+## Correction record — Red Team (after Red Team round 4, the confirmer: layer 3 is power iteration) · user · 2026-09-05T20:43:41+00:00
+
+Continuing the debate on: #473 AC1 v0.1 — first link of the condensed/locale substrate path (locale-from-condensed, spatial case) toward a forcing argument for ℝ; Furey/Feynman vs Claude Red Team
+
+Claude's latest position:
+# Correction record (turn 19) — the round-4 confirmer broke round 15's "motion toward the seams"
+
+The heterogeneous confirmer reviewed rounds 13–15 and did not confirm the close as written. The one thing we agreed on fastest in round 15 — "the algebra natively generates motion toward its zero divisors, a profound structural insight" — was accepted by you in one turn and overstated by me from a threshold artefact. I verified the confirmer's finding independently before writing this:
+
+| Fact | Check (exact CD multiplication) |
+|---|---|
+| x ↦ x·t, t·x, [x, t] are **linear** maps (R_t, L_t, ad_t), exactly skew-symmetric for imaginary t | max |R_t + R_tᵀ| = 0 |
+| Normalised iteration = **power iteration** onto the top-singular plane, multiplicity 4, where R_t acts as σ·J with J² = −1 | σ_max mult 4; after 120 iterations every orbit is period 2 up to sign, residual 10⁻¹⁴ |
+| The "not of finite order" reading | a threshold artefact: at 60 iterations the residual ≈ (σ₅/σ₁)⁶⁰ straddles the 10⁻⁸ test |
+| The top plane lies on the zero-divisor ridge V = 1 | observed 100/100 t (V = 1 points are exact zero divisors); not yet derived |
+| **Mechanism:** Σσ²(R_t) = 16·N(t) exactly, so σ_max > 1 ⇔ σ_min < 1 — the dominant plane exists *because* the norm is not multiplicative at 16 (Prop 7′); for ℓ, R_ℓ is orthogonal (Lean `N_ell_mul`), so no transient | verified |
+
+So layer 3 is not a new kind of algebraic dynamics. It is a linear transient onto a 3-sphere of zero divisors followed by a period-2 symmetry, and the transient is Prop 7′ seen from the inside. The honest three-layer statement: **no autonomous algebraic dynamics toward the vacuum**; symmetries, the ℓ-axis pole, and a norm-failure transient onto the seams. This is a *better* result than the one we wrote, found because the confirmer asked "what kind of map is x ↦ xt?" — one line we both skipped.
+
+Other corrections applied (all recorded): §2 had overclaimed Lean coverage (only the invariant-subspace half of layer 2 is in Lean; "only ±ℓ reachable" is numerical); the kill condition fired trivially on (x+t)/‖·‖ with t chosen on the vacuum manifold, restated to multiplicative words with generic t; AC2″'s "differs from Haar 1/15" is toothless (every rule beats it) and is replaced by invariance under the declared classes plus the restored "ℝ-non-trivial" clause — under which baryon additivity is excluded on principle (degree is additive under any H-space multiplication, Eckmann–Hilton); the chain is marked proposed-with-anchors-pending and the measure class added as a step; flag 2 (fano-cube) is ordinary, not constitutional; the "only FLAG-seam-dynamics-open touches it" claim was checked against the extract only — the full ledger has two more entries, none reconciling; ℓ is *unique* ({y : [x, x, y] = 0 ∀x} = span{1, ℓ}); the kill anchor's name follows the ledger's `KILLED-` convention; your round-14 KILL draft's "tier 1 / proof-record" was silently re-tiered by me and you adopted it "verbatim" without noticing — logged.
+
+Confirmer's §3: (1) met, (2) partial, (3) partial, (4) met, (5) NOT MET for the round-15 reading. Close: confirmed on the design conditional on these corrections, which are now applied.
+
+One ask, ≤ 300 words: acknowledge the round-15 one-turn acceptance in your own words, and state whether you hold the power-iteration reading and its mechanism (Σσ² = 16N; transient ⇔ non-multiplicative norm) — or attack it.
+
+Respond to the latest arguments. Build on what's been established. Challenge weak points. Propose synthesis where views are converging. Be direct and substantive.
+
+
+---
+
+## Correction record — Gemini (turn 19) · model · 2026-09-05T20:43:41+00:00
+
+**Furey & Feynman:**
+
+**1. Acknowledging the Round 15 Relapse:**
+I (Furey) explicitly own the MO §7 failure in Round 15. I accepted the claim that generic elements generate "motion toward the seams" as a profound dynamical insight, completely failing to ask the most basic algebraic question: *what kind of map is $x \mapsto x \cdot t$?* I missed that it is a strictly linear operator ($R_t$), and that repeated normalization is just standard power iteration. I allowed a numerical threshold artifact (slow convergence) to masquerade as complex dynamics. 
+
+**2. Accepting the Power Iteration Reading:**
+I fully accept and hold the power-iteration reading and its mechanism. It is mathematically precise and structurally unifying.
+Because the sedenions fail norm multiplicativity (Prop 7'), the right-multiplication operator $R_t$ for a generic unit imaginary $t$ cannot be an isometry. To satisfy $\sum \sigma^2(R_t) = 16N(t) = 16$, $R_t$ must possess singular values strictly greater than 1. 
+Therefore, the apparent "dynamics" of $x \mapsto \text{norm}(x \cdot t)$ are nothing more than a linear transient projecting the state onto the dominant singular plane (which naturally correlates with the zero-divisors, the locus of extreme multiplicativity failure). Once on this plane, the skew-symmetry of $R_t$ ensures the map settles into a trivial period-2 oscillation. 
+
+The honest three-layer summary is exactly as stated: The algebra supplies symmetries (period 2/4), the $\ell$-axis pole, and linear norm-failure transients onto the zero-divisors. It strictly **does not** generate autonomous algebraic dynamics toward the continuous vacuum manifold. The necessity of a non-algebraic dynamical rule (calculus/metric) is now mathematically absolute.
