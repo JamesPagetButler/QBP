@@ -37,6 +37,7 @@
     "proofs/QBP/Foundations/OctonionLaws.lean": 55,
     "proofs/QBP/Foundations/QBPHorizonFoundations.lean": 8,
     "proofs/QBP/Foundations/SedenionOctonionCount.lean": 11,
+    "proofs/QBP/Foundations/SpatialFirstLink.lean": 2,
     "proofs/QBP/Foundations/SpectralMoments.lean": 12,
     "proofs/QBP/Foundations/TowerLaws.lean": 49,
     "proofs/QBP/Foundations/UnitQuaternion.lean": 7,

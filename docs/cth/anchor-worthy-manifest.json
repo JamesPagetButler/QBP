@@ -626,6 +626,15 @@
       ]
     },
     {
+      "anchor_id": "PROOF-spatial-first-link-condensed-locale",
+      "proof_system": "lean4",
+      "declared_by": "#473-ac1",
+      "witnesses": [
+        "QBP.Foundations.SpatialFirstLink.localeIsoOfCondensed_hom",
+        "QBP.Foundations.SpatialFirstLink.realTop_locale_eq"
+      ]
+    },
+    {
       "anchor_id": "PROOF-rot120-invariant-form-scalar",
       "proof_system": "lean4",
       "declared_by": "#473-ac1",

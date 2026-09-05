@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""#473 AC1 δ-landscape descent anchors — append the 2 CTH proof anchors that foot
-proofs/QBP/Foundations/DeltaLandscape.lean (PR #631: Prop 6 descent identity of the
+"""#473 AC1 δ-landscape descent anchors — append the 3 CTH proof anchors that foot
+proofs/QBP/Foundations/DeltaLandscape.lean and proofs/QBP/Foundations/SpatialFirstLink.lean (PR #631: Prop 6 descent identity of the
 #629 landscape potential, and the Prop 7′ order-3-rotation ⇒ scalar-form step behind
 the S₃ reduction of Aut(𝕊)-invariant quadratic forms) into the ledger, plus the matching
 manifest entries. Idempotent: re-running removes any prior foundation_batch=="#473-ac1"
@@ -28,6 +28,18 @@ LEDGER = os.path.join(
 MANIFEST = os.path.join(ROOT, "docs/cth/anchor-worthy-manifest.json")
 PROOF_FILE = "proofs/QBP/Foundations/DeltaLandscape.lean"
 NS = "QBP.Foundations.DeltaLandscape."
+SPATIAL = {
+    "PROOF-spatial-first-link-condensed-locale": (
+        "proofs/QBP/Foundations/SpatialFirstLink.lean",
+        "QBP.Foundations.SpatialFirstLink.",
+    )
+}
+
+
+def pf_ns(aid):
+    return SPATIAL.get(aid, (PROOF_FILE, NS))
+
+
 BATCH = "#473-ac1"
 STAMP = "2026-09-04T00:00:00Z"
 CLEAN = ["propext", "Classical.choice", "Quot.sound"]
@@ -65,6 +77,27 @@ ANCHORS = {
             "sedenion_landscape_nonneg",
             "sedenion_gram_nonneg",
         ],
+    ),
+    "PROOF-spatial-first-link-condensed-locale": (
+        "Ω(X) ≅ Ω(condensedSetToTopCat X̲) for compactly generated X (ℝ included)",
+        "#473 AC1 v0.3.1 Prop 1 (PR #631): the spatial first link of the proposed "
+        "condensed → locale chain, written out as a composition of Mathlib facts and "
+        "type-checked. For X : TopCat.{u+1} compactly generated, `localeIsoOfCondensed X` is "
+        "the isomorphism in Locale between the locale of the topological space recovered from "
+        "the condensed set X̲ and the locale of X (topToLocale applied to the counit "
+        "homeomorphism CondensedSet.compactlyGeneratedAdjunctionCounitHomeo); "
+        "`localeFunctorIso` is the natural isomorphism CG → Cond → Top → Loc ≅ CG → Top → Loc "
+        "(also obtained by whiskering the invertible counit, `localeFunctorIso'`); "
+        "`realLocaleIsoOfCondensed` is the ℝ instance via ULift.{1} ℝ (first countable ⇒ "
+        "sequential ⇒ compactly generated). Witness theorems: the iso's hom is the counit's "
+        "comap (localeIsoOfCondensed_hom) and the locale is literally Opens (ULift ℝ) "
+        "(realTop_locale_eq); the constructions are noncomputable defs in the same file. "
+        "Faithfulness of Top → Loc on CompHaus is Mathlib's CompHausToLocale.faithful (cited by "
+        "type-check). SCOPE: this shows the ledger's Cantor-set anecdote was never load-bearing "
+        "and that set-theoretic forcing (Prop 4) does not deliver the FORCED/PERMITTED-sense "
+        "forcing argument AC1 asks for (doc §4). Research-thread evidence; not a substrate "
+        "claim; no Substrate/ file; #473 stays open.",
+        ["localeIsoOfCondensed_hom", "realTop_locale_eq"],
     ),
     "PROOF-rot120-invariant-form-scalar": (
         "A quadratic form on ℝ² invariant under a 120° rotation is scalar (order 2 is not enough)",
@@ -106,6 +139,7 @@ def verification():
 
 def build_anchor(aid):
     name, desc, wits = ANCHORS[aid]
+    pf, ns = pf_ns(aid)
     return {
         "id": aid,
         "name": name,
@@ -117,11 +151,11 @@ def build_anchor(aid):
         "provenance_kind": "proof",
         "proof_system": "lean4",
         "proof_language": "lean4",
-        "proof_file": PROOF_FILE,
+        "proof_file": pf,
         "sorry_count": 0,
         "proof_state": "verified",
-        "lean_theorem": NS + wits[0],
-        "lean_companion_theorems": [NS + w for w in wits[1:]],
+        "lean_theorem": ns + wits[0],
+        "lean_companion_theorems": [ns + w for w in wits[1:]],
         "theorems": [{"name": w, "status": "verified"} for w in wits],
         "foundation_batch": BATCH,
         "last_tested_at": STAMP,
@@ -130,18 +164,20 @@ def build_anchor(aid):
 
 
 def main():
-    src = open(os.path.join(ROOT, PROOF_FILE), encoding="utf-8").read()
-    missing = [
-        w
-        for _, _, wits in ANCHORS.values()
-        for w in wits
-        if f"theorem {w} " not in src
-        and f"theorem {w}\n" not in src
-        and f"theorem {w} :" not in src
-        and f"lemma {w} " not in src
-    ]
+    missing = []
+    for aid, (_, _, wits) in ANCHORS.items():
+        pf, _ = pf_ns(aid)
+        src = open(os.path.join(ROOT, pf), encoding="utf-8").read()
+        missing += [
+            f"{pf}:{w}"
+            for w in wits
+            if f"theorem {w} " not in src
+            and f"theorem {w}\n" not in src
+            and f"theorem {w} :" not in src
+            and f"lemma {w} " not in src
+        ]
     if missing:
-        sys.exit(f"witnesses not found in {PROOF_FILE}: {missing}")
+        sys.exit(f"witnesses not found: {missing}")
 
     ledger = json.load(open(LEDGER, encoding="utf-8"))
     anchors = ledger["anchors"]
@@ -154,12 +190,13 @@ def main():
     manifest = json.load(open(MANIFEST, encoding="utf-8"))
     entries = [e for e in manifest["entries"] if e.get("declared_by") != BATCH]
     for aid, (_, _, wits) in ANCHORS.items():
+        _, ns = pf_ns(aid)
         entries.append(
             {
                 "anchor_id": aid,
                 "proof_system": "lean4",
                 "declared_by": BATCH,
-                "witnesses": [NS + w for w in wits],
+                "witnesses": [ns + w for w in wits],
             }
         )
     manifest["entries"] = entries

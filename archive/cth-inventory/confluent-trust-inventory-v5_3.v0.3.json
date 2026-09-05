@@ -8117,6 +8117,58 @@
       }
     },
     {
+      "id": "PROOF-spatial-first-link-condensed-locale",
+      "name": "Ω(X) ≅ Ω(condensedSetToTopCat X̲) for compactly generated X (ℝ included)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 AC1 v0.3.1 Prop 1 (PR #631): the spatial first link of the proposed condensed → locale chain, written out as a composition of Mathlib facts and type-checked. For X : TopCat.{u+1} compactly generated, `localeIsoOfCondensed X` is the isomorphism in Locale between the locale of the topological space recovered from the condensed set X̲ and the locale of X (topToLocale applied to the counit homeomorphism CondensedSet.compactlyGeneratedAdjunctionCounitHomeo); `localeFunctorIso` is the natural isomorphism CG → Cond → Top → Loc ≅ CG → Top → Loc (also obtained by whiskering the invertible counit, `localeFunctorIso'`); `realLocaleIsoOfCondensed` is the ℝ instance via ULift.{1} ℝ (first countable ⇒ sequential ⇒ compactly generated). Witness theorems: the iso's hom is the counit's comap (localeIsoOfCondensed_hom) and the locale is literally Opens (ULift ℝ) (realTop_locale_eq); the constructions are noncomputable defs in the same file. Faithfulness of Top → Loc on CompHaus is Mathlib's CompHausToLocale.faithful (cited by type-check). SCOPE: this shows the ledger's Cantor-set anecdote was never load-bearing and that set-theoretic forcing (Prop 4) does not deliver the FORCED/PERMITTED-sense forcing argument AC1 asks for (doc §4). Research-thread evidence; not a substrate claim; no Substrate/ file; #473 stays open.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/SpatialFirstLink.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SpatialFirstLink.localeIsoOfCondensed_hom",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SpatialFirstLink.realTop_locale_eq"
+      ],
+      "theorems": [
+        {
+          "name": "localeIsoOfCondensed_hom",
+          "status": "verified"
+        },
+        {
+          "name": "realTop_locale_eq",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473-ac1",
+      "last_tested_at": "2026-09-04T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-04T00:00:00Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 δ-landscape descent anchors, PR #631); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
       "id": "PROOF-rot120-invariant-form-scalar",
       "name": "A quadratic form on ℝ² invariant under a 120° rotation is scalar (order 2 is not enough)",
       "tier": 1,
