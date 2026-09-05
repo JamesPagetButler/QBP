@@ -6,6 +6,19 @@ scalar s on ℓ:   x₀ + a + b₀ℓ + cℓ  ↦  x₀ + (m₁₁a + m₁₂c) 
 We solve φ(xy) = φ(x)φ(y) numerically for (M, s) and list the distinct solutions; then read
 off how they act on the G₂-invariants (|a|², |Im b|², ⟨a,Im b⟩, b₀) and on the vacuum orbit
 space.  Also checks that the unit zero-divisor locus δ = 1 is a single G₂-orbit (dim 11).
+
+Why the ansatz is complete (Schur; PR #631 Red Team (iii)).  As a G₂-module 𝕊 = 1 ⊕ 7 ⊕ 1 ⊕ 7.
+The 7 is absolutely irreducible, so the commutant on its isotypic component is M₂(ℝ) ⊗ I₇ —
+that is M.  The trivial isotypic component is span{1, ℓ}, so a priori φ(ℓ) = α·1 + s·ℓ; but
+φ(1) = 1 and φ(ℓ)² = φ(ℓ²) = −1 force αs = 0 and α² − s² = −1, hence α = 0, s = ±1.  So the
+five-parameter (M, s) family IS the full centraliser of G₂ in End(𝕊).  Automorphisms preserve
+Im𝕊 = {x ∉ ℝ : x² ∈ ℝ} ∪ {0}, hence the involution, hence N, so M ∈ O(2).  That the centraliser
+of G₂ in Aut(𝕊) is all of Aut(𝕊)/G₂ is Brown's theorem (R. B. Brown, "On generalized
+Cayley–Dickson algebras", Pacific J. Math. 20 (1967) 415–422).
+
+The least-squares search below is a SEARCH, not an enumeration; the exact 256-basis-pair
+check that follows it (section "exact verification") is what turns the six solutions — and
+the closed-form D₃ they match — into a verification.
 """
 
 import numpy as np
@@ -52,6 +65,66 @@ for q in sols:
     print(
         f"  s = {q[4]:+.3f}   M = {np.round(M, 4).tolist()}   det M = {np.linalg.det(M):+.3f}"
     )
+
+
+# --- exact verification on all 256 basis pairs (turns the search into a check) -------------
+e16 = basis(16)
+
+
+def aut_residual(p):
+    """max_{i,j} |φ(e_i e_j) − φ(e_i) φ(e_j)| over all 256 basis pairs — exact, not sampled."""
+    return max(
+        np.abs(phi(p, cd_mul(x, y)) - cd_mul(phi(p, x), phi(p, y))).max()
+        for x in e16
+        for y in e16
+    )
+
+
+def rot(deg, s):
+    t = np.radians(deg)
+    return np.array([np.cos(t), -np.sin(t), np.sin(t), np.cos(t), s])
+
+
+def refl(deg, s):
+    t = np.radians(2 * deg)  # reflection across the line at angle `deg`
+    return np.array([np.cos(t), np.sin(t), np.sin(t), -np.cos(t), s])
+
+
+print("\nexact verification (256 basis pairs, residual = max |φ(xy) − φ(x)φ(y)|):")
+print("  the six least-squares solutions:")
+for q in sols:
+    print(
+        f"    s = {q[4]:+.0f}  det M = {np.linalg.det(q[:4].reshape(2, 2)):+.0f}  residual {aut_residual(q):.1e}"
+    )
+
+# closed-form D₃: rotations by 0, ±120° with s = +1; reflections with s = −1.  The reflection
+# axes are pinned by matching the numerical solutions (a reflection axis at angle θ₀ maps
+# θ ↦ 2θ₀ − θ); we recover θ₀ from each det = −1 solution and check it is exact.
+d3 = [rot(0, +1), rot(120, +1), rot(-120, +1)]
+for q in sols:
+    M = q[:4].reshape(2, 2)
+    if np.linalg.det(M) < 0:
+        th0 = 0.5 * np.degrees(np.arctan2(M[1, 0], M[0, 0]))  # M = refl(th0)
+        d3.append(refl(th0, -1))
+print("  closed-form D₃ (rot 0, ±120 with s=+1; the three reflections with s=−1):")
+d3_ok = True
+for p in d3:
+    r = aut_residual(p)
+    d3_ok &= r < 1e-12
+    print(f"    {np.round(p[:4], 4).tolist()}  s = {p[4]:+.0f}  residual {r:.1e}")
+print(f"  all six exact (< 1e-12): {d3_ok}")
+
+# non-members must FAIL: the test has a null.
+print("  non-members (must fail):")
+for name, p in [
+    ("rot 60°, s=+1", rot(60, +1)),
+    ("rot 90°, s=+1", rot(90, +1)),
+    ("rot 37°, s=+1", rot(37, +1)),
+    ("rot 120°, s=−1", rot(120, -1)),
+    ("refl (axis of sol) with s=+1", d3[3].copy() * np.array([1, 1, 1, 1, -1])),
+]:
+    print(f"    {name:32s} residual {aut_residual(p):.2f}")
+assert len(sols) == 6 and d3_ok, "S3 verification failed"
 
 # action on the invariants: Gram matrix G = [[|a|²,⟨a,c⟩],[⟨a,c⟩,|c|²]] ↦ M G Mᵀ ; b0 ↦ s·b0
 # vacuum orbit space: rank G ≤ 1, i.e. (a, c) = (cosθ, sinθ)·u ; θ ∈ RP¹ ↦ M·(cosθ, sinθ)

@@ -95,7 +95,7 @@ Endpoint statistics from Haar initial data on S¹⁴ (Haar: ⟨b₀²⟩ = ⟨|a
 
 No closed form found for 0.146; not pursued further (see firewall reading).
 
-Firewall reading: these numbers are forced by (ℝ + doubling) + (gradient-flow law) + (Haar initial measure). The last two are inputs — and the initial measure on S¹⁴ is precisely what the substrate is supposed to supply. So the flow gives Strategy C a coupling-free order parameter and a dynamics-to-vacuum map, but does not by itself produce an AC2-grade forced number.
+Firewall reading (**superseded by §9 on the measure; still correct on the rule**): these numbers are forced by (ℝ + doubling) + (gradient-flow law) + (Haar initial measure). The last two are inputs. §9 shows the Haar measure is the CD norm's own surface measure (algebra-supplied); what remains an input is the flow law — and a second algebra-compatible rule (Gibbs β → ∞) gives a different endpoint number (≈ 1/3 vs the quench's 0.146), see §9. So the flow gives Strategy C a coupling-free order parameter and a dynamics-to-vacuum map, but does not by itself produce an AC2-grade forced number.
 
 ## 9. Descent to the orbit space (AC1 v0.3, 2026-09-04)
 
@@ -104,11 +104,16 @@ V = δ² = 4(|a|²|Im b|² − ⟨a,Im b⟩²) is G₂-invariant, so the whole l
 manifold V = 0, where the G₂ orbit dimension is 6, so the endpoints live on a **2-dimensional**
 vacuum orbit space (θ = direction in the (a, Im b) plane mod 180°, b₀) — topologically a 2-sphere.
 The Haar initial measure of §8 is *not* a free input: it is the surface measure of the CD norm
-N = s s̄ (still positive-definite at dim 16; only multiplicativity breaks), and the S₃ factor of
-Aut(𝕊) = G₂ × S₃ leaves exactly one Aut-invariant alternative, Q_μ = |a|² + |Im b|² + μb₀².
+N = s s̄ (still positive-definite at dim 16; only multiplicativity breaks), and among Aut-invariant *quadratic-form* measures the S₃ factor of
+Aut(𝕊) = G₂ × S₃ leaves exactly one alternative, Q_μ = |a|² + |Im b|² + μb₀² (a general
+Aut-invariant measure is any S₃-invariant density on the 3-dim orbit space — the admissible
+*class* is the beekeeper's crux). The rule is a separate input: the gradient-flow quench gives
+⟨b₀²⟩ = 0.146, the Gibbs anneal β → ∞ gives ≈ 1/3 from the same measure (`gibbs_check.py`).
 `orbit_space.py` checks orbit dimensions 11 / 6 / 0, the descent identity and Fix(G₂) = ℝℓ and
 draws `hvr_orbit_space.png`; `aut_s3.py` solves for the six automorphisms commuting with G₂
 (dihedral: ±120° rotations of the (a, Im b) plane, reflections flipping b₀) and shows the ZD ridge
-is one 11-dim G₂-orbit; `s3_check.py` re-runs the §8 flow and confirms the endpoints are
-60°-periodic in θ and even in b₀, as S₃ predicts (a-type and c-type vacua are Aut-equivalent).
+is one 11-dim G₂-orbit; `aut_s3.py` also verifies all six exactly on the 256 basis pairs (non-members fail);
+`s3_check.py` re-runs the §8 flow as a smoke test — V is invariant under the full O(2) on the
+(a, Im b) plane, so endpoint θ is uniform (KS test) and any S₃-periodicity is automatic;
+`norm_check.py` and `gibbs_check.py` back Props 7′ and 9.
 Ladder and consequences: `docs/foundations/473-ac1-first-link-2026-09-04.md`.

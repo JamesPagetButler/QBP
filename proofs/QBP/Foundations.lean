@@ -9,6 +9,7 @@ import QBP.Foundations.CDDimension
 import QBP.Foundations.CPPhase
 import QBP.Foundations.CDLifting
 import QBP.Foundations.CrossProduct
+import QBP.Foundations.DeltaLandscape
 import QBP.Foundations.Exp
 import QBP.Foundations.Breakdown
 import QBP.Foundations.FanoGenesis

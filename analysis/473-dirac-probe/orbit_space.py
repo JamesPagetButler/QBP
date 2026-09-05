@@ -1,4 +1,4 @@
-"""#473 AC1 v0.2 — the G₂ orbit space of S¹⁴ ⊂ Im𝕊 and the descent of the δ-landscape.
+"""#473 AC1 v0.3 — the G₂ orbit space of S¹⁴ ⊂ Im𝕊 and the descent of the δ-landscape.
 
 Checks (numerically; the committed evidence behind Props 5–6 and 9–10 of
 docs/foundations/473-ac1-first-link-2026-09-04.md):
@@ -12,8 +12,8 @@ docs/foundations/473-ac1-first-link-2026-09-04.md):
       gradient flow of #629 descends to the orbit space;
   (4) on the vacuum manifold V = 0 the orbit dimension is 6 (0 only at ±ℓ), so the
       vacuum orbit space is 2-dimensional — the residual the flow leaves free;
-  (5) Fix(G₂) on Im𝕊 is the line ℝℓ, so Fix ∩ S¹⁴ = {±ℓ} — the no-tower theorem's
-      only input beyond "G₂ is connected".
+  (5) Fix(G₂) on Im𝕊 is the line ℝℓ, so Fix ∩ S¹⁴ = {±ℓ} — the no-tower LEMMA's
+      only input beyond "G₂ is connected" (demoted from theorem in v0.3: not load-bearing).
 
 Also writes hvr_orbit_space.png: V over the orbit space (slices in ⟨a,Im b⟩), with the
 vacuum locus and the zero-divisor ridge marked.  Numerical flashlight only.
