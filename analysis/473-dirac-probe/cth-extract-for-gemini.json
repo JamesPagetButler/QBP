@@ -1,0 +1,740 @@
+{
+ "what_this_is": "Extract of QBP's Confluent Trust Hypergraph (CTH) ledger archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json — the theory-state authority. 48 of 277 anchors selected by relevance to #473 (substrate/locale/condensed/Fano/crystallisation/sedenion/Hopf), plus the meta-axiom, axioms, derived principles and all chains. Status vocabulary: coherent | untested | marginal | incoherent | killed. Tier 1 = load-bearing proof/derivation; tier 3 = reference/insight.",
+ "meta_axiom": {
+  "id": "META-1",
+  "name": "Change is constant",
+  "statement": "No framework is guaranteed complete. All knowledge is provisional within its axiomatic system."
+ },
+ "axioms": [
+  {
+   "id": "AXIOM-1",
+   "name": "Information is preserved",
+   "statement": "No physical process destroys information. Selects division algebras (no zero divisors: ab=0 implies a=0 or b=0).",
+   "derivable": false
+  },
+  {
+   "id": "AXIOM-2",
+   "name": "The encoding is maximal",
+   "statement": "The boundary encoding uses the largest normed division algebra: octonions (dim 8).",
+   "derivable": false
+  }
+ ],
+ "derived_principles": [
+  {
+   "id": "DERIV-holographic",
+   "name": "Holographic principle",
+   "statement": "Observers require associativity. The largest associative subalgebra of O is H (dim 4). The 4D gap is the holographic boundary.",
+   "derived_from": [
+    "AXIOM-1",
+    "AXIOM-2"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-observation",
+   "name": "Observation is C-projected",
+   "statement": "Electromagnetic observation accesses the C subalgebra of H. Measurement projects H -> C -> R.",
+   "derived_from": [
+    "DERIV-holographic"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-arrow",
+   "name": "Arrow of time",
+   "statement": "Information preservation + lossy projection implies irreversibility in the bulk. Gamma counter is monotonic.",
+   "derived_from": [
+    "AXIOM-1",
+    "DERIV-holographic"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-3plus1",
+   "name": "3+1 dimensions",
+   "statement": "Quaternion structure: 1 scalar (time) + 3 vector (space) components.",
+   "derived_from": [
+    "AXIOM-2",
+    "DERIV-holographic"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-sedenion",
+   "name": "Sedenion inter-cell topology",
+   "statement": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: seams where information CAN be destroyed.",
+   "derived_from": [
+    "AXIOM-2"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-born",
+   "name": "Born rule",
+   "statement": "The quaternion norm qq* is the unique multiplicative positive-definite norm on H (Hurwitz). P=|psi|^2 follows.",
+   "derived_from": [
+    "AXIOM-1"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-constants",
+   "name": "hbar, k, c are conversion factors",
+   "statement": "Not fundamental constants. hbar = information per Gamma-step. k = information per DOF per Gamma-rate. c = max displacement per Gamma-step.",
+   "derived_from": [
+    "DERIV-holographic"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-pati-salam",
+   "name": "NCG gives Pati-Salam, not SU(5)",
+   "statement": "The spectral action on A_F = C+H+M3(C) with left-right extension naturally produces G_422 = SU(4)xSU(2)_LxSU(2)_R. Proton decay d=6 and d=5 operators are forbidden by NCG scalar constraints.",
+   "derived_from": [
+    "AXIOM-1",
+    "AXIOM-2",
+    "DERIV-holographic"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-topo-protection",
+   "name": "Topological protection from quaternion norm",
+   "statement": "The Hurwitz property (|ab|²=|a|²|b|² in ℍ) guarantees exact Berry phase π for surface states and exact Z₂ classification for band insulators. Topology is protected within ℍ but breaks at 𝕊 boundary (ZDs). This connects Born rule, Berry phase, and topological protection as a single algebraic fact.",
+   "derived_from": [
+    "PROOF-hurwitz-quat",
+    "PROOF-kramers",
+    "PROOF-z2-cover"
+   ],
+   "layer": 1
+  },
+  {
+   "id": "DERIV-crystallisation-asymptotic",
+   "name": "Time is crystallisation; constants converge asymptotically, never freeze",
+   "statement": "The spectral action gives gravity (f₂), gauge couplings (f₀), and Λ (f₄) as moments of ONE crystallisation profile f(u). 'Time' is not a stage on which crystallisation occurs — it IS the crystallisation. The Γ counter counts crystallisation steps. Constants converge at different rates: c,ℏ (from algebra) fastest; f₀ (gauge couplings) medium; f₄ (cosmological constant) slowest. No constant is exactly frozen — the crystallisation is asymptotic, never terminating. Consistent with AXIOM-1 ('everything changes'). The hierarchy of convergence rates explains why Λ (the least-converged moment) is the most puzzling observable.",
+   "derived_from": [
+    "AXIOM-1",
+    "AXIOM-2",
+    "DERIV-constants"
+   ],
+   "layer": 1
+  }
+ ],
+ "chains": [
+  {
+   "id": "CHAIN-axioms-to-gauge",
+   "name": "Axioms -> CD hierarchy -> ZD locus -> Hessian -> Gauge groups",
+   "target_id": "PROOF-eigenratios",
+   "weakest_link_id": null,
+   "status": "coherent",
+   "steps": 4
+  },
+  {
+   "id": "CHAIN-axioms-to-alpha",
+   "name": "Axioms -> Gauge groups -> f(0) -> RGE -> alpha_em",
+   "target_id": "MEAS-alpha",
+   "weakest_link_id": "INST-f0",
+   "status": "coherent",
+   "steps": 6
+  },
+  {
+   "id": "CHAIN-alpha-to-udd",
+   "name": "alpha_em -> Slater screening -> Z_eff -> IE -> U_dd",
+   "target_id": "MEAS-udd",
+   "weakest_link_id": "DERIV-slater",
+   "status": "coherent",
+   "steps": 4
+  },
+  {
+   "id": "CHAIN-alpha-to-tolerance",
+   "name": "alpha_em -> Slater -> ionic radii -> Goldschmidt -> REBCO stability",
+   "target_id": "MEAS-tolfac",
+   "weakest_link_id": "DERIV-ionic-radii",
+   "status": "coherent",
+   "steps": 4
+  },
+  {
+   "id": "CHAIN-udd-to-J",
+   "name": "U_dd + Delta + t_pd -> t_eff -> J (superexchange)",
+   "target_id": "FLAG-J",
+   "weakest_link_id": "DERIV-tpd",
+   "status": "incoherent",
+   "steps": 3
+  },
+  {
+   "id": "CHAIN-J-to-Tc",
+   "name": "J -> Tc/J ratio (INPUT) -> Tc",
+   "target_id": "FLAG-Tc",
+   "weakest_link_id": "INST-TcJ-ratio",
+   "status": "incoherent",
+   "steps": 1
+  },
+  {
+   "id": "CHAIN-udd-to-Jd",
+   "name": "U_dd + Delta + t_pd -> GL parameters -> Jd",
+   "target_id": "MEAS-jd",
+   "weakest_link_id": "DERIV-tpd",
+   "status": "coherent",
+   "steps": 5
+  },
+  {
+   "id": "CHAIN-sedenion-to-gw",
+   "name": "Sedenion topology -> seam formation -> GW-EM correlation",
+   "target_id": "PRED-gw-em",
+   "weakest_link_id": "DERIV-sedenion",
+   "status": "untested",
+   "steps": 3
+  },
+  {
+   "id": "CHAIN-zd-to-lambda",
+   "name": "42 ZDs -> basin geometry -> seam fluctuation rate -> Lambda",
+   "target_id": "PRED-lambda",
+   "weakest_link_id": "DERIV-sedenion",
+   "status": "untested",
+   "steps": 4
+  },
+  {
+   "id": "CHAIN-hessian-to-threshold",
+   "name": "Hessian multiplicities -> threshold correction pattern",
+   "target_id": "MEAS-mult-threshold",
+   "weakest_link_id": null,
+   "status": "marginal",
+   "steps": 3
+  },
+  {
+   "id": "CHAIN-ncg-to-proton",
+   "name": "NCG Pati-Salam -> no diquark couplings -> proton stable",
+   "target_id": "MEAS-proton-stable",
+   "weakest_link_id": "DERIV-pati-salam",
+   "status": "coherent",
+   "steps": 4
+  },
+  {
+   "id": "CHAIN-born-to-revival",
+   "name": "Hurwitz -> Born rule exact -> revival fidelity mass-independent",
+   "target_id": "PRED-revival-exact",
+   "weakest_link_id": null,
+   "status": "untested",
+   "steps": 3
+  },
+  {
+   "id": "CHAIN-axioms-to-kramers",
+   "name": "Axioms → CD → ZD → Hessian → SU(2) → Kramers theorem",
+   "target_id": "PROOF-kramers",
+   "weakest_link_id": null,
+   "status": "coherent",
+   "steps": 6
+  },
+  {
+   "id": "CHAIN-kramers-to-z2",
+   "name": "Kramers → double cover → Z₂ → topological classification",
+   "target_id": "PROOF-z2-cover",
+   "weakest_link_id": null,
+   "status": "coherent",
+   "steps": 2
+  },
+  {
+   "id": "CHAIN-z2-to-bi2se3",
+   "name": "Z₂ classification + SOC(Bi) → Bi₂Se₃ is topological insulator",
+   "target_id": "MEAS-bi2se3-topo",
+   "weakest_link_id": "MEAS-bi2se3-topo",
+   "status": "coherent",
+   "steps": 4
+  },
+  {
+   "id": "CHAIN-axioms-to-honeycomb",
+   "name": "Axioms → quaternion closure → Z₃ cyclic → honeycomb symmetry",
+   "target_id": "PROOF-z3-cyclic",
+   "weakest_link_id": null,
+   "status": "coherent",
+   "steps": 4
+  },
+  {
+   "id": "CHAIN-kramers-to-fragile",
+   "name": "Kramers (T²=-1) + C₂z (e₁²=-1) → (C₂zT)²=+1 → fragile topology",
+   "target_id": "PROOF-c2zt-square",
+   "weakest_link_id": null,
+   "status": "coherent",
+   "steps": 2
+  },
+  {
+   "id": "CHAIN-helicity-to-matbg",
+   "name": "Z₃ cyclic sign → helicity → Wannier obstruction → MATBG fragile topology",
+   "target_id": "MEAS-matbg-fragile",
+   "weakest_link_id": null,
+   "status": "coherent",
+   "steps": 3
+  },
+  {
+   "id": "CHAIN-axioms-to-z2gauge",
+   "name": "Axioms → quaternion closure → triple product → Z₂ gauge → Kitaev spin liquid",
+   "target_id": "PROOF-plaquette-z2",
+   "weakest_link_id": null,
+   "status": "coherent",
+   "steps": 5
+  },
+  {
+   "id": "CHAIN-kramers-to-jeff",
+   "name": "Kramers T²=-1 + SOC regime → j_eff=1/2 → Kitaev interaction in α-RuCl₃",
+   "target_id": "MEAS-rucl3-jeff",
+   "weakest_link_id": "MEAS-rucl3-jeff",
+   "status": "coherent",
+   "steps": 3
+  },
+  {
+   "id": "CHAIN-majorana-to-thermal-hall",
+   "name": "dim(ℝ)/dim(ℂ) = 1/2 → Majorana c=1/2 → half-quantized thermal Hall",
+   "target_id": "OBS-thermal-hall-half",
+   "weakest_link_id": "OBS-thermal-hall-half",
+   "status": "marginal",
+   "steps": 3
+  },
+  {
+   "id": "CHAIN-overconstrained-crystallisation",
+   "name": "Five datasets → two parameters → three redundant constraints (crystallisation test)",
+   "target_id": "PRED-correlated-alpha-G",
+   "weakest_link_id": "OBS-alpha-dipole",
+   "status": "untested",
+   "steps": 5
+  }
+ ],
+ "anchors_selected": [
+  {
+   "id": "CONJ-condensed-math-for-transition-state",
+   "name": "CONJECTURE: Condensed mathematics provides the natural framework for QBP's transition-state regimes (crystallization in-flight, event horizon formation, higher-order harmonic coupling)",
+   "tier": 3,
+   "status": "marginal",
+   "provenance_kind": "theory",
+   "description": "QBP has a structural asymmetry: the post-crystallization regime (stable ℍ algebra, stable spacetime, stable spectral triple) is describable with classical noncommutative geometry, but the transition regime is not. The transition states include:\n\n1. CRYSTALLIZATION IN-FLIGHT: the 𝕆→ℍ transformation, when the algebra is neither cleanly non-associative nor cleanly associative.\n2. EVENT HORIZON FORMATION: the moment a Schwarzschild-radius surface appears, when the spacetime topology is changing from connected to horizon-bounded.\n3. HIGHER-ORDER HARMONICS: cross-scale coupling between the primary 𝕆→ℍ harmonic and derivative harmonics at chemical / nuclear / atomic scales (per W-001).\n\nCONJECTURE: Each of these transition regimes admits a clean description in the category of condensed objects, with the transition itself as a morphism whose cokernel or Ext¹ is a new physical quantity not present in classical NCG.\n\nSPECIFIC SUB-CONJECTURES:\n  (a) The 𝕆→ℍ crystallization is an inverse system of finite-dim approximations in the category of condensed real algebras; ℍ is the inverse limit, 𝕆 is the parent.\n  (b) Ext¹(ℍ_condensed, 𝕆_condensed) is non-zero during crystallization and zero at the limit; the non-zero value parameterizes a measurable physical quantity (candidate: the entropy of the in-flight state, the spectral 'thickness' of the transition, or the coupling to the next harmonic).\n  (c) Event horizon formation is a topology change describable in the condensed sheaf category but not in the classical manifold category. The 'horizon-zero to horizon-positive' transition has finite Ext¹ parameterising the formation rate.\n  (d) Higher-order harmonics are stalks of a single condensed sheaf on a site of scales; cross-harmonic effects are computed by H¹ of the sheaf, which provides the first-principles route to higher-order corrections to f(u)."
+  },
+  {
+   "id": "REF-ecker-grumiller-spacetime-crystal",
+   "name": "Ecker, Ecker & Grumiller (2026): Analytic Discrete Self-Similar Solutions of Einstein-Klein-Gordon at Large D ('spacetime crystal' critical collapse)",
+   "tier": 2,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Ecker (Goethe U. Frankfurt), Ecker & Grumiller (TU Wien), Phys. Rev. Lett. 2026, arXiv:2601.14358. Constructs in CLOSED ANALYTIC FORM an infinite family of discretely self-similar (DSS) solutions of the Einstein-massless-Klein-Gordon system using the large-D expansion — the first analytic capture of Choptuik's 1993 critical-collapse solution, which had been known only numerically for 33 years. The critical solution is the threshold between black-hole formation and dispersal; DSS = 'echoing', periodic self-similarity in logarithmic spacetime scales (Choptuik 4D scaling factor ~30 in radius). The authors and press describe the intermediate critical state as a 'spacetime crystal': an unstable intermediate that either dissolves back into ordinary spacetime with free particles, or — with a tiny added energy — collapses into a black hole. Believed relevant to primordial black holes in the early universe. Key structure: a SELF-SIMILAR HORIZON (SSH), a null ingoing hypersurface where the DSS lattice vector becomes null, terminating in a naked singularity."
+  },
+  {
+   "id": "INSIGHT-echo-harmony-z2",
+   "name": "Echo vs harmony: the Cantor set is the simplest echo (monophonic); echo + a Z2 parity grading is the simplest harmony (odd-harmonic series)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "internal-compute",
+   "description": "Sharpening of James's observation that 'the Cantor set is the simplest object that echoes / makes a harmony'. Made precise and verified (sympy, 2026-05-22):\n\nECHO != HARMONY, separated by exactly one Z2. The bare Cantor set is MONOPHONIC: it repeats at a single scale ratio 3^-n (equally spaced in log-scale, spacing log3), one fundamental log-frequency, NO overtones. A pure echo. (Universal/terminal self-similar object on a binary choice: C = C/3 + (2/3 + C/3), the unique compact attractor of two contractions — Hutchinson fixed point. So 'simplest thing that echoes' has a theorem behind it.)\n\nHARMONY = echo + Z2. Imposing the half-period antisymmetry f(tau + Delta/2) = -f(tau) on the log-periodic self-similar tower selects EXACTLY the ODD harmonics k=1,3,5,7,... of the fundamental 1/Delta (verified: even modes killed, odd modes survive, k=1..12 checked). Odd overtones over a fundamental in integer ratio is a harmonic SERIES — literally harmony (the overtone content of a square/odd wave). So: simplest echo = Cantor set; simplest harmony = self-similar tower + Z2 parity grading; the two are separated by precisely one Z2."
+  },
+  {
+   "id": "INSIGHT-condensed-math-deferred",
+   "name": "MATHEMATICS: Condensed mathematics (Clausen-Scholze) as a candidate framework for QBP's transition-state regimes — formally deferred until foundations stabilise",
+   "tier": 3,
+   "status": "marginal",
+   "provenance_kind": "theory",
+   "description": "Condensed mathematics, developed by Dustin Clausen and Peter Scholze from 2018 onward, replaces topological spaces with sheaves on the site of profinite sets. Its primary motivation is that topological abelian groups do not form an abelian category, so homological algebra on them is broken — condensed abelian groups DO form an abelian category, enabling Ext groups, derived categories, and six-functor formalisms on objects that classical functional analysis cannot handle cleanly.\n\nRELEVANCE TO QBP: Classical noncommutative geometry (Connes' spectral triples) requires (A, H, D) to be fully formed — the algebra fixed, the Hilbert space complete, the Dirac operator self-adjoint. This describes the POST-crystallization regime well but provides no machinery for the TRANSITION state where:\n  - The algebra is in flux between 𝕆 (non-associative) and ℍ (associative)\n  - The Hilbert space is forming (no fixed inner product)\n  - The Dirac operator has not yet stabilized as self-adjoint\n  - Spacetime topology is changing (event horizon formation)\n\nCondensed math provides three relevant mechanisms:\n  1. LIQUID VECTOR SPACES contain Banach spaces as a full subcategory but also contain 'becoming-Banach' objects — a candidate framework for the Hilbert-space-in-formation regime.\n  2. PROFINITE-SET SITES are the natural language for 'partial formation' via inverse systems — the crystallization is an inverse limit of finite approximations.\n  3. EXT GROUPS in condensed abelian groups compute obstructions to forming. Ext¹(ℍ_condensed, 𝕆_condensed) would be a new physical quantity measuring algebraic obstruction to clean crystallization.\n\nSTATUS: Marginal because the machinery exists, is Lean-formalized (Liquid Tensor Experiment + Mathlib condensed-math infrastructure), and addresses pathologies QBP genuinely has — BUT no published work bridges condensed mathematics to noncommutative geometry or spectral triples. The bridge is speculative pending concrete investigation."
+  },
+  {
+   "id": "INSIGHT-locale-condensed-chain",
+   "name": "Locale-from-condensed compatibility: verified for spatial locales (Cantor-set calc); the pointless case gates the whole QBP physics path",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "internal-compute",
+   "description": "Tests James's proposed path: locales-from-condensed-sets => black-hole formation => crystallization => CD tower => particular physics. The FIRST LINK was computed concretely (2026-05-22).\n\nVERIFIED (spatial case): for profinite / compact-Hausdorff spaces, the locale IS expressible from the condensed set. Demonstrated on the Cantor set C = 2^N = lim 2^n: clopen Boolean algebras B_n = P(2^n) computed at each stage; the projection pullback B_n -> B_(n+1) verified (exhaustively, small n) to be an injective Boolean homomorphism that doubles cardinality, so the colimit B (countable atomless Boolean algebra) is well-defined; frame axioms verified exhaustively on the truncation P(2^2) (4096 instances of finite-meet-over-join distributivity); and O(C) = Idl(B) by Stone duality. The condensed-set data (maps from test objects 2^n into C) determines the clopen algebra, hence the frame, hence the locale. Rests on the foundational Clausen-Scholze embedding CompHaus -> Cond and Stone duality, both solid.\n\nTHE STRUCTURAL CATCH: this works because the Cantor set is SPATIAL (has points) and the condensed test objects (profinite sets) are themselves POINT-HAVING (inverse limits of finite sets). The locales expressible this way are the SPATIAL ones (compact-regular = compact Hausdorff). But the transition state needs POINTLESS locales — the crystallization in flight is the regime where points are not yet available. Condensed math de-emphasizes points in the ambient object but its PROBES are point-having. Whether the condensed topos can faithfully express genuinely pointless locales (as INTERNAL locales) is unsettled, and it is exactly the case QBP needs."
+  },
+  {
+   "id": "PROOF-spatial-first-link-condensed-locale",
+   "name": "Ω(X) ≅ Ω(condensedSetToTopCat X̲) for compactly generated X (ℝ included)",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/SpatialFirstLink.lean",
+   "lean_theorem": "QBP.Foundations.SpatialFirstLink.localeIsoOfCondensed_hom",
+   "foundation_batch": "#473-ac1",
+   "description": "#473 AC1 v0.3.1 Prop 1 (PR #631): the spatial first link of the proposed condensed → locale chain, written out as a composition of Mathlib facts and type-checked. For X : TopCat.{u+1} compactly generated, `localeIsoOfCondensed X` is the isomorphism in Locale between the locale of the topological space recovered from the condensed set X̲ and the locale of X (topToLocale applied to the counit homeomorphism CondensedSet.compactlyGeneratedAdjunctionCounitHomeo); `localeFunctorIso` is the natural isomorphism CG → Cond → Top → Loc ≅ CG → Top → Loc (also obtained by whiskering the invertible counit, `localeFunctorIso'`); `realLocaleIsoOfCondensed` is the ℝ instance via ULift.{1} ℝ (first countable ⇒ sequential ⇒ compactly generated). Witness theorems (rfl-level bookkeeping — the mathematical content is in the noncomputable iso defs, which the audit does not count): localeIsoOfCondensed_hom (the iso's hom is topToLocale.map of the counit iso's hom) and realTop_locale_eq (the locale is literally Opens (ULift ℝ)); realOpensOrderIso gives Opens (ULift ℝ) ≃o Opens ℝ. Faithfulness of Top → Loc on CompHaus is Mathlib's CompHausToLocale.faithful (cited by type-check). SCOPE: this shows the ledger's Cantor-set anecdote was never load-bearing and that set-theoretic forcing (Prop 4) does not deliver the FORCED/PERMITTED-sense forcing argument AC1 asks for (doc §4). Research-thread evidence; not a substrate claim; no Substrate/ file; #473 stays open."
+  },
+  {
+   "id": "CONV-cd-tower-in-zeta-moments",
+   "name": "MATHEMATICS: Even-level Cayley-Dickson tower (dim Im H, S, chingons, ...) embedded as dim-Im factors in CCvS entropy-function coefficients",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "The CCvS 2018 closed form gamma(-a) = (2^(2a) - 1)/(a*2^(2a)) * (2a+1)!/(a-1)! * zeta(2a+1) for positive integer a contains the numerator factor 2^(2a) - 1, which is exactly dim(Im A_(2a)) where A_(2a) is the Cayley-Dickson algebra at level 2a.\n\nEVEN-LEVEL TOWER (appears in integer-a coefficients):\n  a=1: 2^2 - 1 = 3   = dim Im H (quaternions)         [QBP daughter universe]\n  a=2: 2^4 - 1 = 15  = dim Im S (sedenions)            [QBP inter-cell topology]\n  a=3: 2^6 - 1 = 63  = dim Im (chingons, dim 64)      [deeper boundary]\n  a=4: 2^8 - 1 = 255 = dim Im (dim 256)               [...]\n\nODD-LEVEL ALGEBRAS (R, C, O, pathions) do NOT appear in integer-a coefficients. OPEN: do they appear in half-integer-a coefficients gamma(+/-1/2), gamma(+/-3/2), ...? If yes, the full Cayley-Dickson tower is encoded in CCvS's universal function with the xi functional equation as the parity map between odd and even levels.\n\nSTRUCTURAL SIGNIFICANCE: CCvS derived chi(x) = h(sqrt(x)) from a first-principles requirement (the spectral action should compute von Neumann entropy of the fermionic Fock-space KMS state). The result was independent of QBP. That the even-level Cayley-Dickson tower appears as the dim-Im factor in each zeta-weighted moment is independent first-principles support for QBP's algebraic foundation. ℍ at level 2 (where the daughter universe lives) and 𝕊 at level 4 (where the inter-cell topology / information-loss seams live) are exactly the two algebras QBP treats as physically realised.\n\nCORRECTION (2026-06-01): the 'even levels privileged / odd levels absent' structural claim is WITHDRAWN. dim(Im A_n)=2^n−1 for every level n; the factor 2^(2a)−1 = dim(Im A_{2a}) is a CONTINUOUS family, not a parity selection. Integer-a sampling yields even levels (a=1→3=Im ℍ, a=2→15=Im 𝕊); half-integer a recovers the odd levels (a=½→1=Im ℂ, a=3/2→7=Im 𝕆, a=5/2→31=Im pathions), with γ finite/smooth there. The arithmetic identity stands; the structural over-claim does not. See QBP/analysis/HQM-MMI-derive-or-die-report.md."
+  },
+  {
+   "id": "PROOF-delta-landscape-descent",
+   "name": "‖[a,b]‖² = 4(|a|²|Im b|² − ⟨a,Im b⟩²): the δ-landscape descends to the G₂-invariants",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/DeltaLandscape.lean",
+   "lean_theorem": "QBP.Foundations.DeltaLandscape.sedenion_landscape_descends",
+   "foundation_batch": "#473-ac1",
+   "description": "#473 AC1 v0.3.1 Prop 6 (PR #631), research-thread evidence anchoring the #629 δ-landscape. For an imaginary sedenion s ∈ CDAlg ℝ 4 (s.coord 0 = 0) with Cayley–Dickson octonion components a = cdLo s, b = cdHi s and c = b − b₀•1 = Im b: N(a·b − b·a) = 4·(N a · N c − (bil a c)²). Hence the landscape potential V(s) = ‖[a,b]‖² is a function of the three G₂-invariants (|a|², |Im b|², ⟨a,Im b⟩) only, so the #629 gradient flow descends to the 3-dimensional orbit space S¹⁴/G₂. Structural proof (no decide): real multiples of 1 are central for the commutator, [x,y] = 2·(x ×ₙ y), N(2•v) = 4·N v, and the 𝕆 Lagrange identity CrossProduct.octonion_cross_norm_identity. Workhorse octonion_commutator_norm_im has the second argument arbitrary (only a imaginary is used). Companions: V ≥ 0 and the Cauchy–Schwarz consequence ⟨a,Im b⟩² ≤ |a|²|Im b|² on the orbit space. Numerical counterpart: analysis/473-dirac-probe/orbit_space.py check (3), residual 7e-16. Not a substrate claim; #473 stays open."
+  },
+  {
+   "id": "INSIGHT-resonance-vs-amplification-scale-invariance",
+   "name": "Self-similar structure gives scale-invariant RESONANCE, not amplification; gain requires the crystallization's nonlinearity (criticality)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "internal-compute",
+   "description": "Addresses James's two-stones-in-a-pond question: can the Cantor / self-similar structure enable AMPLIFICATION, and is 'harmonic resonance' a cross-cutting all-scales property?\n\nSOLID (exact, from energy conservation):\n  - Two-source interference does NOT amplify. Two equal sources give a 4x PEAK intensity on the perpendicular bisector but the SPATIAL MEAN is exactly 2x (= sum of sources); bright fringes borrow exactly what dark fringes lose. Energy conserved; the pattern rings and decays. The 'more peaks as waves connect' is the hyperbolic two-source fringe family — redistribution, not gain.\n  - Amplification needs an ingredient interference lacks: FEEDBACK (in-phase re-injection over many cycles) or NONLINEARITY (super-proportional response). Linear superposition has neither. So the Cantor set does NOT amplify by itself — linear self-similar structure conserves energy like any linear system.\n\nTHE REAL CROSS-CUTTING PROPERTY (this is what the intuition correctly points at): a SELF-SIMILAR resonator has the SAME resonance at EVERY SCALE. An ordinary resonator (string, pipe) has one fundamental + integer overtones — one scale. A self-similar resonator's reinforcement condition RECURS at a geometric ladder of frequencies — the same resonance at the fundamental, again at the scale-factor multiple, scale after scale. No gain, but scale-invariant SELECTIVITY. That scale-invariance IS why 'harmonic resonance feels cross-cutting at all scales': the same resonant condition holds at every magnification."
+  },
+  {
+   "id": "INSIGHT-threshold-transition-new-stable-state",
+   "name": "Reaching critical energy x relocates the system to a NEW STABLE STATE (first-order transition / latent heat), not amplification; CD-tower thresholds are geometrically spaced",
+   "tier": 2,
+   "status": "coherent",
+   "provenance_kind": "internal-compute",
+   "description": "James's reframe: at an energy level x, do you actually rise to a NEW STABLE STATE (rather than amplify the old one)? YES — and this is a better fit for QBP than amplification.\n\nPRECISE NAME: a FIRST-ORDER (discontinuous) transition to a new stable branch, triggered at a critical energy. The system sits stably in state A; below threshold x it rattles in its well and returns; at x the barrier is cleared / A loses stability; above x the system is on a NEW stable branch B and STAYS there. Energy does not grow the old state — it pays the cost of relocating to a new one. Bistability with a barrier; the new state is as stable as the old (its own potential well). Energy-conserving, not runaway gain.\n\nMATCHES (not coincidentally):\n  - water -> ice at freezing: x = LATENT HEAT, the fixed energy cost to     relocate to the crystalline state.\n  - EEG spacetime crystal: 'a tiny added energy turns the crystal into     a black hole' — threshold tips dissolution-branch to collapse-    branch; the EEG critical solution sits AT the tipping point.\n  - QBP O->H crystallization: transition to a new stable ALGEBRA, not a     deformation of the old."
+  },
+  {
+   "id": "PROOF-alternator-vanishes-iff-commute",
+   "name": "δ-landscape vacua: T_s = 0 ⟺ the CD components of s commute",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/Alternator.lean",
+   "lean_theorem": "QBP.Foundations.CDAlg.sedenion_alternator_vanishes_iff_components_commute",
+   "foundation_batch": "#473",
+   "description": "#473 δ-landscape (T2a). Left-alternator T_s x := (s·s)·x − s·(s·x). At 𝕆: for imaginary a, (∀y, [a,y,b] = 0) ⟺ a·b = b·a (via octonion_commutant: an imaginary a ≠ 0 commuting with b forces b ∈ span{1,a}, from the polarised CD square identity, norm composition and positive-definiteness of N). At 𝕊: for s with s.coord 0 = 0, (∀x, T_s x = 0) ⟺ cdLo s · cdHi s = cdHi s · cdLo s. This is the algebraic characterisation of the vacuum manifold {δ(s) = 0} of V(s) = ‖[a,b]‖² on S¹⁴ (the octonion subalgebra directions). Non-vacuity: sedenion_not_alternative_via_commutator re-derives 𝕊's non-alternativity from the criterion with a constructed witness (e₁e₂ ≠ e₂e₁)."
+  },
+  {
+   "id": "PROOF-associator-contraction-identity",
+   "name": "Σᵢ eᵢ·[a,eᵢ,b] = −4·[a,b] on 𝕆, and its sedenion lift",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/Alternator.lean",
+   "lean_theorem": "QBP.Foundations.CDAlg.octonion_assoc_contract",
+   "foundation_batch": "#473",
+   "description": "#473 δ-landscape. Bilinear contraction identity relating the associator to the commutator: Σ_{i=0}^{7} eᵢ·[a,eᵢ,b] = (−4)•(a·b − b·a) on the octonions (64 basis cases by kernel decide + bilinearity), and for EVERY sedenion s (imaginary or not): cdHi(Σ_t e_{8+t}·[s,s,e_{8+t}]) = 4•(cdLo s·cdHi s − cdHi s·cdLo s). Gives an algebraic (rather than norm-based) definition of the alternativity defect δ(s) = ‖[a,b]‖ and is the ⇒ direction of PROOF-alternator-vanishes-iff-commute."
+  },
+  {
+   "id": "PROOF-cd-algebra-finrank-2n",
+   "name": "Cayley-Dickson algebra dimension: finrank ℝ (CDAlg ℝ n) = 2ⁿ (Im part = 2ⁿ−1)",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/CDDimension.lean",
+   "lean_theorem": "QBP.Foundations.CDDimension.finrank_cdAlg",
+   "foundation_batch": "#466",
+   "description": "finrank ℝ (CDAlg ℝ n) = 2ⁿ, Im submodule = 2ⁿ−1, via explicit basis/coordEquiv. Foundation: dim 𝕆=8, dim(Im 𝕆)=7 (n=3) — the 7 underlying the CKM CP-phase prediction. FAULT-S4-005 C5; resolves CPPhase's prediction_chain root."
+  },
+  {
+   "id": "PROOF-octonion-zd-hypersurface-empty",
+   "name": "Octonion left-mult determinant det Lₓ = N(x)⁴; ZD-hypersurface empty (𝕆 has no zero divisors)",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/LeftMulDet.lean",
+   "lean_theorem": "QBP.Foundations.LeftMulDet.octonionLeftMul_det",
+   "foundation_batch": "#594",
+   "description": "det Lₓ = N(x)⁴ and det Lₓ = 0 ⟺ x = 0 → octonion zero-divisor hypersurface EMPTY (𝕆 has no zero divisors); det=N⁴ over every CommRing (ℤ-descent). #594 VML-ladder rung 1."
+  },
+  {
+   "id": "PROOF-sedenion-dirac-sum-kill",
+   "name": "D = i·L_{Σeₐ} is scalar on 𝕊: s(sx) = −15x",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/Alternator.lean",
+   "lean_theorem": "QBP.Foundations.CDAlg.sAll_left_mul_sq",
+   "foundation_batch": "#473",
+   "description": "#473 AC2 first pass, step 1 of the lit path. For s = Σ_{a=1}^{15} eₐ in the sedenions (CDAlg ℝ 4, Schafer convention): s·(s·x) = −15•x for every x, i.e. the candidate algebraic Dirac operator D = i·Σₐ L_{eₐ} = i·L_s satisfies D² = 15·I — Tr f(D/Λ) = 16·f(√15/Λ) carries no spectral information. (The analogous ℍ/𝕆 scalars 3 and 7 are numerical only — not encoded here.) Kernel `decide` on the integer 16×16 left-multiplication matrix (sAllLZ_sq) + ℝ-linearity transfer; companions give s·s = −15, the vanishing left-associator [s,s,x] = 0, N(s) = 15, and an independent re-derivation via the alternator identity. Scope of the PROOF: this one operator at 𝕊. The generalisation to every finite Aut(𝕊)-covariant D over one CD copy (envelope M₁₆(ℝ) + Schur) is numerical/structural, README §3 — the #473 AC2 first-pass KILL rests on that flashlight, not on this anchor alone (see #473 comment 5535630651)."
+  },
+  {
+   "id": "REF-buchholtz-rijke-cd-hott",
+   "name": "Buchholtz-Rijke (2016): The Cayley-Dickson Construction in Homotopy Type Theory",
+   "tier": 2,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Buchholtz & Rijke, arXiv:1610.01134 (2016). H-space structure on S^3 in HoTT + the quaternionic Hopf fibration, homotopy-invariantly. VERIFIED REAL (direct fetch 2026-06-12). Prior art for the QBP Agda foundation layer (#556): synthetic S^1/S^3/S^7 as HITs + Hopf fibrations, the coordinate-free side of the Lean<->Agda bridge."
+  },
+  {
+   "id": "REF-internal-hom-condensed-prismatic-reals",
+   "name": "Internal Hom of condensed sets / prismatic construction of the reals (arXiv:2109.07816)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Provides the explicit R_disc -> R motivating example and RHom computations in locally compact abelian groups — the exact machinery the horizon-growth Ext^1 calculation would use. The discrete-vs-condensed distinction here is the toy model for 'tame vs structured' transitions in the CD-tower Ext walk."
+  },
+  {
+   "id": "DEFN-sedenion-structural-box-kite",
+   "name": "𝕊 structural object — box-kite / assessor structure (de Marrais 2000)",
+   "tier": 1,
+   "status": "untested",
+   "provenance_kind": "theory",
+   "description": "𝕊 = CD(𝕆) = A₄. Fifteen imaginary units e₁..e₁₅ (see docs/conventions/sedenion-indexing.md, F5). The zero-divisor structure is captured by the de Marrais box-kite / assessor framework. 42 zero-divisor pairs (PROOF-42zd); Hessian spectrum (PROOF-hessian)."
+  },
+  {
+   "id": "FLAG-seam-dynamics-open",
+   "name": "Sedenion seam current conservation: open (Bogoliubov placeholder, no proof)",
+   "tier": 2,
+   "status": "incoherent",
+   "provenance_kind": "theory",
+   "description": "Proposed Bogoliubov-style seam scattering matrix to conserve probability current across the sedenion zero-divisor locus, with information loss scaled by the stabilizer fraction 1-1/24. Conceptual placeholder only: no compiled Lean 4 wave-transport theorem exists. Replaces the over-claimed 'PROOF-seam-current-conservation' framing."
+  },
+  {
+   "id": "INSIGHT-fano-cube-universal-compute-cell",
+   "name": "Fano cube as universal compute cell: Locale, BMA, holographic hypergraph, QBP compute unit converge on same geometry",
+   "tier": 2,
+   "status": "untested",
+   "provenance_kind": "theory",
+   "description": "INSIGHT (Session 12): The Fano cube (7 vertices of F₂³ minus origin = 7 imaginary octonion units) is the natural compute cell for four QBP programmes simultaneously: (1) Locale: 3 spatial coordinates → 3 binary bits → 8 vertices = octonionic address space. (2) BMA: crystallisation selects 1 of 7 buses (Fano lines) as active ℍ for computation, remaining 6 buses are latent storage. Active bus = GPU cache, latent = hypergraph memory. (3) Holographic hypergraph: 7 lines = 7 hyperedges stored as 3-beam interference patterns. O(1) associative recall by probing with one vertex. (4) QBP compute unit: multiplication = XOR of 3-bit addresses (3 gates per product). Sign from 49-entry ROM or orientation bits. One clock cycle per octonion product. KEY PROPERTY: multiplication index is XOR — the cheapest possible computation. The geometry IS the algorithm. No lookup table, no memory access, no branching. CONVERGENCE: Four programmes independently require the same mathematical object. Handoff document created for RISC-V implementation instance."
+  },
+  {
+   "id": "PRED-f4-zero-vacuum-energy",
+   "name": "Spectral action vacuum energy f₄ = 0: information-theoretic argument from Axiom 1",
+   "tier": 1,
+   "status": "marginal",
+   "provenance_kind": "theory",
+   "description": "DERIVED (Session 12): The spectral action's cosmological constant term f₄Λ⁴ must vanish (f₄ = 0) for two independent reasons: (1) CONSISTENCY: QBP explains 'dark energy' as accretion cross-term 2AB. If f₄ ≠ 0, f₄Λ⁴ + 2AB must cancel to 10⁻¹²³ precision — unacceptable fine-tuning. (2) INFORMATION-THEORETIC: Axiom 1 (information preserved) extended to 'information not wasted'. The f₄ term produces uniform curvature carrying ZERO information. An optimal encoding minimises uniform curvature. f₄ = 0 means no curvature budget wasted on vacuum. MECHANISM: The profile f(u) must go negative above a crossover u_c. In the exponential family, f(u) = (1 - u/2)exp(-u) uniquely achieves f₄ = 0, with crossover at u = 2 (energy √2×Λ, reflecting the Cayley-Dickson doubling). Below u = 2: ℍ-phase contributes positively. Above u = 2: 𝕆-phase residual contributes negatively. Parent and daughter vacuum energies EXACTLY cancel. DISSOLVES the 120-orders-of-magnitude problem: QFT vacuum energy is exactly zero, observed acceleration is accretion, nothing to fine-tune."
+  },
+  {
+   "id": "PROOF-cd-structure-constant-tables",
+   "name": "Cayley-Dickson structure-constant tables (F3/F4) + orientation",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/CDAlg.lean",
+   "lean_theorem": "QBP.Foundations.CDAlg.mulCoeff_three_eq_fano",
+   "foundation_batch": "#619",
+   "description": "The level-3/4 CD structure-constant tables and their Fano-orientation provenance: mulCoeff_three_eq_fano, mulCoeff_four_eq_sgnTable (CDAlg), and the FanoOrientationF3 pins (fanoTableF4_eq_cayleyDickson, cayleyDickson8_sq_neg_one, cayleyDickson8_alternative_on_basis, fanoTriples_oriented, archiveTable_disagrees_cd). cayleyDickson8_sq_neg_one is a distinct theorem from PROOF-fano-genesis.imaginary_units_square_neg_one — see also PROOF-fano-genesis. Kernel-verified."
+  },
+  {
+   "id": "PROOF-left-mul-sq-alternator",
+   "name": "−L_s² = N(s)·id + T_s for imaginary s (T2c, scalar half)",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/Alternator.lean",
+   "lean_theorem": "QBP.Foundations.CDAlg.left_mul_sq_imaginary",
+   "foundation_batch": "#473",
+   "description": "#473 δ-landscape (T2c). For imaginary s in any CD algebra level covered: s·(s·x) = −N(s)•x − [s,s,x], i.e. −L_s² = N(s)·id + T_s (sign fixed per Red Team PR #629 finding 1), so the spectrum of −L_s² is N(s) shifted by the alternator spectrum ({1−δ ×4, 1 ×8, 1+δ ×4} for unit s — the spectral multiplicities are NOT yet Lean-proved; only the operator identity is). Convention-explicit: T_s := (s·s)·x − s·(s·x); the unit-normalised form −L_s² = id + T_s holds iff N(s) = 1. The symmetry of T_s and the minimal polynomial T_s³ = ‖[a,b]‖²·T_s remain flashlight-only (see PR #629)."
+  },
+  {
+   "id": "PROOF-normed-division-tower-existence",
+   "name": "Normed composition tower — existence + termination: ℝ,ℂ,ℍ,𝕆 compose (dims 1/2/4/8); 𝕊 does not",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/Hurwitz.lean",
+   "lean_theorem": "QBP.Foundations.Hurwitz.octonion_norm_multiplicative",
+   "foundation_batch": "#466",
+   "description": "ℝ,ℂ,ℍ,𝕆 are normed composition algebras (N(xy)=N(x)N(y)) of dims 1/2/4/8; 𝕊 is NOT (composition terminates at 𝕆). EXISTENCE + TERMINATION ONLY — explicitly NOT the uniqueness converse ('only 4 exist'). Distinct from PROOF-hurwitz (classical 1898 uniqueness citation). #466 item 6."
+  },
+  {
+   "id": "PROOF-ops-alternativity-ladder",
+   "name": "Operations matrix: alternativity ✓ℝℂℍ𝕆 ✗𝕊",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+   "lean_theorem": "QBP.Foundations.TowerLaws.real_alternative",
+   "foundation_batch": "#619",
+   "description": "#474 operations matrix (alternativity row): the algebra is alternative through 𝕆 (TowerLaws + CDLifting.octonion_alternative) and first fails at 𝕊 (Breakdown.sedenion_not_alternative). Kernel-verified."
+  },
+  {
+   "id": "PROOF-ops-associativity-ladder",
+   "name": "Operations matrix: associativity ✓ℝℂℍ ✗𝕆𝕊",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+   "lean_theorem": "QBP.Foundations.TowerLaws.real_associative",
+   "foundation_batch": "#619",
+   "description": "#474 operations matrix (associativity row): mul is associative for ℝ,ℂ,ℍ (TowerLaws) and fails for 𝕆,𝕊 (Breakdown). octonion_not_associative overlaps the fact anchored as octonion_non_associative in PROOF-fano-genesis (distinct theorem/file) — see also PROOF-fano-genesis. Kernel-verified."
+  },
+  {
+   "id": "PROOF-ops-division-ladder",
+   "name": "Operations matrix: division algebra ✓ℝℂℍ𝕆 ✗𝕊",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+   "lean_theorem": "QBP.Foundations.TowerLaws.real_division",
+   "foundation_batch": "#619",
+   "description": "#474 operations matrix (division row): ℝ,ℂ,ℍ are division algebras (TowerLaws); 𝕊 has zero divisors (Breakdown.sedenion_zero_divisors). See also PROOF-42zd (the 42-plane count of 𝕊 zero divisors) and PROOF-normed-division-tower-existence. Kernel-verified."
+  },
+  {
+   "id": "PROOF-ops-flexibility-ladder",
+   "name": "Operations matrix: flexibility ✓ all levels",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/TowerLaws.lean",
+   "lean_theorem": "QBP.Foundations.TowerLaws.real_flexible",
+   "foundation_batch": "#619",
+   "description": "#474 operations matrix (flexibility row): x(yx)=(xy)x holds at every level ℝ,ℂ,ℍ,𝕆,𝕊 (TowerLaws + OctonionLaws). Flexibility is the one identity that survives the whole Cayley-Dickson tower. Kernel-verified."
+  },
+  {
+   "id": "PROOF-sedenion-alternative-hyperplane-count",
+   "name": "O1a: 8 of 15 sedenion basis hyperplanes are alternative",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+   "lean_theorem": "QBP.Foundations.SedenionOctonionCount.alternative_hyperplane_count_eq_eight",
+   "foundation_batch": "#619",
+   "description": "Exactly 8 of the 15 basis-normal sedenion hyperplanes are alternative (alternative_hyperplane_count_eq_eight), with the pass/fail discriminators. Kernel-verified (SedenionOctonionCount.lean). See also PROOF-sedenion-zero-divisor-witnesses."
+  },
+  {
+   "id": "PROOF-sedenion-zero-divisor-witnesses",
+   "name": "Seven witnessed failing sedenion hyperplanes",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+   "lean_theorem": "QBP.Foundations.SedenionOctonionCount.zero_divisor_normal9",
+   "foundation_batch": "#619",
+   "description": "Seven explicit basis-normal sedenion hyperplanes (normal9..15) carrying zero-divisor pairs — the witnessed failures behind the 8/15 alternative-hyperplane split. Kernel-verified (SedenionOctonionCount.lean). See also PROOF-42zd, PROOF-sedenion-alternative-hyperplane-count."
+  },
+  {
+   "id": "PROOF-substrate-baryon-additive",
+   "name": "Substrate baryon number additive under the quaternion product: B(f⋆g) = Bf + Bg",
+   "tier": 1,
+   "status": "coherent",
+   "provenance_kind": "proof",
+   "proof_file": "proofs/agda-cubical/SubstrateCharge.agda",
+   "lean_theorem": "SubstrateCharge.baryonNumber-quaternionProduct-correct",
+   "foundation_batch": "#595",
+   "description": "baryonNumber additive under the substrate quaternion product ⋆: B(f⋆g)≡Bf+ℤBg = SubstrateLink.⋆∙-additive at the concrete S3FromCD.S³-HSpace (⋆ = HSpace.μ, pointwise quaternion mult). #595."
+  },
+  {
+   "id": "REF-brink-condensed-group-cohomology",
+   "name": "Brink (2025): Condensed Group Cohomology (arXiv:2512.03648)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Emma Brink, 'Condensed Group Cohomology' (arXiv:2512.03648, Dec 2025). Cohomology of condensed objects equipped with a group action. Identified as the MOST APPLICABLE recent building block for the H(t)=Mdot/M derivation idea, which needs cohomology of condensed objects with a time-evolution group action."
+  },
+  {
+   "id": "REF-capoferri-dirac-lorentzian",
+   "name": "Capoferri (2025): Global and microlocal aspects of Dirac operators (Math. Nachr.)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Constructs the Cauchy evolution operator for the Lorentzian Dirac operator on globally hyperbolic 4-manifolds. Matters for QBP because the spectral action is built on the Dirac operator D — the object whose growth across the horizon the obstruction calculation tracks is one the literature already knows how to evolve."
+  },
+  {
+   "id": "REF-clausen-scholze-condensed",
+   "name": "Clausen-Scholze: Condensed Mathematics (Lectures 2019; Complex Geometry 2022)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Clausen, D. & Scholze, P. Foundational condensed-mathematics corpus: 'Lectures on Condensed Mathematics' (Scholze 2019, Bonn lecture notes) and 'Condensed Mathematics and Complex Geometry' (Clausen-Scholze 2022). Replaces topological spaces with sheaves on the proetale site of profinite sets; condensed abelian groups form an ABELIAN category (unlike topological abelian groups), restoring homological algebra (Ext, derived categories, six-functor formalisms) on objects classical functional analysis cannot handle cleanly. The complex-geometry text gives the liquid tensor product and analysis-free Serre duality / Riemann-Roch — the closest existing application to 'doing geometry with condensed sheaves'."
+  },
+  {
+   "id": "REF-condensed-categorical-foundations-mathlib",
+   "name": "Categorical Foundations of Formalized Condensed Mathematics (J. Symbolic Logic 2024; now in Mathlib)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Incorporates the categorical foundations of condensed mathematics into Mathlib in an organic, reusable form (Condensed.Ab, the category of condensed abelian groups as sheaves on the proetale site valued in Ab). Plus supporting formalisations: Asgeirsson 'A formal characterization of discrete condensed objects' (arXiv:2410.17847) and the Noebeling theorem formalisation (arXiv:2309.07252). Makes Ext computations in Cond(Ab) tractable in QBP's Lean environment."
+  },
+  {
+   "id": "REF-continuous-six-functor-lch",
+   "name": "Universal continuous six-functor formalism on light condensed anima (arXiv:2511.17944); Heyer-Mann setup",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Establishes a six-functor formalism on LOCALLY COMPACT HAUSDORFF spaces (X |-> Shv(X; Sp) promotes to a six-functor formalism on LCH spaces with all morphisms), built via the Heyer-Mann geometric-setup framework (HM24). CRUCIAL for the GR-applicability question: a spacetime manifold IS locally compact Hausdorff, so condensed math's six-functor machinery already covers spacetime's underlying topology — no profinite-site reconstruction needed. Corrects the earlier (v5.8) wrong obstruction framing."
+  },
+  {
+   "id": "REF-fargues-scholze-geometrization",
+   "name": "Fargues-Scholze: Geometrization of the local Langlands correspondence (arXiv:2102.13459)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Existence proof that condensed sheaf cohomology can carry serious bulk/boundary (local/global) structure at scale. Relevant to QBP only as a proof-of-concept that the machinery handles hard bulk/boundary problems — its domain (Langlands) is unrelated, but the harmonics-as-sheaf-stalks and horizon bulk/boundary framings borrow its structural template."
+  },
+  {
+   "id": "REF-internal-locales-toposes",
+   "name": "Internal locales in a topos; externalisation dictionary; internal nuclei <-> sublocale embeddings",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Every Grothendieck topos has a rich internal language and a theory of INTERNAL LOCALES (objects behaving as locales in the internal logic), with a developed externalisation dictionary (e.g. arXiv:2301.00961 'Some Properties of Internal Locale Morphisms Externalised'; Joyal-Tierney; Johnstone). Internal nuclei correspond bijectively to internal sublocale embeddings. Internal points of an internal locale L are internal frame-homs O(L) -> Omega (the subobject classifier), NOT -> 2; in a non-Boolean topos Omega is richer than 2, so internal points can exist where external (Set) points do not. This is the precise mechanism by which a topos 'supplies points internally'."
+  },
+  {
+   "id": "REF-islam-strohmaier-feynman-propagators",
+   "name": "Islam-Strohmaier: Microlocalisation and Feynman Propagators (arXiv:2012.09767); Baer-Strohmaier Lorentzian index theorem",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Microlocal Feynman propagators for Dirac-type operators on globally hyperbolic spacetimes, with positivity reflecting Hadamard states. Together with the Baer-Strohmaier Lorentzian index theorem (index(D) = bulk A-hat + boundary eta-terms), this is the index-theoretic frame in which the horizon-growth obstruction was analysed. The S^2 eta-invariant vanishing (PROOF-s2-dirac-eta-vanishes) relocates the obstruction to the bulk A-hat integral within exactly this framework."
+  },
+  {
+   "id": "REF-jubin-schapira-lorentzian",
+   "name": "Jubin-Schapira: Sheaves and D-modules on Lorentzian manifolds (arXiv:1510.01499)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Introduces causal manifolds (containing globally hyperbolic spacetimes) and proves global propagation theorems for sheaves whose microsupport lies in the polar (causal) cone; solves the global Cauchy problem for hyperbolic systems. The 'World 1' foundation: causality encoded sheaf-theoretically via microsupport. On a globally hyperbolic spacetime with Cauchy time function, causal diamonds are compact. This is the machinery the nested-Schwarzschild propagation-obstruction calculation runs in (no condensed math required)."
+  },
+  {
+   "id": "REF-liquid-tensor-experiment",
+   "name": "Liquid Tensor Experiment (Commelin-Topaz et al., Lean formalisation 2022)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Lean 4 / mathlib formalisation of the central condensed-math result (Ext^i vanishing for liquid real vector spaces against p-measure spaces), completed 2022. ~90,000 lines of Lean for the proof plus the abelian-category prerequisites. Demonstrates the condensed machinery is formally verifiable and now partly resident in Mathlib. Relevant to QBP because it puts the tooling inside QBP's own verification environment."
+  },
+  {
+   "id": "REF-pyknotic-condensed-topos-status",
+   "name": "Barwick-Haine pyknotic sets vs Clausen-Scholze condensed sets: topos vs infinitary pretopos",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Barwick-Haine (arXiv:1904.09966, 'Pyknotic objects'). Condensed sets do NOT form a topos — they form an infinitary pretopos (a cocomplete locally small pretopos = small sheaves on a large site, filtered by regular cardinals into Grothendieck toposes; each kappa-condensed category IS a Grothendieck topos). PYKNOTIC sets (sheaves on tiny profinite sets valued in small sets, using a tiny/small universe pair) DO form a coherent topos — the difference is set-theoretic, pyknotic admits pathological objects (e.g. indiscrete {0,1}) to secure topos-hood. For internal-locale theory the correct arena is pyknotic / kappa-condensed (an actual topos), not 'condensed' loosely."
+  },
+  {
+   "id": "REF-sanchez-globally-hyperbolic-slicings",
+   "name": "Sanchez et al.: Globally hyperbolic spacetimes — slicings, boundaries, counterexamples (arXiv:2110.13672); Geroch 1970; Bernal-Sanchez 2005",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Establishes that globally hyperbolic spacetimes split as R x S (Cauchy time function; Geroch 1970) with smooth spacelike slicing (Bernal-Sanchez 2005), and that the region between two Cauchy slices is itself globally hyperbolic (arXiv:2110.13672). This is PRECISELY the 'spacetime between mass M and mass M+dM' nested object the horizon-growth calculation needs. Underpins the World-1 calculation's well-posedness."
+  },
+  {
+   "id": "REF-schapira-causal-propagation",
+   "name": "Schapira: Hyperbolic systems and propagation on causal manifolds (arXiv:1305.3535)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "Survey of the Cauchy-problem-via-microlocal-sheaves method on causal manifolds. Companion/precursor to Jubin-Schapira; gives the propagation results in the form used to argue the obstruction localises at the horizon."
+  },
+  {
+   "id": "REF-vaidya-accreting-horizon",
+   "name": "Ingoing Vaidya metric and apparent-horizon causal character (standard GR)",
+   "tier": 3,
+   "status": "coherent",
+   "provenance_kind": "theory-external",
+   "description": "The ingoing Vaidya metric ds^2 = -(1-2M(v)/r)dv^2 + 2 dv dr + r^2 dOmega^2 is the standard description of a black hole accreting null dust; M(v) increasing for accretion. The apparent horizon r_H = 2M(v) is spacelike when dM/dv>0 (the diagnostic g^{mu nu} n_mu n_nu = -4M' on the horizon). Established GR; the geometric basis for PROOF-vaidya-accreting-horizon-spacelike and the microlocal obstruction setup."
+  },
+  {
+   "id": "CONV-spectral-entropy-zeta",
+   "name": "MATHEMATICS: Chamseddine-Connes-van Suijlekom 2018 derives universal profile function from entropy/Riemann zeta - candidate convergence with QBP f(u)",
+   "tier": 3,
+   "status": "marginal",
+   "provenance_kind": "theory-external",
+   "description": "External mathematical result by the originators of the spectral action: the von Neumann entropy of the fermionic second quantization of a spectral triple equals the spectral action for a SPECIFIC universal test function chi(x) = h(sqrt(x)) where h(x) = x/(1+e^x) + log(1+e^(-x)) is the Fermi-Dirac vacuum entropy function. The function's heat-expansion coefficients gamma(a) = (1 - 2^(-2a))/a * pi^(-a) * xi(2a) involve the Riemann xi function. In particular gamma(-2) = 225*zeta(5)/4 (4D cosmological-constant coefficient) and gamma(-1) = 9*zeta(3)/2 (4D Newton's-constant coefficient).\n\nCOMPARISON WITH QBP f(u) (verified 2026-05-10 via 50-digit mp-arithmetic):\nT1 (numerical match): FAILS. CCvS gamma(-2) * Lambda_c^4 at QBP's stated cutoff (0.04 M_Pl) gives ~1.5e-4 M_Pl^4 vacuum-energy contribution. Observed rho_Lambda ~ 1.2e-106 M_Pl^4. Mismatch ~10^102 orders of magnitude. The accretion-driven Lambda_eff = 2AB is the same order as observed and cannot cancel the spectral-action contribution.\nT2 (Cayley-Dickson tower): CONFIRMED. See CONV-cd-tower-in-zeta-moments.\nT3 (functional-equation map): No simple map relates f(u) to chi(u). Constant-rescaling tests give inconsistent values for A (0.69 from f(0), 1.80 from f_2). Functional-equation reflection gamma(a) <-> gamma(1/2-a) gives non-constant ratios. The duality operates at the level of which zeta values appear (structural), not at the level of producing equal coefficients.\nT4 (sectoring): Both f and chi are one-particle traces of the same Dirac operator with different test functions. No fermion/boson decomposition of f recovers chi. Spectral action principle (CCvS §1) explicitly allows arbitrary test functions.\n\nNET: f(u) and chi(u) are DIFFERENT functions on the SAME spectral triple, each computing a different observable. The candidate identity-level convergence is disconfirmed. Status MARGINAL because (a) the underlying spectral-action machinery is shared, (b) the Cayley-Dickson structural confluence in CCvS's coefficients (T2) is independently strong, but (c) the specific f(u) <-> chi(u) match the original anchor proposed has failed."
+  },
+  {
+   "id": "DEFN-cayley-dickson-doubling",
+   "name": "Cayley-Dickson doubling construction",
+   "tier": 1,
+   "status": "untested",
+   "provenance_kind": "theory",
+   "description": "The generic doubling construction CD(A) from a *-algebra A. Multiplication: (a₁,a₂)(b₁,b₂) = (a₁b₁ − conj(b₂)·a₂, b₂·a₁ + a₂·conj(b₁)). Parametric in level n; supports Aₙ = CD(Aₙ₋₁) for n ≥ 0. See docs/conventions/cd-doubling.md (F3) for the canonical form and Baez 2002 §1.1 citation."
+  },
+  {
+   "id": "DERIV-hubble-half-entropy-factor",
+   "name": "Hubble half-entropy identity H = (1/2) Sdot/S (the factor of 1/2)",
+   "tier": 2,
+   "status": "coherent",
+   "provenance_kind": "derivation",
+   "proof_file": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
+   "lean_theorem": "QBP.Foundations.QBPHorizonFoundations.hubble_half_entropy",
+   "description": "Given horizon area A = c*rH^2 (c != 0) and the chain-rule relation Adot = 2*c*rH*rHdot, the logarithmic rate of the horizon radius is half the logarithmic rate of the area: rHdot/rH = (1/2)*(Adot/A). With Bekenstein-Hawking S proportional to A, this is H = (1/2)*Sdot/S. The factor of 1/2 (from area proportional to radius squared) is the content — it sharpens QBP's postulated H = Mdot/M into a more specific relation to parent-horizon entropy growth."
+  }
+ ]
+}
