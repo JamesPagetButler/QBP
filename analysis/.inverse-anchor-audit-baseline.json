@@ -32,6 +32,7 @@
     "proofs/QBP/Foundations/Hurwitz.lean": 8,
     "proofs/QBP/Foundations/LeftMulDet.lean": 22,
     "proofs/QBP/Foundations/LieAlgebraIso.lean": 21,
+    "proofs/QBP/Foundations/NoAutonomousDynamics.lean": 53,
     "proofs/QBP/Foundations/NormForm.lean": 10,
     "proofs/QBP/Foundations/Octonion32Count.lean": 8,
     "proofs/QBP/Foundations/OctonionLaws.lean": 55,

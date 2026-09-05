@@ -643,6 +643,29 @@
         "QBP.Foundations.DeltaLandscape.rot120_h22_of_h11",
         "QBP.Foundations.DeltaLandscape.rot180_admits_nonscalar"
       ]
+    },
+    {
+      "anchor_id": "PROOF-no-autonomous-algebraic-dynamics",
+      "proof_system": "lean4",
+      "declared_by": "#473-ac2",
+      "witnesses": [
+        "QBP.Foundations.NoAutonomousDynamics.genBy_mem_span",
+        "QBP.Foundations.NoAutonomousDynamics.genBy_unit_imag_eq",
+        "QBP.Foundations.NoAutonomousDynamics.genByPair_ell_mem_quatSpan",
+        "QBP.Foundations.NoAutonomousDynamics.quatSpan_mul_closed",
+        "QBP.Foundations.NoAutonomousDynamics.quatSpan_conj_closed",
+        "QBP.Foundations.NoAutonomousDynamics.quatSpan_proper",
+        "QBP.Foundations.NoAutonomousDynamics.assoc_self_ell",
+        "QBP.Foundations.NoAutonomousDynamics.ell_sq",
+        "QBP.Foundations.NoAutonomousDynamics.p_ell_anticomm",
+        "QBP.Foundations.NoAutonomousDynamics.p_sq",
+        "QBP.Foundations.NoAutonomousDynamics.p_mul_ell_p",
+        "QBP.Foundations.NoAutonomousDynamics.ell_p_mul_p",
+        "QBP.Foundations.NoAutonomousDynamics.ell_p_sq",
+        "QBP.Foundations.NoAutonomousDynamics.cdLo_ell_commutator",
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator",
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator_imaginary"
+      ]
     }
   ]
 }
