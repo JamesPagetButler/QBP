@@ -106,6 +106,11 @@ noncomputable def realLocaleIsoOfCondensed :
 /-- The locale in question is literally the frame of open sets of (lifted) ℝ. -/
 theorem realTop_locale_eq : (topToLocale.obj RealTop : Type 1) = Opens (ULift.{1} ℝ) := rfl
 
+/-- …and that frame is order-isomorphic to the frame of open sets of ℝ itself, via the lift
+    homeomorphism — so "ℝ is an instance" is literal, not up to universe bookkeeping. -/
+noncomputable def realOpensOrderIso : Opens (ULift.{1} ℝ) ≃o Opens ℝ :=
+  (Homeomorph.ulift.{1, 0} (X := ℝ)).opensCongr
+
 /-! ## 4. Faithfulness (library facts, cited by type-check) -/
 
 /-- Top → Loc is faithful on compact Hausdorff spaces (Mathlib: T₀ suffices). -/
@@ -123,5 +128,6 @@ noncomputable example : CondensedSet.compactlyGeneratedToCondensedSet.{u}.FullyF
 #print axioms realTop_uCompactlyGenerated
 #print axioms realLocaleIsoOfCondensed
 #print axioms realTop_locale_eq
+#print axioms realOpensOrderIso
 
 end QBP.Foundations.SpatialFirstLink

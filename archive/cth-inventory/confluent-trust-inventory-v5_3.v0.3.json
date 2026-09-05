@@ -8107,7 +8107,7 @@
           }
         },
         "verified_at": "2026-09-04T00:00:00Z",
-        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 δ-landscape descent anchors, PR #631); pending cth §I4",
+        "verifier": "lake build QBP.Foundations.DeltaLandscape / .SpatialFirstLink + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 batch #473-ac1: δ-landscape descent, rot120 scalar form, spatial first link; PR #631 head ddfdec0+); pending cth §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -8122,7 +8122,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "#473 AC1 v0.3.1 Prop 1 (PR #631): the spatial first link of the proposed condensed → locale chain, written out as a composition of Mathlib facts and type-checked. For X : TopCat.{u+1} compactly generated, `localeIsoOfCondensed X` is the isomorphism in Locale between the locale of the topological space recovered from the condensed set X̲ and the locale of X (topToLocale applied to the counit homeomorphism CondensedSet.compactlyGeneratedAdjunctionCounitHomeo); `localeFunctorIso` is the natural isomorphism CG → Cond → Top → Loc ≅ CG → Top → Loc (also obtained by whiskering the invertible counit, `localeFunctorIso'`); `realLocaleIsoOfCondensed` is the ℝ instance via ULift.{1} ℝ (first countable ⇒ sequential ⇒ compactly generated). Witness theorems: the iso's hom is the counit's comap (localeIsoOfCondensed_hom) and the locale is literally Opens (ULift ℝ) (realTop_locale_eq); the constructions are noncomputable defs in the same file. Faithfulness of Top → Loc on CompHaus is Mathlib's CompHausToLocale.faithful (cited by type-check). SCOPE: this shows the ledger's Cantor-set anecdote was never load-bearing and that set-theoretic forcing (Prop 4) does not deliver the FORCED/PERMITTED-sense forcing argument AC1 asks for (doc §4). Research-thread evidence; not a substrate claim; no Substrate/ file; #473 stays open.",
+      "description": "#473 AC1 v0.3.1 Prop 1 (PR #631): the spatial first link of the proposed condensed → locale chain, written out as a composition of Mathlib facts and type-checked. For X : TopCat.{u+1} compactly generated, `localeIsoOfCondensed X` is the isomorphism in Locale between the locale of the topological space recovered from the condensed set X̲ and the locale of X (topToLocale applied to the counit homeomorphism CondensedSet.compactlyGeneratedAdjunctionCounitHomeo); `localeFunctorIso` is the natural isomorphism CG → Cond → Top → Loc ≅ CG → Top → Loc (also obtained by whiskering the invertible counit, `localeFunctorIso'`); `realLocaleIsoOfCondensed` is the ℝ instance via ULift.{1} ℝ (first countable ⇒ sequential ⇒ compactly generated). Witness theorems (rfl-level bookkeeping — the mathematical content is in the noncomputable iso defs, which the audit does not count): localeIsoOfCondensed_hom (the iso's hom is topToLocale.map of the counit iso's hom) and realTop_locale_eq (the locale is literally Opens (ULift ℝ)); realOpensOrderIso gives Opens (ULift ℝ) ≃o Opens ℝ. Faithfulness of Top → Loc on CompHaus is Mathlib's CompHausToLocale.faithful (cited by type-check). SCOPE: this shows the ledger's Cantor-set anecdote was never load-bearing and that set-theoretic forcing (Prop 4) does not deliver the FORCED/PERMITTED-sense forcing argument AC1 asks for (doc §4). Research-thread evidence; not a substrate claim; no Substrate/ file; #473 stays open.",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -8159,7 +8159,7 @@
           }
         },
         "verified_at": "2026-09-04T00:00:00Z",
-        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 δ-landscape descent anchors, PR #631); pending cth §I4",
+        "verifier": "lake build QBP.Foundations.DeltaLandscape / .SpatialFirstLink + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 batch #473-ac1: δ-landscape descent, rot120 scalar form, spatial first link; PR #631 head ddfdec0+); pending cth §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -8174,7 +8174,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "#473 AC1 v0.3.1 Prop 7′ (PR #631), the algebraic step of the S₃ reduction: the G₂-invariant quadratic forms on Im𝕊 = 7 ⊕ 1 ⊕ 7 restricted to the (a, Im b) multiplicity plane are |a|² + λ|Im b|² + ν⟨a,Im b⟩, i.e. a symmetric form (p q; q r) on ℝ²; invariance under the order-3 rotation R (entries (−1/2, −√3/2; √3/2, −1/2), the ±120° rotations in Aut(𝕊) = G₂ × S₃ commuting with G₂) forces q = 0 and p = r, so the form is scalar (λ = 1, ν = 0) and the Aut-invariant quadratic-form family collapses to Q_μ = |a|² + |Im b|² + μb₀². Stated with the explicit RᵀQR entries as hypotheses; proved by linear_combination over √3² = 3. Companions: the ₂₂ invariance equation is redundant given the ₁₁ one (trace preservation), and a constructed witness (p,q,r) = (1,1,0) shows a 180° rotation admits a non-scalar invariant form — order 2 would NOT suffice. SCOPE: this is the quadratic-form class only; a general Aut-invariant measure is any S₃-invariant density on the orbit space (doc Prop 7′ / Prop 12 crux). Research-thread evidence; #473 stays open.",
+      "description": "#473 AC1 v0.3.1 Prop 7′ (PR #631), the algebraic step of the S₃ reduction: the G₂-invariant quadratic forms on Im𝕊 = 7 ⊕ 1 ⊕ 7 restricted to the (a, Im b) multiplicity plane are |a|² + λ|Im b|² + ν⟨a,Im b⟩, i.e. a symmetric form (p q; q r) on ℝ²; invariance under the order-3 rotation R (entries (−1/2, −√3/2; √3/2, −1/2), the ±120° rotations in Aut(𝕊) = G₂ × S₃ commuting with G₂) forces q = 0 and p = r, so the form is scalar (λ = 1, ν = 0) and the Aut-invariant quadratic-form family collapses to Q_μ = |a|² + |Im b|² + μb₀². Stated with the explicit RᵀQR entries as hypotheses; proved by linear_combination over √3² = 3. Companions: the ₂₂ invariance equation is redundant given the ₁₁ one (trace preservation), and `rot180_admits_nonscalar` exhibits (p,q,r) = (1,1,0) satisfying the 180° conjugation equations with q ≠ 0, p ≠ r (the equations are trivial at 180°, which is the point: order 2 constrains nothing on the traceless part — the argument is in the docstring, the theorem is the explicit witness). SCOPE: this is the quadratic-form class only; a general Aut-invariant measure is any S₃-invariant density on the orbit space (doc Prop 7′ / Prop 12 crux). Research-thread evidence; #473 stays open.",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -8216,7 +8216,7 @@
           }
         },
         "verified_at": "2026-09-04T00:00:00Z",
-        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 δ-landscape descent anchors, PR #631); pending cth §I4",
+        "verifier": "lake build QBP.Foundations.DeltaLandscape / .SpatialFirstLink + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 batch #473-ac1: δ-landscape descent, rot120 scalar form, spatial first link; PR #631 head ddfdec0+); pending cth §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",

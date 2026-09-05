@@ -1,5 +1,5 @@
-"""#473 AC1 round 8 (relabelled after PR #631 review) — flow smoke test + S₃-consistency of
-the #629 endpoints.
+"""#473 AC1 round 8 (relabelled after PR #631 review) — flow smoke test on the #629 endpoints
+(θ-uniformity under O(2), b₀ evenness, pinch at ±ℓ) plus an independent ⟨b₀²⟩ re-measurement.
 
 WHAT THIS TESTS, honestly.  V = 4·det Gram(a, Im b) is invariant under the FULL O(2) acting on
 the (a, Im b) multiplicity plane (centraliser of G₂ in O(15) is O(2) × O(1)), not just under the
@@ -16,7 +16,10 @@ Seeding: same seed VALUE as flow_big.py (rng(1)) but an independent stream — f
 consumes two FD-check draws before sampling, this script reseeds after the exec'd prefix — so
 the 24 000 initial points differ from #629's.  The endpoint ⟨b₀²⟩ printed below is therefore an
 independent re-measurement of #629's 0.1462 ± 0.0011 (1500 steps here vs 5000 there).
-Set S3_CHECK_N=3000 for a ~1 min validation run; S3_CHECK_MU=μ for a Q_μ-Gaussian initial state.
+Set S3_CHECK_N=3000 for a ~1 min validation run; S3_CHECK_MU=μ for a Q_μ-Gaussian initial
+state (radially projected to S¹⁴ — NOT the coarea measure on {Q_μ = 1}; the two agree only at
+μ = 1); S3_CHECK_SEED=k for an independent seed (the KS test at seed 1 gave p = 0.021, a 2.3σ
+fluctuation on one of four correlated tests — a second seed is the test, not more steps).
 """
 
 import os
@@ -28,15 +31,16 @@ src = open("flow_big.py").read()
 exec(src.split("# --- flow")[0])  # omul, V, grad, FD check
 
 N = int(os.environ.get("S3_CHECK_N", "24000"))
-rng = np.random.default_rng(1)
+SEED = int(os.environ.get("S3_CHECK_SEED", "1"))
+rng = np.random.default_rng(SEED)
 s = rng.normal(size=(N, 15))
 # optional Q_μ-Gaussian initial state (Prop 7′ BOTE check): b₀ ~ N(0, 1/μ), then project to S¹⁴
 MU = float(os.environ.get("S3_CHECK_MU", "1"))
 s[:, 7] /= np.sqrt(MU)
 s /= np.linalg.norm(s, axis=1, keepdims=True)
 print(
-    "N = %d   mu = %g   initial <b0^2> = %.4f  (BOTE (1/mu)/(14+1/mu) = %.4f)"
-    % (N, MU, (s[:, 7] ** 2).mean(), (1 / MU) / (14 + 1 / MU))
+    "N = %d   seed = %d   mu = %g   initial <b0^2> = %.4f  (BOTE (1/mu)/(14+1/mu) = %.4f)"
+    % (N, SEED, MU, (s[:, 7] ** 2).mean(), (1 / MU) / (14 + 1 / MU))
 )
 a = np.concatenate([np.zeros((N, 1)), s[:, :7]], 1)
 b = s[:, 7:].copy()
