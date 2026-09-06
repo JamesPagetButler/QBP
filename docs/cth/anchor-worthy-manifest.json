@@ -664,7 +664,18 @@
         "QBP.Foundations.NoAutonomousDynamics.ell_p_sq",
         "QBP.Foundations.NoAutonomousDynamics.cdLo_ell_commutator",
         "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator",
-        "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator_imaginary"
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator_imaginary",
+        "QBP.Foundations.NoAutonomousDynamics.rightMul_isometry_of_half",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_right_of_lo",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_right_of_hi",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_ell",
+        "QBP.Foundations.NoAutonomousDynamics.half_hypothesis_necessary",
+        "QBP.Foundations.NoAutonomousDynamics.sum_N_basis_mul",
+        "QBP.Foundations.NoAutonomousDynamics.sum_N_mul_basis",
+        "QBP.Foundations.NoAutonomousDynamics.assoc_self_zero_iff",
+        "QBP.Foundations.NoAutonomousDynamics.cdLo_mul",
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_mul",
+        "QBP.Foundations.NoAutonomousDynamics.N_split"
       ]
     }
   ]

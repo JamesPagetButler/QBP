@@ -8255,7 +8255,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "#473 AC1 v0.4/v0.5 Prop 16, PR #634, research-thread evidence. (i) For every imaginary s ∈ CDAlg ℝ n, every element obtained from s by the algebra's operations (products in any bracketing, conjugation, real scalars) lies in span{1, s} (genBy_mem_span, induction on an inductive closure GenBy from imaginary_sq; no power-associativity needed); an imaginary unit in that span is ±s (genBy_unit_imag_eq). (ii) In the sedenions, for ℓ = e₈ and p = s − s₈·ℓ: span{1, ℓ, p, ℓp} is a *-subalgebra closed under multiplication (quatSpan_mul_closed, quatSpan_conj_closed) and every word in {1, s, ℓ} lies in it (genByPair_ell_mem_quatSpan); the non-associative products are derived, not assumed, from assoc_self_ell ([x, x, ℓ] = 0 for EVERY sedenion — a genuine fact about ℓ, 64-case kernel decide — the sedenion alternator is nonzero in general) with p·(ℓp) = N(p)·ℓ, (ℓp)·p = −N(p)·ℓ, (ℓp)² = −N(p)·1; non-vacuity witness quatSpan_proper. Commutator in CD coordinates: [s, ℓ] = −2c + 2aℓ (cdLo/cdHi_ell_commutator). SCOPE (docstring): the shape-invariant half of (ii) — σ = V/(1−b₀²)² constant, hence only ±ℓ reachable — is NOT formalised (numerical, lmaps_check.py); normalisation is not an algebra operation, so the (s+ℓ)/‖s+ℓ‖ map is outside the closure; layer (iii) — with an unforced t the maps x·t, t·x, [x,t] are power iteration of linear skew maps onto the zero-divisor ridge, Σσ²(R_t) = 16·N(t) — is numerical (generic_maps_check.py). Not a substrate claim; no Substrate/ file.",
+      "description": "#473 AC1 v0.4/v0.5 Prop 16, PR #634, research-thread evidence. (i) For every imaginary s ∈ CDAlg ℝ n, every element obtained from s by the algebra's operations (products in any bracketing, conjugation, real scalars) lies in span{1, s} (genBy_mem_span, induction on an inductive closure GenBy from imaginary_sq; no power-associativity needed); an imaginary unit in that span is ±s (genBy_unit_imag_eq). (ii) In the sedenions, for ℓ = e₈ and p = s − s₈·ℓ: span{1, ℓ, p, ℓp} is a *-subalgebra closed under multiplication (quatSpan_mul_closed, quatSpan_conj_closed) and every word in {1, s, ℓ} lies in it (genByPair_ell_mem_quatSpan); the non-associative products are derived, not assumed, from assoc_self_ell ([x, x, ℓ] = 0 for EVERY sedenion — a genuine fact about ℓ, 64-case kernel decide — the sedenion alternator is nonzero in general) with p·(ℓp) = N(p)·ℓ, (ℓp)·p = −N(p)·ℓ, (ℓp)² = −N(p)·1; non-vacuity witness quatSpan_proper. Commutator in CD coordinates: [s, ℓ] = −2c + 2aℓ (cdLo/cdHi_ell_commutator). SCOPE (docstring): the shape-invariant half of (ii) — σ = V/(1−b₀²)² constant, hence only ±ℓ reachable — is NOT formalised (numerical, lmaps_check.py); normalisation is not an algebra operation, so the (s+ℓ)/‖s+ℓ‖ map is outside the closure; layer (iii) — with an unforced t the maps x·t, t·x, [x,t] are power iteration of linear skew maps onto the zero-divisor ridge, Σσ²(R_t) = 16·N(t) — is numerical (generic_maps_check.py). Layer-3 MECHANISM, Lean (PR #640 fix): right-multiplication is norm-multiplicative for every t in either CD half (rightMul_isometry_of_half; N_mul_ell the ℓ instance; half_hypothesis_necessary shows composition fails off 𝕆 ∪ 𝕆ℓ), so 'no transient' does not single out ℓ; Σ_k N(e_k t) = 16 N(t) (sum_N_basis_mul = tr(R_tᵀR_t)); what IS special about ℓ is now exact: assoc_self_zero_iff — {y : ∀x, [x,x,y] = 0} = span{1, ℓ}. The doubling formula itself is derived from mulCoeff 4 by kernel decide (cdLo_mul, cdHi_mul). Not a substrate claim; no Substrate/ file.",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -8279,7 +8279,18 @@
         "QBP.Foundations.NoAutonomousDynamics.ell_p_sq",
         "QBP.Foundations.NoAutonomousDynamics.cdLo_ell_commutator",
         "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator",
-        "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator_imaginary"
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator_imaginary",
+        "QBP.Foundations.NoAutonomousDynamics.rightMul_isometry_of_half",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_right_of_lo",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_right_of_hi",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_ell",
+        "QBP.Foundations.NoAutonomousDynamics.half_hypothesis_necessary",
+        "QBP.Foundations.NoAutonomousDynamics.sum_N_basis_mul",
+        "QBP.Foundations.NoAutonomousDynamics.sum_N_mul_basis",
+        "QBP.Foundations.NoAutonomousDynamics.assoc_self_zero_iff",
+        "QBP.Foundations.NoAutonomousDynamics.cdLo_mul",
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_mul",
+        "QBP.Foundations.NoAutonomousDynamics.N_split"
       ],
       "theorems": [
         {
@@ -8345,6 +8356,50 @@
         {
           "name": "cdHi_ell_commutator_imaginary",
           "status": "verified"
+        },
+        {
+          "name": "rightMul_isometry_of_half",
+          "status": "verified"
+        },
+        {
+          "name": "N_mul_right_of_lo",
+          "status": "verified"
+        },
+        {
+          "name": "N_mul_right_of_hi",
+          "status": "verified"
+        },
+        {
+          "name": "N_mul_ell",
+          "status": "verified"
+        },
+        {
+          "name": "half_hypothesis_necessary",
+          "status": "verified"
+        },
+        {
+          "name": "sum_N_basis_mul",
+          "status": "verified"
+        },
+        {
+          "name": "sum_N_mul_basis",
+          "status": "verified"
+        },
+        {
+          "name": "assoc_self_zero_iff",
+          "status": "verified"
+        },
+        {
+          "name": "cdLo_mul",
+          "status": "verified"
+        },
+        {
+          "name": "cdHi_mul",
+          "status": "verified"
+        },
+        {
+          "name": "N_split",
+          "status": "verified"
         }
       ],
       "foundation_batch": "#473-ac2",
@@ -8362,7 +8417,7 @@
           }
         },
         "verified_at": "2026-09-05T00:00:00Z",
-        "verifier": "lake build QBP.Foundations.NoAutonomousDynamics + #print axioms (51 declarations), leanprover/lean4:v4.30.0 (qbp-oppenheimer + lean-prover agent, #634); Red Team round-4 confirmer rebuilt; pending cth §I4",
+        "verifier": "lake build QBP.Foundations.NoAutonomousDynamics + #print axioms (84 declarations), leanprover/lean4:v4.30.0 (qbp-oppenheimer + lean-prover agent, #634); Red Team round-4 confirmer rebuilt; pending cth §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",

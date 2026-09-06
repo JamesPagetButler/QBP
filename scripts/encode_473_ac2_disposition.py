@@ -45,6 +45,17 @@ WITS = [
     "cdLo_ell_commutator",
     "cdHi_ell_commutator",
     "cdHi_ell_commutator_imaginary",
+    "rightMul_isometry_of_half",
+    "N_mul_right_of_lo",
+    "N_mul_right_of_hi",
+    "N_mul_ell",
+    "half_hypothesis_necessary",
+    "sum_N_basis_mul",
+    "sum_N_mul_basis",
+    "assoc_self_zero_iff",
+    "cdLo_mul",
+    "cdHi_mul",
+    "N_split",
 ]
 
 KILLED = {
@@ -120,7 +131,12 @@ PROOF16 = {
         "NOT formalised (numerical, lmaps_check.py); normalisation is not an algebra operation, so the "
         "(s+ℓ)/‖s+ℓ‖ map is outside the closure; layer (iii) — with an unforced t the maps x·t, t·x, [x,t] are "
         "power iteration of linear skew maps onto the zero-divisor ridge, Σσ²(R_t) = 16·N(t) — is numerical "
-        "(generic_maps_check.py). Not a substrate claim; no Substrate/ file."
+        "(generic_maps_check.py). Layer-3 MECHANISM, Lean (PR #640 fix): right-multiplication is norm-multiplicative "
+        "for every t in either CD half (rightMul_isometry_of_half; N_mul_ell the ℓ instance; half_hypothesis_necessary "
+        "shows composition fails off 𝕆 ∪ 𝕆ℓ), so 'no transient' does not single out ℓ; Σ_k N(e_k t) = 16 N(t) "
+        "(sum_N_basis_mul = tr(R_tᵀR_t)); what IS special about ℓ is now exact: assoc_self_zero_iff — "
+        "{y : ∀x, [x,x,y] = 0} = span{1, ℓ}. The doubling formula itself is derived from mulCoeff 4 by kernel decide "
+        "(cdLo_mul, cdHi_mul). Not a substrate claim; no Substrate/ file."
     ),
     "prediction_chain": [],
     "provenance_kind": "proof",
@@ -147,7 +163,7 @@ PROOF16 = {
             },
         },
         "verified_at": STAMP,
-        "verifier": "lake build QBP.Foundations.NoAutonomousDynamics + #print axioms (51 declarations), leanprover/lean4:v4.30.0 (qbp-oppenheimer + lean-prover agent, #634); Red Team round-4 confirmer rebuilt; pending cth §I4",
+        "verifier": "lake build QBP.Foundations.NoAutonomousDynamics + #print axioms (84 declarations), leanprover/lean4:v4.30.0 (qbp-oppenheimer + lean-prover agent, #634); Red Team round-4 confirmer rebuilt; pending cth §I4",
         "result": "verified",
         "axiom_closure": CLEAN,
     },
