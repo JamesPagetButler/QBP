@@ -76,7 +76,7 @@ operations never leave `ℍ_s`.  The "only `±ℓ` are reachable" half of the do
 Third layer — the mechanism, now FORMALISED in §4 below (numerical origin:
 `analysis/473-dirac-probe/generic_maps_check.py`, Red Team round-4 confirmer).  With an
 UNFORCED second element t, the maps x ↦ x·t, t·x, [x,t] are linear (R_t, L_t, ad_t); their
-normalised iteration is power iteration onto the top-singular plane — which lies on the
+normalised iteration is power iteration onto the top-singular subspace — which lies on the
 zero-divisor ridge V = 1 — followed by a period-2 symmetry.  Three facts about that picture
 are theorems here, and they correct the attribution this file previously carried:
 
