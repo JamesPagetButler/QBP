@@ -76,14 +76,15 @@ operations never leave `ℍ_s`.  The "only `±ℓ` are reachable" half of the do
 Third layer — the mechanism, now FORMALISED in §4 below (numerical origin:
 `analysis/473-dirac-probe/generic_maps_check.py`, Red Team round-4 confirmer).  With an
 UNFORCED second element t, the maps x ↦ x·t, t·x, [x,t] are linear (R_t, L_t, ad_t); their
-normalised iteration is power iteration onto the top-singular subspace — which lies on the
-zero-divisor ridge V = 1 — followed by a period-2 symmetry.  Three facts about that picture
+normalised iteration is power iteration onto the top-singular subspace — which numerically lies
+on the zero-divisor ridge V = 1 (observed for 100/100 t, NOT derived) — followed by a period-2
+symmetry.  Three facts about that picture
 are theorems here, and they correct the attribution this file previously carried:
 
   * **Σσ²(R_t) = 16·N(t)** (`sum_N_basis_mul`; `sum_N_mul_basis` for L_t).  In the basis
     {e_k} the columns of R_t are e_k·t, so the sum is tr(R_tᵀR_t).  For unit t this forces
     Σσᵢ² = 16 = dim 𝕊, so a singular value above 1 requires another below 1: a dominant
-    plane can exist only because the norm is not multiplicative at dim 16.
+    subspace can exist only because the norm is not multiplicative at dim 16.
   * **R_t is norm-multiplicative — hence transient-free — for EVERY t in EITHER Cayley–Dickson
     half**, t ∈ 𝕆 (`N_mul_right_of_lo`) or t ∈ 𝕆ℓ (`N_mul_right_of_hi`), packaged as
     `rightMul_isometry_of_half`.  The engine is the doubling formula (a,b)(c,d) =
@@ -659,7 +660,7 @@ The mechanism is `N_basis_mul` / `N_mul_basis`: left- and right-multiplication b
 basis element is a signed permutation of coordinates, hence an isometry.
 *Consequence (not formalised — singular values are not defined here):* for a unit `t`
 the singular values of `R_t` satisfy `Σ σ_i² = 16 = dim 𝕊`, so if some `σ_i > 1` then
-some `σ_j < 1`.  A dominant singular plane can exist only because `N` is not
+some `σ_j < 1`.  A dominant singular subspace can exist only because `N` is not
 multiplicative at dimension 16; on the two halves all `σ_i = 1` and there is nothing
 to dominate.
 
