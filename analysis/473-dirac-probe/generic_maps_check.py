@@ -5,7 +5,7 @@ only ±ℓ reachable). Round 13's tempting generalisation — "the algebra's ope
 only H-space substructures (Adams' theorem in algebraic dress)" — is FALSE; this script is the evidence:
 
   (1) two generic imaginary units s, t generate a NON-associative subalgebra (dimension grows with word
-      length; associator ~0.3–0.4), not an H-space; the pair (s, ℓ) generates dim 4 with associator 0;
+      length; associator ~0.3–0.5, seed-dependent), not an H-space; the pair (s, ℓ) generates dim 4 with associator 0;
   (2) algebraic maps built from a state x and a generic unforced t (x·t, t·x, [x,t]) are not of finite
       order and drive every start to the ZERO-DIVISOR RIDGE V = 1 (the landscape maximum), not to the
       vacuum; (x+t)/‖·‖ attracts to t; x·(x·t) leaves Im𝕊.
@@ -18,8 +18,13 @@ Numerical flashlight only.
 """
 
 import itertools
+import os
 
 import numpy as np
+
+os.chdir(
+    os.path.dirname(os.path.abspath(__file__))
+)  # exec() below is cwd-relative; run from anywhere
 
 exec(open("dirac_probe.py").read().split("def spec")[0])  # cd_mul
 exec(open("flow_big.py").read().split("# --- FD check")[0])  # omul, V
@@ -129,7 +134,9 @@ for name, mk in {
     )
 print("    (V = 1 is the zero-divisor ridge, the landscape maximum; V = 0 the vacuum)")
 
-print("(3) mechanism: x ↦ x·t is the linear map R_t (matrix on coordinates)")
+print(
+    "(3) mechanism: x ↦ x·t is the linear map R_t (matrix on coordinates); top-σ subspace is 4-dim (an S³ on the sphere)"
+)
 for _ in range(3):
     t = rand_imag()
     Rt = np.array([cd_mul(e[k], t) for k in range(16)]).T
@@ -142,5 +149,5 @@ for _ in range(3):
     )
 Rl = np.array([cd_mul(e[k], e[8]) for k in range(16)]).T
 print(
-    f"    R_ℓ orthogonal (all σ = 1): {np.allclose(np.linalg.svd(Rl, compute_uv=False), 1)}  → no transient for the forced element"
+    f"    R_ℓ orthogonal (all σ = 1): {np.allclose(np.linalg.svd(Rl, compute_uv=False), 1)}  → no transient; NB this holds for every t in 𝕆 ∪ 𝕆ℓ (norm multiplicative there) — what singles out ℓ is [x,x,ℓ] = 0"
 )

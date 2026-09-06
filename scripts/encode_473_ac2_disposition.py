@@ -61,7 +61,9 @@ KILLED = {
         "of the vacuum S² — the S₃-orbifold S²(2,2,3) — pushes down no measure (Props 10′, 15); (3) the algebra "
         "supplies the metric N and the potential δ² but no autonomous dynamics toward the vacuum (Prop 16, "
         "three layers: one element trivial; the forced pair (s, ℓ) a quaternion subalgebra reaching only ±ℓ; "
-        "an unforced pair a norm-failure transient onto the zero-divisor ridge, then a symmetry), and nothing "
+        "an unforced pair a norm-failure transient onto the zero-divisor ridge, then a symmetry — layer (ii)'s "
+        "'only ±ℓ reachable' and layer (iii) are NUMERICAL, not Lean; Prop 15's vacuum S² is elementary/numerical, "
+        "#634 AC3), and nothing "
         "in a frame, locale or condensed set selects among quench / anneal / ℓ-axis, which give different "
         "numbers from the same measure (Prop 9). With the horn-1 ruling (initial ensemble = MaxEnt relative "
         "to the algebra's constraints = N's surface measure, PERMITTED) the measure half is closed by a "
@@ -178,6 +180,12 @@ def main():
         if a["id"] == "INSIGHT-locale-condensed-chain":
             a["description"] = a["description"].split(" UPDATE 2026-09-05")[0] + NOTE
             a["last_tested_at"] = STAMP
+            n = (a.get("notes") or "").split(" [2026-09-05:")[0]
+            a["notes"] = (
+                n
+                + " [2026-09-05: superseded on the forcing reading — see KILLED-locale-forcing-route; the pointless / "
+                "in-flight regime is now AC1-hosting clause (c), #639.]"
+            )
     anchors += [KILLED, ADAMS, PROOF16]
     json.dump(ledger, open(LEDGER, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     open(LEDGER, "a", encoding="utf-8").write("\n")

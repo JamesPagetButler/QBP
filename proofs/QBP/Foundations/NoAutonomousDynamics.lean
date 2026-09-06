@@ -45,6 +45,15 @@ Also proved: the Cayley–Dickson coordinate form of the `ℓ`-commutator,
 `[s, ℓ] = −2·Im(cdHi s) + 2·Im(cdLo s)·ℓ` (`cdLo_ell_commutator` /
 `cdHi_ell_commutator`), i.e. the doc's `[s, ℓ] = −2c + 2aℓ`.
 
+**Layer 3 mechanism (§4) — what is and is not special about `ℓ`.**  Three theorems
+correcting the attribution flagged by the PR #640 review: (T1) `N (x·t) = N x · N t` for
+every `x` and every `t` in either Cayley–Dickson half (`N_mul_right_of_lo`,
+`N_mul_right_of_hi`, `rightMul_isometry_of_half`), from the doubling formula `cdLo_mul` /
+`cdHi_mul` — so `R_t` is transient-free for a whole 8+8-dimensional set, not just for `ℓ`;
+(T2) the trace identity `Σ_k N(e_k·t) = 16·N t` (`sum_N_basis_mul`, and `sum_N_mul_basis`);
+(T3) `assoc_self_zero_iff`: `{y | ∀ x, [x,x,y] = 0} = span_ℝ{1, ℓ}` exactly — this, not
+orthogonality, is what singles out `ℓ`.
+
 ## Numerical counterpart
 
 `analysis/473-dirac-probe/lmaps_check.py` — check (1) "dim span{1,ℓ,p,ℓp} = {4};
@@ -64,13 +73,32 @@ operations never leave `ℍ_s`.  The "only `±ℓ` are reachable" half of the do
 
 ## Completeness
 
-Third layer (NOT formalised; `analysis/473-dirac-probe/generic_maps_check.py`, Red Team round-4 confirmer):
-  with an UNFORCED second element t, the maps x ↦ x·t, t·x, [x,t] are linear and skew (R_t, L_t, ad_t);
-  their normalised iteration is power iteration onto the top-singular plane — which lies on the zero-divisor
-  ridge V = 1 — followed by a period-2 symmetry. Σσ²(R_t) = 16·N(t), so the dominant plane exists exactly
-  because the norm is not multiplicative at dim 16; for ℓ, R_ℓ is orthogonal (`N_ell_mul`) and no transient
-  exists. So: no autonomous algebraic dynamics toward the vacuum; the only non-symmetric behaviour is a
-  linear transient onto the zero-divisor locus.
+Third layer — the mechanism, now FORMALISED in §4 below (numerical origin:
+`analysis/473-dirac-probe/generic_maps_check.py`, Red Team round-4 confirmer).  With an
+UNFORCED second element t, the maps x ↦ x·t, t·x, [x,t] are linear (R_t, L_t, ad_t); their
+normalised iteration is power iteration onto the top-singular plane — which lies on the
+zero-divisor ridge V = 1 — followed by a period-2 symmetry.  Three facts about that picture
+are theorems here, and they correct the attribution this file previously carried:
+
+  * **Σσ²(R_t) = 16·N(t)** (`sum_N_basis_mul`; `sum_N_mul_basis` for L_t).  In the basis
+    {e_k} the columns of R_t are e_k·t, so the sum is tr(R_tᵀR_t).  For unit t this forces
+    Σσᵢ² = 16 = dim 𝕊, so a singular value above 1 requires another below 1: a dominant
+    plane can exist only because the norm is not multiplicative at dim 16.
+  * **R_t is norm-multiplicative — hence transient-free — for EVERY t in EITHER Cayley–Dickson
+    half**, t ∈ 𝕆 (`N_mul_right_of_lo`) or t ∈ 𝕆ℓ (`N_mul_right_of_hi`), packaged as
+    `rightMul_isometry_of_half`.  The engine is the doubling formula (a,b)(c,d) =
+    (ac − d̄b, da + bc̄), proved here as `cdLo_mul` / `cdHi_mul`, plus 𝕆's norm composition.
+    So the absence of a transient does **not** single out ℓ — ℓ is just one point of an
+    8-dimensional half (`N_mul_ell`).  The hypothesis is not vacuous: `half_hypothesis_necessary`
+    exhibits the failure of composition on the rest of 𝕊.
+  * **What DOES single out ℓ is alternator-flatness in the third slot**: `assoc_self_ell` says
+    [x, x, ℓ] = 0 for every sedenion x, and `assoc_self_zero_iff` proves the converse —
+    {y | ∀x, [x,x,y] = 0} is EXACTLY span_ℝ{1, ℓ}, a 2-dimensional kernel.  (Previously this
+    was asserted as a numerical observation; it is now an iff-theorem.)
+
+So: no autonomous algebraic dynamics toward the vacuum; the only non-symmetric behaviour is a
+linear transient onto the zero-divisor locus, and it is a property of 𝕊's failure of
+composition off 𝕆 ∪ 𝕆ℓ, not of ℓ.
 
 Zero `sorry`, zero `native_decide`, zero vacuous `True`.  `#print axioms` audit at
 the bottom: every result depends only on `{propext, Classical.choice, Quot.sound}`.
@@ -601,7 +629,348 @@ theorem cdHi_ell_commutator_imaginary {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) :
     cdHi (s * ell - ell * s) = (2 : ℝ) • cdLo s := by
   rw [cdHi_ell_commutator, cdLo_coord, loIdx_zero, hs, zero_smul, sub_zero]
 
-/-! ## 4. Axiom audit
+/-! ## 4. Layer 3 mechanism: what is and is not special about `ℓ`
+
+Red Team review of PR #640 (finding #2, concurred by Gemini) flagged the previous
+docstring for attributing *"`R_t` is orthogonal, hence no transient"* to `ℓ`
+specifically.  That attribution is wrong, and this section proves the correct one.
+
+**T1 — orthogonality of `R_t` is a property of BOTH Cayley–Dickson halves, not of `ℓ`.**
+The norm form is multiplicative against any `t` lying in a single half of the pair
+split `𝕊 = 𝕆 ⊕ 𝕆ℓ`: `N (x·t) = N x · N t` for every `x` whenever `cdHi t = 0`
+(`N_mul_right_of_lo`, `t ∈ 𝕆`) or `cdLo t = 0` (`N_mul_right_of_hi`, `t ∈ 𝕆ℓ`),
+packaged as `rightMul_isometry_of_half`.  So for nonzero such `t` the map `R_t` is a
+similarity (`√N t` times an orthogonal map) — no transient — on a `(8+8)`-dimensional
+set of `t`, of which `ℓ` is one point (`N_mul_ell`).  The engine is the Cayley–Dickson doubling formula,
+proved here coordinatewise from `mulCoeff 4` (`cdLo_mul` / `cdHi_mul`):
+
+    (a, b)·(c, d) = (a c − d̄ b,  d a + b c̄)
+
+together with 𝕆's norm composition (`CDAlg.octonion_norm_composition`) and
+`N (conj z) = N z`.  The hypothesis is not removable: `N` is genuinely
+non-multiplicative on 𝕊 (`half_hypothesis_necessary`, from the zero-divisor
+witnesses), so the two halves really are the exceptional locus, not the whole algebra.
+
+**T2 — the singular-value sum identity `Σ σ²(R_t) = 16·N(t)`.**  In the basis
+`{e_k}` the columns of `R_t : x ↦ x·t` are `R_t e_k = e_k·t`, so
+`tr(R_tᵀ R_t) = Σ_k ‖e_k·t‖² = Σ_k N(e_k·t)`.  `sum_N_basis_mul` proves that this
+equals `16·N t`; `sum_N_mul_basis` is the same statement for `L_t` (`Σ_k N(t·e_k)`).
+The mechanism is `N_basis_mul` / `N_mul_basis`: left- and right-multiplication by a
+basis element is a signed permutation of coordinates, hence an isometry.
+*Consequence (not formalised — singular values are not defined here):* for a unit `t`
+the singular values of `R_t` satisfy `Σ σ_i² = 16 = dim 𝕊`, so if some `σ_i > 1` then
+some `σ_j < 1`.  A dominant singular plane can exist only because `N` is not
+multiplicative at dimension 16; on the two halves all `σ_i = 1` and there is nothing
+to dominate.
+
+**T3 — what IS special about `ℓ`: `[x, x, ℓ] = 0`, and `ℓ` is the only such element.**
+`assoc_self_zero_iff` proves that the set of `y ∈ 𝕊` annihilated by every left
+alternator, `{y | ∀ x, [x, x, y] = 0}`, is EXACTLY `span_ℝ {1, ℓ}` — a genuine
+if-and-only-if, so the kernel has dimension exactly 2.  `⇐` is `assoc_self_ell`
+plus `alt_assoc_one_right` and trilinearity; `⇒` polarizes the hypothesis to
+`laMap u v y = 0` (`laMap_of_assoc_self_zero`), reads off the basis coefficient
+(`coord_laMap_e_e`), and uses the kernel-`decide`d fact that every index outside
+`{0, 8}` carries a nonzero cross-alternator coefficient (`laCoeffZ_cross_witness`).
+
+So the correct attribution is: absence of a transient is shared by all of `𝕆 ∪ 𝕆ℓ`;
+alternator-flatness in the third slot is what singles out `ℓ` (up to `span{1, ℓ}`). -/
+
+section Layer3
+
+/-! ### Index and structure-constant facts for the pair split (kernel `decide`) -/
+
+/-- Low ⊕ low lands in the low half. -/
+theorem loIdx_xor_loIdx : ∀ p q : Fin (2^3), (loIdx p ^^^ loIdx q) = loIdx (p ^^^ q) := by decide
+
+/-- Low ⊕ high lands in the high half. -/
+theorem loIdx_xor_hiIdx : ∀ p q : Fin (2^3), (loIdx p ^^^ hiIdx q) = hiIdx (p ^^^ q) := by decide
+
+/-- High ⊕ low lands in the high half. -/
+theorem hiIdx_xor_loIdx : ∀ p q : Fin (2^3), (hiIdx p ^^^ loIdx q) = hiIdx (p ^^^ q) := by decide
+
+/-- High ⊕ high lands in the low half. -/
+theorem hiIdx_xor_hiIdx : ∀ p q : Fin (2^3), (hiIdx p ^^^ hiIdx q) = loIdx (p ^^^ q) := by decide
+
+/-- Doubling row `(a,0)(c,0) = (ac, 0)` at the coefficient level (64 cases). -/
+theorem mulCoeff_lo_lo : ∀ p q : Fin (2^3),
+    mulCoeff 4 (loIdx p) (loIdx q) = mulCoeff 3 p q := by decide
+
+/-- Doubling row `(a,0)(0,d) = (0, da)` at the coefficient level (64 cases). -/
+theorem mulCoeff_lo_hi : ∀ p q : Fin (2^3),
+    mulCoeff 4 (loIdx p) (hiIdx q) = mulCoeff 3 q p := by decide
+
+/-- Doubling row `(0,b)(c,0) = (0, b c̄)` at the coefficient level (64 cases). -/
+theorem mulCoeff_hi_lo : ∀ p q : Fin (2^3),
+    mulCoeff 4 (hiIdx p) (loIdx q) = conjSign 3 q * mulCoeff 3 p q := by decide
+
+/-- Doubling row `(0,b)(0,d) = (−d̄ b, 0)` at the coefficient level (64 cases). -/
+theorem mulCoeff_hi_hi : ∀ p q : Fin (2^3),
+    mulCoeff 4 (hiIdx p) (hiIdx q) = -(conjSign 3 q * mulCoeff 3 q p) := by decide
+
+/-- Every sedenion structure constant is `±1` (256 cases) — so left/right
+    multiplication by a basis element is a *signed permutation* of coordinates. -/
+theorem mulCoeff_four_sq : ∀ i j : Fin (2^4), mulCoeff 4 i j * mulCoeff 4 i j = 1 := by decide
+
+/-! ### The pair split as a `Fintype` bijection, and `N x = N(cdLo x) + N(cdHi x)` -/
+
+/-- The Cayley–Dickson half-split bijection `Fin 8 ⊕ Fin 8 ≃ Fin 16`. -/
+def halfEquiv : (Fin (2^3) ⊕ Fin (2^3)) ≃ Fin (2^4) where
+  toFun := Sum.elim loIdx hiIdx
+  invFun k := if h : k.val < 2^3 then Sum.inl ⟨k.val, h⟩ else Sum.inr ⟨k.val - 2^3, by omega⟩
+  left_inv := by decide
+  right_inv := by decide
+
+/-- Any sum over `Fin 16` splits as low-half plus high-half. -/
+theorem sum_split {M : Type*} [AddCommMonoid M] (f : Fin (2^4) → M) :
+    (∑ k, f k) = (∑ p : Fin (2^3), f (loIdx p)) + (∑ q : Fin (2^3), f (hiIdx q)) := by
+  rw [← Equiv.sum_comp halfEquiv f, Fintype.sum_sum_type]
+  rfl
+
+/-- Coordinatewise conjugation as a signed scaling: `(conj z)_i = conjSign i · z_i`. -/
+theorem conj_coord_conjSign {R : Type*} [CommRing R] {n : ℕ} (z : CDAlg R n) (i : Fin (2^n)) :
+    (conj z).coord i = ((conjSign n i : Int) : R) * z.coord i := by
+  rw [conj_coord, conjSign]
+  by_cases h : i.val = 0
+  · rw [if_pos h, if_pos h]; push_cast; ring
+  · rw [if_neg h, if_neg h]; push_cast; ring
+
+/-- `conj 0 = 0`. -/
+theorem cd_conj_zero {R : Type*} [CommRing R] {n : ℕ} : conj (0 : CDAlg R n) = 0 := by
+  ext i; rw [conj_coord, zero_coord]; split_ifs <;> simp
+
+/-- `N 0 = 0`. -/
+theorem N_zero {n : ℕ} : N (0 : CDAlg ℝ n) = 0 := by
+  rw [N_def]; exact Finset.sum_eq_zero (fun i _ => by rw [zero_coord]; ring)
+
+/-- `N (−z) = N z`. -/
+theorem N_neg {n : ℕ} (z : CDAlg ℝ n) : N (-z) = N z := by
+  rw [N_def, N_def]; exact Finset.sum_congr rfl (fun i _ => by rw [neg_coord]; ring)
+
+/-- `N (conj z) = N z` (conjugation flips signs of imaginary coordinates only). -/
+theorem N_conj {n : ℕ} (z : CDAlg ℝ n) : N (conj z) = N z := by
+  rw [N_def, N_def]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [conj_coord]; split_ifs <;> ring
+
+/-- **The norm form is additive over the pair split:** `N x = N(cdLo x) + N(cdHi x)`. -/
+theorem N_split (x : CDAlg ℝ 4) : N x = N (cdLo x) + N (cdHi x) := by
+  rw [N_def, sum_split (fun k => (x.coord k)^2), N_def, N_def]; rfl
+
+/-! ### The Cayley–Dickson doubling formula on 𝕊 = 𝕆 ⊕ 𝕆 -/
+
+/-- **Doubling formula, low component:** for `x = (a, b)` and `y = (c, d)` in the
+    pair split, `cdLo (x·y) = a c − d̄ b`.  Proved coordinatewise from the
+    `mulCoeff 4` recursion via the four kernel-`decide`d doubling rows. -/
+theorem cdLo_mul (x y : CDAlg ℝ 4) :
+    cdLo (x * y) = cdLo x * cdLo y - conj (cdHi y) * cdHi x := by
+  ext s
+  have h1 : (∑ p : Fin (2^3), (mulCoeff 4 (loIdx p) (loIdx p ^^^ loIdx s) : ℝ)
+        * x.coord (loIdx p) * y.coord (loIdx p ^^^ loIdx s))
+      = (cdLo x * cdLo y).coord s := by
+    rw [mul_coord_single]
+    refine Finset.sum_congr rfl (fun p _ => ?_)
+    rw [loIdx_xor_loIdx, mulCoeff_lo_lo, cdLo_coord, cdLo_coord]
+  have h2 : (∑ q : Fin (2^3), (mulCoeff 4 (hiIdx q) (hiIdx q ^^^ loIdx s) : ℝ)
+        * x.coord (hiIdx q) * y.coord (hiIdx q ^^^ loIdx s))
+      = -((conj (cdHi y) * cdHi x).coord s) := by
+    rw [mul_coord_matrix, ← Finset.sum_neg_distrib]
+    refine Finset.sum_congr rfl (fun q _ => ?_)
+    rw [hiIdx_xor_loIdx, mulCoeff_hi_hi, conj_coord_conjSign, cdHi_coord, cdHi_coord]
+    push_cast; ring
+  rw [cdLo_coord, mul_coord_single, sum_split, h1, h2, sub_coord]
+  ring
+
+/-- **Doubling formula, high component:** `cdHi (x·y) = d a + b c̄`. -/
+theorem cdHi_mul (x y : CDAlg ℝ 4) :
+    cdHi (x * y) = cdHi y * cdLo x + cdHi x * conj (cdLo y) := by
+  ext s
+  have h1 : (∑ p : Fin (2^3), (mulCoeff 4 (loIdx p) (loIdx p ^^^ hiIdx s) : ℝ)
+        * x.coord (loIdx p) * y.coord (loIdx p ^^^ hiIdx s))
+      = (cdHi y * cdLo x).coord s := by
+    rw [mul_coord_matrix]
+    refine Finset.sum_congr rfl (fun p _ => ?_)
+    rw [loIdx_xor_hiIdx, mulCoeff_lo_hi, cdHi_coord, cdLo_coord]
+    ring
+  have h2 : (∑ q : Fin (2^3), (mulCoeff 4 (hiIdx q) (hiIdx q ^^^ hiIdx s) : ℝ)
+        * x.coord (hiIdx q) * y.coord (hiIdx q ^^^ hiIdx s))
+      = (cdHi x * conj (cdLo y)).coord s := by
+    rw [mul_coord_single]
+    refine Finset.sum_congr rfl (fun q _ => ?_)
+    rw [hiIdx_xor_hiIdx, mulCoeff_hi_lo, conj_coord_conjSign, cdHi_coord, cdLo_coord]
+    push_cast; ring
+  rw [cdHi_coord, mul_coord_single, sum_split, h1, h2, add_coord]
+
+/-! ### T1 — `R_t` is norm-multiplicative for EVERY `t` in either half -/
+
+/-- **T1a.**  If `t` lies in the low Cayley–Dickson half (`t ∈ 𝕆`, i.e. `cdHi t = 0`)
+    then `N (x·t) = N x · N t` for EVERY sedenion `x`: right multiplication by `t` is
+    a similarity of the norm form, so it has no transient.  Nothing about `ℓ` is used. -/
+theorem N_mul_right_of_lo (x t : CDAlg ℝ 4) (ht : cdHi t = 0) : N (x * t) = N x * N t := by
+  have hlo : cdLo (x * t) = cdLo x * cdLo t := by
+    rw [cdLo_mul, ht, cd_conj_zero, alt_zero_mul, sub_zero]
+  have hhi : cdHi (x * t) = cdHi x * conj (cdLo t) := by
+    rw [cdHi_mul, ht, alt_zero_mul, zero_add]
+  rw [N_split (x * t), hlo, hhi, octonion_norm_composition, octonion_norm_composition,
+    N_conj, N_split x, N_split t, ht, N_zero, add_zero]
+  ring
+
+/-- **T1b.**  If `t` lies in the high Cayley–Dickson half (`t ∈ 𝕆ℓ`, i.e. `cdLo t = 0`)
+    then `N (x·t) = N x · N t` for EVERY sedenion `x`.  `ℓ = e₈` is one point of this
+    8-dimensional set (`N_mul_ell`), in no way distinguished. -/
+theorem N_mul_right_of_hi (x t : CDAlg ℝ 4) (ht : cdLo t = 0) : N (x * t) = N x * N t := by
+  have hlo : cdLo (x * t) = -(conj (cdHi t) * cdHi x) := by
+    rw [cdLo_mul, ht, alt_mul_zero, zero_sub]
+  have hhi : cdHi (x * t) = cdHi t * cdLo x := by
+    rw [cdHi_mul, ht, cd_conj_zero, alt_mul_zero, add_zero]
+  rw [N_split (x * t), hlo, hhi, N_neg, octonion_norm_composition, octonion_norm_composition,
+    N_conj, N_split x, N_split t, ht, N_zero, zero_add]
+  ring
+
+/-- **T1, operator form.**  For every `t` in either Cayley–Dickson half, the linear
+    map `R_t : x ↦ x·t` scales the norm form by the constant `N t` — i.e. `R_t` is
+    `√N t` times an orthogonal map when `t ≠ 0` (and the zero map when `t = 0`), so its
+    normalised iteration has no transient.  The statement itself is the exact quadratic-form
+    identity, which holds unconditionally.
+    The set of such `t` is `𝕆 ∪ 𝕆ℓ`, of real dimension 8 in each half. -/
+theorem rightMul_isometry_of_half (t : CDAlg ℝ 4) (ht : cdHi t = 0 ∨ cdLo t = 0) :
+    ∀ x, N (x * t) = N x * N t := by
+  rcases ht with h | h
+  · exact fun x => N_mul_right_of_lo x t h
+  · exact fun x => N_mul_right_of_hi x t h
+
+/-- `ℓ` lies in the high half: `cdLo ℓ = 0`. -/
+theorem cdLo_ell : cdLo ell = 0 := by
+  ext p
+  rw [cdLo_coord, ell, e_coord, if_neg (loIdx_ne_hiIdx p 0), zero_coord]
+
+/-- **`R_ℓ` preserves the norm form** — the `t = ℓ` instance of `N_mul_right_of_hi`,
+    NOT a property peculiar to `ℓ`.  (`N_ell_mul` above is the `L_ℓ` counterpart.) -/
+theorem N_mul_ell (x : CDAlg ℝ 4) : N (x * ell) = N x := by
+  rw [N_mul_right_of_hi x ell cdLo_ell, N_ell, mul_one]
+
+/-- **The half hypothesis in T1 is necessary, not decorative.**  On all of 𝕊 the norm
+    form is NOT multiplicative — the zero-divisor witnesses give `x, t` with
+    `N (x·t) ≠ N x · N t` — so `𝕆 ∪ 𝕆ℓ` is a genuine exceptional locus for
+    `rightMul_isometry_of_half`, and the theorem is not vacuously general. -/
+theorem half_hypothesis_necessary : ∃ x t : CDAlg ℝ 4, N (x * t) ≠ N x * N t :=
+  QBP.Foundations.CrossProduct.no_sedenion_composition_for_cross
+
+/-! ### T2 — the singular-value sum identity `Σ σ²(R_t) = 16·N(t)` -/
+
+/-- **Left multiplication by a basis element is an isometry:** `N (e_m · x) = N x`.
+    (`e_m ·` is a signed permutation of coordinates, `mulCoeff_four_sq`.) -/
+theorem N_basis_mul (m : Fin (2^4)) (x : CDAlg ℝ 4) : N (e m * x) = N x := by
+  have hsq : ∀ j : Fin (2^4), ((mulCoeff 4 m j : ℝ))^2 = 1 := by
+    intro j
+    have h2 := congrArg (fun z : ℤ => (z : ℝ)) (mulCoeff_four_sq m j)
+    push_cast at h2
+    rw [pow_two]; exact h2
+  have hterm : ∀ k : Fin (2^4), ((e m * x).coord k)^2 = (x.coord (k ^^^ m))^2 := by
+    intro k
+    rw [e_mul_coord, xor_comm_fin m k, mul_pow, hsq, one_mul]
+  rw [N_def, N_def, Finset.sum_congr rfl (fun k (_ : k ∈ Finset.univ) => hterm k)]
+  exact (sum_xor_reindex m (fun i => (x.coord i)^2)).symm
+
+/-- **Right multiplication by a basis element is an isometry:** `N (x · e_m) = N x`. -/
+theorem N_mul_basis (x : CDAlg ℝ 4) (m : Fin (2^4)) : N (x * e m) = N x := by
+  have hsq : ∀ j : Fin (2^4), ((mulCoeff 4 j m : ℝ))^2 = 1 := by
+    intro j
+    have h2 := congrArg (fun z : ℤ => (z : ℝ)) (mulCoeff_four_sq j m)
+    push_cast at h2
+    rw [pow_two]; exact h2
+  have hterm : ∀ k : Fin (2^4), ((x * e m).coord k)^2 = (x.coord (k ^^^ m))^2 := by
+    intro k
+    rw [mul_e_coord, xor_comm_fin m k, mul_pow, hsq, one_mul]
+  rw [N_def, N_def, Finset.sum_congr rfl (fun k (_ : k ∈ Finset.univ) => hterm k)]
+  exact (sum_xor_reindex m (fun i => (x.coord i)^2)).symm
+
+/-- **T2 — `Σ σ²(R_t) = 16·N(t)`.**  The columns of the right-multiplication matrix
+    `R_t : x ↦ x·t` in the basis `{e_k}` are `R_t e_k = e_k·t`, so this sum is
+    `tr(R_tᵀ R_t) = Σ_i σ_i(R_t)²`.  It equals `16·N t = (dim 𝕊)·N t` for EVERY
+    sedenion `t` — for unit `t` the singular values therefore satisfy `Σ σ_i² = 16`,
+    so a singular value above 1 forces another below 1.  (Singular values themselves
+    are not formalised here; the trace identity is the anchor.) -/
+theorem sum_N_basis_mul (t : CDAlg ℝ 4) : (∑ k : Fin (2^4), N (e k * t)) = 16 * N t := by
+  rw [Finset.sum_congr rfl (fun k (_ : k ∈ Finset.univ) => N_basis_mul k t), Finset.sum_const,
+    Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  norm_num
+
+/-- **T2, left version — `Σ σ²(L_t) = 16·N(t)`**, with `L_t e_k = t·e_k`. -/
+theorem sum_N_mul_basis (t : CDAlg ℝ 4) : (∑ k : Fin (2^4), N (t * e k)) = 16 * N t := by
+  rw [Finset.sum_congr rfl (fun k (_ : k ∈ Finset.univ) => N_mul_basis t k), Finset.sum_const,
+    Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  norm_num
+
+/-! ### T3 — `span{1, ℓ}` is EXACTLY the alternator-flat third slot -/
+
+/-- **Off `span{1, ℓ}` the cross alternator is nonzero (kernel `decide`).**  For every
+    basis index `j ∉ {0, 8}` there is a low/high basis pair whose polarized left
+    alternator has a nonzero coefficient at `j`. -/
+theorem laCoeffZ_cross_witness : ∀ j : Fin (2^4), j ≠ 0 → j ≠ hiIdx 0 →
+    ∃ p q : Fin (2^3), laCoeffZ 4 (loIdx p) (hiIdx q) j ≠ 0 := by decide
+
+/-- Polarization: if the diagonal left alternator kills `y` for every `x`, then the
+    polarized alternator `laMap u v y` vanishes for every pair `(u, v)`. -/
+theorem laMap_of_assoc_self_zero {y : CDAlg ℝ 4} (h : ∀ x, assoc x x y = 0) (u v : CDAlg ℝ 4) :
+    laMap u v y = 0 := by
+  have hsum := h (u + v)
+  rw [assoc_trilinear.add_left, assoc_trilinear.add_mid, assoc_trilinear.add_mid, h u, h v] at hsum
+  rw [laMap]
+  calc assoc u v y + assoc v u y = 0 + assoc u v y + (assoc v u y + 0) := by abel
+    _ = 0 := hsum
+
+/-- Reading off one basis coefficient of `laMap (e i) (e j) y` (trilinearity plus the
+    injectivity of `k ↦ i ⊕ j ⊕ k`). -/
+theorem coord_laMap_e_e (i j j0 : Fin (2^4)) (y : CDAlg ℝ 4) :
+    (laMap (e i) (e j) y).coord (i ^^^ j ^^^ j0) = (laCoeffZ 4 i j j0 : ℝ) * y.coord j0 := by
+  conv_lhs => rw [basis_expansion y]
+  rw [laMap_trilinear.sum_right, sum_coord, Finset.sum_eq_single j0]
+  · rw [laMap_trilinear.smul_right, laMap_e, smul_smul, smul_coord, e_coord, if_pos rfl]
+    ring
+  · intro b _ hb
+    rw [laMap_trilinear.smul_right, laMap_e, smul_smul, smul_coord, e_coord,
+      if_neg (fun hh => hb (xor_left_injective (i ^^^ j) hh.symm)), mul_zero]
+  · intro hcon; exact absurd (Finset.mem_univ _) hcon
+
+/-- If `[x, x, y] = 0` for every `x`, then every coordinate of `y` outside `{0, 8}`
+    vanishes. -/
+theorem coord_zero_of_assoc_self_zero {y : CDAlg ℝ 4} (h : ∀ x, assoc x x y = 0) :
+    ∀ j : Fin (2^4), j ≠ 0 → j ≠ hiIdx 0 → y.coord j = 0 := by
+  intro j hj0 hj8
+  obtain ⟨p, q, hpq⟩ := laCoeffZ_cross_witness j hj0 hj8
+  have hz := laMap_of_assoc_self_zero h (e (loIdx p)) (e (hiIdx q))
+  have hc := congrArg (fun z : CDAlg ℝ 4 => z.coord (loIdx p ^^^ hiIdx q ^^^ j)) hz
+  simp only [zero_coord] at hc
+  rw [coord_laMap_e_e] at hc
+  rcases mul_eq_zero.mp hc with h1 | h1
+  · exact absurd (by exact_mod_cast h1) hpq
+  · exact h1
+
+/-- **T3 — `ℓ` is the unique alternator-flat direction, modulo `1`.**  For a sedenion
+    `y`, the left alternator `[x, x, y]` vanishes for EVERY `x` if and only if
+    `y ∈ span_ℝ {1, ℓ}`.  So the kernel of `y ↦ [·, ·, y]` on the diagonal is exactly
+    2-dimensional: `assoc_self_ell` is not an accident of `e₈`, it is the defining
+    property of the doubling unit up to the trivial directions `1` and rescaling. -/
+theorem assoc_self_zero_iff (y : CDAlg ℝ 4) :
+    (∀ x, assoc x x y = 0) ↔ ∃ a b : ℝ, y = a • (1 : CDAlg ℝ 4) + b • ell := by
+  constructor
+  · intro h
+    refine ⟨y.coord 0, y.coord (hiIdx 0), ?_⟩
+    ext k
+    rw [add_coord, smul_coord, smul_coord, one_coord, ell, e_coord]
+    by_cases hk0 : k = 0
+    · rw [hk0, if_pos rfl, if_neg (by decide : ¬((0 : Fin (2^4)) = hiIdx 0))]; ring
+    · by_cases hk8 : k = hiIdx 0
+      · rw [hk8, if_neg (by decide : ¬(hiIdx (0 : Fin (2^3)) = (0 : Fin (2^4)))), if_pos rfl]
+        ring
+      · rw [if_neg hk0, if_neg hk8, coord_zero_of_assoc_self_zero h k hk0 hk8]; ring
+  · rintro ⟨a, b, rfl⟩ x
+    rw [assoc_trilinear.add_right, assoc_trilinear.smul_right, assoc_trilinear.smul_right,
+      alt_assoc_one_right, assoc_self_ell, smul_zero, smul_zero, add_zero]
+
+end Layer3
+
+/-! ## 5. Axiom audit
 
 Every theorem in this file must depend only on `{propext, Classical.choice,
 Quot.sound}` — no `sorryAx`, no native-reduction axiom, no user axiom. -/
@@ -657,5 +1026,39 @@ Quot.sound}` — no `sorryAx`, no native-reduction axiom, no user axiom. -/
 #print axioms cdLo_ell_commutator
 #print axioms cdHi_ell_commutator
 #print axioms cdHi_ell_commutator_imaginary
+
+#print axioms loIdx_xor_loIdx
+#print axioms loIdx_xor_hiIdx
+#print axioms hiIdx_xor_loIdx
+#print axioms hiIdx_xor_hiIdx
+#print axioms mulCoeff_lo_lo
+#print axioms mulCoeff_lo_hi
+#print axioms mulCoeff_hi_lo
+#print axioms mulCoeff_hi_hi
+#print axioms mulCoeff_four_sq
+#print axioms sum_split
+#print axioms conj_coord_conjSign
+#print axioms cd_conj_zero
+#print axioms N_zero
+#print axioms N_neg
+#print axioms N_conj
+#print axioms N_split
+#print axioms cdLo_mul
+#print axioms cdHi_mul
+#print axioms N_mul_right_of_lo
+#print axioms N_mul_right_of_hi
+#print axioms rightMul_isometry_of_half
+#print axioms cdLo_ell
+#print axioms N_mul_ell
+#print axioms half_hypothesis_necessary
+#print axioms N_basis_mul
+#print axioms N_mul_basis
+#print axioms sum_N_basis_mul
+#print axioms sum_N_mul_basis
+#print axioms laCoeffZ_cross_witness
+#print axioms laMap_of_assoc_self_zero
+#print axioms coord_laMap_e_e
+#print axioms coord_zero_of_assoc_self_zero
+#print axioms assoc_self_zero_iff
 
 end QBP.Foundations.NoAutonomousDynamics
