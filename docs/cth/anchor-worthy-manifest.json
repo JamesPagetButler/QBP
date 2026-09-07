@@ -710,9 +710,11 @@
         "QBP.Foundations.CrystalHosting.aut_genByPair",
         "QBP.Foundations.CrystalHosting.aut_map_isVacuum",
         "QBP.Foundations.CrystalHosting.aut_alternator_flat",
-        "QBP.Foundations.CrystalHosting.map_re_and_N",
-        "QBP.Foundations.CrystalHosting.map_conj",
-        "QBP.Foundations.CrystalHosting.map_assoc",
+        "QBP.Foundations.CrystalHosting.CDAut.map_re_and_N",
+        "QBP.Foundations.CrystalHosting.CDAut.map_conj",
+        "QBP.Foundations.CrystalHosting.CDAut.map_assoc",
+        "QBP.Foundations.CrystalHosting.gradeAut_hosting_equivariant",
+        "QBP.Foundations.CrystalHosting.genByPair_neg_right",
         "QBP.Foundations.CrystalHosting.gradeAut_ell",
         "QBP.Foundations.CrystalHosting.gradeAut_ne_id",
         "QBP.Foundations.CrystalHosting.cdLift_ell",
@@ -765,7 +767,8 @@
         "QBP.Substrate.Hosting.inFlight_nonempty",
         "QBP.Substrate.Hosting.universeSpace_ne_stateSphere",
         "QBP.Substrate.Hosting.normalise_mem_stateSphere",
-        "QBP.Substrate.Hosting.isVacuum_smul_iff"
+        "QBP.Substrate.Hosting.isVacuum_smul_iff",
+        "QBP.Substrate.Hosting.hosting_equivariant_grade"
       ]
     }
   ]

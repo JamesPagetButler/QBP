@@ -64,7 +64,9 @@ ANCHORS = {
         "structure CDAut (linear bijection, map_mul) with map_one / map_re / map_N / map_conj DERIVED (map_re_and_N "
         "via cdAlg_sq_eq + injectivity); aut_map_isVacuum; aut_genByPair; aut_image_quatSpan (onto) and "
         "aut_hosting_equivariant for ℓ-fixing φ (the G₂ side). Witnesses: gradeAut (ℓ ↦ −ℓ, the S₃ side, ≠ id) and "
-        "the half-wise lift cdLift with cdLift gradeAut3 ≠ id, cdLift_ell. Aut(𝕊) = G₂ × S₃ is NOT claimed. The "
+        "the half-wise lift cdLift with cdLift gradeAut3 ≠ id, cdLift_ell. The ℤ/2 of the S₃ side is also covered: "
+        "gradeAut_hosting_equivariant (via genByPair_neg_right: −ℓ generates the same algebra as ℓ); the order-3 "
+        "elements of S₃ are NOT treated. Aut(𝕊) = G₂ × S₃ is NOT claimed. The "
         'interpretation of this ℍ as "the observer\'s" (DERIV-holographic, flag 3) is NOT claimed.',
         [
             "vacuum_hosts_quaternion",
@@ -78,9 +80,11 @@ ANCHORS = {
             "aut_genByPair",
             "aut_map_isVacuum",
             "aut_alternator_flat",
-            "map_re_and_N",
-            "map_conj",
-            "map_assoc",
+            "CDAut.map_re_and_N",
+            "CDAut.map_conj",
+            "CDAut.map_assoc",
+            "gradeAut_hosting_equivariant",
+            "genByPair_neg_right",
             "gradeAut_ell",
             "gradeAut_ne_id",
             "cdLift_ell",
@@ -122,7 +126,8 @@ ANCHORS = {
         "inFlight_no_quaternion_closure ⇔ mem_universeSpace_iff_complex_structure (the two regions separated by an "
         "iff); non-vacuity: universeSpace_nonpole (not only the ℂ-poles), inFlight_nonempty, universeSpace_ne_stateSphere. "
         "NOT in this file (owners named in its §11): the initial ensemble (beekeeper ruling, horn 1), the rule/flow (#635), "
-        "the Agda S³ transport (#639 (c)), S₃-side covariance (#639 (e)), the boundary of a universe, the pointless "
+        "the Agda S³ transport (#639 (c)), covariance across the order-3 elements of S₃ (#639 (e); the ℤ/2 is "
+        "hosting_equivariant_grade), the boundary of a universe, the pointless "
         "in-flight description (#636/#639), our universe's b₀ (#637). Hosts; does not derive (KILLED-locale-forcing-route). "
         "No observer reading (flag 3).",
         [
@@ -152,6 +157,7 @@ ANCHORS = {
             "universeSpace_ne_stateSphere",
             "normalise_mem_stateSphere",
             "isVacuum_smul_iff",
+            "hosting_equivariant_grade",
         ],
     ),
 }
@@ -177,9 +183,9 @@ def main():
         missing = [
             w
             for w in wits
-            if f"theorem {w} " not in src
-            and f"theorem {w}\n" not in src
-            and f"theorem {w} :" not in src
+            if f"theorem {w.split('.')[-1]} " not in src
+            and f"theorem {w.split('.')[-1]}\n" not in src
+            and f"theorem {w.split('.')[-1]} :" not in src
         ]
         if missing:
             sys.exit(f"{aid}: witnesses not found in {pf}: {missing}")

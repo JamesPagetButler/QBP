@@ -19,8 +19,8 @@ Aggregator: `QBP/Substrate.lean` (imported from `QBP.lean`).
   `QBP.Foundations` (enrichment direction) and never imports `QBP.Physics`
   except via ratified bridge files.
 * Zero `sorry`, zero `native_decide`, zero vacuous `True` stubs; every theorem
-  carries a `#print axioms` line and must show exactly
-  `{propext, Classical.choice, Quot.sound}`.
+  carries a `#print axioms` line and must show a subset of
+  `{propext, Classical.choice, Quot.sound}` (`decide`-based lemmas show fewer).
 * `Hosting.lean` derives **no** measure, **no** rule/flow, **no** boundary or
   holography semantics, and does **not** identify the crystal's ℍ with "the
   observer's ℍ" (DERIV-holographic flag 3 pending). See its §11 for the full

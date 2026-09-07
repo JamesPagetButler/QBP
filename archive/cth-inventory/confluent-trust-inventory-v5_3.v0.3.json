@@ -8519,7 +8519,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "#639 hosting groundwork (T1/T2). vacuum_hosts_quaternion: for a vacuum s there is a direction u with every word in {1, s, ℓ} lying in span{1, u, ℓ, ℓu} (InQuatSpan (loOf u)); crystal_quaternion_table: the ℍ relations (ℓ² = u² = (ℓu)² = −1, uℓ = −ℓu, u(ℓu) = ℓ, (ℓu)u = −ℓ, ℓ(ℓu) = −u); crystal_quatSpan_independent: exactly 4-dimensional; quatSpan_dir_proper: a proper part of 𝕊 for every u; inQuatSpan_ell_right: k = ℓu and k = uℓ span the same 4-space (orientation is NOT fixed by the landscape — a theory convention). Equivariance: structure CDAut (linear bijection, map_mul) with map_one / map_re / map_N / map_conj DERIVED (map_re_and_N via cdAlg_sq_eq + injectivity); aut_map_isVacuum; aut_genByPair; aut_image_quatSpan (onto) and aut_hosting_equivariant for ℓ-fixing φ (the G₂ side). Witnesses: gradeAut (ℓ ↦ −ℓ, the S₃ side, ≠ id) and the half-wise lift cdLift with cdLift gradeAut3 ≠ id, cdLift_ell. Aut(𝕊) = G₂ × S₃ is NOT claimed. The interpretation of this ℍ as \"the observer's\" (DERIV-holographic, flag 3) is NOT claimed.",
+      "description": "#639 hosting groundwork (T1/T2). vacuum_hosts_quaternion: for a vacuum s there is a direction u with every word in {1, s, ℓ} lying in span{1, u, ℓ, ℓu} (InQuatSpan (loOf u)); crystal_quaternion_table: the ℍ relations (ℓ² = u² = (ℓu)² = −1, uℓ = −ℓu, u(ℓu) = ℓ, (ℓu)u = −ℓ, ℓ(ℓu) = −u); crystal_quatSpan_independent: exactly 4-dimensional; quatSpan_dir_proper: a proper part of 𝕊 for every u; inQuatSpan_ell_right: k = ℓu and k = uℓ span the same 4-space (orientation is NOT fixed by the landscape — a theory convention). Equivariance: structure CDAut (linear bijection, map_mul) with map_one / map_re / map_N / map_conj DERIVED (map_re_and_N via cdAlg_sq_eq + injectivity); aut_map_isVacuum; aut_genByPair; aut_image_quatSpan (onto) and aut_hosting_equivariant for ℓ-fixing φ (the G₂ side). Witnesses: gradeAut (ℓ ↦ −ℓ, the S₃ side, ≠ id) and the half-wise lift cdLift with cdLift gradeAut3 ≠ id, cdLift_ell. The ℤ/2 of the S₃ side is also covered: gradeAut_hosting_equivariant (via genByPair_neg_right: −ℓ generates the same algebra as ℓ); the order-3 elements of S₃ are NOT treated. Aut(𝕊) = G₂ × S₃ is NOT claimed. The interpretation of this ℍ as \"the observer's\" (DERIV-holographic, flag 3) is NOT claimed.",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -8539,9 +8539,11 @@
         "QBP.Foundations.CrystalHosting.aut_genByPair",
         "QBP.Foundations.CrystalHosting.aut_map_isVacuum",
         "QBP.Foundations.CrystalHosting.aut_alternator_flat",
-        "QBP.Foundations.CrystalHosting.map_re_and_N",
-        "QBP.Foundations.CrystalHosting.map_conj",
-        "QBP.Foundations.CrystalHosting.map_assoc",
+        "QBP.Foundations.CrystalHosting.CDAut.map_re_and_N",
+        "QBP.Foundations.CrystalHosting.CDAut.map_conj",
+        "QBP.Foundations.CrystalHosting.CDAut.map_assoc",
+        "QBP.Foundations.CrystalHosting.gradeAut_hosting_equivariant",
+        "QBP.Foundations.CrystalHosting.genByPair_neg_right",
         "QBP.Foundations.CrystalHosting.gradeAut_ell",
         "QBP.Foundations.CrystalHosting.gradeAut_ne_id",
         "QBP.Foundations.CrystalHosting.cdLift_ell",
@@ -8597,15 +8599,23 @@
           "status": "verified"
         },
         {
-          "name": "map_re_and_N",
+          "name": "CDAut.map_re_and_N",
           "status": "verified"
         },
         {
-          "name": "map_conj",
+          "name": "CDAut.map_conj",
           "status": "verified"
         },
         {
-          "name": "map_assoc",
+          "name": "CDAut.map_assoc",
+          "status": "verified"
+        },
+        {
+          "name": "gradeAut_hosting_equivariant",
+          "status": "verified"
+        },
+        {
+          "name": "genByPair_neg_right",
           "status": "verified"
         },
         {
@@ -8738,7 +8748,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "#473 AC1 (hosting) / #639; beekeeper lift of the empty-Substrate rule 2026-09-07 (#473 issuecomment-5574256922), scope AC1-hosting only. Definitions: StateSphere = imaginary unit sedenions; potential s = ‖[cdLo s, cdHi s]‖² (= V); UniverseSpace = StateSphere ∩ {V = 0}; InFlight = StateSphere ∩ {V > 0}; structure Universe (crystal + membership); Universe.hosted = the algebra the crystal generates with ℓ. Theorems: potential_eq_zero_iff_isVacuum; the partition (stateSphere_partition, universeSpace_inFlight_disjoint, universeSpace_union_inFlight); universe_hosts_quaternion (hosted ⊆ a quaternion subalgebra) and universe_hosted_proper; pole_hosts_complex (the poles ±ℓ host exactly span{1, ℓ} ≅ ℂ — an equality); local_spectrum_at_universe (s(sx) = −x on the sphere); hosting_equivariant (ℓ-fixing automorphisms preserve the sphere, vacua and hosted algebras); inFlight_no_quaternion_closure ⇔ mem_universeSpace_iff_complex_structure (the two regions separated by an iff); non-vacuity: universeSpace_nonpole (not only the ℂ-poles), inFlight_nonempty, universeSpace_ne_stateSphere. NOT in this file (owners named in its §11): the initial ensemble (beekeeper ruling, horn 1), the rule/flow (#635), the Agda S³ transport (#639 (c)), S₃-side covariance (#639 (e)), the boundary of a universe, the pointless in-flight description (#636/#639), our universe's b₀ (#637). Hosts; does not derive (KILLED-locale-forcing-route). No observer reading (flag 3).",
+      "description": "#473 AC1 (hosting) / #639; beekeeper lift of the empty-Substrate rule 2026-09-07 (#473 issuecomment-5574256922), scope AC1-hosting only. Definitions: StateSphere = imaginary unit sedenions; potential s = ‖[cdLo s, cdHi s]‖² (= V); UniverseSpace = StateSphere ∩ {V = 0}; InFlight = StateSphere ∩ {V > 0}; structure Universe (crystal + membership); Universe.hosted = the algebra the crystal generates with ℓ. Theorems: potential_eq_zero_iff_isVacuum; the partition (stateSphere_partition, universeSpace_inFlight_disjoint, universeSpace_union_inFlight); universe_hosts_quaternion (hosted ⊆ a quaternion subalgebra) and universe_hosted_proper; pole_hosts_complex (the poles ±ℓ host exactly span{1, ℓ} ≅ ℂ — an equality); local_spectrum_at_universe (s(sx) = −x on the sphere); hosting_equivariant (ℓ-fixing automorphisms preserve the sphere, vacua and hosted algebras); inFlight_no_quaternion_closure ⇔ mem_universeSpace_iff_complex_structure (the two regions separated by an iff); non-vacuity: universeSpace_nonpole (not only the ℂ-poles), inFlight_nonempty, universeSpace_ne_stateSphere. NOT in this file (owners named in its §11): the initial ensemble (beekeeper ruling, horn 1), the rule/flow (#635), the Agda S³ transport (#639 (c)), covariance across the order-3 elements of S₃ (#639 (e); the ℤ/2 is hosting_equivariant_grade), the boundary of a universe, the pointless in-flight description (#636/#639), our universe's b₀ (#637). Hosts; does not derive (KILLED-locale-forcing-route). No observer reading (flag 3).",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -8772,7 +8782,8 @@
         "QBP.Substrate.Hosting.inFlight_nonempty",
         "QBP.Substrate.Hosting.universeSpace_ne_stateSphere",
         "QBP.Substrate.Hosting.normalise_mem_stateSphere",
-        "QBP.Substrate.Hosting.isVacuum_smul_iff"
+        "QBP.Substrate.Hosting.isVacuum_smul_iff",
+        "QBP.Substrate.Hosting.hosting_equivariant_grade"
       ],
       "theorems": [
         {
@@ -8877,6 +8888,10 @@
         },
         {
           "name": "isVacuum_smul_iff",
+          "status": "verified"
+        },
+        {
+          "name": "hosting_equivariant_grade",
           "status": "verified"
         }
       ],

@@ -1079,11 +1079,44 @@ theorem alternator_expansion_off_vacuum {v : CDAlg ℝ 4} (hv : IsVacuum v)
     assoc_trilinear.smul_mid, h0, laMap]
   module
 
+/-! ### The ℤ/2 of the `S₃` side is free
+
+`gradeAut` (`ℓ ↦ −ℓ`) is NOT `ℓ`-fixing, so `aut_hosting_equivariant` does not
+apply to it directly.  But the hosted algebra is *generated* by `{1, s, ℓ}`, and
+`−ℓ` generates the same algebra (the sign is absorbed by real scaling), so the
+hosting assignment is equivariant under `gradeAut` all the same.  The order-3
+elements of `S₃` are NOT treated here. -/
+
+/-- Words in `{1, s, −t}` are words in `{1, s, t}`: a generator's sign is absorbed
+    by the real-scaling constructor. -/
+theorem genByPair_neg_right {n : ℕ} {s t : CDAlg ℝ n} :
+    ∀ x, GenByPair s (-t) x → GenByPair s t x := by
+  intro x hx
+  induction hx with
+  | one => exact GenByPair.one
+  | left => exact GenByPair.left
+  | right => rw [← neg_one_smul ℝ t]; exact GenByPair.smul (-1) GenByPair.right
+  | add _ _ ih1 ih2 => exact GenByPair.add ih1 ih2
+  | smul r _ ih => exact GenByPair.smul r ih
+  | mul _ _ ih1 ih2 => exact GenByPair.mul ih1 ih2
+  | conj _ ih => exact GenByPair.conj ih
+
+/-- **Hosting is equivariant under the grade automorphism `ℓ ↦ −ℓ`** (the ℤ/2 of
+    the `S₃` factor), even though it moves `ℓ`: `gradeAut s` is a crystal and
+    every word in `{1, s, ℓ}` is carried to a word in `{1, gradeAut s, ℓ}`. -/
+theorem gradeAut_hosting_equivariant {s : CDAlg ℝ 4} (hv : IsVacuum s) :
+    IsVacuum (gradeAut s) ∧
+      (∀ x, GenByPair s ell x → GenByPair (gradeAut s) ell (gradeAut x)) := by
+  refine ⟨aut_map_isVacuum gradeAut hv, fun x hx => ?_⟩
+  have h := aut_genByPair gradeAut x hx
+  rw [gradeAut_ell] at h
+  exact genByPair_neg_right _ h
+
 
 /-! ## 5. Completeness audit — `#print axioms`
 
-Every theorem in this file must depend on exactly `{propext, Classical.choice,
-Quot.sound}`.  Anything else (`sorryAx`, a native-reduction axiom, a user axiom)
+Every theorem in this file must depend on a subset of `{propext, Classical.choice,
+Quot.sound}` (`decide`-based lemmas legitimately show fewer).  Anything else (`sorryAx`, a native-reduction axiom, a user axiom)
 is a finding. -/
 
 #print axioms hiIdx_ne_zero
@@ -1184,5 +1217,7 @@ is a finding. -/
 #print axioms left_mul_sq_scalar_iff_vacuum
 #print axioms vacuum_eigenvalue_unique
 #print axioms alternator_expansion_off_vacuum
+#print axioms genByPair_neg_right
+#print axioms gradeAut_hosting_equivariant
 
 end QBP.Foundations.CrystalHosting
