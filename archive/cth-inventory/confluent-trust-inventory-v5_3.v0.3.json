@@ -8425,6 +8425,484 @@
           "Quot.sound"
         ]
       }
+    },
+    {
+      "id": "PROOF-vacuum-parametrisation",
+      "name": "Prop 15 / #634 AC3: a vacuum of the δ-landscape is a + (b₀ + γu)ℓ with a = αu — parametrised, poles included",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#639 hosting groundwork (#634 AC3). IsVacuum s := s imaginary ∧ cdLo s · cdHi s = cdHi s · cdLo s, proved equivalent to alternator-flatness (isVacuum_iff_alternator_flat, via PROOF-alternator-vanishes-iff-commute). vacuum_iff_parametrised: IsVacuum s ⇔ ∃ u α γ b₀, u imaginary, (N u = 1 ∨ u = 0), cdLo s = α•u, cdHi s = b₀•1 + γ•u; vacuum_norm_parametrised: N s = α² + γ² + b₀²; the poles u = 0 are s = b₀•ℓ (vacuum_pole_of_dir_zero). Non-vacuity: sAll_isVacuum, ell_isVacuum; sedWitX_not_isVacuum. The topology (suspension of ℝP¹ ≅ S²) is NOT formalised — numerical (orbit_space.py, lmaps_check.py). Research-thread evidence; hosting, not deriving.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CrystalHosting.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CrystalHosting.vacuum_iff_parametrised",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CrystalHosting.vacuum_norm_parametrised",
+        "QBP.Foundations.CrystalHosting.isVacuum_iff_alternator_flat",
+        "QBP.Foundations.CrystalHosting.vacuum_pole_of_dir_zero",
+        "QBP.Foundations.CrystalHosting.sAll_isVacuum",
+        "QBP.Foundations.CrystalHosting.ell_isVacuum",
+        "QBP.Foundations.CrystalHosting.sedWitX_not_isVacuum",
+        "QBP.Foundations.CrystalHosting.eq_of_halves",
+        "QBP.Foundations.CrystalHosting.split_lo_hi"
+      ],
+      "theorems": [
+        {
+          "name": "vacuum_iff_parametrised",
+          "status": "verified"
+        },
+        {
+          "name": "vacuum_norm_parametrised",
+          "status": "verified"
+        },
+        {
+          "name": "isVacuum_iff_alternator_flat",
+          "status": "verified"
+        },
+        {
+          "name": "vacuum_pole_of_dir_zero",
+          "status": "verified"
+        },
+        {
+          "name": "sAll_isVacuum",
+          "status": "verified"
+        },
+        {
+          "name": "ell_isVacuum",
+          "status": "verified"
+        },
+        {
+          "name": "sedWitX_not_isVacuum",
+          "status": "verified"
+        },
+        {
+          "name": "eq_of_halves",
+          "status": "verified"
+        },
+        {
+          "name": "split_lo_hi",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#639-hosting",
+      "last_tested_at": "2026-09-07T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-07T00:00:00Z",
+        "verifier": "lake build + #print axioms on proofs/QBP/Foundations/CrystalHosting.lean (qbp-oppenheimer + lean-prover agent, #639 hosting groundwork, 2026-09-07); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-crystal-hosts-quaternion",
+      "name": "Every crystal generates, with ℓ, a quaternion subalgebra span{1,u,ℓ,ℓu} of 𝕊 (4-dim, proper); ℓ-fixing automorphisms act equivariantly",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#639 hosting groundwork (T1/T2). vacuum_hosts_quaternion: for a vacuum s there is a direction u with every word in {1, s, ℓ} lying in span{1, u, ℓ, ℓu} (InQuatSpan (loOf u)); crystal_quaternion_table: the ℍ relations (ℓ² = u² = (ℓu)² = −1, uℓ = −ℓu, u(ℓu) = ℓ, (ℓu)u = −ℓ, ℓ(ℓu) = −u); crystal_quatSpan_independent: exactly 4-dimensional; quatSpan_dir_proper: a proper part of 𝕊 for every u; inQuatSpan_ell_right: k = ℓu and k = uℓ span the same 4-space (orientation is NOT fixed by the landscape — a theory convention). Equivariance: structure CDAut (linear bijection, map_mul) with map_one / map_re / map_N / map_conj DERIVED (map_re_and_N via cdAlg_sq_eq + injectivity); aut_map_isVacuum; aut_genByPair; aut_image_quatSpan (onto) and aut_hosting_equivariant for ℓ-fixing φ (the G₂ side). Witnesses: gradeAut (ℓ ↦ −ℓ, the S₃ side, ≠ id) and the half-wise lift cdLift with cdLift gradeAut3 ≠ id, cdLift_ell. Aut(𝕊) = G₂ × S₃ is NOT claimed. The interpretation of this ℍ as \"the observer's\" (DERIV-holographic, flag 3) is NOT claimed.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CrystalHosting.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CrystalHosting.vacuum_hosts_quaternion",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CrystalHosting.crystal_quaternion_table",
+        "QBP.Foundations.CrystalHosting.crystal_quatSpan_independent",
+        "QBP.Foundations.CrystalHosting.quatSpan_dir_proper",
+        "QBP.Foundations.CrystalHosting.inQuatSpan_of_dir",
+        "QBP.Foundations.CrystalHosting.inQuatSpan_ell_right",
+        "QBP.Foundations.CrystalHosting.aut_hosting_equivariant",
+        "QBP.Foundations.CrystalHosting.aut_image_quatSpan",
+        "QBP.Foundations.CrystalHosting.aut_genByPair",
+        "QBP.Foundations.CrystalHosting.aut_map_isVacuum",
+        "QBP.Foundations.CrystalHosting.aut_alternator_flat",
+        "QBP.Foundations.CrystalHosting.map_re_and_N",
+        "QBP.Foundations.CrystalHosting.map_conj",
+        "QBP.Foundations.CrystalHosting.map_assoc",
+        "QBP.Foundations.CrystalHosting.gradeAut_ell",
+        "QBP.Foundations.CrystalHosting.gradeAut_ne_id",
+        "QBP.Foundations.CrystalHosting.cdLift_ell",
+        "QBP.Foundations.CrystalHosting.cdLift_gradeAut3_ne_id",
+        "QBP.Foundations.CrystalHosting.cdLiftFun_mul",
+        "QBP.Foundations.CrystalHosting.cdLiftFun_bijective",
+        "QBP.Foundations.CrystalHosting.gradeMap_mul",
+        "QBP.Foundations.CrystalHosting.gradeMap_involutive"
+      ],
+      "theorems": [
+        {
+          "name": "vacuum_hosts_quaternion",
+          "status": "verified"
+        },
+        {
+          "name": "crystal_quaternion_table",
+          "status": "verified"
+        },
+        {
+          "name": "crystal_quatSpan_independent",
+          "status": "verified"
+        },
+        {
+          "name": "quatSpan_dir_proper",
+          "status": "verified"
+        },
+        {
+          "name": "inQuatSpan_of_dir",
+          "status": "verified"
+        },
+        {
+          "name": "inQuatSpan_ell_right",
+          "status": "verified"
+        },
+        {
+          "name": "aut_hosting_equivariant",
+          "status": "verified"
+        },
+        {
+          "name": "aut_image_quatSpan",
+          "status": "verified"
+        },
+        {
+          "name": "aut_genByPair",
+          "status": "verified"
+        },
+        {
+          "name": "aut_map_isVacuum",
+          "status": "verified"
+        },
+        {
+          "name": "aut_alternator_flat",
+          "status": "verified"
+        },
+        {
+          "name": "map_re_and_N",
+          "status": "verified"
+        },
+        {
+          "name": "map_conj",
+          "status": "verified"
+        },
+        {
+          "name": "map_assoc",
+          "status": "verified"
+        },
+        {
+          "name": "gradeAut_ell",
+          "status": "verified"
+        },
+        {
+          "name": "gradeAut_ne_id",
+          "status": "verified"
+        },
+        {
+          "name": "cdLift_ell",
+          "status": "verified"
+        },
+        {
+          "name": "cdLift_gradeAut3_ne_id",
+          "status": "verified"
+        },
+        {
+          "name": "cdLiftFun_mul",
+          "status": "verified"
+        },
+        {
+          "name": "cdLiftFun_bijective",
+          "status": "verified"
+        },
+        {
+          "name": "gradeMap_mul",
+          "status": "verified"
+        },
+        {
+          "name": "gradeMap_involutive",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#639-hosting",
+      "last_tested_at": "2026-09-07T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-07T00:00:00Z",
+        "verifier": "lake build + #print axioms on proofs/QBP/Foundations/CrystalHosting.lean (qbp-oppenheimer + lean-prover agent, #639 hosting groundwork, 2026-09-07); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-local-spectrum-at-crystal",
+      "name": "At a crystal −L_s² = N(s)·id exactly, and this characterises crystals; N(s) is the unique eigenvalue; off a crystal the alternator is first order",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#639 hosting groundwork / #634 AC4. left_mul_sq_at_vacuum: s(sx) = −N(s)•x for every x at a vacuum; left_mul_sq_scalar_iff_vacuum: (∀x, s(sx) = −N(s)•x) ⇔ IsVacuum s (for imaginary s) — \"not yet crystallised\" is the theorem that the scalar spectrum fails; vacuum_eigenvalue_unique: if −s(sx) = λ•x with x ≠ 0 then λ = N s; alternator_expansion_off_vacuum: assoc (v + εw) (v + εw) x = ε•laMap v w x + ε²•assoc w w x (exact, no constant term). The transverse Hessian of V and the {1−δ, 1, 1+δ} multiplicities are NOT formalised (PROOF-left-mul-sq-alternator scope).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/CrystalHosting.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CrystalHosting.left_mul_sq_at_vacuum",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CrystalHosting.neg_left_mul_sq_at_vacuum",
+        "QBP.Foundations.CrystalHosting.left_mul_sq_scalar_iff_vacuum",
+        "QBP.Foundations.CrystalHosting.vacuum_eigenvalue_unique",
+        "QBP.Foundations.CrystalHosting.alternator_expansion_off_vacuum"
+      ],
+      "theorems": [
+        {
+          "name": "left_mul_sq_at_vacuum",
+          "status": "verified"
+        },
+        {
+          "name": "neg_left_mul_sq_at_vacuum",
+          "status": "verified"
+        },
+        {
+          "name": "left_mul_sq_scalar_iff_vacuum",
+          "status": "verified"
+        },
+        {
+          "name": "vacuum_eigenvalue_unique",
+          "status": "verified"
+        },
+        {
+          "name": "alternator_expansion_off_vacuum",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#639-hosting",
+      "last_tested_at": "2026-09-07T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-07T00:00:00Z",
+        "verifier": "lake build + #print axioms on proofs/QBP/Foundations/CrystalHosting.lean (qbp-oppenheimer + lean-prover agent, #639 hosting groundwork, 2026-09-07); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-substrate-hosting-definition",
+      "name": "The hosting definition (first Substrate/ file): state sphere, potential, universes vs in-flight region, a universe's hosted algebra — and their coherence theorems",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 AC1 (hosting) / #639; beekeeper lift of the empty-Substrate rule 2026-09-07 (#473 issuecomment-5574256922), scope AC1-hosting only. Definitions: StateSphere = imaginary unit sedenions; potential s = ‖[cdLo s, cdHi s]‖² (= V); UniverseSpace = StateSphere ∩ {V = 0}; InFlight = StateSphere ∩ {V > 0}; structure Universe (crystal + membership); Universe.hosted = the algebra the crystal generates with ℓ. Theorems: potential_eq_zero_iff_isVacuum; the partition (stateSphere_partition, universeSpace_inFlight_disjoint, universeSpace_union_inFlight); universe_hosts_quaternion (hosted ⊆ a quaternion subalgebra) and universe_hosted_proper; pole_hosts_complex (the poles ±ℓ host exactly span{1, ℓ} ≅ ℂ — an equality); local_spectrum_at_universe (s(sx) = −x on the sphere); hosting_equivariant (ℓ-fixing automorphisms preserve the sphere, vacua and hosted algebras); inFlight_no_quaternion_closure ⇔ mem_universeSpace_iff_complex_structure (the two regions separated by an iff); non-vacuity: universeSpace_nonpole (not only the ℂ-poles), inFlight_nonempty, universeSpace_ne_stateSphere. NOT in this file (owners named in its §11): the initial ensemble (beekeeper ruling, horn 1), the rule/flow (#635), the Agda S³ transport (#639 (c)), S₃-side covariance (#639 (e)), the boundary of a universe, the pointless in-flight description (#636/#639), our universe's b₀ (#637). Hosts; does not derive (KILLED-locale-forcing-route). No observer reading (flag 3).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Substrate/Hosting.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.Hosting.potential_eq_zero_iff_isVacuum",
+      "lean_companion_theorems": [
+        "QBP.Substrate.Hosting.potential_descends",
+        "QBP.Substrate.Hosting.stateSphere_partition",
+        "QBP.Substrate.Hosting.universeSpace_inFlight_disjoint",
+        "QBP.Substrate.Hosting.universeSpace_union_inFlight",
+        "QBP.Substrate.Hosting.mem_universeSpace_iff_potential",
+        "QBP.Substrate.Hosting.mem_inFlight_iff_potential",
+        "QBP.Substrate.Hosting.universe_hosts_quaternion",
+        "QBP.Substrate.Hosting.universe_hosted_proper",
+        "QBP.Substrate.Hosting.universe_quaternion_table",
+        "QBP.Substrate.Hosting.smul_ell_hosted_eq_complex",
+        "QBP.Substrate.Hosting.pole_hosts_complex",
+        "QBP.Substrate.Hosting.polePlus_hosted_eq_complex",
+        "QBP.Substrate.Hosting.local_spectrum_at_universe",
+        "QBP.Substrate.Hosting.local_spectrum_at_universe_smul",
+        "QBP.Substrate.Hosting.universe_eigenvalue_unique",
+        "QBP.Substrate.Hosting.hosting_equivariant",
+        "QBP.Substrate.Hosting.stateSphere_map_mem",
+        "QBP.Substrate.Hosting.inFlight_no_quaternion_closure",
+        "QBP.Substrate.Hosting.mem_universeSpace_iff_complex_structure",
+        "QBP.Substrate.Hosting.universeSpace_nonempty",
+        "QBP.Substrate.Hosting.universeSpace_nonpole",
+        "QBP.Substrate.Hosting.inFlight_nonempty",
+        "QBP.Substrate.Hosting.universeSpace_ne_stateSphere",
+        "QBP.Substrate.Hosting.normalise_mem_stateSphere",
+        "QBP.Substrate.Hosting.isVacuum_smul_iff"
+      ],
+      "theorems": [
+        {
+          "name": "potential_eq_zero_iff_isVacuum",
+          "status": "verified"
+        },
+        {
+          "name": "potential_descends",
+          "status": "verified"
+        },
+        {
+          "name": "stateSphere_partition",
+          "status": "verified"
+        },
+        {
+          "name": "universeSpace_inFlight_disjoint",
+          "status": "verified"
+        },
+        {
+          "name": "universeSpace_union_inFlight",
+          "status": "verified"
+        },
+        {
+          "name": "mem_universeSpace_iff_potential",
+          "status": "verified"
+        },
+        {
+          "name": "mem_inFlight_iff_potential",
+          "status": "verified"
+        },
+        {
+          "name": "universe_hosts_quaternion",
+          "status": "verified"
+        },
+        {
+          "name": "universe_hosted_proper",
+          "status": "verified"
+        },
+        {
+          "name": "universe_quaternion_table",
+          "status": "verified"
+        },
+        {
+          "name": "smul_ell_hosted_eq_complex",
+          "status": "verified"
+        },
+        {
+          "name": "pole_hosts_complex",
+          "status": "verified"
+        },
+        {
+          "name": "polePlus_hosted_eq_complex",
+          "status": "verified"
+        },
+        {
+          "name": "local_spectrum_at_universe",
+          "status": "verified"
+        },
+        {
+          "name": "local_spectrum_at_universe_smul",
+          "status": "verified"
+        },
+        {
+          "name": "universe_eigenvalue_unique",
+          "status": "verified"
+        },
+        {
+          "name": "hosting_equivariant",
+          "status": "verified"
+        },
+        {
+          "name": "stateSphere_map_mem",
+          "status": "verified"
+        },
+        {
+          "name": "inFlight_no_quaternion_closure",
+          "status": "verified"
+        },
+        {
+          "name": "mem_universeSpace_iff_complex_structure",
+          "status": "verified"
+        },
+        {
+          "name": "universeSpace_nonempty",
+          "status": "verified"
+        },
+        {
+          "name": "universeSpace_nonpole",
+          "status": "verified"
+        },
+        {
+          "name": "inFlight_nonempty",
+          "status": "verified"
+        },
+        {
+          "name": "universeSpace_ne_stateSphere",
+          "status": "verified"
+        },
+        {
+          "name": "normalise_mem_stateSphere",
+          "status": "verified"
+        },
+        {
+          "name": "isVacuum_smul_iff",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#639-hosting",
+      "last_tested_at": "2026-09-07T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-07T00:00:00Z",
+        "verifier": "lake build + #print axioms on proofs/QBP/Substrate/Hosting.lean (qbp-oppenheimer + lean-prover agent, #639 hosting groundwork, 2026-09-07); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
     }
   ],
   "inputs": [
