@@ -30,6 +30,7 @@
     "proofs/QBP/Foundations/FanoOrientationF3.lean": 12,
     "proofs/QBP/Foundations/FanoSubalgebras.lean": 16,
     "proofs/QBP/Foundations/G2Transitivity.lean": 23,
+    "proofs/QBP/Foundations/HolographicSubalgebra.lean": 46,
     "proofs/QBP/Foundations/Hurwitz.lean": 8,
     "proofs/QBP/Foundations/LeftMulDet.lean": 22,
     "proofs/QBP/Foundations/LieAlgebraIso.lean": 21,
