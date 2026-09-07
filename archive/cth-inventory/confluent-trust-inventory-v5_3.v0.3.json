@@ -4148,7 +4148,7 @@
       "provenance": "I",
       "provenance_kind": "internal-compute",
       "status": "coherent",
-      "description": "Tests James's proposed path: locales-from-condensed-sets => black-hole formation => crystallization => CD tower => particular physics. The FIRST LINK was computed concretely (2026-05-22).\n\nVERIFIED (spatial case): for profinite / compact-Hausdorff spaces, the locale IS expressible from the condensed set. Demonstrated on the Cantor set C = 2^N = lim 2^n: clopen Boolean algebras B_n = P(2^n) computed at each stage; the projection pullback B_n -> B_(n+1) verified (exhaustively, small n) to be an injective Boolean homomorphism that doubles cardinality, so the colimit B (countable atomless Boolean algebra) is well-defined; frame axioms verified exhaustively on the truncation P(2^2) (4096 instances of finite-meet-over-join distributivity); and O(C) = Idl(B) by Stone duality. The condensed-set data (maps from test objects 2^n into C) determines the clopen algebra, hence the frame, hence the locale. Rests on the foundational Clausen-Scholze embedding CompHaus -> Cond and Stone duality, both solid.\n\nTHE STRUCTURAL CATCH: this works because the Cantor set is SPATIAL (has points) and the condensed test objects (profinite sets) are themselves POINT-HAVING (inverse limits of finite sets). The locales expressible this way are the SPATIAL ones (compact-regular = compact Hausdorff). But the transition state needs POINTLESS locales — the crystallization in flight is the regime where points are not yet available. Condensed math de-emphasizes points in the ambient object but its PROBES are point-having. Whether the condensed topos can faithfully express genuinely pointless locales (as INTERNAL locales) is unsettled, and it is exactly the case QBP needs.",
+      "description": "Tests James's proposed path: locales-from-condensed-sets => black-hole formation => crystallization => CD tower => particular physics. The FIRST LINK was computed concretely (2026-05-22).\n\nVERIFIED (spatial case): for profinite / compact-Hausdorff spaces, the locale IS expressible from the condensed set. Demonstrated on the Cantor set C = 2^N = lim 2^n: clopen Boolean algebras B_n = P(2^n) computed at each stage; the projection pullback B_n -> B_(n+1) verified (exhaustively, small n) to be an injective Boolean homomorphism that doubles cardinality, so the colimit B (countable atomless Boolean algebra) is well-defined; frame axioms verified exhaustively on the truncation P(2^2) (4096 instances of finite-meet-over-join distributivity); and O(C) = Idl(B) by Stone duality. The condensed-set data (maps from test objects 2^n into C) determines the clopen algebra, hence the frame, hence the locale. Rests on the foundational Clausen-Scholze embedding CompHaus -> Cond and Stone duality, both solid.\n\nTHE STRUCTURAL CATCH: this works because the Cantor set is SPATIAL (has points) and the condensed test objects (profinite sets) are themselves POINT-HAVING (inverse limits of finite sets). The locales expressible this way are the SPATIAL ones (compact-regular = compact Hausdorff). But the transition state needs POINTLESS locales — the crystallization in flight is the regime where points are not yet available. Condensed math de-emphasizes points in the ambient object but its PROBES are point-having. Whether the condensed topos can faithfully express genuinely pointless locales (as INTERNAL locales) is unsettled, and it is exactly the case QBP needs. UPDATE 2026-09-05 (#473, PR #631/#634, beekeeper rulings): the spatial first link is now PROVED in Lean (PROOF-spatial-first-link-condensed-locale) — this entry's spatial claim stays coherent and the Cantor calculation was never load-bearing. The FORCING extension ('the pointless case gates the physics path' as a route to a forced measure/rule) is KILLED (KILLED-locale-forcing-route; Prop 12 ratified). The pointless / in-flight regime itself is re-scoped as a HOSTING question — AC1 (hosting) clause (c), #639 — where circularity with the algebra is permitted.",
       "prediction_chain": [
         "CONJ-condensed-math-for-transition-state"
       ],
@@ -4158,8 +4158,8 @@
         "REF-ecker-grumiller-spacetime-crystal",
         "AXIOM-1"
       ],
-      "last_tested_at": "2026-05-22T00:00:00Z",
-      "notes": "GRADED DEPENDENCY CHAIN (James's path, each link marked):\n\nLink 1 — locales expressible from condensed sets. SPATIAL CASE: VERIFIED (Cantor-set calc above). POINTLESS CASE: OPEN, and structural (point-having probes), and it is the case the transition state needs.\n\nLink 2 — express black-hole formation. REACHABLE-WITH-WORK, but BLOCKED on link 1's pointless case. EEG's explicit transition-state metric gives the locale and the DSS gives the automorphism, but near the SSH/naked singularity (where EEG's own chart breaks down) points fail and the pointless case is required. Not independently reachable.\n\nLink 3 — express crystallization. SAME STATUS AS LINK 2: in QBP, black-hole formation in Universe 1 IS the O->H crystallization seeding Universe 2. No new obstruction; link 2 viewed from the algebra side.\n\nLink 4 — express the CD tower. SPLITS: (4a) the tower as a STATIC object is finite-dim algebra, captured by CLASSICAL Hochschild cohomology (per v5.6), needs no condensed math — effectively the foundations-rebuild work. (4b) the tower as the OUTPUT of the crystallization (the tower EMERGING from the transition) needs links 2-3.\n\nLink 5 — particular physics. NOT YET FORMULABLE. Needs the spectral action on the emerged algebra (CCvS thread) -> needs link 4b -> needs links 2-3 -> needs link 1's pointless case.\n\nVERDICT: the path is CLEAR (every link well-defined, dependencies explicit) but not WALKABLE today, because link 1's pointless case is a single load-bearing gap everything downstream rests on.\n\nTHE ONE GATING CALCULATION (sharply identified): can a genuinely POINTLESS locale be expressed as an INTERNAL locale in the condensed topos? This is a specific, answerable topos-theory question, not a vague 'more research'. Conjecture (Red Team): the resolution runs through the INTERNAL locale notion — locales inside the condensed topos, where the topos's own intuitionistic logic supplies the missing points internally exactly where the classical manifold cannot. If so, the condensed topos supplies points internally precisely in the regime the transition state needs them, and the whole chain becomes a research program with no conceptual blocker (only hard work). If pointless locales are NOT faithfully expressible even internally, the chain breaks at link 1 and QBP needs a different point-free framework or a hybrid.\n\nCONFIDENCE: the spatial-case calculation is solid (sympy-verified + standard duality). The 'internal locale supplies points intuition' is a Red Team conjecture, not established. The gating question is well-posed and is the correct next target for the condensed thread, ahead of any black-hole / crystallization construction.\n\n===== GATING QUESTION — FORCING MECHANISM (added 2026-05-22) =====\n\nThe gating question ('can a pointless locale be expressed as an internal locale in the condensed topos, supplying the missing points?') was investigated. Verified facts + the rigorous mechanism + the open part:\n\nCORRECTION: 'condensed topos' is loose. Condensed sets form an infinitary PRETOPOS, not a topos; the topos arena is PYKNOTIC sets (coherent topos) or kappa-condensed sets (each a Grothendieck topos). See REF-pyknotic-condensed-topos-status. Internal-locale theory needs an actual topos, so use pyknotic/kappa-condensed.\n\nLAYER 1 (trivial, supplies nothing): any external locale L pulls back to a CONSTANT internal locale Delta(L) in any topos. So 'expressible' is trivially yes — but constant, uses no condensed structure, supplies no points. Not what is wanted.\n\nLAYER 2 (rigorous mechanism — FORCING): the prototype of a pointless locale acquiring a point INTERNALLY is forcing. Take an atomless complete Boolean algebra B (e.g. the measure algebra of [0,1], Borel mod null) — genuinely POINTLESS as a locale (every singleton is null = 0, so no completely prime filter). Pass to Sh(B) = the Boolean-valued model V^B. INTERNALLY B acquires a generic point (the random real) that does NOT exist externally in Set. Formal core (REF-internal-locales-toposes): internal points are frame-homs O(L)->Omega, and Omega is richer than 2 in a non-Boolean topos, so internal points exist where external O(L)->2 points do not. This is EXACTLY 'the topos supplies the missing points'. Rigorous, not speculative.\n\nLAYER 3 (is pyknotic the right host?): ENCOURAGING verified fact — the pyknotic/condensed topos is NON-LOCALIC (a gros topos of generalized spaces; objects like R are not subterminal-generated). A localic topos can only host internal locales that are ~sublocales of its defining locale ('thin'); a NON-localic topos has room for richer non-constant internal locales. So pyknotic is the KIND of topos that CAN host nontrivial internal locales — necessary condition, and it holds. A localic host would have been a dead end; it is not one.\n\nVERIFIED PROTOTYPE (sympy, 2026-05-22): the Cantor profinite tower 2^0 <- 2^1 <- ... — the SAME tower used to show spatial-locale<->condensed (Step 1-4 above) — IS the Cohen forcing poset (finite binary strings ordered by extension). Its points (= locale points = completely prime filters = frame-homs O(C)->2 = infinite branches) exist ONLY in the completed inverse limit, never at any finite stage: (1) every finite stage 2^n is a finite antichain with no branch inside it — point invisible at every finite resolution; (2) a point is a compatible thread through ALL stages = an inverse-limit element, supplied only by completion; (3) branches <-> points verified on truncations. So the two halves of the question meet in ONE object: the Cantor tower is simultaneously the condensed test object AND the Cohen forcing poset whose generic is the prototype internally-supplied point.\n\nSHARPENED CONJECTURE (now attackable): the crystallization locale L_cryst is pointless externally (points = settled spacetime events, absent mid-transition). It embeds as a NON-CONSTANT internal locale in the kappa-condensed/pyknotic topos. The profinite probes — the SCALE HIERARCHY of the crystallization, each finite quotient a resolution level / harmonic — play the forcing-poset role and supply, internally, a generic point = the settled spacetime event that exists once one passes to the topos's internal logic but not before. Forcing (Layer 2) is the rigorous template; the profinite scale-tower is the forcing poset; the Cohen/Cantor case is the verified prototype.\n\nSTATUS LEDGER:\n  ESTABLISHED: pretopos-vs-topos correction; pyknotic non-localic (has room); internal-locale theory exists; forcing supplies points internally (rigorous); Cantor tower = Cohen poset, points only in the limit (verified).\n  CONJECTURE (open): that L_cryst specifically embeds as a non-constant internal locale in pyknotic; that the crystallization scale-tower is a forcing poset whose generic is the settled spacetime event. The Cohen/Cantor case is the TEMPLATE, not the crystallization. This makes the gating question precise and attackable; it does NOT confirm it.\n\nNEXT CONCRETE STEP: identify the crystallization's analogue of the binary-string tree — what are the 'finite conditions' (partial crystallizations / coarse resolution levels) and what generic do they force? If the EEG echoing levels (tau mod Delta resolution tower) form a forcing poset, its generic branch is a candidate 'settled event', directly linking the EEG bridge (v5.17/5.18) to the forcing mechanism.",
+      "last_tested_at": "2026-09-05T00:00:00Z",
+      "notes": "GRADED DEPENDENCY CHAIN (James's path, each link marked):\n\nLink 1 — locales expressible from condensed sets. SPATIAL CASE: VERIFIED (Cantor-set calc above). POINTLESS CASE: OPEN, and structural (point-having probes), and it is the case the transition state needs.\n\nLink 2 — express black-hole formation. REACHABLE-WITH-WORK, but BLOCKED on link 1's pointless case. EEG's explicit transition-state metric gives the locale and the DSS gives the automorphism, but near the SSH/naked singularity (where EEG's own chart breaks down) points fail and the pointless case is required. Not independently reachable.\n\nLink 3 — express crystallization. SAME STATUS AS LINK 2: in QBP, black-hole formation in Universe 1 IS the O->H crystallization seeding Universe 2. No new obstruction; link 2 viewed from the algebra side.\n\nLink 4 — express the CD tower. SPLITS: (4a) the tower as a STATIC object is finite-dim algebra, captured by CLASSICAL Hochschild cohomology (per v5.6), needs no condensed math — effectively the foundations-rebuild work. (4b) the tower as the OUTPUT of the crystallization (the tower EMERGING from the transition) needs links 2-3.\n\nLink 5 — particular physics. NOT YET FORMULABLE. Needs the spectral action on the emerged algebra (CCvS thread) -> needs link 4b -> needs links 2-3 -> needs link 1's pointless case.\n\nVERDICT: the path is CLEAR (every link well-defined, dependencies explicit) but not WALKABLE today, because link 1's pointless case is a single load-bearing gap everything downstream rests on.\n\nTHE ONE GATING CALCULATION (sharply identified): can a genuinely POINTLESS locale be expressed as an INTERNAL locale in the condensed topos? This is a specific, answerable topos-theory question, not a vague 'more research'. Conjecture (Red Team): the resolution runs through the INTERNAL locale notion — locales inside the condensed topos, where the topos's own intuitionistic logic supplies the missing points internally exactly where the classical manifold cannot. If so, the condensed topos supplies points internally precisely in the regime the transition state needs them, and the whole chain becomes a research program with no conceptual blocker (only hard work). If pointless locales are NOT faithfully expressible even internally, the chain breaks at link 1 and QBP needs a different point-free framework or a hybrid.\n\nCONFIDENCE: the spatial-case calculation is solid (sympy-verified + standard duality). The 'internal locale supplies points intuition' is a Red Team conjecture, not established. The gating question is well-posed and is the correct next target for the condensed thread, ahead of any black-hole / crystallization construction.\n\n===== GATING QUESTION — FORCING MECHANISM (added 2026-05-22) =====\n\nThe gating question ('can a pointless locale be expressed as an internal locale in the condensed topos, supplying the missing points?') was investigated. Verified facts + the rigorous mechanism + the open part:\n\nCORRECTION: 'condensed topos' is loose. Condensed sets form an infinitary PRETOPOS, not a topos; the topos arena is PYKNOTIC sets (coherent topos) or kappa-condensed sets (each a Grothendieck topos). See REF-pyknotic-condensed-topos-status. Internal-locale theory needs an actual topos, so use pyknotic/kappa-condensed.\n\nLAYER 1 (trivial, supplies nothing): any external locale L pulls back to a CONSTANT internal locale Delta(L) in any topos. So 'expressible' is trivially yes — but constant, uses no condensed structure, supplies no points. Not what is wanted.\n\nLAYER 2 (rigorous mechanism — FORCING): the prototype of a pointless locale acquiring a point INTERNALLY is forcing. Take an atomless complete Boolean algebra B (e.g. the measure algebra of [0,1], Borel mod null) — genuinely POINTLESS as a locale (every singleton is null = 0, so no completely prime filter). Pass to Sh(B) = the Boolean-valued model V^B. INTERNALLY B acquires a generic point (the random real) that does NOT exist externally in Set. Formal core (REF-internal-locales-toposes): internal points are frame-homs O(L)->Omega, and Omega is richer than 2 in a non-Boolean topos, so internal points exist where external O(L)->2 points do not. This is EXACTLY 'the topos supplies the missing points'. Rigorous, not speculative.\n\nLAYER 3 (is pyknotic the right host?): ENCOURAGING verified fact — the pyknotic/condensed topos is NON-LOCALIC (a gros topos of generalized spaces; objects like R are not subterminal-generated). A localic topos can only host internal locales that are ~sublocales of its defining locale ('thin'); a NON-localic topos has room for richer non-constant internal locales. So pyknotic is the KIND of topos that CAN host nontrivial internal locales — necessary condition, and it holds. A localic host would have been a dead end; it is not one.\n\nVERIFIED PROTOTYPE (sympy, 2026-05-22): the Cantor profinite tower 2^0 <- 2^1 <- ... — the SAME tower used to show spatial-locale<->condensed (Step 1-4 above) — IS the Cohen forcing poset (finite binary strings ordered by extension). Its points (= locale points = completely prime filters = frame-homs O(C)->2 = infinite branches) exist ONLY in the completed inverse limit, never at any finite stage: (1) every finite stage 2^n is a finite antichain with no branch inside it — point invisible at every finite resolution; (2) a point is a compatible thread through ALL stages = an inverse-limit element, supplied only by completion; (3) branches <-> points verified on truncations. So the two halves of the question meet in ONE object: the Cantor tower is simultaneously the condensed test object AND the Cohen forcing poset whose generic is the prototype internally-supplied point.\n\nSHARPENED CONJECTURE (now attackable): the crystallization locale L_cryst is pointless externally (points = settled spacetime events, absent mid-transition). It embeds as a NON-CONSTANT internal locale in the kappa-condensed/pyknotic topos. The profinite probes — the SCALE HIERARCHY of the crystallization, each finite quotient a resolution level / harmonic — play the forcing-poset role and supply, internally, a generic point = the settled spacetime event that exists once one passes to the topos's internal logic but not before. Forcing (Layer 2) is the rigorous template; the profinite scale-tower is the forcing poset; the Cohen/Cantor case is the verified prototype.\n\nSTATUS LEDGER:\n  ESTABLISHED: pretopos-vs-topos correction; pyknotic non-localic (has room); internal-locale theory exists; forcing supplies points internally (rigorous); Cantor tower = Cohen poset, points only in the limit (verified).\n  CONJECTURE (open): that L_cryst specifically embeds as a non-constant internal locale in pyknotic; that the crystallization scale-tower is a forcing poset whose generic is the settled spacetime event. The Cohen/Cantor case is the TEMPLATE, not the crystallization. This makes the gating question precise and attackable; it does NOT confirm it.\n\nNEXT CONCRETE STEP: identify the crystallization's analogue of the binary-string tree — what are the 'finite conditions' (partial crystallizations / coarse resolution levels) and what generic do they force? If the EEG echoing levels (tau mod Delta resolution tower) form a forcing poset, its generic branch is a candidate 'settled event', directly linking the EEG bridge (v5.17/5.18) to the forcing mechanism. [2026-09-05: superseded on the forcing reading — see KILLED-locale-forcing-route; the pointless / in-flight regime is now AC1-hosting clause (c), #639.]",
       "maturity": "nascent",
       "layer_tag": "substrate",
       "intake_rider": "ledger entry only — authorizes NO Foundations/Substrate Lean footprint (empty-Substrate rule; the #471 lesson)",
@@ -8217,6 +8217,207 @@
         },
         "verified_at": "2026-09-04T00:00:00Z",
         "verifier": "lake build QBP.Foundations.DeltaLandscape / .SpatialFirstLink + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #473 AC1 batch #473-ac1: δ-landscape descent, rot120 scalar form, spatial first link; PR #631 head ddfdec0+); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "KILLED-locale-forcing-route",
+      "name": "The condensed/locale route cannot force a vacuum measure or a dynamical rule (#473 AC2, Prop 12 ratified 2026-09-05)",
+      "tier": 3,
+      "provenance": "T",
+      "status": "killed",
+      "description": "#473 AC2 first pass (PR #631 v0.4 Prop 12; beekeeper ratification 2026-09-05). The specific path 'locales/condensed sets ⇒ a forced measure on S¹⁴ and a forced dynamical rule' is dead: (1) an algebra-native locale built from ℝ + Cayley–Dickson data relocates the mystery (Prop 8); (2) a non-native tower transports a measure only through a chosen chart, and the sole algebra-native cover of the vacuum S² — the S₃-orbifold S²(2,2,3) — pushes down no measure (Props 10′, 15); (3) the algebra supplies the metric N and the potential δ² but no autonomous dynamics toward the vacuum (Prop 16, three layers: one element trivial; the forced pair (s, ℓ) a quaternion subalgebra reaching only ±ℓ; an unforced pair a norm-failure transient onto the zero-divisor ridge, then a symmetry — layer (ii)'s 'only ±ℓ reachable' and layer (iii) are NUMERICAL, not Lean; Prop 15's vacuum S² is elementary/numerical, #634 AC3), and nothing in a frame, locale or condensed set selects among quench / anneal / ℓ-axis, which give different numbers from the same measure (Prop 9). With the horn-1 ruling (initial ensemble = MaxEnt relative to the algebra's constraints = N's surface measure, PERMITTED) the measure half is closed by a postulate, so the kill rests on the rule. Reversal (Prop 13, clause (b) only): a mechanism that supplies the rule from topological or measure-theoretic data. SCOPE: this kills the FORCING extension of the chain, not its mathematics — the spatial first link is PROVED (PROOF-spatial-first-link-condensed-locale); CONJ-condensed-math-for-transition-state and INSIGHT-condensed-math-deferred stay marginal (their machinery is the candidate framework for AC1-hosting clause (c), #639). Substrate FORCED/PERMITTED status unchanged (PERMITTED, 2026-06-01).",
+      "prediction_chain": [],
+      "provenance_kind": "internal-compute",
+      "foundation_batch": "#473-ac2",
+      "last_tested_at": "2026-09-05T00:00:00Z"
+    },
+    {
+      "id": "REF-adams-hopf-invariant-one",
+      "name": "Adams (1960): On the non-existence of elements of Hopf invariant one — S^{n−1} is an H-space only for n = 1, 2, 4, 8",
+      "tier": 2,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "J. F. Adams, 'On the non-existence of elements of Hopf invariant one', Ann. of Math. 72 (1960) 20–104. The sphere S^{n−1} admits an H-space structure only for n = 1, 2, 4, 8 — the topological twin of Hurwitz's uniqueness theorem for normed division algebras. Role in the ledger (#473 rounds 13–15, PR #634): the NON-EXISTENCE direction that neither PROOF-normed-division-tower-existence (existence + termination of composition algebras, Lean) nor the Agda S³ H-space (existence, Buchholtz–Rijke port) witnesses. Prop 7′'s 'what breaks at dimension 16' (norm no longer multiplicative) is the fact both non-existence results — Hurwitz and Adams — witness; S¹⁵ is not an H-space. Cited, not re-proved.",
+      "prediction_chain": [],
+      "provenance_kind": "theory-external",
+      "foundation_batch": "#473-ac2",
+      "last_tested_at": "2026-09-05T00:00:00Z"
+    },
+    {
+      "id": "PROOF-no-autonomous-algebraic-dynamics",
+      "name": "No autonomous algebraic dynamics: words in one imaginary s lie in span{1,s}; {1,ℓ,p,ℓp} is a quaternion subalgebra",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "#473 AC1 v0.4/v0.5 Prop 16, PR #634, research-thread evidence. (i) For every imaginary s ∈ CDAlg ℝ n, every element obtained from s by the algebra's operations (products in any bracketing, conjugation, real scalars) lies in span{1, s} (genBy_mem_span, induction on an inductive closure GenBy from imaginary_sq; no power-associativity needed); an imaginary unit in that span is ±s (genBy_unit_imag_eq). (ii) In the sedenions, for ℓ = e₈ and p = s − s₈·ℓ: span{1, ℓ, p, ℓp} is a *-subalgebra closed under multiplication (quatSpan_mul_closed, quatSpan_conj_closed) and every word in {1, s, ℓ} lies in it (genByPair_ell_mem_quatSpan); the non-associative products are derived, not assumed, from assoc_self_ell ([x, x, ℓ] = 0 for EVERY sedenion — a genuine fact about ℓ, 64-case kernel decide — the sedenion alternator is nonzero in general) with p·(ℓp) = N(p)·ℓ, (ℓp)·p = −N(p)·ℓ, (ℓp)² = −N(p)·1; non-vacuity witness quatSpan_proper. Commutator in CD coordinates: [s, ℓ] = −2c + 2aℓ (cdLo/cdHi_ell_commutator). SCOPE (docstring): the shape-invariant half of (ii) — σ = V/(1−b₀²)² constant, hence only ±ℓ reachable — is NOT formalised (numerical, lmaps_check.py); normalisation is not an algebra operation, so the (s+ℓ)/‖s+ℓ‖ map is outside the closure; layer (iii) — with an unforced t the maps x·t, t·x, [x,t] are power iteration of linear skew maps onto the zero-divisor ridge, Σσ²(R_t) = 16·N(t) — is numerical (generic_maps_check.py). Layer-3 MECHANISM, Lean (PR #640 fix): right-multiplication is norm-multiplicative for every t in either CD half (rightMul_isometry_of_half; N_mul_ell the ℓ instance; half_hypothesis_necessary shows composition fails off 𝕆 ∪ 𝕆ℓ), so 'no transient' does not single out ℓ; Σ_k N(e_k t) = 16 N(t) (sum_N_basis_mul = tr(R_tᵀR_t)); what IS special about ℓ is now exact: assoc_self_zero_iff — {y : ∀x, [x,x,y] = 0} = span{1, ℓ}. The doubling formula itself is derived from mulCoeff 4 by kernel decide (cdLo_mul, cdHi_mul). Not a substrate claim; no Substrate/ file.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/NoAutonomousDynamics.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.NoAutonomousDynamics.genBy_mem_span",
+      "lean_companion_theorems": [
+        "QBP.Foundations.NoAutonomousDynamics.genBy_unit_imag_eq",
+        "QBP.Foundations.NoAutonomousDynamics.genByPair_ell_mem_quatSpan",
+        "QBP.Foundations.NoAutonomousDynamics.quatSpan_mul_closed",
+        "QBP.Foundations.NoAutonomousDynamics.quatSpan_conj_closed",
+        "QBP.Foundations.NoAutonomousDynamics.quatSpan_proper",
+        "QBP.Foundations.NoAutonomousDynamics.assoc_self_ell",
+        "QBP.Foundations.NoAutonomousDynamics.ell_sq",
+        "QBP.Foundations.NoAutonomousDynamics.p_ell_anticomm",
+        "QBP.Foundations.NoAutonomousDynamics.p_sq",
+        "QBP.Foundations.NoAutonomousDynamics.p_mul_ell_p",
+        "QBP.Foundations.NoAutonomousDynamics.ell_p_mul_p",
+        "QBP.Foundations.NoAutonomousDynamics.ell_p_sq",
+        "QBP.Foundations.NoAutonomousDynamics.cdLo_ell_commutator",
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator",
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_ell_commutator_imaginary",
+        "QBP.Foundations.NoAutonomousDynamics.rightMul_isometry_of_half",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_right_of_lo",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_right_of_hi",
+        "QBP.Foundations.NoAutonomousDynamics.N_mul_ell",
+        "QBP.Foundations.NoAutonomousDynamics.half_hypothesis_necessary",
+        "QBP.Foundations.NoAutonomousDynamics.sum_N_basis_mul",
+        "QBP.Foundations.NoAutonomousDynamics.sum_N_mul_basis",
+        "QBP.Foundations.NoAutonomousDynamics.assoc_self_zero_iff",
+        "QBP.Foundations.NoAutonomousDynamics.cdLo_mul",
+        "QBP.Foundations.NoAutonomousDynamics.cdHi_mul",
+        "QBP.Foundations.NoAutonomousDynamics.N_split"
+      ],
+      "theorems": [
+        {
+          "name": "genBy_mem_span",
+          "status": "verified"
+        },
+        {
+          "name": "genBy_unit_imag_eq",
+          "status": "verified"
+        },
+        {
+          "name": "genByPair_ell_mem_quatSpan",
+          "status": "verified"
+        },
+        {
+          "name": "quatSpan_mul_closed",
+          "status": "verified"
+        },
+        {
+          "name": "quatSpan_conj_closed",
+          "status": "verified"
+        },
+        {
+          "name": "quatSpan_proper",
+          "status": "verified"
+        },
+        {
+          "name": "assoc_self_ell",
+          "status": "verified"
+        },
+        {
+          "name": "ell_sq",
+          "status": "verified"
+        },
+        {
+          "name": "p_ell_anticomm",
+          "status": "verified"
+        },
+        {
+          "name": "p_sq",
+          "status": "verified"
+        },
+        {
+          "name": "p_mul_ell_p",
+          "status": "verified"
+        },
+        {
+          "name": "ell_p_mul_p",
+          "status": "verified"
+        },
+        {
+          "name": "ell_p_sq",
+          "status": "verified"
+        },
+        {
+          "name": "cdLo_ell_commutator",
+          "status": "verified"
+        },
+        {
+          "name": "cdHi_ell_commutator",
+          "status": "verified"
+        },
+        {
+          "name": "cdHi_ell_commutator_imaginary",
+          "status": "verified"
+        },
+        {
+          "name": "rightMul_isometry_of_half",
+          "status": "verified"
+        },
+        {
+          "name": "N_mul_right_of_lo",
+          "status": "verified"
+        },
+        {
+          "name": "N_mul_right_of_hi",
+          "status": "verified"
+        },
+        {
+          "name": "N_mul_ell",
+          "status": "verified"
+        },
+        {
+          "name": "half_hypothesis_necessary",
+          "status": "verified"
+        },
+        {
+          "name": "sum_N_basis_mul",
+          "status": "verified"
+        },
+        {
+          "name": "sum_N_mul_basis",
+          "status": "verified"
+        },
+        {
+          "name": "assoc_self_zero_iff",
+          "status": "verified"
+        },
+        {
+          "name": "cdLo_mul",
+          "status": "verified"
+        },
+        {
+          "name": "cdHi_mul",
+          "status": "verified"
+        },
+        {
+          "name": "N_split",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473-ac2",
+      "last_tested_at": "2026-09-05T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-05T00:00:00Z",
+        "verifier": "lake build QBP.Foundations.NoAutonomousDynamics + #print axioms (84 declarations), leanprover/lean4:v4.30.0 (qbp-oppenheimer + lean-prover agent, #634); Red Team round-4 confirmer rebuilt; pending cth §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",

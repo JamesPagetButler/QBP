@@ -15,6 +15,7 @@ import QBP.Foundations.Breakdown
 import QBP.Foundations.FanoGenesis
 import QBP.Foundations.Hurwitz
 import QBP.Foundations.SpatialFirstLink
+import QBP.Foundations.NoAutonomousDynamics
 import QBP.Foundations.SpectralMoments
 import QBP.Foundations.UnitQuaternion
 import QBP.Foundations.OctonionLaws
