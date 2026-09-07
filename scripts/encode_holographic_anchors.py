@@ -56,18 +56,22 @@ ANCHORS = {
         "assoc u v w = 2·(uv)w, via the left Moufang law; assoc_orthogonal_triple_ne_zero. span4_eq_of_associative / "
         "finrank_eq_four_of_associative / not_associative_of_gt_span4: any associative subalgebra S containing the "
         "frame equals it (dim 4). Concrete cross-check: assoc e₁ e₂ e₄ ≠ 0 by kernel decide (coefficient 2 agrees with "
-        "the structural route). NOT claimed: the fully general 'every associative subalgebra of 𝕆 has dim ≤ 4' "
-        "(needs Gram–Schmidt inside an arbitrary ≥ 3-dim associative subalgebra = a registered inner product on CDAlg; "
-        "architecture ruling 2026-09-07: its own foundational PR when the hosting analytics need it).",
+        "the structural route). quaternion_frame_subalgebra itself carries no orthonormality hypotheses (Artin closure for "
+        "any pair); orthonormality enters only through the frame's independence and the maximality theorem, whose primary "
+        "witness is span4_eq_of_associative. NOT claimed: the fully general 'every associative subalgebra of 𝕆 has dim ≤ 4' "
+        "— DEFERRED, not blocked: closing it needs an orthonormal imaginary pair inside an arbitrary associative subalgebra "
+        "of dimension ≥ 3 (a two-step explicit Gram–Schmidt over the existing bil with Real.sqrt; elementary, no Mathlib "
+        "InnerProductSpace instance required); deferred per the architecture ruling 2026-09-07 (a registered inner-product "
+        "structure on CDAlg, if ever wanted, is its own foundational PR).",
         [
+            "span4_eq_of_associative",
+            "not_associative_of_gt_span4",
+            "finrank_eq_four_of_associative",
             "quaternion_frame_subalgebra",
             "quaternion_frame_table",
             "assoc_orthogonal_triple",
             "assoc_orthogonal_triple_ne_zero",
             "mul_assoc_flip",
-            "span4_eq_of_associative",
-            "finrank_eq_four_of_associative",
-            "not_associative_of_gt_span4",
             "assoc_e1_e2_e4_ne_zero",
             "assoc_e1_e2_e4_ne_zero_structural",
             "fano_pair_frame",
@@ -138,7 +142,7 @@ def main():
                         "batteries": {"ref": "main", "sha": BATTERIES},
                     },
                     "verified_at": STAMP,
-                    "verifier": "lake build QBP.Foundations (umbrella, 3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
+                    "verifier": "lake build QBP.Foundations.HolographicSubalgebra (targeted, 2959 jobs) and the QBP.Foundations umbrella (3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
                     "result": "verified",
                     "axiom_closure": CLEAN,
                 },

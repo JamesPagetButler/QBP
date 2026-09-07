@@ -8484,7 +8484,7 @@
           }
         },
         "verified_at": "2026-09-07T00:00:00Z",
-        "verifier": "lake build QBP.Foundations (umbrella, 3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
+        "verifier": "lake build QBP.Foundations.HolographicSubalgebra (targeted, 2959 jobs) and the QBP.Foundations umbrella (3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -8499,7 +8499,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "DERIV-holographic, theorem part 2 (flag 3): 'the largest associative subalgebra of 𝕆 is ℍ', frame-relative. For orthonormal imaginary u, v ∈ 𝕆: quaternion_frame_table (u² = v² = (uv)² = −1, vu = −uv, u(uv) = −v, (uv)u = v, v(uv) = u, (uv)v = −u — general, from imaginary_sq, anticommutation, alternativity, flexibility, norm composition, no decide); quaternion_frame_subalgebra (span{1,u,v,uv} closed and associative — the Artin chunks instantiated). assoc_orthogonal_triple: for orthogonal imaginary u, v, w with w ⟂ uv, assoc u v w = 2·(uv)w, via the left Moufang law; assoc_orthogonal_triple_ne_zero. span4_eq_of_associative / finrank_eq_four_of_associative / not_associative_of_gt_span4: any associative subalgebra S containing the frame equals it (dim 4). Concrete cross-check: assoc e₁ e₂ e₄ ≠ 0 by kernel decide (coefficient 2 agrees with the structural route). NOT claimed: the fully general 'every associative subalgebra of 𝕆 has dim ≤ 4' (needs Gram–Schmidt inside an arbitrary ≥ 3-dim associative subalgebra = a registered inner product on CDAlg; architecture ruling 2026-09-07: its own foundational PR when the hosting analytics need it).",
+      "description": "DERIV-holographic, theorem part 2 (flag 3): 'the largest associative subalgebra of 𝕆 is ℍ', frame-relative. For orthonormal imaginary u, v ∈ 𝕆: quaternion_frame_table (u² = v² = (uv)² = −1, vu = −uv, u(uv) = −v, (uv)u = v, v(uv) = u, (uv)v = −u — general, from imaginary_sq, anticommutation, alternativity, flexibility, norm composition, no decide); quaternion_frame_subalgebra (span{1,u,v,uv} closed and associative — the Artin chunks instantiated). assoc_orthogonal_triple: for orthogonal imaginary u, v, w with w ⟂ uv, assoc u v w = 2·(uv)w, via the left Moufang law; assoc_orthogonal_triple_ne_zero. span4_eq_of_associative / finrank_eq_four_of_associative / not_associative_of_gt_span4: any associative subalgebra S containing the frame equals it (dim 4). Concrete cross-check: assoc e₁ e₂ e₄ ≠ 0 by kernel decide (coefficient 2 agrees with the structural route). quaternion_frame_subalgebra itself carries no orthonormality hypotheses (Artin closure for any pair); orthonormality enters only through the frame's independence and the maximality theorem, whose primary witness is span4_eq_of_associative. NOT claimed: the fully general 'every associative subalgebra of 𝕆 has dim ≤ 4' — DEFERRED, not blocked: closing it needs an orthonormal imaginary pair inside an arbitrary associative subalgebra of dimension ≥ 3 (a two-step explicit Gram–Schmidt over the existing bil with Real.sqrt; elementary, no Mathlib InnerProductSpace instance required); deferred per the architecture ruling 2026-09-07 (a registered inner-product structure on CDAlg, if ever wanted, is its own foundational PR).",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -8507,15 +8507,15 @@
       "proof_file": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
       "sorry_count": 0,
       "proof_state": "verified",
-      "lean_theorem": "QBP.Foundations.HolographicSubalgebra.quaternion_frame_subalgebra",
+      "lean_theorem": "QBP.Foundations.HolographicSubalgebra.span4_eq_of_associative",
       "lean_companion_theorems": [
+        "QBP.Foundations.HolographicSubalgebra.not_associative_of_gt_span4",
+        "QBP.Foundations.HolographicSubalgebra.finrank_eq_four_of_associative",
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_subalgebra",
         "QBP.Foundations.HolographicSubalgebra.quaternion_frame_table",
         "QBP.Foundations.HolographicSubalgebra.assoc_orthogonal_triple",
         "QBP.Foundations.HolographicSubalgebra.assoc_orthogonal_triple_ne_zero",
         "QBP.Foundations.HolographicSubalgebra.mul_assoc_flip",
-        "QBP.Foundations.HolographicSubalgebra.span4_eq_of_associative",
-        "QBP.Foundations.HolographicSubalgebra.finrank_eq_four_of_associative",
-        "QBP.Foundations.HolographicSubalgebra.not_associative_of_gt_span4",
         "QBP.Foundations.HolographicSubalgebra.assoc_e1_e2_e4_ne_zero",
         "QBP.Foundations.HolographicSubalgebra.assoc_e1_e2_e4_ne_zero_structural",
         "QBP.Foundations.HolographicSubalgebra.fano_pair_frame",
@@ -8523,6 +8523,18 @@
         "QBP.Foundations.HolographicSubalgebra.bil_proj4"
       ],
       "theorems": [
+        {
+          "name": "span4_eq_of_associative",
+          "status": "verified"
+        },
+        {
+          "name": "not_associative_of_gt_span4",
+          "status": "verified"
+        },
+        {
+          "name": "finrank_eq_four_of_associative",
+          "status": "verified"
+        },
         {
           "name": "quaternion_frame_subalgebra",
           "status": "verified"
@@ -8541,18 +8553,6 @@
         },
         {
           "name": "mul_assoc_flip",
-          "status": "verified"
-        },
-        {
-          "name": "span4_eq_of_associative",
-          "status": "verified"
-        },
-        {
-          "name": "finrank_eq_four_of_associative",
-          "status": "verified"
-        },
-        {
-          "name": "not_associative_of_gt_span4",
           "status": "verified"
         },
         {
@@ -8591,7 +8591,7 @@
           }
         },
         "verified_at": "2026-09-07T00:00:00Z",
-        "verifier": "lake build QBP.Foundations (umbrella, 3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
+        "verifier": "lake build QBP.Foundations.HolographicSubalgebra (targeted, 2959 jobs) and the QBP.Foundations umbrella (3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -8668,7 +8668,7 @@
           }
         },
         "verified_at": "2026-09-07T00:00:00Z",
-        "verifier": "lake build QBP.Foundations (umbrella, 3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
+        "verifier": "lake build QBP.Foundations.HolographicSubalgebra (targeted, 2959 jobs) and the QBP.Foundations umbrella (3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",

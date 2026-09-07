@@ -67,10 +67,14 @@
   * **The fully general bound "every associative subalgebra of 𝕆 has dim ≤ 4"
     is NOT proved here.**  What is proved (H3′) is the bound *relative to a
     given quaternion frame*: an associative submodule containing a quaternion
-    frame equals it.  Closing the general statement additionally requires
-    producing an orthonormal imaginary pair *inside* an arbitrary ≥5-dimensional
-    subalgebra (a Gram–Schmidt step, i.e. an inner-product structure on `CDAlg`
-    that this corpus does not yet carry).  That gap is stated, not papered over.
+    frame equals it (primary witness `span4_eq_of_associative`).  Closing the
+    general statement is DEFERRED, not blocked: it additionally requires an
+    orthonormal imaginary pair *inside* an arbitrary associative subalgebra of
+    dimension ≥ 3 — a two-step explicit Gram–Schmidt over the existing `bil`
+    (elementary; no Mathlib `InnerProductSpace` instance is required).  It is
+    deferred per the architecture ruling of 2026-09-07 (a registered
+    inner-product structure on `CDAlg`, if ever wanted, is its own foundational
+    PR).  That gap is stated, not papered over.
 
   Completeness: zero `sorry`, zero `native_decide`, zero vacuous `True`, zero
   `maxHeartbeats` bump.  `#print axioms` audit at the bottom for every theorem.
