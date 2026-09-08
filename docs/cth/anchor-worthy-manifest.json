@@ -677,6 +677,99 @@
         "QBP.Foundations.NoAutonomousDynamics.cdHi_mul",
         "QBP.Foundations.NoAutonomousDynamics.N_split"
       ]
+    },
+    {
+      "anchor_id": "PROOF-vacuum-parametrisation",
+      "proof_system": "lean4",
+      "declared_by": "#639-hosting",
+      "witnesses": [
+        "QBP.Foundations.CrystalHosting.vacuum_iff_parametrised",
+        "QBP.Foundations.CrystalHosting.vacuum_norm_parametrised",
+        "QBP.Foundations.CrystalHosting.isVacuum_iff_alternator_flat",
+        "QBP.Foundations.CrystalHosting.vacuum_pole_of_dir_zero",
+        "QBP.Foundations.CrystalHosting.sAll_isVacuum",
+        "QBP.Foundations.CrystalHosting.ell_isVacuum",
+        "QBP.Foundations.CrystalHosting.sedWitX_not_isVacuum",
+        "QBP.Foundations.CrystalHosting.eq_of_halves",
+        "QBP.Foundations.CrystalHosting.split_lo_hi"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-crystal-hosts-quaternion",
+      "proof_system": "lean4",
+      "declared_by": "#639-hosting",
+      "witnesses": [
+        "QBP.Foundations.CrystalHosting.vacuum_hosts_quaternion",
+        "QBP.Foundations.CrystalHosting.crystal_quaternion_table",
+        "QBP.Foundations.CrystalHosting.crystal_quatSpan_independent",
+        "QBP.Foundations.CrystalHosting.quatSpan_dir_proper",
+        "QBP.Foundations.CrystalHosting.inQuatSpan_of_dir",
+        "QBP.Foundations.CrystalHosting.inQuatSpan_ell_right",
+        "QBP.Foundations.CrystalHosting.aut_hosting_equivariant",
+        "QBP.Foundations.CrystalHosting.aut_image_quatSpan",
+        "QBP.Foundations.CrystalHosting.aut_genByPair",
+        "QBP.Foundations.CrystalHosting.aut_map_isVacuum",
+        "QBP.Foundations.CrystalHosting.aut_alternator_flat",
+        "QBP.Foundations.CrystalHosting.CDAut.map_re_and_N",
+        "QBP.Foundations.CrystalHosting.CDAut.map_conj",
+        "QBP.Foundations.CrystalHosting.CDAut.map_assoc",
+        "QBP.Foundations.CrystalHosting.gradeAut_hosting_equivariant",
+        "QBP.Foundations.CrystalHosting.genByPair_neg_right",
+        "QBP.Foundations.CrystalHosting.gradeAut_ell",
+        "QBP.Foundations.CrystalHosting.gradeAut_ne_id",
+        "QBP.Foundations.CrystalHosting.cdLift_ell",
+        "QBP.Foundations.CrystalHosting.cdLift_gradeAut3_ne_id",
+        "QBP.Foundations.CrystalHosting.cdLiftFun_mul",
+        "QBP.Foundations.CrystalHosting.cdLiftFun_bijective",
+        "QBP.Foundations.CrystalHosting.gradeMap_mul",
+        "QBP.Foundations.CrystalHosting.gradeMap_involutive"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-local-spectrum-at-crystal",
+      "proof_system": "lean4",
+      "declared_by": "#639-hosting",
+      "witnesses": [
+        "QBP.Foundations.CrystalHosting.left_mul_sq_at_vacuum",
+        "QBP.Foundations.CrystalHosting.neg_left_mul_sq_at_vacuum",
+        "QBP.Foundations.CrystalHosting.left_mul_sq_scalar_iff_vacuum",
+        "QBP.Foundations.CrystalHosting.vacuum_eigenvalue_unique",
+        "QBP.Foundations.CrystalHosting.alternator_expansion_off_vacuum"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-substrate-hosting-definition",
+      "proof_system": "lean4",
+      "declared_by": "#639-hosting",
+      "witnesses": [
+        "QBP.Substrate.Hosting.potential_eq_zero_iff_isVacuum",
+        "QBP.Substrate.Hosting.potential_descends",
+        "QBP.Substrate.Hosting.stateSphere_partition",
+        "QBP.Substrate.Hosting.universeSpace_inFlight_disjoint",
+        "QBP.Substrate.Hosting.universeSpace_union_inFlight",
+        "QBP.Substrate.Hosting.mem_universeSpace_iff_potential",
+        "QBP.Substrate.Hosting.mem_inFlight_iff_potential",
+        "QBP.Substrate.Hosting.universe_hosts_quaternion",
+        "QBP.Substrate.Hosting.universe_hosted_proper",
+        "QBP.Substrate.Hosting.universe_quaternion_table",
+        "QBP.Substrate.Hosting.smul_ell_hosted_eq_complex",
+        "QBP.Substrate.Hosting.pole_hosts_complex",
+        "QBP.Substrate.Hosting.polePlus_hosted_eq_complex",
+        "QBP.Substrate.Hosting.local_spectrum_at_universe",
+        "QBP.Substrate.Hosting.local_spectrum_at_universe_smul",
+        "QBP.Substrate.Hosting.universe_eigenvalue_unique",
+        "QBP.Substrate.Hosting.hosting_equivariant",
+        "QBP.Substrate.Hosting.stateSphere_map_mem",
+        "QBP.Substrate.Hosting.inFlight_no_quaternion_closure",
+        "QBP.Substrate.Hosting.mem_universeSpace_iff_complex_structure",
+        "QBP.Substrate.Hosting.universeSpace_nonempty",
+        "QBP.Substrate.Hosting.universeSpace_nonpole",
+        "QBP.Substrate.Hosting.inFlight_nonempty",
+        "QBP.Substrate.Hosting.universeSpace_ne_stateSphere",
+        "QBP.Substrate.Hosting.normalise_mem_stateSphere",
+        "QBP.Substrate.Hosting.isVacuum_smul_iff",
+        "QBP.Substrate.Hosting.hosting_equivariant_grade"
+      ]
     }
   ]
 }

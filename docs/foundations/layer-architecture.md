@@ -16,17 +16,20 @@ proofs/QBP/
 ├── Physics.lean            ← aggregator root (follow-up; see §6)
 │   └── Physics/            namespace QBP.Physics — predictions
 │       Cosmo/  Experiments/  Optics/  Oracle/  Units/
-└── Substrate/              ← RESERVED, EMPTY (README only)
-                            condensed/locale mathematics — napkin-level;
-                            no Lean files until the first real theorem exists
-                            (no sorried scaffolding — the #471 lesson)
+├── Substrate.lean          ← aggregator root (since 2026-09-07)
+│   └── Substrate/          namespace QBP.Substrate — the hosting definition ONLY
+                            (beekeeper lift 2026-09-07, #473 issuecomment-5574256922:
+                            AC1-hosting scope; every file states what it HOSTS and
+                            what it does NOT DERIVE and cites the lift — enforced by
+                            scripts/check_layer_imports.py rule 4; still no sorried
+                            scaffolding — the #471 lesson stands)
 ```
 
 | Layer | Contents | Ground truth |
 |---|---|---|
 | Foundations | Cayley-Dickson construction, per-level algebras, operations-complete matrix, subalgebra counts, zero-divisor witnesses | Lean kernel |
 | Physics | thresholds (M_seed, ladder), crystallisation regimes, experiment formalizations, oracle | Experiment |
-| Substrate | condensed/locale enrichment of the tower (future) | none yet |
+| Substrate | the hosting definition (#639): state sphere, potential, universes vs in-flight region, a universe's hosted quaternion algebra — hosts the tower, does not derive it (job A closed: KILLED-locale-forcing-route) | Lean kernel (Hosting.lean, on top of Foundations/CrystalHosting) |
 
 One aggregator per layer ⇒ one `lake build` target and one CI gate surface per
 layer. This also closes the build-invisibility gap (#481 residual): a layer file

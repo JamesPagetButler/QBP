@@ -6,6 +6,9 @@ Enforces docs/foundations/layer-architecture.md §5:
   2. Physics-layer files never import QBP.Substrate.
   3. Every .lean under a layer directory is reachable from its aggregator root,
      unless listed in the aggregator's quarantine table (| `QBP.Foo.Bar` | ... |).
+  4. Substrate files (allowed since the beekeeper's 2026-09-07 lift, AC1-hosting only)
+     state what they host and what they do not derive, cite the lift, and are reachable
+     from QBP/Substrate.lean (layer-architecture §1).
 
 Exit 0 = clean; exit 1 = violations (printed).
 """
@@ -107,14 +110,44 @@ def main() -> int:
     else:
         errors.append("proofs/QBP/Foundations.lean aggregator missing")
 
-    # Substrate must contain no .lean files yet.
+    # Substrate: reserved until 2026-09-07, when the beekeeper lifted the empty-Substrate
+    # rule for AC1-hosting work only (#473 issuecomment-5574256922). The lift carries a
+    # per-file discipline (layer-architecture §1): every Substrate .lean file must state in
+    # its module docstring what it HOSTS and what it does NOT DERIVE, and cite the lift.
+    # It must also be reachable from the QBP/Substrate.lean aggregator (mirror of rule 3).
     sub = PROOFS / SUBSTRATE_DIR
     if sub.is_dir():
+        sub_agg = PROOFS / "QBP" / "Substrate.lean"
+        sub_imported = set(imports_of(sub_agg)) if sub_agg.exists() else set()
         for lean in sorted(sub.rglob("*.lean")):
-            errors.append(
-                f"{lean}: Substrate layer is reserved — no Lean files "
-                f"until the first real theorem (layer-architecture §1)"
-            )
+            text = lean.read_text(encoding="utf-8")
+            head = text[:6000]
+            missing = []
+            if "host" not in head.lower():
+                missing.append("a statement of what it HOSTS")
+            if (
+                "not derive" not in head.lower()
+                and "does not derive" not in head.lower()
+            ):
+                missing.append("a statement of what it does NOT DERIVE")
+            if "5574256922" not in head and "#473" not in head:
+                missing.append(
+                    "a citation of the beekeeper's lift (#473 issuecomment-5574256922)"
+                )
+            if missing:
+                errors.append(
+                    f"{lean}: Substrate file lacks the per-file discipline of the lift "
+                    f"(layer-architecture §1): {'; '.join(missing)}"
+                )
+            mod = module_of(lean)
+            if not sub_agg.exists():
+                errors.append(
+                    "proofs/QBP/Substrate.lean aggregator missing (Substrate has .lean files)"
+                )
+            elif mod not in sub_imported:
+                errors.append(
+                    f"{lean}: not imported by QBP/Substrate.lean aggregator (build-invisibility)"
+                )
 
     if errors:
         print("LAYER-IMPORT VIOLATIONS:")
