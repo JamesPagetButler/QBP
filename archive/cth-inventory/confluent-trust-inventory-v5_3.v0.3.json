@@ -8427,6 +8427,257 @@
       }
     },
     {
+      "id": "PROOF-associative-composition-iff",
+      "name": "Composition of left-multiplications equals multiplication exactly on associative sets (L_x∘L_y = L_{xy} ⇔ assoc = 0)",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "DERIV-holographic, theorem part 1 (flag 3). lMul_comp_eq_iff_assoc_forall: for A ⊆ CDAlg R n, (∀ x y ∈ A, L_x ∘ L_y = L_{x·y} as linear maps) ⇔ (∀ x y ∈ A, ∀ z, assoc x y z = 0); lMul_comp_eq_iff_assoc_mem: the version restricted to z ∈ A; lMul_comp_of_forall: the one-way bridge. Non-vacuity: lMul_comp_fails_on_octonions (the law fails on all of 𝕆) and lMul_comp_on_quaternion_frame (it holds on a quaternion frame). This is the theorem-shaped content of the POSTULATE 'observers require associativity' (measurements compose as multiplication only in associative substructures); the postulate itself is NOT proved and NOT claimed.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.HolographicSubalgebra.lMul_comp_eq_iff_assoc_forall",
+      "lean_companion_theorems": [
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_eq_iff_assoc_mem",
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_of_forall",
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_fails_on_octonions",
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_on_quaternion_frame"
+      ],
+      "theorems": [
+        {
+          "name": "lMul_comp_eq_iff_assoc_forall",
+          "status": "verified"
+        },
+        {
+          "name": "lMul_comp_eq_iff_assoc_mem",
+          "status": "verified"
+        },
+        {
+          "name": "lMul_comp_of_forall",
+          "status": "verified"
+        },
+        {
+          "name": "lMul_comp_fails_on_octonions",
+          "status": "verified"
+        },
+        {
+          "name": "lMul_comp_on_quaternion_frame",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473-flag3",
+      "last_tested_at": "2026-09-07T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-07T00:00:00Z",
+        "verifier": "lake build QBP.Foundations.HolographicSubalgebra (targeted, 2959 jobs) and the QBP.Foundations umbrella (3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-quaternion-frame-maximal",
+      "name": "Quaternion frames span{1,u,v,uv} of 𝕆 are associative subalgebras, and no associative subalgebra properly contains one",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "DERIV-holographic, theorem part 2 (flag 3): 'the largest associative subalgebra of 𝕆 is ℍ', frame-relative. For orthonormal imaginary u, v ∈ 𝕆: quaternion_frame_table (u² = v² = (uv)² = −1, vu = −uv, u(uv) = −v, (uv)u = v, v(uv) = u, (uv)v = −u — general, from imaginary_sq, anticommutation, alternativity, flexibility, norm composition, no decide); quaternion_frame_subalgebra (span{1,u,v,uv} closed and associative — the Artin chunks instantiated). assoc_orthogonal_triple: for orthogonal imaginary u, v, w with w ⟂ uv, assoc u v w = 2·(uv)w, via the left Moufang law; assoc_orthogonal_triple_ne_zero. span4_eq_of_associative / finrank_eq_four_of_associative / not_associative_of_gt_span4: any associative subalgebra S containing the frame equals it (dim 4). Concrete cross-check: assoc e₁ e₂ e₄ ≠ 0 by kernel decide (coefficient 2 agrees with the structural route). quaternion_frame_subalgebra itself carries no orthonormality hypotheses (Artin closure for any pair); orthonormality enters only through the frame's independence and the maximality theorem, whose primary witness is span4_eq_of_associative. NOT claimed: the fully general 'every associative subalgebra of 𝕆 has dim ≤ 4' — DEFERRED, not blocked: closing it needs an orthonormal imaginary pair inside an arbitrary associative subalgebra of dimension ≥ 3 (a two-step explicit Gram–Schmidt over the existing bil with Real.sqrt; elementary, no Mathlib InnerProductSpace instance required); deferred per the architecture ruling 2026-09-07 (a registered inner-product structure on CDAlg, if ever wanted, is its own foundational PR).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.HolographicSubalgebra.span4_eq_of_associative",
+      "lean_companion_theorems": [
+        "QBP.Foundations.HolographicSubalgebra.not_associative_of_gt_span4",
+        "QBP.Foundations.HolographicSubalgebra.finrank_eq_four_of_associative",
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_subalgebra",
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_table",
+        "QBP.Foundations.HolographicSubalgebra.assoc_orthogonal_triple",
+        "QBP.Foundations.HolographicSubalgebra.assoc_orthogonal_triple_ne_zero",
+        "QBP.Foundations.HolographicSubalgebra.mul_assoc_flip",
+        "QBP.Foundations.HolographicSubalgebra.assoc_e1_e2_e4_ne_zero",
+        "QBP.Foundations.HolographicSubalgebra.assoc_e1_e2_e4_ne_zero_structural",
+        "QBP.Foundations.HolographicSubalgebra.fano_pair_frame",
+        "QBP.Foundations.HolographicSubalgebra.residual_orth_uv",
+        "QBP.Foundations.HolographicSubalgebra.bil_proj4"
+      ],
+      "theorems": [
+        {
+          "name": "span4_eq_of_associative",
+          "status": "verified"
+        },
+        {
+          "name": "not_associative_of_gt_span4",
+          "status": "verified"
+        },
+        {
+          "name": "finrank_eq_four_of_associative",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_frame_subalgebra",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_frame_table",
+          "status": "verified"
+        },
+        {
+          "name": "assoc_orthogonal_triple",
+          "status": "verified"
+        },
+        {
+          "name": "assoc_orthogonal_triple_ne_zero",
+          "status": "verified"
+        },
+        {
+          "name": "mul_assoc_flip",
+          "status": "verified"
+        },
+        {
+          "name": "assoc_e1_e2_e4_ne_zero",
+          "status": "verified"
+        },
+        {
+          "name": "assoc_e1_e2_e4_ne_zero_structural",
+          "status": "verified"
+        },
+        {
+          "name": "fano_pair_frame",
+          "status": "verified"
+        },
+        {
+          "name": "residual_orth_uv",
+          "status": "verified"
+        },
+        {
+          "name": "bil_proj4",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473-flag3",
+      "last_tested_at": "2026-09-07T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-07T00:00:00Z",
+        "verifier": "lake build QBP.Foundations.HolographicSubalgebra (targeted, 2959 jobs) and the QBP.Foundations umbrella (3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-quaternion-frame-codim-four",
+      "name": "A quaternion frame is a 4-dimensional subspace of the 8-dimensional 𝕆: codimension 4",
+      "tier": 1,
+      "provenance": "T",
+      "status": "coherent",
+      "description": "DERIV-holographic, theorem part 3 (flag 3): 'the 4D gap' as a number. quaternion_frame_linearIndependent ({1, u, v, uv} independent from pairwise bil-orthogonality + N = 1, proved); finrank_quaternion_frame = 4; quaternion_frame_codim_four: finrank span + 4 = finrank (CDAlg ℝ 3) = 8 (additive form; the subtraction form as corollary; uses PROOF-cd-algebra-finrank-2n). The interpretation 'the 4D gap is the holographic boundary' is NOT claimed — no boundary, holography, spacetime or physics semantics appears in any statement.",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.HolographicSubalgebra.quaternion_frame_codim_four",
+      "lean_companion_theorems": [
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_codim_four'",
+        "QBP.Foundations.HolographicSubalgebra.finrank_quaternion_frame",
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_linearIndependent",
+        "QBP.Foundations.HolographicSubalgebra.gen4_eq_range",
+        "QBP.Foundations.HolographicSubalgebra.bil_u_uv",
+        "QBP.Foundations.HolographicSubalgebra.bil_v_uv"
+      ],
+      "theorems": [
+        {
+          "name": "quaternion_frame_codim_four",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_frame_codim_four'",
+          "status": "verified"
+        },
+        {
+          "name": "finrank_quaternion_frame",
+          "status": "verified"
+        },
+        {
+          "name": "quaternion_frame_linearIndependent",
+          "status": "verified"
+        },
+        {
+          "name": "gen4_eq_range",
+          "status": "verified"
+        },
+        {
+          "name": "bil_u_uv",
+          "status": "verified"
+        },
+        {
+          "name": "bil_v_uv",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#473-flag3",
+      "last_tested_at": "2026-09-07T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-07T00:00:00Z",
+        "verifier": "lake build QBP.Foundations.HolographicSubalgebra (targeted, 2959 jobs) and the QBP.Foundations umbrella (3546 jobs) + #print axioms ×45 (qbp-oppenheimer + lean-prover agent, 2026-09-07); pending cth §I4",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    },
+    {
       "id": "PROOF-vacuum-parametrisation",
       "name": "Prop 15 / #634 AC3: a vacuum of the δ-landscape is a + (b₀ + γu)ℓ with a = αu — parametrised, poles included",
       "tier": 1,

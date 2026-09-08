@@ -679,6 +679,52 @@
       ]
     },
     {
+      "anchor_id": "PROOF-associative-composition-iff",
+      "proof_system": "lean4",
+      "declared_by": "#473-flag3",
+      "witnesses": [
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_eq_iff_assoc_forall",
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_eq_iff_assoc_mem",
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_of_forall",
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_fails_on_octonions",
+        "QBP.Foundations.HolographicSubalgebra.lMul_comp_on_quaternion_frame"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-quaternion-frame-maximal",
+      "proof_system": "lean4",
+      "declared_by": "#473-flag3",
+      "witnesses": [
+        "QBP.Foundations.HolographicSubalgebra.span4_eq_of_associative",
+        "QBP.Foundations.HolographicSubalgebra.not_associative_of_gt_span4",
+        "QBP.Foundations.HolographicSubalgebra.finrank_eq_four_of_associative",
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_subalgebra",
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_table",
+        "QBP.Foundations.HolographicSubalgebra.assoc_orthogonal_triple",
+        "QBP.Foundations.HolographicSubalgebra.assoc_orthogonal_triple_ne_zero",
+        "QBP.Foundations.HolographicSubalgebra.mul_assoc_flip",
+        "QBP.Foundations.HolographicSubalgebra.assoc_e1_e2_e4_ne_zero",
+        "QBP.Foundations.HolographicSubalgebra.assoc_e1_e2_e4_ne_zero_structural",
+        "QBP.Foundations.HolographicSubalgebra.fano_pair_frame",
+        "QBP.Foundations.HolographicSubalgebra.residual_orth_uv",
+        "QBP.Foundations.HolographicSubalgebra.bil_proj4"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-quaternion-frame-codim-four",
+      "proof_system": "lean4",
+      "declared_by": "#473-flag3",
+      "witnesses": [
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_codim_four",
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_codim_four'",
+        "QBP.Foundations.HolographicSubalgebra.finrank_quaternion_frame",
+        "QBP.Foundations.HolographicSubalgebra.quaternion_frame_linearIndependent",
+        "QBP.Foundations.HolographicSubalgebra.gen4_eq_range",
+        "QBP.Foundations.HolographicSubalgebra.bil_u_uv",
+        "QBP.Foundations.HolographicSubalgebra.bil_v_uv"
+      ]
+    },
+    {
       "anchor_id": "PROOF-vacuum-parametrisation",
       "proof_system": "lean4",
       "declared_by": "#639-hosting",
