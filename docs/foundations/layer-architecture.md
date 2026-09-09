@@ -95,9 +95,30 @@ on first genuine use, per its NASCENT status.
 `scripts/check_layer_imports.py` (wired into the lean-foundations workflow):
 - FAIL if any file under `Foundations/` imports `QBP.Physics` or `QBP.Substrate`.
 - FAIL if any Physics-layer file imports `QBP.Substrate`.
-- FAIL if a `.lean` file under a layer directory is not reachable from its
-  aggregator root (build-invisibility check), unless listed in the explicit
-  quarantine table inside the aggregator file with a tracking issue.
+- FAIL if a `.lean` file under `Foundations/` or `Substrate/` is not reachable
+  from its aggregator root (build-invisibility check), unless listed in the
+  explicit quarantine table inside the aggregator file with a tracking issue.
+- FAIL if a `.lean` file under a **physics dir** (`Experiments/`, `Optics/`,
+  `Cosmo/`, `Oracle/`, `Units/`, …) or the **Sprint12 corpus**
+  (`Sprint12-Inherited/`) is **build-invisible** — reachable from no declared
+  lakefile build-target root (the `QBP` lean_lib root, the Sprint12 lib roots,
+  and every `lean_exe` root). These dirs have no single per-dir aggregator (files
+  are wired straight into `QBP.lean`, `Cosmo` has its own aggregator, `Oracle`/
+  `Units` files hang off `lean_exe` roots, Sprint12 files are each a lib root), so
+  the check uses the REAL import graph (lakefile roots + transitive closure)
+  rather than one aggregator file. This closes the gap that let
+  `Experiments/General3D.lean` be committed build-broken **and** build-invisible
+  while `lake build` stayed green (#625, surfaced by the #619 orphan sweep).
+
+  A file that is intentionally outside the build graph for now is listed in the
+  shrink-only, issue-linked quarantine `proofs/QBP/.build-visibility-quarantine.json`
+  (schema: `{"file", "reason", "issue"}` per entry). The gate hard-fails on a new
+  invisible file that is not listed, on a listed file that became visible again or
+  no longer exists (stale — remove it), and on any entry missing its tracking
+  issue. Adding an entry is a visible, reviewed commit that names an open issue —
+  never a silent CI baseline bump. The gate ships with an adversarial self-test
+  (`scripts/test_check_layer_imports.py`) that plants a build-invisible file and
+  asserts the gate catches it.
 
 ## 6. Migration plan (follow-up housekeeping, NOT this PR)
 

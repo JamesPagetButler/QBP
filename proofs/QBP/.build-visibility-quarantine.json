@@ -1,0 +1,10 @@
+{
+  "policy": "SHRINK-ONLY build-visibility quarantine for scripts/check_layer_imports.py Rule 5. Lists .lean files under the enforced physics/Sprint12 dirs that are intentionally NOT reachable from any lakefile build-target root right now, each pinned to a tracking issue. The gate HARD-FAILS if: (1) a NEW build-invisible file appears that is not listed here (blocked immediately — a broken proof in it would ride CI-green); (2) a listed file becomes build-visible again (stale entry — remove it); (3) a listed file no longer exists (stale — remove it); (4) any entry omits its tracking issue or reason. Adding an entry is a visible, reviewed commit that MUST name an open issue — never a silent CI baseline bump. The list can only lose entries.",
+  "entries": [
+    {
+      "file": "QBP/Oracle/FFI.lean",
+      "reason": "Phase-4e @[export] C-shim over the Float oracle, reachable from no lake target root (the `oracle` exe root QBP.Oracle.Main imports FloatCompute, not FFI; nothing else imports FFI). Its own docstring flags the C-export path as a fallback to the `lake exe oracle` subprocess, which is what is exercised today. Decision (wire-into-a-target or retire) belongs to the Oracle subsystem, tracked in #644 — quarantined so the file stays tracked rather than silently invisible.",
+      "issue": "#644"
+    }
+  ]
+}

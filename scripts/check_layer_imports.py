@@ -9,17 +9,33 @@ Enforces docs/foundations/layer-architecture.md §5:
   4. Substrate files (allowed since the beekeeper's 2026-09-07 lift, AC1-hosting only)
      state what they host and what they do not derive, cite the lift, and are reachable
      from QBP/Substrate.lean (layer-architecture §1).
+  5. BUILD-VISIBILITY for the physics dirs (Experiments/Optics/Cosmo/Oracle/Units) and
+     the Sprint12 corpus. Every .lean under these dirs must be transitively reachable
+     from a DECLARED lakefile build-target root (the `QBP` lean_lib root, the Sprint12
+     lib roots, and every `lean_exe ... root`), OR be listed in the shrink-only,
+     issue-linked build-visibility quarantine.
+
+     Rationale: CI compiles a module only if it is reachable from a declared build root.
+     A .lean reachable from NO root is compiled by nothing — it can be committed
+     build-broken while `lake build` stays green (the General3D.lean build-invisibility
+     class that let an unclosed goal ride CI-green, issue #625/#619). Foundations/Substrate
+     get this via their per-dir aggregators (rules 3/4); the physics + Sprint12 dirs have
+     no single aggregator (files are wired directly into QBP.lean, Cosmo has its own
+     aggregator, Oracle/Units files hang off lean_exe roots, Sprint12 files are each a
+     lib root), so this rule uses the REAL import graph instead.
 
 Exit 0 = clean; exit 1 = violations (printed).
 """
 
 from __future__ import annotations
 
+import argparse
+import json
 import re
 import sys
 from pathlib import Path
 
-PROOFS = Path(__file__).resolve().parent.parent / "proofs"
+DEFAULT_PROOFS = Path(__file__).resolve().parent.parent / "proofs"
 
 # Physics layer currently lives in these directories (pre-migration, see §6).
 PHYSICS_DIRS = [
@@ -34,28 +50,150 @@ PHYSICS_DIRS = [
 FOUNDATIONS_DIR = "QBP/Foundations"
 SUBSTRATE_DIR = "QBP/Substrate"
 
+# The shrink-only build-visibility quarantine, relative to the proofs root.
+QUARANTINE_REL = "QBP/.build-visibility-quarantine.json"
+
+# Directories whose every .lean must be build-visible (reachable from a declared
+# lakefile target root) or quarantined. Foundations/Substrate get completeness from
+# their own aggregators (rules 3/4); rule 5 covers these via the real build graph.
+# Sprint12-Inherited is a separate lean_lib with its own srcDir — issue #625 AC1
+# names it explicitly.
+BUILD_VISIBILITY_DIRS = PHYSICS_DIRS + ["Sprint12-Inherited"]
+
 IMPORT_RE = re.compile(r"^import\s+([\w.]+)", re.MULTILINE)
 QUARANTINE_RE = re.compile(r"^\|\s*`(QBP\.[\w.]+)`", re.MULTILINE)
+# Lakefile parsing: `lean_lib`/`lean_exe` target blocks, each with an optional
+# `srcDir := "X"` and roots given as `root := `Mod`` or `roots := #[`A, `B]`.
+LAKE_DECL_RE = re.compile(r"^\s*lean_(?:lib|exe)\b", re.MULTILINE)
+LAKE_SRCDIR_RE = re.compile(r'srcDir\s*:=\s*"([^"]*)"')
+LAKE_ROOT_RE = re.compile(r"root\s*:=\s*`([\w.]+)")
+LAKE_ROOTS_RE = re.compile(r"roots\s*:=\s*#\[([^\]]*)\]")
+BACKTICK_NAME_RE = re.compile(r"`([\w.]+)")
 
 
 def imports_of(path: Path) -> list[str]:
     return IMPORT_RE.findall(path.read_text(encoding="utf-8"))
 
 
-def module_of(path: Path) -> str:
-    return ".".join(path.relative_to(PROOFS).with_suffix("").parts)
+def module_of(path: Path, proofs: Path) -> str:
+    return ".".join(path.relative_to(proofs).with_suffix("").parts)
 
 
-def main() -> int:
+def lakefile_targets(proofs: Path, errors: list[str]) -> list[tuple[str, list[str]]]:
+    """Every `lean_lib`/`lean_exe` target as `(srcDir, [root modules])`.
+
+    Parsing the lakefile (rather than hardcoding `QBP`) keeps the linter honest
+    when a new target is added, and captures each target's `srcDir` so roots under
+    a non-default srcDir (the Sprint12 corpus) resolve to the right files.
+    """
+    lakefile = proofs / "lakefile.lean"
+    if not lakefile.is_file():
+        errors.append("proofs/lakefile.lean missing — cannot determine build roots")
+        return []
+    text = lakefile.read_text(encoding="utf-8")
+    starts = [m.start() for m in LAKE_DECL_RE.finditer(text)]
+    if not starts:
+        errors.append("proofs/lakefile.lean declares no lean_lib/lean_exe targets")
+        return []
+    bounds = starts + [len(text)]
+    targets: list[tuple[str, list[str]]] = []
+    for i in range(len(starts)):
+        block = text[bounds[i] : bounds[i + 1]]
+        sd = LAKE_SRCDIR_RE.search(block)
+        srcdir = sd.group(1) if sd else "."
+        roots: list[str] = list(LAKE_ROOT_RE.findall(block))
+        for group in LAKE_ROOTS_RE.findall(block):
+            roots.extend(BACKTICK_NAME_RE.findall(group))
+        if roots:
+            targets.append((srcdir, roots))
+    return targets
+
+
+def resolve_module(module: str, proofs: Path, srcdirs: list[str]) -> Path | None:
+    """First existing file for `module` across the candidate srcDirs, else None.
+
+    A Lean module name resolves against the srcDir of some package library; here
+    we try each declared srcDir (default "." first). Externals (Mathlib/Init/...)
+    resolve to no file and are naturally skipped.
+    """
+    for sd in srcdirs:
+        target = (proofs / sd / Path(*module.split("."))).with_suffix(".lean")
+        if target.is_file():
+            return target
+    return None
+
+
+def build_visible_files(
+    proofs: Path, targets: list[tuple[str, list[str]]], srcdirs: list[str]
+) -> set[Path]:
+    """Resolved-file transitive import closure from all declared target roots.
+
+    Keyed on resolved file paths (not module names, which can collide across
+    srcDirs). A .lean whose resolved path is in this set is compiled by some
+    `lake` target; one that is not is build-invisible.
+    """
+    seen: set[Path] = set()
+    stack: list[str] = []
+    for _srcdir, roots in targets:
+        stack.extend(roots)
+    while stack:
+        module = stack.pop()
+        path = resolve_module(module, proofs, srcdirs)
+        if path is None:
+            continue
+        rp = path.resolve()
+        if rp in seen:
+            continue
+        seen.add(rp)
+        stack.extend(imports_of(path))
+    return seen
+
+
+def load_quarantine(proofs: Path, errors: list[str]) -> dict[str, dict]:
+    """Read the shrink-only build-visibility quarantine, keyed on proofs-relative path.
+
+    Schema: {"entries": [{"file": "QBP/Oracle/FFI.lean", "reason": "...",
+    "issue": "#NNN"}]}. Every entry MUST carry a non-empty issue and reason — a
+    quarantine with no tracking issue is exactly the silent-baseline anti-pattern
+    this gate exists to prevent.
+    """
+    qfile = proofs / QUARANTINE_REL
+    if not qfile.is_file():
+        return {}
+    name = qfile.name
+    try:
+        data = json.loads(qfile.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        errors.append(f"{name}: invalid JSON ({exc})")
+        return {}
+    out: dict[str, dict] = {}
+    for entry in data.get("entries", []):
+        rel = entry.get("file")
+        if not rel:
+            errors.append(f"{name}: entry with no 'file' field")
+            continue
+        if not entry.get("issue"):
+            errors.append(
+                f"{name}: quarantine entry for {rel} has no 'issue' — every "
+                f"quarantined file must name a tracking issue (no silent baselining)"
+            )
+        if not entry.get("reason"):
+            errors.append(f"{name}: quarantine entry for {rel} has no 'reason'")
+        out[rel] = entry
+    return out
+
+
+def check(proofs: Path) -> list[str]:
     errors: list[str] = []
+    qf_name = (proofs / QUARANTINE_REL).name
 
     # Rules 1 & 2: forbidden imports.
-    for lean in sorted((PROOFS / FOUNDATIONS_DIR).rglob("*.lean")):
+    for lean in sorted((proofs / FOUNDATIONS_DIR).rglob("*.lean")):
         for imp in imports_of(lean):
             if imp.startswith("QBP.Physics") or imp.startswith("QBP.Substrate"):
                 errors.append(f"{lean}: Foundations imports {imp} (forbidden)")
     for pdir in PHYSICS_DIRS:
-        base = PROOFS / pdir
+        base = proofs / pdir
         if not base.is_dir():
             continue
         for lean in sorted(base.rglob("*.lean")):
@@ -64,7 +202,7 @@ def main() -> int:
                     errors.append(f"{lean}: Physics imports {imp} (forbidden)")
 
     # Rule 3: aggregator completeness for Foundations.
-    aggregator = PROOFS / "QBP" / "Foundations.lean"
+    aggregator = proofs / "QBP" / "Foundations.lean"
     if aggregator.is_file():
         text = aggregator.read_text(encoding="utf-8")
         all_imports = IMPORT_RE.findall(text)
@@ -93,15 +231,15 @@ def main() -> int:
         for imp in sorted(imported):
             if not imp.startswith("QBP.Foundations."):
                 continue
-            target = PROOFS / Path(*imp.split(".")).with_suffix(".lean")
+            target = proofs / Path(*imp.split(".")).with_suffix(".lean")
             if not target.is_file():
                 errors.append(
                     f"QBP/Foundations.lean: import {imp} resolves to no file "
-                    f"({target.relative_to(PROOFS)} missing — stale/renamed import, "
+                    f"({target.relative_to(proofs)} missing — stale/renamed import, "
                     f"possibly a union-merge divergent-edit artifact)"
                 )
-        for lean in sorted((PROOFS / FOUNDATIONS_DIR).rglob("*.lean")):
-            mod = module_of(lean)
+        for lean in sorted((proofs / FOUNDATIONS_DIR).rglob("*.lean")):
+            mod = module_of(lean, proofs)
             if mod not in imported and mod not in quarantined:
                 errors.append(
                     f"{lean}: not imported by QBP/Foundations.lean aggregator and "
@@ -115,9 +253,9 @@ def main() -> int:
     # per-file discipline (layer-architecture §1): every Substrate .lean file must state in
     # its module docstring what it HOSTS and what it does NOT DERIVE, and cite the lift.
     # It must also be reachable from the QBP/Substrate.lean aggregator (mirror of rule 3).
-    sub = PROOFS / SUBSTRATE_DIR
+    sub = proofs / SUBSTRATE_DIR
     if sub.is_dir():
-        sub_agg = PROOFS / "QBP" / "Substrate.lean"
+        sub_agg = proofs / "QBP" / "Substrate.lean"
         sub_imported = set(imports_of(sub_agg)) if sub_agg.exists() else set()
         for lean in sorted(sub.rglob("*.lean")):
             text = lean.read_text(encoding="utf-8")
@@ -139,7 +277,7 @@ def main() -> int:
                     f"{lean}: Substrate file lacks the per-file discipline of the lift "
                     f"(layer-architecture §1): {'; '.join(missing)}"
                 )
-            mod = module_of(lean)
+            mod = module_of(lean, proofs)
             if not sub_agg.exists():
                 errors.append(
                     "proofs/QBP/Substrate.lean aggregator missing (Substrate has .lean files)"
@@ -149,6 +287,70 @@ def main() -> int:
                     f"{lean}: not imported by QBP/Substrate.lean aggregator (build-invisibility)"
                 )
 
+    # Rule 5: build-visibility for the physics dirs + Sprint12 corpus. "Visible" =
+    # its resolved file is in the transitive import closure of the declared lakefile
+    # target roots (the real build graph). These dirs have no single per-dir
+    # aggregator to key a membership check on, so we use the closure directly.
+    targets = lakefile_targets(proofs, errors)
+    srcdirs: list[str] = ["."]
+    for srcdir, _roots in targets:
+        if srcdir not in srcdirs:
+            srcdirs.append(srcdir)
+    visible = build_visible_files(proofs, targets, srcdirs)
+    quarantine = load_quarantine(proofs, errors)
+
+    enforced_files: set[str] = set()
+    for vdir in BUILD_VISIBILITY_DIRS:
+        base = proofs / vdir
+        if not base.is_dir():
+            continue
+        for lean in sorted(base.rglob("*.lean")):
+            rel = str(lean.relative_to(proofs))
+            enforced_files.add(rel)
+            in_build = lean.resolve() in visible
+            in_quar = rel in quarantine
+            if not in_build and not in_quar:
+                errors.append(
+                    f"{rel}: build-invisible — its resolved file is reachable from no "
+                    f"lakefile target root and it is not in {qf_name}. Nothing compiles "
+                    f"it, so it can be committed broken while `lake build` stays green. "
+                    f"Wire it into an imported module, or quarantine it with a "
+                    f"tracking issue."
+                )
+            elif in_build and in_quar:
+                errors.append(
+                    f"{rel}: listed in {qf_name} but is now build-visible (reachable "
+                    f"from a target root) — stale quarantine entry, remove it (the "
+                    f"quarantine is shrink-only)."
+                )
+
+    # Stale-quarantine guard: an entry whose file is gone, or that is not under an
+    # enforced dir (the quarantine only governs the enforced tree).
+    for rel in sorted(quarantine):
+        if not (proofs / rel).is_file():
+            errors.append(
+                f"{rel}: quarantined in {qf_name} but the file does not exist — "
+                f"stale entry, remove it."
+            )
+        elif rel not in enforced_files:
+            errors.append(
+                f"{rel}: quarantined in {qf_name} but is not under an enforced dir "
+                f"{BUILD_VISIBILITY_DIRS} — the quarantine only governs the enforced "
+                f"tree; remove it."
+            )
+
+    return errors
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--proofs",
+        default=str(DEFAULT_PROOFS),
+        help="Path to the proofs/ tree to check (default: the repo's proofs/).",
+    )
+    args = parser.parse_args(argv)
+    errors = check(Path(args.proofs))
     if errors:
         print("LAYER-IMPORT VIOLATIONS:")
         for e in errors:
