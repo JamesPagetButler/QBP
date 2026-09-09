@@ -11,18 +11,21 @@ Enforces docs/foundations/layer-architecture.md §5:
      from QBP/Substrate.lean (layer-architecture §1).
   5. BUILD-VISIBILITY for the physics dirs (Experiments/Optics/Cosmo/Oracle/Units) and
      the Sprint12 corpus. Every .lean under these dirs must be transitively reachable
-     from a DECLARED lakefile build-target root (the `QBP` lean_lib root, the Sprint12
-     lib roots, and every `lean_exe ... root`), OR be listed in the shrink-only,
+     from a DEFAULT-target root (a lakefile target carrying `@[default_target]` — the
+     `QBP` lean_lib root and the Sprint12 lib roots), OR be listed in the shrink-only,
      issue-linked build-visibility quarantine.
 
-     Rationale: CI compiles a module only if it is reachable from a declared build root.
-     A .lean reachable from NO root is compiled by nothing — it can be committed
-     build-broken while `lake build` stays green (the General3D.lean build-invisibility
-     class that let an unclosed goal ride CI-green, issue #625/#619). Foundations/Substrate
-     get this via their per-dir aggregators (rules 3/4); the physics + Sprint12 dirs have
-     no single aggregator (files are wired directly into QBP.lean, Cosmo has its own
-     aggregator, Oracle/Units files hang off lean_exe roots, Sprint12 files are each a
-     lib root), so this rule uses the REAL import graph instead.
+     Rationale: CI runs bare `lake build`, which compiles only the `@[default_target]`s.
+     A .lean reachable from none of them is compiled by nothing in CI — it can be
+     committed build-broken while `lake build` stays green (the General3D.lean
+     build-invisibility class that let an unclosed goal ride CI-green, issue #625/#619).
+     "Reachable via a declared-but-non-default target" (a `lean_exe`) is NOT enough:
+     CI does not build the exes, so that corpus is invisible to CI too (tracked in
+     #646). Foundations/Substrate get completeness via their per-dir aggregators
+     (rules 3/4); the physics + Sprint12 dirs have no single aggregator (files wire
+     directly into QBP.lean, Cosmo has its own aggregator, Oracle/Units files hang off
+     lean_exe roots, Sprint12 files are each a lib root), so this rule uses the REAL
+     import graph instead.
 
 Exit 0 = clean; exit 1 = violations (printed).
 """
@@ -79,12 +82,18 @@ def module_of(path: Path, proofs: Path) -> str:
     return ".".join(path.relative_to(proofs).with_suffix("").parts)
 
 
-def lakefile_targets(proofs: Path, errors: list[str]) -> list[tuple[str, list[str]]]:
-    """Every `lean_lib`/`lean_exe` target as `(srcDir, [root modules])`.
+def lakefile_targets(
+    proofs: Path, errors: list[str]
+) -> list[tuple[str, list[str], bool]]:
+    """Every `lean_lib`/`lean_exe` target as `(srcDir, [root modules], is_default)`.
 
-    Parsing the lakefile (rather than hardcoding `QBP`) keeps the linter honest
-    when a new target is added, and captures each target's `srcDir` so roots under
-    a non-default srcDir (the Sprint12 corpus) resolve to the right files.
+    `is_default` is True when the target carries the `@[default_target]` attribute
+    (on the line before its declaration) — the ONLY targets bare `lake build`
+    compiles, which is what CI runs. Non-default targets (the exes) are declared
+    but not built by CI, so files reachable only through them are build-invisible
+    to CI. Parsing the lakefile (rather than hardcoding `QBP`) keeps the linter
+    honest when a target is added; capturing each target's `srcDir` lets roots
+    under a non-default srcDir (the Sprint12 corpus) resolve to the right files.
     """
     lakefile = proofs / "lakefile.lean"
     if not lakefile.is_file():
@@ -96,16 +105,20 @@ def lakefile_targets(proofs: Path, errors: list[str]) -> list[tuple[str, list[st
         errors.append("proofs/lakefile.lean declares no lean_lib/lean_exe targets")
         return []
     bounds = starts + [len(text)]
-    targets: list[tuple[str, list[str]]] = []
+    targets: list[tuple[str, list[str], bool]] = []
     for i in range(len(starts)):
         block = text[bounds[i] : bounds[i + 1]]
+        # The `@[default_target]` attribute sits on the line just before the
+        # declaration keyword — look at the short window preceding this decl.
+        preceding = text[max(0, starts[i] - 60) : starts[i]]
+        is_default = "@[default_target]" in preceding
         sd = LAKE_SRCDIR_RE.search(block)
         srcdir = sd.group(1) if sd else "."
         roots: list[str] = list(LAKE_ROOT_RE.findall(block))
         for group in LAKE_ROOTS_RE.findall(block):
             roots.extend(BACKTICK_NAME_RE.findall(group))
         if roots:
-            targets.append((srcdir, roots))
+            targets.append((srcdir, roots, is_default))
     return targets
 
 
@@ -124,18 +137,22 @@ def resolve_module(module: str, proofs: Path, srcdirs: list[str]) -> Path | None
 
 
 def build_visible_files(
-    proofs: Path, targets: list[tuple[str, list[str]]], srcdirs: list[str]
+    proofs: Path, targets: list[tuple[str, list[str], bool]], srcdirs: list[str]
 ) -> set[Path]:
-    """Resolved-file transitive import closure from all declared target roots.
+    """Resolved-file transitive import closure from the DEFAULT-target roots.
 
-    Keyed on resolved file paths (not module names, which can collide across
-    srcDirs). A .lean whose resolved path is in this set is compiled by some
-    `lake` target; one that is not is build-invisible.
+    Only `@[default_target]` roots seed the closure, because bare `lake build`
+    (what CI runs) compiles only those. A .lean whose resolved path is in this set
+    is actually compiled by CI; one that is not is build-invisible to CI — even if
+    it is reachable from a declared-but-non-default target such as a `lean_exe`
+    (that corpus is tracked separately, e.g. #646). Keyed on resolved file paths,
+    not module names (which can collide across srcDirs).
     """
     seen: set[Path] = set()
     stack: list[str] = []
-    for _srcdir, roots in targets:
-        stack.extend(roots)
+    for _srcdir, roots, is_default in targets:
+        if is_default:
+            stack.extend(roots)
     while stack:
         module = stack.pop()
         path = resolve_module(module, proofs, srcdirs)
@@ -288,12 +305,14 @@ def check(proofs: Path) -> list[str]:
                 )
 
     # Rule 5: build-visibility for the physics dirs + Sprint12 corpus. "Visible" =
-    # its resolved file is in the transitive import closure of the declared lakefile
-    # target roots (the real build graph). These dirs have no single per-dir
-    # aggregator to key a membership check on, so we use the closure directly.
+    # its resolved file is in the transitive import closure of the DEFAULT-target
+    # roots — what bare `lake build` (CI) actually compiles. A file reachable only
+    # via a non-default target (a lean_exe) is invisible to CI and must be
+    # quarantined. These dirs have no single per-dir aggregator to key a membership
+    # check on, so we use the closure directly.
     targets = lakefile_targets(proofs, errors)
     srcdirs: list[str] = ["."]
-    for srcdir, _roots in targets:
+    for srcdir, _roots, _is_default in targets:
         if srcdir not in srcdirs:
             srcdirs.append(srcdir)
     visible = build_visible_files(proofs, targets, srcdirs)

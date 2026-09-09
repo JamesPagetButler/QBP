@@ -100,12 +100,15 @@ on first genuine use, per its NASCENT status.
   explicit quarantine table inside the aggregator file with a tracking issue.
 - FAIL if a `.lean` file under a **physics dir** (`Experiments/`, `Optics/`,
   `Cosmo/`, `Oracle/`, `Units/`, …) or the **Sprint12 corpus**
-  (`Sprint12-Inherited/`) is **build-invisible** — reachable from no declared
-  lakefile build-target root (the `QBP` lean_lib root, the Sprint12 lib roots,
-  and every `lean_exe` root). These dirs have no single per-dir aggregator (files
-  are wired straight into `QBP.lean`, `Cosmo` has its own aggregator, `Oracle`/
-  `Units` files hang off `lean_exe` roots, Sprint12 files are each a lib root), so
-  the check uses the REAL import graph (lakefile roots + transitive closure)
+  (`Sprint12-Inherited/`) is **build-invisible** — reachable from no
+  `@[default_target]` root (the `QBP` lean_lib root and the Sprint12 lib roots).
+  "Visible" means *CI compiles it*: CI runs bare `lake build`, which builds only
+  the `@[default_target]`s, so a file reachable only via a **non-default** target
+  (a `lean_exe`) is invisible to CI too and is not treated as visible (that corpus
+  is tracked in #646). These dirs have no single per-dir aggregator (files are
+  wired straight into `QBP.lean`, `Cosmo` has its own aggregator, `Oracle`/`Units`
+  files hang off `lean_exe` roots, Sprint12 files are each a lib root), so the
+  check uses the REAL import graph (default-target roots + transitive closure)
   rather than one aggregator file. This closes the gap that let
   `Experiments/General3D.lean` be committed build-broken **and** build-invisible
   while `lake build` stayed green (#625, surfaced by the #619 orphan sweep).
