@@ -1,6 +1,6 @@
-# The holographic boundary — the tail of DERIV-holographic, defined on the hosting objects (v0.2, 2026-09-08)
+# The holographic boundary — the tail of DERIV-holographic, defined on the hosting objects (v0.3, 2026-09-09)
 
-**Status:** definition proposal for the beekeeper, v0.2 after the #643 Red Team + Gemini reviews (item 2 of the 2026-09-08 plan; asked for on 2026-09-07: *"you're going to have to define that in a little bit more detail"*). Everything here is tagged to a source — a Lean theorem on master, a numerical script in this repo, a CTH ledger entry with its status, or a beekeeper ruling. **This document edits no ledger entry.** DERIV-holographic and its five dependents are constitutional (layer 1); §5 is a *draft* re-statement for the beekeeper's ruling, not a change. Written by qbp-oppenheimer.
+**Status:** definition proposal for the beekeeper, v0.3 — v0.2 after the #643 Red Team + Gemini reviews; v0.3 adds §1a (DERIV-holographic formalised; P1 reduced to hosting clause (a)) on the beekeeper's 2026-09-09 direction (item 2 of the 2026-09-08 plan; asked for on 2026-09-07: *"you're going to have to define that in a little bit more detail"*). Everything here is tagged to a source — a Lean theorem on master, a numerical script in this repo, a CTH ledger entry with its status, or a beekeeper ruling. **This document edits no ledger entry.** DERIV-holographic and its five dependents are constitutional (layer 1); §5 is a *draft* re-statement for the beekeeper's ruling, not a change. Written by qbp-oppenheimer.
 
 **One-line summary.** The ledger's "4D gap" is now a theorem; the phrase "*is the holographic boundary*" was never given an object. On the hosting objects there are **two different boundaries** with two different ledger parents — the *holographic* boundary of one universe (candidate A below, inside an octonion containing the crystal's ℍ) and the *seam* boundary between universes (the zero-divisor locus, DERIV-sedenion) — and candidate A **reduces the ledger's pre-existing frame freedom** (which ℍ the observer sits in: 8 parameters, G₂/SO(4)) **to the choice of an encoding octonion around the crystal's ℍ_s: 4 parameters, a ℂP²** — a choice the hosting definition does not yet carry, and which has a canonical v-free home (the ℍ_s-module ℍ_s^⊥ ≅ ℍ_s³). Two premises carry that reading and are named in §3.
 
@@ -16,6 +16,38 @@ Ledger text (layer 1, `derived_from` AXIOM-1, AXIOM-2): *"Observers require asso
 | "…is the holographic boundary" | **interpretation** | **no object behind it** until this document | — |
 
 So flag 3 (addendum §5, item 3) resolves into: two theorems on master, one postulate that stays a postulate, and one interpretation that needs a definition. §2 supplies the candidates.
+
+## 1a. DERIV-holographic formalised, and what its support actually is (beekeeper direction, 2026-09-09)
+
+**Why the Prop 16 support runs only through ℓ.** Prop 16(ii) says a crystal `s` together with `ℓ` generates a quaternion algebra. In #473 round 13 this was elevated to "the algebra's operations on any state generate only associative (H-space) substructures" (T-B); round 14 computed it instead of agreeing (transcript `473-ac1-rounds-13-15-transcript-2026-09-05.md` §1):
+
+| Generators | Generated subalgebra (words ≤ 4) | Max associator | Associative? |
+|---|---|---|---|
+| `s`, `ℓ` | dim 4 — a copy of ℍ | 0 (exact) | yes |
+| `s`, generic `t` | dim 10 and growing with word length | 0.34–0.40 | no; not even alternative |
+
+The quaternion closure is a property of **ℓ**, not of the algebra's operations: `{y : [x, x, y] = 0 ∀x} = span{1, ℓ}` (`assoc_self_zero_iff`, #640). Adjoin the one distinguished direction and you get ℍ; adjoin anything else and you get a non-associative 10-dim subalgebra. So Prop 16 says "ℓ is the unique direction that associates with everything, and crystal + ℓ = ℍ" — nothing about observers.
+
+**Why "dynamics need associativity" was retracted (round 14/15).** The round-13 claim was that autonomous dynamics require associative-ish composition, so physics could only live on ℍ. The test inverted it: the generic non-associative subalgebra *does* carry the algebra's own self-maps, and iterating them (`x ↦ x·t`, power iteration of the skew part of `R_t`, `generic_maps_check.py`) gives genuine dynamics with an attractor — the zero-divisor ridge `V = 1`. The associative case (`s` with `ℓ`) gives only finite-order maps, i.e. symmetries, and the ℓ-axis pole. On the record: **associativity ⇒ symmetries; non-associativity ⇒ motion.** Both retractions are recorded (transcript round 15 §1). "Observers require associativity" therefore cannot be read as a dynamical necessity.
+
+**The entry, formally.** Setting: `𝕊 = CDAlg ℝ 4`; a universe `U(s)` with hosted algebra `ℍ_s` (`Hosting.lean`).
+
+| Part | Formal content | Status |
+|---|---|---|
+| **T1** composition | for `A ⊆ 𝕊`: `L_x ∘ L_y = L_{xy}` for all `x, y ∈ A` **iff** `A` is associative | proved (`lMul_comp_eq_iff_assoc_forall`) |
+| **T2** maximality | an associative subalgebra containing a quaternion frame equals it (dim 4) | proved, frame-relative (`span4_eq_of_associative`); global ≤ 4 deferred |
+| **T3** the gap | `dim 𝕆 − dim ℍ = 4` | proved (`quaternion_frame_codim_four`) |
+| **P** the postulate | an *observer* `O` in `U(s)` is a subset `A_O ⊆ 𝕊` on which `O`'s actions compose; by T1 `A_O` is associative; by T2 it lies inside one ℍ | not provable — the entire content of "observers require associativity" |
+| **I** the interpretation | there is an injective map `Φ` from bulk configurations on the unit `S³ ⊂ ℍ_s` to data on the 4-dim gap inside the encoding octonion (injective by AXIOM-1) | no `Φ` on record; "holographic" is the name of `Φ`; §2–§3 |
+
+**The hole in P.** "Observer = associative subset" is a *definition*, not a claim, unless *observer* is defined independently first. The ledger never did that. **Hosting does.** Clause (a) of the hosting definition (`substrate-hosting-definition-2026-09-07.md` §2; the frame the beekeeper ruled 2026-09-07) says an *entity* of `U(s)` is a persistent configuration on the unit sphere `S³ ⊂ ℍ_s` with a topological charge (Agda `SkyrmionCharge`: `B(hedgehog) = 1`, `π₃(S³) ≅ ℤ`). Observers are made of entities. Hence:
+
+> **P1, reduced.** Under hosting clause (a), the observer's algebra is `ℍ_s` **by construction**, and the justification "observers require associativity" is replaced by "matter is hosted on the crystal's ℍ". What remains as an assumption is only
+> **P1′:** *observers are entities in the sense of clause (a)* — i.e. an observer is a (composite of) persistent charged configuration(s) on `S³ ⊂ ℍ_s`.
+
+P1′ is weaker than P1 and it is not the flag-3 identification any more: it does not identify `ℍ_s` with anything external; it says observers are made of the matter the universe hosts. Flag 3's remaining content is then the **postulate P**, whose only job under hosting is to say *why* entities compose (T1) — and that is what the retracted dynamics claim was trying to do. Honest status: P is a postulate with no dynamical support; P1′ is the hosting frame applied to observers.
+
+**Pole corollary (derivable).** A pole universe hosts `ℂ = span{1, ℓ}` (`pole_hosts_complex`, master). The unit sphere of ℂ is `S¹`, and `π₃(S¹) = 0` (`S¹` is a 1-type: `isGroupoidS¹` in `cubical`), so no configuration on it carries a topological charge: **pole universes host no charged entities, hence no observers.** The pole objection to P1 (boundary note v0.2 §3; answer to the beekeeper 2026-09-09) is not an exception to be declared — it is a theorem to be filed (§6 (viii)). P2 is untouched by all of this.
 
 ## 2. What "the boundary of a universe U(s)" could be, on the objects in Lean
 
@@ -33,7 +65,7 @@ The objects (all on master, `Substrate/Hosting.lean`, `Foundations/CrystalHostin
 
 **Two premises first** (neither forced by the objects; both must be ruled, not assumed):
 
-- **P1.** The crystal's hosted `ℍ_s` *is* the ℍ of DERIV-holographic ("the observer's ℍ"). The beekeeper's 2026-09-07 ruling left exactly this pending under flag 3.
+- **P1 → P1′.** The crystal's hosted `ℍ_s` is the observer's ℍ. Under hosting clause (a) this holds *by construction* (§1a); the residual assumption is **P1′: observers are entities in the sense of clause (a)**. Flag 3's remaining content is the postulate P of §1a, not this identification.
 - **P2.** The encoding octonion of AXIOM-2 must *contain* `ℍ_s`.
 
 Grant both. Then the honest headline is a **reduction, not a discovery**: before hosting, nothing selected which quaternion frame `ℍ ⊂ 𝕆` the observer sat in — G₂ is transitive on frames, so that freedom was `G₂/SO(4)`, **8 parameters**. Hosting fixes the direction `u` from the crystal (Prop 15), and what remains is the choice of an encoding octonion around `ℍ_s`, i.e. a ℂ_u-line `span{v, uv}` in `u^⊥ ≅ ℝ⁶`: a **ℂP², 4 parameters**. The gap `∂_v = ℍ_s·V` depends only on that line (numerically asserted: `𝕆'_{uv} = 𝕆'_v`).
@@ -63,7 +95,8 @@ Which of these "the holographic boundary of U(s)" *is* — a chosen line, or the
 | `ℍ_s^⊥` is a left `ℍ_s`-module `≅ ℍ_s³`; the union of the gaps is an 8-dim cone in it | theorem, **to prove** | numerical, asserted; Lean §6 (iv) |
 | **completeness**: every octonion subalgebra of 𝕊 containing `ℍ_s` is some `𝕆'_v` | **conjecture** | numerical probe only (mixed-halves `w` fails closure); Lean §6 (v) or a counterexample |
 | every associative subalgebra of 𝕆 has dim ≤ 4 (global) | theorem, deferred | Gram–Schmidt over `bil`; architecture ruling 2026-09-07 |
-| P1: `ℍ_s` is the observer's ℍ; P2: the encoding 𝕆 contains `ℍ_s` | **premises** | not forced by the objects; P1 is flag 3, pending the beekeeper |
+| P1′: observers are entities of clause (a) (then the observer's ℍ is `ℍ_s` by construction); P2: the encoding 𝕆 contains `ℍ_s` | **premises** | P1′ is the hosting frame applied to observers (§1a); P2 not forced by the objects |
+| pole universes host no charged entities, hence no observers | corollary, **to file** | `pole_hosts_complex` (master) + `π₃(S¹) = 0` (Agda, §6 (viii)) |
 | observers require associativity | **postulate** | unchanged; support narrow (§1) |
 | the bulk physics on `S³ ⊂ ℍ_s` is encoded on `∂_v U(s)` | **interpretation** | no map; no kill condition yet |
 | information can be destroyed at the seams (B) | constitutional flag 1 | DERIV-sedenion vs AXIOM-1, unreconciled (addendum §5 item 1) |
@@ -74,7 +107,7 @@ Split the one entry into three, so a citation can say which part it rests on:
 
 | Proposed id | Text | Kind / status | Anchors |
 |---|---|---|---|
-| **POST-observer-associativity** | "Observers require associativity: physics is hosted on an associative subalgebra." | postulate; support narrow (composition law; ℓ unique) | PROOF-associative-composition-iff; `assoc_self_zero_iff` |
+| **POST-observer-associativity** | "An observer is a subset of 𝕊 on which its actions compose; by the composition theorem such a subset is associative and lies inside one ℍ. Under the hosting definition (clause (a)) the observer's ℍ is the crystal's `ℍ_s` by construction." | postulate; support narrow (composition law; ℓ unique); NOT a dynamical necessity (round-14 retraction) | PROOF-associative-composition-iff; `assoc_self_zero_iff`; PROOF-substrate-hosting-definition |
 | **DERIV-holographic-theorem** | "Quaternion frames span{1,u,v,uv} are associative subalgebras of 𝕆; no associative subalgebra properly contains one (frame-relative; global dim ≤ 4 deferred); the codimension of ℍ in 𝕆 is 4." | derived, **proved** | PROOF-quaternion-frame-maximal, PROOF-quaternion-frame-codim-four |
 | **INTERP-holographic-boundary** | "The holographic gap of a universe U(s) is an admissible ℍ_s-line `∂_v = ℍ_s·V` (4-dim) in the module `ℍ_s^⊥ ≅ ℍ_s³`, the complement of ℍ_s inside an encoding octonion `𝕆'_v ⊃ ℍ_s`; the encodings form a ℂP² not fixed by the landscape; the seam boundary between universes is the zero-divisor locus (DERIV-sedenion)." | interpretation, **proposed**; rests on premises P1, P2 | this document; `boundary_octonion_check.py`; Lean §6 pending |
 
@@ -99,11 +132,12 @@ Split the one entry into three, so a citation can say which part it rests on:
 5. **(v) Completeness** — every octonion subalgebra of 𝕊 containing `ℍ_s` is some `𝕆'_v`: the real theorem behind the ℂP²; moderate-to-hard (classify `w ⊥ ℍ_s` with `ℍ_s ⊕ ℍ_s w` closed and alternative). A counterexample kills the ℂP² count.
 6. **(vi) Global dim ≤ 4** — the deferred Gram–Schmidt; not needed for A.
 7. **(vii) Uniqueness of `u` up to sign for a non-pole crystal** — owed from the definition doc §6; independent.
+8. **(viii) Pole universes carry no topological charge** — Agda: `S¹` is a 1-type (`isGroupoidS¹`) ⇒ `π₃(S¹) ≅ 0`, wired to the `SkyrmionCharge` degree so that no configuration on the unit sphere of `span{1, ℓ}` has `B ≠ 0`; Lean side already on master (`pole_hosts_complex`). Cheap; the `agda-prover` lane.
 
 ## 7. Questions this puts to the beekeeper and to the definition conversation
 
 1. **Two boundaries, two names** (holographic = A per universe; seam = B between universes) — adopt?
-2. **Is the holographic boundary a line or the bundle?** Under P1 + P2 the freedom is a ℂP² (down from the ledger's 8-parameter frame freedom). If "a line", `Universe` gains a ℂP² point (field / later crystallisation stage the rule acts on / observer's choice belonging with the postulate). If "the bundle", the boundary is the canonical module `ℍ_s^⊥ ≅ ℍ_s³` with its cone of admissible lines and no new datum. This is doc §5 Q2, sharpened. **P1 and P2 themselves need a ruling before either answer means anything.**
+2. **Is the holographic boundary a line or the bundle?** Under P1 + P2 the freedom is a ℂP² (down from the ledger's 8-parameter frame freedom). If "a line", `Universe` gains a ℂP² point (field / later crystallisation stage the rule acts on / observer's choice belonging with the postulate). If "the bundle", the boundary is the canonical module `ℍ_s^⊥ ≅ ℍ_s³` with its cone of admissible lines and no new datum. This is doc §5 Q2, sharpened. **P2 needs a ruling before either answer means anything; P1 has been reduced to P1′ (§1a), which is the hosting frame applied to observers.**
 3. **Flag-3 re-statement** (§5): rule on the split and the re-pointing, or keep the single entry with the theorem anchors attached.
 4. **Flag 1 placement:** under the two-boundaries reading, "information CAN be destroyed" is a statement about B (DERIV-sedenion), not about the holographic boundary; that narrows, but does not resolve, the tension with AXIOM-1.
 5. **Kill conditions:** the mathematical ones are scripted and hold (closure, dimension, module) with completeness as the open one; the physical one does not exist until an encoding map is defined — propose the conversation is asked to produce *the form* such a map must take, not the map.
