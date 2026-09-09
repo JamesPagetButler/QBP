@@ -82,6 +82,28 @@ def module_of(path: Path, proofs: Path) -> str:
     return ".".join(path.relative_to(proofs).with_suffix("").parts)
 
 
+def _has_default_attr(text_before_decl: str) -> bool:
+    """Is the target declared right after `text_before_decl` a `@[default_target]`?
+
+    Walks upward over the contiguous run of attribute/blank lines directly above
+    the declaration. `@[default_target]` on such a line marks it default; a comment
+    line (`--` or a `/-` docstring) or any other content ends the run WITHOUT
+    marking it — so a commented-out `-- @[default_target]` never counts, and a
+    docstring or blank lines between attributes and the decl do not break detection.
+    Robust to formatting, unlike a fixed-width character window (Gemini/#645, Knuth).
+    """
+    for line in reversed(text_before_decl.splitlines()):
+        s = line.strip()
+        if not s:
+            continue  # blank line — keep scanning upward
+        if s.startswith("@["):
+            if "default_target" in s:
+                return True
+            continue  # a different attribute — another may sit above it
+        return False  # comment, docstring, or code — end of the attribute run
+    return False
+
+
 def lakefile_targets(
     proofs: Path, errors: list[str]
 ) -> list[tuple[str, list[str], bool]]:
@@ -108,10 +130,7 @@ def lakefile_targets(
     targets: list[tuple[str, list[str], bool]] = []
     for i in range(len(starts)):
         block = text[bounds[i] : bounds[i + 1]]
-        # The `@[default_target]` attribute sits on the line just before the
-        # declaration keyword — look at the short window preceding this decl.
-        preceding = text[max(0, starts[i] - 60) : starts[i]]
-        is_default = "@[default_target]" in preceding
+        is_default = _has_default_attr(text[: starts[i]])
         sd = LAKE_SRCDIR_RE.search(block)
         srcdir = sd.group(1) if sd else "."
         roots: list[str] = list(LAKE_ROOT_RE.findall(block))

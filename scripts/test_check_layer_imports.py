@@ -136,6 +136,27 @@ def main():
     rc, out = run(files)
     check("default_target exe makes its corpus visible", rc == 0)
 
+    # 5b. A COMMENTED-OUT @[default_target] must NOT mark the target default
+    #     (Gemini #645 false-positive concern): the exe corpus stays invisible.
+    files = dict(BASE_FILES)
+    files["lakefile.lean"] = files["lakefile.lean"] + (
+        "\n-- @[default_target]\nlean_exe «oracle» where\n  root := `QBP.Oracle.Main\n"
+    )
+    files.update(ORACLE_FILES)
+    rc, out = run(files)
+    check("commented-out @[default_target] does not count", rc == 1)
+
+    # 5c. Valid Lean ordering (docstring, then attribute, then decl) + blank lines
+    #     must not break detection: the exe corpus is visible.
+    files = dict(BASE_FILES)
+    files["lakefile.lean"] = files["lakefile.lean"] + (
+        "\n/-- the oracle exe -/\n@[default_target]\n\n"
+        "lean_exe «oracle» where\n  root := `QBP.Oracle.Main\n"
+    )
+    files.update(ORACLE_FILES)
+    rc, out = run(files)
+    check("docstring-above-attr + blank line does not break detection", rc == 0)
+
     # 6. Quarantine lets a known-invisible file pass (with issue + reason).
     files = dict(BASE_FILES)
     files["lakefile.lean"] = files["lakefile.lean"] + NONDEFAULT_EXE
