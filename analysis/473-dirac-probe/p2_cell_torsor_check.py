@@ -2,8 +2,9 @@
 
 There is an order-3 automorphism ρ of 𝕊 that FIXES ℓ and rotates the two octonion halves into
 each other: on Im𝕆_low, a ↦ cos(2π/3)·a + sin(2π/3)·(aℓ); on Im𝕆_low·ℓ, aℓ ↦ −sin(2π/3)·a +
-cos(2π/3)·(aℓ); 1 and ℓ fixed. (This is an order-3 element of the S₃ factor of Aut(𝕊); it fixes ℓ,
-so CrystalHosting.aut_hosting_equivariant already applies to it.) Consequences asserted here:
+cos(2π/3)·(aℓ); 1 and ℓ fixed. (This is an order-3 element of the S₃ factor of Aut(𝕊) — master's aut_s3.py already exhibits it as
+rot(120°, s = +1); it fixes ℓ, so CrystalHosting.aut_hosting_equivariant already applies to it, and it
+fixes each ℍ_s as a set, acting on it as the inner automorphism x ↦ q̄xq, q = cos(π/3) + sin(π/3)ℓ.) Consequences asserted here:
   (1) ρ is an algebra automorphism (multiplicative on random pairs), ρ³ = id, ρ ≠ id, ρ(ℓ) = ℓ;
   (2) ρ(𝕆_low) is a closed octonion subalgebra of 𝕊 DIFFERENT from 𝕆_low (rank(𝕆_low ∪ ρ𝕆_low) = 15);
   (3) ρ preserves the crystal condition: V(ρ s) = V(s) on random states, so V = 0 ⇔ V(ρs) = 0 —
