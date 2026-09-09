@@ -3,28 +3,8 @@
   "entries": [
     {
       "file": "QBP/Oracle/FFI.lean",
-      "reason": "Phase-4e @[export] C-shim over the Float oracle, reachable from NO target root at all (the `oracle` exe root QBP.Oracle.Main imports FloatCompute, not FFI; nothing else imports FFI). Its own docstring flags the C-export path as a fallback to the `lake exe oracle` subprocess, which is what is exercised today. Decision (wire-into-a-target or retire) belongs to the Oracle subsystem, tracked in #644 — quarantined so the file stays tracked rather than silently invisible.",
+      "reason": "Phase-4e @[export] C-shim over the Float oracle, reachable from NO target root at all (the `oracle` exe root QBP.Oracle.Main imports FloatCompute, not FFI; nothing else imports FFI). Its own docstring flags the C-export path as a fallback to the `lake exe oracle` subprocess, which is what is exercised today. Unlike the rest of the oracle corpus (now @[default_target] and CI-compiled), FFI is reachable from nothing, so promoting the exe does not cover it. Decision (wire-into-a-target or retire) belongs to the Oracle subsystem, tracked in #644 — quarantined so the file stays tracked rather than silently invisible.",
       "issue": "#644"
-    },
-    {
-      "file": "QBP/Oracle/Main.lean",
-      "reason": "Root of the `lean_exe oracle` target (generates tests/oracle_predictions.json). CI runs bare `lake build`, which compiles only the @[default_target] libs — not the exes — so this file is not CI-compiled. Tracked in #646 (add the exe targets to CI's build, or promote to @[default_target]); when done, this entry is removed as stale.",
-      "issue": "#646"
-    },
-    {
-      "file": "QBP/Oracle/FloatCompute.lean",
-      "reason": "Reached only via the `lean_exe oracle` root (QBP.Oracle.Main imports it); not reachable from any @[default_target], so CI's `lake build` does not compile it. Tracked in #646 (add exe targets to CI's build).",
-      "issue": "#646"
-    },
-    {
-      "file": "QBP/Units/GenTestVectors.lean",
-      "reason": "Root of the `lean_exe gen_test_vectors` target (SI conversion test-vector generator). Not a @[default_target], so CI's bare `lake build` does not compile it. Tracked in #646 (add exe targets to CI's build).",
-      "issue": "#646"
-    },
-    {
-      "file": "QBP/Units/Oracle.lean",
-      "reason": "Reached only via the `lean_exe gen_test_vectors` root (QBP.Units.GenTestVectors imports it); not reachable from any @[default_target], so CI's `lake build` does not compile it. Tracked in #646 (add exe targets to CI's build).",
-      "issue": "#646"
     }
   ]
 }

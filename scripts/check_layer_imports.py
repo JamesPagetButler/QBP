@@ -20,8 +20,10 @@ Enforces docs/foundations/layer-architecture.md §5:
      committed build-broken while `lake build` stays green (the General3D.lean
      build-invisibility class that let an unclosed goal ride CI-green, issue #625/#619).
      "Reachable via a declared-but-non-default target" (a `lean_exe`) is NOT enough:
-     CI does not build the exes, so that corpus is invisible to CI too (tracked in
-     #646). Foundations/Substrate get completeness via their per-dir aggregators
+     CI does not build a non-default target, so its files are invisible to CI too.
+     (The QBP `oracle`/`gen_test_vectors` exes were promoted to `@[default_target]`
+     in #646 so CI now compiles them; a future non-default target would be caught
+     here.) Foundations/Substrate get completeness via their per-dir aggregators
      (rules 3/4); the physics + Sprint12 dirs have no single aggregator (files wire
      directly into QBP.lean, Cosmo has its own aggregator, Oracle/Units files hang off
      lean_exe roots, Sprint12 files are each a lib root), so this rule uses the REAL
@@ -163,9 +165,9 @@ def build_visible_files(
     Only `@[default_target]` roots seed the closure, because bare `lake build`
     (what CI runs) compiles only those. A .lean whose resolved path is in this set
     is actually compiled by CI; one that is not is build-invisible to CI — even if
-    it is reachable from a declared-but-non-default target such as a `lean_exe`
-    (that corpus is tracked separately, e.g. #646). Keyed on resolved file paths,
-    not module names (which can collide across srcDirs).
+    it is reachable from a declared-but-non-default target such as a non-default
+    `lean_exe`. Keyed on resolved file paths, not module names (which can collide
+    across srcDirs).
     """
     seen: set[Path] = set()
     stack: list[str] = []
