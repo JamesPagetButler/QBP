@@ -6,8 +6,10 @@ imaginary unit sphere S¹⁴ ⊂ Im𝕊) places all its measure on the vacuum ma
 Dimension count: a vacuum is s = a + bℓ with a = α·u, Im b = γ·u (Prop 15, Lean
 CrystalHosting.vacuum_iff_parametrised), so the vacuum locus in S¹⁴ is parametrised by
 u ∈ S⁶ (6 dims) and (α, γ, b₀) on S² (2 dims): an 8-dimensional subset of a 14-manifold,
-hence surface-measure ZERO. So the kill cannot fire, and POST-hosting (history form) follows
-from the horn-1 ruling + Prop 15 + this measure-zero fact.
+hence surface-measure ZERO. So the kill cannot fire. NOTE (confirmer delta, package v0.4 §9c):
+this does NOT derive POST-hosting from the ruling — horn 1 already lives on the level-16
+sphere, and one level down (𝕆, every state a crystal) the same kill FIRES; the measure argument
+re-expresses POST-hosting as the level lower bound. POST-hosting remains a root.
 This script checks the dimension count numerically (rank of the Jacobian of the vacuum
 parametrisation) and samples the ensemble: fraction of Haar-random imaginary unit sedenions
 with V below a threshold, and the distribution of V.  Every claim is asserted.

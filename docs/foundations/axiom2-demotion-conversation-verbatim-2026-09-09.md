@@ -1,5 +1,5 @@
-# Verbatim Gemini session turns 50–55 — AXIOM-2 demotion conversation (session debate-20260904-151140, 2026-09-09)
-Extracted unedited from the MCP session store (`~/.claude/mcp-servers/gemini/state/sessions/`). `user` = qbp-oppenheimer's turn (the MCP wrapper prepends a 'Continuing the debate on: #473 AC1 v0.1…' header — the session was the #473 one, turns 50–55 are this conversation); `model` = Gemini, thinking blocks included. Confirmer condition 6 (round 4).
+# Verbatim Gemini session turns 50–59 — AXIOM-2 demotion conversation (session debate-20260904-151140, 2026-09-09)
+Extracted unedited from the MCP session store (`~/.claude/mcp-servers/gemini/state/sessions/`). `user` = qbp-oppenheimer's turn (the MCP wrapper prepends a 'Continuing the debate on: #473 AC1 v0.1…' header — the session was the #473 one, turns 50–59 are this conversation); `model` = Gemini, thinking blocks included. Confirmer condition 6 (round 4); rounds 5–6 (turns 56–59) appended. The transcript summary numbers Gemini's replies by model-turn (26–30); this file by message index (50–59).
 
 ---
 
