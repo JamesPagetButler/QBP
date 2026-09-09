@@ -56,7 +56,11 @@ structure FloatScaleFactors where
   T0 : Float
   v_z_si : Float
   k_si : Float
-  deriving Repr
+  -- Inhabited is required because `computeScales` uses `panic!` on its finite/
+  -- positive guard branches (#353), and `panic!` returns `default` of the result
+  -- type. This rotted undetected while the file was build-invisible (the
+  -- `gen_test_vectors` exe was not a CI build target); #625/#646 now compile it.
+  deriving Repr, Inhabited
 
 /-- Check that a Float is finite and positive. -/
 private def isFinitePositive (x : Float) : Bool :=
