@@ -1,6 +1,6 @@
-# Demoting AXIOM-2 — proposal package from the qbp-oppenheimer × Gemini conversation (v0.2, 2026-09-09)
+# Demoting AXIOM-2 — proposal package from the qbp-oppenheimer × Gemini conversation (v0.3, 2026-09-09)
 
-**Status:** conversation outcome under the Conversation MO. **Confirmer (Red Team round 4): CONFIRMED-ON-CONDITIONS**, six conditions — v0.2 applies all six (§10 lists each with where it landed). Gate §3 as assessed by the confirmer: (1) met; (2) partial → addressed by §2a/§4a; (3) partial → addressed by §3 DERIV-substrate-level; (4) met with the AXIOM-1 caveat now stated in §3; (5) partial → addressed by §2a/§3/§4a. Constitutional texts below are **drafts for the beekeeper**; nothing in the ledger is edited by this document. Transcript: driver summary `axiom2-demotion-conversation-transcript-2026-09-09.md`; **verbatim turns** `axiom2-demotion-conversation-verbatim-2026-09-09.md` (Gemini session turns 50–55, thinking included). Beekeeper brief: demote AXIOM-2?; refine "use the largest structure available"; downstream impacts and re-proofs traced through the CTH, Lean and Agda; rephrase "fewer axioms + more derived work = more rigorous" as a wisdom.
+**Status:** conversation outcome under the Conversation MO. **Confirmer (Red Team round 4): CONFIRMED-ON-CONDITIONS**, six conditions — v0.2 applied all six; **v0.3 adds rounds 5–6** (beekeeper-directed: arrow-of-time rooting; precision observables) — §9 — whose one new result (POST-hosting's kill is decidable) is the driver's and **awaits a second-party check** (§10 lists each with where it landed). Gate §3 as assessed by the confirmer: (1) met; (2) partial → addressed by §2a/§4a; (3) partial → addressed by §3 DERIV-substrate-level; (4) met with the AXIOM-1 caveat now stated in §3; (5) partial → addressed by §2a/§3/§4a. Constitutional texts below are **drafts for the beekeeper**; nothing in the ledger is edited by this document. Transcript: driver summary `axiom2-demotion-conversation-transcript-2026-09-09.md`; **verbatim turns** `axiom2-demotion-conversation-verbatim-2026-09-09.md` (Gemini session turns 50–55, thinking included). Beekeeper brief: demote AXIOM-2?; refine "use the largest structure available"; downstream impacts and re-proofs traced through the CTH, Lean and Agda; rephrase "fewer axioms + more derived work = more rigorous" as a wisdom.
 
 ## 0. The result in one table
 
@@ -117,7 +117,47 @@ Pressure-tested against: (F1) one axiom hiding ten assumptions in a definition (
 2. **Beekeeper ruling** on: (i) AXIOM-1 option A (rescope, priced) or option B (untouched, DERIV-sedenion algebraic — recommended); (ii) adopt POST-hosting, META-2 (schema note: `meta_axiom` is a single object today, so META-2 needs a list), DERIV-encoding-level, DERIV-substrate-level with the crystal definition, DERIV-sedenion inverted, the re-pointing; (iii) whether the honest outcome "a split into named roots, not fewer roots" is what the beekeeper wants recorded. *Because* every text above is a layer-1 edit.
 3. **Encode** on ratification: one PR that applies the ledger texts, re-points the 14 + 5 + 9, and adds the AXIOM-1 clarification; no Lean. *Because* the derivation is already fully anchored.
 4. **Do not** fold P2 / P2′ or the flag-3 split into this PR. *Because* they are independent rulings and the package is orthogonal to the copy question.
-5. **Possible round 5 (beekeeper's question, 2026-09-09 — not run):** root POST-hosting in an *observation* instead of a postulate: the arrow of time is observed → dynamics is the algebra's own maps (hosting frame, Prop 16 layer 3) → where the norm composes every such map is an isometry and iteration has no transient (round 14/15 record; PROOF-ops-norm-composition-ladder) → an arrow needs a non-isometric map → norm non-multiplicativity → level ≥ 16. The second root would then be a measurement. Caveats: step 2 is the hosting frame (a definition), and "arrow = transient onto the zero-divisor ridge" is numerical (five generic multipliers), not a theorem; DERIV-arrow's direction would flip (input, not output). Held for the beekeeper's word.
+5. **Rounds 5–6 (run on the beekeeper's direction, 2026-09-09):** see §9. Outcome: the arrow-of-time rooting **fails**; g-2 and the electron moment are **null bounds**, not discriminators; the α-drift clocks test DERIV-crystallisation-asymptotic, not POST-hosting; POST-hosting is re-worded as a statement about **histories**, and its kill turns out to be **decidable under the horn-1 ruling** — pending a second-party check.
+6. **Confirmer delta** on §9 (rounds 5–6 and the dimension-count claim). *Because* the claim that POST-hosting derives from horn 1 + Prop 15 is the driver's, made after Gemini yielded, and would remove a root — exactly the kind of move the wisdom says to count carefully.
+
+## 9. Rounds 5–6: rooting POST-hosting in an observation; precision observables (beekeeper-directed)
+
+### 9a. The arrow-of-time rooting fails
+
+| Step of the proposed chain | Status |
+|---|---|
+| the arrow of time is observed | measurement |
+| dynamics is the algebra's own maps | the hosting frame — a definition |
+| where the norm composes, every map R_t is an isometry, so iteration is a rotation with no transient | true (PROOF-ops-norm-composition-ladder; round 14/15 record) |
+| **hence an arrow needs a non-isometric map** | **false.** The physical arrow is statistical: volume-preserving dynamics plus coarse-graining gives the second law; compositions of isometric R_t are ergodic on the state sphere. The ledger's own crystal-side arrow is projective (DERIV-arrow, "lossy projection") and the crystal is unitary (PRED-revival-exact, no objective collapse). What the step needs is a *fundamental* arrow — a postulate again, and one QBP's own predictions deny inside a crystal. |
+
+Both parties: the arrow rooting fails completely; the macroscopic arrow is a property of the observer's projection, not a signature of level 16. The only fundamental dissipation on record is the substrate transient onto the zero-divisor ridge, invisible from inside a crystal by construction.
+
+### 9b. Precision observables (beekeeper's question: Muon g-2, the electron moment, or another high-precision observable)
+
+Sourced numbers used (no others): Fermilab Muon g-2 final (2025-06-03) a_μ = 0.001165920705(114), 0.127 ppm, 0.5σ from the 2025 lattice-based Standard Model value; electron a_e = 0.00115965218059(13), ≈ 0.11 ppb (Gabrielse group, 2023); MEAS-alpha: 1/α(M_Z) predicted 128.05 vs measured 127.95 ± 0.02.
+
+| Observable | What QBP predicts for it | Use | Why |
+|---|---|---|---|
+| Muon g-2, electron a_e | **null**: no mechanism in the ledger couples the seam sector to a local QED vertex (DERIV-sedenion confines zero divisors to inter-cell boundaries; DERIV-observation confines EM to the ℂ of one crystal) | the sharpest **upper bound on substrate leakage** into crystal physics, < 10⁻¹⁰ relative; solidifies PRED-no-gup; cannot prove the substrate | a consistency check, not a discriminator |
+| α from a_e vs MEAS-alpha | category mismatch today: f(0) is the bare coupling at the Γ-scale, a_e gives the renormalised IR coupling; the 0.08% is RGE running QBP has not computed (CHAIN-axioms-to-alpha lists RGE, does not calculate it) | not a test until the running is derived | 7 orders of magnitude of precision are irrelevant until the category gap closes |
+| **α-drift** (Th-229 nuclear clock, REF-th229-alpha-sensitivity; optical clocks) | DERIV-crystallisation-asymptotic: constants converge, never freeze — but **no rate is predicted** | the in-flight observable **of our universe, now**; today a bound, not a measurement; DERIV-crystallisation-asymptotic stays `untested` until α̇ or Ġ is predicted | rank 1 — but it tests the local claim, not the global postulate (§9c) |
+| PRED-revival-exact, PRED-gamma-universality | exact revival, no collapse | tests the *crystal's* unitarity; says nothing about the substrate | rank 3 |
+
+### 9c. POST-hosting re-worded, and its kill is decidable
+
+Round 5's "α frozen ⇒ in-flight region empty ⇒ level 16 unnecessary" was the new easy answer and does not follow: POST-hosting is global (all universes, per the 2026-09-07 scope) and historical (our crystal had to pass through V > 0 whether or not it is over). Two claims, separated:
+
+| Claim | Scope | Observable | Status |
+|---|---|---|---|
+| **POST-hosting (history form):** "the substrate possesses an in-flight region V > 0 that every universe's history must pass through to reach a crystallised state" | global, structural | none directly | root — **or derived, see below** |
+| DERIV-crystallisation-asymptotic: constants converge, never freeze | our universe, now | α̇, Ġ (CONSTRAINT-gdot, MEAS-G-cmb, MEAS-jwst-alpha-constraint) | `untested` until a rate is predicted; re-points to [POST-hosting, DERIV-constants] as the observational face |
+
+**Gemini's kill for the history form:** the ruled initial ensemble (horn 1) places all its measure on the vacuum manifold V = 0 at Γ = 0 — the universe is born crystallised and no history passes through V > 0.
+
+**Driver's observation (after Gemini yielded; not yet checked by a second party):** that kill is decidable now, and it fails. Under horn 1 the ensemble is the surface measure on S¹⁴. The vacuum locus is parametrised by u ∈ S⁶ and (α, γ, b₀) ∈ S² (Prop 15, `vacuum_iff_parametrised`): an 8-dimensional subset of a 14-manifold, hence of surface measure zero. With probability 1 a history starts in flight. Numerically (`analysis/473-dirac-probe/inflight_measure_check.py`, asserted): Jacobian rank 8 at 20 random vacua; 20 000 Haar-random imaginary unit sedenions, none with V < 10⁻³ (V: min 0.030, median 0.683, max 0.9999 at the ridge). Consequence, if a second party confirms: **POST-hosting (history form) is not a root** — it follows from the horn-1 ruling + Prop 15 + an elementary measure-zero lemma (not in Lean; owed). The honest root list would then be: AXIOM-1; META-2 (level saturation, for levels); horn 1 (MaxEnt, for states — already a ruling); the crystal definition; the CD tower. The two epistemic rules are a matched pair: saturation selects levels, maximum entropy selects states.
+
+**What this does to the beekeeper's original question.** "Could we enable the derivation by writing down a physical postulate?" — yes, and the postulate that does it (POST-hosting) is itself a consequence of a ruling already made. The ledger's second *physical* axiom would then be gone, replaced by two named epistemic rules and one named definition. Fewer physical roots; more named ones.
 
 ## 10. Confirmer conditions and where each landed (v0.2)
 
