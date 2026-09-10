@@ -816,6 +816,46 @@
         "QBP.Substrate.Hosting.isVacuum_smul_iff",
         "QBP.Substrate.Hosting.hosting_equivariant_grade"
       ]
+    },
+    {
+      "anchor_id": "PROOF-hosted-algebra-meets-cell-in-complex-line",
+      "declared_by": "#649-p2-lean",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.CrystalHosting.quatSpan_inter_lowHalf",
+        "QBP.Foundations.CrystalHosting.quatSpan_eq_cd_double",
+        "QBP.Foundations.CrystalHosting.inQuatSpan_ell_right",
+        "QBP.Foundations.CrystalHosting.crystal_quatSpan_independent"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-order-three-automorphism-fixes-ell",
+      "declared_by": "#649-p2-lean",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.CrystalHosting.rotAut3_hosting_equivariant",
+        "QBP.Foundations.CrystalHosting.rotMap3_mul",
+        "QBP.Foundations.CrystalHosting.rot_lo_mul",
+        "QBP.Foundations.CrystalHosting.rot_hi_mul",
+        "QBP.Foundations.CrystalHosting.rotAut3_ell",
+        "QBP.Foundations.CrystalHosting.rotAut3_pow_three",
+        "QBP.Foundations.CrystalHosting.rotAut3_ne_id",
+        "QBP.Foundations.CrystalHosting.rotMap3_loOf",
+        "QBP.Foundations.CrystalHosting.rotMap3_loOf_mul_ell",
+        "QBP.Foundations.CrystalHosting.rotMap3_cube",
+        "QBP.Foundations.CrystalHosting.reCoord_mul",
+        "QBP.Foundations.CrystalHosting.mul_swap_eq"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-hosting-equivariant-under-order-three",
+      "declared_by": "#649-p2-lean",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.Hosting.hosting_equivariant_rot3",
+        "QBP.Substrate.Hosting.hosting_equivariant",
+        "QBP.Substrate.Hosting.hosting_equivariant_grade"
+      ]
     }
   ]
 }
