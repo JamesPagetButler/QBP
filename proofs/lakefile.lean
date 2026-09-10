@@ -35,10 +35,18 @@ lean_lib «QBPSprint12» where
   srcDir := "Sprint12-Inherited"
   roots := #[`Bi2Se3, `Crystallisation, `Elements, `Graphene, `Kitaev, `Quaternion, `Sedenion, `SedenionHessianTraceSq]
 
--- Phase 4d: Float oracle executable for differential testing
+-- Phase 4d: Float oracle executable for differential testing.
+-- @[default_target] (#646): CI runs bare `lake build`, which compiles only the
+-- default targets. Without this, the oracle corpus (Main + FloatCompute) was
+-- compiled by nothing in CI — a broken proof there would ride green (the #625
+-- build-invisibility class). Marking it default makes CI compile it; the #625
+-- build-visibility gate then sees it as visible.
+@[default_target]
 lean_exe «oracle» where
   root := `QBP.Oracle.Main
 
--- SI conversion test vector generator
+-- SI conversion test vector generator. @[default_target] (#646): same rationale —
+-- CI now compiles the gen_test_vectors corpus (GenTestVectors + Units.Oracle).
+@[default_target]
 lean_exe «gen_test_vectors» where
   root := `QBP.Units.GenTestVectors
