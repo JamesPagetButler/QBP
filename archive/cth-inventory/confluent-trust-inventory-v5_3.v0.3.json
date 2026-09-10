@@ -65,11 +65,13 @@
     {
       "id": "DERIV-sedenion",
       "name": "Sedenion inter-cell topology",
-      "statement": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: seams where information CAN be destroyed.",
+      "statement": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: seams where the multiplication map is non-injective (left multiplication by a zero divisor has a kernel, PROOF-42zd). No process is asserted at the seams; whether crystallisation is a physical process AXIOM-1 governs is deferred to the trigger issue #647 (beekeeper ruling, option B, 2026-09-10).",
       "derived_from": [
         "AXIOM-2"
       ],
-      "layer": 1
+      "layer": 1,
+      "statement_before_option_b": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: seams where information CAN be destroyed.",
+      "ruling": "AXIOM-1 option B — beekeeper 2026-09-10; PR #648 package §3; trigger issue #647"
     },
     {
       "id": "DERIV-born",
@@ -9854,8 +9856,13 @@
       "version": "5.6.0",
       "date": "2026-06-18T00:00:00Z",
       "note": "qbp-oppenheimer: +5 anchors from the #570-#573 purely-algebraic-derivation investigation — the #570 gate (DEFN), footprint=CD-dimension (pyrrhic pass), constants (nothing content-distinct), loop-closure (0% built / structural obstruction), and the consolidated 'organization not generator' verdict. Brings CTH current with the option-1 result (V&V remediation: 'update CTH as we go')."
+    },
+    {
+      "version": "5.7.0",
+      "date": "2026-09-10T00:00:00Z",
+      "note": "qbp-oppenheimer: AXIOM-1 option B applied (beekeeper ruling 2026-09-10): AXIOM-1 unchanged; DERIV-sedenion's 'information CAN be destroyed' clause replaced by the algebraic statement (non-injective multiplication at zero divisors, PROOF-42zd); flag 1 dissolved as a category error pending #647's trigger. derived_from untouched (AXIOM-2 package encode PR pending adoption)."
     }
   ],
   "last_updated": "2026-09-10T00:00:00Z",
-  "update_provenance": "qbp-oppenheimer 2026-09-10: #649-p2-lean — P2′ lemmas + the order-3 automorphism (3 proof anchors)"
+  "update_provenance": "qbp-oppenheimer 2026-09-10: AXIOM-1 option B (DERIV-sedenion clause; #647)"
 }
