@@ -1,5 +1,6 @@
 import QBP.Foundations.NoAutonomousDynamics
 import QBP.Foundations.DeltaLandscape
+import QBP.Foundations.ArtinTrace
 
 /-!
 # QBP.Foundations.CrystalHosting — what a crystal (vacuum) hosts
@@ -1080,6 +1081,387 @@ theorem cdLift_gradeAut3_ne_id :
   rw [neg_coord, loOf_coord_loIdx, e_coord, if_pos rfl] at h2
   norm_num at h2
 
+/-! ### The order-3 elements of the `S₃` factor, constructed
+
+This section closes the construction gap flagged above: it exhibits the order-3
+element `ρ` of the `S₃` factor of `Aut(𝕊)` as an honest term of `CDAut 4`, with
+`ρ ℓ = ℓ` and `ρ³ = id`, so that `aut_hosting_equivariant` applies to it.
+
+**The map.**  `ρ` fixes `1` and `ℓ` and rotates each plane `(e_k, e_k·ℓ)`,
+`k = 1..7`, by `2π/3`.  In Cayley–Dickson pair coordinates `x = a + b·ℓ` with
+`a = a₀ + a′`, `b = b₀ + b′` (`a′, b′` imaginary octonions),
+
+  `ρ(x) = (a₀ + c·a′ − s·b′) + (b₀ + s·a′ + c·b′)·ℓ`,
+  `c = cos(2π/3) = −1/2`,  `s = sin(2π/3) = √3/2`.
+
+Equivalently on the basis, `ρ(e_k) = c·e_k + s·e_{k+8}` and
+`ρ(e_{k+8}) = −s·e_k + c·e_{k+8}` — the orientation is fixed by `e_k · ℓ = e_{k+8}`,
+which in this development is `loOf_mul_ell` (`U · ℓ = hiOf u`), matching the
+convention checked numerically in `analysis/473-dirac-probe/p2_cell_torsor_check.py`.
+`rotMap3_loOf` / `rotMap3_loOf_mul_ell` below state exactly that basis action.
+
+**Why it is multiplicative.**  Multiplicativity is *not* generic in the angle: the
+two identities `rot_lo_mul` / `rot_hi_mul` reduce, through the Cayley–Dickson
+doubling formula `(a,b)(p,q) = (ap − q̄b, qa + bp̄)` and the swap identity
+`cdAlg_mul_add_swap`, to the scalar relations `c² + s² = 1`, `c² − s² = c` and
+`2c = −1` — i.e. exactly to `3·(2π/3) ≡ 0 mod 2π`.  For a generic angle they fail
+(θ = π/2 and π/3 were checked numerically in the PR #649 Red Team review).
+
+Everything below is `CDAlg ℝ`/ℝ algebra; no substrate semantics is used or implied. -/
+
+section RotHelpers
+
+variable {n : ℕ}
+
+/-- Conjugation fixes the real coordinate. -/
+theorem conj_re (x : CDAlg ℝ n) : (conj x).coord 0 = x.coord 0 := by
+  rw [conj_coord]; simp
+
+/-- `(−x)·y = −(x·y)` (from `ℝ`-homogeneity of the product). -/
+theorem cd_neg_mul (x y : CDAlg ℝ n) : (-x) * y = -(x * y) := by
+  rw [← neg_one_smul ℝ x, mul_smul_left, neg_one_smul]
+
+/-- `x·(−y) = −(x·y)`. -/
+theorem cd_mul_neg (x y : CDAlg ℝ n) : x * (-y) = -(x * y) := by
+  rw [← neg_one_smul ℝ y, mul_smul_right, neg_one_smul]
+
+/-- Right-distributivity over subtraction. -/
+theorem cd_sub_mul (x y z : CDAlg ℝ n) : (x - y) * z = x * z - y * z := by
+  rw [sub_eq_add_neg, mul_add_left, cd_neg_mul, ← sub_eq_add_neg]
+
+/-- Left-distributivity over subtraction. -/
+theorem cd_mul_sub (x y z : CDAlg ℝ n) : x * (y - z) = x * y - x * z := by
+  rw [sub_eq_add_neg, mul_add_right, cd_mul_neg, ← sub_eq_add_neg]
+
+/-- **`Re (x·y) = 2 Re x · Re y − ⟨x, y⟩`.**  The general form of
+    `CrossProduct.reCoord_mul_pure`, obtained by splitting off the real part of
+    `y`. -/
+theorem reCoord_mul (x y : CDAlg ℝ n) :
+    (x * y).coord 0 = 2 * x.coord 0 * y.coord 0 - bil x y := by
+  have hpure : (y - (y.coord 0) • (1 : CDAlg ℝ n)).coord 0 = 0 := by
+    rw [sub_coord, smul_coord, one_coord, if_pos rfl, mul_one, sub_self]
+  have hmul : x * y = x * (y - (y.coord 0) • (1 : CDAlg ℝ n)) + (y.coord 0) • x := by
+    have h : y = (y - (y.coord 0) • (1 : CDAlg ℝ n)) + (y.coord 0) • (1 : CDAlg ℝ n) := by
+      abel
+    conv_lhs => rw [h]
+    rw [mul_add_right, mul_smul_right, cd_mul_one]
+  rw [hmul, add_coord, smul_coord,
+    QBP.Foundations.CrossProduct.reCoord_mul_pure _ _ hpure,
+    alt_bil_sub_right, bil_smul_right, bil_one_right]
+  ring
+
+/-- `⟨x̄, y⟩ = 2 Re x · Re y − ⟨x, y⟩`. -/
+theorem bil_conj_left (x y : CDAlg ℝ n) :
+    bil (conj x) y = 2 * x.coord 0 * y.coord 0 - bil x y := by
+  rw [bil_comm', CDAut.conj_eq_two_re_sub, alt_bil_sub_right, bil_smul_right,
+    bil_one_right, bil_comm' y x]
+
+/-- The swap identity `cdAlg_mul_add_swap`, solved for the reversed product.
+    This is the only *nonlinear* input to the multiplicativity of `ρ`. -/
+theorem mul_swap_eq (x y : CDAlg ℝ n) :
+    y * x = (2 * x.coord 0) • y + (2 * y.coord 0) • x - (2 * bil x y) • (1 : CDAlg ℝ n)
+      - x * y := by
+  have h := cdAlg_mul_add_swap x y
+  rw [← h]; abel
+
+end RotHelpers
+
+section Rot
+
+/-- Low Cayley–Dickson half of the plane rotation by `(c, s)`:
+    `a₀ + c·a′ − s·b′`, written without an explicit real/imaginary split. -/
+def rotLo (c s : ℝ) (a b : CDAlg ℝ 3) : CDAlg ℝ 3 :=
+  c • a + (-s) • b + ((1 - c) * a.coord 0 + s * b.coord 0) • (1 : CDAlg ℝ 3)
+
+/-- High Cayley–Dickson half of the plane rotation by `(c, s)`:
+    `b₀ + s·a′ + c·b′`. -/
+def rotHi (c s : ℝ) (a b : CDAlg ℝ 3) : CDAlg ℝ 3 :=
+  s • a + c • b + (-(s * a.coord 0) + (1 - c) * b.coord 0) • (1 : CDAlg ℝ 3)
+
+theorem rotLo_def (c s : ℝ) (a b : CDAlg ℝ 3) :
+    rotLo c s a b
+      = c • a + (-s) • b + ((1 - c) * a.coord 0 + s * b.coord 0) • (1 : CDAlg ℝ 3) := rfl
+
+theorem rotHi_def (c s : ℝ) (a b : CDAlg ℝ 3) :
+    rotHi c s a b
+      = s • a + c • b + (-(s * a.coord 0) + (1 - c) * b.coord 0) • (1 : CDAlg ℝ 3) := rfl
+
+variable {c s : ℝ}
+
+/-- The rotation fixes the real part of the low half (`ρ 1 = 1`). -/
+theorem rotLo_re (a b : CDAlg ℝ 3) : (rotLo c s a b).coord 0 = a.coord 0 := by
+  rw [rotLo, add_coord, add_coord, smul_coord, smul_coord, smul_coord, one_coord,
+    if_pos rfl]
+  ring
+
+/-- The rotation fixes the real part of the high half (`ρ ℓ = ℓ`). -/
+theorem rotHi_re (a b : CDAlg ℝ 3) : (rotHi c s a b).coord 0 = b.coord 0 := by
+  rw [rotHi, add_coord, add_coord, smul_coord, smul_coord, smul_coord, one_coord,
+    if_pos rfl]
+  ring
+
+theorem rotLo_add (a a' b b' : CDAlg ℝ 3) :
+    rotLo c s (a + a') (b + b') = rotLo c s a b + rotLo c s a' b' := by
+  rw [rotLo, rotLo, rotLo, add_coord, add_coord]
+  module
+
+theorem rotHi_add (a a' b b' : CDAlg ℝ 3) :
+    rotHi c s (a + a') (b + b') = rotHi c s a b + rotHi c s a' b' := by
+  rw [rotHi, rotHi, rotHi, add_coord, add_coord]
+  module
+
+theorem rotLo_smul (r : ℝ) (a b : CDAlg ℝ 3) :
+    rotLo c s (r • a) (r • b) = r • rotLo c s a b := by
+  rw [rotLo, rotLo, smul_coord, smul_coord]
+  module
+
+theorem rotHi_smul (r : ℝ) (a b : CDAlg ℝ 3) :
+    rotHi c s (r • a) (r • b) = r • rotHi c s a b := by
+  rw [rotHi, rotHi, smul_coord, smul_coord]
+  module
+
+theorem conj_rotLo (a b : CDAlg ℝ 3) :
+    conj (rotLo c s a b)
+      = (-c) • a + s • b + ((1 + c) * a.coord 0 - s * b.coord 0) • (1 : CDAlg ℝ 3) := by
+  rw [CDAut.conj_eq_two_re_sub, rotLo_re, rotLo]
+  module
+
+theorem conj_rotHi (a b : CDAlg ℝ 3) :
+    conj (rotHi c s a b)
+      = (-s) • a + (-c) • b + (s * a.coord 0 + (1 + c) * b.coord 0) • (1 : CDAlg ℝ 3) := by
+  rw [CDAut.conj_eq_two_re_sub, rotHi_re, rotHi]
+  module
+
+/-- Composing two plane rotations adds the angles (low half). -/
+theorem rotLo_comp (c s c' s' : ℝ) (a b : CDAlg ℝ 3) :
+    rotLo c s (rotLo c' s' a b) (rotHi c' s' a b)
+      = rotLo (c * c' - s * s') (c * s' + s * c') a b := by
+  rw [rotLo_def c s (rotLo c' s' a b) (rotHi c' s' a b), rotLo_re, rotHi_re,
+    rotLo_def c' s' a b, rotHi_def c' s' a b, rotLo_def]
+  module
+
+/-- Composing two plane rotations adds the angles (high half). -/
+theorem rotHi_comp (c s c' s' : ℝ) (a b : CDAlg ℝ 3) :
+    rotHi c s (rotLo c' s' a b) (rotHi c' s' a b)
+      = rotHi (c * c' - s * s') (c * s' + s * c') a b := by
+  rw [rotHi_def c s (rotLo c' s' a b) (rotHi c' s' a b), rotLo_re, rotHi_re,
+    rotLo_def c' s' a b, rotHi_def c' s' a b, rotHi_def]
+  module
+
+theorem rotLo_id (a b : CDAlg ℝ 3) : rotLo 1 0 a b = a := by
+  rw [rotLo_def]; module
+
+theorem rotHi_id (a b : CDAlg ℝ 3) : rotHi 1 0 a b = b := by
+  rw [rotHi_def]; module
+
+/-- `Re` of the low half of a Cayley–Dickson product. -/
+theorem re_cdLo_mul (a b p q : CDAlg ℝ 3) :
+    (a * p - conj q * b).coord 0 = 2 * a.coord 0 * p.coord 0 - bil a p - bil b q := by
+  rw [sub_coord, reCoord_mul, reCoord_mul, conj_re, bil_conj_left, bil_comm' q b]
+  ring
+
+/-- `Re` of the high half of a Cayley–Dickson product. -/
+theorem re_cdHi_mul (a b p q : CDAlg ℝ 3) :
+    (q * a + b * conj p).coord 0 = 2 * a.coord 0 * q.coord 0 - bil a q + bil b p := by
+  rw [add_coord, reCoord_mul, reCoord_mul, conj_re, bil_comm' b (conj p), bil_conj_left,
+    bil_comm' q a, bil_comm' p b]
+  ring
+
+/-- **Multiplicativity of the `2π/3` rotation, low half.**  With
+    `(a,b)·(p,q) = (ap − q̄b, qa + bp̄)` the Cayley–Dickson doubling formula
+    (`cdLo_mul`), this says `ρ` commutes with the product on the low half.  The
+    hypotheses `c = −1/2` and `s² = 3/4` are exactly what the proof consumes:
+    after expanding by bilinearity and normalising every reversed product with
+    `mul_swap_eq`, the nine coefficient identities are `c² + s² = 1`,
+    `c² − s² = c` and `2c = −1`. -/
+theorem rot_lo_mul (hc : c = -(1/2)) (hs : s ^ 2 = 3/4) (a b p q : CDAlg ℝ 3) :
+    rotLo c s (a * p - conj q * b) (q * a + b * conj p)
+      = rotLo c s a b * rotLo c s p q - conj (rotHi c s p q) * rotHi c s a b := by
+  rw [rotLo, re_cdLo_mul, re_cdHi_mul, conj_rotHi, rotLo, rotLo, rotHi,
+    CDAut.conj_eq_two_re_sub q, CDAut.conj_eq_two_re_sub p]
+  simp only [mul_add_left, mul_add_right, mul_smul_left, mul_smul_right,
+    cd_sub_mul, cd_mul_sub, cd_one_mul, cd_mul_one, smul_sub, smul_add, smul_smul]
+  rw [mul_swap_eq a p, mul_swap_eq b p, mul_swap_eq a q, mul_swap_eq b q]
+  match_scalars
+  all_goals (subst hc; ring_nf; try rw [hs]; try ring)
+
+/-- **Multiplicativity of the `2π/3` rotation, high half** (`cdHi_mul` side). -/
+theorem rot_hi_mul (hc : c = -(1/2)) (hs : s ^ 2 = 3/4) (a b p q : CDAlg ℝ 3) :
+    rotHi c s (a * p - conj q * b) (q * a + b * conj p)
+      = rotHi c s p q * rotLo c s a b + rotHi c s a b * conj (rotLo c s p q) := by
+  rw [rotHi, re_cdLo_mul, re_cdHi_mul, conj_rotLo, rotLo, rotHi, rotHi,
+    CDAut.conj_eq_two_re_sub q, CDAut.conj_eq_two_re_sub p]
+  simp only [mul_add_left, mul_add_right, mul_smul_left, mul_smul_right,
+    cd_sub_mul, cd_mul_sub, cd_one_mul, cd_mul_one, smul_sub, smul_add, smul_smul]
+  rw [mul_swap_eq a p, mul_swap_eq b p, mul_swap_eq a q, mul_swap_eq b q]
+  match_scalars
+  all_goals (subst hc; ring_nf; try rw [hs]; try ring)
+
+end Rot
+
+section RotAut
+
+/-- `cos(2π/3) = −1/2`. -/
+noncomputable def rot3c : ℝ := -(1/2)
+
+/-- `sin(2π/3) = √3/2`. -/
+noncomputable def rot3s : ℝ := Real.sqrt 3 / 2
+
+theorem rot3c_eq : rot3c = -(1/2) := rfl
+
+theorem rot3s_sq : rot3s ^ 2 = 3/4 := by
+  rw [rot3s, div_pow, Real.sq_sqrt (by norm_num : (0:ℝ) ≤ 3)]
+  norm_num
+
+theorem rot3s_mul_self : rot3s * rot3s = 3/4 := by
+  rw [← pow_two]; exact rot3s_sq
+
+/-- **The order-3 rotation `ρ` of 𝕊**: fixes `1` and `ℓ`, rotates each plane
+    `(e_k, e_k·ℓ)` by `2π/3`. -/
+noncomputable def rotMap3 (x : CDAlg ℝ 4) : CDAlg ℝ 4 :=
+  loOf (rotLo rot3c rot3s (cdLo x) (cdHi x))
+    + hiOf (rotHi rot3c rot3s (cdLo x) (cdHi x))
+
+theorem cdLo_rotMap3 (x : CDAlg ℝ 4) :
+    cdLo (rotMap3 x) = rotLo rot3c rot3s (cdLo x) (cdHi x) := by
+  rw [rotMap3, cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+
+theorem cdHi_rotMap3 (x : CDAlg ℝ 4) :
+    cdHi (rotMap3 x) = rotHi rot3c rot3s (cdLo x) (cdHi x) := by
+  rw [rotMap3, cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]
+
+theorem rotMap3_add (x y : CDAlg ℝ 4) : rotMap3 (x + y) = rotMap3 x + rotMap3 y := by
+  refine eq_of_halves ?_ ?_
+  · simp only [cdLo_rotMap3, cdLo_add, cdHi_add, rotLo_add]
+  · simp only [cdHi_rotMap3, cdLo_add, cdHi_add, rotHi_add]
+
+theorem rotMap3_smul (r : ℝ) (x : CDAlg ℝ 4) : rotMap3 (r • x) = r • rotMap3 x := by
+  refine eq_of_halves ?_ ?_
+  · simp only [cdLo_rotMap3, cdLo_smul, cdHi_smul, rotLo_smul]
+  · simp only [cdHi_rotMap3, cdLo_smul, cdHi_smul, rotHi_smul]
+
+/-- **`ρ` is multiplicative** — the substantive fact.  Both halves come from
+    `rot_lo_mul` / `rot_hi_mul` through the doubling formula. -/
+theorem rotMap3_mul (x y : CDAlg ℝ 4) : rotMap3 (x * y) = rotMap3 x * rotMap3 y := by
+  refine eq_of_halves ?_ ?_
+  · rw [cdLo_rotMap3, cdLo_mul x y, cdHi_mul x y, cdLo_mul (rotMap3 x) (rotMap3 y),
+      cdLo_rotMap3, cdLo_rotMap3, cdHi_rotMap3, cdHi_rotMap3]
+    exact rot_lo_mul rot3c_eq rot3s_sq _ _ _ _
+  · rw [cdHi_rotMap3, cdLo_mul x y, cdHi_mul x y, cdHi_mul (rotMap3 x) (rotMap3 y),
+      cdLo_rotMap3, cdLo_rotMap3, cdHi_rotMap3, cdHi_rotMap3]
+    exact rot_hi_mul rot3c_eq rot3s_sq _ _ _ _
+
+theorem cdLo_rotMap3_two (x : CDAlg ℝ 4) :
+    cdLo (rotMap3 (rotMap3 x))
+      = rotLo (rot3c * rot3c - rot3s * rot3s) (rot3c * rot3s + rot3s * rot3c)
+          (cdLo x) (cdHi x) := by
+  rw [cdLo_rotMap3, cdLo_rotMap3, cdHi_rotMap3, rotLo_comp]
+
+theorem cdHi_rotMap3_two (x : CDAlg ℝ 4) :
+    cdHi (rotMap3 (rotMap3 x))
+      = rotHi (rot3c * rot3c - rot3s * rot3s) (rot3c * rot3s + rot3s * rot3c)
+          (cdLo x) (cdHi x) := by
+  rw [cdHi_rotMap3, cdLo_rotMap3, cdHi_rotMap3, rotHi_comp]
+
+/-- `cos(2π/3 + 4π/3) = 1`. -/
+theorem rot3_comp_c :
+    rot3c * (rot3c * rot3c - rot3s * rot3s)
+      - rot3s * (rot3c * rot3s + rot3s * rot3c) = 1 := by
+  rw [rot3c_eq]; linear_combination (3/2 : ℝ) * rot3s_mul_self
+
+/-- `sin(2π/3 + 4π/3) = 0`. -/
+theorem rot3_comp_s :
+    rot3c * (rot3c * rot3s + rot3s * rot3c)
+      + rot3s * (rot3c * rot3c - rot3s * rot3s) = 0 := by
+  rw [rot3c_eq]; linear_combination (-rot3s) * rot3s_mul_self
+
+/-- **`ρ³ = id`** — three rotations by `2π/3` are the identity. -/
+theorem rotMap3_cube (x : CDAlg ℝ 4) : rotMap3 (rotMap3 (rotMap3 x)) = x := by
+  refine eq_of_halves ?_ ?_
+  · rw [cdLo_rotMap3, cdLo_rotMap3_two, cdHi_rotMap3_two, rotLo_comp, rot3_comp_c,
+      rot3_comp_s, rotLo_id]
+  · rw [cdHi_rotMap3, cdLo_rotMap3_two, cdHi_rotMap3_two, rotHi_comp, rot3_comp_c,
+      rot3_comp_s, rotHi_id]
+
+/-- Bijectivity of `ρ` — its own square is a two-sided inverse. -/
+theorem rotMap3_bijective : Function.Bijective rotMap3 :=
+  Function.bijective_iff_has_inverse.mpr
+    ⟨fun x => rotMap3 (rotMap3 x), fun x => rotMap3_cube x, fun x => rotMap3_cube x⟩
+
+/-- **The order-3 element of the `S₃` factor of `Aut(𝕊)`, as a term of `CDAut 4`.** -/
+noncomputable def rotAut3 : CDAut 4 where
+  toFun := rotMap3
+  map_add := rotMap3_add
+  map_smul := rotMap3_smul
+  map_mul := rotMap3_mul
+  bijective := rotMap3_bijective
+
+/-- **`ρ` fixes `ℓ`** — the point of the docstring correction in §11 of
+    `QBP.Substrate.Hosting`: the order-3 elements of `S₃` are the rotations
+    (`det M = +1`), and they do *not* move `ℓ`. -/
+theorem rotAut3_ell : rotAut3 ell = ell := by
+  show rotMap3 ell = ell
+  refine eq_of_halves ?_ ?_
+  · rw [cdLo_rotMap3, cdLo_ell, cdHi_ell, rotLo_def, zero_coord, one_coord, if_pos rfl]
+    module
+  · rw [cdHi_rotMap3, cdLo_ell, cdHi_ell, rotHi_def, zero_coord, one_coord, if_pos rfl]
+    module
+
+/-- **`ρ` has order dividing 3.** -/
+theorem rotAut3_pow_three (x : CDAlg ℝ 4) : rotAut3 (rotAut3 (rotAut3 x)) = x :=
+  rotMap3_cube x
+
+/-- **`ρ ≠ id`** — with `rotAut3_pow_three` this pins the order at exactly 3.
+    Witness: `ρ (loOf e₁) = −(1/2)·loOf e₁ ≠ loOf e₁`. -/
+theorem rotAut3_ne_id :
+    rotAut3 (loOf (e (1 : Fin (2^3)))) ≠ loOf (e (1 : Fin (2^3))) := by
+  intro h
+  have h' : rotMap3 (loOf (e (1 : Fin (2^3)))) = loOf (e (1 : Fin (2^3))) := h
+  have hlo := congrArg cdLo h'
+  rw [cdLo_rotMap3, cdLo_loOf, cdHi_loOf, rotLo_def, zero_coord, e_coord] at hlo
+  have h1 := congrArg (fun z : CDAlg ℝ 3 => z.coord 1) hlo
+  simp only [add_coord, smul_coord, e_coord, zero_coord, one_coord] at h1
+  rw [rot3c_eq] at h1
+  norm_num at h1
+
+/-- **The basis action, low half:** `ρ(U) = c·U + s·(U·ℓ)` for `U = loOf u` with
+    `u` imaginary.  This is the convention of
+    `analysis/473-dirac-probe/p2_cell_torsor_check.py` (`a ↦ cos·a + sin·(aℓ)`),
+    with `U·ℓ = hiOf u` fixed by `loOf_mul_ell`. -/
+theorem rotMap3_loOf {u : CDAlg ℝ 3} (hu : u.coord 0 = 0) :
+    rotMap3 (loOf u) = rot3c • loOf u + rot3s • (loOf u * ell) := by
+  rw [loOf_mul_ell]
+  refine eq_of_halves ?_ ?_
+  · rw [cdLo_rotMap3, cdLo_loOf, cdHi_loOf, rotLo_def, hu, zero_coord, cdLo_add,
+      cdLo_smul, cdLo_smul, cdLo_loOf, cdLo_hiOf]
+    module
+  · rw [cdHi_rotMap3, cdLo_loOf, cdHi_loOf, rotHi_def, hu, zero_coord, cdHi_add,
+      cdHi_smul, cdHi_smul, cdHi_loOf, cdHi_hiOf]
+    module
+
+/-- **The basis action, high half:** `ρ(U·ℓ) = −s·U + c·(U·ℓ)`. -/
+theorem rotMap3_loOf_mul_ell {u : CDAlg ℝ 3} (hu : u.coord 0 = 0) :
+    rotMap3 (loOf u * ell) = (-rot3s) • loOf u + rot3c • (loOf u * ell) := by
+  rw [loOf_mul_ell]
+  refine eq_of_halves ?_ ?_
+  · rw [cdLo_rotMap3, cdLo_hiOf, cdHi_hiOf, rotLo_def, hu, zero_coord, cdLo_add,
+      cdLo_smul, cdLo_smul, cdLo_loOf, cdLo_hiOf]
+    module
+  · rw [cdHi_rotMap3, cdLo_hiOf, cdHi_hiOf, rotHi_def, hu, zero_coord, cdHi_add,
+      cdHi_smul, cdHi_smul, cdHi_loOf, cdHi_hiOf]
+    module
+
+/-- **Crystal-covariance under the order-3 element** — hosting AC(e) for `ρ`.
+    Since `ρ ℓ = ℓ`, this is a direct instance of `aut_hosting_equivariant`; with
+    `gradeAut_hosting_equivariant` for the reflection, the whole `S₃` factor is
+    now covered (`gradeAut` and `ρ` generate `S₃`). -/
+theorem rotAut3_hosting_equivariant {v : CDAlg ℝ 4} (hv : IsVacuum v) :
+    IsVacuum (rotAut3 v) ∧
+      (∀ x, GenByPair v ell x → GenByPair (rotAut3 v) ell (rotAut3 x)) :=
+  aut_hosting_equivariant rotAut3 rotAut3_ell hv
+
+end RotAut
+
 /-! ## 4. T4 — the local spectrum at a crystal (#634 AC4) -/
 
 /-- **T4 — the local spectrum is degenerate at a crystal.**  At a vacuum `s`
@@ -1159,8 +1541,10 @@ only gap.  In the `S₃ ≅ D₃` description of `Aut(𝕊)/G₂` (Brown 1967; s
 the `7` together with the scalar `det M` on `ℓ`.  The order-3 elements are the
 rotations by `±120°`, so they have `det M = +1` and **fix `ℓ`**; it is the three
 reflections (`det M = −1`, `gradeAut` among them) that send `ℓ ↦ −ℓ`.  Hence
-`aut_hosting_equivariant` covers the order-3 elements *as stated*, as soon as they
-are available as terms of `CDAut 4`; only that construction is missing. -/
+`aut_hosting_equivariant` covers the order-3 elements *as stated*, once they are
+available as terms of `CDAut 4` — and §3's `rotAut3` (with `rotAut3_ell`,
+`rotAut3_pow_three`, `rotAut3_ne_id` and `rotAut3_hosting_equivariant`) is exactly
+that construction. -/
 
 /-- Words in `{1, s, −t}` are words in `{1, s, t}`: a generator's sign is absorbed
     by the real-scaling constructor. -/
@@ -1289,6 +1673,52 @@ is a finding. -/
 #print axioms gradeMap3_involutive
 #print axioms gradeAut3_e_four
 #print axioms cdLift_gradeAut3_ne_id
+#print axioms conj_re
+#print axioms cd_neg_mul
+#print axioms cd_mul_neg
+#print axioms cd_sub_mul
+#print axioms cd_mul_sub
+#print axioms reCoord_mul
+#print axioms bil_conj_left
+#print axioms mul_swap_eq
+#print axioms rotLo_def
+#print axioms rotHi_def
+#print axioms rotLo_re
+#print axioms rotHi_re
+#print axioms rotLo_add
+#print axioms rotHi_add
+#print axioms rotLo_smul
+#print axioms rotHi_smul
+#print axioms conj_rotLo
+#print axioms conj_rotHi
+#print axioms rotLo_comp
+#print axioms rotHi_comp
+#print axioms rotLo_id
+#print axioms rotHi_id
+#print axioms re_cdLo_mul
+#print axioms re_cdHi_mul
+#print axioms rot_lo_mul
+#print axioms rot_hi_mul
+#print axioms rot3c_eq
+#print axioms rot3s_sq
+#print axioms rot3s_mul_self
+#print axioms cdLo_rotMap3
+#print axioms cdHi_rotMap3
+#print axioms rotMap3_add
+#print axioms rotMap3_smul
+#print axioms rotMap3_mul
+#print axioms cdLo_rotMap3_two
+#print axioms cdHi_rotMap3_two
+#print axioms rot3_comp_c
+#print axioms rot3_comp_s
+#print axioms rotMap3_cube
+#print axioms rotMap3_bijective
+#print axioms rotAut3_ell
+#print axioms rotAut3_pow_three
+#print axioms rotAut3_ne_id
+#print axioms rotMap3_loOf
+#print axioms rotMap3_loOf_mul_ell
+#print axioms rotAut3_hosting_equivariant
 #print axioms left_mul_sq_at_vacuum
 #print axioms neg_left_mul_sq_at_vacuum
 #print axioms left_mul_sq_scalar_iff_vacuum
