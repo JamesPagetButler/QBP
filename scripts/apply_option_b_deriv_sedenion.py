@@ -31,8 +31,9 @@ NEW = (
 RULING = (
     "AXIOM-1 option B — ruled by the beekeeper 2026-09-09 (PR #648 package v0.5 §3), applied on direction "
     "2026-09-10 (PR #651). No process is asserted at the seams; whether crystallisation is a physical "
-    "process AXIOM-1 governs is deferred to trigger issue #647. Beekeeper's own-hand ruling line: "
-    "<URL to be filled when posted on #647 or #651>."
+    "process AXIOM-1 governs is deferred to trigger issue #647. Beekeeper's own-hand ruling line "
+    "('I choose option B.', 2026-09-11): "
+    + "https://github.com/JamesPagetButler/QBP/issues/647#issuecomment-5639808463"
 )
 NOTE = (
     "qbp-oppenheimer: AXIOM-1 option B applied (ruled 2026-09-09; applied on direction 2026-09-10): "
