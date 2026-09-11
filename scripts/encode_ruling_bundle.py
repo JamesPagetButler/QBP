@@ -24,12 +24,16 @@ import json
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cth_ledger_edit import ledger_edit  # noqa: E402  (#654 D7: confined write)
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEDGER = os.path.join(
     ROOT, "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
 )
 
 # ----------------------------------------------------------------------------- rulings (fill in)
+DRY_RUN = False  # True: verify confinement and print the summary, write nothing
 RULED = False  # set True only when the beekeeper has ruled Decisions 0–5 on PR #652
 READING = "open"  # "open" (v0.3: not decidable from the axioms — both hypotheses encoded, status open) | "P2prime" | "P2line" | "P2bundle"
 RULING_DATE = "<ruling date>"
@@ -263,10 +267,17 @@ def main():
         )
         sys.exit(2)
     with open(LEDGER, encoding="utf-8") as f:
-        L = json.load(f)
-    if any(e["id"] == "DERIV-encoding-level" for e in L["derived_principles"]):
-        print("already applied — no change")
-        return
+        if any(
+            e["id"] == "DERIV-encoding-level"
+            for e in json.load(f)["derived_principles"]
+        ):
+            print("already applied — no change")
+            return
+    with ledger_edit(LEDGER, dry_run=DRY_RUN) as ed:
+        _apply(ed.ledger, ed)
+
+
+def _apply(L, ed):
     # D5: AXIOM-2 → retired; DERIV-encoding-level in
     ax2 = next(a for a in L["axioms"] if a["id"] == "AXIOM-2")
     L["axioms"] = [a for a in L["axioms"] if a["id"] != "AXIOM-2"]
@@ -278,6 +289,11 @@ def main():
     )
     L["axioms"].extend([POST_HOSTING, POST_ASSOC, POST_OBS])
     L["meta_principles"] = [META2]
+    ed.touch("axioms", "AXIOM-2")
+    ed.touch("retired_axioms", "AXIOM-2")
+    for p in (POST_HOSTING, POST_ASSOC, POST_OBS):
+        ed.touch("axioms", p["id"])
+    ed.touch("meta_principles", META2["id"])
     # D2: DERIV-holographic → retired; four entries in
     holo = next(e for e in L["derived_principles"] if e["id"] == "DERIV-holographic")
     L["derived_principles"] = [
@@ -293,8 +309,14 @@ def main():
     L["interpretations"] = [
         INTERP
     ]  # schema pins derived_principles ids to ^DERIV-; interpretations get their own list
+    ed.touch("derived_principles", "DERIV-holographic")
+    ed.touch("retired_principles", "DERIV-holographic")
+    for d in (DERIV_ENC, DERIV_SUB, DERIV_HOLO_THM):
+        ed.touch("derived_principles", d["id"])
+    ed.touch("interpretations", INTERP["id"])
     # DERIV-sedenion inverted + first clause per reading
     sed = next(e for e in L["derived_principles"] if e["id"] == "DERIV-sedenion")
+    ed.touch("derived_principles", "DERIV-sedenion")
     sed["derived_from"] = ["DERIV-substrate-level", "DERIV-encoding-level"]
     sed["statement"] = (
         SEDENION_FIRST_CLAUSE[READING] + " " + sed["statement"].split(". ", 1)[1]
@@ -310,18 +332,22 @@ def main():
     # re-point derived principles
     for e in L["derived_principles"]:
         if e["id"] in REPOINT_DERIVED:
-            e["derived_from"] = REPOINT_DERIVED[e["id"]]
-        else:
-            replace_in_lists(e, "AXIOM-2", ["DERIV-encoding-level"])
+            if e["derived_from"] != REPOINT_DERIVED[e["id"]]:
+                e["derived_from"] = REPOINT_DERIVED[e["id"]]
+                ed.touch("derived_principles", e["id"])
+        elif replace_in_lists(e, "AXIOM-2", ["DERIV-encoding-level"]):
+            ed.touch("derived_principles", e["id"])
     # re-point anchors (list fields) and the flag-3 anchor descriptions
     n_ax2 = n_holo = 0
     for a in L["anchors"]:
         if replace_in_lists(a, "AXIOM-2", ["DERIV-encoding-level"]):
             n_ax2 += 1
+            ed.touch("anchors", a["id"])
         if a["id"] in ANCHOR_HOLO_MAP and replace_in_lists(
             a, "DERIV-holographic", ANCHOR_HOLO_MAP[a["id"]]
         ):
             n_holo += 1
+            ed.touch("anchors", a["id"])
         if (
             isinstance(a.get("description"), str)
             and "DERIV-holographic, theorem part" in a["description"]
@@ -330,17 +356,20 @@ def main():
                 "DERIV-holographic, theorem part",
                 "DERIV-holographic-theorem (was DERIV-holographic), part",
             )
+            ed.touch("anchors", a["id"])
     # chains
     n_ch = 0
     for c in L["chains"]:
         if replace_in_lists(c, "AXIOM-2", ["META-2", "DERIV-encoding-level"]):
             n_ch += 1
+            ed.touch("chains", c["id"])
         if replace_in_lists(
             c,
             "DERIV-holographic",
             ["POST-observer-associativity", "DERIV-holographic-theorem"],
         ):
             n_ch += 1
+            ed.touch("chains", c["id"])
     L["changelog"].append(
         {
             "version": "6.0.0",
@@ -360,9 +389,9 @@ def main():
         f"qbp-oppenheimer {RULING_DATE}: ruling bundle (PR #652) encoded"
     )
     L["last_updated"] = f"{RULING_DATE}T00:00:00Z"
-    with open(LEDGER, "w", encoding="utf-8") as f:
-        json.dump(L, f, ensure_ascii=False, indent=2)
-        f.write("\n")
+    ed.touch("changelog")
+    ed.touch("update_provenance")
+    ed.touch("last_updated")
     print(
         f"applied: reading={READING}; anchors re-pointed AXIOM-2={n_ax2}, DERIV-holographic={n_holo}; chain fields={n_ch}"
     )
