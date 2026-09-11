@@ -462,8 +462,9 @@ def Universe.map (φ : CDAut 4) (U : Universe) : Universe :=
 /-- **Hosting is equivariant under every `ℓ`-fixing automorphism** —
     `CrystalHosting.aut_hosting_equivariant` restated on `Universe`.  The crystal
     condition, the substrate and the hosted tower instance are all carried along.
-    (`φ ℓ = ℓ` covers the whole G₂ side and, inside `S₃`, exactly the rotations
-    — the identity and the two order-3 elements; the three reflections, of which
+    (`φ ℓ = ℓ` covers the whole G₂ side and, inside `S₃` — under Brown's
+    description `Aut(𝕊) = G₂ × S₃`, which is not claimed here — the rotations:
+    the identity and the two order-3 elements; the three reflections, of which
     `gradeAut` is one, send `ℓ ↦ −ℓ` and are handled separately.  See §11.) -/
 theorem hosting_equivariant (φ : CDAut 4) (hφ : φ ell = ell) (U : Universe) :
     IsVacuum (φ U.crystal) ∧ φ U.crystal ∈ StateSphere ∧

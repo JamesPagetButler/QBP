@@ -834,6 +834,7 @@
       "proof_system": "lean4",
       "witnesses": [
         "QBP.Foundations.CrystalHosting.rotAut3_hosting_equivariant",
+        "QBP.Foundations.CrystalHosting.rotAut3_moves_lowHalf",
         "QBP.Foundations.CrystalHosting.rotMap3_mul",
         "QBP.Foundations.CrystalHosting.rot_lo_mul",
         "QBP.Foundations.CrystalHosting.rot_hi_mul",

@@ -1104,8 +1104,10 @@ convention checked numerically in `analysis/473-dirac-probe/p2_cell_torsor_check
 two identities `rot_lo_mul` / `rot_hi_mul` reduce, through the Cayley–Dickson
 doubling formula `(a,b)(p,q) = (ap − q̄b, qa + bp̄)` and the swap identity
 `cdAlg_mul_add_swap`, to the scalar relations `c² + s² = 1`, `c² − s² = c` and
-`2c = −1` — i.e. exactly to `3·(2π/3) ≡ 0 mod 2π`.  For a generic angle they fail
-(θ = π/2 and π/3 were checked numerically in the PR #649 Red Team review).
+`2c = −1` — i.e. to `3·(2π/3) ≡ 0 mod 2π`.  Lean proves *sufficiency* at
+θ = ±2π/3 (`c = −1/2`, `s² = 3/4` covers both ρ and ρ² = ρ⁻¹); that other angles
+fail is numerical only (θ = π/2, π/3, 0.7 checked in the PR #649 Red Team review
+and `aut_s3.py`), not a Lean statement.
 
 Everything below is `CDAlg ℝ`/ℝ algebra; no substrate semantics is used or implied. -/
 
@@ -1424,6 +1426,25 @@ theorem rotAut3_ne_id :
   rw [rot3c_eq] at h1
   norm_num at h1
 
+/-- **ρ moves the Cayley–Dickson low half:** `loOf e₁` lies in the low half
+    (`cdHi = 0`) and its image under `ρ` does not.  So `ρ(𝕆_low) ⊄ 𝕆_low` — the
+    Lean content of "the cell is not canonical" (PR #649 confirmer finding 1); the
+    three halves `𝕆_low, ρ𝕆_low, ρ²𝕆_low` form a ℤ/3-torsor
+    (`p2_cell_torsor_check.py` asserts the rest numerically). -/
+theorem rotAut3_moves_lowHalf :
+    cdHi (loOf (e (1 : Fin (2^3)))) = 0 ∧
+      cdHi (rotAut3 (loOf (e (1 : Fin (2^3))))) ≠ 0 := by
+  refine ⟨cdHi_loOf _, ?_⟩
+  intro h
+  have h' : cdHi (rotMap3 (loOf (e (1 : Fin (2^3))))) = 0 := h
+  rw [cdHi_rotMap3, cdLo_loOf, cdHi_loOf, rotHi_def, zero_coord, e_coord] at h'
+  have h1 := congrArg (fun z : CDAlg ℝ 3 => z.coord 1) h'
+  simp only [add_coord, smul_coord, e_coord, zero_coord, one_coord] at h1
+  have hs : rot3s ≠ 0 := by
+    intro hs; have := rot3s_sq; rw [hs] at this; norm_num at this
+  norm_num at h1
+  exact hs h1
+
 /-- **The basis action, low half:** `ρ(U) = c·U + s·(U·ℓ)` for `U = loOf u` with
     `u` imaginary.  This is the convention of
     `analysis/473-dirac-probe/p2_cell_torsor_check.py` (`a ↦ cos·a + sin·(aℓ)`),
@@ -1454,7 +1475,8 @@ theorem rotMap3_loOf_mul_ell {u : CDAlg ℝ 3} (hu : u.coord 0 = 0) :
 /-- **Crystal-covariance under the order-3 element** — hosting AC(e) for `ρ`.
     Since `ρ ℓ = ℓ`, this is a direct instance of `aut_hosting_equivariant`; with
     `gradeAut_hosting_equivariant` for the reflection, the whole `S₃` factor is
-    now covered (`gradeAut` and `ρ` generate `S₃`). -/
+    now covered — both classes named so far; that they generate `S₃` (Brown 1967)
+    is the residue named in `Substrate/Hosting.lean` §11, not claimed here. -/
 theorem rotAut3_hosting_equivariant {v : CDAlg ℝ 4} (hv : IsVacuum v) :
     IsVacuum (rotAut3 v) ∧
       (∀ x, GenByPair v ell x → GenByPair (rotAut3 v) ell (rotAut3 x)) :=
@@ -1716,6 +1738,7 @@ is a finding. -/
 #print axioms rotAut3_ell
 #print axioms rotAut3_pow_three
 #print axioms rotAut3_ne_id
+#print axioms rotAut3_moves_lowHalf
 #print axioms rotMap3_loOf
 #print axioms rotMap3_loOf_mul_ell
 #print axioms rotAut3_hosting_equivariant

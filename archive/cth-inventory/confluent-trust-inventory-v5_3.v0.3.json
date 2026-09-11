@@ -9225,17 +9225,18 @@
     },
     {
       "id": "PROOF-order-three-automorphism-fixes-ell",
-      "name": "The order-3 element ρ of Aut(𝕊)'s S₃ factor, as a CDAut 4: ρ³ = id, ρ(ℓ) = ℓ, ρ ≠ id, multiplicative — and hosting is equivariant under it",
+      "name": "An ℓ-fixing order-3 automorphism ρ of 𝕊 (the order-3 element of the S₃ factor under Brown 1967, not claimed here), as a CDAut 4: ρ³ = id, ρ(ℓ) = ℓ, ρ ≠ id, multiplicative — and hosting is equivariant under it",
       "tier": 1,
       "layer_tag": "T",
       "status": "coherent",
       "provenance_kind": "proof",
-      "description": "PR #649 confirmer finding 1 / #639 (e). rotMap3 rotates each plane (e_k, e_k·ℓ), k = 1..7, by 2π/3 with 1 and ℓ fixed (c = cos(2π/3) = −1/2, s = sin(2π/3) = √3/2). rotMap3_mul (via rot_lo_mul / rot_hi_mul through the CD doubling formula, reCoord_mul and mul_swap_eq from ArtinTrace; the nine coefficient identities close under c = −1/2, s² = 3/4 — exactly 3·(2π/3) ≡ 0, nothing goes through at a generic angle): ρ(xy) = ρx·ρy. rotAut3 : CDAut 4 (linear, multiplicative, bijective); rotAut3_ell: ρ ℓ = ℓ; rotAut3_pow_three: ρ³ = id; rotAut3_ne_id: ρ(loOf e₁) ≠ loOf e₁ (order exactly 3); rotMap3_loOf / rotMap3_loOf_mul_ell: the action on U and U·ℓ (sign convention checked against loOf_mul_ell, e_k·ℓ = +e_{k+8}). Consequences: rotAut3_hosting_equivariant (aut_hosting_equivariant applies since ρ fixes ℓ) and Substrate.Hosting.hosting_equivariant_rot3 — crystal-covariance across the order-3 elements of S₃, which the master docstrings had wrongly recorded as 'moving ℓ' (they fix ℓ; the reflections, gradeAut among them, move it — aut_s3.py). Consequence for P2′: ρ carries the CD low half to a different half (numerically asserted in p2_cell_torsor_check.py; the halves form a ℤ/3-torsor), so 'the cell' is a discrete choice, not canonical. NOT claimed: Brown's Aut(𝕊) = G₂ × S₃; that gradeAut and ρ generate the S₃ factor.",
+      "description": "PR #649 confirmer finding 1 / #639 (e). rotMap3 rotates each plane (e_k, e_k·ℓ), k = 1..7, by 2π/3 with 1 and ℓ fixed (c = cos(2π/3) = −1/2, s = sin(2π/3) = √3/2). rotMap3_mul (via rot_lo_mul / rot_hi_mul through the CD doubling formula, reCoord_mul and mul_swap_eq from ArtinTrace; the nine coefficient identities close under c = −1/2, s² = 3/4 — i.e. at θ = ±2π/3 — Lean proves sufficiency; that other angles fail is numerical, aut_s3.py): ρ(xy) = ρx·ρy. rotAut3 : CDAut 4 (linear, multiplicative, bijective); rotAut3_ell: ρ ℓ = ℓ; rotAut3_pow_three: ρ³ = id; rotAut3_ne_id: ρ(loOf e₁) ≠ loOf e₁ (order exactly 3); rotMap3_loOf / rotMap3_loOf_mul_ell: the action on U and U·ℓ (sign convention checked against loOf_mul_ell, e_k·ℓ = +e_{k+8}). Consequences: rotAut3_hosting_equivariant (aut_hosting_equivariant applies since ρ fixes ℓ) and Substrate.Hosting.hosting_equivariant_rot3 — crystal-covariance across the order-3 elements of S₃, which the master docstrings had wrongly recorded as 'moving ℓ' (they fix ℓ; the reflections, gradeAut among them, move it — aut_s3.py). Consequence for P2′: ρ carries the CD low half out of itself — rotAut3_moves_lowHalf (Lean: cdHi (ρ (loOf e₁)) ≠ 0), so ρ(𝕆_low) ⊄ 𝕆_low; that the three halves form a ℤ/3-torsor is asserted numerically in p2_cell_torsor_check.py — so 'the cell' is a discrete choice, not canonical. NOT claimed: Brown's Aut(𝕊) = G₂ × S₃; that gradeAut and ρ generate the S₃ factor.",
       "proof_file": "proofs/QBP/Foundations/CrystalHosting.lean",
       "proof_language": "lean4",
       "proof_state": "verified",
       "lean_theorem": "QBP.Foundations.CrystalHosting.rotAut3_hosting_equivariant",
       "lean_companion_theorems": [
+        "QBP.Foundations.CrystalHosting.rotAut3_moves_lowHalf",
         "QBP.Foundations.CrystalHosting.rotMap3_mul",
         "QBP.Foundations.CrystalHosting.rot_lo_mul",
         "QBP.Foundations.CrystalHosting.rot_hi_mul",
@@ -9278,6 +9279,7 @@
         ],
         "witnesses": [
           "QBP.Foundations.CrystalHosting.rotAut3_hosting_equivariant",
+          "QBP.Foundations.CrystalHosting.rotAut3_moves_lowHalf",
           "QBP.Foundations.CrystalHosting.rotMap3_mul",
           "QBP.Foundations.CrystalHosting.rot_lo_mul",
           "QBP.Foundations.CrystalHosting.rot_hi_mul",
