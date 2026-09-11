@@ -1,0 +1,452 @@
+{
+  "register_version": "1.0",
+  "description": "Issue #654 D1/D2 — shrink-only, issue-linked register for the root GATE and chain-to-root audit (scripts/root_audit.py). Enumerated by the audit's first run (2026-09-11, ledger v5.4.0): 3 roots sorting into no four-bucket exit + 2 smuggled roots (open_roots); 16 chain ids cited but never encoded + 18 derived chains (principles / DERIV-* / PRED-*) that do not terminate (chain_debt). Every entry is a burn-down item on the clock with a tracking issue, not an allowlist.",
+  "policy": "SHRINK-ONLY. root_audit.py HARD-FAILS if: (1) any root sorts into no bucket, or any root-prefixed id lives outside the root lists, and is NOT listed in open_roots (a NEW unforced root — blocked: you cannot add a root without forcing it, killing it, or filing its issue); (2) any chain id fails to resolve, or any derived chain fails to terminate, and is NOT listed in chain_debt; (3) any listed entry is now fixed (the root sorts, the id resolves, the chain terminates) — remove the stale entry. Adding an entry is a visible, reviewed commit to this file with a tracking issue — NEVER a CI-driven or reflexive green-making step (the silent baseline raise is what defeated the FAULT-S4-005 ratchet; PATTERN-02). Entries carry no counts and no baseline: the population is itemised.",
+  "open_roots": [
+    {
+      "id": "META-1",
+      "lives_in": "meta_axiom",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/655",
+      "reason": "epistemic meta-principle; no forcing, no kill_condition — classify (root / reclassify / kill)",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "AXIOM-1",
+      "lives_in": "axioms",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/647",
+      "reason": "physical root with no forcing and no kill_condition — trigger question #647 (is crystallisation a physical process AXIOM-1 governs?)",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "AXIOM-2",
+      "lives_in": "axioms",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/473",
+      "reason": "to be RETIRED by the AXIOM-2 encode PR (derivable as a level statement: DERIV-encoding-level; #648 v0.6) — entry becomes stale and is removed there",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "META-physical-mapping-status-field",
+      "lives_in": "anchors",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/657",
+      "reason": "smuggled root: META- prefixed field-documentation anchor — rename out of the root prefix space",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "META-regime-of-validity-field",
+      "lives_in": "anchors",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/657",
+      "reason": "smuggled root: META- prefixed field-documentation anchor — rename out of the root prefix space",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    }
+  ],
+  "chain_debt": [
+    {
+      "id": "INST-f0",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-alpha -> INST-f0",
+        "MEAS-sin2tw -> INST-f0",
+        "MEAS-alphas -> INST-f0",
+        "OBS-f0-2alpha -> INST-f0",
+        "CONSTRAINT-ynu -> INST-f0"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-rge",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-sin2tw -> DERIV-rge",
+        "MEAS-alphas -> DERIV-rge"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "INST-theta",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-koide -> INST-theta"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-slater",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-udd -> DERIV-slater",
+        "MEAS-delta -> DERIV-slater",
+        "MEAS-tolfac -> DERIV-slater",
+        "FLAG-postd-IE -> DERIV-slater"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-ie",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-udd -> DERIV-ie",
+        "MEAS-delta -> DERIV-ie"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-screening",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-udd -> DERIV-screening"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-electronegativity",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-delta -> DERIV-electronegativity"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-tpd",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-jd -> DERIV-tpd",
+        "FLAG-J -> DERIV-tpd",
+        "FLAG-Tc -> FLAG-J -> DERIV-tpd",
+        "PRED-willow-j -> DERIV-tpd"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-teff",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-jd -> DERIV-teff",
+        "FLAG-J -> DERIV-teff",
+        "FLAG-Tc -> FLAG-J -> DERIV-teff",
+        "FLAG-xi -> DERIV-teff",
+        "FLAG-Hc2 -> FLAG-xi -> DERIV-teff"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-lambda",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-jd -> DERIV-lambda"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-xi",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-jd -> DERIV-xi"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-ionic-radii",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-tolfac -> DERIV-ionic-radii"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-tolerance",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "MEAS-tolfac -> DERIV-tolerance"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "INST-TcJ-ratio",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "FLAG-Tc -> INST-TcJ-ratio"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "PROOF-koide",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "PRED-koide-phase-2-over-9 -> PROOF-koide",
+        "PRED-wolfenstein-A-sqrt-Q -> PROOF-koide"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "PROOF-stabiliser-order-24",
+      "kind": "unresolved-id",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "cited_via": [
+        "PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "PRED-peak-sound-speed-Q -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "INSIGHT-iron-handoff-nuclear-to-magnetic -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "PRED-urca-onset-3rho0 -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "PRED-urca-onset-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "FLAG-tov-eos-shape-underdetermined -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-peak-sound-speed-Q -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "PRED-tov-mass-at-bump-peak -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24",
+        "PROOF-iron-to-ns-bridge -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24"
+      ],
+      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "PRED-conformal-sound-speed-1-over-3",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "PRED-conformal-sound-speed-1-over-3 (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "PRED-magnetar-energy-fraction-1-over-3",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "PRED-magnetar-energy-fraction-1-over-3 (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "PRED-fano-associativity-7beam",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "PRED-fano-associativity-7beam (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "PRED-tov-mass-at-bump-peak",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "PRED-tov-mass-at-bump-peak -> PRED-conformal-sound-speed-1-over-3 (empty prediction_chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-vaidya-accreting-horizon-spacelike",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-vaidya-accreting-horizon-spacelike -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-hubble-half-entropy-factor",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-hubble-half-entropy-factor -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-fraunhofer-optics",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-fraunhofer-optics (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-sterngerlach-qbp",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-sterngerlach-qbp (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-angle-dependent-qbp",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-angle-dependent-qbp (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-general3d-qbp",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-general3d-qbp (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-doubleslit-visibility-model",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-doubleslit-visibility-model (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-measurement-ansatz-basic",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-measurement-ansatz-basic (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-code-si-constants",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-code-si-constants (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-kitaev-model",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-kitaev-model (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-graphene-model",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-graphene-model (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-bi2se3-ti",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-bi2se3-ti (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-crystallisation-spectral-moments",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-crystallisation-spectral-moments (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "DERIV-quaternion-physics-kramers",
+      "kind": "dangling-derived-chain",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "DERIV-quaternion-physics-kramers (empty chain)"
+      ],
+      "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
+      "added": "2026-09-11",
+      "added_by": "#654 D6 first run"
+    }
+  ]
+}
