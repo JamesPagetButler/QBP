@@ -58,6 +58,7 @@ POST_HOSTING = {
         "Convergence to a crystal is the rule's claim (#635), separate."
     ),
     "kind": "physical postulate",
+    "kill_condition": "a substrate level at which V ≡ 0 — the level bound failing; no observable yet (observers live in crystals; FLAG-seam-dynamics-open)",
     "derivable": False,
     "anchors": ["PROOF-substrate-hosting-definition", "PROOF-delta-landscape-descent"],
     "ruling": f"Decision 5, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
@@ -72,6 +73,7 @@ POST_ASSOC = {
         "entities of clause (a)). Exclusivity — no observer lives outside the hosted algebra — is the postulate's content."
     ),
     "kind": "physical postulate",
+    "kill_condition": "an observer exhibited outside any associative subalgebra (exclusivity failing), or a non-associative subset on which actions compose",
     "derivable": False,
     "anchors": [
         "PROOF-associative-composition-iff",
@@ -97,6 +99,7 @@ POST_OBS = {
         )
     ),
     "kind": "physical postulate",
+    "kill_condition": "an observable that requires access to information not encoded in the observer's encoding octonion (O⊆ failing), or an EM ℂ shown distinct from the encoding-selected ℂ (E failing)",
     "derivable": False,
     "anchors": ["PROOF-hosted-algebra-meets-cell-in-complex-line"],
     "ruling": f"Decision 2, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
@@ -189,10 +192,11 @@ INTERP = {
         "POST-observation",
     ],
     "layer": 1,
-    "kind": "interpretation",
+    "kind": "interpretation",  # cth-implementor (seq 1297): INTERP = provenance_kind philosophy + decision_state; no new kind
     "supersedes": "DERIV-holographic (interpretation part)",
     "ruling": f"Decisions 1–3, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
-    "status": "open" if READING == "open" else "ruled",
+    "provenance_kind": "philosophy",
+    "decision_state": "open" if READING == "open" else "ruled",
 }
 SEDENION_FIRST_CLAUSE = {
     "open": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of an octonion (which copy encodes a universe is open — INTERP-holographic-boundary).",
