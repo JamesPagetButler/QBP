@@ -22,6 +22,8 @@ on:
       - 'docs/cth/anchor-worthy-manifest.json'
       - 'docs/cth/proof-anchor-remediation.json'
       - 'scripts/check_anchor_manifest.py'
+      - 'docs/cth/root-audit-register.json'
+      - 'scripts/root_audit.py'
       - 'proofs/agda-cubical/**'
 
 permissions:
@@ -62,3 +64,13 @@ jobs:
           #      source scan + resolution run (no --skip-full-ledger). Airtight #print-axioms/--safe
           #      re-derivation is the authoritative follow-on on the foundations CI.
           python3 scripts/check_anchor_manifest.py
+      - name: Root GATE + chain-to-root audit (#654 D1/D2) — absolute, whole-population, no baseline; shrink-only issue-linked register
+        run: |
+          # #654 — the beekeeper's standard mechanised: every root (AXIOM-/POST-/META-/INTERP-)
+          # sorts into a four-bucket exit (PROVED forcing / FORCED cite / OPEN kill_condition /
+          # RETIRED) or is an itemised, issue-linked entry in docs/cth/root-audit-register.json
+          # (shrink-only: a fixed-but-still-listed entry HARD-FAILS). Every chain resolves
+          # (gated for all owners) and every derived chain (principles / DERIV-* / PRED-*)
+          # terminates in {root | PROOF | MEAS | experimental anchor} (seen-set cycle check).
+          # Ledger-only; no baseline file exists for this gate (PATTERN-02).
+          python3 scripts/root_audit.py
