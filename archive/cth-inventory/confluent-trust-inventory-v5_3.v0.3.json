@@ -9188,6 +9188,11 @@
         "QBP.Foundations.CrystalHosting.crystal_quatSpan_independent"
       ],
       "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-crystal-hosts-quaternion",
+        "AXIOM-2"
+      ],
       "foundation_batch": "#649-p2-lean",
       "last_tested_at": "2026-09-10T00:00:00Z",
       "verification": {
@@ -9244,6 +9249,11 @@
         "QBP.Foundations.CrystalHosting.mul_swap_eq"
       ],
       "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-crystal-hosts-quaternion",
+        "PROOF-alternator-vanishes-iff-commute"
+      ],
       "foundation_batch": "#649-p2-lean",
       "last_tested_at": "2026-09-10T00:00:00Z",
       "verification": {
@@ -9299,6 +9309,11 @@
         "QBP.Substrate.Hosting.hosting_equivariant_grade"
       ],
       "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-order-three-automorphism-fixes-ell",
+        "PROOF-substrate-hosting-definition"
+      ],
       "foundation_batch": "#649-p2-lean",
       "last_tested_at": "2026-09-10T00:00:00Z",
       "verification": {

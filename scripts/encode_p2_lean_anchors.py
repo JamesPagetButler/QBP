@@ -91,6 +91,22 @@ ANCHORS = {
 }
 
 
+CHAINS = {
+    "PROOF-hosted-algebra-meets-cell-in-complex-line": [
+        "PROOF-crystal-hosts-quaternion",
+        "AXIOM-2",
+    ],
+    "PROOF-order-three-automorphism-fixes-ell": [
+        "PROOF-crystal-hosts-quaternion",
+        "PROOF-alternator-vanishes-iff-commute",
+    ],
+    "PROOF-hosting-equivariant-under-order-three": [
+        "PROOF-order-three-automorphism-fixes-ell",
+        "PROOF-substrate-hosting-definition",
+    ],
+}
+
+
 def verification(pf):
     return {
         "toolchain": "leanprover/lean4:v4.30.0",
@@ -139,6 +155,8 @@ def main():
                 "lean_theorem": ns + wits[0],
                 "lean_companion_theorems": [ns + w for w in wits[1:]],
                 "sorry_count": 0,
+                "provenance": "T",
+                "prediction_chain": CHAINS[aid],
                 "foundation_batch": BATCH,
                 "last_tested_at": STAMP,
                 "verification": {
