@@ -65,11 +65,13 @@
     {
       "id": "DERIV-sedenion",
       "name": "Sedenion inter-cell topology",
-      "statement": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: seams where information CAN be destroyed.",
+      "statement": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: on the zero-divisor locus, left multiplication L_a has a non-trivial kernel (42 basis-sum witnesses, PROOF-42zd).",
       "derived_from": [
         "AXIOM-2"
       ],
-      "layer": 1
+      "layer": 1,
+      "superseded_statement": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: seams where information CAN be destroyed.",
+      "ruling": "AXIOM-1 option B — ruled by the beekeeper 2026-09-09 (PR #648 package v0.5 §3), applied on direction 2026-09-10 (PR #651). No process is asserted at the seams; whether crystallisation is a physical process AXIOM-1 governs is deferred to trigger issue #647. Beekeeper's own-hand ruling line ('I choose option B.', 2026-09-11): https://github.com/JamesPagetButler/QBP/issues/647#issuecomment-5639808463"
     },
     {
       "id": "DERIV-born",
@@ -9854,8 +9856,13 @@
       "version": "5.6.0",
       "date": "2026-06-18T00:00:00Z",
       "note": "qbp-oppenheimer: +5 anchors from the #570-#573 purely-algebraic-derivation investigation — the #570 gate (DEFN), footprint=CD-dimension (pyrrhic pass), constants (nothing content-distinct), loop-closure (0% built / structural obstruction), and the consolidated 'organization not generator' verdict. Brings CTH current with the option-1 result (V&V remediation: 'update CTH as we go')."
+    },
+    {
+      "version": "5.7.0",
+      "date": "2026-09-10T00:00:00Z",
+      "note": "qbp-oppenheimer: AXIOM-1 option B applied (ruled 2026-09-09; applied on direction 2026-09-10): AXIOM-1 unchanged; DERIV-sedenion's 'information CAN be destroyed' clause replaced by the algebraic statement (L_a has a non-trivial kernel on the zero-divisor locus, PROOF-42zd); deferral recorded in the entry's ruling field; flag 1 dissolved as a category error pending #647's trigger. derived_from untouched (AXIOM-2 package encode PR pending adoption)."
     }
   ],
   "last_updated": "2026-09-10T00:00:00Z",
-  "update_provenance": "qbp-oppenheimer 2026-09-10: #649-p2-lean — P2′ lemmas + the order-3 automorphism (3 proof anchors)"
+  "update_provenance": "qbp-oppenheimer 2026-09-10: AXIOM-1 option B (ruled 2026-09-09; DERIV-sedenion clause; #647)"
 }
