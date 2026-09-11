@@ -1,6 +1,14 @@
-# Ruling bundle — six decisions that edit the same sentences (v0.2, 2026-09-10)
+# Ruling bundle — what the axioms decide, and the one thing they do not (v0.3, 2026-09-11)
 
-**Status:** decision page for the beekeeper, prepared on request after PRs #648 and #649 merged; **v0.2 applies the PR #652 Red Team review** (six must-changes, should-fixes). qbp-architecture asked (#643 §I4) that the flag-3 split, the P2/P2′ reading, and the boundary vocabulary be ruled **together**, because each edits DERIV-holographic's last sentence. Two further open rulings are listed because their outcome feeds the same encode PR, and a **Decision 0** is added because one of the package's texts rests on a ruling that has no source in the beekeeper's hand yet. Most texts below are drafts carried from merged documents and say where from; the two that are **composed on this page** (v0.1/v0.2) are marked as such. **Nothing here is applied.** Written by qbp-oppenheimer.
+**Status:** v0.3 rewrites the framing after the beekeeper's objection (2026-09-11): *"this whole process of having me choose something seems very off — it should be proven from our axioms, not just my personal take."* He is right, and the page's own wisdom says so: a ruling that is not forced by the axioms is a root in disguise, and the page was asking for five of them. Re-audited against that standard, the six items sort into three kinds, and **only one of them was ever a genuine choice — and that one should not be chosen at all.**
+
+| Kind | Items | What the beekeeper is asked for |
+|---|---|---|
+| **Already ruled** (record exists) | Decision 0 (option B, #647 issuecomment-5639808463); the hosting frame (#473 issuecomment-5574256922, 2026-09-07); horn 1 (2026-09-05) | nothing |
+| **Consequences of the ledger's own rules + prior rulings** — housekeeping, not taste | 2 (one kind of statement per entry ⇒ the split), 3 (one name per object), 4 (an AC that was not met is not ticked ⇒ rescope or hold, either is bookkeeping), 5 (the package encodes rulings already made: the hosting frame ⇒ POST-hosting; the ladders ⇒ the two level principles; option B ⇒ DERIV-sedenion) | **no choice** — applied as consequences, with the prior rulings cited; the beekeeper's merge of this page is the record that he saw the consequences drawn |
+| **Not decidable from the axioms** | 1 (P2 vs P2′: which copy of 𝕆 encodes a universe) | **not a ruling** — the axioms under-determine it (the algebra does not pick a copy; ρ permutes the halves; no experiment on record distinguishes). Encoded as an **open hypothesis pair** with its discriminator, exactly as hosting §4 records kill conditions. Choosing by parsimony would add an unforced root. |
+
+Everything below §0 is kept as the record of how the page arrived here; the "recommended" column is now read as "the consequence" for 2–5 and as "not chosen" for 1. Written by qbp-oppenheimer.
 
 ## 0. The decisions and how they couple
 
@@ -42,9 +50,9 @@ Facts on master: the crystal's algebra ℍ_s = span{1, ℓ, U, ℓU} contains �
 | Constitutional cost | none beyond flag 3 | none beyond flag 3 | DERIV-holographic's "4D gap" (→ 6-dim complement of ℂ_u); T2 ("largest associative subalgebra of 𝕆 is ℍ") stops describing the observer's algebra; DERIV-3plus1's route (ℍ ⊂ 𝕆 ⇒ 1 + 3) is severed — two of the three spatial directions lie outside the encoding; the flag-3 draft is written under P2 and must be redrafted |
 | Truth | undecided | undecided | undecided — **no experiment on record distinguishes any of the three; the ruling is by parsimony** |
 
-**Recommendation: P2′**, with the ℤ/3 named as the discrete datum — **with three caveats the record insists on.** (i) The selection discriminator holds only under O⊆, a premise introduced in-round, and gives the *observed* ℂ only under (E); (ii) the audit's §7 tell is on record: both Gemini rounds were fast agreement and no party ever argued the P2 side; (iii) P2's bundle form costs no datum at all, and if the beekeeper weighs "no new datum" above "fewer unproved links", the bundle form is the rigorous P2. What P2′ buys is: one discrete choice instead of a four-parameter family, no octonion-existence link, no completeness conjecture. What it costs is the T2 / DERIV-3plus1 rewording, paid in the same encode PR as Decision 2.
+**v0.3 — no recommendation.** The three columns above are consistent with every theorem on master; the axioms do not select one, and the algebra itself does not pick a copy (ρ permutes the three halves, `rotAut3_moves_lowHalf`; nothing selects a ℂP² point). A choice here would be the beekeeper's taste written into layer 1 — an unforced root, which the wisdom ratified in this arc says to count and avoid. **Encoding:** INTERP-holographic-boundary carries the reading-independent content (there is an encoding octonion; the gap is the complement of the observer's algebra inside it; the seam is the zero-divisor locus) and names **P2 and P2′ as hypotheses with status `open`**, each with what would decide it: a theorem that the encoding must contain ℍ_s (P2) or must be a Cayley–Dickson half (P2′), or an observable that distinguishes them (none on record). DERIV-sedenion's first clause is worded neutrally ("two copies of an octonion"). The two P2′ lemmas and ρ stay on master as theorems about the objects, not as a ruling.
 
-**Ruling text (one line):** "Decision 1: P2′ — the encoding octonion of a universe is a Cayley–Dickson half, one of three; the choice is a discrete datum; ℍ_s meets it in ℂ_u." (or "P2 as a line" / "P2 as the bundle".)
+**What would decide it later:** (i) a Lean statement of AXIOM-2's "boundary encoding" as an object with a defining property — if that property is "a CD half", P2′ is a theorem; if "contains the observer's algebra", P2 is; (ii) the definition conversation's answer to what the encoding *map* is — a map forces its domain; (iii) an experiment. Until one of those exists the ledger says "open", which is the truthful state.
 
 ## 2. Decision 2 — the flag-3 split
 
@@ -71,7 +79,7 @@ The boundary note §5 drafted three entries. Two later documents added observati
 | holographic gap | the complement of the observer's algebra inside its encoding (P2′: of ℂ_u in the half, 6-dim; P2: of ℍ_s in 𝕆'_v, 4-dim) | 6 or 4 | DERIV-holographic |
 | seam | the zero-divisor locus V = 1 in the substrate, between universes | 11 | DERIV-sedenion |
 
-**Cost of keeping one word:** the three objects differ in dimension by a factor of two and in ambient space, and qbp-architecture flagged the overload on #643 as the thing to fix together with the split. **Recommendation: adopt**, and forbid the bare word "boundary" in any ledger entry or Lean docstring without one of the three. **Ruling text:** "Decision 3: adopt the three names."
+**Cost of keeping one word:** the three objects differ in dimension by a factor of two and in ambient space, and qbp-architecture flagged the overload on #643 as the thing to fix together with the split. **Consequence, not a choice (v0.3):** three distinct objects with three distinct parents need three names; "boundary" bare is forbidden in ledger entries and Lean docstrings. **Ruling text:** "Decision 3: adopt the three names."
 
 ## 4. Decision 4 — #634 AC4
 
@@ -79,7 +87,7 @@ AC4 asked for the transverse Hessian 4r²·I on the 6-dim normal space (or the {
 
 **Close mechanics if (i) is ruled** (Red Team #652 F8 — #634 was auto-reopened on 2026-09-08 when a commit keyword closed it with AC4 unchecked): edit AC4's text in the issue body to the rescoped statement; tick it citing #641's Red Team and Gemini evidence; record the follow-up issue number for the Hessian in the body; close **by hand**, not by a commit keyword.
 
-**Recommendation: (i) rescope.** **Ruling text:** "Decision 4: AC4 rescoped to the spectrum-at-crystal statement; Hessian filed as a follow-up; close by hand."
+**Bookkeeping, not a choice (v0.3):** AC4 was not met (both #641 reviewers: PARTIAL); the ledger's rule is that an unmet AC is not ticked. Either (i) or (ii) is a truthful record; (i) is applied because the delivered statement is the one the anchor carries, and the Hessian is filed as its own AC. If the beekeeper prefers (ii), nothing else changes. **Ruling text:** "Decision 4: AC4 rescoped to the spectrum-at-crystal statement; Hessian filed as a follow-up; close by hand."
 
 ## 5. Decision 5 — adopt the AXIOM-2 package for its encode PR (conditioned on Decision 0)
 
@@ -87,7 +95,7 @@ What the encode PR would apply (package v0.6, all drafts): META-2 level saturati
 
 **"Hold" waits for:** Decision 0 (without it the package encodes a text whose ruling has no source), and optionally the definition conversation (§7), if the beekeeper wants the substrate's definition conversed before its roots are constitutional.
 
-**Recommendation: adopt, conditioned on Decision 0.** **Ruling text:** "Decision 5: adopt the package; encode as drafted once Decision 0 is posted."
+**Consequence, not a choice (v0.3):** every text in the package encodes a ruling already made — the hosting frame (2026-09-07) ⇒ POST-hosting; the proved ladders + META-2 ⇒ DERIV-encoding-level and DERIV-substrate-level; option B (#647) ⇒ DERIV-sedenion. META-2 is the one new epistemic root and is named as such. Decision 0 is met. **Ruling text:** "Decision 5: adopt the package; encode as drafted once Decision 0 is posted."
 
 ## 6. What the encode PR(s) contain
 
