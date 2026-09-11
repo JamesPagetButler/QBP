@@ -1,0 +1,355 @@
+#!/usr/bin/env python3
+"""Encode the ruling bundle (PR #652) into the CTH ledger — ONE constitutional PR, shape A.
+
+RUNS ONLY AFTER THE BEEKEEPER RULES Decisions 0–5 on PR #652. Parameters below carry the rulings;
+the script refuses to run while RULED is False. Idempotent (guards on DERIV-encoding-level's presence).
+
+What it applies (package v0.6 §3 + ruling page v0.2 §2–§5), all previously drafted texts:
+  D5  META-2 level saturation → new top-level list `meta_principles` (the schema pins `meta_axiom` to a single
+      object, so META-2 cannot be appended there; `additionalProperties: true` at top level admits the new key);
+      POST-hosting (final form) → `axioms` (it is the second physical axiom, package §2a);
+      DERIV-encoding-level replaces AXIOM-2 (moved to `retired_axioms` with the demotion note);
+      DERIV-substrate-level (with the level-generic crystal definition);
+      DERIV-sedenion `derived_from` inverted → [DERIV-substrate-level, DERIV-encoding-level] (clause already option B, #651).
+  D2  DERIV-holographic → POST-observer-associativity + POST-observation (→ `axioms`), DERIV-holographic-theorem and
+      INTERP-holographic-boundary (→ new top-level list `interpretations`; the schema pins derived_principles ids to ^DERIV-);
+      the 5 dependents + 3 chained anchors + CHAIN-born-to-revival + the flag-3 anchor descriptions re-pointed.
+  D1  READING selects the INTERP text and the DERIV-sedenion first clause.
+  D3  the three names are used in every new text.
+  re-pointing of the 14 AXIOM-2-citing anchors and the 7 "Axioms ->" chains' source_ids.
+Usage: python3 scripts/encode_ruling_bundle.py    (edit RULED / READING / RULING_URLS first)
+"""
+
+import json
+import os
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LEDGER = os.path.join(
+    ROOT, "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
+)
+
+# ----------------------------------------------------------------------------- rulings (fill in)
+RULED = False  # set True only when the beekeeper has ruled Decisions 0–5 on PR #652
+READING = "P2prime"  # "P2prime" | "P2line" | "P2bundle"  — Decision 1
+RULING_DATE = "<ruling date>"
+RULING_URL_OPTION_B = "<URL of the beekeeper's own-hand option-B line on #647/#651>"
+RULING_URL_BUNDLE = "<URL of the beekeeper's ruling comment on PR #652>"
+# ----------------------------------------------------------------------------- texts (drafted, PR #652 v0.2)
+
+META2 = {
+    "id": "META-2",
+    "name": "Level saturation",
+    "statement": (
+        "A structural level sits exactly at the bound its constraint sets; no slack. Domain: Cayley–Dickson levels only. "
+        "It does not select states (the ensemble is MaxEnt, horn 1), copies (the ℤ/3 of encoding halves, or the ℂP² of "
+        "encodings under P2), orientations, or signs."
+    ),
+    "kind": "epistemic principle",
+    "ruling": f"Decision 5, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+}
+POST_HOSTING = {
+    "id": "POST-hosting",
+    "name": "Non-crystal states are physically realised",
+    "statement": (
+        "The state sphere at the substrate level carries an in-flight region V > 0 of positive measure, and almost every "
+        "history starts in it. Kill (theory-internal only): a substrate level at which V ≡ 0 — the level bound failing; "
+        "no observable (observers live in crystals; FLAG-seam-dynamics-open) — recorded as such, not as a pass. "
+        "Convergence to a crystal is the rule's claim (#635), separate."
+    ),
+    "kind": "physical postulate",
+    "derivable": False,
+    "anchors": ["PROOF-substrate-hosting-definition", "PROOF-delta-landscape-descent"],
+    "ruling": f"Decision 5, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+}
+POST_ASSOC = {
+    "id": "POST-observer-associativity",
+    "name": "Observers require associativity",
+    "statement": (
+        "An observer is a subset of 𝕊 on which its actions compose; by the composition theorem such a subset is "
+        "associative, and — if it lies inside an octonion — inside one ℍ by frame-maximality (in 𝕊 at large this is open). "
+        "Under the hosting definition the observer's ℍ is the crystal's ℍ_s (definition D; premise P1′: observers are "
+        "entities of clause (a)). Exclusivity — no observer lives outside the hosted algebra — is the postulate's content."
+    ),
+    "kind": "physical postulate",
+    "derivable": False,
+    "anchors": [
+        "PROOF-associative-composition-iff",
+        "PROOF-quaternion-frame-maximal",
+        "PROOF-crystal-hosts-quaternion",
+    ],
+    "ruling": f"Decision 2, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+}
+POST_OBS = {
+    "id": "POST-observation",
+    "name": "Observation is bounded by the encoding",
+    "statement": (
+        "(O⊆) What an observer can access is contained in what is encoded in its encoding octonion. "
+        "(E) The electromagnetic ℂ of DERIV-observation is the ℂ selected by that encoding."
+        + (
+            " Under the ruled reading (P2′) (E) has content: the selected ℂ is ℂ_u = ℍ_s ∩ (the encoding half)."
+            if READING == "P2prime"
+            else " Under the ruled reading (P2) no ℂ is selected geometrically and DERIV-observation's ℂ is EM's own."
+        )
+    ),
+    "kind": "physical postulate",
+    "derivable": False,
+    "anchors": ["PROOF-hosted-algebra-meets-cell-in-complex-line"],
+    "ruling": f"Decision 2, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+}
+DERIV_ENC = {
+    "id": "DERIV-encoding-level",
+    "name": "The encoding is the last information-preserving level",
+    "statement": (
+        "The encoding octonion of a universe sits at the Cayley–Dickson level below the first failure of AXIOM-1's "
+        "selection: 𝕆 (dim 8) — division, norm composition and alternativity all hold through 𝕆 and all fail at 𝕊. "
+        "Tower-relative ('largest in the Cayley–Dickson sequence'); the classification 'only four normed division "
+        "algebras exist' (PROOF-hurwitz) is not used."
+    ),
+    "derived_from": ["AXIOM-1", "META-2"],
+    "layer": 1,
+    "anchors": [
+        "PROOF-ops-division-ladder",
+        "PROOF-ops-norm-composition-ladder",
+        "PROOF-ops-alternativity-ladder",
+        "PROOF-normed-division-tower-existence",
+    ],
+    "supersedes": "AXIOM-2",
+    "ruling": f"Decision 5, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+}
+DERIV_SUB = {
+    "id": "DERIV-substrate-level",
+    "name": "The substrate is the first level that hosts crystallisation",
+    "statement": (
+        "Definition (level-generic): a state s is a crystal iff its left alternator vanishes, assoc s s x = 0 for all x "
+        "(equivalently L_s² is scalar). At 𝕊 this is equivalent to the Cayley–Dickson components of s commuting, "
+        "V = ‖[a, b]‖² = 0 — an equivalence that holds at 𝕊 only; the commutator form is the 𝕊-specific computation. "
+        "Statement: the substrate is the first Cayley–Dickson level at which a non-crystal exists: 𝕊 (dim 16). In every "
+        "alternative algebra every state is a crystal (dimensions ≤ 8: CDLifting.assoc_diag_left at 𝕆, associativity "
+        "below); at 𝕊 a non-crystal exists (sedWitX_alternator_ne_zero, inFlight_nonempty)."
+    ),
+    "derived_from": ["POST-hosting", "META-2"],
+    "layer": 1,
+    "anchors": [
+        "PROOF-ops-alternativity-ladder",
+        "PROOF-alternator-vanishes-iff-commute",
+        "PROOF-substrate-hosting-definition",
+    ],
+    "ruling": f"Decision 5, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+}
+DERIV_HOLO_THM = {
+    "id": "DERIV-holographic-theorem",
+    "name": "Quaternion frames are the maximal associative subalgebras of 𝕆 (frame-relative); codimension 4",
+    "statement": (
+        "Quaternion frames span{1,u,v,uv} are associative subalgebras of 𝕆; no associative subalgebra of 𝕆 properly "
+        "contains one (frame-relative; the global bound is deferred); the codimension of ℍ in 𝕆 is 4."
+    ),
+    "derived_from": ["DERIV-encoding-level"],
+    "layer": 1,
+    "anchors": [
+        "PROOF-associative-composition-iff",
+        "PROOF-quaternion-frame-maximal",
+        "PROOF-quaternion-frame-codim-four",
+    ],
+    "supersedes": "DERIV-holographic (theorem part)",
+    "ruling": f"Decision 2, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+}
+INTERP_COMMON = (
+    "There is a boundary encoding: each universe has an encoding octonion (the algebra AXIOM-2 referred to, now "
+    "DERIV-encoding-level), and the holographic gap is the complement of the observer's algebra inside it; the seam "
+    "boundary between universes is the zero-divisor locus (DERIV-sedenion). "
+)
+INTERP_VARIANT = {
+    "P2prime": "The encoding octonion is a Cayley–Dickson half, one of three (the ℓ-fixing order-3 automorphism permutes them, "
+    "PROOF-order-three-automorphism-fixes-ell), a discrete datum of the universe; ℍ_s meets it in ℂ_u "
+    "(PROOF-hosted-algebra-meets-cell-in-complex-line); DERIV-holographic-theorem describes the frame inside the "
+    "half, not the observer's algebra, which straddles the halves; the holographic gap is 6-dimensional.",
+    "P2line": "The encoding octonion is an octonion 𝕆'_v ⊃ ℍ_s chosen from a ℂP² (completeness of the family is a conjecture); "
+    "the holographic gap is the 4-dimensional ℍ_s^⊥ ∩ 𝕆'_v.",
+    "P2bundle": "The boundary is the canonical module ℍ_s^⊥ ≅ ℍ_s³ with its cone of admissible ℍ_s-lines; no encoding is chosen.",
+}
+INTERP = {
+    "id": "INTERP-holographic-boundary",
+    "name": "The holographic gap and the seam (interpretation)",
+    "statement": INTERP_COMMON + INTERP_VARIANT[READING],
+    "derived_from": [
+        "DERIV-encoding-level",
+        "POST-observer-associativity",
+        "POST-observation",
+    ],
+    "layer": 1,
+    "kind": "interpretation",
+    "supersedes": "DERIV-holographic (interpretation part)",
+    "ruling": f"Decisions 1–3, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+}
+SEDENION_FIRST_CLAUSE = {
+    "P2prime": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of the encoding half (one of three such decompositions, permuted by the order-3 automorphism).",
+    "P2line": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of an octonion; each universe's encoding octonion is chosen around its crystal.",
+    "P2bundle": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of an octonion.",
+}
+REPOINT_DERIVED = {  # derived_from replacements after the split
+    "DERIV-3plus1": ["POST-observer-associativity", "DERIV-holographic-theorem"],
+    "DERIV-observation": ["POST-observation", "DERIV-holographic-theorem"],
+    "DERIV-pati-salam": [
+        "AXIOM-1",
+        "DERIV-encoding-level",
+        "DERIV-holographic-theorem",
+    ],
+    "DERIV-arrow": [
+        "AXIOM-1",
+        "POST-observer-associativity",
+        "INTERP-holographic-boundary",
+    ],
+    "DERIV-constants": ["POST-observer-associativity", "INTERP-holographic-boundary"],
+    "DERIV-crystallisation-asymptotic": [
+        "AXIOM-1",
+        "DERIV-encoding-level",
+        "DERIV-constants",
+    ],
+}
+ANCHOR_HOLO_MAP = {  # anchors whose list fields cite DERIV-holographic
+    "PROOF-3gen": ["DERIV-holographic-theorem"],
+    "PRED-gw-em": ["POST-observer-associativity", "INTERP-holographic-boundary"],
+    "PRED-revival-exact": [
+        "POST-observer-associativity",
+        "INTERP-holographic-boundary",
+    ],
+    "CONJ-condensed-math-for-transition-state": ["INTERP-holographic-boundary"],
+    "INSIGHT-condensed-math-deferred": ["INTERP-holographic-boundary"],
+    "PROOF-associative-composition-iff": ["DERIV-holographic-theorem"],
+    "PROOF-quaternion-frame-maximal": ["DERIV-holographic-theorem"],
+    "PROOF-quaternion-frame-codim-four": ["DERIV-holographic-theorem"],
+    "PROOF-crystal-hosts-quaternion": ["DERIV-holographic-theorem"],
+}
+LIST_FIELDS = ("prediction_chain", "converges_with", "source_ids", "derived_from")
+
+
+def replace_in_lists(obj, old, new_list):
+    changed = False
+    for f in LIST_FIELDS:
+        if isinstance(obj.get(f), list) and old in obj[f]:
+            seq = []
+            for x in obj[f]:
+                if x == old:
+                    seq.extend(n for n in new_list if n not in seq)
+                elif x not in seq:
+                    seq.append(x)
+            obj[f] = seq
+            changed = True
+    return changed
+
+
+def main():
+    if not RULED:
+        print(
+            "REFUSING: RULED is False — the beekeeper has not ruled Decisions 0–5 on PR #652. Edit the parameters and re-run."
+        )
+        sys.exit(2)
+    with open(LEDGER, encoding="utf-8") as f:
+        L = json.load(f)
+    if any(e["id"] == "DERIV-encoding-level" for e in L["derived_principles"]):
+        print("already applied — no change")
+        return
+    # D5: AXIOM-2 → retired; DERIV-encoding-level in
+    ax2 = next(a for a in L["axioms"] if a["id"] == "AXIOM-2")
+    L["axioms"] = [a for a in L["axioms"] if a["id"] != "AXIOM-2"]
+    L.setdefault("retired_axioms", []).append(
+        {
+            **ax2,
+            "retired": f"demoted to DERIV-encoding-level (Decision 5, PR #652, {RULING_DATE}); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6",
+        }
+    )
+    L["axioms"].extend([POST_HOSTING, POST_ASSOC, POST_OBS])
+    L["meta_principles"] = [META2]
+    # D2: DERIV-holographic → retired; four entries in
+    holo = next(e for e in L["derived_principles"] if e["id"] == "DERIV-holographic")
+    L["derived_principles"] = [
+        e for e in L["derived_principles"] if e["id"] != "DERIV-holographic"
+    ]
+    L.setdefault("retired_principles", []).append(
+        {
+            **holo,
+            "retired": f"split into POST-observer-associativity, POST-observation, DERIV-holographic-theorem, INTERP-holographic-boundary (Decision 2, PR #652, {RULING_DATE})",
+        }
+    )
+    L["derived_principles"].extend([DERIV_ENC, DERIV_SUB, DERIV_HOLO_THM])
+    L["interpretations"] = [
+        INTERP
+    ]  # schema pins derived_principles ids to ^DERIV-; interpretations get their own list
+    # DERIV-sedenion inverted + first clause per reading
+    sed = next(e for e in L["derived_principles"] if e["id"] == "DERIV-sedenion")
+    sed["derived_from"] = ["DERIV-substrate-level", "DERIV-encoding-level"]
+    sed["statement"] = (
+        SEDENION_FIRST_CLAUSE[READING] + " " + sed["statement"].split(". ", 1)[1]
+    )
+    sed["ruling"] = (
+        sed.get("ruling", "")
+        + f" | derived_from inverted (Decision 5, PR #652, {RULING_DATE}); first clause per Decision 1 ({READING})."
+    ).strip(" |")
+    if "<URL of the beekeeper's own-hand" not in RULING_URL_OPTION_B:
+        sed["ruling"] = sed["ruling"].replace(
+            "<URL to be filled when posted on #647 or #651>", RULING_URL_OPTION_B
+        )
+    # re-point derived principles
+    for e in L["derived_principles"]:
+        if e["id"] in REPOINT_DERIVED:
+            e["derived_from"] = REPOINT_DERIVED[e["id"]]
+        else:
+            replace_in_lists(e, "AXIOM-2", ["DERIV-encoding-level"])
+    # re-point anchors (list fields) and the flag-3 anchor descriptions
+    n_ax2 = n_holo = 0
+    for a in L["anchors"]:
+        if replace_in_lists(a, "AXIOM-2", ["DERIV-encoding-level"]):
+            n_ax2 += 1
+        if a["id"] in ANCHOR_HOLO_MAP and replace_in_lists(
+            a, "DERIV-holographic", ANCHOR_HOLO_MAP[a["id"]]
+        ):
+            n_holo += 1
+        if (
+            isinstance(a.get("description"), str)
+            and "DERIV-holographic, theorem part" in a["description"]
+        ):
+            a["description"] = a["description"].replace(
+                "DERIV-holographic, theorem part",
+                "DERIV-holographic-theorem (was DERIV-holographic), part",
+            )
+    # chains
+    n_ch = 0
+    for c in L["chains"]:
+        if replace_in_lists(c, "AXIOM-2", ["META-2", "DERIV-encoding-level"]):
+            n_ch += 1
+        if replace_in_lists(
+            c,
+            "DERIV-holographic",
+            ["POST-observer-associativity", "DERIV-holographic-theorem"],
+        ):
+            n_ch += 1
+    L["changelog"].append(
+        {
+            "version": "6.0.0",
+            "date": f"{RULING_DATE}T00:00:00Z",
+            "note": (
+                f"qbp-oppenheimer: ruling bundle encoded (PR #652 Decisions 0–5, {RULING_DATE}; {RULING_URL_BUNDLE}). AXIOM-2 demoted to "
+                f"DERIV-encoding-level (retired_axioms keeps the record); POST-hosting, POST-observer-associativity, POST-observation added as "
+                f"axioms; META-2 level saturation in meta_principles; DERIV-substrate-level; DERIV-holographic split into theorem + INTERP "
+                f"(retired_principles keeps the record); DERIV-sedenion derived_from inverted, first clause per Decision 1 = {READING}; "
+                f"re-pointed {n_ax2} anchors (AXIOM-2), {n_holo} anchors (DERIV-holographic), {n_ch} chain fields. Honest root count after: "
+                f"AXIOM-1, POST-hosting, the rule (#635, not yet an entry), META-2, the crystal definition (in DERIV-substrate-level), the "
+                f"state-space identification (in PROOF-substrate-hosting-definition) — six, not fewer."
+            ),
+        }
+    )
+    L["update_provenance"] = (
+        f"qbp-oppenheimer {RULING_DATE}: ruling bundle (PR #652) encoded"
+    )
+    L["last_updated"] = f"{RULING_DATE}T00:00:00Z"
+    with open(LEDGER, "w", encoding="utf-8") as f:
+        json.dump(L, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    print(
+        f"applied: reading={READING}; anchors re-pointed AXIOM-2={n_ax2}, DERIV-holographic={n_holo}; chain fields={n_ch}"
+    )
+
+
+if __name__ == "__main__":
+    main()
