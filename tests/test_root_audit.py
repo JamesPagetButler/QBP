@@ -145,6 +145,29 @@ def test_smuggled_root_in_anchors_fails_without_carveout():
     assert any(x.startswith("SMUGGLED ROOT META-some-field") for x in f)
     L["anchors"].append(_anchor("POST-hidden", []))
     assert any(x.startswith("SMUGGLED ROOT POST-hidden") for x in _run(L)["failures"])
+    L["derived_principles"].append(
+        {
+            "id": "INTERP-in-principles",
+            "name": "n",
+            "statement": "s",
+            "derived_from": [],
+        }
+    )
+    L["chains"] = [{"id": "AXIOM-in-chains", "source_ids": [], "target_id": "PRED-p"}]
+    f = _run(L)["failures"]
+    assert any(
+        x.startswith("SMUGGLED ROOT INTERP-in-principles") and "derived_principles" in x
+        for x in f
+    )
+    assert any(
+        x.startswith("SMUGGLED ROOT AXIOM-in-chains") and "chains" in x for x in f
+    )
+
+
+def test_ruling_cite_must_be_a_federation_repo():
+    L = _ledger()
+    L["axioms"][2]["ruling"] = "https://github.com/someone-else/repo/issues/1"
+    assert any("POST-ruled" in x and "cites no" in x for x in _run(L)["failures"])
 
 
 def test_chain_resolution_gated_for_every_owner():

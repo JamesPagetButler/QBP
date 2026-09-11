@@ -16,15 +16,19 @@ sort into exactly one Conversation-MO bucket, from the ledger alone:
 
   bucket 1  PROVED   `forced_by` names a PROOF-* anchor that resolves in-ledger.
   bucket 2  FORCED   `forced_by` names a MEAS-* anchor that resolves in-ledger, or
-                     `decision_state: ruled` with a `ruling` that cites a GitHub
-                     issue/PR URL (the beekeeper's own-hand line — a scope/process
-                     ruling, never a physical truth; the cite is the guard).
+                     `decision_state: ruled` with a `ruling` that cites a
+                     JamesPagetButler/* GitHub issue/PR URL (the beekeeper's own-hand
+                     line — a scope/process ruling, never a physical truth). This
+                     check is STRUCTURAL (a cite is present); whether the cited ruling
+                     actually forces THIS root is the Red Team confirmer's semantic
+                     half (#654 D4) — the URL check is not the whole guard.
   bucket 3  OPEN     `kill_condition` present AND `decision_state: open` (or
                      `status: open`). An open root is an Impasse Record, not a request.
   bucket 4  RETIRED  lives in `retired_axioms` / `retired_principles` — reported only.
 
 A root sorting into NO bucket is UNSORTED → HARD FAIL unless listed in the register's
-`open_roots`. A root-prefixed id living anywhere else (e.g. `anchors[]`) is a smuggled
+`open_roots`. A root-prefixed id living in ANY other id-bearing list (`anchors`,
+`derived_principles`, `chains`, `inputs`, …) is a smuggled
 root → HARD FAIL unless registered — a structural rule, no hand-maintained exception
 list (a legacy `META-*-field` documentation anchor is renamed out of the prefix space,
 tracked by its register entry, never carved out).
@@ -68,7 +72,9 @@ TERMINAL_ANCHOR_PREFIXES = ("PROOF-", "MEAS-")
 GATED_CHAIN_PREFIXES = ("DERIV-", "PRED-")
 ROOT_LISTS = ("meta_axiom", "meta_principles", "axioms", "interpretations")
 RETIRED_LISTS = ("retired_axioms", "retired_principles")
-GITHUB_CITE = re.compile(r"https://github\.com/[^\s)]+/(issues|pull)/\d+")
+GITHUB_CITE = re.compile(
+    r"https://github\.com/JamesPagetButler/[^\s)/]+/(issues|pull)/\d+"
+)
 
 BUCKET = {
     1: "bucket-1 PROVED",
@@ -107,10 +113,15 @@ def collect(ledger):
             retired[rec.get("id")] = (key, rec)
     principles = OrderedDict((p["id"], p) for p in ledger.get("derived_principles", []))
     anchors = OrderedDict((a["id"], a) for a in ledger.get("anchors", []))
+    # Smuggled roots: a root-prefixed id in ANY id-bearing top-level list that is not a
+    # root list (anchors, derived_principles, chains, inputs, …) — structural, no carve-out.
     smuggled = OrderedDict()
-    for aid, a in anchors.items():
-        if is_root_id(aid):
-            smuggled[aid] = ("anchors", a)
+    for key, val in ledger.items():
+        if key in ROOT_LISTS or key in RETIRED_LISTS or not isinstance(val, list):
+            continue
+        for rec in val:
+            if isinstance(rec, dict) and is_root_id(rec.get("id")):
+                smuggled[rec["id"]] = (key, rec)
     return roots, retired, principles, anchors, problems, warnings, smuggled
 
 
