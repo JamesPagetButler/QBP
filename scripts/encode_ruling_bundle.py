@@ -31,7 +31,7 @@ LEDGER = os.path.join(
 
 # ----------------------------------------------------------------------------- rulings (fill in)
 RULED = False  # set True only when the beekeeper has ruled Decisions 0–5 on PR #652
-READING = "P2prime"  # "P2prime" | "P2line" | "P2bundle"  — Decision 1
+READING = "open"  # "open" (v0.3: not decidable from the axioms — both hypotheses encoded, status open) | "P2prime" | "P2line" | "P2bundle"
 RULING_DATE = "<ruling date>"
 RULING_URL_OPTION_B = "<URL of the beekeeper's own-hand option-B line on #647/#651>"
 RULING_URL_BUNDLE = "<URL of the beekeeper's ruling comment on PR #652>"
@@ -87,9 +87,13 @@ POST_OBS = {
         "(O⊆) What an observer can access is contained in what is encoded in its encoding octonion. "
         "(E) The electromagnetic ℂ of DERIV-observation is the ℂ selected by that encoding."
         + (
-            " Under the ruled reading (P2′) (E) has content: the selected ℂ is ℂ_u = ℍ_s ∩ (the encoding half)."
-            if READING == "P2prime"
-            else " Under the ruled reading (P2) no ℂ is selected geometrically and DERIV-observation's ℂ is EM's own."
+            " Under P2′ (E) has content: the selected ℂ is ℂ_u = ℍ_s ∩ (the encoding half); under P2 no ℂ is selected geometrically and DERIV-observation's ℂ is EM's own; the reading is open (INTERP-holographic-boundary)."
+            if READING == "open"
+            else (
+                " Under the ruled reading (P2′) (E) has content: the selected ℂ is ℂ_u = ℍ_s ∩ (the encoding half)."
+                if READING == "P2prime"
+                else " Under the ruled reading (P2) no ℂ is selected geometrically and DERIV-observation's ℂ is EM's own."
+            )
         )
     ),
     "kind": "physical postulate",
@@ -160,6 +164,13 @@ INTERP_COMMON = (
     "boundary between universes is the zero-divisor locus (DERIV-sedenion). "
 )
 INTERP_VARIANT = {
+    "open": "Which octonion encodes a universe is NOT decided by the axioms: the algebra does not pick a copy (the "
+    "ℓ-fixing order-3 automorphism permutes the three Cayley–Dickson halves, PROOF-order-three-automorphism-fixes-ell; "
+    "nothing selects a point of the ℂP² of octonions around ℍ_s). Two hypotheses, status open: P2′ — the encoding "
+    "is a Cayley–Dickson half (one of three; ℍ_s meets it in ℂ_u, PROOF-hosted-algebra-meets-cell-in-complex-line; "
+    "the gap is 6-dim; a discrete datum); P2 — the encoding is an octonion containing ℍ_s (a ℂP² of them, completeness "
+    "a conjecture; the gap is 4-dim; or the datum-free bundle form ℍ_s^⊥ ≅ ℍ_s³). Decides it: a defining property for "
+    "AXIOM-2's encoding stated as an object; the encoding map; or an observable — none on record.",
     "P2prime": "The encoding octonion is a Cayley–Dickson half, one of three (the ℓ-fixing order-3 automorphism permutes them, "
     "PROOF-order-three-automorphism-fixes-ell), a discrete datum of the universe; ℍ_s meets it in ℂ_u "
     "(PROOF-hosted-algebra-meets-cell-in-complex-line); DERIV-holographic-theorem describes the frame inside the "
@@ -181,8 +192,10 @@ INTERP = {
     "kind": "interpretation",
     "supersedes": "DERIV-holographic (interpretation part)",
     "ruling": f"Decisions 1–3, PR #652, {RULING_DATE}: {RULING_URL_BUNDLE}",
+    "status": "open" if READING == "open" else "ruled",
 }
 SEDENION_FIRST_CLAUSE = {
+    "open": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of an octonion (which copy encodes a universe is open — INTERP-holographic-boundary).",
     "P2prime": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of the encoding half (one of three such decompositions, permuted by the order-3 automorphism).",
     "P2line": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of an octonion; each universe's encoding octonion is chosen around its crystal.",
     "P2bundle": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of an octonion.",
