@@ -110,3 +110,18 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions land formally with the foundations reb
 | 2026-05-22 | qbp-implementor | v0.1 — initial canonicalisation post-Phase-0 discovery (D/I/P documented; confluent-trust #88 referenced) |
 
 — qbp-implementor, foundations rebuild Phase 0
+
+---
+
+## Axiom decision fields (`axioms[].decision_state`, `axioms[].kill_condition`)
+
+**Status:** QBP-local since PR #659 (ledger 5.7.1, 2026-09-14); required by #654 D3 (the root gate's four-bucket exit, `scripts/root_audit.py`, PR #658). Validate today under `$defs/Axiom.additionalProperties: true` (vendored v0.3.3 = canonical). **Upstream extension issue:** confluent-trust #102 (canonical delta owned by @cth-implementor; drafted after the AXIOM-2 encode lands, with AXIOM-1's record as the test vector). **Co-sign on the introducing PR:** @cth-implementor, #659 issuecomment-5658368053 (pinned to head 762b7b4; field surface unchanged since).
+
+| Field | Type | Meaning | Gate reading (`root_audit.py`) |
+|---|---|---|---|
+| `decision_state` | enum `open` \| `ruled` | decision lifecycle, distinct from the coherence `status` enum. `open` = the root is an Impasse Record with a stated falsifier; `ruled` = a scope/process ruling exists and is cited by a `JamesPagetButler/*` GitHub URL in `ruling` (structural check; the semantic half is the Red Team confirmer's) | `open` + `kill_condition` ⇒ bucket-3 OPEN; `ruled` + cite ⇒ bucket-2 FORCED |
+| `kill_condition` | non-placeholder string | the falsifier: the ledger-observable event that fires the kill, and (where stated) the discharge arm. Named `kill_condition`, not `kill`, to avoid collision with the anchor field `killed_by`. Invariant (cth-implementor): `decision_state: open` ⇒ `kill_condition` present — nothing parks open without a kill | required for bucket-3 |
+
+**Current usage:** `AXIOM-1` — `decision_state: "open"`, `kill_condition` = two armed questions (process; scope of the selection clause), each with kill and discharge, trigger #647. No other root carries the fields yet (META-1, AXIOM-2 are in the open-roots register, #655 / #473).
+
+**Forward rule:** no other QBP-local field on `Axiom` records without a row here and an upstream issue. When confluent-trust #102 lands, this row is marked canonical and the vendored schema is synced per `schema-change-propagation-checklist.md`.
