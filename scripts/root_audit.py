@@ -153,10 +153,9 @@ def collect(ledger):
 
     def walk(node, where):
         if isinstance(node, dict):
-            if (
-                is_root_id(node.get("id"))
-                and where.split("[")[0] not in ROOT_LISTS + RETIRED_LISTS
-            ):
+            if is_root_id(node.get("id")):
+                # walk() is only ever entered from a non-root list or from INSIDE a root
+                # record, so any root-prefixed id seen here is smuggled
                 smuggled.setdefault(node["id"], (where, node))
             for k, v in node.items():
                 if isinstance(v, (dict, list)):
