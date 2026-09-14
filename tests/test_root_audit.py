@@ -340,3 +340,15 @@ def test_forcing_needs_verified_proof_or_measured_meas():
     assert any("POST-forced" in x and "cannot force" in x for x in _run(L)["failures"])
     L["anchors"][1]["status"] = "coherent"
     assert _run(L)["roots"]["POST-forced"][1] == 2
+
+
+def test_suffixed_placeholder_and_nested_root_inside_root(tmp_path):
+    """Gemini round 2 on PR #658: 'TODO: write later' is a stub; a root-prefixed record nested
+    inside a root record is smuggled."""
+    L = _ledger()
+    L["axioms"][1]["kill_condition"] = ["TODO: write the real kill condition later"]
+    assert ra.sort_root(L["axioms"][1], {a["id"]: a for a in L["anchors"]})[0] is None
+    L = _ledger()
+    L["axioms"][0]["notes"] = [{"id": "POST-hidden-inside-axiom", "statement": "x"}]
+    f = _run(L)["failures"]
+    assert any(x.startswith("SMUGGLED ROOT POST-hidden-inside-axiom") for x in f)

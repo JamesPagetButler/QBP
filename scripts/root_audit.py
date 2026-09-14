@@ -100,8 +100,8 @@ FORCING_STATUSES = (
 # resolving discharge) lands with array<object> at the confluent-trust #102 delta; until then a
 # text heuristic is the honest bound. The >= 8 floor is a crude stub-guard, not a quality check.
 _KILL_PLACEHOLDER = re.compile(
-    r"^(todo|tbd|tba|fixme|xxx+|placeholder|none|n/?a|\?+|-+|\.+)$", re.I
-)
+    r"^(todo|tbd|tba|fixme|xxx+|placeholder|none|n/?a|\?+|-+|\.+)(\b|$)", re.I
+)  # matches a stub token at the START of an entry — so "TODO: write later" is a stub too
 ROOT_LISTS = ("meta_axiom", "meta_principles", "axioms", "interpretations")
 RETIRED_LISTS = ("retired_axioms", "retired_principles")
 GITHUB_CITE = re.compile(
@@ -167,6 +167,13 @@ def collect(ledger):
 
     for key, val in ledger.items():
         if key in ROOT_LISTS or key in RETIRED_LISTS:
+            # the top-level records ARE roots; anything root-prefixed nested INSIDE one of them
+            # is smuggled (Gemini round 2 on PR #658)
+            for rec in _as_list(val):
+                if isinstance(rec, dict):
+                    for k, v in rec.items():
+                        if isinstance(v, (dict, list)):
+                            walk(v, f"{key}[{rec.get('id')}].{k}")
             continue
         walk(val, key)
     return roots, retired, principles, anchors, problems, warnings, smuggled
@@ -176,7 +183,7 @@ def _non_placeholder(e):
     if not isinstance(e, str):
         return False  # array-only<string>: objects/nulls are not a kill yet
     t = e.strip()
-    return len(t) >= 8 and not _KILL_PLACEHOLDER.fullmatch(t)
+    return len(t) >= 8 and not _KILL_PLACEHOLDER.search(t)
 
 
 def kill_present(kc):
