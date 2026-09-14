@@ -160,6 +160,16 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 - `KILLED-locale-forcing-route`: KILLED-locale-forcing-route (empty chain)
 - `REF-adams-hopf-invariant-one`: REF-adams-hopf-invariant-one (empty chain)
 
+## Dead anchors (status killed / incoherent / refuted) — visibility (qbp-implementor, live-test 1336)
+
+A dead anchor carries no derivation obligation of its own AND satisfies nobody else's: it is
+not a terminator and not a forcing. Marking an anchor dead is a reviewed status change; this
+section makes a wave of such changes visible on the report, not only in a diff.
+
+- dead owners (ungated for termination): 19 — `PROOF-fano`, `FLAG-J`, `FLAG-Tc`, `FLAG-xi`, `FLAG-Hc2`, `FLAG-postd-IE`, `EXT-dm-null-detection`, `PRED-conformal-profile`, `COMP-branch-A-cmb-boundary-analysis`, `INSIGHT-entropy-cone-division-algebra-inversion`, `PROOF-division-algebra-entropy-cone-mapping`, `Q28-alpha-GUT-from-stabiliser`, `KILLED-f4-info-theoretic-justification`, `PRED-hypergraph-cmb-camb-rerun`, `FLAG-ngc2683-mass-discrepancy`, `FLAG-seam-dynamics-open`, `REF-phantom-cohesion-before-computation`, `INSIGHT-octonion-higgs-killed`, `KILLED-locale-forcing-route`
+- dead anchors reached directly by live chains (each such chain must ground elsewhere): 3 — `PROOF-fano` (×6), `PROOF-division-algebra-entropy-cone-mapping` (×1), `COMP-branch-A-cmb-boundary-analysis` (×1)
+- roots rejected for a dead `forced_by`: 0
+
 ## Warnings (2)
 
 - registered smuggled root META-physical-mapping-status-field in anchors[154][] (issue https://github.com/JamesPagetButler/QBP/issues/657)

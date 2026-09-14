@@ -357,6 +357,21 @@ def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
 
     owners = [(pid, _as_list(p.get("derived_from"))) for pid, p in principles.items()]
     owners += [(aid, _as_list(a.get("prediction_chain"))) for aid, a in anchors.items()]
+    dead_owners = [
+        o
+        for o, _ in owners
+        if o in anchors and anchors[o].get("status") in DEAD_STATUSES
+    ]
+    dead_terminators_hit = (
+        Counter()
+    )  # dead anchor id -> number of live chains that reach it
+    for owner, chain in owners:
+        if owner in dead_owners:
+            continue
+        for node in _as_list(chain):
+            a = anchors.get(node)
+            if a is not None and a.get("status") in DEAD_STATUSES:
+                dead_terminators_hit[node] += 1
     for owner, chain in owners:
         unresolved, dangling, cycles = walk_chain(
             owner, chain, roots, principles, anchors
@@ -408,6 +423,11 @@ def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
         "ungated_dangling": ungated_dangling,
         "gated_owner": gated_owner,
         "warnings": warnings,
+        "dead_owners": dead_owners,
+        "dead_terminators_hit": dead_terminators_hit,
+        "dead_forcings": [
+            f for f in failures if f.startswith("UNSORTED ROOT") and "dead anchors" in f
+        ],
         "failures": failures,
         "n_principles": len(principles),
         "n_anchors": len(anchors),
@@ -484,6 +504,26 @@ def write_report(res, path, ledger_path, register_path):
     L += [""]
     for owner, paths in other.items():
         L.append(f"- `{owner}`: " + "; ".join(paths))
+    L += [
+        "",
+        f"## Dead anchors (status killed / incoherent / refuted) — visibility (qbp-implementor, live-test 1336)",
+        "",
+        "A dead anchor carries no derivation obligation of its own AND satisfies nobody else's: it is",
+        "not a terminator and not a forcing. Marking an anchor dead is a reviewed status change; this",
+        "section makes a wave of such changes visible on the report, not only in a diff.",
+        "",
+        f"- dead owners (ungated for termination): {len(res['dead_owners'])} — "
+        + (", ".join(f"`{o}`" for o in res["dead_owners"]) or "none"),
+        f"- dead anchors reached directly by live chains (each such chain must ground elsewhere): "
+        f"{len(res['dead_terminators_hit'])} — "
+        + (
+            ", ".join(
+                f"`{k}` (×{v})" for k, v in res["dead_terminators_hit"].most_common()
+            )
+            or "none"
+        ),
+        f"- roots rejected for a dead `forced_by`: {len(res['dead_forcings'])}",
+    ]
     L += ["", f"## Warnings ({len(res['warnings'])})", ""]
     for w in res["warnings"]:
         L.append(f"- {w}")
