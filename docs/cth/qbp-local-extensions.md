@@ -115,7 +115,7 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions land formally with the foundations reb
 
 ## Axiom decision fields (`axioms[].decision_state`, `axioms[].kill_condition`)
 
-**Status:** QBP-local since PR #659 (ledger 5.7.1, 2026-09-14); required by #654 D3 (the root gate's four-bucket exit, `scripts/root_audit.py`, PR #658). Validate today under `$defs/Axiom.additionalProperties: true` (vendored v0.3.3 = canonical). **Upstream extension issue:** confluent-trust #102 (canonical delta owned by @cth-implementor; drafted after the AXIOM-2 encode lands, with AXIOM-1's record as the test vector). **Co-sign on the introducing PR:** @cth-implementor, #659 issuecomment-5658368053 (pinned to head 762b7b4; field surface unchanged since).
+**Status:** QBP-local since PR #659 (ledger 5.7.1, 2026-09-14); required by #654 D3 (the root gate's four-bucket exit, `scripts/root_audit.py`, PR #658). Validate today under `$defs/Axiom.additionalProperties: true` in the vendored schema (`docs/cth/inventory.schema.v0.3.json`, synced from confluent-trust #98; canonical-PR status per the sidecar `inventory.schema.v0.3.meta.json`). **Upstream extension issue:** confluent-trust #102 (canonical delta owned by @cth-implementor; drafted after the AXIOM-2 encode lands, with AXIOM-1's record as the test vector). **Co-sign on the introducing PR:** @cth-implementor, #659 issuecomment-5658368053 (pinned to head 762b7b4; field surface unchanged since).
 
 | Field | Type | Meaning | Gate reading (`root_audit.py`) |
 |---|---|---|---|
