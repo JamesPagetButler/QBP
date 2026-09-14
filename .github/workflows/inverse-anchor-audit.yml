@@ -12,17 +12,8 @@
 name: Inverse Anchor Audit
 
 on:
-  pull_request:
-    paths:
-      - 'proofs/**/*.lean'
-      - 'archive/cth-inventory/*.json'
-      - 'scripts/anchor_inverse_audit.py'
-      - 'analysis/.inverse-anchor-audit-baseline.json'
-      - '.github/workflows/inverse-anchor-audit.yml'
-      - 'docs/cth/anchor-worthy-manifest.json'
-      - 'docs/cth/proof-anchor-remediation.json'
-      - 'scripts/check_anchor_manifest.py'
-      - 'proofs/agda-cubical/**'
+  pull_request:  # every PR — no path filter, so this job can be a REQUIRED check (a path-filtered
+                 # required check blocks unrelated PRs; the job runs in ~10 s). #654 D1/D2.
 
 permissions:
   contents: read
@@ -62,3 +53,13 @@ jobs:
           #      source scan + resolution run (no --skip-full-ledger). Airtight #print-axioms/--safe
           #      re-derivation is the authoritative follow-on on the foundations CI.
           python3 scripts/check_anchor_manifest.py
+      - name: Root GATE + chain-to-root audit (#654 D1/D2) — absolute, whole-population, no baseline; shrink-only issue-linked register
+        run: |
+          # #654 — the beekeeper's standard mechanised: every root (AXIOM-/POST-/META-/INTERP-)
+          # sorts into a four-bucket exit (PROVED forcing / FORCED cite / OPEN kill_condition /
+          # RETIRED) or is an itemised, issue-linked entry in docs/cth/root-audit-register.json
+          # (shrink-only: a fixed-but-still-listed entry HARD-FAILS). Every chain resolves
+          # (gated for all owners) and every derived chain (principles / DERIV-* / PRED-*)
+          # terminates in {root | PROOF | MEAS | experimental anchor} (seen-set cycle check).
+          # Ledger-only; no baseline file exists for this gate (PATTERN-02).
+          python3 scripts/root_audit.py
