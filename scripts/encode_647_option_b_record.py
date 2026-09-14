@@ -5,14 +5,19 @@ Four-bucket audit of option B (the beekeeper's standard, 2026-09-11 — the beek
 scope, priority and process, never a physical truth; anything the axioms under-determine
 is encoded open with a kill condition). v2 applies the PR #659 Red Team + Gemini findings:
 "flag 1 is not a contradiction today" was mis-filed as FORCED on an absence; it is OPEN.
+v3 applies round 2: the selection-clause scope leaves the kill (it is forced by AXIOM-2's
+statement), the ledger-facing kill arm is gated on proof_state verified, the citers are
+characterised exactly, and the stale "forced" vocabulary is gone.
 
   PROVED   DERIV-sedenion's algebraic clause: left multiplication by a zero divisor has a
            non-trivial kernel — PROOF-42zd (bridge prodIsZero_iff_cdAlg_mul_eq_zero,
            Breakdown.lean; count zero_divisor_count_42, Sedenion.lean).
-  OPEN     (a) whether crystallisation is a physical process AXIOM-1 governs, and
-           (b) whether AXIOM-1's selection clause ranges over the substrate S (zero
-           divisors by construction) or the encoding only — undecidable until the rule
-           (#635) exists as a proven flow. No contradiction is DERIVABLE today (a kernel
+  FORCED   AXIOM-1's selection clause is exercised on the encoding: AXIOM-2's own
+           statement applies the selection to the boundary encoding, and DERIV-sedenion
+           (derived from AXIOM-2) places the sedenions at the substrate — cite, not
+           absence (v3; round-2 Red Team NEW-1: not a kill-condition question).
+  OPEN     whether crystallisation is a physical process AXIOM-1's first sentence
+           governs — undecidable until the rule (#635) exists as a proven flow. No contradiction is DERIVABLE today (a kernel
            is a map; no proven process through the zero-divisor locus exists), but
            candidate processes are on record (Prop 16 layer 3 transient, numerical;
            FLAG-seam-dynamics-open placeholder; DERIV-arrow's lossy projection), so this
@@ -41,45 +46,53 @@ BEEKEEPER_LINE = (
 )
 
 AXIOM1_KILL = (
-    "OPEN — two questions the axioms under-determine: (a) whether 'physical process' ranges "
-    "over the substrate (crystallisation) or only over processes in a crystal; (b) whether the "
-    "selection clause 'selects division algebras' ranges over the substrate S (zero divisors "
-    "by construction, DERIV-sedenion) or over the encoding only. KILL: a proven flow on "
-    "StateSphere (the rule, #635) whose omega-limit meets the zero-divisor locus and whose "
-    "omega-limit map is non-injective on a positive-measure set of states (strict phase-volume "
-    "contraction), OR an encoded PROOF-/DERIV- anchor asserting such a loss from a stated "
-    "process — then 'no physical process destroys information' is contradicted by an asserted "
-    "process and AXIOM-1 must change (option A: rescope to the encoding, package §4a price: 22 "
-    "citers + 5 principles), because it has been proven that it must. DISCHARGE: the flow proven "
-    "information-preserving (omega-limit map injective a.e.) — the kill is then removed as "
-    "discharged. First-order semiflows are injective at finite time, so the criterion is on the "
-    "omega-limit, not on finite-time states. TODAY: no proven flow exists; the ledger holds "
-    "candidate processes touching the locus — Prop 16 layer 3 (power-iteration transient onto "
-    "the dominant subspace; numerical, not pressure-tested, 473-ac1-v0.5 addendum), "
-    "FLAG-seam-dynamics-open (incoherent placeholder asserting a seam scattering process), and "
-    "two AXIOM-1 citers asserting a lossy process (DERIV-arrow 'lossy projection', "
-    "DERIV-crystallisation-asymptotic 'time IS the crystallisation') — none proven, so the kill "
-    "cannot fire and no contradiction is derivable: recorded as OPEN, not as a pass. Trigger "
-    "issue #647; the answer is DERIVED there at trigger time, never ruled."
+    "OPEN — the one question the axioms under-determine: whether 'physical process' ranges "
+    "over the substrate (crystallisation, the descent through the zero-divisor locus) or only "
+    "over processes in a crystal. KILL: a proven flow on StateSphere (the rule, #635) whose "
+    "omega-limit set meets the zero-divisor locus and whose omega-limit map is non-injective on "
+    "a positive-measure set of states, OR a PROOF-* anchor with proof_state verified asserting "
+    "such a loss from a stated process — then 'no physical process destroys information' is "
+    "contradicted by a proven process and AXIOM-1 must change (option A: rescope to the "
+    "encoding; package §4a price, 22 citers + 5 principles), because it has been proven that "
+    "it must. DISCHARGE: the same flow proven information-preserving (omega-limit map injective "
+    "almost everywhere) — the kill is then removed as discharged. First-order semiflows are "
+    "injective at finite time, so the criterion is on the omega-limit, not on finite-time "
+    "states. TODAY: no proven flow exists; the ledger holds candidate assertions touching the "
+    "locus — Prop 16 layer 3 (power-iteration transient onto the dominant subspace; numerical, "
+    "not pressure-tested, 473-ac1-v0.5 addendum), FLAG-seam-dynamics-open (incoherent "
+    "placeholder asserting a seam scattering process), DERIV-crystallisation-asymptotic ('time "
+    "IS the crystallisation': a process named without a flow object), and DERIV-arrow (which "
+    "takes information preservation as its premise and asserts a lossy *projection* — a map, "
+    "listed as the ledger's nearest assertion of loss, not as a process) — none proven, so the "
+    "kill cannot fire and no contradiction is derivable: recorded as OPEN, not as a pass. The "
+    "scope of the SELECTION clause is not part of this question — see DERIV-sedenion.ruling "
+    "(forced by AXIOM-2's statement). Trigger issue #647; the answer is DERIVED there at "
+    "trigger time, never ruled."
 )
 SEDENION_RECORD = (
-    f"Record ({DATE}, four-bucket re-audit, #654/#647/#659 v2). PROVED — the algebraic clause: "
+    f"Record ({DATE}, four-bucket re-audit, #654/#647/#659 v3). PROVED — the algebraic clause: "
     "left multiplication by a zero divisor has a non-trivial kernel (PROOF-42zd; bridge "
     "prodIsZero_iff_cdAlg_mul_eq_zero, Breakdown.lean; count zero_divisor_count_42, "
-    "Sedenion.lean). OPEN — whether this clause conflicts with AXIOM-1: a kernel is a map, and "
-    "no proven process through the zero-divisor locus exists (Prop 16 layers 1-2 prove the "
-    "algebra generates symmetries, never dynamics toward the vacuum; layer 3's transient onto "
-    "the locus is numerical; FLAG-seam-dynamics-open is an incoherent placeholder), so no "
-    "contradiction is derivable today — but candidate processes are on record, so this is OPEN "
-    "under AXIOM-1.kill_condition, trigger #647, derived at trigger time, never ruled. WRONG "
-    "(superseded record): 'AXIOM-1 option B — ruled by the beekeeper 2026-09-09 (PR #648 "
-    "package v0.5 §3), applied on direction 2026-09-10 (PR #651)' — a forced-plus-open item "
-    "was put to the beekeeper as a choice; option A (rescope AXIOM-1) was an unforced axiom "
-    "edit, option B the non-choice. The beekeeper's line 'I choose option B.' "
-    f"({BEEKEEPER_LINE}, 2026-09-11) post-dates the applied rewording (PR #651, 2026-09-10) and "
-    "is retained as ratification of process only, not as the physical reason. Retiring 'seams "
-    "where information CAN be destroyed' stands: it asserted a loss with no proven process to "
-    "carry it."
+    "Sedenion.lean). FORCED — AXIOM-1's selection clause ('selects division algebras') is "
+    "exercised on the encoding, not the substrate: AXIOM-2's statement as it stands ('The "
+    "boundary encoding uses the largest normed division algebra: octonions') is where the "
+    "selection is applied, and this entry (derived_from AXIOM-2) places the sedenions at the "
+    "substrate; so PROOF-42zd's 42 zero divisors are the ledger's own content, not a "
+    "contradiction of the clause (after #652's encode the cite moves to DERIV-encoding-level). "
+    "OPEN — whether the kernel clause conflicts with AXIOM-1's process sentence: a kernel is a "
+    "map, and no proven process through the zero-divisor locus exists (Prop 16 layers 1-2 "
+    "prove the algebra generates symmetries, never dynamics toward the vacuum; layer 3's "
+    "transient onto the locus is numerical; FLAG-seam-dynamics-open is an incoherent "
+    "placeholder), so no contradiction is derivable today — but candidate assertions are on "
+    "record, so this is OPEN under AXIOM-1.kill_condition, trigger #647, derived at trigger "
+    "time, never ruled. WRONG (superseded record): 'AXIOM-1 option B — ruled by the beekeeper "
+    "2026-09-09 (PR #648 package v0.5 §3), applied on direction 2026-09-10 (PR #651)' — an item "
+    "that was proved-plus-open was put to the beekeeper as a choice; option A (rescope "
+    "AXIOM-1's process sentence) was an unforced axiom edit, option B the non-choice. The "
+    f"beekeeper's line 'I choose option B.' ({BEEKEEPER_LINE}, 2026-09-11) post-dates the "
+    "applied rewording (PR #651, 2026-09-10) and is retained as ratification of process only, "
+    "not as the physical reason. Retiring 'seams where information CAN be destroyed' stands: it "
+    "asserted a loss with no proven process to carry it."
 )
 
 
@@ -104,7 +117,7 @@ def main():
                 "note": (
                     "qbp-oppenheimer: AXIOM-1 'option B' re-recorded under the four-bucket standard "
                     "(#654, beekeeper direction 2026-09-11; PR #659 v2 after Red Team + Gemini): the algebraic "
-                    "clause is PROVED (PROOF-42zd); whether it conflicts with AXIOM-1 is OPEN — no "
+                    "clause is PROVED (PROOF-42zd); the selection clause's scope is FORCED by AXIOM-2's statement; whether the kernel clause conflicts with AXIOM-1's process sentence is OPEN — no "
                     "contradiction derivable today, candidate processes on record — with a kill_condition "
                     "on AXIOM-1 (omega-limit information loss of a proven flow through the zero-divisor "
                     "locus; trigger #647, derived not ruled). The old record 'ruled by the beekeeper' is "
@@ -118,7 +131,7 @@ def main():
         L["version"] = "5.7.1"
         ed.touch("version")
         L["update_provenance"] = (
-            f"qbp-oppenheimer {DATE}: #647 option-B record re-audited, v2 (#654/#659)"
+            f"qbp-oppenheimer {DATE}: #647 option-B record re-audited, v3 (#654/#659)"
         )
         ed.touch("update_provenance")
         L["last_updated"] = f"{DATE}T00:00:00Z"
