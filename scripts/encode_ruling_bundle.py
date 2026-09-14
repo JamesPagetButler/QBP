@@ -54,12 +54,35 @@ META2 = {
     "derivable": False,
     "decision_state": "open",
     "kill_condition": [
-        "A Cayley–Dickson level shown to sit strictly inside its constraint's bound — a "
-        "crystal-hosting division or alternative structure above O (dim 8), or a non-crystal at "
-        "a level below S (dim 16) — would break saturation and, with it, DERIV-encoding-level and "
-        "DERIV-substrate-level. Discharge: none available (a positive principle about levels is "
-        "not discharged by more examples); recorded OPEN. Root introduced by the AXIOM-2 "
-        "demotion package (PR #648 v0.6) and the ruling bundle v0.4 §5 (PR #652)."
+        "Structural arm — EXCLUDED by the proved ladders and therefore unable to fire: a "
+        "crystal-hosting division or alternative structure above O, or a non-crystal below S "
+        "(PROOF-ops-*-ladder; CDLifting.assoc_diag_left). Physical arm — the live falsifier: a "
+        "universe's encoding shown to be a smaller algebra than the last information-preserving "
+        "level (e.g. an observer's algebra with no octonionic completion; the encoding shown to "
+        "be H) — no observable on record. This kill CANNOT FIRE today; recorded OPEN, not as a "
+        "pass (ruling bundle v0.5 §5, PR #652 v0.4 Red Team V1)."
+    ],
+}
+POST_ENC_EXISTS = {
+    "id": "POST-boundary-encoding",
+    "name": "A boundary encoding exists",
+    "statement": (
+        "Each universe has an encoding octonion — a boundary encoding exists. (AXIOM-2's "
+        "existential clause, kept as a root: 'THE boundary encoding uses ...'.) Which octonion "
+        "encodes a universe is a separate open question (INTERP-holographic-boundary); where the "
+        "encoding sits in the Cayley–Dickson tower is DERIV-encoding-level."
+    ),
+    "kind": "physical postulate",
+    "derivable": False,
+    "decision_state": "open",
+    "kill_condition": [
+        "An observable requiring information not representable in any octonionic encoding, or "
+        "the encoding map shown not to exist — none on record. This kill CANNOT FIRE today; "
+        "recorded OPEN, not as a pass (ruling bundle v0.5 §5, PR #652 v0.4 Red Team V4)."
+    ],
+    "anchors": [
+        "PROOF-quaternion-frame-maximal",
+        "PROOF-hosted-algebra-meets-cell-in-complex-line",
     ],
 }
 POST_HOSTING = {
@@ -142,9 +165,12 @@ DERIV_ENC = {
         "The encoding octonion of a universe sits at the Cayley–Dickson level below the first failure of AXIOM-1's "
         "selection: 𝕆 (dim 8) — division, norm composition and alternativity all hold through 𝕆 and all fail at 𝕊. "
         "Tower-relative ('largest in the Cayley–Dickson sequence'); the classification 'only four normed division "
-        "algebras exist' (PROOF-hurwitz) is not used."
+        "algebras exist' (PROOF-hurwitz) is not used. CONDITIONAL on: META-2 (saturation), POST-boundary-encoding "
+        "(there is an encoding to place), and the encoding-only reading of AXIOM-1's selection clause — AXIOM-1 "
+        "kill_condition question 2, OPEN (PR #659): this entry STATES where the selection is exercised and does not "
+        "derive it, so it is conditional on that question, not its discharge."
     ),
-    "derived_from": ["AXIOM-1", "META-2"],
+    "derived_from": ["AXIOM-1", "META-2", "POST-boundary-encoding"],
     "layer": 1,
     "anchors": [
         "PROOF-ops-division-ladder",
@@ -190,8 +216,8 @@ DERIV_HOLO_THM = {
     "supersedes": "DERIV-holographic (theorem part)",
 }
 INTERP_COMMON = (
-    "There is a boundary encoding: each universe has an encoding octonion (the algebra AXIOM-2 referred to, now "
-    "DERIV-encoding-level), and the holographic gap is the complement of the observer's algebra inside it; the seam "
+    "There is a boundary encoding (POST-boundary-encoding): each universe has an encoding octonion (the algebra AXIOM-2 "
+    "referred to; its level is DERIV-encoding-level), and the holographic gap is the complement of the observer's algebra inside it; the seam "
     "boundary between universes is the zero-divisor locus (DERIV-sedenion). "
 )
 INTERP_VARIANT = {
@@ -215,6 +241,7 @@ INTERP = {
     "name": "The holographic gap and the seam (interpretation)",
     "statement": INTERP_COMMON + INTERP_VARIANT[READING],
     "derived_from": [
+        "POST-boundary-encoding",
         "DERIV-encoding-level",
         "POST-observer-associativity",
         "POST-observation",
@@ -315,14 +342,14 @@ def _apply(L, ed):
     L.setdefault("retired_axioms", []).append(
         {
             **ax2,
-            "retired": f"{ENCODE_DATE}: content restated as DERIV-encoding-level (a derivation from AXIOM-1 + META-2 + the proved ladders — not a change of axiom: nothing AXIOM-2 asserted is denied; its 'largest' clause is now META-2's, an OPEN root with a kill). Ruling bundle v0.4 §5 (PR #652, {PAGE_URL}); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6.",
+            "retired": f"{ENCODE_DATE}: re-rooted, not changed in content: its existential clause is POST-boundary-encoding (OPEN root), its 'largest' clause is META-2 (OPEN root), and the level statement is DERIV-encoding-level (derived, conditional on both and on AXIOM-1's encoding-only reading); route narrows from Hurwitz-absolute to tower-relative (same object, O). Nothing AXIOM-2 asserted is denied. Ruling bundle v0.4 §5 (PR #652, {PAGE_URL}); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6.",
         }
     )
-    L["axioms"].extend([POST_HOSTING, POST_ASSOC, POST_OBS])
+    L["axioms"].extend([POST_ENC_EXISTS, POST_HOSTING, POST_ASSOC, POST_OBS])
     L["meta_principles"] = [META2]
     ed.touch("axioms", "AXIOM-2")
     ed.touch("retired_axioms", "AXIOM-2")
-    for p in (POST_HOSTING, POST_ASSOC, POST_OBS):
+    for p in (POST_ENC_EXISTS, POST_HOSTING, POST_ASSOC, POST_OBS):
         ed.touch("axioms", p["id"])
     ed.touch("meta_principles", META2["id"])
     # D2: DERIV-holographic → retired; four entries in
@@ -404,13 +431,13 @@ def _apply(L, ed):
             "note": (
                 f"qbp-oppenheimer: ruling bundle v0.4 sort encoded (PR #652 merged {ENCODE_DATE}; {PAGE_URL}) — nothing ruled, "
                 f"nothing forced by fiat. PROVED: T1–T3 (DERIV-holographic-theorem), the level ladders. OPEN roots with kill "
-                f"lists (decision_state open): META-2 (meta_principles), POST-hosting (kill cannot fire — recorded as such), "
+                f"lists (decision_state open): META-2 (meta_principles; kill cannot fire today), POST-boundary-encoding (AXIOM-2's existential clause; kill cannot fire today), POST-hosting (kill cannot fire — recorded as such), "
                 f"POST-observer-associativity, POST-observation ((O⊆),(E) beside P2/P2'), INTERP-holographic-boundary (P2 vs P2' "
                 f"open, kill cannot fire). DERIV-encoding-level and DERIV-substrate-level are derivations conditional on the open "
-                f"roots. AXIOM-2 → retired_axioms (a derivation, not a change of axiom); DERIV-holographic → retired_principles "
+                f"roots (DERIV-encoding-level also conditional on AXIOM-1 question 2, #659 — it states the range, it does not discharge it). AXIOM-2 → retired_axioms (re-rooted, not changed in content); DERIV-holographic → retired_principles "
                 f"(editorial split). DERIV-sedenion derived_from inverted, first clause neutral ({READING}). Re-pointed {n_ax2} "
                 f"anchors (AXIOM-2), {n_holo} anchors (DERIV-holographic), {n_ch} chain fields. Root list after: AXIOM-1 (open, "
-                f"#659), META-1 (registered #655), META-2, POST-hosting, POST-observer-associativity, POST-observation (all open); "
+                f"#659), META-1 (registered #655), META-2, POST-boundary-encoding, POST-hosting, POST-observer-associativity, POST-observation (all open); "
                 f"the rule (#635), the crystal definition and the state-space identification live inside records under non-root "
                 f"prefixes — outside the root gate's reach until encoded as roots (scripts/root_audit.py, #658)."
             ),
