@@ -20,8 +20,9 @@ clause's range). Both are OPEN with their own kill and discharge arms on AXIOM-1
            loss of a proven flow, or a verified anchor asserting it. Trigger #647.
   OPEN 2   the range of AXIOM-1's selection clause — AXIOM-2 applies the selection at the
            encoding but does not state the range; both readings are admitted today.
-           Discharge route: #652's DERIV-encoding-level states where the selection is
-           exercised. Kill: a rule anchor asserting the selection over the substrate.
+           No discharge by derivation (a stated range is a stipulation; DERIV-encoding-level
+           is conditional on this question, not its resolution). Kill: the unrestricted
+           reading proven to contradict a proved fact — then rescope, option A.
   WRONG    the record "option B — ruled by the beekeeper": a proved-plus-open item put
            to him as a choice and his answer filed as the physical reason. Option A
            (rescope AXIOM-1) was the unforced axiom edit; option B the non-choice.
@@ -78,11 +79,17 @@ AXIOM1_KILL = [
         "clause ranges over the encoding only, and AXIOM-1's own wording leaves the range "
         "unstated. The ledger admits both readings: encoding-only (DERIV-sedenion's substrate "
         "sedenions are the ledger's own content, no conflict) or unrestricted (PROOF-42zd's 42 "
-        "zero divisors contradict the clause and AXIOM-1 must be rescoped, option A). KILL — an "
-        "encoded rule anchor asserting the selection over the substrate S, against PROOF-42zd, "
-        "then option A is due. DISCHARGE — a rule anchor stating the range: #652's "
-        "DERIV-encoding-level (selection exercised at the encoding level) is the named route. "
-        "Recorded OPEN until encoded; not forced."
+        "zero divisors contradict the clause and AXIOM-1 must be rescoped, option A). KILL — the "
+        "unrestricted reading proven to contradict a proved fact about a physical object: a rule "
+        "anchor (proof_state verified) asserting AXIOM-1's selection over the substrate S "
+        "together with PROOF-42zd's zero divisors — then AXIOM-1 must be rescoped (option A, §4a "
+        "price), because it has been proven that it must. DISCHARGE — none by derivation: the "
+        "range of a clause is a constitutional statement, not a theorem; a rule anchor that "
+        "writes 'the selection is exercised at the encoding' (e.g. DERIV-encoding-level) STATES "
+        "the range and does not derive it (PR #652 v0.4 Red Team V2), and a derivation that "
+        "assumes the encoding-only reading (DERIV-encoding-level does) is conditional on this "
+        "question, not its resolution. Recorded OPEN; the clause's range changes only if the kill "
+        "fires."
     ),
 ]
 SEDENION_RECORD = (
@@ -93,8 +100,9 @@ SEDENION_RECORD = (
     "applies the selection at the boundary encoding but does not state that the clause ranges "
     "over the encoding only; the ledger admits both readings (encoding-only: this entry's "
     "substrate sedenions are the ledger's own content; unrestricted: PROOF-42zd contradicts the "
-    "clause and option A is due); resolved when a rule anchor states the range — #652's "
-    "DERIV-encoding-level is the named route; recorded OPEN until encoded, not forced "
+    "clause and option A is due); no discharge by derivation — a rule anchor that states the "
+    "range (e.g. #652's DERIV-encoding-level) stipulates it and is itself conditional on this "
+    "question; the range changes only if the kill fires; recorded OPEN "
     "(AXIOM-1.kill_condition question 2). OPEN (process) — whether the kernel clause conflicts "
     "with AXIOM-1's process sentence: a kernel is a map, and no proven process through the "
     "zero-divisor locus exists (Prop 16 layer (i) and the invariant-subspace half of layer (ii) "
