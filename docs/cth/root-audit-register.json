@@ -1,6 +1,6 @@
 {
   "register_version": "1.0",
-  "description": "Issue #654 D1/D2 — shrink-only, issue-linked register for the root GATE and chain-to-root audit (scripts/root_audit.py). Enumerated by the audit's first run (2026-09-11, ledger v5.4.0): 3 roots sorting into no four-bucket exit + 2 smuggled roots (open_roots); 16 chain ids cited but never encoded + 18 derived chains (principles / DERIV-* / PRED-*) that do not terminate (chain_debt); 2026-09-14 (#658 review fixes): +11 — chains whose only terminator is a dead (killed/incoherent/refuted) anchor, and ledger-declared derived claims (provenance_kind derivation / internal-compute) under non-DERIV/PRED prefixes. Every entry is a burn-down item on the clock with a tracking issue, not an allowlist.",
+  "description": "Issue #654 D1/D2 — shrink-only, issue-linked register for the root GATE and chain-to-root audit (scripts/root_audit.py). Enumerated by the audit's first run (2026-09-11, ledger v5.4.0): 3 roots sorting into no four-bucket exit + 2 smuggled roots (open_roots); 16 chain ids cited but never encoded + 18 derived chains (principles / DERIV-* / PRED-*) that do not terminate (chain_debt); 2026-09-14 (#658 review fixes): +11 ledger-declared derived claims (provenance_kind derivation / internal-compute) under non-DERIV/PRED prefixes; round-2 fix +4 chains whose only ground is a dead (killed/incoherent/refuted/falsified) anchor — PROOF-fano — surfaced once the walker stopped recursing through dead anchors. Every entry is a burn-down item on the clock with a tracking issue, not an allowlist.",
   "policy": "SHRINK-ONLY. root_audit.py HARD-FAILS if: (1) any root sorts into no bucket, or any root-prefixed id lives outside the root lists, and is NOT listed in open_roots (a NEW unforced root — blocked: you cannot add a root without forcing it, killing it, or filing its issue); (2) any chain id fails to resolve, or any derived chain fails to terminate, and is NOT listed in chain_debt; (3) any listed entry is now fixed (the root sorts, the id resolves, the chain terminates) — remove the stale entry. Adding an entry is a visible, reviewed commit to this file with a tracking issue — NEVER a CI-driven or reflexive green-making step. GROWTH IS A REVIEW GATE, NOT A MACHINE GATE: the script cannot tell a new entry from an old one, so a same-commit root+entry passes the machine and is caught by the human reviewer (the register diff is in the PR); the machine enforces shrink-only staleness, resolution and issue-linking (the silent baseline raise is what defeated the FAULT-S4-005 ratchet; PATTERN-02). Entries carry no counts and no baseline: the population is itemised.",
   "open_roots": [
     {
@@ -568,6 +568,50 @@
       "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
       "added": "2026-09-14",
       "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "PRED-cosmic-birefringence",
+      "kind": "dangling-derived-chain (terminator dead: killed/incoherent/refuted/falsified)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "PRED-cosmic-birefringence -> PROOF-fano (dead anchor, status killed: grounds nothing)"
+      ],
+      "resolution": "re-ground the chain in a LIVE {root | PROOF | MEAS | experimental anchor} — a dead anchor ends a path — or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 round-2 fix (Red Team NF-1: the walker no longer recurses through dead anchors)"
+    },
+    {
+      "id": "PRED-a0-saturating-Fmax-7",
+      "kind": "dangling-derived-chain (terminator dead: killed/incoherent/refuted/falsified)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "PRED-a0-saturating-Fmax-7 -> PROOF-fano (dead anchor, status killed: grounds nothing)"
+      ],
+      "resolution": "re-ground the chain in a LIVE {root | PROOF | MEAS | experimental anchor} — a dead anchor ends a path — or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 round-2 fix (Red Team NF-1: the walker no longer recurses through dead anchors)"
+    },
+    {
+      "id": "PROOF-iron-56-double-octet",
+      "kind": "dangling-derived-chain (terminator dead: killed/incoherent/refuted/falsified)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "PROOF-iron-56-double-octet -> PROOF-fano (dead anchor, status killed: grounds nothing)"
+      ],
+      "resolution": "re-ground the chain in a LIVE {root | PROOF | MEAS | experimental anchor} — a dead anchor ends a path — or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 round-2 fix (Red Team NF-1: the walker no longer recurses through dead anchors)"
+    },
+    {
+      "id": "PROOF-silicon-28-fano-ladder",
+      "kind": "dangling-derived-chain (terminator dead: killed/incoherent/refuted/falsified)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "PROOF-silicon-28-fano-ladder -> PROOF-fano (dead anchor, status killed: grounds nothing)"
+      ],
+      "resolution": "re-ground the chain in a LIVE {root | PROOF | MEAS | experimental anchor} — a dead anchor ends a path — or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 round-2 fix (Red Team NF-1: the walker no longer recurses through dead anchors)"
     }
   ]
 }

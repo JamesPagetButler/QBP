@@ -107,9 +107,14 @@ class LedgerEdit:
                 return lst.pop(i)
         raise KeyError(f"{key}[{rid}] not in ledger")
 
+    SENTINELS = ("<record order>", "<top-level key order>")
+
     def touch(self, key, rid=None):
         """Declare an edit to a non-record top-level key (changelog, last_updated, …) or,
-        with rid, to a record you mutate through another reference."""
+        with rid, to a record you mutate through another reference. Order sentinels cannot
+        be declared: reordering is never a confined edit (PR #658 round-2 NF-5)."""
+        if key in self.SENTINELS or rid in self.SENTINELS:
+            raise ConfinementError(f"order changes cannot be declared: {(key, rid)}")
         self.declared.add((key, rid))
 
     # --- verification -------------------------------------------------------------
@@ -120,12 +125,15 @@ class LedgerEdit:
         for k in set(b_recs) | set(a_recs):
             bi, ai = b_recs.get(k, {}), a_recs.get(k, {})
             for rid in set(bi) | set(ai):
-                if bi.get(rid) != ai.get(rid):
+                # serialised: key ORDER inside a record is content (PR #658 round-2 NF-4)
+                if json.dumps(bi.get(rid)) != json.dumps(ai.get(rid)):
                     changed.add((k, rid))
             if k in b_recs and k not in a_recs and not b_recs[k]:
                 pass
         for k in set(b_sc) | set(a_sc):
-            if b_sc.get(k, object()) != a_sc.get(k, object()):
+            if json.dumps(b_sc.get(k, "<absent>")) != json.dumps(
+                a_sc.get(k, "<absent>")
+            ):
                 changed.add((k, None))
         # a list key that changed shape (record list <-> scalar) shows up on both sides
         for k in (set(b_recs) ^ set(a_recs)) & (set(b_sc) | set(a_sc)):

@@ -105,14 +105,14 @@ def test_live_ledger_is_canonical():
 
 
 def test_no_top_level_script_writes_the_ledger_directly():
-    """D7 guard (#654 AC6), AST + taint (the regex form was evadable via `p = LEDGER; open(p, "w")`
-    or `Path(LEDGER).write_text(...)`): a top-level scripts/*.py may not write to any path
-    expression tainted by a ledger path. Taint = a string constant naming the inventory
-    (`cth-inventory` / `confluent-trust-inventory`), any name assigned from a tainted
-    expression (transitively), and any expression containing a tainted name. Writes = open()
-    with a w/a/+ mode, Path(...).write_text/.write_bytes, json.dump into such an open().
-    Report writers on untainted paths are not flagged. Applied one-shot encoders live under
-    scripts/applied-encoders/ (archived; each exits at import) and are not scanned."""
+    """D7 guard (#654 AC6), AST + taint — a HEURISTIC, stated honestly (PR #658 round-2 NF-6):
+    it catches the direct forms — open() with a write mode, Path(...).write_text/.write_bytes,
+    json.dump into such an open() — on any path expression tainted by a ledger path (string
+    constant naming the inventory, names assigned from it transitively, string concatenation).
+    It does NOT catch indirection through getattr, shutil.copy/move, os.replace/os.open, a
+    subprocess, or a path returned from a function; those are caught by review (the register
+    diff and the confined helper's output are in every PR). A top-level scripts/*.py may not
+    write to any tainted path expression through the forms it does catch."""
     import ast
 
     HINTS = ("cth-inventory", "confluent-trust-inventory")
@@ -216,3 +216,22 @@ def test_declared_append_does_not_trip_the_order_check(tmp_path):
         )
         e.remove("anchors", "PRED-a")
     assert [a["id"] for a in json.load(open(p))["anchors"]] == ["PRED-b", "PRED-c"]
+
+
+def test_intra_record_key_reorder_is_an_undeclared_change(tmp_path):
+    """PR #658 round-2 NF-4: reordering keys inside a record writes a real diff."""
+    p = _mini(tmp_path)
+    with pytest.raises(cle.ConfinementError, match="UNDECLARED.*PRED-b"):
+        with cle.ledger_edit(p) as e:
+            rec = e.ledger["anchors"][1]
+            items = list(rec.items())[::-1]
+            rec.clear()
+            rec.update(items)
+            e.record("anchors", "PRED-a")["status"] = "coherent"
+
+
+def test_order_sentinels_cannot_be_declared(tmp_path):
+    p = _mini(tmp_path)
+    with pytest.raises(cle.ConfinementError, match="cannot be declared"):
+        with cle.ledger_edit(p) as e:
+            e.touch("anchors", "<record order>")

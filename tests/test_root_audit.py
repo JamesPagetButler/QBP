@@ -73,8 +73,8 @@ def _ledger():
             },
         ],
         "anchors": [
-            _anchor("PROOF-x", []),
-            _anchor("MEAS-y", ["DERIV-b"], prov="E"),
+            dict(_anchor("PROOF-x", []), proof_state="verified"),
+            dict(_anchor("MEAS-y", ["DERIV-b"], prov="E"), status="coherent"),
             _anchor("OBS-z", [], prov="E"),
             _anchor("PRED-p", ["DERIV-b", "OBS-z"]),
             _anchor("INSIGHT-i", []),
@@ -312,3 +312,31 @@ def test_smuggled_root_scan_is_recursive():
     ]
     f = _run(L)["failures"]
     assert any(x.startswith("SMUGGLED ROOT POST-nested") and "chains" in x for x in f)
+
+
+def test_dead_anchor_ends_the_path_and_falsified_is_dead():
+    """PR #658 round-2 NF-1/NF-2: a chain whose only ground is a dead anchor is dangling even
+    if the dead anchor's own chain would reach a root; `falsified` counts as dead."""
+    L = _ledger()
+    L["anchors"].append(_anchor("PROOF-dead", ["AXIOM-1"]))
+    L["anchors"][-1]["status"] = "falsified"
+    L["anchors"].append(_anchor("PRED-through-dead", ["PROOF-dead"]))
+    f = _run(L)["failures"]
+    assert any(
+        x.startswith("CHAIN DANGLING PRED-through-dead") and "dead anchor" in x
+        for x in f
+    )
+
+
+def test_forcing_needs_verified_proof_or_measured_meas():
+    """PR #658 round-2 NF-3: an untested MEAS or an unverified PROOF cannot force a root."""
+    L = _ledger()
+    L["anchors"][0]["proof_state"] = "written"
+    assert any("POST-forced" in x and "cannot force" in x for x in _run(L)["failures"])
+    L = _ledger()
+    assert _run(L)["roots"]["POST-forced"][1] == 1
+    L["axioms"][3]["forced_by"] = ["MEAS-y"]
+    L["anchors"][1]["status"] = "untested"
+    assert any("POST-forced" in x and "cannot force" in x for x in _run(L)["failures"])
+    L["anchors"][1]["status"] = "coherent"
+    assert _run(L)["roots"]["POST-forced"][1] == 2

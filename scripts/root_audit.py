@@ -16,9 +16,11 @@ D1 — ROOT GATE. Every root (a record in the root lists `meta_axiom`, `meta_pri
 `axioms`, `interpretations`, whose id starts with AXIOM-, POST-, META- or INTERP-) must
 sort into exactly one Conversation-MO bucket, from the ledger alone:
 
-  bucket 1  PROVED   `forced_by` names a PROOF-* anchor that resolves in-ledger.
-  bucket 2  FORCED   `forced_by` names a MEAS-* anchor that resolves in-ledger (a forcing
-                     anchor whose status is killed/incoherent/refuted forces nothing), or
+  bucket 1  PROVED   `forced_by` names a PROOF-* anchor that resolves in-ledger with
+                     proof_state verified.
+  bucket 2  FORCED   `forced_by` names a MEAS-* anchor that resolves in-ledger with status
+                     coherent/converged (an untested, marginal, contested or dead anchor
+                     forces nothing), or
                      `decision_state: ruled` with a `ruling` that cites a
                      JamesPagetButler/* GitHub issue/PR URL (the beekeeper's own-hand
                      line — a scope/process ruling, never a physical truth). This
@@ -41,8 +43,9 @@ tracked by its register entry, never carved out).
 D2 — CHAIN-TO-ROOT. Chains are followed transitively: a DERIV-* principle via
 `derived_from`, an anchor via `prediction_chain`. A path TERMINATES at a root id, a
 PROOF-*/MEAS-* anchor, or an anchor with `provenance: "E"` (an experimental fact — the
-beekeeper's zero-axiom target) — PROVIDED its status is not killed/incoherent/refuted (a
-dead anchor grounds nothing). A seen-set on the current path catches cycles (A→B→A
+beekeeper's zero-axiom target) — PROVIDED its status is not killed/incoherent/refuted/
+falsified. A dead anchor grounds nothing AND ends the path: the walker never recurses
+through it, so a chain whose only ground is a dead anchor is DANGLING. A seen-set on the current path catches cycles (A→B→A
 fails, never loops).
   * RESOLUTION is gated for EVERY chain: an id that is not in the ledger HARD-FAILS
     unless the missing id is listed in the register's `chain_debt`.
@@ -85,7 +88,12 @@ DEAD_STATUSES = (
     "killed",
     "incoherent",
     "refuted",
-)  # a dead anchor grounds nothing, forces nothing
+    "falsified",
+)  # dead: grounds/forces nothing; ends a path
+FORCING_STATUSES = (
+    "coherent",
+    "converged",
+)  # a MEAS-* forcing must be measured and hold; PROOF-* verified
 # array<string> era (cth-implementor, live-test 1325; qbp-implementor 1330): a kill entry must be
 # real prose, not empty/stub. This is the HEURISTIC half of §10 precision — "does each open
 # question name a precise missing piece". The STRUCTURAL half (each entry must also name a
@@ -190,10 +198,21 @@ def sort_root(rec, anchors):
             f"forced_by names dead anchors (status killed/incoherent/refuted) — a dead anchor "
             f"forces nothing: {dead}"
         )
+    weak = [
+        x
+        for x in forced
+        if (x.startswith("PROOF-") and anchors[x].get("proof_state") != "verified")
+        or (x.startswith("MEAS-") and anchors[x].get("status") not in FORCING_STATUSES)
+    ]
+    if weak:
+        return None, (
+            f"forced_by names anchors that cannot force — an unverified PROOF-* or a MEAS-* "
+            f"whose status is not coherent/converged (untested, marginal, contested…): {weak}"
+        )
     if any(x.startswith("PROOF-") for x in forced):
-        return 1, "forced_by PROOF-* resolves"
+        return 1, "forced_by verified PROOF-* resolves"
     if any(x.startswith("MEAS-") for x in forced):
-        return 2, "forced_by MEAS-* resolves"
+        return 2, "forced_by coherent/converged MEAS-* resolves"
     if forced:
         return None, f"forced_by names non-PROOF/MEAS ids (not a forcing): {forced}"
     ds = rec.get("decision_state")
@@ -276,6 +295,14 @@ def walk_chain(owner, start_ids, roots, principles, anchors):
                 visit(n, path + [node])
             return
         if node in anchors:
+            if anchors[node].get("status") in DEAD_STATUSES:
+                # a dead anchor is the END of a path, never a node to recurse through: the
+                # chain must ground elsewhere (PR #658 round-2 NF-1)
+                dangling.append(
+                    " -> ".join(path + [node])
+                    + f" (dead anchor, status {anchors[node].get('status')}: grounds nothing)"
+                )
+                return
             nxt = [
                 x for x in _as_list(anchors[node].get("prediction_chain")) if x != node
             ]

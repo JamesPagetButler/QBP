@@ -35,8 +35,8 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 - `DERIV-ie` cited via: MEAS-udd -> DERIV-ie; MEAS-delta -> DERIV-ie
 - `DERIV-screening` cited via: MEAS-udd -> DERIV-screening
 - `DERIV-electronegativity` cited via: MEAS-delta -> DERIV-electronegativity
-- `DERIV-tpd` cited via: MEAS-jd -> DERIV-tpd; FLAG-J -> DERIV-tpd; FLAG-Tc -> FLAG-J -> DERIV-tpd; PRED-willow-j -> DERIV-tpd
-- `DERIV-teff` cited via: MEAS-jd -> DERIV-teff; FLAG-J -> DERIV-teff; FLAG-Tc -> FLAG-J -> DERIV-teff; FLAG-xi -> DERIV-teff; FLAG-Hc2 -> FLAG-xi -> DERIV-teff
+- `DERIV-tpd` cited via: MEAS-jd -> DERIV-tpd; FLAG-J -> DERIV-tpd; PRED-willow-j -> DERIV-tpd
+- `DERIV-teff` cited via: MEAS-jd -> DERIV-teff; FLAG-J -> DERIV-teff; FLAG-xi -> DERIV-teff
 - `DERIV-lambda` cited via: MEAS-jd -> DERIV-lambda
 - `DERIV-xi` cited via: MEAS-jd -> DERIV-xi
 - `DERIV-ionic-radii` cited via: MEAS-tolfac -> DERIV-ionic-radii
@@ -45,18 +45,22 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 - `PROOF-koide` cited via: PRED-koide-phase-2-over-9 -> PROOF-koide; PRED-wolfenstein-A-sqrt-Q -> PROOF-koide
 - `PROOF-stabiliser-order-24` cited via: PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-peak-sound-speed-Q -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; INSIGHT-iron-handoff-nuclear-to-magnetic -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-urca-onset-3rho0 -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-urca-onset-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; FLAG-tov-eos-shape-underdetermined -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-peak-sound-speed-Q -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-tov-mass-at-bump-peak -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PROOF-iron-to-ns-bridge -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24
 
-### Dangling gated chains — principles / DERIV-* / PRED-* (29)
+### Dangling gated chains — principles / DERIV-* / PRED-* (33)
 
 - `INST-ckm`: INST-ckm (empty chain)
 - `EXT-dm-particle-mass`: EXT-dm-particle-mass (empty chain)
 - `EXT-dm-cross-section`: EXT-dm-cross-section (empty chain)
+- `PRED-cosmic-birefringence`: PRED-cosmic-birefringence -> PROOF-fano (dead anchor, status killed: grounds nothing)
 - `REF-algebraic-crystallisation-paper`: REF-algebraic-crystallisation-paper (empty chain)
 - `PRED-conformal-sound-speed-1-over-3`: PRED-conformal-sound-speed-1-over-3 (empty chain)
 - `PRED-magnetar-energy-fraction-1-over-3`: PRED-magnetar-energy-fraction-1-over-3 (empty chain)
 - `PRED-fano-associativity-7beam`: PRED-fano-associativity-7beam (empty chain)
 - `COMP-sm-non-unification-at-1loop`: COMP-sm-non-unification-at-1loop (empty chain)
 - `INSIGHT-eos-integration-shifts-tov-by-30pct`: INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-conformal-sound-speed-1-over-3 (empty prediction_chain)
+- `PRED-a0-saturating-Fmax-7`: PRED-a0-saturating-Fmax-7 -> PROOF-fano (dead anchor, status killed: grounds nothing)
 - `PRED-tov-mass-at-bump-peak`: PRED-tov-mass-at-bump-peak -> PRED-conformal-sound-speed-1-over-3 (empty prediction_chain)
+- `PROOF-iron-56-double-octet`: PROOF-iron-56-double-octet -> PROOF-fano (dead anchor, status killed: grounds nothing)
+- `PROOF-silicon-28-fano-ladder`: PROOF-silicon-28-fano-ladder -> PROOF-fano (dead anchor, status killed: grounds nothing)
 - `INSIGHT-locale-condensed-chain`: INSIGHT-locale-condensed-chain -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
 - `INSIGHT-echo-harmony-z2`: INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
 - `INSIGHT-resonance-vs-amplification-scale-invariance`: INSIGHT-resonance-vs-amplification-scale-invariance -> INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
@@ -80,7 +84,7 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 ### Cycles (0)
 
 
-### Reported, not gated — other kinds with non-terminating chains (61)
+### Reported, not gated — other kinds with non-terminating chains (65)
 
 | kind | owners |
 |---|---|
@@ -88,16 +92,20 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 | CONV | 3 |
 | DEFN | 7 |
 | EXT | 1 |
+| FLAG | 2 |
 | INSIGHT | 14 |
 | KILLED | 1 |
 | META | 2 |
-| OBS | 1 |
+| OBS | 3 |
 | PRED | 1 |
 | PROOF | 7 |
 | QBP | 2 |
 | REF | 18 |
 | WISDOM | 2 |
 
+- `FLAG-Tc`: FLAG-Tc -> FLAG-J (dead anchor, status incoherent: grounds nothing)
+- `FLAG-Hc2`: FLAG-Hc2 -> FLAG-xi (dead anchor, status incoherent: grounds nothing)
+- `OBS-cbt-koide`: OBS-cbt-koide -> PROOF-fano (dead anchor, status killed: grounds nothing)
 - `OBS-finsler-gravity`: OBS-finsler-gravity (empty chain)
 - `EXT-dm-null-detection`: EXT-dm-null-detection (empty chain)
 - `CONV-flow-fragmentalism`: CONV-flow-fragmentalism (empty chain)
@@ -105,7 +113,7 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 - `INSIGHT-urca-threshold-dim-O`: INSIGHT-urca-threshold-dim-O (empty chain)
 - `INSIGHT-entropy-cone-division-algebra-inversion`: INSIGHT-entropy-cone-division-algebra-inversion (empty chain)
 - `PROOF-division-algebra-entropy-cone-mapping`: PROOF-division-algebra-entropy-cone-mapping (empty chain)
-- `INSIGHT-branch-A-hypergraph-boundary`: INSIGHT-branch-A-hypergraph-boundary -> PROOF-division-algebra-entropy-cone-mapping (empty prediction_chain)
+- `INSIGHT-branch-A-hypergraph-boundary`: INSIGHT-branch-A-hypergraph-boundary -> PROOF-division-algebra-entropy-cone-mapping (dead anchor, status incoherent: grounds nothing); INSIGHT-branch-A-hypergraph-boundary -> COMP-branch-A-cmb-boundary-analysis (dead anchor, status incoherent: grounds nothing)
 - `INSIGHT-bcc-iron-fano-cube`: INSIGHT-bcc-iron-fano-cube (empty chain)
 - `INSIGHT-fano-cube-universal-compute-cell`: INSIGHT-fano-cube-universal-compute-cell (empty chain)
 - `WISDOM-schema-vs-instance`: WISDOM-schema-vs-instance (empty chain)
@@ -115,14 +123,15 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 - `DEFN-real-structural-trivial`: DEFN-real-structural-trivial (empty chain)
 - `DEFN-complex-structural-i`: DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
 - `DEFN-quaternion-structural-triad`: DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
-- `DEFN-octonion-structural-fano`: DEFN-octonion-structural-fano -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
-- `DEFN-sedenion-structural-box-kite`: DEFN-sedenion-structural-box-kite -> DEFN-octonion-structural-fano -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
+- `DEFN-octonion-structural-fano`: DEFN-octonion-structural-fano -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain); DEFN-octonion-structural-fano -> PROOF-fano (dead anchor, status killed: grounds nothing)
+- `DEFN-sedenion-structural-box-kite`: DEFN-sedenion-structural-box-kite -> DEFN-octonion-structural-fano -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain); DEFN-sedenion-structural-box-kite -> DEFN-octonion-structural-fano -> PROOF-fano (dead anchor, status killed: grounds nothing)
 - `PROOF-loss-of-order-R-to-C`: PROOF-loss-of-order-R-to-C -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
 - `PROOF-loss-of-commutativity-C-to-H`: PROOF-loss-of-commutativity-C-to-H -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
 - `WISDOM-algebra-restricts-state-class-not-scalar-field`: WISDOM-algebra-restricts-state-class-not-scalar-field (empty chain)
 - `META-physical-mapping-status-field`: META-physical-mapping-status-field (empty chain)
 - `META-regime-of-validity-field`: META-regime-of-validity-field (empty chain)
-- `PRED-hypergraph-cmb-camb-rerun`: PRED-hypergraph-cmb-camb-rerun -> INSIGHT-branch-A-hypergraph-boundary -> PROOF-division-algebra-entropy-cone-mapping (empty prediction_chain); PRED-hypergraph-cmb-camb-rerun -> PROOF-division-algebra-entropy-cone-mapping (empty prediction_chain)
+- `OBS-jades-gs-z14-0-vrot-lower-100`: OBS-jades-gs-z14-0-vrot-lower-100 -> PRED-a0-saturating-Fmax-7 -> PROOF-fano (dead anchor, status killed: grounds nothing)
+- `PRED-hypergraph-cmb-camb-rerun`: PRED-hypergraph-cmb-camb-rerun -> COMP-branch-A-cmb-boundary-analysis (dead anchor, status incoherent: grounds nothing); PRED-hypergraph-cmb-camb-rerun -> INSIGHT-branch-A-hypergraph-boundary -> PROOF-division-algebra-entropy-cone-mapping (dead anchor, status incoherent: grounds nothing); PRED-hypergraph-cmb-camb-rerun -> INSIGHT-branch-A-hypergraph-boundary -> COMP-branch-A-cmb-boundary-analysis (dead anchor, status incoherent: grounds nothing); PRED-hypergraph-cmb-camb-rerun -> PROOF-division-algebra-entropy-cone-mapping (dead anchor, status incoherent: grounds nothing)
 - `REF-brink-condensed-group-cohomology`: REF-brink-condensed-group-cohomology (empty chain)
 - `REF-capoferri-dirac-lorentzian`: REF-capoferri-dirac-lorentzian (empty chain)
 - `REF-clausen-scholze-condensed`: REF-clausen-scholze-condensed (empty chain)
@@ -155,7 +164,7 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 - `QBP-POS-organization-not-generator`: QBP-POS-organization-not-generator -> DEFN-purely-algebraic-derivation-gate (empty prediction_chain); QBP-POS-organization-not-generator -> INSIGHT-footprint-cd-dimension-pyrrhic (empty prediction_chain); QBP-POS-organization-not-generator -> INSIGHT-constants-no-content-distinct (empty prediction_chain); QBP-POS-organization-not-generator -> INSIGHT-loop-closure-structural-obstruction (empty prediction_chain)
 - `PROOF-cd-algebra-finrank-2n`: PROOF-cd-algebra-finrank-2n -> DEFN-cayley-dickson-doubling (empty prediction_chain)
 - `PROOF-sp1-unit-quaternion-group`: PROOF-sp1-unit-quaternion-group -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
-- `PROOF-fano-genesis`: PROOF-fano-genesis -> DEFN-octonion-structural-fano -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
+- `PROOF-fano-genesis`: PROOF-fano-genesis -> DEFN-octonion-structural-fano -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain); PROOF-fano-genesis -> DEFN-octonion-structural-fano -> PROOF-fano (dead anchor, status killed: grounds nothing)
 - `PROOF-s3-hspace`: PROOF-s3-hspace -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
 - `KILLED-locale-forcing-route`: KILLED-locale-forcing-route (empty chain)
 - `REF-adams-hopf-invariant-one`: REF-adams-hopf-invariant-one (empty chain)
