@@ -20,6 +20,15 @@ plus the tier-domain gate [1,3] and the stale-pointer resolution rule.
 Authors: qbp-implementor (Integration role), 2026-06-04
 """
 
+import sys as _sys  # noqa: E402
+
+_sys.exit(
+    "ARCHIVED ONE-SHOT ENCODER (scripts/applied-encoders/, #654 D7): already applied to the "
+    "ledger once (#509 three-way merge); do not re-run. It wrote the canonical ledger whole via "
+    "Path.write_text — the pattern retired by #654 D7. New encoders write through "
+    "scripts/cth_ledger_edit.py."
+)
+
 from __future__ import annotations
 
 import json

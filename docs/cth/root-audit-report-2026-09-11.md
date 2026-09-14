@@ -2,6 +2,10 @@
 
 Ledger: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` — register: `docs/cth/root-audit-register.json`
 
+## Scope of the root population
+
+Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principles', 'axioms', 'interpretations'] (plus any root-prefixed id found elsewhere, reported as smuggled). A ledger may carry roots the programme names but has not yet encoded as records — e.g. the #654 D6 expectation of six roots (AXIOM-1, POST-hosting, the rule, META-2, the crystal definition, the state-space identification) against the three records below: POST-hosting and META-2 are not encoded until the #652 encode lands; the rule (#635), the crystal definition and the state-space identification live inside other records under non-root prefixes and are outside this gate's reach until encoded as roots. The gate audits what is written, and says so.
+
 ## Roots (whole population of the root lists)
 
 | Root | lives in | bucket | reason | register issue |
@@ -41,12 +45,23 @@ Ledger: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` — reg
 - `PROOF-koide` cited via: PRED-koide-phase-2-over-9 -> PROOF-koide; PRED-wolfenstein-A-sqrt-Q -> PROOF-koide
 - `PROOF-stabiliser-order-24` cited via: PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-peak-sound-speed-Q -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; INSIGHT-iron-handoff-nuclear-to-magnetic -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-urca-onset-3rho0 -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-urca-onset-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; FLAG-tov-eos-shape-underdetermined -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-peak-sound-speed-Q -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-chiral-restoration-3rho0 -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PRED-tov-mass-at-bump-peak -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24; PROOF-iron-to-ns-bridge -> PRED-TOV-limit-sqrt-7-over-3 -> Q27-TOV-limit-from-Fano -> PRED-eta-prime-mass-shift-1-over-24 -> PROOF-stabiliser-order-24
 
-### Dangling gated chains — principles / DERIV-* / PRED-* (18)
+### Dangling gated chains — principles / DERIV-* / PRED-* (29)
 
+- `INST-ckm`: INST-ckm (empty chain)
+- `EXT-dm-particle-mass`: EXT-dm-particle-mass (empty chain)
+- `EXT-dm-cross-section`: EXT-dm-cross-section (empty chain)
+- `REF-algebraic-crystallisation-paper`: REF-algebraic-crystallisation-paper (empty chain)
 - `PRED-conformal-sound-speed-1-over-3`: PRED-conformal-sound-speed-1-over-3 (empty chain)
 - `PRED-magnetar-energy-fraction-1-over-3`: PRED-magnetar-energy-fraction-1-over-3 (empty chain)
 - `PRED-fano-associativity-7beam`: PRED-fano-associativity-7beam (empty chain)
+- `COMP-sm-non-unification-at-1loop`: COMP-sm-non-unification-at-1loop (empty chain)
+- `INSIGHT-eos-integration-shifts-tov-by-30pct`: INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-conformal-sound-speed-1-over-3 (empty prediction_chain)
 - `PRED-tov-mass-at-bump-peak`: PRED-tov-mass-at-bump-peak -> PRED-conformal-sound-speed-1-over-3 (empty prediction_chain)
+- `INSIGHT-locale-condensed-chain`: INSIGHT-locale-condensed-chain -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
+- `INSIGHT-echo-harmony-z2`: INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
+- `INSIGHT-resonance-vs-amplification-scale-invariance`: INSIGHT-resonance-vs-amplification-scale-invariance -> INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
+- `INSIGHT-threshold-transition-new-stable-state`: INSIGHT-threshold-transition-new-stable-state -> INSIGHT-resonance-vs-amplification-scale-invariance -> INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
+- `INSIGHT-s2-dirac-eta-vanishes`: INSIGHT-s2-dirac-eta-vanishes -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
 - `DERIV-vaidya-accreting-horizon-spacelike`: DERIV-vaidya-accreting-horizon-spacelike -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
 - `DERIV-hubble-half-entropy-factor`: DERIV-hubble-half-entropy-factor -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
 - `DERIV-fraunhofer-optics`: DERIV-fraunhofer-optics (empty chain)
@@ -65,38 +80,35 @@ Ledger: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` — reg
 ### Cycles (0)
 
 
-### Reported, not gated — other kinds with non-terminating chains (67)
+### Reported, not gated — other kinds with non-terminating chains (61)
 
 | kind | owners |
 |---|---|
-| COMP | 1 |
 | CONJ | 2 |
 | CONV | 3 |
 | DEFN | 7 |
-| EXT | 2 |
-| INSIGHT | 19 |
-| INST | 1 |
+| EXT | 1 |
+| INSIGHT | 14 |
 | KILLED | 1 |
 | META | 2 |
 | OBS | 1 |
-| PROOF | 6 |
+| PRED | 1 |
+| PROOF | 7 |
 | QBP | 2 |
 | REF | 18 |
 | WISDOM | 2 |
 
-- `INST-ckm`: INST-ckm (empty chain)
 - `OBS-finsler-gravity`: OBS-finsler-gravity (empty chain)
-- `EXT-dm-particle-mass`: EXT-dm-particle-mass (empty chain)
-- `EXT-dm-cross-section`: EXT-dm-cross-section (empty chain)
-- `REF-algebraic-crystallisation-paper`: REF-algebraic-crystallisation-paper (empty chain)
+- `EXT-dm-null-detection`: EXT-dm-null-detection (empty chain)
 - `CONV-flow-fragmentalism`: CONV-flow-fragmentalism (empty chain)
 - `REF-jido-eta-prime-chiral-2012`: REF-jido-eta-prime-chiral-2012 (empty chain)
 - `INSIGHT-urca-threshold-dim-O`: INSIGHT-urca-threshold-dim-O (empty chain)
 - `INSIGHT-entropy-cone-division-algebra-inversion`: INSIGHT-entropy-cone-division-algebra-inversion (empty chain)
+- `PROOF-division-algebra-entropy-cone-mapping`: PROOF-division-algebra-entropy-cone-mapping (empty chain)
+- `INSIGHT-branch-A-hypergraph-boundary`: INSIGHT-branch-A-hypergraph-boundary -> PROOF-division-algebra-entropy-cone-mapping (empty prediction_chain)
 - `INSIGHT-bcc-iron-fano-cube`: INSIGHT-bcc-iron-fano-cube (empty chain)
 - `INSIGHT-fano-cube-universal-compute-cell`: INSIGHT-fano-cube-universal-compute-cell (empty chain)
 - `WISDOM-schema-vs-instance`: WISDOM-schema-vs-instance (empty chain)
-- `COMP-sm-non-unification-at-1loop`: COMP-sm-non-unification-at-1loop (empty chain)
 - `CONV-spectral-entropy-zeta`: CONV-spectral-entropy-zeta (empty chain)
 - `CONV-cd-tower-in-zeta-moments`: CONV-cd-tower-in-zeta-moments (empty chain)
 - `DEFN-cayley-dickson-doubling`: DEFN-cayley-dickson-doubling (empty chain)
@@ -108,9 +120,9 @@ Ledger: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` — reg
 - `PROOF-loss-of-order-R-to-C`: PROOF-loss-of-order-R-to-C -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
 - `PROOF-loss-of-commutativity-C-to-H`: PROOF-loss-of-commutativity-C-to-H -> DEFN-quaternion-structural-triad -> DEFN-complex-structural-i -> DEFN-real-structural-trivial (empty prediction_chain)
 - `WISDOM-algebra-restricts-state-class-not-scalar-field`: WISDOM-algebra-restricts-state-class-not-scalar-field (empty chain)
-- `INSIGHT-eos-integration-shifts-tov-by-30pct`: INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-conformal-sound-speed-1-over-3 (empty prediction_chain)
 - `META-physical-mapping-status-field`: META-physical-mapping-status-field (empty chain)
 - `META-regime-of-validity-field`: META-regime-of-validity-field (empty chain)
+- `PRED-hypergraph-cmb-camb-rerun`: PRED-hypergraph-cmb-camb-rerun -> INSIGHT-branch-A-hypergraph-boundary -> PROOF-division-algebra-entropy-cone-mapping (empty prediction_chain); PRED-hypergraph-cmb-camb-rerun -> PROOF-division-algebra-entropy-cone-mapping (empty prediction_chain)
 - `REF-brink-condensed-group-cohomology`: REF-brink-condensed-group-cohomology (empty chain)
 - `REF-capoferri-dirac-lorentzian`: REF-capoferri-dirac-lorentzian (empty chain)
 - `REF-clausen-scholze-condensed`: REF-clausen-scholze-condensed (empty chain)
@@ -128,11 +140,7 @@ Ledger: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` — reg
 - `REF-vaidya-accreting-horizon`: REF-vaidya-accreting-horizon (empty chain)
 - `CONJ-condensed-math-for-transition-state`: CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
 - `INSIGHT-condensed-math-deferred`: INSIGHT-condensed-math-deferred (empty chain)
-- `INSIGHT-locale-condensed-chain`: INSIGHT-locale-condensed-chain -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
-- `INSIGHT-echo-harmony-z2`: INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
-- `INSIGHT-resonance-vs-amplification-scale-invariance`: INSIGHT-resonance-vs-amplification-scale-invariance -> INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
-- `INSIGHT-threshold-transition-new-stable-state`: INSIGHT-threshold-transition-new-stable-state -> INSIGHT-resonance-vs-amplification-scale-invariance -> INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
-- `INSIGHT-s2-dirac-eta-vanishes`: INSIGHT-s2-dirac-eta-vanishes -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)
+- `REF-phantom-cohesion-before-computation`: REF-phantom-cohesion-before-computation (empty chain)
 - `INSIGHT-octonion-quaternion-branching`: INSIGHT-octonion-quaternion-branching (empty chain)
 - `INSIGHT-crystallisation-ssb-ingredients`: INSIGHT-crystallisation-ssb-ingredients (empty chain)
 - `INSIGHT-crystallisation-gauge-vs-physical`: INSIGHT-crystallisation-gauge-vs-physical (empty chain)
@@ -154,8 +162,8 @@ Ledger: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` — reg
 
 ## Warnings (2)
 
-- registered smuggled root META-physical-mapping-status-field in anchors[] (issue https://github.com/JamesPagetButler/QBP/issues/657)
-- registered smuggled root META-regime-of-validity-field in anchors[] (issue https://github.com/JamesPagetButler/QBP/issues/657)
+- registered smuggled root META-physical-mapping-status-field in anchors[154][] (issue https://github.com/JamesPagetButler/QBP/issues/657)
+- registered smuggled root META-regime-of-validity-field in anchors[155][] (issue https://github.com/JamesPagetButler/QBP/issues/657)
 
 ## Gate: PASS
 

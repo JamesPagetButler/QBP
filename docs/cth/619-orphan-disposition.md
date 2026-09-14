@@ -75,4 +75,4 @@ Named in `analysis/foundations-inverse-anchor-audit.json`. They are: the Artin p
 - **Sedenion-table single source:** the 16×16 table is re-embedded in 6 Sprint-12 files. Filed separately.
 
 ---
-*Disposition adjudicated by qbp-oppenheimer; encoded via `scripts/encode_619_anchors.py`; gate-validated. Pending cth §I4 (schema authority) review.*
+*Disposition adjudicated by qbp-oppenheimer; encoded via `scripts/applied-encoders/encode_619_anchors.py` (archived one-shot); gate-validated. Pending cth §I4 (schema authority) review.*

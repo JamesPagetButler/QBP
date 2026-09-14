@@ -2,7 +2,7 @@
 
 These scripts each encoded one reviewed batch into the CTH ledger and have already been
 applied (the ledger changelog names the PR for each). They rewrote the whole ledger with
-`json.dump` — the pattern retired by issue #654 D7: every new encoder writes through
+`json.dump` (or `Path.write_text`) — the pattern retired by issue #654 D7: every new encoder writes through
 `scripts/cth_ledger_edit.py`, which proves the write is confined to the declared records,
 that no declared edit silently failed to land, and that no formatting noise is introduced.
 `tests/test_cth_ledger_edit.py` guards that no top-level `scripts/*.py` writes the ledger
@@ -18,3 +18,4 @@ directly. They are kept here, unmodified, as the provenance of what was encoded 
 | encode_holographic_anchors.py | #642 holographic subalgebra | #642 |
 | encode_p2_lean_anchors.py | #649 P2 Lean anchors | #653 |
 | apply_option_b_deriv_sedenion.py | #647 option B (DERIV-sedenion clause) | #651 |
+| cth_509_apply.py | #509 three-way inventory merge (wrote the canonical ledger whole via `Path.write_text` — found by the #658 AST guard) | #509 |

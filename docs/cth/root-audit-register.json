@@ -1,7 +1,7 @@
 {
   "register_version": "1.0",
-  "description": "Issue #654 D1/D2 — shrink-only, issue-linked register for the root GATE and chain-to-root audit (scripts/root_audit.py). Enumerated by the audit's first run (2026-09-11, ledger v5.4.0): 3 roots sorting into no four-bucket exit + 2 smuggled roots (open_roots); 16 chain ids cited but never encoded + 18 derived chains (principles / DERIV-* / PRED-*) that do not terminate (chain_debt). Every entry is a burn-down item on the clock with a tracking issue, not an allowlist.",
-  "policy": "SHRINK-ONLY. root_audit.py HARD-FAILS if: (1) any root sorts into no bucket, or any root-prefixed id lives outside the root lists, and is NOT listed in open_roots (a NEW unforced root — blocked: you cannot add a root without forcing it, killing it, or filing its issue); (2) any chain id fails to resolve, or any derived chain fails to terminate, and is NOT listed in chain_debt; (3) any listed entry is now fixed (the root sorts, the id resolves, the chain terminates) — remove the stale entry. Adding an entry is a visible, reviewed commit to this file with a tracking issue — NEVER a CI-driven or reflexive green-making step (the silent baseline raise is what defeated the FAULT-S4-005 ratchet; PATTERN-02). Entries carry no counts and no baseline: the population is itemised.",
+  "description": "Issue #654 D1/D2 — shrink-only, issue-linked register for the root GATE and chain-to-root audit (scripts/root_audit.py). Enumerated by the audit's first run (2026-09-11, ledger v5.4.0): 3 roots sorting into no four-bucket exit + 2 smuggled roots (open_roots); 16 chain ids cited but never encoded + 18 derived chains (principles / DERIV-* / PRED-*) that do not terminate (chain_debt); 2026-09-14 (#658 review fixes): +11 — chains whose only terminator is a dead (killed/incoherent/refuted) anchor, and ledger-declared derived claims (provenance_kind derivation / internal-compute) under non-DERIV/PRED prefixes. Every entry is a burn-down item on the clock with a tracking issue, not an allowlist.",
+  "policy": "SHRINK-ONLY. root_audit.py HARD-FAILS if: (1) any root sorts into no bucket, or any root-prefixed id lives outside the root lists, and is NOT listed in open_roots (a NEW unforced root — blocked: you cannot add a root without forcing it, killing it, or filing its issue); (2) any chain id fails to resolve, or any derived chain fails to terminate, and is NOT listed in chain_debt; (3) any listed entry is now fixed (the root sorts, the id resolves, the chain terminates) — remove the stale entry. Adding an entry is a visible, reviewed commit to this file with a tracking issue — NEVER a CI-driven or reflexive green-making step. GROWTH IS A REVIEW GATE, NOT A MACHINE GATE: the script cannot tell a new entry from an old one, so a same-commit root+entry passes the machine and is caught by the human reviewer (the register diff is in the PR); the machine enforces shrink-only staleness, resolution and issue-linking (the silent baseline raise is what defeated the FAULT-S4-005 ratchet; PATTERN-02). Entries carry no counts and no baseline: the population is itemised.",
   "open_roots": [
     {
       "id": "META-1",
@@ -447,6 +447,127 @@
       "resolution": "supply the derivation chain to {root | PROOF | MEAS | experimental anchor} or KILL the claim",
       "added": "2026-09-11",
       "added_by": "#654 D6 first run"
+    },
+    {
+      "id": "INST-ckm",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "INST-ckm (empty chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "EXT-dm-particle-mass",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "EXT-dm-particle-mass (empty chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "EXT-dm-cross-section",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "EXT-dm-cross-section (empty chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "REF-algebraic-crystallisation-paper",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "REF-algebraic-crystallisation-paper (empty chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "COMP-sm-non-unification-at-1loop",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "COMP-sm-non-unification-at-1loop (empty chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "INSIGHT-eos-integration-shifts-tov-by-30pct",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "INSIGHT-eos-integration-shifts-tov-by-30pct -> PRED-conformal-sound-speed-1-over-3 (empty prediction_chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "INSIGHT-locale-condensed-chain",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "INSIGHT-locale-condensed-chain -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "INSIGHT-echo-harmony-z2",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "INSIGHT-resonance-vs-amplification-scale-invariance",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "INSIGHT-resonance-vs-amplification-scale-invariance -> INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "INSIGHT-threshold-transition-new-stable-state",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "INSIGHT-threshold-transition-new-stable-state -> INSIGHT-resonance-vs-amplification-scale-invariance -> INSIGHT-echo-harmony-z2 -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
+    },
+    {
+      "id": "INSIGHT-s2-dirac-eta-vanishes",
+      "kind": "dangling-derived-chain (provenance_kind derivation/internal-compute)",
+      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
+      "paths": [
+        "INSIGHT-s2-dirac-eta-vanishes -> CONJ-condensed-math-for-transition-state -> INSIGHT-condensed-math-deferred (empty prediction_chain)"
+      ],
+      "resolution": "supply a derivation chain to a LIVE {root | PROOF | MEAS | experimental anchor} (a killed/incoherent/refuted terminator grounds nothing) or KILL the claim",
+      "added": "2026-09-14",
+      "added_by": "#658 fix commit (PR #658 Red Team + Gemini: status-checked terminators; provenance_kind-gated owners)"
     }
   ]
 }

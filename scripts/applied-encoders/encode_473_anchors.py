@@ -13,6 +13,13 @@ the encode is self-contained.
 Usage: python3 scripts/encode_473_anchors.py   (from the repo root)
 """
 
+import sys as _sys  # noqa: E402
+
+_sys.exit(
+    "ARCHIVED ONE-SHOT ENCODER (scripts/applied-encoders/, #654 D7): already applied to the "
+    "ledger once; do not re-run. New encoders write through scripts/cth_ledger_edit.py."
+)
+
 import json
 import os
 import sys

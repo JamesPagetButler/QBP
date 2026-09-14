@@ -130,6 +130,18 @@ class LedgerEdit:
         # a list key that changed shape (record list <-> scalar) shows up on both sides
         for k in (set(b_recs) ^ set(a_recs)) & (set(b_sc) | set(a_sc)):
             changed.add((k, None))
+        # ORDER is content: the top-level key sequence and each record list's id sequence must
+        # be identical up to declared appends/removals; any reordering is an undeclared change
+        # of the whole key (PR #658 Red Team: a reversed anchors[] wrote a 17k-line diff that
+        # the per-record comparison reported as confined).
+        if list(self._before.keys()) != list(self.ledger.keys()):
+            changed.add(("<top-level key order>", None))
+        for k in set(b_recs) & set(a_recs):
+            b_ids, a_ids = list(b_recs[k]), list(a_recs[k])
+            kept_b = [i for i in b_ids if i in a_recs[k]]
+            kept_a = [i for i in a_ids if i in b_recs[k]]
+            if kept_b != kept_a:
+                changed.add((k, "<record order>"))
         return changed
 
     def verify(self):

@@ -105,21 +105,114 @@ def test_live_ledger_is_canonical():
 
 
 def test_no_top_level_script_writes_the_ledger_directly():
-    """D7 guard (#654 AC6): the only way to write the ledger from scripts/ is the helper.
-    Applied one-shot encoders live under scripts/applied-encoders/ (history, do not re-run).
-    """
-    pat = re.compile(
-        r"open\(\s*(LEDGER|ledger_path|args\.ledger|DEFAULT_LEDGER)\s*,\s*['\"]w"
-    )
+    """D7 guard (#654 AC6), AST + taint (the regex form was evadable via `p = LEDGER; open(p, "w")`
+    or `Path(LEDGER).write_text(...)`): a top-level scripts/*.py may not write to any path
+    expression tainted by a ledger path. Taint = a string constant naming the inventory
+    (`cth-inventory` / `confluent-trust-inventory`), any name assigned from a tainted
+    expression (transitively), and any expression containing a tainted name. Writes = open()
+    with a w/a/+ mode, Path(...).write_text/.write_bytes, json.dump into such an open().
+    Report writers on untainted paths are not flagged. Applied one-shot encoders live under
+    scripts/applied-encoders/ (archived; each exits at import) and are not scanned."""
+    import ast
+
+    HINTS = ("cth-inventory", "confluent-trust-inventory")
+
+    def tainted_expr(node, tainted):
+        for sub in ast.walk(node):
+            if (
+                isinstance(sub, ast.Constant)
+                and isinstance(sub.value, str)
+                and any(h in sub.value for h in HINTS)
+            ):
+                return True
+            if isinstance(sub, ast.Name) and sub.id in tainted:
+                return True
+        return False
+
+    def write_mode(call):
+        mode = None
+        if len(call.args) > 1 and isinstance(call.args[1], ast.Constant):
+            mode = call.args[1].value
+        for kw in call.keywords:
+            if kw.arg == "mode" and isinstance(kw.value, ast.Constant):
+                mode = kw.value.value
+        return isinstance(mode, str) and any(c in mode for c in "wa+")
+
     offenders = []
-    for f in glob.glob(os.path.join(ROOT, "scripts", "*.py")):
-        src = open(f, encoding="utf-8").read()
-        if os.path.basename(f) == "cth_ledger_edit.py":
+    for f in sorted(glob.glob(os.path.join(ROOT, "scripts", "*.py"))):
+        base = os.path.basename(f)
+        if base == "cth_ledger_edit.py":
             continue
-        if pat.search(src) or re.search(
-            r"json\.dump\(\s*(ledger|L)\s*,\s*open\(\s*LEDGER", src
-        ):
-            offenders.append(os.path.basename(f))
+        tree = ast.parse(open(f, encoding="utf-8").read())
+        tainted = set()
+        changed = True
+        while changed:  # fixpoint over assignments
+            changed = False
+            for node in ast.walk(tree):
+                targets = []
+                if isinstance(node, ast.Assign):
+                    targets, value = node.targets, node.value
+                elif (
+                    isinstance(node, (ast.AnnAssign, ast.AugAssign))
+                    and node.value is not None
+                ):
+                    targets, value = [node.target], node.value
+                else:
+                    continue
+                if tainted_expr(value, tainted):
+                    for t in targets:
+                        for n in ast.walk(t):
+                            if isinstance(n, ast.Name) and n.id not in tainted:
+                                tainted.add(n.id)
+                                changed = True
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            fn = node.func
+            name = fn.attr if isinstance(fn, ast.Attribute) else getattr(fn, "id", "")
+            if (
+                name == "open"
+                and node.args
+                and write_mode(node)
+                and tainted_expr(node.args[0], tainted)
+            ):
+                offenders.append(f"{base}:{node.lineno} open(<ledger>, w)")
+            elif (
+                name in ("write_text", "write_bytes")
+                and isinstance(fn, ast.Attribute)
+                and tainted_expr(fn.value, tainted)
+            ):
+                offenders.append(f"{base}:{node.lineno} <ledger>.{name}()")
     assert (
         offenders == []
     ), f"scripts that write the ledger without cth_ledger_edit: {offenders}"
+
+
+def test_reordering_records_is_an_undeclared_change(tmp_path):
+    """PR #658 Red Team: reversing anchors[] was reported as confined. Order is content."""
+    p = _mini(tmp_path)
+    before = open(p).read()
+    with pytest.raises(cle.ConfinementError, match="record order"):
+        with cle.ledger_edit(p) as e:
+            e.ledger["anchors"].reverse()
+            e.record("anchors", "PRED-a")["status"] = "coherent"
+    assert open(p).read() == before
+
+
+def test_reordering_top_level_keys_is_an_undeclared_change(tmp_path):
+    p = _mini(tmp_path)
+    with pytest.raises(cle.ConfinementError, match="top-level key order"):
+        with cle.ledger_edit(p) as e:
+            v = e.ledger.pop("programme")
+            e.ledger["programme"] = v  # same content, moved to the end
+            e.record("anchors", "PRED-a")["status"] = "coherent"
+
+
+def test_declared_append_does_not_trip_the_order_check(tmp_path):
+    p = _mini(tmp_path)
+    with cle.ledger_edit(p) as e:
+        e.append(
+            "anchors", {"id": "PRED-c", "status": "untested", "prediction_chain": []}
+        )
+        e.remove("anchors", "PRED-a")
+    assert [a["id"] for a in json.load(open(p))["anchors"]] == ["PRED-b", "PRED-c"]

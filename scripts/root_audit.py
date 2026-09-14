@@ -8,22 +8,27 @@ not a ratchet (PATTERN-02, docs/process_violation_log.md): absolute, whole-popul
 no count, no baseline file. The only escape is an ITEMISED, issue-linked, SHRINK-ONLY
 register (docs/cth/root-audit-register.json, modelled on proof-anchor-remediation.json):
 adding an entry is a visible, reviewed commit with a tracking issue, never a CI-driven
-baseline raise; a listed entry that is later fixed but not removed HARD-FAILS.
+baseline raise; a listed entry that is later fixed but not removed HARD-FAILS. Register
+GROWTH is a REVIEW gate (a same-commit entry passes the machine) — the machine enforces
+shrink-only staleness, resolution and issue-linking; the human reviewer owns growth.
 
 D1 — ROOT GATE. Every root (a record in the root lists `meta_axiom`, `meta_principles`,
 `axioms`, `interpretations`, whose id starts with AXIOM-, POST-, META- or INTERP-) must
 sort into exactly one Conversation-MO bucket, from the ledger alone:
 
   bucket 1  PROVED   `forced_by` names a PROOF-* anchor that resolves in-ledger.
-  bucket 2  FORCED   `forced_by` names a MEAS-* anchor that resolves in-ledger, or
+  bucket 2  FORCED   `forced_by` names a MEAS-* anchor that resolves in-ledger (a forcing
+                     anchor whose status is killed/incoherent/refuted forces nothing), or
                      `decision_state: ruled` with a `ruling` that cites a
                      JamesPagetButler/* GitHub issue/PR URL (the beekeeper's own-hand
                      line — a scope/process ruling, never a physical truth). This
                      check is STRUCTURAL (a cite is present); whether the cited ruling
                      actually forces THIS root is the Red Team confirmer's semantic
                      half (#654 D4) — the URL check is not the whole guard.
-  bucket 3  OPEN     `kill_condition` present AND `decision_state: open` (or
-                     `status: open`). An open root is an Impasse Record, not a request.
+  bucket 3  OPEN     `kill_condition` is a NON-EMPTY ARRAY of non-placeholder entries — one
+                     Impasse Record per open question on the root (array-only canonical,
+                     confluent-trust #102) — AND `decision_state: open` (or `status: open`).
+                     An open root is an Impasse Record, not a request.
   bucket 4  RETIRED  lives in `retired_axioms` / `retired_principles` — reported only.
 
 A root sorting into NO bucket is UNSORTED → HARD FAIL unless listed in the register's
@@ -36,11 +41,13 @@ tracked by its register entry, never carved out).
 D2 — CHAIN-TO-ROOT. Chains are followed transitively: a DERIV-* principle via
 `derived_from`, an anchor via `prediction_chain`. A path TERMINATES at a root id, a
 PROOF-*/MEAS-* anchor, or an anchor with `provenance: "E"` (an experimental fact — the
-beekeeper's zero-axiom target). A seen-set on the current path catches cycles (A→B→A
+beekeeper's zero-axiom target) — PROVIDED its status is not killed/incoherent/refuted (a
+dead anchor grounds nothing). A seen-set on the current path catches cycles (A→B→A
 fails, never loops).
   * RESOLUTION is gated for EVERY chain: an id that is not in the ledger HARD-FAILS
     unless the missing id is listed in the register's `chain_debt`.
-  * TERMINATION is gated for `derived_principles`, DERIV-* anchors and PRED-* anchors:
+  * TERMINATION is gated for `derived_principles`, DERIV-* / PRED-* anchors, and any anchor
+    whose declared `provenance_kind` is derivation or internal-compute:
     an empty or dangling chain HARD-FAILS unless the chain's owner is listed in
     `chain_debt`.
   * Other anchor kinds (INSIGHT, REF, DEFN, FLAG, …) with non-terminating chains are
@@ -70,6 +77,23 @@ DEFAULT_REGISTER = "docs/cth/root-audit-register.json"
 ROOT_PREFIXES = ("AXIOM-", "POST-", "META-", "INTERP-")
 TERMINAL_ANCHOR_PREFIXES = ("PROOF-", "MEAS-")
 GATED_CHAIN_PREFIXES = ("DERIV-", "PRED-")
+GATED_PROVENANCE_KINDS = (
+    "derivation",
+    "internal-compute",
+)  # ledger-declared derived claims
+DEAD_STATUSES = (
+    "killed",
+    "incoherent",
+    "refuted",
+)  # a dead anchor grounds nothing, forces nothing
+# array<string> era (cth-implementor, live-test 1325; qbp-implementor 1330): a kill entry must be
+# real prose, not empty/stub. This is the HEURISTIC half of §10 precision — "does each open
+# question name a precise missing piece". The STRUCTURAL half (each entry must also name a
+# resolving discharge) lands with array<object> at the confluent-trust #102 delta; until then a
+# text heuristic is the honest bound. The >= 8 floor is a crude stub-guard, not a quality check.
+_KILL_PLACEHOLDER = re.compile(
+    r"^(todo|tbd|tba|fixme|xxx+|placeholder|none|n/?a|\?+|-+|\.+)$", re.I
+)
 ROOT_LISTS = ("meta_axiom", "meta_principles", "axioms", "interpretations")
 RETIRED_LISTS = ("retired_axioms", "retired_principles")
 GITHUB_CITE = re.compile(
@@ -115,14 +139,43 @@ def collect(ledger):
     anchors = OrderedDict((a["id"], a) for a in ledger.get("anchors", []))
     # Smuggled roots: a root-prefixed id in ANY id-bearing top-level list that is not a
     # root list (anchors, derived_principles, chains, inputs, …) — structural, no carve-out.
+    # Smuggled roots: a root-prefixed id-bearing record ANYWHERE outside the root lists —
+    # top-level lists and nested containers alike (walked recursively). Structural, no carve-out.
     smuggled = OrderedDict()
+
+    def walk(node, where):
+        if isinstance(node, dict):
+            if (
+                is_root_id(node.get("id"))
+                and where.split("[")[0] not in ROOT_LISTS + RETIRED_LISTS
+            ):
+                smuggled.setdefault(node["id"], (where, node))
+            for k, v in node.items():
+                if isinstance(v, (dict, list)):
+                    walk(v, f"{where}.{k}" if where else k)
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                walk(v, f"{where}[{i}]")
+
     for key, val in ledger.items():
-        if key in ROOT_LISTS or key in RETIRED_LISTS or not isinstance(val, list):
+        if key in ROOT_LISTS or key in RETIRED_LISTS:
             continue
-        for rec in val:
-            if isinstance(rec, dict) and is_root_id(rec.get("id")):
-                smuggled[rec["id"]] = (key, rec)
+        walk(val, key)
     return roots, retired, principles, anchors, problems, warnings, smuggled
+
+
+def _non_placeholder(e):
+    if not isinstance(e, str):
+        return False  # array-only<string>: objects/nulls are not a kill yet
+    t = e.strip()
+    return len(t) >= 8 and not _KILL_PLACEHOLDER.fullmatch(t)
+
+
+def kill_present(kc):
+    """cth-implementor's D3 invariant: an open root carries a NON-EMPTY ARRAY of kill entries,
+    one per open question, EVERY entry non-placeholder. A bare string is not the canonical
+    shape (array-only, confluent-trust #102) and does not count."""
+    return isinstance(kc, list) and len(kc) > 0 and all(_non_placeholder(e) for e in kc)
 
 
 def sort_root(rec, anchors):
@@ -131,6 +184,12 @@ def sort_root(rec, anchors):
     missing = [x for x in forced if x not in anchors]
     if missing:
         return None, f"forced_by names ids that do not resolve in-ledger: {missing}"
+    dead = [x for x in forced if anchors[x].get("status") in DEAD_STATUSES]
+    if dead:
+        return None, (
+            f"forced_by names dead anchors (status killed/incoherent/refuted) — a dead anchor "
+            f"forces nothing: {dead}"
+        )
     if any(x.startswith("PROOF-") for x in forced):
         return 1, "forced_by PROOF-* resolves"
     if any(x.startswith("MEAS-") for x in forced):
@@ -139,10 +198,17 @@ def sort_root(rec, anchors):
         return None, f"forced_by names non-PROOF/MEAS ids (not a forcing): {forced}"
     ds = rec.get("decision_state")
     if ds == "ruled":
-        if GITHUB_CITE.search(str(rec.get("ruling", ""))):
-            return 2, "decision_state ruled with a GitHub-cited ruling"
-        return None, "decision_state ruled but `ruling` cites no GitHub issue/PR URL"
-    has_kill = bool(str(rec.get("kill_condition", "")).strip())
+        ruling = rec.get("ruling")
+        if isinstance(ruling, str) and GITHUB_CITE.search(ruling):
+            return (
+                2,
+                "decision_state ruled with a GitHub-cited ruling (structural check only)",
+            )
+        return None, (
+            "decision_state ruled but `ruling` is not a string citing a JamesPagetButler/* "
+            "GitHub issue/PR URL"
+        )
+    has_kill = kill_present(rec.get("kill_condition"))
     is_open = ds == "open" or rec.get("status") == "open"
     if has_kill and is_open:
         return 3, "kill_condition present and open"
@@ -152,7 +218,10 @@ def sort_root(rec, anchors):
             "kill_condition present but neither decision_state nor status is open",
         )
     if is_open:
-        return None, "open but no kill_condition (an open root without a falsifier)"
+        return None, (
+            "open but kill_condition is missing, not a non-empty array, or has a placeholder/"
+            "stub entry (an open root without a real falsifier)"
+        )
     return None, "no forcing (forced_by), no ruling cite, no kill_condition"
 
 
@@ -184,6 +253,8 @@ def is_terminal(node, roots, anchors):
     a = anchors.get(node)
     if a is None:
         return False
+    if a.get("status") in DEAD_STATUSES:
+        return False  # a killed / incoherent / refuted anchor grounds nothing
     return node.startswith(TERMINAL_ANCHOR_PREFIXES) or a.get("provenance") == "E"
 
 
@@ -269,7 +340,21 @@ def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
     unresolved_by_id = OrderedDict()  # missing id -> [owners]
     dangling_by_owner = OrderedDict()  # owner -> [paths]
     cycles_by_owner = OrderedDict()
-    gated_owner = lambda o: o in principles or o.startswith(GATED_CHAIN_PREFIXES)
+
+    def gated_owner(o):
+        # termination obligation = the ledger says it is a derived claim: by id prefix OR by
+        # its declared provenance_kind (never by volume — PATTERN-02)
+        if o in anchors and anchors[o].get("status") in DEAD_STATUSES:
+            return False  # a killed / incoherent / refuted claim has no live derivation obligation
+        return (
+            o in principles
+            or o.startswith(GATED_CHAIN_PREFIXES)
+            or (
+                o in anchors
+                and anchors[o].get("provenance_kind") in GATED_PROVENANCE_KINDS
+            )
+        )
+
     owners = [(pid, _as_list(p.get("derived_from"))) for pid, p in principles.items()]
     owners += [(aid, _as_list(a.get("prediction_chain"))) for aid, a in anchors.items()]
     for owner, chain in owners:
@@ -333,6 +418,20 @@ def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
 def write_report(res, path, ledger_path, register_path):
     L = ["# Root audit report (issue #654 D6)", ""]
     L.append(f"Ledger: `{ledger_path}` — register: `{register_path}`")
+    L += [
+        "",
+        "## Scope of the root population",
+        "",
+        f"Roots are the id-bearing records of the root lists {list(ROOT_LISTS)} (plus any "
+        "root-prefixed id found elsewhere, reported as smuggled). A ledger may carry roots the "
+        "programme names but has not yet encoded as records — e.g. the #654 D6 expectation of "
+        "six roots (AXIOM-1, POST-hosting, the rule, META-2, the crystal definition, the "
+        "state-space identification) against the three records below: POST-hosting and META-2 "
+        "are not encoded until the #652 encode lands; the rule (#635), the crystal definition and "
+        "the state-space identification live inside other records under non-root prefixes and "
+        "are outside this gate's reach until encoded as roots. The gate audits what is written, "
+        "and says so.",
+    ]
     L += ["", "## Roots (whole population of the root lists)", ""]
     L.append("| Root | lives in | bucket | reason | register issue |")
     L.append("|---|---|---|---|---|")

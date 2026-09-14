@@ -13,6 +13,13 @@ scratch importer under `run-bounded 10G 400 lake env lean`; all 202 ⊆ {propext
 Classical.choice, Quot.sound}; every proof_file is source-hole-free. See the #619 report.
 """
 
+import sys as _sys  # noqa: E402
+
+_sys.exit(
+    "ARCHIVED ONE-SHOT ENCODER (scripts/applied-encoders/, #654 D7): already applied to the "
+    "ledger once; do not re-run. New encoders write through scripts/cth_ledger_edit.py."
+)
+
 import json, os
 
 ROOT = "/home/prime/Documents/QBP/.claude/worktrees/agent-a8618428d18c8f79d"

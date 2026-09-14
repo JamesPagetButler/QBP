@@ -37,7 +37,9 @@ def _ledger():
                 "name": "p",
                 "statement": "s",
                 "derivable": False,
-                "kill_condition": "if X then dead",
+                "kill_condition": [
+                    "if the omega-limit map of the proven flow is non-injective then dead"
+                ],
                 "decision_state": "open",
             },
             {
@@ -104,7 +106,12 @@ def test_register_is_the_only_escape_and_is_shrink_only():
     }
     assert not _run(L, open_roots=reg)["failures"]
     # a registered root that now sorts → stale entry → HARD FAIL (register only shrinks)
-    L["axioms"][0].update({"kill_condition": "k", "decision_state": "open"})
+    L["axioms"][0].update(
+        {
+            "kill_condition": ["a real kill entry of sufficient length"],
+            "decision_state": "open",
+        }
+    )
     f = _run(L, open_roots=reg)["failures"]
     assert any(x.startswith("STALE REGISTER open_roots AXIOM-1") for x in f)
     # an entry for a root that does not exist is stale too
@@ -125,7 +132,7 @@ def test_ruled_root_needs_a_github_cite():
     L = _ledger()
     L["axioms"][2]["ruling"] = "the beekeeper said so"
     f = _run(L)["failures"]
-    assert any("POST-ruled" in x and "cites no GitHub" in x for x in f)
+    assert any("POST-ruled" in x and "not a string citing" in x for x in f)
 
 
 def test_forced_by_must_resolve_and_be_proof_or_meas():
@@ -167,7 +174,9 @@ def test_smuggled_root_in_anchors_fails_without_carveout():
 def test_ruling_cite_must_be_a_federation_repo():
     L = _ledger()
     L["axioms"][2]["ruling"] = "https://github.com/someone-else/repo/issues/1"
-    assert any("POST-ruled" in x and "cites no" in x for x in _run(L)["failures"])
+    assert any(
+        "POST-ruled" in x and "not a string citing" in x for x in _run(L)["failures"]
+    )
 
 
 def test_chain_resolution_gated_for_every_owner():
@@ -210,8 +219,16 @@ def test_terminal_owner_with_empty_chain_is_not_dangling():
 
 
 def test_no_baseline_file_exists():
-    for name in os.listdir(os.path.join(ROOT, "analysis")):
-        assert "root-audit" not in name and "root_audit" not in name
+    """Whole-tree walk: no file anywhere in the repo names a root-audit baseline."""
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        dirnames[:] = [
+            d for d in dirnames if d not in (".git", ".lake", "node_modules", ".claude")
+        ]
+        for name in filenames:
+            low = name.lower()
+            assert not (
+                ("root-audit" in low or "root_audit" in low) and "baseline" in low
+            ), name
 
 
 def test_live_ledger_passes_with_committed_register():
@@ -221,3 +238,77 @@ def test_live_ledger_passes_with_committed_register():
     assert _run(L, o, c)["failures"] == []
     for e in list(o.values()) + list(c.values()):
         assert e["issue"].startswith("https://github.com/JamesPagetButler/QBP/issues/")
+
+
+def test_kill_condition_must_be_a_non_placeholder_array():
+    """qbp-implementor (live-test 1330): array-only; every entry real prose. Plants all fail."""
+    for bad in (
+        [],
+        [""],
+        ["TODO"],
+        ["N/A"],
+        "a plain string that is long enough",
+        ["real enough kill", ""],
+        None,
+    ):
+        L = _ledger()
+        L["axioms"][1]["kill_condition"] = bad
+        b, why = ra.sort_root(L["axioms"][1], {a["id"]: a for a in L["anchors"]})
+        assert b is None, (bad, why)
+    L = _ledger()
+    L["axioms"][1]["kill_condition"] = [
+        "information loss under the omega-limit of a proven flow through the zero-divisor locus",
+        "selection-clause scope: discharged at #652 DERIV-encoding-level",
+    ]
+    assert ra.sort_root(L["axioms"][1], {a["id"]: a for a in L["anchors"]})[0] == 3
+
+
+def test_dead_anchors_ground_and_force_nothing():
+    L = _ledger()
+    L["anchors"][0]["status"] = "killed"  # PROOF-x
+    f = _run(L)["failures"]
+    assert any("POST-forced" in x and "dead anchors" in x for x in f)
+    # a DERIV chain terminating only in a killed PROOF is dangling
+    L = _ledger()
+    L["anchors"][0]["status"] = "incoherent"
+    L["anchors"].append(_anchor("DERIV-via-dead", ["PROOF-x"]))
+    f = _run(L)["failures"]
+    assert any(x.startswith("CHAIN DANGLING DERIV-via-dead") for x in f)
+    # an experimental anchor that is refuted is not a terminator either
+    L = _ledger()
+    L["anchors"][2]["status"] = "refuted"  # OBS-z (provenance E)
+    L["anchors"].append(_anchor("PRED-via-refuted", ["OBS-z"]))
+    assert any(
+        x.startswith("CHAIN DANGLING PRED-via-refuted") for x in _run(L)["failures"]
+    )
+
+
+def test_ruling_must_be_a_string_with_the_cite():
+    L = _ledger()
+    L["axioms"][2]["ruling"] = {
+        "url": "https://github.com/JamesPagetButler/QBP/issues/1",
+        "note": "withdrawn",
+    }
+    assert any("POST-ruled" in x and "not a string" in x for x in _run(L)["failures"])
+
+
+def test_provenance_kind_gates_termination_not_prefix():
+    L = _ledger()
+    a = _anchor("INSIGHT-derived-claim", [])
+    a["provenance_kind"] = "derivation"
+    L["anchors"].append(a)
+    f = _run(L)["failures"]
+    assert any(x.startswith("CHAIN DANGLING INSIGHT-derived-claim") for x in f)
+    b = _anchor("COMP-calc", [])
+    b["provenance_kind"] = "internal-compute"
+    L["anchors"].append(b)
+    assert any(x.startswith("CHAIN DANGLING COMP-calc") for x in _run(L)["failures"])
+
+
+def test_smuggled_root_scan_is_recursive():
+    L = _ledger()
+    L["chains"] = [
+        {"id": "CHAIN-x", "steps": [{"id": "POST-nested", "note": "hidden"}]}
+    ]
+    f = _run(L)["failures"]
+    assert any(x.startswith("SMUGGLED ROOT POST-nested") and "chains" in x for x in f)
