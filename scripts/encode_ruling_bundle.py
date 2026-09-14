@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Encode the ruling bundle (PR #652) into the CTH ledger — ONE constitutional PR, shape A.
 
-RUNS ONLY AFTER THE BEEKEEPER RULES Decisions 0–5 on PR #652. Parameters below carry the rulings;
+RUNS ONLY AFTER PR #652 (v0.6) HAS MERGED — the merge is a process acceptance of the sort, not a ruling; nothing here is ruled Decisions 0–5 on PR #652. Parameters below carry the rulings;
 the script refuses to run while MERGED_652 is False (the #652 merge is a process acceptance of the v0.4 sort, not a ruling). Idempotent (guards on DERIV-encoding-level's presence).
 
 What it applies (package v0.6 §3 + ruling page v0.2 §2–§5), all previously drafted texts:
@@ -17,7 +17,7 @@ What it applies (package v0.6 §3 + ruling page v0.2 §2–§5), all previously 
   D1  READING selects the INTERP text and the DERIV-sedenion first clause.
   D3  the three names are used in every new text.
   re-pointing of the 14 AXIOM-2-citing anchors and the 7 "Axioms ->" chains' source_ids.
-Usage: python3 scripts/encode_ruling_bundle.py    (edit RULED / READING / RULING_URLS first)
+Usage: python3 scripts/encode_ruling_bundle.py    (edit MERGED_652 / ENCODE_DATE / PAGE_URL / READING first)
 """
 
 import json
@@ -40,7 +40,7 @@ ENCODE_DATE = "<date PR #652 merged>"
 PAGE_URL = (
     "<URL of docs/foundations/ruling-bundle-2026-09-10.md at the #652 merge commit>"
 )
-# ----------------------------------------------------------------------------- texts (drafted, PR #652 v0.2)
+# ----------------------------------------------------------------------------- texts (drafted PR #652 v0.2; sorted per v0.6 — every root open with a kill list)
 
 META2 = {
     "id": "META-2",
