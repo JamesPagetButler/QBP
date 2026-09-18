@@ -11,6 +11,13 @@ claimed (needs an orthonormal pair inside an arbitrary associative subalgebra â‡
 architecture ruling 2026-09-07: its own foundational PR when needed). Usage: python3 scripts/encode_holographic_anchors.py
 """
 
+import sys as _sys  # noqa: E402
+
+_sys.exit(
+    "ARCHIVED ONE-SHOT ENCODER (scripts/applied-encoders/, #654 D7): already applied to the "
+    "ledger once; do not re-run. New encoders write through scripts/cth_ledger_edit.py."
+)
+
 import json
 import os
 import sys
