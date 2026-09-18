@@ -11,7 +11,7 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 | Root | lives in | bucket | reason | register issue |
 |---|---|---|---|---|
 | META-1 | meta_axiom | UNSORTED | no forcing (forced_by), no ruling cite, no kill_condition | https://github.com/JamesPagetButler/QBP/issues/655 |
-| AXIOM-1 | axioms | UNSORTED | no forcing (forced_by), no ruling cite, no kill_condition | https://github.com/JamesPagetButler/QBP/issues/647 |
+| AXIOM-1 | axioms | bucket-3 OPEN | kill_condition present and open |  |
 | AXIOM-2 | axioms | UNSORTED | no forcing (forced_by), no ruling cite, no kill_condition | https://github.com/JamesPagetButler/QBP/issues/473 |
 
 ## Counts
@@ -20,8 +20,8 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 |---|---|
 | bucket-1 PROVED | 0 |
 | bucket-2 FORCED | 0 |
-| bucket-3 OPEN | 0 |
-| UNSORTED (registered or failing) | 3 |
+| bucket-3 OPEN | 1 |
+| UNSORTED (registered or failing) | 2 |
 | bucket-4 RETIRED | 0 |
 
 ## Chains: 10 principles + 290 anchors; 300 chain owners walked
