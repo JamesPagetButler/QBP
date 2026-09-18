@@ -1,6 +1,6 @@
 {
   "register_version": "1.0",
-  "description": "Issue #654 D1/D2 — shrink-only, issue-linked register for the root GATE and chain-to-root audit (scripts/root_audit.py). Enumerated by the audit's first run (2026-09-11, ledger v5.4.0): 3 roots sorting into no four-bucket exit + 2 smuggled roots (open_roots); 16 chain ids cited but never encoded + 18 derived chains (principles / DERIV-* / PRED-*) that do not terminate (chain_debt); 2026-09-14 (#658 review fixes): +11 ledger-declared derived claims (provenance_kind derivation / internal-compute) under non-DERIV/PRED prefixes; round-2 fix +4 chains whose only ground is a dead (killed/incoherent/refuted/falsified) anchor — PROOF-fano — surfaced once the walker stopped recursing through dead anchors. Every entry is a burn-down item on the clock with a tracking issue, not an allowlist. 2026-09-18 (PR #659 rebased onto #658): AXIOM-1 entry REMOVED — it now sorts into bucket-3 OPEN (decision_state open + a two-entry kill_condition list; trigger #647), the merge-order handoff both PRs declared.",
+  "description": "Issue #654 D1/D2 — shrink-only, issue-linked register for the root GATE and chain-to-root audit (scripts/root_audit.py). Enumerated by the audit's first run (2026-09-11, ledger v5.4.0): 3 roots sorting into no four-bucket exit + 2 smuggled roots (open_roots); 16 chain ids cited but never encoded + 18 derived chains (principles / DERIV-* / PRED-*) that do not terminate (chain_debt); 2026-09-14 (#658 review fixes): +11 ledger-declared derived claims (provenance_kind derivation / internal-compute) under non-DERIV/PRED prefixes; round-2 fix +4 chains whose only ground is a dead (killed/incoherent/refuted/falsified) anchor — PROOF-fano — surfaced once the walker stopped recursing through dead anchors. Every entry is a burn-down item on the clock with a tracking issue, not an allowlist. 2026-09-18 (PR #659 rebased onto #658): AXIOM-1 entry REMOVED — it now sorts into bucket-3 OPEN (decision_state open + a two-entry kill_condition list; trigger #647), the merge-order handoff both PRs declared. 2026-09-18 (encode PR, ruling bundle v0.7 applied): AXIOM-2 entry REMOVED — AXIOM-2 is re-rooted into retired_axioms (its content now POST-boundary-encoding + META-2 + DERIV-encoding-level); the six new roots (META-2, POST-boundary-encoding, POST-hosting, POST-observer-associativity, POST-observation, INTERP-holographic-boundary) all sort into bucket-3 OPEN with kill lists — no register entry needed.",
   "policy": "SHRINK-ONLY. root_audit.py HARD-FAILS if: (1) any root sorts into no bucket, or any root-prefixed id lives outside the root lists, and is NOT listed in open_roots (a NEW unforced root — blocked: you cannot add a root without forcing it, killing it, or filing its issue); (2) any chain id fails to resolve, or any derived chain fails to terminate, and is NOT listed in chain_debt; (3) any listed entry is now fixed (the root sorts, the id resolves, the chain terminates) — remove the stale entry. Adding an entry is a visible, reviewed commit to this file with a tracking issue — NEVER a CI-driven or reflexive green-making step. GROWTH IS A REVIEW GATE, NOT A MACHINE GATE: the script cannot tell a new entry from an old one, so a same-commit root+entry passes the machine and is caught by the human reviewer (the register diff is in the PR); the machine enforces shrink-only staleness, resolution and issue-linking (the silent baseline raise is what defeated the FAULT-S4-005 ratchet; PATTERN-02). Entries carry no counts and no baseline: the population is itemised.",
   "open_roots": [
     {
@@ -8,14 +8,6 @@
       "lives_in": "meta_axiom",
       "issue": "https://github.com/JamesPagetButler/QBP/issues/655",
       "reason": "epistemic meta-principle; no forcing, no kill_condition — classify (root / reclassify / kill)",
-      "added": "2026-09-11",
-      "added_by": "#654 D6 first run"
-    },
-    {
-      "id": "AXIOM-2",
-      "lives_in": "axioms",
-      "issue": "https://github.com/JamesPagetButler/QBP/issues/473",
-      "reason": "to be RETIRED by the AXIOM-2 encode PR (derivable as a level statement: DERIV-encoding-level; #648 v0.6) — entry becomes stale and is removed there",
       "added": "2026-09-11",
       "added_by": "#654 D6 first run"
     },

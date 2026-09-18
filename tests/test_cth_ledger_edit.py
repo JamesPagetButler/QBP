@@ -235,3 +235,22 @@ def test_order_sentinels_cannot_be_declared(tmp_path):
     with pytest.raises(cle.ConfinementError, match="cannot be declared"):
         with cle.ledger_edit(p) as e:
             e.touch("anchors", "<record order>")
+
+
+def test_declared_new_top_level_key_is_not_a_reorder(tmp_path):
+    """A new top-level record list (e.g. retired_axioms) appended and declared is an addition,
+    not a key reorder (found by the AXIOM-2 encode PR against the #658 order check)."""
+    p = _mini(tmp_path)
+    with cle.ledger_edit(p) as e:
+        e.ledger["retired_axioms"] = [{"id": "AXIOM-9", "statement": "s"}]
+        e.touch("retired_axioms", "AXIOM-9")
+    L = json.load(open(p))
+    assert L["retired_axioms"][0]["id"] == "AXIOM-9"
+    assert list(L.keys())[:-1] == [
+        "programme",
+        "meta_axiom",
+        "axioms",
+        "anchors",
+        "changelog",
+        "last_updated",
+    ]

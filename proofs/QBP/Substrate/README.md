@@ -22,8 +22,7 @@ Aggregator: `QBP/Substrate.lean` (imported from `QBP.lean`).
   carries a `#print axioms` line and must show a subset of
   `{propext, Classical.choice, Quot.sound}` (`decide`-based lemmas show fewer).
 * `Hosting.lean` derives **no** measure, **no** rule/flow, **no** boundary or
-  holography semantics, and does **not** identify the crystal's ℍ with "the
-  observer's ℍ" (DERIV-holographic flag 3 pending). See its §11 for the full
+  holography semantics, and identifies the crystal's ℍ with the observer's ℍ only as a postulate (identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — as ruled with the flag-3 split (POST-observer-associativity; beekeeper 2026-09-18, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); exclusivity remains the postulate's content). See its §11 for the full
   not-in-this-file list with issue owners (#635, #636, #637, #639).
 * The condensed/locale substrate mathematics remains napkin-level and is still
   gated; nothing here authorises new files beyond the lift above.

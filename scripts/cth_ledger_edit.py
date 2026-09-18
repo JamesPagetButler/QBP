@@ -142,7 +142,10 @@ class LedgerEdit:
         # be identical up to declared appends/removals; any reordering is an undeclared change
         # of the whole key (PR #658 Red Team: a reversed anchors[] wrote a 17k-line diff that
         # the per-record comparison reported as confined).
-        if list(self._before.keys()) != list(self.ledger.keys()):
+        # only the KEPT keys' relative order is content; a declared new key (appended) is an
+        # addition, not a reorder — same rule as the per-list id sequence below
+        b_keys, a_keys = list(self._before.keys()), list(self.ledger.keys())
+        if [k for k in b_keys if k in a_keys] != [k for k in a_keys if k in b_keys]:
             changed.add(("<top-level key order>", None))
         for k in set(b_recs) & set(a_recs):
             b_ids, a_ids = list(b_recs[k]), list(a_recs[k])

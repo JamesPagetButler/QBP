@@ -80,9 +80,7 @@ The theorems below say **exactly** that a vacuum of the δ-landscape generates a
 quaternion subalgebra of 𝕊, that this assignment is natural under algebra
 automorphisms, and that the local `−L_s²` spectrum is degenerate there.  They do
 **NOT** claim, and must not be cited as claiming, that this quaternion algebra
-"is the observer's ℍ" or carries any DERIV-holographic reading — that
-interpretation is pending the beekeeper's ruling on ledger flag 3 and is
-deliberately absent from every statement here.  No energy, crystallisation or
+"is the observer's ℍ" as a theorem — that identification is identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — as ruled with the flag-3 split (POST-observer-associativity; beekeeper 2026-09-18, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); exclusivity remains the postulate's content, and is deliberately absent from every statement here.  No energy, crystallisation or
 spacetime semantics appears in any type or theorem statement (layer rule,
 `docs/foundations/layer-architecture.md`).
 
@@ -619,9 +617,7 @@ theorem quatSpan_eq_cd_double (hu0 : u.coord 0 = 0) {x : CDAlg ℝ 4} :
     the statement that the crystal *hosts a copy of ℍ*.
 
     **Interpretation guardrail:** this says only that the generated subalgebra is
-    a quaternion algebra.  No identification of it with "the observer's ℍ", and
-    no DERIV-holographic reading, is claimed here (pending the beekeeper's ruling
-    on ledger flag 3). -/
+    a quaternion algebra.  The identification with the observer's ℍ is identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — as ruled with the flag-3 split (POST-observer-associativity; beekeeper 2026-09-18, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); exclusivity remains the postulate's content; no theorem here claims it. -/
 theorem vacuum_hosts_quaternion {s : CDAlg ℝ 4} (hv : IsVacuum s) :
     ∃ (u : CDAlg ℝ 3) (α γ b₀ : ℝ),
       u.coord 0 = 0 ∧ (N u = 1 ∨ u = 0) ∧

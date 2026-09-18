@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "5.7.1",
+  "version": "6.0.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -21,29 +21,75 @@
       "decision_state": "open"
     },
     {
-      "id": "AXIOM-2",
-      "name": "The encoding is maximal",
-      "statement": "The boundary encoding uses the largest normed division algebra: octonions (dim 8).",
-      "derivable": false
+      "id": "POST-boundary-encoding",
+      "name": "A boundary encoding exists",
+      "statement": "Each universe has an encoding octonion — a boundary encoding exists. (AXIOM-2's existential clause, kept as a root: 'THE boundary encoding uses ...'.) Which octonion encodes a universe is a separate open question (INTERP-holographic-boundary); where the encoding sits in the Cayley–Dickson tower is DERIV-encoding-level.",
+      "kind": "physical postulate",
+      "derivable": false,
+      "decision_state": "open",
+      "kill_condition": [
+        "An observable requiring information not representable in any octonionic encoding, or the encoding map shown not to exist — none on record. This kill CANNOT FIRE today; recorded OPEN, not as a pass (ruling bundle v0.5 §5, PR #652 v0.4 Red Team V4)."
+      ],
+      "anchors": [
+        "PROOF-quaternion-frame-maximal",
+        "PROOF-hosted-algebra-meets-cell-in-complex-line"
+      ]
+    },
+    {
+      "id": "POST-hosting",
+      "name": "Non-crystal states are physically realised",
+      "statement": "The state sphere at the substrate level carries an in-flight region V > 0 of positive measure, and almost every history starts in it. Kill (theory-internal only): a substrate level at which V ≡ 0 — the level bound failing; no observable (observers live in crystals; FLAG-seam-dynamics-open) — recorded as such, not as a pass. Convergence to a crystal is the rule's claim (#635), separate.",
+      "kind": "physical postulate",
+      "kill_condition": [
+        "A substrate level at which V ≡ 0 — the level bound failing. Theory-internal: this kill is the negation of the postulate and no observable reaches it (observers live in crystals; FLAG-seam-dynamics-open is incoherent) — it CANNOT FIRE today, recorded as such, not as a pass (package §9c; ruling bundle v0.4 §5)."
+      ],
+      "decision_state": "open",
+      "derivable": false,
+      "anchors": [
+        "PROOF-substrate-hosting-definition",
+        "PROOF-delta-landscape-descent"
+      ]
+    },
+    {
+      "id": "POST-observer-associativity",
+      "name": "Observers require associativity",
+      "statement": "An observer is a subset of 𝕊 on which its actions compose; by the composition theorem such a subset is associative, and — if it lies inside an octonion — inside one ℍ by frame-maximality (in 𝕊 at large this is open). Under the hosting definition the observer's ℍ is the crystal's ℍ_s (definition D; premise P1′: observers are entities of clause (a)). Exclusivity — no observer lives outside the hosted algebra — is the postulate's content.",
+      "kind": "physical postulate",
+      "kill_condition": [
+        "An observer exhibited outside any associative subalgebra of S (exclusivity failing), or a non-associative subset of S on which actions compose (contradicting PROOF-associative-composition-iff's premise set). Discharge: none — a postulate about all observers; recorded OPEN (ruling bundle v0.4 §2)."
+      ],
+      "decision_state": "open",
+      "derivable": false,
+      "anchors": [
+        "PROOF-associative-composition-iff",
+        "PROOF-quaternion-frame-maximal",
+        "PROOF-crystal-hosts-quaternion"
+      ]
+    },
+    {
+      "id": "POST-observation",
+      "name": "Observation is bounded by the encoding",
+      "statement": "(O⊆) What an observer can access is contained in what is encoded in its encoding octonion. (E) The electromagnetic ℂ of DERIV-observation is the ℂ selected by that encoding. Under P2′ (E) has content: the selected ℂ is ℂ_u = ℍ_s ∩ (the encoding half); under P2 no ℂ is selected geometrically and DERIV-observation's ℂ is EM's own; the reading is open (INTERP-holographic-boundary).",
+      "kind": "physical postulate",
+      "kill_condition": [
+        "(O⊆) An observable that requires access to information not encoded in the observer's encoding octonion. Recorded OPEN.",
+        "(E) An electromagnetic C shown distinct from the encoding-selected C. Has content only under P2' (where a C is selected); empty under P2 — so this entry is OPEN exactly as INTERP-holographic-boundary's P2/P2' pair is, and cannot fire before that pair is decided (ruling bundle v0.4 §2)."
+      ],
+      "decision_state": "open",
+      "derivable": false,
+      "anchors": [
+        "PROOF-hosted-algebra-meets-cell-in-complex-line"
+      ]
     }
   ],
   "derived_principles": [
-    {
-      "id": "DERIV-holographic",
-      "name": "Holographic principle",
-      "statement": "Observers require associativity. The largest associative subalgebra of O is H (dim 4). The 4D gap is the holographic boundary.",
-      "derived_from": [
-        "AXIOM-1",
-        "AXIOM-2"
-      ],
-      "layer": 1
-    },
     {
       "id": "DERIV-observation",
       "name": "Observation is C-projected",
       "statement": "Electromagnetic observation accesses the C subalgebra of H. Measurement projects H -> C -> R.",
       "derived_from": [
-        "DERIV-holographic"
+        "POST-observation",
+        "DERIV-holographic-theorem"
       ],
       "layer": 1
     },
@@ -53,7 +99,8 @@
       "statement": "Information preservation + lossy projection implies irreversibility in the bulk. Gamma counter is monotonic.",
       "derived_from": [
         "AXIOM-1",
-        "DERIV-holographic"
+        "POST-observer-associativity",
+        "INTERP-holographic-boundary"
       ],
       "layer": 1
     },
@@ -62,21 +109,23 @@
       "name": "3+1 dimensions",
       "statement": "Quaternion structure: 1 scalar (time) + 3 vector (space) components.",
       "derived_from": [
-        "AXIOM-2",
-        "DERIV-holographic"
+        "POST-observer-associativity",
+        "DERIV-holographic-theorem"
       ],
       "layer": 1
     },
     {
       "id": "DERIV-sedenion",
       "name": "Sedenion inter-cell topology",
-      "statement": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: on the zero-divisor locus, left multiplication L_a has a non-trivial kernel (42 basis-sum witnesses, PROOF-42zd).",
+      "statement": "𝕊 = 𝕆 ⊕ 𝕆ℓ: the substrate decomposes as two copies of an octonion (which copy encodes a universe is open — INTERP-holographic-boundary). Zero divisors provide flexible topology: on the zero-divisor locus, left multiplication L_a has a non-trivial kernel (42 basis-sum witnesses, PROOF-42zd).",
       "derived_from": [
-        "AXIOM-2"
+        "DERIV-substrate-level",
+        "DERIV-encoding-level"
       ],
       "layer": 1,
       "superseded_statement": "Inter-cell boundary structure is S (sedenion, dim 16). Zero divisors provide flexible topology: seams where information CAN be destroyed.",
-      "ruling": "Record (2026-09-13, four-bucket re-audit, #654/#647/#659). PROVED — the algebraic clause: left multiplication by a zero divisor has a non-trivial kernel (PROOF-42zd; bridge prodIsZero_iff_cdAlg_mul_eq_zero, Breakdown.lean; count zero_divisor_count_42, Sedenion.lean). OPEN (scope) — the range of AXIOM-1's selection clause: AXIOM-2's statement applies the selection at the boundary encoding but does not state that the clause ranges over the encoding only; the ledger admits both readings (encoding-only: this entry's substrate sedenions are the ledger's own content; unrestricted: PROOF-42zd contradicts the clause and option A is due); no discharge by derivation — a rule anchor that states the range (e.g. #652's DERIV-encoding-level) stipulates it and is itself conditional on this question; the range changes only if the kill fires; recorded OPEN (AXIOM-1.kill_condition question 2). OPEN (process) — whether the kernel clause conflicts with AXIOM-1's process sentence: a kernel is a map, and no proven process through the zero-divisor locus exists (Prop 16 layer (i) and the invariant-subspace half of layer (ii) are in Lean, NoAutonomousDynamics.lean; the shape-invariant half of (ii) and layer (iii) are numerical; FLAG-seam-dynamics-open is an incoherent placeholder), so no contradiction is derivable today — candidate assertions are on record, none proven — OPEN under AXIOM-1.kill_condition question 1, trigger #647, derived at trigger time, never ruled. WRONG (superseded record): 'AXIOM-1 option B — ruled by the beekeeper 2026-09-09 (PR #648 package v0.5 §3), applied on direction 2026-09-10 (PR #651)' — an item that was proved plus open was put to the beekeeper as a choice; option A (rescope AXIOM-1's process sentence) was an unforced axiom edit, option B the non-choice. The beekeeper's line 'I choose option B.' (https://github.com/JamesPagetButler/QBP/issues/647#issuecomment-5639808463, 2026-09-11) post-dates the applied rewording (PR #651, 2026-09-10) and is read as ratification of process only, not as the physical reason — a reading PENDING the beekeeper's own confirmation (asked on PR #659), not asserted as his. Retiring 'seams where information CAN be destroyed' stands: it asserted a loss with no proven process to carry it."
+      "ruling": "Record (2026-09-13, four-bucket re-audit, #654/#647/#659). PROVED — the algebraic clause: left multiplication by a zero divisor has a non-trivial kernel (PROOF-42zd; bridge prodIsZero_iff_cdAlg_mul_eq_zero, Breakdown.lean; count zero_divisor_count_42, Sedenion.lean). OPEN (scope) — the range of AXIOM-1's selection clause: AXIOM-2's statement applies the selection at the boundary encoding but does not state that the clause ranges over the encoding only; the ledger admits both readings (encoding-only: this entry's substrate sedenions are the ledger's own content; unrestricted: PROOF-42zd contradicts the clause and option A is due); no discharge by derivation — a rule anchor that states the range (e.g. #652's DERIV-encoding-level) stipulates it and is itself conditional on this question; the range changes only if the kill fires; recorded OPEN (AXIOM-1.kill_condition question 2). OPEN (process) — whether the kernel clause conflicts with AXIOM-1's process sentence: a kernel is a map, and no proven process through the zero-divisor locus exists (Prop 16 layer (i) and the invariant-subspace half of layer (ii) are in Lean, NoAutonomousDynamics.lean; the shape-invariant half of (ii) and layer (iii) are numerical; FLAG-seam-dynamics-open is an incoherent placeholder), so no contradiction is derivable today — candidate assertions are on record, none proven — OPEN under AXIOM-1.kill_condition question 1, trigger #647, derived at trigger time, never ruled. WRONG (superseded record): 'AXIOM-1 option B — ruled by the beekeeper 2026-09-09 (PR #648 package v0.5 §3), applied on direction 2026-09-10 (PR #651)' — an item that was proved plus open was put to the beekeeper as a choice; option A (rescope AXIOM-1's process sentence) was an unforced axiom edit, option B the non-choice. The beekeeper's line 'I choose option B.' (https://github.com/JamesPagetButler/QBP/issues/647#issuecomment-5639808463, 2026-09-11) post-dates the applied rewording (PR #651, 2026-09-10) and is read as ratification of process only, not as the physical reason — a reading PENDING the beekeeper's own confirmation (asked on PR #659), not asserted as his. Retiring 'seams where information CAN be destroyed' stands: it asserted a loss with no proven process to carry it.",
+      "notes": "2026-09-18: derived_from inverted to [DERIV-substrate-level, DERIV-encoding-level] with the AXIOM-2 re-rooting (ruling bundle v0.7 §5, PR #652); first clause neutral (open: which copy encodes a universe is OPEN, INTERP-holographic-boundary). The `ruling` field (the #659 four-bucket record) is untouched."
     },
     {
       "id": "DERIV-born",
@@ -92,7 +141,8 @@
       "name": "hbar, k, c are conversion factors",
       "statement": "Not fundamental constants. hbar = information per Gamma-step. k = information per DOF per Gamma-rate. c = max displacement per Gamma-step.",
       "derived_from": [
-        "DERIV-holographic"
+        "POST-observer-associativity",
+        "INTERP-holographic-boundary"
       ],
       "layer": 1
     },
@@ -102,8 +152,8 @@
       "statement": "The spectral action on A_F = C+H+M3(C) with left-right extension naturally produces G_422 = SU(4)xSU(2)_LxSU(2)_R. Proton decay d=6 and d=5 operators are forbidden by NCG scalar constraints.",
       "derived_from": [
         "AXIOM-1",
-        "AXIOM-2",
-        "DERIV-holographic"
+        "DERIV-encoding-level",
+        "DERIV-holographic-theorem"
       ],
       "layer": 1
     },
@@ -124,10 +174,58 @@
       "statement": "The spectral action gives gravity (f₂), gauge couplings (f₀), and Λ (f₄) as moments of ONE crystallisation profile f(u). 'Time' is not a stage on which crystallisation occurs — it IS the crystallisation. The Γ counter counts crystallisation steps. Constants converge at different rates: c,ℏ (from algebra) fastest; f₀ (gauge couplings) medium; f₄ (cosmological constant) slowest. No constant is exactly frozen — the crystallisation is asymptotic, never terminating. Consistent with AXIOM-1 ('everything changes'). The hierarchy of convergence rates explains why Λ (the least-converged moment) is the most puzzling observable.",
       "derived_from": [
         "AXIOM-1",
-        "AXIOM-2",
+        "DERIV-encoding-level",
         "DERIV-constants"
       ],
       "layer": 1
+    },
+    {
+      "id": "DERIV-encoding-level",
+      "name": "The encoding is the last information-preserving level",
+      "statement": "The encoding octonion of a universe sits at the Cayley–Dickson level below the first failure of AXIOM-1's selection: 𝕆 (dim 8) — division, norm composition and alternativity all hold through 𝕆 and all fail at 𝕊. Tower-relative ('largest in the Cayley–Dickson sequence'); the classification 'only four normed division algebras exist' (PROOF-hurwitz) is not used. CONDITIONAL on: META-2 (saturation), POST-boundary-encoding (there is an encoding to place), and the encoding-only reading of AXIOM-1's selection clause — AXIOM-1 kill_condition question 2, OPEN (PR #659): this entry STATES where the selection is exercised and does not derive it, so it is conditional on that question, not its discharge.",
+      "derived_from": [
+        "AXIOM-1",
+        "META-2",
+        "POST-boundary-encoding"
+      ],
+      "layer": 1,
+      "anchors": [
+        "PROOF-ops-division-ladder",
+        "PROOF-ops-norm-composition-ladder",
+        "PROOF-ops-alternativity-ladder",
+        "PROOF-normed-division-tower-existence"
+      ],
+      "supersedes": "AXIOM-2"
+    },
+    {
+      "id": "DERIV-substrate-level",
+      "name": "The substrate is the first level that hosts crystallisation",
+      "statement": "Definition (level-generic): a state s is a crystal iff its left alternator vanishes, assoc s s x = 0 for all x (equivalently L_s² is scalar). At 𝕊 this is equivalent to the Cayley–Dickson components of s commuting, V = ‖[a, b]‖² = 0 — an equivalence that holds at 𝕊 only; the commutator form is the 𝕊-specific computation. Statement: the substrate is the first Cayley–Dickson level at which a non-crystal exists: 𝕊 (dim 16). In every alternative algebra every state is a crystal (dimensions ≤ 8: CDLifting.assoc_diag_left at 𝕆, associativity below); at 𝕊 a non-crystal exists (sedWitX_alternator_ne_zero, inFlight_nonempty).",
+      "derived_from": [
+        "POST-hosting",
+        "META-2"
+      ],
+      "layer": 1,
+      "anchors": [
+        "PROOF-ops-alternativity-ladder",
+        "PROOF-alternator-vanishes-iff-commute",
+        "PROOF-substrate-hosting-definition"
+      ]
+    },
+    {
+      "id": "DERIV-holographic-theorem",
+      "name": "Quaternion frames are the maximal associative subalgebras of 𝕆 (frame-relative); codimension 4",
+      "statement": "Quaternion frames span{1,u,v,uv} are associative subalgebras of 𝕆; no associative subalgebra of 𝕆 properly contains one (frame-relative; the global bound is deferred); the codimension of ℍ in 𝕆 is 4.",
+      "derived_from": [
+        "DERIV-encoding-level"
+      ],
+      "layer": 1,
+      "anchors": [
+        "PROOF-associative-composition-iff",
+        "PROOF-quaternion-frame-maximal",
+        "PROOF-quaternion-frame-codim-four"
+      ],
+      "supersedes": "DERIV-holographic (theorem part)"
     }
   ],
   "anchors": [
@@ -160,7 +258,7 @@
       "id": "PROOF-42zd",
       "proof_language": "lean4",
       "prediction_chain": [
-        "AXIOM-2",
+        "DERIV-encoding-level",
         "DERIV-sedenion"
       ],
       "tier": 1,
@@ -269,7 +367,7 @@
       "id": "PROOF-g2",
       "proof_language": "python_exhaustive",
       "prediction_chain": [
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 1,
       "provenance": "T",
@@ -306,7 +404,7 @@
       "name": "Fano mediator theorem",
       "id": "PROOF-fano",
       "prediction_chain": [
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 1,
       "provenance": "T",
@@ -325,7 +423,7 @@
       "id": "PROOF-cl6",
       "proof_language": "lean4",
       "prediction_chain": [
-        "AXIOM-2",
+        "DERIV-encoding-level",
         "DERIV-observation"
       ],
       "tier": 1,
@@ -366,8 +464,8 @@
       "id": "PROOF-3gen",
       "proof_language": "lean4",
       "prediction_chain": [
-        "AXIOM-2",
-        "DERIV-holographic"
+        "DERIV-encoding-level",
+        "DERIV-holographic-theorem"
       ],
       "tier": 1,
       "provenance": "T",
@@ -466,7 +564,7 @@
       "id": "MEAS-alpha",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2",
+        "DERIV-encoding-level",
         "PROOF-eigenratios",
         "INST-f0"
       ],
@@ -737,7 +835,8 @@
       "id": "PRED-gw-em",
       "prediction_chain": [
         "DERIV-sedenion",
-        "DERIV-holographic"
+        "POST-observer-associativity",
+        "INTERP-holographic-boundary"
       ],
       "tier": 2,
       "provenance": "T",
@@ -880,7 +979,8 @@
       "id": "PRED-revival-exact",
       "prediction_chain": [
         "PROOF-born",
-        "DERIV-holographic"
+        "POST-observer-associativity",
+        "INTERP-holographic-boundary"
       ],
       "tier": 2,
       "provenance": "T",
@@ -993,7 +1093,7 @@
       "id": "PROOF-quat-closure",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 1,
       "provenance": "T",
@@ -1129,7 +1229,7 @@
       "id": "OBS-tenfold-division",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2",
+        "DERIV-encoding-level",
         "PROOF-quat-closure"
       ],
       "tier": 2,
@@ -1288,7 +1388,7 @@
       "id": "PROOF-majorana-charge",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 1,
       "provenance": "T",
@@ -1399,7 +1499,7 @@
       "id": "PRED-no-dm-particle",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 3,
       "provenance": "T",
@@ -1419,7 +1519,7 @@
       "id": "FLAG-inflation",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 3,
       "provenance": "T",
@@ -1440,7 +1540,7 @@
       "id": "OBS-desi-4thirds",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 3,
       "provenance": "P",
@@ -1806,7 +1906,7 @@
       "id": "PROOF-stelle-no-linear",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 1,
       "provenance": "P",
@@ -2796,7 +2896,7 @@
       "id": "KILLED-f4-info-theoretic-justification",
       "prediction_chain": [
         "AXIOM-1",
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "tier": 3,
       "provenance": "T",
@@ -4105,7 +4205,7 @@
       ],
       "converges_with": [
         "DERIV-sedenion",
-        "DERIV-holographic",
+        "INTERP-holographic-boundary",
         "CONJ-fu-from-hawking-time-reverse",
         "WISDOM-001-stability-as-alignment",
         "WISDOM-003-there-is-only-f-u",
@@ -4134,7 +4234,7 @@
         "AXIOM-1",
         "CONV-spectral-entropy-zeta",
         "CONV-cd-tower-in-zeta-moments",
-        "DERIV-holographic",
+        "INTERP-holographic-boundary",
         "DERIV-sedenion",
         "WISDOM-001-stability-as-alignment",
         "WISDOM-003-there-is-only-f-u"
@@ -8439,7 +8539,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "DERIV-holographic, theorem part 1 (flag 3). lMul_comp_eq_iff_assoc_forall: for A ⊆ CDAlg R n, (∀ x y ∈ A, L_x ∘ L_y = L_{x·y} as linear maps) ⇔ (∀ x y ∈ A, ∀ z, assoc x y z = 0); lMul_comp_eq_iff_assoc_mem: the version restricted to z ∈ A; lMul_comp_of_forall: the one-way bridge. Non-vacuity: lMul_comp_fails_on_octonions (the law fails on all of 𝕆) and lMul_comp_on_quaternion_frame (it holds on a quaternion frame). This is the theorem-shaped content of the POSTULATE 'observers require associativity' (measurements compose as multiplication only in associative substructures); the postulate itself is NOT proved and NOT claimed.",
+      "description": "DERIV-holographic-theorem (was DERIV-holographic), part 1 (flag 3). lMul_comp_eq_iff_assoc_forall: for A ⊆ CDAlg R n, (∀ x y ∈ A, L_x ∘ L_y = L_{x·y} as linear maps) ⇔ (∀ x y ∈ A, ∀ z, assoc x y z = 0); lMul_comp_eq_iff_assoc_mem: the version restricted to z ∈ A; lMul_comp_of_forall: the one-way bridge. Non-vacuity: lMul_comp_fails_on_octonions (the law fails on all of 𝕆) and lMul_comp_on_quaternion_frame (it holds on a quaternion frame). This is the theorem-shaped content of the POSTULATE 'observers require associativity' (measurements compose as multiplication only in associative substructures); the postulate itself is NOT proved and NOT claimed.",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -8506,7 +8606,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "DERIV-holographic, theorem part 2 (flag 3): 'the largest associative subalgebra of 𝕆 is ℍ', frame-relative. For orthonormal imaginary u, v ∈ 𝕆: quaternion_frame_table (u² = v² = (uv)² = −1, vu = −uv, u(uv) = −v, (uv)u = v, v(uv) = u, (uv)v = −u — general, from imaginary_sq, anticommutation, alternativity, flexibility, norm composition, no decide); quaternion_frame_subalgebra (span{1,u,v,uv} closed and associative — the Artin chunks instantiated). assoc_orthogonal_triple: for orthogonal imaginary u, v, w with w ⟂ uv, assoc u v w = 2·(uv)w, via the left Moufang law; assoc_orthogonal_triple_ne_zero. span4_eq_of_associative / finrank_eq_four_of_associative / not_associative_of_gt_span4: any associative subalgebra S containing the frame equals it (dim 4). Concrete cross-check: assoc e₁ e₂ e₄ ≠ 0 by kernel decide (coefficient 2 agrees with the structural route). quaternion_frame_subalgebra itself carries no orthonormality hypotheses (Artin closure for any pair); orthonormality enters only through the frame's independence and the maximality theorem, whose primary witness is span4_eq_of_associative. NOT claimed: the fully general 'every associative subalgebra of 𝕆 has dim ≤ 4' — DEFERRED, not blocked: closing it needs an orthonormal imaginary pair inside an arbitrary associative subalgebra of dimension ≥ 3 (a two-step explicit Gram–Schmidt over the existing bil with Real.sqrt; elementary, no Mathlib InnerProductSpace instance required); deferred per the architecture ruling 2026-09-07 (a registered inner-product structure on CDAlg, if ever wanted, is its own foundational PR).",
+      "description": "DERIV-holographic-theorem (was DERIV-holographic), part 2 (flag 3): 'the largest associative subalgebra of 𝕆 is ℍ', frame-relative. For orthonormal imaginary u, v ∈ 𝕆: quaternion_frame_table (u² = v² = (uv)² = −1, vu = −uv, u(uv) = −v, (uv)u = v, v(uv) = u, (uv)v = −u — general, from imaginary_sq, anticommutation, alternativity, flexibility, norm composition, no decide); quaternion_frame_subalgebra (span{1,u,v,uv} closed and associative — the Artin chunks instantiated). assoc_orthogonal_triple: for orthogonal imaginary u, v, w with w ⟂ uv, assoc u v w = 2·(uv)w, via the left Moufang law; assoc_orthogonal_triple_ne_zero. span4_eq_of_associative / finrank_eq_four_of_associative / not_associative_of_gt_span4: any associative subalgebra S containing the frame equals it (dim 4). Concrete cross-check: assoc e₁ e₂ e₄ ≠ 0 by kernel decide (coefficient 2 agrees with the structural route). quaternion_frame_subalgebra itself carries no orthonormality hypotheses (Artin closure for any pair); orthonormality enters only through the frame's independence and the maximality theorem, whose primary witness is span4_eq_of_associative. NOT claimed: the fully general 'every associative subalgebra of 𝕆 has dim ≤ 4' — DEFERRED, not blocked: closing it needs an orthonormal imaginary pair inside an arbitrary associative subalgebra of dimension ≥ 3 (a two-step explicit Gram–Schmidt over the existing bil with Real.sqrt; elementary, no Mathlib InnerProductSpace instance required); deferred per the architecture ruling 2026-09-07 (a registered inner-product structure on CDAlg, if ever wanted, is its own foundational PR).",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -8613,7 +8713,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "DERIV-holographic, theorem part 3 (flag 3): 'the 4D gap' as a number. quaternion_frame_linearIndependent ({1, u, v, uv} independent from pairwise bil-orthogonality + N = 1, proved); finrank_quaternion_frame = 4; quaternion_frame_codim_four: finrank span + 4 = finrank (CDAlg ℝ 3) = 8 (additive form; the subtraction form as corollary; uses PROOF-cd-algebra-finrank-2n). The interpretation 'the 4D gap is the holographic boundary' is NOT claimed — no boundary, holography, spacetime or physics semantics appears in any statement.",
+      "description": "DERIV-holographic-theorem (was DERIV-holographic), part 3 (flag 3): 'the 4D gap' as a number. quaternion_frame_linearIndependent ({1, u, v, uv} independent from pairwise bil-orthogonality + N = 1, proved); finrank_quaternion_frame = 4; quaternion_frame_codim_four: finrank span + 4 = finrank (CDAlg ℝ 3) = 8 (additive form; the subtraction form as corollary; uses PROOF-cd-algebra-finrank-2n). The interpretation 'the 4D gap is the holographic boundary' is NOT claimed — no boundary, holography, spacetime or physics semantics appears in any statement.",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -9198,7 +9298,7 @@
       "provenance": "T",
       "prediction_chain": [
         "PROOF-crystal-hosts-quaternion",
-        "AXIOM-2"
+        "DERIV-encoding-level"
       ],
       "foundation_batch": "#649-p2-lean",
       "last_tested_at": "2026-09-10T00:00:00Z",
@@ -9398,7 +9498,8 @@
       "notes": "Entirely Tier 1. Every step is proven.",
       "source_ids": [
         "AXIOM-1",
-        "AXIOM-2"
+        "META-2",
+        "DERIV-encoding-level"
       ],
       "steps": 4,
       "status": "coherent"
@@ -9411,7 +9512,8 @@
       "notes": "Weakest link is f(0) candidate. All other steps proven or standard physics.",
       "source_ids": [
         "AXIOM-1",
-        "AXIOM-2"
+        "META-2",
+        "DERIV-encoding-level"
       ],
       "steps": 6,
       "status": "coherent"
@@ -9485,7 +9587,8 @@
       "target_id": "PRED-gw-em",
       "notes": "The physical interpretation of sedenion seams is the weakest link.",
       "source_ids": [
-        "AXIOM-2",
+        "META-2",
+        "DERIV-encoding-level",
         "DERIV-sedenion"
       ],
       "steps": 3,
@@ -9524,7 +9627,8 @@
       "notes": "Relies on Chamseddine-Connes-van Suijlekom (2013) for Pati-Salam emergence and Aydemir et al. (2018) for absence of diquark couplings.",
       "source_ids": [
         "AXIOM-1",
-        "AXIOM-2",
+        "META-2",
+        "DERIV-encoding-level",
         "DERIV-pati-salam"
       ],
       "steps": 4,
@@ -9537,7 +9641,8 @@
       "notes": "If the Born rule is exact (Hurwitz), revival fidelity depends only on decoherence, not mass. Distinguishes QBP from CSL and Diosi-Penrose.",
       "source_ids": [
         "PROOF-born",
-        "DERIV-holographic"
+        "POST-observer-associativity",
+        "DERIV-holographic-theorem"
       ],
       "steps": 3,
       "status": "untested"
@@ -9549,7 +9654,8 @@
       "notes": "Entirely Tier 1. Every step is Lean-verified. Axioms → sedenion (CD construction) → 42 ZDs → Hessian spectrum → λ=8 eigenspace = SU(2) → pure quaternions square to -1 → Kramers.",
       "source_ids": [
         "AXIOM-1",
-        "AXIOM-2"
+        "META-2",
+        "DERIV-encoding-level"
       ],
       "steps": 6,
       "status": "coherent"
@@ -9585,7 +9691,8 @@
       "notes": "Entirely Tier 1. CD construction → sedenion → quaternion subalgebra → cyclic product.",
       "source_ids": [
         "AXIOM-1",
-        "AXIOM-2"
+        "META-2",
+        "DERIV-encoding-level"
       ],
       "steps": 4,
       "status": "coherent"
@@ -9621,7 +9728,8 @@
       "notes": "Entirely Tier 1. CD → sedenion → quaternion subalgebra → e₁e₂e₃=-e₀ → Z₂. The Z₂ gauge structure is algebraically forced.",
       "source_ids": [
         "AXIOM-1",
-        "AXIOM-2"
+        "META-2",
+        "DERIV-encoding-level"
       ],
       "steps": 5,
       "status": "coherent"
@@ -9871,8 +9979,69 @@
       "version": "5.7.1",
       "date": "2026-09-13T00:00:00Z",
       "note": "qbp-oppenheimer: AXIOM-1 'option B' re-recorded under the four-bucket standard (#654, beekeeper direction 2026-09-11; PR #659 after three Red Team rounds + Gemini): the algebraic clause is PROVED (PROOF-42zd); two questions are OPEN on AXIOM-1 — the process question (omega-limit information loss of a proven flow through the zero-divisor locus; trigger #647) and the scope of the selection clause (#652's DERIV-encoding-level is the discharge route) — each with its own kill_condition arm; no contradiction derivable today, candidate assertions on record, none proven. The old record 'ruled by the beekeeper' is superseded; his line is ratification of process, not physical reason. AXIOM-1 sorts into bucket-3 OPEN under scripts/root_audit.py (#658); its open_roots register entry is removed by whichever of #658 / #659 merges second. Fields documented in docs/cth/qbp-local-extensions.md; upstream confluent-trust #102."
+    },
+    {
+      "version": "6.0.0",
+      "date": "2026-09-18T00:00:00Z",
+      "note": "qbp-oppenheimer: ruling bundle v0.4 sort encoded (PR #652 merged 2026-09-18; https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md) — nothing ruled, nothing forced by fiat. PROVED: T1–T3 (DERIV-holographic-theorem), the level ladders. OPEN roots with kill lists (decision_state open): META-2 (meta_principles; kill cannot fire today), POST-boundary-encoding (AXIOM-2's existential clause; kill cannot fire today), POST-hosting (kill cannot fire — recorded as such), POST-observer-associativity, POST-observation ((O⊆),(E) beside P2/P2'), INTERP-holographic-boundary (P2 vs P2' open, kill cannot fire). DERIV-encoding-level and DERIV-substrate-level are derivations conditional on the open roots (DERIV-encoding-level also conditional on AXIOM-1 question 2, #659 — it states the range, it does not discharge it). AXIOM-2 → retired_axioms (re-rooted, not changed in content); DERIV-holographic → retired_principles (editorial split). DERIV-sedenion derived_from inverted, first clause neutral (open). Re-pointed 15 anchors (AXIOM-2), 5 anchors (DERIV-holographic), 8 chain fields. Root list after: AXIOM-1 (open, #659), META-1 (registered #655), META-2, POST-boundary-encoding, POST-hosting, POST-observer-associativity, POST-observation (all open); the rule (#635), the crystal definition and the state-space identification live inside records under non-root prefixes — outside the root gate's reach until encoded as roots (scripts/root_audit.py, #658)."
     }
   ],
-  "last_updated": "2026-09-13T00:00:00Z",
-  "update_provenance": "qbp-oppenheimer 2026-09-13: #647 option-B record re-audited (#654/#659, confluent-trust #102)"
+  "last_updated": "2026-09-18T00:00:00Z",
+  "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.4 sort encoded (PR #652; nothing ruled)",
+  "retired_axioms": [
+    {
+      "id": "AXIOM-2",
+      "name": "The encoding is maximal",
+      "statement": "The boundary encoding uses the largest normed division algebra: octonions (dim 8).",
+      "derivable": false,
+      "retired": "2026-09-18: re-rooted, not changed in content: its existential clause is POST-boundary-encoding (OPEN root), its 'largest' clause is META-2 (OPEN root), and the level statement is DERIV-encoding-level (derived, conditional on both and on AXIOM-1's encoding-only reading); route narrows from Hurwitz-absolute to tower-relative (same object, O). Nothing AXIOM-2 asserted is denied. Ruling bundle v0.4 §5 (PR #652, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6."
+    }
+  ],
+  "meta_principles": [
+    {
+      "id": "META-2",
+      "name": "Level saturation",
+      "statement": "A structural level sits exactly at the bound its constraint sets; no slack. Domain: Cayley–Dickson levels only. It does not select states (the ensemble is MaxEnt, horn 1), copies (the ℤ/3 of encoding halves, or the ℂP² of encodings under P2), orientations, or signs.",
+      "kind": "epistemic principle",
+      "derivable": false,
+      "decision_state": "open",
+      "kill_condition": [
+        "Structural arm — EXCLUDED by the proved ladders and therefore unable to fire: a crystal-hosting division or alternative structure above O, or a non-crystal below S (PROOF-ops-*-ladder; CDLifting.assoc_diag_left). Physical arm — the live falsifier: a universe's encoding shown to be a smaller algebra than the last information-preserving level (e.g. an observer's algebra with no octonionic completion; the encoding shown to be H) — no observable on record. This kill CANNOT FIRE today; recorded OPEN, not as a pass (ruling bundle v0.5 §5, PR #652 v0.4 Red Team V1)."
+      ]
+    }
+  ],
+  "retired_principles": [
+    {
+      "id": "DERIV-holographic",
+      "name": "Holographic principle",
+      "statement": "Observers require associativity. The largest associative subalgebra of O is H (dim 4). The 4D gap is the holographic boundary.",
+      "derived_from": [
+        "AXIOM-1",
+        "AXIOM-2"
+      ],
+      "layer": 1,
+      "retired": "2026-09-18: split into POST-observer-associativity, POST-observation, DERIV-holographic-theorem, INTERP-holographic-boundary — an editorial split (one kind of statement per entry, ruling bundle v0.4 §2, PR #652, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); the theorem part is proved, the postulate and interpretation parts are OPEN roots with kill conditions."
+    }
+  ],
+  "interpretations": [
+    {
+      "id": "INTERP-holographic-boundary",
+      "name": "The holographic gap and the seam (interpretation)",
+      "statement": "There is a boundary encoding (POST-boundary-encoding): each universe has an encoding octonion (the algebra AXIOM-2 referred to; its level is DERIV-encoding-level), and the holographic gap is the complement of the observer's algebra inside it; the seam boundary between universes is the zero-divisor locus (DERIV-sedenion). Which octonion encodes a universe is NOT decided by the axioms: the algebra does not pick a copy (the ℓ-fixing order-3 automorphism permutes the three Cayley–Dickson halves, PROOF-order-three-automorphism-fixes-ell; nothing selects a point of the ℂP² of octonions around ℍ_s). Two hypotheses, status open: P2′ — the encoding is a Cayley–Dickson half (one of three; ℍ_s meets it in ℂ_u, PROOF-hosted-algebra-meets-cell-in-complex-line; the gap is 6-dim; a discrete datum); P2 — the encoding is an octonion containing ℍ_s (a ℂP² of them, completeness a conjecture; the gap is 4-dim; or the datum-free bundle form ℍ_s^⊥ ≅ ℍ_s³). Decides it: a defining property for AXIOM-2's encoding stated as an object; the encoding map; or an observable — none on record.",
+      "derived_from": [
+        "POST-boundary-encoding",
+        "DERIV-encoding-level",
+        "POST-observer-associativity",
+        "POST-observation"
+      ],
+      "layer": 1,
+      "kind": "interpretation",
+      "supersedes": "DERIV-holographic (interpretation part)",
+      "provenance_kind": "philosophy",
+      "decision_state": "open",
+      "kill_condition": [
+        "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by a defining property of the encoding stated as an object (a Cayley–Dickson half → P2' is a theorem; contains the observer's algebra → P2 is), by the encoding MAP (a map forces its domain), or by an observable distinguishing the readings — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.4 §1; hosting §4's form)."
+      ]
+    }
+  ]
 }

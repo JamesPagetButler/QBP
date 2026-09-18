@@ -12,9 +12,9 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RULED = False
-RULING_DATE = "<ruling date>"
-RULING_URL_BUNDLE = "<URL of the beekeeper's ruling comment on PR #652>"
+RULED = True
+RULING_DATE = "2026-09-18"
+RULING_URL_BUNDLE = "https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md"
 MARKER = "ruled with the flag-3 split"
 NEW = (
     f"identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities "

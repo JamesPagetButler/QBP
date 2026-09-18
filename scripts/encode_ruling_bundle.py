@@ -34,12 +34,10 @@ LEDGER = os.path.join(
 
 # ----------------------------------------------------------------------------- rulings (fill in)
 DRY_RUN = False  # True: verify confinement and print the summary, write nothing
-MERGED_652 = False  # set True only when PR #652 (ruling bundle v0.4) has MERGED — a process acceptance of the sort, not a ruling; nothing here is ruled
+MERGED_652 = True  # set True only when PR #652 (ruling bundle v0.4) has MERGED — a process acceptance of the sort, not a ruling; nothing here is ruled
 READING = "open"  # "open" (v0.3: not decidable from the axioms — both hypotheses encoded, status open) | "P2prime" | "P2line" | "P2bundle"
-ENCODE_DATE = "<date PR #652 merged>"
-PAGE_URL = (
-    "<URL of docs/foundations/ruling-bundle-2026-09-10.md at the #652 merge commit>"
-)
+ENCODE_DATE = "2026-09-18"
+PAGE_URL = "https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md"
 # ----------------------------------------------------------------------------- texts (drafted PR #652 v0.2; sorted per v0.7 — every root open with a kill list)
 
 META2 = {
@@ -448,6 +446,8 @@ def _apply(L, ed):
     )
     L["last_updated"] = f"{ENCODE_DATE}T00:00:00Z"
     ed.touch("changelog")
+    L["version"] = "6.0.0"
+    ed.touch("version")
     ed.touch("update_provenance")
     ed.touch("last_updated")
     print(

@@ -11,8 +11,18 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 | Root | lives in | bucket | reason | register issue |
 |---|---|---|---|---|
 | META-1 | meta_axiom | UNSORTED | no forcing (forced_by), no ruling cite, no kill_condition | https://github.com/JamesPagetButler/QBP/issues/655 |
+| META-2 | meta_principles | bucket-3 OPEN | kill_condition present and open |  |
 | AXIOM-1 | axioms | bucket-3 OPEN | kill_condition present and open |  |
-| AXIOM-2 | axioms | UNSORTED | no forcing (forced_by), no ruling cite, no kill_condition | https://github.com/JamesPagetButler/QBP/issues/473 |
+| POST-boundary-encoding | axioms | bucket-3 OPEN | kill_condition present and open |  |
+| POST-hosting | axioms | bucket-3 OPEN | kill_condition present and open |  |
+| POST-observer-associativity | axioms | bucket-3 OPEN | kill_condition present and open |  |
+| POST-observation | axioms | bucket-3 OPEN | kill_condition present and open |  |
+| INTERP-holographic-boundary | interpretations | bucket-3 OPEN | kill_condition present and open |  |
+
+## Retired (bucket-4, reported not gated)
+
+- AXIOM-2 (retired_axioms)
+- DERIV-holographic (retired_principles)
 
 ## Counts
 
@@ -20,11 +30,11 @@ Roots are the id-bearing records of the root lists ['meta_axiom', 'meta_principl
 |---|---|
 | bucket-1 PROVED | 0 |
 | bucket-2 FORCED | 0 |
-| bucket-3 OPEN | 1 |
-| UNSORTED (registered or failing) | 2 |
-| bucket-4 RETIRED | 0 |
+| bucket-3 OPEN | 7 |
+| UNSORTED (registered or failing) | 1 |
+| bucket-4 RETIRED | 2 |
 
-## Chains: 10 principles + 290 anchors; 300 chain owners walked
+## Chains: 12 principles + 290 anchors; 302 chain owners walked
 
 ### Unresolved ids (16) — gated for every owner
 
