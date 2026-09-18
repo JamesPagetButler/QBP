@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Encode the ruling bundle (PR #652) into the CTH ledger — ONE constitutional PR, shape A.
 
-RUNS ONLY AFTER PR #652 (v0.7) HAS MERGED — the merge is a process acceptance of the sort, not a ruling; nothing here is ruled Decisions 0–5 on PR #652. Parameters below carry the rulings;
-the script refuses to run while MERGED_652 is False (the #652 merge is a process acceptance of the v0.4 sort, not a ruling). Idempotent (guards on DERIV-encoding-level's presence).
+RUNS ONLY AFTER PR #652 (ruling bundle v0.7) HAS MERGED — the merge is a process acceptance of the page's sort, not a
+ruling; nothing on the page and nothing here is ruled. The parameters below carry the sort; the script refuses to run
+while MERGED_652 is False. Idempotent (guards on DERIV-encoding-level's presence).
 
-What it applies (package v0.6 §3 + ruling page v0.2 §2–§5), all previously drafted texts:
+What it applies (package v0.6 §3 + ruling bundle v0.7 §1–§6), all previously drafted texts:
   D5  META-2 level saturation → new top-level list `meta_principles` (the schema pins `meta_axiom` to a single
       object, so META-2 cannot be appended there; `additionalProperties: true` at top level admits the new key);
       POST-hosting (final form) → `axioms` (it is the second physical axiom, package §2a);
@@ -354,7 +355,7 @@ def _apply(L, ed):
     L.setdefault("retired_axioms", []).append(
         {
             **ax2,
-            "notes": f"{ENCODE_DATE}: re-rooted, not changed in content: its existential clause is POST-boundary-encoding (OPEN root), its 'largest' clause is META-2 (OPEN root), and the level statement is DERIV-encoding-level (derived, conditional on both and on AXIOM-1's encoding-only reading); route narrows from Hurwitz-absolute to tower-relative (same object, O). Nothing AXIOM-2 asserted is denied. Ruling bundle v0.4 §5 (PR #652, {PAGE_URL}); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6.",
+            "notes": f"{ENCODE_DATE}: re-rooted, not changed in content: its existential clause is POST-boundary-encoding (OPEN root), its 'largest' clause is META-2 (OPEN root), and the level statement is DERIV-encoding-level (derived, conditional on both and on AXIOM-1's encoding-only reading); route narrows from Hurwitz-absolute to tower-relative (same object, O). Nothing AXIOM-2 asserted is denied. Ruling bundle v0.7 §5 (PR #652, {PAGE_URL}); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6.",
         }
     )
     for r in (

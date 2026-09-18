@@ -9958,7 +9958,7 @@
       "name": "The encoding is maximal",
       "statement": "The boundary encoding uses the largest normed division algebra: octonions (dim 8).",
       "derivable": false,
-      "notes": "2026-09-18: re-rooted, not changed in content: its existential clause is POST-boundary-encoding (OPEN root), its 'largest' clause is META-2 (OPEN root), and the level statement is DERIV-encoding-level (derived, conditional on both and on AXIOM-1's encoding-only reading); route narrows from Hurwitz-absolute to tower-relative (same object, O). Nothing AXIOM-2 asserted is denied. Ruling bundle v0.4 §5 (PR #652, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6."
+      "notes": "2026-09-18: re-rooted, not changed in content: its existential clause is POST-boundary-encoding (OPEN root), its 'largest' clause is META-2 (OPEN root), and the level statement is DERIV-encoding-level (derived, conditional on both and on AXIOM-1's encoding-only reading); route narrows from Hurwitz-absolute to tower-relative (same object, O). Nothing AXIOM-2 asserted is denied. Ruling bundle v0.7 §5 (PR #652, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6."
     }
   ],
   "meta_principles": [
