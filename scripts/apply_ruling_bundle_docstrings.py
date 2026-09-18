@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Ruling bundle, Decision 2 — update the guardrail docstrings that say the crystal's ℍ is "NOT identified with the
-observer's ℍ … pending flag 3", plus the Substrate README, once the beekeeper has ruled PR #652. Refuses to run
+observer's ℍ … pending flag 3", plus the Substrate README, once PR #652 (v0.7) has MERGED — nothing is ruled; the merge is a process acceptance. Refuses to run
 while RULED is False. Idempotent (guards on the marker string). Sites (PR #652 §2): proofs/QBP/Substrate/Hosting.lean
 (module docstring item 2; universe_hosts_quaternion docstring; §11 boundary bullet); proofs/QBP/Foundations/
 CrystalHosting.lean (interpretation guardrail; vacuum_hosts_quaternion docstring); proofs/QBP/Substrate/README.md.
@@ -15,10 +15,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RULED = True
 RULING_DATE = "2026-09-18"
 RULING_URL_BUNDLE = "https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md"
-MARKER = "ruled with the flag-3 split"
+MARKER = "per the flag-3 split"
 NEW = (
     f"identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities "
-    f"of clause (a)) — as {MARKER} (POST-observer-associativity; beekeeper {RULING_DATE}, {RULING_URL_BUNDLE}); "
+    f"of clause (a)) — {MARKER} (POST-observer-associativity, an OPEN root with a kill list — an editorial split applied by the #652 encode, ruling bundle v0.7 §2; nothing ruled: the 'one kind of statement per entry' rule is a process proposal pending the beekeeper's ratification); "
     f"exclusivity remains the postulate's content"
 )
 PATTERNS = [
@@ -57,7 +57,7 @@ PATTERNS = [
 
 def main():
     if not RULED:
-        print("REFUSING: RULED is False — the beekeeper has not ruled PR #652.")
+        print("REFUSING: RULED is False — PR #652 has not merged.")
         sys.exit(2)
     total = 0
     for rel, pat, rep in PATTERNS:

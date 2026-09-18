@@ -70,7 +70,7 @@ each restatement cites its original.
    substrate *hosts*; **circularity with the algebra is permitted** — the objects
    here are built out of `CDAlg ℝ 4` on purpose and no attempt is made to
    generate the algebra from something prior.
-2. **The crystal's ℍ is identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — as ruled with the flag-3 split (POST-observer-associativity; beekeeper 2026-09-18, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); exclusivity remains the postulate's content.**  `U.hosted ⊆ span{1, ℓ, U, ℓU}` is a
+2. **The crystal's ℍ is identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — per the flag-3 split (POST-observer-associativity, an OPEN root with a kill list — an editorial split applied by the #652 encode, ruling bundle v0.7 §2; nothing ruled: the 'one kind of statement per entry' rule is a process proposal pending the beekeeper's ratification); exclusivity remains the postulate's content.**  `U.hosted ⊆ span{1, ℓ, U, ℓU}` is a
    statement about a subalgebra of 𝕊 and nothing more.
 3. **No boundary and no holography semantics.**  `Universe` carries no boundary
    field; the word "bounded" in the frame is not formalised anywhere below.
@@ -284,7 +284,7 @@ end Universe
     `span_ℝ{1, ℓ, U, ℓU}`, `U = loOf u`.
 
     **Guardrail:** this asserts a containment in a quaternion subalgebra of 𝕊 and
-    nothing else.  The hosted ℍ is identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — as ruled with the flag-3 split (POST-observer-associativity; beekeeper 2026-09-18, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); exclusivity remains the postulate's content. -/
+    nothing else.  The hosted ℍ is identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — per the flag-3 split (POST-observer-associativity, an OPEN root with a kill list — an editorial split applied by the #652 encode, ruling bundle v0.7 §2; nothing ruled: the 'one kind of statement per entry' rule is a process proposal pending the beekeeper's ratification); exclusivity remains the postulate's content. -/
 theorem universe_hosts_quaternion (U : Universe) :
     ∃ u : CDAlg ℝ 3, u.coord 0 = 0 ∧ (N u = 1 ∨ u = 0) ∧
       ∀ x ∈ U.hosted, InQuatSpan (loOf u) x := by
@@ -583,7 +583,7 @@ issue that owns the gap.
   exhaust the `S₃` factor.  Owner: #639 (e).
 * **The boundary of a universe.**  AXIOM-2 says the boundary encoding is 𝕆; the
   `Universe` structure above carries NO boundary field and no holography
-  semantics.  The identification of `ℍ_s` with the observer's ℍ is identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — as ruled with the flag-3 split (POST-observer-associativity; beekeeper 2026-09-18, https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md); exclusivity remains the postulate's content.  Owner: #473 / #639 (open question 2).
+  semantics.  The identification of `ℍ_s` with the observer's ℍ is identified with the observer's ℍ under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — per the flag-3 split (POST-observer-associativity, an OPEN root with a kill list — an editorial split applied by the #652 encode, ruling bundle v0.7 §2; nothing ruled: the 'one kind of statement per entry' rule is a process proposal pending the beekeeper's ratification); exclusivity remains the postulate's content.  Owner: #473 / #639 (open question 2).
 * **A "pointless" description of the in-flight region.**  `InFlight` is a plain
   `Set`; no locale, condensed object or limit of finite approximations is built.
   Owner: #636 / #639 (open question 3).

@@ -427,7 +427,7 @@ def _apply(L, ed):
             "version": "6.0.0",
             "date": f"{ENCODE_DATE}T00:00:00Z",
             "note": (
-                f"qbp-oppenheimer: ruling bundle v0.4 sort encoded (PR #652 merged {ENCODE_DATE}; {PAGE_URL}) — nothing ruled, "
+                f"qbp-oppenheimer: ruling bundle v0.7 sort encoded (PR #652 merged {ENCODE_DATE}; {PAGE_URL}) — nothing ruled, "
                 f"nothing forced by fiat. PROVED: T1–T3 (DERIV-holographic-theorem), the level ladders. OPEN roots with kill "
                 f"lists (decision_state open): META-2 (meta_principles; kill cannot fire today), POST-boundary-encoding (AXIOM-2's existential clause; kill cannot fire today), POST-hosting (kill cannot fire — recorded as such), "
                 f"POST-observer-associativity, POST-observation ((O⊆),(E) beside P2/P2'), INTERP-holographic-boundary (P2 vs P2' "
@@ -442,7 +442,7 @@ def _apply(L, ed):
         }
     )
     L["update_provenance"] = (
-        f"qbp-oppenheimer {ENCODE_DATE}: ruling bundle v0.4 sort encoded (PR #652; nothing ruled)"
+        f"qbp-oppenheimer {ENCODE_DATE}: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)"
     )
     L["last_updated"] = f"{ENCODE_DATE}T00:00:00Z"
     ed.touch("changelog")
