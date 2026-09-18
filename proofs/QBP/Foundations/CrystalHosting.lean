@@ -80,7 +80,10 @@ The theorems below say **exactly** that a vacuum of the δ-landscape generates a
 quaternion subalgebra of 𝕊, that this assignment is natural under algebra
 automorphisms, and that the local `−L_s²` spectrum is degenerate there.  They do
 **NOT** claim, and must not be cited as claiming, that this quaternion algebra
-"is the observer's ℍ" as a theorem — that identification holds under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — per the flag-3 split (POST-observer-associativity, an OPEN root with a kill list — an editorial split applied by the #652 encode, ruling bundle v0.7 §2; nothing ruled: the 'one kind of statement per entry' rule is a process proposal pending the beekeeper's ratification); exclusivity remains the postulate's content, and is deliberately absent from every statement here.  No energy, crystallisation or
+"is the observer's ℍ" or carries any holographic reading — that identification
+is POST-observer-associativity, an OPEN root with a kill list (flag-3 split, ruling
+bundle v0.7 §2; nothing ruled), and is
+deliberately absent from every statement here.  No energy, crystallisation or
 spacetime semantics appears in any type or theorem statement (layer rule,
 `docs/foundations/layer-architecture.md`).
 
@@ -550,7 +553,8 @@ For a unit imaginary octonion direction `u`, write `U = loOf u` and
 So "the crystal picks out one ℂ inside 𝕆" and "the crystal hosts an ℍ inside 𝕊"
 are the *same* datum read at two levels of the tower — a single discrete root,
 not a ℂP² of them.  Neither statement identifies `ℂ_u` with any physical
-observable; that reading is the (still open) DERIV-holographic flag 3. -/
+observable; that reading is INTERP-holographic-boundary — an OPEN root, the P2 vs P2′
+    pair (ruling bundle v0.7 §1). -/
 
 /-- **P2′ (i) — the hosted algebra meets the CD low half in exactly `ℂ_u`.**
     For a unit imaginary octonion direction `u` (`U = loOf u`), an element of
@@ -617,7 +621,9 @@ theorem quatSpan_eq_cd_double (hu0 : u.coord 0 = 0) {x : CDAlg ℝ 4} :
     the statement that the crystal *hosts a copy of ℍ*.
 
     **Interpretation guardrail:** this says only that the generated subalgebra is
-    a quaternion algebra.  The identification with the observer's ℍ holds under hosting clause (a) — definition D + premise P1′ (observers are entities of clause (a)) — per the flag-3 split (POST-observer-associativity, an OPEN root with a kill list — an editorial split applied by the #652 encode, ruling bundle v0.7 §2; nothing ruled: the 'one kind of statement per entry' rule is a process proposal pending the beekeeper's ratification); exclusivity remains the postulate's content; no theorem here claims it. -/
+    a quaternion algebra.  No identification of it with "the observer's ℍ", and
+    no DERIV-holographic reading, is claimed here (pending the beekeeper's ruling
+    on ledger flag 3). -/
 theorem vacuum_hosts_quaternion {s : CDAlg ℝ 4} (hv : IsVacuum s) :
     ∃ (u : CDAlg ℝ 3) (α γ b₀ : ℝ),
       u.coord 0 = 0 ∧ (N u = 1 ∨ u = 0) ∧

@@ -147,6 +147,10 @@ class LedgerEdit:
         b_keys, a_keys = list(self._before.keys()), list(self.ledger.keys())
         if [k for k in b_keys if k in a_keys] != [k for k in a_keys if k in b_keys]:
             changed.add(("<top-level key order>", None))
+        # a top-level key added or removed is itself a change and must be declared with
+        # touch(key) — even an empty new list (PR #662 Red Team A7)
+        for k in set(a_keys) ^ set(b_keys):
+            changed.add((k, None))
         for k in set(b_recs) & set(a_recs):
             b_ids, a_ids = list(b_recs[k]), list(a_recs[k])
             kept_b = [i for i in b_ids if i in a_recs[k]]

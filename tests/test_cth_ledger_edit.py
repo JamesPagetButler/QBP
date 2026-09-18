@@ -244,6 +244,7 @@ def test_declared_new_top_level_key_is_not_a_reorder(tmp_path):
     with cle.ledger_edit(p) as e:
         e.ledger["retired_axioms"] = [{"id": "AXIOM-9", "statement": "s"}]
         e.touch("retired_axioms", "AXIOM-9")
+        e.touch("retired_axioms")  # the new KEY is a change of its own
     L = json.load(open(p))
     assert L["retired_axioms"][0]["id"] == "AXIOM-9"
     assert list(L.keys())[:-1] == [
@@ -254,3 +255,14 @@ def test_declared_new_top_level_key_is_not_a_reorder(tmp_path):
         "changelog",
         "last_updated",
     ]
+
+
+def test_undeclared_new_empty_top_level_key_is_refused(tmp_path):
+    """PR #662 Red Team A7: an undeclared new (even empty) top-level key is not confined."""
+    p = _mini(tmp_path)
+    before = open(p).read()
+    with pytest.raises(cle.ConfinementError, match="UNDECLARED.*sneaky"):
+        with cle.ledger_edit(p) as e:
+            e.ledger["sneaky"] = []
+            e.record("anchors", "PRED-a")["status"] = "coherent"
+    assert open(p).read() == before

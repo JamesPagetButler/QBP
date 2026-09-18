@@ -34,7 +34,7 @@ LEDGER = os.path.join(
 
 # ----------------------------------------------------------------------------- rulings (fill in)
 DRY_RUN = False  # True: verify confinement and print the summary, write nothing
-MERGED_652 = True  # set True only when PR #652 (ruling bundle v0.4) has MERGED — a process acceptance of the sort, not a ruling; nothing here is ruled
+MERGED_652 = True  # set True only when PR #652 (ruling bundle v0.7) has MERGED — a process acceptance of the sort, not a ruling; nothing here is ruled
 READING = "open"  # "open" (v0.3: not decidable from the axioms — both hypotheses encoded, status open) | "P2prime" | "P2line" | "P2bundle"
 ENCODE_DATE = "2026-09-18"
 PAGE_URL = "https://github.com/JamesPagetButler/QBP/blob/9b28adf/docs/foundations/ruling-bundle-2026-09-10.md"
@@ -48,7 +48,6 @@ META2 = {
         "It does not select states (the ensemble is MaxEnt, horn 1), copies (the ℤ/3 of encoding halves, or the ℂP² of "
         "encodings under P2), orientations, or signs."
     ),
-    "kind": "epistemic principle",
     "derivable": False,
     "decision_state": "open",
     "kill_condition": [
@@ -58,7 +57,7 @@ META2 = {
         "universe's encoding shown to be a smaller algebra than the last information-preserving "
         "level (e.g. an observer's algebra with no octonionic completion; the encoding shown to "
         "be H) — no observable on record. This kill CANNOT FIRE today; recorded OPEN, not as a "
-        "pass (ruling bundle v0.5 §5, PR #652 v0.4 Red Team V1)."
+        "pass (ruling bundle v0.7 §5, PR #652 v0.4 Red Team V1)."
     ],
 }
 POST_ENC_EXISTS = {
@@ -70,13 +69,12 @@ POST_ENC_EXISTS = {
         "encodes a universe is a separate open question (INTERP-holographic-boundary); where the "
         "encoding sits in the Cayley–Dickson tower is DERIV-encoding-level."
     ),
-    "kind": "physical postulate",
     "derivable": False,
     "decision_state": "open",
     "kill_condition": [
         "An observable requiring information not representable in any octonionic encoding, or "
         "the encoding map shown not to exist — none on record. This kill CANNOT FIRE today; "
-        "recorded OPEN, not as a pass (ruling bundle v0.5 §5, PR #652 v0.4 Red Team V4)."
+        "recorded OPEN, not as a pass (ruling bundle v0.7 §5, PR #652 v0.4 Red Team V4)."
     ],
     "anchors": [
         "PROOF-quaternion-frame-maximal",
@@ -92,12 +90,11 @@ POST_HOSTING = {
         "no observable (observers live in crystals; FLAG-seam-dynamics-open) — recorded as such, not as a pass. "
         "Convergence to a crystal is the rule's claim (#635), separate."
     ),
-    "kind": "physical postulate",
     "kill_condition": [
         "A substrate level at which V ≡ 0 — the level bound failing. Theory-internal: this kill "
         "is the negation of the postulate and no observable reaches it (observers live in "
         "crystals; FLAG-seam-dynamics-open is incoherent) — it CANNOT FIRE today, recorded as "
-        "such, not as a pass (package §9c; ruling bundle v0.4 §5)."
+        "such, not as a pass (package §9c; ruling bundle v0.7 §5)."
     ],
     "decision_state": "open",
     "derivable": False,
@@ -112,12 +109,11 @@ POST_ASSOC = {
         "Under the hosting definition the observer's ℍ is the crystal's ℍ_s (definition D; premise P1′: observers are "
         "entities of clause (a)). Exclusivity — no observer lives outside the hosted algebra — is the postulate's content."
     ),
-    "kind": "physical postulate",
     "kill_condition": [
         "An observer exhibited outside any associative subalgebra of S (exclusivity failing), "
         "or a non-associative subset of S on which actions compose (contradicting "
         "PROOF-associative-composition-iff's premise set). Discharge: none — a postulate about "
-        "all observers; recorded OPEN (ruling bundle v0.4 §2)."
+        "all observers; recorded OPEN (ruling bundle v0.7 §2)."
     ],
     "decision_state": "open",
     "derivable": False,
@@ -143,14 +139,13 @@ POST_OBS = {
             )
         )
     ),
-    "kind": "physical postulate",
     "kill_condition": [
         "(O⊆) An observable that requires access to information not encoded in the observer's "
         "encoding octonion. Recorded OPEN.",
         "(E) An electromagnetic C shown distinct from the encoding-selected C. Has content only "
         "under P2' (where a C is selected); empty under P2 — so this entry is OPEN exactly as "
         "INTERP-holographic-boundary's P2/P2' pair is, and cannot fire before that pair is "
-        "decided (ruling bundle v0.4 §2).",
+        "decided (ruling bundle v0.7 §2).",
     ],
     "decision_state": "open",
     "derivable": False,
@@ -204,7 +199,11 @@ DERIV_HOLO_THM = {
         "Quaternion frames span{1,u,v,uv} are associative subalgebras of 𝕆; no associative subalgebra of 𝕆 properly "
         "contains one (frame-relative; the global bound is deferred); the codimension of ℍ in 𝕆 is 4."
     ),
-    "derived_from": ["DERIV-encoding-level"],
+    "derived_from": [
+        "PROOF-associative-composition-iff",
+        "PROOF-quaternion-frame-maximal",
+        "PROOF-quaternion-frame-codim-four",
+    ],
     "layer": 1,
     "anchors": [
         "PROOF-associative-composition-iff",
@@ -245,7 +244,6 @@ INTERP = {
         "POST-observation",
     ],
     "layer": 1,
-    "kind": "interpretation",  # cth-implementor (seq 1297): INTERP = provenance_kind philosophy + decision_state; no new kind
     "supersedes": "DERIV-holographic (interpretation part)",
     "provenance_kind": "philosophy",
     "decision_state": "open" if READING == "open" else "ruled",
@@ -255,7 +253,7 @@ INTERP = {
         "contains the observer's algebra → P2 is), by the encoding MAP (a map forces its domain), "
         "or by an observable distinguishing the readings — none on record. The first two are "
         "stipulations someone would write, not discoveries. This kill CANNOT FIRE today — "
-        "recorded as such, not as a pass (ruling bundle v0.4 §1; hosting §4's form)."
+        "recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form)."
     ],
 }
 SEDENION_FIRST_CLAUSE = {
@@ -296,9 +294,25 @@ ANCHOR_HOLO_MAP = {  # anchors whose list fields cite DERIV-holographic
     "PROOF-associative-composition-iff": ["DERIV-holographic-theorem"],
     "PROOF-quaternion-frame-maximal": ["DERIV-holographic-theorem"],
     "PROOF-quaternion-frame-codim-four": ["DERIV-holographic-theorem"],
-    "PROOF-crystal-hosts-quaternion": ["DERIV-holographic-theorem"],
 }
 LIST_FIELDS = ("prediction_chain", "converges_with", "source_ids", "derived_from")
+
+
+def _normalise(rec):
+    """No record-level field beyond the D3 two (decision_state, kill_condition) and INTERP's
+    provenance_kind: evidence anchors and supersession go into the pre-existing `notes` prose
+    (PR #662 Red Team R1: `kind` was ruled out by cth-implementor, #654 D3(b))."""
+    rec.pop("kind", None)
+    extra = []
+    if "anchors" in rec:
+        extra.append("Evidence anchors: " + ", ".join(rec.pop("anchors")) + ".")
+    if "supersedes" in rec:
+        extra.append(f"Supersedes {rec.pop('supersedes')}.")
+    if extra:
+        rec["notes"] = ((rec["notes"] + " ") if rec.get("notes") else "") + " ".join(
+            extra
+        )
+    return rec
 
 
 def replace_in_lists(obj, old, new_list):
@@ -319,7 +333,7 @@ def replace_in_lists(obj, old, new_list):
 def main():
     if not MERGED_652:
         print(
-            "REFUSING: MERGED_652 is False — PR #652 (v0.4) has not merged. Nothing here is ruled; the merge is the process acceptance of the sort. Edit the parameters and re-run."
+            "REFUSING: MERGED_652 is False — PR #652 (v0.7) has not merged. Nothing here is ruled; the merge is the process acceptance of the sort. Edit the parameters and re-run."
         )
         sys.exit(2)
     with open(LEDGER, encoding="utf-8") as f:
@@ -340,11 +354,25 @@ def _apply(L, ed):
     L.setdefault("retired_axioms", []).append(
         {
             **ax2,
-            "retired": f"{ENCODE_DATE}: re-rooted, not changed in content: its existential clause is POST-boundary-encoding (OPEN root), its 'largest' clause is META-2 (OPEN root), and the level statement is DERIV-encoding-level (derived, conditional on both and on AXIOM-1's encoding-only reading); route narrows from Hurwitz-absolute to tower-relative (same object, O). Nothing AXIOM-2 asserted is denied. Ruling bundle v0.4 §5 (PR #652, {PAGE_URL}); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6.",
+            "notes": f"{ENCODE_DATE}: re-rooted, not changed in content: its existential clause is POST-boundary-encoding (OPEN root), its 'largest' clause is META-2 (OPEN root), and the level statement is DERIV-encoding-level (derived, conditional on both and on AXIOM-1's encoding-only reading); route narrows from Hurwitz-absolute to tower-relative (same object, O). Nothing AXIOM-2 asserted is denied. Ruling bundle v0.4 §5 (PR #652, {PAGE_URL}); package docs/foundations/axiom2-demotion-proposal-2026-09-09.md v0.6.",
         }
     )
+    for r in (
+        META2,
+        POST_ENC_EXISTS,
+        POST_HOSTING,
+        POST_ASSOC,
+        POST_OBS,
+        DERIV_ENC,
+        DERIV_SUB,
+        DERIV_HOLO_THM,
+        INTERP,
+    ):
+        _normalise(r)
     L["axioms"].extend([POST_ENC_EXISTS, POST_HOSTING, POST_ASSOC, POST_OBS])
     L["meta_principles"] = [META2]
+    ed.touch("meta_principles")
+    ed.touch("retired_axioms")
     ed.touch("axioms", "AXIOM-2")
     ed.touch("retired_axioms", "AXIOM-2")
     for p in (POST_ENC_EXISTS, POST_HOSTING, POST_ASSOC, POST_OBS):
@@ -358,7 +386,7 @@ def _apply(L, ed):
     L.setdefault("retired_principles", []).append(
         {
             **holo,
-            "retired": f"{ENCODE_DATE}: split into POST-observer-associativity, POST-observation, DERIV-holographic-theorem, INTERP-holographic-boundary — an editorial split (one kind of statement per entry, ruling bundle v0.4 §2, PR #652, {PAGE_URL}); the theorem part is proved, the postulate and interpretation parts are OPEN roots with kill conditions.",
+            "notes": f"{ENCODE_DATE}: split into POST-observer-associativity, POST-observation, DERIV-holographic-theorem, INTERP-holographic-boundary — an editorial split (one kind of statement per entry, ruling bundle v0.7 §2, PR #652, {PAGE_URL}); the theorem part is proved, the postulate and interpretation parts are OPEN roots with kill conditions.",
         }
     )
     L["derived_principles"].extend([DERIV_ENC, DERIV_SUB, DERIV_HOLO_THM])
@@ -367,6 +395,8 @@ def _apply(L, ed):
     ]  # schema pins derived_principles ids to ^DERIV-; interpretations get their own list
     ed.touch("derived_principles", "DERIV-holographic")
     ed.touch("retired_principles", "DERIV-holographic")
+    ed.touch("retired_principles")
+    ed.touch("interpretations")
     for d in (DERIV_ENC, DERIV_SUB, DERIV_HOLO_THM):
         ed.touch("derived_principles", d["id"])
     ed.touch("interpretations", INTERP["id"])
@@ -412,8 +442,13 @@ def _apply(L, ed):
     # chains
     n_ch = 0
     for c in L["chains"]:
-        if replace_in_lists(c, "AXIOM-2", ["META-2", "DERIV-encoding-level"]):
+        if replace_in_lists(c, "AXIOM-2", ["DERIV-encoding-level"]):
             n_ch += 1
+            c["notes"] = (c.get("notes") or "") + (
+                f" | {ENCODE_DATE}: source AXIOM-2 -> DERIV-encoding-level (derived; conditional on the "
+                f"open roots META-2 and POST-boundary-encoding, ruling bundle v0.7 §5) — the chain's first "
+                f"step is an open root's consequence, not a proven step."
+            )
             ed.touch("chains", c["id"])
         if replace_in_lists(
             c,
@@ -435,7 +470,7 @@ def _apply(L, ed):
                 f"roots (DERIV-encoding-level also conditional on AXIOM-1 question 2, #659 — it states the range, it does not discharge it). AXIOM-2 → retired_axioms (re-rooted, not changed in content); DERIV-holographic → retired_principles "
                 f"(editorial split). DERIV-sedenion derived_from inverted, first clause neutral ({READING}). Re-pointed {n_ax2} "
                 f"anchors (AXIOM-2), {n_holo} anchors (DERIV-holographic), {n_ch} chain fields. Root list after: AXIOM-1 (open, "
-                f"#659), META-1 (registered #655), META-2, POST-boundary-encoding, POST-hosting, POST-observer-associativity, POST-observation (all open); "
+                f"#659), META-1 (registered #655), META-2, POST-boundary-encoding, POST-hosting, POST-observer-associativity, POST-observation, INTERP-holographic-boundary (all open) — eight root records; "
                 f"the rule (#635), the crystal definition and the state-space identification live inside records under non-root "
                 f"prefixes — outside the root gate's reach until encoded as roots (scripts/root_audit.py, #658)."
             ),

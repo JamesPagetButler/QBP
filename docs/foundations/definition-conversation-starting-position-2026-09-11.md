@@ -21,7 +21,7 @@
 
 1. **"Is the substrate what allows for the crystallisation?"** — now a definition on master; the conversation tests whether the definition *hosts* the physics the beekeeper asked for: "all types of physical matter and their interactions in all possible universes", crystal-covariantly (AC1-hosting, #639).
 2. **The in-flight region as a space** (hosting definition §5 Q3): which of {the orbit-space flow as a process; a locale / condensed object; a limit of finite approximations} is a *definition* rather than a description? The ledger's condensed-math conjecture (CONJ-condensed-math-for-transition-state, marginal) is the only candidate framework on record; the spatial first link is proved (PROOF-spatial-first-link-condensed-locale); the pointless case is the gate.
-3. **The boundary of a universe** (§5 Q2) — **reshaped by Decision 1**: under P2′ it is the ℤ/3-datum half and the 6-dim gap; under P2 a ℂP² point (or the bundle); the conversation's job is no longer *which* but *what the encoding map is* — no bulk-to-boundary map exists under any reading.
+3. **The boundary of a universe** (§5 Q2) — **Decision 1 is OPEN** (ruling bundle v0.7 §1; encoded as the P2/P2′ pair in INTERP-holographic-boundary, kill cannot fire today): under P2′ it would be the ℤ/3-datum half and the 6-dim gap; under P2 a ℂP² point (or the bundle); the conversation's job is no longer *which* but *what the encoding map is* — no bulk-to-boundary map exists under any reading.
 4. **Is "universe = crystal + hosted ℍ" the right unit** (§5 Q1), or must a universe include its history in the substrate — sharpened by POST-hosting's history form (almost every history starts in flight) and the Γ-counter clause of DERIV-arrow.
 5. **What is measurable across the space of universes** (§5 Q4): b₀ (#637); the S₃ class; the local spectrum; α̇ / Ġ as the observational face of "still crystallising" (DERIV-crystallisation-asymptotic, no rate predicted).
 
@@ -51,4 +51,4 @@ Three rounds minimum, each advancing (build / challenge / surface / resolve), dr
 
 ## 5. Gating
 
-Runs after the beekeeper rules PR #652 (Decisions 1–3 at minimum). If Decision 1 is P2′, §1 item 3 reads as above; if P2 (line or bundle), item 3 becomes "which line, and why" and the ℂP² datum joins §2.
+Runs after PR #652 (v0.7, merged 9b28adf) and its encode (#662) have landed. Nothing was ruled: Decision 1 is open, so §1 item 3 carries both readings; the split and the names are editorial, pending the beekeeper's ratification of the two process rules. (Superseded wording: if Decision 1 were P2′, §1 item 3 would read as above; if P2 (line or bundle), item 3 would becomes "which line, and why" and the ℂP² datum joins §2.

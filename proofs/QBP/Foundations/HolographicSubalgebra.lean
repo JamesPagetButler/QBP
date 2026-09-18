@@ -4,12 +4,14 @@
 
   **The THEOREM parts of the CTH derived principle `DERIV-holographic`.**
 
-  `DERIV-holographic` currently reads: *"Observers require associativity.  The
-  largest associative subalgebra of 𝕆 is ℍ (dim 4).  The 4D gap is the
-  holographic boundary."*  It carries constitutional flag 3 (#473 rounds 13–15)
-  because it was supported only through Prop 16 via `ℓ`.  This file splits the
-  principle into its provable and its non-provable parts and proves the provable
-  ones, so that the flag can be re-scoped to exactly what remains a postulate.
+  `DERIV-holographic` read: *"Observers require associativity.  The largest
+  associative subalgebra of 𝕆 is ℍ (dim 4).  The 4D gap is the holographic
+  boundary."*  It carried constitutional flag 3 (#473 rounds 13–15) because it was
+  supported only through Prop 16 via `ℓ`.  The #652 encode (ruling bundle v0.7 §2)
+  split it: the proved parts are `DERIV-holographic-theorem` (this file); the
+  postulate parts are `POST-observer-associativity` and `POST-observation`; the
+  reading is `INTERP-holographic-boundary` — all three OPEN roots with kill lists
+  (nothing ruled).  This file proves the provable parts.
 
   ## What IS claimed here (proved, kernel-checked)
 

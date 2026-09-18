@@ -113,7 +113,7 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions land formally with the foundations reb
 
 ---
 
-## Axiom decision fields (`axioms[].decision_state`, `axioms[].kill_condition`)
+## Root decision fields (`decision_state`, `kill_condition` on any record in a root list)
 
 **Status:** QBP-local since PR #659 (ledger 5.7.1, 2026-09-14); required by #654 D3 (the root gate's four-bucket exit, `scripts/root_audit.py`, PR #658). Validate today under `$defs/Axiom.additionalProperties: true` in the vendored schema (`docs/cth/inventory.schema.v0.3.json`, synced from confluent-trust #98; canonical-PR status per the sidecar `inventory.schema.v0.3.meta.json`). **Upstream extension issue:** confluent-trust #102 (canonical delta owned by @cth-implementor; drafted after the AXIOM-2 encode lands, with AXIOM-1's record as the test vector). **Co-sign on the introducing PR:** @cth-implementor, #659 issuecomment-5658610585 (re-pinned to head d6ac91b after the string→array re-cut; earlier pins issuecomment-5658354408 / -5658368053).
 
@@ -122,6 +122,21 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions land formally with the foundations reb
 | `decision_state` | enum `open` \| `ruled` | decision lifecycle, distinct from the coherence `status` enum. `open` = the root is an Impasse Record with a stated falsifier; `ruled` = a scope/process ruling exists and is cited by a `JamesPagetButler/*` GitHub URL in `ruling` (structural check; the semantic half is the Red Team confirmer's) | `open` + `kill_condition` ⇒ bucket-3 OPEN; `ruled` + cite ⇒ bucket-2 FORCED |
 | `kill_condition` | list of non-placeholder strings — **one entry per open question** on the root (a single question = a one-element list; per qbp-architecture §I4 on #659, decision-boundary principle: each entry is one Impasse Record with its own kill and discharge; **array-only canonical** — decided by @cth-implementor (schema authority, live-test 1325; confluent-trust #102); a `string \| array` union was rejected as a consumer footgun. Entry type may become a structured object `{kill, discharge, trigger_issue, question}` at the canonical delta so the gate can machine-check that each open question names both its kill and its discharge — decided in #102, one migration) | the falsifier(s): per entry, the ledger-observable event that fires that kill, and (where stated) its discharge arm. Named `kill_condition`, not `kill`, to avoid collision with the anchor field `killed_by`. Invariant (cth-implementor): `decision_state: open` ⇒ `kill_condition` present — nothing parks open without a kill | required non-empty for bucket-3; every entry non-placeholder |
 
-**Current usage:** `AXIOM-1` — `decision_state: "open"`, `kill_condition` = a two-entry list (question 1 process; question 2 scope of the selection clause), each entry with its own kill and discharge, trigger #647. No other root carries the fields yet (META-1, AXIOM-2 are in the open-roots register, #655 / #473).
+**Current usage (after #662, ledger 6.0.0):** `AXIOM-1` (two-entry list, #647); `META-2`, `POST-boundary-encoding`, `POST-hosting`, `POST-observer-associativity`, `POST-observation`, `INTERP-holographic-boundary` — all `decision_state: open` with one-or-more-entry kill lists (four of them cannot fire today and say so). META-1 is in the open-roots register (#655); AXIOM-2 is retired.
 
 **Forward rule:** no other QBP-local field on `Axiom` records without a row here and an upstream issue. When confluent-trust #102 lands, this row is marked canonical and the vendored schema is synced per `schema-change-propagation-checklist.md`.
+
+
+---
+
+## QBP-local top-level lists (`meta_principles`, `interpretations`, `retired_axioms`, `retired_principles`)
+
+**Status:** QBP-local since PR #662 (ledger 6.0.0, 2026-09-18); validate under the schema's top-level `additionalProperties: true`. **Upstream tracking issue:** https://github.com/JamesPagetButler/confluent-trust/issues/103 (promotion to canonical `$defs` when the shape freezes; @cth-implementor owns the delta together with #102). **Co-sign on the introducing PR:** @cth-implementor, #662.
+
+| List | Records | Why a separate list | Gate reading (`root_audit.py`) |
+|---|---|---|---|
+| `meta_principles` | epistemic roots (`META-*`; today META-2 level saturation) | the canonical `meta_axiom` is a single object; a second epistemic root needs a list | a root list: every record must sort (open + kill list) or be registered |
+| `interpretations` | `INTERP-*` records — `provenance_kind: philosophy` + `decision_state` + `kill_condition` (cth-implementor, live-test 1297: no new kind) | the schema pins `derived_principles` ids to `^DERIV-` | a root list (the gate's `INTERP-` prefix) |
+| `retired_axioms` / `retired_principles` | records retired as roots/principles, kept verbatim with a dated `notes` string saying where their content went (AXIOM-2 → POST-boundary-encoding + META-2 + DERIV-encoding-level; DERIV-holographic → the flag-3 split) | the record is the audit trail; nothing is deleted | reported (bucket-4), not gated |
+
+**No further record-level fields.** Records in these lists carry only the schema's fields, the two D3 fields, and — for INTERP — `provenance_kind`. Evidence-anchor lists and supersession pointers are prose in the pre-existing `notes` field, not new fields (PR #662 Red Team R1: a `kind` taxonomy was ruled out at #654 D3(b)).
