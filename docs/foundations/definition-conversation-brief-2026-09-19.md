@@ -71,3 +71,8 @@ Every claim in the runner's four-bucket table carries a **test column**:
 - bucket 3 *open* — the kill condition or the precise missing piece (§10 form);
 - bucket 4 *wrong and withdrawn* — with the author.
 Nothing from this conversation reaches the ledger, an anchor, a Lean docstring or a PR body from the runner's report. The path after the report is: heterogeneous Red Team confirmer on the transcript → proof PRs for every *provable* row (lean-prover / agda-prover, `#print axioms` clean, CI green) → only then an encode through `scripts/cth_ledger_edit.py` under Tier-3 review. The beekeeper sees results only after the confirmer.
+
+## 7. Errata (v0.1 → recorded by the confirmer, 2026-09-19; the sealed text above is left as written)
+
+- **Sealed R3 said "the gap is 4-dimensional either way".** Wrong: INTERP-holographic-boundary states the gap is 6-dimensional under P2′ (ℍ_s meets the half only in ℂ_u) and 4-dimensional under P2. The driver's error, not Gemini's; it was not checked against the ledger before sealing (gate condition 2). The corrected statement is used from round 6 on.
+- **Sealed R3 predicted the kill could be sharpened to "a defining property that is ρ-invariant (P2′ ⇒ theorem)".** The confirmer showed that branch is unsatisfiable: the Cayley–Dickson half is never ρ-invariant (`rotAut3_moves_lowHalf`), while every ℍ ⊕ ℍℓ around a generic crystal is. The surviving finding is bucket 3: ρ-equivariance eliminates P2′ and imposes no constraint on P2; Decision 1 stays open.
