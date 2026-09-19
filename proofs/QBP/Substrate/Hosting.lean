@@ -393,6 +393,125 @@ theorem polePlus_hosted_eq_complex :
     simp only [polePlus, one_smul]
   rw [h, smul_ell_hosted_eq_complex]
 
+/-! ## 7b. Off the poles, hosting is an EQUALITY (#2); two generic universes
+       share exactly `ℂ` (#3)
+
+`universe_hosts_quaternion` (§6) is a **containment** `hosted ⊆ ℍ_u`; the
+heterogeneous confirmer's verdict of 2026-09-19 (row 1, §8 item 2) demoted the
+"`hosts ℍ_s =`" reading for exactly that reason and named the missing half as
+the real prerequisite.  Here it is, with the hypothesis the confirmer identified:
+the crystal must not be a **pole**.  The hypothesis is necessary — at a pole the
+hosted algebra is `span{1, ℓ} ≅ ℂ` (`pole_hosts_complex`, §7), which is
+2-dimensional, so no equality with a 4-dimensional `ℍ_u` can hold there.
+
+Interpretation guardrail unchanged: these are statements about subalgebras of 𝕊.
+No identification with "the observer's ℍ" or with any physical structure is made
+(POST-observer-associativity / INTERP-holographic-boundary remain OPEN roots). -/
+
+/-- **A universe is NON-POLE** when the component of its crystal orthogonal to
+    the doubling unit `ℓ` is nonzero. -/
+def Universe.NonPole (U : Universe) : Prop :=
+  U.crystal - (U.crystal.coord (hiIdx 0)) • ell ≠ 0
+
+/-- `NonPole` says exactly what its name says: the crystal is not a real multiple
+    of `ℓ`. -/
+theorem Universe.nonPole_iff (U : Universe) :
+    U.NonPole ↔ ∀ t : ℝ, U.crystal ≠ t • ell := by
+  constructor
+  · intro h t hEq
+    refine h ?_
+    have hc : U.crystal.coord (hiIdx 0) = t := by
+      rw [hEq, smul_coord, ell_coord_hiIdx_zero, mul_one]
+    rw [hc, hEq, sub_self]
+  · intro h hzero
+    exact h (U.crystal.coord (hiIdx 0)) (by rw [← sub_eq_zero]; exact hzero)
+
+/-- The north pole is, as advertised, NOT a non-pole: the hypothesis of
+    `Universe.hosted_eq_quatSpan` genuinely excludes `pole_hosts_complex`. -/
+theorem polePlus_not_nonPole : ¬ polePlus.NonPole := by
+  intro h
+  exact (polePlus.nonPole_iff.mp h) 1 (by rw [one_smul]; rfl)
+
+/-- **`hosted_eq_quatSpan` (#2).**  For a NON-POLE universe there is a unit
+    imaginary octonion direction `u` with
+
+      `U.hosted = ℍ_u = span_ℝ{1, ℓ, U, ℓU}`,  `U = loOf u`,
+
+    an EQUALITY of sets — both the containment of `universe_hosts_quaternion` and
+    its converse.  (`crystal_quatSpan_independent` then makes `ℍ_u` genuinely
+    4-dimensional, so the hosted algebra is a copy of ℍ on the nose.) -/
+theorem Universe.hosted_eq_quatSpan (U : Universe) (h : U.NonPole) :
+    ∃ u : CDAlg ℝ 3, u.coord 0 = 0 ∧ N u = 1 ∧
+      U.hosted = {x : CDAlg ℝ 4 | InQuatSpan (loOf u) x} := by
+  obtain ⟨u, α, γ, b₀, hu0, hNu, hlo, hhi⟩ :=
+    (vacuum_iff_parametrised U.crystal).mp U.isVacuum
+  have hP := crystal_perp_eq (u := u) (b₀ := b₀) hu0 hlo hhi
+  have hk : α ^ 2 + γ ^ 2 ≠ 0 := by
+    intro h0
+    have hα : α = 0 := by nlinarith [sq_nonneg α, sq_nonneg γ]
+    have hγ : γ = 0 := by nlinarith [sq_nonneg α, sq_nonneg γ]
+    exact h (by rw [hP, hα, hγ]; module)
+  have hNu' : N u = 1 := by
+    rcases hNu with h1 | h0
+    · exact h1
+    · exact absurd (by rw [hP, h0, loOf_zero, hiOf_zero]; module) h
+  exact ⟨u, hu0, hNu',
+    genByPair_eq_quatSpan_of_param (u := u) U.coord_zero hu0 hlo hhi hk⟩
+
+/-- **`universe_intersection_generic_eq_complex` (#3).**  Two NON-POLE universes
+    with DIFFERENT hosted algebras share exactly the complex line
+    `span_ℝ{1, ℓ} ≅ ℂ`.
+
+    The genericity hypothesis is stated intrinsically as `U₁.hosted ≠ U₂.hosted`;
+    by `inQuatSpan_neg_dir` this is equivalent to the confirmer's `u₁ ≠ ±u₂`
+    (the quaternion span only sees the direction up to sign).  `ℓ` lies in both,
+    so the intersection is 2-dimensional — it is `ℂ`, not `ℝ`. -/
+theorem universe_intersection_eq_complex {U₁ U₂ : Universe}
+    (h₁ : U₁.NonPole) (h₂ : U₂.NonPole) (hne : U₁.hosted ≠ U₂.hosted) :
+    U₁.hosted ∩ U₂.hosted
+      = {x : CDAlg ℝ 4 | ∃ a b : ℝ, x = a • (1 : CDAlg ℝ 4) + b • ell} := by
+  obtain ⟨u₁, hu1, hN1, he1⟩ := U₁.hosted_eq_quatSpan h₁
+  obtain ⟨u₂, hu2, hN2, he2⟩ := U₂.hosted_eq_quatSpan h₂
+  have hd : u₁ ≠ u₂ := by
+    intro hEq
+    exact hne (by rw [he1, he2, hEq])
+  have hd' : u₁ ≠ -u₂ := by
+    intro hEq
+    refine hne ?_
+    rw [he1, he2, hEq]
+    ext x
+    simp only [Set.mem_setOf_eq]
+    exact inQuatSpan_neg_dir
+  rw [he1, he2]
+  exact quatSpan_inter_eq_complex hu1 hu2 hN1 hN2 hd hd'
+
+/-! ### A concrete non-pole universe, so §7b is not vacuous -/
+
+theorem loOf_e1_mem_universeSpace :
+    loOf (e (1 : Fin (2 ^ 3))) ∈ UniverseSpace := by
+  have he0 : (e (1 : Fin (2 ^ 3)) : CDAlg ℝ 3).coord 0 = 0 := by
+    rw [e_coord, if_neg (by decide : ¬ ((0 : Fin (2 ^ 3)) = 1))]
+  refine ⟨⟨loOf_coord_zero he0, ?_⟩, ⟨loOf_coord_zero he0, ?_⟩⟩
+  · rw [N_loOf, N_e]
+  · rw [cdLo_loOf, cdHi_loOf, alt_mul_zero, alt_zero_mul]
+
+/-- A universe whose crystal is `loOf e₁` — imaginary, unit, and with vanishing
+    `ℓ`-component, hence non-pole. -/
+def genericUniverse : Universe := ⟨loOf (e (1 : Fin (2 ^ 3))), loOf_e1_mem_universeSpace⟩
+
+theorem genericUniverse_nonPole : genericUniverse.NonPole := by
+  have hhi : genericUniverse.crystal.coord (hiIdx 0) = 0 := loOf_coord_hi_zero _
+  intro hz
+  rw [hhi, zero_smul, sub_zero] at hz
+  have hN : N (loOf (e (1 : Fin (2 ^ 3)))) = 0 := by rw [show loOf (e (1 : Fin (2^3))) = genericUniverse.crystal from rfl, hz, N_zero]
+  rw [N_loOf, N_e] at hN
+  norm_num at hN
+
+/-- **§7b is not vacuous:** a non-pole universe exists, and its hosted algebra is
+    an honest 4-dimensional quaternion span. -/
+theorem exists_nonPole_universe : ∃ U : Universe, U.NonPole :=
+  ⟨genericUniverse, genericUniverse_nonPole⟩
+
 /-! ## 8. The local spectrum at a universe, and its failure in flight -/
 
 /-- **The local spectrum at a universe.**  `CrystalHosting.left_mul_sq_at_vacuum`
@@ -657,6 +776,13 @@ is a finding. -/
 #print axioms normalise_sedWitX_mem_inFlight
 #print axioms inFlight_nonempty
 #print axioms universeSpace_ne_stateSphere
+#print axioms Universe.nonPole_iff
+#print axioms polePlus_not_nonPole
+#print axioms Universe.hosted_eq_quatSpan
+#print axioms universe_intersection_eq_complex
+#print axioms loOf_e1_mem_universeSpace
+#print axioms genericUniverse_nonPole
+#print axioms exists_nonPole_universe
 
 -- Data definitions that use choice / classical reasoning, printed for completeness.
 #print axioms normalise
