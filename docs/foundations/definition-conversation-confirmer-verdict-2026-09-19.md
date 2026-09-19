@@ -233,3 +233,153 @@ Sequencing for a prover: **#4 is free (done) → #5 → #9**, and independently 
 5. **Correct "the gap is 4-dimensional either way"** to the ledger's own split (P2′ 6-dim, P2 4-dim) wherever it appears, including the driver's sealed R3 position.
 
 Nothing in this file is anchored, encoded or ruled. No GitHub or bridge post was made.
+
+---
+---
+
+# PASS 2 — confirmer verdict on the re-opened conversation (rounds 6–7)
+
+**Scope:** appended, not edited over pass 1. Read: transcript §Rounds 6–7, verbatim indices **84–87**, and the runner report's "Runner report — rounds 6–7" section. Same rules: read-only, no lake/lean/agda, numerics under `run-bounded` into the confirmer scratchpad, nothing posted.
+
+> ## Pass-2 verdict
+>
+> **IMPASSED** — the §10 impasse on Decision 1 is now **EARNED (6/6 components)**, and I could **not** break it: I ran the decisive test the dyad left open (the completeness conjecture) over a search space that is *exhaustive by construction*, and found **no counterexample in 98 converged solutions**. The §3 gate is now **4/5**: conditions 1–4 hold, condition 5 fails on **one word** of the exit answer ("irreducible"), which I refute below against a reading already on the ledger. **Conditional on the two one-line corrections in §P2.7, this is IMPASSED; without them it remains OPEN.**
+
+---
+
+## P2.1 — The §3 gate over the full seven rounds
+
+| # | Condition | Pass 1 | **Pass 2** | Evidence (turns 84–87) |
+|---|---|---|---|---|
+| 1 | Next steps **well-reasoned** | NOT MET | **MET** 🟢 | The proof-owed list is corrected with reasons: three struck (#1 exists, #4 exists, #7 false), six kept with explicit hypotheses, one added. Gemini accepts each individually with a stated reason (turn 87 B), e.g. *"#3 … ACCEPT. The hypothesis correction is vital (α=0 crystals still have a valid u direction)."* **Caveat (not a failure):** #10 needs continuous G₂ and SU(3). The repo's `Foundations/G2Transitivity.lean` covers only **signed-basis** automorphisms (`SignedBasisMap`, `IsBasisAuto` — a finite group); G₂ as Aut(𝕆) is in neither the repo nor Mathlib. #10 is true and well-posed but **out of toolchain** — see P2.4. |
+| 2 | Load-bearing assumptions **validated** | NOT MET | **MET, conditional on one edit** 🟡 | The assumption table (turn 87 A) is the right instrument and five rows are honestly tagged — completeness is tagged **CONJECTURE** with a proof shape, and the SU(3) rows carry one-line derivations. **One over-tag:** row 4, *"$\mathbb{H}_s = \text{span}\{1,u,\ell,\ell u\}$ — **VALIDATED** … (The inductive constructors `GenByPair.add/smul` provide the equality)"* — false reasoning, and it contradicts the **same turn's** acceptance of #2 `hosted_eq_quatSpan` as *owed*. Closure under + and • does not give `u, uℓ ∈ hosted`. The runner logged it as an over-tag; the table still stands in the verbatim. One-line edit closes this. |
+| 3 | Reasoning **grounded** | MET | **MET** 🟢 (strengthened) | Turn 84 opens *"I re-ran its scripts myself before writing this"* — the driver re-derived a third party's result rather than quoting it, which is exactly MO §7's "independent evidence before agreement". |
+| 4 | **Shared understanding** | MET | **MET** 🟢 (strongest in the record) | Turn 84 surfaces **three of the driver's own errors** unprompted: F2 *"My '0/20' enumerated only the Fano-aligned slice"*; F4 *"I told you '4-dimensional either way' … **My error, not yours**"*; F6 row 12's over-claim. Turn 85 reciprocates: *"The 'fast agreement' trap caught both of us again."* |
+| 5 | Easy answer **pressure-tested** | NOT MET | **NOT MET** 🔴 (narrowly) | Genuine improvement: the round-5 answer **was** tested in round 6 and withdrawn (turn 85: *"My Round 5 claim … was a massive overstatement"*), and the round-6 answer's *structure* was attacked in round 7 (A1–A5: completeness? equivariance? Stab(s) vs Stab(u)? pole?). But the exit answer's **modal half — "the choice is irreducible" — was never attacked**, and the decisive completeness test was deferred to "still to run". I attack both in P2.5; the completeness half survives, "irreducible" does not. |
+
+**Gate: 4 / 5.**
+
+---
+
+## P2.2 — The §10 impasse on Decision 1 — **EARNED**
+
+| # | Component | Pass 1 | **Pass 2** | Assessment |
+|---|---|---|---|---|
+| 1 | Problem-type | 🟡 mis-typed | **MET** 🟢 | Correctly re-typed. Turn 87 C: *"We do not have a disagreement; we have discovered a fundamental algebraic **under-determination**. P2 and P2′ are not competing physical theories; they are two different ways to slice a highly degenerate phase space."* And the consequence is drawn correctly: *"It must be encoded OPEN with a kill"* — never a beekeeper choice (ruling bundle v0.7 §0). |
+| 2 | Precise missing piece | 🔴 | **MET** 🟢 | *"A mathematical theorem proving the completeness conjecture is false (i.e. discovering a non-standard octonion subalgebra containing ℍ_s) **OR** a physical derivation from an existing ledger anchor that uniquely constrains the ℂP² parameter."* The **first disjunct is a specific exhibitable object** — obtaining it settles the question — which satisfies MO §10.2 where "a symmetry-breaking mechanism" did not. (The second disjunct is still type-level; the first carries the component.) **Note for the record:** my search (P2.3) makes the first disjunct *unlikely to be the resolving route*. |
+| 3 | Gap type | 🟢 | **MET** 🟢 | Theoretical. |
+| 4 | Crux | 🔴 | **MET** 🟢 | MO §10.4 is *"the crux, **if it is a disagreement**"*. Turn 87 declares plainly that it is not one and reframes — which is the correct disposal of the component, not an evasion of it. |
+| 5 | Strategies run | 🔴 | **MET** 🟢 | Three named with their yields — ρ-equivariance check (*"P2′ breaks ρ while the entire P2 family preserves it"*), §9-D moduli count (*"the exact ℂP² parameterization and the SU(3) transitivity"*), observable/intersection check — plus one named still to run. **§9-D, the family skipped in rounds 1–5 and the one that broke the round-5 draft, was actually run in round 6.** |
+| 6 | Best partial + bound | 🔴 | **MET, conditional on one edit** 🟡 | *"The residual freedom is … a ℂP² manifold (4 real dimensions) on which the crystal's symmetry group acts transitively"*, with the pole at 8 dims. **Both dimensions independently verified by me** (P2.4). The word **"exactly"** is load-bearing on the completeness conjecture and must carry that qualifier in the artefact itself, as the runner's report already does elsewhere. |
+
+**Could I break it with a §9 strategy the dyad skipped? — No.** I ran the one decisive test (P2.3) and it held. One strategy still unrun that would *upgrade* rather than break the impasse: **§9-B working-backwards** — ask what would have to be true for a selector to exist. By the dyad's own #10, transitivity means **no Stab(s)-natural selector can exist**; that converts the open kill into a *theorem of non-selectability*, a stronger and more useful federation artefact than an open flag.
+
+**Verdict on the impasse: EARNED.**
+
+---
+
+## P2.3 — (B) The completeness conjecture: I tried to refute it and could not
+
+Script: `…/scratchpad/confirmer/pass2d.py` (log `pass2d.log`), plus `pass2b.py`/`pass2c.py`. Independent CD product rebuilt as a structure tensor `T[i,j,:] = e_i·e_j`; ρ rebuilt from the basis-free rule (automorphism residual **1.79e-14**, `‖ρ³−I‖ = 2.4e-15`, `ρ(ℓ)=ℓ` exact).
+
+**The search space is exhaustive by construction — this is the part that makes the result worth something.** Let `O` be any 8-dimensional subalgebra of 𝕊 with `ℍ_s ⊆ O`. Then:
+- `dim(O ∩ ℍ_s^⊥) = 4` and `O = ℍ_s ⊕ W` with `W = O ∩ ℍ_s^⊥` (since `ℍ_s ∩ ℍ_s^⊥ = 0`);
+- `ℍ_s^⊥` **is a left ℍ_s-module** — I verified this rather than assuming it: `max‖g·w − P_{⊥}(g·w)‖ = 1.06e-14` over `g ∈ {U, ℓ, Uℓ}` and an orthonormal basis of the 12-dim `ℍ_s^⊥`;
+- hence `ℍ_s·W ⊆ O ∩ ℍ_s^⊥ = W`, so `W` is a 4-dim left ℍ_s-submodule of `ℍ_s^⊥ ≅ ℍ_s³`, and over a division ring a rank-1 submodule is free: `W = ℍ_s·w`.
+
+So the **entire** space of candidates is the ℍ_s-lines in `ℍ_s³` — a **ℍP², 8 real dimensions** — and the known family `𝕆'_v` is a 4-dim subvariety of it. Nothing is excluded by the parametrisation.
+
+**Result.** Random `w`: closure residual² **min 7.1e-02, median 4.75** over 3000 samples — a generic `w` does *not* close, as the repo's own check (6) says. Optimising over the ℍP² from **120 random restarts**: **98 converged** to closure residual² < 1e-16, and **98 of 98 are exactly some `𝕆'_v`** (CD-graded, `dim(O ∩ 𝕆_low) = 4`, and matching a `𝕆'_v` projector to < 1e-6). **Zero counterexamples.**
+
+**What this search covers, honestly:** the full candidate space (above), sampled by 120 uniformly-random restarts of a local optimiser. It is strong numerical support, **not a proof** — a solution branch of small measure could be missed by 120 restarts. It does **not** cover subalgebras of dimension other than 8, nor the pole case (treated separately).
+
+**What it hands a prover — a concrete route, replacing "via the sedenion alternator":**
+> `encoding_octonion_completeness` — if `O` is an 8-dim subalgebra of 𝕊 containing `ℍ_s` (non-pole `s`), then `W := O ∩ ℍ_s^⊥` is a free rank-1 left ℍ_s-submodule `ℍ_s·w`; imposing closure of `ℍ_s ⊕ ℍ_s·w` forces `w ∈ ℍ_s·v` for a unit imaginary `v ⊥ u` in 𝕆, i.e. `O = 𝕆'_v`.
+
+This is a finite algebraic computation over the existing `quatSpan`/`GenByPair` machinery — far more tractable than the "sedenion alternator" shape Gemini proposed (turn 87 A1), and it is the single highest-value addition to the proof-owed list.
+
+---
+
+## P2.4 — (C) Rows 11 and 12, and whether #10 is well-posed
+
+**Row 11 (generic crystal: ℂP², single SU(3) orbit).** What I verified:
+
+| Check | Result |
+|---|---|
+| `𝕆'_{a·v + b·(uv)} = 𝕆'_v` (the parameter is the ℂ_u-**line**) | **20/20** |
+| `v₂` off that line gives a different subalgebra | **20/20** |
+| `ρ(𝕆'_v) = 𝕆'_v` | residual **2.94e-16** |
+| `L_u² = −Id` on `u^⊥ ∩ Im𝕆` (dim 6) | residual **1.49e-16** → `u^⊥ ≅ ℂ³`, so "ℂ_u-lines in ℂ³" *is* ℂP² |
+| **tangent dimension of the family** | **4** — singular values of the tangent sample are `{1.000, 0.942, 0.853, 0.746}` then `1e-5`, then 0: a five-order-of-magnitude gap at rank 4 |
+
+**Cannot check:** SU(3)-transitivity itself. Testing it requires constructing elements of the *continuous* `Stab_{G₂}(u)`, which I did not do. What I can say is that the family is **exactly** the set of complex lines of a ℂ³ (verified above), so transitivity reduces to the textbook facts `Stab_{G₂}(u) ≅ SU(3)` and `SU(3)` transitive on `ℂP²` — both taken on reference, by me and by the dyad. The runner is right to list them under "not verified".
+
+**Is #10 `encoding_octonions_su3_orbit` well-posed for a prover?** **Mathematically yes** — the statement is true, hypotheses explicit (non-pole, direction `u`), and it is deliberately restricted to subalgebras *of the form* `H ⊕ Hℓ`, which **insulates it from the completeness conjecture**. Good design. **For this toolchain, no**: `G2Transitivity.lean` proves things only about `SignedBasisMap` / `IsBasisAuto` — the finite signed-basis automorphisms — and neither the repo nor Mathlib has G₂ as Aut(𝕆) or SU(3) acting on ℂP². **Recommended surrogate, which carries the content that matters and is provable with existing machinery:**
+> `encoding_family_eq_complex_lines` (`Foundations/HolographicSubalgebra.lean`) — for a non-pole crystal with direction `u`, the map `v ↦ ℍ'_v ⊕ ℍ'_v·ℓ` induces a bijection from the `L_u`-complex lines of `u^⊥ ∩ Im𝕆` onto `Fam(s)`. Hypotheses: `u` imaginary unit, `s` non-pole.
+
+That gives "a 4-dimensional continuum with no distinguished member" from pure CD algebra. Keep #10 as a reference-backed remark, or mark it explicitly out-of-toolchain — do **not** hand a prover a goal requiring Lie theory the repo does not have.
+
+**Row 12 (pole family).** Verified: every `ℍ ⊕ ℍℓ` has closure **4.65e-16**, ρ-residual **3.78e-16**, contains `span{1,ℓ}` exactly. **Tangent dimension measured = 8**: singular values `{1.000, 0.941, 0.927, 0.819, 0.608, 0.542, 0.450, 0.418}` then `2e-5, 1e-5`, then 0 — a clean gap at rank 8. So "8-dimensional" is now **measured**, not reasoned, and the pole is indeed strictly less determined than a generic crystal (8 > 4).
+
+**But the name is wrong.** Turn 87 A5 and runner row 12 say *"the Grassmannian `Gr₃(7)` (or `G₂/SO(4)`), which is 8-dimensional"*. `Gr₃(7)` has dimension `3·4 = 12`, not 8. The correct object is the **associative Grassmannian** `G₂/SO(4)`, an 8-dim submanifold *of* `Gr₃(7)`. My measurement (8, not 12) confirms it is the associative Grassmannian. The "≅" must go.
+
+---
+
+## P2.5 — (D) Pressure test of the new last easy answer
+
+> *"The residual freedom in the encoding is exactly a ℂP², a single SU(3) orbit, so no canonical choice exists and the choice is irreducible."*
+
+**The structural half survives.** "ℂP², 4 real dims, single orbit" — I verified the dimension and the ℂ_u-line parametrisation, and I failed to refute completeness over an exhaustive-by-construction space. This half is the best-characterised object the conversation has produced. Two qualifiers must travel with it: **"exactly" is conditional on the completeness conjecture**, and it is **false at the poles** (8-dim).
+
+**The modal half — "the choice is irreducible" — fails, on three counts.**
+
+1. **The ledger already carries a reading in which there is no choice to make.** INTERP-holographic-boundary, verbatim: *"P2 — the encoding is an octonion containing ℍ_s (a ℂP² of them, completeness a conjecture; the gap is 4-dim; **or the datum-free bundle form ℍ_s^⊥ ≅ ℍ_s³**)."* A group acting **transitively** on a fibre is precisely the signature of a situation where the **bundle is canonical and no section is** — the freedom is not an irreducible choice, it is the absence of a section in a canonical bundle. Neither party engaged this reading in seven rounds, and my own numerics *are* that object: I verified `ℍ_s^⊥` is a left ℍ_s-module of rank 3 (residual **1.06e-14**), i.e. literally `ℍ_s³`, and my entire search ran over its ℍ-lines. "Irreducible choice" and "canonical bundle, no canonical section" are different claims with different encodes.
+2. **"Irreducible" over-reads transitivity.** Stab(s)-transitivity establishes that **no Aut(𝕊)-natural** selector exists. It says nothing about selection by data *outside* the algebra — the in-flight trajectory (a different object, per the round-2 Q1 split), the rule (#635), or the initial ensemble. Round 6's own list (a) established that exactly those three carry information `V`'s geometry does not. Going from "the algebra's symmetries do not break it" to "the choice is irreducible" is the inference the record does not support.
+3. **The quantifier is missing.** At a pole the residual is 8-dim, not a ℂP² — so "the residual is *exactly* a ℂP²" is false for the crystals the record singles out (`pole_hosts_complex`), as the dyad's own row 12 concedes.
+
+**Corrected claim I would accept:** *For a non-pole crystal, the encoding octonions of the form `ℍ ⊕ ℍℓ` containing ℍ_s form a canonical ℂP²-bundle over the vacuum manifold on which Stab(s) acts transitively, so no section is natural to `Aut(𝕊)`; whether the encoding is a point of that ℂP² or the bundle itself is undecided, and any selection must come from data outside `Aut(𝕊)`. At a pole the fibre is 8-dimensional. "Exactly ℂP²" holds only if the completeness conjecture does.*
+
+---
+
+## P2.6 — (E) The candidate kill rewrite for INTERP-holographic-boundary
+
+> *"killed if a defining mathematical property — an algebraic invariant or a projection operator — selects a unique encoding octonion from the ℂP² moduli space without a manual parameter choice."*
+
+| Test | Verdict |
+|---|---|
+| Avoids putting a choice to the beekeeper? | 🟢 **Yes.** It is a kill on an open item, not an option list. Correct under ruling bundle v0.7 §0. |
+| Fires on a derivation, not a stipulation? | 🟡 **Better than its predecessor, but still defective.** By the dyad's own **validated** transitivity (#10), *no property natural to `Stab(s)` can select a point*. So as written the clause can only ever fire on something **not** natural to the algebra — which is a stipulation, the exact disease of the "ρ-invariant ⇒ P2′" branch it replaces. It must name **where the selecting datum is allowed to come from.** |
+| Faithful bucket-3 kill? | 🟡 It also **drops the one positive result of the whole arc** — ρ-equivariance *eliminates P2′* — and it drops the ledger's own third reading (the datum-free bundle), which would **dissolve** the kill rather than fire it. |
+
+**Candidate I would put in its place — three clauses, explicitly labelled:**
+- **(a) Non-selectability (a theorem in waiting, not a live kill).** No defining property invariant under `Stab_{Aut(𝕊)}(s)` selects a point of `Fam(s)` — this *follows* from #10 and should be recorded as a result, not left as a kill that cannot fire.
+- **(b) The live kill.** Fires if data **outside `Aut(𝕊)`** — the in-flight trajectory, the rule (#635), the initial ensemble, or an interior observable — is *derived* (not stipulated) to fix the ℂP² parameter. This names the source, which is what MO §10.2 demands.
+- **(c) Dissolution, not a fire.** If the datum-free bundle form `ℍ_s^⊥ ≅ ℍ_s³` is derived to be the encoding, there is no parameter to select and Decision 1 closes without anything being chosen. Already on record in INTERP-holographic-boundary; never engaged by the dyad.
+- **Sub-results to record alongside:** ρ-equivariance **eliminates P2′** (`𝕆_low` not ρ-invariant, residual 0.866, Lean witness `rotAut3_moves_lowHalf`); completeness is **CONJECTURE** with the ℍ_s-line proof route of P2.3; the pole fibre is 8-dimensional.
+
+---
+
+## P2.7 — (F) New withdrawals, and the two corrections that close the gate
+
+| Claim | Turn | Gemini's own words | Verdict |
+|---|---|---|---|
+| `generic_quatSpan_not_subset_rho_inv_octonion` | **85** | *"I unconditionally **WITHDRAW** the theorem `generic_quatSpan_not_subset_rho_inv_octonion` proposed in Round 5."* + *"my geometric argument regarding the rotation of v failed because ρ(v) generates the identical subalgebra as v."* | 🟢 **Confirmed** |
+| "The rule adds only a clock / the substrate is dynamically pre-determined" | **85** | *"My Round 5 claim that the substrate is 'dynamically pre-determined' by the Hessian was a **massive overstatement**."* + the replacement claim and its falsifier | 🟡 **Confirmed in substance**, but **without the `WITHDRAWN by Furey/Feynman` tag** the other rows carry, while runner row 19 records it as "withdrawn by Furey/Feynman, R6". Minor provenance slip — add the tag or soften the row. |
+| "Exactly 7"; "0/20 obstruction"; "ρ kills both readings"; "gap 4-dim either way" | **84** | Driver's own, correctly self-attributed: *"my '0/20' enumerated only the Fano-aligned slice"*; *"**My error, not yours**"* | 🟢 **Confirmed**, and correctly attributed to the driver/runner rather than to Gemini |
+| R1–R5 withdrawals | 77/79/81/83 | unchanged | 🟢 Confirmed in pass 1 |
+
+### The two corrections that turn OPEN into IMPASSED
+
+1. **Gate 5** — replace the last easy answer / best-partial wording with the corrected claim of P2.5 ("canonical bundle, no natural section" — not "irreducible choice"; "exactly ℂP²" conditional on completeness; 8-dim at the pole), and engage the ledger's datum-free bundle reading.
+2. **Gate 2** — fix the assumption-table over-tag: `ℍ_s = span{1,ℓ,u,ℓu}` is ⊆ only; `GenByPair.add/.smul` are *ingredients of* owed item #2, not the theorem.
+
+## P2.8 — Must-do list
+
+1. Apply the two corrections above (closes gate 5 and gate 2).
+2. Add **`encoding_octonion_completeness`** to the proof-owed list with the ℍ_s-line route of P2.3 — it is the missing piece the impasse names, and it is now tractable.
+3. Replace **#10** with the feasible surrogate **`encoding_family_eq_complex_lines`**; mark #10 out-of-toolchain (`G2Transitivity.lean` has only signed-basis automorphisms).
+4. Adopt the three-clause kill of P2.6, and record ρ-eliminates-P2′ as a **result**, not as an unfireable kill branch.
+5. Fix **`Gr₃(7)` → the associative Grassmannian `G₂/SO(4)`** (8-dim; `Gr₃(7)` is 12-dim — measured 8).
+6. Carry the pole quantifier (`s ≠ ±ℓ`) on every ℂP² statement, including row 11 and the best partial.
+
+Nothing in pass 2 is anchored, encoded or ruled. No GitHub or bridge post was made.
