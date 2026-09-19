@@ -88,6 +88,7 @@ import QBP.Foundations.Alternator
 import QBP.Foundations.CrossProduct
 import QBP.Foundations.CDDimension
 import QBP.Foundations.NormForm
+import QBP.Foundations.CrystalHosting
 
 namespace QBP.Foundations.HolographicSubalgebra
 
@@ -701,6 +702,190 @@ theorem lMul_comp_fails_on_octonions :
   exact assoc_e1_e2_e4_ne_zero
     (hall (e i1) (Set.mem_univ _) (e i2) (Set.mem_univ _) (e i4))
 
+/-! ## 8. The ρ-invariant octonion doubles `ℍ ⊕ ℍ·ℓ ⊂ 𝕊` (#6)
+
+The heterogeneous confirmer's verdict of 2026-09-19 (§4.3, §8 item 6) refuted
+the claim that there are *exactly seven* `ρ`-invariant octonion subalgebras of 𝕊
+(the coordinate-aligned Fano doubles) and replaced it by the true statement:
+
+> for **every** quaternion subalgebra `ℍ = span ℝ {1, p, q, pq} ⊂ 𝕆` — not only
+> the seven Fano-aligned ones — the Cayley–Dickson double `ℍ ⊕ ℍ·ℓ ⊂ 𝕊` is a
+> subalgebra containing `1` and `ℓ`, and it is invariant under the order-3
+> automorphism `ρ = rotAut3`.
+
+That is what this section proves, for an **arbitrary** pair `p q : 𝕆` (closure,
+`*`-closure, `1`, `ℓ`) and, where 4-dimensionality of `ℍ` is needed, for an
+orthonormal imaginary pair (properness).  The reason `ρ` preserves the double is
+structural and is visible in `rotLo`/`rotHi`: `ρ` acts on the pair split by a
+**plane rotation mixing the two halves by real scalars**, `(a, b) ↦ (ca − sb + λ1,
+sa + cb + μ1)`, so it preserves `S ⊕ S` for *any* submodule `S ⊆ 𝕆` containing
+`1`.  Multiplicative closure is the Cayley–Dickson doubling formula plus closure
+of `ℍ` under the octonion product and under conjugation.
+
+**Non-claims.** Nothing here says the double is 8-dimensional, that it is
+alternative or a composition algebra, or that the family of such doubles is
+finite — the confirmer's measurement says the family is a continuum, and no
+counting statement is made in either direction.  Nor is `ρ`-invariance of the
+double read as selecting anything physical (INTERP-holographic-boundary stays
+OPEN). -/
+
+section RhoInvariantDoubles
+
+open QBP.Foundations.NoAutonomousDynamics
+open QBP.Foundations.CrystalHosting
+
+/-- **The Cayley–Dickson double of a quaternion span**, `ℍ ⊕ ℍ·ℓ ⊂ 𝕊`, written
+    as the set of sedenions both of whose Cayley–Dickson halves lie in
+    `ℍ = span ℝ {1, p, q, p·q}`. -/
+def quatDouble (p q : CDAlg ℝ 3) : Set (CDAlg ℝ 4) :=
+  {x | cdLo x ∈ Submodule.span ℝ (gen4 p q) ∧ cdHi x ∈ Submodule.span ℝ (gen4 p q)}
+
+variable (p q : CDAlg ℝ 3)
+
+theorem mem_quatDouble_iff_halves {x : CDAlg ℝ 4} :
+    x ∈ quatDouble p q ↔
+      cdLo x ∈ Submodule.span ℝ (gen4 p q) ∧ cdHi x ∈ Submodule.span ℝ (gen4 p q) :=
+  Iff.rfl
+
+/-- `1 ∈ ℍ`. -/
+theorem one_mem_span_gen4 : (1 : CDAlg ℝ 3) ∈ Submodule.span ℝ (gen4 p q) :=
+  Submodule.subset_span (Set.mem_insert _ _)
+
+/-- `ℍ` is closed under conjugation (`x̄ = (2 Re x)·1 − x`, and `1 ∈ ℍ`). -/
+theorem conj_mem_span_gen4 {z : CDAlg ℝ 3} (hz : z ∈ Submodule.span ℝ (gen4 p q)) :
+    conj z ∈ Submodule.span ℝ (gen4 p q) := by
+  rw [CDAut.conj_eq_two_re_sub]
+  exact Submodule.sub_mem _ (Submodule.smul_mem _ _ (one_mem_span_gen4 p q)) hz
+
+/-- **The double really is `ℍ ⊕ ℍ·ℓ`.**  Membership is equivalent to being of the
+    form `a + b·ℓ` with `a, b ∈ ℍ` (`loOf` is the embedding of the low half,
+    `loOf b * ell = hiOf b` by `loOf_mul_ell`). -/
+theorem mem_quatDouble_iff {x : CDAlg ℝ 4} :
+    x ∈ quatDouble p q ↔
+      ∃ a b : CDAlg ℝ 3, a ∈ Submodule.span ℝ (gen4 p q) ∧
+        b ∈ Submodule.span ℝ (gen4 p q) ∧ x = loOf a + loOf b * ell := by
+  constructor
+  · rintro ⟨hlo, hhi⟩
+    refine ⟨cdLo x, cdHi x, hlo, hhi, ?_⟩
+    rw [loOf_mul_ell]
+    exact split_lo_hi x
+  · rintro ⟨a, b, ha, hb, rfl⟩
+    rw [loOf_mul_ell]
+    refine ⟨?_, ?_⟩
+    · rw [cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]; exact ha
+    · rw [cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]; exact hb
+
+/-- `1 ∈ ℍ ⊕ ℍℓ`. -/
+theorem one_mem_quatDouble : (1 : CDAlg ℝ 4) ∈ quatDouble p q := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_one]; exact one_mem_span_gen4 p q
+  · rw [cdHi_one]; exact Submodule.zero_mem _
+
+/-- `ℓ ∈ ℍ ⊕ ℍℓ`. -/
+theorem ell_mem_quatDouble : ell ∈ quatDouble p q := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_ell]; exact Submodule.zero_mem _
+  · rw [cdHi_ell]; exact one_mem_span_gen4 p q
+
+theorem zero_mem_quatDouble : (0 : CDAlg ℝ 4) ∈ quatDouble p q := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_zero]; exact Submodule.zero_mem _
+  · rw [cdHi_zero]; exact Submodule.zero_mem _
+
+theorem add_mem_quatDouble {x y : CDAlg ℝ 4}
+    (hx : x ∈ quatDouble p q) (hy : y ∈ quatDouble p q) : x + y ∈ quatDouble p q := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_add]; exact Submodule.add_mem _ hx.1 hy.1
+  · rw [cdHi_add]; exact Submodule.add_mem _ hx.2 hy.2
+
+theorem smul_mem_quatDouble (r : ℝ) {x : CDAlg ℝ 4} (hx : x ∈ quatDouble p q) :
+    r • x ∈ quatDouble p q := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_smul]; exact Submodule.smul_mem _ _ hx.1
+  · rw [cdHi_smul]; exact Submodule.smul_mem _ _ hx.2
+
+/-- **Multiplicative closure — the substantive half.**  The Cayley–Dickson
+    doubling formula `(a,b)(c,d) = (ac − d̄b, da + bc̄)` keeps both halves inside
+    `ℍ` because `ℍ` is closed under the octonion product (`span4_mul_closed`) and
+    under conjugation. -/
+theorem mul_mem_quatDouble {x y : CDAlg ℝ 4}
+    (hx : x ∈ quatDouble p q) (hy : y ∈ quatDouble p q) : x * y ∈ quatDouble p q := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_mul]
+    exact Submodule.sub_mem _ (span4_mul_closed p q hx.1 hy.1)
+      (span4_mul_closed p q (conj_mem_span_gen4 p q hy.2) hx.2)
+  · rw [cdHi_mul]
+    exact Submodule.add_mem _ (span4_mul_closed p q hy.2 hx.1)
+      (span4_mul_closed p q hx.2 (conj_mem_span_gen4 p q hy.1))
+
+/-- The double is a `*`-subalgebra: closed under sedenion conjugation too. -/
+theorem conj_mem_quatDouble {x : CDAlg ℝ 4} (hx : x ∈ quatDouble p q) :
+    conj x ∈ quatDouble p q := by
+  have h : conj x = (2 * x.coord 0) • (1 : CDAlg ℝ 4) + (-1 : ℝ) • x := by
+    rw [CDAut.conj_eq_two_re_sub]; module
+  rw [h]
+  exact add_mem_quatDouble p q
+    (smul_mem_quatDouble p q _ (one_mem_quatDouble p q))
+    (smul_mem_quatDouble p q _ hx)
+
+/-- **ρ-invariance (membership form).**  `ρ` acts on the pair split by a plane
+    rotation with **real** coefficients plus a real multiple of `1` in each half
+    (`rotLo_def` / `rotHi_def`), so it maps `ℍ ⊕ ℍℓ` into itself for any
+    submodule `ℍ` containing `1`. -/
+theorem rotAut3_mem_quatDouble {x : CDAlg ℝ 4} (hx : x ∈ quatDouble p q) :
+    rotAut3 x ∈ quatDouble p q := by
+  have hone := one_mem_span_gen4 p q
+  refine ⟨?_, ?_⟩
+  · show cdLo (rotMap3 x) ∈ _
+    rw [cdLo_rotMap3, rotLo_def]
+    exact Submodule.add_mem _
+      (Submodule.add_mem _ (Submodule.smul_mem _ _ hx.1) (Submodule.smul_mem _ _ hx.2))
+      (Submodule.smul_mem _ _ hone)
+  · show cdHi (rotMap3 x) ∈ _
+    rw [cdHi_rotMap3, rotHi_def]
+    exact Submodule.add_mem _
+      (Submodule.add_mem _ (Submodule.smul_mem _ _ hx.1) (Submodule.smul_mem _ _ hx.2))
+      (Submodule.smul_mem _ _ hone)
+
+/-- **`rho_invariant_octonion_doubles` — ρ-invariance as an equality of SETS.**
+    For every `p q : 𝕆`, `ρ(ℍ ⊕ ℍℓ) = ℍ ⊕ ℍℓ`.  (`⊆` is
+    `rotAut3_mem_quatDouble`; `⊇` uses `ρ³ = id`.)  Contrast
+    `CrystalHosting.rho_moves_cd_half`: the CD half `𝕆_low` itself is **not**
+    ρ-invariant, because it is not of the form `ℍ ⊕ ℍℓ`. -/
+theorem rotAut3_image_quatDouble :
+    rotAut3.toFun '' quatDouble p q = quatDouble p q := by
+  ext y
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    exact rotAut3_mem_quatDouble p q hx
+  · intro hy
+    exact ⟨rotAut3 (rotAut3 y),
+      rotAut3_mem_quatDouble p q (rotAut3_mem_quatDouble p q hy), rotAut3_pow_three y⟩
+
+/-- **The double is a PROPER subset of 𝕊**, so the closure statements above are
+    not vacuous.  For an orthonormal imaginary pair `p q`, `ℍ` is 4-dimensional
+    (`finrank_quaternion_frame`) hence a proper submodule of the 8-dimensional
+    `𝕆`, and any `z ∉ ℍ` gives `loOf z ∉ ℍ ⊕ ℍℓ`. -/
+theorem quatDouble_proper
+    (hp0 : p.coord 0 = 0) (hq0 : q.coord 0 = 0) (hpq : bil p q = 0)
+    (hNp : N p = 1) (hNq : N q = 1) :
+    ∃ z : CDAlg ℝ 4, z ∉ quatDouble p q := by
+  have hne : Submodule.span ℝ (gen4 p q) ≠ ⊤ := by
+    intro htop
+    have h4 : Module.finrank ℝ (Submodule.span ℝ (gen4 p q)) = 4 :=
+      finrank_quaternion_frame hp0 hq0 hpq hNp hNq
+    rw [htop, finrank_top, QBP.Foundations.CDDimension.finrank_cdAlg] at h4
+    norm_num at h4
+  obtain ⟨z, hz⟩ : ∃ z : CDAlg ℝ 3, z ∉ Submodule.span ℝ (gen4 p q) := by
+    by_contra hcon
+    push Not at hcon
+    exact hne (Submodule.eq_top_iff'.mpr hcon)
+  refine ⟨loOf z, ?_⟩
+  intro hmem
+  exact hz (by simpa using hmem.1)
+
+end RhoInvariantDoubles
+
 /-! ## 7. Completeness audit — `#print axioms`
 
 Every theorem must depend only on `{propext, Classical.choice, Quot.sound}`. -/
@@ -750,5 +935,19 @@ Every theorem must depend only on `{propext, Classical.choice, Quot.sound}`. -/
 #print axioms assoc_e1_e2_e4_ne_zero_structural
 #print axioms fano_pair_frame
 #print axioms lMul_comp_fails_on_octonions
+#print axioms mem_quatDouble_iff_halves
+#print axioms one_mem_span_gen4
+#print axioms conj_mem_span_gen4
+#print axioms mem_quatDouble_iff
+#print axioms one_mem_quatDouble
+#print axioms ell_mem_quatDouble
+#print axioms zero_mem_quatDouble
+#print axioms add_mem_quatDouble
+#print axioms smul_mem_quatDouble
+#print axioms mul_mem_quatDouble
+#print axioms conj_mem_quatDouble
+#print axioms rotAut3_mem_quatDouble
+#print axioms rotAut3_image_quatDouble
+#print axioms quatDouble_proper
 
 end QBP.Foundations.HolographicSubalgebra
