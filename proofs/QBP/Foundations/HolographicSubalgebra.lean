@@ -886,6 +886,335 @@ theorem quatDouble_proper
 
 end RhoInvariantDoubles
 
+/-! ## 9. The encoding family (#A) and the left-module structure of `ℍ^⊥` (#B)
+
+Confirmer pass 2.  §8 above showed every `quatDouble p q = ℍ ⊕ ℍ·ℓ` is a
+ρ-invariant, multiplicatively closed subalgebra of 𝕊.  This section identifies
+**which** of them contain a given crystal's hosted algebra `ℍ_u`, and proves the
+module fact that any completeness argument has to rest on.
+
+**(A) The encoding family.**  Fix a unit imaginary `u : 𝕆`.  For a unit imaginary
+`w ⟂ u`, `quatDouble u w` contains `ℍ_u = span{1, ℓ, U, ℓU}`
+(`quatSpan_subset_quatDouble`), is closed under the sedenion product and is
+ρ-invariant (§8).  Left multiplication `L_u` restricts to `u^⊥ ∩ Im 𝕆` and
+squares to `−Id` there (`leftMul_sq_eq_neg`, `perp_stable_under_leftMul`), so
+`(u^⊥ ∩ Im 𝕆, L_u)` is a complex vector space; and `w` and `u·w` give the SAME
+member of the family (`quatDouble_eq_of_mul_u`).  So the family is parametrised
+by the `L_u`-complex lines of `u^⊥`, exactly as the confirmer's pass 2 says.
+
+**Not claimed (out of toolchain, per the dispatch):** that the parametrisation is
+a bijection onto the ℂP² of complex lines, that `G₂`/`SU(3)` acts transitively on
+it, or any dimension count for the family.
+
+**(B) `ℍ^⊥` as a left `ℍ`-module.**  The composition-algebra adjoint identity
+`⟨a·c, d⟩ = ⟨c, ā·d⟩` (`bil_mul_left_adjoint`, derived from the *polarised* norm
+composition `octonion_normMap_zero` already in `OctonionLaws`) gives at once that
+the orthogonal complement of a quaternion span in 𝕆 is stable under left and
+right multiplication by the span (`perp_span4_left_module`,
+`perp_span4_right_module`), and `mul_right_ne_zero_of_ne_zero` gives that
+`h ↦ h·z` is injective on it.  These are the three inputs the "every 8-dimensional
+multiplicatively closed extension is `ℍ ⊕ ℍ·w`" argument needs. -/
+
+section EncodingFamily
+
+open QBP.Foundations.NoAutonomousDynamics
+open QBP.Foundations.CrystalHosting
+
+variable {u w : CDAlg ℝ 3}
+
+/-- **(A)(i) — `L_u² = −Id`.**  Left multiplication by a unit imaginary octonion
+    squares to minus the identity (left alternativity plus `u² = −1`); on
+    `u^⊥ ∩ Im 𝕆` this is a complex structure. -/
+theorem leftMul_sq_eq_neg (hu0 : u.coord 0 = 0) (hNu : N u = 1) (z : CDAlg ℝ 3) :
+    u * (u * z) = -z := by
+  rw [u_mul_uv hu0 hNu]; module
+
+/-- **(A)(i, second half) — `L_u` preserves `u^⊥ ∩ Im 𝕆`.**  If `w` is a unit
+    imaginary orthogonal to `u`, so is `u·w`. -/
+theorem perp_stable_under_leftMul (hu0 : u.coord 0 = 0) (hw0 : w.coord 0 = 0)
+    (huw : bil u w = 0) (hNu : N u = 1) (hNw : N w = 1) :
+    (u * w).coord 0 = 0 ∧ N (u * w) = 1 ∧ bil u (u * w) = 0 :=
+  ⟨mul_coord_zero hw0 huw, N_mul_unit hNu hNw, bil_u_uv hu0 hw0 huw hNu⟩
+
+/-- **(A)(ii) — every member of the family contains the hosted algebra.**  For any
+    `w`, the quaternion span `ℍ_u = span{1, ℓ, U, ℓU} ⊂ 𝕊` sits inside
+    `quatDouble u w`.  (Only `u.coord 0 = 0` is needed; orthonormality of `w` is
+    what makes the double 8-dimensional, which is not claimed here.) -/
+theorem quatSpan_subset_quatDouble (hu0 : u.coord 0 = 0) (w : CDAlg ℝ 3) :
+    {x : CDAlg ℝ 4 | InQuatSpan (loOf u) x} ⊆ quatDouble u w := by
+  rintro x ⟨a, b, c, d, rfl⟩
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_quatComb a b c d hu0]
+    exact Submodule.add_mem _ (Submodule.smul_mem _ _ (one_mem_span_gen4 u w))
+      (Submodule.smul_mem _ _ (x_mem_span_gen4 u w))
+  · rw [cdHi_quatComb a b c d hu0]
+    exact Submodule.add_mem _ (Submodule.smul_mem _ _ (one_mem_span_gen4 u w))
+      (Submodule.smul_mem _ _ (x_mem_span_gen4 u w))
+
+/-- **(A)(ii), packaged.**  For a unit imaginary `w ⟂ u`, `𝕆'_w := quatDouble u w`
+    contains the hosted algebra, is closed under the sedenion product, and is
+    ρ-invariant as a set. -/
+theorem encoding_family_member (hu0 : u.coord 0 = 0) (w : CDAlg ℝ 3) :
+    {x : CDAlg ℝ 4 | InQuatSpan (loOf u) x} ⊆ quatDouble u w ∧
+      (∀ x ∈ quatDouble u w, ∀ y ∈ quatDouble u w, x * y ∈ quatDouble u w) ∧
+      rotAut3.toFun '' quatDouble u w = quatDouble u w :=
+  ⟨quatSpan_subset_quatDouble hu0 w,
+   fun _ hx _ hy => mul_mem_quatDouble u w hx hy,
+   rotAut3_image_quatDouble u w⟩
+
+/-- `span{1, u, u·w, u·(u·w)} = span{1, u, w, u·w}`: the two generating frames of
+    the same quaternion subalgebra. -/
+theorem span_gen4_u_mul (hu0 : u.coord 0 = 0) (hNu : N u = 1) (w : CDAlg ℝ 3) :
+    Submodule.span ℝ (gen4 u (u * w)) = Submodule.span ℝ (gen4 u w) := by
+  have hneg : u * (u * w) = -w := leftMul_sq_eq_neg hu0 hNu w
+  refine le_antisymm (Submodule.span_le.mpr ?_) (Submodule.span_le.mpr ?_)
+  · intro z hz
+    simp only [gen4, Set.mem_insert_iff, Set.mem_singleton_iff] at hz
+    rcases hz with h | h | h | h
+    · rw [h]; exact one_mem_span_gen4 u w
+    · rw [h]; exact x_mem_span_gen4 u w
+    · rw [h]; exact xy_mem_span_gen4 u w
+    · rw [h, hneg, show -w = (-1 : ℝ) • w by module]
+      exact Submodule.smul_mem _ _ (y_mem_span_gen4 u w)
+  · intro z hz
+    simp only [gen4, Set.mem_insert_iff, Set.mem_singleton_iff] at hz
+    rcases hz with h | h | h | h
+    · rw [h]; exact one_mem_span_gen4 u (u * w)
+    · rw [h]; exact x_mem_span_gen4 u (u * w)
+    · rw [h]
+      have hsm : (-1 : ℝ) • (u * (u * w)) ∈ Submodule.span ℝ (gen4 u (u * w)) :=
+        Submodule.smul_mem _ (-1) (xy_mem_span_gen4 u (u * w))
+      have heq : (-1 : ℝ) • (u * (u * w)) = w := by rw [hneg]; module
+      rwa [heq] at hsm
+    · rw [h]; exact y_mem_span_gen4 u (u * w)
+
+/-- **(A)(iii) — `w` and `u·w` give the SAME member of the family.**  So the
+    family is indexed by the `L_u`-complex LINES of `u^⊥`, not by its unit
+    vectors. -/
+theorem quatDouble_eq_of_mul_u (hu0 : u.coord 0 = 0) (hNu : N u = 1)
+    (w : CDAlg ℝ 3) : quatDouble u (u * w) = quatDouble u w := by
+  rw [quatDouble, quatDouble, span_gen4_u_mul hu0 hNu w]
+
+end EncodingFamily
+
+section PerpModule
+
+open QBP.Foundations.NoAutonomousDynamics
+open QBP.Foundations.CrystalHosting
+
+/-- **The composition-algebra adjoint identity at 𝕆:** `⟨a·c, d⟩ = ⟨c, ā·d⟩`.
+    Derived from the *polarised* norm-composition identity `octonion_normMap_zero`
+    (already proved in `OctonionLaws` by the quadrilinear lift) by setting the
+    second argument to `1`.  This is the statement that `L_a` and `L_{ā}` are
+    mutually adjoint for the norm form. -/
+theorem bil_mul_left_adjoint (a c d : CDAlg ℝ 3) :
+    bil (a * c) d = bil c (conj a * d) := by
+  have h : bil (a * c) ((1 : CDAlg ℝ 3) * d) + bil ((1 : CDAlg ℝ 3) * c) (a * d)
+      - 2 * bil a (1 : CDAlg ℝ 3) * bil c d = 0 := by
+    rw [← normMap_coord0 a 1 c d, octonion_normMap_zero]
+    rfl
+  rw [cd_one_mul, cd_one_mul, bil_one_right] at h
+  rw [CDAut.conj_eq_two_re_sub a, cd_sub_mul, mul_smul_left, cd_one_mul,
+    QBP.Foundations.CrossProduct.bil_sub_right, bil_smul_right]
+  linarith
+
+/-- The mirror adjoint identity: `⟨c·a, d⟩ = ⟨c, d·ā⟩`. -/
+theorem bil_mul_right_adjoint (a c d : CDAlg ℝ 3) :
+    bil (c * a) d = bil c (d * conj a) := by
+  have h : bil (c * a) (d * (1 : CDAlg ℝ 3)) + bil (d * a) (c * (1 : CDAlg ℝ 3))
+      - 2 * bil c d * bil a (1 : CDAlg ℝ 3) = 0 := by
+    rw [← normMap_coord0 c d a 1, octonion_normMap_zero]
+    rfl
+  rw [cd_mul_one, cd_mul_one, bil_one_right] at h
+  rw [CDAut.conj_eq_two_re_sub a, cd_mul_sub, mul_smul_right, cd_mul_one,
+    QBP.Foundations.CrossProduct.bil_sub_right, bil_smul_right,
+    QBP.Foundations.NormForm.bil_symm c (d * a)]
+  linarith
+
+/-- **(B) — `ℍ^⊥` is a LEFT `ℍ`-module.**  If `z` is orthogonal to the quaternion
+    span `ℍ = span ℝ {1, p, q, pq}` then so is `a·z` for every `a ∈ ℍ`.  (Proof:
+    `⟨k, a·z⟩ = ⟨a·z, k⟩ = ⟨z, ā·k⟩` and `ā·k ∈ ℍ` because `ℍ` is closed under
+    conjugation and multiplication.) -/
+theorem perp_span4_left_module (p q : CDAlg ℝ 3) {z : CDAlg ℝ 3}
+    (hz : ∀ k ∈ Submodule.span ℝ (gen4 p q), bil k z = 0)
+    {a : CDAlg ℝ 3} (ha : a ∈ Submodule.span ℝ (gen4 p q)) :
+    ∀ k ∈ Submodule.span ℝ (gen4 p q), bil k (a * z) = 0 := by
+  intro k hk
+  have hadj : bil (a * z) k = bil z (conj a * k) := bil_mul_left_adjoint a z k
+  have hmem : conj a * k ∈ Submodule.span ℝ (gen4 p q) :=
+    span4_mul_closed p q (conj_mem_span_gen4 p q ha) hk
+  rw [QBP.Foundations.NormForm.bil_symm k (a * z), hadj,
+    QBP.Foundations.NormForm.bil_symm z (conj a * k)]
+  exact hz _ hmem
+
+/-- **(B, mirror) — `ℍ^⊥` is a RIGHT `ℍ`-module.** -/
+theorem perp_span4_right_module (p q : CDAlg ℝ 3) {z : CDAlg ℝ 3}
+    (hz : ∀ k ∈ Submodule.span ℝ (gen4 p q), bil k z = 0)
+    {a : CDAlg ℝ 3} (ha : a ∈ Submodule.span ℝ (gen4 p q)) :
+    ∀ k ∈ Submodule.span ℝ (gen4 p q), bil k (z * a) = 0 := by
+  intro k hk
+  have hadj : bil (z * a) k = bil z (k * conj a) := bil_mul_right_adjoint a z k
+  have hmem : k * conj a ∈ Submodule.span ℝ (gen4 p q) :=
+    span4_mul_closed p q hk (conj_mem_span_gen4 p q ha)
+  rw [QBP.Foundations.NormForm.bil_symm k (z * a), hadj,
+    QBP.Foundations.NormForm.bil_symm z (k * conj a)]
+  exact hz _ hmem
+
+/-- **`h ↦ h·z` is injective for `z ≠ 0`** — 𝕆 has no zero divisors (norm
+    composition).  Together with the module statement this is what forces
+    `dim (ℍ·z) = 4` in any completeness argument. -/
+theorem mul_right_eq_zero_iff {z : CDAlg ℝ 3} (hz : z ≠ 0) (h : CDAlg ℝ 3) :
+    h * z = 0 ↔ h = 0 := by
+  constructor
+  · intro h0
+    have hN : N h * N z = 0 := by rw [← octonion_norm_composition, h0, N_zero]
+    have hNz : N z ≠ 0 := fun hc => hz ((alt_N_eq_zero_iff z).mp hc)
+    exact (alt_N_eq_zero_iff h).mp ((mul_eq_zero.mp hN).resolve_right hNz)
+  · intro h0; rw [h0]; exact alt_zero_mul z
+
+end PerpModule
+
+/-! ### (B) completeness: a quaternion span has no proper multiplicative extension
+
+The three facts above (`perp_span4_left_module`, `bil_mul_left_adjoint`,
+`mul_right_eq_zero_iff`) close the octonion-level form of the confirmer's
+completeness route: inside 𝕆 a quaternion subalgebra `ℍ` is **maximal among
+multiplicatively closed submodules** — any such `O ⊋ ℍ` already contains
+`ℍ ⊕ ℍ·z` for any `z ∈ O ∩ ℍ^⊥`, which is all of 𝕆 by dimension.
+
+**What this does NOT do.**  It is the statement inside 𝕆, not inside 𝕊.  The 𝕊
+form ("every 8-dimensional multiplicatively closed `O ⊆ 𝕊` containing `ℍ_s` is a
+`quatDouble u w`") does **not** follow, because 𝕊 is not a composition algebra:
+`N(xy) = N x·N y` fails at level 4, so `bil_mul_left_adjoint` — the engine of the
+module argument — is unavailable there and would have to be re-proved from the
+level-4 structure constants.  That remains open. -/
+
+section Completeness
+
+open QBP.Foundations.NoAutonomousDynamics
+open QBP.Foundations.CrystalHosting
+
+variable {p q : CDAlg ℝ 3}
+
+theorem bil_zero_left (y : CDAlg ℝ 3) : bil (0 : CDAlg ℝ 3) y = 0 := by
+  show (∑ i, (0 : CDAlg ℝ 3).coord i * y.coord i) = 0
+  simp
+
+/-- Orthogonality to the four frame generators propagates to the whole span. -/
+theorem orth_span4_of_orth_gen (p q r : CDAlg ℝ 3)
+    (h1 : bil (1 : CDAlg ℝ 3) r = 0) (hp : bil p r = 0) (hq : bil q r = 0)
+    (hpq : bil (p * q) r = 0) :
+    ∀ k ∈ Submodule.span ℝ (gen4 p q), bil k r = 0 := by
+  intro k hk
+  induction hk using Submodule.span_induction with
+  | mem x hx =>
+      simp only [gen4, Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rcases hx with h | h | h | h <;> rw [h]
+      · exact h1
+      · exact hp
+      · exact hq
+      · exact hpq
+  | zero => exact bil_zero_left r
+  | add x y _ _ hx hy => rw [bil_add_left, hx, hy]; ring
+  | smul a x _ hx => rw [bil_smul_left, hx]; ring
+
+/-- Right multiplication by a fixed octonion, as an ℝ-linear map. -/
+def rMul (z : CDAlg ℝ 3) : CDAlg ℝ 3 →ₗ[ℝ] CDAlg ℝ 3 where
+  toFun h := h * z
+  map_add' a b := mul_add_left a b z
+  map_smul' r a := mul_smul_left r a z
+
+@[simp] theorem rMul_apply (z h : CDAlg ℝ 3) : rMul z h = h * z := rfl
+
+theorem rMul_injective {z : CDAlg ℝ 3} (hz : z ≠ 0) : Function.Injective (rMul z) := by
+  intro a b hab
+  have hab' : a * z = b * z := hab
+  have h : (a - b) * z = 0 := by rw [cd_sub_mul, hab', sub_self]
+  exact sub_eq_zero.mp ((mul_right_eq_zero_iff hz (a - b)).mp h)
+
+/-- **`ℍ ⊕ ℍ·z = 𝕆`** for any nonzero `z ⟂ ℍ`: the quaternion span and its image
+    under right multiplication by `z` are complementary and fill 𝕆. -/
+theorem span4_sup_rMul_eq_top
+    (hp0 : p.coord 0 = 0) (hq0 : q.coord 0 = 0) (hpq : bil p q = 0)
+    (hNp : N p = 1) (hNq : N q = 1)
+    {z : CDAlg ℝ 3} (hz0 : z ≠ 0)
+    (hz : ∀ k ∈ Submodule.span ℝ (gen4 p q), bil k z = 0) :
+    Submodule.span ℝ (gen4 p q) ⊔ Submodule.map (rMul z) (Submodule.span ℝ (gen4 p q))
+      = ⊤ := by
+  haveI : FiniteDimensional ℝ (CDAlg ℝ 3) :=
+    Module.Finite.of_basis (QBP.Foundations.CDDimension.cdBasis 3)
+  have hinj := rMul_injective hz0
+  have hHrank : Module.finrank ℝ (Submodule.span ℝ (gen4 p q)) = 4 :=
+    finrank_quaternion_frame hp0 hq0 hpq hNp hNq
+  have hKrank :
+      Module.finrank ℝ (Submodule.map (rMul z) (Submodule.span ℝ (gen4 p q))) = 4 := by
+    rw [← LinearEquiv.finrank_eq
+      (Submodule.equivMapOfInjective (rMul z) hinj (Submodule.span ℝ (gen4 p q)))]
+    exact hHrank
+  have hinf :
+      Submodule.span ℝ (gen4 p q) ⊓ Submodule.map (rMul z) (Submodule.span ℝ (gen4 p q))
+        = ⊥ := by
+    refine le_antisymm (fun x hx => ?_) bot_le
+    obtain ⟨hxH, a, ha, hax⟩ := hx
+    have hx' : bil x x = 0 := by
+      have h2 := perp_span4_left_module p q hz ha x hxH
+      have hxz : x = a * z := hax.symm
+      rw [hxz] at h2 ⊢
+      exact h2
+    rw [Submodule.mem_bot]
+    exact (alt_N_eq_zero_iff x).mp (by rw [N_eq_bil]; exact hx')
+  have hsum := Submodule.finrank_sup_add_finrank_inf_eq
+    (Submodule.span ℝ (gen4 p q)) (Submodule.map (rMul z) (Submodule.span ℝ (gen4 p q)))
+  rw [hinf, finrank_bot, hHrank, hKrank] at hsum
+  refine Submodule.eq_top_of_finrank_eq ?_
+  rw [QBP.Foundations.CDDimension.finrank_cdAlg]
+  omega
+
+/-- **Maximality of a quaternion subalgebra of 𝕆.**  If `O` is a submodule of 𝕆
+    containing `ℍ = span ℝ {1,p,q,pq}` (`p q` orthonormal imaginary) and closed
+    under multiplication, then `O = ℍ` or `O = 𝕆`.  There is nothing in between —
+    in particular no 8-dimensional proper extension, which is the octonion-level
+    form of `encoding_octonion_completeness`. -/
+theorem span4_maximal
+    (hp0 : p.coord 0 = 0) (hq0 : q.coord 0 = 0) (hpq : bil p q = 0)
+    (hNp : N p = 1) (hNq : N q = 1)
+    (O : Submodule ℝ (CDAlg ℝ 3))
+    (hsub : Submodule.span ℝ (gen4 p q) ≤ O)
+    (hmul : ∀ a ∈ O, ∀ b ∈ O, a * b ∈ O) :
+    O = Submodule.span ℝ (gen4 p q) ∨ O = ⊤ := by
+  by_cases hle : O ≤ Submodule.span ℝ (gen4 p q)
+  · exact Or.inl (le_antisymm hle hsub)
+  · right
+    obtain ⟨y, hyO, hyH⟩ := SetLike.not_le_iff_exists.mp hle
+    set r : CDAlg ℝ 3 := y - proj4 p q y with hr
+    have hrO : r ∈ O := Submodule.sub_mem O hyO (hsub (proj4_mem p q y))
+    have hr0 : r ≠ 0 := by
+      intro h0
+      refine hyH ?_
+      have : y = proj4 p q y := by rw [← sub_eq_zero]; exact h0
+      rw [this]
+      exact proj4_mem p q y
+    have hrperp : ∀ k ∈ Submodule.span ℝ (gen4 p q), bil k r = 0 := by
+      refine orth_span4_of_orth_gen p q r ?_ ?_ ?_ ?_
+      · rw [QBP.Foundations.NormForm.bil_symm]
+        exact residual_orth_one hp0 hq0 hpq y
+      · rw [QBP.Foundations.NormForm.bil_symm]
+        exact residual_orth_u hp0 hq0 hpq hNp y
+      · rw [QBP.Foundations.NormForm.bil_symm]
+        exact residual_orth_v hp0 hq0 hpq hNq y
+      · rw [QBP.Foundations.NormForm.bil_symm]
+        exact residual_orth_uv hp0 hq0 hpq hNp hNq y
+    have htop := span4_sup_rMul_eq_top hp0 hq0 hpq hNp hNq hr0 hrperp
+    refine eq_top_iff.mpr ?_
+    rw [← htop]
+    refine sup_le hsub ?_
+    rintro x ⟨a, ha, rfl⟩
+    exact hmul a (hsub ha) r hrO
+
+end Completeness
+
+
+
 /-! ## 7. Completeness audit — `#print axioms`
 
 Every theorem must depend only on `{propext, Classical.choice, Quot.sound}`. -/
@@ -949,5 +1278,21 @@ Every theorem must depend only on `{propext, Classical.choice, Quot.sound}`. -/
 #print axioms rotAut3_mem_quatDouble
 #print axioms rotAut3_image_quatDouble
 #print axioms quatDouble_proper
+#print axioms leftMul_sq_eq_neg
+#print axioms perp_stable_under_leftMul
+#print axioms quatSpan_subset_quatDouble
+#print axioms encoding_family_member
+#print axioms span_gen4_u_mul
+#print axioms quatDouble_eq_of_mul_u
+#print axioms bil_mul_left_adjoint
+#print axioms bil_mul_right_adjoint
+#print axioms perp_span4_left_module
+#print axioms perp_span4_right_module
+#print axioms mul_right_eq_zero_iff
+#print axioms bil_zero_left
+#print axioms orth_span4_of_orth_gen
+#print axioms rMul_injective
+#print axioms span4_sup_rMul_eq_top
+#print axioms span4_maximal
 
 end QBP.Foundations.HolographicSubalgebra
