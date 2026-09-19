@@ -80,8 +80,9 @@ The theorems below say **exactly** that a vacuum of the δ-landscape generates a
 quaternion subalgebra of 𝕊, that this assignment is natural under algebra
 automorphisms, and that the local `−L_s²` spectrum is degenerate there.  They do
 **NOT** claim, and must not be cited as claiming, that this quaternion algebra
-"is the observer's ℍ" or carries any DERIV-holographic reading — that
-interpretation is pending the beekeeper's ruling on ledger flag 3 and is
+"is the observer's ℍ" or carries any holographic reading — that identification
+is POST-observer-associativity, an OPEN root with a kill list (flag-3 split, ruling
+bundle v0.7 §2; nothing ruled), and is
 deliberately absent from every statement here.  No energy, crystallisation or
 spacetime semantics appears in any type or theorem statement (layer rule,
 `docs/foundations/layer-architecture.md`).
@@ -552,7 +553,8 @@ For a unit imaginary octonion direction `u`, write `U = loOf u` and
 So "the crystal picks out one ℂ inside 𝕆" and "the crystal hosts an ℍ inside 𝕊"
 are the *same* datum read at two levels of the tower — a single discrete root,
 not a ℂP² of them.  Neither statement identifies `ℂ_u` with any physical
-observable; that reading is the (still open) DERIV-holographic flag 3. -/
+observable; that reading is INTERP-holographic-boundary — an OPEN root, the P2 vs P2′
+    pair (ruling bundle v0.7 §1). -/
 
 /-- **P2′ (i) — the hosted algebra meets the CD low half in exactly `ℂ_u`.**
     For a unit imaginary octonion direction `u` (`U = loOf u`), an element of
