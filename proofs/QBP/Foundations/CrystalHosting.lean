@@ -1596,6 +1596,48 @@ theorem gradeAut_hosting_equivariant {s : CDAlg ℝ 4} (hv : IsVacuum s) :
   exact genByPair_neg_right _ h
 
 
+/-! ### The Cayley–Dickson low half is not ρ-invariant, as a SET (#8)
+
+`rotAut3_moves_lowHalf` above exhibits a single witness.  The confirmer's
+proof-owed item 8 asks for the set-level statement: the *image* of the low half
+under `ρ` is not the low half.  That is what `rho_moves_cd_half` says, and
+`rotAut3_lowHalf_not_subset` says the stronger local fact that the image is not
+even contained in the low half.  (This is the only half of the "ℤ/3-torsor"
+gloss that is a theorem here; that the three halves `𝕆_low, ρ𝕆_low, ρ²𝕆_low`
+are pairwise distinct is NOT claimed.) -/
+
+/-- **The Cayley–Dickson low half of 𝕊**, `𝕆_low = {x : cdHi x = 0}` — the copy
+    of 𝕆 that the doubling `𝕊 = 𝕆 ⊕ 𝕆ℓ` singles out. -/
+def lowHalf : Set (CDAlg ℝ 4) := {x | cdHi x = 0}
+
+@[simp] theorem mem_lowHalf {x : CDAlg ℝ 4} : x ∈ lowHalf ↔ cdHi x = 0 := Iff.rfl
+
+/-- `lowHalf` is inhabited by a genuinely non-real element, so the statements
+    below are not about the empty or trivial set. -/
+theorem loOf_mem_lowHalf (a : CDAlg ℝ 3) : loOf a ∈ lowHalf := cdHi_loOf a
+
+/-- **`ρ(𝕆_low) ⊄ 𝕆_low`** — the image of the low half under the order-3
+    automorphism is not contained in the low half. -/
+theorem rotAut3_lowHalf_not_subset : ¬ (rotAut3.toFun '' lowHalf ⊆ lowHalf) := by
+  intro hsub
+  obtain ⟨h0, hne⟩ := rotAut3_moves_lowHalf
+  exact hne (hsub ⟨loOf (e (1 : Fin (2^3))), h0, rfl⟩)
+
+/-- **`rho_moves_cd_half` — `ρ(𝕆_low) ≠ 𝕆_low` as SETS.**  The set-level
+    strengthening of `rotAut3_moves_lowHalf`: no Cayley–Dickson low half is
+    invariant under the order-3 element of the `S₃` factor of `Aut(𝕊)`.  (With
+    `rotAut3_ell` this is the Lean content of "the P2′ cell is not canonical".) -/
+theorem rho_moves_cd_half : rotAut3.toFun '' lowHalf ≠ lowHalf := by
+  intro h
+  exact rotAut3_lowHalf_not_subset (le_of_eq h)
+
+/-- The same statement in the pointwise `∃`-form the confirmer offered as an
+    equivalent: some element of the low half is moved off it by `ρ`. -/
+theorem exists_mem_lowHalf_rotAut3_not_mem :
+    ∃ x ∈ lowHalf, rotAut3 x ∉ lowHalf :=
+  ⟨loOf (e (1 : Fin (2^3))), rotAut3_moves_lowHalf.1, rotAut3_moves_lowHalf.2⟩
+
+
 /-! ## 5. Completeness audit — `#print axioms`
 
 Every theorem in this file must depend on a subset of `{propext, Classical.choice,
@@ -1751,5 +1793,9 @@ is a finding. -/
 #print axioms alternator_expansion_off_vacuum
 #print axioms genByPair_neg_right
 #print axioms gradeAut_hosting_equivariant
+#print axioms loOf_mem_lowHalf
+#print axioms rotAut3_lowHalf_not_subset
+#print axioms rho_moves_cd_half
+#print axioms exists_mem_lowHalf_rotAut3_not_mem
 
 end QBP.Foundations.CrystalHosting
