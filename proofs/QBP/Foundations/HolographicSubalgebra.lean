@@ -1213,6 +1213,252 @@ theorem span4_maximal
 
 end Completeness
 
+/-! ## 10. (C) transitivity on the encoding family — the reduction
+
+The confirmer's pass-3 construction (`pass3_transitivity.py`, 20/20 to 8e-15)
+builds, for two unit imaginary `w₁, w₂ ⟂ u`, an automorphism `Ψ` of 𝕊 that fixes
+the crystal and carries `𝕆'_{w₁}` onto `𝕆'_{w₂}`.  Its two halves are:
+
+1. an automorphism `ψ` of 𝕆 with `ψ u = u` and `ψ w₁ = w₂` (in the script: the
+   composite of two frame maps `(e₁,e₂,e₄) ↦ (u,wᵢ,rᵢ)`), and
+2. the diagonal lift `Ψ = cdLift ψ` to 𝕊.
+
+**Step 2 is proved here in full** (`encoding_family_transitive_of_aut`): given any
+such `ψ`, the lift is an automorphism of 𝕊 (that is `CrystalHosting.cdLift`), it
+fixes `ℓ`, it fixes EVERY crystal with direction `u`, and it carries
+`quatDouble u w₁` onto `quatDouble u w₂` as sets.
+
+**Step 1 is NOT proved and is the whole residue.**  The existence of `ψ` is
+transitivity on orthonormal frames of 𝕆 — the script's `frame_auto`, i.e. the
+claim that an arbitrary orthonormal imaginary triple is the image of
+`(e₁, e₂, e₄)` under an automorphism.  The repository has only the SEVEN
+signed-basis witnesses (`G2Transitivity.g2_transitive_genuine_automorphisms`),
+which are discrete; the continuous statement is not in the toolchain.  So (C) is
+reduced to one named octonion-level input and no further.  No group is named or
+used in any statement below. -/
+
+section Transitivity
+
+open QBP.Foundations.NoAutonomousDynamics
+open QBP.Foundations.CrystalHosting
+
+/-- A `CDAut` read as an ℝ-linear map (so `Submodule.map` applies to it). -/
+def autLin {n : ℕ} (φ : CDAut n) : CDAlg ℝ n →ₗ[ℝ] CDAlg ℝ n where
+  toFun := φ.toFun
+  map_add' := φ.map_add
+  map_smul' := φ.map_smul
+
+@[simp] theorem autLin_apply {n : ℕ} (φ : CDAut n) (x : CDAlg ℝ n) :
+    autLin φ x = φ x := rfl
+
+/-- An automorphism carries a quaternion frame span to the frame span of the
+    images. -/
+theorem map_span_gen4 (ψ : CDAut 3) (a b : CDAlg ℝ 3) :
+    Submodule.map (autLin ψ) (Submodule.span ℝ (gen4 a b))
+      = Submodule.span ℝ (gen4 (ψ a) (ψ b)) := by
+  rw [Submodule.map_span]
+  congr 1
+  simp only [gen4, Set.image_insert_eq, Set.image_singleton, autLin_apply,
+    CDAut.map_one ψ, ψ.map_mul]
+
+/-- **(C) — the reduction.**  Given an automorphism `ψ` of 𝕆 fixing `u` and
+    carrying `w₁` to `w₂`, its diagonal lift `Ψ = cdLift ψ` is an automorphism of
+    𝕊 that (a) fixes `ℓ`, (b) fixes EVERY crystal with direction `u`, and
+    (c) carries `quatDouble u w₁` onto `quatDouble u w₂`. -/
+theorem encoding_family_transitive_of_aut {u w₁ w₂ : CDAlg ℝ 3}
+    (ψ : CDAut 3) (hu : ψ u = u) (hw : ψ w₁ = w₂) :
+    cdLift ψ ell = ell
+    ∧ (∀ (s : CDAlg ℝ 4) (α γ b₀ : ℝ), cdLo s = α • u →
+        cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u → cdLift ψ s = s)
+    ∧ (cdLift ψ).toFun '' quatDouble u w₁ = quatDouble u w₂ := by
+  have hmap : Submodule.map (autLin ψ) (Submodule.span ℝ (gen4 u w₁))
+      = Submodule.span ℝ (gen4 u w₂) := by
+    rw [map_span_gen4 ψ u w₁, hu, hw]
+  refine ⟨cdLift_ell ψ, ?_, ?_⟩
+  · intro s α γ b₀ hlo hhi
+    refine eq_of_halves ?_ ?_
+    · show cdLo (cdLiftFun ψ s) = cdLo s
+      rw [cdLo_liftFun, hlo, ψ.map_smul, hu]
+    · show cdHi (cdLiftFun ψ s) = cdHi s
+      rw [cdHi_liftFun, hhi, ψ.map_add, ψ.map_smul, ψ.map_smul, hu, CDAut.map_one]
+  · ext y
+    constructor
+    · rintro ⟨x, hx, rfl⟩
+      refine ⟨?_, ?_⟩
+      · show cdLo (cdLiftFun ψ x) ∈ _
+        rw [cdLo_liftFun, ← hmap]
+        exact Submodule.mem_map_of_mem hx.1
+      · show cdHi (cdLiftFun ψ x) ∈ _
+        rw [cdHi_liftFun, ← hmap]
+        exact Submodule.mem_map_of_mem hx.2
+    · intro hy
+      have hylo : cdLo y ∈ Submodule.map (autLin ψ) (Submodule.span ℝ (gen4 u w₁)) := by
+        rw [hmap]; exact hy.1
+      have hyhi : cdHi y ∈ Submodule.map (autLin ψ) (Submodule.span ℝ (gen4 u w₁)) := by
+        rw [hmap]; exact hy.2
+      obtain ⟨a, ha, hae⟩ := hylo
+      obtain ⟨b, hb, hbe⟩ := hyhi
+      refine ⟨loOf a + hiOf b, ⟨?_, ?_⟩, ?_⟩
+      · rw [cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]; exact ha
+      · rw [cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]; exact hb
+      · refine eq_of_halves ?_ ?_
+        · show cdLo (cdLiftFun ψ (loOf a + hiOf b)) = cdLo y
+          rw [cdLo_liftFun, cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+          exact hae
+        · show cdHi (cdLiftFun ψ (loOf a + hiOf b)) = cdHi y
+          rw [cdHi_liftFun, cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]
+          exact hbe
+
+end Transitivity
+
+/-! ## 11. (D) The numerals: `dim (u^⊥ ∩ Im 𝕆) = 6` and the transverse trace
+
+`dim (u^⊥ ∩ Im 𝕆) = 6` closes (`finrank_perpIm_eq_six`).  With it, the transverse
+component map `transComp α γ u` is ONTO a 6-dimensional space
+(`transComp_surjOn_perpIm`, via `transComp_eigDir`), which is the honest content
+of "the transverse form has rank 6": the form is `8(1−b₀²)` times the squared
+norm of a component taking values in a 6-dimensional space, and it vanishes on
+the flat family.
+
+**Not proved, stated precisely:** `finrank (tangent space) = 14` and
+`finrank (radical of the form) = 8`, hence "rank = 14 − 8 = 6" as a *finrank*
+identity.  That needs the radical as a submodule of the tangent space and a
+second rank–nullity computation, neither of which is formalised.
+
+The **trace** is proved in the form that a trace actually has:
+`hess_trace_transverse` sums the Hessian over an ORTHONORMAL 6-frame of the
+transverse subspace and gets `48(1−b₀²)`.  What is missing for the full
+tangent-space trace is that those 6 vectors extend to an orthonormal basis of the
+14-dimensional tangent space whose other 8 members lie in the flat family; the
+flat family is known to be annihilated (`hessQuad_flatDir`) but the basis
+extension is not formalised.
+
+At the poles the form vanishes in EVERY direction (`hessQuad_pole_eq_zero`), which
+is "rank 0" with nothing left to prove. -/
+
+section Numerals
+
+open QBP.Foundations.NoAutonomousDynamics
+open QBP.Foundations.CrystalHosting
+
+variable {u : CDAlg ℝ 3}
+
+/-- `z ↦ (Re z, ⟨u, z⟩)` as an ℝ-linear map. -/
+def imPerpMap (u : CDAlg ℝ 3) : CDAlg ℝ 3 →ₗ[ℝ] ℝ × ℝ where
+  toFun z := (z.coord 0, bil u z)
+  map_add' a b := by
+    simp only [Prod.mk_add_mk]
+    rw [add_coord, bil_add_right]
+  map_smul' r a := by
+    simp only [RingHom.id_apply, Prod.smul_mk, smul_eq_mul]
+    rw [smul_coord, bil_smul_right]
+
+/-- `u^⊥ ∩ Im 𝕆` — the imaginary octonions orthogonal to `u`. -/
+def perpIm (u : CDAlg ℝ 3) : Submodule ℝ (CDAlg ℝ 3) := LinearMap.ker (imPerpMap u)
+
+theorem mem_perpIm {z : CDAlg ℝ 3} :
+    z ∈ perpIm u ↔ z.coord 0 = 0 ∧ bil u z = 0 := by
+  rw [perpIm, LinearMap.mem_ker]
+  exact ⟨fun h => ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩,
+    fun h => Prod.ext h.1 h.2⟩
+
+theorem imPerpMap_surjective (hu0 : u.coord 0 = 0) (hNu : N u = 1) :
+    Function.Surjective (imPerpMap u) := by
+  rintro ⟨a, b⟩
+  refine ⟨a • (1 : CDAlg ℝ 3) + b • u, ?_⟩
+  have h1 : (a • (1 : CDAlg ℝ 3) + b • u).coord 0 = a := by
+    rw [add_coord, smul_coord, smul_coord, one_coord, if_pos rfl, hu0, mul_one,
+      mul_zero, add_zero]
+  have h2 : bil u (a • (1 : CDAlg ℝ 3) + b • u) = b := by
+    rw [bil_add_right, bil_smul_right, bil_smul_right, bil_one_right, hu0,
+      ← N_eq_bil, hNu]
+    ring
+  show ((a • (1 : CDAlg ℝ 3) + b • u).coord 0, bil u (a • (1 : CDAlg ℝ 3) + b • u))
+      = (a, b)
+  rw [h1, h2]
+
+/-- **(D) — `dim (u^⊥ ∩ Im 𝕆) = 6`** for a unit imaginary `u`: rank–nullity for
+    the surjection `z ↦ (Re z, ⟨u,z⟩) : 𝕆 → ℝ²`. -/
+theorem finrank_perpIm_eq_six (hu0 : u.coord 0 = 0) (hNu : N u = 1) :
+    Module.finrank ℝ (perpIm u) = 6 := by
+  haveI : FiniteDimensional ℝ (CDAlg ℝ 3) :=
+    Module.Finite.of_basis (QBP.Foundations.CDDimension.cdBasis 3)
+  have h := LinearMap.finrank_range_add_finrank_ker (imPerpMap u)
+  rw [LinearMap.range_eq_top.mpr (imPerpMap_surjective hu0 hNu), finrank_top,
+    QBP.Foundations.CDDimension.finrank_cdAlg] at h
+  have h2 : Module.finrank ℝ (ℝ × ℝ) = 2 := by simp
+  rw [h2] at h
+  rw [perpIm]
+  omega
+
+/-- **The transverse component map is ONTO `u^⊥ ∩ Im 𝕆`** — every 6-dimensional
+    direction is realised by a tangent vector of the explicit transverse family.
+    With `finrank_perpIm_eq_six` this is the honest content of "rank 6". -/
+theorem transComp_surjOn_perpIm {α γ b₀ : ℝ} {s : CDAlg ℝ 4}
+    (hu0 : u.coord 0 = 0) (hk : α ^ 2 + γ ^ 2 ≠ 0)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    {e : CDAlg ℝ 3} (he : e ∈ perpIm u) :
+    ∃ v : CDAlg ℝ 4, v.coord 0 = 0 ∧ bil s v = 0 ∧ transComp α γ u v = e := by
+  obtain ⟨he0, hue⟩ := mem_perpIm.mp he
+  exact ⟨eigDir α γ e, eigDir_coord_zero he0 α γ,
+    eigDir_orth_crystal (u := u) he0 hue hlo hhi,
+    transComp_eigDir (u := u) hk he0 hue⟩
+
+/-- The Hessian quadratic form is homogeneous of degree 2. -/
+theorem hessQuad_smul (s v : CDAlg ℝ 4) (r : ℝ) :
+    hessQuad s (r • v) = r ^ 2 * hessQuad s v := by
+  have h : secVar s (r • v) = r • secVar s v := by
+    rw [secVar, secVar, cdLo_smul, cdHi_smul]
+    simp only [mul_smul_left, mul_smul_right]
+    module
+  rw [hessQuad, hessQuad, h, N_smul]
+  ring
+
+/-- The transverse family is conformal: `⟨v_e, v_f⟩ = (α²+γ²)·⟨e, f⟩`. -/
+theorem bil_eigDir (α γ : ℝ) (e f : CDAlg ℝ 3) :
+    bil (eigDir α γ e) (eigDir α γ f) = (α ^ 2 + γ ^ 2) * bil e f := by
+  rw [bil_split]
+  simp only [cdLo_eigDir, cdHi_eigDir, bil_smul_left, bil_smul_right]
+  ring
+
+/-- **(D) — the transverse trace is `48(1 − b₀²)`.**  For an ORTHONORMAL 6-frame
+    `e₀,…,e₅` of `u^⊥ ∩ Im 𝕆` the rescaled transverse vectors `c·v_{eᵢ}` are
+    orthonormal tangent vectors and the Hessian sums to `48(1 − b₀²)` on them. -/
+theorem hess_trace_transverse {s : CDAlg ℝ 4} {α γ b₀ c : ℝ}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs : N s = 1) (hk : α ^ 2 + γ ^ 2 ≠ 0) (hc : c ^ 2 * (α ^ 2 + γ ^ 2) = 1)
+    {e : Fin 6 → CDAlg ℝ 3} (he0 : ∀ i, (e i).coord 0 = 0)
+    (hue : ∀ i, bil u (e i) = 0) (hNe : ∀ i, N (e i) = 1)
+    (horth : ∀ i j, i ≠ j → bil (e i) (e j) = 0) :
+    (∀ i, N (c • eigDir α γ (e i)) = 1) ∧
+      (∀ i j, i ≠ j → bil (c • eigDir α γ (e i)) (c • eigDir α γ (e j)) = 0) ∧
+      (∑ i : Fin 6, hessQuad s (c • eigDir α γ (e i))) = 48 * (1 - b₀ ^ 2) := by
+  have hb : (1 : ℝ) - b₀ ^ 2 = α ^ 2 + γ ^ 2 := by
+    have hnorm : α ^ 2 + γ ^ 2 + b₀ ^ 2 = 1 := by
+      rw [← vacuum_norm_parametrised hu0 hNu hlo hhi, hNs]
+    linarith
+  have hNv : ∀ i, N (c • eigDir α γ (e i)) = 1 := by
+    intro i
+    rw [N_smul, N_eigDir, hNe i, mul_one]
+    exact hc
+  refine ⟨hNv, ?_, ?_⟩
+  · intro i j hij
+    rw [bil_smul_left, bil_smul_right, bil_eigDir, horth i j hij]
+    ring
+  · have hterm : ∀ i : Fin 6, hessQuad s (c • eigDir α γ (e i)) = 8 * (1 - b₀ ^ 2) := by
+      intro i
+      rw [hessQuad_smul, hessQuad_eigDir (u := u) (b₀ := b₀) hu0 hNu (he0 i) (hue i)
+        hlo hhi hNs hk, N_eigDir, hNe i, mul_one, hb]
+      linear_combination (8 * (α ^ 2 + γ ^ 2)) * hc
+    rw [Finset.sum_congr rfl (fun i _ => hterm i)]
+    simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+    push_cast
+    ring
+
+end Numerals
+
+
 
 
 /-! ## 7. Completeness audit — `#print axioms`
@@ -1294,5 +1540,14 @@ Every theorem must depend only on `{propext, Classical.choice, Quot.sound}`. -/
 #print axioms rMul_injective
 #print axioms span4_sup_rMul_eq_top
 #print axioms span4_maximal
+#print axioms map_span_gen4
+#print axioms encoding_family_transitive_of_aut
+#print axioms mem_perpIm
+#print axioms imPerpMap_surjective
+#print axioms finrank_perpIm_eq_six
+#print axioms transComp_surjOn_perpIm
+#print axioms hessQuad_smul
+#print axioms bil_eigDir
+#print axioms hess_trace_transverse
 
 end QBP.Foundations.HolographicSubalgebra
