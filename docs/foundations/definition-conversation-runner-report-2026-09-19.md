@@ -122,3 +122,47 @@ R6: ⟨b₀²⟩ ≈ 0.146 (quench endpoint) UNVERIFIED, not carried. R7: over-t
 ## Not verified
 
 No Lean/Agda runs. Pole family dimension reasoned, not measured. Stab_{G₂}(u) ≅ SU(3) and SU(3)-transitivity on ℂP² taken as standard. Completeness open. ⟨b₀²⟩ ≈ 0.146 unverified.
+
+---
+
+# Runner report — round 8 (close; verbatim 88–89)
+
+The runner re-verified the confirmer's decisive datum before quoting it: dim ℍ_s^⊥ = 12 = 3×4; ℍ_s·w free of rank 1, 10/10 (`module_check.py`). ℍ_s^⊥ ≅ ℍ_s³ holds independently.
+
+## Final four-bucket table
+
+| # | Claim | Bucket | Test |
+|---|---|---|---|
+| 1 | Hosting basics; equivariance | 1 proved | `universe_hosts_quaternion`, `pole_hosts_complex`, `inFlight_nonempty`, `aut_hosting_equivariant`, `rotAut3_hosting_equivariant` |
+| 2 | ℍ_s ∩ 𝕆_low = ℂ_u; ℍ_s = ℂ_u ⊕ ℂ_uℓ; ρ moves the low half (witness) | 1 proved | `quatSpan_inter_lowHalf`, `quatSpan_eq_cd_double`, `rotAut3_moves_lowHalf` |
+| 3 | V = 4(‖a‖²‖Im b‖² − ⟨a,Im b⟩²) | 1 proved | `DeltaLandscape.sedenion_landscape_descends` |
+| 4 | 𝕆 has exactly 7 Fano triples | 1 proved | `fanoTriples_card` |
+| 5 | ρ-equivariance eliminates P2′, constrains P2 not at all — a RESULT | 2 forced | 𝕆_low not ρ-invariant + `rotAut3_moves_lowHalf`; ρ(𝕆'_v)=𝕆'_v ≤4.9e-16 |
+| 6 | Decision 1 is an under-determination → open with a kill, never a choice | 2 forced | INTERP-holographic-boundary + ruling bundle v0.7 §0 |
+| 7 | Vacuum Hessian rank 6, eigenvalues 8(1−b₀²), rank 0 at poles | 3 provable | item #5 |
+| 8 | spec(Hess V) depends only on b₀² | 3 provable | item #9 |
+| 9 | Every ℍ ⊕ ℍℓ is a ρ-invariant octonion subalgebra — a continuum | 3 provable | item #6 |
+| 10 | Non-pole s: v ↦ ℍ'_v ⊕ ℍ'_vℓ is a bijection from the L_u-complex lines of u^⊥ ∩ Im𝕆 onto Fam(s) — a ℂP² | 3 provable | item #10 `encoding_family_eq_complex_lines` |
+| 11 | Stab(s) ≅ SU(3) transitive on Fam(s) ⇒ no Aut(𝕊)-natural section | 3 open — OUT OF TOOLCHAIN | reference-backed remark only |
+| 12 | Completeness: an 8-dim O ⊇ ℍ_s is some 𝕆'_v | 3 provable (CONJECTURE until proved) | item #11 `encoding_octonion_completeness`; 98/98, exhaustive-by-construction space |
+| 13 | Pole fibre is 8-dim, G₂/SO(4) (not Gr₃(7)) | 3 open | measured tangent rank 8 |
+| 14 | `U.hosted = quatSpan` (non-pole) | 3 provable | item #2 — ⊆ on master; equality on the proofs branch |
+| 15 | Generic pair intersection = span{1,ℓ} | 3 provable | item #3 |
+| 16 | Decision 1 impasse (earned 6/6) + three-clause kill | 3 open | below |
+| 17 | Seam dynamics; Dirac spectrum; α̇/Ġ; b₀ → interior | 3 open | unchanged |
+| 18 | "The choice is irreducible" | 4 withdrawn | Furey/Feynman, R8 — replaced by the bundle formulation |
+| 19 | "Gr₃(7)"; "constructors give the hosted equality" | 4 withdrawn | Furey/Feynman, R8 |
+| 20 | "Exactly 7"; "0/20"; "ρ kills both"; "gap 4-dim either way" | 4 withdrawn — driver's own | |
+| 21 | R1–R6 withdrawals | 4 withdrawn | Furey/Feynman |
+
+## Exit inventory for the confirmer
+
+**Corrected exit claim (gate 5):** assuming completeness, the boundary encodings of a non-pole universe form a canonical ℂP²-bundle over the vacuum manifold with no Aut(𝕊)-natural section; selection must come from data outside Aut(𝕊) (the rule, the initial ensemble, the in-flight trajectory) — or the question dissolves if the datum-free bundle ℍ_s^⊥ ≅ ℍ_s³ is derived to be the encoding. At a pole the fibre is 8-dimensional. Falsifier: an Aut(𝕊)-equivariant operator sectioning the bundle with no manual input.
+
+**Three-clause kill for INTERP-holographic-boundary (candidate, not a ruling):** (a) non-selectability as a result; (b) live kill fires only on outside-the-algebra data derived, not stipulated; (c) dissolution via the datum-free bundle. Sub-results: ρ eliminates P2′; completeness conjecture with the ℍ_s-line route; pole fibre 8-dim.
+
+**Proof-owed:** #2, #3, #5, #6, #8, #9, #10, #11. Struck: old #1, #4, #7. Out of toolchain: SU(3)-transitivity.
+
+## §7 tells (R8): none new. Both corrected errors were omissions of available data, found only by the heterogeneous reader.
+
+## Not verified: no Lean/Agda runs; SU(3) facts on reference; completeness a conjecture; G₂/SO(4) rests on measured dimension 8.
