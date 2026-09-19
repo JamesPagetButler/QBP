@@ -71,3 +71,54 @@ Nothing above is anchored, encoded or ruled by this report.
 ## What the runner could not verify
 
 Lean/Agda statements (no lake or agda runs — every row 8–12 is numerical or analytic only); **"exactly 7"** in row 10 (only coordinate-aligned triples of (e_k, e_kℓ) planes enumerated; ρ's isotypic components admit non-aligned invariant subspaces, so the *count* is a limited search, while the *existence* refutation stands); the measure-zero clause in row 11; Gemini's Brown/G₂ framing beyond the ledger; whether `Universe.hosted = quatSpan` holds non-generically. The Hessian is finite-difference (h = 1e-4) though backed by the verified closed form.
+
+---
+
+# Runner report — rounds 6–7 (re-opened after the confirmer's OPEN)
+
+**Session:** `debate-20260904-151140`; verbatim indices **84–87** (74–83 unchanged). The runner re-ran the confirmer's three scripts before quoting them; they reproduce.
+
+## Corrected four-bucket table
+
+| # | Claim | Bucket | Test |
+|---|---|---|---|
+| 1 | Universes host ℍ_s; poles host exactly ℂ; in-flight inhabited; hosting equivariant | 1 proved | `universe_hosts_quaternion`, `pole_hosts_complex`, `inFlight_nonempty`, `aut_hosting_equivariant`, `rotAut3_hosting_equivariant` |
+| 2 | ℍ_s ∩ 𝕆_low = ℂ_u; ℍ_s = ℂ_u ⊕ ℂ_uℓ; ρ moves the low half (witness) | 1 proved | `quatSpan_inter_lowHalf`, `quatSpan_eq_cd_double`, `rotAut3_moves_lowHalf` |
+| 3 | V = 4(‖a‖²‖Im b‖² − ⟨a,Im b⟩²) | 1 proved (promoted) | `DeltaLandscape.sedenion_landscape_descends` |
+| 4 | 𝕆 has exactly 7 Fano triples | 1 proved | `fanoTriples_card` |
+| 5 | Decision 1 stays OPEN; encoded open with a kill, never a beekeeper choice | 2 forced | INTERP-holographic-boundary kill + ruling bundle v0.7 §0 |
+| 6 | ρ-equivariance eliminates P2′ and imposes no constraint on P2 | 2 forced (rewritten) | 𝕆_low not ρ-invariant (0.866); ρ(𝕆'_v)=𝕆'_v ≤4.9e-16; ρ∘E−E∘ρ ≤1.4e-15 (`row7_rho_P2.py`) |
+| 7 | The condensed/locale route may not be offered as *the* definition of the in-flight region | 2 forced | KILLED-locale-forcing-route Prop 12 (earlier phrasing over-read its SCOPE line) |
+| 8 | Vacuum Hessian: rank 6, eigenvalues 8(1−b₀²), trace 48(1−b₀²), rank 0 at poles | 3 provable (best value) | proof item #5; confirmer-reproduced |
+| 9 | spec(Hess V) depends on the crystal only through b₀² | 3 provable | proof item #9 |
+| 10 | For every quaternion ℍ ⊂ 𝕆, ℍ ⊕ ℍℓ is a ρ-invariant octonion subalgebra — a continuum, not 7 | 3 provable | proof item #6; 200 distinct, residuals ≤5.1e-16 |
+| 11 | The ρ-invariant encodings containing ℍ_s form a ℂP² (ℂ_u-lines in u^⊥), one Stab(s) ≅ SU(3) orbit ⇒ no canonical point | 3 provable (new) | proposed item #10 `encoding_octonions_su3_orbit`; 20/20 (`family_check.py`) |
+| 12 | At a pole the family is larger (every ℍ ⊕ ℍℓ; Gr₃(7) ≅ G₂/SO(4), 8-dim) | 3 open/provable | 20/20 dim-8; the 8-dim count reasoned, not measured |
+| 13 | Generic pair `U₁.hosted ∩ U₂.hosted = span{1,ℓ}` | 3 provable | item #3, hypothesis u₁ ≠ ±u₂, both non-pole; 200/200 |
+| 14 | `U.hosted = quatSpan` | 3 provable | item #2, hypothesis non-pole |
+| 15 | Decision 1 impasse (re-drafted) | 3 open | below |
+| 16 | Seam dynamics; local spectrum; α̇/Ġ; b₀ → interior observable | 3 open | unchanged |
+| 17 | "No ρ-invariant octonion algebra exists" / `generic_quatSpan_not_subset_rho_inv_octonion` | 4 withdrawn | by Furey/Feynman, R6 — a false theorem, struck |
+| 18 | "Exactly 7"; "0/20 obstruction"; "ρ kills both readings"; "gap 4-dim either way" | 4 withdrawn — driver's/runner's errors | gap 6-dim under P2′, 4-dim under P2 |
+| 19 | "The rule adds only a clock and descent-vs-conservation" | 4 withdrawn | by Furey/Feynman, R6 |
+| 20 | R1–R5 withdrawals | 4 withdrawn | by Furey/Feynman |
+
+## Proof-owed (corrected)
+
+Commission: #2 `hosted_eq_quatSpan` (non-pole) · #3 `universe_intersection_generic_eq_complex` (u₁ ≠ ±u₂, both non-pole) · #5 `vacuum_hessian_rank_six_eigenvalue` · #6 `rho_invariant_octonion_doubles` (every quaternion ℍ) · #8 `rho_moves_cd_half` (as sets) · #9 `hessian_spectrum_function_of_b0_sq` · #10 `encoding_octonions_su3_orbit` (new). Struck: #1 (exists), #4 (exists), #7 (false).
+
+## §10 impasse on Decision 1 — re-drafted
+
+Type: under-determination, not a disagreement (no crux; both parties agree) → encoded open with a kill, never a choice. Missing piece: a theorem refuting the completeness conjecture (an octonion subalgebra containing ℍ_s outside the ℂP² family), or a derivation from an existing anchor fixing the ℂP² parameter. Gap type: theoretical. Strategies run: ρ-equivariance check; §9-D moduli count (ℂP², SU(3)-transitive); intersection/observable check; still to run: prove/refute completeness via the sedenion alternator. Best partial + bound: residual = a ℂP² (4 real dims), one orbit of Stab(s); 8-dim at a pole. Candidate kill rewrite (for the confirmer, not a ruling): killed if an algebraic invariant or projection operator selects a unique encoding octonion from the ℂP² moduli without a manual choice; the "ρ-invariant ⇒ P2′" branch is unsatisfiable and must go.
+
+## §7 tells (R6–R7)
+
+R6: ⟨b₀²⟩ ≈ 0.146 (quench endpoint) UNVERIFIED, not carried. R7: over-tag — "ℍ_s = span{1,ℓ,u,ℓu} VALIDATED" when only ⊆ is proved. No sycophancy. The correlated error (both parties treating the ρ-torsor as a universal killer) was broken only by the third party — direct evidence for MO §7's heterogeneity rule.
+
+## Last easy answer (for the confirmer)
+
+"The residual freedom in the encoding is exactly a ℂP², a single SU(3) orbit, so no canonical choice exists and the choice is irreducible." Untested outside the dyad; rests on the completeness conjecture (𝕆'_v exhausts the octonion subalgebras containing ℍ_s), tagged CONJECTURE by both parties and the repo's own script.
+
+## Not verified
+
+No Lean/Agda runs. Pole family dimension reasoned, not measured. Stab_{G₂}(u) ≅ SU(3) and SU(3)-transitivity on ℂP² taken as standard. Completeness open. ⟨b₀²⟩ ≈ 0.146 unverified.
