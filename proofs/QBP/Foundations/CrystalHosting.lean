@@ -1,6 +1,9 @@
 import QBP.Foundations.NoAutonomousDynamics
 import QBP.Foundations.DeltaLandscape
 import QBP.Foundations.ArtinTrace
+import Mathlib.Analysis.Calculus.Deriv.Pow
+import Mathlib.Analysis.Calculus.Deriv.Add
+import Mathlib.Analysis.Calculus.Deriv.Mul
 
 /-!
 # QBP.Foundations.CrystalHosting — what a crystal (vacuum) hosts
@@ -1811,6 +1814,365 @@ theorem quatSpan_inter_eq_complex {u₁ u₂ : CDAlg ℝ 3} (h1 : u₁.coord 0 =
 
 end HostedEq
 
+/-! ## 4c. The second variation of the δ-landscape at a crystal (#5)
+
+The heterogeneous confirmer's verdict of 2026-09-19 (§4.2) reproduced, and
+derived analytically, the transverse Hessian of the potential
+`V(s) = ‖[cdLo s, cdHi s]‖²` at a vacuum: **rank 6, all nonzero eigenvalues
+`8(1 − b₀²)`, trace `48(1 − b₀²)`, identically zero at the poles.**  This
+section proves the algebraic core of that statement.  What IS proved:
+
+* `potential_taylor_at_vacuum` — at a vacuum, `t ↦ V(s + t·v)` is the **exactly
+  quartic** polynomial `t²·N(L) + 2t³·⟨L,Q⟩ + t⁴·N(Q)`, so the second derivative
+  at `t = 0` is `2·N(L)` with `L = secVar s v`.  (`deriv2_potential_at_vacuum`
+  states that as a genuine `deriv`.)  This is what makes `2·N(secVar s v)` the
+  Hessian quadratic form and not a guess.
+* `N_secVar_closed` — the closed form `2·N(L) = 8·(N m − ⟨u,m⟩²)` with
+  `m = α·Im(cdHi v) − γ·cdLo v`, from `DeltaLandscape.octonion_commutator_norm`
+  (the 7-dimensional Lagrange identity), **not** from finite differences.  The
+  confirmer explicitly warned that finite differences are unreliable at `γ = 0`.
+* `hessQuad_eq_transverse` — the sharp statement:
+  `Hess_s(v,v) = 8(1 − b₀²)·‖P v‖²` where `P v = eigDir α γ (transComp α γ u v)`
+  is the **transverse component** of `v`.  So the eigenvalue is exactly
+  `8(1 − b₀²)` on the transverse part and `0` on its complement, for EVERY
+  imaginary direction `v` — no basis, no numerics.
+* `transComp_eigDir` / `transComp_flatDir` — the explicit 6-parameter transverse
+  family (`e` ranging over imaginary `e ⟂ u`) realises the eigenvalue, and the
+  explicit 9-parameter flat family is in the kernel.
+* `hessQuad_pole_eq_zero` — at a pole `s = b₀·ℓ` the form vanishes identically.
+
+What is **NOT** proved here, and must not be read in: the *numerals* `rank = 6`
+and `trace = 48(1 − b₀²)`.  Those need `finrank (u^⊥ ∩ Im 𝕆) = 6` and a rank
+computation for the quadratic form, neither of which is formalised.  The
+statements above are strictly stronger than "some 6-dimensional family has
+eigenvalue 8(1−b₀²)" but strictly weaker than "the rank is the numeral 6". -/
+
+section SecondVariation
+
+variable {u : CDAlg ℝ 3}
+
+/-- Additivity of `bil` over the Cayley–Dickson pair split. -/
+theorem bil_split (x y : CDAlg ℝ 4) :
+    bil x y = bil (cdLo x) (cdLo y) + bil (cdHi x) (cdHi y) := by
+  show (∑ i, x.coord i * y.coord i) = _
+  rw [sum_split (fun k => x.coord k * y.coord k)]
+  rfl
+
+/-- The **linear** term of the commutator along `s + t·v`. -/
+def secVar (s v : CDAlg ℝ 4) : CDAlg ℝ 3 :=
+  cdLo s * cdHi v - cdHi v * cdLo s + (cdLo v * cdHi s - cdHi s * cdLo v)
+
+/-- The **quadratic** term of the commutator along `s + t·v` (it is the
+    commutator of `v` with itself, i.e. `V(v)` before taking norms). -/
+def quadVar (v : CDAlg ℝ 4) : CDAlg ℝ 3 := cdLo v * cdHi v - cdHi v * cdLo v
+
+/-- At a vacuum the commutator along the ray `s + t·v` has no constant term:
+    `[a + tp, b + tq] = t·L + t²·Q`. -/
+theorem commutator_along_ray {s : CDAlg ℝ 4} (hv : IsVacuum s) (v : CDAlg ℝ 4) (t : ℝ) :
+    cdLo (s + t • v) * cdHi (s + t • v) - cdHi (s + t • v) * cdLo (s + t • v)
+      = t • secVar s v + (t ^ 2) • quadVar v := by
+  rw [secVar, quadVar, cdLo_add, cdHi_add, cdLo_smul, cdHi_smul]
+  simp only [mul_add_left, mul_add_right, mul_smul_left, mul_smul_right]
+  rw [hv.2]
+  module
+
+/-- **The Taylor expansion of `V` along a ray through a crystal.**  `V` restricted
+    to `t ↦ s + t·v` is the quartic `t²·N(L) + 2t³·⟨L,Q⟩ + t⁴·N(Q)`: no constant
+    term (the crystal is a zero of `V`) and no linear term (it is a minimum). -/
+theorem potential_taylor_at_vacuum {s : CDAlg ℝ 4} (hv : IsVacuum s)
+    (v : CDAlg ℝ 4) (t : ℝ) :
+    N (cdLo (s + t • v) * cdHi (s + t • v) - cdHi (s + t • v) * cdLo (s + t • v))
+      = N (secVar s v) * t ^ 2 + 2 * bil (secVar s v) (quadVar v) * t ^ 3
+        + N (quadVar v) * t ^ 4 := by
+  rw [commutator_along_ray hv v t, alt_N_add, N_smul, N_smul, bil_smul_left,
+    bil_smul_right]
+  ring
+
+/-- **The Hessian quadratic form of `V` at a crystal**, `Hess_s(v,v)`.  Justified
+    as the second derivative by `potential_taylor_at_vacuum` /
+    `deriv2_potential_at_vacuum`. -/
+def hessQuad (s v : CDAlg ℝ 4) : ℝ := 2 * N (secVar s v)
+
+/-- **`hessQuad` really is the second derivative.**  `d²/dt²|₀ V(s + t·v) = 2·N(L)`.
+    Proved by rewriting the (exactly quartic) function through
+    `potential_taylor_at_vacuum` and differentiating the polynomial. -/
+theorem deriv2_potential_at_vacuum {s : CDAlg ℝ 4} (hv : IsVacuum s) (v : CDAlg ℝ 4) :
+    deriv (deriv (fun t : ℝ =>
+        N (cdLo (s + t • v) * cdHi (s + t • v) - cdHi (s + t • v) * cdLo (s + t • v)))) 0
+      = hessQuad s v := by
+  set A : ℝ := N (secVar s v) with hA
+  set B : ℝ := 2 * bil (secVar s v) (quadVar v) with hB
+  set C : ℝ := N (quadVar v) with hC
+  have hfun : (fun t : ℝ =>
+      N (cdLo (s + t • v) * cdHi (s + t • v) - cdHi (s + t • v) * cdLo (s + t • v)))
+      = fun t : ℝ => A * t ^ 2 + B * t ^ 3 + C * t ^ 4 :=
+    funext (potential_taylor_at_vacuum hv v)
+  have hd1 : ∀ t : ℝ, HasDerivAt (fun t : ℝ => A * t ^ 2 + B * t ^ 3 + C * t ^ 4)
+      (A * 2 * t ^ 1 + B * 3 * t ^ 2 + C * 4 * t ^ 3) t := fun t =>
+    ((((hasDerivAt_pow 2 t).const_mul A).add ((hasDerivAt_pow 3 t).const_mul B)).add
+      ((hasDerivAt_pow 4 t).const_mul C)).congr_deriv (by push_cast; ring)
+  have h1 : deriv (fun t : ℝ => A * t ^ 2 + B * t ^ 3 + C * t ^ 4)
+      = fun t : ℝ => A * 2 * t ^ 1 + B * 3 * t ^ 2 + C * 4 * t ^ 3 :=
+    funext fun t => (hd1 t).deriv
+  have hd2 : HasDerivAt (fun t : ℝ => A * 2 * t ^ 1 + B * 3 * t ^ 2 + C * 4 * t ^ 3)
+      (2 * A) 0 :=
+    ((((hasDerivAt_pow 1 (0:ℝ)).const_mul (A * 2)).add
+      ((hasDerivAt_pow 2 (0:ℝ)).const_mul (B * 3))).add
+      ((hasDerivAt_pow 3 (0:ℝ)).const_mul (C * 4))).congr_deriv (by push_cast; ring)
+  rw [hfun, h1, hd2.deriv, hessQuad, hA]
+
+/-! ### The closed form of the second variation -/
+
+/-- The octonion `m = α·Im(cdHi v) − γ·cdLo v` that carries the whole second
+    variation at a vacuum with parameters `(u, α, γ)`. -/
+def mVec (α γ : ℝ) (v : CDAlg ℝ 4) : CDAlg ℝ 3 :=
+  α • (cdHi v - ((cdHi v).coord 0) • (1 : CDAlg ℝ 3)) - γ • cdLo v
+
+theorem mVec_coord_zero {v : CDAlg ℝ 4} (hv : v.coord 0 = 0) (α γ : ℝ) :
+    (mVec α γ v).coord 0 = 0 := by
+  rw [mVec, sub_coord, smul_coord, smul_coord, sub_coord, smul_coord, one_coord,
+    if_pos rfl, mul_one, sub_self, mul_zero, cdLo_coord_zero hv, mul_zero, sub_zero]
+
+/-- **The second variation is a single octonion commutator:** `L = [u, m]`. -/
+theorem secVar_eq_commutator {s v : CDAlg ℝ 4} {α γ b₀ : ℝ}
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u) :
+    secVar s v = u * mVec α γ v - mVec α γ v * u := by
+  rw [secVar, mVec, hlo, hhi]
+  simp only [mul_add_left, mul_add_right, mul_smul_left, mul_smul_right,
+    cd_sub_mul, cd_mul_sub, cd_one_mul, cd_mul_one]
+  module
+
+/-- **Closed form of the Hessian quadratic form at a crystal.**
+
+      `Hess_s(v,v) = 8·( |m|² − ⟨u, m⟩² )`,  `m = α·Im(cdHi v) − γ·cdLo v`.
+
+    From the 7-dimensional Lagrange identity on `Im 𝕆`
+    (`DeltaLandscape.octonion_commutator_norm`) — an exact algebraic identity, not
+    a finite-difference estimate. -/
+theorem hessQuad_closed {s v : CDAlg ℝ 4} {α γ b₀ : ℝ}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1) (hv : v.coord 0 = 0)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u) :
+    hessQuad s v = 8 * (N (mVec α γ v) - (bil u (mVec α γ v)) ^ 2) := by
+  rw [hessQuad, secVar_eq_commutator (u := u) (b₀ := b₀) hlo hhi,
+    QBP.Foundations.DeltaLandscape.octonion_commutator_norm u (mVec α γ v) hu0
+      (mVec_coord_zero hv α γ), hNu]
+  ring
+
+/-! ### Transverse and flat directions -/
+
+/-- The `u`-orthogonal part of an octonion. -/
+def perpU (u w : CDAlg ℝ 3) : CDAlg ℝ 3 := w - (bil u w) • u
+
+theorem perpU_coord_zero (hu0 : u.coord 0 = 0) {w : CDAlg ℝ 3} (hw : w.coord 0 = 0) :
+    (perpU u w).coord 0 = 0 := by
+  rw [perpU, sub_coord, smul_coord, hu0, mul_zero, hw, sub_zero]
+
+theorem bil_perpU (hNu : N u = 1) (w : CDAlg ℝ 3) : bil u (perpU u w) = 0 := by
+  rw [perpU, alt_bil_sub_right, bil_smul_right, ← N_eq_bil, hNu, mul_one, sub_self]
+
+/-- **The explicit transverse family**: `v_e = (−γ·e) + (α·e)·ℓ` for `e` imaginary
+    and orthogonal to `u`.  A 6-parameter family (`e ∈ u^⊥ ∩ Im 𝕆`). -/
+def eigDir (α γ : ℝ) (e : CDAlg ℝ 3) : CDAlg ℝ 4 := loOf ((-γ) • e) + hiOf (α • e)
+
+/-- **The explicit flat family**: everything built from `u`, `1` and a single
+    `e ⟂ u` in the `(α, γ)`-aligned combination.  A 9-parameter family; it
+    contains the crystal `s` itself (`e = 0, x = α, y = b₀, z = γ`). -/
+def flatDir (α γ : ℝ) (u e : CDAlg ℝ 3) (x y z : ℝ) : CDAlg ℝ 4 :=
+  loOf (α • e + x • u) + hiOf (y • (1 : CDAlg ℝ 3) + z • u + γ • e)
+
+@[simp] theorem cdLo_eigDir (α γ : ℝ) (e : CDAlg ℝ 3) :
+    cdLo (eigDir α γ e) = (-γ) • e := by
+  rw [eigDir, cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+
+@[simp] theorem cdHi_eigDir (α γ : ℝ) (e : CDAlg ℝ 3) :
+    cdHi (eigDir α γ e) = α • e := by
+  rw [eigDir, cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]
+
+@[simp] theorem cdLo_flatDir (α γ : ℝ) (u e : CDAlg ℝ 3) (x y z : ℝ) :
+    cdLo (flatDir α γ u e x y z) = α • e + x • u := by
+  rw [flatDir, cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+
+@[simp] theorem cdHi_flatDir (α γ : ℝ) (u e : CDAlg ℝ 3) (x y z : ℝ) :
+    cdHi (flatDir α γ u e x y z) = y • (1 : CDAlg ℝ 3) + z • u + γ • e := by
+  rw [flatDir, cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]
+
+/-- `‖v_e‖² = (α² + γ²)·‖e‖²`. -/
+theorem N_eigDir (α γ : ℝ) (e : CDAlg ℝ 3) :
+    N (eigDir α γ e) = (α ^ 2 + γ ^ 2) * N e := by
+  rw [N_split, cdLo_eigDir, cdHi_eigDir, N_smul, N_smul]
+  ring
+
+theorem eigDir_coord_zero {e : CDAlg ℝ 3} (he : e.coord 0 = 0) (α γ : ℝ) :
+    (eigDir α γ e).coord 0 = 0 := by
+  refine coord_zero_of_cdLo ?_
+  rw [cdLo_eigDir, smul_coord, he, mul_zero]
+
+/-- **The transverse directions are tangent to the state sphere** at the crystal:
+    imaginary, and `bil`-orthogonal to `s`. -/
+theorem eigDir_orth_crystal {s : CDAlg ℝ 4} {α γ b₀ : ℝ} {e : CDAlg ℝ 3}
+    (he : e.coord 0 = 0) (hue : bil u e = 0)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u) :
+    bil s (eigDir α γ e) = 0 := by
+  rw [bil_split, hlo, hhi, cdLo_eigDir, cdHi_eigDir,
+    bil_comm' (b₀ • (1 : CDAlg ℝ 3) + γ • u) (α • e)]
+  simp only [bil_smul_left, bil_smul_right, bil_add_right, bil_one_right, smul_coord,
+    he, hue]
+  rw [bil_comm' e u, hue]
+  ring
+
+/-- **The transverse component of an arbitrary imaginary direction.** -/
+noncomputable def transComp (α γ : ℝ) (u : CDAlg ℝ 3) (v : CDAlg ℝ 4) : CDAlg ℝ 3 :=
+  (α ^ 2 + γ ^ 2)⁻¹ • ((-γ) • perpU u (cdLo v)
+    + α • perpU u (cdHi v - ((cdHi v).coord 0) • (1 : CDAlg ℝ 3)))
+
+theorem transComp_coord_zero (hu0 : u.coord 0 = 0) {v : CDAlg ℝ 4} (hv : v.coord 0 = 0)
+    (α γ : ℝ) : (transComp α γ u v).coord 0 = 0 := by
+  rw [transComp, smul_coord, add_coord, smul_coord, smul_coord,
+    perpU_coord_zero hu0 (cdLo_coord_zero hv),
+    perpU_coord_zero hu0 (QBP.Foundations.DeltaLandscape.im_coord_zero (cdHi v))]
+  ring
+
+theorem bil_transComp (hNu : N u = 1) (α γ : ℝ) (v : CDAlg ℝ 4) :
+    bil u (transComp α γ u v) = 0 := by
+  rw [transComp, bil_smul_right, bil_add_right, bil_smul_right, bil_smul_right,
+    bil_perpU hNu, bil_perpU hNu]
+  ring
+
+/-- **The key decomposition:** `m = (α² + γ²)·P + c·u` with `P` the transverse
+    component and `c = α⟨u, Im b⟩ − γ⟨u, a⟩` the component along `u`. -/
+theorem mVec_decomp (hk : α ^ 2 + γ ^ 2 ≠ 0) (v : CDAlg ℝ 4) :
+    mVec α γ v = (α ^ 2 + γ ^ 2) • transComp α γ u v
+      + (α * bil u (cdHi v - ((cdHi v).coord 0) • (1 : CDAlg ℝ 3))
+          - γ * bil u (cdLo v)) • u := by
+  rw [transComp, smul_smul, mul_inv_cancel₀ hk, one_smul, mVec, perpU, perpU]
+  module
+
+/-- **The sharp Hessian statement (#5).**  At a crystal `s` with parameters
+    `(u, α, γ, b₀)` on the unit sphere, for EVERY imaginary direction `v`
+
+      `Hess_s(v, v) = 8·(1 − b₀²)·‖P v‖²`,
+
+    where `P v = eigDir α γ (transComp α γ u v)` is the transverse component of
+    `v`.  So `8(1 − b₀²)` is the eigenvalue on the transverse part, the flat part
+    is exactly the kernel, and the spectrum depends on the crystal only through
+    `b₀²`. -/
+theorem hessQuad_eq_transverse {s v : CDAlg ℝ 4} {α γ b₀ : ℝ}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1) (hv : v.coord 0 = 0)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs : N s = 1) (hk : α ^ 2 + γ ^ 2 ≠ 0) :
+    hessQuad s v = 8 * (1 - b₀ ^ 2) * N (eigDir α γ (transComp α γ u v)) := by
+  have hnorm : α ^ 2 + γ ^ 2 + b₀ ^ 2 = 1 := by
+    rw [← vacuum_norm_parametrised hu0 hNu hlo hhi, hNs]
+  set P : CDAlg ℝ 3 := transComp α γ u v with hP
+  set c : ℝ := α * bil u (cdHi v - ((cdHi v).coord 0) • (1 : CDAlg ℝ 3))
+      - γ * bil u (cdLo v) with hc
+  have hm : mVec α γ v = (α ^ 2 + γ ^ 2) • P + c • u := mVec_decomp hk v
+  have hbP : bil u P = 0 := bil_transComp hNu α γ v
+  have hNm : N (mVec α γ v) = (α ^ 2 + γ ^ 2) ^ 2 * N P + c ^ 2 := by
+    rw [hm, alt_N_add, N_smul, N_smul, hNu, bil_smul_left, bil_smul_right,
+      bil_comm' P u, hbP]
+    ring
+  have hbm : bil u (mVec α γ v) = c := by
+    rw [hm, bil_add_right, bil_smul_right, bil_smul_right, hbP, ← N_eq_bil, hNu]
+    ring
+  rw [hessQuad_closed (u := u) (b₀ := b₀) hu0 hNu hv hlo hhi, hNm, hbm, N_eigDir]
+  have hb : (1 : ℝ) - b₀ ^ 2 = α ^ 2 + γ ^ 2 := by linarith
+  rw [hb]
+  ring
+
+/-- The transverse family realises the eigenvalue: `P (v_e) = e`. -/
+theorem transComp_eigDir (hk : α ^ 2 + γ ^ 2 ≠ 0)
+    {e : CDAlg ℝ 3} (he : e.coord 0 = 0) (hue : bil u e = 0) :
+    transComp α γ u (eigDir α γ e) = e := by
+  have h1 : perpU u ((-γ) • e) = (-γ) • e := by
+    rw [perpU, bil_smul_right, hue, mul_zero, zero_smul, sub_zero]
+  have h2 : perpU u (α • e - ((α • e).coord 0) • (1 : CDAlg ℝ 3)) = α • e := by
+    have h0 : (α • e).coord 0 = 0 := by rw [smul_coord, he, mul_zero]
+    rw [h0, zero_smul, sub_zero, perpU, bil_smul_right, hue, mul_zero, zero_smul,
+      sub_zero]
+  rw [transComp, cdLo_eigDir, cdHi_eigDir, h1, h2, smul_smul, smul_smul]
+  have : ((-γ) * -γ) • e + (α * α) • e = (α ^ 2 + γ ^ 2) • e := by module
+  rw [this, smul_smul, inv_mul_cancel₀ hk, one_smul]
+
+/-- The flat family is in the kernel: `P (w) = 0`, hence `Hess_s(w,w) = 0`. -/
+theorem transComp_flatDir (hu0 : u.coord 0 = 0) (hNu : N u = 1)
+    {e : CDAlg ℝ 3} (he : e.coord 0 = 0) (hue : bil u e = 0) (x y z : ℝ) :
+    transComp α γ u (flatDir α γ u e x y z) = 0 := by
+  have h1 : perpU u (α • e + x • u) = α • e := by
+    rw [perpU, bil_add_right, bil_smul_right, bil_smul_right, hue, ← N_eq_bil, hNu]
+    module
+  have hcoord : (y • (1 : CDAlg ℝ 3) + z • u + γ • e).coord 0 = y := by
+    rw [add_coord, add_coord, smul_coord, smul_coord, smul_coord, one_coord,
+      if_pos rfl, hu0, he, mul_one, mul_zero, mul_zero]
+    ring
+  have h2 : perpU u (y • (1 : CDAlg ℝ 3) + z • u + γ • e
+      - ((y • (1 : CDAlg ℝ 3) + z • u + γ • e).coord 0) • (1 : CDAlg ℝ 3)) = γ • e := by
+    rw [hcoord]
+    have hsub : y • (1 : CDAlg ℝ 3) + z • u + γ • e - y • (1 : CDAlg ℝ 3)
+        = z • u + γ • e := by module
+    rw [hsub, perpU, bil_add_right, bil_smul_right, bil_smul_right, hue, ← N_eq_bil,
+      hNu]
+    module
+  rw [transComp, cdLo_flatDir, cdHi_flatDir, h1, h2, smul_smul, smul_smul]
+  have : ((-γ) * α) • e + (α * γ) • e = (0 : CDAlg ℝ 3) := by module
+  rw [this, smul_zero]
+
+/-- **The eigenvalue, explicitly.**  On the transverse family the Hessian is
+    `8(1 − b₀²)` times the squared norm — the confirmer's `8(1 − b₀²)`. -/
+theorem hessQuad_eigDir {s : CDAlg ℝ 4} {α γ b₀ : ℝ} {e : CDAlg ℝ 3}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1) (he : e.coord 0 = 0) (hue : bil u e = 0)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs : N s = 1) (hk : α ^ 2 + γ ^ 2 ≠ 0) :
+    hessQuad s (eigDir α γ e) = 8 * (1 - b₀ ^ 2) * N (eigDir α γ e) := by
+  rw [hessQuad_eq_transverse (u := u) (b₀ := b₀) hu0 hNu (eigDir_coord_zero he α γ)
+      hlo hhi hNs hk,
+    transComp_eigDir (u := u) hk he hue]
+
+/-- **The kernel, explicitly.**  The flat family is annihilated by the Hessian. -/
+theorem hessQuad_flatDir {s : CDAlg ℝ 4} {α γ b₀ : ℝ} {e : CDAlg ℝ 3}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1) (he : e.coord 0 = 0) (hue : bil u e = 0)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs : N s = 1) (hk : α ^ 2 + γ ^ 2 ≠ 0) (x y z : ℝ) :
+    hessQuad s (flatDir α γ u e x y z) = 0 := by
+  have hvim : (flatDir α γ u e x y z).coord 0 = 0 := by
+    refine coord_zero_of_cdLo ?_
+    rw [cdLo_flatDir, add_coord, smul_coord, smul_coord, he, hu0, mul_zero, mul_zero,
+      add_zero]
+  rw [hessQuad_eq_transverse (u := u) (b₀ := b₀) hu0 hNu hvim hlo hhi hNs hk,
+    transComp_flatDir (u := u) hu0 hNu he hue, eigDir, smul_zero, smul_zero,
+    loOf_zero, hiOf_zero, add_zero, N_zero]
+  ring
+
+/-- **At a pole the Hessian vanishes identically** (`rank 0`): for `s = b₀·ℓ` the
+    second variation is zero in every direction, so `V` is quartic, not quadratic,
+    transverse to the pole. -/
+theorem hessQuad_pole_eq_zero (b₀ : ℝ) (v : CDAlg ℝ 4) : hessQuad (b₀ • ell) v = 0 := by
+  have hlo : cdLo (b₀ • ell) = 0 := by rw [cdLo_smul, cdLo_ell, smul_zero]
+  have hhi : cdHi (b₀ • ell) = b₀ • (1 : CDAlg ℝ 3) := by rw [cdHi_smul, cdHi_ell]
+  have h : secVar (b₀ • ell) v = 0 := by
+    rw [secVar, hlo, hhi]
+    simp only [mul_smul_left, mul_smul_right, cd_one_mul, cd_mul_one, alt_zero_mul,
+      alt_mul_zero]
+    module
+  rw [hessQuad, h, N_zero]
+  ring
+
+/-- **`hessian_spectrum_function_of_b0_sq` (#9).**  The eigenvalue is
+    `λ(b₀) = 8(1 − b₀²)`, an EVEN function of the pole coordinate: it takes the
+    same value at `b₀` and at `−b₀`, so the Hessian spectrum does **not** separate
+    a crystal from its `b₀ ↦ −b₀` partner, and does not see the `(α, γ)` phase at
+    all.  (The confirmer's row-12 correction: the invariant resolves the `b₀²`
+    level set only.) -/
+theorem hessQuad_eigenvalue_even (b₀ : ℝ) :
+    8 * (1 - b₀ ^ 2) = 8 * (1 - (-b₀) ^ 2) := by ring
+
+/-- Two crystals with the same `b₀²` have the same transverse eigenvalue, whatever
+    their direction `u` and phase `(α, γ)`. -/
+theorem hessQuad_eigenvalue_depends_only_on_b0_sq {b₀ b₀' : ℝ} (h : b₀ ^ 2 = b₀' ^ 2) :
+    8 * (1 - b₀ ^ 2) = 8 * (1 - b₀' ^ 2) := by rw [h]
+
+end SecondVariation
+
 /-! ### The Cayley–Dickson low half is not ρ-invariant, as a SET (#8)
 
 `rotAut3_moves_lowHalf` above exhibits a single witness.  The confirmer's
@@ -2021,5 +2383,32 @@ is a finding. -/
 #print axioms inQuatSpan_neg_dir
 #print axioms span_one_u_inter
 #print axioms quatSpan_inter_eq_complex
+#print axioms bil_split
+#print axioms commutator_along_ray
+#print axioms potential_taylor_at_vacuum
+#print axioms deriv2_potential_at_vacuum
+#print axioms mVec_coord_zero
+#print axioms secVar_eq_commutator
+#print axioms hessQuad_closed
+#print axioms perpU_coord_zero
+#print axioms bil_perpU
+#print axioms cdLo_eigDir
+#print axioms cdHi_eigDir
+#print axioms cdLo_flatDir
+#print axioms cdHi_flatDir
+#print axioms N_eigDir
+#print axioms eigDir_coord_zero
+#print axioms eigDir_orth_crystal
+#print axioms transComp_coord_zero
+#print axioms bil_transComp
+#print axioms mVec_decomp
+#print axioms hessQuad_eq_transverse
+#print axioms transComp_eigDir
+#print axioms transComp_flatDir
+#print axioms hessQuad_eigDir
+#print axioms hessQuad_flatDir
+#print axioms hessQuad_pole_eq_zero
+#print axioms hessQuad_eigenvalue_even
+#print axioms hessQuad_eigenvalue_depends_only_on_b0_sq
 
 end QBP.Foundations.CrystalHosting

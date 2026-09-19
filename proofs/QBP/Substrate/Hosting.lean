@@ -566,6 +566,102 @@ theorem mem_universeSpace_iff_complex_structure {s : CDAlg ℝ 4} (hs : s ∈ St
     rw [h x, hs.2]
     module
 
+/-! ## 8b. The Hessian of `potential` at a universe (#5, #9)
+
+`CrystalHosting` §4c proves the algebra; here it is restated on `potential` and
+on `Universe`.  `b₀` is the **pole coordinate** `s.coord 8 = s.coord (hiIdx 0)`
+of the confirmer's §4.2 — pinned to the parametrisation below, not assumed. -/
+
+/-- The Prop-15 parametrisation of a NON-POLE universe, with the non-degeneracy
+    `α² + γ² ≠ 0` and `b₀` identified as the pole coordinate `s.coord (hiIdx 0)`. -/
+theorem Universe.exists_param (U : Universe) (h : U.NonPole) :
+    ∃ (u : CDAlg ℝ 3) (α γ b₀ : ℝ), u.coord 0 = 0 ∧ N u = 1 ∧
+      cdLo U.crystal = α • u ∧ cdHi U.crystal = b₀ • (1 : CDAlg ℝ 3) + γ • u ∧
+      α ^ 2 + γ ^ 2 ≠ 0 ∧ b₀ = U.crystal.coord (hiIdx 0) := by
+  obtain ⟨u, α, γ, b₀, hu0, hNu, hlo, hhi⟩ :=
+    (vacuum_iff_parametrised U.crystal).mp U.isVacuum
+  have hP := crystal_perp_eq (u := u) (b₀ := b₀) hu0 hlo hhi
+  have hk : α ^ 2 + γ ^ 2 ≠ 0 := by
+    intro h0
+    have hα : α = 0 := by nlinarith [sq_nonneg α, sq_nonneg γ]
+    have hγ : γ = 0 := by nlinarith [sq_nonneg α, sq_nonneg γ]
+    exact h (by rw [hP, hα, hγ]; module)
+  have hNu' : N u = 1 := by
+    rcases hNu with h1 | h0
+    · exact h1
+    · exact absurd (by rw [hP, h0, loOf_zero, hiOf_zero]; module) h
+  have hb : b₀ = U.crystal.coord (hiIdx 0) := by
+    have hc : (cdHi U.crystal).coord 0 = b₀ := by
+      rw [hhi, add_coord, smul_coord, smul_coord, one_coord, if_pos rfl, hu0, mul_one,
+        mul_zero, add_zero]
+    rw [← hc, cdHi_coord]
+  exact ⟨u, α, γ, b₀, hu0, hNu', hlo, hhi, hk, hb⟩
+
+/-- **The potential along a ray through a crystal is an exact quartic.**  No
+    constant term (the crystal is a zero of `V`), no linear term (it is a
+    minimum), quadratic coefficient `N (secVar s v)`. -/
+theorem potential_taylor_at_universe (U : Universe) (v : CDAlg ℝ 4) (t : ℝ) :
+    potential (U.crystal + t • v)
+      = N (secVar U.crystal v) * t ^ 2
+        + 2 * bil (secVar U.crystal v) (quadVar v) * t ^ 3
+        + N (quadVar v) * t ^ 4 :=
+  potential_taylor_at_vacuum U.isVacuum v t
+
+/-- **The Hessian of `potential`, as a genuine second derivative.** -/
+theorem deriv2_potential_at_universe (U : Universe) (v : CDAlg ℝ 4) :
+    deriv (deriv (fun t : ℝ => potential (U.crystal + t • v))) 0
+      = hessQuad U.crystal v :=
+  deriv2_potential_at_vacuum U.isVacuum v
+
+/-- **`vacuum_hessian_rank_six_eigenvalue` — the part that is PROVED (#5).**
+
+    At a NON-POLE universe with pole coordinate `b₀ = s.coord (hiIdx 0)`, for
+    EVERY imaginary direction `v`
+
+      `Hess_s(v, v) = 8·(1 − b₀²)·‖P v‖²`,
+
+    where `P v = eigDir α γ (transComp α γ u v)` is the transverse component.
+    On the explicit 6-parameter transverse family (`e` imaginary, `e ⟂ u`) this
+    gives `Hess = 8(1 − b₀²)·‖v‖` exactly; on the explicit 9-parameter flat
+    family it gives `0`.
+
+    **NOT proved here:** the numerals `rank = 6` and `trace = 48(1 − b₀²)`, which
+    need `finrank (u^⊥ ∩ Im 𝕆) = 6` and a rank computation for the quadratic
+    form.  Those remain owed. -/
+theorem universe_hessian_eigenvalue (U : Universe) (h : U.NonPole) :
+    ∃ (u : CDAlg ℝ 3) (α γ b₀ : ℝ), u.coord 0 = 0 ∧ N u = 1 ∧
+      b₀ = U.crystal.coord (hiIdx 0) ∧ α ^ 2 + γ ^ 2 ≠ 0 ∧
+      (∀ v : CDAlg ℝ 4, v.coord 0 = 0 →
+          hessQuad U.crystal v
+            = 8 * (1 - b₀ ^ 2) * N (eigDir α γ (transComp α γ u v))) ∧
+      (∀ e : CDAlg ℝ 3, e.coord 0 = 0 → bil u e = 0 →
+          hessQuad U.crystal (eigDir α γ e)
+            = 8 * (1 - b₀ ^ 2) * N (eigDir α γ e)) ∧
+      (∀ (e : CDAlg ℝ 3) (x y z : ℝ), e.coord 0 = 0 → bil u e = 0 →
+          hessQuad U.crystal (flatDir α γ u e x y z) = 0) := by
+  obtain ⟨u, α, γ, b₀, hu0, hNu, hlo, hhi, hk, hb⟩ := U.exists_param h
+  refine ⟨u, α, γ, b₀, hu0, hNu, hb, hk, ?_, ?_, ?_⟩
+  · intro v hv
+    exact hessQuad_eq_transverse (u := u) (b₀ := b₀) hu0 hNu hv hlo hhi U.norm_one hk
+  · intro e he hue
+    exact hessQuad_eigDir (u := u) (b₀ := b₀) hu0 hNu he hue hlo hhi U.norm_one hk
+  · intro e x y z he hue
+    exact hessQuad_flatDir (u := u) (b₀ := b₀) hu0 hNu he hue hlo hhi U.norm_one hk x y z
+
+/-- **At a pole the Hessian is identically zero** — the `rank 0` clause of #5. -/
+theorem polePlus_hessian_eq_zero (v : CDAlg ℝ 4) : hessQuad polePlus.crystal v = 0 := by
+  have h : polePlus.crystal = (1 : ℝ) • ell := by rw [one_smul]; rfl
+  rw [h]
+  exact hessQuad_pole_eq_zero 1 v
+
+/-- **`hessian_spectrum_function_of_b0_sq` (#9).**  The transverse eigenvalue is
+    `8(1 − b₀²)`: a function of `b₀²` alone.  It is therefore blind to the sign of
+    `b₀` and to the `(α, γ)` phase, so — as the confirmer's row-12 correction says
+    — it separates the `b₀²` level sets and nothing finer. -/
+theorem universe_hessian_eigenvalue_depends_only_on_b0_sq
+    {b₀ b₀' : ℝ} (h : b₀ ^ 2 = b₀' ^ 2) :
+    8 * (1 - b₀ ^ 2) = 8 * (1 - b₀' ^ 2) := by rw [h]
+
 /-! ## 9. Equivariance under `ℓ`-fixing automorphisms (the G₂ side) -/
 
 /-- Automorphisms preserve the substrate: they fix the real part and the norm
@@ -783,6 +879,12 @@ is a finding. -/
 #print axioms loOf_e1_mem_universeSpace
 #print axioms genericUniverse_nonPole
 #print axioms exists_nonPole_universe
+#print axioms Universe.exists_param
+#print axioms potential_taylor_at_universe
+#print axioms deriv2_potential_at_universe
+#print axioms universe_hessian_eigenvalue
+#print axioms polePlus_hessian_eq_zero
+#print axioms universe_hessian_eigenvalue_depends_only_on_b0_sq
 
 -- Data definitions that use choice / classical reasoning, printed for completeness.
 #print axioms normalise
