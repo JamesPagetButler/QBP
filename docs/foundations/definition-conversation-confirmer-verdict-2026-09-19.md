@@ -383,3 +383,93 @@ That gives "a 4-dimensional continuum with no distinguished member" from pure CD
 6. Carry the pole quantifier (`s ≠ ±ℓ`) on every ℂP² statement, including row 11 and the best partial.
 
 Nothing in pass 2 is anchored, encoded or ruled. No GitHub or bridge post was made.
+
+---
+---
+
+# PASS 3 — final confirmer verdict (round 8, close)
+
+**Scope:** appended; passes 1 and 2 untouched. Read: verbatim **88–89**, transcript §Round 8 (close), runner report §"Runner report — round 8 (close; verbatim 88–89)". Lean status on the `probe-definition-lean` branch (#2, #3, #6, #8, #9 complete; #5 **partial**) is taken **as reported by the coordinator, who verified it** — I ran no lake/lean/agda. Treated throughout as *"proved on a branch, not on master."*
+
+> ## FINAL VERDICT
+>
+> **CONVERGED** — all five §3 gate conditions now hold, each with a named definition of done (§P3.5). The conversation's open sub-question, **Decision 1, exits as an earned §10 Impasse Record (6/6, certified in pass 2 and unchanged)** — that record is a *product* of the converged conversation, not a separate exit. Four small must-dos remain (§P3.6); none of them reopens the gate, and one of them (row 11) is a **re-bucketing I can now settle by computation**.
+
+---
+
+## P3.1 — (A) Gate condition 5: **derived, not conceded** → MET
+
+Turn 89 answers the driver's "derive or refute" with a five-step derivation, not an acceptance:
+
+> *"**The Base:** The vacuum manifold M_vac ⊂ S¹⁴. **The Module:** At each non-pole crystal s, the orthogonal complement ℍ_s^⊥ is a left ℍ_s-module. Because ℍ_s ≅ ℍ, this 12-dimensional real space is exactly isomorphic to ℍ³. **The Fibre:** Candidate octonion encodings are ℍ_s-lines in this module, forming an ℍP² space. The lines that satisfy alternativity/closure form a 4-dimensional subvariety homeomorphic to ℂP². **Canonicity:** … generated entirely by the native, Aut(𝕊)-equivariant algebra … **No Section:** The stabilizer Stab(s) ≅ SU(3) acts transitively on the fibre F_s. Therefore, any algebraic rule attempting to define a global, continuous section … must be invariant under SU(3). Because the action is transitive, no such non-trivial invariant exists."*
+
+Three things make this a derivation rather than a concession. It **re-derives the fibre from the module structure** (ℍP² → the closed subvariety), which is the step I supplied only as a search space. It **works out the dissolution reading beyond what it was handed**, and states what would have to be shown: *"we must prove that holographic boundary physics … can be coherently formulated as distributions or sections over a ℂP² bundle, rather than requiring a single fixed octonion algebra."* And it **distinguishes dissolve from resolve** correctly: *"If the 'datum-free bundle reading' is derived, it completely **dissolves** Decision 1 … The physical 'choice' of an encoding octonion is exposed as a mathematical illusion."*
+
+The word that failed the gate is gone. Turn 89 withdraws it by name: *"improperly concluding that the absence of a canonical section implied an irreducible choice, missing the profound possibility of the bundle itself."*
+
+**Pressure-test status.** The MO §3.5 cycle completed: exit answer → deliberate counter-case (my three counts, relayed in turn 88 G2) → the answer **changed materially** and now carries explicit quantifiers *and* a falsifier (*"falsified if a purely algebraic, Aut(𝕊)-equivariant operator is discovered that uniquely sections the bundle"*). That is what the condition asks for. **MET.**
+
+**One residual, carried to the must-dos.** The exit claim carries the **completeness** qualifier but not the **transitivity** qualifier — yet its "no algebraic invariant can select a unique encoding section" half rests *entirely* on transitivity, which the runner's own final table parks as row 11, **3 open, "OUT OF TOOLCHAIN"**. A headline claim should not rest on a row with no proof path. §P3.3 removes that problem.
+
+## P3.2 — (B) Gate condition 2: the over-tag is fixed → MET
+
+Turn 88 G4 states the correction; turn 89 owns it in Gemini's own words, in the opening sentence: *"I explicitly own my errors: conflating Gr₃(7) with G₂/SO(4), **assuming Lean constructor closure implied set equality without the explicit proof**, and improperly concluding that the absence of a canonical section implied an irreducible choice."*
+
+The replacement tag is the honest one. Runner final table row 14: *"`U.hosted = quatSpan` (non-pole) — 3 provable — item #2 — ⊆ on master; equality on the proofs branch."* Given the coordinator's report that `probe-definition-lean` closes #2 axiom-clean, **"proved on a branch, not on master"** is exactly the right status, and the master-facing owed list correctly still carries it. No over-tags remain in the assumption table. The two genuinely open assumptions — completeness and transitivity — are both tagged openly, each with a route. **MET.**
+
+## P3.3 — (C) The three-clause kill, and the one row I can re-bucket
+
+**The kill passes all four tests.**
+
+| Test | Verdict |
+|---|---|
+| Faithful bucket-3 kill | 🟢 Clause (b) is a live kill with a named firing surface: *"Fires if external physics (the Rule, the Trajectory, the Ensemble, or a derived internal observable) is rigorously derived to mathematically force a specific ℂP² section."* |
+| Fires on derivation, not stipulation | 🟢 The words *"derived, not stipulated"* are in the clause, and the permitted sources are enumerated rather than left as "a mechanism". Both pass-2 objections addressed. |
+| No choice put to the beekeeper | 🟢 A kill plus a dissolution path; nothing is offered as an option. Consistent with ruling bundle v0.7 §0. |
+| ρ-eliminates-P2′ recorded as a RESULT | 🟢 Runner final table row 5 is now **"2 forced"** and reads *"ρ-equivariance eliminates P2′, constrains P2 not at all — a RESULT"*; clause (a) records non-selectability as a theorem-in-waiting rather than an unfireable kill branch. |
+
+**But clause (a) is currently a result in name only** — it rests on row 11, which the runner parks as out of toolchain. **I can settle that.** Script `…/scratchpad/confirmer/pass3_transitivity.py`, `run-bounded 2G 300`:
+
+I built automorphisms of 𝕆 **explicitly** from orthonormal frames — a frame `(p,q,r)` (p,q orthonormal imaginary, r imaginary unit ⊥ `span{1,p,q,pq}`) determines the map `e₁,e₂,e₄ ↦ p,q,r`. Verified these are genuine octonion automorphisms: **max residual 8.11e-15** over 30 frames × 10 random pairs. Then for each trial: two frames `(u,v₁,w₁)`, `(u,v₂,w₂)` sharing `u`; `ψ = φ₂∘φ₁⁻¹`; `Ψ = ψ ⊕ ψ` the diagonal lift to 𝕊.
+
+| Check (20 random trials) | Result |
+|---|---|
+| `Ψ` is an algebra automorphism of 𝕊 | **20/20** |
+| `Ψ(s) = s` for a random crystal with direction `u` | **20/20** |
+| `Ψ(𝕆'_{v₁}) = 𝕆'_{v₂}` — **transitivity** | **20/20** |
+
+So transitivity is now **measured**, not reference-backed — and, decisively, **the construction never mentions G₂ or SU(3)**. That gives a group-free statement that *is* in toolchain:
+
+> **`encoding_family_transitive`** (`Foundations/HolographicSubalgebra.lean`) — for a non-pole crystal `s` with direction `u`, and any two unit imaginary `v₁, v₂ ∈ 𝕆` orthogonal to `u`, there exists an algebra automorphism `Ψ` of 𝕊 with `Ψ(s) = s` and `Ψ(𝕆'_{v₁}) = 𝕆'_{v₂}`. **Hypotheses:** `s` non-pole; `v₁, v₂` unit imaginary ⊥ `u`. **Ingredients already present:** `G2Transitivity.inducedMap_isAlgHom` (a basis map extends to an algebra automorphism — the signed-basis case generalises to an orthonormal frame), `quaternion_frame_table`, `assoc_orthogonal_triple`, and the ℓ-fixing hypothesis class of `aut_hosting_equivariant`.
+
+This is a modest extension of machinery the repo already has, not a Lie-theory import. **Row 11 is mis-bucketed.**
+
+## P3.4 — (D) The final table: two rows to fix
+
+| Row | Runner's bucket | Confirmer | Reason |
+|---|---|---|---|
+| 11 — "Stab(s) ≅ SU(3) transitive on Fam(s) ⇒ no Aut(𝕊)-natural section" | 3 open — **OUT OF TOOLCHAIN** | **RE-BUCKET → 3 provable** | The *group-theoretic phrasing* is out of toolchain; the *content* is not. `encoding_family_transitive` (§P3.3) states it without naming a Lie group, and I hold a constructive witness, 20/20. This matters twice over: clause (a) of the kill and the exit claim's "no natural section" both rest on this row. |
+| 7 — "Vacuum Hessian rank 6, eigenvalues 8(1−b₀²), rank 0 at poles — 3 provable, item #5" | 3 provable | **SPLIT** | Per the coordinator, the branch proves #5 only **partially**: `Hess = 8(1−b₀²)‖Pv‖²` for all imaginary `v`. The **numerals — rank 6, trace 48(1−b₀²), pole rank 0 — are not proved.** They are what distinguishes the claim from the quadratic-form identity, and they reduce to one fact: `finrank (range P) = 6`, i.e. `dim(u^⊥ ∩ Im𝕆) = 6`. Record row 7 as *eigenvalue identity proved on branch; rank/trace numerals owed*. |
+
+Everything else confirms. Rows 1–4 re-verified in pass 1 (Lean names present, statements cover the claims, with the ⊆-not-= caveat now carried as item #2). Row 5 (ρ as discriminator) and row 6 (under-determination → open with a kill) confirmed in passes 1–2. Rows 12 (completeness CONJECTURE), 13 (pole fibre 8-dim, `G₂/SO(4)`, `Gr₃(7)` withdrawn) and 14/15 (branch-vs-master) are correctly tagged. **Withdrawals (F):** rows 18 and 19 are Gemini's own words in **turn 89**, quoted in §P3.2 — all three errors owned by name in one sentence. Row 20 is correctly attributed to the driver, not to Gemini.
+
+## P3.5 — (E) Definition of done, per gate condition
+
+| # | Condition | Definition of done (as a PR names its test plan) | Status |
+|---|---|---|---|
+| 1 | Next steps well-reasoned | Every owed item carries name + file + statement + explicit hypotheses; every item accepted or challenged **with a reason**; every strike justified | ✅ 8 items (#2, #3, #5, #6, #8, #9, #10′, #11), 3 strikes justified, turn 89(d) |
+| 2 | Assumptions validated | Every load-bearing assumption tagged VALIDATED (with cite) / CONJECTURE (with route) / branch-vs-master — **no over-tags** | ✅ over-tag corrected (turn 89); completeness + transitivity openly tagged, each with a route |
+| 3 | Reasoning grounded | Every load-bearing number re-run by a party **other than its author** | ✅ driver re-ran my scripts (turn 88 G1; `module_check.py`, 3.83e-16); I re-ran the driver's in passes 1–3 |
+| 4 | Shared understanding | Each party can restate and attack the other's model; errors owned **by name** | ✅ turn 88 owns four driver errors (*"My error, not yours"*); turn 89 owns three of its own |
+| 5 | Easy answer pressure-tested | A deliberate counter-case run against the **exit** answer; the answer survives or is corrected with quantifiers **and** a falsifier | ✅ three counter-cases; "irreducible" withdrawn; corrected claim carries non-pole + completeness quantifiers and a falsifier |
+
+**§10 Impasse on Decision 1: EARNED 6/6**, certified in pass 2, unchanged and strengthened — the missing piece (completeness) now has a tractable route (#11) and my search found zero counterexamples in an exhaustive-by-construction space.
+
+## P3.6 — Remaining must-dos (none reopens the gate)
+
+1. **Re-bucket row 11** to 3-provable and commission **`encoding_family_transitive`** (§P3.3) — the group-free statement, with my constructive witness. Clause (a) of the kill and the exit claim's "no natural section" both depend on it; leaving it "out of toolchain" leaves the headline claim without a proof path.
+2. **Add the transitivity qualifier to the exit claim.** It currently carries only the completeness qualifier; it rests on two unproved statements, not one.
+3. **Split item #5 / row 7:** the branch proves the eigenvalue identity; the rank-6, trace-48(1−b₀²) and pole-rank-0 numerals are still owed and reduce to `finrank(u^⊥ ∩ Im𝕆) = 6`.
+4. **Give clause (c) a §10.2-precise criterion.** "If the datum-free bundle form is derived to be the encoding" is still type-level; turn 89 supplies the shape (*holographic bulk-to-boundary physics formulated over a sectionless ℂP² bundle*) but not a specific object whose exhibition settles it.
+
+Prove-before-encode stands: **nothing from this conversation may be anchored or encoded until the master-facing items close** (`#print axioms` clean, CI green). The branch proofs are evidence, not the gate. Nothing in pass 3 is anchored, encoded or ruled; no GitHub or bridge post was made.
