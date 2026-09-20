@@ -110,7 +110,7 @@ Stop condition: the round budget (5) was reached with Decision 1 exiting as an i
 
 # RE-OPENED after the heterogeneous confirmer returned OPEN (gate 2/5; row-13 impasse NOT earned)
 
-**Verdict read:** `definition-conversation-confirmer-verdict-2026-09-19.md` §2, §4, §5b, §6, §8, §9. The runner re-ran the confirmer's scripts (`scratchpad/confirmer/{numerics,rows8_12,row7_rho_P2}.py`, `run-bounded 2G 200`) before putting anything to Gemini — they reproduce: generic pair intersection dim 2 (200/200); spec(Hess V) identical for (u, 0.5, φ=0.0), (u, 0.5, 1.3), (u, −0.5, 2.1) with ‖s₁−s₃‖ = 1.80; 𝕆'_v closed ≤ 7.1e-16, ℍ_s ⊂ 𝕆'_v, **ρ(𝕆'_v) = 𝕆'_v ≤ 4.9e-16, ρ∘E − E∘ρ ≤ 1.4e-15** over 6 trials; 𝕆_low **not** ρ-invariant (0.866); ℓ ∉ 𝕆_low so the P2′ gap is **6**-dim.
+**Verdict read:** `definition-conversation-confirmer-verdict-2026-09-19.md` §2, §4, §5b, §6, §8, §9. The runner re-ran the confirmer's scripts (`analysis/definition-conversation-2026-09-19/confirmer/{numerics,rows8_12,row7_rho_P2}.py`, `run-bounded 2G 200`) before putting anything to Gemini — they reproduce: generic pair intersection dim 2 (200/200); spec(Hess V) identical for (u, 0.5, φ=0.0), (u, 0.5, 1.3), (u, −0.5, 2.1) with ‖s₁−s₃‖ = 1.80; 𝕆'_v closed ≤ 7.1e-16, ℍ_s ⊂ 𝕆'_v, **ρ(𝕆'_v) = 𝕆'_v ≤ 4.9e-16, ρ∘E − E∘ρ ≤ 1.4e-15** over 6 trials; 𝕆_low **not** ρ-invariant (0.866); ℓ ∉ 𝕆_low so the P2′ gap is **6**-dim.
 
 ## Round 6 — the confirmer's facts put verbatim; gate-5 pressure test of the surviving easy answer; §9-D run
 
