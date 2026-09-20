@@ -83,6 +83,7 @@
 
   Best practices: `~/Documents/inter/lean-proof-best-practices.md`.
 -/
+import Mathlib.Analysis.InnerProductSpace.PiL2
 import QBP.Foundations.Artin
 import QBP.Foundations.Alternator
 import QBP.Foundations.CrossProduct
@@ -804,10 +805,26 @@ theorem smul_mem_quatDouble (r : ℝ) {x : CDAlg ℝ 4} (hx : x ∈ quatDouble p
   · rw [cdLo_smul]; exact Submodule.smul_mem _ _ hx.1
   · rw [cdHi_smul]; exact Submodule.smul_mem _ _ hx.2
 
-/-- **Multiplicative closure — the substantive half.**  The Cayley–Dickson
-    doubling formula `(a,b)(c,d) = (ac − d̄b, da + bc̄)` keeps both halves inside
-    `ℍ` because `ℍ` is closed under the octonion product (`span4_mul_closed`) and
-    under conjugation. -/
+/-- **Multiplicative closure — the substantive half.**  Holds for ARBITRARY
+    `p, q` (no unit / imaginary / orthogonality hypothesis), and the mechanism is
+    worth stating precisely because the obvious reading of it is wrong:
+
+    * **Artin's theorem does NOT apply in 𝕊.**  𝕊 = `CDAlg ℝ 4` is not alternative
+      (`CDLifting.sedenion_not_alternative`), so "any two elements generate an
+      associative subalgebra" is FALSE at level 4 and cannot be what closes this.
+    * **What the proof actually uses.**  Two steps, both of them:
+      (i) the Cayley–Dickson doubling formula in 𝕊 — `cdLo_mul` / `cdHi_mul`,
+      `(a,b)(c,d) = (ac − d̄b, da + bc̄)` — which reduces the single 𝕊-product to
+      four 𝕆-products; and
+      (ii) closure of the 𝕆-level submodule `ℍ = span (gen4 p q)` under the
+      OCTONION product (`ArtinSpan.span4_mul_closed`, which is where Artin's
+      theorem is genuinely available, 𝕆 being alternative) together with its
+      closure under conjugation (`conj_mem_span_gen4`, needed for the `d̄` and `c̄`
+      slots).
+    So the double `S ⊕ S·ℓ` of a conjugation-closed, multiplicatively closed
+    `S ⊂ 𝕆` is closed in 𝕊 by the CD formula — a level-3 fact transported by a
+    level-4 identity, never an alternativity claim about 𝕊.
+    (Red Team item 8, PR #663.) -/
 theorem mul_mem_quatDouble {x y : CDAlg ℝ 4}
     (hx : x ∈ quatDouble p q) (hy : y ∈ quatDouble p q) : x * y ∈ quatDouble p q := by
   refine ⟨?_, ?_⟩
@@ -951,9 +968,16 @@ theorem quatSpan_subset_quatDouble (hu0 : u.coord 0 = 0) (w : CDAlg ℝ 3) :
     exact Submodule.add_mem _ (Submodule.smul_mem _ _ (one_mem_span_gen4 u w))
       (Submodule.smul_mem _ _ (x_mem_span_gen4 u w))
 
-/-- **(A)(ii), packaged.**  For a unit imaginary `w ⟂ u`, `𝕆'_w := quatDouble u w`
-    contains the hosted algebra, is closed under the sedenion product, and is
-    ρ-invariant as a set. -/
+/-- **(A)(ii), packaged.**  `𝕆'_w := quatDouble u w` contains the hosted algebra,
+    is closed under the sedenion product, and is ρ-invariant as a set.
+
+    **`w` is ARBITRARY here** — no unit/imaginary/orthogonality hypothesis is used
+    or needed for these three clauses, so degenerate `w` (e.g. `w = 0`, where the
+    "double" collapses to the 4-dimensional quaternion span) are included.  What
+    orthonormality of `w` buys is 8-dimensionality of the double — the property
+    that makes the `w`-indexed collection a *family of octonion copies* — and that
+    is NOT claimed by this theorem.  (Red Team F11, PR #663: an earlier docstring
+    said "for a unit imaginary `w ⟂ u`", which the statement does not require.) -/
 theorem encoding_family_member (hu0 : u.coord 0 = 0) (w : CDAlg ℝ 3) :
     {x : CDAlg ℝ 4 | InQuatSpan (loOf u) x} ⊆ quatDouble u w ∧
       (∀ x ∈ quatDouble u w, ∀ y ∈ quatDouble u w, x * y ∈ quatDouble u w) ∧
@@ -1327,7 +1351,10 @@ second rank–nullity computation, neither of which is formalised.
 
 The **trace** is proved in the form that a trace actually has:
 `hess_trace_transverse` sums the Hessian over an ORTHONORMAL 6-frame of the
-transverse subspace and gets `48(1−b₀²)`.  What is missing for the full
+transverse subspace and gets `48(1−b₀²)`, and `exists_orthonormal_perpIm_frame`
+now EXHIBITS such a frame for every unit imaginary `u`, so
+`hess_trace_transverse_exists` states the trace with no undischarged hypothesis
+at all (Red Team F7, PR #663).  What is missing for the full
 tangent-space trace is that those 6 vectors extend to an orthonormal basis of the
 14-dimensional tangent space whose other 8 members lie in the flat family; the
 flat family is known to be annihilated (`hessQuad_flatDir`) but the basis
@@ -1401,7 +1428,7 @@ theorem transComp_surjOn_perpIm {α γ b₀ : ℝ} {s : CDAlg ℝ 4}
     ∃ v : CDAlg ℝ 4, v.coord 0 = 0 ∧ bil s v = 0 ∧ transComp α γ u v = e := by
   obtain ⟨he0, hue⟩ := mem_perpIm.mp he
   exact ⟨eigDir α γ e, eigDir_coord_zero he0 α γ,
-    eigDir_orth_crystal (u := u) he0 hue hlo hhi,
+    eigDir_orth_crystal (u := u) he0 hlo hhi,
     transComp_eigDir (u := u) hk he0 hue⟩
 
 /-- The Hessian quadratic form is homogeneous of degree 2. -/
@@ -1420,6 +1447,82 @@ theorem bil_eigDir (α γ : ℝ) (e f : CDAlg ℝ 3) :
   rw [bil_split]
   simp only [cdLo_eigDir, cdHi_eigDir, bil_smul_left, bil_smul_right]
   ring
+
+/-! ### The orthonormal 6-frame EXISTS — `hess_trace_transverse` is not vacuous
+
+`hess_trace_transverse` below takes an orthonormal 6-frame of `u^⊥ ∩ Im 𝕆` as a
+hypothesis.  Red Team item F7 (PR #663) correctly objected that nothing in the
+tree produced one, so "trace = 48(1 − b₀²)" rested on an undischarged premise.
+`exists_orthonormal_perpIm_frame` discharges it.
+
+The construction imports Mathlib's orthonormal-basis machinery through a
+coordinate linear equivalence: `CDAlg ℝ n ≃ₗ[ℝ] EuclideanSpace ℝ (Fin (2^n))`
+carries `bil` to the Euclidean inner product (`bil_eq_inner`, both sides being
+`∑ᵢ xᵢyᵢ`), so `perpIm u` — of dimension `6` by `finrank_perpIm_eq_six` — maps to
+a 6-dimensional subspace of `ℝ⁸`, which has an orthonormal basis
+(`stdOrthonormalBasis`).  Pulling that basis back gives the frame.  No
+`InnerProductSpace` instance is put on `CDAlg` itself. -/
+
+/-- The coordinate linear equivalence `CDAlg ℝ n ≃ₗ[ℝ] EuclideanSpace ℝ (Fin (2^n))`.
+    Used ONLY to borrow Mathlib's orthonormal-basis machinery for `bil`. -/
+noncomputable def toEuclid (n : ℕ) : CDAlg ℝ n ≃ₗ[ℝ] EuclideanSpace ℝ (Fin (2^n)) :=
+  (QBP.Foundations.CDDimension.coordEquiv n).trans
+    (WithLp.linearEquiv 2 ℝ (Fin (2^n) → ℝ)).symm
+
+open scoped RealInnerProductSpace in
+/-- `toEuclid` is an isometry of the bilinear form: `bil x y = ⟪x, y⟫` after
+    transport.  Both sides are literally `∑ᵢ xᵢ yᵢ`. -/
+theorem bil_eq_inner (n : ℕ) (x y : CDAlg ℝ n) :
+    bil x y = ⟪toEuclid n x, toEuclid n y⟫ := by
+  rw [PiLp.inner_apply]
+  simp [toEuclid, bil, QBP.Foundations.CDDimension.coordEquiv, mul_comm]
+
+open scoped RealInnerProductSpace in
+/-- **(D) — an orthonormal 6-frame of `u^⊥ ∩ Im 𝕆` EXISTS** for every unit
+    imaginary `u`: six imaginary octonions, each orthogonal to `u`, each of unit
+    norm form, pairwise orthogonal.  This is exactly the hypothesis bundle of
+    `hess_trace_transverse`, so that theorem is not vacuous (Red Team F7, #663). -/
+theorem exists_orthonormal_perpIm_frame (hu0 : u.coord 0 = 0) (hNu : N u = 1) :
+    ∃ e : Fin 6 → CDAlg ℝ 3,
+      (∀ i, (e i).coord 0 = 0) ∧ (∀ i, bil u (e i) = 0) ∧
+      (∀ i, N (e i) = 1) ∧ (∀ i j, i ≠ j → bil (e i) (e j) = 0) := by
+  haveI : FiniteDimensional ℝ (CDAlg ℝ 3) :=
+    Module.Finite.of_basis (QBP.Foundations.CDDimension.cdBasis 3)
+  set f := toEuclid 3 with hf
+  set S : Submodule ℝ (EuclideanSpace ℝ (Fin (2^3))) := (perpIm u).map f.toLinearMap with hS
+  have hdim : Module.finrank ℝ S = 6 := by
+    rw [hS, LinearEquiv.finrank_map_eq f (perpIm u)]
+    exact finrank_perpIm_eq_six hu0 hNu
+  let b : OrthonormalBasis (Fin 6) ℝ S :=
+    (stdOrthonormalBasis ℝ S).reindex (finCongr hdim)
+  have hmem : ∀ i : Fin 6, f.symm ((b i : EuclideanSpace ℝ (Fin (2^3)))) ∈ perpIm u := by
+    intro i
+    obtain ⟨z, hz, hzeq⟩ := (b i).2
+    have hzz : f.symm ((b i : EuclideanSpace ℝ (Fin (2^3)))) = z := by
+      rw [← hzeq]; exact f.symm_apply_apply z
+    rw [hzz]; exact hz
+  refine ⟨fun i => f.symm ((b i : EuclideanSpace ℝ (Fin (2^3)))), ?_, ?_, ?_, ?_⟩
+  · intro i; exact (mem_perpIm.mp (hmem i)).1
+  · intro i; exact (mem_perpIm.mp (hmem i)).2
+  · intro i
+    have hON := b.orthonormal
+    rw [orthonormal_iff_ite] at hON
+    rw [N_eq_bil, bil_eq_inner, ← hf, f.apply_symm_apply, ← Submodule.coe_inner,
+      hON i i, if_pos rfl]
+  · intro i j hij
+    have hON := b.orthonormal
+    rw [orthonormal_iff_ite] at hON
+    rw [bil_eq_inner, ← hf, f.apply_symm_apply, f.apply_symm_apply, ← Submodule.coe_inner,
+      hON i j, if_neg hij]
+
+/-- The trace normaliser `c` with `c²(α² + γ²) = 1` exists whenever `α² + γ² ≠ 0`
+    (the non-pole condition).  Removes the last free parameter of the trace
+    statement. -/
+theorem exists_trace_normaliser {α γ : ℝ} (hk : α ^ 2 + γ ^ 2 ≠ 0) :
+    ∃ c : ℝ, c ^ 2 * (α ^ 2 + γ ^ 2) = 1 := by
+  have hpos : 0 < α ^ 2 + γ ^ 2 := lt_of_le_of_ne (by positivity) (Ne.symm hk)
+  refine ⟨(Real.sqrt (α ^ 2 + γ ^ 2))⁻¹, ?_⟩
+  rw [inv_pow, Real.sq_sqrt hpos.le, inv_mul_cancel₀ (ne_of_gt hpos)]
 
 /-- **(D) — the transverse trace is `48(1 − b₀²)`.**  For an ORTHONORMAL 6-frame
     `e₀,…,e₅` of `u^⊥ ∩ Im 𝕆` the rescaled transverse vectors `c·v_{eᵢ}` are
@@ -1455,6 +1558,28 @@ theorem hess_trace_transverse {s : CDAlg ℝ 4} {α γ b₀ c : ℝ}
     simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
     push_cast
     ring
+
+/-- **(D) — the transverse trace `48(1 − b₀²)`, with NO undischarged hypothesis.**
+    For every non-pole crystal `s` parametrised by `(u, α, γ, b₀)` there EXIST a
+    normaliser `c` and six directions `e₀,…,e₅` such that the rescaled transverse
+    vectors `c·v_{eᵢ}` are orthonormal and the Hessian sums to `48(1 − b₀²)` on
+    them.  Obtained from `hess_trace_transverse` by discharging its frame and
+    normaliser hypotheses with `exists_orthonormal_perpIm_frame` and
+    `exists_trace_normaliser` (Red Team F7, PR #663). -/
+theorem hess_trace_transverse_exists {s : CDAlg ℝ 4} {α γ b₀ : ℝ}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs : N s = 1) (hk : α ^ 2 + γ ^ 2 ≠ 0) :
+    ∃ (c : ℝ) (e : Fin 6 → CDAlg ℝ 3),
+      (∀ i, (e i).coord 0 = 0) ∧ (∀ i, bil u (e i) = 0) ∧
+      (∀ i, N (c • eigDir α γ (e i)) = 1) ∧
+      (∀ i j, i ≠ j → bil (c • eigDir α γ (e i)) (c • eigDir α γ (e j)) = 0) ∧
+      (∑ i : Fin 6, hessQuad s (c • eigDir α γ (e i))) = 48 * (1 - b₀ ^ 2) := by
+  obtain ⟨c, hc⟩ := exists_trace_normaliser (α := α) (γ := γ) hk
+  obtain ⟨e, he0, hue, hNe, horth⟩ := exists_orthonormal_perpIm_frame (u := u) hu0 hNu
+  obtain ⟨h1, h2, h3⟩ :=
+    hess_trace_transverse (u := u) hu0 hNu hlo hhi hNs hk hc he0 hue hNe horth
+  exact ⟨c, e, he0, hue, h1, h2, h3⟩
 
 end Numerals
 
@@ -1548,6 +1673,11 @@ Every theorem must depend only on `{propext, Classical.choice, Quot.sound}`. -/
 #print axioms transComp_surjOn_perpIm
 #print axioms hessQuad_smul
 #print axioms bil_eigDir
+#print axioms toEuclid
+#print axioms bil_eq_inner
+#print axioms exists_orthonormal_perpIm_frame
+#print axioms exists_trace_normaliser
 #print axioms hess_trace_transverse
+#print axioms hess_trace_transverse_exists
 
 end QBP.Foundations.HolographicSubalgebra

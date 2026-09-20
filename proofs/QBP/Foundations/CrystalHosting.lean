@@ -1841,6 +1841,20 @@ section proves the algebraic core of that statement.  What IS proved:
   explicit 9-parameter flat family is in the kernel.
 * `hessQuad_pole_eq_zero` — at a pole `s = b₀·ℓ` the form vanishes identically.
 
+**Why the ambient ray IS the `StateSphere` Hessian.**  `hessQuad` is defined from
+the second derivative along the STRAIGHT ambient ray `t ↦ s + t·v`, whereas the
+Hessian a reader wants is the one of `V` restricted to the sphere.  They agree at
+a crystal, and `potential_taylor_at_vacuum` is exactly the reason: at a vacuum the
+`t¹` coefficient of `V(s + t·v)` vanishes for EVERY ambient `v`, i.e. the ambient
+gradient `∇V(s)` is zero (equivalently: `V ≥ 0` everywhere and `V(s) = 0`, so a
+vacuum is a global minimum of `V` on the ambient space, not merely on the sphere).
+For any twice-differentiable curve `γ` in `StateSphere` with `γ 0 = s`, `γ' 0 = v`,
+the chain rule gives `(V ∘ γ)''(0) = Hess^amb_s(v,v) + ⟨∇V(s), γ''(0)⟩`; the second
+term — the second-fundamental-form correction that would otherwise make the two
+Hessians differ — is `0` because `∇V(s) = 0`.  So no curvature correction is
+dropped, and `hessQuad s v` is the sphere Hessian in the tangent direction `v`.
+(Red Team F12, PR #663.)
+
 What is **NOT** proved here, and must not be read in: the *numerals* `rank = 6`
 and `trace = 48(1 − b₀²)`.  Those need `finrank (u^⊥ ∩ Im 𝕆) = 6` and a rank
 computation for the quadratic form, neither of which is formalised.  The
@@ -2008,16 +2022,22 @@ theorem eigDir_coord_zero {e : CDAlg ℝ 3} (he : e.coord 0 = 0) (α γ : ℝ) :
   rw [cdLo_eigDir, smul_coord, he, mul_zero]
 
 /-- **The transverse directions are tangent to the state sphere** at the crystal:
-    imaginary, and `bil`-orthogonal to `s`. -/
+    imaginary, and `bil`-orthogonal to `s`.
+
+    **No orthogonality of `e` to `u` is needed.**  Expanding over the pair split,
+    `⟨s, eigDir α γ e⟩ = α(−γ)⟨u,e⟩ + b₀α⟨1,e⟩ + γα⟨u,e⟩`; the two `⟨u,e⟩` terms
+    cancel identically and `⟨1,e⟩ = e₀ = 0`, so only `e` imaginary is used.  (The
+    earlier version carried a redundant `bil u e = 0` hypothesis; Red Team item 7,
+    PR #663.) -/
 theorem eigDir_orth_crystal {s : CDAlg ℝ 4} {α γ b₀ : ℝ} {e : CDAlg ℝ 3}
-    (he : e.coord 0 = 0) (hue : bil u e = 0)
+    (he : e.coord 0 = 0)
     (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u) :
     bil s (eigDir α γ e) = 0 := by
   rw [bil_split, hlo, hhi, cdLo_eigDir, cdHi_eigDir,
     bil_comm' (b₀ • (1 : CDAlg ℝ 3) + γ • u) (α • e)]
   simp only [bil_smul_left, bil_smul_right, bil_add_right, bil_one_right, smul_coord,
-    he, hue]
-  rw [bil_comm' e u, hue]
+    he]
+  rw [bil_comm' e u]
   ring
 
 /-- **The transverse component of an arbitrary imaginary direction.** -/
@@ -2157,19 +2177,49 @@ theorem hessQuad_pole_eq_zero (b₀ : ℝ) (v : CDAlg ℝ 4) : hessQuad (b₀ �
   rw [hessQuad, h, N_zero]
   ring
 
-/-- **`hessian_spectrum_function_of_b0_sq` (#9).**  The eigenvalue is
-    `λ(b₀) = 8(1 − b₀²)`, an EVEN function of the pole coordinate: it takes the
-    same value at `b₀` and at `−b₀`, so the Hessian spectrum does **not** separate
-    a crystal from its `b₀ ↦ −b₀` partner, and does not see the `(α, γ)` phase at
-    all.  (The confirmer's row-12 correction: the invariant resolves the `b₀²`
-    level set only.) -/
-theorem hessQuad_eigenvalue_even (b₀ : ℝ) :
-    8 * (1 - b₀ ^ 2) = 8 * (1 - (-b₀) ^ 2) := by ring
+/-- **`hessian_spectrum_function_of_b0_sq` (#9), crystal-level.**  The Hessian
+    does **not** separate a crystal from its `b₀ ↦ −b₀` partner: if `s` and `s'`
+    are two unit vacua with the SAME direction `u` and phase `(α, γ)` but opposite
+    pole coordinates `±b₀`, then their Hessian quadratic forms are EQUAL — the same
+    number in every imaginary direction `v`, not merely the same eigenvalue numeral.
 
-/-- Two crystals with the same `b₀²` have the same transverse eigenvalue, whatever
-    their direction `u` and phase `(α, γ)`. -/
-theorem hessQuad_eigenvalue_depends_only_on_b0_sq {b₀ b₀' : ℝ} (h : b₀ ^ 2 = b₀' ^ 2) :
-    8 * (1 - b₀ ^ 2) = 8 * (1 - b₀' ^ 2) := by rw [h]
+    (This replaces an earlier version whose statement was the real-number identity
+    `8(1−b₀²) = 8(1−(−b₀)²)`, which mentions no crystal; Red Team F6, PR #663.) -/
+theorem hessQuad_eigenvalue_even {s s' : CDAlg ℝ 4} {α γ b₀ : ℝ}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs : N s = 1)
+    (hlo' : cdLo s' = α • u) (hhi' : cdHi s' = (-b₀) • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs' : N s' = 1) (hk : α ^ 2 + γ ^ 2 ≠ 0)
+    (v : CDAlg ℝ 4) (hv : v.coord 0 = 0) :
+    hessQuad s v = hessQuad s' v := by
+  rw [hessQuad_eq_transverse (u := u) (b₀ := b₀) hu0 hNu hv hlo hhi hNs hk,
+    hessQuad_eq_transverse (u := u) (b₀ := -b₀) hu0 hNu hv hlo' hhi' hNs' hk]
+  ring
+
+/-- **Two crystals with the same `b₀²` have the same Hessian eigenvalue**, whatever
+    their directions `u, u'` and phases `(α, γ), (α', γ')`: ONE real number `λ`
+    serves as the transverse coefficient of BOTH Hessian quadratic forms.  This is
+    a statement about the two crystals `s, s'`, not about two real numbers.
+
+    (Replaces an earlier real-number tautology; Red Team F6, PR #663.) -/
+theorem hessQuad_eigenvalue_depends_only_on_b0_sq {u' : CDAlg ℝ 3}
+    {s s' : CDAlg ℝ 4} {α γ b₀ α' γ' b₀' : ℝ}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs : N s = 1) (hk : α ^ 2 + γ ^ 2 ≠ 0)
+    (hu0' : u'.coord 0 = 0) (hNu' : N u' = 1)
+    (hlo' : cdLo s' = α' • u') (hhi' : cdHi s' = b₀' • (1 : CDAlg ℝ 3) + γ' • u')
+    (hNs' : N s' = 1) (hk' : α' ^ 2 + γ' ^ 2 ≠ 0)
+    (hb : b₀ ^ 2 = b₀' ^ 2) :
+    ∃ lam : ℝ,
+      (∀ v : CDAlg ℝ 4, v.coord 0 = 0 →
+          hessQuad s v = lam * N (eigDir α γ (transComp α γ u v))) ∧
+      (∀ v : CDAlg ℝ 4, v.coord 0 = 0 →
+          hessQuad s' v = lam * N (eigDir α' γ' (transComp α' γ' u' v))) := by
+  refine ⟨8 * (1 - b₀ ^ 2), fun v hv => ?_, fun v hv => ?_⟩
+  · exact hessQuad_eq_transverse (u := u) (b₀ := b₀) hu0 hNu hv hlo hhi hNs hk
+  · rw [hessQuad_eq_transverse (u := u') (b₀ := b₀') hu0' hNu' hv hlo' hhi' hNs' hk', hb]
 
 end SecondVariation
 

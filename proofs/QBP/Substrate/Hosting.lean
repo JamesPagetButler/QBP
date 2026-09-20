@@ -463,9 +463,13 @@ theorem Universe.hosted_eq_quatSpan (U : Universe) (h : U.NonPole) :
     `span_ℝ{1, ℓ} ≅ ℂ`.
 
     The genericity hypothesis is stated intrinsically as `U₁.hosted ≠ U₂.hosted`;
-    by `inQuatSpan_neg_dir` this is equivalent to the confirmer's `u₁ ≠ ±u₂`
-    (the quaternion span only sees the direction up to sign).  `ℓ` lies in both,
-    so the intersection is 2-dimensional — it is `ℂ`, not `ℝ`. -/
+    by `inQuatSpan_neg_dir` (the quaternion span only sees the direction up to
+    sign) this IMPLIES the confirmer's `u₁ ≠ ±u₂`, which is the form the proof
+    consumes.  It is **not** claimed to be equivalent: the converse — distinct
+    directions give distinct hosted algebras — needs uniqueness of the hosting
+    direction up to sign, which is NOT in this tree (see `Universe.dir`, whose
+    own docstring disclaims any uniqueness).  `ℓ` lies in both, so the
+    intersection is 2-dimensional — it is `ℂ`, not `ℝ`.  (Red Team F10, PR #663.) -/
 theorem universe_intersection_eq_complex {U₁ U₂ : Universe}
     (h₁ : U₁.NonPole) (h₂ : U₂.NonPole) (hne : U₁.hosted ≠ U₂.hosted) :
     U₁.hosted ∩ U₂.hosted
@@ -654,13 +658,36 @@ theorem polePlus_hessian_eq_zero (v : CDAlg ℝ 4) : hessQuad polePlus.crystal v
   rw [h]
   exact hessQuad_pole_eq_zero 1 v
 
-/-- **`hessian_spectrum_function_of_b0_sq` (#9).**  The transverse eigenvalue is
-    `8(1 − b₀²)`: a function of `b₀²` alone.  It is therefore blind to the sign of
-    `b₀` and to the `(α, γ)` phase, so — as the confirmer's row-12 correction says
-    — it separates the `b₀²` level sets and nothing finer. -/
+/-- **`hessian_spectrum_function_of_b0_sq` (#9).**  The transverse eigenvalue is a
+    function of `b₀²` alone — stated where it belongs, about two UNIVERSES.
+
+    If `U` and `U'` are non-pole universes whose crystals have the same squared
+    pole coordinate `b₀² = (crystal.coord ℓ)²`, then ONE real number `λ` is the
+    transverse coefficient of BOTH Hessian quadratic forms: for each universe there
+    is a parametrisation `(u, α, γ)` with `Hess(v,v) = λ·‖P v‖²` in every imaginary
+    direction `v`.  So the Hessian is blind to the sign of `b₀` and to the `(α, γ)`
+    phase; it separates the `b₀²` level sets and nothing finer (the confirmer's
+    row-12 correction).
+
+    (This replaces an earlier version whose statement was the real-number identity
+    `8(1−b₀²) = 8(1−b₀'²)` — no universe, no crystal, no `hessQuad` appeared in it;
+    Red Team F6, PR #663.  The tautology is deleted, not renamed.) -/
 theorem universe_hessian_eigenvalue_depends_only_on_b0_sq
-    {b₀ b₀' : ℝ} (h : b₀ ^ 2 = b₀' ^ 2) :
-    8 * (1 - b₀ ^ 2) = 8 * (1 - b₀' ^ 2) := by rw [h]
+    (U U' : Universe) (h : U.NonPole) (h' : U'.NonPole)
+    (hb : U.crystal.coord (hiIdx 0) ^ 2 = U'.crystal.coord (hiIdx 0) ^ 2) :
+    ∃ lam : ℝ,
+      (∃ (u : CDAlg ℝ 3) (α γ : ℝ), u.coord 0 = 0 ∧ N u = 1 ∧ α ^ 2 + γ ^ 2 ≠ 0 ∧
+          ∀ v : CDAlg ℝ 4, v.coord 0 = 0 →
+            hessQuad U.crystal v = lam * N (eigDir α γ (transComp α γ u v))) ∧
+      (∃ (u' : CDAlg ℝ 3) (α' γ' : ℝ), u'.coord 0 = 0 ∧ N u' = 1 ∧ α' ^ 2 + γ' ^ 2 ≠ 0 ∧
+          ∀ v : CDAlg ℝ 4, v.coord 0 = 0 →
+            hessQuad U'.crystal v = lam * N (eigDir α' γ' (transComp α' γ' u' v))) := by
+  obtain ⟨u, α, γ, b₀, hu0, hNu, hb0, hk, hT, -, -⟩ := universe_hessian_eigenvalue U h
+  obtain ⟨u', α', γ', b₀', hu0', hNu', hb0', hk', hT', -, -⟩ := universe_hessian_eigenvalue U' h'
+  have hsq : b₀' ^ 2 = b₀ ^ 2 := by rw [hb0', hb0]; exact hb.symm
+  refine ⟨8 * (1 - b₀ ^ 2), ⟨u, α, γ, hu0, hNu, hk, hT⟩, ⟨u', α', γ', hu0', hNu', hk', ?_⟩⟩
+  intro v hv
+  rw [hT' v hv, hsq]
 
 /-! ## 9. Equivariance under `ℓ`-fixing automorphisms (the G₂ side) -/
 
