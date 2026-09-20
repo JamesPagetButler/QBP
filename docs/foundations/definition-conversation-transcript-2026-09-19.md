@@ -33,7 +33,7 @@
 - `one_mem_hosted` (Hosting.lean:275) and `ell_mem_hosted` (Hosting.lean:277) **exist** — cites VERIFIED, though neither was on the permitted list.
 - DERIV-observation exists in the extract with exactly the quoted statement — VERIFIED.
 - `U.hosted` is `{x | GenByPair U.crystal ell x}`; the record proves only `hosted_subset_quatSpan` (⊆). Gemini's derivation silently used the **equality** hosted = span{1,ℓ,u,ℓu}, which is NOT on record — a gap in the offered theorem, not (numerically) a falsehood.
-- Runner-side numerical check (NOT a committed script; `/tmp/.../scratchpad/intersection_check.py`, run under `run-bounded 2G 120`): the generated subalgebra ⟨1, s, ℓ⟩ has dim 4 and equals span{1,ℓ,u,ℓu} on 30/30 generic crystals; 50/50 generic crystal pairs give intersection dim **2**; span{1,ℓ} lies in both. **Gemini's numerical claim holds.** Three counter-cases also fell out: same-u distinct crystals (min ‖s₁−s₂‖ = 0.38) give intersection dim **4** (30/30); the pole (hosted dim 2) shares **100%** of its hosted algebra with a generic universe; and the shared object is the *same* span{1,ℓ} for every generic pair.
+- Runner-side numerical check (committed at `analysis/definition-conversation-2026-09-19/intersection_check.py`, run under `run-bounded 2G 120`): the generated subalgebra ⟨1, s, ℓ⟩ has dim 4 and equals span{1,ℓ,u,ℓu} on 30/30 generic crystals; 50/50 generic crystal pairs give intersection dim **2**; span{1,ℓ} lies in both. **Gemini's numerical claim holds.** Three counter-cases also fell out: same-u distinct crystals (min ‖s₁−s₂‖ = 0.38) give intersection dim **4** (30/30); the pole (hosted dim 2) shares **100%** of its hosted algebra with a generic universe; and the shared object is the *same* span{1,ℓ} for every generic pair.
 
 **Tells (MO §7):** none yet — the reply challenged rather than agreed, gave a second-best and a falsifier. Flag for watching: the volunteered DERIV-observation link is a *premature-convergence* candidate ("universes interact electromagnetically") — an interpretation asserted with no derivation, stated in the same breath as the algebra.
 
@@ -74,7 +74,7 @@
 
 ## Round 4 — the Hessian measurement refutes "b₀ is gauge" + §5 Q4
 
-**Runner-side computation (not a committed script; `/tmp/.../scratchpad/same_u_fit.py`, `run-bounded 2G 300`):** the Hessian of V restricted to the state sphere, at vacua sharing one u with (α, γ, b₀) varying over the S² fibre — central 4-point second differences, h = 1e-4:
+**Runner-side computation (committed at `analysis/definition-conversation-2026-09-19/same_u_fit.py`, `run-bounded 2G 300`):** the Hessian of V restricted to the state sphere, at vacua sharing one u with (α, γ, b₀) varying over the S² fibre — central 4-point second differences, h = 1e-4:
 
 | b₀ | 0.000 | 0.300 | 0.500 | 0.707 | 0.866 | 0.950 | 1.000 |
 |---|---|---|---|---|---|---|---|
@@ -92,7 +92,7 @@ Independent of u and of the (α, γ) phase (traces 36.0000 at four random u and 
 
 ## Round 5 — the non-existence "theorem" refuted; the last easy answer pressure-tested
 
-**Runner-side computation (`/tmp/.../scratchpad/rho_fixed_check.py`, `fano_check.py`):**
+**Runner-side computation (`analysis/definition-conversation-2026-09-19/rho_fixed_check.py`, `…/fano_check.py`):**
 - the **only** ρ-fixed imaginary direction is ℓ, so the **pole is the only ρ-fixed crystal**; ℍ_s is ρ-invariant setwise for every crystal (dim(ℍ_s ∩ ρℍ_s) = 4);
 - enumerating all 35 triples of (e_k, e_kℓ) planes: **seven** give a multiplicatively closed 8-dim algebra — {1,2,3}, {1,4,5}, {1,6,7}, {2,4,6}, {2,5,7}, {3,4,7}, {3,5,6}, the **seven Fano lines** (cf. the already-proved `fanoTriples_card = 7` in `Foundations/FanoSubalgebras.lean`);
 - each is a genuine octonion algebra: ‖xy‖ = ‖x‖‖y‖ to 3.6e-15, alternator to 1.8e-14, no zero divisors on 300 random pairs;
@@ -123,7 +123,7 @@ Stop condition: the round budget (5) was reached with Decision 1 exiting as an i
 
 ## Round 7 — validation, the corrected proof-owed list, and the impasse re-draft
 
-**Runner verification before accepting (c)** (`scratchpad/family_check.py`, 20 random (u,v)): 𝕆'_{a·v+b·(uv)} = 𝕆'_v **20/20**; a v₂ off the ℂ_u-line gives a different algebra **20/20**; ρ(𝕆'_v) = 𝕆'_v **20/20**; ℍ_s ⊂ 𝕆'_v **20/20**. The ℂP² parametrisation is **measured**, not asserted. **Pole case** (`scratchpad/pole_family.py`, 20 random quaternion ℍ ⊂ 𝕆): every double ℍ ⊕ ℍℓ has dim 8, is ρ-invariant, contains span{1,ℓ}, and all 190 pairs are distinct — the pole's family is strictly larger than a ℂP².
+**Runner verification before accepting (c)** (`analysis/definition-conversation-2026-09-19/family_check.py`, 20 random (u,v)): 𝕆'_{a·v+b·(uv)} = 𝕆'_v **20/20**; a v₂ off the ℂ_u-line gives a different algebra **20/20**; ρ(𝕆'_v) = 𝕆'_v **20/20**; ℍ_s ⊂ 𝕆'_v **20/20**. The ℂP² parametrisation is **measured**, not asserted. **Pole case** (`scratchpad/pole_family.py`, 20 random quaternion ℍ ⊂ 𝕆): every double ℍ ⊕ ℍℓ has dim 8, is ρ-invariant, contains span{1,ℓ}, and all 190 pairs are distinct — the pole's family is strictly larger than a ℂP².
 
 **Gemini's reply:**
 - **(A) assumption table:** completeness of the 𝕆'_v family — **CONJECTURE** (Furey), with the shape of a proof (show any octonion O ⊇ ℍ_s decomposes as H ⊕ Hℓ over the base 𝕆); equivariance v ↦ 𝕆'_v under SU(3) — **VALIDATED** with a one-line reason (g(ℍ'_v) = ℍ'_{g(v)}, g fixes ℓ); Stab_{G₂}(s) = Stab_{G₂}(u) ≅ SU(3) — **VALIDATED** (α, γ, b₀ are scalars); pole family — **Gr₃(7) ≅ G₂/SO(4), 8-dimensional**, so *the pole is strictly less determined than a generic crystal*. **Runner correction:** it tagged "ℍ_s = span{1,ℓ,u,ℓu}" **VALIDATED** — that is wrong, only ⊆ is proved; `GenByPair.add/.smul` are ingredients of the owed proof (#2), not the theorem. Logged as an over-tag.
@@ -135,7 +135,7 @@ Stop condition: the round budget (5) was reached with Decision 1 exiting as an i
 
 ## Round 8 (close) — after confirmer pass 2 (IMPASSED-conditional; impasse EARNED 6/6, gate 5 still failing on one word)
 
-**Runner verification before the round** (`scratchpad/module_check.py`, `run-bounded 2G 200`, 10 crystals): dim ℍ_s^⊥ = **12 = 3×4**; max ‖g·w − proj_⊥(g·w)‖ = **3.83e-16** for g ∈ {U, ℓ, Uℓ, ℓU}; ℍ_s·w is 4-dimensional (free rank 1) for a random w, **10/10**. So the confirmer's datum-free reading ℍ_s^⊥ ≅ ℍ_s³ is independently reproduced here, not quoted.
+**Runner verification before the round** (`analysis/definition-conversation-2026-09-19/module_check.py`, `run-bounded 2G 200`, 10 crystals): dim ℍ_s^⊥ = **12 = 3×4**; max ‖g·w − proj_⊥(g·w)‖ = **3.83e-16** for g ∈ {U, ℓ, Uℓ, ℓU}; ℍ_s·w is 4-dimensional (free rank 1) for a random w, **10/10**. So the confirmer's datum-free reading ℍ_s^⊥ ≅ ℍ_s³ is independently reproduced here, not quoted.
 
 **Prompt shape (driver):** four facts — G1 completeness now near-decided over a space **exhaustive by construction** (98/98 converged solutions are some 𝕆'_v, zero counterexamples), with the proof route replaced (`encoding_octonion_completeness` via the ℍ_s-line, not "the sedenion alternator"); G2 the failing word is **"irreducible"**, against the ledger's own datum-free bundle reading, the outside-the-algebra carriers, and the missing pole quantifier; G3 the naming error **Gr₃(7) (12-dim) → the associative Grassmannian G₂/SO(4) (8-dim, measured)**; G4 the assumption-table over-tag (⊆ only on master; the equality was closed **on a branch**, not on master). Then four tasks: derive-or-refute the bundle reformulation, restate the exit claim with every quantifier, accept-or-improve the three-clause kill, finalise the proof-owed list. **Advances by: challenge + resolve.**
 
