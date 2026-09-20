@@ -239,7 +239,7 @@ Nothing in this file is anchored, encoded or ruled. No GitHub or bridge post was
 
 # PASS 2 — confirmer verdict on the re-opened conversation (rounds 6–7)
 
-**Scope:** appended, not edited over pass 1. Read: transcript §Rounds 6–7, verbatim indices **84–87**, and the runner report's "Runner report — rounds 6–7" section. Same rules: read-only, no lake/lean/agda, numerics under `run-bounded` into the confirmer scratchpad, nothing posted.
+**Scope:** appended, not edited over pass 1. Read: transcript §Rounds 6–7, verbatim indices **84–87**, and the runner report's "Runner report — rounds 6–7" section. Same rules: read-only, no lake/lean/agda, numerics under `run-bounded` into the confirmer's own scratch directory (scripts since committed under `analysis/definition-conversation-2026-09-19/confirmer/`), nothing posted.
 
 > ## Pass-2 verdict
 >
