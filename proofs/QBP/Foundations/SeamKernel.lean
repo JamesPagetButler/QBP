@@ -18,7 +18,7 @@
     annihilated on the other side (`kᵢ·x = 0`), and in fact
     `ker L_x = ker R_x` exactly, both equal to that 4-plane
     (`zd_witness_kernels_coincide`, via `seamR_ker_eq`).
-  * **The lost directions are not an algebra.**  `k₁·k₁ = −2·1` and `k₁·k₃ = −2(e₂+e₉)`
+  * **The lost directions are not an algebra.**  `k₁·k₁ = −2·1` (proved: `k1_sq`) and `(k₁·k₃).coord 2 = −2` (proved: `k1_mul_k3_coord2`; the full value `k₁·k₃ = −2(e₂+e₉)` is numerical, not proved)
     both leave the 4-plane (`zd_witness_kernel_not_subalgebra`), so the "deleted"
     subspace is not closed under the operation that deletes it.  Sharper, and also
     proved: `k1_sq : k₁·k₁ = (−2)•1` puts that escaped product on the REAL SCALAR
