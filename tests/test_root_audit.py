@@ -47,7 +47,7 @@ def _ledger():
                 "name": "p",
                 "statement": "s",
                 "derivable": False,
-                "decision_state": "ruled",
+                "decision_state": "settled",
                 "ruling": "https://github.com/JamesPagetButler/QBP/issues/647#issuecomment-1",
             },
             {

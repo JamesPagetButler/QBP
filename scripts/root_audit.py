@@ -222,7 +222,7 @@ def sort_root(rec, anchors):
     if forced:
         return None, f"forced_by names non-PROOF/MEAS ids (not a forcing): {forced}"
     ds = rec.get("decision_state")
-    if ds == "ruled":
+    if ds == "settled":
         ruling = rec.get("ruling")
         if isinstance(ruling, str) and GITHUB_CITE.search(ruling):
             return (
