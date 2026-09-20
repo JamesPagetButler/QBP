@@ -81,7 +81,13 @@ here, THEN …"*.  The antecedent is a postulate.
    (`ruleField_eq_zero_of_potential_eq_one`).
 9. **ω-limit avoidance** (§17): a forward integral curve on the sphere with
    `V(γ 0) < 1` has `V < 1` at every point of its ω-limit set
-   (`omega_avoids_locus`).
+   (`omega_avoids_locus`).  The set avoided is the **level set `{V = 1}`** — the
+   argmax locus — and the zero-divisor reading of it is licensed only through
+   item 13.  **Scope warning:** every such statement is conditional on a *given*
+   curve, because **local existence of integral curves of `F` is NOT proved**
+   here (FLAG-rule-flow-open).  "A trajectory from `V < 1` never reaches a zero
+   divisor" therefore means "no curve that exists does", not "for all initial
+   data there is a curve, and it does not".
 10. **Non-vacuity of the landscape** (§10): `V` is not identically zero
    (`potential_witness`), so `gradV` is not identically zero
    (`exists_gradV_ne_zero`).  **Scope warning:** the witness there is
@@ -98,6 +104,18 @@ here, THEN …"*.  The antecedent is a postulate.
    (`normForm_mul_eq`), and it vanishes at a vacuum — so `N(s·y) = N s·N y`
    (`normForm_mul_of_isVacuum`) and `y ↦ s·y` is injective
    (`crystal_not_zeroDivisor`).
+13. **`ZD ⇒ V = N²` — every zero divisor sits at the maximum** (§19).  The same
+   defect pairing, bounded by Cauchy–Schwarz and 𝕆's composition law, gives the
+   sharp inequality `|N(s·x) − N s·N x| ≤ √(V s)·N x`
+   (`abs_normForm_mul_sub_le`; right-factor form
+   `abs_normForm_mul_sub_le_right`).  Feeding it a zero divisor yields
+   `V s = (N s)²` (`potential_eq_normForm_sq_of_mul_eq_zero`, and the same for
+   `y·s = 0`), i.e. `V = 1` on the sphere (`potential_eq_one_of_zeroDivisor`).
+   Non-vacuous: the proved sedenion zero divisors `e₂ + e₉`, `e₄ + e₁₅` have
+   `V = 4 = N²` (`potential_zdX`, `potential_zdY`).  Combining with items 8–9:
+   **no point of the ω-limit set of a sub-maximal orbit is a zero divisor**, on
+   either side (`omega_avoids_zeroDivisors`) — subject to the item-9 scope
+   warning.  The CONVERSE (`V = N² ⇒ ZD`) is **NOT** proved and is used nowhere.
 
 ## FLAG-rule-flow-open — what is NOT proved
 
@@ -110,6 +128,12 @@ here, THEN …"*.  The antecedent is a postulate.
 * **The omega-limit map** `s ↦ lim_{t→∞} γ_s(t)` is NOT constructed, and no
   claim is made that the flow converges, that it converges to a vacuum, or that
   the limit map is measurable/measure-preserving/injective.
+* **Łojasiewicz / point convergence (the confirmer's P11) is NOT proved.**  `V`
+  is a real polynomial, so a Łojasiewicz inequality is *expected* to hold near
+  each critical point and to upgrade the ω-limit statements of §17 from "the
+  ω-limit set avoids `{V = 1}`" to "the orbit converges to a single point"; none
+  of that is established here.  Nothing may assume that an ω-limit set is a
+  singleton, or that `∫‖F‖` is finite along an orbit.
 * **Rest points are not claimed to be vacua.**  `ruleField_eq_zero_iff` says
   exactly what `F s = 0` means — the tangential part of `∇V` vanishes — and
   `ruleField_eq_zero_of_isVacuum` gives one direction.  The converse (every
@@ -118,11 +142,15 @@ here, THEN …"*.  The antecedent is a postulate.
 * **Renormalised-step injectivity** is proved only on level sets of `‖F‖`
   (`renormStep_injOn_of_normForm_const`); the general case is open.  The probe
   scripts run `renormStep`, not `eulerStep` — see item 4 above.
-* **`ZD ⇔ V = N²` is NOT proved here.**  The `⇐` direction is not proof-owed;
-  the `⇒` direction (`s ≠ 0`, `V s = (N s)²` ⟹ `s` is a zero divisor) is owed
-  and OPEN — see `FLAG-P5-open` in the §18 preamble.  Everything in this file
-  about the "zero-divisor locus" is therefore stated on `{V = 1}`, the argmax
-  locus, which is what the proofs actually establish.
+* **`ZD ⇔ V = N²`: one direction proved, one OPEN.**  `ZD ⇒ V = N²` — the
+  load-bearing half — **is** proved (§19, item 13 above).  The converse,
+  `s ≠ 0` and `V s = (N s)²` ⟹ `s` is a zero divisor (the confirmer's P5), is
+  **NOT** proved, is OPEN, and is used by nothing in this file — see
+  `FLAG-P5-open` in the §18 preamble.  Consequence for wording: `{V = 1}` is the
+  **argmax locus**; it is proved to *contain* the sphere's zero divisors and is
+  NOT proved to contain only them, so "the ω-limit set misses `{V = 1}`" is the
+  strong statement and "misses the zero-divisor locus" is the weaker one it
+  implies — never the other way round.
 * No measure, no ensemble, no dynamics beyond the ODE form.  The initial
   ensemble remains the beekeeper ruling recorded in `Hosting`.
 
@@ -1361,8 +1389,11 @@ theorem bil_gradV_eq_zero_of_potential_eq_one {s v : CDAlg ℝ 4}
 
 /-- **P6 — the frozen-locus theorem.**  Every state-sphere point at which `V`
     attains its maximum value `1` is a REST POINT of the rule: `F s = 0`.
-    Since every zero divisor on the sphere has `V = 1`, the zero-divisor locus is
-    frozen — it cannot be entered (`V` is antitone, P3) and cannot be left. -/
+    Every zero divisor on the sphere has `V = 1` (§19,
+    `potential_eq_one_of_zeroDivisor`), so the zero divisors are among the frozen
+    points — the level set `{V = 1}` cannot be entered (`V` is antitone, P3) and
+    cannot be left.  Note the containment is one-way: `{V = 1}` is the argmax
+    locus and is not proved to consist only of zero divisors (`FLAG-P5-open`). -/
 theorem ruleField_eq_zero_of_potential_eq_one {s : CDAlg ℝ 4}
     (hs : s ∈ Hosting.StateSphere) (h1 : Hosting.potential s = 1) : ruleField s = 0 := by
   have hv : bil s (ruleField s) = 0 := by
@@ -1372,7 +1403,14 @@ theorem ruleField_eq_zero_of_potential_eq_one {s : CDAlg ℝ 4}
   have hN : N (ruleField s) = 0 := by linarith
   exact (alt_N_eq_zero_iff _).mp hN
 
-/-! ## 17. P8 — the ω-limit set of a sub-maximal forward orbit avoids `{V = 1}` -/
+/-! ## 17. P8 — the ω-limit set of a sub-maximal forward orbit avoids `{V = 1}`
+
+`{V = 1}` is the **argmax locus** on `StateSphere` (P7), not by definition the
+zero-divisor locus.  §19 proves the inclusion that connects the two in the
+load-bearing direction — every zero divisor on the sphere has `V = 1` — so the
+zero-divisor reading of this section is licensed through
+`omega_avoids_zeroDivisors` (§19) and nowhere else.  The reverse inclusion
+(`V = 1 ⇒` zero divisor) remains OPEN; see `FLAG-P5-open`. -/
 
 /-- **The tail bound.**  Along a forward integral curve on the state sphere,
     `V(γ t) ≤ V(γ 0)` for every `t ≥ 0` (P3 applied on `[0,t]`). -/
@@ -1407,7 +1445,11 @@ theorem potential_le_initial_of_mem_closure {γ : ℝ → CDAlg ℝ 4}
 /-- **P8 — locus avoidance.**  If a forward integral curve on the state sphere
     starts strictly below the maximum (`V(γ 0) < 1`), then every point of its
     ω-limit set also has `V < 1` — in particular the ω-limit set misses the
-    zero-divisor locus `{V = 1}` (frozen by P6).
+    **level set `{V = 1}`**, the argmax locus, which P6 shows is frozen.  (That
+    this level set *contains* every zero divisor of the sphere is §19,
+    `potential_eq_one_of_zeroDivisor`; that it contains *nothing else* is NOT
+    proved — `FLAG-P5-open`.  For the zero-divisor statement use
+    `omega_avoids_zeroDivisors`.)
 
     `omegaLimit Filter.atTop (fun t _ => γ t) Set.univ` is Mathlib's ω-limit of
     the single orbit: `⋂ u ∈ atTop, closure (γ '' u)`. -/
@@ -1458,13 +1500,27 @@ read off from `potential_eq_cross`), the real part of `b` is associator-inert, a
 the associator is alternating — so the defect vanishes identically and `L_x` is a
 similarity of the norm form, hence injective.
 
-**FLAG-P5-open.**  The confirmer's P5 (`s ≠ 0 → V s = (N s)² → s` is a zero
-divisor) is **NOT** proved here.  The route hinted in the verdict,
-`N(s·x) ≥ (N s − √(V s))·N x`, degenerates at `V s = (N s)²` to `N(s·x) ≥ 0`,
-which is vacuous; the `⇒` direction needs an *exhibited* kernel vector (or the
-4/8/4 spectral identity of `L_sᵀL_s`, an XL-cost object).  What IS proved here is
-the P9-relevant consequence of the same defect identity, in the opposite regime
-(`V = 0`).  Nothing below may be read as establishing P5. -/
+**FLAG-P5-open** (labels corrected 2026-09-20; the earlier version had the two
+arrows the wrong way round).  Of the two halves of `ZD ⇔ V = N²`:
+
+* **`ZD ⇒ V = N²` — PROVED** (§19, `potential_eq_normForm_sq_of_mul_eq_zero` and
+  its right-handed twin).  This is the **load-bearing** half: it is what every
+  "a trajectory from `V < 1` never reaches a zero divisor" reading needs, since
+  it puts every zero divisor inside the argmax locus `{V = N²}` that P3/P8 make
+  unreachable from below.  The proof is the inequality
+  `|N(s·x) − N s·N x| ≤ √(V s)·N x` (`abs_normForm_mul_sub_le`), which is the
+  defect identity below plus Cauchy–Schwarz — see the §19 preamble.
+* **`V = N² ⇒ ZD` (the confirmer's P5) — NOT proved, and nothing uses it.**  The
+  route hinted in the verdict, `N(s·x) ≥ (N s − √(V s))·N x`, degenerates at
+  `V s = (N s)²` to `N(s·x) ≥ 0`, which is vacuous; this direction needs an
+  *exhibited* kernel vector (or the 4/8/4 spectral identity of `L_sᵀL_s`, an
+  XL-cost object).  Nothing in this file may be read as establishing it.  In
+  particular `{V = 1}` is the **argmax locus**, and is *not* proved to consist
+  only of zero divisors — statements about `{V = 1}` must not be silently
+  re-read as statements about "the zero-divisor locus".
+
+What §18 proves below is the `V = 0` end of the same defect identity: a crystal
+composes, hence is not a zero divisor (P9). -/
 
 theorem assoc_def (x y z : CDAlg ℝ n) : assoc x y z = (x * y) * z - x * (y * z) := rfl
 
@@ -1628,6 +1684,398 @@ theorem crystal_mul_ne_zero {s : CDAlg ℝ 4} (hv : IsVacuum s) (hs : s ≠ 0)
   have h0 : s * y = s * 0 := by rw [h, alt_mul_zero]
   exact hy (crystal_not_zeroDivisor hv hs h0)
 
+/-! ## 19. **ZD ⇒ V = N²** — the load-bearing inclusion
+
+This is the direction every "never reaches a zero divisor" reading needs, and the
+direction that was missing: **a zero divisor sits at the maximum of the
+landscape.**  Precisely, if `s·y = 0` (or `y·s = 0`) for some `y ≠ 0`, then
+`V(s) = (N s)²`; on `StateSphere` that is `V(s) = 1`.
+
+The route is the norm defect of §18 turned into an *inequality*.  Write
+`s = (a,b)`, `x = (c,d)` in Cayley–Dickson pairs.  By `normForm_mul_eq`,
+
+    N(s·x) − N s · N x = −2·⟪a, [d̄, b, c̄]⟫.
+
+Three reductions make that pairing small:
+
+1. **Only imaginary parts contribute.**  `⟪1, [u,w,v]⟫ = 0` (`bil_one_assoc`,
+   from the adjoint transfer plus `[·,1,·] = 0`), so the outer vector may be
+   replaced by `Im a`; and `[u,1,v] = 0` directly, so the middle vector may be
+   replaced by `Im b` (`assoc_imPart_mid`).
+2. **Only the part of `Im b` orthogonal to `Im a` contributes.**
+   `⟪a, [u,a,v]⟫ = 0` for imaginary `a` (§18's
+   `bil_assoc_mid_self_of_imaginary`), so `Im b` may be replaced by
+   `B⊥ = Im b − λ·Im a` for any `λ` — in particular the Gram–Schmidt `λ`, for
+   which `N(Im a)·N(B⊥) = N(Im a)·N(Im b) − ⟪Im a, Im b⟫²`, i.e. exactly
+   `V(s)/4` by `potential_eq_cross` (P1).
+3. **Cauchy–Schwarz plus 𝕆's composition law.**  The two adjoint identities turn
+   the pairing into `⟪d̄·B⊥, Im a·c⟫ − ⟪B⊥·c̄, d·Im a⟫`, each factor of which has
+   norm `√(N ·)·√(N ·)` because 𝕆 *does* compose.  With `2√(N c)√(N d) ≤ N x`
+   this gives the sharp constant:
+
+    **`|N(s·x) − N s·N x| ≤ √(V s) · N x`**   (`abs_normForm_mul_sub_le`).
+
+Setting `x = y` with `s·y = 0` and `N y > 0` gives `N s ≤ √(V s)`, hence
+`(N s)² ≤ V s`; with P2 (`potential_le_normForm_sq`, `V ≤ N²`) the two
+inequalities pinch to equality.
+
+The same bound read from the *right* factor (`abs_normForm_mul_sub_le_right`,
+`|N(x·y) − N x·N y| ≤ √(V y)·N x`) is obtained by moving the contraction and the
+middle slot onto `y` with one alternation and one adjoint transfer
+(`bil_assoc_conj_swap`); it covers **right** zero divisors, so the conclusion is
+handedness-complete.
+
+**Non-vacuity.**  `Breakdown.zdX = e₂ + e₉`, `zdY = e₄ + e₁₅` is a *proved*
+sedenion zero-divisor pair (`Breakdown.zdX_mul_zdY_eq_zero`), and the new
+theorems give `V = 4 = N²` at both (`potential_zdX`, `potential_zdY`) — so the
+implication is not vacuous, and it is attained.
+
+**Still open (and unused):** the converse `V s = (N s)² ⇒ s` is a zero divisor.
+See `FLAG-P5-open`. -/
+
+/-- **The octonion associator has no real part:** `⟪1, [u,w,v]⟫ = 0`.  Immediate
+    from the adjoint transfer and `[·,1,·] = 0`. -/
+theorem bil_one_assoc (u w v : CDAlg ℝ 3) : bil (1 : CDAlg ℝ 3) (assoc u w v) = 0 := by
+  rw [NormForm.bil_symm, bil_assoc_transfer u w v 1, assoc_mid_one, bil_zero_right, neg_zero]
+
+/-- The associator pairing sees only the **imaginary part of the outer vector**. -/
+theorem bil_assoc_imPart_left (a u w v : CDAlg ℝ 3) :
+    bil (imPart a) (assoc u w v) = bil a (assoc u w v) := by
+  rw [imPart_def, bil_sub_left, bil_smul_left, bil_one_assoc, mul_zero, sub_zero]
+
+/-- The associator sees only the **imaginary part of its middle slot** (`[·,1,·] = 0`). -/
+theorem assoc_imPart_mid (u w v : CDAlg ℝ n) : assoc u (imPart w) v = assoc u w v := by
+  have h : imPart w = w + (-(w.coord 0)) • (1 : CDAlg ℝ n) := by
+    rw [imPart_def]; module
+  rw [h, assoc_trilinear.add_mid, assoc_trilinear.smul_mid, assoc_mid_one, smul_zero, add_zero]
+
+/-- **Gram–Schmidt freedom in the middle slot.**  For imaginary `a`, shifting the
+    middle slot by any real multiple of `a` leaves the pairing unchanged. -/
+theorem bil_assoc_mid_shift {a : CDAlg ℝ 3} (ha : a.coord 0 = 0) (lam : ℝ)
+    (u w v : CDAlg ℝ 3) :
+    bil a (assoc u (w - lam • a) v) = bil a (assoc u w v) := by
+  have h : assoc u (w - lam • a) v = assoc u w v - lam • assoc u a v := by
+    have hw : w - lam • a = w + (-lam) • a := by module
+    rw [hw, assoc_trilinear.add_mid, assoc_trilinear.smul_mid]
+    module
+  rw [h, bil_sub_right, bil_smul_right, bil_assoc_mid_self_of_imaginary ha, mul_zero, sub_zero]
+
+/-- **Cauchy–Schwarz for the algebraic polar form:** `|⟪x,y⟫| ≤ √(N x)·√(N y)`.
+    Transported from the scoped inner-product structure of §1. -/
+theorem abs_bil_le_sqrt (x y : CDAlg ℝ n) :
+    |bil x y| ≤ Real.sqrt (N x) * Real.sqrt (N y) := by
+  have hx : ‖x‖ = Real.sqrt (N x) := by
+    rw [← norm_sq_eq_normForm, Real.sqrt_sq (norm_nonneg x)]
+  have hy : ‖y‖ = Real.sqrt (N y) := by
+    rw [← norm_sq_eq_normForm, Real.sqrt_sq (norm_nonneg y)]
+  have h := abs_real_inner_le_norm x y
+  rwa [inner_def', hx, hy] at h
+
+/-- `√(N(p·q)) = √(N p)·√(N q)` in 𝕆 — the composition law, in root form. -/
+theorem sqrt_normForm_mul_oct (p q : CDAlg ℝ 3) :
+    Real.sqrt (N (p * q)) = Real.sqrt (N p) * Real.sqrt (N q) := by
+  rw [QBP.Foundations.NormForm.octonion_norm_form_composition, Real.sqrt_mul (alt_N_nonneg p)]
+
+/-- `√(N x̄) = √(N x)`. -/
+theorem sqrt_N_conj (x : CDAlg ℝ n) : Real.sqrt (N (conj x)) = Real.sqrt (N x) := by
+  rw [QBP.Foundations.NoAutonomousDynamics.N_conj]
+
+/-- **The defect pairing as two composable products.**
+    `⟪a, [d̄,b,c̄]⟫ = ⟪d̄·b, a·c⟫ − ⟪b·c̄, d·a⟫`, by the two adjoint identities. -/
+theorem bil_assoc_conj_expand (a b c d : CDAlg ℝ 3) :
+    bil a (assoc (conj d) b (conj c)) = bil (conj d * b) (a * c) - bil (b * conj c) (d * a) := by
+  rw [assoc_def, bil_sub_right]
+  congr 1
+  · rw [NormForm.bil_symm a ((conj d * b) * conj c),
+      bil_mul_right_adj (conj c) (conj d * b) a, conj_conj_cd]
+  · rw [NormForm.bil_symm a (conj d * (b * conj c)),
+      bil_mul_left_adj (conj d) (b * conj c) a, conj_conj_cd]
+
+/-- **The raw bound on the defect pairing** (no imaginarity, no orthogonality):
+    `|⟪a,[d̄,b,c̄]⟫| ≤ 2·√(N a)·√(N b)·√(N c)·√(N d)`. -/
+theorem abs_bil_assoc_conj_le (a b c d : CDAlg ℝ 3) :
+    |bil a (assoc (conj d) b (conj c))|
+      ≤ 2 * (Real.sqrt (N a) * Real.sqrt (N b) * (Real.sqrt (N c) * Real.sqrt (N d))) := by
+  have h1 : |bil (conj d * b) (a * c)|
+      ≤ Real.sqrt (N d) * Real.sqrt (N b) * (Real.sqrt (N a) * Real.sqrt (N c)) := by
+    have h := abs_bil_le_sqrt (conj d * b) (a * c)
+    rwa [sqrt_normForm_mul_oct, sqrt_normForm_mul_oct, sqrt_N_conj] at h
+  have h2 : |bil (b * conj c) (d * a)|
+      ≤ Real.sqrt (N b) * Real.sqrt (N c) * (Real.sqrt (N d) * Real.sqrt (N a)) := by
+    have h := abs_bil_le_sqrt (b * conj c) (d * a)
+    rwa [sqrt_normForm_mul_oct, sqrt_normForm_mul_oct, sqrt_N_conj] at h
+  have hsplit : |bil (conj d * b) (a * c) - bil (b * conj c) (d * a)|
+      ≤ |bil (conj d * b) (a * c)| + |bil (b * conj c) (d * a)| := by
+    have := abs_add_le (bil (conj d * b) (a * c)) (-(bil (b * conj c) (d * a)))
+    simpa [sub_eq_add_neg, abs_neg] using this
+  rw [bil_assoc_conj_expand]
+  nlinarith [h1, h2, hsplit]
+
+/-- **The sharp defect bound.**  For imaginary `A`, `|2⟪A,[d̄,B,c̄]⟫|` is bounded by
+    `2√(N A·N B − ⟪A,B⟫²)·(N c + N d)` — the Gram determinant of `(A,B)`, which is
+    `V/4` when `(A,B)` are the imaginary CD components (`potential_eq_cross`). -/
+theorem abs_bil_assoc_le_cross {A : CDAlg ℝ 3} (hA : A.coord 0 = 0) (B c d : CDAlg ℝ 3) :
+    |2 * bil A (assoc (conj d) B (conj c))|
+      ≤ 2 * Real.sqrt (N A * N B - (bil A B) ^ 2) * (N c + N d) := by
+  by_cases h0 : A = 0
+  · subst h0
+    have hN : N (0 : CDAlg ℝ 3) = 0 := (alt_N_eq_zero_iff (0 : CDAlg ℝ 3)).mpr rfl
+    rw [bil_zero_left, bil_zero_left, hN]
+    rw [show (0 : ℝ) * N B - (0 : ℝ) ^ 2 = 0 by ring, Real.sqrt_zero]
+    norm_num
+  · have hNA : 0 < N A :=
+      lt_of_le_of_ne (alt_N_nonneg A) (fun h => h0 ((alt_N_eq_zero_iff A).mp h.symm))
+    set lam : ℝ := bil A B / N A with hlamdef
+    have hlamA : lam * N A = bil A B := by
+      rw [hlamdef]; field_simp
+    have hNB' : N (B - lam • A) = N B - 2 * (lam * bil A B) + lam ^ 2 * N A := by
+      rw [N_sub, bil_smul_right, QBP.Foundations.NoAutonomousDynamics.N_smul,
+        NormForm.bil_symm B A]
+    have hprod : N A * N (B - lam • A) = N A * N B - (bil A B) ^ 2 := by
+      rw [hNB']
+      linear_combination (lam * N A - bil A B) * hlamA
+    have hshift : bil A (assoc (conj d) B (conj c))
+        = bil A (assoc (conj d) (B - lam • A) (conj c)) :=
+      (bil_assoc_mid_shift hA lam (conj d) B (conj c)).symm
+    have hraw := abs_bil_assoc_conj_le A (B - lam • A) c d
+    have hsq : Real.sqrt (N A * N B - (bil A B) ^ 2)
+        = Real.sqrt (N A) * Real.sqrt (N (B - lam • A)) := by
+      rw [← hprod, Real.sqrt_mul (alt_N_nonneg A)]
+    have hcd : 2 * (Real.sqrt (N c) * Real.sqrt (N d)) ≤ N c + N d := by
+      nlinarith [sq_nonneg (Real.sqrt (N c) - Real.sqrt (N d)),
+        Real.sq_sqrt (alt_N_nonneg c), Real.sq_sqrt (alt_N_nonneg d)]
+    have hP : 0 ≤ Real.sqrt (N A) * Real.sqrt (N (B - lam • A)) := by positivity
+    have habs2 : |2 * bil A (assoc (conj d) (B - lam • A) (conj c))|
+        = 2 * |bil A (assoc (conj d) (B - lam • A) (conj c))| := by
+      rw [abs_mul]; norm_num
+    rw [hshift, hsq, habs2]
+    nlinarith [hraw, hcd, hP, abs_nonneg (bil A (assoc (conj d) (B - lam • A) (conj c)))]
+
+/-- **THE INEQUALITY (left form).**  `|N(s·x) − N s·N x| ≤ √(V s)·N x` for every
+    `s, x : 𝕊`.  The whole failure of norm composition on the sedenions is
+    controlled by the landscape potential of the LEFT factor. -/
+theorem abs_normForm_mul_sub_le (s x : CDAlg ℝ 4) :
+    |N (s * x) - N s * N x| ≤ Real.sqrt (Hosting.potential s) * N x := by
+  have hdef : N (s * x) - N s * N x
+      = -(2 * bil (cdLo s) (assoc (conj (cdHi x)) (cdHi s) (conj (cdLo x)))) := by
+    rw [normForm_mul_eq]; ring
+  have himg : bil (cdLo s) (assoc (conj (cdHi x)) (cdHi s) (conj (cdLo x)))
+      = bil (imPart (cdLo s)) (assoc (conj (cdHi x)) (imPart (cdHi s)) (conj (cdLo x))) := by
+    rw [assoc_imPart_mid, bil_assoc_imPart_left]
+  have h4 : Real.sqrt 4 = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num : (0:ℝ) ≤ 2)]
+  have hV : Real.sqrt (Hosting.potential s)
+      = 2 * Real.sqrt (N (imPart (cdLo s)) * N (imPart (cdHi s))
+          - (bil (imPart (cdLo s)) (imPart (cdHi s))) ^ 2) := by
+    rw [potential_eq_cross, Real.sqrt_mul (by norm_num : (0:ℝ) ≤ 4), h4]
+  rw [hdef, abs_neg, himg, hV, QBP.Foundations.NoAutonomousDynamics.N_split x]
+  exact abs_bil_assoc_le_cross (imPart_coord_zero _) _ _ _
+
+/-- Swap the last two associator slots (right alternativity, polarized). -/
+theorem assoc_swap_right (u w v : CDAlg ℝ 3) : assoc u w v = - assoc u v w := by
+  rw [eq_neg_iff_add_eq_zero]; exact octonion_right_alternative_polarized u w v
+
+/-- Swap the first two associator slots (left alternativity, polarized). -/
+theorem assoc_swap_left (u w v : CDAlg ℝ 3) : assoc u w v = - assoc w u v := by
+  rw [eq_neg_iff_add_eq_zero]; exact octonion_left_alternative_polarized u w v
+
+/-- **The defect pairing, re-read from the other factor.**
+    `⟪a, [d̄,b,c̄]⟫ = −⟪c̄, [a,d,b̄]⟫`: one alternation moves `c̄` into the middle,
+    one adjoint transfer swaps it with the contraction, one more alternation
+    restores the order.  Now `c` and `d` occupy the contraction and middle slots. -/
+theorem bil_assoc_conj_swap (a b c d : CDAlg ℝ 3) :
+    bil a (assoc (conj d) b (conj c)) = - bil (conj c) (assoc a d (conj b)) := by
+  rw [assoc_swap_right (conj d) b (conj c), bil_neg_right,
+    NormForm.bil_symm a (assoc (conj d) (conj c) b),
+    bil_assoc_transfer (conj d) (conj c) b a, conj_conj_cd,
+    assoc_swap_left d a (conj b), bil_neg_right]
+  ring
+
+/-- `(x̄)₀ = x₀`. -/
+theorem conj_coord_zero (x : CDAlg ℝ n) : (conj x).coord 0 = x.coord 0 := by
+  rw [conj_eq_sub, sub_coord, smul_coord, one_coord, if_pos rfl]
+  ring
+
+/-- `Im x̄ = −Im x`. -/
+theorem imPart_conj (x : CDAlg ℝ n) : imPart (conj x) = (-1 : ℝ) • imPart x := by
+  rw [imPart_def, imPart_def, conj_coord_zero, conj_eq_sub]
+  module
+
+/-- **THE INEQUALITY (right form).**  `|N(x·y) − N x·N y| ≤ √(V y)·N x`: the same
+    defect, bounded by the landscape potential of the RIGHT factor. -/
+theorem abs_normForm_mul_sub_le_right (x y : CDAlg ℝ 4) :
+    |N (x * y) - N x * N y| ≤ Real.sqrt (Hosting.potential y) * N x := by
+  have hdef : N (x * y) - N x * N y
+      = 2 * bil (conj (cdLo y)) (assoc (cdLo x) (cdHi y) (conj (cdHi x))) := by
+    rw [normForm_mul_eq, bil_assoc_conj_swap (cdLo x) (cdHi x) (cdLo y) (cdHi y)]
+    ring
+  have himg : bil (conj (cdLo y)) (assoc (cdLo x) (cdHi y) (conj (cdHi x)))
+      = bil (imPart (conj (cdLo y)))
+          (assoc (conj (conj (cdLo x))) (imPart (cdHi y)) (conj (cdHi x))) := by
+    rw [conj_conj_cd, assoc_imPart_mid, bil_assoc_imPart_left]
+  have hbound := abs_bil_assoc_le_cross (A := imPart (conj (cdLo y)))
+    (by rw [imPart_conj, smul_coord, imPart_coord_zero]; ring)
+    (imPart (cdHi y)) (cdHi x) (conj (cdLo x))
+  have hA : N (imPart (conj (cdLo y))) = N (imPart (cdLo y)) := by
+    rw [imPart_conj, QBP.Foundations.NoAutonomousDynamics.N_smul]; ring
+  have hAB : (bil (imPart (conj (cdLo y))) (imPart (cdHi y))) ^ 2
+      = (bil (imPart (cdLo y)) (imPart (cdHi y))) ^ 2 := by
+    rw [imPart_conj, bil_smul_left]; ring
+  have h4 : Real.sqrt 4 = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num : (0:ℝ) ≤ 2)]
+  have hV : Real.sqrt (Hosting.potential y)
+      = 2 * Real.sqrt (N (imPart (conj (cdLo y))) * N (imPart (cdHi y))
+          - (bil (imPart (conj (cdLo y))) (imPart (cdHi y))) ^ 2) := by
+    rw [hA, hAB, potential_eq_cross, Real.sqrt_mul (by norm_num : (0:ℝ) ≤ 4), h4]
+  have hNx : N (cdHi x) + N (conj (cdLo x)) = N x := by
+    rw [QBP.Foundations.NoAutonomousDynamics.N_conj,
+      QBP.Foundations.NoAutonomousDynamics.N_split x]
+    ring
+  rw [hdef, himg, hV, ← hNx]
+  exact hbound
+
+/-- **ZD ⇒ V = N² (left), strongest form.**  If `s` annihilates some `y ≠ 0` on
+    the right, then `s` sits on the argmax locus: `V s = (N s)²`.  No hypothesis
+    on `s` is needed — at `s = 0` both sides are `0`. -/
+theorem potential_eq_normForm_sq_of_mul_eq_zero {s y : CDAlg ℝ 4} (hy : y ≠ 0)
+    (h : s * y = 0) : Hosting.potential s = (N s) ^ 2 := by
+  have hNy : 0 < N y :=
+    lt_of_le_of_ne (alt_N_nonneg y) (fun hh => hy ((alt_N_eq_zero_iff y).mp hh.symm))
+  have hb := abs_normForm_mul_sub_le s y
+  rw [h, (alt_N_eq_zero_iff (0 : CDAlg ℝ 4)).mpr rfl] at hb
+  have habs : |(0 : ℝ) - N s * N y| = N s * N y := by
+    rw [zero_sub, abs_neg, abs_of_nonneg (mul_nonneg (alt_N_nonneg s) (alt_N_nonneg y))]
+  rw [habs] at hb
+  have h2 : N s ≤ Real.sqrt (Hosting.potential s) := le_of_mul_le_mul_right hb hNy
+  have hsq : Real.sqrt (Hosting.potential s) ^ 2 = Hosting.potential s :=
+    Real.sq_sqrt (Hosting.potential_nonneg s)
+  have h3 : (N s) ^ 2 ≤ Hosting.potential s := by nlinarith [h2, alt_N_nonneg s, hsq]
+  exact le_antisymm (potential_le_normForm_sq s) h3
+
+/-- **ZD ⇒ V = N² (right), strongest form.** -/
+theorem potential_eq_normForm_sq_of_mul_eq_zero_right {s y : CDAlg ℝ 4} (hy : y ≠ 0)
+    (h : y * s = 0) : Hosting.potential s = (N s) ^ 2 := by
+  have hNy : 0 < N y :=
+    lt_of_le_of_ne (alt_N_nonneg y) (fun hh => hy ((alt_N_eq_zero_iff y).mp hh.symm))
+  have hb := abs_normForm_mul_sub_le_right y s
+  rw [h, (alt_N_eq_zero_iff (0 : CDAlg ℝ 4)).mpr rfl] at hb
+  have habs : |(0 : ℝ) - N y * N s| = N s * N y := by
+    rw [zero_sub, abs_neg, abs_of_nonneg (mul_nonneg (alt_N_nonneg y) (alt_N_nonneg s))]
+    ring
+  rw [habs] at hb
+  have h2 : N s ≤ Real.sqrt (Hosting.potential s) := le_of_mul_le_mul_right hb hNy
+  have hsq : Real.sqrt (Hosting.potential s) ^ 2 = Hosting.potential s :=
+    Real.sq_sqrt (Hosting.potential_nonneg s)
+  have h3 : (N s) ^ 2 ≤ Hosting.potential s := by nlinarith [h2, alt_N_nonneg s, hsq]
+  exact le_antisymm (potential_le_normForm_sq s) h3
+
+/-- **ZD ⇒ V = N², in zero-divisor shape.**  `_hs` is part of the definition of a
+    zero divisor and is deliberately not used: the identity holds at `s = 0` too
+    (`potential_eq_normForm_sq_of_mul_eq_zero` is the strongest form). -/
+theorem potential_eq_normForm_sq_of_zeroDivisor {s : CDAlg ℝ 4} (_hs : s ≠ 0)
+    {y : CDAlg ℝ 4} (hy : y ≠ 0) (h : s * y = 0) : Hosting.potential s = (N s) ^ 2 :=
+  potential_eq_normForm_sq_of_mul_eq_zero hy h
+
+/-- **On the state sphere every zero divisor has `V = 1`** — it sits on the
+    argmax locus, and is therefore a REST POINT of the rule by P6. -/
+theorem potential_eq_one_of_zeroDivisor {s : CDAlg ℝ 4} (hmem : s ∈ Hosting.StateSphere)
+    {y : CDAlg ℝ 4} (hy : y ≠ 0) (h : s * y = 0) : Hosting.potential s = 1 := by
+  rw [potential_eq_normForm_sq_of_mul_eq_zero hy h, hmem.2]
+  norm_num
+
+/-- Right-handed form of `potential_eq_one_of_zeroDivisor`. -/
+theorem potential_eq_one_of_zeroDivisor_right {s : CDAlg ℝ 4} (hmem : s ∈ Hosting.StateSphere)
+    {y : CDAlg ℝ 4} (hy : y ≠ 0) (h : y * s = 0) : Hosting.potential s = 1 := by
+  rw [potential_eq_normForm_sq_of_mul_eq_zero_right hy h, hmem.2]
+  norm_num
+
+/-- **Non-vacuity, left.**  The *proved* sedenion zero divisor `e₂ + e₉`
+    (`Breakdown.zdX_mul_zdY_eq_zero`) has `V = 4 = (N zdX)²`: the inclusion is
+    attained, not empty. -/
+theorem potential_zdX : Hosting.potential Breakdown.zdX = 4 := by
+  rw [potential_eq_normForm_sq_of_mul_eq_zero Breakdown.zdY_ne_zero
+      Breakdown.zdX_mul_zdY_eq_zero, Breakdown.N_zdX]
+  norm_num
+
+/-- **Non-vacuity, right.**  `e₄ + e₁₅` likewise has `V = 4 = (N zdY)²`. -/
+theorem potential_zdY : Hosting.potential Breakdown.zdY = 4 := by
+  rw [potential_eq_normForm_sq_of_mul_eq_zero_right Breakdown.zdX_ne_zero
+      Breakdown.zdX_mul_zdY_eq_zero, Breakdown.N_zdY]
+  norm_num
+
+/-- If `s` annihilates nothing but `0` on the right, `y ↦ s·y` is injective. -/
+theorem injective_mul_of_mul_ne_zero {s : CDAlg ℝ 4}
+    (h : ∀ y : CDAlg ℝ 4, y ≠ 0 → s * y ≠ 0) :
+    Function.Injective (fun y : CDAlg ℝ 4 => s * y) := by
+  intro y₁ y₂ hy
+  simp only at hy
+  by_contra hne
+  have hsub : y₁ - y₂ ≠ 0 := fun hh => hne (sub_eq_zero.mp hh)
+  refine h _ hsub ?_
+  have hdist : s * (y₁ - y₂) = s * y₁ - s * y₂ := by
+    have hy' : y₁ - y₂ = y₁ + (-1 : ℝ) • y₂ := by module
+    rw [hy', mul_add_right, mul_smul_right]; module
+  rw [hdist, hy, sub_self]
+
+/-- If nothing but `0` annihilates `s` on the left, `y ↦ y·s` is injective. -/
+theorem injective_mul_right_of_mul_ne_zero {s : CDAlg ℝ 4}
+    (h : ∀ y : CDAlg ℝ 4, y ≠ 0 → y * s ≠ 0) :
+    Function.Injective (fun y : CDAlg ℝ 4 => y * s) := by
+  intro y₁ y₂ hy
+  simp only at hy
+  by_contra hne
+  have hsub : y₁ - y₂ ≠ 0 := fun hh => hne (sub_eq_zero.mp hh)
+  refine h _ hsub ?_
+  have hdist : (y₁ - y₂) * s = y₁ * s - y₂ * s := by
+    have hy' : y₁ - y₂ = y₁ + (-1 : ℝ) • y₂ := by module
+    rw [hy', mul_add_left, mul_smul_left]; module
+  rw [hdist, hy, sub_self]
+
+/-- **The ω-limit set of a state-sphere orbit lies on the state sphere**
+    (`StateSphere` is closed, and the ω-limit set is contained in the closure of
+    the forward orbit). -/
+theorem omega_mem_stateSphere {γ : ℝ → CDAlg ℝ 4}
+    (hmem : ∀ t ∈ Set.Ici (0 : ℝ), γ t ∈ Hosting.StateSphere)
+    {p : CDAlg ℝ 4}
+    (hp : p ∈ omegaLimit Filter.atTop (fun (_t : ℝ) (_ : Unit) => γ _t) Set.univ) :
+    p ∈ Hosting.StateSphere := by
+  rw [omegaLimit_def] at hp
+  have hmem' := Set.mem_iInter₂.mp hp (Set.Ici (0 : ℝ)) (Filter.Ici_mem_atTop 0)
+  have himg : Set.image2 (fun (_t : ℝ) (_ : Unit) => γ _t) (Set.Ici 0) Set.univ
+      = γ '' Set.Ici 0 := by
+    ext z
+    simp only [Set.mem_image2, Set.mem_univ, true_and, Set.mem_image, exists_const]
+  rw [himg] at hmem'
+  exact closure_minimal (by rintro _ ⟨t, ht, rfl⟩; exact hmem t ht) isClosed_stateSphere hmem'
+
+/-- **P6 + P8 + (ZD ⇒ V = 1): a sub-maximal forward orbit never approaches a zero
+    divisor.**  If a forward integral curve of the rule lies on `StateSphere` and
+    starts strictly below the maximum (`V(γ 0) < 1`), then no point `p` of its
+    ω-limit set is a zero divisor — left multiplication AND right multiplication
+    by `p` are injective on all of 𝕊.
+
+    **Scope.**  This is conditional on a *given* curve: local existence of
+    integral curves of `F` is NOT proved in this file (FLAG-rule-flow-open), so
+    "never" here means "for any curve that exists", not "for all initial data". -/
+theorem omega_avoids_zeroDivisors {γ : ℝ → CDAlg ℝ 4}
+    (hcont : ContinuousOn γ (Set.Ici 0))
+    (hd : ∀ t ∈ Set.Ioi (0 : ℝ), HasDerivAt γ (ruleField (γ t)) t)
+    (hmem : ∀ t ∈ Set.Ici (0 : ℝ), γ t ∈ Hosting.StateSphere)
+    (h0 : Hosting.potential (γ 0) < 1)
+    {p : CDAlg ℝ 4}
+    (hp : p ∈ omegaLimit Filter.atTop (fun (_t : ℝ) (_ : Unit) => γ _t) Set.univ) :
+    Function.Injective (fun y : CDAlg ℝ 4 => p * y)
+      ∧ Function.Injective (fun y : CDAlg ℝ 4 => y * p) := by
+  have hmemp := omega_mem_stateSphere hmem hp
+  have h2 := omega_avoids_locus hcont hd hmem h0 hp
+  constructor
+  · refine injective_mul_of_mul_ne_zero (fun y hy hzero => ?_)
+    rw [potential_eq_one_of_zeroDivisor hmemp hy hzero] at h2
+    exact lt_irrefl 1 h2
+  · refine injective_mul_right_of_mul_ne_zero (fun y hy hzero => ?_)
+    rw [potential_eq_one_of_zeroDivisor_right hmemp hy hzero] at h2
+    exact lt_irrefl 1 h2
+
 /-! ## 11. Completeness audit (`#print axioms`)
 
 Every declaration introduced by this file.  The gate: only
@@ -1788,5 +2236,34 @@ Every declaration introduced by this file.  The gate: only
 #print axioms normForm_mul_of_isVacuum
 #print axioms crystal_not_zeroDivisor
 #print axioms crystal_mul_ne_zero
+
+#print axioms bil_one_assoc
+#print axioms bil_assoc_imPart_left
+#print axioms assoc_imPart_mid
+#print axioms bil_assoc_mid_shift
+#print axioms abs_bil_le_sqrt
+#print axioms sqrt_normForm_mul_oct
+#print axioms sqrt_N_conj
+#print axioms bil_assoc_conj_expand
+#print axioms abs_bil_assoc_conj_le
+#print axioms abs_bil_assoc_le_cross
+#print axioms abs_normForm_mul_sub_le
+#print axioms assoc_swap_right
+#print axioms assoc_swap_left
+#print axioms bil_assoc_conj_swap
+#print axioms conj_coord_zero
+#print axioms imPart_conj
+#print axioms abs_normForm_mul_sub_le_right
+#print axioms potential_eq_normForm_sq_of_mul_eq_zero
+#print axioms potential_eq_normForm_sq_of_mul_eq_zero_right
+#print axioms potential_eq_normForm_sq_of_zeroDivisor
+#print axioms potential_eq_one_of_zeroDivisor
+#print axioms potential_eq_one_of_zeroDivisor_right
+#print axioms potential_zdX
+#print axioms potential_zdY
+#print axioms injective_mul_of_mul_ne_zero
+#print axioms injective_mul_right_of_mul_ne_zero
+#print axioms omega_mem_stateSphere
+#print axioms omega_avoids_zeroDivisors
 
 end QBP.Substrate.RuleFlow
