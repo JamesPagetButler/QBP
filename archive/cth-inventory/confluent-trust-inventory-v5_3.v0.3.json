@@ -73,7 +73,7 @@
           "discharge": "FLAG-observer-exclusivity-open"
         },
         {
-          "kill": "A non-associative subset of S on which actions compose (contradicting PROOF-associative-composition-iff's premise set). Discharge: none — a postulate about all observers; recorded OPEN (ruling bundle v0.7 §2). [0.3.4 migration 2026-09-20: closure/discharge carried by this entry's fields; the v0.7 phrase 'Discharge: none' above meant 'no realised route', which the FLAG- discharge now records as route OPEN (tracked).]",
+          "kill": "A non-associative subset of S on which actions compose (contradicting PROOF-associative-composition-iff's premise set). Discharge: none — a postulate about all observers; recorded OPEN (ruling bundle v0.7 §2). [0.3.4 migration 2026-09-20: closure/discharge carried by this entry's fields; the v0.7 phrase 'Discharge: none' above meant 'no realised route to a fired kill' — the PROOF- discharge names the theorem whose premise set EXCLUDES this arm (route EXISTS; result: cannot fire).]",
           "closure": "derivation",
           "discharge": "PROOF-associative-composition-iff"
         }
@@ -10015,7 +10015,7 @@
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
-      "description": "The rule (#635) is a postulate: first-order overdamped descent of the potential V in the metric N (the only metric on record; hosting definition §0 table). Its flow is numerical only (`flow_big.py`, #629; endpoint statistics 0.146 quench / ≈1/3 anneal / 1 ℓ-axis). No Lean statement of the flow exists (Hosting.lean states that `potential` is a function, not a gradient field), no normed structure is placed on CDAlg, and no omega-limit map is defined. AXIOM-1's kill (question 1) fires only on such a proven flow whose omega-limit map is non-injective on positive measure; its own text records that first-order semiflows are injective at finite time. Feasibility (2026-09-20, lean-prover read): finite-time injectivity = backward uniqueness via Grönwall (`ODE_solution_unique_of_mem_Icc_left`), size S once the field is defined; the field's definition needs a normed/inner-product transport of CDAlg (M) and the flow itself (M); global existence L. Nothing here is ruled: the flow's FORM is what #635 already states.",
+      "description": "The rule (#635) is a postulate: first-order overdamped descent of the potential V in the metric N (the only metric on record; hosting definition §0 table). Its flow is numerical only (`flow_big.py`, #629; endpoint statistics 0.146 quench / ≈1/3 anneal / 1 ℓ-axis). No Lean statement of the flow exists (Hosting.lean states that `potential` is a function, not a gradient field), no normed structure is placed on CDAlg, and no omega-limit map is defined. AXIOM-1's kill (question 1) fires only on such a proven flow whose omega-limit map is non-injective on positive measure; its own text records that first-order semiflows are injective at finite time. Feasibility read (2026-09-20) recorded in PR #667's body and RuleFlow.lean's docstring, not restated here. Nothing here is ruled: the flow's FORM is what #635 already states.",
       "prediction_chain": [
         "PROOF-substrate-hosting-definition"
       ],
@@ -10607,7 +10607,7 @@
     {
       "version": "6.2.0",
       "date": "2026-09-20T00:00:00Z",
-      "note": "qbp-oppenheimer: vendored schema 0.3.4 sync (confluent-trust#104, merged 2026-09-20) — the seven open roots' kill_condition migrated array<string> → array<object> KillConditionEntry {kill, closure, discharge}: 13 entries from 9 strings (arms of different closure kind split, text verbatim). Closure kinds follow each entry's own text; a discharge names the resolving anchor where a route EXISTS (PROOF-substrate-hosting-definition, PROOF-associative-composition-iff, PROOF-ops-alternativity-ladder) and a FLAG tracking anchor where the route is OPEN (four minted: FLAG-rule-flow-open, FLAG-encoding-map-open, FLAG-observer-exclusivity-open, FLAG-encoding-level-physical-open) — per live-test seq 1506–1509; no physics kill relabelled ruling-rescope. decision_state value 'ruled' → 'settled' (no record affected). Nothing ruled, nothing forced; no root added or removed."
+      "note": "qbp-oppenheimer: vendored schema 0.3.4 sync (confluent-trust#104, merged 2026-09-20) — the seven open roots' kill_condition migrated array<string> → array<object> KillConditionEntry {kill, closure, discharge}: 14 entries from 9 strings (arms of different closure kind split, text verbatim). Closure kinds follow each entry's own text; a discharge names the resolving anchor where a route EXISTS (PROOF-substrate-hosting-definition, PROOF-associative-composition-iff, PROOF-ops-alternativity-ladder) and a FLAG tracking anchor where the route is OPEN (four minted: FLAG-rule-flow-open, FLAG-encoding-map-open, FLAG-observer-exclusivity-open, FLAG-encoding-level-physical-open) — per live-test seq 1506–1509; no physics kill relabelled ruling-rescope. decision_state value 'ruled' → 'settled' (no record affected). Nothing ruled, nothing forced; no root added or removed."
     }
   ],
   "last_updated": "2026-09-20T00:00:00Z",
@@ -10671,16 +10671,16 @@
       "decision_state": "open",
       "kill_condition": [
         {
-          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by a defining property of the encoding stated as an object (a Cayley–Dickson half → P2' is a theorem; contains the observer's algebra → P2 is) — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form).",
+          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by a defining property of the encoding stated as an object (a Cayley–Dickson half → P2' is a theorem; contains the observer's algebra → P2 is) — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form). [0.3.4 migration 2026-09-20: in the shared tail, 'the first two' refers to arms (a) and (b) of the original single entry — the object-stated defining property and the encoding map.]",
           "closure": "ruling-rescope"
         },
         {
-          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by the encoding MAP (a map forces its domain) — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form).",
+          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by the encoding MAP (a map forces its domain) — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form). [0.3.4 migration 2026-09-20: in the shared tail, 'the first two' refers to arms (a) and (b) of the original single entry — the object-stated defining property and the encoding map.]",
           "closure": "derivation",
           "discharge": "FLAG-encoding-map-open"
         },
         {
-          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by an observable distinguishing the readings — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form).",
+          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by an observable distinguishing the readings — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form). [0.3.4 migration 2026-09-20: in the shared tail, 'the first two' refers to arms (a) and (b) of the original single entry — the object-stated defining property and the encoding map.]",
           "closure": "measurement",
           "discharge": "FLAG-encoding-map-open"
         }

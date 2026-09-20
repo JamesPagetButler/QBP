@@ -30,7 +30,9 @@ ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
 DATE = "2026-09-20T00:00:00Z"
 
-MIG = "[0.3.4 migration 2026-09-20: closure/discharge carried by this entry's fields; the v0.7 phrase 'Discharge: none' above meant 'no realised route', which the FLAG- discharge now records as route OPEN (tracked).]"
+MIG_OPEN = "[0.3.4 migration 2026-09-20: closure/discharge carried by this entry's fields; the v0.7 phrase 'Discharge: none' above meant 'no realised route', which the FLAG- discharge now records as route OPEN (tracked).]"
+MIG_EXISTS = "[0.3.4 migration 2026-09-20: closure/discharge carried by this entry's fields; the v0.7 phrase 'Discharge: none' above meant 'no realised route to a fired kill' — the PROOF- discharge names the theorem whose premise set EXCLUDES this arm (route EXISTS; result: cannot fire).]"
+MIG_REF = "[0.3.4 migration 2026-09-20: in the shared tail, 'the first two' refers to arms (a) and (b) of the original single entry — the object-stated defining property and the encoding map.]"
 
 
 def flag(fid, name, desc, testable, notes, chain):
@@ -54,7 +56,7 @@ FLAGS = [
     flag(
         "FLAG-rule-flow-open",
         "The rule's flow on StateSphere has no formal existence/uniqueness or omega-limit statement (open route for AXIOM-1 question 1)",
-        "The rule (#635) is a postulate: first-order overdamped descent of the potential V in the metric N (the only metric on record; hosting definition §0 table). Its flow is numerical only (`flow_big.py`, #629; endpoint statistics 0.146 quench / ≈1/3 anneal / 1 ℓ-axis). No Lean statement of the flow exists (Hosting.lean states that `potential` is a function, not a gradient field), no normed structure is placed on CDAlg, and no omega-limit map is defined. AXIOM-1's kill (question 1) fires only on such a proven flow whose omega-limit map is non-injective on positive measure; its own text records that first-order semiflows are injective at finite time. Feasibility (2026-09-20, lean-prover read): finite-time injectivity = backward uniqueness via Grönwall (`ODE_solution_unique_of_mem_Icc_left`), size S once the field is defined; the field's definition needs a normed/inner-product transport of CDAlg (M) and the flow itself (M); global existence L. Nothing here is ruled: the flow's FORM is what #635 already states.",
+        "The rule (#635) is a postulate: first-order overdamped descent of the potential V in the metric N (the only metric on record; hosting definition §0 table). Its flow is numerical only (`flow_big.py`, #629; endpoint statistics 0.146 quench / ≈1/3 anneal / 1 ℓ-axis). No Lean statement of the flow exists (Hosting.lean states that `potential` is a function, not a gradient field), no normed structure is placed on CDAlg, and no omega-limit map is defined. AXIOM-1's kill (question 1) fires only on such a proven flow whose omega-limit map is non-injective on positive measure; its own text records that first-order semiflows are injective at finite time. Feasibility read (2026-09-20) recorded in PR #667's body and RuleFlow.lean's docstring, not restated here. Nothing here is ruled: the flow's FORM is what #635 already states.",
         "When a Lean definition of the rule's vector field on StateSphere exists with local existence/uniqueness; then when its omega-limit map is characterised on the zero-divisor locus.",
         "Tracking anchor only (route OPEN). Discharge target for AXIOM-1 kill_condition[0] (closure derivation). Owners: #635 (rule postulate), #629 (flow numerics), #647 (trigger).",
         ["PROOF-substrate-hosting-definition"],
@@ -138,9 +140,13 @@ def migrate(ed, L):
     tail = s[s.index(". Discharge: none") :]
     assert s.startswith(arm_a) and arm_b in s
     poa["kill_condition"] = [
-        obj(arm_a + tail + " " + MIG, "measurement", "FLAG-observer-exclusivity-open"),
         obj(
-            arm_b[0].upper() + arm_b[1:] + tail + " " + MIG,
+            arm_a + tail + " " + MIG_OPEN,
+            "measurement",
+            "FLAG-observer-exclusivity-open",
+        ),
+        obj(
+            arm_b[0].upper() + arm_b[1:] + tail + " " + MIG_EXISTS,
             "derivation",
             "PROOF-associative-composition-iff",
         ),
@@ -175,9 +181,13 @@ def migrate(ed, L):
     tail = s[s.index(" — none on record") :]
     assert s.startswith(lead + arm_a) and arm_b in s and arm_c in s
     ih["kill_condition"] = [
-        obj(lead + arm_a + tail, "ruling-rescope"),
-        obj(lead + arm_b + tail, "derivation", "FLAG-encoding-map-open"),
-        obj(lead + arm_c + tail, "measurement", "FLAG-encoding-map-open"),
+        obj(lead + arm_a + tail + " " + MIG_REF, "ruling-rescope"),
+        obj(
+            lead + arm_b + tail + " " + MIG_REF, "derivation", "FLAG-encoding-map-open"
+        ),
+        obj(
+            lead + arm_c + tail + " " + MIG_REF, "measurement", "FLAG-encoding-map-open"
+        ),
     ]
 
 
@@ -187,7 +197,7 @@ CHANGELOG = {
     "note": (
         "qbp-oppenheimer: vendored schema 0.3.4 sync (confluent-trust#104, merged 2026-09-20) — the seven open "
         "roots' kill_condition migrated array<string> → array<object> KillConditionEntry {kill, closure, discharge}: "
-        "13 entries from 9 strings (arms of different closure kind split, text verbatim). Closure kinds follow each "
+        "14 entries from 9 strings (arms of different closure kind split, text verbatim). Closure kinds follow each "
         "entry's own text; a discharge names the resolving anchor where a route EXISTS (PROOF-substrate-hosting-"
         "definition, PROOF-associative-composition-iff, PROOF-ops-alternativity-ladder) and a FLAG tracking anchor "
         "where the route is OPEN (four minted: FLAG-rule-flow-open, FLAG-encoding-map-open, "
