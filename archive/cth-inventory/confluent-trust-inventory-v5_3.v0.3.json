@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.2.0",
+  "version": "6.3.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -10072,6 +10072,277 @@
       "provenance_kind": "theory",
       "foundation_batch": "#654-D3-0.3.4-migration",
       "last_tested_at": "2026-09-20T00:00:00Z"
+    },
+    {
+      "id": "PROOF-seam-zd-witness-kernel-four",
+      "name": "At the zero divisor x = e₁ + e₁₀, left multiplication has kernel exactly span{e₇+e₁₂, e₆−e₁₃, e₅+e₁₄, e₄−e₁₅}, dimension 4, rank 12",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamKernel.lean: `seamL_ker_eq` (both inclusions — the kernel IS the span of the four explicit signed basis sums), `seam_finrank_ker_eq_four` (finrank 4), `seam_finrank_range_eq_twelve` (rank 12 by rank–nullity), packaged as `zd_witness_left_kernel_four`. Bench reading: multiplying by this zero divisor drops exactly 4 of 16 real components and passes 12 — a rank-12 linear map, not annihilation. Witness x·kᵢ = 0 for the four kernel vectors by coordinates (`seamX_mul_k1`…`k4`). NOT claimed: the same for the other 83 basis-sum zero divisors (PROOF-42zd's 42 planes) or for the zero-divisor locus — witness only (numerically all 84 have nullity 4; unproved). NOT claimed: that multiplication is the seam's physical operation (the dynamics is the rule, #635; nothing on the ledger says a seam crossing is computed by a product); anything about the flow.",
+      "proof_file": "proofs/QBP/Foundations/SeamKernel.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamKernel.zd_witness_left_kernel_four",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamKernel.seamL_ker_eq",
+        "QBP.Foundations.SeamKernel.seam_finrank_ker_eq_four",
+        "QBP.Foundations.SeamKernel.seam_finrank_range_eq_twelve",
+        "QBP.Foundations.SeamKernel.seamX_mul_k1",
+        "QBP.Foundations.SeamKernel.seamX_mul_k2",
+        "QBP.Foundations.SeamKernel.seamX_mul_k3",
+        "QBP.Foundations.SeamKernel.seamX_mul_k4"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-42zd"
+      ],
+      "foundation_batch": "#666-seam-zero-divisor-kernel",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build (3020 jobs, exit 0) + #print axioms on all 65 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #666 Red Team ×2, Gemini ×2)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamKernel.zd_witness_left_kernel_four",
+          "QBP.Foundations.SeamKernel.seamL_ker_eq",
+          "QBP.Foundations.SeamKernel.seam_finrank_ker_eq_four",
+          "QBP.Foundations.SeamKernel.seam_finrank_range_eq_twelve",
+          "QBP.Foundations.SeamKernel.seamX_mul_k1",
+          "QBP.Foundations.SeamKernel.seamX_mul_k2",
+          "QBP.Foundations.SeamKernel.seamX_mul_k3",
+          "QBP.Foundations.SeamKernel.seamX_mul_k4"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-seam-zd-witness-kernels-coincide",
+      "name": "At x = e₁ + e₁₀ the left and right kernels are EQUAL: the four erased directions are erased from both sides",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamKernel.lean: `zd_witness_kernels_coincide` — kᵢ·x = 0 for the four vectors, ker L_x = ker R_x (an equality, `seamR_ker_eq` computes the right kernel independently), finrank of the right kernel 4. Bench reading: the component that left multiplication erases is not recoverable from right multiplication — it is erased there too. This is what makes 're-encoding into the kernel' (inter#119) fail as worded: the kernel is the set of erased directions, not a store. NOT claimed: recoverability from the seam's actual scattering (FLAG-seam-dynamics-open remains open) — this anchor speaks only of the two multiplications. NOT claimed: that multiplication is the seam's physical operation (the dynamics is the rule, #635; nothing on the ledger says a seam crossing is computed by a product); anything about the flow.",
+      "proof_file": "proofs/QBP/Foundations/SeamKernel.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamKernel.zd_witness_kernels_coincide",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamKernel.seamR_ker_eq",
+        "QBP.Foundations.SeamKernel.k1_mul_seamX",
+        "QBP.Foundations.SeamKernel.k2_mul_seamX",
+        "QBP.Foundations.SeamKernel.k3_mul_seamX",
+        "QBP.Foundations.SeamKernel.k4_mul_seamX"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-seam-zd-witness-kernel-four"
+      ],
+      "foundation_batch": "#666-seam-zero-divisor-kernel",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build (3020 jobs, exit 0) + #print axioms on all 65 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #666 Red Team ×2, Gemini ×2)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamKernel.zd_witness_kernels_coincide",
+          "QBP.Foundations.SeamKernel.seamR_ker_eq",
+          "QBP.Foundations.SeamKernel.k1_mul_seamX",
+          "QBP.Foundations.SeamKernel.k2_mul_seamX",
+          "QBP.Foundations.SeamKernel.k3_mul_seamX",
+          "QBP.Foundations.SeamKernel.k4_mul_seamX"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-seam-zd-witness-kernel-not-subalgebra",
+      "name": "The erased 4-space at x = e₁ + e₁₀ is not closed under the product: k₁·k₁ = −2·1 and (k₁·k₃).coord 2 = −2 leave the span",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamKernel.lean: `zd_witness_kernel_not_subalgebra` (two witnesses), `k1_sq` (k₁·k₁ = (−2)•1 — the escaped product lands on the real scalar line), `k1_mul_k3_coord2`. Bench reading: the kernel has no arithmetic of its own; it is not a hidden sub-universe. NOT claimed: the full value k₁·k₃ = −2(e₂+e₉) (only coordinate 2 is proved; the rest is numerical). NOT claimed: that multiplication is the seam's physical operation (the dynamics is the rule, #635; nothing on the ledger says a seam crossing is computed by a product); anything about the flow.",
+      "proof_file": "proofs/QBP/Foundations/SeamKernel.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamKernel.zd_witness_kernel_not_subalgebra",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamKernel.k1_sq",
+        "QBP.Foundations.SeamKernel.k1_mul_k3_coord2"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-seam-zd-witness-kernel-four"
+      ],
+      "foundation_batch": "#666-seam-zero-divisor-kernel",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build (3020 jobs, exit 0) + #print axioms on all 65 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #666 Red Team ×2, Gemini ×2)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamKernel.zd_witness_kernel_not_subalgebra",
+          "QBP.Foundations.SeamKernel.k1_sq",
+          "QBP.Foundations.SeamKernel.k1_mul_k3_coord2"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-frobenius-basis-sum-general",
+      "name": "For every sedenion x, Σ_j N(x·e_j) = 16·N(x): the Frobenius norm of left multiplication is that of a norm-preserving map — norm conservation is not information conservation",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamKernel.lean: `sum_N_mul_basis_eq` (all x; a re-export of the fully general `NoAutonomousDynamics.sum_N_mul_basis`), instantiated at the witness as `zd_witness_frobenius_preserved` (= 16·N(x) = 32 while 4 directions are killed). Bench reading: a test that only checks total norm passes at a zero divisor where information is lost — so a seam theorem must test reversibility, not size. NOT claimed: how the surviving directions are scaled (numerically the singular values are 2 ×4, √2 ×8, 0 ×4 — four amplified, eight unchanged, four killed; unproved). NOT claimed: that multiplication is the seam's physical operation (the dynamics is the rule, #635; nothing on the ledger says a seam crossing is computed by a product); anything about the flow.",
+      "proof_file": "proofs/QBP/Foundations/SeamKernel.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamKernel.sum_N_mul_basis_eq",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamKernel.zd_witness_frobenius_preserved",
+        "QBP.Foundations.SeamKernel.N_seamX"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-42zd"
+      ],
+      "foundation_batch": "#666-seam-zero-divisor-kernel",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build (3020 jobs, exit 0) + #print axioms on all 65 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #666 Red Team ×2, Gemini ×2)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamKernel.sum_N_mul_basis_eq",
+          "QBP.Foundations.SeamKernel.zd_witness_frobenius_preserved",
+          "QBP.Foundations.SeamKernel.N_seamX"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-encoding-copy-mul-injective",
+      "name": "Nonzero elements of the encoding octonion copy never annihilate under left or right multiplication in 𝕊",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamKernel.lean: `octonion_copy_mul_injective` and `octonion_copy_mul_injective_right` — for x with cdHi x = 0 and x ≠ 0, y ↦ x·y and y ↦ y·x are injective on CDAlg ℝ 4 (via the Cayley–Dickson product formula with a zero high part, `cdLo_mul_of_lo`/`cdHi_mul_of_lo` and their right twins, and octonion norm composition). `seamX_not_in_octonion_copy`: the zero-divisor witness is not in the copy. Bench reading: information deletion by multiplication, if it happens at all, lives strictly at the seam (cross-copy elements). NOT claimed: the converse — that ONLY cross-copy elements can annihilate (the cdLo x = 0 mirror case is uncovered; non-alternativity blocks the easy argument). NOT claimed: that multiplication is the seam's physical operation (the dynamics is the rule, #635; nothing on the ledger says a seam crossing is computed by a product); anything about the flow.",
+      "proof_file": "proofs/QBP/Foundations/SeamKernel.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamKernel.octonion_copy_mul_injective",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamKernel.octonion_copy_mul_injective_right",
+        "QBP.Foundations.SeamKernel.octonion_copy_mul_eq_zero_imp",
+        "QBP.Foundations.SeamKernel.octonion_copy_mul_eq_zero_imp_right",
+        "QBP.Foundations.SeamKernel.seamX_not_in_octonion_copy"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-ops-norm-composition-ladder",
+        "PROOF-42zd"
+      ],
+      "foundation_batch": "#666-seam-zero-divisor-kernel",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build (3020 jobs, exit 0) + #print axioms on all 65 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #666 Red Team ×2, Gemini ×2)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamKernel.octonion_copy_mul_injective",
+          "QBP.Foundations.SeamKernel.octonion_copy_mul_injective_right",
+          "QBP.Foundations.SeamKernel.octonion_copy_mul_eq_zero_imp",
+          "QBP.Foundations.SeamKernel.octonion_copy_mul_eq_zero_imp_right",
+          "QBP.Foundations.SeamKernel.seamX_not_in_octonion_copy"
+        ]
+      }
     }
   ],
   "inputs": [
@@ -10608,6 +10879,11 @@
       "version": "6.2.0",
       "date": "2026-09-20T00:00:00Z",
       "note": "qbp-oppenheimer: vendored schema 0.3.4 sync (confluent-trust#104, merged 2026-09-20) — the seven open roots' kill_condition migrated array<string> → array<object> KillConditionEntry {kill, closure, discharge}: 14 entries from 9 strings (arms of different closure kind split, text verbatim). Closure kinds follow each entry's own text; a discharge names the resolving anchor where a route EXISTS (PROOF-substrate-hosting-definition, PROOF-associative-composition-iff, PROOF-ops-alternativity-ladder) and a FLAG tracking anchor where the route is OPEN (four minted: FLAG-rule-flow-open, FLAG-encoding-map-open, FLAG-observer-exclusivity-open, FLAG-encoding-level-physical-open) — per live-test seq 1506–1509; no physics kill relabelled ruling-rescope. decision_state value 'ruled' → 'settled' (no record affected). Nothing ruled, nothing forced; no root added or removed."
+    },
+    {
+      "version": "6.3.0",
+      "date": "2026-09-20T00:00:00Z",
+      "note": "qbp-oppenheimer: PROOF anchors for the seam zero-divisor kernel theorems (PR #666; the beekeeper's information-deletion question of 2026-09-19/20) — encode-after-prove: at the witness e₁+e₁₀, left multiplication has an explicit 4-dim kernel and rank 12; left and right kernels coincide; the kernel is not a subalgebra; the Frobenius identity Σ N(x e_j) = 16 N(x) holds for every x (norm conservation ≠ information conservation); nonzero encoding-copy elements are injective on both sides. Five anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound}. Every anchor carries its caveats (witness-only; converse unproved; singular values numerical; multiplication not shown to be the seam's operation). No root, principle, decision or kill touched; FLAG-seam-dynamics-open stays open. (Renumbered 6.3.0 at rebase after PR #665 landed as 6.2.0.)"
     }
   ],
   "last_updated": "2026-09-20T00:00:00Z",

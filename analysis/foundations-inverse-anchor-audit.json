@@ -246,15 +246,20 @@
       "name": "fanoTriple_oriented_356"
     }
   ],
-  "phantoms": [],
+  "phantoms": [
+    {
+      "anchor": "FLAG-rule-flow-open",
+      "cited": "RuleFlow.lean"
+    }
+  ],
   "stale": [],
   "stats": {
-    "anchor_side_phantoms": 0,
-    "anchors_total": 300,
-    "anchors_with_proof_file": 91,
+    "anchor_side_phantoms": 1,
+    "anchors_total": 309,
+    "anchors_with_proof_file": 96,
     "anchors_with_theorems_list": 66,
     "lean_side_orphans": 49,
     "stale_path_citations": 0,
-    "theorems_total": 1331
+    "theorems_total": 1384
   }
 }

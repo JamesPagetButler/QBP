@@ -7,12 +7,12 @@
 
 | Metric | Count |
 |---|---|
-| theorems total | 1331 |
-| anchors total | 300 |
+| theorems total | 1384 |
+| anchors total | 309 |
 | anchors with theorems list | 66 |
-| anchors with proof file | 91 |
+| anchors with proof file | 96 |
 | lean side orphans | 49 |
-| anchor side phantoms | 0 |
+| anchor side phantoms | 1 |
 | stale path citations | 0 |
 
 > **Note — `lean_side_orphans` is a LOWER BOUND.** A theorem counts as *anchored* if any anchor cites its **file** (or its name), so a theorem in a file some anchor references is counted anchored even if no anchor addresses *that* theorem. True per-theorem orphans are ≥ this count; the exact figure lands in Phase B (per-theorem classification, #464). The CI gate closes the resulting ratchet loophole with a **per-file theorem-count ratchet**: new theorems added to an already-file-anchored file are caught (they can't hide behind the coarse global count), forcing a deliberate baseline bump that confirms the new theorems are anchored.
@@ -25,7 +25,7 @@
 
 ## 3. Anchor-side phantoms (cite a non-existent `.lean`)
 
-_none_
+- `FLAG-rule-flow-open` → `RuleFlow.lean`
 
 ## 4. Stale-path drift (cite archive/legacy trees)
 
