@@ -19,21 +19,53 @@
     `ker L_x = ker R_x` exactly, both equal to that 4-plane
     (`zd_witness_kernels_coincide`, via `seamR_ker_eq`).
   * **The lost directions are not an algebra.**  `k₁·k₁ = −2·1` and `k₁·k₃ = −2(e₂+e₉)`
-    both leave the 4-plane (`seam_kernel_not_subalgebra`), so the "deleted" subspace
-    is not closed under the operation that deletes it.
-  * **Nothing is lost in aggregate over a frame.**  `Σ_j N(x·e_j) = 16·N(x)`
-    (`seam_frobenius_preserved`): the Frobenius norm of `L_x` is unchanged by the
-    zero divisors; the 4 lost directions are exactly compensated by 4 directions
-    of gain. (Rests on `NoAutonomousDynamics.sum_N_mul_basis`.)
-  * **The encoding copy never deletes.**  If `x` lies in the low Cayley–Dickson
-    copy of 𝕆 (`cdHi x = 0`) and `x ≠ 0`, then `L_x` is INJECTIVE
-    (`octonion_copy_mul_injective`).  Only elements with legs in BOTH copies — the
-    seam — can annihilate anything.  This is the physical statement: an operation
-    that stays inside the octonion encoding is information-preserving; information
-    loss requires crossing the seam.
+    both leave the 4-plane (`zd_witness_kernel_not_subalgebra`), so the "deleted"
+    subspace is not closed under the operation that deletes it.  Sharper, and also
+    proved: `k1_sq : k₁·k₁ = (−2)•1` puts that escaped product on the REAL SCALAR
+    LINE `ℝ·1` — the escape is not merely out of the 4-plane, it lands in ℝ.
+  * **Aggregate norm is preserved — for EVERY element, zero divisor or not.**
+    `Σ_j N(x·e_j) = 16·N(x)` holds for all `x : CDAlg ℝ 4` (`sum_N_mul_basis_eq`,
+    re-exporting `NoAutonomousDynamics.sum_N_mul_basis`); specialised to the seam
+    witness it gives `32` (`zd_witness_frobenius_preserved`).  Because the identity
+    is witness-independent it is BLIND to the kernel: aggregate norm preservation
+    therefore cannot be read as preservation of information.
+  * **The encoding copy never deletes, on either side.**  For a NONZERO element of
+    the low Cayley–Dickson copy of 𝕆 — hypotheses `cdHi x = 0` and `x ≠ 0` — both
+    left multiplication `y ↦ x·y` and right multiplication `y ↦ y·x` are INJECTIVE
+    (`octonion_copy_mul_injective`, `octonion_copy_mul_injective_right`).
+
+  ## What this file does NOT prove
+
+  The bullets above are to be read narrowly.  None of the following is established
+  here, and none of it should be cited from this file.
+
+  * **Nothing here says multiplication is the seam's physical operation.**  `*` is
+    the algebra's operation.  That it is what the seam physically *does* is an
+    interpretation: the substrate's dynamics is not fixed by anything on the
+    ledger, and choosing it is exactly the open question (#635 — the dynamics is
+    the rule).  Every theorem below is a statement about `CDAlg ℝ 4`, full stop.
+  * **Nothing here is about the flow.**  No evolution, no trajectory, no
+    backward-uniqueness or reversibility claim appears anywhere in this file.
+  * **The kernel facts are for ONE witness.**  `seamL_ker_eq`, `finrank = 4`,
+    `ker L_x = ker R_x`, the not-a-subalgebra escapes and the Frobenius value `32`
+    are proved for `x = e₁ + e₁₀` and for no other element.  They are NOT proved
+    for the other 83 basis-sum zero divisors `eₐ ± e_b` (`a ∈ 1..7`, `b ∈ 9..15`),
+    and NOT for the zero-divisor locus of 𝕊 at large.  Any uniformity over the
+    seam is, as far as this file is concerned, unproven.
+  * **The converse of TARGET 5 is NOT proved.**  What is proved is one direction:
+    nonzero elements of the LOW copy (`cdHi x = 0`) annihilate nothing.  The mirror
+    case `cdLo x = 0` — the high copy — is entirely uncovered, so the universal
+    reading "only cross-copy (seam) elements can annihilate" does NOT follow from
+    anything here.  Note that sedenion non-alternativity blocks the easy argument
+    "nonzero norm ⇒ invertible", so this is a real gap, not a formality.
+  * **The singular values of `L_x` are NOT proved.**  `zd_witness_frobenius_preserved`
+    gives the trace `Σσ² = 32` and nothing finer.  How the surviving directions
+    scale — numerically `σ = 2` (×4), `√2` (×8), `0` (×4) — is NOT established in
+    this file, so no statement of the form "the 4 lost directions are compensated
+    by 4 directions of gain" is supported by it.
 
   Completeness: zero `sorry`, zero `native_decide`, zero vacuous `True`.
-  `#print axioms` audit at the bottom.
+  `#print axioms` audit at the bottom, covering every declaration in the file.
 -/
 import QBP.Foundations.Breakdown
 import QBP.Foundations.CrystalHosting
@@ -98,6 +130,10 @@ def k3 : CDAlg ℝ 4 := sbp 5 14 1
 /-- Fourth kernel direction `k₄ = e₄ − e₁₅`. -/
 def k4 : CDAlg ℝ 4 := sbp 4 15 (-1)
 
+/-- The witness and the four kernel directions are genuinely nonzero, so none of
+    the statements below is vacuous.  (Independence, `seamKer_linearIndependent`,
+    re-proves this for the `kᵢ`; these are kept as the direct, cheap form and are
+    audited in §10 with everything else.) -/
 theorem seamX_ne_zero : seamX ≠ 0 := sbp_ne_zero 1 10 1 (by decide)
 theorem k1_ne_zero : k1 ≠ 0 := sbp_ne_zero 7 12 1 (by decide)
 theorem k2_ne_zero : k2 ≠ 0 := sbp_ne_zero 6 13 (-1) (by decide)
@@ -376,8 +412,12 @@ theorem seamKerSpan_flat : seamKerSpan ≤ LinearMap.ker coord0 ⊓ LinearMap.ke
     simp only [coord0, coord2, LinearMap.coe_mk, AddHom.coe_mk, k1, k2, k3, k4] <;>
     norm_num +decide
 
-/-- `k₁·k₁ = −2·1`: the square of a lost direction is a REAL scalar, which has
-    nonzero `e₀`-coordinate and so lies outside the 4-plane. -/
+/-- `k₁·k₁ = (−2)•1`: the square of a lost direction lands on the REAL SCALAR LINE
+    `ℝ·1 ⊆ 𝕊`.  This is a proved fact and is stronger than "outside the 4-plane":
+    a product of two deleted directions is not merely elsewhere in 𝕊, it is a real
+    multiple of the identity (and hence has nonzero `e₀`-coordinate, which is how
+    the escape is certified below).  Nothing further is claimed — in particular
+    this says nothing about products of the other `kᵢ` pairs. -/
 theorem k1_sq : k1 * k1 = (-2 : ℝ) • (1 : CDAlg ℝ 4) := by
   have h := cdAlg_sq_eq (n := 4) k1
   have hre : k1.coord 0 = 0 := by simp only [k1, sbp_coord]; norm_num +decide
@@ -403,8 +443,13 @@ theorem k1_mul_k3_coord2 : (k1 * k3).coord 2 = (-2 : ℝ) := by
   norm_num
 
 /-- **TARGET 3.**  The 4-dimensional space of directions deleted by the seam witness
-    is NOT a subalgebra: both `k₁·k₁` and `k₁·k₃` leave it.  (Equivalently, the
-    "lost information" is not itself closed under the substrate operation.) -/
+    `x = e₁ + e₁₀` is NOT a subalgebra: both `k₁·k₁` and `k₁·k₃` leave it.  So the
+    "lost" subspace is not closed under the operation that deletes it.
+
+    Stronger, and proved separately as `k1_sq`: `k₁·k₁ = (−2)•1` lands on the real
+    scalar line `ℝ·1`, i.e. this escaped product is a real multiple of the
+    identity.  Claimed for this witness only; nothing is asserted about the other
+    83 basis-sum zero divisors. -/
 theorem zd_witness_kernel_not_subalgebra :
     k1 * k1 ∉ seamKerSpan ∧ k1 * k3 ∉ seamKerSpan := by
   constructor
@@ -419,40 +464,72 @@ theorem zd_witness_kernel_not_subalgebra :
     rw [k1_mul_k3_coord2] at h2
     norm_num at h2
 
-/-! ## 8. TARGET 4 — the Frobenius norm of `L_x` is untouched by the zero divisors -/
+/-! ## 8. TARGET 4 — the Frobenius trace identity, and why it is NOT information
+conservation
+
+`Σ_j N(t·e_j) = 16·N(t)` is `NoAutonomousDynamics.sum_N_mul_basis`, and it holds
+for EVERY `t : CDAlg ℝ 4` — zero divisor or not.  It is therefore blind to the
+kernel: the witness `x = e₁+e₁₀` has a 4-dimensional kernel and still satisfies it.
+That blindness is the point.  Aggregate (Frobenius) norm preservation is a trace
+statement and says nothing about which directions survive, so it must not be read
+as conservation of information. -/
 
 /-- `N(x) = 2` for the seam witness. -/
 theorem N_seamX : N seamX = 2 := by
   rw [seamX_eq]
   exact QBP.Foundations.Breakdown.N_e_add_e (n := 4) 1 10 (by decide)
 
-/-- **TARGET 4.**  `Σ_{j<16} N(x·e_j) = 16·N(x) = 32`.  Left multiplication by the
-    seam witness is a signed-permutation-sum on each basis vector, so the total
-    squared singular mass is exactly `16·N(x)` — the 4 annihilated directions are
-    compensated by 4 directions of gain.  Aggregate "information" (Frobenius norm)
-    is preserved even where pointwise injectivity fails. -/
+/-- The Frobenius trace identity `Σ_{j<16} N(x·e_j) = 16·N(x)`, stated here for
+    EVERY `x : CDAlg ℝ 4`.  A re-export of `NoAutonomousDynamics.sum_N_mul_basis`,
+    recorded in this file because its generality is the load-bearing part: the
+    identity does not know whether `x` is a zero divisor. -/
+theorem sum_N_mul_basis_eq (x : CDAlg ℝ 4) :
+    (∑ j : Fin (2^4), N (x * e j)) = 16 * N x :=
+  sum_N_mul_basis x
+
+/-- **TARGET 4.**  For the seam witness, `Σ_{j<16} N(x·e_j) = 16·N(x) = 32`: the
+    squared Frobenius norm of `L_x` is `32` even though `L_x` has a 4-dimensional
+    kernel.
+
+    What this does NOT show: how the 12 surviving directions scale.  The statement
+    is a trace, `Σσ² = 32`; the singular values themselves (numerically `σ = 2`
+    with multiplicity 4, `√2` with multiplicity 8, `0` with multiplicity 4) are NOT
+    proved here, so no "4 lost directions compensated by 4 directions of gain"
+    claim may be cited from this theorem.  Note also (`sum_N_mul_basis_eq`) that
+    the first conjunct holds for every element of 𝕊, so it is not a fact about
+    zero divisors at all. -/
 theorem zd_witness_frobenius_preserved :
     (∑ j : Fin (2^4), N (seamX * e j)) = 16 * N seamX ∧
     (∑ j : Fin (2^4), N (seamX * e j)) = 32 := by
-  have h := sum_N_mul_basis seamX
+  have h := sum_N_mul_basis_eq seamX
   refine ⟨h, ?_⟩
   rw [h, N_seamX]; norm_num
 
-/-! ## 9. TARGET 5 — the octonion encoding copy never deletes information
+/-! ## 9. TARGET 5 — nonzero elements of the octonion encoding copy never delete
 
-If `x = (o, 0)` with `o ∈ 𝕆` nonzero, the Cayley–Dickson doubling formula gives
-`x·y = (o·c, d·o)` for `y = (c, d)`.  Both components are octonion products with a
-nonzero factor, and 𝕆 is a composition algebra with a positive-definite norm form,
-so both vanish only if `c = d = 0`.  Hence `L_x` is injective: an operation that
-stays inside the encoding copy deletes nothing.  Only seam elements — with legs in
-BOTH copies, like `e₁ + e₁₀` — can annihilate. -/
+Throughout this section the hypotheses are explicit and both are needed:
+`cdHi x = 0` (`x` lies in the low Cayley–Dickson copy of 𝕆) and `x ≠ 0`.
 
-/-- The low-copy product rule: if `cdHi x = 0` then `cdLo (x·y) = cdLo x · cdLo y`. -/
+For such an `x = (o, 0)` with `o ≠ 0`, the doubling formula gives, for `y = (c, d)`,
+`x·y = (o·c, d·o)` and `y·x = (c·o, d·ō)`.  Every component is an octonion product
+with the nonzero factor `o` (or its conjugate, of the same norm), and 𝕆 is a
+composition algebra with a positive-definite norm form, so each vanishes only if
+`c = d = 0`.  Hence BOTH `L_x` and `R_x` are injective.
+
+What is NOT proved here: the converse.  The mirror hypothesis `cdLo x = 0` (the
+high copy) is not treated anywhere in this file, so "only cross-copy — seam —
+elements can annihilate" is an open universal, not a consequence of these
+theorems.  Sedenion non-alternativity means it cannot be waved through by
+"nonzero norm ⇒ invertible". -/
+
+/-- The low-copy product rule (LEFT): if `cdHi x = 0` then
+    `cdLo (x·y) = cdLo x · cdLo y`. -/
 theorem cdLo_mul_of_lo {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (y : CDAlg ℝ 4) :
     cdLo (x * y) = cdLo x * cdLo y := by
   rw [cdLo_mul, hhi, alt_mul_zero, sub_zero]
 
-/-- The high-copy product rule: if `cdHi x = 0` then `cdHi (x·y) = cdHi y · cdLo x`. -/
+/-- The high-copy product rule (LEFT): if `cdHi x = 0` then
+    `cdHi (x·y) = cdHi y · cdLo x`. -/
 theorem cdHi_mul_of_lo {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (y : CDAlg ℝ 4) :
     cdHi (x * y) = cdHi y * cdLo x := by
   rw [cdHi_mul, hhi, alt_zero_mul, add_zero]
@@ -463,9 +540,10 @@ theorem cdLo_ne_zero_of_lo {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (hx : x ≠ 0) :
   apply hx
   rw [← alt_N_eq_zero_iff, N_split x, h, hhi, N_zero]; ring
 
-/-- **TARGET 5.**  `x` in the low Cayley–Dickson copy of 𝕆 (`cdHi x = 0`) and `x ≠ 0`
-    ⟹ `x·y = 0 → y = 0`.  Elements of the octonion encoding copy never delete
-    information under multiplication. -/
+/-- **TARGET 5 (left).**  If `cdHi x = 0` and `x ≠ 0` then `x·y = 0 → y = 0`:
+    a NONZERO element of the octonion encoding copy annihilates nothing on the
+    left.  (The converse — that only seam elements can annihilate — is not proved;
+    see the section header.) -/
 theorem octonion_copy_mul_eq_zero_imp {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (hx : x ≠ 0)
     (y : CDAlg ℝ 4) (h : x * y = 0) : y = 0 := by
   have ho : cdLo x ≠ 0 := cdLo_ne_zero_of_lo hhi hx
@@ -491,8 +569,9 @@ theorem octonion_copy_mul_eq_zero_imp {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (hx :
     · exact absurd h1 hoN
   rw [← alt_N_eq_zero_iff, N_split y, hcy, hdy, N_zero]; ring
 
-/-- **TARGET 5, injectivity form.**  For `x` a nonzero element of the low 𝕆 copy,
-    `y ↦ x·y` is injective on all of 𝕊: no information is lost. -/
+/-- **TARGET 5, injectivity form (LEFT).**  For `x` with `cdHi x = 0` and `x ≠ 0`
+    — a nonzero element of the low 𝕆 encoding copy — the map `y ↦ x·y` is injective
+    on all of 𝕊: left multiplication by such an `x` loses nothing. -/
 theorem octonion_copy_mul_injective {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (hx : x ≠ 0) :
     Function.Injective (fun y : CDAlg ℝ 4 => x * y) := by
   intro y z hyz
@@ -501,9 +580,68 @@ theorem octonion_copy_mul_injective {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (hx : x
     rw [QBP.Foundations.CrystalHosting.cd_mul_sub, hyz', sub_self]
   exact sub_eq_zero.mp (octonion_copy_mul_eq_zero_imp hhi hx (y - z) hsub)
 
-/-- **The contrast that makes TARGET 5 a physical statement.**  The seam witness is
-    NOT in the low copy (`cdHi (e₁+e₁₀) ≠ 0`) — and it is exactly the seam elements
-    that can delete.  Inside the encoding copy, multiplication is injective. -/
+/-! ### 9a. The right-multiplication twin -/
+
+/-- The low-copy product rule (RIGHT): if `cdHi x = 0` then
+    `cdLo (y·x) = cdLo y · cdLo x`. -/
+theorem cdLo_mul_of_lo_right {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (y : CDAlg ℝ 4) :
+    cdLo (y * x) = cdLo y * cdLo x := by
+  rw [cdLo_mul, hhi, cd_conj_zero, alt_zero_mul, sub_zero]
+
+/-- The high-copy product rule (RIGHT): if `cdHi x = 0` then
+    `cdHi (y·x) = cdHi y · conj (cdLo x)`. -/
+theorem cdHi_mul_of_lo_right {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (y : CDAlg ℝ 4) :
+    cdHi (y * x) = cdHi y * conj (cdLo x) := by
+  rw [cdHi_mul, hhi, alt_zero_mul, zero_add]
+
+/-- **TARGET 5 (right).**  If `cdHi x = 0` and `x ≠ 0` then `y·x = 0 → y = 0`.
+    Same hypotheses as the left case; the conjugate appearing in the high component
+    is harmless because `N (conj z) = N z`. -/
+theorem octonion_copy_mul_eq_zero_imp_right {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (hx : x ≠ 0)
+    (y : CDAlg ℝ 4) (h : y * x = 0) : y = 0 := by
+  have ho : cdLo x ≠ 0 := cdLo_ne_zero_of_lo hhi hx
+  have hoN : N (cdLo x) ≠ 0 := fun hz => ho (alt_N_eq_zero_iff (cdLo x) |>.mp hz)
+  -- low component: cdLo y · cdLo x = 0
+  have hlo : cdLo y * cdLo x = 0 := by
+    rw [← cdLo_mul_of_lo_right hhi y, h, QBP.Foundations.CrystalHosting.cdLo_zero]
+  have hcy : cdLo y = 0 := by
+    rw [← alt_N_eq_zero_iff]
+    have := octonion_norm_composition (cdLo y) (cdLo x)
+    rw [hlo, N_zero] at this
+    rcases mul_eq_zero.mp this.symm with h1 | h1
+    · exact h1
+    · exact absurd h1 hoN
+  -- high component: cdHi y · conj (cdLo x) = 0
+  have hhi2 : cdHi y * conj (cdLo x) = 0 := by
+    rw [← cdHi_mul_of_lo_right hhi y, h, cdHi_zero]
+  have hdy : cdHi y = 0 := by
+    rw [← alt_N_eq_zero_iff]
+    have := octonion_norm_composition (cdHi y) (conj (cdLo x))
+    rw [hhi2, N_zero, N_conj] at this
+    rcases mul_eq_zero.mp this.symm with h1 | h1
+    · exact h1
+    · exact absurd h1 hoN
+  rw [← alt_N_eq_zero_iff, N_split y, hcy, hdy, N_zero]; ring
+
+/-- **TARGET 5, injectivity form (RIGHT).**  For `x` with `cdHi x = 0` and `x ≠ 0`,
+    the map `y ↦ y·x` is injective on all of 𝕊.  Together with
+    `octonion_copy_mul_injective` this makes TARGET 5 two-sided: nonzero elements
+    of the octonion encoding copy delete nothing under LEFT or RIGHT
+    multiplication.  The converse remains unproved (section header). -/
+theorem octonion_copy_mul_injective_right {x : CDAlg ℝ 4} (hhi : cdHi x = 0) (hx : x ≠ 0) :
+    Function.Injective (fun y : CDAlg ℝ 4 => y * x) := by
+  intro y z hyz
+  have hyz' : y * x = z * x := hyz
+  have hsub : (y - z) * x = 0 := by
+    rw [QBP.Foundations.CrystalHosting.cd_sub_mul, hyz', sub_self]
+  exact sub_eq_zero.mp (octonion_copy_mul_eq_zero_imp_right hhi hx (y - z) hsub)
+
+/-! ### 9b. The witness is not in the encoding copy -/
+
+/-- The seam witness is NOT in the low copy (`cdHi (e₁+e₁₀) ≠ 0`), so it is outside
+    the reach of the two injectivity theorems above — consistent with its having a
+    4-dimensional kernel.  This is a consistency check, NOT a converse: it does not
+    show that being off the low copy is what makes deletion possible. -/
 theorem seamX_not_in_octonion_copy : cdHi seamX ≠ 0 := by
   intro h
   have h2 := congrArg (fun z : CDAlg ℝ 3 => z.coord 2) h
@@ -512,10 +650,25 @@ theorem seamX_not_in_octonion_copy : cdHi seamX ≠ 0 := by
 
 /-! ## 10. Completeness audit — `#print axioms`
 
-Every theorem below must depend only on `{propext, Classical.choice, Quot.sound}`. -/
+Every declaration in this file is listed below; each must depend only on
+`{propext, Classical.choice, Quot.sound}`.  The list is exhaustive — definitions
+and the `FiniteDimensional` instance included — so no declaration is unaudited. -/
 
+#print axioms instFiniteDimensionalCDAlg
+#print axioms sbp
+#print axioms sbp_coord
 #print axioms sbp_ne_zero
 #print axioms sbp_mul_eq_zero_iff
+#print axioms seamX
+#print axioms k1
+#print axioms k2
+#print axioms k3
+#print axioms k4
+#print axioms seamX_ne_zero
+#print axioms k1_ne_zero
+#print axioms k2_ne_zero
+#print axioms k3_ne_zero
+#print axioms k4_ne_zero
 #print axioms seamX_mul_k1
 #print axioms seamX_mul_k2
 #print axioms seamX_mul_k3
@@ -526,32 +679,45 @@ Every theorem below must depend only on `{propext, Classical.choice, Quot.sound}
 #print axioms k4_mul_seamX
 #print axioms seamKer_indep_explicit
 #print axioms seamKer_linearIndependent
+#print axioms seamKerSpan
 #print axioms finrank_seamKerSpan
+#print axioms seamX_eq
 #print axioms seamX_mul_coord
+#print axioms fin16_cases
 #print axioms seam_eq_at
 #print axioms seam_ker_subset
+#print axioms seamL
+#print axioms seamL_apply
 #print axioms seamL_ker_eq
 #print axioms seam_finrank_ker_eq_four
 #print axioms seam_finrank_range_eq_twelve
 #print axioms zd_witness_left_kernel_four
-#print axioms fin16_cases
+#print axioms seamR
+#print axioms seamR_apply
+#print axioms seamKerSpan_le_ker_seamR
 #print axioms seamX_rmul_coord
 #print axioms seam_req_at
 #print axioms seam_rker_subset
 #print axioms seamR_ker_eq
-#print axioms seamKerSpan_le_ker_seamR
 #print axioms zd_witness_kernels_coincide
+#print axioms coord0
+#print axioms coord2
+#print axioms seamKerSpan_flat
 #print axioms k1_sq
 #print axioms k1_mul_k3_coord2
-#print axioms seamKerSpan_flat
 #print axioms zd_witness_kernel_not_subalgebra
 #print axioms N_seamX
+#print axioms sum_N_mul_basis_eq
 #print axioms zd_witness_frobenius_preserved
 #print axioms cdLo_mul_of_lo
 #print axioms cdHi_mul_of_lo
 #print axioms cdLo_ne_zero_of_lo
 #print axioms octonion_copy_mul_eq_zero_imp
 #print axioms octonion_copy_mul_injective
+#print axioms cdLo_mul_of_lo_right
+#print axioms cdHi_mul_of_lo_right
+#print axioms octonion_copy_mul_eq_zero_imp_right
+#print axioms octonion_copy_mul_injective_right
 #print axioms seamX_not_in_octonion_copy
 
 end QBP.Foundations.SeamKernel
