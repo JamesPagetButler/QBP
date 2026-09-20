@@ -254,7 +254,10 @@ def route_status(entry):
     d = entry.get("discharge") or ""
     if d.startswith(_OPEN_ROUTE_PREFIXES):
         return f"route OPEN (tracked by {d})"
-    return f"route EXISTS (dischargeable via {d})"
+    # A PROOF-/DERIV-/MEAS- discharge means the route has been RUN, not that the kill has fired:
+    # the cited anchor either discharges the question or EXCLUDES this arm (the kill text says which).
+    # "dischargeable" over-read that (PR #665 Red Team C1–C3, Gemini concurring).
+    return f"route EXISTS (realised via {d} — discharges or excludes this arm; see the kill text)"
 
 
 def kill_routes(ledger, anchors):
