@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.3.0",
+  "version": "6.4.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -10343,6 +10343,383 @@
           "QBP.Foundations.SeamKernel.seamX_not_in_octonion_copy"
         ]
       }
+    },
+    {
+      "id": "PROOF-rule-gradient-and-tangent-field",
+      "name": "The rule's descent direction exists everywhere: closed-form gradient of the potential, smooth to every order; the tangent field keeps the state sphere invariant",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlow.lean: `gradV` (closed form via two octonion adjoint identities), `hasGradientAt_potential`, `hasFDerivAt_potential`, `contDiff_potential` (every order); `ruleField s = −(∇V − ⟨∇V,s⟩s − (∇V)₀·1)`, `ruleField_bil_self`, `ruleField_coord_zero`; `stateSphere_invariant`: an integral curve of the field that is on StateSphere at one time is on it throughout (two scalar linear ODEs); `gradV_eq_zero_of_isVacuum`, `ruleField_eq_zero_of_isVacuum` (crystals are rest points); `exists_ruleField_ne_zero` (the field is not identically zero — witness (e₁+e₂+e₉) normalised; the earlier witness e₁+e₁₀ is a zero divisor and a rest point). Formalises the postulate #635 as written (first-order overdamped descent of V in the N-metric); derives and changes nothing about its form. NOT proved: local or global EXISTENCE of the flow — every dynamical statement is about integral curves as hypotheses (FLAG-rule-flow-open tracks it); Łojasiewicz / point convergence.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlow.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlow.stateSphere_invariant",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlow.hasGradientAt_potential",
+        "QBP.Substrate.RuleFlow.contDiff_potential",
+        "QBP.Substrate.RuleFlow.ruleField_bil_self",
+        "QBP.Substrate.RuleFlow.ruleField_coord_zero",
+        "QBP.Substrate.RuleFlow.gradV_eq_zero_of_isVacuum",
+        "QBP.Substrate.RuleFlow.ruleField_eq_zero_of_isVacuum",
+        "QBP.Substrate.RuleFlow.exists_ruleField_ne_zero"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-substrate-hosting-definition"
+      ],
+      "foundation_batch": "#635-rule-flow",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build QBP.Substrate.RuleFlow (3124 jobs, exit 0) + #print axioms on all 183 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #667 Red Team ×2, Gemini ×2, §I4)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlow.stateSphere_invariant",
+          "QBP.Substrate.RuleFlow.hasGradientAt_potential",
+          "QBP.Substrate.RuleFlow.contDiff_potential",
+          "QBP.Substrate.RuleFlow.ruleField_bil_self",
+          "QBP.Substrate.RuleFlow.ruleField_coord_zero",
+          "QBP.Substrate.RuleFlow.gradV_eq_zero_of_isVacuum",
+          "QBP.Substrate.RuleFlow.ruleField_eq_zero_of_isVacuum",
+          "QBP.Substrate.RuleFlow.exists_ruleField_ne_zero"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-rule-euler-step-injective",
+      "name": "The un-normalised Euler step of the rule never merges two states for small step size",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlow.lean: `exists_lipschitzOnWith_ruleField` (Lipschitz on a compact ball), `eulerStep_injOn` (s ↦ s + h·F s injective on the sphere for h·K < 1), `normForm_eulerStep`. NOT proved: general injectivity of the RENORMALISED step the numerical scripts actually run — only on ‖F‖ level sets (`renormStep_injOn_of_normForm_const`). NOT proved: local or global EXISTENCE of the flow — every dynamical statement is about integral curves as hypotheses (FLAG-rule-flow-open tracks it); Łojasiewicz / point convergence.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlow.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlow.eulerStep_injOn",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlow.exists_lipschitzOnWith_ruleField",
+        "QBP.Substrate.RuleFlow.normForm_eulerStep",
+        "QBP.Substrate.RuleFlow.renormStep_injOn_of_normForm_const"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-rule-gradient-and-tangent-field"
+      ],
+      "foundation_batch": "#635-rule-flow",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build QBP.Substrate.RuleFlow (3124 jobs, exit 0) + #print axioms on all 183 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #667 Red Team ×2, Gemini ×2, §I4)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlow.eulerStep_injOn",
+          "QBP.Substrate.RuleFlow.exists_lipschitzOnWith_ruleField",
+          "QBP.Substrate.RuleFlow.normForm_eulerStep",
+          "QBP.Substrate.RuleFlow.renormStep_injOn_of_normForm_const"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-rule-flow-finite-time-uniqueness",
+      "name": "Two integral curves of the rule that agree at one time agree at every earlier time (backward uniqueness via Grönwall): the continuous rule merges no two states in finite time",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlow.lean: `flow_unique_of_mem_Icc`, `flow_unique_of_endpoint` (Mathlib `ODE_solution_unique_of_mem_Icc*`), corollary `flow_time_map_injective` (backward uniqueness — the name says injectivity of the time-t map where defined). Presupposition-free: the curves are hypotheses. The only place two states could merge is the infinite-time limit — AXIOM-1's open question 1 (its kill text: #668). NOT proved: local or global EXISTENCE of the flow — every dynamical statement is about integral curves as hypotheses (FLAG-rule-flow-open tracks it); Łojasiewicz / point convergence.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlow.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlow.flow_time_map_injective",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlow.flow_unique_of_mem_Icc",
+        "QBP.Substrate.RuleFlow.flow_unique_of_endpoint"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-rule-gradient-and-tangent-field"
+      ],
+      "foundation_batch": "#635-rule-flow",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build QBP.Substrate.RuleFlow (3124 jobs, exit 0) + #print axioms on all 183 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #667 Red Team ×2, Gemini ×2, §I4)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlow.flow_time_map_injective",
+          "QBP.Substrate.RuleFlow.flow_unique_of_mem_Icc",
+          "QBP.Substrate.RuleFlow.flow_unique_of_endpoint"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-potential-descent-along-rule",
+      "name": "Along any integral curve of the rule the potential is monotone non-increasing, with d/dt V = −N(F)",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlow.lean: `hasDerivAt_potential_along_flow` (pointwise derivative −N(F(γ t)) ≤ 0), `potential_nonincreasing_along_flow` (pointwise), `potential_antitone_along_flow` (the MONOTONE form, via the mean-value theorem), `potential_le_initial_along_flow`. Bench reading: crystallisation is monotone descent. NOT claimed: that every rest point is a vacuum — false; `exists_rest_point_not_vacuum` exhibits the maximiser. NOT proved: local or global EXISTENCE of the flow — every dynamical statement is about integral curves as hypotheses (FLAG-rule-flow-open tracks it); Łojasiewicz / point convergence.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlow.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlow.potential_antitone_along_flow",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlow.hasDerivAt_potential_along_flow",
+        "QBP.Substrate.RuleFlow.potential_nonincreasing_along_flow",
+        "QBP.Substrate.RuleFlow.potential_le_initial_along_flow",
+        "QBP.Substrate.RuleFlow.exists_rest_point_not_vacuum"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-rule-gradient-and-tangent-field"
+      ],
+      "foundation_batch": "#635-rule-flow",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build QBP.Substrate.RuleFlow (3124 jobs, exit 0) + #print axioms on all 183 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #667 Red Team ×2, Gemini ×2, §I4)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlow.potential_antitone_along_flow",
+          "QBP.Substrate.RuleFlow.hasDerivAt_potential_along_flow",
+          "QBP.Substrate.RuleFlow.potential_nonincreasing_along_flow",
+          "QBP.Substrate.RuleFlow.potential_le_initial_along_flow",
+          "QBP.Substrate.RuleFlow.exists_rest_point_not_vacuum"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-potential-bounded-by-normForm-sq-frozen-max",
+      "name": "V(s) = 4(N(Im a)N(Im b) − ⟨Im a, Im b⟩²) for all s; V ≤ N(s)²; on the state sphere V attains its maximum 1, and every point at the maximum is a rest point (the level set V = 1 is frozen)",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlow.lean: `potential_eq_cross` (unconditional closed form — the Im-a form of master's `DeltaLandscape.sedenion_landscape_descends`), `potential_le_normForm_sq` (Cauchy–Schwarz + AM–GM), `exists_isMaxOn_potential_stateSphere` (compactness; value 1), `ruleField_eq_zero_of_potential_eq_one` (a constrained maximum has vanishing tangential gradient — no Lagrange multipliers; h(t) = V(s+tv) − N(s+tv)² ≤ 0 with equality at 0). Bench reading: the level set V = 1 is a set of maxima where nothing moves. NOT proved: V = N² ⇒ zero divisor (the converse of the next anchor; unused); the dimension of the level set (numerically 11, codimension 3). NOT proved: local or global EXISTENCE of the flow — every dynamical statement is about integral curves as hypotheses (FLAG-rule-flow-open tracks it); Łojasiewicz / point convergence.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlow.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlow.ruleField_eq_zero_of_potential_eq_one",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlow.potential_eq_cross",
+        "QBP.Substrate.RuleFlow.potential_le_normForm_sq",
+        "QBP.Substrate.RuleFlow.exists_isMaxOn_potential_stateSphere"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-substrate-hosting-definition"
+      ],
+      "foundation_batch": "#635-rule-flow",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build QBP.Substrate.RuleFlow (3124 jobs, exit 0) + #print axioms on all 183 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #667 Red Team ×2, Gemini ×2, §I4)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlow.ruleField_eq_zero_of_potential_eq_one",
+          "QBP.Substrate.RuleFlow.potential_eq_cross",
+          "QBP.Substrate.RuleFlow.potential_le_normForm_sq",
+          "QBP.Substrate.RuleFlow.exists_isMaxOn_potential_stateSphere"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-zero-divisors-sit-at-potential-max",
+      "name": "|N(s·x) − N(s)N(x)| ≤ √V(s)·N(x) for all s, x (sharp, both-handed); hence every zero divisor has V = N², on the sphere V = 1; nonzero crystals are never zero divisors",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlow.lean: `normForm_mul_eq` (NEW identity: N(xy) = N(x)N(y) − 2⟨cdLo x, assoc(conj(cdHi y), cdHi x, conj(cdLo y))⟩ — all sedenion non-composition is one associator pairing), `abs_normForm_mul_sub_le` and `abs_normForm_mul_sub_le_right` (Cauchy–Schwarz after Gram–Schmidt on the associator's middle slot; the Gram determinant is V/4 by `potential_eq_cross`; the constant √V is attained at every basis-sum zero divisor), `potential_eq_normForm_sq_of_mul_eq_zero` (+ right), `potential_eq_one_of_zeroDivisor` (+ right), `crystal_not_zeroDivisor` (V = 0 < N²). Bench reading: zero divisors live only at the maximum of the potential. NOT proved: the converse V = N² ⇒ zero divisor (numerically true, unused). NOT proved: local or global EXISTENCE of the flow — every dynamical statement is about integral curves as hypotheses (FLAG-rule-flow-open tracks it); Łojasiewicz / point convergence.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlow.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlow.potential_eq_normForm_sq_of_mul_eq_zero",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlow.normForm_mul_eq",
+        "QBP.Substrate.RuleFlow.abs_normForm_mul_sub_le",
+        "QBP.Substrate.RuleFlow.abs_normForm_mul_sub_le_right",
+        "QBP.Substrate.RuleFlow.potential_eq_one_of_zeroDivisor",
+        "QBP.Substrate.RuleFlow.crystal_not_zeroDivisor"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-ops-norm-composition-ladder",
+        "PROOF-42zd",
+        "PROOF-potential-bounded-by-normForm-sq-frozen-max"
+      ],
+      "foundation_batch": "#635-rule-flow",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build QBP.Substrate.RuleFlow (3124 jobs, exit 0) + #print axioms on all 183 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #667 Red Team ×2, Gemini ×2, §I4)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlow.potential_eq_normForm_sq_of_mul_eq_zero",
+          "QBP.Substrate.RuleFlow.normForm_mul_eq",
+          "QBP.Substrate.RuleFlow.abs_normForm_mul_sub_le",
+          "QBP.Substrate.RuleFlow.abs_normForm_mul_sub_le_right",
+          "QBP.Substrate.RuleFlow.potential_eq_one_of_zeroDivisor",
+          "QBP.Substrate.RuleFlow.crystal_not_zeroDivisor"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-rule-descent-avoids-zero-divisors",
+      "name": "A forward integral curve of the rule starting below the maximum (V < 1) is never a zero divisor, on either side, at any finite time or in its omega-limit set",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlow.lean: `not_zeroDivisor_along_flow` (finite time: both-sided injectivity of γ t for every t ≥ 0), `omega_avoids_locus` (every omega-limit point has V < 1; Mathlib `omegaLimit`), `omega_avoids_zeroDivisors` (both-sided). Bench reading, for the beekeeper's question: under the rule as written, for any trajectory that exists, no state reachable from an ordinary state is ever a zero divisor; the infinite-time limit does not land on the seam either. This is the theorem the #668 rewrite's replacement observable leans on; it decides nothing about that rewrite (the beekeeper's process call). NOT proved: local or global EXISTENCE of the flow — every dynamical statement is about integral curves as hypotheses (FLAG-rule-flow-open tracks it); Łojasiewicz / point convergence.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlow.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlow.omega_avoids_zeroDivisors",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlow.not_zeroDivisor_along_flow",
+        "QBP.Substrate.RuleFlow.omega_avoids_locus"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-zero-divisors-sit-at-potential-max",
+        "PROOF-potential-descent-along-rule"
+      ],
+      "foundation_batch": "#635-rule-flow",
+      "last_tested_at": "2026-09-20T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-20T00:00:00Z",
+        "verifier": "lake build QBP.Substrate.RuleFlow (3124 jobs, exit 0) + #print axioms on all 183 declarations (lean-prover agent + qbp-oppenheimer re-run, 2026-09-20; PR #667 Red Team ×2, Gemini ×2, §I4)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlow.omega_avoids_zeroDivisors",
+          "QBP.Substrate.RuleFlow.not_zeroDivisor_along_flow",
+          "QBP.Substrate.RuleFlow.omega_avoids_locus"
+        ]
+      }
     }
   ],
   "inputs": [
@@ -10884,6 +11261,11 @@
       "version": "6.3.0",
       "date": "2026-09-20T00:00:00Z",
       "note": "qbp-oppenheimer: PROOF anchors for the seam zero-divisor kernel theorems (PR #666; the beekeeper's information-deletion question of 2026-09-19/20) — encode-after-prove: at the witness e₁+e₁₀, left multiplication has an explicit 4-dim kernel and rank 12; left and right kernels coincide; the kernel is not a subalgebra; the Frobenius identity Σ N(x e_j) = 16 N(x) holds for every x (norm conservation ≠ information conservation); nonzero encoding-copy elements are injective on both sides. Five anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound}. Every anchor carries its caveats (witness-only; converse unproved; singular values numerical; multiplication not shown to be the seam's operation). No root, principle, decision or kill touched; FLAG-seam-dynamics-open stays open. (Renumbered 6.3.0 at rebase after PR #665 landed as 6.2.0.)"
+    },
+    {
+      "version": "6.4.0",
+      "date": "2026-09-20T00:00:00Z",
+      "note": "qbp-oppenheimer: PROOF anchors for the rule's flow (PR #667; #635 Phase A + C; the beekeeper's information-deletion question) — encode-after-prove: gradient + tangent field + sphere invariance; un-normalised Euler step injective; Grönwall finite-time uniqueness; monotone descent; V ≤ N² with the level set V = 1 frozen; |N(sx) − N s N x| ≤ √V(s) N x (sharp) so every zero divisor sits at the maximum and crystals never are; descent from below never reaches a zero divisor (finite time and omega-limit). Seven anchors, 0-sorry, axiom closure {propext, Classical.choice, Quot.sound}. The rule stays a POSTULATE; nothing derives or changes its form; local/global existence and Łojasiewicz convergence NOT proved; V = N² ⇒ ZD (unused) NOT proved. No root, principle, decision or kill touched; AXIOM-1's kill-text defect is #668 (separate PR). (Renumbered 6.4.0 at rebase after #665 → 6.2.0 and #666 → 6.3.0 landed.)"
     }
   ],
   "last_updated": "2026-09-20T00:00:00Z",

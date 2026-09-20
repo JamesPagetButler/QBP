@@ -49,6 +49,7 @@
     "proofs/QBP/Optics/Fraunhofer.lean": 10,
     "proofs/QBP/SpectralAction/ProfileFit.lean": 4,
     "proofs/QBP/Substrate/Hosting.lean": 71,
+    "proofs/QBP/Substrate/RuleFlow.lean": 168,
     "proofs/QBP/Units/Constants.lean": 9,
     "proofs/QBP/Units/ScaleFactors.lean": 14,
     "proofs/Sprint12-Inherited/Bi2Se3.lean": 6,
