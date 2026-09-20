@@ -38,7 +38,11 @@ def _ledger():
                 "statement": "s",
                 "derivable": False,
                 "kill_condition": [
-                    "if the omega-limit map of the proven flow is non-injective then dead"
+                    {
+                        "kill": "if the omega-limit map of the proven flow is non-injective then dead",
+                        "closure": "derivation",
+                        "discharge": "FLAG-t",
+                    }
                 ],
                 "decision_state": "open",
             },
@@ -78,6 +82,9 @@ def _ledger():
             _anchor("OBS-z", [], prov="E"),
             _anchor("PRED-p", ["DERIV-b", "OBS-z"]),
             _anchor("INSIGHT-i", []),
+            _anchor("FLAG-t", []),
+            _anchor("DERIV-y", ["PROOF-x"]),
+            dict(_anchor("FLAG-dead", []), status="incoherent"),
         ],
     }
 
@@ -108,7 +115,12 @@ def test_register_is_the_only_escape_and_is_shrink_only():
     # a registered root that now sorts → stale entry → HARD FAIL (register only shrinks)
     L["axioms"][0].update(
         {
-            "kill_condition": ["a real kill entry of sufficient length"],
+            "kill_condition": [
+                {
+                    "kill": "a real kill entry of sufficient length",
+                    "closure": "ruling-rescope",
+                }
+            ],
             "decision_state": "open",
         }
     )
@@ -241,26 +253,117 @@ def test_live_ledger_passes_with_committed_register():
 
 
 def test_kill_condition_must_be_a_non_placeholder_array():
-    """qbp-implementor (live-test 1330): array-only; every entry real prose. Plants all fail."""
+    """qbp-implementor (live-test 1330 / 1500 / 1506): array<object>-only; every entry a valid
+    KillConditionEntry — kill non-placeholder, closure in the enum, discharge RESOLVES and matches
+    the closure's kind (PROOF-/DERIV- derivation-only, MEAS- measurement-only, FLAG-/CONJ- both as
+    OPEN-route trackers). Plants all fail; the PASS slots all sort bucket 3."""
+    A = lambda L: {a["id"]: a for a in L["anchors"]}
     for bad in (
         [],
         [""],
         ["TODO"],
         ["N/A"],
         "a plain string that is long enough",
-        ["real enough kill", ""],
+        ["a bare string entry of sufficient length is not an object"],
+        [{"kill": "TODO: later", "closure": "derivation", "discharge": "PROOF-x"}],
+        [{"kill": "a real kill entry of sufficient length", "closure": "vibes"}],
+        [{"kill": "a real kill entry of sufficient length", "closure": "derivation"}],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "derivation",
+                "discharge": "MEAS-y",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "measurement",
+                "discharge": "PROOF-x",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "derivation",
+                "discharge": "DERIV-missing",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "measurement",
+                "discharge": "OBS-z",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "derivation",
+                "discharge": "FLAG-dead",
+            }
+        ],
         None,
     ):
         L = _ledger()
         L["axioms"][1]["kill_condition"] = bad
-        b, why = ra.sort_root(L["axioms"][1], {a["id"]: a for a in L["anchors"]})
+        b, why = ra.sort_root(L["axioms"][1], A(L))
         assert b is None, (bad, why)
-    L = _ledger()
-    L["axioms"][1]["kill_condition"] = [
-        "information loss under the omega-limit of a proven flow through the zero-divisor locus",
-        "selection-clause scope: discharged at #652 DERIV-encoding-level",
-    ]
-    assert ra.sort_root(L["axioms"][1], {a["id"]: a for a in L["anchors"]})[0] == 3
+    for good in (
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "ruling-rescope",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "derivation",
+                "discharge": "PROOF-x",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "derivation",
+                "discharge": "DERIV-y",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "measurement",
+                "discharge": "MEAS-y",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "derivation",
+                "discharge": "FLAG-t",
+            }
+        ],
+        [
+            {
+                "kill": "a real kill entry of sufficient length",
+                "closure": "measurement",
+                "discharge": "FLAG-t",
+            }
+        ],
+    ):
+        L = _ledger()
+        L["axioms"][1]["kill_condition"] = good
+        b, why = ra.sort_root(L["axioms"][1], A(L))
+        assert b == 3, (good, why)
+    # the anti-laundering tag: a FLAG-/CONJ- discharge reads as route OPEN, never dischargeable
+    assert ra.route_status({"closure": "derivation", "discharge": "FLAG-t"}).startswith(
+        "route OPEN"
+    )
+    assert ra.route_status(
+        {"closure": "derivation", "discharge": "PROOF-x"}
+    ).startswith("route EXISTS")
+    assert ra.route_status({"closure": "ruling-rescope"}).startswith("constitutional")
 
 
 def test_dead_anchors_ground_and_force_nothing():

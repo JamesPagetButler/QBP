@@ -185,11 +185,88 @@ def _non_placeholder(e):
     return len(t) >= 8 and not _KILL_PLACEHOLDER.search(t)
 
 
-def kill_present(kc):
-    """cth-implementor's D3 invariant: an open root carries a NON-EMPTY ARRAY of kill entries,
-    one per open question, EVERY entry non-placeholder. A bare string is not the canonical
-    shape (array-only, confluent-trust #102) and does not count."""
-    return isinstance(kc, list) and len(kc) > 0 and all(_non_placeholder(e) for e in kc)
+# Canonical schema 0.3.4 (confluent-trust#104): kill_condition is array<object> KillConditionEntry
+# {kill, closure, discharge}. The schema checks STRUCTURE (kill minLength, closure enum, discharge
+# present iff closure ∈ {derivation, measurement}, OpenNeedsKill); this gate adds the SEMANTIC half
+# (qbp-implementor, live-test seq 1500/1506/1515; cth-implementor seq 1507/1508/1516): placeholder-token on
+# `kill`, `discharge` RESOLVES in-ledger, and the discharge's kind matches the closure. A realised
+# route is kind-locked (PROOF-/DERIV- derivation-only, MEAS- measurement-only); a FLAG-/CONJ- id is a
+# TRACKING anchor for a route that is OPEN, admitted for both kinds and reported as "route OPEN
+# (tracked)", never as dischargeable — so a physics kill is never relabelled ruling-rescope for want
+# of a route (the flag-3 trap), and "cannot fire today" is a concrete record, not an absent field.
+_CLOSURE_KINDS = ("derivation", "measurement", "ruling-rescope")
+_DISCHARGE_TARGET = {
+    "derivation": ("PROOF-", "DERIV-", "FLAG-", "CONJ-"),
+    "measurement": ("MEAS-", "FLAG-", "CONJ-"),
+}
+_OPEN_ROUTE_PREFIXES = ("FLAG-", "CONJ-")
+
+
+def _kill_entry_ok(entry, anchors):
+    if not isinstance(
+        entry, dict
+    ):  # array<object>-only: a leftover string is not an entry
+        return False
+    if not _non_placeholder(entry.get("kill")):
+        return False
+    closure = entry.get("closure")
+    if closure not in _CLOSURE_KINDS:
+        return False
+    if (
+        closure == "ruling-rescope"
+    ):  # closes on the fired kill; discharge legitimately absent
+        return True
+    discharge = entry.get("discharge")
+    if not isinstance(discharge, str) or discharge not in anchors:
+        return False  # derivation/measurement must name a RESOLVING route or tracker
+    if anchors[discharge].get("status") in DEAD_STATUSES:
+        return False  # a dead anchor tracks/grounds nothing — an open kill's route cannot point at it
+    return discharge.startswith(_DISCHARGE_TARGET[closure])
+
+
+def kill_present(kc, anchors):
+    """cth-implementor's D3 invariant (OpenNeedsKill): an open root carries a NON-EMPTY ARRAY of
+    KillConditionEntry objects, one per open question, every entry semantically valid
+    (`_kill_entry_ok`). A bare string is not the canonical shape and does not count."""
+    return (
+        isinstance(kc, list)
+        and len(kc) > 0
+        and all(_kill_entry_ok(e, anchors) for e in kc)
+    )
+
+
+def route_status(entry):
+    """The anti-laundering tag (cth-implementor seq 1508): an open kill must never read as
+    dischargeable."""
+    closure = entry.get("closure")
+    if closure == "ruling-rescope":
+        return "constitutional (closes only when the kill fires)"
+    d = entry.get("discharge") or ""
+    if d.startswith(_OPEN_ROUTE_PREFIXES):
+        return f"route OPEN (tracked by {d})"
+    return f"route EXISTS (dischargeable via {d})"
+
+
+def kill_routes(ledger, anchors):
+    """[(root id, list, closure, discharge, status tag, kill excerpt)] for every open root."""
+    out = []
+    for key in ROOT_LISTS:
+        for rec in ledger.get(key, []) or []:
+            if not isinstance(rec, dict) or rec.get("decision_state") != "open":
+                continue
+            for e in rec.get("kill_condition") or []:
+                if isinstance(e, dict):
+                    out.append(
+                        (
+                            rec["id"],
+                            key,
+                            e.get("closure"),
+                            e.get("discharge"),
+                            route_status(e),
+                            (e.get("kill") or "")[:80],
+                        )
+                    )
+    return out
 
 
 def sort_root(rec, anchors):
@@ -227,13 +304,13 @@ def sort_root(rec, anchors):
         if isinstance(ruling, str) and GITHUB_CITE.search(ruling):
             return (
                 2,
-                "decision_state ruled with a GitHub-cited ruling (structural check only)",
+                "decision_state settled with a GitHub-cited ruling (structural check only)",
             )
         return None, (
-            "decision_state ruled but `ruling` is not a string citing a JamesPagetButler/* "
+            "decision_state settled but `ruling` is not a string citing a JamesPagetButler/* "
             "GitHub issue/PR URL"
         )
-    has_kill = kill_present(rec.get("kill_condition"))
+    has_kill = kill_present(rec.get("kill_condition"), anchors)
     is_open = ds == "open" or rec.get("status") == "open"
     if has_kill and is_open:
         return 3, "kill_condition present and open"
@@ -557,6 +634,16 @@ def write_report(res, path, ledger_path, register_path):
         ),
         f"- roots rejected for a dead `forced_by`: {len(res['dead_forcings'])}",
     ]
+    if res.get("kill_routes") is not None:
+        L += [
+            "",
+            "## Open-root kill entries — route status (schema 0.3.4; anti-laundering tag)",
+            "",
+            "| root | closure | discharge | status | kill (excerpt) |",
+            "|---|---|---|---|---|",
+        ]
+        for rid, key, closure, d, tag, ex in res["kill_routes"]:
+            L.append(f"| {rid} | {closure} | {d or ''} | {tag} | {ex}… |")
     L += ["", f"## Warnings ({len(res['warnings'])})", ""]
     for w in res["warnings"]:
         L.append(f"- {w}")
@@ -581,6 +668,9 @@ def main():
         ledger = json.load(f)
     open_roots_reg, chain_debt_reg, reg_problems = load_register(args.register)
     res = audit(ledger, open_roots_reg, chain_debt_reg, reg_problems)
+    res["kill_routes"] = kill_routes(
+        ledger, {a["id"]: a for a in ledger.get("anchors", []) if isinstance(a, dict)}
+    )
     if args.report_md:
         write_report(res, args.report_md, args.ledger, args.register)
 

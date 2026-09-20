@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -15,8 +15,15 @@
       "statement": "No physical process destroys information. Selects division algebras (no zero divisors: ab=0 implies a=0 or b=0).",
       "derivable": false,
       "kill_condition": [
-        "QUESTION 1 (process) — OPEN: whether 'physical process' ranges over the substrate (crystallisation, the descent through the zero-divisor locus) or only over processes in a crystal. KILL — a proven flow on StateSphere (the rule, #635) whose omega-limit set meets the zero-divisor locus and whose omega-limit map is non-injective on a set of states of positive normalised surface measure on StateSphere, OR an anchor with proof_state verified (PROOF-* or DERIV-*) asserting such a loss from a stated process — then 'no physical process destroys information' is contradicted by a proven process and AXIOM-1 must change (option A: rescope to the encoding; package §4a price, 22 citers + 5 principles), because it has been proven that it must. DISCHARGE — the same flow proven information-preserving (omega-limit map injective almost everywhere with respect to that measure). First-order semiflows are injective at finite time, so the criterion is on the omega-limit, not on finite-time states. TODAY — no proven flow exists; the ledger holds candidate assertions touching the locus, none proven: Prop 16 layer (iii) (power-iteration transient onto the dominant subspace; numerical, generic_maps_check.py; not pressure-tested per the 473-ac1-v0.5 addendum), FLAG-seam-dynamics-open (incoherent placeholder asserting a seam scattering process), DERIV-crystallisation-asymptotic (names a process and a step counter Gamma but no map on states), DERIV-arrow (takes information preservation as its premise and asserts a lossy projection — a map; listed as the ledger's nearest assertion of loss). The kill cannot fire and no contradiction is derivable: recorded as OPEN, not as a pass. Trigger issue #647; derived there at trigger time, never ruled.",
-        "QUESTION 2 (scope of the selection clause 'selects division algebras') — OPEN, independent of question 1 (discharging one does not discharge the other): AXIOM-2's statement applies the selection at the boundary encoding; it does not state that the clause ranges over the encoding only, and AXIOM-1's own wording leaves the range unstated. The ledger admits both readings: encoding-only (DERIV-sedenion's substrate sedenions are the ledger's own content, no conflict) or unrestricted (PROOF-42zd's 42 zero divisors contradict the clause and AXIOM-1 must be rescoped, option A). KILL — the unrestricted reading proven to contradict a proved fact about a physical object: a rule anchor (proof_state verified) asserting AXIOM-1's selection over the substrate S together with PROOF-42zd's zero divisors — then AXIOM-1 must be rescoped (option A, §4a price), because it has been proven that it must. DISCHARGE — none by derivation: the range of a clause is a constitutional statement, not a theorem; a rule anchor that writes 'the selection is exercised at the encoding' (e.g. DERIV-encoding-level) STATES the range and does not derive it (PR #652 v0.4 Red Team V2), and a derivation that assumes the encoding-only reading (DERIV-encoding-level does) is conditional on this question, not its resolution. Recorded OPEN; the clause's range changes only if the kill fires."
+        {
+          "kill": "QUESTION 1 (process) — OPEN: whether 'physical process' ranges over the substrate (crystallisation, the descent through the zero-divisor locus) or only over processes in a crystal. KILL — a proven flow on StateSphere (the rule, #635) whose omega-limit set meets the zero-divisor locus and whose omega-limit map is non-injective on a set of states of positive normalised surface measure on StateSphere, OR an anchor with proof_state verified (PROOF-* or DERIV-*) asserting such a loss from a stated process — then 'no physical process destroys information' is contradicted by a proven process and AXIOM-1 must change (option A: rescope to the encoding; package §4a price, 22 citers + 5 principles), because it has been proven that it must. DISCHARGE — the same flow proven information-preserving (omega-limit map injective almost everywhere with respect to that measure). First-order semiflows are injective at finite time, so the criterion is on the omega-limit, not on finite-time states. TODAY — no proven flow exists; the ledger holds candidate assertions touching the locus, none proven: Prop 16 layer (iii) (power-iteration transient onto the dominant subspace; numerical, generic_maps_check.py; not pressure-tested per the 473-ac1-v0.5 addendum), FLAG-seam-dynamics-open (incoherent placeholder asserting a seam scattering process), DERIV-crystallisation-asymptotic (names a process and a step counter Gamma but no map on states), DERIV-arrow (takes information preservation as its premise and asserts a lossy projection — a map; listed as the ledger's nearest assertion of loss). The kill cannot fire and no contradiction is derivable: recorded as OPEN, not as a pass. Trigger issue #647; derived there at trigger time, never ruled.",
+          "closure": "derivation",
+          "discharge": "FLAG-rule-flow-open"
+        },
+        {
+          "kill": "QUESTION 2 (scope of the selection clause 'selects division algebras') — OPEN, independent of question 1 (discharging one does not discharge the other): AXIOM-2's statement applies the selection at the boundary encoding; it does not state that the clause ranges over the encoding only, and AXIOM-1's own wording leaves the range unstated. The ledger admits both readings: encoding-only (DERIV-sedenion's substrate sedenions are the ledger's own content, no conflict) or unrestricted (PROOF-42zd's 42 zero divisors contradict the clause and AXIOM-1 must be rescoped, option A). KILL — the unrestricted reading proven to contradict a proved fact about a physical object: a rule anchor (proof_state verified) asserting AXIOM-1's selection over the substrate S together with PROOF-42zd's zero divisors — then AXIOM-1 must be rescoped (option A, §4a price), because it has been proven that it must. DISCHARGE — none by derivation: the range of a clause is a constitutional statement, not a theorem; a rule anchor that writes 'the selection is exercised at the encoding' (e.g. DERIV-encoding-level) STATES the range and does not derive it (PR #652 v0.4 Red Team V2), and a derivation that assumes the encoding-only reading (DERIV-encoding-level does) is conditional on this question, not its resolution. Recorded OPEN; the clause's range changes only if the kill fires.",
+          "closure": "ruling-rescope"
+        }
       ],
       "decision_state": "open"
     },
@@ -27,7 +34,16 @@
       "derivable": false,
       "decision_state": "open",
       "kill_condition": [
-        "An observable requiring information not representable in any octonionic encoding, or the encoding map shown not to exist — none on record. This kill CANNOT FIRE today; recorded OPEN, not as a pass (ruling bundle v0.7 §5, PR #652 v0.4 Red Team V4)."
+        {
+          "kill": "An observable requiring information not representable in any octonionic encoding — none on record. This kill CANNOT FIRE today; recorded OPEN, not as a pass (ruling bundle v0.7 §5, PR #652 v0.4 Red Team V4).",
+          "closure": "measurement",
+          "discharge": "FLAG-encoding-map-open"
+        },
+        {
+          "kill": "The encoding map shown not to exist — none on record. This kill CANNOT FIRE today; recorded OPEN, not as a pass (ruling bundle v0.7 §5, PR #652 v0.4 Red Team V4).",
+          "closure": "derivation",
+          "discharge": "FLAG-encoding-map-open"
+        }
       ],
       "notes": "Evidence anchors: PROOF-quaternion-frame-maximal, PROOF-hosted-algebra-meets-cell-in-complex-line."
     },
@@ -36,7 +52,11 @@
       "name": "Non-crystal states are physically realised",
       "statement": "The state sphere at the substrate level carries an in-flight region V > 0 of positive measure, and almost every history starts in it. Kill (theory-internal only): a substrate level at which V ≡ 0 — the level bound failing; no observable (observers live in crystals; FLAG-seam-dynamics-open) — recorded as such, not as a pass. Convergence to a crystal is the rule's claim (#635), separate.",
       "kill_condition": [
-        "A substrate level at which V ≡ 0 — the level bound failing. Theory-internal: this kill is the negation of the postulate and no observable reaches it (observers live in crystals; FLAG-seam-dynamics-open is incoherent) — it CANNOT FIRE today, recorded as such, not as a pass (package §9c; ruling bundle v0.7 §5)."
+        {
+          "kill": "A substrate level at which V ≡ 0 — the level bound failing. Theory-internal: this kill is the negation of the postulate and no observable reaches it (observers live in crystals; FLAG-seam-dynamics-open is incoherent) — it CANNOT FIRE today, recorded as such, not as a pass (package §9c; ruling bundle v0.7 §5).",
+          "closure": "derivation",
+          "discharge": "PROOF-substrate-hosting-definition"
+        }
       ],
       "decision_state": "open",
       "derivable": false,
@@ -47,7 +67,16 @@
       "name": "Observers require associativity",
       "statement": "An observer is a subset of 𝕊 on which its actions compose; by the composition theorem such a subset is associative, and — if it lies inside an octonion — inside one ℍ by frame-maximality (in 𝕊 at large this is open). Under the hosting definition the observer's ℍ is the crystal's ℍ_s (definition D; premise P1′: observers are entities of clause (a)). Exclusivity — no observer lives outside the hosted algebra — is the postulate's content.",
       "kill_condition": [
-        "An observer exhibited outside any associative subalgebra of S (exclusivity failing), or a non-associative subset of S on which actions compose (contradicting PROOF-associative-composition-iff's premise set). Discharge: none — a postulate about all observers; recorded OPEN (ruling bundle v0.7 §2)."
+        {
+          "kill": "An observer exhibited outside any associative subalgebra of S (exclusivity failing). Discharge: none — a postulate about all observers; recorded OPEN (ruling bundle v0.7 §2). [0.3.4 migration 2026-09-20: closure/discharge carried by this entry's fields; the v0.7 phrase 'Discharge: none' above meant 'no realised route', which the FLAG- discharge now records as route OPEN (tracked).]",
+          "closure": "measurement",
+          "discharge": "FLAG-observer-exclusivity-open"
+        },
+        {
+          "kill": "A non-associative subset of S on which actions compose (contradicting PROOF-associative-composition-iff's premise set). Discharge: none — a postulate about all observers; recorded OPEN (ruling bundle v0.7 §2). [0.3.4 migration 2026-09-20: closure/discharge carried by this entry's fields; the v0.7 phrase 'Discharge: none' above meant 'no realised route', which the FLAG- discharge now records as route OPEN (tracked).]",
+          "closure": "derivation",
+          "discharge": "PROOF-associative-composition-iff"
+        }
       ],
       "decision_state": "open",
       "derivable": false,
@@ -58,8 +87,16 @@
       "name": "Observation is bounded by the encoding",
       "statement": "(O⊆) What an observer can access is contained in what is encoded in its encoding octonion. (E) The electromagnetic ℂ of DERIV-observation is the ℂ selected by that encoding. Under P2′ (E) has content: the selected ℂ is ℂ_u = ℍ_s ∩ (the encoding half); under P2 no ℂ is selected geometrically and DERIV-observation's ℂ is EM's own; the reading is open (INTERP-holographic-boundary).",
       "kill_condition": [
-        "(O⊆) An observable that requires access to information not encoded in the observer's encoding octonion. Recorded OPEN.",
-        "(E) An electromagnetic C shown distinct from the encoding-selected C. Has content only under P2' (where a C is selected); empty under P2 — so this entry is OPEN exactly as INTERP-holographic-boundary's P2/P2' pair is, and cannot fire before that pair is decided (ruling bundle v0.7 §2)."
+        {
+          "kill": "(O⊆) An observable that requires access to information not encoded in the observer's encoding octonion. Recorded OPEN.",
+          "closure": "measurement",
+          "discharge": "FLAG-encoding-map-open"
+        },
+        {
+          "kill": "(E) An electromagnetic C shown distinct from the encoding-selected C. Has content only under P2' (where a C is selected); empty under P2 — so this entry is OPEN exactly as INTERP-holographic-boundary's P2/P2' pair is, and cannot fire before that pair is decided (ruling bundle v0.7 §2).",
+          "closure": "measurement",
+          "discharge": "FLAG-encoding-map-open"
+        }
       ],
       "decision_state": "open",
       "derivable": false,
@@ -9971,6 +10008,70 @@
           "QBP.Foundations.HolographicSubalgebra.span_gen4_u_mul"
         ]
       }
+    },
+    {
+      "id": "FLAG-rule-flow-open",
+      "name": "The rule's flow on StateSphere has no formal existence/uniqueness or omega-limit statement (open route for AXIOM-1 question 1)",
+      "tier": 2,
+      "provenance": "T",
+      "status": "marginal",
+      "description": "The rule (#635) is a postulate: first-order overdamped descent of the potential V in the metric N (the only metric on record; hosting definition §0 table). Its flow is numerical only (`flow_big.py`, #629; endpoint statistics 0.146 quench / ≈1/3 anneal / 1 ℓ-axis). No Lean statement of the flow exists (Hosting.lean states that `potential` is a function, not a gradient field), no normed structure is placed on CDAlg, and no omega-limit map is defined. AXIOM-1's kill (question 1) fires only on such a proven flow whose omega-limit map is non-injective on positive measure; its own text records that first-order semiflows are injective at finite time. Feasibility (2026-09-20, lean-prover read): finite-time injectivity = backward uniqueness via Grönwall (`ODE_solution_unique_of_mem_Icc_left`), size S once the field is defined; the field's definition needs a normed/inner-product transport of CDAlg (M) and the flow itself (M); global existence L. Nothing here is ruled: the flow's FORM is what #635 already states.",
+      "prediction_chain": [
+        "PROOF-substrate-hosting-definition"
+      ],
+      "testable_when": "When a Lean definition of the rule's vector field on StateSphere exists with local existence/uniqueness; then when its omega-limit map is characterised on the zero-divisor locus.",
+      "notes": "Tracking anchor only (route OPEN). Discharge target for AXIOM-1 kill_condition[0] (closure derivation). Owners: #635 (rule postulate), #629 (flow numerics), #647 (trigger).",
+      "provenance_kind": "theory",
+      "foundation_batch": "#654-D3-0.3.4-migration",
+      "last_tested_at": "2026-09-20T00:00:00Z"
+    },
+    {
+      "id": "FLAG-encoding-map-open",
+      "name": "The bulk-to-boundary encoding map does not exist on record; which octonion encodes a universe is an earned impasse (open route for the boundary-encoding kills)",
+      "tier": 2,
+      "provenance": "T",
+      "status": "marginal",
+      "description": "No map from a universe to its encoding octonion is defined under either reading of INTERP-holographic-boundary (P2 / P2′). The substrate definition conversation (#639; records PR #664; proofs PR #663) closed CONVERGED with Decision 1 exiting as an earned §10 Impasse Record: assuming completeness and stabiliser-transitivity (both open; proof routes in #663), a non-pole universe's candidate encodings form a canonical ℂP²-bundle over the vacuum manifold with no Aut(𝕊)-natural section; selection must come from data outside Aut(𝕊) or the question dissolves via the datum-free bundle ℍ_s^⊥ ≅ ℍ_s³; ρ-equivariance eliminates P2′ and constrains P2 not at all (PROOF-rho-moves-cd-half-as-set, PROOF-quatdouble-rho-invariant-mul-closed). Falsifier: an Aut(𝕊)-equivariant sectioning operator with no manual input. Also tracks the observational arms (an observable requiring information outside any octonionic encoding; an electromagnetic ℂ distinct from the encoding-selected ℂ; an observable distinguishing the readings) — none on record.",
+      "prediction_chain": [
+        "PROOF-order-three-automorphism-fixes-ell"
+      ],
+      "testable_when": "When a defining property of the encoding is DERIVED (not stipulated) from an existing anchor, or the encoding map is exhibited or shown not to exist, or an observable distinguishing P2 from P2′ is on record.",
+      "notes": "Tracking anchor only (route OPEN). Discharge target for POST-boundary-encoding, POST-observation (O⊆), (E), and INTERP-holographic-boundary arms (b), (c). The three-clause kill rewrite drafted by the conversation is NOT encoded here (later PR).",
+      "provenance_kind": "theory",
+      "foundation_batch": "#654-D3-0.3.4-migration",
+      "last_tested_at": "2026-09-20T00:00:00Z"
+    },
+    {
+      "id": "FLAG-observer-exclusivity-open",
+      "name": "No observer has been exhibited outside an associative subalgebra of 𝕊, and no theorem forbids one (open route for POST-observer-associativity's observational arm)",
+      "tier": 2,
+      "provenance": "T",
+      "status": "marginal",
+      "description": "POST-observer-associativity postulates that every observer is an entity of an associative subalgebra (clause (a), P1′ + D). The observational falsifier — an observer exhibited outside any associative subalgebra — has no measurement on record and no defined observable; the derivational arm (a non-associative subset on which actions compose) is excluded by PROOF-associative-composition-iff's premise set and is a realised route, not this one.",
+      "prediction_chain": [
+        "PROOF-associative-composition-iff"
+      ],
+      "testable_when": "When an observable is defined whose value could locate an observer outside every associative subalgebra, or when a hosted-physics theorem shows observers cannot be so located.",
+      "notes": "Tracking anchor only (route OPEN). Discharge target for POST-observer-associativity kill arm (a) (closure measurement).",
+      "provenance_kind": "theory",
+      "foundation_batch": "#654-D3-0.3.4-migration",
+      "last_tested_at": "2026-09-20T00:00:00Z"
+    },
+    {
+      "id": "FLAG-encoding-level-physical-open",
+      "name": "No observation bears on whether a universe's encoding is smaller than the last information-preserving level (open route for META-2's physical arm)",
+      "tier": 2,
+      "provenance": "T",
+      "status": "marginal",
+      "description": "META-2's structural arm is excluded by the proved ladders (PROOF-ops-*-ladder; CDLifting.assoc_diag_left) and cannot fire. Its physical arm — a universe's encoding shown to be a smaller algebra than the last information-preserving level (e.g. an observer's algebra with no octonionic completion; the encoding shown to be ℍ) — has no observable on record. DERIV-encoding-level places the encoding at 8 conditionally on META-2, POST-boundary-encoding and AXIOM-1's open scope question.",
+      "prediction_chain": [
+        "PROOF-ops-alternativity-ladder"
+      ],
+      "testable_when": "When an observable is defined that measures the algebraic dimension of a universe's encoding, or when the encoding map exists (FLAG-encoding-map-open) and its image is computed.",
+      "notes": "Tracking anchor only (route OPEN). Discharge target for META-2 kill_condition physical arm (closure measurement).",
+      "provenance_kind": "theory",
+      "foundation_batch": "#654-D3-0.3.4-migration",
+      "last_tested_at": "2026-09-20T00:00:00Z"
     }
   ],
   "inputs": [
@@ -10502,6 +10603,11 @@
       "version": "6.1.0",
       "date": "2026-09-20T00:00:00Z",
       "note": "qbp-oppenheimer: PROOF anchors for the substrate definition conversation's proved theorems (PR #663; #639) — encode-after-prove: hosted = quatSpan for non-pole crystals (equality); generic intersection = span{1,ℓ}; every ℍ⊕ℍℓ (any pair p, q) ρ-invariant and mul-closed (the seven Fano doubles are members; distinctness and count NOT claimed); ρ moves the CD half as a set (under the premise of ρ-equivariance, P2′ is excluded and P2 unconstrained — a result, the premise not a theorem, nothing ruled); the vacuum Hessian eigenvalue 8(1−b₀²) via Mathlib deriv, dim 6, transverse trace, evenness non-vacuous; the encoding family invariant under w ↦ u·w (line-constancy NOT claimed); 𝕆-level perp-module/maximality (𝕊-level completeness open); the transitivity reduction (frame-transitivity of Aut 𝕆 not in the toolchain). Ten anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound}, every witness validated by #print axioms. NOT here: the INTERP-holographic-boundary kill rewrite (open; later PR); the false 'generic ℍ_s in no ρ-invariant octonion' (refuted before any prover saw it). Manifest entries added; inverse-audit baseline updated to the anchored growth. Review record: Red Team ×4, Gemini ×3, §I4 statement-vs-claim + anchor-text (PR #663)."
+    },
+    {
+      "version": "6.2.0",
+      "date": "2026-09-20T00:00:00Z",
+      "note": "qbp-oppenheimer: vendored schema 0.3.4 sync (confluent-trust#104, merged 2026-09-20) — the seven open roots' kill_condition migrated array<string> → array<object> KillConditionEntry {kill, closure, discharge}: 13 entries from 9 strings (arms of different closure kind split, text verbatim). Closure kinds follow each entry's own text; a discharge names the resolving anchor where a route EXISTS (PROOF-substrate-hosting-definition, PROOF-associative-composition-iff, PROOF-ops-alternativity-ladder) and a FLAG tracking anchor where the route is OPEN (four minted: FLAG-rule-flow-open, FLAG-encoding-map-open, FLAG-observer-exclusivity-open, FLAG-encoding-level-physical-open) — per live-test seq 1506–1509; no physics kill relabelled ruling-rescope. decision_state value 'ruled' → 'settled' (no record affected). Nothing ruled, nothing forced; no root added or removed."
     }
   ],
   "last_updated": "2026-09-20T00:00:00Z",
@@ -10523,7 +10629,16 @@
       "derivable": false,
       "decision_state": "open",
       "kill_condition": [
-        "Structural arm — EXCLUDED by the proved ladders and therefore unable to fire: a crystal-hosting division or alternative structure above O, or a non-crystal below S (PROOF-ops-*-ladder; CDLifting.assoc_diag_left). Physical arm — the live falsifier: a universe's encoding shown to be a smaller algebra than the last information-preserving level (e.g. an observer's algebra with no octonionic completion; the encoding shown to be H) — no observable on record. This kill CANNOT FIRE today; recorded OPEN, not as a pass (ruling bundle v0.7 §5, PR #652 v0.4 Red Team V1)."
+        {
+          "kill": "Structural arm — EXCLUDED by the proved ladders and therefore unable to fire: a crystal-hosting division or alternative structure above O, or a non-crystal below S (PROOF-ops-*-ladder; CDLifting.assoc_diag_left).",
+          "closure": "derivation",
+          "discharge": "PROOF-ops-alternativity-ladder"
+        },
+        {
+          "kill": "Physical arm — the live falsifier: a universe's encoding shown to be a smaller algebra than the last information-preserving level (e.g. an observer's algebra with no octonionic completion; the encoding shown to be H) — no observable on record. This kill CANNOT FIRE today; recorded OPEN, not as a pass (ruling bundle v0.7 §5, PR #652 v0.4 Red Team V1).",
+          "closure": "measurement",
+          "discharge": "FLAG-encoding-level-physical-open"
+        }
       ]
     }
   ],
@@ -10555,7 +10670,20 @@
       "provenance_kind": "philosophy",
       "decision_state": "open",
       "kill_condition": [
-        "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by a defining property of the encoding stated as an object (a Cayley–Dickson half → P2' is a theorem; contains the observer's algebra → P2 is), by the encoding MAP (a map forces its domain), or by an observable distinguishing the readings — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form)."
+        {
+          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by a defining property of the encoding stated as an object (a Cayley–Dickson half → P2' is a theorem; contains the observer's algebra → P2 is) — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form).",
+          "closure": "ruling-rescope"
+        },
+        {
+          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by the encoding MAP (a map forces its domain) — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form).",
+          "closure": "derivation",
+          "discharge": "FLAG-encoding-map-open"
+        },
+        {
+          "kill": "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by an observable distinguishing the readings — none on record. The first two are stipulations someone would write, not discoveries. This kill CANNOT FIRE today — recorded as such, not as a pass (ruling bundle v0.7 §1; hosting §4's form).",
+          "closure": "measurement",
+          "discharge": "FLAG-encoding-map-open"
+        }
       ],
       "notes": "Supersedes DERIV-holographic (interpretation part)."
     }
