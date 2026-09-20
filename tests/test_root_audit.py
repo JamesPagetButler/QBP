@@ -455,3 +455,27 @@ def test_suffixed_placeholder_and_nested_root_inside_root(tmp_path):
     L["axioms"][0]["notes"] = [{"id": "POST-hidden-inside-axiom", "statement": "x"}]
     f = _run(L)["failures"]
     assert any(x.startswith("SMUGGLED ROOT POST-hidden-inside-axiom") for x in f)
+
+
+def test_ruling_rescope_discharge_must_be_live_if_present():
+    """PR #665 Red Team MC6: the constitutional branch must not hide a bogus or dead discharge."""
+    A = lambda L: {a["id"]: a for a in L["anchors"]}
+    base = "a real kill entry of sufficient length"
+    for bad in (
+        [{"kill": base, "closure": "ruling-rescope", "discharge": "PROOF-nonexistent"}],
+        [{"kill": base, "closure": "ruling-rescope", "discharge": "FLAG-dead"}],
+        [{"kill": base, "closure": "ruling-rescope", "discharge": 42}],
+    ):
+        L = _ledger()
+        L["axioms"][1]["kill_condition"] = bad
+        b, why = ra.sort_root(L["axioms"][1], A(L))
+        assert b is None, (bad, why)
+    L = _ledger()
+    L["axioms"][1]["kill_condition"] = [
+        {"kill": base, "closure": "ruling-rescope", "discharge": "PROOF-x"}
+    ]
+    b, _ = ra.sort_root(L["axioms"][1], A(L))
+    assert b == 3
+    assert "discharge noted: PROOF-x" in ra.route_status(
+        {"closure": "ruling-rescope", "discharge": "PROOF-x"}
+    )

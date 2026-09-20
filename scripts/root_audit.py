@@ -21,7 +21,7 @@ sort into exactly one Conversation-MO bucket, from the ledger alone:
   bucket 2  FORCED   `forced_by` names a MEAS-* anchor that resolves in-ledger with status
                      coherent/converged (an untested, marginal, contested or dead anchor
                      forces nothing), or
-                     `decision_state: ruled` with a `ruling` that cites a
+                     `decision_state: settled` with a `ruling` that cites a
                      JamesPagetButler/* GitHub issue/PR URL (the beekeeper's own-hand
                      line — a scope/process ruling, never a physical truth). This
                      check is STRUCTURAL (a cite is present); whether the cited ruling
@@ -212,11 +212,19 @@ def _kill_entry_ok(entry, anchors):
     closure = entry.get("closure")
     if closure not in _CLOSURE_KINDS:
         return False
+    discharge = entry.get("discharge")
     if (
         closure == "ruling-rescope"
     ):  # closes on the fired kill; discharge legitimately absent
-        return True
-    discharge = entry.get("discharge")
+        if discharge is None:
+            return True
+        # a discharge that IS present must still be a live, resolving anchor — no bogus or dead
+        # string may hide behind the constitutional branch (PR #665 Red Team MC6)
+        return (
+            isinstance(discharge, str)
+            and discharge in anchors
+            and anchors[discharge].get("status") not in DEAD_STATUSES
+        )
     if not isinstance(discharge, str) or discharge not in anchors:
         return False  # derivation/measurement must name a RESOLVING route or tracker
     if anchors[discharge].get("status") in DEAD_STATUSES:
@@ -240,7 +248,9 @@ def route_status(entry):
     dischargeable."""
     closure = entry.get("closure")
     if closure == "ruling-rescope":
-        return "constitutional (closes only when the kill fires)"
+        d0 = entry.get("discharge")
+        tail = f"; discharge noted: {d0}" if d0 else ""
+        return "constitutional (closes only when the kill fires)" + tail
     d = entry.get("discharge") or ""
     if d.startswith(_OPEN_ROUTE_PREFIXES):
         return f"route OPEN (tracked by {d})"
