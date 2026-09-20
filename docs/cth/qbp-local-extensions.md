@@ -122,7 +122,7 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions land formally with the foundations reb
 | `decision_state` | enum `open` \| `settled` (renamed from `ruled` in canonical 0.3.4: the settled state is reached by proof or force, never by fiat) | decision lifecycle, distinct from the coherence `status` enum. `open` = the root is an Impasse Record with a stated falsifier; `settled` = a scope/process ruling exists and is cited by a `JamesPagetButler/*` GitHub URL in `ruling` (structural check; the semantic half is the Red Team confirmer's) | `open` + `kill_condition` ⇒ bucket-3 OPEN; `settled` + cite ⇒ bucket-2 FORCED |
 | `kill_condition` | array<object> `KillConditionEntry` — `{kill (required, non-placeholder), closure ∈ {derivation, measurement, ruling-rescope} (required), discharge}` (canonical 0.3.4, confluent-trust#104; migrated from array<string> on QBP #665) | one entry per open question; `discharge` names the resolving anchor if the route exists, else a LIVE `FLAG-`/`CONJ-` tracker (route OPEN); absent only for `ruling-rescope`. root_audit's `kill_present` checks every entry semantically (placeholder-token, discharge resolves to a live anchor of the matching kind) and the D6 report tags each entry route EXISTS / route OPEN / constitutional. |
 
-**Current usage (after #662, ledger 6.0.0):** `AXIOM-1` (two-entry list, #647); `META-2`, `POST-boundary-encoding`, `POST-hosting`, `POST-observer-associativity`, `POST-observation`, `INTERP-holographic-boundary` — all `decision_state: open` with one-or-more-entry kill lists (four of them cannot fire today and say so). META-1 is in the open-roots register (#655); AXIOM-2 is retired.
+**Current usage (after #662, ledger 6.2.0 (root fields since 6.0.0; KillConditionEntry objects since 6.2.0)):** `AXIOM-1` (two-entry list, #647); `META-2`, `POST-boundary-encoding`, `POST-hosting`, `POST-observer-associativity`, `POST-observation`, `INTERP-holographic-boundary` — all `decision_state: open` with one-or-more-entry kill lists (four of them cannot fire today and say so). META-1 is in the open-roots register (#655); AXIOM-2 is retired.
 
 **Forward rule:** no other QBP-local field on `Axiom` records without a row here and an upstream issue. When confluent-trust #102 lands, this row is marked canonical and the vendored schema is synced per `schema-change-propagation-checklist.md`.
 
@@ -131,7 +131,7 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions land formally with the foundations reb
 
 ## QBP-local top-level lists (`meta_principles`, `interpretations`, `retired_axioms`, `retired_principles`)
 
-**Status:** QBP-local since PR #662 (ledger 6.0.0, 2026-09-18); validate under the schema's top-level `additionalProperties: true`. **Upstream tracking issue:** https://github.com/JamesPagetButler/confluent-trust/issues/103 (promotion to canonical `$defs` when the shape freezes; @cth-implementor owns the delta together with #102). **Co-sign on the introducing PR:** @cth-implementor, #662.
+**Status:** QBP-local since PR #662 (ledger 6.2.0 (root fields since 6.0.0; KillConditionEntry objects since 6.2.0), 2026-09-18); validate under the schema's top-level `additionalProperties: true`. **Upstream tracking issue:** https://github.com/JamesPagetButler/confluent-trust/issues/103 (promotion to canonical `$defs` when the shape freezes; @cth-implementor owns the delta together with #102). **Co-sign on the introducing PR:** @cth-implementor, #662.
 
 | List | Records | Why a separate list | Gate reading (`root_audit.py`) |
 |---|---|---|---|
