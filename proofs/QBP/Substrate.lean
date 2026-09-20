@@ -4,3 +4,4 @@
 -- The empty-`Substrate/` rule was lifted by the beekeeper on 2026-09-07
 -- (#473 issuecomment-5574256922) for the hosting DEFINITION file only.
 import QBP.Substrate.Hosting
+import QBP.Substrate.RuleFlow
