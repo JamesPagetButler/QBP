@@ -860,7 +860,11 @@ theorem flow_unique_of_endpoint {a b R : ℝ} {γ₁ γ₂ : ℝ → CDAlg ℝ 4
     (fun t _ => hK) hc₁ (fun t ht => (hd₁ t ht).hasDerivWithinAt) hb₁
     hc₂ (fun t ht => (hd₂ t ht).hasDerivWithinAt) hb₂ heq
 
-/-- **The time-`t` map of the rule is injective where it is defined.** -/
+/-- **The time-`t` map of the rule is injective where it is defined.**  Read
+    dynamically this is **backward uniqueness**: two integral curves that agree
+    at the *final* time `b` already agreed at the *initial* time `a`, so no two
+    distinct states can be merged by the flow in finite time.  (The name records
+    the algebraic phrasing; the content is the backward-uniqueness statement.) -/
 theorem flow_time_map_injective {a b R : ℝ} (hab : a ≤ b) {γ₁ γ₂ : ℝ → CDAlg ℝ 4}
     (hc₁ : ContinuousOn γ₁ (Set.Icc a b))
     (hd₁ : ∀ t ∈ Set.Ioc a b, HasDerivAt γ₁ (ruleField (γ₁ t)) t)
@@ -1402,6 +1406,20 @@ theorem ruleField_eq_zero_of_potential_eq_one {s : CDAlg ℝ 4}
   rw [bil_gradV_ruleField hs] at h
   have hN : N (ruleField s) = 0 := by linarith
   exact (alt_N_eq_zero_iff _).mp hN
+
+/-- **A rest point of the rule that is NOT a vacuum exists.**  P7 produces a
+    state-sphere point `s` with `V s = 1`; P6 turns that into `F s = 0`.  Since
+    `V s = 1 ≠ 0` and `V` is exactly the vacuum indicator
+    (`potential_eq_zero_iff_isVacuum`), `s` is not a crystal.  So the rest set of
+    the rule is strictly larger than the vacuum set: freezing is not the same
+    phenomenon as being a vacuum. -/
+theorem exists_rest_point_not_vacuum :
+    ∃ s ∈ Hosting.StateSphere, ruleField s = 0 ∧ ¬ IsVacuum s := by
+  obtain ⟨s, hs, _hmax, h1⟩ := exists_isMaxOn_potential_stateSphere
+  refine ⟨s, hs, ruleField_eq_zero_of_potential_eq_one hs h1, fun hv => ?_⟩
+  have h0 : Hosting.potential s = 0 := (Hosting.potential_eq_zero_iff_isVacuum hs.1).mpr hv
+  rw [h1] at h0
+  norm_num at h0
 
 /-! ## 17. P8 — the ω-limit set of a sub-maximal forward orbit avoids `{V = 1}`
 
@@ -2076,6 +2094,41 @@ theorem omega_avoids_zeroDivisors {γ : ℝ → CDAlg ℝ 4}
     rw [potential_eq_one_of_zeroDivisor_right hmemp hy hzero] at h2
     exact lt_irrefl 1 h2
 
+/-- **FINITE-TIME form: a sub-maximal forward orbit is never *at* a zero divisor.**
+    If a forward integral curve of the rule lies on `StateSphere` and starts
+    strictly below the maximum (`V(γ 0) < 1`), then for EVERY finite time
+    `t ≥ 0` the state `γ t` is not a zero divisor on either side — left and
+    right multiplication by `γ t` are injective on all of 𝕊.
+
+    This is the finite-time statement that `omega_avoids_zeroDivisors`
+    generalises to the limit `t → ∞`: here the conclusion holds at each point of
+    the orbit itself (via the tail bound `potential_le_initial_along_flow`),
+    there it holds at every point of the ω-limit set (via the closure form).
+
+    **Scope.**  As with `omega_avoids_zeroDivisors`, this is conditional on a
+    *given* curve: local existence of integral curves of `F` is NOT proved in
+    this file (FLAG-rule-flow-open), so "never" means "for any curve that
+    exists", not "for all initial data". -/
+theorem not_zeroDivisor_along_flow {γ : ℝ → CDAlg ℝ 4}
+    (hcont : ContinuousOn γ (Set.Ici 0))
+    (hd : ∀ t ∈ Set.Ioi (0 : ℝ), HasDerivAt γ (ruleField (γ t)) t)
+    (hmem : ∀ t ∈ Set.Ici (0 : ℝ), γ t ∈ Hosting.StateSphere)
+    (h0 : Hosting.potential (γ 0) < 1) :
+    ∀ t ∈ Set.Ici (0 : ℝ),
+      Function.Injective (fun y : CDAlg ℝ 4 => γ t * y)
+        ∧ Function.Injective (fun y : CDAlg ℝ 4 => y * γ t) := by
+  intro t ht
+  have hmemt := hmem t ht
+  have h2 : Hosting.potential (γ t) < 1 :=
+    lt_of_le_of_lt (potential_le_initial_along_flow hcont hd hmem t ht) h0
+  constructor
+  · refine injective_mul_of_mul_ne_zero (fun y hy hzero => ?_)
+    rw [potential_eq_one_of_zeroDivisor hmemt hy hzero] at h2
+    exact lt_irrefl 1 h2
+  · refine injective_mul_right_of_mul_ne_zero (fun y hy hzero => ?_)
+    rw [potential_eq_one_of_zeroDivisor_right hmemt hy hzero] at h2
+    exact lt_irrefl 1 h2
+
 /-! ## 11. Completeness audit (`#print axioms`)
 
 Every declaration introduced by this file.  The gate: only
@@ -2216,6 +2269,7 @@ Every declaration introduced by this file.  The gate: only
 #print axioms exists_isMaxOn_potential_stateSphere
 #print axioms bil_gradV_eq_zero_of_potential_eq_one
 #print axioms ruleField_eq_zero_of_potential_eq_one
+#print axioms exists_rest_point_not_vacuum
 #print axioms potential_le_initial_along_flow
 #print axioms potential_le_initial_of_mem_closure
 #print axioms omega_avoids_locus
@@ -2265,5 +2319,6 @@ Every declaration introduced by this file.  The gate: only
 #print axioms injective_mul_right_of_mul_ne_zero
 #print axioms omega_mem_stateSphere
 #print axioms omega_avoids_zeroDivisors
+#print axioms not_zeroDivisor_along_flow
 
 end QBP.Substrate.RuleFlow
