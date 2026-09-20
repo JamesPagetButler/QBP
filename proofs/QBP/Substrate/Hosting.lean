@@ -393,6 +393,129 @@ theorem polePlus_hosted_eq_complex :
     simp only [polePlus, one_smul]
   rw [h, smul_ell_hosted_eq_complex]
 
+/-! ## 7b. Off the poles, hosting is an EQUALITY (#2); two generic universes
+       share exactly `ℂ` (#3)
+
+`universe_hosts_quaternion` (§6) is a **containment** `hosted ⊆ ℍ_u`; the
+heterogeneous confirmer's verdict of 2026-09-19 (row 1, §8 item 2) demoted the
+"`hosts ℍ_s =`" reading for exactly that reason and named the missing half as
+the real prerequisite.  Here it is, with the hypothesis the confirmer identified:
+the crystal must not be a **pole**.  The hypothesis is necessary — at a pole the
+hosted algebra is `span{1, ℓ} ≅ ℂ` (`pole_hosts_complex`, §7), which is
+2-dimensional, so no equality with a 4-dimensional `ℍ_u` can hold there.
+
+Interpretation guardrail unchanged: these are statements about subalgebras of 𝕊.
+No identification with "the observer's ℍ" or with any physical structure is made
+(POST-observer-associativity / INTERP-holographic-boundary remain OPEN roots). -/
+
+/-- **A universe is NON-POLE** when the component of its crystal orthogonal to
+    the doubling unit `ℓ` is nonzero. -/
+def Universe.NonPole (U : Universe) : Prop :=
+  U.crystal - (U.crystal.coord (hiIdx 0)) • ell ≠ 0
+
+/-- `NonPole` says exactly what its name says: the crystal is not a real multiple
+    of `ℓ`. -/
+theorem Universe.nonPole_iff (U : Universe) :
+    U.NonPole ↔ ∀ t : ℝ, U.crystal ≠ t • ell := by
+  constructor
+  · intro h t hEq
+    refine h ?_
+    have hc : U.crystal.coord (hiIdx 0) = t := by
+      rw [hEq, smul_coord, ell_coord_hiIdx_zero, mul_one]
+    rw [hc, hEq, sub_self]
+  · intro h hzero
+    exact h (U.crystal.coord (hiIdx 0)) (by rw [← sub_eq_zero]; exact hzero)
+
+/-- The north pole is, as advertised, NOT a non-pole: the hypothesis of
+    `Universe.hosted_eq_quatSpan` genuinely excludes `pole_hosts_complex`. -/
+theorem polePlus_not_nonPole : ¬ polePlus.NonPole := by
+  intro h
+  exact (polePlus.nonPole_iff.mp h) 1 (by rw [one_smul]; rfl)
+
+/-- **`hosted_eq_quatSpan` (#2).**  For a NON-POLE universe there is a unit
+    imaginary octonion direction `u` with
+
+      `U.hosted = ℍ_u = span_ℝ{1, ℓ, U, ℓU}`,  `U = loOf u`,
+
+    an EQUALITY of sets — both the containment of `universe_hosts_quaternion` and
+    its converse.  (`crystal_quatSpan_independent` then makes `ℍ_u` genuinely
+    4-dimensional, so the hosted algebra is a copy of ℍ on the nose.) -/
+theorem Universe.hosted_eq_quatSpan (U : Universe) (h : U.NonPole) :
+    ∃ u : CDAlg ℝ 3, u.coord 0 = 0 ∧ N u = 1 ∧
+      U.hosted = {x : CDAlg ℝ 4 | InQuatSpan (loOf u) x} := by
+  obtain ⟨u, α, γ, b₀, hu0, hNu, hlo, hhi⟩ :=
+    (vacuum_iff_parametrised U.crystal).mp U.isVacuum
+  have hP := crystal_perp_eq (u := u) (b₀ := b₀) hu0 hlo hhi
+  have hk : α ^ 2 + γ ^ 2 ≠ 0 := by
+    intro h0
+    have hα : α = 0 := by nlinarith [sq_nonneg α, sq_nonneg γ]
+    have hγ : γ = 0 := by nlinarith [sq_nonneg α, sq_nonneg γ]
+    exact h (by rw [hP, hα, hγ]; module)
+  have hNu' : N u = 1 := by
+    rcases hNu with h1 | h0
+    · exact h1
+    · exact absurd (by rw [hP, h0, loOf_zero, hiOf_zero]; module) h
+  exact ⟨u, hu0, hNu',
+    genByPair_eq_quatSpan_of_param (u := u) U.coord_zero hu0 hlo hhi hk⟩
+
+/-- **`universe_intersection_generic_eq_complex` (#3).**  Two NON-POLE universes
+    with DIFFERENT hosted algebras share exactly the complex line
+    `span_ℝ{1, ℓ} ≅ ℂ`.
+
+    The genericity hypothesis is stated intrinsically as `U₁.hosted ≠ U₂.hosted`;
+    by `inQuatSpan_neg_dir` (the quaternion span only sees the direction up to
+    sign) this IMPLIES the confirmer's `u₁ ≠ ±u₂`, which is the form the proof
+    consumes.  It is **not** claimed to be equivalent: the converse — distinct
+    directions give distinct hosted algebras — needs uniqueness of the hosting
+    direction up to sign, which is NOT in this tree (see `Universe.dir`, whose
+    own docstring disclaims any uniqueness).  `ℓ` lies in both, so the
+    intersection is 2-dimensional — it is `ℂ`, not `ℝ`.  (Red Team F10, PR #663.) -/
+theorem universe_intersection_eq_complex {U₁ U₂ : Universe}
+    (h₁ : U₁.NonPole) (h₂ : U₂.NonPole) (hne : U₁.hosted ≠ U₂.hosted) :
+    U₁.hosted ∩ U₂.hosted
+      = {x : CDAlg ℝ 4 | ∃ a b : ℝ, x = a • (1 : CDAlg ℝ 4) + b • ell} := by
+  obtain ⟨u₁, hu1, hN1, he1⟩ := U₁.hosted_eq_quatSpan h₁
+  obtain ⟨u₂, hu2, hN2, he2⟩ := U₂.hosted_eq_quatSpan h₂
+  have hd : u₁ ≠ u₂ := by
+    intro hEq
+    exact hne (by rw [he1, he2, hEq])
+  have hd' : u₁ ≠ -u₂ := by
+    intro hEq
+    refine hne ?_
+    rw [he1, he2, hEq]
+    ext x
+    simp only [Set.mem_setOf_eq]
+    exact inQuatSpan_neg_dir
+  rw [he1, he2]
+  exact quatSpan_inter_eq_complex hu1 hu2 hN1 hN2 hd hd'
+
+/-! ### A concrete non-pole universe, so §7b is not vacuous -/
+
+theorem loOf_e1_mem_universeSpace :
+    loOf (e (1 : Fin (2 ^ 3))) ∈ UniverseSpace := by
+  have he0 : (e (1 : Fin (2 ^ 3)) : CDAlg ℝ 3).coord 0 = 0 := by
+    rw [e_coord, if_neg (by decide : ¬ ((0 : Fin (2 ^ 3)) = 1))]
+  refine ⟨⟨loOf_coord_zero he0, ?_⟩, ⟨loOf_coord_zero he0, ?_⟩⟩
+  · rw [N_loOf, N_e]
+  · rw [cdLo_loOf, cdHi_loOf, alt_mul_zero, alt_zero_mul]
+
+/-- A universe whose crystal is `loOf e₁` — imaginary, unit, and with vanishing
+    `ℓ`-component, hence non-pole. -/
+def genericUniverse : Universe := ⟨loOf (e (1 : Fin (2 ^ 3))), loOf_e1_mem_universeSpace⟩
+
+theorem genericUniverse_nonPole : genericUniverse.NonPole := by
+  have hhi : genericUniverse.crystal.coord (hiIdx 0) = 0 := loOf_coord_hi_zero _
+  intro hz
+  rw [hhi, zero_smul, sub_zero] at hz
+  have hN : N (loOf (e (1 : Fin (2 ^ 3)))) = 0 := by rw [show loOf (e (1 : Fin (2^3))) = genericUniverse.crystal from rfl, hz, N_zero]
+  rw [N_loOf, N_e] at hN
+  norm_num at hN
+
+/-- **§7b is not vacuous:** a non-pole universe exists, and its hosted algebra is
+    an honest 4-dimensional quaternion span. -/
+theorem exists_nonPole_universe : ∃ U : Universe, U.NonPole :=
+  ⟨genericUniverse, genericUniverse_nonPole⟩
+
 /-! ## 8. The local spectrum at a universe, and its failure in flight -/
 
 /-- **The local spectrum at a universe.**  `CrystalHosting.left_mul_sq_at_vacuum`
@@ -446,6 +569,128 @@ theorem mem_universeSpace_iff_complex_structure {s : CDAlg ℝ 4} (hs : s ∈ St
     refine ⟨hs, (left_mul_sq_scalar_iff_vacuum hs.1).mp (fun x => ?_)⟩
     rw [h x, hs.2]
     module
+
+/-! ## 8b. The Hessian of `potential` at a universe (#5, #9)
+
+`CrystalHosting` §4c proves the algebra; here it is restated on `potential` and
+on `Universe`.  `b₀` is the **pole coordinate** `s.coord 8 = s.coord (hiIdx 0)`
+of the confirmer's §4.2 — pinned to the parametrisation below, not assumed. -/
+
+/-- The Prop-15 parametrisation of a NON-POLE universe, with the non-degeneracy
+    `α² + γ² ≠ 0` and `b₀` identified as the pole coordinate `s.coord (hiIdx 0)`. -/
+theorem Universe.exists_param (U : Universe) (h : U.NonPole) :
+    ∃ (u : CDAlg ℝ 3) (α γ b₀ : ℝ), u.coord 0 = 0 ∧ N u = 1 ∧
+      cdLo U.crystal = α • u ∧ cdHi U.crystal = b₀ • (1 : CDAlg ℝ 3) + γ • u ∧
+      α ^ 2 + γ ^ 2 ≠ 0 ∧ b₀ = U.crystal.coord (hiIdx 0) := by
+  obtain ⟨u, α, γ, b₀, hu0, hNu, hlo, hhi⟩ :=
+    (vacuum_iff_parametrised U.crystal).mp U.isVacuum
+  have hP := crystal_perp_eq (u := u) (b₀ := b₀) hu0 hlo hhi
+  have hk : α ^ 2 + γ ^ 2 ≠ 0 := by
+    intro h0
+    have hα : α = 0 := by nlinarith [sq_nonneg α, sq_nonneg γ]
+    have hγ : γ = 0 := by nlinarith [sq_nonneg α, sq_nonneg γ]
+    exact h (by rw [hP, hα, hγ]; module)
+  have hNu' : N u = 1 := by
+    rcases hNu with h1 | h0
+    · exact h1
+    · exact absurd (by rw [hP, h0, loOf_zero, hiOf_zero]; module) h
+  have hb : b₀ = U.crystal.coord (hiIdx 0) := by
+    have hc : (cdHi U.crystal).coord 0 = b₀ := by
+      rw [hhi, add_coord, smul_coord, smul_coord, one_coord, if_pos rfl, hu0, mul_one,
+        mul_zero, add_zero]
+    rw [← hc, cdHi_coord]
+  exact ⟨u, α, γ, b₀, hu0, hNu', hlo, hhi, hk, hb⟩
+
+/-- **The potential along a ray through a crystal is an exact quartic.**  No
+    constant term (the crystal is a zero of `V`), no linear term (it is a
+    minimum), quadratic coefficient `N (secVar s v)`. -/
+theorem potential_taylor_at_universe (U : Universe) (v : CDAlg ℝ 4) (t : ℝ) :
+    potential (U.crystal + t • v)
+      = N (secVar U.crystal v) * t ^ 2
+        + 2 * bil (secVar U.crystal v) (quadVar v) * t ^ 3
+        + N (quadVar v) * t ^ 4 :=
+  potential_taylor_at_vacuum U.isVacuum v t
+
+/-- **The Hessian of `potential`, as a genuine second derivative.** -/
+theorem deriv2_potential_at_universe (U : Universe) (v : CDAlg ℝ 4) :
+    deriv (deriv (fun t : ℝ => potential (U.crystal + t • v))) 0
+      = hessQuad U.crystal v :=
+  deriv2_potential_at_vacuum U.isVacuum v
+
+/-- **`vacuum_hessian_rank_six_eigenvalue` — the part that is PROVED (#5).**
+
+    At a NON-POLE universe with pole coordinate `b₀ = s.coord (hiIdx 0)`, for
+    EVERY imaginary direction `v`
+
+      `Hess_s(v, v) = 8·(1 − b₀²)·‖P v‖²`,
+
+    where `P v = eigDir α γ (transComp α γ u v)` is the transverse component.
+    On the explicit 6-parameter transverse family (`e` imaginary, `e ⟂ u`) this
+    gives `Hess = 8(1 − b₀²)·‖v‖` exactly; on the explicit 9-parameter flat
+    family it gives `0`.
+
+    **Proved elsewhere on this branch:** `finrank (u^⊥ ∩ Im 𝕆) = 6`
+    (`HolographicSubalgebra.finrank_perpIm_eq_six`) and the transverse trace
+    `48(1 − b₀²)` over an orthonormal 6-frame whose existence is discharged
+    (`hess_trace_transverse_exists`).  **NOT proved:** the finrank identity
+    `rank = 14 − 8 = 6` for the FULL tangent form, and the full-tangent-space
+    trace.  Those remain owed. -/
+theorem universe_hessian_eigenvalue (U : Universe) (h : U.NonPole) :
+    ∃ (u : CDAlg ℝ 3) (α γ b₀ : ℝ), u.coord 0 = 0 ∧ N u = 1 ∧
+      b₀ = U.crystal.coord (hiIdx 0) ∧ α ^ 2 + γ ^ 2 ≠ 0 ∧
+      (∀ v : CDAlg ℝ 4, v.coord 0 = 0 →
+          hessQuad U.crystal v
+            = 8 * (1 - b₀ ^ 2) * N (eigDir α γ (transComp α γ u v))) ∧
+      (∀ e : CDAlg ℝ 3, e.coord 0 = 0 → bil u e = 0 →
+          hessQuad U.crystal (eigDir α γ e)
+            = 8 * (1 - b₀ ^ 2) * N (eigDir α γ e)) ∧
+      (∀ (e : CDAlg ℝ 3) (x y z : ℝ), e.coord 0 = 0 → bil u e = 0 →
+          hessQuad U.crystal (flatDir α γ u e x y z) = 0) := by
+  obtain ⟨u, α, γ, b₀, hu0, hNu, hlo, hhi, hk, hb⟩ := U.exists_param h
+  refine ⟨u, α, γ, b₀, hu0, hNu, hb, hk, ?_, ?_, ?_⟩
+  · intro v hv
+    exact hessQuad_eq_transverse (u := u) (b₀ := b₀) hu0 hNu hv hlo hhi U.norm_one hk
+  · intro e he hue
+    exact hessQuad_eigDir (u := u) (b₀ := b₀) hu0 hNu he hue hlo hhi U.norm_one hk
+  · intro e x y z he hue
+    exact hessQuad_flatDir (u := u) (b₀ := b₀) hu0 hNu he hue hlo hhi U.norm_one hk x y z
+
+/-- **At a pole the Hessian is identically zero** — the `rank 0` clause of #5. -/
+theorem polePlus_hessian_eq_zero (v : CDAlg ℝ 4) : hessQuad polePlus.crystal v = 0 := by
+  have h : polePlus.crystal = (1 : ℝ) • ell := by rw [one_smul]; rfl
+  rw [h]
+  exact hessQuad_pole_eq_zero 1 v
+
+/-- **`hessian_spectrum_function_of_b0_sq` (#9).**  The transverse eigenvalue is a
+    function of `b₀²` alone — stated where it belongs, about two UNIVERSES.
+
+    If `U` and `U'` are non-pole universes whose crystals have the same squared
+    pole coordinate `b₀² = (crystal.coord ℓ)²`, then ONE real number `λ` is the
+    transverse coefficient of BOTH Hessian quadratic forms: for each universe there
+    is a parametrisation `(u, α, γ)` with `Hess(v,v) = λ·‖P v‖²` in every imaginary
+    direction `v`.  So the Hessian is blind to the sign of `b₀` and to the `(α, γ)`
+    phase; it separates the `b₀²` level sets and nothing finer (the confirmer's
+    row-12 correction).
+
+    (This replaces an earlier version whose statement was the real-number identity
+    `8(1−b₀²) = 8(1−b₀'²)` — no universe, no crystal, no `hessQuad` appeared in it;
+    Red Team F6, PR #663.  The tautology is deleted, not renamed.) -/
+theorem universe_hessian_eigenvalue_depends_only_on_b0_sq
+    (U U' : Universe) (h : U.NonPole) (h' : U'.NonPole)
+    (hb : U.crystal.coord (hiIdx 0) ^ 2 = U'.crystal.coord (hiIdx 0) ^ 2) :
+    ∃ lam : ℝ,
+      (∃ (u : CDAlg ℝ 3) (α γ : ℝ), u.coord 0 = 0 ∧ N u = 1 ∧ α ^ 2 + γ ^ 2 ≠ 0 ∧
+          ∀ v : CDAlg ℝ 4, v.coord 0 = 0 →
+            hessQuad U.crystal v = lam * N (eigDir α γ (transComp α γ u v))) ∧
+      (∃ (u' : CDAlg ℝ 3) (α' γ' : ℝ), u'.coord 0 = 0 ∧ N u' = 1 ∧ α' ^ 2 + γ' ^ 2 ≠ 0 ∧
+          ∀ v : CDAlg ℝ 4, v.coord 0 = 0 →
+            hessQuad U'.crystal v = lam * N (eigDir α' γ' (transComp α' γ' u' v))) := by
+  obtain ⟨u, α, γ, b₀, hu0, hNu, hb0, hk, hT, -, -⟩ := universe_hessian_eigenvalue U h
+  obtain ⟨u', α', γ', b₀', hu0', hNu', hb0', hk', hT', -, -⟩ := universe_hessian_eigenvalue U' h'
+  have hsq : b₀' ^ 2 = b₀ ^ 2 := by rw [hb0', hb0]; exact hb.symm
+  refine ⟨8 * (1 - b₀ ^ 2), ⟨u, α, γ, hu0, hNu, hk, hT⟩, ⟨u', α', γ', hu0', hNu', hk', ?_⟩⟩
+  intro v hv
+  rw [hT' v hv, hsq]
 
 /-! ## 9. Equivariance under `ℓ`-fixing automorphisms (the G₂ side) -/
 
@@ -657,6 +902,19 @@ is a finding. -/
 #print axioms normalise_sedWitX_mem_inFlight
 #print axioms inFlight_nonempty
 #print axioms universeSpace_ne_stateSphere
+#print axioms Universe.nonPole_iff
+#print axioms polePlus_not_nonPole
+#print axioms Universe.hosted_eq_quatSpan
+#print axioms universe_intersection_eq_complex
+#print axioms loOf_e1_mem_universeSpace
+#print axioms genericUniverse_nonPole
+#print axioms exists_nonPole_universe
+#print axioms Universe.exists_param
+#print axioms potential_taylor_at_universe
+#print axioms deriv2_potential_at_universe
+#print axioms universe_hessian_eigenvalue
+#print axioms polePlus_hessian_eq_zero
+#print axioms universe_hessian_eigenvalue_depends_only_on_b0_sq
 
 -- Data definitions that use choice / classical reasoning, printed for completeness.
 #print axioms normalise

@@ -857,6 +857,129 @@
         "QBP.Substrate.Hosting.hosting_equivariant",
         "QBP.Substrate.Hosting.hosting_equivariant_grade"
       ]
+    },
+    {
+      "anchor_id": "PROOF-hosted-eq-quatspan-nonpole",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.Hosting.Universe.hosted_eq_quatSpan",
+        "QBP.Substrate.Hosting.Universe.nonPole_iff",
+        "QBP.Substrate.Hosting.polePlus_not_nonPole",
+        "QBP.Foundations.CrystalHosting.genByPair_eq_quatSpan_of_param",
+        "QBP.Substrate.Hosting.exists_nonPole_universe"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-universe-intersection-eq-complex",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.Hosting.universe_intersection_eq_complex",
+        "QBP.Foundations.CrystalHosting.quatSpan_inter_eq_complex",
+        "QBP.Foundations.CrystalHosting.inQuatSpan_neg_dir"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-quatdouble-rho-invariant-mul-closed",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.HolographicSubalgebra.rotAut3_image_quatDouble",
+        "QBP.Foundations.HolographicSubalgebra.mul_mem_quatDouble",
+        "QBP.Foundations.HolographicSubalgebra.mem_quatDouble_iff",
+        "QBP.Foundations.HolographicSubalgebra.one_mem_quatDouble",
+        "QBP.Foundations.HolographicSubalgebra.ell_mem_quatDouble",
+        "QBP.Foundations.HolographicSubalgebra.quatDouble_proper"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-rho-moves-cd-half-as-set",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.CrystalHosting.rho_moves_cd_half",
+        "QBP.Foundations.CrystalHosting.rotAut3_lowHalf_not_subset",
+        "QBP.Foundations.CrystalHosting.exists_mem_lowHalf_rotAut3_not_mem",
+        "QBP.Foundations.CrystalHosting.mem_lowHalf"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-vacuum-hessian-transverse-eigenvalue",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.CrystalHosting.hessQuad_eq_transverse",
+        "QBP.Foundations.CrystalHosting.potential_taylor_at_vacuum",
+        "QBP.Foundations.CrystalHosting.deriv2_potential_at_vacuum",
+        "QBP.Foundations.CrystalHosting.hessQuad_closed",
+        "QBP.Foundations.CrystalHosting.hessQuad_pole_eq_zero",
+        "QBP.Foundations.CrystalHosting.exists_pole_flip_vacuum",
+        "QBP.Foundations.CrystalHosting.hessQuad_eigenvalue_even_exists",
+        "QBP.Foundations.CrystalHosting.hessQuad_flatDir"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-transverse-space-dim-six-trace",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.HolographicSubalgebra.hess_trace_transverse_exists",
+        "QBP.Foundations.HolographicSubalgebra.finrank_perpIm_eq_six",
+        "QBP.Foundations.HolographicSubalgebra.exists_orthonormal_perpIm_frame",
+        "QBP.Foundations.HolographicSubalgebra.transComp_surjOn_perpIm",
+        "QBP.Foundations.HolographicSubalgebra.hess_trace_transverse",
+        "QBP.Foundations.HolographicSubalgebra.bil_eq_inner"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-vacuum-hessian-universe-level",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.Hosting.universe_hessian_eigenvalue",
+        "QBP.Substrate.Hosting.potential_taylor_at_universe",
+        "QBP.Substrate.Hosting.deriv2_potential_at_universe",
+        "QBP.Substrate.Hosting.polePlus_hessian_eq_zero",
+        "QBP.Substrate.Hosting.universe_hessian_eigenvalue_depends_only_on_b0_sq"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-encoding-family-u-mul-invariant",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.HolographicSubalgebra.quatDouble_eq_of_mul_u",
+        "QBP.Foundations.HolographicSubalgebra.leftMul_sq_eq_neg",
+        "QBP.Foundations.HolographicSubalgebra.perp_stable_under_leftMul",
+        "QBP.Foundations.HolographicSubalgebra.quatSpan_subset_quatDouble",
+        "QBP.Foundations.HolographicSubalgebra.encoding_family_member",
+        "QBP.Foundations.HolographicSubalgebra.span_gen4_u_mul"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-octonion-perp-module-span4-maximal",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.HolographicSubalgebra.span4_maximal",
+        "QBP.Foundations.HolographicSubalgebra.bil_mul_left_adjoint",
+        "QBP.Foundations.HolographicSubalgebra.bil_mul_right_adjoint",
+        "QBP.Foundations.HolographicSubalgebra.perp_span4_left_module",
+        "QBP.Foundations.HolographicSubalgebra.perp_span4_right_module",
+        "QBP.Foundations.HolographicSubalgebra.rMul_injective",
+        "QBP.Foundations.HolographicSubalgebra.span4_sup_rMul_eq_top"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-encoding-family-transitive-of-aut",
+      "declared_by": "#639-definition-conversation-proofs",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.HolographicSubalgebra.encoding_family_transitive_of_aut",
+        "QBP.Foundations.HolographicSubalgebra.autLin_apply",
+        "QBP.Foundations.HolographicSubalgebra.map_span_gen4"
+      ]
     }
   ]
 }
