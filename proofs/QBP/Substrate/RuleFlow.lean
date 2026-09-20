@@ -6,7 +6,10 @@ import Mathlib.Analysis.InnerProductSpace.Calculus
 import Mathlib.Analysis.Calculus.ContDiff.Operations
 import Mathlib.Analysis.Calculus.Gradient.Basic
 import Mathlib.Analysis.Calculus.MeanValue
+import Mathlib.Analysis.Calculus.Deriv.MeanValue
 import Mathlib.Analysis.ODE.Gronwall
+import Mathlib.Analysis.Calculus.LocalExtr.Basic
+import Mathlib.Dynamics.OmegaLimit
 
 /-!
 # QBP.Substrate.RuleFlow — the FORM of the rule (#635)
@@ -50,14 +53,51 @@ here, THEN …"*.  The antecedent is a postulate.
    `gradV_eq_zero_of_isVacuum`).
 3. **`StateSphere` is invariant** (§9): any integral curve of `F` that lies on
    the state sphere at one interior time lies on it throughout its interval.
-4. **No deletion, discrete** (§7): the explicit Euler step `s ↦ s + h·F s` is
-   injective on any set where `F` is `K`-Lipschitz and `hK < 1`.
+4. **No deletion, discrete** (§7): the **un-normalised** explicit Euler step
+   `eulerStep h s = s + h·F s` is injective on any set where `F` is
+   `K`-Lipschitz and `hK < 1` (`eulerStep_injOn`).  **Scope warning:** this is
+   NOT the step the #635/#473 probe scripts run.  They run the *renormalised*
+   step `renormStep h s = normalise (s + h·F s)`, whose injectivity is proved
+   here only on a **level set of `‖F‖`** (`renormStep_injOn_of_normForm_const`);
+   the general case is open.  Do not cite `eulerStep_injOn` as covering the
+   scripts.
 5. **No deletion, continuous** (§8): two integral curves agreeing at one time
    agree throughout — hence the time-`t` map is injective where defined.
-6. **`V` is non-increasing along the flow** (§6): `d/dt V(γ t) = −‖F(γ t)‖²`.
-7. **Non-vacuity** (§10): `V` is not identically zero (`potential_witness`), so
-   `gradV` is not identically zero (`exists_gradV_ne_zero`).  Without this the
-   statements above would be satisfied by the zero field.
+6. **`V` descends along the flow.**  Two distinct statements, do not conflate:
+   *pointwise* (§6) `d/dt V(γ t) = −‖F(γ t)‖² ≤ 0`
+   (`hasDerivAt_potential_along_flow`, `potential_nonincreasing_along_flow`) —
+   this is a derivative sign at **one** time `t`, and is NOT by itself the
+   Lyapunov/monotonicity statement; and *monotone* (§14)
+   `AntitoneOn (V ∘ γ) (Icc a b)` (`potential_antitone_along_flow`), which is
+   what every locus-avoidance argument actually needs.
+7. **`V` in closed form** (§12): `V(s) = 4·(N(Im a)·N(Im b) − ⟪Im a, Im b⟫²)`
+   for `a = cdLo s`, `b = cdHi s` (`potential_eq_cross`), with no imaginarity
+   hypothesis — the unconditional form of
+   `DeltaLandscape.sedenion_landscape_descends`.  Consequence
+   (`potential_le_normForm_sq`): `V ≤ N²` globally.
+8. **The frozen locus** (§16): `V` attains its maximum on `StateSphere` and that
+   maximum is exactly `1` (`exists_isMaxOn_potential_stateSphere`), and every
+   state-sphere point with `V = 1` is a **rest point**
+   (`ruleField_eq_zero_of_potential_eq_one`).
+9. **ω-limit avoidance** (§17): a forward integral curve on the sphere with
+   `V(γ 0) < 1` has `V < 1` at every point of its ω-limit set
+   (`omega_avoids_locus`).
+10. **Non-vacuity of the landscape** (§10): `V` is not identically zero
+   (`potential_witness`), so `gradV` is not identically zero
+   (`exists_gradV_ne_zero`).  **Scope warning:** the witness there is
+   `witness = e₁ + e₁₀`, which is one of the 42 rank-2 **zero divisors**; it lies
+   on the argmax locus `{V = N²}` and, once normalised, is a **rest point**
+   (`F = 0`, by item 8).  So `exists_gradV_ne_zero` does NOT witness that the
+   *dynamics* is non-trivial.
+11. **Non-vacuity of the dynamics** (§15): `∃ s ∈ StateSphere, F s ≠ 0`
+   (`exists_ruleField_ne_zero`), witnessed by the in-flight point
+   `(e₁ + e₂ + e₉)/√3` (CD pair `(e₁ + e₂, e₁)`, `V/N² = 4/9`).  This, not
+   `exists_gradV_ne_zero`, is the statement that rules out the zero field.
+12. **Crystals are not zero divisors** (§18): the norm defect of left
+   multiplication is one associator pairing, `N(x·y) = N x·N y − 2⟪a,[d̄,b,c̄]⟫`
+   (`normForm_mul_eq`), and it vanishes at a vacuum — so `N(s·y) = N s·N y`
+   (`normForm_mul_of_isVacuum`) and `y ↦ s·y` is injective
+   (`crystal_not_zeroDivisor`).
 
 ## FLAG-rule-flow-open — what is NOT proved
 
@@ -76,7 +116,13 @@ here, THEN …"*.  The antecedent is a postulate.
   critical point of `V` on the sphere is a minimum) is **FALSE in general** for
   a quartic on a sphere and is NOT asserted.
 * **Renormalised-step injectivity** is proved only on level sets of `‖F‖`
-  (`renormStep_injOn_of_normForm_const`); the general case is open.
+  (`renormStep_injOn_of_normForm_const`); the general case is open.  The probe
+  scripts run `renormStep`, not `eulerStep` — see item 4 above.
+* **`ZD ⇔ V = N²` is NOT proved here.**  The `⇐` direction is not proof-owed;
+  the `⇒` direction (`s ≠ 0`, `V s = (N s)²` ⟹ `s` is a zero divisor) is owed
+  and OPEN — see `FLAG-P5-open` in the §18 preamble.  Everything in this file
+  about the "zero-divisor locus" is therefore stated on `{V = 1}`, the argmax
+  locus, which is what the proofs actually establish.
 * No measure, no ensemble, no dynamics beyond the ODE form.  The initial
   ensemble remains the beekeeper ruling recorded in `Hosting`.
 
@@ -951,6 +997,637 @@ theorem exists_gradV_ne_zero : ∃ s : CDAlg ℝ 4, gradV s ≠ 0 := by
   rw [potential_witness, potential_zero] at hconst
   norm_num at hconst
 
+/-! ## 12. The closed form of `V` (P1) and the sharp bound `V ≤ N²` (P2)
+
+`P1` is the keystone of the #635 confirmer's proof-owed list
+(`docs/foundations/rule-flow-research-conversation-confirmer-verdict-2026-09-20.md`
+§7): `V` depends only on the *imaginary parts* of the two Cayley–Dickson
+components, through the Gram determinant of the pair.  `Foundations`'
+`DeltaLandscape.sedenion_landscape_descends` is the same identity under the
+standing hypothesis `s.coord 0 = 0`; the statement below drops that hypothesis
+(the real part of `cdLo s` is central for the commutator too), which is what the
+downstream global bound `V ≤ N²` needs. -/
+
+/-- The imaginary part `Im x = x − x₀·1`. -/
+def imPart (x : CDAlg ℝ n) : CDAlg ℝ n := x - (x.coord 0) • (1 : CDAlg ℝ n)
+
+theorem imPart_def (x : CDAlg ℝ n) : imPart x = x - (x.coord 0) • (1 : CDAlg ℝ n) := rfl
+
+/-- `Im x` is imaginary. -/
+theorem imPart_coord_zero (x : CDAlg ℝ n) : (imPart x).coord 0 = 0 :=
+  QBP.Foundations.DeltaLandscape.im_coord_zero x
+
+/-- `N (Im x) = N x − x₀²`. -/
+theorem N_imPart (x : CDAlg ℝ n) : N (imPart x) = N x - (x.coord 0) ^ 2 := by
+  have h : imPart x = x + (-(x.coord 0)) • (1 : CDAlg ℝ n) := by
+    rw [imPart_def, neg_smul]; abel
+  rw [h, alt_N_add, bil_smul_right, bil_one_right,
+    QBP.Foundations.NoAutonomousDynamics.N_smul, N_one']
+  ring
+
+/-- `N (Im x) ≤ N x`. -/
+theorem N_imPart_le (x : CDAlg ℝ n) : N (imPart x) ≤ N x := by
+  rw [N_imPart]; nlinarith [sq_nonneg (x.coord 0)]
+
+/-- **Real multiples of `1` are central for the commutator — left version.**
+    `[x − r·1, y] = [x, y]`.  (`DeltaLandscape.commutator_sub_central` is the
+    right version.) -/
+theorem commutator_sub_central_left {R : Type*} [CommRing R] {n : ℕ}
+    (r : R) (x y : CDAlg R n) :
+    (x - r • (1 : CDAlg R n)) * y - y * (x - r • (1 : CDAlg R n)) = x * y - y * x := by
+  have h := QBP.Foundations.DeltaLandscape.commutator_sub_central r y x
+  have h2 := congrArg (fun z : CDAlg R n => -z) h
+  simpa only [neg_sub] using h2
+
+/-- The CD commutator only sees the imaginary parts:
+    `[cdLo s, cdHi s] = [Im (cdLo s), Im (cdHi s)]`. -/
+theorem comm_eq_imPart (s : CDAlg ℝ 4) :
+    comm s = imPart (cdLo s) * imPart (cdHi s) - imPart (cdHi s) * imPart (cdLo s) := by
+  rw [comm, imPart_def, imPart_def,
+    QBP.Foundations.DeltaLandscape.commutator_sub_central, commutator_sub_central_left]
+
+/-- **P1 — the closed form of the landscape potential.**  For *every* sedenion
+    `s` (no imaginarity hypothesis),
+
+      `V(s) = 4·( N(Im a)·N(Im b) − ⟪Im a, Im b⟫² )`,  `a = cdLo s`, `b = cdHi s`,
+
+    i.e. `4` times the Gram determinant of the imaginary parts of the two
+    Cayley–Dickson components.  Equivalently `V(s) = ‖2·(Im a × Im b)‖²`.
+    This is the confirmer's keystone (§7 P1); `V ≤ N²`, the equality locus and
+    the frozen-locus theorem all follow from it. -/
+theorem potential_eq_cross (s : CDAlg ℝ 4) :
+    Hosting.potential s
+      = 4 * (N (imPart (cdLo s)) * N (imPart (cdHi s))
+             - (bil (imPart (cdLo s)) (imPart (cdHi s))) ^ 2) := by
+  rw [potential_eq_N_comm, comm_eq_imPart]
+  exact QBP.Foundations.DeltaLandscape.octonion_commutator_norm _ _
+    (imPart_coord_zero _) (imPart_coord_zero _)
+
+/-- **P2 — the sharp global bound `V ≤ N²`.**  Cauchy–Schwarz on the Gram
+    determinant (drop `−⟪Im a, Im b⟫² ≤ 0`), then AM–GM `4uv ≤ (u+v)²`, then
+    `N(Im a) + N(Im b) ≤ N a + N b = N s` (`N_split`).  Holds on all of
+    `CDAlg ℝ 4`, not only on `StateSphere`. -/
+theorem potential_le_normForm_sq (s : CDAlg ℝ 4) : Hosting.potential s ≤ (N s) ^ 2 := by
+  have hu : N (imPart (cdLo s)) ≤ N (cdLo s) := N_imPart_le _
+  have hv : N (imPart (cdHi s)) ≤ N (cdHi s) := N_imPart_le _
+  have hu0 : 0 ≤ N (imPart (cdLo s)) := alt_N_nonneg _
+  have hv0 : 0 ≤ N (imPart (cdHi s)) := alt_N_nonneg _
+  have hsplit : N s = N (cdLo s) + N (cdHi s) :=
+    QBP.Foundations.NoAutonomousDynamics.N_split s
+  have hle : N (imPart (cdLo s)) + N (imPart (cdHi s)) ≤ N s := by rw [hsplit]; linarith
+  have h0 : (0 : ℝ) ≤ N (imPart (cdLo s)) + N (imPart (cdHi s)) := by linarith
+  have h1 : 4 * (N (imPart (cdLo s)) * N (imPart (cdHi s)))
+      ≤ (N (imPart (cdLo s)) + N (imPart (cdHi s))) ^ 2 := by
+    nlinarith [sq_nonneg (N (imPart (cdLo s)) - N (imPart (cdHi s)))]
+  have h2 : (N (imPart (cdLo s)) + N (imPart (cdHi s))) ^ 2 ≤ (N s) ^ 2 := by
+    nlinarith [hle, h0]
+  have h3 : (0 : ℝ) ≤ (bil (imPart (cdLo s)) (imPart (cdHi s))) ^ 2 := sq_nonneg _
+  rw [potential_eq_cross]
+  linarith
+
+/-! ## 13. Homogeneity of `V` -/
+
+/-- `[·,·]` is homogeneous of degree 2: `C (r·s) = r²·C s`. -/
+theorem comm_smul (r : ℝ) (s : CDAlg ℝ 4) : comm (r • s) = (r ^ 2) • comm s := by
+  simp only [comm, cdLo_smul, cdHi_smul, mul_smul_left, mul_smul_right, smul_smul]
+  module
+
+/-- `V` is homogeneous of degree 4: `V(r·s) = r⁴·V(s)`. -/
+theorem potential_smul (r : ℝ) (s : CDAlg ℝ 4) :
+    Hosting.potential (r • s) = r ^ 4 * Hosting.potential s := by
+  rw [potential_eq_N_comm, potential_eq_N_comm, comm_smul,
+    QBP.Foundations.NoAutonomousDynamics.N_smul]
+  ring
+
+/-- `secVar` is linear in its first (base-point) argument. -/
+theorem secVar_smul_left (r : ℝ) (s v : CDAlg ℝ 4) :
+    secVar (r • s) v = r • secVar s v := by
+  simp only [secVar, cdLo_smul, cdHi_smul, mul_smul_left, mul_smul_right]
+  module
+
+/-! ## 14. P3 — `V` is ANTITONE along the flow (not merely `deriv ≤ 0`)
+
+`potential_nonincreasing_along_flow` (§6) is a **pointwise** statement: the
+derivative of `V ∘ γ` at one time `t` is `≤ 0`.  Every locus-avoidance argument
+needs the *monotone* form on an interval.  This is the confirmer's P3. -/
+
+/-- **P3 — the potential is antitone along any integral curve on the state
+    sphere.**  For `γ` continuous on `[a,b]`, an integral curve of `F` on
+    `(a,b)`, staying on `StateSphere`: `t ↦ V(γ t)` is antitone on `[a,b]`. -/
+theorem potential_antitone_along_flow {a b : ℝ} {γ : ℝ → CDAlg ℝ 4}
+    (hcont : ContinuousOn γ (Set.Icc a b))
+    (hd : ∀ t ∈ Set.Ioo a b, HasDerivAt γ (ruleField (γ t)) t)
+    (hmem : ∀ t ∈ Set.Icc a b, γ t ∈ Hosting.StateSphere) :
+    AntitoneOn (fun t => Hosting.potential (γ t)) (Set.Icc a b) := by
+  refine antitoneOn_of_deriv_nonpos (convex_Icc a b) ?_ ?_ ?_
+  · exact ((contDiff_potential (k := 1)).continuous).comp_continuousOn hcont
+  · rw [interior_Icc]
+    intro t ht
+    exact ((hasDerivAt_potential_along_flow (hd t ht)
+      (hmem t (Set.Ioo_subset_Icc_self ht))).differentiableAt).differentiableWithinAt
+  · rw [interior_Icc]
+    intro t ht
+    rw [(hasDerivAt_potential_along_flow (hd t ht)
+      (hmem t (Set.Ioo_subset_Icc_self ht))).deriv]
+    exact neg_nonpos.mpr (alt_N_nonneg _)
+
+/-! ## 15. P4 — an IN-FLIGHT witness with `F ≠ 0`
+
+The §10 witness `e₁ + e₁₀` is unusable for non-triviality of the *dynamics*:
+it is one of the 42 rank-2 zero divisors, it sits on the argmax locus `{V = N²}`,
+and once normalised it is a **rest point** (`F = 0`).  The confirmer measured
+`‖F‖ = 0` there to `6.3e-16` and supplied a usable replacement,
+`(e₁ + e₂ + e₉)/√3`, with `V/N² = 4/9` and `‖F‖ = 1.9876`.  In Cayley–Dickson
+pair coordinates that is `(e₁ + e₂, e₁)`.  The proof does not compute `F`: it
+pairs `F` against the tangent direction `e₁₀ = (0, e₂)` and uses
+`⟪F s, v⟫ = −⟪∇V s, v⟫ = −2⟪C s, secVar s v⟫` for tangent imaginary `v`. -/
+
+/-- `⟪x, 0⟫ = 0`. -/
+theorem bil_zero_right (x : CDAlg ℝ n) : bil x 0 = 0 := by
+  simp only [bil_def, zero_coord, mul_zero]
+  exact Finset.sum_const_zero
+
+/-- `⟪0, y⟫ = 0`. -/
+theorem bil_zero_left (y : CDAlg ℝ n) : bil 0 y = 0 := by
+  rw [NormForm.bil_symm]; exact bil_zero_right y
+
+/-- **Tangential test for the rule field.**  If `v` is orthogonal to `s` and
+    imaginary, then `⟪F s, v⟫ = −⟪∇V s, v⟫`: the two correction terms in the
+    definition of `F` are orthogonal to `v`. -/
+theorem bil_ruleField_tangent {s v : CDAlg ℝ 4} (hsv : bil s v = 0) (hv : v.coord 0 = 0) :
+    bil (ruleField s) v = - bil (gradV s) v := by
+  rw [ruleField, bil_neg_left, bil_sub_left, bil_sub_left, bil_smul_left, bil_smul_left,
+    hsv, bil_one_left, hv]
+  ring
+
+/-- The in-flight witness `(e₁ + e₂, e₁)` = `e₁ + e₂ + e₉` (unnormalised). -/
+noncomputable def flowWitness : CDAlg ℝ 4 := loOf (e 1 + e 2) + hiOf (e 1)
+
+/-- The tangent direction `(0, e₂)` = `e₁₀` used to detect `F ≠ 0`. -/
+noncomputable def flowWitnessDir : CDAlg ℝ 4 := hiOf (e 2)
+
+theorem cdLo_flowWitness : cdLo flowWitness = e 1 + e 2 := by
+  rw [flowWitness, cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+
+theorem cdHi_flowWitness : cdHi flowWitness = e 1 := by
+  rw [flowWitness, cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]
+
+theorem cdLo_flowWitnessDir : cdLo flowWitnessDir = 0 := by
+  rw [flowWitnessDir, cdLo_hiOf]
+
+theorem cdHi_flowWitnessDir : cdHi flowWitnessDir = e 2 := by
+  rw [flowWitnessDir, cdHi_hiOf]
+
+/-- `C(flowWitness) = −2·μ·e₃` with `μ = mulCoeff 3 1 2 = ±1`. -/
+theorem comm_flowWitness :
+    comm flowWitness = ((-2 * (mulCoeff 3 1 2 : ℤ) : ℤ) : ℝ) • (e 3 : CDAlg ℝ 3) := by
+  have h21 : mulCoeff 3 2 1 = - mulCoeff 3 1 2 := by decide
+  have h11 : (1 ^^^ 1 : Fin (2 ^ 3)) = 0 := by decide
+  have hx1 : (1 ^^^ 2 : Fin (2 ^ 3)) = 3 := by decide
+  have hx2 : (2 ^^^ 1 : Fin (2 ^ 3)) = 3 := by decide
+  rw [comm, cdLo_flowWitness, cdHi_flowWitness, mul_add_left, mul_add_right,
+    e_mul_e, e_mul_e, e_mul_e, h11, hx1, hx2, h21]
+  push_cast
+  module
+
+/-- `secVar(flowWitness, e₁₀) = 2·μ·e₃`. -/
+theorem secVar_flowWitness :
+    secVar flowWitness flowWitnessDir
+      = ((2 * (mulCoeff 3 1 2 : ℤ) : ℤ) : ℝ) • (e 3 : CDAlg ℝ 3) := by
+  have h21 : mulCoeff 3 2 1 = - mulCoeff 3 1 2 := by decide
+  have h22 : (2 ^^^ 2 : Fin (2 ^ 3)) = 0 := by decide
+  have hx1 : (1 ^^^ 2 : Fin (2 ^ 3)) = 3 := by decide
+  have hx2 : (2 ^^^ 1 : Fin (2 ^ 3)) = 3 := by decide
+  rw [secVar, cdLo_flowWitness, cdHi_flowWitness, cdLo_flowWitnessDir, cdHi_flowWitnessDir,
+    alt_zero_mul, alt_mul_zero, sub_zero, add_zero, mul_add_left, mul_add_right,
+    e_mul_e, e_mul_e, e_mul_e, h22, hx1, hx2, h21]
+  push_cast
+  module
+
+/-- The pairing that certifies `F ≠ 0`: `⟪C w, secVar w v⟫ = −4 ≠ 0`. -/
+theorem bil_comm_secVar_flowWitness :
+    bil (comm flowWitness) (secVar flowWitness flowWitnessDir) = -4 := by
+  have hsq : (mulCoeff 3 1 2 : ℤ) * (mulCoeff 3 1 2 : ℤ) = 1 := by decide
+  have hcast : ((mulCoeff 3 1 2 : ℤ) : ℝ) * ((mulCoeff 3 1 2 : ℤ) : ℝ) = 1 := by
+    exact_mod_cast congrArg (fun z : ℤ => (z : ℝ)) hsq
+  rw [comm_flowWitness, secVar_flowWitness, bil_smul_left, bil_smul_right, bil_e, if_pos rfl]
+  push_cast
+  linear_combination (-4 : ℝ) * hcast
+
+theorem normForm_flowWitness : N flowWitness = 3 := by
+  have h12 : bil (e 1 : CDAlg ℝ 3) (e 2) = 0 := by rw [bil_e, if_neg (by decide)]
+  rw [QBP.Foundations.NoAutonomousDynamics.N_split, cdLo_flowWitness, cdHi_flowWitness,
+    alt_N_add, h12, N_e, N_e]
+  norm_num
+
+theorem flowWitness_coord_zero : flowWitness.coord 0 = 0 := by
+  have h : (cdLo flowWitness).coord 0 = flowWitness.coord 0 := by rw [cdLo_coord, loIdx_zero]
+  rw [← h, cdLo_flowWitness, add_coord, e_coord, e_coord, if_neg (by decide),
+    if_neg (by decide)]
+  ring
+
+theorem flowWitness_ne_zero : flowWitness ≠ 0 := by
+  intro h
+  have := normForm_flowWitness
+  rw [h] at this
+  rw [(alt_N_eq_zero_iff (0 : CDAlg ℝ 4)).mpr rfl] at this
+  norm_num at this
+
+theorem flowWitnessDir_coord_zero : flowWitnessDir.coord 0 = 0 := by
+  have h : (cdLo flowWitnessDir).coord 0 = flowWitnessDir.coord 0 := by
+    rw [cdLo_coord, loIdx_zero]
+  rw [← h, cdLo_flowWitnessDir, zero_coord]
+
+theorem bil_flowWitness_dir : bil flowWitness flowWitnessDir = 0 := by
+  rw [bil_split, cdLo_flowWitness, cdHi_flowWitness, cdLo_flowWitnessDir, cdHi_flowWitnessDir,
+    bil_zero_right, bil_e, if_neg (by decide)]
+  ring
+
+/-- **P4 — the dynamics is not trivial: some state-sphere point moves.**
+    `∃ s ∈ StateSphere, F s ≠ 0`, witnessed by `(e₁ + e₂ + e₉)/√3`.  Note this is
+    NOT deducible from `exists_gradV_ne_zero`: that theorem's witness `e₁ + e₁₀`
+    is a zero divisor and, normalised, a rest point. -/
+theorem exists_ruleField_ne_zero : ∃ s ∈ Hosting.StateSphere, ruleField s ≠ 0 := by
+  refine ⟨Hosting.normalise flowWitness,
+    Hosting.normalise_mem_stateSphere flowWitness_coord_zero flowWitness_ne_zero, ?_⟩
+  set r : ℝ := (Real.sqrt (N flowWitness))⁻¹ with hr
+  have hrpos : 0 < r := by
+    rw [hr, normForm_flowWitness]
+    positivity
+  have hnorm : Hosting.normalise flowWitness = r • flowWitness := rfl
+  have hsv : bil (r • flowWitness) flowWitnessDir = 0 := by
+    rw [bil_smul_left, bil_flowWitness_dir]; ring
+  have hgrad : bil (gradV (r • flowWitness)) flowWitnessDir = -8 * r ^ 3 := by
+    rw [bil_gradV, comm_smul, secVar_smul_left, bil_smul_left, bil_smul_right,
+      bil_comm_secVar_flowWitness]
+    ring
+  have hkey : bil (ruleField (r • flowWitness)) flowWitnessDir = 8 * r ^ 3 := by
+    rw [bil_ruleField_tangent hsv flowWitnessDir_coord_zero, hgrad]
+    ring
+  intro hzero
+  rw [← hnorm, hzero, bil_zero_left] at hkey
+  have : (0 : ℝ) < 8 * r ^ 3 := by positivity
+  linarith
+
+/-! ## 16. P7/P6 — the argmax of `V` on the sphere is `1`, and it is FROZEN -/
+
+theorem isClosed_stateSphere : IsClosed Hosting.StateSphere := by
+  have h1 : Continuous fun s : CDAlg ℝ 4 => s.coord 0 := (coordCLM 4 0).continuous
+  have h2 : Continuous fun s : CDAlg ℝ 4 => N s :=
+    (contDiff_normForm (k := 1) (contDiff_id (𝕜 := ℝ) (E := CDAlg ℝ 4))).continuous
+  exact (isClosed_eq h1 continuous_const).inter (isClosed_eq h2 continuous_const)
+
+theorem isCompact_stateSphere : IsCompact Hosting.StateSphere :=
+  IsCompact.of_isClosed_subset (isCompact_closedBall (0 : CDAlg ℝ 4) 1)
+    isClosed_stateSphere stateSphere_subset_closedBall
+
+theorem normForm_witness : N witness = 2 := by
+  have hlo : cdLo witness = e 1 := by rw [witness, cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+  have hhi : cdHi witness = e 2 := by rw [witness, cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]
+  rw [QBP.Foundations.NoAutonomousDynamics.N_split, hlo, hhi, N_e, N_e]
+  norm_num
+
+theorem witness_coord_zero : witness.coord 0 = 0 := by
+  have hlo : cdLo witness = e 1 := by rw [witness, cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+  have h : (cdLo witness).coord 0 = witness.coord 0 := by rw [cdLo_coord, loIdx_zero]
+  rw [← h, hlo, e_coord, if_neg (by decide)]
+
+theorem witness_ne_zero : witness ≠ 0 := by
+  intro h
+  have h2 := normForm_witness
+  rw [h, (alt_N_eq_zero_iff (0 : CDAlg ℝ 4)).mpr rfl] at h2
+  norm_num at h2
+
+/-- **The normalised zero divisor `(e₁ + e₁₀)/√2` attains `V = 1`.** -/
+theorem potential_normalise_witness : Hosting.potential (Hosting.normalise witness) = 1 := by
+  rw [Hosting.normalise_def, potential_smul, potential_witness, normForm_witness, inv_pow,
+    show Real.sqrt 2 ^ 4 = (Real.sqrt 2 ^ 2) ^ 2 by ring, Real.sq_sqrt (by norm_num : (0:ℝ) ≤ 2)]
+  norm_num
+
+theorem stateSphere_nonempty : Hosting.StateSphere.Nonempty :=
+  ⟨Hosting.normalise witness,
+    Hosting.normalise_mem_stateSphere witness_coord_zero witness_ne_zero⟩
+
+/-- **P7 — `V` attains its maximum on `StateSphere`, and that maximum is `1`.**
+    Compactness (`StateSphere` is closed and bounded in a finite-dimensional
+    space) gives attainment; `V ≤ N² = 1` (P2) bounds it above; the normalised
+    zero divisor `(e₁ + e₁₀)/√2` attains `1`, so the bound is sharp. -/
+theorem exists_isMaxOn_potential_stateSphere :
+    ∃ s ∈ Hosting.StateSphere,
+      IsMaxOn Hosting.potential Hosting.StateSphere s ∧ Hosting.potential s = 1 := by
+  obtain ⟨s, hs, hmax⟩ := isCompact_stateSphere.exists_isMaxOn stateSphere_nonempty
+    ((contDiff_potential (k := 1)).continuous).continuousOn
+  refine ⟨s, hs, hmax, le_antisymm ?_ ?_⟩
+  · have h := potential_le_normForm_sq s
+    rw [hs.2] at h
+    simpa using h
+  · have hz : Hosting.potential (Hosting.normalise witness) ≤ Hosting.potential s :=
+      hmax (Hosting.normalise_mem_stateSphere witness_coord_zero witness_ne_zero)
+    rwa [potential_normalise_witness] at hz
+
+/-- **The tangential gradient vanishes at a point of `{V = 1} ∩ StateSphere`.**
+    The trick avoids Lagrange multipliers: by P2 the function
+    `h(t) = V(s + t·v) − N(s + t·v)²` is `≤ 0` *everywhere*, and `h(0) = 0` when
+    `V(s) = N(s)² = 1`.  So `0` is a global max of `h`; and if `⟪s,v⟫ = 0` the
+    `N²` term has vanishing derivative at `0`, so `h'(0) = ⟪∇V s, v⟫ = 0`. -/
+theorem bil_gradV_eq_zero_of_potential_eq_one {s v : CDAlg ℝ 4}
+    (hs : s ∈ Hosting.StateSphere) (h1 : Hosting.potential s = 1) (hv : bil s v = 0) :
+    bil (gradV s) v = 0 := by
+  have hN : ∀ t : ℝ, N (s + t • v) = 1 + t ^ 2 * N v := by
+    intro t
+    rw [alt_N_add, bil_smul_right, hv, QBP.Foundations.NoAutonomousDynamics.N_smul, hs.2]
+    ring
+  have hd1 : HasDerivAt (fun t : ℝ => Hosting.potential (s + t • v))
+      (2 * bil (comm s) (secVar s v)) 0 := hasDerivAt_potential_ray s v
+  have hd2 : HasDerivAt (fun t : ℝ => (N (s + t • v)) ^ 2) 0 0 := by
+    have he : (fun t : ℝ => (N (s + t • v)) ^ 2) = fun t : ℝ => (1 + t ^ 2 * N v) ^ 2 := by
+      funext t; rw [hN t]
+    rw [he]
+    have hin : HasDerivAt (fun t : ℝ => 1 + t ^ 2 * N v) 0 0 := by
+      simpa using ((hasDerivAt_pow 2 (0 : ℝ)).mul_const (N v)).const_add (1 : ℝ)
+    simpa using hin.pow 2
+  have hdf : HasDerivAt (fun t : ℝ => Hosting.potential (s + t • v) - (N (s + t • v)) ^ 2)
+      (2 * bil (comm s) (secVar s v) - 0) 0 := hd1.sub hd2
+  have hf0 : Hosting.potential (s + (0 : ℝ) • v) - (N (s + (0 : ℝ) • v)) ^ 2 = 0 := by
+    rw [zero_smul, add_zero, h1, hs.2]; norm_num
+  have hlm : IsLocalMax (fun t : ℝ => Hosting.potential (s + t • v) - (N (s + t • v)) ^ 2) 0 := by
+    refine Filter.Eventually.of_forall (fun t => ?_)
+    have h := potential_le_normForm_sq (s + t • v)
+    simp only [hf0]
+    linarith
+  have hzero := hlm.hasDerivAt_eq_zero hdf
+  rw [bil_gradV]
+  linarith
+
+/-- **P6 — the frozen-locus theorem.**  Every state-sphere point at which `V`
+    attains its maximum value `1` is a REST POINT of the rule: `F s = 0`.
+    Since every zero divisor on the sphere has `V = 1`, the zero-divisor locus is
+    frozen — it cannot be entered (`V` is antitone, P3) and cannot be left. -/
+theorem ruleField_eq_zero_of_potential_eq_one {s : CDAlg ℝ 4}
+    (hs : s ∈ Hosting.StateSphere) (h1 : Hosting.potential s = 1) : ruleField s = 0 := by
+  have hv : bil s (ruleField s) = 0 := by
+    rw [NormForm.bil_symm]; exact ruleField_bil_self hs
+  have h := bil_gradV_eq_zero_of_potential_eq_one hs h1 hv
+  rw [bil_gradV_ruleField hs] at h
+  have hN : N (ruleField s) = 0 := by linarith
+  exact (alt_N_eq_zero_iff _).mp hN
+
+/-! ## 17. P8 — the ω-limit set of a sub-maximal forward orbit avoids `{V = 1}` -/
+
+/-- **The tail bound.**  Along a forward integral curve on the state sphere,
+    `V(γ t) ≤ V(γ 0)` for every `t ≥ 0` (P3 applied on `[0,t]`). -/
+theorem potential_le_initial_along_flow {γ : ℝ → CDAlg ℝ 4}
+    (hcont : ContinuousOn γ (Set.Ici 0))
+    (hd : ∀ t ∈ Set.Ioi (0 : ℝ), HasDerivAt γ (ruleField (γ t)) t)
+    (hmem : ∀ t ∈ Set.Ici (0 : ℝ), γ t ∈ Hosting.StateSphere) :
+    ∀ t ∈ Set.Ici (0 : ℝ), Hosting.potential (γ t) ≤ Hosting.potential (γ 0) := by
+  intro t ht
+  have ht0 : (0 : ℝ) ≤ t := ht
+  have hanti := potential_antitone_along_flow (a := 0) (b := t)
+    (hcont.mono (Set.Icc_subset_Ici_self))
+    (fun u hu => hd u (lt_of_le_of_lt (le_refl 0) hu.1))
+    (fun u hu => hmem u (le_trans (le_refl 0) hu.1))
+  exact hanti (Set.left_mem_Icc.mpr ht0) (Set.right_mem_Icc.mpr ht0) ht0
+
+/-- **The closure form.**  Every limit point of the forward orbit inherits the
+    tail bound, because `{x | V x ≤ c}` is closed. -/
+theorem potential_le_initial_of_mem_closure {γ : ℝ → CDAlg ℝ 4}
+    (hcont : ContinuousOn γ (Set.Ici 0))
+    (hd : ∀ t ∈ Set.Ioi (0 : ℝ), HasDerivAt γ (ruleField (γ t)) t)
+    (hmem : ∀ t ∈ Set.Ici (0 : ℝ), γ t ∈ Hosting.StateSphere)
+    {p : CDAlg ℝ 4} (hp : p ∈ closure (γ '' Set.Ici 0)) :
+    Hosting.potential p ≤ Hosting.potential (γ 0) := by
+  have hsub : γ '' Set.Ici 0 ⊆ {x | Hosting.potential x ≤ Hosting.potential (γ 0)} := by
+    rintro _ ⟨t, ht, rfl⟩
+    exact potential_le_initial_along_flow hcont hd hmem t ht
+  have hclosed : IsClosed {x : CDAlg ℝ 4 | Hosting.potential x ≤ Hosting.potential (γ 0)} :=
+    isClosed_le ((contDiff_potential (k := 1)).continuous) continuous_const
+  exact closure_minimal hsub hclosed hp
+
+/-- **P8 — locus avoidance.**  If a forward integral curve on the state sphere
+    starts strictly below the maximum (`V(γ 0) < 1`), then every point of its
+    ω-limit set also has `V < 1` — in particular the ω-limit set misses the
+    zero-divisor locus `{V = 1}` (frozen by P6).
+
+    `omegaLimit Filter.atTop (fun t _ => γ t) Set.univ` is Mathlib's ω-limit of
+    the single orbit: `⋂ u ∈ atTop, closure (γ '' u)`. -/
+theorem omega_avoids_locus {γ : ℝ → CDAlg ℝ 4}
+    (hcont : ContinuousOn γ (Set.Ici 0))
+    (hd : ∀ t ∈ Set.Ioi (0 : ℝ), HasDerivAt γ (ruleField (γ t)) t)
+    (hmem : ∀ t ∈ Set.Ici (0 : ℝ), γ t ∈ Hosting.StateSphere)
+    (h0 : Hosting.potential (γ 0) < 1)
+    {p : CDAlg ℝ 4}
+    (hp : p ∈ omegaLimit Filter.atTop (fun (_t : ℝ) (_ : Unit) => γ _t) Set.univ) :
+    Hosting.potential p < 1 := by
+  rw [omegaLimit_def] at hp
+  have hmem' := Set.mem_iInter₂.mp hp (Set.Ici (0 : ℝ)) (Filter.Ici_mem_atTop 0)
+  have himg : Set.image2 (fun (_t : ℝ) (_ : Unit) => γ _t) (Set.Ici 0) Set.univ
+      = γ '' Set.Ici 0 := by
+    ext y
+    simp only [Set.mem_image2, Set.mem_univ, true_and, Set.mem_image, exists_const]
+  rw [himg] at hmem'
+  exact lt_of_le_of_lt (potential_le_initial_of_mem_closure hcont hd hmem hmem') h0
+
+/-- Every point of the ω-limit set of a sub-maximal forward orbit is a
+    non-maximiser; combined with P6 (`V = 1 ⇒ F = 0`) this is the precise
+    statement the #635 conversation's "frozen locus" argument needs. -/
+theorem omega_ne_of_potential_eq_one {γ : ℝ → CDAlg ℝ 4}
+    (hcont : ContinuousOn γ (Set.Ici 0))
+    (hd : ∀ t ∈ Set.Ioi (0 : ℝ), HasDerivAt γ (ruleField (γ t)) t)
+    (hmem : ∀ t ∈ Set.Ici (0 : ℝ), γ t ∈ Hosting.StateSphere)
+    (h0 : Hosting.potential (γ 0) < 1)
+    {p q : CDAlg ℝ 4}
+    (hp : p ∈ omegaLimit Filter.atTop (fun (_t : ℝ) (_ : Unit) => γ _t) Set.univ)
+    (hq : Hosting.potential q = 1) : p ≠ q := by
+  intro h
+  have := omega_avoids_locus hcont hd hmem h0 hp
+  rw [h, hq] at this
+  exact lt_irrefl 1 this
+
+/-! ## 18. P9 — a crystal is not a zero divisor
+
+The route is the **norm defect of left multiplication**.  Writing `x = (a,b)`,
+`y = (c,d)` in Cayley–Dickson pairs and using the doubling formula
+(`NoAutonomousDynamics.cdLo_mul`/`cdHi_mul`) together with 𝕆's norm composition:
+
+    N(x·y) = N x · N y − 2·⟪a, [d̄, b, c̄]⟫       (`normForm_mul_eq`)
+
+where `[·,·,·] = assoc` is the octonion associator.  At a **crystal** (`[a,b] = 0`)
+the imaginary part of `b` is a real multiple of `a` (equality in Cauchy–Schwarz,
+read off from `potential_eq_cross`), the real part of `b` is associator-inert, and
+the associator is alternating — so the defect vanishes identically and `L_x` is a
+similarity of the norm form, hence injective.
+
+**FLAG-P5-open.**  The confirmer's P5 (`s ≠ 0 → V s = (N s)² → s` is a zero
+divisor) is **NOT** proved here.  The route hinted in the verdict,
+`N(s·x) ≥ (N s − √(V s))·N x`, degenerates at `V s = (N s)²` to `N(s·x) ≥ 0`,
+which is vacuous; the `⇒` direction needs an *exhibited* kernel vector (or the
+4/8/4 spectral identity of `L_sᵀL_s`, an XL-cost object).  What IS proved here is
+the P9-relevant consequence of the same defect identity, in the opposite regime
+(`V = 0`).  Nothing below may be read as establishing P5. -/
+
+theorem assoc_def (x y z : CDAlg ℝ n) : assoc x y z = (x * y) * z - x * (y * z) := rfl
+
+/-- `⟪x, −y⟫ = −⟪x, y⟫`. -/
+theorem bil_neg_right (x y : CDAlg ℝ n) : bil x (-y) = - bil x y := by
+  rw [NormForm.bil_symm, bil_neg_left, NormForm.bil_symm]
+
+/-- Polarization of `N` over a difference. -/
+theorem N_sub (x y : CDAlg ℝ n) : N (x - y) = N x - 2 * bil x y + N y := by
+  have h : x - y = x + (-1 : ℝ) • y := by module
+  rw [h, alt_N_add, bil_smul_right, QBP.Foundations.NoAutonomousDynamics.N_smul]
+  ring
+
+theorem imPart_eq_self {x : CDAlg ℝ n} (hx : x.coord 0 = 0) : imPart x = x := by
+  rw [imPart_def, hx, zero_smul, sub_zero]
+
+theorem conj_eq_neg_of_coord_zero {x : CDAlg ℝ n} (hx : x.coord 0 = 0) : conj x = -x := by
+  rw [conj_eq_sub, hx, mul_zero, zero_smul, zero_sub]
+
+theorem conj_conj_cd (x : CDAlg ℝ n) : conj (conj x) = x := by
+  ext i
+  by_cases h : i.val = 0 <;> simp [h]
+
+/-- `1` is inert in the middle slot of the associator. -/
+theorem assoc_mid_one (x z : CDAlg ℝ n) : assoc x (1 : CDAlg ℝ n) z = 0 := by
+  rw [assoc_def, cd_mul_one, cd_one_mul, sub_self]
+
+theorem assoc_neg_left (x y z : CDAlg ℝ n) : assoc (-x) y z = - assoc x y z := by
+  have h : (-x : CDAlg ℝ n) = (-1 : ℝ) • x := by module
+  rw [h, assoc_trilinear.smul_left]
+  module
+
+/-- **Adjoint transfer for the octonion associator.**
+    `⟪[x,y,z], w⟫ = −⟪y, [x̄, w, z̄]⟫`.  Pure consequence of the two adjoint
+    identities `⟪x·p, q⟫ = ⟪p, x̄·q⟫`, `⟪p·x, q⟫ = ⟪p, q·x̄⟫` (§2). -/
+theorem bil_assoc_transfer (x y z w : CDAlg ℝ 3) :
+    bil (assoc x y z) w = - bil y (assoc (conj x) w (conj z)) := by
+  rw [assoc_def, assoc_def, bil_sub_left, bil_sub_right,
+    bil_mul_right_adj z (x * y) w, bil_mul_left_adj x y (w * conj z),
+    bil_mul_left_adj x (y * z) w, bil_mul_right_adj z y (conj x * w)]
+  ring
+
+/-- **The middle-slot contraction vanishes for an imaginary vector.**
+    `⟪a, [u, a, v]⟫ = 0` whenever `a₀ = 0`.  Proof: swap the first two slots
+    (polarized left alternativity), transfer the adjoint, use `ā = −a` and
+    `[a,a,·] = 0`. -/
+theorem bil_assoc_mid_self_of_imaginary {a : CDAlg ℝ 3} (ha : a.coord 0 = 0)
+    (u v : CDAlg ℝ 3) : bil a (assoc u a v) = 0 := by
+  have hswap : assoc u a v = - assoc a u v := by
+    rw [eq_neg_iff_add_eq_zero]; exact octonion_left_alternative_polarized u a v
+  rw [hswap, bil_neg_right, NormForm.bil_symm a (assoc a u v),
+    bil_assoc_transfer a u v a, conj_eq_neg_of_coord_zero ha, assoc_neg_left,
+    bil_neg_right, assoc_diag_left, bil_zero_right]
+  ring
+
+/-- **The norm defect of left multiplication on 𝕊.**  For `x = (a,b)`, `y = (c,d)`:
+
+      `N(x·y) = N x · N y − 2·⟪a, [d̄, b, c̄]⟫`.
+
+    The whole failure of the composition law on the sedenions sits in that one
+    associator pairing. -/
+theorem normForm_mul_eq (x y : CDAlg ℝ 4) :
+    N (x * y) = N x * N y
+      - 2 * bil (cdLo x) (assoc (conj (cdHi y)) (cdHi x) (conj (cdLo y))) := by
+  have hcomp := QBP.Foundations.NormForm.octonion_norm_form_composition
+  have h1 : N (cdLo (x * y))
+      = N (cdLo x) * N (cdLo y) + N (cdHi y) * N (cdHi x)
+        - 2 * bil (cdLo x * cdLo y) (conj (cdHi y) * cdHi x) := by
+    rw [QBP.Foundations.NoAutonomousDynamics.cdLo_mul, N_sub, hcomp, hcomp,
+      QBP.Foundations.NoAutonomousDynamics.N_conj]
+    ring
+  have h2 : N (cdHi (x * y))
+      = N (cdHi y) * N (cdLo x) + N (cdHi x) * N (cdLo y)
+        + 2 * bil (cdHi y * cdLo x) (cdHi x * conj (cdLo y)) := by
+    rw [QBP.Foundations.NoAutonomousDynamics.cdHi_mul, alt_N_add, hcomp, hcomp,
+      QBP.Foundations.NoAutonomousDynamics.N_conj]
+    ring
+  have hA : bil (cdHi y * cdLo x) (cdHi x * conj (cdLo y))
+      = bil (cdLo x) (conj (cdHi y) * (cdHi x * conj (cdLo y))) :=
+    bil_mul_left_adj (cdHi y) (cdLo x) (cdHi x * conj (cdLo y))
+  have hB : bil (cdLo x * cdLo y) (conj (cdHi y) * cdHi x)
+      = bil (cdLo x) ((conj (cdHi y) * cdHi x) * conj (cdLo y)) :=
+    bil_mul_right_adj (cdLo y) (cdLo x) (conj (cdHi y) * cdHi x)
+  have hassoc : bil (cdLo x) (assoc (conj (cdHi y)) (cdHi x) (conj (cdLo y)))
+      = bil (cdLo x) ((conj (cdHi y) * cdHi x) * conj (cdLo y))
+        - bil (cdLo x) (conj (cdHi y) * (cdHi x * conj (cdLo y))) := by
+    rw [assoc_def, bil_sub_right]
+  rw [QBP.Foundations.NoAutonomousDynamics.N_split (x * y), h1, h2, hA, hB, hassoc,
+    QBP.Foundations.NoAutonomousDynamics.N_split x,
+    QBP.Foundations.NoAutonomousDynamics.N_split y]
+  ring
+
+/-- **At a crystal the defect vanishes.**  `⟪a, [u, b, v]⟫ = 0` for every `u, v`,
+    because `Im b` is a real multiple of `a` (equality in Cauchy–Schwarz, from
+    `V(s) = 0` and `potential_eq_cross`) and the associator is alternating. -/
+theorem bil_cdLo_assoc_eq_zero_of_isVacuum {s : CDAlg ℝ 4} (hv : IsVacuum s)
+    (u v : CDAlg ℝ 3) : bil (cdLo s) (assoc u (cdHi s) v) = 0 := by
+  have ha0 : (cdLo s).coord 0 = 0 := cdLo_coord_zero hv.1
+  by_cases hA : cdLo s = 0
+  · rw [hA, bil_zero_left]
+  · have hNa : N (cdLo s) ≠ 0 := fun h => hA ((alt_N_eq_zero_iff _).mp h)
+    have hp0 : Hosting.potential s = 0 := (Hosting.potential_eq_zero_iff_isVacuum hv.1).mpr hv
+    have hcross := potential_eq_cross s
+    rw [hp0, imPart_eq_self ha0] at hcross
+    have hAP : N (cdLo s) * N (imPart (cdHi s))
+        = (bil (cdLo s) (imPart (cdHi s))) ^ 2 := by linarith [hcross]
+    set lam : ℝ := bil (cdLo s) (imPart (cdHi s)) / N (cdLo s) with hlam
+    have hlamA : lam * N (cdLo s) = bil (cdLo s) (imPart (cdHi s)) := by
+      rw [hlam]; field_simp
+    have hlamQ : lam * bil (cdLo s) (imPart (cdHi s)) = N (imPart (cdHi s)) := by
+      rw [hlam, div_mul_eq_mul_div, div_eq_iff hNa]
+      linarith [hAP]
+    have hexp : N (imPart (cdHi s) - lam • cdLo s)
+        = N (imPart (cdHi s)) - 2 * (lam * bil (cdLo s) (imPart (cdHi s)))
+          + lam ^ 2 * N (cdLo s) := by
+      rw [N_sub, bil_smul_right, QBP.Foundations.NoAutonomousDynamics.N_smul,
+        NormForm.bil_symm (imPart (cdHi s)) (cdLo s)]
+    have hzero : N (imPart (cdHi s) - lam • cdLo s) = 0 := by
+      rw [hexp, show lam ^ 2 * N (cdLo s) = lam * (lam * N (cdLo s)) by ring, hlamA, hlamQ]
+      ring
+    have hb : imPart (cdHi s) = lam • cdLo s := by
+      have h := (alt_N_eq_zero_iff _).mp hzero
+      rwa [sub_eq_zero] at h
+    have hbb : cdHi s = lam • cdLo s + ((cdHi s).coord 0) • (1 : CDAlg ℝ 3) := by
+      rw [← hb, imPart_def]; abel
+    rw [hbb, assoc_trilinear.add_mid, assoc_trilinear.smul_mid, assoc_trilinear.smul_mid,
+      assoc_mid_one, smul_zero, add_zero, bil_smul_right,
+      bil_assoc_mid_self_of_imaginary ha0]
+    ring
+
+/-- **A crystal composes:** `N(s·y) = N s · N y` for every `y`, when `s` is a
+    vacuum.  (The confirmer measured `σ_min(L_s) = 1.000000` and kernel dimension
+    `0` on 200 random crystals; this is the theorem behind that measurement.) -/
+theorem normForm_mul_of_isVacuum {s : CDAlg ℝ 4} (hv : IsVacuum s) (y : CDAlg ℝ 4) :
+    N (s * y) = N s * N y := by
+  rw [normForm_mul_eq, bil_cdLo_assoc_eq_zero_of_isVacuum hv]
+  ring
+
+/-- **P9 — a crystal is not a zero divisor.**  Left multiplication by a non-zero
+    vacuum is injective on all of 𝕊.  No information is lost by multiplying by a
+    crystal. -/
+theorem crystal_not_zeroDivisor {s : CDAlg ℝ 4} (hv : IsVacuum s) (hs : s ≠ 0) :
+    Function.Injective (fun y : CDAlg ℝ 4 => s * y) := by
+  have hNs : N s ≠ 0 := fun h => hs ((alt_N_eq_zero_iff _).mp h)
+  intro y₁ y₂ h
+  simp only at h
+  have hdist : s * (y₁ - y₂) = s * y₁ - s * y₂ := by
+    have hy : y₁ - y₂ = y₁ + (-1 : ℝ) • y₂ := by module
+    rw [hy, mul_add_right, mul_smul_right]
+    module
+  have h0 : s * (y₁ - y₂) = 0 := by rw [hdist, h, sub_self]
+  have hN : N s * N (y₁ - y₂) = 0 := by
+    rw [← normForm_mul_of_isVacuum hv, h0, (alt_N_eq_zero_iff (0 : CDAlg ℝ 4)).mpr rfl]
+  have h1 := (mul_eq_zero.mp hN).resolve_left hNs
+  exact sub_eq_zero.mp ((alt_N_eq_zero_iff _).mp h1)
+
+/-- The zero-divisor form of P9: a non-zero crystal annihilates nothing but `0`. -/
+theorem crystal_mul_ne_zero {s : CDAlg ℝ 4} (hv : IsVacuum s) (hs : s ≠ 0)
+    {y : CDAlg ℝ 4} (hy : y ≠ 0) : s * y ≠ 0 := by
+  intro h
+  have h0 : s * y = s * 0 := by rw [h, alt_mul_zero]
+  exact hy (crystal_not_zeroDivisor hv hs h0)
+
 /-! ## 11. Completeness audit (`#print axioms`)
 
 Every declaration introduced by this file.  The gate: only
@@ -1049,5 +1726,67 @@ Every declaration introduced by this file.  The gate: only
 #print axioms potential_witness
 #print axioms potential_zero
 #print axioms exists_gradV_ne_zero
+
+#print axioms imPart
+#print axioms imPart_def
+#print axioms imPart_coord_zero
+#print axioms N_imPart
+#print axioms N_imPart_le
+#print axioms commutator_sub_central_left
+#print axioms comm_eq_imPart
+#print axioms potential_eq_cross
+#print axioms potential_le_normForm_sq
+#print axioms comm_smul
+#print axioms potential_smul
+#print axioms secVar_smul_left
+#print axioms potential_antitone_along_flow
+#print axioms bil_zero_right
+#print axioms bil_zero_left
+#print axioms bil_ruleField_tangent
+#print axioms flowWitness
+#print axioms flowWitnessDir
+#print axioms cdLo_flowWitness
+#print axioms cdHi_flowWitness
+#print axioms cdLo_flowWitnessDir
+#print axioms cdHi_flowWitnessDir
+#print axioms comm_flowWitness
+#print axioms secVar_flowWitness
+#print axioms bil_comm_secVar_flowWitness
+#print axioms normForm_flowWitness
+#print axioms flowWitness_coord_zero
+#print axioms flowWitness_ne_zero
+#print axioms flowWitnessDir_coord_zero
+#print axioms bil_flowWitness_dir
+#print axioms exists_ruleField_ne_zero
+#print axioms isClosed_stateSphere
+#print axioms isCompact_stateSphere
+#print axioms normForm_witness
+#print axioms witness_coord_zero
+#print axioms witness_ne_zero
+#print axioms potential_normalise_witness
+#print axioms stateSphere_nonempty
+#print axioms exists_isMaxOn_potential_stateSphere
+#print axioms bil_gradV_eq_zero_of_potential_eq_one
+#print axioms ruleField_eq_zero_of_potential_eq_one
+#print axioms potential_le_initial_along_flow
+#print axioms potential_le_initial_of_mem_closure
+#print axioms omega_avoids_locus
+#print axioms omega_ne_of_potential_eq_one
+
+#print axioms assoc_def
+#print axioms bil_neg_right
+#print axioms N_sub
+#print axioms imPart_eq_self
+#print axioms conj_eq_neg_of_coord_zero
+#print axioms conj_conj_cd
+#print axioms assoc_mid_one
+#print axioms assoc_neg_left
+#print axioms bil_assoc_transfer
+#print axioms bil_assoc_mid_self_of_imaginary
+#print axioms normForm_mul_eq
+#print axioms bil_cdLo_assoc_eq_zero_of_isVacuum
+#print axioms normForm_mul_of_isVacuum
+#print axioms crystal_not_zeroDivisor
+#print axioms crystal_mul_ne_zero
 
 end QBP.Substrate.RuleFlow
