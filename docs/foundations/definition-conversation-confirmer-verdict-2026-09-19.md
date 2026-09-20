@@ -87,9 +87,9 @@ Lean-name existence checked on HEAD `89ccb9d` by `grep -rn "theorem <name>" proo
 
 Scripts (written by me; no repo imports; Cayley–Dickson product built from scratch as `(a,b)(c,d) = (ac − d̄b, da + bc̄)`, and the octonion product **independently** re-built from Fano triples and cross-checked):
 
-- `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/confirmer/numerics.py`
-- `…/scratchpad/confirmer/rows8_12.py`
-- `…/scratchpad/confirmer/row7_rho_P2.py`
+- `analysis/definition-conversation-2026-09-19/confirmer/numerics.py`
+- `analysis/definition-conversation-2026-09-19/confirmer/rows8_12.py`
+- `analysis/definition-conversation-2026-09-19/confirmer/row7_rho_P2.py`
 
 All run under `run-bounded 2G {300,300,180} python3 …`.
 
@@ -280,7 +280,7 @@ Nothing in this file is anchored, encoded or ruled. No GitHub or bridge post was
 
 ## P2.3 — (B) The completeness conjecture: I tried to refute it and could not
 
-Script: `…/scratchpad/confirmer/pass2d.py` (log `pass2d.log`), plus `pass2b.py`/`pass2c.py`. Independent CD product rebuilt as a structure tensor `T[i,j,:] = e_i·e_j`; ρ rebuilt from the basis-free rule (automorphism residual **1.79e-14**, `‖ρ³−I‖ = 2.4e-15`, `ρ(ℓ)=ℓ` exact).
+Script: `analysis/definition-conversation-2026-09-19/confirmer/pass2d.py` (log `pass2d.log`), plus `pass2b.py`/`pass2c.py`. Independent CD product rebuilt as a structure tensor `T[i,j,:] = e_i·e_j`; ρ rebuilt from the basis-free rule (automorphism residual **1.79e-14**, `‖ρ³−I‖ = 2.4e-15`, `ρ(ℓ)=ℓ` exact).
 
 **The search space is exhaustive by construction — this is the part that makes the result worth something.** Let `O` be any 8-dimensional subalgebra of 𝕊 with `ℍ_s ⊆ O`. Then:
 - `dim(O ∩ ℍ_s^⊥) = 4` and `O = ℍ_s ⊕ W` with `W = O ∩ ℍ_s^⊥` (since `ℍ_s ∩ ℍ_s^⊥ = 0`);
@@ -428,7 +428,7 @@ The replacement tag is the honest one. Runner final table row 14: *"`U.hosted = 
 | No choice put to the beekeeper | 🟢 A kill plus a dissolution path; nothing is offered as an option. Consistent with ruling bundle v0.7 §0. |
 | ρ-eliminates-P2′ recorded as a RESULT | 🟢 Runner final table row 5 is now **"2 forced"** and reads *"ρ-equivariance eliminates P2′, constrains P2 not at all — a RESULT"*; clause (a) records non-selectability as a theorem-in-waiting rather than an unfireable kill branch. |
 
-**But clause (a) is currently a result in name only** — it rests on row 11, which the runner parks as out of toolchain. **I can settle that.** Script `…/scratchpad/confirmer/pass3_transitivity.py`, `run-bounded 2G 300`:
+**But clause (a) is currently a result in name only** — it rests on row 11, which the runner parks as out of toolchain. **I can settle that.** Script `analysis/definition-conversation-2026-09-19/confirmer/pass3_transitivity.py`, `run-bounded 2G 300`:
 
 I built automorphisms of 𝕆 **explicitly** from orthonormal frames — a frame `(p,q,r)` (p,q orthonormal imaginary, r imaginary unit ⊥ `span{1,p,q,pq}`) determines the map `e₁,e₂,e₄ ↦ p,q,r`. Verified these are genuine octonion automorphisms: **max residual 8.11e-15** over 30 frames × 10 random pairs. Then for each trial: two frames `(u,v₁,w₁)`, `(u,v₂,w₂)` sharing `u`; `ψ = φ₂∘φ₁⁻¹`; `Ψ = ψ ⊕ ψ` the diagonal lift to 𝕊.
 

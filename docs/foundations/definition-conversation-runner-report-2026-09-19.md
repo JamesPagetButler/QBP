@@ -87,7 +87,7 @@ Lean/Agda statements (no lake or agda runs — every row 8–12 is numerical or 
 | 3 | V = 4(‖a‖²‖Im b‖² − ⟨a,Im b⟩²) | 1 proved (promoted) | `DeltaLandscape.sedenion_landscape_descends` |
 | 4 | 𝕆 has exactly 7 Fano triples | 1 proved | `fanoTriples_card` |
 | 5 | Decision 1 stays OPEN; encoded open with a kill, never a beekeeper choice | 2 forced | INTERP-holographic-boundary kill + ruling bundle v0.7 §0 |
-| 6 | ρ-equivariance eliminates P2′ and imposes no constraint on P2 | 2 forced (rewritten) | 𝕆_low not ρ-invariant (0.866); ρ(𝕆'_v)=𝕆'_v ≤4.9e-16; ρ∘E−E∘ρ ≤1.4e-15 (`row7_rho_P2.py`) |
+| 6 | ρ-equivariance eliminates P2′ and imposes no constraint on P2 | 2 forced (rewritten) | 𝕆_low not ρ-invariant (0.866); ρ(𝕆'_v)=𝕆'_v ≤4.9e-16; ρ∘E−E∘ρ ≤1.5e-15 (`row7_rho_P2.py`) |
 | 7 | The condensed/locale route may not be offered as *the* definition of the in-flight region | 2 forced | KILLED-locale-forcing-route Prop 12 (earlier phrasing over-read its SCOPE line) |
 | 8 | Vacuum Hessian: rank 6, eigenvalues 8(1−b₀²), trace 48(1−b₀²), rank 0 at poles | 3 provable (best value) | proof item #5; confirmer-reproduced |
 | 9 | spec(Hess V) depends on the crystal only through b₀² | 3 provable | proof item #9 |
@@ -127,6 +127,8 @@ No Lean/Agda runs. Pole family dimension reasoned, not measured. Stab_{G₂}(u) 
 
 # Runner report — round 8 (close; verbatim 88–89)
 
+> **Supersession note (post-confirmer pass 3):** in the table below, row 11 (transitivity, "OUT OF TOOLCHAIN") is superseded by the confirmer's pass 3 §P3.3–P3.4 — transitivity was measured 20/20 by explicitly constructed automorphisms and re-bucketed **3 provable** (`encoding_family_transitive`, group-free); and the earlier rounds' row 7 ("ρ kills both readings") was refuted in pass 1 §4.3 and is carried only as row 5's rewritten form. The tables of rounds 1–5 and 6–7 above are the historical record and are not edited.
+
 The runner re-verified the confirmer's decisive datum before quoting it: dim ℍ_s^⊥ = 12 = 3×4; ℍ_s·w free of rank 1, 10/10 (`module_check.py`). ℍ_s^⊥ ≅ ℍ_s³ holds independently.
 
 ## Final four-bucket table
@@ -152,7 +154,7 @@ The runner re-verified the confirmer's decisive datum before quoting it: dim ℍ
 | 17 | Seam dynamics; Dirac spectrum; α̇/Ġ; b₀ → interior | 3 open | unchanged |
 | 18 | "The choice is irreducible" | 4 withdrawn | Furey/Feynman, R8 — replaced by the bundle formulation |
 | 19 | "Gr₃(7)"; "constructors give the hosted equality" | 4 withdrawn | Furey/Feynman, R8 |
-| 20 | "Exactly 7"; "0/20"; "ρ kills both"; "gap 4-dim either way" | 4 withdrawn — driver's own | |
+| 20 | "Exactly 7"; "0/20"; "ρ kills both"; "gap 4-dim either way" | 4 withdrawn — driver's own | driver's own errata, brief §7; confirmer pass 1 §4.3 |
 | 21 | R1–R6 withdrawals | 4 withdrawn | Furey/Feynman |
 
 ## Exit inventory for the confirmer
