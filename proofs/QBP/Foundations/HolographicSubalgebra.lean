@@ -817,8 +817,9 @@ theorem smul_mem_quatDouble (r : ℝ) {x : CDAlg ℝ 4} (hx : x ∈ quatDouble p
       `(a,b)(c,d) = (ac − d̄b, da + bc̄)` — which reduces the single 𝕊-product to
       four 𝕆-products; and
       (ii) closure of the 𝕆-level submodule `ℍ = span (gen4 p q)` under the
-      OCTONION product (`ArtinSpan.span4_mul_closed`, which is where Artin's
-      theorem is genuinely available, 𝕆 being alternative) together with its
+      OCTONION product (`QBP.Foundations.CDAlg.span4_mul_closed`,
+      `ArtinSpan.lean:312` — where Artin's theorem is genuinely available, 𝕆 being
+      alternative) together with its
       closure under conjugation (`conj_mem_span_gen4`, needed for the `d̄` and `c̄`
       slots).
     So the double `S ⊕ S·ℓ` of a conjugation-closed, multiplicatively closed

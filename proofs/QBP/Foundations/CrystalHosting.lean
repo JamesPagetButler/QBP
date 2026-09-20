@@ -2177,14 +2177,44 @@ theorem hessQuad_pole_eq_zero (b₀ : ℝ) (v : CDAlg ℝ 4) : hessQuad (b₀ �
   rw [hessQuad, h, N_zero]
   ring
 
+/-- **The `b₀ ↦ −b₀` partner crystal EXISTS.**  For every unit imaginary `u` and
+    every `(α, γ, b₀)` on the unit sphere `α² + γ² + b₀² = 1`, the explicit
+    sedenion `s' = loOf(α·u) + hiOf((−b₀)·1 + γ·u)` is a genuine vacuum of unit
+    norm form with the pole coordinate flipped.  Together with `IsVacuum`'s first
+    clause (`s'.coord 0 = 0`) this says `s'` lies on the state sphere, so the
+    hypothesis bundle of `hessQuad_eigenvalue_even` is never vacuous.
+    (Red Team round-2 item N4, PR #663 — the F7 defect in miniature.) -/
+theorem exists_pole_flip_vacuum {α γ b₀ : ℝ}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1) (hsum : α ^ 2 + γ ^ 2 + b₀ ^ 2 = 1) :
+    ∃ s' : CDAlg ℝ 4,
+      cdLo s' = α • u ∧ cdHi s' = (-b₀) • (1 : CDAlg ℝ 3) + γ • u ∧
+      N s' = 1 ∧ IsVacuum s' := by
+  refine ⟨loOf (α • u) + hiOf ((-b₀) • (1 : CDAlg ℝ 3) + γ • u), ?_, ?_, ?_, ?_⟩
+  · rw [cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+  · rw [cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]
+  · rw [vacuum_norm_parametrised (u := u) (α := α) (γ := γ) (b₀ := -b₀) hu0 hNu
+      (by rw [cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero])
+      (by rw [cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add])]
+    linear_combination hsum
+  · exact (vacuum_iff_parametrised _).mpr
+      ⟨u, α, γ, -b₀, hu0, Or.inl hNu,
+        by rw [cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero],
+        by rw [cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]⟩
+
 /-- **`hessian_spectrum_function_of_b0_sq` (#9), crystal-level.**  The Hessian
     does **not** separate a crystal from its `b₀ ↦ −b₀` partner: if `s` and `s'`
     are two unit vacua with the SAME direction `u` and phase `(α, γ)` but opposite
     pole coordinates `±b₀`, then their Hessian quadratic forms are EQUAL — the same
     number in every imaginary direction `v`, not merely the same eigenvalue numeral.
 
+    **Not vacuous:** `exists_pole_flip_vacuum` (just above) exhibits the partner
+    `s'` explicitly for every admissible `(u, α, γ, b₀)`, and
+    `hessQuad_eigenvalue_even_exists` (just below) is the ∃-form that carries the
+    existence with it.
+
     (This replaces an earlier version whose statement was the real-number identity
-    `8(1−b₀²) = 8(1−(−b₀)²)`, which mentions no crystal; Red Team F6, PR #663.) -/
+    `8(1−b₀²) = 8(1−(−b₀)²)`, which mentions no crystal; Red Team F6, PR #663.
+    The existence lemma answers Red Team round-2 item N4.) -/
 theorem hessQuad_eigenvalue_even {s s' : CDAlg ℝ 4} {α γ b₀ : ℝ}
     (hu0 : u.coord 0 = 0) (hNu : N u = 1)
     (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
@@ -2196,6 +2226,25 @@ theorem hessQuad_eigenvalue_even {s s' : CDAlg ℝ 4} {α γ b₀ : ℝ}
   rw [hessQuad_eq_transverse (u := u) (b₀ := b₀) hu0 hNu hv hlo hhi hNs hk,
     hessQuad_eq_transverse (u := u) (b₀ := -b₀) hu0 hNu hv hlo' hhi' hNs' hk]
   ring
+
+/-- **The `±b₀` blindness of the Hessian, with the partner crystal SUPPLIED.**
+    For every non-pole unit vacuum `s` parametrised by `(u, α, γ, b₀)` there EXISTS
+    a unit vacuum `s'` with pole coordinate `−b₀` (same `u`, same `(α, γ)`) whose
+    Hessian quadratic form agrees with that of `s` in every imaginary direction.
+    No hypothesis is left undischarged.  (Red Team round-2 item N4, PR #663.) -/
+theorem hessQuad_eigenvalue_even_exists {s : CDAlg ℝ 4} {α γ b₀ : ℝ}
+    (hu0 : u.coord 0 = 0) (hNu : N u = 1)
+    (hlo : cdLo s = α • u) (hhi : cdHi s = b₀ • (1 : CDAlg ℝ 3) + γ • u)
+    (hNs : N s = 1) (hk : α ^ 2 + γ ^ 2 ≠ 0) :
+    ∃ s' : CDAlg ℝ 4,
+      IsVacuum s' ∧ N s' = 1 ∧
+      cdLo s' = α • u ∧ cdHi s' = (-b₀) • (1 : CDAlg ℝ 3) + γ • u ∧
+      (∀ v : CDAlg ℝ 4, v.coord 0 = 0 → hessQuad s v = hessQuad s' v) := by
+  have hsum : α ^ 2 + γ ^ 2 + b₀ ^ 2 = 1 := by
+    rw [← vacuum_norm_parametrised hu0 hNu hlo hhi, hNs]
+  obtain ⟨s', hlo', hhi', hNs', hv'⟩ := exists_pole_flip_vacuum (u := u) hu0 hNu hsum
+  exact ⟨s', hv', hNs', hlo', hhi',
+    fun v hv => hessQuad_eigenvalue_even hu0 hNu hlo hhi hNs hlo' hhi' hNs' hk v hv⟩
 
 /-- **Two crystals with the same `b₀²` have the same Hessian eigenvalue**, whatever
     their directions `u, u'` and phases `(α, γ), (α', γ')`: ONE real number `λ`
@@ -2458,7 +2507,9 @@ is a finding. -/
 #print axioms hessQuad_eigDir
 #print axioms hessQuad_flatDir
 #print axioms hessQuad_pole_eq_zero
+#print axioms exists_pole_flip_vacuum
 #print axioms hessQuad_eigenvalue_even
+#print axioms hessQuad_eigenvalue_even_exists
 #print axioms hessQuad_eigenvalue_depends_only_on_b0_sq
 
 end QBP.Foundations.CrystalHosting
