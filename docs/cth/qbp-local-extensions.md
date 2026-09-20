@@ -131,7 +131,7 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions land formally with the foundations reb
 
 ## QBP-local top-level lists (`meta_principles`, `interpretations`, `retired_axioms`, `retired_principles`)
 
-**Status:** QBP-local since PR #662 (ledger 6.2.0 (root fields since 6.0.0; KillConditionEntry objects since 6.2.0), 2026-09-18); validate under the schema's top-level `additionalProperties: true`. **Upstream tracking issue:** https://github.com/JamesPagetButler/confluent-trust/issues/103 (promotion to canonical `$defs` when the shape freezes; @cth-implementor owns the delta together with #102). **Co-sign on the introducing PR:** @cth-implementor, #662.
+**Status:** QBP-local since PR #662 (ledger 6.0.0, 2026-09-18; KillConditionEntry objects since 6.2.0, PR #665); validate under the schema's top-level `additionalProperties: true`. **Upstream tracking issue:** https://github.com/JamesPagetButler/confluent-trust/issues/103 (promotion to canonical `$defs` when the shape freezes; @cth-implementor owns the delta together with #102). **Co-sign on the introducing PR:** @cth-implementor, #662.
 
 | List | Records | Why a separate list | Gate reading (`root_audit.py`) |
 |---|---|---|---|
