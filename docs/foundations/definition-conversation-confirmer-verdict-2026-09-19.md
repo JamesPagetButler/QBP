@@ -177,6 +177,8 @@ No sycophancy anywhere — Gemini volunteered five withdrawals and attacked the 
 
 ## 6. §10 impasse assessment on row 13 — **NOT EARNED**
 
+> **SUPERSEDED (record-of-record note, 2026-09-20):** this pass-1 assessment is retained as history. The impasse was re-drafted by the dyad in rounds 6–7 and certified **EARNED (6/6)** in pass 2 (§P2.6), unchanged in pass 3; the record-of-record is §P2.6 / §P3.2, not this section.
+
 | # | Component | Verdict | Why |
 |---|---|---|---|
 | 1 | Problem-type (tame / wicked) | 🟡 **mis-typed** | Declared WICKED (turn 79). But the record's own kill says the resolving moves *"are **stipulations someone would write, not discoveries**"* — a problem whose resolution is a stipulation is not wicked, it is an **under-determination**, and the beekeeper's standing rule (ruling bundle v0.7 §0) is that an under-determined item is *encoded open with a kill condition, never put as a choice*. The **mathematical** sub-question ("is there a ρ-equivariant octonion-valued encoding?") is **tame — and now answered**: yes, a 4-dimensional family (§4.3). |
