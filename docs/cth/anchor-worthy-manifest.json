@@ -915,7 +915,8 @@
         "QBP.Foundations.CrystalHosting.hessQuad_closed",
         "QBP.Foundations.CrystalHosting.hessQuad_pole_eq_zero",
         "QBP.Foundations.CrystalHosting.exists_pole_flip_vacuum",
-        "QBP.Foundations.CrystalHosting.hessQuad_eigenvalue_even_exists"
+        "QBP.Foundations.CrystalHosting.hessQuad_eigenvalue_even_exists",
+        "QBP.Foundations.CrystalHosting.hessQuad_flatDir"
       ]
     },
     {
@@ -944,7 +945,7 @@
       ]
     },
     {
-      "anchor_id": "PROOF-encoding-family-constant-along-complex-lines",
+      "anchor_id": "PROOF-encoding-family-u-mul-invariant",
       "declared_by": "#639-definition-conversation-proofs",
       "proof_system": "lean4",
       "witnesses": [

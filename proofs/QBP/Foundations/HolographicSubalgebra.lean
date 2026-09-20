@@ -917,8 +917,10 @@ module fact that any completeness argument has to rest on.
 ρ-invariant (§8).  Left multiplication `L_u` restricts to `u^⊥ ∩ Im 𝕆` and
 squares to `−Id` there (`leftMul_sq_eq_neg`, `perp_stable_under_leftMul`), so
 `(u^⊥ ∩ Im 𝕆, L_u)` is a complex vector space; and `w` and `u·w` give the SAME
-member of the family (`quatDouble_eq_of_mul_u`).  So the family is parametrised
-by the `L_u`-complex lines of `u^⊥`, exactly as the confirmer's pass 2 says.
+member of the family (`quatDouble_eq_of_mul_u`) — ONE step of the `L_u`-action.
+Constancy along a whole `L_u`-complex line (invariance under `w ↦ (a + b·u)·w`
+for all `(a, b) ≠ 0`, including real rescaling) is NOT proved here; the confirmer's
+"parametrised by complex lines" is therefore a numerical gloss, not a theorem.
 
 **Not claimed (out of toolchain, per the dispatch):** that the parametrisation is
 a bijection onto the ℂP² of complex lines, that `G₂`/`SU(3)` acts transitively on
@@ -1013,9 +1015,9 @@ theorem span_gen4_u_mul (hu0 : u.coord 0 = 0) (hNu : N u = 1) (w : CDAlg ℝ 3) 
       rwa [heq] at hsm
     · rw [h]; exact y_mem_span_gen4 u (u * w)
 
-/-- **(A)(iii) — `w` and `u·w` give the SAME member of the family.**  So the
-    family is indexed by the `L_u`-complex LINES of `u^⊥`, not by its unit
-    vectors. -/
+/-- **(A)(iii) — `w` and `u·w` give the SAME member of the family** (one step of
+    the `L_u`-action).  Line-constancy — invariance under every `(a + b·u)·w` —
+    is NOT claimed. -/
 theorem quatDouble_eq_of_mul_u (hu0 : u.coord 0 = 0) (hNu : N u = 1)
     (w : CDAlg ℝ 3) : quatDouble u (u * w) = quatDouble u w := by
   rw [quatDouble, quatDouble, span_gen4_u_mul hu0 hNu w]

@@ -629,9 +629,12 @@ theorem deriv2_potential_at_universe (U : Universe) (v : CDAlg ℝ 4) :
     gives `Hess = 8(1 − b₀²)·‖v‖` exactly; on the explicit 9-parameter flat
     family it gives `0`.
 
-    **NOT proved here:** the numerals `rank = 6` and `trace = 48(1 − b₀²)`, which
-    need `finrank (u^⊥ ∩ Im 𝕆) = 6` and a rank computation for the quadratic
-    form.  Those remain owed. -/
+    **Proved elsewhere on this branch:** `finrank (u^⊥ ∩ Im 𝕆) = 6`
+    (`HolographicSubalgebra.finrank_perpIm_eq_six`) and the transverse trace
+    `48(1 − b₀²)` over an orthonormal 6-frame whose existence is discharged
+    (`hess_trace_transverse_exists`).  **NOT proved:** the finrank identity
+    `rank = 14 − 8 = 6` for the FULL tangent form, and the full-tangent-space
+    trace.  Those remain owed. -/
 theorem universe_hessian_eigenvalue (U : Universe) (h : U.NonPole) :
     ∃ (u : CDAlg ℝ 3) (α γ b₀ : ℝ), u.coord 0 = 0 ∧ N u = 1 ∧
       b₀ = U.crystal.coord (hiIdx 0) ∧ α ^ 2 + γ ^ 2 ≠ 0 ∧
