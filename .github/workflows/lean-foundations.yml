@@ -16,22 +16,41 @@ name: Lean Foundations Gate
 
 on:
   pull_request:
-    paths:
-      - 'proofs/**/*.lean'
-      - 'proofs/lakefile.lean'
-      - 'proofs/lean-toolchain'
-      - 'proofs/QBP/Foundations/.lean-gate-baseline.json'
-      - 'proofs/QBP/.build-visibility-quarantine.json'
-      - 'scripts/check_lean_foundations.py'
-      - 'scripts/check_layer_imports.py'
-      - 'scripts/test_check_layer_imports.py'
-      - '.github/workflows/lean-foundations.yml'
+
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    # Always runs. The two gate jobs below are skipped (which GitHub counts as passing for a
+    # required check) when no Lean-relevant path changed. This replaces the workflow-level
+    # `paths:` filter, which left non-Lean PRs stuck at "Expected" once `lake build (zero
+    # errors)` became a required check on master (2026-09-21).
+    name: Detect Lean changes
+    runs-on: ubuntu-latest
+    outputs:
+      lean: ${{ steps.filter.outputs.lean }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            lean:
+              - 'proofs/**/*.lean'
+              - 'proofs/lakefile.lean'
+              - 'proofs/lean-toolchain'
+              - 'proofs/QBP/Foundations/.lean-gate-baseline.json'
+              - 'proofs/QBP/.build-visibility-quarantine.json'
+              - 'scripts/check_lean_foundations.py'
+              - 'scripts/check_layer_imports.py'
+              - 'scripts/test_check_layer_imports.py'
+              - '.github/workflows/lean-foundations.yml'
+
   foundations-standard:
+    needs: changes
+    if: needs.changes.outputs.lean == 'true'
     name: Foundations standard (no-sorry-increase / no native_decide / no vacuous stubs)
     runs-on: ubuntu-latest
     steps:
@@ -47,6 +66,8 @@ jobs:
         run: python3 scripts/test_check_layer_imports.py
 
   lake-build:
+    needs: changes
+    if: needs.changes.outputs.lean == 'true'
     name: lake build (zero errors)
     runs-on: ubuntu-latest
     steps:
