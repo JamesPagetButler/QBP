@@ -1,10 +1,26 @@
-# Efimov states as a test of the substrate — research note (v0.1, 2026-09-21)
+# Efimov states as a test of the substrate — research note (v0.2, 2026-09-21)
 
 **Status:** side project directed by the beekeeper (2026-09-21; tracking issue #669): "research what experiments have been done and add them to the CTH; understand what is happening; think through whether we can run a test of our substrate, and whether this is appropriate." Written by qbp-oppenheimer. **Nothing here is ruled, anchored or encoded**; §1's anchor candidates enter the ledger only through a Tier-3 PR via the confined writer. Every physics statement carries its source; every QBP-side statement carries its ledger or Lean cite or is marked open.
 
 ## 1. Experiments (verified table)
 
-*Filled from the literature sweep — see `efimov-experiments-2026-09-21.md` alongside; only entries whose values were read from the paper or abstract are carried. Anchor candidates are listed in §7.*
+Full sweep with per-entry verification status: `efimov-experiments-2026-09-21.md` (same directory). Three tiers — **verified** (value and error read from the paper's own text or abstract), **partial** (citation solid; number corroborated only through secondary sources), **unverified** (no numeric value recovered — the fetch tools could not read several journal PDFs). Only verified entries are anchor candidates; the rest need a primary-source pass first.
+
+| Experiment | System | Observable | Measured | Universal prediction | Tier |
+|---|---|---|---|---|---|
+| Kraemer et al., Nature 440, 315 (2006) — Innsbruck | Cs-133, identical bosons | three-body recombination resonance a₋; atom–dimer resonance a₊ | a₋ = −850(20) a₀; a₊ = 1060(70) a₀; ratio 1.25(9) | ratio 0.96(3) (zero-range theory) | verified |
+| Gross et al., PRL 103, 163202 (2009) | Li-7 | a₊, a₋ | a₊ = 243(35) a₀; a₋ = −264(11) a₀; ratio 0.92(14) | 0.96(3) | verified |
+| Pollack, Dries, Hulet, Science 326, 1683 (2009) | Li-7 | two consecutive trimer pairs across a Feshbach resonance | ratios 22.5(22)(11) and 21.1(11)(24) | 22.7 | verified |
+| Huang, Sidorenkov, Grimm, Hutson, PRL 112, 190401 (2014) | Cs-133 | second (excited) triatomic resonance; scaling to the first | λ = 21.0(1.3) | 22.7 | verified (the brief mis-cited this as PRL 113, 240402 — that is Tung et al.; corrected) |
+| Huckans et al., PRL 102, 165302 (2009); Williams et al., PRL 103, 130404 (2009) | Li-6, three spin components (distinguishable fermions) | trimer resonances in three-body loss | loss features near 130 G and 500 G (ground trimers), excited trimer at 895 G; a_t → −2140 a₀ | positions from three-component theory | verified (from abstracts) |
+| Ulmanis et al., PRL 117, 153201 (2016) — Heidelberg | Li-6/Cs-133 heteronuclear (heavy-heavy-light) | consecutive Cs–Cs–Li Efimov resonances | scaling 4.0(3) | 4.9 (mass-ratio universal) | verified |
+| Berninger et al., PRL 107, 120401 (2011) | Cs-133 across several Feshbach resonances | universality of the three-body parameter | a₋ ≈ −9.5 to −9.7 r_vdW (spread unresolved in the sweep) | universal ≈ −9.7 r_vdW (Wang et al. 2012; Chin 2011) | partial |
+| Pires et al., PRL 112, 250404 (2014); Tung et al., PRL 113, 240402 (2014) | Li–Cs | first heteronuclear Efimov resonances; geometric scaling | scaling ≈ 4.9 reported | 4.9 | partial |
+| Kunitski et al., Science 348, 551 (2015) | He-4 trimer, Coulomb-explosion imaging | direct observation of the excited Efimov trimer and its size | size ≈ 100 Å scale (number not re-read) | Efimov-state structure | partial |
+| Ferlaino et al., PRL 102, 140401 (2009); von Stecher, D'Incao, Greene, Nat. Phys. 5, 417 (2009) | Cs; theory | tetramers tied to each trimer | binding ratios B₄⁽⁰⁾ ≈ 4.57 B₃, B₄⁽¹⁾ ≈ 1.01 B₃ (theory); the '0.43 / 0.9' ratios in the brief could NOT be located | four-body universality | partial |
+| Zaccanti et al., Nat. Phys. 5, 586 (2009) K-39; Lompe et al., Science 330, 940 (2010) RF association; Nakajima et al., PRL 106, 143201 (2011); Roy et al., PRL 111, 053202 (2013); Wild et al., PRL 108, 145305 (2012) Rb-85 | various | consecutive features / RF-associated trimers / cross-resonance universality | numeric values not recovered | — | unverified |
+
+**Negative findings of the sweep:** no confirmed *experimental* Efimov observation in nuclear physics (triton, halo nuclei — theory only, the Phillips line); none yet in the dipolar mixtures (Er–Li, Dy–Li: mixtures realised, predictions published, no resonance observed); none in photonic or synthetic-lattice analogues.
 
 ## 2. What the Efimov effect is (Efimov 1970; Braaten & Hammer 2006; Naidon & Endo 2017)
 
@@ -66,4 +82,4 @@ Consequence, sorted:
 
 ## 7. Anchor candidates (for a Tier-3 PR; not encoded here)
 
-*Filled from §1 once the sweep's verified table is in: one REF- per landmark experiment (Kraemer 2006; Zaccanti 2009; Pollack 2009; Berninger 2011; Huang 2014; Pires/Tung 2014; Kunitski 2015; Ferlaino 2009 tetramers) with `measured_value`, `predicted_value` (the universal number), `measured_source`, provenance E, `provenance_kind: experiment`; one REF- for Moretti–Oppio 2019 (theory-external); one FLAG- "hosted composite-system rule undefined" pointing at theory doc §8.2–8.4 and this note.*
+Only the **verified** tier qualifies today: REF-efimov-kraemer-2006 (a₋ = −850(20) a₀, ratio 1.25(9) vs 0.96(3)); REF-efimov-gross-2009 (ratio 0.92(14)); REF-efimov-pollack-2009 (22.5(22)(11), 21.1(11)(24) vs 22.7); REF-efimov-huang-2014 (λ = 21.0(1.3) vs 22.7 — the single number the associativity null test leans on); REF-efimov-li6-three-component-2009; REF-efimov-ulmanis-2016 (4.0(3) vs 4.9). Each: provenance E, `provenance_kind: experiment`, `measured_value`/`predicted_value`/`predicted_unit`, `measured_source` with DOI. Plus REF-moretti-oppio-2019 (theory-external; the reduction theorem) and FLAG-hosted-composite-rule-open (the hosted layer has no composite-system rule; points at theory doc §8.2–8.4 and this note; kill = a rule that reproduces the verified table). The partial and unverified rows enter only after a primary-source pass with PDF-capable tooling.
