@@ -31,6 +31,7 @@ def ref(
     mv=None,
     pv=None,
     unit=None,
+    merr=None,
     kind="experiment",
     notes=None,
     chain=None,
@@ -51,6 +52,8 @@ def ref(
     }
     if mv is not None:
         r["measured_value"] = mv
+    if merr is not None:
+        r["measured_error"] = merr
     if pv is not None:
         r["predicted_value"] = pv
     if unit:
@@ -77,17 +80,25 @@ ANCHORS = [
         "Kraemer, T., Mark, M., Waldburger, P., Danzl, J. G., Chin, C., Engeser, B., Lange, A. D., Pilch, K., Jaakkola, A., "
         "Nägerl, H.-C., Grimm, R., Nature 440, 315–318 (2006). doi:10.1038/nature04626",
         mv=1.25,
+        merr=0.09,
         pv=0.96,
-        unit="a₊/|a₋| (dimensionless; a₋ = −850(20) a₀)",
+        unit="a₊/|a₋| (dimensionless)",
+        notes=(
+            "a₋ = −850(20) a₀; a₊ = 1060(70) a₀. The 0.96(3) is the zero-range universal prediction; the ≈3σ gap is "
+            "understood in the subsequent literature through finite-range corrections to that baseline. The record's "
+            "status describes the ledger record (an external result on file), not agreement with zero-range theory."
+        ),
     ),
     ref(
         "REF-efimov-gross-2009",
-        "Gross et al. (2009): Li-7 Efimov trimer resonances a₊ = 243(35) a₀, a₋ = −264(11) a₀; ratio 0.92(14)",
+        "Gross et al. (2009): Li-7 Efimov resonance a₋ = −264(11) a₀ and recombination minimum a₊ = 243(35) a₀; ratio 0.92(14)",
         "Bar-Ilan (Khaykovich). Li-7 in a single spin state: three-body recombination resonance at a₋ = −264(11) a₀ and "
-        "atom–dimer resonance at a₊ = 243(35) a₀; ratio a₊/|a₋| = 0.92(14), consistent with the zero-range prediction 0.96(3) "
+        "recombination minimum at a₊ = 243(35) a₀ (the paper's term; not an atom–dimer resonance); ratio a₊/|a₋| = 0.92(14), "
+        "consistent with the zero-range prediction 0.96(3) "
         "(where Cs gave 1.25(9)).",
         "Gross, N., Shotan, Z., Kokkelmans, S., Khaykovich, L., Phys. Rev. Lett. 103, 163202 (2009). doi:10.1103/PhysRevLett.103.163202",
         mv=0.92,
+        merr=0.14,
         pv=0.96,
         unit="a₊/|a₋| (dimensionless)",
     ),
@@ -100,22 +111,30 @@ ANCHORS = [
         "Efimov scaling factor itself.",
         "Pollack, S. E., Dries, D., Hulet, R. G., Science 326, 1683–1685 (2009). doi:10.1126/science.1182840",
         mv=22.5,
+        merr=2.2,
         pv=22.694,
-        unit="ratio of consecutive Efimov resonance positions a_{n+1}/a_n (dimensionless)",
-        notes="Two independent ratios: 22.5(22)(11) and 21.1(11)(24). " + UNIV,
+        unit="ratio of consecutive Efimov feature positions a_{n+1}/a_n (dimensionless)",
+        notes=(
+            "Two independent ratios: 22.5(22)(11) and 21.1(11)(24) (statistical)(systematic); measured_error is the "
+            "statistical error of the first. Caveat: the same group reanalysed exactly these positions with finite-range "
+            "corrections — Dyke, Pollack & Hulet, Phys. Rev. A 88, 023625 (2013) — recorded here as a caveat only (not "
+            "re-read in the sweep). " + UNIV
+        ),
     ),
     ref(
         "REF-efimov-huang-2014",
         "Huang, Sidorenkov, Grimm, Hutson (2014): second triatomic Efimov resonance in Cs-133; scaling factor 21.0(1.3) vs 22.7",
         "Innsbruck. Cs-133 at large scattering length: observation of the second (excited) triatomic recombination "
-        "resonance and its ratio to the first, λ = 21.0(1.3), against the universal e^{π/s₀} = 22.694 — a 7 % test at 1σ "
-        "of discrete scale invariance in a homonuclear system. QBP relevance (#669): the cleanest three-body number in "
-        "physics; under PROOF-associative-composition-iff the hosted algebra predicts zero deviation, so this bounds any "
-        "residual hosted non-associativity once a kernel model exists (open; see the FLAG).",
+        "resonance and its ratio to the first, λ = 21.0(1.3), against the universal e^{π/s₀} = 22.694: the 1σ width is "
+        "6.2 % of the value and the central offset is 7.5 % below the universal number — a test of discrete scale "
+        "invariance in a homonuclear system. QBP relevance (#669): the cleanest three-body number in physics; the "
+        "observable any hosted composite-system rule must reproduce (FLAG-hosted-composite-rule-open). No QBP "
+        "prediction is recorded here.",
         "Huang, B., Sidorenkov, L. A., Grimm, R., Hutson, J. M., Phys. Rev. Lett. 112, 190401 (2014). doi:10.1103/PhysRevLett.112.190401",
         mv=21.0,
+        merr=1.3,
         pv=22.694,
-        unit="Efimov scaling factor λ = a₋⁽¹⁾/a₋⁽⁰⁾ (dimensionless); 1σ = 1.3",
+        unit="Efimov scaling factor λ = a₋⁽¹⁾/a₋⁽⁰⁾ (dimensionless)",
         notes=UNIV,
     ),
     ref(
@@ -123,24 +142,33 @@ ANCHORS = [
         "Huckans et al.; Williams et al. (2009): Efimov trimers in three-component Li-6 (distinguishable fermions)",
         "Penn State (O'Hara) and Heidelberg (Jochim). A three-component Fermi gas of Li-6 (three lowest hyperfine states) "
         "shows three-body loss resonances from Efimov trimers: ground trimers near 130 G and 500 G, an excited trimer near "
-        "895 G; the largest two-body scattering length approaches a_t → −2140 a₀. Efimov physics with three distinguishable "
+        "895 G; all three pairwise scattering lengths approach a_t → −2140 a₀ at high field. Efimov physics with three distinguishable "
         "fermions rather than identical bosons.",
-        "Huckans, J. H., Williams, J. R., Hazlett, E. L., Stites, R. W., O'Hara, K. M., Phys. Rev. Lett. 102, 165302 (2009). "
-        "doi:10.1103/PhysRevLett.102.165302; Williams, J. R. et al., Phys. Rev. Lett. 103, 130404 (2009). doi:10.1103/PhysRevLett.103.130404",
-        notes="Values from the abstracts (loss-feature positions in gauss; a_t → −2140 a₀).",
+        "Ottenstein, T. B., Lompe, T., Kohnen, M., Wenz, A. N., Jochim, S., Phys. Rev. Lett. 101, 203202 (2008). "
+        "doi:10.1103/PhysRevLett.101.203202 (the 130 G loss feature); Huckans, J. H., Williams, J. R., Hazlett, E. L., "
+        "Stites, R. W., O'Hara, K. M., Phys. Rev. Lett. 102, 165302 (2009). doi:10.1103/PhysRevLett.102.165302 (a_t → "
+        "−2140 a₀; loss vs field); Williams, J. R. et al., Phys. Rev. Lett. 103, 130404 (2009). "
+        "doi:10.1103/PhysRevLett.103.130404 (excited trimer near 895 G; 130 G and 500 G identified as ground trimers)",
+        notes=(
+            "Qualitative record by design: the abstracts give loss-feature positions in gauss and a_t → −2140 a₀, with no "
+            "universal-ratio comparison, so no measured/predicted pair is encoded. The 130 G feature was first reported by "
+            "Ottenstein 2008 (whose abstract does not name Efimov) and identified as a ground-state Efimov trimer by "
+            "Williams 2009."
+        ),
     ),
     ref(
         "REF-efimov-ulmanis-2016",
         "Ulmanis et al. (2016): consecutive heteronuclear Cs–Cs–Li Efimov resonances; scaling 4.0(3) vs universal 4.9",
         "Heidelberg (Weidemüller). Li-6/Cs-133 mixture (heavy-heavy-light): consecutive Cs–Cs–Li Efimov resonances with "
         "measured scaling 4.0(3) against the mass-ratio-universal e^{π/s₀} ≈ 4.9 for this system — the scaling factor "
-        "depends on masses and statistics, not on the species' potentials. Deviation attributed to finite-range effects "
-        "near the first resonance.",
+        "depends on masses and statistics, not on the species' potentials. The paper attributes the deviation from 4.9 to "
+        "the Cs–Cs intraspecies scattering length (the three-body parameter's dependence on it).",
         "Ulmanis, J., Häfner, S., Pires, R., Kuhnle, E. D., Wang, Y., Greene, C. H., Weidemüller, M., Phys. Rev. Lett. 117, "
         "153201 (2016). doi:10.1103/PhysRevLett.117.153201",
         mv=4.0,
+        merr=0.3,
         pv=4.9,
-        unit="heteronuclear Efimov scaling factor (dimensionless); 1σ = 0.3",
+        unit="heteronuclear Efimov scaling factor (dimensionless)",
     ),
     ref(
         "REF-moretti-oppio-2019",
@@ -150,9 +178,12 @@ ANCHORS = [
         "structure commuting with the observables; the theory is physically equivalent to a complex Hilbert-space theory in "
         "which all self-adjoint operators are observables, Noether's theorem holds, and composite systems are given by tensor "
         "products. QBP relevance (#669; theory doc docs/theory/quaternionic_si_definitions.md §8.2): if the hosted quantum layer "
-        "is such a theory, its three-body (Efimov) physics is standard by theorem — fidelity, not discrimination.",
-        "Moretti, V., Oppio, M., Rev. Math. Phys. 31, 1950013 (2019); arXiv:1709.09246. (The theory doc cites the 2017 Rev. Math. "
-        "Phys. 29(4) 1750021 companion.)",
+        "is such a theory, its three-body (Efimov) physics is standard by theorem — fidelity, not discrimination. Caveat: the "
+        "premise is Poincaré symmetry; cold-atom Efimov physics is Galilean, so the application assumes the non-relativistic "
+        "effective theory inherits the reduction from the fundamental layer.",
+        "Moretti, V., Oppio, M., Rev. Math. Phys. 31, 1950013 (2019); arXiv:1709.09246. (The theory doc's reference [7] "
+        "gives this title under the 2017 coordinates RMP 29(4) 1750021 / arXiv:1611.09029, which belong to the authors' "
+        "real-Hilbert-space paper — a mis-citation, tracked as #671.)",
         kind="theory-external",
     ),
     {
@@ -170,8 +201,9 @@ ANCHORS = [
             "trimers are the sharpest composite-system observable: an infinite ladder scaling by e^{π/s₀} = 22.694 "
             "(measured 21.0(1.3), REF-efimov-huang-2014). Any candidate composite rule that fails to reproduce the ladder is "
             "killed. Under the Moretti–Oppio premises (REF-moretti-oppio-2019) the answer is standard QM; whether the hosted "
-            "layer satisfies those premises is itself unrecorded. Associativity (PROOF-associative-composition-iff) makes "
-            "three-body composition exact in the hosted ℍ_s, so QBP's own prediction is a NULL: zero three-body anomaly. "
+            "layer satisfies those premises is itself unrecorded. No QBP prediction is recorded: "
+            "PROOF-associative-composition-iff concerns composing left-multiplication operators in the algebra, not the "
+            "composition of multi-particle states, and no prediction follows from a rule that does not exist. "
             "See " + NOTE + " §3–§6."
         ),
         "prediction_chain": [
@@ -183,9 +215,10 @@ ANCHORS = [
             "identical bosons and the mass-ratio-dependent factors (≈ 4.9 for Cs–Cs–Li) within the measured errors."
         ),
         "notes": (
-            "Tracking anchor only (route OPEN). Kill: a composite rule reproducing the verified Efimov table; or a proof that "
-            "the hosted layer meets the Moretti–Oppio premises (then standard QM by theorem). Same gap as link 4 of the "
-            "matter-conservation question (#635 records)."
+            "Tracking anchor only (route OPEN; no root, no claim). It closes when the gap closes: a composite-system rule on "
+            "record for the hosted layer, tested against the verified Efimov table (a rule that fails the table is dead, "
+            "the gap stays open); or a record that the hosted layer meets the Moretti–Oppio premises (then the rule is the "
+            "standard tensor product, by theorem). Same gap as link 4 of the matter-conservation question (#635 records)."
         ),
         "foundation_batch": "#669-efimov",
         "last_tested_at": DATE,
@@ -200,7 +233,7 @@ CHANGELOG = {
         "experiments (Kraemer 2006; Gross 2009; Pollack/Dries/Hulet 2009; Huang 2014 λ = 21.0(1.3) vs 22.694; Li-6 "
         "three-component 2009; Ulmanis 2016 heteronuclear 4.0(3) vs 4.9), REF-moretti-oppio-2019 (quaternionic Hilbert + "
         "Poincaré ⇒ complex QM), and FLAG-hosted-composite-rule-open (the hosted layer has no multi-particle composition rule; "
-        "Efimov data force one; QBP's own prediction is a null via associativity). Tier 2: documentation of external results; "
+        "Efimov data force one; no QBP prediction recorded). Tier 2: documentation of external results; "
         "no theory claim, no root, no kill on any root. Partial/unverified sweep entries NOT encoded. (Renumbered 6.5.0 at "
         "rebase after #665 → 6.2.0, #666 → 6.3.0 and #667 → 6.4.0 landed.)"
     ),
