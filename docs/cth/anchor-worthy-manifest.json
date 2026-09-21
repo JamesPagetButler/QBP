@@ -980,6 +980,66 @@
         "QBP.Foundations.HolographicSubalgebra.autLin_apply",
         "QBP.Foundations.HolographicSubalgebra.map_span_gen4"
       ]
+    },
+    {
+      "anchor_id": "PROOF-seam-zd-witness-kernel-four",
+      "declared_by": "#666-seam-zero-divisor-kernel",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamKernel.zd_witness_left_kernel_four",
+        "QBP.Foundations.SeamKernel.seamL_ker_eq",
+        "QBP.Foundations.SeamKernel.seam_finrank_ker_eq_four",
+        "QBP.Foundations.SeamKernel.seam_finrank_range_eq_twelve",
+        "QBP.Foundations.SeamKernel.seamX_mul_k1",
+        "QBP.Foundations.SeamKernel.seamX_mul_k2",
+        "QBP.Foundations.SeamKernel.seamX_mul_k3",
+        "QBP.Foundations.SeamKernel.seamX_mul_k4"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-seam-zd-witness-kernels-coincide",
+      "declared_by": "#666-seam-zero-divisor-kernel",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamKernel.zd_witness_kernels_coincide",
+        "QBP.Foundations.SeamKernel.seamR_ker_eq",
+        "QBP.Foundations.SeamKernel.k1_mul_seamX",
+        "QBP.Foundations.SeamKernel.k2_mul_seamX",
+        "QBP.Foundations.SeamKernel.k3_mul_seamX",
+        "QBP.Foundations.SeamKernel.k4_mul_seamX"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-seam-zd-witness-kernel-not-subalgebra",
+      "declared_by": "#666-seam-zero-divisor-kernel",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamKernel.zd_witness_kernel_not_subalgebra",
+        "QBP.Foundations.SeamKernel.k1_sq",
+        "QBP.Foundations.SeamKernel.k1_mul_k3_coord2"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-frobenius-basis-sum-general",
+      "declared_by": "#666-seam-zero-divisor-kernel",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamKernel.sum_N_mul_basis_eq",
+        "QBP.Foundations.SeamKernel.zd_witness_frobenius_preserved",
+        "QBP.Foundations.SeamKernel.N_seamX"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-encoding-copy-mul-injective",
+      "declared_by": "#666-seam-zero-divisor-kernel",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamKernel.octonion_copy_mul_injective",
+        "QBP.Foundations.SeamKernel.octonion_copy_mul_injective_right",
+        "QBP.Foundations.SeamKernel.octonion_copy_mul_eq_zero_imp",
+        "QBP.Foundations.SeamKernel.octonion_copy_mul_eq_zero_imp_right",
+        "QBP.Foundations.SeamKernel.seamX_not_in_octonion_copy"
+      ]
     }
   ]
 }

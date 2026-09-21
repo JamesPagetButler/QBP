@@ -39,6 +39,7 @@
     "proofs/QBP/Foundations/Octonion32Count.lean": 8,
     "proofs/QBP/Foundations/OctonionLaws.lean": 55,
     "proofs/QBP/Foundations/QBPHorizonFoundations.lean": 8,
+    "proofs/QBP/Foundations/SeamKernel.lean": 53,
     "proofs/QBP/Foundations/SedenionOctonionCount.lean": 11,
     "proofs/QBP/Foundations/SpatialFirstLink.lean": 2,
     "proofs/QBP/Foundations/SpectralMoments.lean": 12,
