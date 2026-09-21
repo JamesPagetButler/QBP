@@ -76,7 +76,7 @@ ANCHORS = [
         "length a₋ = −850(20) a₀ (Bohr radii), the signature of an Efimov trimer crossing the three-atom threshold; an "
         "atom–dimer resonance at a₊ = 1060(70) a₀; the ratio a₊/|a₋| = 1.25(9) against the zero-range prediction "
         "0.96(3). The first experimental evidence for Efimov states. QBP relevance (#669): a three-body bound-state "
-        "spectrum — the observable where the hosted layer's composite-system rule and its associativity are tested.",
+        "spectrum — the observable against which any hosted-layer composite-system rule is tested.",
         "Kraemer, T., Mark, M., Waldburger, P., Danzl, J. G., Chin, C., Engeser, B., Lange, A. D., Pilch, K., Jaakkola, A., "
         "Nägerl, H.-C., Grimm, R., Nature 440, 315–318 (2006). doi:10.1038/nature04626",
         mv=1.25,
@@ -206,10 +206,7 @@ ANCHORS = [
             "composition of multi-particle states, and no prediction follows from a rule that does not exist. "
             "See " + NOTE + " §3–§6."
         ),
-        "prediction_chain": [
-            "PROOF-associative-composition-iff",
-            "DERIV-doubleslit-visibility-model",
-        ],
+        "prediction_chain": ["DERIV-doubleslit-visibility-model"],
         "testable_when": (
             "When a composite-system rule for the hosted layer is written: it must reproduce s₀ = 1.00624 (λ = 22.694) for "
             "identical bosons and the mass-ratio-dependent factors (≈ 4.9 for Cs–Cs–Li) within the measured errors."
