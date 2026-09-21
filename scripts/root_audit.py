@@ -21,7 +21,7 @@ sort into exactly one Conversation-MO bucket, from the ledger alone:
   bucket 2  FORCED   `forced_by` names a MEAS-* anchor that resolves in-ledger with status
                      coherent/converged (an untested, marginal, contested or dead anchor
                      forces nothing), or
-                     `decision_state: ruled` with a `ruling` that cites a
+                     `decision_state: settled` with a `ruling` that cites a
                      JamesPagetButler/* GitHub issue/PR URL (the beekeeper's own-hand
                      line — a scope/process ruling, never a physical truth). This
                      check is STRUCTURAL (a cite is present); whether the cited ruling
@@ -185,11 +185,101 @@ def _non_placeholder(e):
     return len(t) >= 8 and not _KILL_PLACEHOLDER.search(t)
 
 
-def kill_present(kc):
-    """cth-implementor's D3 invariant: an open root carries a NON-EMPTY ARRAY of kill entries,
-    one per open question, EVERY entry non-placeholder. A bare string is not the canonical
-    shape (array-only, confluent-trust #102) and does not count."""
-    return isinstance(kc, list) and len(kc) > 0 and all(_non_placeholder(e) for e in kc)
+# Canonical schema 0.3.4 (confluent-trust#104): kill_condition is array<object> KillConditionEntry
+# {kill, closure, discharge}. The schema checks STRUCTURE (kill minLength, closure enum, discharge
+# present iff closure ∈ {derivation, measurement}, OpenNeedsKill); this gate adds the SEMANTIC half
+# (qbp-implementor, live-test seq 1500/1506/1515; cth-implementor seq 1507/1508/1516): placeholder-token on
+# `kill`, `discharge` RESOLVES in-ledger, and the discharge's kind matches the closure. A realised
+# route is kind-locked (PROOF-/DERIV- derivation-only, MEAS- measurement-only); a FLAG-/CONJ- id is a
+# TRACKING anchor for a route that is OPEN, admitted for both kinds and reported as "route OPEN
+# (tracked)", never as dischargeable — so a physics kill is never relabelled ruling-rescope for want
+# of a route (the flag-3 trap), and "cannot fire today" is a concrete record, not an absent field.
+_CLOSURE_KINDS = ("derivation", "measurement", "ruling-rescope")
+_DISCHARGE_TARGET = {
+    "derivation": ("PROOF-", "DERIV-", "FLAG-", "CONJ-"),
+    "measurement": ("MEAS-", "FLAG-", "CONJ-"),
+}
+_OPEN_ROUTE_PREFIXES = ("FLAG-", "CONJ-")
+
+
+def _kill_entry_ok(entry, anchors):
+    if not isinstance(
+        entry, dict
+    ):  # array<object>-only: a leftover string is not an entry
+        return False
+    if not _non_placeholder(entry.get("kill")):
+        return False
+    closure = entry.get("closure")
+    if closure not in _CLOSURE_KINDS:
+        return False
+    discharge = entry.get("discharge")
+    if (
+        closure == "ruling-rescope"
+    ):  # closes on the fired kill; discharge legitimately absent
+        if discharge is None:
+            return True
+        # a discharge that IS present must still be a live, resolving anchor — no bogus or dead
+        # string may hide behind the constitutional branch (PR #665 Red Team MC6)
+        return (
+            isinstance(discharge, str)
+            and discharge in anchors
+            and anchors[discharge].get("status") not in DEAD_STATUSES
+        )
+    if not isinstance(discharge, str) or discharge not in anchors:
+        return False  # derivation/measurement must name a RESOLVING route or tracker
+    if anchors[discharge].get("status") in DEAD_STATUSES:
+        return False  # a dead anchor tracks/grounds nothing — an open kill's route cannot point at it
+    return discharge.startswith(_DISCHARGE_TARGET[closure])
+
+
+def kill_present(kc, anchors):
+    """cth-implementor's D3 invariant (OpenNeedsKill): an open root carries a NON-EMPTY ARRAY of
+    KillConditionEntry objects, one per open question, every entry semantically valid
+    (`_kill_entry_ok`). A bare string is not the canonical shape and does not count."""
+    return (
+        isinstance(kc, list)
+        and len(kc) > 0
+        and all(_kill_entry_ok(e, anchors) for e in kc)
+    )
+
+
+def route_status(entry):
+    """The anti-laundering tag (cth-implementor seq 1508): an open kill must never read as
+    dischargeable."""
+    closure = entry.get("closure")
+    if closure == "ruling-rescope":
+        d0 = entry.get("discharge")
+        tail = f"; discharge noted: {d0}" if d0 else ""
+        return "constitutional (closes only when the kill fires)" + tail
+    d = entry.get("discharge") or ""
+    if d.startswith(_OPEN_ROUTE_PREFIXES):
+        return f"route OPEN (tracked by {d})"
+    # A PROOF-/DERIV-/MEAS- discharge means the route has been RUN, not that the kill has fired:
+    # the cited anchor either discharges the question or EXCLUDES this arm (the kill text says which).
+    # "dischargeable" over-read that (PR #665 Red Team C1–C3, Gemini concurring).
+    return f"route EXISTS (realised via {d} — discharges or excludes this arm; see the kill text)"
+
+
+def kill_routes(ledger, anchors):
+    """[(root id, list, closure, discharge, status tag, kill excerpt)] for every open root."""
+    out = []
+    for key in ROOT_LISTS:
+        for rec in ledger.get(key, []) or []:
+            if not isinstance(rec, dict) or rec.get("decision_state") != "open":
+                continue
+            for e in rec.get("kill_condition") or []:
+                if isinstance(e, dict):
+                    out.append(
+                        (
+                            rec["id"],
+                            key,
+                            e.get("closure"),
+                            e.get("discharge"),
+                            route_status(e),
+                            (e.get("kill") or "")[:80],
+                        )
+                    )
+    return out
 
 
 def sort_root(rec, anchors):
@@ -222,18 +312,18 @@ def sort_root(rec, anchors):
     if forced:
         return None, f"forced_by names non-PROOF/MEAS ids (not a forcing): {forced}"
     ds = rec.get("decision_state")
-    if ds == "ruled":
+    if ds == "settled":
         ruling = rec.get("ruling")
         if isinstance(ruling, str) and GITHUB_CITE.search(ruling):
             return (
                 2,
-                "decision_state ruled with a GitHub-cited ruling (structural check only)",
+                "decision_state settled with a GitHub-cited ruling (structural check only)",
             )
         return None, (
-            "decision_state ruled but `ruling` is not a string citing a JamesPagetButler/* "
+            "decision_state settled but `ruling` is not a string citing a JamesPagetButler/* "
             "GitHub issue/PR URL"
         )
-    has_kill = kill_present(rec.get("kill_condition"))
+    has_kill = kill_present(rec.get("kill_condition"), anchors)
     is_open = ds == "open" or rec.get("status") == "open"
     if has_kill and is_open:
         return 3, "kill_condition present and open"
@@ -557,6 +647,16 @@ def write_report(res, path, ledger_path, register_path):
         ),
         f"- roots rejected for a dead `forced_by`: {len(res['dead_forcings'])}",
     ]
+    if res.get("kill_routes") is not None:
+        L += [
+            "",
+            "## Open-root kill entries — route status (schema 0.3.4; anti-laundering tag)",
+            "",
+            "| root | closure | discharge | status | kill (excerpt) |",
+            "|---|---|---|---|---|",
+        ]
+        for rid, key, closure, d, tag, ex in res["kill_routes"]:
+            L.append(f"| {rid} | {closure} | {d or ''} | {tag} | {ex}… |")
     L += ["", f"## Warnings ({len(res['warnings'])})", ""]
     for w in res["warnings"]:
         L.append(f"- {w}")
@@ -581,6 +681,9 @@ def main():
         ledger = json.load(f)
     open_roots_reg, chain_debt_reg, reg_problems = load_register(args.register)
     res = audit(ledger, open_roots_reg, chain_debt_reg, reg_problems)
+    res["kill_routes"] = kill_routes(
+        ledger, {a["id"]: a for a in ledger.get("anchors", []) if isinstance(a, dict)}
+    )
     if args.report_md:
         write_report(res, args.report_md, args.ledger, args.register)
 

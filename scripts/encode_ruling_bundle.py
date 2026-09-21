@@ -247,7 +247,7 @@ INTERP = {
     "layer": 1,
     "supersedes": "DERIV-holographic (interpretation part)",
     "provenance_kind": "philosophy",
-    "decision_state": "open" if READING == "open" else "ruled",
+    "decision_state": "open" if READING == "open" else "settled",
     "kill_condition": [
         "Which copy of O encodes a universe (P2 vs P2'): fired or discharged by a defining "
         "property of the encoding stated as an object (a Cayley–Dickson half → P2' is a theorem; "
