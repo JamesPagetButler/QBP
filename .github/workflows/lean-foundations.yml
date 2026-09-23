@@ -4,11 +4,14 @@
 # FAULT-S4-001 + the archive octonionMul `True := by trivial` stub are what this prevents).
 # Policy: inter/lean-proof-best-practices.md Rule 4 + docs/foundations/scope-deliberation-2026-05-31.md.
 #
-# Two jobs:
-#   foundations-standard (fast, no toolchain) — hard-ban native_decide + `: True := by trivial`;
-#     ratchet sorry + vacuous-`: True :=` theorems against proofs/QBP/Foundations/.lean-gate-baseline.json.
-#     This is the core gate and always runs.
-#   lake-build (heavy) — `lake build` must succeed (zero errors) with the pinned toolchain + Mathlib cache.
+# Three jobs:
+#   changes (always runs) — dorny/paths-filter decides whether any Lean-relevant path changed.
+#   foundations-standard (fast, no toolchain; runs when changes.lean == true) — hard-ban native_decide +
+#     `: True := by trivial`; ratchet sorry + vacuous-`: True :=` theorems against
+#     proofs/QBP/Foundations/.lean-gate-baseline.json.
+#   lake-build (heavy; runs when changes.lean == true) — `lake build` must succeed (zero errors) with the
+#     pinned toolchain + Mathlib cache. Required status check on master since 2026-09-21; when skipped
+#     (no Lean path changed) GitHub reports the check as satisfied.
 #
 # Same shape as cth-schema-lint.yml (PR #459): workflow + script + fail-on-violation.
 
@@ -20,6 +23,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read  # dorny/paths-filter lists the PR's files on pull_request events
 
 jobs:
   changes:
