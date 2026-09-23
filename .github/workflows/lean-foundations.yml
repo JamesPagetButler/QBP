@@ -4,11 +4,14 @@
 # FAULT-S4-001 + the archive octonionMul `True := by trivial` stub are what this prevents).
 # Policy: inter/lean-proof-best-practices.md Rule 4 + docs/foundations/scope-deliberation-2026-05-31.md.
 #
-# Two jobs:
-#   foundations-standard (fast, no toolchain) — hard-ban native_decide + `: True := by trivial`;
-#     ratchet sorry + vacuous-`: True :=` theorems against proofs/QBP/Foundations/.lean-gate-baseline.json.
-#     This is the core gate and always runs.
-#   lake-build (heavy) — `lake build` must succeed (zero errors) with the pinned toolchain + Mathlib cache.
+# Three jobs:
+#   changes (always runs) — dorny/paths-filter decides whether any Lean-relevant path changed.
+#   foundations-standard (fast, no toolchain; runs when changes.lean == true) — hard-ban native_decide +
+#     `: True := by trivial`; ratchet sorry + vacuous-`: True :=` theorems against
+#     proofs/QBP/Foundations/.lean-gate-baseline.json.
+#   lake-build (heavy; runs when changes.lean == true) — `lake build` must succeed (zero errors) with the
+#     pinned toolchain + Mathlib cache. Required status check on master since 2026-09-21; when skipped
+#     (no Lean path changed) GitHub reports the check as satisfied.
 #
 # Same shape as cth-schema-lint.yml (PR #459): workflow + script + fail-on-violation.
 
@@ -16,22 +19,42 @@ name: Lean Foundations Gate
 
 on:
   pull_request:
-    paths:
-      - 'proofs/**/*.lean'
-      - 'proofs/lakefile.lean'
-      - 'proofs/lean-toolchain'
-      - 'proofs/QBP/Foundations/.lean-gate-baseline.json'
-      - 'proofs/QBP/.build-visibility-quarantine.json'
-      - 'scripts/check_lean_foundations.py'
-      - 'scripts/check_layer_imports.py'
-      - 'scripts/test_check_layer_imports.py'
-      - '.github/workflows/lean-foundations.yml'
+
 
 permissions:
   contents: read
+  pull-requests: read  # dorny/paths-filter lists the PR's files on pull_request events
 
 jobs:
+  changes:
+    # Always runs. The two gate jobs below are skipped (which GitHub counts as passing for a
+    # required check) when no Lean-relevant path changed. This replaces the workflow-level
+    # `paths:` filter, which left non-Lean PRs stuck at "Expected" once `lake build (zero
+    # errors)` became a required check on master (2026-09-21).
+    name: Detect Lean changes
+    runs-on: ubuntu-latest
+    outputs:
+      lean: ${{ steps.filter.outputs.lean }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            lean:
+              - 'proofs/**/*.lean'
+              - 'proofs/lakefile.lean'
+              - 'proofs/lean-toolchain'
+              - 'proofs/QBP/Foundations/.lean-gate-baseline.json'
+              - 'proofs/QBP/.build-visibility-quarantine.json'
+              - 'scripts/check_lean_foundations.py'
+              - 'scripts/check_layer_imports.py'
+              - 'scripts/test_check_layer_imports.py'
+              - '.github/workflows/lean-foundations.yml'
+
   foundations-standard:
+    needs: changes
+    if: needs.changes.outputs.lean == 'true'
     name: Foundations standard (no-sorry-increase / no native_decide / no vacuous stubs)
     runs-on: ubuntu-latest
     steps:
@@ -47,6 +70,8 @@ jobs:
         run: python3 scripts/test_check_layer_imports.py
 
   lake-build:
+    needs: changes
+    if: needs.changes.outputs.lean == 'true'
     name: lake build (zero errors)
     runs-on: ubuntu-latest
     steps:
