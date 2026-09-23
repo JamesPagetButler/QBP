@@ -1040,6 +1040,88 @@
         "QBP.Foundations.SeamKernel.octonion_copy_mul_eq_zero_imp_right",
         "QBP.Foundations.SeamKernel.seamX_not_in_octonion_copy"
       ]
+    },
+    {
+      "anchor_id": "PROOF-rule-gradient-and-tangent-field",
+      "declared_by": "#635-rule-flow",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlow.stateSphere_invariant",
+        "QBP.Substrate.RuleFlow.hasGradientAt_potential",
+        "QBP.Substrate.RuleFlow.contDiff_potential",
+        "QBP.Substrate.RuleFlow.ruleField_bil_self",
+        "QBP.Substrate.RuleFlow.ruleField_coord_zero",
+        "QBP.Substrate.RuleFlow.gradV_eq_zero_of_isVacuum",
+        "QBP.Substrate.RuleFlow.ruleField_eq_zero_of_isVacuum",
+        "QBP.Substrate.RuleFlow.exists_ruleField_ne_zero"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-rule-euler-step-injective",
+      "declared_by": "#635-rule-flow",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlow.eulerStep_injOn",
+        "QBP.Substrate.RuleFlow.exists_lipschitzOnWith_ruleField",
+        "QBP.Substrate.RuleFlow.normForm_eulerStep",
+        "QBP.Substrate.RuleFlow.renormStep_injOn_of_normForm_const"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-rule-flow-finite-time-uniqueness",
+      "declared_by": "#635-rule-flow",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlow.flow_time_map_injective",
+        "QBP.Substrate.RuleFlow.flow_unique_of_mem_Icc",
+        "QBP.Substrate.RuleFlow.flow_unique_of_endpoint"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-potential-descent-along-rule",
+      "declared_by": "#635-rule-flow",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlow.potential_antitone_along_flow",
+        "QBP.Substrate.RuleFlow.hasDerivAt_potential_along_flow",
+        "QBP.Substrate.RuleFlow.potential_nonincreasing_along_flow",
+        "QBP.Substrate.RuleFlow.potential_le_initial_along_flow",
+        "QBP.Substrate.RuleFlow.exists_rest_point_not_vacuum"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-potential-bounded-by-normForm-sq-frozen-max",
+      "declared_by": "#635-rule-flow",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlow.ruleField_eq_zero_of_potential_eq_one",
+        "QBP.Substrate.RuleFlow.potential_eq_cross",
+        "QBP.Substrate.RuleFlow.potential_le_normForm_sq",
+        "QBP.Substrate.RuleFlow.exists_isMaxOn_potential_stateSphere"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-zero-divisors-sit-at-potential-max",
+      "declared_by": "#635-rule-flow",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlow.potential_eq_normForm_sq_of_mul_eq_zero",
+        "QBP.Substrate.RuleFlow.normForm_mul_eq",
+        "QBP.Substrate.RuleFlow.abs_normForm_mul_sub_le",
+        "QBP.Substrate.RuleFlow.abs_normForm_mul_sub_le_right",
+        "QBP.Substrate.RuleFlow.potential_eq_one_of_zeroDivisor",
+        "QBP.Substrate.RuleFlow.crystal_not_zeroDivisor"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-rule-descent-avoids-zero-divisors",
+      "declared_by": "#635-rule-flow",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlow.omega_avoids_zeroDivisors",
+        "QBP.Substrate.RuleFlow.not_zeroDivisor_along_flow",
+        "QBP.Substrate.RuleFlow.omega_avoids_locus"
+      ]
     }
   ]
 }
