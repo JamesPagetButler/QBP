@@ -25,3 +25,117 @@ Vacuum manifold M = {V = 0} = {a ∥ c}; r² = |a|² + |c|² = 1 − b₀².
 
 Sealed 2026-09-24 before the first `run-bounded` launch. Any later edit to this section would be a protocol violation.
 
+---
+
+## 1. Leg A — the anneal, analytically
+
+### 1a. Tube / Laplace route (the one the driver asked for)
+
+**Second-order expansion of V at a vacuum.** With A = |a|², C = |c|², D = ⟨a, c⟩: V = 4(AC − D²) = 4‖a ∧ c‖² (Gram determinant = squared area). A vacuum is (a, c) = r(cos θ u, sin θ u), u ∈ S⁶, r² = 1 − b₀². Perturb (δa, δc, δb₀). Since a ∧ c = 0 at the vacuum, δ(a ∧ c) = δa ∧ c + a ∧ δc = r(sin θ δa − cos θ δc) ∧ u to first order, so with w := sin θ δa − cos θ δc,
+
+  V = 4 r² ‖w_⊥‖² + O(δ³),  w_⊥ = w − ⟨w, u⟩u,  i.e. D²V(v, v) = 8 r² ‖w_⊥‖².
+
+**Tangent and normal spaces.** The tangent space of M at the vacuum (inside T S¹⁴, 8-dim) is spanned by ∂_θ = (−r sin θ u, r cos θ u, 0), ∂_{u_i} = (r cos θ e_i, r sin θ e_i, 0) (e_i ⊥ u, i = 1..6), ∂_{b₀} = (−(b₀/r) cos θ u, −(b₀/r) sin θ u, 1). On each of these w_⊥ = 0 (for ∂_θ, w = −r u ∥ u; for ∂_{u_i}, w = r(sin θ cos θ − cos θ sin θ) e_i = 0; for ∂_{b₀}, w ∥ u), so D²V annihilates T M. The 6-dim normal space is {n̂ = (sin θ n, −cos θ n, 0) : n ⊥ u}: it is orthogonal to all eight tangent vectors, unit-normalised when |n| = 1, and gives w = n, so
+
+  **H_⊥ = 8 r² · I₆ = 8(1 − b₀²) I₆.**
+
+Because V ≥ 0 vanishes on M, D²V at a vacuum is positive semi-definite; its kernel contains T M and its restriction to the normal space is positive definite (r > 0), so the kernel is exactly T M and there are no tangent–normal cross terms. Because M consists of global minima of V on all of ℝ¹⁶ (V ≥ 0 there too), the ambient gradient vanishes on M and the intrinsic Hessian of V|_{S¹⁴} equals the ambient Hessian restricted to T S¹⁴ (the second-fundamental-form term is multiplied by ∇V = 0). This matches PR #667's `hessQuad = 8(1−b₀²)‖Pv‖²` and transverse trace 48(1−b₀²), and is confirmed numerically to 5·10⁻¹⁴ in §2b.
+
+**Laplace on a manifold with a minimum submanifold.** For a compact Riemannian manifold X (here S¹⁴, round metric), V ≥ 0 smooth with {V = 0} = M a submanifold of codimension k along which the normal Hessian is non-degenerate,
+
+  ∫_X f e^{−βV} dvol_X = (2π/β)^{k/2} ∫_M f · det(H_⊥)^{−1/2} dvol_M · (1 + o(1)),
+
+with H_⊥ in an orthonormal normal frame. Here k = 6 and det(H_⊥)^{−1/2} = (8r²)^{−3} = 8⁻³ (1 − b₀²)⁻³.
+
+**Surface element of M in the round metric.** In the parametrisation x(θ, u, b₀) = (r cos θ u, r sin θ u, b₀), r = √(1 − b₀²), the three families of tangent vectors above are mutually orthogonal with |∂_θ|² = r², |∂_{u_i}|² = r², |∂_{b₀}|² = b₀²/r² + 1 = 1/r². So the induced metric is diag(r², r² I₆, r⁻²) and
+
+  dvol_M = r · r⁶ · r⁻¹ dθ dΩ₆ db₀ = **(1 − b₀²)³ dθ db₀ dΩ_{S⁶}** = (1 − b₀²)³ dΩ_{S²} dΩ_{S⁶},
+
+using that dθ db₀ is the round area element of the vacuum S² in (azimuth, height) coordinates (Archimedes). This is the driver's expected (α² + γ²)³ dΩ_{S²} dΩ_{S⁶}.
+
+**Cancellation.** det(H_⊥)^{−1/2} dvol_M = 8⁻³ (1 − b₀²)⁻³ · (1 − b₀²)³ dθ db₀ dΩ₆ = 8⁻³ dθ db₀ dΩ₆. The β → ∞ Gibbs density on the vacuum S² is **exactly uniform in (θ, b₀)**, i.e. round-uniform on S², so
+
+  **⟨b₀²⟩_anneal = ½ ∫₋₁¹ b₀² db₀ = 1/3 exactly.**
+
+Every step checked; the cancellation does not fail. Two things the argument has to survive, both fine: (i) M is not smooth at the two poles r = 0 (its link there is (S¹ × S⁶)/ℤ₂, not S⁷), and H_⊥ → 0 there — but the limit density 8⁻³ dθ db₀ dΩ₆ is bounded, so the poles carry zero limiting mass, and the near-pole band r ≲ β^{−1/4} where the Gaussian approximation fails has S¹⁴-measure ∝ β^{−14/4} = β^{−3.5} against the bulk's β^{−3}: it is an O(β^{−1/2}) correction (this is the origin of the slow, from-below convergence seen at finite β — see §2a); (ii) the degenerate vacua a = 0 or c = 0 (θ ∈ {0, π/2} mod π) are ordinary points of M (the parametrisation is regular there), so nothing special happens.
+
+### 1b. Independent route: reduce Haar on S¹⁴ to three invariants, then β → ∞
+
+Write x = (a, b₀, c) with height coordinate b₀: dσ_{S¹⁴} = (1 − b₀²)⁶ db₀ dΩ₁₃ (general: (1 − z²)^{(n−2)/2} on Sⁿ). Put (a, c) = r ω, ω ∈ S¹³ ⊂ ℝ⁷ ⊕ ℝ⁷, ω = (√t p, √(1−t) q): under uniform ω, t = |â|² ~ Beta(7/2, 7/2), p, q independent uniform on S⁶, and cos φ = ⟨p, q⟩ has density ∝ sin⁵ φ on [0, π]. Then V = 4 r⁴ t(1 − t) sin² φ =: 4 r⁴ κ, and
+
+  ⟨b₀²⟩_β = ∫ (1 − b₀²)⁶ b₀² I(β, (1 − b₀²)²) db₀ / ∫ (1 − b₀²)⁶ I(β, (1 − b₀²)²) db₀,
+  I(β, x) = ∫₀¹ t^{5/2}(1 − t)^{5/2} J(4βx t(1 − t)) dt,  J(μ) = ∫₀^π sin⁵φ e^{−μ sin²φ} dφ = ∫₀¹ w²(1 − w)^{−1/2} e^{−μw} dw = B(3, ½) ₁F₁(3; 7/2; −μ).
+
+As μ → ∞, J(μ) → 2/μ³ (both endpoints φ = 0, π contribute Γ(3)/(2μ³)); so I(β, x) → 2 (4βx)⁻³ ∫₀¹ (t(1 − t))^{5/2 − 3} dt = 2π/(4βx)³ = 2π/(64 β³ x³). With x = (1 − b₀²)², the b₀-density becomes (1 − b₀²)⁶ · (1 − b₀²)⁻⁶ · const = **const**: uniform in b₀, ⟨b₀²⟩ → 1/3. The θ-marginal in the same limit is ∝ t^{5/2}(1−t)^{5/2}/(t(1−t))³ dt = (t(1−t))^{−1/2} dt = 2 dθ (t = cos² θ): uniform in θ — the same S²-uniform statement as §1a, reached by a different split (r¹² vs r⁻¹² here, r⁶ vs r⁻⁶ there).
+
+This route also gives the exact finite-β values by 3-d quadrature (`anneal_quadrature.py`, §2a), including the β⁻¹ᐟ² approach.
+
+## 2. Leg A/B — the anneal, numerically
+
+### 2a. Exact quadrature of the reduced integral (`anneal_quadrature.py` → `anneal_quadrature_out.txt`)
+
+Composite Gauss–Legendre (32 nodes × 300 geometric panels per level) resolving the boundary layers t ~ 1/(βx) and 1 − b₀ ~ β⁻¹ᐟ². Self-checks: J(μ) against a reference quad to 10⁻⁹ over μ ∈ [0, 10⁶]; β = 0 gives 1/15 to 10 digits; the Laplace constant β³x³ I(β, x) → 2π/64 = 0.098175 is reproduced to 6 digits at β = 10³, 10⁵, 10⁷ for x = 1 and x = ¼ — this is the §1b limit "I → 2π/(64β³x³)" checked numerically, i.e. the cancellation of §1a/§1b seen directly.
+
+| β | ⟨b₀²⟩_β exact | (1/3 − ⟨b₀²⟩_β)·√β | on record (`gibbs_check.py`, importance sampling) |
+|---|---|---|---|
+| 0 | 0.066667 | — | 1/15 |
+| 5 | 0.121549 | 0.474 | 0.121 |
+| 10 | 0.167532 | 0.524 | 0.167 |
+| 40 | 0.247124 | 0.545 | 0.245 |
+| 160 | 0.289832 | 0.550 | 0.290 ± 0.03 |
+| 1000 | 0.315860 | 0.553 | — |
+| 10⁴ | 0.327798 | 0.5535 | — |
+| 10⁶ | 0.332779 | 0.5539 | — |
+| 10⁷ | 0.333158 | 0.5539 | — |
+
+Findings: (i) every on-record importance-sampling value is reproduced within its MC error; (ii) the approach to 1/3 is **exactly** of the form 1/3 − 0.5539·β⁻¹ᐟ² + o(β⁻¹ᐟ²) — the constant is flat to four digits from β = 10⁴ on — which is the near-pole (r ≲ β⁻¹ᐟ⁴) correction predicted in §1a, and nothing else; (iii) the b₀-density relative to b₀ = 0 is 1.0000 at b₀ = 0.3, 0.6, 0.9, 0.99 for β = 10⁶ (at β = 100 the b₀ = 0.9 point is still at 0.699 — the pole band is wide at small β). The limit is uniform in b₀ and ⟨b₀²⟩_∞ = 1/3, with no free constant left over.
+
+Numerics failure caught and fixed (on record, not hidden): the first version used `scipy.integrate.quad` with algebraic end-point weights; it silently under-resolved the t-boundary layer for βx ≳ 10³ and returned I(β, x) 1–2 % low (visible as β³x³I → 0.0961 instead of 0.0982 and as a d·√β that *fell* at large β). Caught by the Laplace-constant check, replaced by the panelled Gauss–Legendre; the β ≤ 320 values were unaffected to 6 digits. The aborted first RK4 output (`quench_rk4_out_aborted_v1.txt`, Euler line only) is likewise kept.
+
+### 2b. Hessian isotropy at 50 random vacua (`hessian_isotropy.py` → `hessian_isotropy_out.txt`)
+
+Random b₀ ∈ (−0.95, 0.95) plus b₀ = 0, 0.99, −0.999; random θ and u ∈ S⁶; full 14 × 14 Hessian on T_x S¹⁴ by Richardson-corrected central differences (exact for a quartic). Result: **8 eigenvalues zero to 4.9·10⁻¹⁴, 6 eigenvalues equal to 8(1 − b₀²) to 4.9·10⁻¹⁴**, |∇V| ≤ 2.5·10⁻¹⁶ at every vacuum. Rank 6, single transverse eigenvalue — PR #667's `hessQuad` confirmed far beyond the 10⁻⁶ seal.
+
+## 3. Leg C — the quench
+
+### 3a. The quench endpoint has a closed form (derived before the runs)
+
+The sphere-projected gradient flow ẋ = −(∇V − ⟨∇V, x⟩x) with V = 4(AC − D²), A = |a|², C = |c|², D = ⟨a, c⟩, B = b₀²:
+∂V/∂a = 8(Ca − Dc), ∂V/∂c = 8(Ac − Da), ∂V/∂b₀ = 0, and ⟨∇V, x⟩ = 16(AC − D²) = 4V (degree-4 homogeneity). Hence
+
+  ȧ = −8(Ca − Dc) + 4V a,  ċ = −8(Ac − Da) + 4V c,  ḃ₀ = 4V b₀,
+
+and the G₂ × O(2)-invariants close:
+
+  Ȧ = 2⟨a, ȧ⟩ = −4V + 8VA = 4V(2A − 1),  Ċ = 4V(2C − 1),  Ḋ = 8VD,  Ḃ = 8VB   (check: Ȧ + Ċ + Ḃ = 8V(A + C + B − 1) = 0).
+
+In the reparametrised time dτ = 4V dt this is **linear**: A′ = 2A − 1, C′ = 2C − 1, D′ = 2D, B′ = 2B, so with λ = e^{2τ} ∈ [1, ∞)
+
+  (A − ½, C − ½, D, B)(λ) = λ · (A₀ − ½, C₀ − ½, D₀, B₀):
+
+the invariants move on a **straight ray** from the initial point, away from (½, ½, 0, 0), until V = 0, i.e. AC = D². Substituting, the stopping condition is the quadratic q(λ) = (A₀ − ½)(C₀ − ½)λ² − ... which, using A₀ + C₀ = 1 − B₀ and V₀ = 4(A₀C₀ − D₀²), collapses to
+
+  (V₀ + 2B₀ − 1) λ² − 2B₀ λ + 1 = 0,  λ* = 1/(B₀ + √((1 − B₀)² − V₀))
+
+(the smaller positive root, ≥ 1 since V₀ ≤ (1 − B₀)²; q(1) = V₀/4 > 0 so the flow reaches this root first). Therefore
+
+  **b₀²_end = B₀ λ* = b₀² / ( b₀² + √((1 − b₀²)² − V₀) ),**
+
+a function of the initial (b₀², V) only: the endpoint is independent of the integrator, of the time parametrisation, and of the stopping time (as long as the flow is followed to V = 0). Sanity: V₀ = 0 ⇒ unchanged; V₀ = (1 − B₀)² (a ⊥ c, |a| = |c| — the symmetric configuration) ⇒ b₀² → 1 (flows to the pole ±ℓ, cf. Prop 16); ḃ₀ = 4Vb₀ says |b₀| only grows (ln(b₀_end/b₀_init) = 4∫V dt, the "b₀ growth ratio" printed by `flow_big.py`).
+
+With the Haar reduction of §1b (V₀ = 4(1 − B₀)² κ, κ = t(1 − t) sin²φ), the quench number is the 3-d integral
+
+  **⟨b₀²⟩_quench = E_Haar[ B / (B + (1 − B)√(1 − 4κ)) ],**  B ~ (1 − b₀²)⁶ db₀, t ~ Beta(7/2, 7/2), φ ~ sin⁵φ dφ.
+
+This is what `quench_exact.py` evaluates (quadrature, and 10⁷ Haar points using `flowlib.potential`, no reduction). The integrators in `quench_rk4.py` then have an exact per-seed target to be compared against.
+
+### 3b. The exact quench number (`quench_exact.py`, output `quench_exact_out.txt`)
+
+| Method | ⟨b₀²⟩_quench | Notes |
+|---|---|---|
+| 3-d quadrature of E_Haar[B/(B + (1−B)√(1−4κ))] | **0.141587** | 25 s; β = 0 check ∫ b₀² = 1/15 to 7 digits |
+| 10⁷ Haar points, V from `flowlib.potential` (full sedenion commutator, no reduction), closed form per point | **0.14162 ± 0.00005** | max |V − 4(AC − D²)| = 9·10⁻¹⁶ over 10⁷ points; endpoint quantiles (10/25/50/75/90 %) = 0.0027 / 0.0174 / 0.076 / 0.208 / 0.386 |
+| on record (renormalised Euler, h = 0.02, T = 100) | 0.1462 ± 0.0011 (#629), 0.1454 ± 0.0011, 0.1436 ± 0.0011 | three independent seed streams; their mean 0.1451 ± 0.0006 |
+
+The exact value **0.1416** sits 3σ–4σ below the on-record Euler numbers taken individually and 5.5σ below their pooled mean. The integrator ladder in §3c decides whether that gap is the h = 0.02 Euler bias (sealed expectation: |Euler − RK4| < 0.002 — this row will test that seal).
+
