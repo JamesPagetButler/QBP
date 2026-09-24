@@ -5,3 +5,4 @@
 -- (#473 issuecomment-5574256922) for the hosting DEFINITION file only.
 import QBP.Substrate.Hosting
 import QBP.Substrate.RuleFlow
+import QBP.Substrate.RuleFlowInvariants
