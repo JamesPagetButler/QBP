@@ -11,7 +11,7 @@ Sections mirror the report:
      rule-invariance of the atomic measures (V=0 on support, F=0), the l-axis map endpoint.
   C. Galois correspondence Fix(ker(G^ -> G^_k)) = CD_k inside the sedenions (k=0..4); the action
      of the profinite G^ on the sedenions factors through the finite G^_4 (kernel check).
-Resource estimate: < 300 MB, < 60 s.  Run:  run-bounded 2G 120 python3 attack4_dual_cantor.py
+Resource estimate: < 300 MB, < 300 s (the first run at 120 s timed out, rc 124; rerun at 300 s).  Run:  run-bounded 2G 300 python3 attack4_dual_cantor.py
 """
 
 import itertools, json, sys
