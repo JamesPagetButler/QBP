@@ -96,6 +96,20 @@ Numerics failure caught and fixed (on record, not hidden): the first version use
 
 Random b₀ ∈ (−0.95, 0.95) plus b₀ = 0, 0.99, −0.999; random θ and u ∈ S⁶; full 14 × 14 Hessian on T_x S¹⁴ by Richardson-corrected central differences (exact for a quartic). Result: **8 eigenvalues zero to 4.9·10⁻¹⁴, 6 eigenvalues equal to 8(1 − b₀²) to 4.9·10⁻¹⁴**, |∇V| ≤ 2.5·10⁻¹⁶ at every vacuum. Rank 6, single transverse eigenvalue — PR #667's `hessQuad` confirmed far beyond the 10⁻⁶ seal.
 
+### 2c. MCMC anneal on S¹⁴ with the full sedenion potential (`anneal_mcmc.py` → `anneal_mcmc_out.txt`)
+
+Random-walk Metropolis, 8192 independent chains, symmetric proposal x′ = normalise(x + εξ), ε adapted to acceptance 0.30 during burn-in, `flowlib.potential` (no reduction to invariants). Standard error from the spread of the 8192 independent chain means. Two initial ensembles: **Haar**, and **pole** (all chains within 0.045 of +ℓ, ⟨b₀²⟩_init = 0.998 — the worst start for mixing along the b₀ direction of M).
+
+| β | ε | exact (quadrature, §2a) | MCMC, Haar init | MCMC, pole init | halves (pole): first / second |
+|---|---|---|---|---|---|
+| 10 | 0.20 | 0.167532 | 0.1676 ± 0.0002 | 0.1676 ± 0.0002 | 0.1675 / 0.1677 |
+| 30 | 0.081 | 0.234149 | 0.2342 ± 0.0005 | 0.2338 ± 0.0005 | 0.2342 / 0.2334 |
+| 100 | 0.042 | 0.278425 | 0.2777 ± 0.0010 | 0.2783 ± 0.0011 | 0.2774 / 0.2793 |
+| 300 | 0.024 | 0.301502 | 0.3037 ± 0.0017 | 0.3001 ± 0.0017 | 0.3006 / 0.2995 |
+| 1000 | 0.013 | 0.315860 | 0.3143 ± 0.0023 | 0.3150 ± 0.0023 | 0.3134 / 0.3165 |
+
+All ten MCMC values lie within 1.3σ of the exact quadrature; the two initial ensembles agree with each other within 1.5σ at every β (the pole start forgets ⟨b₀²⟩ = 0.998 completely); the sequence is monotone toward 1/3 at the exact β⁻¹ᐟ² rate. Wall: 1630 s (Haar), 1083 s (pole), each under a 2 GB / 3600 s cap.
+
 ## 3. Leg C — the quench
 
 ### 3a. The quench endpoint has a closed form (derived before the runs)
@@ -139,3 +153,60 @@ This is what `quench_exact.py` evaluates (quadrature, and 10⁷ Haar points usin
 
 The exact value **0.1416** sits 3σ–4σ below the on-record Euler numbers taken individually and 5.5σ below their pooled mean. The integrator ladder in §3c decides whether that gap is the h = 0.02 Euler bias (sealed expectation: |Euler − RK4| < 0.002 — this row will test that seal).
 
+### 3c. Integrator ladder on identical seeds (`quench_rk4.py` → `quench_rk4_out.txt`)
+
+Seeds: 24 000 Haar states, `default_rng(20260924)` (a stream distinct from every on-record run; ⟨b₀²⟩_init = 0.06768 vs 1/15 = 0.06667, a 1σ fluctuation), all integrators started from the **same** states so that per-seed differences are integrator error only. Closed-form gradient checked against `flowlib.gradV_exact` to 2·10⁻¹⁶; field tangency 2·10⁻¹⁵.
+
+| Integrator | seeds | ⟨b₀²⟩_end | vs closed form (paired): mean / max per seed | all seeds converged? |
+|---|---|---|---|---|
+| closed form b₀²/(b₀² + √((1−b₀²)² − V₀)) | 24 000 | 0.14215 ± 0.00108 | — | — |
+| **renormalised Euler h = 0.02, T = 100** (flow_big's scheme) | 24 000 | **0.14525 ± 0.00110** | **+3.10·10⁻³** / 4.8·10⁻² | yes (max V 5·10⁻¹⁸) |
+| `flowlib.step` h = 0.02 (the on-record integrator itself) | 1 000 | 0.14975 ± 0.0056 | +3.16·10⁻³ / 4.2·10⁻²; identical to my Euler to 3.9·10⁻¹⁵ | yes |
+| RK4 + renormalise h = 0.02 | 24 000 | **0.14215 ± 0.00108** | +1.0·10⁻⁷ / 4.0·10⁻⁶ | yes (max V 9·10⁻¹⁹) |
+| RK4 h = 0.01 | 6 000 | (subset) | +6.5·10⁻⁹ / 2.3·10⁻⁷ | yes |
+| RK4 h = 0.005 | 6 000 | (subset) | +4.1·10⁻¹⁰ / 1.5·10⁻⁸ | yes |
+| Dormand–Prince 5(4), rtol 10⁻⁹ (544 steps, 10 rejected) | 2 000 | (subset) | −5·10⁻¹³ / 3.9·10⁻¹¹ | yes (max V 9·10⁻²¹) |
+| RK4 continued T = 100 → 400 from the DP45 endpoints | 2 000 | shift **+1.8·10⁻¹⁹** | — | max V 7·10⁻³¹ |
+
+Richardson on the 6000-seed subset: mean|RK4(0.02) − RK4(0.01)| = 9.5·10⁻⁸, mean|RK4(0.01) − RK4(0.005)| = 6.1·10⁻⁹, **ratio 15.7** (h⁴ → 16). Paired Euler(0.02) − RK4(0.005): **+3.12·10⁻³ ± 0.05·10⁻³**, max per seed 4.2·10⁻².
+
+Reading:
+1. **The h → 0 quench limit is the closed form of §3a, to 10⁻¹¹ per seed**, by three integrators of different order (RK4 ladder with the right h⁴ scaling, adaptive DP45). The stopping rule is irrelevant (T = 100 → 400 changes nothing at 10⁻¹⁹; every seed is at V < 10⁻¹⁸ by T = 100, including the near-pole ones — the "unconverged fraction" of the seal is 0.0000, not < 1 %).
+2. **Renormalised Euler at h = 0.02 carries a systematic bias of +0.0031 in ⟨b₀²⟩** (a 130σ paired effect; per-seed up to +0.048, always upward since Euler over-shoots along the ray and ḃ₀ = 4Vb₀ only grows |b₀|). This is exactly the gap between the on-record numbers (0.1462, 0.1454, 0.1436; pooled 0.1451 ± 0.0006) and the exact 0.1416 (0.1416 + 0.0031 = 0.1447). The on-record integrator (`flowlib.step`, and `flow_big.py`'s identical scheme) is the source — verified by running `flowlib.step` itself on the same seeds.
+3. Hence: **"0.146" is 0.1416 + a first-order discretisation artefact of +0.003.** The quench number, correctly stated, is **0.1416 (exact: E_Haar[B/(B + (1−B)√(1−4κ))] = 0.141587)**, with the on-record MC scatter (±0.001) on top of that bias.
+
+---
+
+## 4. Verdict
+
+| Question | Answer | Evidence |
+|---|---|---|
+| Does the β → ∞ Gibbs anneal give ⟨b₀²⟩ = 1/3? | **Yes, exactly.** | §1a tube/Laplace (Hessian 8r²·I₆ × surface element r⁶ cancel); §1b independent reduction to (b₀, t, φ); §2a exact quadrature → 1/3 − 0.5539 β⁻¹ᐟ², 0.333158 at β = 10⁷; §2c MCMC at 5 β's, 2 inits, all within 1.3σ; §2b Hessian isotropy to 5·10⁻¹⁴ |
+| Does the gradient-flow quench give 0.146? | **No — it gives 0.1416; "0.146" = 0.1416 + a +0.003 Euler h = 0.02 artefact.** | §3a closed form b₀²/(b₀² + √((1−b₀²)² − V₀)); §3b quadrature 0.141587 and 10⁷-point MC 0.14162 ± 0.00005; §3c RK4/DP45 reproduce the closed form to 10⁻⁸–10⁻¹¹ per seed, Euler/`flowlib.step` are +0.0031 ± 0.0000(5) above it on the same seeds |
+| Do the two numbers coincide? | **No.** 1/3 vs 0.1416 — the gap is 0.19, about 60× the size of the artefact found. | all of the above |
+| Is Prop 9 cracked? | **Not as a measure statement; its quench number is wrong in the third decimal.** Two algebra-compatible rules on the same N-measure give two different, now *exactly known* numbers: anneal 1/3, quench 0.141587. | — |
+
+**Driver's sealed positions:** (A) "factors cancel, uniform on S², 1/3 exactly" — **held**, and now with a second derivation and an exact finite-β law. (B) "monotone toward 1/3" — **held**. (B) "Hessian rank 6, single eigenvalue 8(1 − b₀²)" — **held** (to 5·10⁻¹⁴). (C) "0.146 ± 0.003" — **missed by 0.0044**: the exact quench value is 0.1416, and the on-record 0.146 is 0.1416 + 0.003 (renormalised-Euler bias at h = 0.02) + MC scatter.
+
+**My own seals** (§0): all held except two, recorded honestly: "|Euler − RK4| < 0.002" **failed** (it is 0.0031); "unconverged fraction < 1 %" was too pessimistic (it is 0). The sealed range for the exact quench value [0.140, 0.150] held (0.1416).
+
+**Findings beyond the target (numerical leg only; none is a theory claim):**
+1. The quench endpoint is closed-form: b₀²_end = b₀²/(b₀² + √((1 − b₀²)² − V₀)) — the invariants move on a straight ray under the flow. Hence ⟨b₀²⟩_quench = E_Haar[B/(B + (1 − B)√(1 − 4κ))] = **0.141587**, no ODE needed. This also makes Prop 9's two numbers *both* integrals over the same 3-dim invariant space with the same Haar weights (1 − b₀²)⁶ · t^{5/2}(1−t)^{5/2} · sin⁵φ — one with weight → uniform-on-S², the other with the ray map — which is a sharper form of "same measure, two rules, two numbers".
+2. The finite-β anneal obeys ⟨b₀²⟩_β = 1/3 − 0.5539 β⁻¹ᐟ² + o(β⁻¹ᐟ²) (the near-pole band r ≲ β⁻¹ᐟ⁴), so any finite-β "anneal" number quoted without this correction is not the limit.
+3. Corrections owed to the record (for the driver, not made here — nothing outside `analysis/473-kill-attack/` was touched): Prop 9's "quench 0.146" → "quench 0.1416 (exact 0.141587; the on-record 0.146 carried a +0.003 renormalised-Euler h = 0.02 bias)"; the same 0.146/0.1462/0.1454/0.1436 numbers appear in Props 12, 14, 16 and the one-line result. `gibbs_check.py`'s "≈ 1/3" can be upgraded to "= 1/3 exactly, approach 1/3 − 0.554/√β".
+
+## 5. Resource log (every compute run under `run-bounded`; ledger `~/.federation-watcher/run-bounded.ledger`)
+
+| Run | Estimate (RAM / wall) | Cap | Actual wall | Exit |
+|---|---|---|---|---|
+| `hessian_isotropy.py` | <200 MB / ~5 s | 1G / 300 s | ~5 s | 0 |
+| `anneal_quadrature.py` v1 (scipy quad; superseded, result kept in §2a note) | <200 MB / 1–5 min | 1G / 1800 s | ~3 min | 0 |
+| `anneal_quadrature.py` v2 (panelled GL; the recorded one) | <200 MB / ~5 min | 1G / 900 s | ~8 min | 0 |
+| `anneal_quadrature` at the five MCMC β's | <200 MB / <5 min | 1G / 900 s | ~2 min | 0 |
+| `quench_exact.py` | <1 GB / ~2 min | 2G / 900 s | ~1.5 min | 0 |
+| `quench_rk4.py` v1 (aborted by me after the Euler line — the 24 000-seed h = 0.005 RK4 + T = 400 continuation would have exceeded the cap; output kept as `quench_rk4_out_aborted_v1.txt`) | <500 MB / ~21 min | 2G / 3600 s | killed at ~6 min | 144 (SIGTERM by me) |
+| `quench_rk4.py` v2 | <500 MB / ~40 min | 2G / 5400 s | ~45 min | 0 |
+| `anneal_mcmc.py haar` | <300 MB / ~22 min | 2G / 3600 s | 1630 s | 0 |
+| `anneal_mcmc.py pole` | <300 MB / ~22 min | 2G / 3600 s | 1083 s | 0 |
+
+No run approached its memory cap; none timed out. Files: `attack1_anneal_vs_quench.md` (this report), `flowlib.py` (verbatim copy from `research/635-analysis-records`), `anneal_quadrature.py`, `hessian_isotropy.py`, `anneal_mcmc.py`, `quench_exact.py`, `quench_rk4.py`, and the raw outputs `*_out.txt`, `anneal_quadrature_mcmc_betas.txt`, `quench_rk4_out_aborted_v1.txt`.
