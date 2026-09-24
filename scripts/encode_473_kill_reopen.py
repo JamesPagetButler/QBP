@@ -32,9 +32,10 @@ RULING = (
     "LocaleDynamics.lean) and Prop 10′'s 'no algebra-native profinite object' (false — the CD index "
     "tower's dual Cantor group exists and is the tower's Galois group; it is inert by the no-small-"
     "subgroups theorem). The kill's CONCLUSION — no topological or measure-theoretic mechanism supplies "
-    "the dynamical rule — was NOT reversed by any attack and three legs are now theorem-grade (anneal = "
-    "1/3 exactly and a closed-form quench endpoint; lfp of the sublevel filtration = ⊥ and no V-natural "
-    "valuation; level-set invariants rule-blind, 13 of 14 in-flight directions V-neutral). Route "
+    "the dynamical rule — was NOT reversed by any attack; two legs are now theorem-grade in Lean (lfp of the "
+    "sublevel filtration = ⊥ and no V-natural valuation; level-set invariants rule-blind, 13 of 14 in-flight "
+    "directions V-neutral) and one is NUMERICAL + ARGUMENT, Lean pending (anneal = 1/3 exactly by a Laplace "
+    "derivation re-checked in review; closed-form quench endpoint to 10⁻¹¹ by three integrators). Route "
     "reopened as FLAG-locale-forcing-route-reopened. This record is kept as history."
 )
 
