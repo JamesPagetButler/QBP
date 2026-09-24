@@ -60,8 +60,9 @@ NEW_FLAG = {
         "(LocaleDynamics.lean, 41 theorems); (5) every level-set invariant is rule-blind: at any in-flight "
         "state 13 of 14 tangent directions are V-neutral (TransitionState.lean, 15 declarations); (6) the "
         "CD index tower's dual Cantor group is an algebra-native profinite Galois group acting by sign "
-        "automorphisms, and every continuous profinite action on 𝕊 has finite image (attack 4; Lie-group "
-        "no-small-subgroups; numerical + argument). NOT proved: that no mechanism outside these classes "
+        "automorphisms, and every continuous profinite action by automorphisms on 𝕊 has finite image (attack 4; "
+        "Aut(𝕊) is a closed norm-preserving subgroup of GL(16,ℝ), hence a compact Lie group — no small subgroups; "
+        "the unformalised Aut(𝕊) = G₂ × S₃ is not used; numerical + argument). NOT proved: that no mechanism outside these classes "
         "exists — which is why the route is OPEN rather than killed or validated."
     ),
     "prediction_chain": ["PROOF-spatial-first-link-condensed-locale"],
