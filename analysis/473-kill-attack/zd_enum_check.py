@@ -39,7 +39,8 @@ print(
 # V on the sphere
 vals = [potential(z / np.sqrt(2)) for *_, z, _ in zds]
 print(f"V(z/√2): min {min(vals):.12f} max {max(vals):.12f} (expect 1)")
-# singular values of L_z, R_z, ad_z for one canonical z (structure)
+# singular values of L_z, R_z, ad_z for one canonical z (structure).  All are the full 16×16 matrices on 𝕊
+# (real line included); ad_z = L_z − R_z on 𝕊 gives {4 ×4, 2√2 ×6, 0 ×6}, Σσ² = 112 (Red Team #676 F3).
 z = E[1] + E[10]
 for name, M in [
     ("L_z", L_matrix(z)),

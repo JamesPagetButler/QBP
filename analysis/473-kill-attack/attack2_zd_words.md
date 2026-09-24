@@ -6,12 +6,19 @@ symmetries, never dynamics toward the vacuum.* Its examined scope is one imagina
 `(s, ℓ)` (quaternion subalgebra `ℍ_s`, shape invariant `σ = V/(1−b₀²)²` constant, only `±ℓ` reachable), and one
 unforced generic `t` (linear maps → power iteration onto the ridge `V = 1`). **Unexamined:** a third generator
 that is canonical *as a set* — the 84 basis-sum zero divisors `e_i ± e_j` (42 planes, PROOF-42zd), which are
-Aut-invariant as a set unlike a generic `t`. Kill condition (doc §7 rank 2): *an (s, ℓ, z)-word that reaches a
-vacuum other than `±ℓ` from a non-vacuum `s`.*
+Aut-invariant as a set unlike a generic `t`. Kill condition as originally posed (doc §7 rank 2, #473 plan row 2): *an
+(s, ℓ, z)-word that reaches a vacuum other than `±ℓ` from a non-vacuum `s`.* **Re-posed after review** (Red Team #676
+F1; #473 comment 5822879405): as literally posed the condition **fires** — reachability of a non-pole vacuum by a fixed
+word is a measure-zero event that holds by construction (§7.0), so it is not the statement Prop 16 makes. The kill for
+this attack is *a word-map with a positive-measure set of `s` landing on a non-pole vacuum, or an iterated word-map with
+a non-pole vacuum attractor.* The driver's sealed position (S2/S3 below) was mis-posed as a reachability claim and is
+correct only under this dynamical reading.
 
 **Status.** Research probe, numerical flashlight only (branch `research/473-kill-attack-2`; nothing here touches
 the ledger or `proofs/`). Beekeeper-directed attempt to prove `KILLED-locale-forcing-route` wrong
-(plan: #473, comment 5808096164), ATTACK 2 of the plan.
+(plan: #473, comment 5808096164), ATTACK 2 of the plan. **Revision:** Red Team #676 (comment 5822866563, REQUEST
+CHANGES) F1–F5 applied — the reachability claim is withdrawn (§7.0), σ is the hit variable (§1), counts corrected (§5,
+§7), "not covered" extended (§7). No number from the runs was changed; the raw outputs are untouched.
 
 ## 0. Sealed expectations (written before each run; the driver's position)
 
@@ -26,6 +33,11 @@ the ledger or `proofs/`). Beekeeper-directed attempt to prove `KILLED-locale-for
 | S7 | `attack2_nearmiss.py` | the small-`V` endpoints of S6 are pole approaches (`|b₀| → 1` with σ bounded away from 0) or σ-conserving quasi-periodic motion — not σ → 0 |
 | S5 | `attack2_equiv.py` | every statistic is exactly Aut-invariant: `G₂` acts diagonally and fixes `ℓ`, so `w(φs, ℓ, φz) = φ w(s, ℓ, z)`; the `S₃` factor preserves `V` (det M = ±1) and maps `b₀ ↦ ±b₀` |
 
+*Post-review annotation (the sealed text above is left as written).* S2/S3 are **reachability** claims and are FALSE as
+stated: fixed words do reach non-pole vacua, on a measure-zero (codim ≥ 4) set of `s` that 200 sampled `s` cannot hit
+(§7.0). What the runs S2/S3 actually test — and what held — is the absence of positive-measure steering; S1/S4/S6/S7
+(attractors) are the dynamical statements and held as sealed. S0/S5 are exact and held.
+
 ## 1. Setup
 
 State sphere: imaginary unit sedenions `x ∈ ℝ¹⁶`, `x₀ = 0`, `‖x‖ = 1`; `cdLo = x[0:8]`, `cdHi = x[8:16]`;
@@ -34,8 +46,13 @@ vacua `V = 0` (8-dim); ridge `V = 1` (unit ZDs; `V ≤ (1 − b₀²)²` so `V =
 `flowlib.py` (`analysis/rule-flow-tests-2026-09-20`, CD convention `(a,b)(c,d) = (ac − conj(d) b, da + b conj(c))`).
 A word's value need not be imaginary; it is read on the state sphere as `Im w / ‖Im w‖` (`Im` is in the
 `(+, conj, scalar)` closure); `V` ignores real parts anyway. A word is *degenerate* on a pair when `‖Im w‖ < 10⁻⁷`
-(leaves are unit vectors, so this is round-off scale — e.g. `s + s³/‖s³‖ ≡ 0`). **Hit:** `V < 10⁻⁸`, `|b₀| < 0.999`,
-non-degenerate.
+(leaves are unit vectors, so this is round-off scale — e.g. `s + s³/‖s³‖ ≡ 0`). **Hit (as computed):** `V < 10⁻⁸`,
+`|b₀| < 0.999`, non-degenerate. **Hit variable (as read):** the shape invariant `σ = V/(1−b₀²)² ∈ [0, 1]`, which vanishes
+exactly on the non-pole vacua and is the quantity Prop 16(ii) conserves. The computed criterion is `σ < 10⁻⁸/(1−b₀²)²`:
+`σ < 10⁻⁸` at `b₀ = 0` but `σ < 2.5 × 10⁻³` at the `|b₀| = 0.999` cut — so a "hit" and a σ-floor are not comparable
+without this conversion, and every σ_min quoted below is the smallest σ *reached on the sampled `s`* (a sampling floor),
+not a property of the word. The `|b₀| ≥ 0.999` slab is classed as a pole landing **by definition**: a genuine non-pole
+vacuum with `b₀` that close to `±1` would not be counted as a hit (measure-tiny, but a definition, not a result).
 
 Conjugation is redundant: for imaginary generators `conj(w) = ±(w reversed)`, and every reversal is enumerated.
 Real scalars are absorbed by normalisation.
@@ -47,7 +64,7 @@ Real scalars are absorbed by normalisation.
 | basis-sum elements `e_i ± e_j` with singular `L_z` | **84**, in **42 planes**, both signs in every plane |
 | planes straddling `𝕆` / `𝕆ℓ` | 42 / 42; **none involves `e₈ = ℓ`** |
 | `V(z/√2)` | `1.000000000000` for all 84 (the ridge) |
-| `L_z` singular values (unnormalised `z`, `Σσ² = 16·N(z) = 32`) | `{2 ×4, √2 ×8, 0 ×4}` — **one spectrum for all 84** (`R_z` identical; `ad_z`: `{4 ×4, 2√2 ×6, 0 ×6}`) |
+| `L_z` singular values (unnormalised `z`, `Σσ² = 16·N(z) = 32`) | `{2 ×4, √2 ×8, 0 ×4}` — **one spectrum for all 84** (`R_z` identical). `ad_z = L_z − R_z` **as the full 16×16 matrix on `𝕊`** (real line and `z`-line included, both in the kernel; float SVD): `{4 ×4, 2√2 ×6, 0 ×6}`, `Σσ² = 112`; the `σ = 4` block is supported on `span{e₄…e₇, e₁₂…e₁₅}` (it is the 4-dim `T(ad_z)` of §3), the `{2√2 ×6, 0 ×6}` part on the complementary 8-dim block containing `1`, `z`, `ℓ` — the Red Team's exact ℚ check on the 12-dim `ad_z`-closed block reproduces `{2√2 ×6, 0 ×6}` |
 | Jordan map `xz + zx` on `Im𝕊` | **real**: `= −2(x_i ± x_j)`, max imaginary part `0.0` (exact, from pairwise anticommutation) |
 | random ridge points (`a ⊥ Im b`, `|a| = |Im b|`, `b₀ = 0`) | `rank L_x = 12` for 20/20 → ridge points are zero divisors, kernel dim 4 |
 | `G₂ ⊂ Aut(𝕊)` construction | `Der(𝕆)` from basis pairs has rank 14; `exp(D) ⊕ exp(D)` is orthogonal, fixes `ℓ`, automorphism residual `9e-15` on all 256 basis pairs |
@@ -80,7 +97,7 @@ basis description (`NoAutonomousDynamics.lean`, "Completeness").
 
 ### 4a. (a) 84 basis-sum z — 200 s × 84 z, 1663 s
 
-| class | evaluations (non-degenerate) | exact pole landings `V<1e-8, |b₀|≥0.999` | non-pole `V<1e-3` | non-pole `σ<0.05` | non-pole `σ>0.95` | `σ_min` (non-pole) | **hits** |
+| class | evaluations (non-degenerate) | exact pole landings `V<1e-8, |b₀|≥0.999` | non-pole `V<1e-3` | non-pole `σ<0.05` | non-pole `σ>0.95` | `σ_min` reached, non-pole (sampling floor) | **hits** (`V<1e-8, |b₀|<0.999`) |
 |---|---|---|---|---|---|---|---|
 | pure | 63,722,400 | 8,037,490 (12.6%) | 678,396 (1.06%) | 383,050 (0.69%) | 31,734,122 (57.1%) | 2.70e-03 | **0** |
 | imnode | 40,723,200 | 542,304 (1.3%) | 78,288 (0.19%) | 305,060 (0.76%) | 22,908,444 (57.0%) | 2.70e-03 | **0** |
@@ -96,7 +113,7 @@ Linear closure: rank of the 3873+1 word vectors = **16** on all 20 sampled `(s, 
 | 4 | 405 | 77 | 60 | 2.70e-03 | 0.073 |
 | 5 | 3402 | 0 | 374 | 2.70e-03 | 0.073 |
 
-Smallest per-word `σ_min` (the closest any pure word came to a non-pole vacuum on any pair):
+Smallest per-word `σ_min` reached on the 200 sampled `s` (a sampling floor — the preimage of the vacuum under these words is non-empty, §7.0):
 
 | word | `σ_min` | `V_min` | `max|b₀|` | fraction on ridge |
 |---|---|---|---|---|
@@ -105,11 +122,11 @@ Smallest per-word `σ_min` (the closest any pure word came to a non-pole vacuum 
 | `((z(zs))s)` | 2.70e-03 | 2.70e-03 | 0.000 | 0.005 |
 | `(((sz)z)s)` | 2.70e-03 | 2.70e-03 | 0.000 | 0.005 |
 
-Control: the 371 `(s, ℓ)`-only words have `σ_min = 0.0053` = min over the 200 `s` of `σ(s)` — the shape invariant is conserved on them to round-off, exactly as Prop 16(ii) states; words containing `z` are the only ones that move σ, and they never move it to 0.
+Control: the 371 `(s, ℓ)`-only words have `σ_min = 0.0053` = min over the 200 `s` of `σ(s)` — the shape invariant is conserved on them to round-off, exactly as Prop 16(ii) states; words containing `z` are the only ones that move σ; on the sampled `s` they did not move it below the floors in the table — which is a sampling floor, not a bound (σ = 0 *is* attained on a codim-≥ 4 set of `s`, §7.0).
 
 ### 4b. (b) 50 ridge-point z — 200 s × 50 z, 1067 s
 
-| class | evaluations (non-degenerate) | exact pole landings `V<1e-8, |b₀|≥0.999` | non-pole `V<1e-3` | non-pole `σ<0.05` | non-pole `σ>0.95` | `σ_min` (non-pole) | **hits** |
+| class | evaluations (non-degenerate) | exact pole landings `V<1e-8, |b₀|≥0.999` | non-pole `V<1e-3` | non-pole `σ<0.05` | non-pole `σ>0.95` | `σ_min` reached, non-pole (sampling floor) | **hits** (`V<1e-8, |b₀|<0.999`) |
 |---|---|---|---|---|---|---|---|
 | pure | 37,930,000 | 4,783,882 (12.6%) | 402,880 (1.06%) | 227,686 (0.69%) | 18,936,130 (57.2%) | 1.47e-03 | **0** |
 | imnode | 24,240,000 | 322,800 (1.3%) | 46,600 (0.19%) | 181,632 (0.76%) | 13,660,488 (57.1%) | 4.88e-03 | **0** |
@@ -125,7 +142,7 @@ Linear closure: rank of the 3873+1 word vectors = **16** on all 20 sampled `(s, 
 | 4 | 405 | 77 | 60 | 4.88e-03 | 0.092 |
 | 5 | 3402 | 0 | 374 | 1.47e-03 | 0.086 |
 
-Smallest per-word `σ_min` (the closest any pure word came to a non-pole vacuum on any pair):
+Smallest per-word `σ_min` reached on the 200 sampled `s` (a sampling floor — the preimage of the vacuum under these words is non-empty, §7.0):
 
 | word | `σ_min` | `V_min` | `max|b₀|` | fraction on ridge |
 |---|---|---|---|---|
@@ -134,7 +151,7 @@ Smallest per-word `σ_min` (the closest any pure word came to a non-pole vacuum 
 | `((z(s(sz)))s)` | 1.47e-03 | 1.39e-03 | 0.735 | 0.000 |
 | `((z((zs)s))s)` | 1.47e-03 | 1.39e-03 | 0.735 | 0.000 |
 
-Control: the 371 `(s, ℓ)`-only words have `σ_min = 0.0053` = min over the 200 `s` of `σ(s)` — the shape invariant is conserved on them to round-off, exactly as Prop 16(ii) states; words containing `z` are the only ones that move σ, and they never move it to 0.
+Control: the 371 `(s, ℓ)`-only words have `σ_min = 0.0053` = min over the 200 `s` of `σ(s)` — the shape invariant is conserved on them to round-off, exactly as Prop 16(ii) states; words containing `z` are the only ones that move σ; on the sampled `s` they did not move it below the floors in the table — which is a sampling floor, not a bound (σ = 0 *is* attained on a codim-≥ 4 set of `s`, §7.0).
 
 
 ## 5. Iterated linear maps (`attack2_maps.py`, S4 — met)
@@ -151,7 +168,7 @@ Control: the 371 `(s, ℓ)`-only words have `σ_min = 0.0053` = min over the 200
 | `xz + zx` | raw: 1.000 (the real output is renormalised to `±1`, then `1·z`…, degenerate); **im: dead** (`Im = 0` at step 1, all 16 800) | — | — | — | 0 |
 | `x + z ± ℓ` | **0.250** (→ `(z ± ℓ)/‖·‖`: `a = e_i/2`, `b₀ = ±1/√2`, `Im b = e_j/2`) | ±0.707 | 1 | no | 0 |
 
-No trajectory (0 / 26 800 + 20 000) ended within `10⁻³` of a vacuum other than a pole. Endpoint `V` is *exactly* 1 or
+No trajectory ended within `10⁻³` of a vacuum other than a pole: **0 of 482 400** = 9 maps × 2 variants × 26 800 `(s, z)` pairs (16 800 basis-sum + 10 000 ridge; the `im` variant of `xz + zx` is dead at step 1, so 455 600 are alive). Endpoint `V` is *exactly* 1 or
 *exactly* 1/4 to the printed precision — the maps are linear, the endpoints are the canonical subspaces of §3 or the
 fixed point `norm(z ± ℓ)`, not distributions.
 
@@ -201,44 +218,116 @@ basis-sum `z` and 20 `s` × 20 ridge `z`, for all words of length ≤ 3 and the 
 
 As predicted: `G₂` acts diagonally and fixes `ℓ`, so `w(φs, ℓ, φz) = φ w(s, ℓ, z)` exactly; the `S₃` factor preserves
 `V = 4 det Gram(a, Im b)` (`det M = ±1`) and flips `b₀` at most. **Any hit would be Aut-invariant; equally, the absence
-of hits is not a basis-labelling accident** — and the ridge-`z` runs (§4b, §5) say the same without any basis at all.
+of hits is not a basis-labelling accident** (though, per §7.0, it is not discriminating either) — and the ridge-`z` runs
+(§4b, §5) say the same without any basis at all.
 
 
-## 7. Verdict
+## 7. Verdict (revised after Red Team #676; the original verdict paragraph is withdrawn — see 7.0)
 
-**No.** No `(s, ℓ, z)`-word reaches a vacuum other than `±ℓ` from a non-vacuum `s`: **0 hits** in ≈ 3.2 × 10⁸ word
-evaluations (both `z`-sets, three word classes), 0 in 46 800 iterated linear-map trajectories, 0 in 765 440 iterated
-nonlinear word-map trajectories; σ never fell below `7 × 10⁻⁴` (combos) / `1.5 × 10⁻³` (pure words) anywhere, and
-every dynamical approach to small `V` was a pole approach on a σ-conserving or σ ≡ 1 stratum. The kill condition of
-§7 rank 2 does not fire with the canonical zero divisors as a third generator; `KILLED-locale-forcing-route` stands
-against this attack. The negative is Aut-exact (§6) and basis-free (the ridge-`z` runs reproduce every number to the
-percent).
+### 7.0 Review record — the kill condition as posed FIRED; the sealed position was mis-posed
+
+The verdict originally written here read: *"No `(s, ℓ, z)`-word reaches a vacuum other than `±ℓ` from a non-vacuum
+`s` … the vacuum is unreachable except `±ℓ` … every fixed word / fixed-coefficient combination avoids the non-pole vacuum
+set entirely … no algebra-native map has the vacuum set in its image other than at `±ℓ`."* **That is false as stated.**
+The Red Team (PR #676, comment 5822866563) exhibited reaching words under this report's own hit criterion:
+
+| word | mechanism | witness (Red Team, independent code) |
+|---|---|---|
+| `s·z` (pure, length 2) | `s ↦ s·z` is `R_z`, rank 12; a 12-dim subspace meets the 10-dim vacuum cone | Nelder–Mead on `s ∈ S¹⁴`: `V(w) = 0.0`, `‖Im w‖ = 0.79`, `|b₀(w)| = 0.456`, from `V(s) = 0.507` |
+| `(s(z(zs)))` (this report's own near-miss, §4a) | nonlinear in `s`; same codimension count | `V(w) = 9.5 × 10⁻³⁴`, `|b₀| = 0.000`, from `V(s) = 0.533` |
+| `s + ½·z` (combo class) | `s ↦ norm(s + ½z)` is onto the whole state sphere | closed form: for a vacuum `y`, `s = t·y − ½z`, `t = ½⟨y,z⟩ + √(¼⟨y,z⟩² + ¾)` gives `V(w) = 0` exactly, `V(s) = 0.106`; 4/4 random `(y, z)` trials |
+
+Why the enumeration could not see this: the preimage of the vacuum set under a fixed word has **codimension ≥ 4** in
+`S¹⁴` (Red Team tail fit `P(σ < ε) ∝ ε^k` with `k ≈ 2.2–2.7` in log ε over 10⁶ uniform `s`, i.e. codim 4–5;
+`P(σ < 10⁻³) ≤ 3 × 10⁻⁶`). 200 stratified `s` never land on a codim-≥ 4 set, and the expected number of `V < 10⁻⁸` hits in
+`5 × 10⁸` evaluations is `N·ε^k ≈ 5 × 10⁻⁸ … 5 × 10⁻¹⁶` **whether or not the vacuum set lies in the image**. "0 hits"
+therefore does not discriminate between the sealed position and its negation. Measure-zero reachability is true *by
+construction* — three generators span the algebra (§4), and the image of each of the three word maps above meets the
+vacuum set (witnesses in the table) — not something the sampling tested or could test.
+
+**The driver's sealed position (S2/S3; #473 plan row 2) was mis-posed as a reachability claim; it is correct only under
+the dynamical reading (7.1).** Recorded on #473 by qbp-oppenheimer (comment 5822879405, 2026-09-24) — surfaced for the
+beekeeper, not absorbed: whether a literal firing of the rank-2 kill condition as written reopens anything is the
+beekeeper's call under the plan ("reopened for the beekeeper — not reversed by the agent"). The Red Team's reading, and
+the driver's, is that it does not touch Prop 16's *dynamics* statement.
+
+**Kill condition, re-posed:** *a word-map with a positive-measure set of `s` landing on a non-pole vacuum, or an
+iterated word-map with a non-pole vacuum attractor.* Under this posing the attack's result is 7.1.
+
+### 7.1 What was shown — the dynamical negative
+
+Three statements survive review and are the content of this record:
+
+1. **Measure-zero reachability, true by construction.** A fixed `(s, ℓ, z)`-word or fixed-coefficient combination reaches
+   a non-pole vacuum only on a measure-zero set of `s` (codim ≥ 4; verified by construction for `s·z`, `(s(z(zs)))`,
+   `s + ½·z`, 7.0). This is not a finding of the enumeration; it is established by the constructions in 7.0 (and `span(words) = 𝕊`,
+   §4, is why such words exist at all).
+2. **No positive-measure steering onto the vacuum.** No word map sends a positive-measure set of `s` onto a non-pole
+   vacuum: on 200 stratified `s` × (84 basis-sum `z` and 50 ridge `z`), **≈ 5.06 × 10⁸ word evaluations** (3.17 × 10⁸
+   basis-sum + 1.89 × 10⁸ ridge; three word classes), the smallest σ reached off the poles was `7.2 × 10⁻⁴` (combos) /
+   `1.5 × 10⁻³` (pure words) — **sampling floors** (the smallest σ attained on the sampled `s`), consistent with the
+   codim-≥ 4 tail; they are not bounds on the words (σ = 0 is attained, 7.0). In σ, the computed hit criterion is
+   `σ < 2.5 × 10⁻³` at the `|b₀| = 0.999` cut (§1), so the floors and "0 hits" are consistent with each other and with
+   the tail fit.
+3. **No non-pole vacuum attractor.** The attractors of every normalised linear map `L_z`, `R_z`, `ad_z` are 4-dim ridge
+   planes spanned by other canonical ZDs (§3, exact); **0 of 482 400** iterated linear-map trajectories (§5; 9 maps × 2
+   variants × 26 800 pairs) and **0 of 765 440** iterated nonlinear word-map trajectories (§5b; 618 240 + 147 200) end
+   at a non-pole vacuum; every small-`V` endpoint is a pole approach on a σ-conserving stratum (the `(x, ℓ)`-only maps —
+   Prop 16(ii) seen dynamically) or on the σ ≡ 1 stratum, where the only vacua are the poles (§5c). The `(s, ℓ)`-only
+   words conserve σ to round-off (§4 control).
+
+Under the re-posed kill condition the attack does **not** fire; `KILLED-locale-forcing-route` stands against this attack
+**in its dynamical reading only**. The kill's *conclusion* is untouched — Prop 13(b) needs a rule selecting endpoints for
+generic states, and a measure-zero preimage is not one. The negative is Aut-exact (§6) and basis-free (the ridge-`z` runs
+reproduce every number to the percent).
+
+**Consequence for Prop 16.** Its clause "the only vacua reachable from a non-vacuum `s` are `±ℓ`" holds for the
+operations on `(s, ℓ)` (Lean closure into `ℍ_s`) but **needs a qualifier once the canonical zero-divisor set is admitted as
+a third generator**: there it must read "no positive-measure / no attractor route to a non-pole vacuum" — every vacuum
+*is* the image of some `s` under a fixed word, but only for a codim-≥ 4 set of `s`. Attack 2's row in the v0.6 addendum is
+being corrected accordingly (#680).
 
 **What the words DO — the sharpening of Prop 16 this attack buys:**
 
 1. **Three generators generate everything, but no fixed word steers.** `span(words in s, ℓ, z)` is the full 16-dim
-   algebra (vs 4 for `(s, ℓ)`), so the *subalgebra* contains every vacuum — yet reaching one needs `s`-dependent
-   coefficients. Every fixed word / fixed-coefficient combination avoids the non-pole vacuum set entirely. Prop 16's
-   "symmetries, never dynamics" survives the loss of its invariant subspace: the obstruction is not `ℍ_s`, it is that
-   no algebra-native map has the vacuum set in its image other than at `±ℓ`.
-2. **The ZD's canonical attractors are ridge planes.** `L_z`, `R_z`, `ad_z` for a basis-sum `z` have one spectrum
-   `{2 ×4, √2 ×8, 0 ×4}`; the top space and the kernel are 4-dim planes lying *identically* on the ridge, each spanned by
-   four other basis-sum ZDs (`T(e₁+e₁₀) = span{e₄+e₁₅, e₅−e₁₄, e₆+e₁₃, e₇−e₁₂} = K(e₁−e₁₀)`). This is the structural
-   reason the generic-`t` observation "top plane lies on `V = 1`" (`NoAutonomousDynamics.lean`, Completeness, observed
-   100/100 — NOT derived) holds *exactly and by name* for the canonical set — a candidate Lean target
-   (finite: 84 elements × 16 basis columns).
-3. **Mass goes to the ridge and the poles, never to the 8-dim vacuum.** Of the pure-word evaluations 12.6% land exactly
-   on `±ℓ`, 57% of the non-pole remainder have σ > 0.95, 0.7% have σ < 0.05, none σ = 0. The `x + z ± ℓ` maps have the
-   fixed point `(z ± ℓ)/‖·‖` with `V = 1/4`, `b₀ = ±1/√2` — a canonical non-vacuum, non-ridge point.
+   algebra (vs 4 for `(s, ℓ)`), so the *subalgebra* contains every vacuum and every non-pole vacuum is reached by some
+   fixed word from some `s` (7.0) — but only from a measure-zero set of `s`; landing on the vacuum from *generic* `s` needs
+   `s`-dependent coefficients. Prop 16's "symmetries, never dynamics" survives the loss of its invariant subspace in its
+   dynamical form: no algebra-native map has a non-pole vacuum as an attractor, and none steers a positive-measure set of
+   `s` onto the vacuum. (The sentence that stood here — "avoids the non-pole vacuum set entirely … no algebra-native map
+   has the vacuum set in its image other than at `±ℓ`" — is withdrawn; see 7.0.)
+2. **The ZD's canonical attractors are ridge planes.** `L_z`, `R_z` for a basis-sum `z` have one spectrum
+   `{2 ×4, √2 ×8, 0 ×4}` (`ad_z` on all of `𝕊`: `{4 ×4, 2√2 ×6, 0 ×6}`, §2); the top space and the kernel are 4-dim planes
+   lying *identically* on the ridge, each spanned by four other basis-sum ZDs
+   (`T(e₁+e₁₀) = span{e₄+e₁₅, e₅−e₁₄, e₆+e₁₃, e₇−e₁₂} = K(e₁−e₁₀)`; reproduced exactly in ℚ by the Red Team). This is the
+   structural reason the generic-`t` observation "top plane lies on `V = 1`" (`NoAutonomousDynamics.lean`, Completeness,
+   observed 100/100 — NOT derived) holds *exactly and by name* for the canonical set — a candidate Lean target (finite:
+   84 elements × 16 basis columns).
+3. **Mass goes to the ridge and the poles, never to the 8-dim vacuum — on the sampled `s`.** Of the pure-word evaluations
+   12.6% land exactly on `±ℓ`, 57% of the non-pole remainder have σ > 0.95, 0.7% have σ < 0.05, none σ = 0 on the 200
+   sampled `s` (7.0: σ = 0 is attained on a codim-≥ 4 set). The `x + z ± ℓ` maps have the fixed point `(z ± ℓ)/‖·‖` with
+   `V = 1/4`, `b₀ = ±1/√2` — a canonical non-vacuum, non-ridge point.
 4. **Exact identities found on the way:** `xz + zx = −2(x_i ± x_j)` is real on `Im𝕊` (Jordan map degenerate);
    `x((xz)z)` maps `Im𝕊` into the `b₀ = 0` slice; `(x, ℓ)`-only maps conserve σ dynamically to 1e-12 (Prop 16(ii) as a
    flow statement); `z(x(ℓx))` and `x(ℓ(xz))` map onto the σ = 1 stratum.
 
-**What this does not show.** Words of length ≥ 6, three or more distinct ZDs in one word (`z₁ z₂ = 0` pairs), and
-`s`-dependent coefficients were not tested; the nonlinear map census is length ≤ 4 and 100 steps (2000 for the four
-near-miss families). None of the trends (σ_min by length: 5.3e-3 → 2.7e-3 → 2.7e-3 basis; 4.9e-3 → 1.5e-3 ridge)
-extrapolates to 0 within reach, but the length-5 ridge minimum is the one number here that moved, and a length-6/7
-run on the four `(s,(s,z)z)`-type families is the cheapest follow-up if anyone wants to press.
+**What this does not show (extended after review, F5).**
+
+1. **Reachability — not tested, and not testable by this method.** The preimage of the vacuum under a fixed word has
+   codim ≥ 4, so every "0 hits" and every σ_min here is a statement about 200 stratified `s` (expected hits under the
+   alternative `5 × 10⁻⁸ … 5 × 10⁻¹⁶`). Reachability is decided by construction or optimisation (the Red Team did it: three
+   words hit, 7.0); steering is decided by a measure estimate (the tail exponent `k ≈ 2.2–2.7`), which this record did not
+   compute itself.
+2. **Coefficient restriction.** The combination class is two-term only, `ŵ₁ + c·ŵ₂` with `c ∈ {±1, ±2, ±½}` and words of
+   length ≤ 3; three-term combinations, other coefficients, and `s`-dependent coefficients were not tested (with
+   `s`-dependent coefficients every vacuum is reachable trivially, since the span is all of `𝕊`).
+3. **The `|b₀| ≥ 0.999` slab is excluded by definition** (§1): a genuine non-pole vacuum with `b₀` that close to `±1`
+   counts as a pole landing. Measure-tiny, but it is a definition of "pole", not a result.
+4. **Length and multiplicity.** Words of length ≥ 6, three or more distinct ZDs in one word (`z₁ z₂ = 0` pairs); the
+   nonlinear map census is length ≤ 4 and 100 steps (2000 for the four near-miss families).
+5. The σ_min-by-length trend (5.3e-3 → 2.7e-3 → 2.7e-3 basis; 4.9e-3 → 1.5e-3 ridge) is a sampling-floor trend and says
+   nothing about reachability (7.0). For the *dynamical* question (attractors of longer words), a length-6/7 run on the
+   four `(s,(s,z)z)`-type families is the cheapest follow-up if anyone wants to press.
 
 ## 8. Resource log and files
 

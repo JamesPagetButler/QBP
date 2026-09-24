@@ -5,6 +5,10 @@ a word is ± its reversal, and every reversal is enumerated); real scalars are a
 Variant 'imnode': words of length ≤ 4 where every internal node may additionally be Im-projected
 (the (+, conj, scalar) closure the Lean `GenBy` uses).  Each word is evaluated on the state sphere
 x = Im w/‖Im w‖; hit ⇔ V < 1e-8 and |b₀| < 0.999 and the word is non-degenerate (‖Im w‖ > 1e-7 absolute; leaves are unit).
+NOTE (Red Team #676 F1/F2): in the invariant σ = V/(1−b₀²)² this criterion is σ < 1e-8/(1−b₀²)², i.e. σ < 2.5e-3 at
+the |b₀| = 0.999 cut; σ is the hit variable to read the outputs by.  The preimage of the vacuum under a fixed word has
+codim ≥ 4, so 200 sampled s cannot hit it and "0 hits" does NOT test reachability (fixed words such as s·z do reach
+non-pole vacua on a measure-zero set of s); the reported σ_min values are sampling floors.  See attack2_zd_words.md §7.0.
 Also: linear closure dimension of the (s, ℓ, z)-subalgebra (rank of the word vectors, 20 pairs), and
 fixed-coefficient two-word combinations w₁ + c·w₂ (length ≤ 3, c ∈ {±1, ±2, ±½}).
 Usage: python3 attack2_words.py basis|ridge   (RAM ≈ 1.6 GB for 'basis', ≈ 1 GB for 'ridge'; ≈ 2–5 min)

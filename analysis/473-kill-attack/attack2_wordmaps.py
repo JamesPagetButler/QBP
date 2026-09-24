@@ -6,6 +6,8 @@ ZDs (mode basis) or 20 random ridge points (mode ridge).  This is the probe Prop
 (zd_subspaces.py), the nonlinear ones (≥ 2 x) are new — e.g. x((xz)z) ≠ −2x·x because 𝕊 is not alternative.
 Sealed expectation (driver): no non-pole vacuum is an attractor; endpoints are ridge points, poles, or cycles/fixed
 points with V bounded away from 0; a few maps may be degenerate (Im → 0).  Hit ⇔ endpoint V < 1e-6, |b₀| < 0.999.
+(In σ = V/(1−b₀²)² that is σ < 2.5e-1 at the |b₀| = 0.999 cut and σ < 1e-6 at b₀ = 0; the question this script answers
+is the attractor one — no non-pole vacuum attractor — not reachability; see attack2_zd_words.md §7.0/§7.1.)
 RAM < 400 MB; ≈ 10–20 min per mode (471 words × 100 steps × ≤ 3 products on 1680 rows).
 """
 
