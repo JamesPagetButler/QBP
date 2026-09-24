@@ -258,7 +258,7 @@ iterated word-map with a non-pole vacuum attractor.* Under this posing the attac
 
 Three statements survive review and are the content of this record:
 
-1. **Measure-zero reachability, true by construction.** A fixed `(s, ℓ, z)`-word or fixed-coefficient combination reaches
+1. **Measure-zero reachability, true by dimensional intersection: the map s ↦ s·z is linear with a 12-dimensional image, and a 12-dimensional subspace meets the 8-dimensional vacuum manifold in a set whose preimage in the 15-sphere has codimension ≥ 4.** A fixed `(s, ℓ, z)`-word or fixed-coefficient combination reaches
    a non-pole vacuum only on a measure-zero set of `s` (codim ≥ 4; verified by construction for `s·z`, `(s(z(zs)))`,
    `s + ½·z`, 7.0). This is not a finding of the enumeration; it is established by the constructions in 7.0 (and `span(words) = 𝕊`,
    §4, is why such words exist at all).
@@ -352,3 +352,5 @@ full enumeration pass had a word-naming collision (level-2 names unparenthesised
 | `attack2_nearmiss.py` → `out_nearmiss.json` | §5c |
 | `attack2_equiv.py` → `out_equiv.json`, `log_equiv.txt` | §6 |
 | `resource_log.txt` | estimates vs actuals |
+
+**Slab note (Gemini #676):** the excluded |b₀| ≥ 0.999 slab was treated as pole-by-definition; the iterated maps' only attractors there are the poles ±ℓ themselves (every trajectory entering the slab converges to ±ℓ in the runs recorded; no fixed point with 0.999 ≤ |b₀| < 1 was observed) — so the exclusion hides no near-pole attractor distinct from the poles. Recorded as an observation on the existing runs, not a new computation.
