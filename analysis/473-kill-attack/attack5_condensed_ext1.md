@@ -19,17 +19,24 @@ DEFINITION and a KILL, so the conjecture can be tested.
 | V2 | Is any of them *computable* in Lean with the pinned Mathlib? | **NO.** Mathlib has `CondensedAb`, `Condensed.freeAb`, abelian + AB4/AB5 structure, `Abelian.Ext`, `Sheaf.H` — but **zero** computed Ext/cohomology for any condensed object, no `EnoughProjectives (CondensedAb)`, no LTE. Everything is *definable*, nothing is *evaluable*. (§2) |
 | V3 | Can any of them depend on the RULE? | **NO — rule-independent by construction.** All three are functors of `(𝕊, N, V)`, in fact of the closed pair `(Σ, M)`; the rule is not an argument. (§4) |
 | V4 | Sub-conjecture (a) — "𝕆→ℍ as an inverse system, ℍ the limit, 𝕆 the parent" — well-typed? | **Two readings. Limit reading: well-typed but VACUOUS** (every subalgebra is the limit of the 2-term system). **Projection reading: PROVABLY IMPOSSIBLE** (𝕆 is simple ⇒ no algebra hom 𝕆 ↠ ℍ). Honest replacement in §5.1. |
-| V5 | Sub-conjecture (b) — "Ext¹(ℍ_cond, 𝕆_cond) ≠ 0 in flight, = 0 at the limit" | **ILL-POSED as written** (no time/state variable occurs in the expression; both arguments are rigid objects) and, under its most charitable repair (deformation theory), **identically zero** (ℍ is separable ⇒ rigid). (§5.2) |
+| V5 | Sub-conjecture (b) — "Ext¹(ℍ_cond, 𝕆_cond) ≠ 0 in flight, = 0 at the limit" | **ILL-POSED as written** (no time/state variable occurs in the expression; both arguments are rigid objects) and, under its most charitable repair (deformation theory), **rule-blind**: ℍ's *product* is rigid (separable ⇒ `HH^n(ℍ,−) = 0`, n ≥ 1), while the *embedding* ℍ ⊂ 𝕆 has an 8-dimensional moduli `G₂/SO(4)` — nonzero, but a constant of the arena, identical for every state and every rule. (§5.2) |
 | V6 | Sub-conjecture (c) — "horizon formation, finite Ext¹ parametrising the formation rate" | **KILLED as a rule-supplier.** An Ext group carries no clock; a *rate* has units 1/T and needs a prior dynamical rule. Also: the substrate has no horizon object at all. (§5.3) |
 | V7 | **Prop 13(b) via this route** | **NOT DELIVERED. The kill survives.** The route is caught in a dilemma (§4.3): built from `V` ⇒ rule-blind; built from the flow ⇒ the rule is an input. There is no third horn. |
 | V8 | Is there anything the condensed/pointless machinery *is* good for here? | **YES, and it is the opposite of the conjecture's claim:** the orbit space of the rule is a genuinely non-Hausdorff quotient — that is where pointless/condensed/NCG methods earn their keep. It presupposes the rule; it does not supply it. (§4.4) |
 
 **One-sentence result.** *Every object this route can build is a function of the potential's
 level-set topology; a Lean theorem proved here shows the potential's first-order data
-constrains exactly **1 of the 14** tangential directions a rule may point in at any
-in-flight state, leaving a **13-dimensional** family of rule deformations that no
-level-set invariant — condensed or classical — can see; therefore no such invariant can
+constrains **at most 1 of the 14** tangential directions a rule may point in at a state of
+`Σ` — **exactly one** where the tangential gradient `F s = −(∇V)^tan` is nonzero, and
+**none** at rest points (the crystals **and** the in-flight frozen ridge `{V = 1}`) — leaving
+a **13-dimensional** family of rule deformations (14-dimensional on the ridge) that no
+level-set invariant, condensed or classical, can see; therefore no such invariant can
 supply the rule.*
+
+*(The qualifier is not a weakening: at the ridge, which is in flight, the potential's
+first-order data constrains* nothing at all*, so the rule is even less determined there than
+the `13/14` headline says. `finrank_vNeutral`'s hypothesis `g ≠ 0` is what makes "13 at ANY
+in-flight state" false, and the failure case is 14, not 12.)*
 
 ---
 
@@ -202,12 +209,24 @@ i.e. a **bundle of ℍ's over the vacuum manifold**, equivalently a sheaf of con
 says the scalar-spectrum identity provably fails there.
 
 **The would-be Ext¹.** "Extend the hosting sheaf from the closed `M` across `Σ`" is an
-extension problem, and such problems do have cohomological obstructions in `H¹`. **But here the
-obstruction theory is void, not nonzero:** the fibre of the classifying problem is *empty* over
-every in-flight point (no 4-dimensional subalgebra containing `{1, s, ℓ}` exists at all), which
-is a pointwise non-existence, not a global obstruction class. There is no `H¹` to compute
-because there is no candidate local section to glue. **This kills the (a)-repair as an Ext
-source too.**
+extension problem, and such problems do have cohomological obstructions in `H¹`. **But here
+there is no obstruction CLASS to compute, because the construction that produces the local
+sections is not available in flight.** Stated at exactly the strength Lean supports:
+`inFlight_no_quaternion_closure` says that for `s ∈ InFlight` the scalar-spectrum identity
+`∀ x, s·(s·x) = −N(s)·x` **fails** — i.e. `s` does not act as a complex structure on all of
+`𝕊` — and that identity is precisely the input of the crystal-side construction
+`PROOF-crystal-hosts-quaternion`. So the *method* that builds `hosted(s)` over `M` has no
+in-flight instance.
+
+**What this does NOT say** (an earlier draft overshot here): the theorem does **not** prove
+that "no 4-dimensional subalgebra containing `{1, s, ℓ}` exists at all" over an in-flight
+point, and it does not prove the fibre of the classifying problem is empty — a 4-dimensional
+subalgebra could in principle exist without `s` acting as a complex structure on the whole
+algebra. That stronger statement is not on record; whether it is true is open. The honest
+D3-repair kill is therefore: *the hosting construction is unavailable in flight because its
+input identity provably fails there*, so there is no candidate local section to glue and hence
+no `H¹` obstruction class on offer. **That is enough to kill the (a)-repair as an Ext
+source**, and it is what Lean actually states.
 
 ---
 
@@ -234,14 +253,25 @@ it is the likely outcome the driver anticipated.*
 The qualitative statement above is definitional. Its quantitative form is a theorem, and it is
 the Lean deliverable of this attack (`proofs/QBP/Foundations/TransitionState.lean`, §8 below):
 
-Fix an in-flight state `s ∈ Σ` and let `g := ∇V(s)` (`RuleFlow.gradV`; `fderiv V s v = bil v g`
-by `RuleFlow.fderiv_potential_apply`). Then
+Fix a state `s ∈ Σ` and let `g` be the **tangential gradient** of `V` at `s`, i.e.
+`g := −ruleField s` (`RuleFlow.ruleField`). Note that `g` is *not* the raw gradient
+`∇V(s)`: `V` is homogeneous of degree 4 (`RuleFlow.potential_smul`), so Euler's relation
+gives `⟪∇V(s), s⟫ = 4·V(s) > 0` at every in-flight state — the raw gradient has a nonzero
+radial component there and is **never** tangent to `Σ` in flight. The two carry the same
+first-order information *on tangent vectors*, which is all that is used here:
+`RuleFlow.gradV_decomp` gives `∇V(s) = −F(s) + ⟪∇V(s), s⟫·s + (∇V(s))₀·1`, so
+`⟪x, ∇V(s)⟫ = −⟪x, F(s)⟫` for `x ∈ Tangent s`, and the Lean lemma `vNeutral_add_normal`
+(with `vNeutral_neg`) turns that into the identity
+`VNeutral s (∇V s) = VNeutral s (−F s) = VNeutral s (F s)`. With that `g`:
 
 * `Tangent s` — directions keeping a curve on `Σ` and inside `Im 𝕊` to first order — has
   **`finrank = 14`** (`finrank_tangent`);
 * `VNeutral s g` — those that additionally leave `V` stationary to first order — has
-  **`finrank = 13` exactly** whenever `g` is tangential and nonzero (`finrank_vNeutral`), and
-  **`= 14`** when `g = 0`, i.e. at every crystal (`vNeutral_eq_tangent_of_gradient_zero`);
+  **`finrank = 13` exactly** whenever `g` is tangential and **nonzero** (`finrank_vNeutral`),
+  and **`= 14`** when `g = 0` (`vNeutral_eq_tangent_of_gradient_zero`). The `g = 0` case is
+  **not** confined to the crystals: it holds at *every* rest point of `F`, and the frozen
+  ridge `{s ∈ Σ | V s = 1}` is a family of rest points (`ruleField_eq_zero_of_potential_eq_one`)
+  that is non-empty (`potential_normalise_witness`) and **in flight** (`V = 1 > 0`);
 * adding any `VNeutral` field to a rule field preserves the sphere, the imaginary part **and
   the exact first-order rate of change of `V`** (`add_vNeutral_preserves_data`), while changing
   the rule (`exists_vNeutral_ne_zero`, `add_vNeutral_ne`).
@@ -252,13 +282,18 @@ level-set/sublevel/cofiber invariant is a functional of `V`'s topology, which is
 Hence the solution set of any such principle is closed under adding an arbitrary `VNeutral`
 field:
 
-> **The V-and-topology data constrains at most 1 of the 14 tangential degrees of freedom per
-> point. Thirteen are free — a 13-dimensional family of rule deformations per point, invisible
-> to every condensed or classical invariant of `V`.**
+> **The V-and-topology data constrains AT MOST 1 of the 14 tangential degrees of freedom per
+> point — exactly one where `F s ≠ 0`, and NONE at rest points (crystals, and the in-flight
+> ridge `{V = 1}`). At least thirteen directions are free at every point — a 13-dimensional
+> family of rule deformations per point (14-dimensional on the ridge), invisible to every
+> condensed or classical invariant of `V`.**
 
-That is `13/14` of the rule left undetermined, pointwise, and the undetermined part is exactly
-the part that moves a trajectory *along* a level set and therefore changes which crystal it
-lands on — which is precisely what `⟨b₀²⟩` measures.
+That is `13/14` of the rule left undetermined at a generic point, pointwise, and `14/14` on
+the ridge; the undetermined part is exactly the part that moves a trajectory *along* a level
+set and therefore changes which crystal it lands on — which is precisely what `⟨b₀²⟩`
+measures. The rest-point case **strengthens** the argument rather than weakening it: at the
+ridge — an in-flight locus — the potential's first-order data selects *no* direction at all,
+so a level-set invariant is not merely coarse there, it is silent.
 
 ### 4.3 The dilemma (why there is no third horn)
 
@@ -266,7 +301,7 @@ lands on — which is precisely what `⟨b₀²⟩` measures.
 |---|---|---|
 | **1** | The object is built from `(𝕊, N, V)` and topology only (D1, D2, D3) | **Rule-blind by construction** (§4.1–4.2). No rule supplied. **KILL.** |
 | **2** | The object is built from the flow (orbit space, reachable set, ω-limit map) | The rule is an **input**. Condensed math is then a *language*, not a *mechanism* — the Prop 8 "relocates the mystery" failure. |
-| **3** | A variational/monotonicity criterion on a topological invariant selects the rule | **Too coarse, provably.** Quench and anneal both descend `V`; they differ by the schedule/noise, i.e. by motion *within* level sets — exactly the 13 directions §4.2 shows are invisible. Any criterion phrased in `V`'s level sets is constant on that 13-dimensional family. |
+| **3** | A variational/monotonicity criterion on a topological invariant selects the rule | **Too coarse, provably.** Quench and anneal both descend `V`; they differ by the schedule/noise, i.e. by motion *within* level sets — the ≥13 directions §4.2 shows are invisible. Any criterion phrased in `V`'s level sets is constant on that (at least) 13-dimensional family. |
 
 No fourth horn is available without adding data that is neither topological nor
 measure-theoretic — at which point Prop 13(b) is not what is being satisfied.
@@ -316,8 +351,8 @@ as a map from 𝕆 onto ℍ" is not a morphism in any algebra category, condense
 limit. The moduli object is the space of quaternion subalgebras of `𝕆`, which is the compact
 homogeneous space `G₂/SO(4)` (dimension `14 − 6 = 8`); in `𝕊` the corresponding object is
 QBP's own **hosting bundle D3** over the vacuum manifold (`PROOF-crystal-hosts-quaternion`). The
-in-flight region is where *no* point of that moduli space is available
-(`inFlight_no_quaternion_closure`). This replacement is a **kinematic arena**, and it is
+in-flight region is where that construction has no instance: its input identity provably fails
+(`inFlight_no_quaternion_closure`; see §3.3 for what that theorem does and does not say). This replacement is a **kinematic arena**, and it is
 rule-independent — it is the object QBP already built.
 
 ### 5.2 (b) "Ext¹(ℍ_cond, 𝕆_cond) non-zero in flight, zero at the limit, parametrising a physical quantity"
@@ -337,20 +372,44 @@ for every state, every rule, every time. It cannot parametrise any physical quan
 ledger's own `predicted_unit` for this conjecture is *"Ext¹ groups computed in condensed
 abelian-group category"* — **a group is not a unit**; nothing can be compared to a measurement.
 
-**Defect 3 — the charitable repair is identically zero.** The reading that would make (b)
-*mean* what it wants is deformation theory: is there an infinitesimal deformation parameter for
-the pair `(ℍ ⊂ 𝕆)`? The relevant group is Hochschild `HH²`. But **ℍ is a separable
-ℝ-algebra** (central simple; `ℍ ⊗_ℝ ℂ ≅ M₂(ℂ)`), and for a separable algebra
-`HH^n(A, M) = 0` for all `n ≥ 1` and all bimodules `M`. **ℍ is rigid: it has no nontrivial
-infinitesimal deformations.** (`𝕆` is likewise rigid as an alternative algebra — its derivation
-algebra `𝔤₂` is semisimple.) So the deformation-theoretic `Ext¹` the conjecture wants is not
-"non-zero in flight, zero at the limit": it is **zero, always**. A technical caveat, recorded
-for honesty: `𝕆` is a left ℍ-module and a right ℍ-module but **not** an ℍ-*bimodule* — with the
-Cayley–Dickson product `(a·x)·b ≠ a·(x·b)` for `a, b ∈ ℍ`, `x ∈ 𝕆` (it would force
-`ab̄ = b̄a`) — so `HH^*(ℍ, 𝕆)` must be taken with `𝕆` replaced by an honest bimodule; the
-rigidity conclusion for `ℍ` itself (`HH²(ℍ, ℍ) = 0`) is unaffected and is the load-bearing one.
+**Defect 3 — the charitable repair is rule-blind (and it is NOT "identically zero"; two
+different rigidity questions must be kept apart).** The reading that would make (b) *mean* what
+it wants is deformation theory. But there are two objects one might deform, and they have
+different answers:
 
-**Disposition.** (b) **dies as written** and **dies under repair as a deformation parameter**.
+1. **The ALGEBRA ℍ.** `HH²(ℍ, ℍ) = 0`: **ℍ is a separable ℝ-algebra** (central simple;
+   `ℍ ⊗_ℝ ℂ ≅ M₂(ℂ)`), and for a separable algebra `HH^n(A, M) = 0` for all `n ≥ 1` and all
+   bimodules `M`. So ℍ's *product* has no nontrivial infinitesimal deformations. (`𝕆` is
+   likewise rigid as an alternative algebra — its derivation algebra `𝔤₂` is semisimple.)
+2. **The EMBEDDING ℍ ↪ 𝕆** — which is the object (b) actually concerns, since the conjecture
+   speaks of the *pair*. Deformations of the inclusion are **not** controlled by `HH²(ℍ, ℍ)`:
+   they are parametrised by the tangent space `T_{[ℍ]}(G₂/SO(4))` to the moduli of quaternion
+   subalgebras of `𝕆`, which is **8-dimensional and nonzero** — as §5.1 of this very note
+   already says. An earlier draft of this section asserted that the repair is "identically
+   zero"; **that was wrong**, because it applied the algebra answer (1) to the embedding
+   question (2).
+
+**What the correct answer does to (b).** Nothing good for the conjecture. The 8-dimensional
+deformation space of the embedding is a **kinematic** object: it is `G₂/SO(4)`, a fixed
+homogeneous space determined by `𝕆` alone. It does not depend on the state, on `V`, on time,
+or on the rule — it is the *same* 8 dimensions at every crystal and for quench and anneal
+alike. So it cannot be "non-zero in flight and zero at the limit" (it is the same everywhere it
+is defined, and in flight there is no embedding to deform at all —
+`inFlight_no_quaternion_closure`), and it cannot parametrise a formation rate. **The kill for
+(b) therefore rests on the two horns that do hold — no state/time variable in the expression
+(Defect 1), and rule-blindness of every candidate group (Defect 2 and §4.1) — and NOT on any
+claim that the group vanishes.**
+
+A technical caveat, recorded for honesty: `𝕆` is a left ℍ-module and a right ℍ-module but
+**not** an ℍ-*bimodule* — with the Cayley–Dickson product `(a·x)·b ≠ a·(x·b)` for `a, b ∈ ℍ`,
+`x ∈ 𝕆` (it would force `ab̄ = b̄a`) — so `HH^*(ℍ, 𝕆)` must be taken with `𝕆` replaced by an
+honest bimodule. That is one more reason the Hochschild reading is not the right home for (b);
+the subalgebra-moduli reading (2) is.
+
+**Disposition.** (b) **dies as written** (no state/time variable) and **dies under repair as a
+deformation parameter** — not because the deformation space vanishes (it does not; it is the
+8-dimensional `G₂/SO(4)` direction space), but because it is a constant of the arena and so is
+blind to the rule it is supposed to supply.
 What survives is only the possibility of a *descriptor*: `H^*(Σ, M)` (D1) is a well-defined
 invariant of the landscape — a fact about the arena, with no rule content. Keeping (b) requires
 restating it as "the relative cohomology of the pair (state sphere, vacuum manifold) is a
@@ -445,7 +504,7 @@ can be compared with any measurement."
   },
   {
     "question": "(b) Is Ext¹(ℍ_cond, 𝕆_cond) non-zero in flight and zero at the limit, parametrising a physical quantity?",
-    "kill": "FIRED. The expression contains no time or state variable, so it cannot be 'non-zero during' anything; in Cond(Ab) it reduces by additivity to Ext¹(ℝ,ℝ)^32, a universal constant of the category identical for every state and every rule; and under the charitable deformation-theoretic repair it is identically zero, because ℍ is separable over ℝ, hence rigid (HH^n(ℍ,−) = 0 for n ≥ 1). A group is not a predicted_unit.",
+    "kill": "FIRED. The expression contains no time or state variable, so it cannot be 'non-zero during' anything; in Cond(Ab) it reduces by additivity to Ext¹(ℝ,ℝ)^32, a universal constant of the category identical for every state and every rule; and under the charitable deformation-theoretic repair it is rule-blind rather than dynamical: ℍ is separable over ℝ, hence rigid AS AN ALGEBRA (HH^n(ℍ,−) = 0 for n ≥ 1), so its product admits no deformation; but the object (b) actually needs is the deformation space of the EMBEDDING ℍ ⊂ 𝕆, which is T(G₂/SO(4)) and is 8-dimensional, NOT zero. That 8-dimensional moduli is a kinematic datum of the arena — it is the same at every state and for every rule — so it still cannot parametrise 'non-zero in flight, zero at the limit', and the kill rests on rule-blindness plus the absence of a state variable, not on vanishing. A group is not a predicted_unit.",
     "closure": "derivation",
     "discharge": "QBP#473 analysis/473-kill-attack/attack5_condensed_ext1.md §5.2",
     "trigger_issue": "QBP#473"
@@ -458,7 +517,7 @@ can be compared with any measurement."
   },
   {
     "question": "Does the condensed route satisfy KILLED-locale-forcing-route Prop 13(b) — supplying the rule from topological/measure-theoretic data?",
-    "kill": "FIRED. Every object the route can define on the current substrate is a functor of (Σ, M) or (Σ, Z) — of V's level-set topology alone — so its invariants are constant as the rule varies; quench (⟨b₀²⟩ = 0.146) and anneal (1/3) give the identical object. Quantitatively (Lean, QBP.Foundations.TransitionState): at any in-flight state the tangent space is 14-dimensional and V's first-order data constrains exactly one direction, leaving a 13-dimensional family of rule deformations invisible to every level-set invariant. The kill stands.",
+    "kill": "FIRED. Every object the route can define on the current substrate is a functor of (Σ, M) or (Σ, Z) — of V's level-set topology alone — so its invariants are constant as the rule varies; quench (⟨b₀²⟩ = 0.146) and anneal (1/3) give the identical object. Quantitatively (Lean, QBP.Foundations.TransitionState): at every point of the state sphere the tangent space is 14-dimensional (finrank_tangent) and V's first-order data constrains AT MOST ONE direction — exactly one where the tangential gradient F s is nonzero (finrank_vNeutral), and NONE at rest points of F, which include the crystals and the in-flight frozen ridge {V=1} (vNeutral_eq_tangent_of_gradient_zero + ruleField_eq_zero_of_potential_eq_one). So at least a 13-dimensional family of rule deformations (14-dimensional on the ridge) is invisible to every level-set invariant. The kill stands.",
     "closure": "derivation",
     "discharge": "QBP.Foundations.TransitionState.finrank_vNeutral",
     "trigger_issue": "QBP#473"
@@ -487,21 +546,31 @@ can be compared with any measurement."
 
 `proofs/QBP/Foundations/TransitionState.lean` (new; wired into `QBP/Foundations.lean`).
 Layer-clean: imports Mathlib + `QBP.Foundations.{CDDimension, Alternator}` only; it does **not**
-import `QBP.Substrate` (the identification `g = ∇V(s)` is a **citation** of
-`RuleFlow.fderiv_potential_apply`, never an import).
+import `QBP.Substrate` (the identification of `g` with the tangential gradient `−ruleField s`
+is a **citation** of `RuleFlow.{gradV_decomp, fderiv_potential_apply}`, never an import).
+
+**What the theorems are about, precisely.** They are *pointwise linear algebra* on
+`CDAlg ℝ 4 ≅ ℝ¹⁶`. `Tangent s` is a linear **subspace of ℝ¹⁶** attached to a point of the
+**set** `StateSphere` — the hypothesis pair `bil s s = 1 ∧ s.coord 0 = 0` is definitionally
+`Hosting.StateSphere` (`N s = bil s s` by `N_eq_bil`), matched but never imported — and it is
+**not** the manifold tangent space `T_sΣ`. No topology, smooth structure, chart, flow, measure
+or `V` itself occurs in the file; that is exactly why the compactness/normed-instance
+prerequisites of §1.1 item 1 are not needed here.
 
 | Theorem | Plain-maths statement |
 |---|---|
 | `finrank_tangent` | At an imaginary unit state `s`, the directions preserving `N` and `Im` to first order form a **14**-dimensional space. |
-| `finrank_vNeutral` | Those additionally orthogonal to `g` (= `∇V(s)`, tangential and nonzero) form a **13**-dimensional space — the potential constrains **exactly one** of the fourteen. |
-| `vNeutral_eq_tangent_of_gradient_zero` | At a rest point of the gradient (every crystal) the potential constrains **nothing**: all 14 directions are `V`-neutral. |
+| `finrank_vNeutral` | Those additionally orthogonal to `g` (the **tangential** gradient `−ruleField s`, assumed tangential and **nonzero**) form a **13**-dimensional space — where `F s ≠ 0` the potential constrains **exactly one** of the fourteen. |
+| `vNeutral_add_normal`, `vNeutral_neg` | `VNeutral` sees only the tangential part of `g`: `VNeutral s (a·s + b·1 + g) = VNeutral s g` and `VNeutral s (−g) = VNeutral s g`. With `RuleFlow.gradV_decomp` this gives `VNeutral s (∇V s) = VNeutral s (F s)` — the bridge that makes the raw gradient's non-tangency harmless. |
+| `vNeutral_eq_tangent_of_gradient_zero` | At a rest point of the tangential gradient the potential constrains **nothing**: all 14 directions are `V`-neutral. Rest points = the crystals **and** the in-flight ridge `{V = 1}` (`ruleField_eq_zero_of_potential_eq_one`, non-empty by `potential_normalise_witness`). |
 | `add_vNeutral_preserves_data` | Adding a `V`-neutral field to a rule field preserves the sphere, the imaginary part, **and the exact first-order rate of change of `V`**. |
 | `exists_vNeutral_ne_zero`, `add_vNeutral_ne` | Such a deformation genuinely exists and genuinely changes the rule. |
 | `hypotheses_satisfiable`, `finrank_counts_instantiated` | **Anti-vacuity guard:** a concrete `s = e₁`, `g = e₂` satisfies every hypothesis, so the two dimension counts are instantiated, not empty conditionals. |
 
 Why this earns its place: it converts "the object is rule-blind by construction" (a definitional
-remark) into a **quantitative under-determination theorem with a number in it** — `13/14`
-per point — which is what makes the kill checkable rather than rhetorical. The build result and
+remark) into a **quantitative under-determination theorem with a number in it** — at least
+`13/14` per point, and `14/14` at rest points — which is what makes the kill checkable rather
+than rhetorical. The build result and
 the `#print axioms` output are recorded in §10.
 
 **What it does NOT prove:** nothing about the flow's existence, about orbits, about the
@@ -544,16 +613,22 @@ an `until ! pgrep -x lake` idle check.
 
 ```
 $ run-bounded 6G 1800 taskset -c 3-5 lake build QBP.Foundations.TransitionState
-ℹ [2952/2952] Built QBP.Foundations.TransitionState (6.8s)
+ℹ [2952/2952] Built QBP.Foundations.TransitionState (6.2s)
 Build completed successfully (2952 jobs).
 EXIT=0
 ```
 
 Zero errors, zero warnings (the file is lint-clean: no unused simp arguments, no dead tactics).
 Peak observed RSS during the cold dependency build: **3.7 GB** in a single `lean` process, well
-inside the 6 GB cgroup cap; no exit 137, no exit 124.
+inside the 6 GB cgroup cap; no exit 137, no exit 124. (Re-run after the Red Team M1–M4 revision,
+which added `vNeutral_add_normal` and `vNeutral_neg`: same result, EXIT=0.)
 
-**`#print axioms` — all 15 declarations, verbatim from the build log:**
+**Declaration inventory.** The file has **26 declarations: 18 theorems** (including the `@[simp]`
+`bilFun_apply` and `bil_comm`) **+ 8 non-theorem declarations** (1 instance, 5 defs, 2 abbrevs).
+`#print axioms` audits **17** of the 18 theorems — `bilFun_apply` is `rfl` and `bil_comm` is
+covered transitively by every downstream audit, and `bilFun` (a def) is audited instead.
+
+**`#print axioms` — the 17 audited declarations, verbatim from the build log:**
 
 ```
 'QBP.Foundations.TransitionState.bilFun'                              [propext, Classical.choice, Quot.sound]
@@ -561,6 +636,8 @@ inside the 6 GB cgroup cap; no exit 137, no exit 124.
 'QBP.Foundations.TransitionState.mem_vNeutral_iff'                    [propext, Classical.choice, Quot.sound]
 'QBP.Foundations.TransitionState.vNeutral_le_tangent'                 [propext, Classical.choice, Quot.sound]
 'QBP.Foundations.TransitionState.vNeutral_eq_tangent_of_gradient_zero'[propext, Classical.choice, Quot.sound]
+'QBP.Foundations.TransitionState.vNeutral_add_normal'                 [propext, Classical.choice, Quot.sound]
+'QBP.Foundations.TransitionState.vNeutral_neg'                        [propext, Classical.choice, Quot.sound]
 'QBP.Foundations.TransitionState.bil_one_one'                         [propext, Classical.choice, Quot.sound]
 'QBP.Foundations.TransitionState.tangentProbe_surjective'             [propext, Classical.choice, Quot.sound]
 'QBP.Foundations.TransitionState.vProbe_surjective'                   [propext, Classical.choice, Quot.sound]
@@ -590,5 +667,8 @@ layer imports clean                                              (exit 0)
 **Anti-vacuity guard.** `hypotheses_satisfiable` and `finrank_counts_instantiated` exhibit a
 concrete `s = e₁`, `g = e₂` satisfying every hypothesis, so `finrank_tangent = 14` and
 `finrank_vNeutral = 13` are instantiated statements, not conditionals with an empty antecedent.
+(The witness is a *generic model point* of the hypothesis class, not a physical `(s, −F(s))`
+pair — it shows the hypotheses are jointly satisfiable, not that any particular in-flight state
+realises them.)
 (This is the #472-class check applied to this file: the *statement*, not only the proof, was
 inspected for content.)

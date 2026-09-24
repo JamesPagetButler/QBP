@@ -9,31 +9,49 @@
   and therefore layer-clean (Foundations imports Mathlib only).
 
   Fix a state `s` on the imaginary unit sphere of 𝕊 (`bil s s = 1`, `s₀ = 0`) and a
-  vector `g` (intended: the gradient `∇V(s)` of the landscape potential — see
-  `QBP.Substrate.RuleFlow.gradV` and `RuleFlow.fderiv_potential_apply`, which says
-  `fderiv ℝ V s v = ⟪∇V s, v⟫ = bil v (∇V s)`; that file is Substrate, so it is CITED
-  here, never imported).  Then:
+  vector `g`.  **`g` is intended to be the TANGENTIAL gradient of the landscape
+  potential, i.e. `g = −RuleFlow.ruleField s`, NOT the raw gradient `∇V(s)`.**  The raw
+  gradient is never tangential in flight: `V` is homogeneous of degree 4
+  (`RuleFlow.potential_smul`), so by Euler's relation `⟪∇V(s), s⟫ = 4·V(s) > 0` at every
+  in-flight state, hence `∇V(s) ∉ Tangent s` there.  The two agree where it matters:
+  `RuleFlow.gradV_decomp` writes `∇V(s) = −F(s) + ⟪∇V(s), s⟫ • s + (∇V(s))₀ • 1`, and
+  `vNeutral_add_normal` below proves that the `s`- and `1`-components are invisible to
+  `VNeutral`, so `VNeutral s (∇V s) = VNeutral s (−F s) = VNeutral s (F s)`.  (See
+  `QBP.Substrate.RuleFlow.{gradV, ruleField, gradV_decomp, fderiv_potential_apply}`,
+  the last of which says `fderiv ℝ V s v = ⟪∇V s, v⟫`; that file is Substrate, so it is
+  CITED here, never imported.)  Then:
 
   * `Tangent s` — the directions that keep a curve on the state sphere and inside the
-    imaginary part, to first order — has dimension **14** (`finrank_tangent`).
+    imaginary part, to first order — has dimension **14** (`finrank_tangent`), at
+    *every* point of the state sphere.
   * `VNeutral s g` — those tangential directions that additionally change the potential
     at **zero** first-order rate — has dimension **13** exactly, whenever `g` is itself
     tangential and nonzero (`finrank_vNeutral`), and **14** when `g = 0`
     (`vNeutral_eq_tangent_of_gradient_zero`).
 
-  So: of the 14 directions a dynamical rule may point in at an in-flight state, the
-  potential `V` constrains **at most one**.  Thirteen are invisible to `V` — and hence
-  invisible to *every* functional of `V`'s level sets, sublevel filtration, vacuum
-  locus, or any condensed/locale-theoretic object built from those (all of which are
-  functions of `V`'s topology alone).  Adding any `VNeutral` field to a rule field
-  leaves the state sphere, the imaginary part and the descent rate of `V` all
-  unchanged (`add_vNeutral_preserves_data`) while changing the rule
-  (`exists_vNeutral_ne_zero`).
+  So: of the 14 directions a dynamical rule may point in, the potential `V` constrains
+  **at most one**, everywhere; **exactly one** at states where the tangential gradient
+  is nonzero (`F s ≠ 0`); and **none at rest points** — which are the crystals
+  (`RuleFlow.ruleField_eq_zero_of_isVacuum`) *and also the frozen ridge*
+  `{s ∈ Σ | V s = 1}`, which is non-empty (`RuleFlow.potential_normalise_witness`),
+  in-flight (`V = 1 > 0`) and a rest point (`RuleFlow.ruleField_eq_zero_of_potential_eq_one`).
+  At the ridge the count is therefore **14, not 13**.  So thirteen directions — fourteen
+  on the ridge — are invisible to `V`, and hence invisible to *every* functional of `V`'s
+  level sets, sublevel filtration, vacuum locus, or any condensed/locale-theoretic object
+  built from those (all of which are functions of `V`'s topology alone).  Adding any
+  `VNeutral` field to a rule field leaves the state sphere, the imaginary part and the
+  descent rate of `V` all unchanged (`add_vNeutral_preserves_data`) while changing the
+  rule (`exists_vNeutral_ne_zero`).
 
   **What this file does NOT prove.**  Nothing about the flow, the measure, the
   crystallisation endpoint, or the condensed category.  No octonionic or sedenionic
   structure is used beyond the norm form `N` and its polar form `bil`.  The
-  identification of `g` with `∇V` is a citation, not a theorem of this file.
+  identification of `g` with the tangential gradient `−F` is a citation, not a theorem
+  of this file.  `Tangent s` is a *linear subspace of `CDAlg ℝ 4 ≅ ℝ¹⁶`* attached to a
+  point of the SET `StateSphere` (the hypothesis pair `bil s s = 1 ∧ s.coord 0 = 0` is
+  definitionally `Hosting.StateSphere` via `N_eq_bil`, matched but never imported); it
+  is not a manifold tangent space `T_sΣ` — no topology, smooth structure or chart
+  occurs anywhere in this file.
 
   Zero `sorry`, zero `native_decide`, zero vacuous `True`.  `#print axioms` at the end.
 -/
@@ -88,7 +106,10 @@ theorem mem_tangent_iff {s x : CDAlg ℝ n} :
 /-! ## 3. The `V`-neutral directions -/
 
 /-- The full first-order probe: stay on the sphere, stay imaginary, and do not move the
-    potential — `x ↦ (⟪x, s⟫, ⟪x, 1⟫, ⟪x, g⟫)` with `g` the gradient of the potential. -/
+    potential — `x ↦ (⟪x, s⟫, ⟪x, 1⟫, ⟪x, g⟫)` with `g` the *tangential* gradient of the
+    potential (`−RuleFlow.ruleField s`; see the file header for why the raw `∇V(s)` is
+    not tangential in flight, and `vNeutral_add_normal` for why the difference is
+    invisible here). -/
 def vProbe (s g : CDAlg ℝ n) : CDAlg ℝ n →ₗ[ℝ] ℝ × ℝ × ℝ :=
   (bilFun s).prod ((bilFun 1).prod (bilFun g))
 
@@ -108,9 +129,20 @@ theorem vNeutral_le_tangent (s g : CDAlg ℝ n) : VNeutral s g ≤ Tangent s := 
   rw [mem_tangent_iff]
   exact ⟨hx.1, hx.2.1⟩
 
-/-- At a rest point of the gradient (`g = 0` — in particular at every crystal, where
-    `RuleFlow.gradV_eq_zero_of_isVacuum` applies) *every* tangential direction is
-    `V`-neutral: the potential constrains nothing at all. -/
+/-- At a rest point of the (tangential) gradient — `g = 0` — *every* tangential direction
+    is `V`-neutral: the potential constrains nothing at all, and the count is 14, not 13.
+
+    Two disjoint families of rest points are on record in `QBP.Substrate.RuleFlow`, and
+    **both** are covered by this lemma:
+
+    * every crystal (`gradV_eq_zero_of_isVacuum`, `ruleField_eq_zero_of_isVacuum`) — these
+      are the vacua, `V = 0`;
+    * every point of the **frozen ridge** `{s ∈ Σ | V s = 1}`
+      (`ruleField_eq_zero_of_potential_eq_one`) — which is non-empty
+      (`potential_normalise_witness`) and **in flight** (`V = 1 > 0`, so not a vacuum).
+
+    The second family is why "13 at any in-flight state" is false: on the ridge the
+    correct in-flight count is 14. -/
 theorem vNeutral_eq_tangent_of_gradient_zero (s : CDAlg ℝ n) :
     VNeutral s 0 = Tangent s := by
   refine le_antisymm (vNeutral_le_tangent s 0) (fun x hx => ?_)
@@ -118,6 +150,46 @@ theorem vNeutral_eq_tangent_of_gradient_zero (s : CDAlg ℝ n) :
   rw [mem_vNeutral_iff]
   refine ⟨hx.1, hx.2, ?_⟩
   simp only [bil_def, zero_coord, mul_zero, Finset.sum_const_zero]
+
+/-- **`VNeutral` sees only the tangential part of `g`.**  Adding any multiple of `s` or of
+    `1` to `g` leaves the `V`-neutral subspace unchanged, because the tangency conditions
+    already kill both components.
+
+    This is what licenses replacing the raw gradient by the tangential one: by
+    `RuleFlow.gradV_decomp`, `∇V(s) = −F(s) + ⟪∇V(s), s⟫ • s + (∇V(s))₀ • 1`, so
+    `VNeutral s (∇V s) = VNeutral s (−F s)` even though `∇V(s)` itself is not a member of
+    `Tangent s` at any in-flight state (Euler: `⟪∇V(s), s⟫ = 4·V(s) > 0`). -/
+theorem vNeutral_add_normal (s g : CDAlg ℝ n) (a b : ℝ) :
+    VNeutral s (a • s + b • (1 : CDAlg ℝ n) + g) = VNeutral s g := by
+  have key : ∀ x : CDAlg ℝ n, bil x s = 0 → x.coord 0 = 0 →
+      bil x (a • s + b • (1 : CDAlg ℝ n) + g) = bil x g := by
+    intro x hxs hx0
+    rw [bil_add_right, bil_add_right, bil_smul_right, bil_smul_right, hxs, bil_one_right,
+      hx0]
+    ring
+  ext x
+  simp only [mem_vNeutral_iff]
+  constructor
+  · rintro ⟨h1, h2, h3⟩
+    exact ⟨h1, h2, by rwa [key x h1 h2] at h3⟩
+  · rintro ⟨h1, h2, h3⟩
+    exact ⟨h1, h2, by rw [key x h1 h2]; exact h3⟩
+
+/-- `VNeutral` is insensitive to the sign of `g` (it is the kernel of a linear functional
+    in `g`'s slot).  With `vNeutral_add_normal` this gives
+    `VNeutral s (∇V s) = VNeutral s (ruleField s)`. -/
+theorem vNeutral_neg (s g : CDAlg ℝ n) : VNeutral s (-g) = VNeutral s g := by
+  ext x
+  simp only [mem_vNeutral_iff]
+  constructor
+  · rintro ⟨h1, h2, h3⟩
+    refine ⟨h1, h2, ?_⟩
+    rw [show (-g) = ((-1 : ℝ) • g) by module, bil_smul_right] at h3
+    linarith
+  · rintro ⟨h1, h2, h3⟩
+    refine ⟨h1, h2, ?_⟩
+    rw [show (-g) = ((-1 : ℝ) • g) by module, bil_smul_right, h3]
+    ring
 
 /-! ## 4. Surjectivity of the probes -/
 
@@ -166,7 +238,8 @@ theorem vProbe_surjective (hs : bil s s = 1) (hs0 : s.coord 0 = 0)
   simp only [vProbe, LinearMap.prod_apply, Function.prod, bilFun_apply, Prod.mk.injEq]
   exact ⟨e1, e2, e3⟩
 
-/-! ## 5. The dimension count — 14 tangential directions, 13 of them `V`-blind -/
+/-! ## 5. The dimension count — 14 tangential directions, 13 of them `V`-blind
+    wherever the tangential gradient is nonzero (all 14 at rest points) -/
 
 /-- **The tangent space of the state sphere is 14-dimensional.**  (`𝕊` is 16-dimensional;
     the sphere condition and imaginarity remove one dimension each, and they are
@@ -180,10 +253,17 @@ theorem finrank_tangent {s : CDAlg ℝ 4} (hs : bil s s = 1) (hs0 : s.coord 0 = 
   have : finrank ℝ (LinearMap.ker (tangentProbe s)) = 14 := by omega
   simpa only [Tangent] using this
 
-/-- **The potential constrains exactly one of those 14 directions.**  At any in-flight
-    state where the gradient is tangential and nonzero, the `V`-neutral subspace is
+/-- **Where the tangential gradient is nonzero, the potential constrains exactly one of
+    those 14 directions.**  At a state of the sphere with `g` tangential and `g ≠ 0` — i.e.
+    `g = −RuleFlow.ruleField s` with `F s ≠ 0` — the `V`-neutral subspace is
     13-dimensional: a 13-parameter family of first-order rule deformations that the
-    potential — and therefore every object built from its level sets — cannot see. -/
+    potential — and therefore every object built from its level sets — cannot see.
+
+    The hypothesis `g ≠ 0` is not cosmetic: at rest points of `F` (crystals, and the
+    in-flight ridge `V = 1`) it fails and the count is 14
+    (`vNeutral_eq_tangent_of_gradient_zero`).  "13 at *any* in-flight state" would
+    therefore be false; the true statement is "at most one direction constrained
+    everywhere, exactly one where `F s ≠ 0`, none at rest points". -/
 theorem finrank_vNeutral {s g : CDAlg ℝ 4} (hs : bil s s = 1) (hs0 : s.coord 0 = 0)
     (hg : g ∈ Tangent s) (hg0 : g ≠ 0) : finrank ℝ (VNeutral s g) = 13 := by
   have hrk := LinearMap.finrank_range_add_finrank_ker (vProbe s g)
@@ -194,8 +274,11 @@ theorem finrank_vNeutral {s g : CDAlg ℝ 4} (hs : bil s s = 1) (hs0 : s.coord 0
   simpa only [VNeutral] using this
 
 /-- **The `V`-blind deformations are genuinely there.**  A nonzero direction exists in
-    every `VNeutral s g` with `g` tangential (including `g = ∇V(s)` at an in-flight
-    state). -/
+    every `VNeutral s g` with `g` tangential and nonzero — in the intended reading
+    `g = −RuleFlow.ruleField s` at a state where the rule field does not vanish.  (Not
+    `g = ∇V(s)`: the raw gradient is not tangential in flight, `⟪∇V(s), s⟫ = 4·V(s) > 0`;
+    `vNeutral_add_normal` supplies the bridge.)  A fortiori a nonzero `V`-blind direction
+    also exists at rest points, where `VNeutral = Tangent` is 14-dimensional. -/
 theorem exists_vNeutral_ne_zero {s g : CDAlg ℝ 4} (hs : bil s s = 1) (hs0 : s.coord 0 = 0)
     (hg : g ∈ Tangent s) (hg0 : g ≠ 0) : ∃ x : CDAlg ℝ 4, x ∈ VNeutral s g ∧ x ≠ 0 := by
   by_contra hcon
@@ -269,6 +352,8 @@ theorem add_vNeutral_ne {Y X : CDAlg ℝ n} (hX : X ≠ 0) : Y + X ≠ Y := by
 #print axioms mem_vNeutral_iff
 #print axioms vNeutral_le_tangent
 #print axioms vNeutral_eq_tangent_of_gradient_zero
+#print axioms vNeutral_add_normal
+#print axioms vNeutral_neg
 #print axioms bil_one_one
 #print axioms tangentProbe_surjective
 #print axioms vProbe_surjective
