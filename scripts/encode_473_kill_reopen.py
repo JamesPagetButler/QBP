@@ -120,7 +120,9 @@ CONJ_NOTES = (
     "the hosting bundle over the vacuum manifold (PROOF-crystal-hosts-quaternion). (b) RE-SCOPED to a "
     "descriptor: Ext¹(ℍ_cond, 𝕆_cond) has no state or time variable, reduces in Cond(Ab) to Ext¹(ℝ,ℝ)^32 "
     "(a constant of the category) and is identically zero under the deformation-theoretic repair (ℍ "
-    "separable ⇒ rigid); it cannot parametrise a physical quantity, at most describe one. (c) WITHDRAWN as a "
+    "separable ⇒ rigid as an algebra, HH²(ℍ,ℍ) = 0 — note the EMBEDDING ℍ ↪ 𝕆 is not rigid: its deformations are "
+    "T(G₂/SO(4)), i.e. the kinematic hosting bundle of (a), not an obstruction); it cannot parametrise a physical "
+    "quantity, at most describe one. (c) WITHDRAWN as a "
     "rule-supplier (closure ruling-rescope): an Ext group carries no clock, a rate needs the rule; and the "
     "substrate has no horizon object. (d) untouched. Prop 13(b) via this route: FIRED — every object the "
     "route can define is a functor of V's level-set topology, hence rule-independent "
@@ -176,6 +178,10 @@ def main():
         ed.append("anchors", NEW_FLAG)
         c = ed.record("anchors", "CONJ-condensed-math-for-transition-state")
         c["testable_when"] = CONJ_TESTABLE
+        c["predicted_unit"] = (
+            "none — Ext groups are not a unit; no comparable quantity until testable_when's prerequisites name one "
+            "(replaces 'Ext-1 groups computed in condensed abelian-group category', 2026-09-25)"
+        )
         c["notes"] = (c.get("notes", "") + " " if c.get("notes") else "") + CONJ_NOTES
         c["last_tested_at"] = DATE
         f = ed.record("anchors", "FLAG-rule-flow-open")
