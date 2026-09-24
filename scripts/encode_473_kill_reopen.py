@@ -25,18 +25,23 @@ RULING = (
     " SUPERSEDED BY RULING 2026-09-25 (beekeeper, #473, after five isolated attacks; "
     + ADD
     + "): "
-    "the status 'killed' was not proof-backed — the 2026-09-05 ratification rested on an argument "
-    "(Prop 12) whose legs were prose (Props 8, 10′), numerical (Props 9, 15, 16(ii)/(iii)) and one "
-    "half-proved theorem; and two justifications are refuted: Prop 12's 'a V-natural mechanism moves "
-    "nothing inside a level set' (false — the vacuum sublocale is V-natively available, "
-    "LocaleDynamics.lean) and Prop 10′'s 'no algebra-native profinite object' (false — the CD index "
-    "tower's dual Cantor group exists and is the tower's Galois group; it is inert by the no-small-"
-    "subgroups theorem). The kill's CONCLUSION — no topological or measure-theoretic mechanism supplies "
-    "the dynamical rule — was NOT reversed by any attack; two legs are now theorem-grade in Lean (lfp of the "
-    "sublevel filtration = ⊥ and no V-natural valuation; level-set invariants rule-blind, 13 of 14 in-flight "
-    "directions V-neutral) and one is NUMERICAL + ARGUMENT, Lean pending (anneal = 1/3 exactly by a Laplace "
-    "derivation re-checked in review; closed-form quench endpoint to 10⁻¹¹ by three integrators). Route "
-    "reopened as FLAG-locale-forcing-route-reopened. This record is kept as history."
+    "the status 'killed' was not proof-backed — the 2026-09-05 ratification rested on an argument (Prop 12) "
+    "whose legs were prose (Props 8, 10′), numerical (Props 9, 15, 16(ii)/(iii)) and one half-proved theorem "
+    "(addendum §1) — and two SUPPORTING SENTENCES did not survive the attacks, while neither proposition's "
+    "conclusion fell: (i) the driver's sealed reasoning behind Prop 12, 'a V-natural mechanism moves nothing "
+    "inside a level set', is false (the vacuum sublocale is V-natively available with its full topology, "
+    "LocaleDynamics.lean), whereas Prop 12's own claim — nothing in a frame selects the rule — is CONFIRMED "
+    "(the nucleus has no clock, identical for quench and anneal); (ii) Prop 10′'s 'the one cover the algebra "
+    "supplies' has a wording gap — the algebra also supplies a canonical profinite GROUP (the CD index tower's "
+    "dual), which is inert because Aut(𝕊) is a compact Lie group (no small subgroups); Prop 10′'s conclusion "
+    "stands. The kill's CONCLUSION — no topological or measure-theoretic mechanism supplies the dynamical rule — "
+    "was NOT reversed by any attack. Evidence classes now: attack 3 Lean (42 theorems; scope: for X = ℝ with a "
+    "constant potential every V-natural valuation vanishes on bounded intervals — the level-set case is classical, "
+    "not formalised — and the least fixed point of the sublevel filtration equals interior{V=0}, hence ⊥ under the "
+    "hypothesis interior{V=0} = ∅, which is not discharged in Lean); attack 5 Lean (16 theorems: 13 of 14 in-flight "
+    "directions V-neutral); attack 1 NUMERICAL + ARGUMENT, Lean pending (anneal = 1/3 exactly by a Laplace "
+    "derivation re-checked in review; closed-form quench endpoint to 10⁻¹¹ by three integrators). Route reopened "
+    "as FLAG-locale-forcing-route-reopened. This record is kept as history."
 )
 
 NEW_FLAG = {
@@ -56,10 +61,12 @@ NEW_FLAG = {
         "cancels the surface element (1−b₀²)³ — derivation + quadrature + MCMC, attack 1; numerical/analytic, "
         "Lean pending); (3) the quench endpoint has the closed form b₀²/(b₀² + √((1−b₀²)² − V₀)) per seed "
         "(three integrators to 10⁻¹¹; exact mean 0.141587; Lean target (i) funded); (4) a V-natural nucleus "
-        "gives the vacuum sublocale with its full topology but no measure: the least fixed point of the "
-        "sublevel filtration is interior{V=0} = ⊥ and every V-natural valuation vanishes "
-        "(LocaleDynamics.lean, 41 theorems); (5) every level-set invariant is rule-blind: at any in-flight "
-        "state 13 of 14 tangent directions are V-neutral (TransitionState.lean, 15 declarations); (6) the "
+        "gives the vacuum sublocale with its full topology but no measure: in the model case X = ℝ with a "
+        "constant potential every V-natural valuation vanishes on bounded intervals (the level-set case is "
+        "classical, not formalised), and the least fixed point of the sublevel filtration equals interior{V=0}, "
+        "hence ⊥ when the vacuum has empty interior — a hypothesis, not discharged in Lean (LocaleDynamics.lean, "
+        "42 theorems, 41 audited); (5) every level-set invariant is rule-blind: at any in-flight state 13 of 14 "
+        "tangent directions are V-neutral (TransitionState.lean, 16 theorems); (6) the "
         "CD index tower's dual Cantor group is an algebra-native profinite Galois group acting by sign "
         "automorphisms, and every continuous profinite action by automorphisms on 𝕊 has finite image (attack 4; "
         "Aut(𝕊) is a closed norm-preserving subgroup of GL(16,ℝ), hence a compact Lie group — no small subgroups; "
@@ -73,8 +80,12 @@ NEW_FLAG = {
         "sets — i.e. a metric-carrying (enriched/Lawvere) locale — and whose metric is shown not to be N "
         "re-labelled (Prop 8's relocation test). Discharge if found: the mechanism's PROOF- anchor and the "
         "rule it selects (quench 0.1416 / anneal 1/3 / ℓ-axis 1 / other), then AC2″ on #473. Discharge if "
-        "excluded: a theorem that no such enriched-locale mechanism natural in (V, N) exists beyond N's "
-        "own gradient flow."
+        "excluded: a theorem that every metric-carrying locale mechanism natural in (V, N) — natural meaning "
+        "equivariant under the isometries of (StateSphere, N) that preserve V — carries a metric that is N "
+        "re-labelled (Prop 8's relocation test fails), so that its rule is one of the N-metric protocols already "
+        "on record (quench 0.1416, anneal 1/3, ℓ-axis 1) rather than new topological data. (The anneal is itself "
+        "(V, N)-natural and supplies a measure and a transport — Prop 9 — so 'beyond N's gradient flow' would be "
+        "the wrong exclusion; the test is relocation, not existence.)"
     ),
     "notes": (
         "Tracking anchor only (route OPEN; no root, no claim). Ruling text and the audit of the original "
@@ -114,7 +125,8 @@ CONJ_NOTES = (
     "substrate has no horizon object. (d) untouched. Prop 13(b) via this route: FIRED — every object the "
     "route can define is a functor of V's level-set topology, hence rule-independent "
     "(TransitionState.finrank_vNeutral). Positive: condensed math is conservative on the spatial inputs "
-    "here (G₂ × S₃ compact ⇒ orbit space compact Hausdorff); the one genuinely non-Hausdorff object in "
+    "here (Aut(𝕊) compact — a closed norm-preserving subgroup of GL(16,ℝ); Brown's G₂ × S₃ unformalised — ⇒ "
+    "orbit space compact Hausdorff); the one genuinely non-Hausdorff object in "
     "reach is the orbit space of the RULE — downstream of it."
 )
 
@@ -124,7 +136,8 @@ CHANGELOG = {
     "note": (
         "qbp-oppenheimer: #473 ruling 2026-09-25 after five isolated attacks on KILLED-locale-forcing-route "
         "(ruling-rescope; nothing physical ruled). KILLED-locale-forcing-route: status killed → marginal, "
-        "superseded (not proof-backed; two justifications refuted; conclusion not reversed), kept as history. "
+        "superseded (not proof-backed; one supporting sentence false and one gapped, neither proposition's "
+        "conclusion fell; the kill's conclusion not reversed), kept as history. "
         "NEW FLAG-locale-forcing-route-reopened (route OPEN; kill = Prop 13(b) with the honest class; six "
         "proved/derived legs listed). CONJ-condensed-math-for-transition-state: testable_when added; (a),(c) "
         "withdrawn, (b) re-scoped to a descriptor, (d) untouched. FLAG-rule-flow-open: quench 0.146 → 0.1416 "
@@ -145,11 +158,13 @@ def main():
             raise SystemExit("already applied")
         k = ed.record("anchors", "KILLED-locale-forcing-route")
         k["status"] = "marginal"
+        k["name"] = "[SUPERSEDED 2026-09-25 by ruling] " + k["name"]
         k["description"] = k["description"] + RULING
         k["killed_note"] = (
-            "The 'killed' status was withdrawn by beekeeper ruling 2026-09-25: it was ratified on an argument, "
-            "not a proof, and two of its justifications were refuted by the attacks of 2026-09-24; the "
-            "conclusion stands unreversed and the route is reopened as FLAG-locale-forcing-route-reopened."
+            "The 'killed' status was withdrawn by beekeeper ruling 2026-09-25: it was ratified on an argument, not "
+            "a proof; the attacks of 2026-09-24 showed one supporting sentence false (the driver's sealed reasoning "
+            "behind Prop 12) and one gapped (Prop 10′'s cover wording) while neither proposition's conclusion fell; "
+            "the kill's conclusion stands unreversed and the route is reopened as FLAG-locale-forcing-route-reopened."
         )
         # A non-killed record must terminate its chain in a PROOF (root gate): the record's true
         # supports are the proved first link and the Lean half of Prop 16.
@@ -180,6 +195,15 @@ def main():
         )
         assert "DEFINABLE but not" in r["description"], "REF replacement did not land"
         r["last_tested_at"] = DATE
+        ic = ed.record("anchors", "INSIGHT-locale-condensed-chain")
+        ic["description"] = ic["description"] + (
+            " UPDATE 2026-09-25 (#473 ruling): the forcing extension's 'KILLED (Prop 12 ratified)' status above was "
+            "WITHDRAWN by beekeeper ruling — not proof-backed; the kill's conclusion unreversed — and the route is "
+            "reopened as FLAG-locale-forcing-route-reopened (kill = Prop 13(b), honest class). See "
+            + ADD
+            + "."
+        )
+        ic["last_tested_at"] = DATE
         p = ed.record("anchors", "REF-pyknotic-condensed-topos-status")
         p["last_tested_at"] = DATE
         p["notes"] = (p.get("notes", "") + " " if p.get("notes") else "") + (
@@ -194,7 +218,7 @@ def main():
         L["changelog"].append(CHANGELOG)
         ed.touch("changelog")
     print(
-        f"{'DRY ' if args.dry_run else ''}applied: ruling encoded (6 records + 1 new)"
+        f"{'DRY ' if args.dry_run else ''}applied: ruling encoded (7 records + 1 new)"
     )
 
 
