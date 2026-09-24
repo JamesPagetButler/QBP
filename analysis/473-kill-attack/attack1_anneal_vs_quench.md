@@ -90,7 +90,7 @@ Composite Gauss–Legendre (32 nodes × 300 geometric panels per level) resolvin
 
 Findings: (i) every on-record importance-sampling value is reproduced within its MC error; (ii) the approach to 1/3 is **exactly** of the form 1/3 − 0.5539·β⁻¹ᐟ² + o(β⁻¹ᐟ²) — the constant is flat to four digits from β = 10⁴ on — which is the near-pole (r ≲ β⁻¹ᐟ⁴) correction predicted in §1a, and nothing else; (iii) the b₀-density relative to b₀ = 0 is 1.0000 at b₀ = 0.3, 0.6, 0.9, 0.99 for β = 10⁶ (at β = 100 the b₀ = 0.9 point is still at 0.699 — the pole band is wide at small β). The limit is uniform in b₀ and ⟨b₀²⟩_∞ = 1/3, with no free constant left over.
 
-Numerics failure caught and fixed (on record, not hidden): the first version used `scipy.integrate.quad` with algebraic end-point weights; it silently under-resolved the t-boundary layer for βx ≳ 10³ and returned I(β, x) 1–2 % low (visible as β³x³I → 0.0961 instead of 0.0982 and as a d·√β that *fell* at large β). Caught by the Laplace-constant check, replaced by the panelled Gauss–Legendre; the β ≤ 320 values were unaffected to 6 digits. The aborted first RK4 output (`quench_rk4_out_aborted_v1.txt`, Euler line only) is likewise kept.
+Numerics failure caught and fixed (on record, not hidden): the first version used `scipy.integrate.quad` with algebraic end-point weights; it silently under-resolved the t-boundary layer for βx ≳ 10³ and returned I(β, x) 1–2 % low (visible as β³x³I → 0.0961 instead of 0.0982 and as a d·√β that *fell* at large β). Caught by the Laplace-constant check, replaced by the panelled Gauss–Legendre; the low-β values (β ≤ 100) were unaffected to 6 digits, β = 320 already differed in the 5th digit (Red Team #675). The superseded v1 output is kept as `anneal_quadrature_out_superseded_v1.txt`. The aborted first RK4 output (`quench_rk4_out_aborted_v1.txt`, Euler line only) is likewise kept.
 
 ### 2b. Hessian isotropy at 50 random vacua (`hessian_isotropy.py` → `hessian_isotropy_out.txt`)
 
@@ -200,12 +200,12 @@ Reading:
 | Run | Estimate (RAM / wall) | Cap | Actual wall | Exit |
 |---|---|---|---|---|
 | `hessian_isotropy.py` | <200 MB / ~5 s | 1G / 300 s | ~5 s | 0 |
-| `anneal_quadrature.py` v1 (scipy quad; superseded, result kept in §2a note) | <200 MB / 1–5 min | 1G / 1800 s | ~3 min | 0 |
+| `anneal_quadrature.py` v1 (scipy quad; superseded, output kept as `anneal_quadrature_out_superseded_v1.txt`) | <200 MB / 1–5 min | 1G / 1800 s | 41 s | 0 |
 | `anneal_quadrature.py` v2 (panelled GL; the recorded one) | <200 MB / ~5 min | 1G / 900 s | ~8 min | 0 |
 | `anneal_quadrature` at the five MCMC β's | <200 MB / <5 min | 1G / 900 s | ~2 min | 0 |
 | `quench_exact.py` | <1 GB / ~2 min | 2G / 900 s | ~1.5 min | 0 |
-| `quench_rk4.py` v1 (aborted by me after the Euler line — the 24 000-seed h = 0.005 RK4 + T = 400 continuation would have exceeded the cap; output kept as `quench_rk4_out_aborted_v1.txt`) | <500 MB / ~21 min | 2G / 3600 s | killed at ~6 min | 144 (SIGTERM by me) |
-| `quench_rk4.py` v2 | <500 MB / ~40 min | 2G / 5400 s | ~45 min | 0 |
+| `quench_rk4.py` v1 (aborted by me after the Euler line — the 24 000-seed h = 0.005 RK4 + T = 400 continuation would have exceeded the cap; output kept as `quench_rk4_out_aborted_v1.txt`) | <500 MB / ~21 min | 2G / 3600 s | killed at ~6 min by me (outside run-bounded's accounting — no DONE line in its ledger) | 144 (SIGTERM by me) |
+| `quench_rk4.py` v2 | <500 MB / ~40 min | 2G / 5400 s | 31 min | 0 |
 | `anneal_mcmc.py haar` | <300 MB / ~22 min | 2G / 3600 s | 1630 s | 0 |
 | `anneal_mcmc.py pole` | <300 MB / ~22 min | 2G / 3600 s | 1083 s | 0 |
 
