@@ -26,6 +26,7 @@ import QBP.Foundations.FanoSubalgebras
 import QBP.Foundations.TowerLaws
 import QBP.Foundations.LeftMulDet
 import QBP.Foundations.LieAlgebraIso
+import QBP.Foundations.LocaleDynamics
 import QBP.Foundations.NormForm
 import QBP.Foundations.Operations
 import QBP.Foundations.SedenionOctonionCount
