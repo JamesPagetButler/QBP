@@ -1,0 +1,21 @@
+mode ridge: 200 s × 50 z = 10000 trajectories, 200 steps
+  x·z      [raw] alive 10000 dead     0 leftIm 10000 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  x·z      [im ] alive 10000 dead     0 leftIm     0 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  z·x      [raw] alive 10000 dead     0 leftIm 10000 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  z·x      [im ] alive 10000 dead     0 leftIm     0 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  [x,z]    [raw] alive 10000 dead     0 leftIm     0 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  [x,z]    [im ] alive 10000 dead     0 leftIm     0 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  x+z      [raw] alive 10000 dead     0 leftIm     0 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'1': 10000} | HITS 0
+  x+z      [im ] alive 10000 dead     0 leftIm     0 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'1': 10000} | HITS 0
+  xz+zx    [raw] alive 10000 dead     0 leftIm 10000 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  xz+zx    [im ] alive     0 dead 10000 leftIm     0 | V_end [None, None] mean None | frac ridge None | max|b0| None | periods {} | HITS 0
+  (xz)ℓ    [raw] alive 10000 dead     0 leftIm 10000 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  (xz)ℓ    [im ] alive 10000 dead     0 leftIm     0 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  z(xℓ)    [raw] alive 10000 dead     0 leftIm 10000 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  z(xℓ)    [im ] alive 10000 dead     0 leftIm     0 | V_end [1.0, 1.0] mean 1.0 | frac ridge 1.0 | max|b0| 0.0 | periods {'2': 10000} | HITS 0
+  x+z+ℓ    [raw] alive 10000 dead     0 leftIm     0 | V_end [0.25, 0.25] mean 0.25 | frac ridge 0.0 | max|b0| 0.707 | periods {'1': 10000} | HITS 0
+  x+z+ℓ    [im ] alive 10000 dead     0 leftIm     0 | V_end [0.25, 0.25] mean 0.25 | frac ridge 0.0 | max|b0| 0.707 | periods {'1': 10000} | HITS 0
+  x+z−ℓ    [raw] alive 10000 dead     0 leftIm     0 | V_end [0.25, 0.25] mean 0.25 | frac ridge 0.0 | max|b0| 0.707 | periods {'1': 10000} | HITS 0
+  x+z−ℓ    [im ] alive 10000 dead     0 leftIm     0 | V_end [0.25, 0.25] mean 0.25 | frac ridge 0.0 | max|b0| 0.707 | periods {'1': 10000} | HITS 0
+done 478s
+rc=0

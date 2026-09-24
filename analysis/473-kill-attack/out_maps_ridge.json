@@ -1,0 +1,277 @@
+{
+ "mode": "ridge",
+ "NS": 200,
+ "NZ": 50,
+ "steps": 200,
+ "results": {
+  "x\u00b7z [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 10000,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.3492982066813692e-16,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "x\u00b7z [im]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.000000000000001,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.3738309013483034e-16,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "z\u00b7x [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 10000,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.3492982066813692e-16,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "z\u00b7x [im]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.000000000000001,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.3738309013483034e-16,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "[x,z] [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.000000000000001,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.3738309013483034e-16,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "[x,z] [im]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.000000000000001,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.3738309013483034e-16,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "x+z [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999994,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.0339019241234959e-60,
+   "periods(up to sign)": {
+    "1": 10000
+   },
+   "hits": 0
+  },
+  "x+z [im]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999994,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.0339019241234959e-60,
+   "periods(up to sign)": {
+    "1": 10000
+   },
+   "hits": 0
+  },
+  "xz+zx [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 10000,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000007,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.0,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "xz+zx [im]": {
+   "alive": 0,
+   "dead(\u21920 or real)": 10000,
+   "left_Im": 0,
+   "V_end_min": null,
+   "V_end_mean": null,
+   "V_end_max": null,
+   "frac_V>0.999": null,
+   "frac_V<1e-3": null,
+   "|b0|_end_max": null,
+   "periods(up to sign)": {},
+   "hits": 0
+  },
+  "(xz)\u2113 [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 10000,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.3492982066813692e-16,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "(xz)\u2113 [im]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.4228962906821713e-16,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "z(x\u2113) [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 10000,
+   "V_end_min": 0.9999999999999994,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.000000000000001,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 8.831770080096237e-17,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "z(x\u2113) [im]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999993,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 8.831770080096237e-17,
+   "periods(up to sign)": {
+    "2": 10000
+   },
+   "hits": 0
+  },
+  "x+z+\u2113 [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.2499999999999998,
+   "V_end_mean": 0.25,
+   "V_end_max": 0.2500000000000002,
+   "frac_V>0.999": 0.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.7071067811865477,
+   "periods(up to sign)": {
+    "1": 10000
+   },
+   "hits": 0
+  },
+  "x+z+\u2113 [im]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.2499999999999998,
+   "V_end_mean": 0.25,
+   "V_end_max": 0.2500000000000002,
+   "frac_V>0.999": 0.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.7071067811865477,
+   "periods(up to sign)": {
+    "1": 10000
+   },
+   "hits": 0
+  },
+  "x+z\u2212\u2113 [raw]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.2499999999999998,
+   "V_end_mean": 0.25,
+   "V_end_max": 0.2500000000000002,
+   "frac_V>0.999": 0.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.7071067811865477,
+   "periods(up to sign)": {
+    "1": 10000
+   },
+   "hits": 0
+  },
+  "x+z\u2212\u2113 [im]": {
+   "alive": 10000,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.2499999999999998,
+   "V_end_mean": 0.25,
+   "V_end_max": 0.2500000000000002,
+   "frac_V>0.999": 0.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.7071067811865477,
+   "periods(up to sign)": {
+    "1": 10000
+   },
+   "hits": 0
+  }
+ },
+ "seconds": 478.422691822052
+}

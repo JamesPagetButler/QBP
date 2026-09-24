@@ -1,0 +1,47 @@
+states: 200, V(s) ∈ [0.0050, 0.9950], |b0| max 0.735, all non-vacuum: True
+  chunk s[0:42] done: words pure/imnode/combo = 3873/3474/12870; hits so far 0; 254s
+  chunk s[42:84] done: words pure/imnode/combo = 3873/3474/12870; hits so far 0; 483s
+  chunk s[84:126] done: words pure/imnode/combo = 3873/3474/12870; hits so far 0; 702s
+  chunk s[126:168] done: words pure/imnode/combo = 3873/3474/12870; hits so far 0; 904s
+  chunk s[168:200] done: words pure/imnode/combo = 3873/3474/12870; hits so far 0; 1067s
+linear-closure dimension of span(words ≤ 5) over 20 (s,z) pairs: [16]
+
+pure words: 3873, fully degenerate (real or zero for all pairs): 80 (of which identically zero: 0)
+  per-word V_min over the batch: min 0.000e+00, median 2.489e-02; words with V_min < 1e-3: 863
+  words whose image is entirely on the ridge (frac V>0.999 = 1): 447
+  [pure] evaluations 37930000: pole landings 4783882, non-pole with V<1e-3: 402880, σ_min (non-pole) 1.474e-03
+     V hist (20 bins on [0,1]):  [6899546, 687550, 558112, 483040, 497018, 460444, 480530, 517954, 576610, 616430, 679512, 783466, 888768, 1081446, 1246166, 1525304, 1906840, 2457652, 3515008, 12068604]
+     σ hist (20 bins on [0,1]):  [227686, 204984, 294268, 277366, 405930, 322266, 283850, 289792, 375682, 494382, 419038, 518940, 393364, 816000, 775030, 1031012, 1385516, 1935624, 3700294, 18936130]
+  [imnode] evaluations 24240000: pole landings 322800, non-pole with V<1e-3: 46600, σ_min (non-pole) 4.881e-03
+     V hist (20 bins on [0,1]):  [609436, 174852, 251196, 235676, 339088, 290596, 257056, 291528, 367860, 471400, 438020, 537932, 464816, 806640, 785008, 1024108, 1279460, 1681708, 2768360, 11165260]
+     σ hist (20 bins on [0,1]):  [181632, 162664, 240212, 218216, 322196, 254452, 214188, 219516, 289564, 374340, 303464, 382960, 264468, 593020, 541628, 727420, 971304, 1358036, 2631632, 13660488]
+  [combo] evaluations 126600000: pole landings 6613220, non-pole with V<1e-3: 795790, σ_min (non-pole) 1.128e-03
+     V hist (20 bins on [0,1]):  [22315794, 3383036, 2721172, 2804729, 5286361, 4787597, 2784535, 2770756, 2851731, 3102447, 3237566, 3610597, 8097261, 4758686, 5111270, 5857658, 6807542, 8006642, 9481375, 18823245]
+     σ hist (20 bins on [0,1]):  [713053, 643413, 996492, 991551, 1519178, 1376787, 1351367, 1502099, 1914506, 2423110, 2296314, 2846985, 2607866, 4254857, 4458629, 5674479, 7221812, 9424361, 14859914, 52809357]
+  pure words σ_min: min 1.474e-03, words with σ_min < 1e-3: 0, < 1e-2: 715
+HITS (V < 1e-08, |b0| < 0.999, non-degenerate): 0
+done 1067s
+	Command being timed: "run-bounded 3G 3000 python3 attack2_words.py ridge 200"
+	User time (seconds): 799.65
+	System time (seconds): 219.80
+	Percent of CPU this job got: 95%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 17:47.88
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1215636
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 70331865
+	Voluntary context switches: 50
+	Involuntary context switches: 227965
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 2848
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+rc=0
