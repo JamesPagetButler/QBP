@@ -1,0 +1,3 @@
+# Correction (2026-09-25, #473 attack 1)
+
+The endpoint statistic reported by `test1_transient.py` (⟨b₀²⟩ = 0.1461 with `flowlib.step`, renormalised Euler, h = 0.01–0.02) carries a first-order discretisation bias of **+0.0031** (paired against RK4 h = 0.02/0.01/0.005 and Dormand–Prince on identical seeds, 130σ). The exact quench value is **0.1416** (0.141587): under the descent the four Gram invariants move on a straight ray and the per-seed endpoint is b₀²/(b₀² + √((1−b₀²)² − V₀)). The relaxation-rate and no-merging conclusions of tests 1–2 are unaffected. Source: `analysis/473-kill-attack/attack1_anneal_vs_quench.md` on branch `research/473-kill-attack-1`.
