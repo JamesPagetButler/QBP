@@ -13,10 +13,10 @@
 | Field | Value |
 |---|---|
 | **Parent** | #473 (condensed-math / locale substrate beneath the Cayley–Dickson tower) |
-| **Now** | **#684** — substrate first draft v0.1, gates **G1–G5**: G1 rule postulate + protocol β(t) ruling (#635, draft posted 2026-09-25); G2 AXIOM-1 kill_condition[0] rewrite (#668, proposal posted 2026-09-25, ratification pending); G3 b₀ observable candidate (#637, pending); G4 this block; G5 funded follow-ups PR #681 (`RuleFlowInvariants.lean`, 4 anchors) + PR #682 (`SeamSpectrum.lean`, 4 anchors), both approved, awaiting beekeeper merge |
+| **Now** | **#684** — substrate first draft v0.1, gates **G1–G5**: G1 rule postulate P1–P8; protocol A/B/C carried as three live hypotheses with kills K1–K4, no ruling (#635, correction 5832433972); G2 AXIOM-1 kill_condition[0] rewrite — PR #687 open (ratified text; beekeeper in-thread confirmation pending); G3 #637 documented negative: one b₀-linked quantity on record (λ⊥ = 8(1−b₀²)), no measured constant tied to it; G4 this block; G5 #681 merged (`bd5ddbc`, ledger 6.9.0); #682 open at `e20ca7f` (ledger claim 6.10.0/339), 4 anchors pending |
 | **Next** | v0.1 review, **Tier 2** (no Lean, no ledger): Red Team → Gemini → §I4 read-through → beekeeper Human Visual Review of the tag table (§7 of the draft); then the two v0.2 research threads (positive in-flight account; AC2 candidate) each get an issue |
-| **Standing** | route `FLAG-locale-forcing-route-reopened` (ruling 2026-09-25, v0.6 addendum); rule existence `FLAG-rule-flow-open`; substrate PERMITTED, not FORCED (unchanged since 2026-06-01) |
-| **Ledger** | 6.8.0 / 331 anchors on master (`b111eb4`); 17 coherent substrate PROOF anchors + 8 pending on #681/#682 |
+| **Standing** | route `FLAG-locale-forcing-route-reopened` (ruling 2026-09-25, v0.6 addendum); rule existence `FLAG-rule-flow-open`; substrate PERMITTED, not FORCED (unchanged since 2026-06-01); horn-1 status explored first, alternatives retained (#473 audit) |
+| **Ledger** | 6.9.0 / 335 anchors on master (`bd5ddbc`); 21 coherent substrate PROOF anchors on master + 4 pending on #682 |
 
 ## Current Position
 

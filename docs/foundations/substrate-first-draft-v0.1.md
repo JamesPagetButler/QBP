@@ -11,29 +11,29 @@
 | **POSTULATE** | a clause the theory asserts and does not derive (PERMITTED, never FORCED) | the ruling or issue stating it |
 | **OPEN** | not settled either way | the owning issue, or "no issue" |
 
-This is the assembly of ingredients scattered across six addenda, five attack reports, three Lean files and the ledger, holes named as holes; not a derivation, a ruling, or a completion of AC1/AC2/AC3. Unsourced facts are marked `[UNSOURCED — needs …]`, not supplied.
+This is the assembly of ingredients scattered across six addenda, five attack reports, three Lean files and the ledger, holes named as holes; not a derivation, a ruling, or a completion of AC1/AC2/AC3. Unsourced facts are marked `[UNSOURCED — needs …]`, not supplied; none remain as of this revision (Red Team #685 N2 sourced the last one).
 
 ## 1. Carrier
 
 | Object | Statement | Tag | Source |
 |---|---|---|---|
 | Algebra 𝕊 | 𝕊 = CD(𝕆) = `CDAlg ℝ 4` as ℝ¹⁶; s = a + bℓ with octonions a = `cdLo s`, b = `cdHi s` | **PROVED** | PROOF-substrate-hosting-definition |
-| Metric N | the Cayley–Dickson norm form, positive definite at level 4; the only metric on record | **PROVED** | PROOF-normed-division-tower-existence |
+| Metric N | the Cayley–Dickson norm form, positive definite at level 4 (`N_pos_of_ne_zero`); the only metric on record | **PROVED** (the norm form and its positivity); *record statement, not a theorem* (only metric on record) | PROOF-normed-division-tower-existence (composition); PROOF-substrate-hosting-definition (`N_pos_of_ne_zero`, positivity); hosting definition §0 (only metric on record, no issue) |
 | StateSphere | `{s : s₀ = 0 ∧ N s = 1}`, the imaginary unit sphere S¹⁴ | **PROVED** | PROOF-substrate-hosting-definition |
 | Potential V | V(s) = N([a, b]) = 4(AC − P²), A = N(Im a), C = N(Im b), P = ⟪Im a, Im b⟫, unconditionally; V ≥ 0; V ≤ N(s)² | **PROVED** | PROOF-delta-landscape-descent; PROOF-potential-bounded-by-normForm-sq-frozen-max |
 | Gram invariants | V depends on (A, C, P) only, so it descends to S¹⁴/G₂; with B = b₀² these are §2's coordinates | **PROVED** | PROOF-delta-landscape-descent |
-| Vacua (crystals) | {V = 0} ∩ StateSphere = `UniverseSpace`; V = 0 ⇔ the components commute ⇔ the left alternator vanishes ⇔ a = αu, Im b = γu for one imaginary direction u (poles u = 0: s = b₀ℓ) | **PROVED** | PROOF-alternator-vanishes-iff-commute; PROOF-vacuum-parametrisation |
+| Vacua (crystals) | {V = 0} ∩ StateSphere = `UniverseSpace`; V = 0 ⇔ the components commute ⇔ the left alternator vanishes ⇔ a = αu, Im b = γu for one imaginary direction u (poles u = 0: s = b₀ℓ) | **PROVED** | PROOF-substrate-hosting-definition (`potential_eq_zero_iff_isVacuum`); PROOF-alternator-vanishes-iff-commute; PROOF-vacuum-parametrisation |
 | Vacuum topology | modulo G₂ a 2-sphere (θ mod 180°, b₀); modulo S₃ the orbifold S²(2,2,3) | **NUMERICAL** | `analysis/473-dirac-probe/orbit_space.py`, `lmaps_check.py`, `aut_s3.py` (NOT formalised, per PROOF-vacuum-parametrisation) |
 | Partition | StateSphere = UniverseSpace ⊔ InFlight = {V > 0}; both non-empty; vacua beyond the ℂ-poles exist | **PROVED** | PROOF-substrate-hosting-definition |
 | Frozen ridge | on StateSphere V attains its maximum, exactly 1, and every point with V = 1 is a rest point of the rule field | **PROVED** | PROOF-potential-bounded-by-normForm-sq-frozen-max |
-| Ridge dimension | {V = 1} has dimension 11 (codimension 3) | **NUMERICAL** | "numerically 11", NOT proved, per PROOF-potential-bounded-by-normForm-sq-frozen-max; `[UNSOURCED — needs the measuring script]` |
+| Ridge dimension | {V = 1} has dimension 11 (codimension 3) | **NUMERICAL** | "numerically 11", NOT proved, per PROOF-potential-bounded-by-normForm-sq-frozen-max; `analysis/473-dirac-probe/aut_s3.py` line 169 (orbit dimension measured at one point plus a single-orbit check, which gives the ridge dimension only under that check) |
 | Zero divisors on the ridge | \|N(sx) − N(s)N(x)\| ≤ √V(s)·N(x) (sharp, both-handed); every zero divisor has V = N², on the sphere V = 1; nonzero crystals are never zero divisors | **PROVED** | PROOF-zero-divisors-sit-at-potential-max |
 | Ridge ⊇ zero divisors, not = | the converse V = N² ⇒ zero divisor is NOT proved (numerically true) | **OPEN** | NOT-proved clause of PROOF-zero-divisors-sit-at-potential-max; the P5-open marker in `RuleFlow.lean` §18; no issue |
 | Basis-sum zero divisors | exactly 42 basis-sum zero-divisor planes (kernel `decide`) | **PROVED** | PROOF-42zd |
 | Seam witness kernel | at z = e₁ + e₁₀: ker L_z is exactly a 4-plane (rank 12); ker L_z = ker R_z; the 4-plane is not a subalgebra (k₁² = −2·1) | **PROVED** | PROOF-seam-zd-witness-kernel-four; PROOF-seam-zd-witness-kernels-coincide; PROOF-seam-zd-witness-kernel-not-subalgebra |
 | Seam spectrum | at z = e₁ + e₁₀: L_zᵀL_z has spectrum exactly 4 (×4), 2 (×8), 0 (×4); R_z shares it; the top eigenspace T(z) lies on the ridge and consists of two-sided zero divisors; T(e₁+e₁₀) = ker L_{e₁−e₁₀}; for every basis pair e_a ± e_b the spectrum lies in [0, 4] with E₄(G₊) = ker L_{z₋}, E₀ = ker L_z (no multiplicity fixed) | **PROVED** | PROOF-seam-zd-gram-spectrum-4-8-4, PROOF-seam-top-plane-on-frozen-ridge, PROOF-seam-right-gram-equals-left, PROOF-basis-pair-gram-uniform-bounds (PR #682, pending merge) |
 | S₃ action, ℤ/2 | `gradeAut` (ℓ ↦ −ℓ) is a non-identity automorphism carrying vacua and hosted algebras along | **PROVED** | PROOF-crystal-hosts-quaternion |
-| S₃ action, order 3 | `rotAut3` ρ (ρ³ = id, ρℓ = ℓ) is an automorphism carrying a universe's crystal, membership and hosted algebra along | **PROVED** | PROOF-hosting-equivariant-under-order-three |
+| S₃ action, order 3 | `rotAut3` ρ (`rotAut3_pow_three`: ρ³ = id, `CrystalHosting.lean:1418`; `rotAut3_ell`: ρℓ = ℓ, `CrystalHosting.lean:1409`) is an automorphism carrying a universe's crystal, membership and hosted algebra along | **PROVED** | PROOF-hosting-equivariant-under-order-three |
 | Aut(𝕊) = G₂ × S₃ | Brown's identification, and that `gradeAut` and ρ generate the S₃ | **OPEN** | #639 (e); NOT claimed by either anchor above |
 
 **Reading.** The carrier is theorem-shaped end to end; two facts stay numerical (vacuum topology; ridge dimension), and the 4/8/4 multiplicities are proved at one witness only. "Crystallisation" means **subalgebra selection** (v0.6 addendum §3), never a homomorphism 𝕆 → ℍ: 𝕆 is simple.
@@ -67,7 +67,7 @@ The eight clauses of the G1 draft (#635, issuecomment-5828899452); substance rep
 | Avoids zero divisors | a forward curve from V < 1 is never a zero divisor, either side, at finite time or in its ω-limit set | **PROVED** | PROOF-rule-descent-avoids-zero-divisors |
 | Ensemble mean, A | ⟨b₀²⟩ = E_Haar[B/(B + (1 − B)√(1 − 4κ))] = 0.141587 (quadrature; 10⁷ MC 0.14162 ± 0.00005; RK4/DP45 match the closed form to 10⁻¹¹ per seed); every on-record 0.146 carried a +0.0031 Euler bias | **NUMERICAL** | `analysis/473-kill-attack/attack1_anneal_vs_quench.md` §3, `quench_exact.py`, `quench_rk4.py` |
 | Ensemble mean, B | Gibbs e^{−βV}, β → ∞: the Laplace factor (8(1 − b₀²))⁻³ cancels the surface element (1 − b₀²)³; limit round-uniform on the vacuum S²; ⟨b₀²⟩ = 1/3 exactly, approach 1/3 − 0.554 β^{−1/2} | **NUMERICAL** (analytic derivation + quadrature + MCMC; not Lean) | `attack1_anneal_vs_quench.md` §1–§2, `anneal_quadrature.py`, `anneal_mcmc.py`, `hessian_isotropy.py` |
-| Ensemble mean, C | iterating (s + ℓ)/‖s + ℓ‖ has attractor ±ℓ, ⟨b₀²⟩ → 1 | **NUMERICAL** | `analysis/473-dirac-probe/flow_big.py` (#629), cited by FLAG-rule-flow-open |
+| Ensemble mean, C | iterating (s + ℓ)/‖s + ℓ‖ has attractor ±ℓ, ⟨b₀²⟩ → 1 | **NUMERICAL** | `analysis/473-dirac-probe/lmaps_check.py` (#629), cited by FLAG-rule-flow-open |
 
 ### 2a. Existence of the flow
 
@@ -81,7 +81,7 @@ The rows above "Ensemble mean" concern a postulated form and curves hypothesised
 
 ### 2b. The protocol β(t): three live hypotheses (G1)
 
-The protocol is **OPEN as physics** (#635): A, B, C are three live hypotheses, not a decision point. Nothing on record selects among them (Prop 16); no sentence here says the beekeeper decides which.
+The protocol is **OPEN as physics** (#635): A, B, C are three live hypotheses, not a decision point. Nothing on record selects among them (Prop 16).
 
 | Option | Protocol on the horn-1 ensemble | ⟨b₀²⟩ | Evidence | Killed if |
 |---|---|---|---|---|
@@ -144,7 +144,7 @@ Correction to the brief this draft was written from: the AC1(a)/(b) witnesses ar
 | Its kill | Prop 13(b) with the honest class, quoted below | **OPEN** | FLAG-locale-forcing-route-reopened; v0.6 addendum §6 |
 | Spatial first link | Ω(X) ≅ Ω(condensedSetToTopCat X̲) for compactly generated X, ℝ included | **PROVED** | PROOF-spatial-first-link-condensed-locale |
 | Profinite structure inert | the CD index tower's dual Cantor group acts by sign automorphisms; every continuous profinite action on 𝕊 has finite image (Aut(𝕊) a compact Lie group); its discrete measure gives ⟨b₀²⟩ = 1/15 | **NUMERICAL** (numerical + argument, not Lean) | `analysis/473-kill-attack/attack4_dual_cantor_group.md` |
-| b₀ observable | exactly one b₀-linked quantity on record: λ⊥ = 8(1 − b₀²), the transverse Hessian coefficient of V at a vacuum, multiplicity 6, trace 48(1 − b₀²); a landscape modulus ("mass² is a modulus, not forced"; "a landscape statement, not a confirmed physical identification"); no measured constant is tied to it or to b₀ on the record | **PROVED** (the mapping); **OPEN** (any physical identification) | PROOF-vacuum-hessian-transverse-eigenvalue; PROOF-vacuum-hessian-universe-level; PROOF-transverse-space-dim-six-trace; #637 (documented negative) |
+| b₀ observable | exactly one b₀-linked quantity on record: λ⊥ = 8(1 − b₀²), the transverse Hessian coefficient of V at a vacuum, on the 6-dimensional transverse space u^⊥ ∩ Im𝕆 (full-tangent-form rank NOT claimed), transverse trace 48(1 − b₀²); a landscape modulus ("mass² is a modulus, not forced"; "a landscape statement, not a confirmed physical identification"); no measured constant is tied to it or to b₀ on the record | **PROVED** (the mapping); **OPEN** (any physical identification) | PROOF-vacuum-hessian-transverse-eigenvalue; PROOF-vacuum-hessian-universe-level; PROOF-transverse-space-dim-six-trace; #637 (documented negative) |
 | One or many | whether the theory admits domains; effect on distributional predictions | **OPEN** | #638 |
 | Composite rule | no multi-particle composition rule in the hosted layer; Efimov data force one | **OPEN** | FLAG-hosted-composite-rule-open; #669, #672 |
 
@@ -178,8 +178,8 @@ The drafting direction phrased the lesson as "a test that passes only because it
 
 | § | PROVED (anchor ids) | NUMERICAL (analysis files) | POSTULATE | OPEN (issues) |
 |---|---|---|---|---|
-| 1 Carrier | PROOF-substrate-hosting-definition; PROOF-normed-division-tower-existence; PROOF-delta-landscape-descent; PROOF-potential-bounded-by-normForm-sq-frozen-max; PROOF-alternator-vanishes-iff-commute; PROOF-vacuum-parametrisation; PROOF-zero-divisors-sit-at-potential-max; PROOF-42zd; PROOF-seam-zd-witness-kernel-four; PROOF-seam-zd-witness-kernels-coincide; PROOF-seam-zd-witness-kernel-not-subalgebra; PROOF-crystal-hosts-quaternion; PROOF-hosting-equivariant-under-order-three; PR #682, pending merge: PROOF-seam-zd-gram-spectrum-4-8-4, PROOF-seam-top-plane-on-frozen-ridge, PROOF-seam-right-gram-equals-left, PROOF-basis-pair-gram-uniform-bounds | `analysis/473-dirac-probe/orbit_space.py`, `lmaps_check.py`, `aut_s3.py`; ridge dimension (unsourced) | — | #639 (e); converse V = N² ⇒ zero divisor (no issue) |
-| 2 Rule | PROOF-rule-gradient-and-tangent-field; PROOF-potential-descent-along-rule; PROOF-rule-flow-finite-time-uniqueness; PROOF-rule-euler-step-injective; PROOF-rule-descent-avoids-zero-divisors; PROOF-rule-gram-invariants-ode, PROOF-rule-descent-straight-ray, PROOF-ell-coefficient-monotone-along-rule, PROOF-quench-endpoint-closed-form-conditional (ledger 6.9.0) | `analysis/473-kill-attack/attack1_anneal_vs_quench.md`, `quench_exact.py`, `quench_rk4.py`, `anneal_quadrature.py`, `anneal_mcmc.py`, `hessian_isotropy.py`; `analysis/473-dirac-probe/flow_big.py` | P3 (#635); P7 (horn 1, working choice) | P4: FLAG-rule-flow-open, #635; P7 selection: #473 horn-1 audit; P8: #635; AXIOM-1 kill clause: #668, #647 |
+| 1 Carrier | PROOF-substrate-hosting-definition; PROOF-normed-division-tower-existence; PROOF-delta-landscape-descent; PROOF-potential-bounded-by-normForm-sq-frozen-max; PROOF-alternator-vanishes-iff-commute; PROOF-vacuum-parametrisation; PROOF-zero-divisors-sit-at-potential-max; PROOF-42zd; PROOF-seam-zd-witness-kernel-four; PROOF-seam-zd-witness-kernels-coincide; PROOF-seam-zd-witness-kernel-not-subalgebra; PROOF-crystal-hosts-quaternion; PROOF-hosting-equivariant-under-order-three; PR #682, pending merge: PROOF-seam-zd-gram-spectrum-4-8-4, PROOF-seam-top-plane-on-frozen-ridge, PROOF-seam-right-gram-equals-left, PROOF-basis-pair-gram-uniform-bounds | `analysis/473-dirac-probe/orbit_space.py`, `lmaps_check.py`, `aut_s3.py` (ridge dimension, line 169) | — | #639 (e); converse V = N² ⇒ zero divisor (no issue) |
+| 2 Rule | PROOF-rule-gradient-and-tangent-field; PROOF-potential-descent-along-rule; PROOF-rule-flow-finite-time-uniqueness; PROOF-rule-euler-step-injective; PROOF-rule-descent-avoids-zero-divisors; PROOF-rule-gram-invariants-ode, PROOF-rule-descent-straight-ray, PROOF-ell-coefficient-monotone-along-rule, PROOF-quench-endpoint-closed-form-conditional (ledger 6.9.0) | `analysis/473-kill-attack/attack1_anneal_vs_quench.md`, `quench_exact.py`, `quench_rk4.py`, `anneal_quadrature.py`, `anneal_mcmc.py`, `hessian_isotropy.py`; `analysis/473-dirac-probe/lmaps_check.py` | P3 (#635); P7 (horn 1, working choice) | P4: FLAG-rule-flow-open, #635; P7 selection: #473 horn-1 audit; P8: #635; AXIOM-1 kill clause: #668, #647 |
 | 3 Hosting | PROOF-substrate-hosting-definition; PROOF-crystal-hosts-quaternion; PROOF-local-spectrum-at-crystal; PROOF-hosting-identity-fails-in-flight; PROOF-hosting-equivariant-under-order-three | — | — | #634/#639 (u canonical); POST-observer-associativity |
 | 3a Witnesses | PROOF-s3-hspace; PROOF-skyrmion-baryon-complete-invariant; PROOF-substrate-baryon-additive | — | — | #639 (c)/(e); #595; #576; #554 |
 | 4 Transition state | PROOF-in-flight-first-order-data-constrains-at-most-one-direction; PROOF-level-set-invariants-rule-blind; PROOF-vacuum-sublocale-v-natural; PROOF-sublevel-infimum-rule-independent | — | — | positive account: **no issue**; CONJ-condensed-math-for-transition-state |
