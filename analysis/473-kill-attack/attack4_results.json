@@ -1,0 +1,53 @@
+{
+ "A1_sigma_vs_flowlib_n3_maxdiff": 0.0,
+ "A1_sigma_vs_flowlib_n4_maxdiff": 0.0,
+ "A2_all_characters_aut_n3": true,
+ "A2_noncharacter_aut_count_n3": 0,
+ "A2_all_characters_aut_n4": true,
+ "A2_noncharacter_aut_count_n4": 0,
+ "A2_exhaustive_n3_count": 8,
+ "A3_fix_ell": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7
+ ],
+ "A3_S3_shape": {
+  "0": [
+   [
+    1,
+    1
+   ],
+   1
+  ],
+  "8": [
+   [
+    1,
+    -1
+   ],
+   -1
+  ]
+ },
+ "A4_n_zds": 84,
+ "A4_n_planes": 42,
+ "A4_G4_orbits_on_84": 42,
+ "B0_haar_avg_is_real_projection": 8.881784197001252e-16,
+ "B1_b0sq_basis": 0.06666666666666667,
+ "B2_zd_points": [
+  [
+   0.707107,
+   0.707107,
+   0.0,
+   0.0,
+   1.0,
+   45.0
+  ]
+ ],
+ "B3_b0sq_basis_sum_vacua": 0.11111117987755557,
+ "B3_b0sq_all_210": 0.06666670792653334,
+ "B3_b0sq_all_subsets": 0.06666666666666665
+}
