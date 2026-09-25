@@ -1,6 +1,6 @@
 # The QBP substrate, first draft v0.1 (2026-09-25)
 
-**Status:** assembly document for #684 (parent #473), branch `research/473-substrate-first-draft`, author qbp-oppenheimer. The substrate stated in one place, every claim tagged. **No new mathematics, no kill's status touched, no acceptance criterion of #473 claimed.** Ledger of record: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` 6.9.0 (335 anchors, master `bd5ddbc`, PR #681 merged). Tier-2 review.
+**Status:** assembly document for #684 (parent #473), branch `research/473-substrate-first-draft`, author qbp-oppenheimer. The substrate stated in one place, every claim tagged. **No new mathematics, no kill's status touched, no acceptance criterion of #473 claimed.** Ledger of record: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` 6.9.0 (335 anchors, master `bd5ddbc`, PR #681 merged). Tier-3 review (docs/foundations is theory-bearing).
 
 ## 0. Reading guide
 
@@ -18,7 +18,7 @@ This is the assembly of ingredients scattered across six addenda, five attack re
 | Object | Statement | Tag | Source |
 |---|---|---|---|
 | Algebra 𝕊 | 𝕊 = CD(𝕆) = `CDAlg ℝ 4` as ℝ¹⁶; s = a + bℓ with octonions a = `cdLo s`, b = `cdHi s` | **PROVED** | PROOF-substrate-hosting-definition |
-| Metric N | the Cayley–Dickson norm form, positive definite at level 4 (`N_pos_of_ne_zero`); the only metric on record | **PROVED** (the norm form and its positivity); *record statement, not a theorem* (only metric on record) | PROOF-normed-division-tower-existence (composition); PROOF-substrate-hosting-definition (`N_pos_of_ne_zero`, positivity); hosting definition §0 (only metric on record, no issue) |
+| Metric N | the Cayley–Dickson norm form, positive definite at level 4 (`N_pos_of_ne_zero`); the only metric on record (*record statement, not a theorem*) | **PROVED** (the norm form and its positivity) | PROOF-normed-division-tower-existence (composition); PROOF-substrate-hosting-definition (`N_pos_of_ne_zero`, positivity); hosting definition §0 (only metric on record, no issue) |
 | StateSphere | `{s : s₀ = 0 ∧ N s = 1}`, the imaginary unit sphere S¹⁴ | **PROVED** | PROOF-substrate-hosting-definition |
 | Potential V | V(s) = N([a, b]) = 4(AC − P²), A = N(Im a), C = N(Im b), P = ⟪Im a, Im b⟫, unconditionally; V ≥ 0; V ≤ N(s)² | **PROVED** | PROOF-delta-landscape-descent; PROOF-potential-bounded-by-normForm-sq-frozen-max |
 | Gram invariants | V depends on (A, C, P) only, so it descends to S¹⁴/G₂; with B = b₀² these are §2's coordinates | **PROVED** | PROOF-delta-landscape-descent |
@@ -50,7 +50,8 @@ The eight clauses of the G1 draft (#635, issuecomment-5828899452); substance rep
 | P4 Existence | integral curves exist through every initial state | **OPEN** | FLAG-rule-flow-open; #635; §2a |
 | P5 Consequences | the table below | **PROVED** (conditional) | PROOF-rule-gram-invariants-ode; PROOF-rule-descent-straight-ray; PROOF-ell-coefficient-monotone-along-rule; PROOF-quench-endpoint-closed-form-conditional (ledger 6.9.0) |
 | P6 No merging | the table below | **PROVED** (conditional) | PROOF-rule-flow-finite-time-uniqueness; PROOF-rule-euler-step-injective; PROOF-rule-descent-avoids-zero-divisors |
-| P7 Initial ensemble | horn 1 (N's normalised surface measure on StateSphere) is the working ensemble explored first (zero free parameters; the reference measure is itself the postulate, per the 2026-09-06 gloss); Q_μ (μ ≠ 1) and the thermal family e^{−β_init V}·dN (β_init ≠ 0) are retained as live alternatives with their own kills; no evidence selects among the three; their numbers have not been computed | **POSTULATE** (horn 1 as the working choice); **OPEN** (the selection) | #473 horn-1 audit, issuecomment-5832434500 (correcting issuecomment-5555310567 per the 2026-09-06 gloss, issuecomment-5555866101) |
+| P7 Initial ensemble (working choice) | horn 1 (N's normalised surface measure on StateSphere) is the working ensemble explored first, zero free parameters; the reference measure is itself the postulate (2026-09-06 gloss) | **POSTULATE** | issuecomment-5832434500 (correcting issuecomment-5555310567 per the 2026-09-06 gloss, issuecomment-5555866101) |
+| P7′ Ensemble selection | Q_μ (μ ≠ 1) and the thermal family e^{−β_init V}·dN (β_init ≠ 0) are retained as live alternatives with their own kills; no evidence selects among the three; their numbers have not been computed | **OPEN** | #473 horn-1 audit |
 | P8 Protocol β(t) | A quench / B anneal / C ℓ-axis map, carried as three live hypotheses; not a decision point | **OPEN** | #635 (G1 correction, issuecomment-5832433972); §2b |
 
 **Consequences of the form.** Every row ASSUMES γ is an integral curve of F; P4 is open, so no row asserts a trajectory exists.
@@ -144,7 +145,8 @@ Correction to the brief this draft was written from: the AC1(a)/(b) witnesses ar
 | Its kill | Prop 13(b) with the honest class, quoted below | **OPEN** | FLAG-locale-forcing-route-reopened; v0.6 addendum §6 |
 | Spatial first link | Ω(X) ≅ Ω(condensedSetToTopCat X̲) for compactly generated X, ℝ included | **PROVED** | PROOF-spatial-first-link-condensed-locale |
 | Profinite structure inert | the CD index tower's dual Cantor group acts by sign automorphisms; every continuous profinite action on 𝕊 has finite image (Aut(𝕊) a compact Lie group); its discrete measure gives ⟨b₀²⟩ = 1/15 | **NUMERICAL** (numerical + argument, not Lean) | `analysis/473-kill-attack/attack4_dual_cantor_group.md` |
-| b₀ observable | exactly one b₀-linked quantity on record: λ⊥ = 8(1 − b₀²), the transverse Hessian coefficient of V at a vacuum, on the 6-dimensional transverse space u^⊥ ∩ Im𝕆 (full-tangent-form rank NOT claimed), transverse trace 48(1 − b₀²); a landscape modulus ("mass² is a modulus, not forced"; "a landscape statement, not a confirmed physical identification"); no measured constant is tied to it or to b₀ on the record | **PROVED** (the mapping); **OPEN** (any physical identification) | PROOF-vacuum-hessian-transverse-eigenvalue; PROOF-vacuum-hessian-universe-level; PROOF-transverse-space-dim-six-trace; #637 (documented negative) |
+| b₀-linked quantity | exactly one b₀-linked quantity on record: λ⊥ = 8(1 − b₀²), the transverse Hessian coefficient of V at a vacuum, on the 6-dimensional transverse space u^⊥ ∩ Im𝕆 (full-tangent-form rank NOT claimed), transverse trace 48(1 − b₀²); a landscape modulus ("mass² is a modulus, not forced"; "a landscape statement, not a confirmed physical identification") | **PROVED** | PROOF-vacuum-hessian-transverse-eigenvalue; PROOF-vacuum-hessian-universe-level; PROOF-transverse-space-dim-six-trace |
+| b₀ physical identification | no measured constant is tied to λ⊥ or to b₀ on the record | **OPEN** | #637 (documented negative) |
 | One or many | whether the theory admits domains; effect on distributional predictions | **OPEN** | #638 |
 | Composite rule | no multi-particle composition rule in the hosted layer; Efimov data force one | **OPEN** | FLAG-hosted-composite-rule-open; #669, #672 |
 
@@ -192,7 +194,7 @@ The drafting direction phrased the lesson as "a test that passes only because it
 | Item | What has to exist | Owner |
 |---|---|---|
 | Protocol hypotheses carried | A / B / C carried with kills K1–K4 as physics questions, not ruled; horn-1 alternatives' (Q_μ, thermal family) numbers computed if funded; #637 negative stands unless a second observable appears | #635; #473 horn-1 audit |
-| G2 landed | AXIOM-1 kill_condition[0] in positive-measure form, ratified, beekeeper's go; before or with any `POST-…` encode | #668 (+ #647) |
+| G2 landed | AXIOM-1 kill_condition[0] in positive-measure form (PR #687): the wording ratified on the review axes (§I4 + schema); the ROOT-record edit itself is a **process** authorisation (a constitutional-layer write, the beekeeper's by federation rule), not a ruling on the kill's physics; lands before or with any `POST-…` encode | #668 (+ #647) |
 | G5 merged | PR #682 on master, so the remaining four "pending merge" citations resolve (PR #681's four anchors already landed, ledger 6.9.0) | #684 G5 |
 | Positive in-flight account | a definition (not a description) of the in-flight region consistent with §4's negatives; needs an issue first | none yet |
 | AC2 candidate | a Prop 13(b)-class mechanism passing the relocation test, or a b₀ observable with a distributional statement | FLAG-locale-forcing-route-reopened; #637; #638 |
