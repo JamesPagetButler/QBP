@@ -31,10 +31,12 @@
     (`top_plane_zero_divisor`) — annihilated on both sides by the single element
     `e₁ − e₁₀`.  So the top plane lies on the zero-divisor ridge, and
     quantitatively `V(t) = N(t)²` on it (`top_plane_on_ridge`), where
-    `V(x) = ‖[cdLo x, cdHi x]‖²` is the attack-2 potential.  This DERIVES, for the
-    canonical zero divisors, the property `NoAutonomousDynamics` could only record
-    as OBSERVED ("the top singular subspace lies on the ridge V = 1 … observed for
-    100/100 t, NOT derived").
+    `V(x) = ‖[cdLo x, cdHi x]‖²` is the attack-2 potential.  This DERIVES — **for
+    `L_z` and `R_z` at the canonical basis-sum zero-divisor generators only** — the
+    property `NoAutonomousDynamics` could only record as OBSERVED ("the top singular
+    subspace lies on the ridge V = 1 … observed for 100/100 t, NOT derived").  That
+    caveat also names the third map `ad_t = L_t − R_t` and quantifies over a GENERIC
+    unforced `t`: both remain observed-only (see "What this file does NOT prove").
   * **RIGHT multiplication has the SAME Gram operator** (§6).  `(x·z)·z = z·(z·x)`
     for every `x` and for both signs `z = e₁ ± e₁₀` (`seam_gram_lr`,
     `seam_gram_lr_m`) — a sign-table identity, not a formal consequence, since 𝕊 is
@@ -50,15 +52,38 @@
     (`basisPair_sq_split`) is proved for every such pair too.  So "the top plane
     of one sign is the kernel of the other sign" is uniform; what is proved for
     the witness only is the *multiplicity* count 4/8/4.
+  * **The uniform statements are named declarations** (§2a), over the pair-generic
+    left multiplication `sbpL`, Gram operator `sbpG = −L_z∘L_z` and eigenspace
+    `sbpEig`: `sbpGram_eq` (`sbpG` really is `L_zᵀL_z`), `sbpG_rayleigh`,
+    **`sbpG_eigenvalue_mem_Icc`** (`spec(G_z) ⊆ [0,4]`, i.e. singular values of
+    `L_z` in `[0,2]`, for `z = e_a ± e_b`), **`sbpEig_four_eq`**
+    (`E₄(G₊) = ker L_{z₋}`) and **`sbpEig_zero_eq`** (`E₀(G_z) = ker L_z`, either
+    sign).  `sbpL_seam` / `sbpG_seam` / `sbpEig_seam` record that the witness
+    operators of §4 are exactly the `{1,10}` instances, so no statement of §2a is
+    about a different object.  None of them fixes a multiplicity.
+  * **The decomposition is genuinely ORTHOGONAL** (§4e): `G` is self-adjoint
+    (`seamG_self_adjoint`), hence eigenvectors for distinct eigenvalues are
+    `bil`-orthogonal (`bil_eq_zero_of_seamEig_ne`), giving `T ⊥ M`, `T ⊥ K`,
+    `M ⊥ K` (`bil_topSpan_midSpan`, `bil_topSpan_seamKerSpan`,
+    `bil_midSpan_seamKerSpan`); and the three spaces exhaust 𝕊 as submodules,
+    `M ⊔ T ⊔ K = ⊤` (`midSpan_sup_topSpan_sup_seamKerSpan`), not merely by the
+    finrank sum.  **Completeness is over the REAL spectrum** (`seamEig_eq_bot_of_ne`
+    quantifies over `c : ℝ`) and that costs nothing: `proj_decomp` plus the three
+    eigen-actions DIAGONALISE `G` over ℝ, so the complexified operator is diagonal
+    with the same entries `{0, 2, 4}` — no complex eigenvalue can hide.
 
   ## What this file does NOT prove
 
   * **The 4/8/4 multiplicities are proved for `z = e₁ + e₁₀` ONLY.**  For the other
-    83 basis-sum zero divisors the uniform facts above give `spec(G) ⊆ [0,4]`,
-    `E₄(G₊) = ker L_{z₋}` and `E₀(G₊) = ker L_{z₊}`, but NOT that those kernels are
+    83 basis-sum zero divisors the uniform facts above give `spec(G) ⊆ [0,4]`
+    (`sbpG_eigenvalue_mem_Icc`), `E₄(G₊) = ker L_{z₋}` (`sbpEig_four_eq`) and
+    `E₀(G₊) = ker L_{z₊}` (`sbpEig_zero_eq`), but NOT that those kernels are
     4-dimensional, and NOT that the remaining spectrum is the single value 2.  The
     numerical claim (attack-2 §2: one spectrum `{2 ×4, √2 ×8, 0 ×4}` for all 84) is
     NOT established here.
+  * **Nothing about a generic unforced `t`.**  Every statement below is about a
+    basis SUM `e_a ± e_b`; `NoAutonomousDynamics`' caveat quantifies over random
+    `t`, which is untouched here.
   * **Nothing about `ad_z = L_z − R_z`.**  Attack 2 reports `ad_z` singular values
     `{4 ×4, 2√2 ×6, 0 ×6}` (dims 4/6/6, a DIFFERENT decomposition from `L_z`'s
     4/8/4).  Neither the `G₊ + G₋ = 4` mechanism nor the left/right Gram identity
@@ -237,6 +262,127 @@ theorem sbp_sq_eq_zero_iff (a b : Fin (2^4)) (ha : a ≠ 0) (hb : b ≠ 0) (s : 
     exact (alt_N_eq_zero_iff _).mp hN
   · intro h
     rw [h, alt_mul_zero]
+
+/-! ### 2a. The uniform Gram operator of a basis-sum pair, and its spectrum
+
+Everything in §2 is pair-generic, so the three *spectral* statements it implies are
+pair-generic too.  They are recorded here as named declarations (rather than left
+as "immediate corollaries") because ledger anchors must cite declarations:
+
+* `sbpG_eigenvalue_mem_Icc` — `spec(G_z) ⊆ [0, 4]` for `z = e_a ± e_b`, i.e. the
+  singular values of `L_z` lie in `[0, 2]`;
+* `sbpEig_four_eq` — `E₄(G₊) = ker L_{z₋}`;
+* `sbpEig_zero_eq` — `E₀(G_z) = ker L_z` (either sign).
+
+What is NOT pair-generic, and is proved for the witness `{1, 10}` only in §4, is the
+*multiplicity* count `4 / 8 / 4` (equivalently: that `E₂` is all that is left over). -/
+
+/-- `N((e_a−e_b)·x) ≤ 4·N(x)` — the `−`-sign twin of `N_basisPair_le`. -/
+theorem N_basisPair_le_neg (a b : Fin (2^4)) (x : CDAlg ℝ 4) :
+    N (sbp a b (-1) * x) ≤ 4 * N x := by
+  have hsplit := N_basisPair_split a b x
+  have hnn : 0 ≤ N (sbp a b 1 * x) := by
+    rw [N_def]; exact Finset.sum_nonneg (fun i _ => sq_nonneg _)
+  linarith
+
+/-- Left multiplication by `z = e_a + s·e_b` as an ℝ-linear endomorphism, for an
+    ARBITRARY basis pair (the pair-generic version of `seamL` / `seamLm`). -/
+def sbpL (a b : Fin (2^4)) (s : ℤ) : CDAlg ℝ 4 →ₗ[ℝ] CDAlg ℝ 4 where
+  toFun y := sbp a b s * y
+  map_add' y z := mul_add_right (sbp a b s) y z
+  map_smul' r y := mul_smul_right r (sbp a b s) y
+
+@[simp] theorem sbpL_apply (a b : Fin (2^4)) (s : ℤ) (y : CDAlg ℝ 4) :
+    sbpL a b s y = sbp a b s * y := rfl
+
+/-- The Gram operator `L_zᵀL_z` of `z = e_a + s·e_b`, realised as `−L_z∘L_z`
+    (legitimate by `sbp_skew`: `L_z` is skew-adjoint for every basis pair). -/
+noncomputable def sbpG (a b : Fin (2^4)) (s : ℤ) : CDAlg ℝ 4 →ₗ[ℝ] CDAlg ℝ 4 :=
+  -(sbpL a b s ∘ₗ sbpL a b s)
+
+@[simp] theorem sbpG_apply (a b : Fin (2^4)) (s : ℤ) (y : CDAlg ℝ 4) :
+    sbpG a b s y = -(sbp a b s * (sbp a b s * y)) := rfl
+
+/-- **`sbpG` IS the Gram operator of `L_z`, uniformly:** `⟨L_z y, L_z w⟩ = ⟨y, G_z w⟩`
+    for every basis pair `e_a, e_b` (`a, b ≠ 0`) and either sign.  No adjoint is
+    postulated; this is the pair-generic form of `seamGram_eq`. -/
+theorem sbpGram_eq (a b : Fin (2^4)) (ha : a ≠ 0) (hb : b ≠ 0) (s : ℤ)
+    (y w : CDAlg ℝ 4) : bil (sbpL a b s y) (sbpL a b s w) = bil y (sbpG a b s w) := by
+  rw [sbpL_apply, sbpL_apply, sbp_skew a b ha hb s y (sbp a b s * w), sbpG_apply,
+    bil_neg_right]
+
+/-- Uniform Rayleigh form: `⟨y, G_z y⟩ = N(z·y)`.  The Gram quadratic form IS the
+    squared length of the image, for every basis pair. -/
+theorem sbpG_rayleigh (a b : Fin (2^4)) (ha : a ≠ 0) (hb : b ≠ 0) (s : ℤ)
+    (y : CDAlg ℝ 4) : bil y (sbpG a b s y) = N (sbp a b s * y) := by
+  rw [← sbpGram_eq a b ha hb s, sbpL_apply, ← N_eq_bil]
+
+/-- The `c`-eigenspace of the uniform Gram operator `G_z`, `z = e_a + s·e_b`. -/
+noncomputable def sbpEig (a b : Fin (2^4)) (s : ℤ) (c : ℝ) : Submodule ℝ (CDAlg ℝ 4) :=
+  LinearMap.ker (sbpG a b s - c • LinearMap.id)
+
+theorem mem_sbpEig (a b : Fin (2^4)) (s : ℤ) (c : ℝ) (x : CDAlg ℝ 4) :
+    x ∈ sbpEig a b s c ↔ sbpG a b s x = c • x := by
+  rw [sbpEig, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply,
+    LinearMap.id_apply, sub_eq_zero]
+
+/-- **UNIFORM SPECTRAL BOUND — `spec(G_z) ⊆ [0, 4]` for EVERY basis-sum pair.**
+    If `x ≠ 0` and `G_z x = c·x` for `z = e_a ± e_b` (`a, b ≠ 0`), then
+    `0 ≤ c ≤ 4`; equivalently the singular values of `L_z` all lie in `[0, 2]`.
+    The eigenvalue is a Rayleigh quotient, `c = N(z·x)/N(x)`, and
+    `0 ≤ N(z·x) ≤ 4·N(x)` by `N_basisPair_split` (positivity of the OTHER sign's
+    Gram form).  The bound is over the REAL spectrum; `G_z` is self-adjoint by
+    `sbpGram_eq`, so no complex eigenvalue can escape it. -/
+theorem sbpG_eigenvalue_mem_Icc (a b : Fin (2^4)) (ha : a ≠ 0) (hb : b ≠ 0) (s : ℤ)
+    (hs : s = 1 ∨ s = -1) (c : ℝ) (x : CDAlg ℝ 4) (hx : x ≠ 0)
+    (hmem : x ∈ sbpEig a b s c) : c ∈ Set.Icc (0 : ℝ) 4 := by
+  rw [mem_sbpEig] at hmem
+  have hNnn : ∀ v : CDAlg ℝ 4, 0 ≤ N v := fun v => by
+    rw [N_def]; exact Finset.sum_nonneg (fun i _ => sq_nonneg _)
+  have hNx : 0 < N x :=
+    lt_of_le_of_ne (hNnn x) (fun h => hx ((alt_N_eq_zero_iff x).mp h.symm))
+  have hc : c * N x = N (sbp a b s * x) := by
+    rw [← sbpG_rayleigh a b ha hb s x, hmem, bil_smul_right, ← N_eq_bil]
+  have hhi : N (sbp a b s * x) ≤ 4 * N x := by
+    rcases hs with rfl | rfl
+    · exact N_basisPair_le a b x
+    · exact N_basisPair_le_neg a b x
+  refine Set.mem_Icc.mpr ⟨?_, ?_⟩
+  · have h0 : (0 : ℝ) * N x ≤ c * N x := by rw [zero_mul, hc]; exact hNnn _
+    exact le_of_mul_le_mul_right h0 hNx
+  · have h4 : c * N x ≤ (4 : ℝ) * N x := by rw [hc]; exact hhi
+    exact le_of_mul_le_mul_right h4 hNx
+
+/-- **UNIFORM TOP EIGENSPACE — `E₄(G₊) = ker L_{z₋}` for EVERY basis pair.**
+    For `z± = e_a ± e_b` with `a, b ≠ 0`: `G₊ x = 4x ↔ z₋·x = 0`.  So "the top
+    eigenspace of one sign is the kernel of the other sign" is pair-generic; only
+    its DIMENSION (4, for the witness) is not.  Corollary of `basisPair_sq_split`
+    (`G₊ + G₋ = 4·id`) and `sbp_sq_eq_zero_iff`. -/
+theorem sbpEig_four_eq (a b : Fin (2^4)) (ha : a ≠ 0) (hb : b ≠ 0) :
+    sbpEig a b 1 4 = LinearMap.ker (sbpL a b (-1)) := by
+  ext x
+  rw [mem_sbpEig, LinearMap.mem_ker, sbpL_apply, sbpG_apply]
+  have hsplit := basisPair_sq_split a b ha hb x
+  constructor
+  · intro h
+    rw [neg_eq_iff_eq_neg] at h
+    have hA : sbp a b 1 * (sbp a b 1 * x) = (-4 : ℝ) • x := by rw [h]; module
+    rw [hA, add_eq_left] at hsplit
+    exact (sbp_sq_eq_zero_iff a b ha hb (-1) x).mp hsplit
+  · intro h
+    have hB : sbp a b (-1) * (sbp a b (-1) * x) = 0 := by rw [h, alt_mul_zero]
+    rw [hB, add_zero] at hsplit
+    rw [hsplit]
+    module
+
+/-- **UNIFORM KERNEL EIGENSPACE — `E₀(G_z) = ker L_z` for EVERY basis pair and
+    either sign:** `G_z x = 0 ↔ z·x = 0`.  This is `sbp_sq_eq_zero_iff` in
+    eigenspace form (skew-adjointness plus positive-definiteness of `N`). -/
+theorem sbpEig_zero_eq (a b : Fin (2^4)) (ha : a ≠ 0) (hb : b ≠ 0) (s : ℤ) :
+    sbpEig a b s 0 = LinearMap.ker (sbpL a b s) := by
+  ext x
+  rw [mem_sbpEig, LinearMap.mem_ker, sbpL_apply, sbpG_apply, zero_smul, neg_eq_zero]
+  exact sbp_sq_eq_zero_iff a b ha hb s x
 
 /-! ## 3. The two signs of the seam plane
 
@@ -462,6 +608,20 @@ noncomputable def seamEig (c : ℝ) : Submodule ℝ (CDAlg ℝ 4) :=
 theorem mem_seamEig (c : ℝ) (x : CDAlg ℝ 4) : x ∈ seamEig c ↔ seamG x = c • x := by
   rw [seamEig, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply,
     LinearMap.id_apply, sub_eq_zero]
+
+/-! The witness operators of this section are the `{1, 10}` instances of the uniform
+operators of §2a — so every uniform statement there applies verbatim to `seamG`. -/
+
+/-- `L_{e₁+e₁₀}` IS the uniform `sbpL 1 10 1` (`seamX = sbp 1 10 1` by definition). -/
+theorem sbpL_seam : sbpL 1 10 1 = seamL := rfl
+
+/-- The witness Gram operator IS the uniform Gram operator at `{1, 10}`. -/
+theorem sbpG_seam : sbpG 1 10 1 = seamG := by rw [sbpG, seamG, sbpL_seam]
+
+/-- The witness eigenspaces ARE the uniform eigenspaces at `{1, 10}`; so
+    `sbpG_eigenvalue_mem_Icc`, `sbpEig_four_eq`, `sbpEig_zero_eq` specialise to §4. -/
+theorem sbpEig_seam (c : ℝ) : sbpEig 1 10 1 c = seamEig c := by
+  rw [sbpEig, seamEig, sbpG_seam]
 
 /-- **Eigenvalue 0 — the kernel.**  `G x = 0 ↔ z·x = 0`. -/
 theorem seamEig_zero_eq : seamEig 0 = seamKerSpan := by
@@ -838,6 +998,68 @@ theorem seam_gram_spectrum_exhaustive :
   have h0 := finrank_seamEig_zero
   omega
 
+/-! ### 4e. The decomposition is genuinely ORTHOGONAL, and it exhausts 𝕊
+
+`G` is self-adjoint for `bil` (`seamG_self_adjoint`, two lines from `seamGram_eq`
+and symmetry of `bil`), so eigenvectors belonging to distinct eigenvalues are
+`bil`-orthogonal (`bil_eq_zero_of_seamEig_ne`).  Hence `T ⊥ M`, `T ⊥ K`, `M ⊥ K`
+are theorems, not a coordinate observation, and "orthogonal decomposition" is
+earned.  `midSpan ⊔ topSpan ⊔ seamKerSpan = ⊤` records the exhaustion as a
+`Submodule` statement rather than only as the finrank sum `4 + 8 + 4 = 16`. -/
+
+/-- **`G` is self-adjoint:** `⟨y, G w⟩ = ⟨w, G y⟩`.  (Immediate from `seamGram_eq`
+    both ways plus symmetry of `bil`.) -/
+theorem seamG_self_adjoint (y w : CDAlg ℝ 4) : bil y (seamG w) = bil w (seamG y) := by
+  rw [← seamGram_eq, ← seamGram_eq, QBP.Foundations.CrystalHosting.bil_comm'
+    (seamL y) (seamL w)]
+
+/-- **Eigenvectors for distinct eigenvalues are orthogonal.**  If `G x = c·x`,
+    `G y = d·y` and `c ≠ d`, then `⟨x, y⟩ = 0`. -/
+theorem bil_eq_zero_of_seamEig_ne (c d : ℝ) (hcd : c ≠ d) (x y : CDAlg ℝ 4)
+    (hx : x ∈ seamEig c) (hy : y ∈ seamEig d) : bil x y = 0 := by
+  rw [mem_seamEig] at hx hy
+  have h1 : bil x (seamG y) = d * bil x y := by rw [hy, bil_smul_right]
+  have h2 : bil x (seamG y) = c * bil x y := by
+    rw [seamG_self_adjoint, hx, bil_smul_right,
+      QBP.Foundations.CrystalHosting.bil_comm' y x]
+  have hzero : (c - d) * bil x y = 0 := by rw [sub_mul, ← h1, ← h2]; ring
+  rcases mul_eq_zero.mp hzero with h | h
+  · exact absurd (sub_eq_zero.mp h) hcd
+  · exact h
+
+/-- `T ⊥ M`: the top plane is `bil`-orthogonal to the middle space. -/
+theorem bil_topSpan_midSpan (t m : CDAlg ℝ 4) (ht : t ∈ topSpan) (hm : m ∈ midSpan) :
+    bil t m = 0 := by
+  refine bil_eq_zero_of_seamEig_ne 4 2 (by norm_num) t m ?_ ?_
+  · rw [seamEig_four_eq]; exact ht
+  · rw [seamEig_two_eq]; exact hm
+
+/-- `T ⊥ K`: the top plane is `bil`-orthogonal to the kernel plane. -/
+theorem bil_topSpan_seamKerSpan (t k : CDAlg ℝ 4) (ht : t ∈ topSpan)
+    (hk : k ∈ seamKerSpan) : bil t k = 0 := by
+  refine bil_eq_zero_of_seamEig_ne 4 0 (by norm_num) t k ?_ ?_
+  · rw [seamEig_four_eq]; exact ht
+  · rw [seamEig_zero_eq]; exact hk
+
+/-- `M ⊥ K`: the middle space is `bil`-orthogonal to the kernel plane. -/
+theorem bil_midSpan_seamKerSpan (m k : CDAlg ℝ 4) (hm : m ∈ midSpan)
+    (hk : k ∈ seamKerSpan) : bil m k = 0 := by
+  refine bil_eq_zero_of_seamEig_ne 2 0 (by norm_num) m k ?_ ?_
+  · rw [seamEig_two_eq]; exact hm
+  · rw [seamEig_zero_eq]; exact hk
+
+/-- **The three eigenspaces EXHAUST 𝕊** as submodules: `M ⊔ T ⊔ K = ⊤`.  (Immediate
+    from `proj_decomp` plus the three membership lemmas.) -/
+theorem midSpan_sup_topSpan_sup_seamKerSpan :
+    midSpan ⊔ topSpan ⊔ seamKerSpan = ⊤ := by
+  refine top_unique (fun x _ => ?_)
+  rw [proj_decomp x]
+  exact Submodule.add_mem _
+    (Submodule.add_mem _
+      (Submodule.mem_sup_left (Submodule.mem_sup_left (projMid_mem x)))
+      (Submodule.mem_sup_left (Submodule.mem_sup_right (projTop_mem x))))
+    (Submodule.mem_sup_right (projKer_mem x))
+
 /-! ## 5. The top plane lies on the zero-divisor ridge
 
 Two statements, one qualitative and one quantitative.  Qualitatively: EVERY
@@ -1211,6 +1433,18 @@ Every declaration in this file is listed; each must depend only on
 #print axioms basisPair_sq_split
 #print axioms sbp_skew
 #print axioms sbp_sq_eq_zero_iff
+#print axioms N_basisPair_le_neg
+#print axioms sbpL
+#print axioms sbpL_apply
+#print axioms sbpG
+#print axioms sbpG_apply
+#print axioms sbpGram_eq
+#print axioms sbpG_rayleigh
+#print axioms sbpEig
+#print axioms mem_sbpEig
+#print axioms sbpG_eigenvalue_mem_Icc
+#print axioms sbpEig_four_eq
+#print axioms sbpEig_zero_eq
 #print axioms seamXm
 #print axioms seamXm_ne_zero
 #print axioms t1
@@ -1251,6 +1485,9 @@ Every declaration in this file is listed; each must depend only on
 #print axioms seamG_rayleigh
 #print axioms seamEig
 #print axioms mem_seamEig
+#print axioms sbpL_seam
+#print axioms sbpG_seam
+#print axioms sbpEig_seam
 #print axioms seamEig_zero_eq
 #print axioms seam_sq_split
 #print axioms seamEig_four_eq
@@ -1293,6 +1530,12 @@ Every declaration in this file is listed; each must depend only on
 #print axioms seamG_cubic
 #print axioms seamEig_eq_bot_of_ne
 #print axioms seam_gram_spectrum_exhaustive
+#print axioms seamG_self_adjoint
+#print axioms bil_eq_zero_of_seamEig_ne
+#print axioms bil_topSpan_midSpan
+#print axioms bil_topSpan_seamKerSpan
+#print axioms bil_midSpan_seamKerSpan
+#print axioms midSpan_sup_topSpan_sup_seamKerSpan
 #print axioms potV
 #print axioms top_plane_zero_divisor
 #print axioms top_generators_are_zero_divisors

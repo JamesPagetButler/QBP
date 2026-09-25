@@ -1,8 +1,8 @@
 # Lean target 6(ii) — the zero-divisor spectrum, mechanised
 
-**Artifact:** `proofs/QBP/Foundations/SeamSpectrum.lean` (1331 lines, 132 declarations)
+**Artifact:** `proofs/QBP/Foundations/SeamSpectrum.lean` (1574 lines, 153 declarations)
 **Wiring:** imported from the `proofs/QBP/Foundations.lean` aggregator.
-**Status:** 0 `sorry`, 0 `native_decide`, 0 vacuous `: True :=`; all 132 declarations carry a
+**Status:** 0 `sorry`, 0 `native_decide`, 0 vacuous `: True :=`; all 153 declarations carry a
 `#print axioms` line and every one resolves to a subset of `{propext, Classical.choice, Quot.sound}`.
 **Numerical origin (flashlight, not evidence):** `analysis/473-kill-attack/attack2_zd_words.md` §2, §3
 (branch `research/473-kill-attack-2`). Nothing in this file cites a numerical run as a premise.
@@ -28,7 +28,15 @@ All statements are about the real algebra `𝕊 = CDAlg ℝ 4` with `N` the Eucl
 
 So the funded claim — **`L_zᵀL_z` has eigenvalues 4 (×4), 2 (×8), 0 (×4)**, i.e. singular values
 `2 (×4)`, `√2 (×8)`, `0 (×4)` for `L_z` — is proved *with the eigenspaces identified exactly* and the
-eigenvalue list proved complete, via an explicit orthogonal-in-coordinates decomposition of ℝ¹⁶.
+eigenvalue list proved complete, via an explicit orthogonal decomposition of ℝ¹⁶.
+
+**Completeness is over the real spectrum, and that is not a restriction.** `seamEig_eq_bot_of_ne`
+quantifies over `c : ℝ`; but `proj_decomp` together with the three eigen-actions *diagonalises* `G` over
+ℝ (`G` is even self-adjoint, `seamG_self_adjoint`), so the complexified operator is diagonal with the
+same entries — no complex eigenvalue can hide. The decomposition is `bil`-orthogonal as a theorem, not
+merely in coordinates: `bil_topSpan_midSpan`, `bil_topSpan_seamKerSpan`, `bil_midSpan_seamKerSpan`, and
+it exhausts 𝕊 as submodules (`midSpan_sup_topSpan_sup_seamKerSpan : M ⊔ T ⊔ K = ⊤`), not only by the
+finrank sum.
 
 ### The two ridge identities
 
@@ -67,6 +75,15 @@ For *every* pair of basis units `e_a, e_b` (hence all 84 basis-sum ZDs, and more
 | 21 | Equality holds **exactly** on `ker L_{z₋}` | `N_basisPair_eq_iff` |
 | 22 | Operator form `G₊ + G₋ = 4·id` | `basisPair_sq_split` |
 | 23 | `L_{e_a+s·e_b}` is skew-adjoint; `z·(z·x) = 0 ↔ z·x = 0` | `sbp_skew`, `sbp_sq_eq_zero_iff` |
+| 24 | `G_z := −L_z∘L_z` **is** the Gram operator of `L_z`, uniformly; Rayleigh form `⟨y, G_z y⟩ = N(z·y)` | `sbpGram_eq`, `sbpG_rayleigh` |
+| 25 | **`spec(G_z) ⊆ [0, 4]`** — every real eigenvalue of `G_z` (`z = e_a ± e_b`, `x ≠ 0`) lies in `[0,4]`, i.e. singular values of `L_z` lie in `[0,2]` | `sbpG_eigenvalue_mem_Icc` |
+| 26 | **`E₄(G₊) = ker L_{z₋}`** for every basis pair | `sbpEig_four_eq` |
+| 27 | **`E₀(G_z) = ker L_z`** for every basis pair, either sign | `sbpEig_zero_eq` |
+
+Rows 25–27 are the pair-generic *spectral* statements; they are named declarations, over the uniform
+Gram operator `sbpG` / eigenspace `sbpEig` (`sbpL` = left multiplication by `e_a + s·e_b` as a linear
+map). Row 25's ≤ 4 half also needs the `−`-sign norm bound `N_basisPair_le_neg`. Rows 25–27 fix NO
+multiplicity: that is the witness-only content (rows 3–6).
 
 ---
 
@@ -74,15 +91,15 @@ For *every* pair of basis units `e_a, e_b` (hence all 84 basis-sum ZDs, and more
 
 | Statement | For `z = e₁ + e₁₀` | For the other 83 |
 |---|---|---|
-| `spec(L_zᵀL_z) ⊆ [0, 4]` | **proved** (19–20) | **proved** (19–20 are uniform) |
-| `E₄(G₊) = ker L_{z₋}`, `E₀(G₊) = ker L_{z₊}` | **proved** (3, 5, 10) | **proved** (21–22 are uniform) |
+| `spec(L_zᵀL_z) ⊆ [0, 4]` | **proved** (19–20, 25) | **proved** — `sbpG_eigenvalue_mem_Icc` (25) |
+| `E₄(G₊) = ker L_{z₋}`, `E₀(G₊) = ker L_{z₊}` | **proved** (3, 5, 10) | **proved** — `sbpEig_four_eq`, `sbpEig_zero_eq` (26–27) |
 | `G₊ + G₋ = 4·id` | **proved** | **proved** (22 is uniform) |
 | multiplicities **4 / 8 / 4** | **proved** (3–6, 8) | **NOT proved** — numerical only (attack-2 §2: one spectrum for all 84) |
 | `R_z` spectrum = `L_z` spectrum | **proved** (14–17) | **NOT proved** |
 | `T` on the ridge, `V = N²` | **proved** (13) | **NOT proved** (attack-2 §3 reports it for the 9 `z` tested) |
 | `ad_z` spectrum `{4×4, 2√2×6, 0×6}` | **NOT proved** | **NOT proved** |
 
-**Why the 84 were not done uniformly.** The uniform machinery (19–23) is genuinely uniform and is
+**Why the 84 were not done uniformly.** The uniform machinery (19–27) is genuinely uniform and is
 stated for arbitrary basis pairs. What does *not* generalise is the multiplicity count: it rests on
 eight explicit sign-table computations (`seamG_e0 … seamG_e11`) identifying the 8-dimensional middle
 block for *this* pair `{1, 10}`. A uniform proof would need the statement "for every basis-sum ZD pair
@@ -103,12 +120,21 @@ so it is not a corollary of anything proved here. It remains numerical.
 
 `proofs/QBP/Foundations/NoAutonomousDynamics.lean` ("Completeness", line ~80) says:
 
-> … their normalised iteration is power iteration onto the top-singular subspace — **which numerically
+> With an UNFORCED second element t, the maps x ↦ x·t, t·x, **[x,t]** are linear (R_t, L_t, ad_t); their
+> normalised iteration is power iteration onto the top-singular subspace — **which numerically
 > lies on the zero-divisor ridge V = 1 (observed for 100/100 t, NOT derived)** …
 
-**What this file closes.** For the canonical, `Aut(𝕊)`-invariant generator class — the basis-sum zero
-divisors, witness `z = e₁ + e₁₀` — the top singular subspace lying on the ridge is now **derived**, in
-two senses and for the entire plane, not a sample:
+Note the quantifier and the *three* maps: the caveat is about `R_t`, `L_t` **and `ad_t = L_t − R_t`**,
+for a generic unforced `t`. This file speaks only about `L_z` and `R_z`, and only at the canonical
+basis-sum zero-divisor generators. `ad_z` is explicitly out of scope (file header): attack-2 §2 reports
+a *different* decomposition for it (dims 4/6/6, σ = {4×4, 2√2×6, 0×6}), so its top space is not
+`T(L_z)` a priori and nothing proved here transfers to it.
+
+**What this file closes.** For **`L_z` and `R_z`** (not `ad_z`) at the canonical, `Aut(𝕊)`-invariant
+generator class — the basis-sum zero divisors, witness `z = e₁ + e₁₀` — the top singular subspace lying
+on the ridge is now **derived**, in two senses and for the entire plane, not a sample. (`R_z` is covered
+because `R_zᵀR_z = L_zᵀL_z` on the nose, `seamGR_eq_seamG`, so it has the *same* top space `T`.)
+
 
 * qualitatively: every nonzero element of `T` is a two-sided zero divisor (`top_plane_zero_divisor`),
   all four generators being basis-sum ZDs themselves (`top_generators_are_zero_divisors`) — so `T` is a
@@ -116,18 +142,26 @@ two senses and for the entire plane, not a sample:
 * quantitatively: `V(t) = N(t)²` identically on `T` (`top_plane_on_ridge_mem`), i.e. `V = 1` for every
   unit vector of `T` — exactly the observed `[1.0000, 1.0000]` of attack-2 §3, now a theorem.
 
-**What this file does NOT close.** The caveat as written is about a **generic unforced `t`**
-(`generic_maps_check.py`, 100/100 random `t`). Nothing here says anything about generic `t`: the proof
-uses that `z` is a basis *sum*, and the eigenspace identification uses the `{1,10}` sign-table block.
+**What this file does NOT close.** Two gaps, both in the caveat as written:
+
+1. **generic unforced `t`** (`generic_maps_check.py`, 100/100 random `t`). Nothing here says anything
+   about generic `t`: the proofs use that `z` is a basis *sum*, and the eigenspace identification uses
+   the `{1,10}` sign-table block.
+2. **`ad_z = L_z − R_z`**, the third map the caveat names. Its square carries the mixed term
+   `z·(x·z) + (z·x)·z`, which neither `G₊ + G₋ = 4·id` nor the left/right Gram identity (14) controls,
+   and attack-2 measures a different decomposition (4/6/6) for it — so its top space is a different
+   subspace and its ridge property is untouched here.
+
 So the honest amendment to the caveat is:
 
-> derived for the canonical basis-sum zero-divisor generators (`SeamSpectrum`, witness `e₁+e₁₀`);
-> still observed-not-derived for a generic unforced `t`.
+> DERIVED for `L_z` and `R_z` at the canonical basis-sum zero-divisor generators (`SeamSpectrum`,
+> witness `e₁+e₁₀`: `top_plane_zero_divisor`, `top_plane_on_ridge_mem`, `seamRm_ker_eq`); `ad_z` and a
+> generic unforced `t` remain **observed-only**.
 
 The corresponding recommendation is to edit that sentence in `NoAutonomousDynamics.lean` to cite
-`SeamSpectrum.top_plane_on_ridge_mem` for the ZD case and retain "NOT derived" for generic `t`. That
-edit is **not** made in this commit (it touches an already-anchored file; it is a separate, reviewable
-change), and no ledger anchor is added here.
+`SeamSpectrum.top_plane_on_ridge_mem` for the `L_z`/`R_z` ZD case and retain "NOT derived" for `ad_z`
+and for generic `t`. That edit is **not** made in this commit (it touches an already-anchored file; it
+is a separate, reviewable change), and no ledger anchor is added here.
 
 ---
 
@@ -135,12 +169,13 @@ change), and no ledger anchor is added here.
 
 ```
 $ cd proofs && run-bounded 6G 1800 taskset -c 3-5 lake build QBP.Foundations.SeamSpectrum
-EXIT=0            # 0 errors; 132 `#print axioms` lines emitted
+EXIT=0            # 0 errors; 153 `#print axioms` lines emitted
 ```
 
-* axiom audit: 129 declarations `[propext, Classical.choice, Quot.sound]`, 3 declarations `[propext]`
-  only. **No `sorryAx`, no `ofReduceBool`/native axiom, no user axiom.**
-* `#print axioms` coverage: 132 declarations in the file, 132 audit lines, no gaps, no strays.
+* axiom audit: 150 declarations `[propext, Classical.choice, Quot.sound]`, 3 declarations `[propext]`
+  only (`midIdx`, `midIdx_spec`, `seam_xor_idx` — pure `Fin`/ℤ `decide`). **No `sorryAx`, no
+  `ofReduceBool`/native axiom, no user axiom.**
+* `#print axioms` coverage: 153 declarations in the file, 153 audit lines, no gaps, no strays.
 * `python3 scripts/check_lean_foundations.py --dir proofs/QBP/Foundations` → `Lean foundations gate PASSED`
   (sorry at baseline 0, vacuous-`: True :=` at baseline 0).
 * `python3 scripts/check_layer_imports.py` → `layer imports clean`;
