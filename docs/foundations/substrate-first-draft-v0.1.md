@@ -1,12 +1,12 @@
 # The QBP substrate, first draft v0.1 (2026-09-25)
 
-**Status:** assembly document for #684 (parent #473), branch `research/473-substrate-first-draft`, author qbp-oppenheimer. The substrate stated in one place, every claim tagged. **No new mathematics, no kill's status touched, no acceptance criterion of #473 claimed.** Ledger of record: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` 6.8.0 (331 anchors, master `b111eb4`). Tier-2 review.
+**Status:** assembly document for #684 (parent #473), branch `research/473-substrate-first-draft`, author qbp-oppenheimer. The substrate stated in one place, every claim tagged. **No new mathematics, no kill's status touched, no acceptance criterion of #473 claimed.** Ledger of record: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` 6.9.0 (335 anchors, master `bd5ddbc`, PR #681 merged). Tier-2 review.
 
 ## 0. Reading guide
 
 | Tag | Meaning | Cites |
 |---|---|---|
-| **PROVED** | a 0-sorry Lean 4 or `--safe` Cubical Agda theorem anchored on the ledger; the sentence stays inside the anchor's NOT-claimed clause | an anchor id; eight anchors on open PRs are cited "PR #681/#682, pending merge" |
+| **PROVED** | a 0-sorry Lean 4 or `--safe` Cubical Agda theorem anchored on the ledger; the sentence stays inside the anchor's NOT-claimed clause | an anchor id; the four PR #681 anchors are now on master (ledger 6.9.0); four anchors on open PR #682 are cited "PR #682, pending merge" |
 | **NUMERICAL** | a scripted computation or an analytic derivation not machine-checked | an `analysis/` file |
 | **POSTULATE** | a clause the theory asserts and does not derive (PERMITTED, never FORCED) | the ruling or issue stating it |
 | **OPEN** | not settled either way | the owning issue, or "no issue" |
@@ -48,20 +48,20 @@ The eight clauses of the G1 draft (#635, issuecomment-5828899452); substance rep
 | P2 Field | F(s) = −(∇V(s) − ⟪∇V(s), s⟫ s − (∇V(s))₀·1): overdamped descent of V in the N-metric, projected tangent to the sphere and to Im 𝕊. ∇V closed-form; V is Cᵏ for every k; F tangent (StateSphere invariant); F = 0 at every crystal; F ≢ 0 | **PROVED** (the form) | PROOF-rule-gradient-and-tangent-field |
 | P3 Dynamics | γ′ = F ∘ γ | **POSTULATE** | `RuleFlow.lean` header "THE RULE IS A POSTULATE"; #635 |
 | P4 Existence | integral curves exist through every initial state | **OPEN** | FLAG-rule-flow-open; #635; §2a |
-| P5 Consequences | the table below | **PROVED** (conditional) | PR #681, pending merge |
+| P5 Consequences | the table below | **PROVED** (conditional) | PROOF-rule-gram-invariants-ode; PROOF-rule-descent-straight-ray; PROOF-ell-coefficient-monotone-along-rule; PROOF-quench-endpoint-closed-form-conditional (ledger 6.9.0) |
 | P6 No merging | the table below | **PROVED** (conditional) | PROOF-rule-flow-finite-time-uniqueness; PROOF-rule-euler-step-injective; PROOF-rule-descent-avoids-zero-divisors |
-| P7 Initial ensemble | N's normalised surface measure on StateSphere (horn 1), PERMITTED as MaxEnt with N's geometry as reference, not FORCED | **POSTULATE** | beekeeper ruling 2026-09-05, #473 issuecomment-5555310567 (gloss 5555866101) |
-| P8 Protocol β(t) | A quench / B anneal / C ℓ-axis map / hold | **OPEN** | #635 (G1 ruling request); §2b |
+| P7 Initial ensemble | horn 1 (N's normalised surface measure on StateSphere) is the working ensemble explored first (zero free parameters; the reference measure is itself the postulate, per the 2026-09-06 gloss); Q_μ (μ ≠ 1) and the thermal family e^{−β_init V}·dN (β_init ≠ 0) are retained as live alternatives with their own kills; no evidence selects among the three; their numbers have not been computed | **POSTULATE** (horn 1 as the working choice); **OPEN** (the selection) | #473 horn-1 audit, issuecomment-5832434500 (correcting issuecomment-5555310567 per the 2026-09-06 gloss, issuecomment-5555866101) |
+| P8 Protocol β(t) | A quench / B anneal / C ℓ-axis map, carried as three live hypotheses; not a decision point | **OPEN** | #635 (G1 correction, issuecomment-5832433972); §2b |
 
 **Consequences of the form.** Every row ASSUMES γ is an integral curve of F; P4 is open, so no row asserts a trajectory exists.
 
 | Result | Statement | Tag | Source |
 |---|---|---|---|
 | Descent | V ∘ γ is monotone non-increasing; d/dt V(γ t) = −N(F(γ t)) | **PROVED** | PROOF-potential-descent-along-rule |
-| Gram-invariant ODEs | Ȧ = 4V(2A − 1), Ċ = 4V(2C − 1), Ṗ = 8VP, ḃ₀ = 4Vb₀; Euler identity ⟪∇V, s⟫ = 4V; A + C + b₀² conserved | **PROVED** | PROOF-rule-gram-invariants-ode (PR #681, pending merge) |
-| Straight ray | (A − ½, C − ½, P, b₀²) moves on a straight ray through (½, ½, 0, 0), any time parametrisation | **PROVED** | PROOF-rule-descent-straight-ray (PR #681, pending merge) |
-| Monotone b₀² | b₀² is non-decreasing along any curve | **PROVED** | PROOF-ell-coefficient-monotone-along-rule (PR #681, pending merge) |
-| Conditional endpoint | ADDITIONALLY ASSUMES V(γ t) → 0 and b₀²(γ t) → L: then L = b₀²/(b₀² + √((1 − b₀²)² − V₀)) in the initial data | **PROVED** (conditional) | PROOF-quench-endpoint-closed-form-conditional (PR #681, pending merge) |
+| Gram-invariant ODEs | Ȧ = 4V(2A − 1), Ċ = 4V(2C − 1), Ṗ = 8VP, ḃ₀ = 4Vb₀; Euler identity ⟪∇V, s⟫ = 4V; A + C + b₀² conserved | **PROVED** | PROOF-rule-gram-invariants-ode (ledger 6.9.0) |
+| Straight ray | (A − ½, C − ½, P, b₀²) moves on a straight ray through (½, ½, 0, 0), any time parametrisation | **PROVED** | PROOF-rule-descent-straight-ray (ledger 6.9.0) |
+| Monotone b₀² | b₀² is non-decreasing along any curve | **PROVED** | PROOF-ell-coefficient-monotone-along-rule (ledger 6.9.0) |
+| Conditional endpoint | ADDITIONALLY ASSUMES V(γ t) → 0 and b₀²(γ t) → L: then L = b₀²/(b₀² + √((1 − b₀²)² − V₀)) in the initial data | **PROVED** (conditional) | PROOF-quench-endpoint-closed-form-conditional (ledger 6.9.0) |
 | Backward uniqueness | two curves agreeing at one time agree at every earlier time (Grönwall): no finite-time merging | **PROVED** | PROOF-rule-flow-finite-time-uniqueness |
 | Euler step injective | s ↦ s + hF(s) is injective on the sphere for hK < 1; the renormalised step the scripts run is proved injective only on level sets of ‖F‖ | **PROVED** | PROOF-rule-euler-step-injective |
 | Avoids zero divisors | a forward curve from V < 1 is never a zero divisor, either side, at finite time or in its ω-limit set | **PROVED** | PROOF-rule-descent-avoids-zero-divisors |
@@ -79,15 +79,19 @@ The eight clauses of the G1 draft (#635, issuecomment-5828899452); substance rep
 
 The rows above "Ensemble mean" concern a postulated form and curves hypothesised, not shown, to exist; 0.1416, 1/3 and 1 are not predictions until P4 and P8 are settled.
 
-### 2b. The protocol decision point (G1)
+### 2b. The protocol β(t): three live hypotheses (G1)
+
+The protocol is **OPEN as physics** (#635): A, B, C are three live hypotheses, not a decision point. Nothing on record selects among them (Prop 16); no sentence here says the beekeeper decides which.
 
 | Option | Protocol on the horn-1 ensemble | ⟨b₀²⟩ | Evidence | Killed if |
 |---|---|---|---|---|
-| A quench | follow γ′ = F(γ) to V → 0 | 0.1416 | NUMERICAL (per-seed map PROVED conditional, PR #681) | positive-measure seeds with non-vacuum ω-limit, or endpoint law ≠ the closed-form pushforward |
+| A quench | follow γ′ = F(γ) to V → 0 | 0.1416 | NUMERICAL (per-seed map PROVED conditional, ledger 6.9.0) | positive-measure seeds with non-vacuum ω-limit, or endpoint law ≠ the closed-form pushforward |
 | B anneal | Gibbs e^{−βV}, β → ∞ | 1/3 | NUMERICAL + analytic, not Lean | Laplace cancellation failing on a stratum; β(t) stalling off {V = 0} on positive measure |
 | C ℓ-axis map | iterate (s + ℓ)/‖s + ℓ‖ | 1 | NUMERICAL | any observed \|b₀\| < 1 |
 
-The choice (A, B, C, or hold) is the beekeeper's: **OPEN** (#635); kills K1–K4 are in the G1 draft. Dependencies: the G2 rewrite of AXIOM-1's kill clause (#668, trigger #647) lands before or with any `POST-…` encode, the current clause being defective both ways (**OPEN**, #668); and one universe supplies one b₀, so A vs B is distributional while C dies on one observation (§5).
+C carries an internal tension, not a kill: C drives b₀² → 1, a pole universe hosts span{1, ℓ} ≅ ℂ, while the hosting clause puts matter on the S³ of ℍ_s — a non-pole crystal. Both are postulates, so this is a tension between two postulates, not a kill of C.
+
+What would decide among A, B, C: (i) a measured quantity tied to b₀ (#637 — none on record); (ii) #638's one-or-many, which determines whether distributions are testable at all; (iii) a theorem that makes one protocol inconsistent with the rest of the stack (C's tension above is the only candidate, and it rests on two postulates, not a proof). Tag: **OPEN** (#635); kills K1–K4 are in the G1 draft. Dependencies: the G2 rewrite of AXIOM-1's kill clause (#668, trigger #647) lands before or with any `POST-…` encode, the current clause being defective both ways (**OPEN**, #668); and one universe supplies one b₀, so A vs B is distributional while C dies on one observation (§5).
 
 ## 3. Hosting
 
@@ -140,7 +144,7 @@ Correction to the brief this draft was written from: the AC1(a)/(b) witnesses ar
 | Its kill | Prop 13(b) with the honest class, quoted below | **OPEN** | FLAG-locale-forcing-route-reopened; v0.6 addendum §6 |
 | Spatial first link | Ω(X) ≅ Ω(condensedSetToTopCat X̲) for compactly generated X, ℝ included | **PROVED** | PROOF-spatial-first-link-condensed-locale |
 | Profinite structure inert | the CD index tower's dual Cantor group acts by sign automorphisms; every continuous profinite action on 𝕊 has finite image (Aut(𝕊) a compact Lie group); its discrete measure gives ⟨b₀²⟩ = 1/15 | **NUMERICAL** (numerical + argument, not Lean) | `analysis/473-kill-attack/attack4_dual_cantor_group.md` |
-| b₀ observable | one candidate mapping of b₀ to at least two measured constants, with its kill; "landscape, not identification" kept | **OPEN** | #637 (G3, pending) |
+| b₀ observable | exactly one b₀-linked quantity on record: λ⊥ = 8(1 − b₀²), the transverse Hessian coefficient of V at a vacuum, multiplicity 6, trace 48(1 − b₀²); a landscape modulus ("mass² is a modulus, not forced"; "a landscape statement, not a confirmed physical identification"); no measured constant is tied to it or to b₀ on the record | **PROVED** (the mapping); **OPEN** (any physical identification) | PROOF-vacuum-hessian-transverse-eigenvalue; PROOF-vacuum-hessian-universe-level; PROOF-transverse-space-dim-six-trace; #637 (documented negative) |
 | One or many | whether the theory admits domains; effect on distributional predictions | **OPEN** | #638 |
 | Composite rule | no multi-particle composition rule in the hosted layer; Efimov data force one | **OPEN** | FLAG-hosted-composite-rule-open; #669, #672 |
 
@@ -148,7 +152,7 @@ What would reverse the reopened route, quoted from the v0.6 addendum §6:
 
 > A mechanism that supplies **both** a reference measure on each level set of V **and** a transport between level sets from topological or measure-theoretic data alone. Attack 3 proves the frame supplies neither; attack 5 proves level-set invariants are rule-blind; attack 4 proves profinite structure is inert. So the class is **metric-carrying (enriched) locales**, and any such candidate must show that the metric it carries is not simply N re-labelled (Prop 8's relocation test). Until then the route is open, not validated.
 
-No AC2 candidate is on record: ⟨b₀²⟩ depends on the protocol (§2b) and is a decision, not a prediction; an observable for b₀ is owed (#637), A vs B is distributional (#638).
+No AC2 candidate is on record: ⟨b₀²⟩ depends on which protocol hypothesis obtains (§2b), unsettled as physics, not a decision awaiting a ruling; #637 is a documented negative — no measured constant is tied to λ⊥ or b₀ — and stands unless a second independent function of b₀ from the hosted layer appears, or a measurement is mapped to λ⊥ by a derivation; A vs B is distributional pending #638.
 
 ## 6. Kills and reversals
 
@@ -175,11 +179,11 @@ The drafting direction phrased the lesson as "a test that passes only because it
 | § | PROVED (anchor ids) | NUMERICAL (analysis files) | POSTULATE | OPEN (issues) |
 |---|---|---|---|---|
 | 1 Carrier | PROOF-substrate-hosting-definition; PROOF-normed-division-tower-existence; PROOF-delta-landscape-descent; PROOF-potential-bounded-by-normForm-sq-frozen-max; PROOF-alternator-vanishes-iff-commute; PROOF-vacuum-parametrisation; PROOF-zero-divisors-sit-at-potential-max; PROOF-42zd; PROOF-seam-zd-witness-kernel-four; PROOF-seam-zd-witness-kernels-coincide; PROOF-seam-zd-witness-kernel-not-subalgebra; PROOF-crystal-hosts-quaternion; PROOF-hosting-equivariant-under-order-three; PR #682, pending merge: PROOF-seam-zd-gram-spectrum-4-8-4, PROOF-seam-top-plane-on-frozen-ridge, PROOF-seam-right-gram-equals-left, PROOF-basis-pair-gram-uniform-bounds | `analysis/473-dirac-probe/orbit_space.py`, `lmaps_check.py`, `aut_s3.py`; ridge dimension (unsourced) | — | #639 (e); converse V = N² ⇒ zero divisor (no issue) |
-| 2 Rule | PROOF-rule-gradient-and-tangent-field; PROOF-potential-descent-along-rule; PROOF-rule-flow-finite-time-uniqueness; PROOF-rule-euler-step-injective; PROOF-rule-descent-avoids-zero-divisors; PR #681, pending merge: PROOF-rule-gram-invariants-ode, PROOF-rule-descent-straight-ray, PROOF-ell-coefficient-monotone-along-rule, PROOF-quench-endpoint-closed-form-conditional | `analysis/473-kill-attack/attack1_anneal_vs_quench.md`, `quench_exact.py`, `quench_rk4.py`, `anneal_quadrature.py`, `anneal_mcmc.py`, `hessian_isotropy.py`; `analysis/473-dirac-probe/flow_big.py` | P3 (#635); P7 (horn-1 ruling) | P4: FLAG-rule-flow-open, #635; P8: #635; AXIOM-1 kill clause: #668, #647 |
+| 2 Rule | PROOF-rule-gradient-and-tangent-field; PROOF-potential-descent-along-rule; PROOF-rule-flow-finite-time-uniqueness; PROOF-rule-euler-step-injective; PROOF-rule-descent-avoids-zero-divisors; PROOF-rule-gram-invariants-ode, PROOF-rule-descent-straight-ray, PROOF-ell-coefficient-monotone-along-rule, PROOF-quench-endpoint-closed-form-conditional (ledger 6.9.0) | `analysis/473-kill-attack/attack1_anneal_vs_quench.md`, `quench_exact.py`, `quench_rk4.py`, `anneal_quadrature.py`, `anneal_mcmc.py`, `hessian_isotropy.py`; `analysis/473-dirac-probe/flow_big.py` | P3 (#635); P7 (horn 1, working choice) | P4: FLAG-rule-flow-open, #635; P7 selection: #473 horn-1 audit; P8: #635; AXIOM-1 kill clause: #668, #647 |
 | 3 Hosting | PROOF-substrate-hosting-definition; PROOF-crystal-hosts-quaternion; PROOF-local-spectrum-at-crystal; PROOF-hosting-identity-fails-in-flight; PROOF-hosting-equivariant-under-order-three | — | — | #634/#639 (u canonical); POST-observer-associativity |
 | 3a Witnesses | PROOF-s3-hspace; PROOF-skyrmion-baryon-complete-invariant; PROOF-substrate-baryon-additive | — | — | #639 (c)/(e); #595; #576; #554 |
 | 4 Transition state | PROOF-in-flight-first-order-data-constrains-at-most-one-direction; PROOF-level-set-invariants-rule-blind; PROOF-vacuum-sublocale-v-natural; PROOF-sublevel-infimum-rule-independent | — | — | positive account: **no issue**; CONJ-condensed-math-for-transition-state |
-| 5 Prediction | PROOF-spatial-first-link-condensed-locale | `analysis/473-kill-attack/attack4_dual_cantor_group.md` | — | FLAG-locale-forcing-route-reopened; KILLED-locale-forcing-route (history); #637; #638; FLAG-hosted-composite-rule-open, #669, #672 |
+| 5 Prediction | PROOF-spatial-first-link-condensed-locale; PROOF-vacuum-hessian-transverse-eigenvalue; PROOF-vacuum-hessian-universe-level; PROOF-transverse-space-dim-six-trace | `analysis/473-kill-attack/attack4_dual_cantor_group.md` | — | FLAG-locale-forcing-route-reopened; KILLED-locale-forcing-route (history); #637 (documented negative); #638; FLAG-hosted-composite-rule-open, #669, #672 |
 | 6 Kills | (attacks 3, 5: the §4 anchors) | `analysis/473-kill-attack/attack{1,2,3,4,5}_*.md` | — | #668; #683 |
 | Not in v0.1 | — | — | — | #661; #596/#600; #636; FLAG-seam-dynamics-open |
 
@@ -187,9 +191,9 @@ The drafting direction phrased the lesson as "a test that passes only because it
 
 | Item | What has to exist | Owner |
 |---|---|---|
-| G1 ruling encoded | A / B / C / hold ruled on #635; P1–P8 encoded as `POST-…` with the chosen kills, confined writer, Tier 3 | #635; beekeeper |
-| G2 landed | AXIOM-1 kill_condition[0] in positive-measure form, ratified, beekeeper's go; before or with the G1 encode | #668 (+ #647) |
-| G5 merged | PR #681 and PR #682 on master, so the eight "pending merge" citations resolve | #684 G5 |
+| Protocol hypotheses carried | A / B / C carried with kills K1–K4 as physics questions, not ruled; horn-1 alternatives' (Q_μ, thermal family) numbers computed if funded; #637 negative stands unless a second observable appears | #635; #473 horn-1 audit |
+| G2 landed | AXIOM-1 kill_condition[0] in positive-measure form, ratified, beekeeper's go; before or with any `POST-…` encode | #668 (+ #647) |
+| G5 merged | PR #682 on master, so the remaining four "pending merge" citations resolve (PR #681's four anchors already landed, ledger 6.9.0) | #684 G5 |
 | Positive in-flight account | a definition (not a description) of the in-flight region consistent with §4's negatives; needs an issue first | none yet |
 | AC2 candidate | a Prop 13(b)-class mechanism passing the relocation test, or a b₀ observable with a distributional statement | FLAG-locale-forcing-route-reopened; #637; #638 |
 | Existence | local existence of integral curves and convergence V → 0, discharging §2's conditionals | FLAG-rule-flow-open; #635 |
