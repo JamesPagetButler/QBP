@@ -7,10 +7,10 @@
 
 | Metric | Count |
 |---|---|
-| theorems total | 1611 |
-| anchors total | 331 |
+| theorems total | 1693 |
+| anchors total | 335 |
 | anchors with theorems list | 66 |
-| anchors with proof file | 109 |
+| anchors with proof file | 113 |
 | lean side orphans | 49 |
 | anchor side phantoms | 0 |
 | stale path citations | 0 |

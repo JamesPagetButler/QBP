@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.8.0",
+  "version": "6.9.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -11186,6 +11186,234 @@
           "QBP.Substrate.Hosting.inFlight_nonempty"
         ]
       }
+    },
+    {
+      "id": "PROOF-rule-gram-invariants-ode",
+      "name": "Along any integral curve of the rule the four Gram invariants close: Ȧ = 4V(2A−1), Ċ = 4V(2C−1), Ṗ = 8VP, ḃ₀ = 4Vb₀, d(b₀²)/dt = 8Vb₀²; Euler identity ⟪∇V, s⟫ = 4V",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlowInvariants.lean: with A = N(Im cdLo s), C = N(Im cdHi s), P = ⟪Im cdLo s, Im cdHi s⟫, b₀ = (cdHi s)₀ (the ℓ-coefficient, coordinate 8) and V = 4(AC − P²) (`potential_eq_gram`), the rule closes on these four numbers along ANY integral curve γ' = ruleField(γ): `hasDerivAt_gramA_along_flow` (Ȧ = 4V(2A−1)), `hasDerivAt_gramC_along_flow` (Ċ = 4V(2C−1)), `hasDerivAt_gramP_along_flow` (Ṗ = 8VP), `hasDerivAt_ellCoeff_along_flow` (ḃ₀ = 4Vb₀), `hasDerivAt_ellSq_along_flow` (d(b₀²)/dt = 8Vb₀²) — NO state-sphere hypothesis on any of these; `gram_sum_hasDerivAt_zero` is the consistency check Ȧ + Ċ + d(b₀²)/dt = 0, the ONLY statement here that uses the sphere (A + C + b₀² = 1). `bil_gradV_self` is the Euler identity ⟪∇V, s⟫ = 4V (V is homogeneous of degree 4). Off the state sphere `ruleField` is the postulated polynomial field of RuleFlow.lean read literally, not a normalised projection — the ODEs hold for it as written. ASSUMES an integral curve: every theorem has the shape 'IF γ satisfies HasDerivAt γ (ruleField (γ t)) t THEN …' and the antecedent is never discharged. NOT claimed: local or global EXISTENCE of any integral curve of the rule (#635, FLAG-rule-flow-open); convergence of any curve; any measure, ensemble average or physical claim — the ensemble mean ⟨b₀²⟩ ≈ 0.1416 of attack 1 is numerical (#675) and is not a Lean statement.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlowInvariants.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramA_along_flow",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramC_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramP_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_ellCoeff_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_ellSq_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.gram_sum_hasDerivAt_zero",
+        "QBP.Substrate.RuleFlowInvariants.bil_gradV_self"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-rule-gradient-and-tangent-field",
+        "PROOF-substrate-hosting-definition"
+      ],
+      "foundation_batch": "#681-rule-flow-invariants",
+      "last_tested_at": "2026-09-25T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-25T00:00:00Z",
+        "verifier": "run-bounded lake build of the Substrate aggregator (QBP.Substrate.RuleFlowInvariants; 3126 jobs, exit 0, peak 3.7 GB) + #print axioms on all 93 declarations (82 theorems + 11 defs) of the file's §8 audit (qbp-oppenheimer, 2026-09-24; PR #681 Red Team APPROVE, Gemini APPROVE)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramA_along_flow",
+          "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramC_along_flow",
+          "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramP_along_flow",
+          "QBP.Substrate.RuleFlowInvariants.hasDerivAt_ellCoeff_along_flow",
+          "QBP.Substrate.RuleFlowInvariants.hasDerivAt_ellSq_along_flow",
+          "QBP.Substrate.RuleFlowInvariants.gram_sum_hasDerivAt_zero",
+          "QBP.Substrate.RuleFlowInvariants.bil_gradV_self"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-rule-descent-straight-ray",
+      "name": "Straight-ray motion in the Gram invariants: along any integral curve every 2×2 minor of (A−½, C−½, P, b₀²)(t) against its initial vector vanishes — the point stays on a line through (½, ½, 0, 0) in any parametrisation",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlowInvariants.lean: `IsRayCoord f` = f continuous and d/dt f(γ t) = 8V(γ t)·f(γ t) along every integral curve; instances `isRayCoord_gramA_sub` (A − ½), `isRayCoord_gramC_sub` (C − ½), `isRayCoord_gramP` (P), `isRayCoord_ellSq` (b₀²), packaged as `isRayCoord_rayVec` for the vector `rayVec = (A−½, C−½, P, b₀²) : Fin 4 → ℝ`. `ray_minor_eq_zero`: any two ray coordinates have vanishing minor f(γ t)·g(γ t₀) − g(γ t)·f(γ t₀) = 0 on [a,b] (Grönwall-type uniqueness for the scalar linear ODE ẏ = 8V·y; V continuous along γ); `gram_ray` (the three minors against b₀²); `rayVec_collinear` (ALL pairwise minors, i j : Fin 4). This is the parametrisation-free form of the straight ray seen numerically in attack 1 §3a: 'ray' means exactly 'all minors against the initial vector vanish' (collinearity). The ray parameter λ itself is NOT constructed (it would need V > 0 along the curve). NOT claimed here: that the motion is OUTWARD along the ray — that is the sign statement of PROOF-ell-coefficient-monotone-along-rule, not a theorem of this anchor. ASSUMES an integral curve: every theorem has the shape 'IF γ satisfies HasDerivAt γ (ruleField (γ t)) t THEN …' and the antecedent is never discharged. NOT claimed: local or global EXISTENCE of any integral curve of the rule (#635, FLAG-rule-flow-open); convergence of any curve; any measure, ensemble average or physical claim — the ensemble mean ⟨b₀²⟩ ≈ 0.1416 of attack 1 is numerical (#675) and is not a Lean statement.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlowInvariants.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlowInvariants.rayVec_collinear",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlowInvariants.ray_minor_eq_zero",
+        "QBP.Substrate.RuleFlowInvariants.gram_ray",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramA_sub",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramC_sub",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramP",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_ellSq",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_rayVec"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-rule-gradient-and-tangent-field",
+        "PROOF-substrate-hosting-definition"
+      ],
+      "foundation_batch": "#681-rule-flow-invariants",
+      "last_tested_at": "2026-09-25T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-25T00:00:00Z",
+        "verifier": "run-bounded lake build of the Substrate aggregator (QBP.Substrate.RuleFlowInvariants; 3126 jobs, exit 0, peak 3.7 GB) + #print axioms on all 93 declarations (82 theorems + 11 defs) of the file's §8 audit (qbp-oppenheimer, 2026-09-24; PR #681 Red Team APPROVE, Gemini APPROVE)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlowInvariants.rayVec_collinear",
+          "QBP.Substrate.RuleFlowInvariants.ray_minor_eq_zero",
+          "QBP.Substrate.RuleFlowInvariants.gram_ray",
+          "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramA_sub",
+          "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramC_sub",
+          "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramP",
+          "QBP.Substrate.RuleFlowInvariants.isRayCoord_ellSq",
+          "QBP.Substrate.RuleFlowInvariants.isRayCoord_rayVec"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-ell-coefficient-monotone-along-rule",
+      "name": "b₀² is non-decreasing along any integral curve of the rule (d(b₀²)/dt = 8Vb₀² ≥ 0 since V ≥ 0); any limit it has is ≥ its initial value",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlowInvariants.lean: `ellSq_monotone_along_flow` — for γ continuous on [a,b] with HasDerivAt γ (ruleField (γ t)) t on (a,b), t ↦ b₀²(γ t) is MonotoneOn [a,b] (via `hasDerivAt_ellSq_along_flow` and `Hosting.potential_nonneg`; no state-sphere hypothesis). `quench_root_ge_initial` (pure algebra): any L ∈ [0,1] solving the quench quadratic with 0 ≤ V₀ and non-negative discriminant satisfies B₀ ≤ L, because D = √((1−B₀)² − V₀) ≤ 1 − B₀. `ellSq_limit_ge_initial`: for a curve on all of ℝ through a state-sphere point, IF V(γ t) → 0 AND b₀²(γ t) → L THEN b₀²(γ t₀) ≤ L — this limit statement ASSUMES V → 0 and ASSUMES the limit exists; both are hypotheses, neither is proved. This is the sign behind attack 1 §3a's '|b₀| only grows' and the outward direction of the straight ray (PROOF-rule-descent-straight-ray). ASSUMES an integral curve: every theorem has the shape 'IF γ satisfies HasDerivAt γ (ruleField (γ t)) t THEN …' and the antecedent is never discharged. NOT claimed: local or global EXISTENCE of any integral curve of the rule (#635, FLAG-rule-flow-open); convergence of any curve; any measure, ensemble average or physical claim — the ensemble mean ⟨b₀²⟩ ≈ 0.1416 of attack 1 is numerical (#675) and is not a Lean statement.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlowInvariants.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlowInvariants.ellSq_monotone_along_flow",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlowInvariants.quench_root_ge_initial",
+        "QBP.Substrate.RuleFlowInvariants.ellSq_limit_ge_initial"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-rule-gradient-and-tangent-field",
+        "PROOF-substrate-hosting-definition"
+      ],
+      "foundation_batch": "#681-rule-flow-invariants",
+      "last_tested_at": "2026-09-25T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-25T00:00:00Z",
+        "verifier": "run-bounded lake build of the Substrate aggregator (QBP.Substrate.RuleFlowInvariants; 3126 jobs, exit 0, peak 3.7 GB) + #print axioms on all 93 declarations (82 theorems + 11 defs) of the file's §8 audit (qbp-oppenheimer, 2026-09-24; PR #681 Red Team APPROVE, Gemini APPROVE)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlowInvariants.ellSq_monotone_along_flow",
+          "QBP.Substrate.RuleFlowInvariants.quench_root_ge_initial",
+          "QBP.Substrate.RuleFlowInvariants.ellSq_limit_ge_initial"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-quench-endpoint-closed-form-conditional",
+      "name": "CONDITIONAL quench endpoint: for an integral curve on ℝ through a state-sphere point, IF V(γ t) → 0 AND b₀²(γ t) → L THEN L = b₀²/(b₀² + √((1−b₀²)² − V₀)) — the attack-1 closed form, with the root selection proved",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Substrate/RuleFlowInvariants.lean: `quench_relation` (on [a,b]) and `quench_relation_univ` (on ℝ, via `stateSphere_invariant_univ`): collinearity plus the sphere constraint A + C + b₀² = 1 at t₀ collapse to the conserved quadratic V·B₀² = B²(V₀ + 2B₀ − 1) − 2B₀²B + B₀² (B = b₀², B₀ = b₀(t₀)²) at EVERY time, depending on the initial data only through (V₀, B₀). `quench_root_pick_aux` / `quench_root_pick`: if L ∈ [0,1] solves the quench quadratic with B₀ ≥ 0 and discriminant (1−B₀)² − V₀ ≥ 0 then L·(B₀ + √((1−B₀)² − V₀)) = B₀ — the root B₀/(B₀ + D) is PROVED to be the one selected, D = √((1−B₀)² − V₀), by cases: for B₀ + D > 0 the quantity B₀/(B₀ + D) lies in [0,1]; when the equation is a genuine quadratic with distinct roots (B₀ ≠ 0, D ≠ 0, B₀ ≠ D) the other root B₀/(B₀ − D) lies outside [0,1] — above 1 for B₀ > D, below 0 for B₀ < D — so 0 ≤ L ≤ 1 excludes it; at B₀ = D > 0 the leading coefficient vanishes and the linear equation has the single solution ½; at D = 0 < B₀ or B₀ = 0 < D the roots coincide (1, resp. 0); at B₀ = D = 0 (V₀ = 1, b₀(t₀) = 0 — the frozen-ridge point) the quadratic is 0 = 0, the division form is undefined, and this is exactly the point excluded by the `hne` hypothesis of `ellSq_limit_eq_closed_form`, while the division-free `ellSq_tendsto_closed_form` (L·(B₀ + D) = B₀) holds there trivially. The discriminant is non-negative on the sphere by `potential_le_one_sub_ellSq_sq`. `ellSq_tendsto_closed_form`: for a curve with HasDerivAt on all of ℝ and γ t₀ ∈ StateSphere, IF Tendsto V(γ t) atTop (nhds 0) AND Tendsto b₀²(γ t) atTop (nhds L) THEN L·(B₀ + √((1−B₀)² − V₀)) = B₀ (division-free); `ellSq_limit_eq_closed_form` is the division form L = b₀²/(b₀² + √((1−b₀²)² − V₀)) under the extra hypothesis that the denominator is non-zero (it vanishes only at b₀(t₀) = 0, V₀ = 1). This anchor ASSUMES V(γ t) → 0 and ASSUMES the limit L exists: both are HYPOTHESES of the theorem, neither is proved anywhere (#635, FLAG-rule-flow-open). NOT claimed: that any curve converges; the ensemble mean ⟨b₀²⟩ ≈ 0.1416 (numerical, #675 — this file proves the per-orbit map the ensemble integrates, not the integral); an `Ici t₀` (half-line) variant of the limit statement (follow-up). ASSUMES an integral curve: every theorem has the shape 'IF γ satisfies HasDerivAt γ (ruleField (γ t)) t THEN …' and the antecedent is never discharged. NOT claimed: local or global EXISTENCE of any integral curve of the rule (#635, FLAG-rule-flow-open); convergence of any curve; any measure, ensemble average or physical claim — the ensemble mean ⟨b₀²⟩ ≈ 0.1416 of attack 1 is numerical (#675) and is not a Lean statement.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlowInvariants.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlowInvariants.ellSq_limit_eq_closed_form",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlowInvariants.ellSq_tendsto_closed_form",
+        "QBP.Substrate.RuleFlowInvariants.quench_relation",
+        "QBP.Substrate.RuleFlowInvariants.quench_relation_univ",
+        "QBP.Substrate.RuleFlowInvariants.quench_root_pick",
+        "QBP.Substrate.RuleFlowInvariants.quench_root_pick_aux"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-rule-gradient-and-tangent-field",
+        "PROOF-substrate-hosting-definition"
+      ],
+      "foundation_batch": "#681-rule-flow-invariants",
+      "last_tested_at": "2026-09-25T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-25T00:00:00Z",
+        "verifier": "run-bounded lake build of the Substrate aggregator (QBP.Substrate.RuleFlowInvariants; 3126 jobs, exit 0, peak 3.7 GB) + #print axioms on all 93 declarations (82 theorems + 11 defs) of the file's §8 audit (qbp-oppenheimer, 2026-09-24; PR #681 Red Team APPROVE, Gemini APPROVE)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlowInvariants.ellSq_limit_eq_closed_form",
+          "QBP.Substrate.RuleFlowInvariants.ellSq_tendsto_closed_form",
+          "QBP.Substrate.RuleFlowInvariants.quench_relation",
+          "QBP.Substrate.RuleFlowInvariants.quench_relation_univ",
+          "QBP.Substrate.RuleFlowInvariants.quench_root_pick",
+          "QBP.Substrate.RuleFlowInvariants.quench_root_pick_aux"
+        ]
+      }
     }
   ],
   "inputs": [
@@ -11752,6 +11980,11 @@
       "version": "6.8.0",
       "date": "2026-09-25T00:00:00Z",
       "note": "qbp-oppenheimer: PROOF anchors for the transition-state theorems (PR #679; #473 kill-attack 5 on CONJ-condensed-math-for-transition-state (a)–(c) / Prop 13(b)) — encode-after-prove, the theorems Gemini named: at every point of the state sphere the tangent space (a subspace of ℝ¹⁶ over the SET StateSphere, not a manifold tangent space) is 14-dimensional and V's first-order data constrains AT MOST one direction — exactly one where the tangential gradient −ruleField s is nonzero (13 V-neutral), none at rest points, the crystals AND the in-flight frozen ridge {V = 1} (14); adding a V-neutral vector to a rule field leaves V's first-order data unchanged, so every level-set invariant is rule-blind (quench and anneal give the identical object); the hosting identity s·(s·x) = −N(s)·x of PROOF-crystal-hosts-quaternion fails at every in-flight state. Three anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound} (TransitionState 17/17 audited; Hosting.lean carried since #639). Negative constraints obeyed in every anchor: Ext¹ NOT computed or evaluated to zero (no EnoughProjectives in the pinned Mathlib; 'identically zero' withdrawn — the embedding ℍ ↪ 𝕆 has 8-dim moduli T(G₂/SO(4))); NOT claimed that no 4-dim subalgebra exists in flight or that the hosting fibre is empty — only that the hosting identity fails. No root, principle, decision or kill touched; the CONJ record's kill/testable_when belong to #680. (Version 6.8.0: rebased onto master after #677 landed 6.7.0; #681/#682 renumber on their turn.)"
+    },
+    {
+      "version": "6.9.0",
+      "date": "2026-09-25T00:00:00Z",
+      "note": "qbp-oppenheimer: PROOF anchors for the rule-flow invariants (PR #681; #473 target 6(i)) — encode-after-prove: along ANY integral curve of the rule the four G₂ × O(2) Gram invariants close (Ȧ = 4V(2A−1), Ċ = 4V(2C−1), Ṗ = 8VP, ḃ₀ = 4Vb₀); (A−½, C−½, P, b₀²) moves on a straight ray through (½, ½, 0, 0) (all 2×2 minors against the initial vector vanish); b₀² is non-decreasing; and CONDITIONALLY on V → 0 and the limit existing, the endpoint is the attack-1 closed form L = b₀²/(b₀² + √((1−b₀²)² − V₀)) with the root selection proved. Four anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound}, chained to PROOF-rule-gradient-and-tangent-field and PROOF-substrate-hosting-definition. Every anchor states that it ASSUMES an integral curve (HasDerivAt hypothesis) and, for the endpoint, ASSUMES V → 0 and the limit exists; none claims flow existence, convergence, or the ensemble mean 0.1416 (numerical, #675). No root, principle, decision or kill touched; FLAG-rule-flow-open stays open. (Version 6.9.0: rebased onto master after #677 → 6.7.0 and #679 → 6.8.0 landed; anchor-4 excluded-root wording corrected per Red Team/Gemini M1 at cda3d32 and M1′ at bf64db1 and M2 at 7b90975 (the B₀ = D = 0 point); #682 renumbers on its turn.)"
     }
   ],
   "last_updated": "2026-09-25T00:00:00Z",

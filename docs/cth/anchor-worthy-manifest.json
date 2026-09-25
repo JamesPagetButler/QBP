@@ -1188,6 +1188,58 @@
         "QBP.Substrate.Hosting.mem_universeSpace_iff_complex_structure",
         "QBP.Substrate.Hosting.inFlight_nonempty"
       ]
+    },
+    {
+      "anchor_id": "PROOF-rule-gram-invariants-ode",
+      "declared_by": "#681-rule-flow-invariants",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramA_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramC_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_gramP_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_ellCoeff_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.hasDerivAt_ellSq_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.gram_sum_hasDerivAt_zero",
+        "QBP.Substrate.RuleFlowInvariants.bil_gradV_self"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-rule-descent-straight-ray",
+      "declared_by": "#681-rule-flow-invariants",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlowInvariants.rayVec_collinear",
+        "QBP.Substrate.RuleFlowInvariants.ray_minor_eq_zero",
+        "QBP.Substrate.RuleFlowInvariants.gram_ray",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramA_sub",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramC_sub",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_gramP",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_ellSq",
+        "QBP.Substrate.RuleFlowInvariants.isRayCoord_rayVec"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-ell-coefficient-monotone-along-rule",
+      "declared_by": "#681-rule-flow-invariants",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlowInvariants.ellSq_monotone_along_flow",
+        "QBP.Substrate.RuleFlowInvariants.quench_root_ge_initial",
+        "QBP.Substrate.RuleFlowInvariants.ellSq_limit_ge_initial"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-quench-endpoint-closed-form-conditional",
+      "declared_by": "#681-rule-flow-invariants",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlowInvariants.ellSq_limit_eq_closed_form",
+        "QBP.Substrate.RuleFlowInvariants.ellSq_tendsto_closed_form",
+        "QBP.Substrate.RuleFlowInvariants.quench_relation",
+        "QBP.Substrate.RuleFlowInvariants.quench_relation_univ",
+        "QBP.Substrate.RuleFlowInvariants.quench_root_pick",
+        "QBP.Substrate.RuleFlowInvariants.quench_root_pick_aux"
+      ]
     }
   ]
 }
