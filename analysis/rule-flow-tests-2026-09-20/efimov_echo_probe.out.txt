@@ -1,0 +1,12 @@
+V(x*) = 0.9999999999999996
+eps=1e-01: 1-V0 mean 9.57e-02  tau mean 0.164 sd 0.032  growth rate of ln(1-V) mean 11.478 sd 1.517  resid sd 7.98e-03  steps 132
+eps=1e-02: 1-V0 mean 1.00e-02  tau mean 0.323 sd 0.060  growth rate of ln(1-V) mean 13.371 sd 1.981  resid sd 2.76e-02  steps 248
+eps=1e-03: 1-V0 mean 1.00e-03  tau mean 0.459 sd 0.037  growth rate of ln(1-V) mean 14.512 sd 1.080  resid sd 4.47e-02  steps 282
+eps=1e-04: 1-V0 mean 1.00e-04  tau mean 0.600 sd 0.042  growth rate of ln(1-V) mean 14.988 sd 0.546  resid sd 4.48e-02  steps 395
+eps=1e-05: 1-V0 mean 1.00e-05  tau mean 0.776 sd 0.071  growth rate of ln(1-V) mean 14.991 sd 0.406  resid sd 4.32e-02  steps 501
+eps=1e-06: 1-V0 mean 1.00e-06  tau mean 0.917 sd 0.065  growth rate of ln(1-V) mean 15.154 sd 0.113  resid sd 4.54e-02  steps 556
+eps=1e-07: 1-V0 mean 1.00e-07  tau mean 1.047 sd 0.035  growth rate of ln(1-V) mean 15.209 sd 0.015  resid sd 4.69e-02  steps 575
+tau(eps) = 0.0645 ln(1/eps) + 0.0188; 1/slope = 15.516 (compare growth rate); residual sd 9.73e-03 vs tau sd across dirs 4.88e-02
+residuals per eps: [-0.0032  0.0078 -0.0052 -0.0125  0.0155  0.0079 -0.0102]
+best log-periodic component in tau residual (fitted-curve sd): 9.16e-03 at w=3.52 (period in ln eps 1.78, R2 0.89); Efimov period would be 3.12; residual noise 9.73e-03; per-direction scatter of tau 4.88e-02
+null (shuffled) best fitted sd: median 8.33e-03, 95% 9.46e-03
