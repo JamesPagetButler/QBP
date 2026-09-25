@@ -1,0 +1,4 @@
+quadrature: <b0^2>_init = 0.0666667 (1/15 = 0.0666667);  <b0^2>_quench (closed form) = 0.141587   [25 s]
+MC 1e7 Haar, V = flowlib.potential:  max |V - 4(AC-D^2)| = 8.9e-16
+MC <b0^2>_quench = 0.14162 +- 0.00005 ;  quantiles(0.1,.25,.5,.75,.9) = [0.0027 0.0174 0.076  0.2076 0.3861]
+on-record quench numbers: flow_big/#629 0.1462+-0.0011, s3_check seed 2 0.1454+-0.0011, 0.1436+-0.0011

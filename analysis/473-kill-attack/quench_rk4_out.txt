@@ -1,0 +1,21 @@
+grad closed form vs flowlib.gradV_exact (5 states): 2.2e-16
+field tangency max|<F,x>| = 2.1e-15 ; F[:,0] max = 0.0e+00
+N = 24000 identical Haar seeds; <b0^2>_init = 0.06768 (1/15 = 0.06667)
+closed form  b0^2/(b0^2+sqrt((1-b0^2)^2-V0)):  <b0^2>_end = 0.14215 +- 0.00108
+Euler h=0.02  T=100 (24000)  <b0^2> = 0.14525 +- 0.00110 | vs closed form: mean diff +3.10e-03, max|diff| 4.80e-02 | max V_end 5.1e-18, frac V_end>1e-8: 0.0000
+   [360 s]
+RK4 h=0.020 T=100 (24000)    <b0^2> = 0.14215 +- 0.00108 | vs closed form: mean diff +1.02e-07, max|diff| 4.01e-06 | max V_end 9.2e-19, frac V_end>1e-8: 0.0000
+   [623 s]
+paired Euler(0.02) - RK4(0.02), N=24000: mean +3.10e-03 +- 2.4e-05, max|.| 4.80e-02
+RK4 h=0.010 T=100 (6000)     <b0^2> = 0.14516 +- 0.00222 | vs closed form: mean diff +6.49e-09, max|diff| 2.25e-07 | max V_end 4.2e-30, frac V_end>1e-8: 0.0000
+   [157 s]
+RK4 h=0.005 T=100 (6000)     <b0^2> = 0.14516 +- 0.00222 | vs closed form: mean diff +4.10e-10, max|diff| 1.45e-08 | max V_end 1.8e-29, frac V_end>1e-8: 0.0000
+   [359 s]
+Richardson (6000 seeds): mean|RK4(0.02)-RK4(0.01)| = 9.53e-08, mean|RK4(0.01)-RK4(0.005)| = 6.08e-09, ratio 15.7 (h^4 -> 16)
+paired Euler(0.02) - RK4(0.005), 6000 seeds: mean +3.12e-03 +- 4.9e-05, max|.| 4.16e-02
+DP45 rtol1e-9 T=100 (2000)   <b0^2> = 0.14402 +- 0.00388 | vs closed form: mean diff -5.48e-13, max|diff| 3.90e-11 | max V_end 9.0e-21, frac V_end>1e-8: 0.0000
+   steps 544 rejected 10 [6 s]; paired DP45 - RK4(0.005): max|.| 1.46e-08
+RK4 h=0.02 T=100->400 (2000) <b0^2> = 0.14402 +- 0.00388 | vs closed form: mean diff -5.48e-13, max|diff| 3.90e-11 | max V_end 6.7e-31, frac V_end>1e-8: 0.0000
+   [78 s]; T=100->400 mean shift +1.80e-19
+flowlib.step h=0.02 (1000)   <b0^2> = 0.14975 +- 0.00560 | vs closed form: mean diff +3.16e-03, max|diff| 4.16e-02 | max V_end 9.2e-31, frac V_end>1e-8: 0.0000
+   [260 s]; paired flowlib.step - my Euler: max|.| 3.94e-15

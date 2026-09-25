@@ -1,0 +1,5 @@
+beta=10  <b0^2>_quadrature = 0.167532
+beta=30  <b0^2>_quadrature = 0.234149
+beta=100  <b0^2>_quadrature = 0.278425
+beta=300  <b0^2>_quadrature = 0.301502
+beta=1000  <b0^2>_quadrature = 0.315860

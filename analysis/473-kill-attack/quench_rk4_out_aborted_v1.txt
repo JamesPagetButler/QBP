@@ -1,0 +1,6 @@
+grad closed form vs flowlib.gradV_exact (5 states): 2.2e-16
+field tangency max|<F,x>| = 2.1e-15 ; F[:,0] max = 0.0e+00
+N = 24000 identical Haar seeds; <b0^2>_init = 0.06768 (1/15 = 0.06667)
+closed form  b0^2/(b0^2+sqrt((1-b0^2)^2-V0)):  <b0^2>_end = 0.14215 +- 0.00108
+Euler h=0.02  T=100          <b0^2> = 0.14525 +- 0.00110 | vs closed form: mean diff +3.10e-03, max|diff| 4.80e-02 | max V_end 5.1e-18, frac V_end>1e-8: 0.0000
+   [214 s]
