@@ -35,6 +35,7 @@ import QBP.Foundations.Octonion32Count
 import QBP.Foundations.QBPHorizonFoundations
 import QBP.Foundations.G2Transitivity
 import QBP.Foundations.SeamKernel
+import QBP.Foundations.SeamSpectrum
 
 /-!
 # QBP.Foundations — aggregator root for the foundation layer
