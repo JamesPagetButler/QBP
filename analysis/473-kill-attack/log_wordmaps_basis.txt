@@ -1,0 +1,52 @@
+mode basis: 368 word-maps with ≥1 x (of 471 trees), 1680 trajectories each, 100 steps
+  [  0/368] (xx)                   alive     0 Vmin(nonpole) None ridge None pole None periods {} HITS 0  12s
+  [ 50/368] (x(x(zl)))             alive  1680 Vmin(nonpole) 0.9995039713419405 ridge 1.0 pole 0.0 periods {'-1': 1680} HITS 0  112s
+  [100/368] (l(x(lx)))             alive     0 Vmin(nonpole) None ridge None pole None periods {} HITS 0  252s
+  [150/368] (z(z(xl)))             alive  1680 Vmin(nonpole) 0.9999999999999996 ridge 1.0 pole 0.0 periods {'2': 1680} HITS 0  393s
+  [200/368] ((lx)(xx))             alive  1680 Vmin(nonpole) 0.005326186419295199 ridge 0.05 pole 0.0 periods {'2': 1680} HITS 0  529s
+  [250/368] ((x(ll))x)             alive     0 Vmin(nonpole) None ridge None pole None periods {} HITS 0  660s
+  [300/368] ((z(zx))z)             alive  1680 Vmin(nonpole) 0.9999999999999991 ridge 1.0 pole 0.0 periods {'2': 1680} HITS 0  786s
+  [350/368] (((zx)x)l)             alive  1680 Vmin(nonpole) 0.9995039713419407 ridge 1.0 pole 0.0 periods {'-1': 1680} HITS 0  912s
+
+nonlinear word-maps (≥2 x): 180; linear (1 x): 188
+min endpoint V over all non-pole alive trajectories and all maps: 4.249e-06
+maps with any non-pole endpoint V<1e-3: 8 of 368; total such trajectories 864 of 618240
+maps whose alive endpoints are all on the ridge: 200; all at a pole: 4; fully dead: 58
+period census over alive trajectories (−1 = not periodic ≤6 at 1e-7): {'-1': 103520, '1': 57120, '2': 360160}
+HITS (endpoint V < 1e-6, |b0| < 0.999): 0
+10 maps with the smallest non-pole endpoint V:
+    (z(x(lx)))             n_x 2  Vmin 4.249e-06  frac<1e-3 0.054  ridge 0.050 pole 0.002  periods {'-1': 1680}
+    (z((xl)x))             n_x 2  Vmin 4.249e-06  frac<1e-3 0.054  ridge 0.050 pole 0.002  periods {'-1': 1680}
+    ((x(lx))z)             n_x 2  Vmin 4.249e-06  frac<1e-3 0.054  ridge 0.050 pole 0.002  periods {'-1': 1680}
+    (((xl)x)z)             n_x 2  Vmin 4.249e-06  frac<1e-3 0.054  ridge 0.050 pole 0.002  periods {'-1': 1680}
+    (x(lx))                n_x 2  Vmin 2.592e-05  frac<1e-3 0.158  ridge 0.000 pole 0.000  periods {'-1': 1680}
+    ((xl)x)                n_x 2  Vmin 2.592e-05  frac<1e-3 0.158  ridge 0.000 pole 0.000  periods {'-1': 1680}
+    (x(l(xz)))             n_x 2  Vmin 2.256e-04  frac<1e-3 0.001  ridge 0.098 pole 0.000  periods {'-1': 1680}
+    (((zx)l)x)             n_x 2  Vmin 2.256e-04  frac<1e-3 0.001  ridge 0.098 pole 0.000  periods {'-1': 1680}
+    (x(z(zx)))             n_x 2  Vmin 3.840e-03  frac<1e-3 0.000  ridge 0.026 pole 0.000  periods {'-1': 1680}
+    (x((xz)z))             n_x 2  Vmin 3.840e-03  frac<1e-3 0.000  ridge 0.026 pole 0.000  periods {'-1': 1680}
+done 956s
+	Command being timed: "run-bounded 2G 3000 python3 attack2_wordmaps.py basis"
+	User time (seconds): 804.32
+	System time (seconds): 106.13
+	Percent of CPU this job got: 95%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 15:55.90
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 38852
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 31195445
+	Voluntary context switches: 45
+	Involuntary context switches: 161023
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 296
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+rc=0

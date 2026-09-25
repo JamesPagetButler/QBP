@@ -1,0 +1,277 @@
+{
+ "mode": "basis",
+ "NS": 200,
+ "NZ": 84,
+ "steps": 200,
+ "results": {
+  "x\u00b7z [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 16800,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.4393221925688696e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "x\u00b7z [im]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.439322192568904e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "z\u00b7x [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 16800,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.4393221925688696e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "z\u00b7x [im]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.439322192568904e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "[x,z] [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.439322192568904e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "[x,z] [im]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.439322192568904e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "x+z [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 1.0000000000000004,
+   "V_end_mean": 1.0000000000000002,
+   "V_end_max": 1.0000000000000004,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.0793865609707937e-60,
+   "periods(up to sign)": {
+    "1": 16800
+   },
+   "hits": 0
+  },
+  "x+z [im]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 1.0000000000000004,
+   "V_end_mean": 1.0000000000000002,
+   "V_end_max": 1.0000000000000004,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 1.0793865609707937e-60,
+   "periods(up to sign)": {
+    "1": 16800
+   },
+   "hits": 0
+  },
+  "xz+zx [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 16800,
+   "V_end_min": 1.0000000000000004,
+   "V_end_mean": 1.0000000000000002,
+   "V_end_max": 1.0000000000000004,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.0,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "xz+zx [im]": {
+   "alive": 0,
+   "dead(\u21920 or real)": 16800,
+   "left_Im": 0,
+   "V_end_min": null,
+   "V_end_mean": null,
+   "V_end_max": null,
+   "frac_V>0.999": null,
+   "frac_V<1e-3": null,
+   "|b0|_end_max": null,
+   "periods(up to sign)": {},
+   "hits": 0
+  },
+  "(xz)\u2113 [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 16800,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.4393221925688696e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "(xz)\u2113 [im]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.439322192568904e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "z(x\u2113) [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 16800,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.439322192568873e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "z(x\u2113) [im]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.9999999999999996,
+   "V_end_mean": 1.0,
+   "V_end_max": 1.0000000000000009,
+   "frac_V>0.999": 1.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 5.439322192568904e-30,
+   "periods(up to sign)": {
+    "2": 16800
+   },
+   "hits": 0
+  },
+  "x+z+\u2113 [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.25,
+   "V_end_mean": 0.25,
+   "V_end_max": 0.25,
+   "frac_V>0.999": 0.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.7071067811865476,
+   "periods(up to sign)": {
+    "1": 16800
+   },
+   "hits": 0
+  },
+  "x+z+\u2113 [im]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.25,
+   "V_end_mean": 0.25,
+   "V_end_max": 0.25,
+   "frac_V>0.999": 0.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.7071067811865476,
+   "periods(up to sign)": {
+    "1": 16800
+   },
+   "hits": 0
+  },
+  "x+z\u2212\u2113 [raw]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.25,
+   "V_end_mean": 0.25,
+   "V_end_max": 0.25,
+   "frac_V>0.999": 0.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.7071067811865476,
+   "periods(up to sign)": {
+    "1": 16800
+   },
+   "hits": 0
+  },
+  "x+z\u2212\u2113 [im]": {
+   "alive": 16800,
+   "dead(\u21920 or real)": 0,
+   "left_Im": 0,
+   "V_end_min": 0.25,
+   "V_end_mean": 0.25,
+   "V_end_max": 0.25,
+   "frac_V>0.999": 0.0,
+   "frac_V<1e-3": 0.0,
+   "|b0|_end_max": 0.7071067811865476,
+   "periods(up to sign)": {
+    "1": 16800
+   },
+   "hits": 0
+  }
+ },
+ "seconds": 888.541757106781
+}

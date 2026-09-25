@@ -1,0 +1,22 @@
+# run-bounded resource log — attack 2 (estimates written before launch; actuals from the run output)
+zd_enum_check.py      est <300MB / <60s   cap 1G/120s
+zd_subspaces.py       est <300MB / <60s   cap 1G/120s
+attack2_words.py basis 4 (smoke)  est <300MB / <90s  cap 2G/300s  actual 79s
+attack2_maps.py basis 4 (smoke)   est <300MB / <60s  cap 2G/300s  actual 34s
+attack2_equiv.py      est <500MB / <180s  cap 2G/600s
+attack2_words.py basis 200  est 1.6GB (471 stored arrays × 16800×16×8B ≈ 1.0GB + level-3 imnode 216 arrays ≈ 0.5GB) / ~10 min (50× smoke batch, product cost ~linear)  cap 6G/1800s
+attack2_words.py ridge 200  est 1.0GB / ~6 min  cap 4G/1800s
+attack2_maps.py basis 200   est <600MB (a few 16800×16 arrays + 7-step history) / ~5 min  cap 3G/1800s
+attack2_maps.py ridge 200   est <400MB / ~3 min  cap 3G/1800s
+attack2_equiv.py rerun: est <500MB / <240s (vectorised residual; 360-angle grid + 2 z-sets × 7 auts × 200-step maps on 1680 rows)  cap 2G/900s
+# --- re-estimates after the OOM kills (words basis 200: killed at 6G; words ridge 200: killed at 4G) ---
+# measured: NS=8 (672 rows) peak RSS 404 MB; NS=20 (1680 rows) 922 MB  → ≈ 0.55 MB/row incl. heap fragmentation (live data ≈ 0.09 MB/row)
+# fix: chunked accumulation (≤ 2100 rows per chunk) + MALLOC_MMAP_THRESHOLD_=65536 so freed temporaries return to the OS
+attack2_words.py basis 200 (chunked)  est ≤ 1.2 GB peak / ≈ 45 min (0.13 s/row measured × 16800 rows + 8 × 60 s fixed)  cap 4G/3600s
+attack2_words.py ridge 200 (chunked)  est ≤ 1.2 GB peak / ≈ 30 min (10000 rows)  cap 3G/3000s
+attack2_maps.py basis 200             actual 889 s, rc 0;  attack2_maps.py ridge 200  actual 478 s, rc 0
+attack2_equiv.py (vectorised)         actual 203 s, rc 0 (first attempt: timed out at 600 s — unvectorised 256-pair residual × 360 grid angles)
+attack2_words.py basis/ridge 200 RERUN (naming fix only): est 1.2 GB / 29 min and 19 min (measured v1)  caps 4G/3600s, 3G/3000s
+attack2_wordmaps.py basis  est <400MB / ≈20 min (468 maps × 100 steps × ≤3 products on 1680 rows ≈ 3 ms each)  cap 2G/3000s
+attack2_wordmaps.py ridge  est <400MB / ≈8 min (400 rows)  cap 2G/3000s
+attack2_nearmiss.py est <200MB / <180s (4 maps × 2000 steps × ≤3 products on 1680 rows)  cap 1G/600s

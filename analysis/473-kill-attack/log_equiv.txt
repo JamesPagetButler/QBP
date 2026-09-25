@@ -1,0 +1,26 @@
+/home/prime/Documents/QBP/.claude/worktrees/probe-kill-2/analysis/473-kill-attack/attack2_equiv.py:88: RuntimeWarning: All-NaN slice encountered
+  dV = max(np.nanmax(np.abs(img[k][0] - base[k][0])) for k in base)
+automorphisms used (residual over 256 basis pairs):
+  rot+120    residual 5.6e-16  ℓ ↦ +ℓ
+  rot-120    residual 5.6e-16  ℓ ↦ +ℓ
+  refl0      residual 0.0e+00  ℓ ↦ −ℓ
+  refl60     residual 5.6e-16  ℓ ↦ −ℓ
+  refl120    residual 1.3e-15  ℓ ↦ −ℓ
+  G2#0       residual 4.2e-14  ℓ ↦ +ℓ
+  G2#1       residual 1.1e-13  ℓ ↦ +ℓ
+  basis84  rot+120    max|ΔV| 1.6e-15  max|Δ|b0|| 2.2e-16  degeneracy mismatches 0
+  basis84  rot-120    max|ΔV| 1.7e-15  max|Δ|b0|| 2.2e-16  degeneracy mismatches 0
+  basis84  refl0      max|ΔV| 0.0e+00  max|Δ|b0|| 0.0e+00  degeneracy mismatches 0
+  basis84  refl60     max|ΔV| 1.7e-15  max|Δ|b0|| 2.2e-16  degeneracy mismatches 0
+  basis84  refl120    max|ΔV| 1.7e-15  max|Δ|b0|| 2.2e-16  degeneracy mismatches 0
+  basis84  G2#0       max|ΔV| 6.0e-14  max|Δ|b0|| 4.5e-14  degeneracy mismatches 0
+  basis84  G2#1       max|ΔV| 9.8e-14  max|Δ|b0|| 7.3e-14  degeneracy mismatches 0
+  ridge20  rot+120    max|ΔV| 1.1e-15  max|Δ|b0|| 2.2e-16  degeneracy mismatches 0
+  ridge20  rot-120    max|ΔV| 1.2e-15  max|Δ|b0|| 2.2e-16  degeneracy mismatches 0
+  ridge20  refl0      max|ΔV| 0.0e+00  max|Δ|b0|| 0.0e+00  degeneracy mismatches 0
+  ridge20  refl60     max|ΔV| 1.2e-15  max|Δ|b0|| 2.2e-16  degeneracy mismatches 0
+  ridge20  refl120    max|ΔV| 1.3e-15  max|Δ|b0|| 2.2e-16  degeneracy mismatches 0
+  ridge20  G2#0       max|ΔV| 6.8e-14  max|Δ|b0|| 3.6e-14  degeneracy mismatches 0
+  ridge20  G2#1       max|ΔV| 1.0e-13  max|Δ|b0|| 6.0e-14  degeneracy mismatches 0
+done 203s
+rc=0

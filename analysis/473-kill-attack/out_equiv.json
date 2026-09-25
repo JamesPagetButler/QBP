@@ -1,0 +1,84 @@
+{
+ "auts": [
+  "rot+120",
+  "rot-120",
+  "refl0",
+  "refl60",
+  "refl120",
+  "G2#0",
+  "G2#1"
+ ],
+ "report": {
+  "basis84/rot+120": {
+   "max|\u0394V|": 1.5543122344752192e-15,
+   "max|\u0394|b0||": 2.220446049250313e-16,
+   "degeneracy-pattern mismatches": 0
+  },
+  "basis84/rot-120": {
+   "max|\u0394V|": 1.6653345369377348e-15,
+   "max|\u0394|b0||": 2.220446049250313e-16,
+   "degeneracy-pattern mismatches": 0
+  },
+  "basis84/refl0": {
+   "max|\u0394V|": 0.0,
+   "max|\u0394|b0||": 0.0,
+   "degeneracy-pattern mismatches": 0
+  },
+  "basis84/refl60": {
+   "max|\u0394V|": 1.6653345369377348e-15,
+   "max|\u0394|b0||": 2.220446049250313e-16,
+   "degeneracy-pattern mismatches": 0
+  },
+  "basis84/refl120": {
+   "max|\u0394V|": 1.6653345369377348e-15,
+   "max|\u0394|b0||": 2.220446049250313e-16,
+   "degeneracy-pattern mismatches": 0
+  },
+  "basis84/G2#0": {
+   "max|\u0394V|": 5.96189764223709e-14,
+   "max|\u0394|b0||": 4.463096558993129e-14,
+   "degeneracy-pattern mismatches": 0
+  },
+  "basis84/G2#1": {
+   "max|\u0394V|": 9.792167077193881e-14,
+   "max|\u0394|b0||": 7.293991799439681e-14,
+   "degeneracy-pattern mismatches": 0
+  },
+  "ridge20/rot+120": {
+   "max|\u0394V|": 1.1102230246251565e-15,
+   "max|\u0394|b0||": 2.220446049250313e-16,
+   "degeneracy-pattern mismatches": 0
+  },
+  "ridge20/rot-120": {
+   "max|\u0394V|": 1.2212453270876722e-15,
+   "max|\u0394|b0||": 2.220446049250313e-16,
+   "degeneracy-pattern mismatches": 0
+  },
+  "ridge20/refl0": {
+   "max|\u0394V|": 0.0,
+   "max|\u0394|b0||": 0.0,
+   "degeneracy-pattern mismatches": 0
+  },
+  "ridge20/refl60": {
+   "max|\u0394V|": 1.2212453270876722e-15,
+   "max|\u0394|b0||": 2.220446049250313e-16,
+   "degeneracy-pattern mismatches": 0
+  },
+  "ridge20/refl120": {
+   "max|\u0394V|": 1.3322676295501878e-15,
+   "max|\u0394|b0||": 2.220446049250313e-16,
+   "degeneracy-pattern mismatches": 0
+  },
+  "ridge20/G2#0": {
+   "max|\u0394V|": 6.816769371198461e-14,
+   "max|\u0394|b0||": 3.642919299551295e-14,
+   "degeneracy-pattern mismatches": 0
+  },
+  "ridge20/G2#1": {
+   "max|\u0394V|": 1.0369483049998962e-13,
+   "max|\u0394|b0||": 6.036837696399289e-14,
+   "degeneracy-pattern mismatches": 0
+  }
+ },
+ "seconds": 203.0959951877594
+}
