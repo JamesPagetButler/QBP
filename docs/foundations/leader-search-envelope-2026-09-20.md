@@ -19,10 +19,10 @@ Our universe has one value of b₀²; the ledger's 0.146 is the ensemble mean (r
 | Component | Free content | Size |
 |---|---|---|
 | clock: rule-time → physical time | linear (τ), logarithmic in scale factor (κ), power law | 3 families, 1–2 parameters |
-| constants map: transverse coordinate x → each dimensionless constant | one integer power p per constant (single Hessian rate ⇒ hierarchies are integer multiples) + today's value as normalisation (fitted, not predicted) | p ∈ {1..4} for {α, μ, G, Λ}: ≤ 256 discrete leaders |
+| constants map: transverse coordinate x → each dimensionless constant | one integer power p per constant — a **working assumption of the map construction** (the single transverse Hessian rate 8(1 − b₀²) forces every decay to share one time scale; it does NOT force the constants map to use integer powers; integer p is the simplest family to enumerate, per Gemini review of PR #686) + today's value as normalisation (fitted, not predicted) | p ∈ {1..4} for {α, μ, G, Λ}: ≤ 256 discrete leaders |
 | matter map (link 4) | undefined — no substrate→hosted-field map exists | not searchable |
 
-Parameter-free predictive content per leader: **the ratios of fractional drift rates**, R_XY = p_X / p_Y, and a common time-dependence e^{−k p t}. This sharpens the ledger's own `INSIGHT-direct-gamma-fixed-ratio-generic` (fixed ratios are generic to any single-field model) into a QBP-specific structure: the ratios are **ratios of small integers**, because the substrate has exactly one relaxation rate.
+Parameter-free predictive content per leader: **the ratios of fractional drift rates**, R_XY = p_X / p_Y, and a common time-dependence e^{−k p t}. This sharpens the ledger's own `INSIGHT-direct-gamma-fixed-ratio-generic` (fixed ratios are generic to any single-field model) into a QBP-specific structure: the ratios are **ratios of small integers** *under the integer-power assumption above*; what the single relaxation rate forces by itself is only that all drifts share one time scale.
 
 ## 3. The experimental data the ledger holds (all bounds; no detections)
 
