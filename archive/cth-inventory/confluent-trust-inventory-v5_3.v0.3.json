@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.9.0",
+  "version": "6.10.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -11414,6 +11414,246 @@
           "QBP.Substrate.RuleFlowInvariants.quench_root_pick_aux"
         ]
       }
+    },
+    {
+      "id": "PROOF-seam-zd-gram-spectrum-4-8-4",
+      "name": "At the canonical zero divisor z₊ = e₁ + e₁₀ the Gram operator G₊ = L_{z₊}ᵀL_{z₊} = −L_{z₊}² has spectrum exactly {4 (×4), 2 (×8), 0 (×4)}: G(G−2)(G−4) = 0, eigenspaces exact as explicit spans, the three eigen-projectors sum to id",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamSpectrum.lean: at the canonical pair {1,10} (z₊ = e₁ + e₁₀, `seamX`) the left-multiplication Gram operator G₊ := −L_{z₊}² (`seamG`) is the Gram operator of L_{z₊} for the coordinate bilinear form, ⟪L y, L w⟫ = ⟪y, G w⟫ (`seamGram_eq`), and satisfies the cubic G(G−2)(G−4) = 0 (`seamG_cubic`, the main theorem). The eigenspaces are identified EXACTLY as explicit spans: E₄ = topSpan (`seamEig_four_eq`), E₂ = midSpan (`seamEig_two_eq`), E₀ = seamKerSpan, the #666 kernel of L_{z₊} (`seamEig_zero_eq`), with finranks 4 / 8 / 4 (`finrank_seamEig_four`, `finrank_seamEig_two`, `finrank_seamEig_zero`). The three eigen-projectors sum to the identity (`proj_decomp`), so G₊ is diagonalised over ℝ; completeness is over the REAL spectrum — G₊ is self-adjoint for the coordinate form (`seamG_self_adjoint`) and the three eigenspaces exhaust 𝕊 as submodules, M ⊔ T ⊔ K = ⊤ (`midSpan_sup_topSpan_sup_seamKerSpan`), so the complexified operator is diagonal with the same entries and no complex eigenvalue can hide. This is the 4/8/4 decomposition attack 2 measured numerically at the witness, now a theorem at the witness. NOT claimed: the 4/8/4 multiplicities for any of the other 83 basis-sum zero divisors (multiplicity is proved only at the canonical pair {1,10}; the uniform theorems fix no multiplicity); anything about ad_z = L_z − R_z or a generic unforced t (attack 2 measures 4/6/6 for ad_z; observed-only); any bearing on the flow, orbits, the crystallisation endpoint, Prop 13(b), or the status of FLAG-locale-forcing-route-reopened; that NoAutonomousDynamics.lean's caveat is closed — it is DERIVED only for L_z and R_z at the canonical generator pair, and the anchored file was not edited.",
+      "proof_file": "proofs/QBP/Foundations/SeamSpectrum.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamSpectrum.seamG_cubic",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamSpectrum.seamGram_eq",
+        "QBP.Foundations.SeamSpectrum.seamEig_four_eq",
+        "QBP.Foundations.SeamSpectrum.seamEig_two_eq",
+        "QBP.Foundations.SeamSpectrum.seamEig_zero_eq",
+        "QBP.Foundations.SeamSpectrum.finrank_seamEig_four",
+        "QBP.Foundations.SeamSpectrum.finrank_seamEig_two",
+        "QBP.Foundations.SeamSpectrum.finrank_seamEig_zero",
+        "QBP.Foundations.SeamSpectrum.proj_decomp",
+        "QBP.Foundations.SeamSpectrum.seamG_self_adjoint",
+        "QBP.Foundations.SeamSpectrum.midSpan_sup_topSpan_sup_seamKerSpan"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-seam-zd-witness-kernel-four",
+        "PROOF-no-autonomous-algebraic-dynamics"
+      ],
+      "foundation_batch": "#682-seam-spectrum",
+      "last_tested_at": "2026-09-25T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-25T00:00:00Z",
+        "verifier": "run-bounded lake build QBP.Foundations.SeamSpectrum (3021 jobs, exit 0) + fresh `lake env lean` elaboration (0 errors) + #print axioms on all 153 declarations of the file's audit block: 150 × {propext, Classical.choice, Quot.sound} + 3 × {propext} (midIdx, midIdx_spec, seam_xor_idx) (qbp-oppenheimer, 2026-09-25; PR #682 Red Team APPROVE at 74ed74c, Gemini APPROVE)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamSpectrum.seamG_cubic",
+          "QBP.Foundations.SeamSpectrum.seamGram_eq",
+          "QBP.Foundations.SeamSpectrum.seamEig_four_eq",
+          "QBP.Foundations.SeamSpectrum.seamEig_two_eq",
+          "QBP.Foundations.SeamSpectrum.seamEig_zero_eq",
+          "QBP.Foundations.SeamSpectrum.finrank_seamEig_four",
+          "QBP.Foundations.SeamSpectrum.finrank_seamEig_two",
+          "QBP.Foundations.SeamSpectrum.finrank_seamEig_zero",
+          "QBP.Foundations.SeamSpectrum.proj_decomp",
+          "QBP.Foundations.SeamSpectrum.seamG_self_adjoint",
+          "QBP.Foundations.SeamSpectrum.midSpan_sup_topSpan_sup_seamKerSpan"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-seam-top-plane-on-frozen-ridge",
+      "name": "Every unit vector of the top eigenspace E₄(G₊) at z₊ = e₁ + e₁₀ lies on the frozen ridge V = 1 of the state sphere; E₄(G₊) = ker L_{z₋}; z₊·x = 0 ⇔ x ∈ E₀(G₊)",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamSpectrum.lean: `top_plane_on_ridge_mem` (the main theorem) — for every t in the top eigenspace T = E₄(G₊) = topSpan of PROOF-seam-zd-gram-spectrum-4-8-4, V(t) = N(t)² (`potV`, the sedenion potential), i.e. every unit vector of T has V = 1 and lies on the frozen ridge of the state sphere — the observed [1.0000, 1.0000] of attack 2 §3 DERIVED for the entire 4-plane, not sampled. `top_plane_zero_divisor`: every nonzero t ∈ T is a two-sided zero divisor against z₋ = e₁ − e₁₀ (`seamXm`): z₋·t = 0 and t·z₋ = 0, so T is a 4-dimensional ridge plane inside the 42-plane system. `seamLm_ker_eq`: ker L_{z₋} = topSpan, i.e. E₄(G₊) = ker L_{z₋} — the first ridge identity, the companion of E₀(G₊) = ker L_{z₊}: z₊·x = 0 ⇔ x ∈ E₀(G₊) = seamKerSpan (`seamEig_zero_eq` of the spectrum anchor; the #666 kernel), so the two eigenspaces at the ends of the spectrum are exactly the two kernels of the paired zero divisors z₊, z₋. NOT claimed: the 4/8/4 multiplicities for any of the other 83 basis-sum zero divisors (multiplicity is proved only at the canonical pair {1,10}; the uniform theorems fix no multiplicity); anything about ad_z = L_z − R_z or a generic unforced t (attack 2 measures 4/6/6 for ad_z; observed-only); any bearing on the flow, orbits, the crystallisation endpoint, Prop 13(b), or the status of FLAG-locale-forcing-route-reopened; that NoAutonomousDynamics.lean's caveat is closed — it is DERIVED only for L_z and R_z at the canonical generator pair, and the anchored file was not edited.",
+      "proof_file": "proofs/QBP/Foundations/SeamSpectrum.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamSpectrum.top_plane_on_ridge_mem",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamSpectrum.top_plane_zero_divisor",
+        "QBP.Foundations.SeamSpectrum.seamLm_ker_eq"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-seam-zd-witness-kernel-four",
+        "PROOF-no-autonomous-algebraic-dynamics"
+      ],
+      "foundation_batch": "#682-seam-spectrum",
+      "last_tested_at": "2026-09-25T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-25T00:00:00Z",
+        "verifier": "run-bounded lake build QBP.Foundations.SeamSpectrum (3021 jobs, exit 0) + fresh `lake env lean` elaboration (0 errors) + #print axioms on all 153 declarations of the file's audit block: 150 × {propext, Classical.choice, Quot.sound} + 3 × {propext} (midIdx, midIdx_spec, seam_xor_idx) (qbp-oppenheimer, 2026-09-25; PR #682 Red Team APPROVE at 74ed74c, Gemini APPROVE)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamSpectrum.top_plane_on_ridge_mem",
+          "QBP.Foundations.SeamSpectrum.top_plane_zero_divisor",
+          "QBP.Foundations.SeamSpectrum.seamLm_ker_eq"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-seam-right-gram-equals-left",
+      "name": "At z₊ = e₁ + e₁₀ the right-multiplication Gram operator R_{z₊}ᵀR_{z₊} EQUALS G₊ = L_{z₊}ᵀL_{z₊} on the nose, via the sign-table identity (x·z)·z = z·(z·x) — NOT via alternativity, which fails in 𝕊 — so R_{z₊} shares the spectrum and eigenspaces",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamSpectrum.lean: `seamGR_eq_seamG` (the main theorem) — the right Gram operator G_R := −R_{z₊}² (`seamGR`) equals G₊ = −L_{z₊}² as linear maps. The route is the sign-table identity `seam_gram_lr`: (x·z₊)·z₊ = z₊·(z₊·x) for every sedenion x, proved from the Cayley–Dickson sign table at the {1,10} block — NOT from alternativity, which FAILS in 𝕊 (no (x·z)·z = x·(z·z) is used or true). `seamRGram_eq`: ⟪R y, R w⟫ = ⟪y, G₊ w⟫, so G₊ is also the Gram operator of R_{z₊}; hence R_{z₊} has the SAME spectrum {4 (×4), 2 (×8), 0 (×4)} on the SAME subspaces T, M, K, and every singular value and top-space statement of PROOF-seam-top-plane-on-frozen-ridge transfers to right multiplication. `seamRm_ker_eq`: ker R_{z₋} = topSpan, the right-multiplication ridge identity (with #666's kernels-coincide: the left and right kernels of z₊ agree, so E₀ is two-sided as well). This is the 'if cheap' item of the note's §1 and it was cheap: one sign-table identity. NOT claimed: the 4/8/4 multiplicities for any of the other 83 basis-sum zero divisors (multiplicity is proved only at the canonical pair {1,10}; the uniform theorems fix no multiplicity); anything about ad_z = L_z − R_z or a generic unforced t (attack 2 measures 4/6/6 for ad_z; observed-only); any bearing on the flow, orbits, the crystallisation endpoint, Prop 13(b), or the status of FLAG-locale-forcing-route-reopened; that NoAutonomousDynamics.lean's caveat is closed — it is DERIVED only for L_z and R_z at the canonical generator pair, and the anchored file was not edited.",
+      "proof_file": "proofs/QBP/Foundations/SeamSpectrum.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamSpectrum.seamGR_eq_seamG",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamSpectrum.seam_gram_lr",
+        "QBP.Foundations.SeamSpectrum.seamRGram_eq",
+        "QBP.Foundations.SeamSpectrum.seamRm_ker_eq"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-seam-zd-witness-kernel-four",
+        "PROOF-no-autonomous-algebraic-dynamics"
+      ],
+      "foundation_batch": "#682-seam-spectrum",
+      "last_tested_at": "2026-09-25T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-25T00:00:00Z",
+        "verifier": "run-bounded lake build QBP.Foundations.SeamSpectrum (3021 jobs, exit 0) + fresh `lake env lean` elaboration (0 errors) + #print axioms on all 153 declarations of the file's audit block: 150 × {propext, Classical.choice, Quot.sound} + 3 × {propext} (midIdx, midIdx_spec, seam_xor_idx) (qbp-oppenheimer, 2026-09-25; PR #682 Red Team APPROVE at 74ed74c, Gemini APPROVE)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamSpectrum.seamGR_eq_seamG",
+          "QBP.Foundations.SeamSpectrum.seam_gram_lr",
+          "QBP.Foundations.SeamSpectrum.seamRGram_eq",
+          "QBP.Foundations.SeamSpectrum.seamRm_ker_eq"
+        ]
+      }
+    },
+    {
+      "id": "PROOF-basis-pair-gram-uniform-bounds",
+      "name": "For EVERY basis pair a, b ≠ 0 and sign s = ±1, z = e_a + s·e_b: any real eigenvalue of G_z = L_zᵀL_z on a nonzero eigenvector lies in [0,4]; E₄(G₊) = ker L_{z₋}; E₀(G_z) = ker L_z — uniform, pair-generic, NO multiplicity fixed",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "Foundations/SeamSpectrum.lean: for every a, b : Fin 16 with a, b ≠ 0 and s ∈ {1, −1}, z = sbp a b s = e_a + s·e_b, with `sbpL a b s` = L_z, `sbpG a b s` = −L_z² and `sbpEig a b s c` the c-eigenspace: `sbpG_eigenvalue_mem_Icc` (the main theorem) — any real c with a NONZERO x ∈ sbpEig a b s c satisfies c ∈ [0, 4]; `sbpEig_four_eq` — sbpEig a b 1 4 = ker (sbpL a b (−1)), i.e. E₄(G₊) = ker L_{z₋} for every pair; `sbpEig_zero_eq` — sbpEig a b s 0 = ker (sbpL a b s), i.e. E₀(G_z) = ker L_z for every pair and sign. The tools: `sbpGram_eq` (sbpG really is L_zᵀL_z: ⟪L_z y, L_z w⟫ = ⟪y, G_z w⟫, so G_z is self-adjoint and no complex eigenvalue can escape [0,4]), `sbpG_rayleigh` (the Rayleigh quotient ⟪y, G_z y⟫ = N(z·y)), `N_basisPair_split` (N(z₊·x) + N(z₋·x) = 4·N(x) for every pair, a, b unrestricted) and `N_basisPair_le_neg` (N(z₋·x) ≤ 4·N(x)), `basisPair_sq_split` (L_{z₊}² + L_{z₋}² = −4·id, i.e. G₊ + G₋ = 4·id), `sbp_sq_eq_zero_iff` (z·(z·x) = 0 ⇔ z·x = 0, so E₀(G_z) is exactly the kernel). NO multiplicity is fixed by any of these — they bound the spectrum and name two eigenspaces, nothing more. Anti-vacuity: the {1,10} instance is the §4 witness operator — `sbpL_seam` (sbpL 1 10 1 = seamL, by rfl), `sbpG_seam` (sbpG 1 10 1 = seamG), `sbpEig_seam` (sbpEig 1 10 1 c = seamEig c), so at the canonical pair these specialise to the 4/8/4 statements of PROOF-seam-zd-gram-spectrum-4-8-4 with E₄ of finrank 4. (`N_basisPair_split` quantifies over all a, b : Fin 16, including a = b and 0 — true but vacuous cases; the 84 basis-sum zero divisors are a strict subset of what is quantified.) NOT claimed: the 4/8/4 multiplicities for any of the other 83 basis-sum zero divisors (multiplicity is proved only at the canonical pair {1,10}; the uniform theorems fix no multiplicity); anything about ad_z = L_z − R_z or a generic unforced t (attack 2 measures 4/6/6 for ad_z; observed-only); any bearing on the flow, orbits, the crystallisation endpoint, Prop 13(b), or the status of FLAG-locale-forcing-route-reopened; that NoAutonomousDynamics.lean's caveat is closed — it is DERIVED only for L_z and R_z at the canonical generator pair, and the anchored file was not edited.",
+      "proof_file": "proofs/QBP/Foundations/SeamSpectrum.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.SeamSpectrum.sbpG_eigenvalue_mem_Icc",
+      "lean_companion_theorems": [
+        "QBP.Foundations.SeamSpectrum.sbpEig_four_eq",
+        "QBP.Foundations.SeamSpectrum.sbpEig_zero_eq",
+        "QBP.Foundations.SeamSpectrum.sbpGram_eq",
+        "QBP.Foundations.SeamSpectrum.sbpG_rayleigh",
+        "QBP.Foundations.SeamSpectrum.N_basisPair_split",
+        "QBP.Foundations.SeamSpectrum.N_basisPair_le_neg",
+        "QBP.Foundations.SeamSpectrum.basisPair_sq_split",
+        "QBP.Foundations.SeamSpectrum.sbp_sq_eq_zero_iff",
+        "QBP.Foundations.SeamSpectrum.sbpL_seam",
+        "QBP.Foundations.SeamSpectrum.sbpG_seam",
+        "QBP.Foundations.SeamSpectrum.sbpEig_seam"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-seam-zd-witness-kernel-four",
+        "PROOF-no-autonomous-algebraic-dynamics"
+      ],
+      "foundation_batch": "#682-seam-spectrum",
+      "last_tested_at": "2026-09-25T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-09-25T00:00:00Z",
+        "verifier": "run-bounded lake build QBP.Foundations.SeamSpectrum (3021 jobs, exit 0) + fresh `lake env lean` elaboration (0 errors) + #print axioms on all 153 declarations of the file's audit block: 150 × {propext, Classical.choice, Quot.sound} + 3 × {propext} (midIdx, midIdx_spec, seam_xor_idx) (qbp-oppenheimer, 2026-09-25; PR #682 Red Team APPROVE at 74ed74c, Gemini APPROVE)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.SeamSpectrum.sbpG_eigenvalue_mem_Icc",
+          "QBP.Foundations.SeamSpectrum.sbpEig_four_eq",
+          "QBP.Foundations.SeamSpectrum.sbpEig_zero_eq",
+          "QBP.Foundations.SeamSpectrum.sbpGram_eq",
+          "QBP.Foundations.SeamSpectrum.sbpG_rayleigh",
+          "QBP.Foundations.SeamSpectrum.N_basisPair_split",
+          "QBP.Foundations.SeamSpectrum.N_basisPair_le_neg",
+          "QBP.Foundations.SeamSpectrum.basisPair_sq_split",
+          "QBP.Foundations.SeamSpectrum.sbp_sq_eq_zero_iff",
+          "QBP.Foundations.SeamSpectrum.sbpL_seam",
+          "QBP.Foundations.SeamSpectrum.sbpG_seam",
+          "QBP.Foundations.SeamSpectrum.sbpEig_seam"
+        ]
+      }
     }
   ],
   "inputs": [
@@ -11985,6 +12225,11 @@
       "version": "6.9.0",
       "date": "2026-09-25T00:00:00Z",
       "note": "qbp-oppenheimer: PROOF anchors for the rule-flow invariants (PR #681; #473 target 6(i)) — encode-after-prove: along ANY integral curve of the rule the four G₂ × O(2) Gram invariants close (Ȧ = 4V(2A−1), Ċ = 4V(2C−1), Ṗ = 8VP, ḃ₀ = 4Vb₀); (A−½, C−½, P, b₀²) moves on a straight ray through (½, ½, 0, 0) (all 2×2 minors against the initial vector vanish); b₀² is non-decreasing; and CONDITIONALLY on V → 0 and the limit existing, the endpoint is the attack-1 closed form L = b₀²/(b₀² + √((1−b₀²)² − V₀)) with the root selection proved. Four anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound}, chained to PROOF-rule-gradient-and-tangent-field and PROOF-substrate-hosting-definition. Every anchor states that it ASSUMES an integral curve (HasDerivAt hypothesis) and, for the endpoint, ASSUMES V → 0 and the limit exists; none claims flow existence, convergence, or the ensemble mean 0.1416 (numerical, #675). No root, principle, decision or kill touched; FLAG-rule-flow-open stays open. (Version 6.9.0: rebased onto master after #677 → 6.7.0 and #679 → 6.8.0 landed; anchor-4 excluded-root wording corrected per Red Team/Gemini M1 at cda3d32 and M1′ at bf64db1 and M2 at 7b90975 (the B₀ = D = 0 point); #682 renumbers on its turn.)"
+    },
+    {
+      "version": "6.10.0",
+      "date": "2026-09-25T00:00:00Z",
+      "note": "qbp-oppenheimer: PROOF anchors for the seam zero-divisor spectrum (PR #682; #473 Lean target 6(ii)) — encode-after-prove: at the canonical basis-sum zero divisor z₊ = e₁ + e₁₀ the Gram operator G₊ = L_{z₊}ᵀL_{z₊} = −L_{z₊}² has spectrum exactly {4 (×4), 2 (×8), 0 (×4)} (G(G−2)(G−4) = 0, eigenspaces exact as explicit spans, projectors sum to id, completeness over the real spectrum); every unit vector of the top plane E₄(G₊) lies on the frozen ridge V = 1 and E₄(G₊) = ker L_{z₋}, E₀(G₊) = ker L_{z₊}; the right Gram operator R_{z₊}ᵀR_{z₊} equals G₊ on the nose via the sign-table identity (x·z)·z = z·(z·x) (not alternativity); and for EVERY basis pair and sign the spectrum of G_z lies in [0,4] with E₄(G₊) = ker L_{z₋} and E₀(G_z) = ker L_z (no multiplicity fixed). Four anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound} (153/153 audited: 150 × the triple + 3 × {propext}), chained to PROOF-seam-zd-witness-kernel-four (#666) and PROOF-no-autonomous-algebraic-dynamics. Every anchor carries Gemini's four negative constraints verbatim: no multiplicity claim for the other 83 basis-sum zero divisors; nothing about ad_z = L_z − R_z or a generic unforced t (observed-only, 4/6/6 for ad_z); no bearing on the flow, orbits, the crystallisation endpoint, Prop 13(b) or FLAG-locale-forcing-route-reopened; NoAutonomousDynamics.lean's caveat is DERIVED only for L_z and R_z at the canonical generator pair and the anchored file was not edited. No root, principle, decision or kill touched. (Version 6.10.0: encoded on master 6.9.0/335 after #681 landed; the earlier 6.10.0 claim on base 6.8.0 was re-encoded here, records unchanged.); #681 claims 6.9.0 — this PR renumbers and re-encodes after #681 lands.)"
     }
   ],
   "last_updated": "2026-09-25T00:00:00Z",

@@ -154,7 +154,7 @@ because `R_zᵀR_z = L_zᵀL_z` on the nose, `seamGR_eq_seamG`, so it has the *s
 
 So the honest amendment to the caveat is:
 
-> DERIVED for `L_z` and `R_z` at the canonical basis-sum zero-divisor generators (`SeamSpectrum`,
+> DERIVED for `L_z` and `R_z` at the canonical basis-sum zero-divisor generator pair (`SeamSpectrum`,
 > witness `e₁+e₁₀`: `top_plane_zero_divisor`, `top_plane_on_ridge_mem`, `seamRm_ker_eq`); `ad_z` and a
 > generic unforced `t` remain **observed-only**.
 

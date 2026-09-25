@@ -1240,6 +1240,64 @@
         "QBP.Substrate.RuleFlowInvariants.quench_root_pick",
         "QBP.Substrate.RuleFlowInvariants.quench_root_pick_aux"
       ]
+    },
+    {
+      "anchor_id": "PROOF-seam-zd-gram-spectrum-4-8-4",
+      "declared_by": "#682-seam-spectrum",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamSpectrum.seamG_cubic",
+        "QBP.Foundations.SeamSpectrum.seamGram_eq",
+        "QBP.Foundations.SeamSpectrum.seamEig_four_eq",
+        "QBP.Foundations.SeamSpectrum.seamEig_two_eq",
+        "QBP.Foundations.SeamSpectrum.seamEig_zero_eq",
+        "QBP.Foundations.SeamSpectrum.finrank_seamEig_four",
+        "QBP.Foundations.SeamSpectrum.finrank_seamEig_two",
+        "QBP.Foundations.SeamSpectrum.finrank_seamEig_zero",
+        "QBP.Foundations.SeamSpectrum.proj_decomp",
+        "QBP.Foundations.SeamSpectrum.seamG_self_adjoint",
+        "QBP.Foundations.SeamSpectrum.midSpan_sup_topSpan_sup_seamKerSpan"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-seam-top-plane-on-frozen-ridge",
+      "declared_by": "#682-seam-spectrum",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamSpectrum.top_plane_on_ridge_mem",
+        "QBP.Foundations.SeamSpectrum.top_plane_zero_divisor",
+        "QBP.Foundations.SeamSpectrum.seamLm_ker_eq"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-seam-right-gram-equals-left",
+      "declared_by": "#682-seam-spectrum",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamSpectrum.seamGR_eq_seamG",
+        "QBP.Foundations.SeamSpectrum.seam_gram_lr",
+        "QBP.Foundations.SeamSpectrum.seamRGram_eq",
+        "QBP.Foundations.SeamSpectrum.seamRm_ker_eq"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-basis-pair-gram-uniform-bounds",
+      "declared_by": "#682-seam-spectrum",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.SeamSpectrum.sbpG_eigenvalue_mem_Icc",
+        "QBP.Foundations.SeamSpectrum.sbpEig_four_eq",
+        "QBP.Foundations.SeamSpectrum.sbpEig_zero_eq",
+        "QBP.Foundations.SeamSpectrum.sbpGram_eq",
+        "QBP.Foundations.SeamSpectrum.sbpG_rayleigh",
+        "QBP.Foundations.SeamSpectrum.N_basisPair_split",
+        "QBP.Foundations.SeamSpectrum.N_basisPair_le_neg",
+        "QBP.Foundations.SeamSpectrum.basisPair_sq_split",
+        "QBP.Foundations.SeamSpectrum.sbp_sq_eq_zero_iff",
+        "QBP.Foundations.SeamSpectrum.sbpL_seam",
+        "QBP.Foundations.SeamSpectrum.sbpG_seam",
+        "QBP.Foundations.SeamSpectrum.sbpEig_seam"
+      ]
     }
   ]
 }

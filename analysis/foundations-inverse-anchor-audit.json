@@ -250,11 +250,11 @@
   "stale": [],
   "stats": {
     "anchor_side_phantoms": 0,
-    "anchors_total": 335,
-    "anchors_with_proof_file": 113,
+    "anchors_total": 339,
+    "anchors_with_proof_file": 117,
     "anchors_with_theorems_list": 66,
     "lean_side_orphans": 49,
     "stale_path_citations": 0,
-    "theorems_total": 1693
+    "theorems_total": 1825
   }
 }
