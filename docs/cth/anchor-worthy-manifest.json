@@ -1154,6 +1154,40 @@
         "QBP.Foundations.LocaleDynamics.LocaleValuation.eq_zero_of_compressed",
         "QBP.Foundations.LocaleDynamics.LocaleValuation.card_mul_le_top"
       ]
+    },
+    {
+      "anchor_id": "PROOF-in-flight-first-order-data-constrains-at-most-one-direction",
+      "declared_by": "#679-transition-state",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.TransitionState.finrank_vNeutral",
+        "QBP.Foundations.TransitionState.finrank_tangent",
+        "QBP.Foundations.TransitionState.vNeutral_eq_tangent_of_gradient_zero",
+        "QBP.Foundations.TransitionState.vNeutral_add_normal",
+        "QBP.Foundations.TransitionState.vNeutral_neg",
+        "QBP.Foundations.TransitionState.hypotheses_satisfiable"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-level-set-invariants-rule-blind",
+      "declared_by": "#679-transition-state",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.TransitionState.add_vNeutral_preserves_data",
+        "QBP.Foundations.TransitionState.add_vNeutral_ne",
+        "QBP.Foundations.TransitionState.exists_vNeutral_ne_zero"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-hosting-identity-fails-in-flight",
+      "declared_by": "#679-transition-state",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.Hosting.inFlight_no_quaternion_closure",
+        "QBP.Substrate.Hosting.inFlight_no_complex_structure",
+        "QBP.Substrate.Hosting.mem_universeSpace_iff_complex_structure",
+        "QBP.Substrate.Hosting.inFlight_nonempty"
+      ]
     }
   ]
 }

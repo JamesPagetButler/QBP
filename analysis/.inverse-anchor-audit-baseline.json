@@ -45,6 +45,7 @@
     "proofs/QBP/Foundations/SpatialFirstLink.lean": 2,
     "proofs/QBP/Foundations/SpectralMoments.lean": 12,
     "proofs/QBP/Foundations/TowerLaws.lean": 49,
+    "proofs/QBP/Foundations/TransitionState.lean": 18,
     "proofs/QBP/Foundations/UnitQuaternion.lean": 7,
     "proofs/QBP/GaugeBosons.lean": 12,
     "proofs/QBP/Optics/Fraunhofer.lean": 10,
