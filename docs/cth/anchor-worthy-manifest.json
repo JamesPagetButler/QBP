@@ -1122,6 +1122,38 @@
         "QBP.Substrate.RuleFlow.not_zeroDivisor_along_flow",
         "QBP.Substrate.RuleFlow.omega_avoids_locus"
       ]
+    },
+    {
+      "anchor_id": "PROOF-vacuum-sublocale-v-natural",
+      "declared_by": "#677-locale-dynamics",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.LocaleDynamics.vacNucleus_fixed_iff",
+        "QBP.Foundations.LocaleDynamics.vacNucleus_natural",
+        "QBP.Foundations.LocaleDynamics.vacNucleus_trace_surjective",
+        "QBP.Foundations.LocaleDynamics.vacNucleus_trace_injective",
+        "QBP.Foundations.LocaleDynamics.crack_vacNucleus_separates_inside_level_set",
+        "QBP.Foundations.LocaleDynamics.crack_vacNucleus_not_defOpens"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-sublevel-infimum-rule-independent",
+      "declared_by": "#677-locale-dynamics",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.LocaleDynamics.iInf_sublevel_eq_interior",
+        "QBP.Foundations.LocaleDynamics.iInf_sublevel_eq_bot_of_interior_eq_empty"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-no-natural-valuation-model-case",
+      "declared_by": "#677-locale-dynamics",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.LocaleDynamics.natural_valuation_vanishes_of_const",
+        "QBP.Foundations.LocaleDynamics.LocaleValuation.eq_zero_of_compressed",
+        "QBP.Foundations.LocaleDynamics.LocaleValuation.card_mul_le_top"
+      ]
     }
   ]
 }

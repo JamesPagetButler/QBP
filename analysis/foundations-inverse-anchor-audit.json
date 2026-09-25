@@ -246,15 +246,20 @@
       "name": "fanoTriple_oriented_356"
     }
   ],
-  "phantoms": [],
+  "phantoms": [
+    {
+      "anchor": "FLAG-locale-forcing-route-reopened",
+      "cited": "TransitionState.lean"
+    }
+  ],
   "stale": [],
   "stats": {
-    "anchor_side_phantoms": 0,
-    "anchors_total": 316,
-    "anchors_with_proof_file": 103,
+    "anchor_side_phantoms": 1,
+    "anchors_total": 328,
+    "anchors_with_proof_file": 106,
     "anchors_with_theorems_list": 66,
     "lean_side_orphans": 49,
     "stale_path_citations": 0,
-    "theorems_total": 1552
+    "theorems_total": 1593
   }
 }
