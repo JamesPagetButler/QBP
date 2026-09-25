@@ -6,11 +6,23 @@
 
 ---
 
+## Substrate track (2026-09-25)
+
+*Added per #684 gate G4. The substrate research thread (#473 and its stack) ran from 2026-06 to 2026-09 without entering this logbook; this block puts it on the critical path alongside Sprint 4. History below is unchanged.*
+
+| Field | Value |
+|---|---|
+| **Parent** | #473 (condensed-math / locale substrate beneath the Cayley–Dickson tower) |
+| **Now** | **#684** — substrate first draft v0.1, gates **G1–G5**: G1 rule postulate P1–P8; protocol A/B/C carried as three live hypotheses with kills K1–K4, no ruling (#635, correction 5832433972); G2 AXIOM-1 kill_condition[0] rewrite — PR #687 open (ratified text; beekeeper in-thread confirmation pending); G3 #637 documented negative: one b₀-linked quantity on record (λ⊥ = 8(1−b₀²)), no measured constant tied to it; G4 this block; G5 #681 merged (`bd5ddbc`, ledger 6.9.0); #682 open at `e20ca7f` (ledger claim 6.10.0/339), 4 anchors pending |
+| **Next** | v0.1 review, **Tier 2** (no Lean, no ledger): Red Team → Gemini → §I4 read-through → beekeeper Human Visual Review of the tag table (§7 of the draft); then the two v0.2 research threads (positive in-flight account; AC2 candidate) each get an issue |
+| **Standing** | route `FLAG-locale-forcing-route-reopened` (ruling 2026-09-25, v0.6 addendum); rule existence `FLAG-rule-flow-open`; substrate PERMITTED, not FORCED (unchanged since 2026-06-01); horn-1 status explored first, alternatives retained (#473 audit) |
+| **Ledger** | 6.9.0 / 335 anchors on master (`bd5ddbc`); 21 coherent substrate PROOF anchors on master + 4 pending on #682 |
+
 ## Current Position
 
 - **Active Sprint:** **Sprint 4 (launching) — Dirac spectrum direct calculation on ℍ ⊗ ℍ.** Sprint 3 closed 2026-05-14; #81 theory-refinement train 8/8 complete; #408 closed 2026-05-15 (all 4 ACs satisfied: prerequisite-dependency tree + tensor-product literature survey + Beekeeper ratification + SPRINT_STATUS update).
 - **Lifecycle Stage:** Sprint 3 fully closed. Sprint 4 pre-flight complete (scope ratified, literature survey landed, framework basis selected). Awaiting Phase 1 (Ground Truth) issue creation + research gate trigger.
-- **Next Critical-Path Action:** **Sprint 4 Phase 1 (Ground Truth) launch** — open Phase 1 issue defining the Dirac spectrum calculation on $\mathcal{A} = \mathbb{H} \otimes_{\mathbb{R}} \mathbb{H} \cong M_4(\mathbb{R})$ per Dixon/Furey framework (`research/quaternionic_tensor_product_survey.md` §9 recommendation); trigger `python scripts/research_gate.py --scope sprint-4` per closure-checklist convention.
+- **Next Critical-Path Action (two tracks, 2026-09-25):** **Sprint 4 (Dirac): Phase 1 (Ground Truth) launch** — open Phase 1 issue defining the Dirac spectrum calculation on $\mathcal{A} = \mathbb{H} \otimes_{\mathbb{R}} \mathbb{H} \cong M_4(\mathbb{R})$ per Dixon/Furey framework (`research/quaternionic_tensor_product_survey.md` §9 recommendation); trigger `python scripts/research_gate.py --scope sprint-4` per closure-checklist convention. **Substrate: #684** — first draft v0.1 assembled on `research/473-substrate-first-draft` (`docs/foundations/substrate-first-draft-v0.1.md`); gates G1–G5 per #684; next = Tier-2 review of v0.1 (Red Team → Gemini → §I4 → Human Visual Review of the tag table). See "Substrate track" below.
 - **Sprint 4 inherited falsification criterion:** the emergent Dirac spectrum on $\mathbb{H} \otimes \mathbb{H}$ MUST yield eigenvalues or phase shifts that intrinsically preserve $\cos^2(\delta_{CP}) = 1/8$ (per `paper/quaternion_physics.md` §XIII.D, merged via PR #435). This is the Orientation Triad invariant from the #81 theory train; falsification of this constraint by the computed spectrum kills the model before Sprint 4 results phase.
 - **Framework basis (selected 2026-05-15):** Dixon/Furey algebraic-spectral framework — $\mathcal{A} = \mathbb{H} \otimes_{\mathbb{R}} \mathbb{H} \cong M_4(\mathbb{R})$ with states as minimal left ideals $\mathcal{A}P$ (P primitive idempotent). Adler 1995 + Horwitz-Biedenharn 1984 rejected (force privileged $i$-direction → contaminate $\cos^2(\delta_{CP}) = 1/8$ invariant). See `research/quaternionic_tensor_product_survey.md` §9 + §10 (open questions: fermion doubling, Bell observables on ideals, octonionic coupling boundary conditions).
 - **Sprint 4 scope (RATIFIED by Beekeeper 2026-05-14):** **Dirac spectrum direct calculation on crystallised ℍ**, with quaternionic tensor-product machinery (ℍ ⊗ ℍ) laid down as a Sprint-4 deliverable that explicitly prepares **Sprint 5's Bell's Theorem test**. This unifies what previously appeared as two competing candidate directions:
