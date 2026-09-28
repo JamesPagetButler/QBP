@@ -23,6 +23,17 @@
     nonzero.  Proved here as `inFlightSpan_mul_closed` + `inFlightSpan_assoc`, with
     the non-vacuity payoff `inFlight_associative_even_where_alternator_nonzero`.
 
+  * **Round-4 core (#688).**  `∇V(s) ∈ 𝕆_s`: writing `s = a + b·ℓ` and `c = Im b`,
+    both Cayley–Dickson components of the gradient of `V(s) = N([a, b])` lie in the
+    host quaternion algebra `H_s = span{1, a, c, a·c} ⊆ 𝕆`, so `∇V(s)` lies in the
+    CD double `𝕆_s = H_s ⊕ H_s·ℓ` (`gradV_mem_kernelAlgebra`,
+    `gradVof_mem_kernelAlgebra`).  `s` itself is in `𝕆_s`
+    (`self_mem_kernelAlgebra`), hence so is every `α·s + β·∇V(s)`
+    (`smul_self_add_smul_gradV_mem_kernelAlgebra`) — the algebraic content of
+    "`ker Δ(s) = CD(H_s)` is a first integral of the rule".  What is **not** proved:
+    `ker Δ(s) ⊆ CD(H_s)` (the reverse, dimension-8 half) and flow-invariance of
+    `s ↦ H_s` (a Substrate-layer derivative statement).
+
   ## Honest scope notes (read before quoting these results)
 
   1. **`Substrate.Hosting.inFlight_no_quaternion_closure` is correctly STATED but
@@ -53,6 +64,7 @@
   `native_decide`, zero vacuous `True`; `#print axioms` audit at the bottom.
 -/
 import QBP.Foundations.CrystalHosting
+import QBP.Foundations.Artin
 
 namespace QBP.Foundations.InFlightAlgebra
 
@@ -422,7 +434,324 @@ theorem left_mul_sq_on_inFlightSpan {s x : CDAlg ℝ 4} (hs : s.coord 0 = 0)
   rw [show s * (s * x) = (s * (s * x) + (N s) • x) - (N s) • x by abel, h]
   module
 
-/-! ## 9. Completeness audit — `#print axioms` -/
+/-! ### 8b. The three named kernel witnesses
+
+`delta_vanishes_on_inFlightSpan` already covers `1`, `s`, `ℓ` and `s·ℓ`, since all
+four are in `InFlightSpan s` by `inFlightSpan_one/self/ell/mul_ell`.  The Red Team
+asked for the three named corollaries explicitly, so they are spelled out here
+(both in `Δ` form and in the raw alternator form `assoc s s · = 0`). -/
+
+/-- `1 ∈ ker Δ(s)`, i.e. `[s, s, 1] = 0`. -/
+theorem one_mem_ker_delta {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) : Delta s 1 = 0 :=
+  delta_vanishes_on_inFlightSpan hs (inFlightSpan_one s)
+
+/-- `s ∈ ker Δ(s)`, i.e. `[s, s, s] = 0` (third-power associativity at `s`). -/
+theorem s_mem_ker_delta {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) : Delta s s = 0 :=
+  delta_vanishes_on_inFlightSpan hs (inFlightSpan_self s)
+
+/-- `ℓ ∈ ker Δ(s)`, i.e. `[s, s, ℓ] = 0`: the doubling unit is always a kernel
+    direction, at every imaginary state. -/
+theorem ell_mem_ker_delta {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) : Delta s ell = 0 :=
+  delta_vanishes_on_inFlightSpan hs (inFlightSpan_ell s)
+
+/-- `s·ℓ ∈ ker Δ(s)` — the fourth in-flight direction. -/
+theorem s_mul_ell_mem_ker_delta {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) :
+    Delta s (s * ell) = 0 :=
+  delta_vanishes_on_inFlightSpan hs (inFlightSpan_mul_ell s)
+
+/-- Alternator form: `[s, s, 1] = 0`. -/
+theorem assoc_self_one {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) : assoc s s 1 = 0 := by
+  have h := one_mem_ker_delta hs
+  rwa [delta_eq_neg_assoc _ _ hs, neg_eq_zero] at h
+
+/-- Alternator form: `[s, s, s] = 0`. -/
+theorem assoc_self_self {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) : assoc s s s = 0 := by
+  have h := s_mem_ker_delta hs
+  rwa [delta_eq_neg_assoc _ _ hs, neg_eq_zero] at h
+
+/-- Alternator form: `[s, s, ℓ] = 0`. -/
+theorem assoc_self_ell {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) : assoc s s ell = 0 := by
+  have h := ell_mem_ker_delta hs
+  rwa [delta_eq_neg_assoc _ _ hs, neg_eq_zero] at h
+
+/-! ## 9. The kernel algebra `𝕆_s = CD(H_s)` and `∇V(s) ∈ 𝕆_s`
+
+Round-4 finding (issue #688): the Red Team observes numerically that
+`ker Δ(s) = CD(H_s)` where, writing `s = a + b·ℓ` in Cayley–Dickson pair
+coordinates (`a = cdLo s`, `b = cdHi s`) and `c := Im b`,
+
+    H_s := span_ℝ {1, a, c, a·c} ⊆ 𝕆 = CDAlg ℝ 3,
+    𝕆_s := H_s ⊕ H_s·ℓ ⊆ 𝕊 = CDAlg ℝ 4   (the CD double of H_s).
+
+This section proves the **algebraic core** of the associated first-integral claim:
+the gradient of the potential `V(s) = N([a, b])` has BOTH Cayley–Dickson components
+inside `H_s`, i.e. `∇V(s) ∈ 𝕆_s`.  That is what makes `H_s` a candidate first
+integral of the gradient rule — the flow cannot push `s` out of the CD double of
+its own host quaternion algebra along the gradient direction.
+
+**Layer discipline.**  `∇V` itself is a `QBP.Substrate.RuleFlow` object
+(`RuleFlow.gradV`), and Foundations may not import Substrate.  So the two CD
+components of the gradient are re-declared here from the *closed form* that
+Substrate proves, namely
+
+    `RuleFlow.cdLo_gradV : cdLo (gradV s) = 2 • (C·b̄ − b̄·C)`
+    `RuleFlow.cdHi_gradV : cdHi (gradV s) = 2 • (ā·C − C·ā)`,   `C = comm s = a·b − b·a`.
+
+`gradVlo`/`gradVhi`/`cdComm` below are verbatim copies of those right-hand sides;
+`RuleFlow.cdLo_gradV` / `RuleFlow.cdHi_gradV` are exactly the identification
+`gradVlo s = cdLo (gradV s)`, `gradVhi s = cdHi (gradV s)`.  Nothing here depends
+on the *variational* characterisation of `∇V` — only on its closed form.
+
+**Hypothesis honesty.**  No imaginarity hypothesis on `s` is needed anywhere in
+this section: the membership is an identity of the closed form, valid for every
+`s : 𝕊`.  (`s.coord 0 = 0` is what the *dynamics* supplies; it is not used.)
+
+**What is NOT proved here.**  The reverse inclusion `ker Δ(s) ⊆ CD(H_s)` — i.e.
+that `𝕆_s` is the FULL kernel, dimension 8 — is not established; §8 gives only the
+4-dimensional `InFlightSpan s ⊆ ker Δ(s)`.  Nor is invariance of `H_s` along the
+flow (that needs the derivative of `s ↦ H_s`, a Substrate-layer statement).  This
+section is strictly the membership `∇V(s) ∈ 𝕆_s`. -/
+
+section KernelAlgebra
+
+/-! ### 9.1 The host quaternion algebra `H_s = span{1, a, c, a·c}` -/
+
+/-- Membership in `H = span_ℝ {1, a, c, a·c} ⊆ 𝕆`, the (at most 4-dimensional)
+    subspace of the octonions generated by the pair `(a, c)`.  Reuses
+    `CDAlg.gen4` / `CDAlg.span4_mul_closed` from the Artin development rather than
+    inventing a new span predicate. -/
+def InQuatSpanOct (a c x : CDAlg ℝ 3) : Prop := x ∈ Submodule.span ℝ (gen4 a c)
+
+theorem inQuatSpanOct_def (a c x : CDAlg ℝ 3) :
+    InQuatSpanOct a c x ↔ x ∈ Submodule.span ℝ (gen4 a c) := Iff.rfl
+
+theorem inQuatSpanOct_one (a c : CDAlg ℝ 3) : InQuatSpanOct a c 1 :=
+  one_mem_span_gen4 a c
+
+theorem inQuatSpanOct_left (a c : CDAlg ℝ 3) : InQuatSpanOct a c a :=
+  x_mem_span_gen4 a c
+
+theorem inQuatSpanOct_right (a c : CDAlg ℝ 3) : InQuatSpanOct a c c :=
+  y_mem_span_gen4 a c
+
+theorem inQuatSpanOct_gen_mul (a c : CDAlg ℝ 3) : InQuatSpanOct a c (a * c) :=
+  xy_mem_span_gen4 a c
+
+theorem inQuatSpanOct_add {a c x y : CDAlg ℝ 3}
+    (hx : InQuatSpanOct a c x) (hy : InQuatSpanOct a c y) : InQuatSpanOct a c (x + y) :=
+  Submodule.add_mem _ hx hy
+
+theorem inQuatSpanOct_sub {a c x y : CDAlg ℝ 3}
+    (hx : InQuatSpanOct a c x) (hy : InQuatSpanOct a c y) : InQuatSpanOct a c (x - y) :=
+  Submodule.sub_mem _ hx hy
+
+theorem inQuatSpanOct_smul {a c x : CDAlg ℝ 3} (r : ℝ)
+    (hx : InQuatSpanOct a c x) : InQuatSpanOct a c (r • x) :=
+  Submodule.smul_mem _ _ hx
+
+/-- **`H` is closed under the octonion product** — this is `span4_mul_closed`
+    (L4 of the Artin development), not a new fact. -/
+theorem inQuatSpanOct_mul {a c x y : CDAlg ℝ 3}
+    (hx : InQuatSpanOct a c x) (hy : InQuatSpanOct a c y) : InQuatSpanOct a c (x * y) :=
+  span4_mul_closed a c hx hy
+
+/-- **`H` is closed under conjugation**: `x̄ = (2 Re x)·1 − x`. -/
+theorem inQuatSpanOct_conj {a c x : CDAlg ℝ 3}
+    (hx : InQuatSpanOct a c x) : InQuatSpanOct a c (conj x) := by
+  rw [inQuatSpanOct_def, CDAut.conj_eq_two_re_sub]
+  exact Submodule.sub_mem _ (Submodule.smul_mem _ _ (one_mem_span_gen4 a c)) hx
+
+/-- **`H` is an ASSOCIATIVE subalgebra of 𝕆** (`assoc_vanishes_on_span4`, C2a):
+    products of any three of its elements re-associate.  This is what makes
+    `H_s` a *quaternion* algebra rather than merely a 4-dimensional subspace. -/
+theorem inQuatSpanOct_assoc {a c x y z : CDAlg ℝ 3}
+    (hx : InQuatSpanOct a c x) (hy : InQuatSpanOct a c y) (hz : InQuatSpanOct a c z) :
+    (x * y) * z = x * (y * z) := by
+  have h : assoc x y z = 0 := assoc_vanishes_on_span4 a c hx hy hz
+  rwa [assoc, sub_eq_zero] at h
+
+/-- If `c` is `x` minus a real multiple of `1`, then `x ∈ span{1, a, c, a·c}`.
+    (Used to put the *full* high component `b = b₀·1 + c` into `H_s`.) -/
+theorem inQuatSpanOct_of_eq_sub_smul_one {a c x : CDAlg ℝ 3} (r : ℝ)
+    (h : c = x - r • (1 : CDAlg ℝ 3)) : InQuatSpanOct a c x := by
+  have hx : x = r • (1 : CDAlg ℝ 3) + c := by rw [h]; abel
+  rw [hx]
+  exact inQuatSpanOct_add (inQuatSpanOct_smul r (inQuatSpanOct_one a c))
+    (inQuatSpanOct_right a c)
+
+/-! ### 9.2 `c := Im b` and the host algebra of a state -/
+
+/-- `c := Im (cdHi s) = b − b₀·1`, the imaginary part of the high CD component of
+    `s`.  (Defined locally rather than via `Exp.imPart`, which is not in this
+    file's import cone.) -/
+def imHi (s : CDAlg ℝ 4) : CDAlg ℝ 3 := cdHi s - ((cdHi s).coord 0) • (1 : CDAlg ℝ 3)
+
+theorem imHi_def (s : CDAlg ℝ 4) :
+    imHi s = cdHi s - ((cdHi s).coord 0) • (1 : CDAlg ℝ 3) := rfl
+
+theorem imHi_coord_zero (s : CDAlg ℝ 4) : (imHi s).coord 0 = 0 := by
+  rw [imHi_def, sub_coord, smul_coord, one_coord, if_pos rfl, mul_one, sub_self]
+
+theorem cdHi_eq_smul_one_add_imHi (s : CDAlg ℝ 4) :
+    cdHi s = ((cdHi s).coord 0) • (1 : CDAlg ℝ 3) + imHi s := by
+  rw [imHi_def]; abel
+
+/-- `a = cdLo s ∈ H_s`. -/
+theorem cdLo_mem_hostQuat (s : CDAlg ℝ 4) : InQuatSpanOct (cdLo s) (imHi s) (cdLo s) :=
+  inQuatSpanOct_left _ _
+
+/-- `c = Im b ∈ H_s`. -/
+theorem imHi_mem_hostQuat (s : CDAlg ℝ 4) : InQuatSpanOct (cdLo s) (imHi s) (imHi s) :=
+  inQuatSpanOct_right _ _
+
+/-- **`b = cdHi s ∈ H_s`** — the real part `b₀·1` costs nothing, so the FULL high
+    component lies in the host algebra generated by `(a, Im b)`. -/
+theorem cdHi_mem_hostQuat (s : CDAlg ℝ 4) : InQuatSpanOct (cdLo s) (imHi s) (cdHi s) :=
+  inQuatSpanOct_of_eq_sub_smul_one ((cdHi s).coord 0) (imHi_def s)
+
+/-! ### 9.3 The commutator and the closed-form gradient, at Foundations level -/
+
+/-- The Cayley–Dickson commutator `C(s) = [a, b] = a·b − b·a`.  Foundations-level
+    copy of `QBP.Substrate.RuleFlow.comm`; `V(s) = N (cdComm s)` there. -/
+def cdComm (s : CDAlg ℝ 4) : CDAlg ℝ 3 := cdLo s * cdHi s - cdHi s * cdLo s
+
+theorem cdComm_def (s : CDAlg ℝ 4) : cdComm s = cdLo s * cdHi s - cdHi s * cdLo s := rfl
+
+/-- A real multiple of `1` drops out of a commutator. -/
+theorem comm_smul_one_add (x y : CDAlg ℝ 3) (r : ℝ) :
+    x * (r • (1 : CDAlg ℝ 3) + y) - (r • (1 : CDAlg ℝ 3) + y) * x = x * y - y * x := by
+  rw [mul_add_right, mul_add_left, mul_smul_right, mul_smul_left, cd_mul_one, cd_one_mul]
+  abel
+
+/-- **`[a, b] = [a, c]`** — the real part of `b` commutes with everything, so the
+    commutator only sees `c = Im b`.  (The cheap sub-step flagged in #688.) -/
+theorem cdComm_eq_comm_imHi (s : CDAlg ℝ 4) :
+    cdComm s = cdLo s * imHi s - imHi s * cdLo s := by
+  rw [cdComm_def, cdHi_eq_smul_one_add_imHi s]
+  exact comm_smul_one_add (cdLo s) (imHi s) ((cdHi s).coord 0)
+
+/-- Low CD component of `∇V`, copied verbatim from the closed form proved by
+    `QBP.Substrate.RuleFlow.cdLo_gradV`:
+    `cdLo (∇V s) = 2·(C·b̄ − b̄·C)` with `C = cdComm s`, `b = cdHi s`. -/
+def gradVlo (s : CDAlg ℝ 4) : CDAlg ℝ 3 :=
+  (2 : ℝ) • (cdComm s * conj (cdHi s) - conj (cdHi s) * cdComm s)
+
+theorem gradVlo_def (s : CDAlg ℝ 4) :
+    gradVlo s = (2 : ℝ) • (cdComm s * conj (cdHi s) - conj (cdHi s) * cdComm s) := rfl
+
+/-- High CD component of `∇V`, copied verbatim from
+    `QBP.Substrate.RuleFlow.cdHi_gradV`: `cdHi (∇V s) = 2·(ā·C − C·ā)`. -/
+def gradVhi (s : CDAlg ℝ 4) : CDAlg ℝ 3 :=
+  (2 : ℝ) • (conj (cdLo s) * cdComm s - cdComm s * conj (cdLo s))
+
+theorem gradVhi_def (s : CDAlg ℝ 4) :
+    gradVhi s = (2 : ℝ) • (conj (cdLo s) * cdComm s - cdComm s * conj (cdLo s)) := rfl
+
+/-- The gradient assembled back into a sedenion, `∇V(s) = (gradVlo s, gradVhi s)`.
+    Matches `QBP.Substrate.RuleFlow.gradV` by `cdLo_gradV` + `cdHi_gradV`. -/
+def gradVof (s : CDAlg ℝ 4) : CDAlg ℝ 4 := loOf (gradVlo s) + hiOf (gradVhi s)
+
+@[simp] theorem cdLo_gradVof (s : CDAlg ℝ 4) : cdLo (gradVof s) = gradVlo s := by
+  rw [gradVof, cdLo_add, cdLo_loOf, cdLo_hiOf, add_zero]
+
+@[simp] theorem cdHi_gradVof (s : CDAlg ℝ 4) : cdHi (gradVof s) = gradVhi s := by
+  rw [gradVof, cdHi_add, cdHi_loOf, cdHi_hiOf, zero_add]
+
+/-! ### 9.4 `C(s) ∈ H_s`, and the main membership -/
+
+/-- **The commutator lies in the host algebra**: `C(s) = [a, b] ∈ H_s`.  Both
+    factors are in `H_s` (`cdLo_mem_hostQuat`, `cdHi_mem_hostQuat`) and `H_s` is
+    closed under products and differences. -/
+theorem cdComm_mem_hostQuat (s : CDAlg ℝ 4) :
+    InQuatSpanOct (cdLo s) (imHi s) (cdComm s) := by
+  rw [cdComm_def]
+  exact inQuatSpanOct_sub
+    (inQuatSpanOct_mul (cdLo_mem_hostQuat s) (cdHi_mem_hostQuat s))
+    (inQuatSpanOct_mul (cdHi_mem_hostQuat s) (cdLo_mem_hostQuat s))
+
+/-- **Low component of the gradient lies in `H_s`.** -/
+theorem gradVlo_mem_hostQuat (s : CDAlg ℝ 4) :
+    InQuatSpanOct (cdLo s) (imHi s) (gradVlo s) := by
+  have hC := cdComm_mem_hostQuat s
+  have hb := inQuatSpanOct_conj (cdHi_mem_hostQuat s)
+  rw [gradVlo_def]
+  exact inQuatSpanOct_smul _
+    (inQuatSpanOct_sub (inQuatSpanOct_mul hC hb) (inQuatSpanOct_mul hb hC))
+
+/-- **High component of the gradient lies in `H_s`.** -/
+theorem gradVhi_mem_hostQuat (s : CDAlg ℝ 4) :
+    InQuatSpanOct (cdLo s) (imHi s) (gradVhi s) := by
+  have hC := cdComm_mem_hostQuat s
+  have ha := inQuatSpanOct_conj (cdLo_mem_hostQuat s)
+  rw [gradVhi_def]
+  exact inQuatSpanOct_smul _
+    (inQuatSpanOct_sub (inQuatSpanOct_mul ha hC) (inQuatSpanOct_mul hC ha))
+
+/-- Membership in `𝕆_s = H_s ⊕ H_s·ℓ`, the Cayley–Dickson double of the host
+    quaternion algebra: a sedenion `x` is in `𝕆_s` iff BOTH of its CD components
+    lie in `H_s`.  (`x = u + v·ℓ` with `u = cdLo x`, `v = cdHi x`.) -/
+def InKernelAlgebra (s x : CDAlg ℝ 4) : Prop :=
+  InQuatSpanOct (cdLo s) (imHi s) (cdLo x)
+    ∧ InQuatSpanOct (cdLo s) (imHi s) (cdHi x)
+
+/-- **Main result (#688 round 4, algebraic core): `∇V(s) ∈ 𝕆_s`.**
+
+    For every sedenion `s = a + b·ℓ`, writing `c = Im b` and
+    `H_s = span_ℝ{1, a, c, a·c} ⊆ 𝕆`, both Cayley–Dickson components of the
+    gradient of `V(s) = N([a, b])` lie in `H_s`; equivalently `∇V(s)` lies in the
+    CD double `𝕆_s = H_s ⊕ H_s·ℓ`.
+
+    No hypothesis on `s` is required (in particular not `s.coord 0 = 0` nor
+    `N s = 1`): this is an identity of the closed form of the gradient.
+
+    Mechanism: `b ∈ H_s` because `b = b₀·1 + c`; `ā, b̄ ∈ H_s` because `H_s` is
+    conjugation-closed; `C = a·b − b·a ∈ H_s` and then both gradient components
+    are ℝ-multiples of differences of products of `C` with `ā`/`b̄` — all inside
+    `H_s` by `span4_mul_closed`. -/
+theorem gradV_mem_kernelAlgebra (s : CDAlg ℝ 4) :
+    InQuatSpanOct (cdLo s) (imHi s) (gradVlo s)
+      ∧ InQuatSpanOct (cdLo s) (imHi s) (gradVhi s) :=
+  ⟨gradVlo_mem_hostQuat s, gradVhi_mem_hostQuat s⟩
+
+/-- The same statement packaged at the sedenion level: `∇V(s) ∈ 𝕆_s`. -/
+theorem gradVof_mem_kernelAlgebra (s : CDAlg ℝ 4) :
+    InKernelAlgebra s (gradVof s) := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_gradVof]; exact gradVlo_mem_hostQuat s
+  · rw [cdHi_gradVof]; exact gradVhi_mem_hostQuat s
+
+/-- **`s` itself lies in `𝕆_s`.**  Together with `gradVof_mem_kernelAlgebra` this
+    says the state and its gradient live in the *same* CD double — the algebraic
+    precondition for `𝕆_s` to be a first integral of the gradient rule. -/
+theorem self_mem_kernelAlgebra (s : CDAlg ℝ 4) : InKernelAlgebra s s :=
+  ⟨cdLo_mem_hostQuat s, cdHi_mem_hostQuat s⟩
+
+/-- **`𝕆_s` is closed under `+` and `•`** (it is the CD double of a subspace). -/
+theorem inKernelAlgebra_add {s x y : CDAlg ℝ 4}
+    (hx : InKernelAlgebra s x) (hy : InKernelAlgebra s y) : InKernelAlgebra s (x + y) := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_add]; exact inQuatSpanOct_add hx.1 hy.1
+  · rw [cdHi_add]; exact inQuatSpanOct_add hx.2 hy.2
+
+theorem inKernelAlgebra_smul {s x : CDAlg ℝ 4} (r : ℝ)
+    (hx : InKernelAlgebra s x) : InKernelAlgebra s (r • x) := by
+  refine ⟨?_, ?_⟩
+  · rw [cdLo_smul]; exact inQuatSpanOct_smul r hx.1
+  · rw [cdHi_smul]; exact inQuatSpanOct_smul r hx.2
+
+/-- **The gradient-flow direction stays in `𝕆_s`.**  Any real combination
+    `α·s + β·∇V(s)` — in particular the Euler step of the gradient rule and the
+    rule field `F(s) = (4V)·s − ∇V(s)` — lies in `𝕆_s`.  This is the algebraic
+    content of "`𝕆_s` is a first integral of the rule": the vector field never
+    points out of the CD double of the host quaternion algebra. -/
+theorem smul_self_add_smul_gradV_mem_kernelAlgebra (s : CDAlg ℝ 4) (α β : ℝ) :
+    InKernelAlgebra s (α • s + β • gradVof s) :=
+  inKernelAlgebra_add (inKernelAlgebra_smul α (self_mem_kernelAlgebra s))
+    (inKernelAlgebra_smul β (gradVof_mem_kernelAlgebra s))
+
+end KernelAlgebra
+
+/-! ## 10. Completeness audit — `#print axioms` -/
 
 #print axioms assoc_self_add_smul_ell
 #print axioms delta_eq_neg_assoc
@@ -444,5 +773,24 @@ theorem left_mul_sq_on_inFlightSpan {s x : CDAlg ℝ 4} (hs : s.coord 0 = 0)
 #print axioms pOf_eq_zero_iff
 #print axioms delta_vanishes_on_inFlightSpan
 #print axioms left_mul_sq_on_inFlightSpan
+#print axioms one_mem_ker_delta
+#print axioms s_mem_ker_delta
+#print axioms ell_mem_ker_delta
+#print axioms s_mul_ell_mem_ker_delta
+#print axioms assoc_self_one
+#print axioms assoc_self_self
+#print axioms assoc_self_ell
+#print axioms inQuatSpanOct_mul
+#print axioms inQuatSpanOct_conj
+#print axioms inQuatSpanOct_assoc
+#print axioms cdHi_mem_hostQuat
+#print axioms cdComm_eq_comm_imHi
+#print axioms cdComm_mem_hostQuat
+#print axioms gradVlo_mem_hostQuat
+#print axioms gradVhi_mem_hostQuat
+#print axioms gradV_mem_kernelAlgebra
+#print axioms gradVof_mem_kernelAlgebra
+#print axioms self_mem_kernelAlgebra
+#print axioms smul_self_add_smul_gradV_mem_kernelAlgebra
 
 end QBP.Foundations.InFlightAlgebra
