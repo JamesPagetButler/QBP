@@ -16,6 +16,7 @@ import QBP.Foundations.Breakdown
 import QBP.Foundations.FanoGenesis
 import QBP.Foundations.HolographicSubalgebra
 import QBP.Foundations.Hurwitz
+import QBP.Foundations.InFlightAlgebra
 import QBP.Foundations.SpatialFirstLink
 import QBP.Foundations.NoAutonomousDynamics
 import QBP.Foundations.SpectralMoments
