@@ -6,7 +6,7 @@
 
 | Tag | Meaning | Cites |
 |---|---|---|
-| **PROVED** | a 0-sorry Lean 4 theorem, anchored on the master ledger (anchor id) or on this branch (PR #689, head 43d29eb) (a name in `proofs/QBP/Foundations/InFlightAlgebra.lean`: unanchored, unreviewed, encode only after review); the sentence stays inside the NOT-claimed clause | anchor id or Lean name |
+| **PROVED** | a 0-sorry Lean 4 theorem, anchored on the master ledger (anchor id) or on this branch (PR #689, head 43d29eb) (a name in `proofs/QBP/Foundations/InFlightAlgebra.lean`; anchored at 62b761e as the four PROOF anchors of §8 after Red Team, Gemini and §I4 review); the sentence stays inside the NOT-claimed clause | anchor id or Lean name |
 | **NUMERICAL** | a scripted computation, not machine-checked | script name (location note below) |
 | **ARGUMENT** | a derivation from PROVED / NUMERICAL ingredients, not itself machine-checked (classical theorems, BOTE counts, equivariance readings) | ingredients and step |
 | **OPEN** | not settled either way | owning issue or tracker anchor |
@@ -152,7 +152,7 @@ Notation: 𝕊 = `CDAlg ℝ 4`, 𝕆 = `CDAlg ℝ 3`, a = `cdLo s`, b = `cdHi s`
 | **Lean follow-ups** | (a) bridge lemma; (b) reverse inclusion; (c) flow-invariance ODE statement; (d) `ruleField` equivariance; (e) T2b; (f) `lake build QBP.Foundations` OOM at `Octonion32Count` under the 6 GB cap | **OPEN** | lean-prover; #683 |
 | **Substrate draft v0.2** (#684) | §4 "Positive in-flight account" and §8: "no issue" → #688, D as candidate | **OPEN** | #684 |
 
-**Encode plan — would-be PROOF anchors after review (ENCODE NOTHING NOW; slugs, not ids).**
+**Encode record — the four PROOF anchors, encoded at 62b761e (ledger 6.12.0/343) after Red Team, Gemini and §I4 review; ids as listed.**
 
 | Candidate slug | Lean theorem(s) | NOT-claimed clause it would carry |
 |---|---|---|
