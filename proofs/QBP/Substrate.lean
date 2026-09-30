@@ -6,3 +6,4 @@
 import QBP.Substrate.Hosting
 import QBP.Substrate.RuleFlow
 import QBP.Substrate.RuleFlowInvariants
+import QBP.Substrate.RuleFlowBridge
