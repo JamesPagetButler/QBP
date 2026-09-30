@@ -1298,6 +1298,61 @@
         "QBP.Foundations.SeamSpectrum.sbpG_seam",
         "QBP.Foundations.SeamSpectrum.sbpEig_seam"
       ]
+    },
+    {
+      "anchor_id": "PROOF-in-flight-alternator-blind-to-ell",
+      "declared_by": "#689-in-flight-algebra",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.InFlightAlgebra.assoc_self_add_smul_ell",
+        "QBP.Foundations.InFlightAlgebra.delta_blind_to_ell",
+        "QBP.Foundations.InFlightAlgebra.left_mul_sq_ell_shift",
+        "QBP.Foundations.InFlightAlgebra.delta_eq_neg_assoc"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-in-flight-quaternion-closes-and-associates",
+      "declared_by": "#689-in-flight-algebra",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.InFlightAlgebra.inFlight_closed_associative",
+        "QBP.Foundations.InFlightAlgebra.inFlightSpan_mul_closed",
+        "QBP.Foundations.InFlightAlgebra.inFlightSpan_assoc",
+        "QBP.Foundations.InFlightAlgebra.quatSpan_assoc",
+        "QBP.Foundations.InFlightAlgebra.quatSpan_mul_expand",
+        "QBP.Foundations.InFlightAlgebra.inFlight_independent",
+        "QBP.Foundations.InFlightAlgebra.pOf_eq_zero_iff",
+        "QBP.Foundations.InFlightAlgebra.ell_mul_eq",
+        "QBP.Foundations.InFlightAlgebra.inFlight_associative_even_where_alternator_nonzero"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-in-flight-span-in-alternator-kernel",
+      "declared_by": "#689-in-flight-algebra",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.InFlightAlgebra.delta_vanishes_on_inFlightSpan",
+        "QBP.Foundations.InFlightAlgebra.left_mul_sq_on_inFlightSpan",
+        "QBP.Foundations.InFlightAlgebra.one_mem_ker_delta",
+        "QBP.Foundations.InFlightAlgebra.s_mem_ker_delta",
+        "QBP.Foundations.InFlightAlgebra.ell_mem_ker_delta",
+        "QBP.Foundations.InFlightAlgebra.s_mul_ell_mem_ker_delta"
+      ]
+    },
+    {
+      "anchor_id": "PROOF-gradient-lies-in-host-kernel-algebra",
+      "declared_by": "#689-in-flight-algebra",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.InFlightAlgebra.gradVof_mem_kernelAlgebra",
+        "QBP.Foundations.InFlightAlgebra.gradVof_components_mem_kernelAlgebra",
+        "QBP.Foundations.InFlightAlgebra.self_mem_kernelAlgebra",
+        "QBP.Foundations.InFlightAlgebra.smul_self_add_smul_gradV_mem_kernelAlgebra",
+        "QBP.Foundations.InFlightAlgebra.inQuatSpanOct_mul",
+        "QBP.Foundations.InFlightAlgebra.inQuatSpanOct_conj",
+        "QBP.Foundations.InFlightAlgebra.inQuatSpanOct_assoc",
+        "QBP.Foundations.InFlightAlgebra.cdComm_eq_comm_imHi"
+      ]
     }
   ]
 }

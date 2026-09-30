@@ -1,12 +1,12 @@
 # The in-flight region — definition D: InFlight with its canonical 𝕆_s-leaf foliation (issue #688, 2026-09-29)
 
-**Status:** output document for issue #688 step 5 (parent #473, AC1 (c), ruled 2026-09-30, Option A — §3); branch `foundations/688-inflight-algebra`, Lean head **b85df23 + C1–C4 (SHA recorded at the encode commit)** (PR #689; §I4 C1–C4 applied — see §6); author qbp-oppenheimer; Tier-3 review: Red Team APPROVE-WITH-CONCERN (M1–M4 applied), Gemini APPROVE, §I4 qbp-architecture APPROVE-WITH-CONCERN at b85df23 (C1–C4 applied at the head above; re-§I4 at the encode head owed). **The four PROOF anchors are written by the encode commit that follows on this branch (ledger 6.12.0); D itself is not anchored; no #473 acceptance criterion is claimed; no #635 protocol and no Strategy-C branch is chosen; no rule is derived.** Ledger of record: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` 6.11.0 on master. Conversation MO followed (sealed position → record pass → rounds 1–5 → two Lean interludes → confirmer). The confirmer report (issue #688, 2026-09-28) is the spine of §§1, 3–5, 9; carried, not re-derived.
+**Status:** output document for issue #688 step 5 (parent #473, AC1 (c), ruled 2026-09-30, Option A — §3); branch `foundations/688-inflight-algebra`, Lean head **43d29eb** (PR #689; §I4 C1–C4 applied — see §6); author qbp-oppenheimer; Tier-3 review: Red Team APPROVE-WITH-CONCERN (M1–M4 applied), Gemini APPROVE, §I4 qbp-architecture APPROVE-WITH-CONCERN at b85df23 (C1–C4 applied at the head above; re-§I4 at the encode head owed). **The four PROOF anchors are written by the encode commit on this branch (the commit that carries this line; ledger 6.12.0); D itself is not anchored; no #473 acceptance criterion is claimed; no #635 protocol and no Strategy-C branch is chosen; no rule is derived.** Ledger of record: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` 6.11.0 on master. Conversation MO followed (sealed position → record pass → rounds 1–5 → two Lean interludes → confirmer). The confirmer report (issue #688, 2026-09-28) is the spine of §§1, 3–5, 9; carried, not re-derived.
 
 ## 0. Reading guide
 
 | Tag | Meaning | Cites |
 |---|---|---|
-| **PROVED** | a 0-sorry Lean 4 theorem, anchored on the master ledger (anchor id) or on this branch (PR #689, head b85df23 + C1–C4 (SHA recorded at the encode commit)) (a name in `proofs/QBP/Foundations/InFlightAlgebra.lean`: unanchored, unreviewed, encode only after review); the sentence stays inside the NOT-claimed clause | anchor id or Lean name |
+| **PROVED** | a 0-sorry Lean 4 theorem, anchored on the master ledger (anchor id) or on this branch (PR #689, head 43d29eb) (a name in `proofs/QBP/Foundations/InFlightAlgebra.lean`: unanchored, unreviewed, encode only after review); the sentence stays inside the NOT-claimed clause | anchor id or Lean name |
 | **NUMERICAL** | a scripted computation, not machine-checked | script name (location note below) |
 | **ARGUMENT** | a derivation from PROVED / NUMERICAL ingredients, not itself machine-checked (classical theorems, BOTE counts, equivariance readings) | ingredients and step |
 | **OPEN** | not settled either way | owning issue or tracker anchor |
@@ -94,11 +94,11 @@ Notation: 𝕊 = `CDAlg ℝ 4`, 𝕆 = `CDAlg ℝ 3`, a = `cdLo s`, b = `cdHi s`
 
 **No dynamical kill inside the class (ARGUMENT).** D's only dynamical falsifier is a symmetry-breaking or stochastic term, which changes the class, not D — N2's rule-blindness in another form, and why D makes no Prop 13(b) contact. Round 2's static kill (vary b₀² on a level set) killed the *Δ-decorated* definition's added content, not D: those states lie on different leaves.
 
-## 6. What was proved in Lean (branch `foundations/688-inflight-algebra`, head b85df23 + C1–C4 (SHA recorded at the encode commit), PR #689)
+## 6. What was proved in Lean (branch `foundations/688-inflight-algebra`, head 43d29eb, PR #689)
 
 `proofs/QBP/Foundations/InFlightAlgebra.lean` (Foundations layer, no Substrate import). By grep: 69 `theorem`s + 10 `def`s (79 declarations; the 69th is the deprecated alias `gradV_mem_kernelAlgebra` added by §I4 C2); 40 audited via `#print axioms` (39 un-audited helper lemmas — the earlier "29" was an arithmetic slip). 0 `sorry`, 0 `native_decide`, axioms ⊆ {`propext`, `Classical.choice`, `Quot.sound`}; `lake build` exit 0; both gates exit 0.
 
-**Verification record (§I4 C4).** Independently re-verified by qbp-architecture at **b85df23** (isolated worktree, 10 GB cap): build exit 0, 39/39 `#print axioms` audits ⊆ {`propext`, `Classical.choice`, `Quot.sound`}, 68 `theorem` + 10 `def`. Re-run at **b85df23 + C1–C4 (SHA recorded at the encode commit)** (this head, after C1–C4) by lean-prover under `run-bounded 6G 1800`: `lake build QBP.Foundations.InFlightAlgebra` exit 0 (3022 jobs), **40/40** audits ⊆ the same three axioms, `check_lean_foundations.py` exit 0 (sorry 0, vacuous-`True` 0), `check_layer_imports.py` exit 0. Every row below is **PROVED** on the branch.
+**Verification record (§I4 C4).** Independently re-verified by qbp-architecture at **b85df23** (isolated worktree, 10 GB cap): build exit 0, 39/39 `#print axioms` audits ⊆ {`propext`, `Classical.choice`, `Quot.sound`}, 68 `theorem` + 10 `def`. Re-run at **43d29eb** (the Lean head, after C1–C4) by lean-prover under `run-bounded 6G 1800`: `lake build QBP.Foundations.InFlightAlgebra` exit 0 (3022 jobs), **40/40** audits ⊆ the same three axioms, `check_lean_foundations.py` exit 0 (sorry 0, vacuous-`True` 0), `check_layer_imports.py` exit 0. Every row below is **PROVED** on the branch.
 
 | Lean name(s) | One-line statement |
 |---|---|
