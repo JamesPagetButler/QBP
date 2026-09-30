@@ -23,16 +23,19 @@
     nonzero.  Proved here as `inFlightSpan_mul_closed` + `inFlightSpan_assoc`, with
     the non-vacuity payoff `inFlight_associative_even_where_alternator_nonzero`.
 
-  * **Round-4 core (#688).**  `∇V(s) ∈ 𝕆_s`: writing `s = a + b·ℓ` and `c = Im b`,
-    both Cayley–Dickson components of the gradient of `V(s) = N([a, b])` lie in the
-    host quaternion algebra `H_s = span{1, a, c, a·c} ⊆ 𝕆`, so `∇V(s)` lies in the
-    CD double `𝕆_s = H_s ⊕ H_s·ℓ` (`gradV_mem_kernelAlgebra`,
+  * **Round-4 core (#688).**  `gradVof s ∈ 𝕆_s`: writing `s = a + b·ℓ` and
+    `c = Im b`, both Cayley–Dickson components of the *Foundations closed form* of
+    the gradient of `V(s) = N([a, b])` lie in the host quaternion algebra
+    `H_s = span{1, a, c, a·c} ⊆ 𝕆`, so `gradVof s` lies in the CD double
+    `𝕆_s = H_s ⊕ H_s·ℓ` (`gradVof_components_mem_kernelAlgebra`,
     `gradVof_mem_kernelAlgebra`).  `s` itself is in `𝕆_s`
-    (`self_mem_kernelAlgebra`), hence so is every `α·s + β·∇V(s)`
-    (`smul_self_add_smul_gradV_mem_kernelAlgebra`) — the algebraic content of
-    "`ker Δ(s) = CD(H_s)` is a first integral of the rule".  What is **not** proved:
-    `ker Δ(s) ⊆ CD(H_s)` (the reverse, dimension-8 half) and flow-invariance of
-    `s ↦ H_s` (a Substrate-layer derivative statement).
+    (`self_mem_kernelAlgebra`), hence so is every `α • s + β • gradVof s`
+    (`smul_self_add_smul_gradV_mem_kernelAlgebra`).  What is **not** proved:
+    `gradVof = QBP.Substrate.RuleFlow.gradV` (the bridge lemma, #683 — so no
+    statement in this file is a statement about the *rule's* gradient);
+    `ker Δ(s) ⊆ CD(H_s)` (the reverse, dimension-8 half); and flow invariance of
+    `s ↦ H_s` — an OPEN ODE statement (FLAG-rule-flow-open), NOT a corollary of the
+    algebraic membership above.
 
   ## Honest scope notes (read before quoting these results)
 
@@ -694,26 +697,47 @@ def InKernelAlgebra (s x : CDAlg ℝ 4) : Prop :=
   InQuatSpanOct (cdLo s) (imHi s) (cdLo x)
     ∧ InQuatSpanOct (cdLo s) (imHi s) (cdHi x)
 
-/-- **Main result (#688 round 4, algebraic core): `∇V(s) ∈ 𝕆_s`.**
+/-- **Main result (#688 round 4, algebraic core), component form: both Foundations
+    gradient components lie in `H_s`.**
 
     For every sedenion `s = a + b·ℓ`, writing `c = Im b` and
-    `H_s = span_ℝ{1, a, c, a·c} ⊆ 𝕆`, both Cayley–Dickson components of the
-    gradient of `V(s) = N([a, b])` lie in `H_s`; equivalently `∇V(s)` lies in the
-    CD double `𝕆_s = H_s ⊕ H_s·ℓ`.
+    `H_s = span_ℝ{1, a, c, a·c} ⊆ 𝕆`, the two Foundations closed-form components
+    `gradVlo s` and `gradVhi s` both lie in `H_s`; equivalently the sedenion
+    `gradVof s = loOf (gradVlo s) + hiOf (gradVhi s)` lies in the CD double
+    `𝕆_s = H_s ⊕ H_s·ℓ` (`gradVof_mem_kernelAlgebra`).
+
+    **Scope (PR #689 §I4 C2).**  The statement is about the *Foundations copies*
+    `gradVlo` / `gradVhi` (§9.3), NOT about `QBP.Substrate.RuleFlow.gradV`.  They
+    are text-identical to the closed form that `RuleFlow.cdLo_gradV` /
+    `RuleFlow.cdHi_gradV` prove, but the identification
+    `gradVof s = RuleFlow.gradV s` is **not stated in Lean** (bridge lemma owed,
+    #683); until it is, nothing here says anything about the rule's gradient.  The
+    old name `gradV_mem_kernelAlgebra` is kept as a deprecated alias.
 
     No hypothesis on `s` is required (in particular not `s.coord 0 = 0` nor
-    `N s = 1`): this is an identity of the closed form of the gradient.
+    `N s = 1`): this is an identity of the closed form.
 
     Mechanism: `b ∈ H_s` because `b = b₀·1 + c`; `ā, b̄ ∈ H_s` because `H_s` is
     conjugation-closed; `C = a·b − b·a ∈ H_s` and then both gradient components
     are ℝ-multiples of differences of products of `C` with `ā`/`b̄` — all inside
     `H_s` by `span4_mul_closed`. -/
-theorem gradV_mem_kernelAlgebra (s : CDAlg ℝ 4) :
+theorem gradVof_components_mem_kernelAlgebra (s : CDAlg ℝ 4) :
     InQuatSpanOct (cdLo s) (imHi s) (gradVlo s)
       ∧ InQuatSpanOct (cdLo s) (imHi s) (gradVhi s) :=
   ⟨gradVlo_mem_hostQuat s, gradVhi_mem_hostQuat s⟩
 
-/-- The same statement packaged at the sedenion level: `∇V(s) ∈ 𝕆_s`. -/
+/-- Deprecated alias for `gradVof_components_mem_kernelAlgebra` (renamed
+    2026-09-30, PR #689 §I4 C2: the old name read as a claim about
+    `RuleFlow.gradV`, which is the OPEN bridge of #683). -/
+@[deprecated gradVof_components_mem_kernelAlgebra (since := "2026-09-30")]
+theorem gradV_mem_kernelAlgebra (s : CDAlg ℝ 4) :
+    InQuatSpanOct (cdLo s) (imHi s) (gradVlo s)
+      ∧ InQuatSpanOct (cdLo s) (imHi s) (gradVhi s) :=
+  gradVof_components_mem_kernelAlgebra s
+
+/-- The same statement packaged at the sedenion level: `gradVof s ∈ 𝕆_s`
+    (`gradVof` is the Foundations copy of the closed-form gradient; the
+    identification with `RuleFlow.gradV` is not in Lean — #683). -/
 theorem gradVof_mem_kernelAlgebra (s : CDAlg ℝ 4) :
     InKernelAlgebra s (gradVof s) := by
   refine ⟨?_, ?_⟩
@@ -721,8 +745,10 @@ theorem gradVof_mem_kernelAlgebra (s : CDAlg ℝ 4) :
   · rw [cdHi_gradVof]; exact gradVhi_mem_hostQuat s
 
 /-- **`s` itself lies in `𝕆_s`.**  Together with `gradVof_mem_kernelAlgebra` this
-    says the state and its gradient live in the *same* CD double — the algebraic
-    precondition for `𝕆_s` to be a first integral of the gradient rule. -/
+    says the state and the Foundations closed-form gradient at that state live in
+    the *same* CD double.  (Whether `𝕆_s` is constant along a trajectory is a
+    separate, OPEN ODE statement — FLAG-rule-flow-open, #683 — and does not follow
+    from this membership.) -/
 theorem self_mem_kernelAlgebra (s : CDAlg ℝ 4) : InKernelAlgebra s s :=
   ⟨cdLo_mem_hostQuat s, cdHi_mem_hostQuat s⟩
 
@@ -739,11 +765,18 @@ theorem inKernelAlgebra_smul {s x : CDAlg ℝ 4} (r : ℝ)
   · rw [cdLo_smul]; exact inQuatSpanOct_smul r hx.1
   · rw [cdHi_smul]; exact inQuatSpanOct_smul r hx.2
 
-/-- **The gradient-flow direction stays in `𝕆_s`.**  Any real combination
-    `α·s + β·∇V(s)` — in particular the Euler step of the gradient rule and the
-    rule field `F(s) = (4V)·s − ∇V(s)` — lies in `𝕆_s`.  This is the algebraic
-    content of "`𝕆_s` is a first integral of the rule": the vector field never
-    points out of the CD double of the host quaternion algebra. -/
+/-- **`α • s + β • gradVof s ∈ 𝕆_s`.**  For every sedenion `s` and all `α β : ℝ`,
+    the real combination `α • s + β • gradVof s` lies in `𝕆_s = H_s ⊕ H_s·ℓ`.
+    Immediate from `self_mem_kernelAlgebra`, `gradVof_mem_kernelAlgebra` and the
+    closure of `𝕆_s` under `+` and `•` (`inKernelAlgebra_add`,
+    `inKernelAlgebra_smul`).
+
+    **Scope (PR #689 §I4 C3) — what this does NOT say.**  `gradVof` is the
+    Foundations copy of the closed-form gradient: the identification
+    `gradVof = RuleFlow.gradV` is not stated in Lean (#683).  So this is not a
+    statement about the rule field `F(s)`, and it is not flow invariance —
+    that `𝕆_s` is constant along a trajectory is an OPEN ODE statement
+    (FLAG-rule-flow-open), not a corollary of this algebraic membership. -/
 theorem smul_self_add_smul_gradV_mem_kernelAlgebra (s : CDAlg ℝ 4) (α β : ℝ) :
     InKernelAlgebra s (α • s + β • gradVof s) :=
   inKernelAlgebra_add (inKernelAlgebra_smul α (self_mem_kernelAlgebra s))
@@ -788,7 +821,8 @@ end KernelAlgebra
 #print axioms cdComm_mem_hostQuat
 #print axioms gradVlo_mem_hostQuat
 #print axioms gradVhi_mem_hostQuat
-#print axioms gradV_mem_kernelAlgebra
+#print axioms gradVof_components_mem_kernelAlgebra
+#print axioms gradV_mem_kernelAlgebra   -- deprecated alias, audited under both names
 #print axioms gradVof_mem_kernelAlgebra
 #print axioms self_mem_kernelAlgebra
 #print axioms smul_self_add_smul_gradV_mem_kernelAlgebra

@@ -1,12 +1,12 @@
 # The in-flight region — definition D: InFlight with its canonical 𝕆_s-leaf foliation (issue #688, 2026-09-29)
 
-**Status:** output document for issue #688 step 5 (parent #473, AC1 (c), ruled 2026-09-30, Option A — §3); branch `foundations/688-inflight-algebra`, Lean head **77a4c60** (PR #689); author qbp-oppenheimer; Tier-3 review owed (Red Team → Gemini → §I4) before anything is encoded. **Nothing is encoded; no #473 acceptance criterion is claimed; no #635 protocol and no Strategy-C branch is chosen; no rule is derived.** Ledger of record: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` 6.11.0 on master. Conversation MO followed (sealed position → record pass → rounds 1–5 → two Lean interludes → confirmer). The confirmer report (issue #688, 2026-09-28) is the spine of §§1, 3–5, 9; carried, not re-derived.
+**Status:** output document for issue #688 step 5 (parent #473, AC1 (c), ruled 2026-09-30, Option A — §3); branch `foundations/688-inflight-algebra`, Lean head **b85df23 + C1–C4 (SHA recorded at the encode commit)** (PR #689; §I4 C1–C4 applied — see §6); author qbp-oppenheimer; Tier-3 review: Red Team APPROVE-WITH-CONCERN (M1–M4 applied), Gemini APPROVE, §I4 qbp-architecture APPROVE-WITH-CONCERN at b85df23 (C1–C4 applied at the head above; re-§I4 at the encode head owed). **The four PROOF anchors are written by the encode commit that follows on this branch (ledger 6.12.0); D itself is not anchored; no #473 acceptance criterion is claimed; no #635 protocol and no Strategy-C branch is chosen; no rule is derived.** Ledger of record: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` 6.11.0 on master. Conversation MO followed (sealed position → record pass → rounds 1–5 → two Lean interludes → confirmer). The confirmer report (issue #688, 2026-09-28) is the spine of §§1, 3–5, 9; carried, not re-derived.
 
 ## 0. Reading guide
 
 | Tag | Meaning | Cites |
 |---|---|---|
-| **PROVED** | a 0-sorry Lean 4 theorem, anchored on the master ledger (anchor id) or on this branch (PR #689, head 77a4c60) (a name in `proofs/QBP/Foundations/InFlightAlgebra.lean`: unanchored, unreviewed, encode only after review); the sentence stays inside the NOT-claimed clause | anchor id or Lean name |
+| **PROVED** | a 0-sorry Lean 4 theorem, anchored on the master ledger (anchor id) or on this branch (PR #689, head b85df23 + C1–C4 (SHA recorded at the encode commit)) (a name in `proofs/QBP/Foundations/InFlightAlgebra.lean`: unanchored, unreviewed, encode only after review); the sentence stays inside the NOT-claimed clause | anchor id or Lean name |
 | **NUMERICAL** | a scripted computation, not machine-checked | script name (location note below) |
 | **ARGUMENT** | a derivation from PROVED / NUMERICAL ingredients, not itself machine-checked (classical theorems, BOTE counts, equivariance readings) | ingredients and step |
 | **OPEN** | not settled either way | owning issue or tracker anchor |
@@ -39,8 +39,8 @@ Notation: 𝕊 = `CDAlg ℝ 4`, 𝕆 = `CDAlg ℝ 3`, a = `cdLo s`, b = `cdHi s`
 | ℍ_s closed under the product and associative at every imaginary s; 4-dimensional for unit imaginary s iff s ≠ ±ℓ (there span{1, ℓ} ≅ ℂ); ℍ_s ⊆ ker Δ(s) | **PROVED** | `inFlight_closed_associative`, `inFlight_independent`, `pOf_eq_zero_iff`, `delta_vanishes_on_inFlightSpan` (branch); the span was first-link Prop 16(ii), `genByPair_ell_mem_quatSpan` |
 | Associativity of ℍ_s is not alternativity restated: it holds at s = e₁ + e₁₀ where 𝕊's alternator at s is nonzero | **PROVED** | `inFlight_associative_even_where_alternator_nonzero`, via `sedWitX_alternator_ne_zero` |
 | H_s ⊂ 𝕆 closed under product and conjugation, associative — a quaternion algebra (degenerate at a vacuum); 𝕆_s = H_s ⊕ H_s ℓ closed under +, • | **PROVED** | `inQuatSpanOct_mul`, `inQuatSpanOct_conj`, `inQuatSpanOct_assoc`, `inKernelAlgebra_add`, `inKernelAlgebra_smul` (branch), on `span4_mul_closed`, `assoc_vanishes_on_span4`, `octonion_artin` |
-| ∇V(s) ∈ 𝕆_s for every s (no imaginarity or unit norm); s ∈ 𝕆_s; hence α·s + β·∇V(s) ∈ 𝕆_s | **PROVED** (modulo the next row) | `gradV_mem_kernelAlgebra`, `gradVof_mem_kernelAlgebra`, `self_mem_kernelAlgebra`, `smul_self_add_smul_gradV_mem_kernelAlgebra` (branch) |
-| `gradVof` (Foundations copy of the closed form) = `RuleFlow.gradV` | **OPEN** | text-identical to `cdLo_gradV` / `cdHi_gradV`, matched by citation only; bridge lemma on #683 |
+| gradVof(s) ∈ 𝕆_s for every s (no imaginarity or unit norm); s ∈ 𝕆_s; hence α·s + β·gradVof(s) ∈ 𝕆_s | **PROVED** | `gradVof_components_mem_kernelAlgebra` (renamed from `gradV_mem_kernelAlgebra`, kept as a deprecated alias — §I4 C2), `gradVof_mem_kernelAlgebra`, `self_mem_kernelAlgebra`, `smul_self_add_smul_gradV_mem_kernelAlgebra` (branch) |
+| `gradVof` (Foundations copy of the closed form) = `RuleFlow.gradV`; hence ∇V(s) ∈ 𝕆_s for the *rule's* gradient `RuleFlow.gradV` | **OPEN** | text-identical to `cdLo_gradV` / `cdHi_gradV`, matched by citation only; bridge lemma on #683 (§I4 C1: the RuleFlow statement is OPEN-conditioned, only the `gradVof` statement above is PROVED) |
 | The rule field F(s) = −(∇V − ⟪∇V, s⟫s − (∇V)₀·1) lies in 𝕆_s | **ARGUMENT** | the row above plus 1 ∈ 𝕆_s; not a stated theorem; F's form: PROOF-rule-gradient-and-tangent-field |
 | ker Δ(s) has rank 8 on 200 random states + the ridge witness (e₁+e₁₀)/√2, and equals 𝕆_s (reverse inclusion) | **NUMERICAL** | 200 states, `analysis/688-in-flight/delta_spectrum_check.py`; rank[Fix, ker] = 8, 3 trials, `r4_out.txt` |
 | The P2 rule is G₂-equivariant | **ARGUMENT** | ingredients PROVED: `map_N`, `map_re`, `map_one`; no Lean `ruleField (φ s) = φ (ruleField s)`; F(s) ∈ 𝕆_s to 1.4·10⁻¹⁵, 200 states (`confirm_leaf.py`) |
@@ -94,9 +94,11 @@ Notation: 𝕊 = `CDAlg ℝ 4`, 𝕆 = `CDAlg ℝ 3`, a = `cdLo s`, b = `cdHi s`
 
 **No dynamical kill inside the class (ARGUMENT).** D's only dynamical falsifier is a symmetry-breaking or stochastic term, which changes the class, not D — N2's rule-blindness in another form, and why D makes no Prop 13(b) contact. Round 2's static kill (vary b₀² on a level set) killed the *Δ-decorated* definition's added content, not D: those states lie on different leaves.
 
-## 6. What was proved in Lean (branch `foundations/688-inflight-algebra`, head 77a4c60, PR #689)
+## 6. What was proved in Lean (branch `foundations/688-inflight-algebra`, head b85df23 + C1–C4 (SHA recorded at the encode commit), PR #689)
 
-`proofs/QBP/Foundations/InFlightAlgebra.lean` (Foundations layer, no Substrate import). By grep: 68 `theorem`s + 10 `def`s (78 declarations); 39 audited via `#print axioms` (29 un-audited helper lemmas). 0 `sorry`, 0 `native_decide`, axioms ⊆ {`propext`, `Classical.choice`, `Quot.sound`}; `lake build` exit 0; both gates exit 0. **Not re-run here.** Every row is **PROVED** on the branch.
+`proofs/QBP/Foundations/InFlightAlgebra.lean` (Foundations layer, no Substrate import). By grep: 69 `theorem`s + 10 `def`s (79 declarations; the 69th is the deprecated alias `gradV_mem_kernelAlgebra` added by §I4 C2); 40 audited via `#print axioms` (39 un-audited helper lemmas — the earlier "29" was an arithmetic slip). 0 `sorry`, 0 `native_decide`, axioms ⊆ {`propext`, `Classical.choice`, `Quot.sound`}; `lake build` exit 0; both gates exit 0.
+
+**Verification record (§I4 C4).** Independently re-verified by qbp-architecture at **b85df23** (isolated worktree, 10 GB cap): build exit 0, 39/39 `#print axioms` audits ⊆ {`propext`, `Classical.choice`, `Quot.sound`}, 68 `theorem` + 10 `def`. Re-run at **b85df23 + C1–C4 (SHA recorded at the encode commit)** (this head, after C1–C4) by lean-prover under `run-bounded 6G 1800`: `lake build QBP.Foundations.InFlightAlgebra` exit 0 (3022 jobs), **40/40** audits ⊆ the same three axioms, `check_lean_foundations.py` exit 0 (sorry 0, vacuous-`True` 0), `check_layer_imports.py` exit 0. Every row below is **PROVED** on the branch.
 
 | Lean name(s) | One-line statement |
 |---|---|
@@ -111,7 +113,7 @@ Notation: 𝕊 = `CDAlg ℝ 4`, 𝕆 = `CDAlg ℝ 3`, a = `cdLo s`, b = `cdHi s`
 | `InQuatSpanOct`, `inQuatSpanOct_mul`, `inQuatSpanOct_conj`, `inQuatSpanOct_assoc` | H = span{1, a, c, ac} ⊂ 𝕆 closed under product and conjugation, associative |
 | `imHi`, `cdHi_mem_hostQuat`, `cdComm`, `cdComm_eq_comm_imHi`, `cdComm_mem_hostQuat` | c := Im b; b ∈ H_s; [a, b] = [a, c] ∈ H_s |
 | `gradVlo`, `gradVhi`, `gradVof`, `gradVlo_mem_hostQuat`, `gradVhi_mem_hostQuat` | Foundations copies of the closed-form CD components of ∇V; both in H_s |
-| `InKernelAlgebra`, `gradV_mem_kernelAlgebra`, `gradVof_mem_kernelAlgebra`, `self_mem_kernelAlgebra`, `inKernelAlgebra_add`, `inKernelAlgebra_smul`, `smul_self_add_smul_gradV_mem_kernelAlgebra` | x ∈ 𝕆_s iff both CD components in H_s; ∇V(s), s ∈ 𝕆_s; closed under +, •; α·s + β·∇V(s) ∈ 𝕆_s |
+| `InKernelAlgebra`, `gradVof_components_mem_kernelAlgebra` (old name `gradV_mem_kernelAlgebra` = deprecated alias), `gradVof_mem_kernelAlgebra`, `self_mem_kernelAlgebra`, `inKernelAlgebra_add`, `inKernelAlgebra_smul`, `smul_self_add_smul_gradV_mem_kernelAlgebra` | x ∈ 𝕆_s iff both CD components in H_s; gradVof(s), s ∈ 𝕆_s; closed under +, •; α·s + β·gradVof(s) ∈ 𝕆_s. **Scope:** `gradVof` is the Foundations copy — not `RuleFlow.gradV` (#683) |
 
 | Not proved on the branch | Tag | Where it would live |
 |---|---|---|
@@ -157,7 +159,7 @@ Notation: 𝕊 = `CDAlg ℝ 4`, 𝕆 = `CDAlg ℝ 3`, a = `cdLo s`, b = `cdHi s`
 | `in-flight-alternator-blind-to-ell` | `assoc_self_add_smul_ell`, `delta_blind_to_ell`, `left_mul_sq_ell_shift` | that L_s² alone is ℓ-blind; anything about Δ's spectrum (T2b) |
 | `in-flight-quaternion-closes-and-associates` | `inFlight_closed_associative`, `inFlight_independent`, `pOf_eq_zero_iff`, `inFlight_associative_even_where_alternator_nonzero` | 4-dimensionality at ±ℓ; that ℍ_s is the full kernel; the flow; any reversal of PROOF-hosting-identity-fails-in-flight (whose NOT-claimed clause this fills) |
 | `in-flight-span-in-alternator-kernel` | `delta_vanishes_on_inFlightSpan`, `left_mul_sq_on_inFlightSpan`, the `*_mem_ker_delta` four | the reverse inclusion; rank 8 |
-| `gradient-lies-in-host-kernel-algebra` | `gradV_mem_kernelAlgebra`, `gradVof_mem_kernelAlgebra`, `smul_self_add_smul_gradV_mem_kernelAlgebra` | that `gradVof` = `RuleFlow.gradV` in Lean; flow invariance (conditional on existence); 𝕆_s = ker Δ(s); leaf space = G₂/SO(4); the anneal; the endpoint |
+| `gradient-lies-in-host-kernel-algebra` | `gradVof_mem_kernelAlgebra`, `gradVof_components_mem_kernelAlgebra`, `smul_self_add_smul_gradV_mem_kernelAlgebra` | that `gradVof` = `RuleFlow.gradV` in Lean; flow invariance (conditional on existence); 𝕆_s = ker Δ(s); leaf space = G₂/SO(4); the anneal; the endpoint |
 
 FLAG/CONJ notes touched, if at all, only via the confined writer in the Tier-3 PR: FLAG-rule-flow-open (leaf invariance conditional on it), CONJ-condensed-math-for-transition-state (D spatial, no bearing). Neither touched here.
 
@@ -165,9 +167,9 @@ FLAG/CONJ notes touched, if at all, only via the confined writer in the Tier-3 P
 
 | Bucket | Contents |
 |---|---|
-| **PROVED** | the set identity (master); Δ = −T_s, ℓ-blind; ℍ_s closed, associative, 4-dim for unit imaginary s off ±ℓ, ⊆ ker Δ(s); H_s a conjugation-closed associative subalgebra of 𝕆; ∇V(s), α·s + β·∇V(s) ∈ 𝕆_s (modulo the `gradV = gradVof` citation); scalar transverse Hessian at vacua (PROOF-vacuum-hessian-transverse-eigenvalue) |
+| **PROVED** | the set identity (master); Δ = −T_s, ℓ-blind; ℍ_s closed, associative, 4-dim for unit imaginary s off ±ℓ, ⊆ ker Δ(s); H_s a conjugation-closed associative subalgebra of 𝕆; gradVof(s), α·s + β·gradVof(s) ∈ 𝕆_s (the Foundations closed form; §I4 C1); scalar transverse Hessian at vacua (PROOF-vacuum-hessian-transverse-eigenvalue) |
 | **NUMERICAL** | ker Δ(s) rank 8 and = 𝕆_s; Δ's spectrum {0⁸, ±√V⁴}, Δ³ = VΔ; Δ depends on s only through a ∧ Im b; P2 trajectories stay in 𝕆_{s₀} to 2.2·10⁻¹⁵; the anneal leaves a leaf per path; endpoint drift 0.40ε² at one crystal |
 | **ARGUMENT** | P2 rule G₂-equivariance; leaf invariance (two routes); leaves partition InFlight; leaf space = G₂/SO(4); 8 + 6 = 14, 4 + 4 = 8; F(s) ∈ 𝕆_s; class-relative rule-blindness; AC2 = none; S4 cannot fire; D spatial |
-| **OPEN** | ker Δ(s) ⊆ 𝕆_s (K-a's target, §5); `gradV = gradVof`; the flow-invariance ODE statement; `ruleField` equivariance in Lean; T2b; uniqueness of 𝕆_s among octonion subalgebras ⊇ ℍ_s; the pointless-locale demand, carried as CONJ-condensed-math-for-transition-state (not AC1 (c), post-ruling — §3); existence and the ω-limit map (FLAG-rule-flow-open); which #635 protocol is the rule (K-b) |
+| **OPEN** | ker Δ(s) ⊆ 𝕆_s (K-a's target, §5); `gradV = gradVof`, and with it **∇V(s) ∈ 𝕆_s for `RuleFlow.gradV`** — the rule-gradient form of the PROVED `gradVof` statement, pending the #683 bridge (§I4 C1); the flow-invariance ODE statement; `ruleField` equivariance in Lean; T2b; uniqueness of 𝕆_s among octonion subalgebras ⊇ ℍ_s; the pointless-locale demand, carried as CONJ-condensed-math-for-transition-state (not AC1 (c), post-ruling — §3); existence and the ω-limit map (FLAG-rule-flow-open); which #635 protocol is the rule (K-b) |
 
 **What would reverse D.** (i) K-a fires: ker Δ(s) strictly larger than 𝕆_s on positive measure — the foliation is by the wrong algebra (the set InFlight is a theorem, irreversible). (ii) K-b: #635 rules the anneal the rule — the invariance clause becomes a statement in law. (iii) A ruling admitting a rule outside the deterministic G₂-equivariant class — the algebraic clauses survive, the invariance clause does not. (iv) A pointless construction answering CONJ-condensed-math-for-transition-state would add to D, not supersede it — AC1 (c) no longer demands one; none on record. Not a reversal: any fact about ⟨b₀²⟩ or quench vs anneal — D is blind to them by construction, and says so.
