@@ -1,0 +1,22 @@
+dim g2 = 14
+dim Stab_g2(u) = 8 (SU(3) has dim 8)
+V(s0)=0.0e+00
+  su(3) kills s0: True | fixes H_s0=span{1,u,l,ul} pointwise: True
+  dim {D in g2 : D(H) ⊆ H} = 6 (SO(4) has dim 6) -- a different object from Stab(u)
+  random in-flight s: rank of su(3)-orbit | g2-orbit  (level set dim 13): [(8, 11), (8, 11), (8, 11), (8, 11)]
+rank of d(b0,|a|²,|c|²,<a,c>,<a,u>,<c,u>,<u,a×c>) on the 14-dim tangent: 6 (expect 6: one relation |a|²+|c|²+b0²=1)
+  su(3)-orbit directions annihilated by dInvs: 3.5603937787257053e-11 (expect ~0) ; so on a level set {V=c}: 6-1 = 5 invariants, of which 2 are G2-invariants (b0, one of |a|²,|c|²,<a,c> given V) and 3 are RELATIVE to u
+crystal-manifold tangent dim: 8  normal-space dim: 6
+normal Hessian eigenvalues: [4.88 4.88 4.88 4.88 4.88 4.88]  8(1-b0²)=4.880000
+cubic coefficient C3(n) along 12 random normal directions: min -0.000 max 0.000  (direction-DEPENDENT: anisotropy starts at order 3)
+exceptional-divisor endpoint map at s0 (RK4 h=0.005, stop V<1e-24):
+  dir 0: |endpoint-s0| = ['1.60e-04', '4.00e-05', '1.00e-05', '2.50e-06']  log-log slope = 2.00  (slope 2 = identity on the divisor to first order)
+  dir 1: |endpoint-s0| = ['1.60e-04', '4.00e-05', '1.00e-05', '2.50e-06']  log-log slope = 2.00  (slope 2 = identity on the divisor to first order)
+  dir 2: |endpoint-s0| = ['1.60e-04', '4.00e-05', '1.00e-05', '2.50e-06']  log-log slope = 2.00  (slope 2 = identity on the divisor to first order)
+in-flight s: Stab_g2(a,c) and its fixed set
+  trial 0: dim Stab_g2(a,c) = 3 (SU(2)=3) | dim Fix_S = 8 | dim ker Δ = 8 | rank[Fix,ker] = 8 (8 ⇒ equal)
+      flow: V_end=9.6e-25 after 1036 steps; max dist(s(t), ker Δ(s0)) = 2.2e-15; max ‖P_ker(s(t)) − P_ker(s0)‖ = 1.3e-10; u_end ∈ span(a,c,a×c)? resid = 2.3e-15; b0_end=0.5582
+  trial 1: dim Stab_g2(a,c) = 3 (SU(2)=3) | dim Fix_S = 8 | dim ker Δ = 8 | rank[Fix,ker] = 8 (8 ⇒ equal)
+      flow: V_end=9.9e-25 after 678 steps; max dist(s(t), ker Δ(s0)) = 1.8e-15; max ‖P_ker(s(t)) − P_ker(s0)‖ = 4.5e-15; u_end ∈ span(a,c,a×c)? resid = 1.1e-15; b0_end=0.0510
+  trial 2: dim Stab_g2(a,c) = 3 (SU(2)=3) | dim Fix_S = 8 | dim ker Δ = 8 | rank[Fix,ker] = 8 (8 ⇒ equal)
+      flow: V_end=9.7e-25 after 720 steps; max dist(s(t), ker Δ(s0)) = 1.7e-15; max ‖P_ker(s(t)) − P_ker(s0)‖ = 4.8e-15; u_end ∈ span(a,c,a×c)? resid = 1.2e-15; b0_end=-0.0523
