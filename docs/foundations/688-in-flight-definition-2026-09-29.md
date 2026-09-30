@@ -152,7 +152,7 @@ Notation: 𝕊 = `CDAlg ℝ 4`, 𝕆 = `CDAlg ℝ 3`, a = `cdLo s`, b = `cdHi s`
 | **Lean follow-ups** | (a) bridge lemma; (b) reverse inclusion; (c) flow-invariance ODE statement; (d) `ruleField` equivariance; (e) T2b; (f) `lake build QBP.Foundations` OOM at `Octonion32Count` under the 6 GB cap | **OPEN** | lean-prover; #683 |
 | **Substrate draft v0.2** (#684) | §4 "Positive in-flight account" and §8: "no issue" → #688, D as candidate | **OPEN** | #684 |
 
-**Encode record — the four PROOF anchors, encoded at 62b761e (ledger 6.12.0/343) after Red Team, Gemini and §I4 review; ids as listed.**
+**Encode record — the four PROOF anchors, encoded at 62b761e (ledger 6.12.0/343) after Red Team, Gemini and §I4 review; anchor 4 re-encoded per §I4 R1/R2 at a38a0af (issuecomment-5903470291): its `name` speaks of `gradVof(s)` only (the identity `gradVof = RuleFlow.gradV` is stated as NOT in Lean, #683), and its `prediction_chain` is [`PROOF-alternator-vanishes-iff-commute`] alone — the edge to `PROOF-rule-gradient-and-tangent-field` is withheld until the #683 bridge lemma lands in Substrate; ids as listed.**
 
 | Candidate slug | Lean theorem(s) | NOT-claimed clause it would carry |
 |---|---|---|

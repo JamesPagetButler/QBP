@@ -6,14 +6,16 @@ Four anchors for `proofs/QBP/Foundations/InFlightAlgebra.lean`: the alternator �
 EVERY imaginary s the in-flight span ℍ_s = span{1, s, ℓ, s·ℓ} is closed under the product and associative,
 4-dimensional for unit imaginary s iff s ≠ ±ℓ, and associative even at s = e₁ + e₁₀ where 𝕊's alternator
 is nonzero; ℍ_s ⊆ ker Δ(s) (the hosting identity s·(s·x) = −N(s)·x holds on ℍ_s); and for EVERY sedenion
-s = a + b·ℓ the Foundations closed-form gradient ∇V(s) lies in 𝕆_s = H_s ⊕ H_s·ℓ, H_s = span{1, a, Im b,
-a·Im b} ⊂ 𝕆 a conjugation-closed associative subalgebra, with s ∈ 𝕆_s and α·s + β·∇V(s) ∈ 𝕆_s. These are
+s = a + b·ℓ the Foundations closed-form gradient components gradVof(s) lie in 𝕆_s = H_s ⊕ H_s·ℓ, H_s =
+span{1, a, Im b, a·Im b} ⊂ 𝕆 a conjugation-closed associative subalgebra, with s ∈ 𝕆_s and
+α·s + β·gradVof(s) ∈ 𝕆_s (the identity gradVof = RuleFlow.gradV is NOT stated in Lean, #683). These are
 the PROVED clauses of D (§1 of docs/foundations/688-in-flight-definition-2026-09-29.md); D itself — the
 foliation of InFlight by the 6-dim leaves S⁶(𝕆_s) ∩ InFlight, leaf invariance, the leaf space G₂/SO(4) —
 is ARGUMENT / NUMERICAL and is NOT anchored. Every anchor cites theorems on the branch, 0-sorry,
 `#print axioms` ⊆ {propext, Classical.choice, Quot.sound} on the 40 audited declarations, reviewed
 (PR #689 Red Team APPROVE-WITH-CONCERN M1–M4 applied, Gemini APPROVE, §I4 qbp-architecture
-APPROVE-WITH-CONCERN at b85df23 with C1–C4 applied). No root, principle, decision or
+APPROVE-WITH-CONCERN at b85df23 with C1–C4 applied; §I4 re-read at a38a0af APPROVE-WITH-CONCERN with
+R1/R2 applied — anchor 4 named for gradVof only, its RuleFlow chain edge withheld). No root, principle, decision or
 kill is touched; FLAG-rule-flow-open and CONJ-condensed-math-for-transition-state are not touched. The
 §8 NOT-claimed clauses go into every anchor; anchor 4 states explicitly that `gradVof = RuleFlow.gradV`
 is NOT in Lean (bridge lemma owed, #683). Manifest entries added alongside; then
@@ -52,9 +54,11 @@ CHAIN_ALG = [
     "PROOF-hosting-identity-fails-in-flight",
     "PROOF-alternator-vanishes-iff-commute",
 ]
-# Anchor 4 (∇V ∈ 𝕆_s) chains to the closed-form gradient anchor it copies and to the same alternator anchor.
+# Anchor 4 (gradVof(s) ∈ 𝕆_s) chains to the same alternator anchor ONLY. The edge to
+# PROOF-rule-gradient-and-tangent-field (proof file Substrate/RuleFlow.lean) is deliberately withheld: the Lean
+# file imports only Foundations, and the only link to RuleFlow's gradient is the OPEN #683 bridge lemma
+# (§I4 R2 at a38a0af — a chain edge is support, and that edge would launder the gap into provenance).
 CHAIN_GRAD = [
-    "PROOF-rule-gradient-and-tangent-field",
     "PROOF-alternator-vanishes-iff-commute",
 ]
 CHAIN_ALL = sorted(set(CHAIN_ALG) | set(CHAIN_GRAD))
@@ -197,13 +201,14 @@ ANCHORS = [
     ),
     anchor(
         "PROOF-gradient-lies-in-host-kernel-algebra",
-        "For EVERY sedenion s = a + b·ℓ (no imaginarity or unit-norm hypothesis) the Foundations closed-form gradient ∇V(s) = gradVof s lies in 𝕆_s = H_s ⊕ H_s·ℓ, where H_s = span{1, a, Im b, a·Im b} ⊂ 𝕆 is closed under product and conjugation and associative; s ∈ 𝕆_s; hence α·s + β·∇V(s) ∈ 𝕆_s for all α, β",
+        "For EVERY sedenion s = a + b·ℓ (no imaginarity or unit-norm hypothesis) gradVof(s) — the Foundations closed-form gradient components — lies in the host kernel algebra 𝕆_s = H_s ⊕ H_s·ℓ, where H_s = span{1, a, Im b, a·Im b} ⊂ 𝕆 is closed under product and conjugation and associative; s ∈ 𝕆_s; hence α·s + β·gradVof(s) ∈ 𝕆_s for all α, β. The identity gradVof = RuleFlow.gradV is NOT stated in Lean (#683)",
         "Foundations/InFlightAlgebra.lean: `gradVof_mem_kernelAlgebra` (the main theorem) — for every "
         "s : CDAlg ℝ 4, InKernelAlgebra s (gradVof s), where InKernelAlgebra s x := "
         "InQuatSpanOct (cdLo s) (imHi s) (cdLo x) ∧ InQuatSpanOct (cdLo s) (imHi s) (cdHi x) (both CD "
         "components of x in H_s), InQuatSpanOct a c x := x ∈ Submodule.span ℝ (gen4 a c) = span{1, a, c, a·c} "
         "⊂ 𝕆 = CDAlg ℝ 3, imHi s := cdHi s − (cdHi s).coord 0 • 1 = Im b, and gradVof s := loOf (gradVlo s) + "
-        "hiOf (gradVhi s) is the Foundations copy of the closed-form CD components of ∇V. "
+        "hiOf (gradVhi s) is the Foundations copy of the closed-form CD components (matched to RuleFlow's gradient by "
+        "citation only — see the NOT-claimed clause). "
         "`gradVof_components_mem_kernelAlgebra` (renamed from `gradV_mem_kernelAlgebra` by §I4 C2, which is "
         "kept as a deprecated alias and is NOT a witness of this anchor) — the component form: "
         "InQuatSpanOct (cdLo s) (imHi s) (gradVlo s) ∧ InQuatSpanOct (cdLo s) (imHi s) (gradVhi s). `self_mem_kernelAlgebra` — InKernelAlgebra s s. "
@@ -216,7 +221,9 @@ ANCHORS = [
         "at a vacuum, where a ∥ Im b). `cdComm_eq_comm_imHi` — cdComm s = cdLo s * imHi s − imHi s * cdLo s, "
         "i.e. [a, b] = [a, Im b] ∈ H_s. `gradVof` is a Foundations-level copy of the closed form that "
         "`RuleFlow.cdLo_gradV`/`cdHi_gradV` prove; the identity `gradVof s = gradV s` is NOT stated in Lean "
-        "(bridge lemma owed, #683). NOT claimed: that `gradVof` = `RuleFlow.gradV` in Lean (matched by "
+        "(bridge lemma owed, #683). prediction_chain: PROOF-alternator-vanishes-iff-commute only — the chain "
+        "to PROOF-rule-gradient-and-tangent-field is deliberately withheld until the #683 bridge lemma lands in "
+        "Substrate (InFlightAlgebra.lean imports only Foundations; §I4 R2). NOT claimed: that `gradVof` = `RuleFlow.gradV` in Lean (matched by "
         "citation only); flow / leaf invariance (ARGUMENT, conditional on existence — FLAG-rule-flow-open); "
         "anything about the rule field F(s) — no theorem in this file mentions it, and no membership of it is "
         "claimed here (§I4 C3); 𝕆_s = ker Δ(s) (rank 8 NUMERICAL, reverse inclusion OPEN); the leaf space "
@@ -242,7 +249,8 @@ CHANGELOG = {
     "note": (
         "qbp-oppenheimer: PROOF anchors for the in-flight algebra (PR #689; #688 definition D) — "
         "encode-after-review (Red Team APPROVE-WITH-CONCERN M1–M4 applied, Gemini APPROVE, §I4 "
-        "qbp-architecture APPROVE-WITH-CONCERN at b85df23 with C1–C4 applied — the gradient theorem renamed "
+        "qbp-architecture APPROVE-WITH-CONCERN at b85df23 with C1–C4 applied, §I4 re-read at a38a0af "
+        "APPROVE-WITH-CONCERN with R1/R2 applied — the gradient theorem renamed "
         "gradV_mem_kernelAlgebra → gradVof_components_mem_kernelAlgebra, old name a deprecated alias): "
         "PROOF-in-flight-alternator-blind-to-ell ([s + tℓ, s + tℓ, ·] = [s, s, ·] for every s, t; "
         "Δ(s + tℓ) = Δ(s) for imaginary s; L_s² alone shifts by (N(s) − N(s + tℓ))·id), "
@@ -250,18 +258,20 @@ CHANGELOG = {
         "associative at every imaginary s, 4-dimensional for unit imaginary s iff s ≠ ±ℓ, associative even at "
         "e₁ + e₁₀ where the alternator is nonzero), PROOF-in-flight-span-in-alternator-kernel (ℍ_s ⊆ ker Δ(s); "
         "the hosting identity s(sx) = −N(s)x holds on ℍ_s; the four kernel witnesses), "
-        "PROOF-gradient-lies-in-host-kernel-algebra (for every sedenion s = a + bℓ, ∇V(s) = gradVof s ∈ 𝕆_s = "
-        "H_s ⊕ H_s ℓ with H_s = span{1, a, Im b, a·Im b} a conjugation-closed associative subalgebra of 𝕆; "
-        "s ∈ 𝕆_s; α·s + β·∇V(s) ∈ 𝕆_s; gradVof = RuleFlow.gradV NOT stated in Lean, bridge lemma owed on #683). "
+        "PROOF-gradient-lies-in-host-kernel-algebra (for every sedenion s = a + bℓ, gradVof(s) — the Foundations "
+        "closed-form gradient components — lies in 𝕆_s = H_s ⊕ H_s ℓ with H_s = span{1, a, Im b, a·Im b} a "
+        "conjugation-closed associative subalgebra of 𝕆; s ∈ 𝕆_s; α·s + β·gradVof(s) ∈ 𝕆_s; "
+        "gradVof = RuleFlow.gradV NOT stated in Lean, bridge lemma owed on #683). "
         "These support D's PROVED clauses — Δ = −T_s and ℓ-blind; ℍ_s closed, associative, 4-dim off ±ℓ, "
-        "⊆ ker Δ(s); H_s a quaternion algebra in 𝕆; ∇V(s), s, α·s + β·∇V(s) ∈ 𝕆_s. D itself — the foliation of "
+        "⊆ ker Δ(s); H_s a quaternion algebra in 𝕆; gradVof(s), s, α·s + β·gradVof(s) ∈ 𝕆_s. D itself — the foliation of "
         "InFlight = {V > 0} by the 6-dim leaves S⁶(𝕆_s) ∩ InFlight, leaf invariance under deterministic "
         "G₂-equivariant rules, the leaf space {ℍ ⊂ 𝕆} = G₂/SO(4) — is ARGUMENT / NUMERICAL and is NOT anchored. "
         "Four anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound} on the 40 audited "
         "declarations of InFlightAlgebra.lean (69 theorems incl. one deprecated alias + 10 defs); anchors 1–3 chained to "
         "PROOF-hosting-identity-fails-in-flight (whose NOT-claimed clause anchor 2 fills) and "
-        "PROOF-alternator-vanishes-iff-commute; anchor 4 to PROOF-rule-gradient-and-tangent-field and "
-        "PROOF-alternator-vanishes-iff-commute. Every anchor carries the §8 NOT-claimed clauses of "
+        "PROOF-alternator-vanishes-iff-commute; anchor 4 to PROOF-alternator-vanishes-iff-commute ONLY — the edge to "
+        "PROOF-rule-gradient-and-tangent-field (Substrate/RuleFlow.lean) is withheld until the #683 bridge lemma "
+        "lands (§I4 R2: InFlightAlgebra.lean imports only Foundations). Every anchor carries the §8 NOT-claimed clauses of "
         "docs/foundations/688-in-flight-definition-2026-09-29.md: L_s² alone is not ℓ-blind; nothing about Δ's "
         "spectrum (T2b); no 4-dimensionality at ±ℓ; ℍ_s / 𝕆_s is not claimed to be the full kernel (reverse "
         "inclusion OPEN, rank 8 NUMERICAL); no reversal of PROOF-hosting-identity-fails-in-flight; no flow, "
