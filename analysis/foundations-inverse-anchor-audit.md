@@ -7,7 +7,7 @@
 
 | Metric | Count |
 |---|---|
-| theorems total | 1896 |
+| theorems total | 1898 |
 | anchors total | 343 |
 | anchors with theorems list | 66 |
 | anchors with proof file | 121 |

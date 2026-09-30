@@ -4,7 +4,8 @@
 Four anchors for `proofs/QBP/Foundations/InFlightAlgebra.lean`: the alternator Δ(s) = L_s² + N(s)·id =
 −[s, s, ·] is blind to the ℓ-direction ([s + tℓ, s + tℓ, ·] = [s, s, ·]) while L_s² alone is not; at
 EVERY imaginary s the in-flight span ℍ_s = span{1, s, ℓ, s·ℓ} is closed under the product and associative,
-4-dimensional for unit imaginary s iff s ≠ ±ℓ, and associative even at s = e₁ + e₁₀ where 𝕊's alternator
+4-dimensional for unit imaginary s iff s ≠ ±ℓ (both directions of the independence iff proved), and
+associative even at s = e₁ + e₁₀ where 𝕊's alternator
 is nonzero; ℍ_s ⊆ ker Δ(s) (the hosting identity s·(s·x) = −N(s)·x holds on ℍ_s); and for EVERY sedenion
 s = a + b·ℓ the Foundations closed-form gradient components gradVof(s) lie in 𝕆_s = H_s ⊕ H_s·ℓ, H_s =
 span{1, a, Im b, a·Im b} ⊂ 𝕆 a conjugation-closed associative subalgebra, with s ∈ 𝕆_s and
@@ -12,10 +13,12 @@ span{1, a, Im b, a·Im b} ⊂ 𝕆 a conjugation-closed associative subalgebra, 
 the PROVED clauses of D (§1 of docs/foundations/688-in-flight-definition-2026-09-29.md); D itself — the
 foliation of InFlight by the 6-dim leaves S⁶(𝕆_s) ∩ InFlight, leaf invariance, the leaf space G₂/SO(4) —
 is ARGUMENT / NUMERICAL and is NOT anchored. Every anchor cites theorems on the branch, 0-sorry,
-`#print axioms` ⊆ {propext, Classical.choice, Quot.sound} on the 40 audited declarations, reviewed
+`#print axioms` ⊆ {propext, Classical.choice, Quot.sound} on the 42 audited declarations, reviewed
 (PR #689 Red Team APPROVE-WITH-CONCERN M1–M4 applied, Gemini APPROVE, §I4 qbp-architecture
 APPROVE-WITH-CONCERN at b85df23 with C1–C4 applied; §I4 re-read at a38a0af APPROVE-WITH-CONCERN with
-R1/R2 applied — anchor 4 named for gradVof only, its RuleFlow chain edge withheld). No root, principle, decision or
+R1/R2 applied — anchor 4 named for gradVof only, its RuleFlow chain edge withheld; Red Team re-check at
+a38a0af APPROVE-WITH-CONCERN with M1 applied — anchor 2's "independent iff p ≠ 0" now has BOTH directions in
+Lean, `inFlight_dependent_of_pOf_eq_zero` and `inFlight_independent_iff`). No root, principle, decision or
 kill is touched; FLAG-rule-flow-open and CONJ-condensed-math-for-transition-state are not touched. The
 §8 NOT-claimed clauses go into every anchor; anchor 4 states explicitly that `gradVof = RuleFlow.gradV`
 is NOT in Lean (bridge lemma owed, #683). Manifest entries added alongside; then
@@ -41,12 +44,15 @@ BATCH = "#689-in-flight-algebra"
 IF = "QBP.Foundations.InFlightAlgebra."
 F_IF = "proofs/QBP/Foundations/InFlightAlgebra.lean"
 VERIFIER = (
-    "run-bounded lake build QBP.Foundations.InFlightAlgebra (3022 jobs, exit 0) + #print axioms on the 40 "
-    "audited declarations of the file (69 theorems — 68 plus the deprecated alias gradV_mem_kernelAlgebra "
+    "run-bounded lake build QBP.Foundations.InFlightAlgebra (3022 jobs, exit 0) + #print axioms on the 42 "
+    "audited declarations of the file (71 theorems — 70 plus the deprecated alias gradV_mem_kernelAlgebra "
     "kept by §I4 C2 — and 10 defs), all ⊆ {propext, Classical.choice, Quot.sound}; foundations gate + "
-    "layer-imports gate exit 0 (lean-prover, 2026-09-29, re-run at the §I4 C1–C4 head; PR #689 Red Team "
-    "APPROVE-WITH-CONCERN M1–M4 applied, Gemini APPROVE, §I4 qbp-architecture APPROVE-WITH-CONCERN at "
-    "b85df23 — independently verified there: build exit 0, 39/39 audits clean before C1–C4)"
+    "layer-imports gate exit 0 (lean-prover, 2026-09-30, re-run at the Red Team re-check M1 head — the "
+    "converse `inFlight_dependent_of_pOf_eq_zero` and the packaged `inFlight_independent_iff` added, so "
+    "anchor 2's independence 'iff' is proved in both directions; PR #689 Red Team APPROVE-WITH-CONCERN "
+    "M1–M4 applied, Gemini APPROVE, §I4 qbp-architecture APPROVE-WITH-CONCERN at b85df23 — independently "
+    "verified there: build exit 0, 39/39 audits clean before C1–C4; Red Team re-check at a38a0af "
+    "APPROVE-WITH-CONCERN, 40/40 clean, its M1 fixed here)"
 )
 # Anchors 1–3 (the ℍ_s algebra) chain to the in-flight hosting-failure anchor whose NOT-claimed clause they
 # fill and to the δ-landscape alternator anchor (T_s = 0 ⟺ CD components commute) that Δ = −T_s refines.
@@ -136,7 +142,7 @@ ANCHORS = [
     ),
     anchor(
         "PROOF-in-flight-quaternion-closes-and-associates",
-        "At EVERY imaginary s ∈ 𝕊 the in-flight span ℍ_s = span{1, s, ℓ, s·ℓ} is closed under the product and associative; {1, s, ℓ, s·ℓ} is linearly independent iff p = s − b₀ℓ ≠ 0, and for UNIT imaginary s, p = 0 iff s = ±ℓ — so ℍ_s is 4-dimensional for unit imaginary s iff s ≠ ±ℓ; associativity holds at s = e₁ + e₁₀ where 𝕊's alternator at s is nonzero",
+        "At EVERY imaginary s ∈ 𝕊 the in-flight span ℍ_s = span{1, s, ℓ, s·ℓ} is closed under the product and associative; {1, s, ℓ, s·ℓ} is linearly independent iff p = s − b₀ℓ ≠ 0 (BOTH directions proved: independence where p ≠ 0, an explicit dependence witness where p = 0), and for UNIT imaginary s, p = 0 iff s = ±ℓ — so ℍ_s is 4-dimensional for unit imaginary s iff s ≠ ±ℓ; associativity holds at s = e₁ + e₁₀ where 𝕊's alternator at s is nonzero",
         "Foundations/InFlightAlgebra.lean: `inFlight_closed_associative` (the main theorem) — for every s with "
         "s.coord 0 = 0: (∀ x y, InFlightSpan s x → InFlightSpan s y → InFlightSpan s (x * y)) ∧ (∀ x y z, "
         "InFlightSpan s x → InFlightSpan s y → InFlightSpan s z → (x * y) * z = x * (y * z)), where "
@@ -146,9 +152,15 @@ ANCHORS = [
         "b₀ = s.coord (hiIdx 0) (`inFlightSpan_iff_quatSpan`); `quatSpan_mul_expand` — for imaginary p ⊥ ℓ "
         "(p.coord 0 = 0, p.coord (hiIdx 0) = 0) the explicit quaternion multiplication table of "
         "(a₁·1 + b₁ℓ + c₁p + d₁ℓp)(a₂·1 + b₂ℓ + c₂p + d₂ℓp) with N(p) as the structure constant; "
-        "`quatSpan_assoc` — three elements of span{1, ℓ, p, ℓp} re-associate. `inFlight_independent` — for "
-        "imaginary s with pOf s ≠ 0, α • 1 + β • s + γ • ell + δ • (s * ell) = 0 → α = β = γ = δ = 0: the four "
-        "generators are independent iff p ≠ 0. `pOf_eq_zero_iff` — for N s = 1, pOf s = 0 ↔ (s = ell ∨ "
+        "`quatSpan_assoc` — three elements of span{1, ℓ, p, ℓp} re-associate. Independence, BOTH "
+        "directions: `inFlight_independent` (⇐) — for imaginary s with pOf s ≠ 0, α • 1 + β • s + γ • ell + "
+        "δ • (s * ell) = 0 → α = β = γ = δ = 0; `inFlight_dependent_of_pOf_eq_zero` (⇒) — for EVERY s with "
+        "pOf s = 0 (no imaginarity hypothesis needed) there EXIST α β γ δ : ℝ, not all zero, with "
+        "α • 1 + β • s + γ • ell + δ • (s * ell) = 0, by the explicit witness (α, β, γ, δ) = (b₀, 0, 0, 1): "
+        "pOf s = 0 gives s = b₀·ℓ, hence s·ℓ = b₀·(ℓ·ℓ) = −b₀·1, and δ = 1 ≠ 0 covers both b₀ ≠ 0 and the "
+        "degenerate b₀ = 0 (s = 0) case; `inFlight_independent_iff` — the packaged equivalence, for imaginary "
+        "s: (∀ α β γ δ : ℝ, α • 1 + β • s + γ • ell + δ • (s * ell) = 0 → α = β = γ = δ = 0) ↔ pOf s ≠ 0. So "
+        "the 'independent iff p ≠ 0' of this anchor's name is a Lean theorem, not a one-way reading. `pOf_eq_zero_iff` — for N s = 1, pOf s = 0 ↔ (s = ell ∨ "
         "s = −ell): so for UNIT imaginary s, ℍ_s is 4-dimensional iff s ≠ ±ℓ (at ±ℓ the span degenerates to "
         "span{1, ℓ} ≅ ℂ). `ell_mul_eq` — for imaginary s, ell * s = (−2·b₀) • 1 − s * ell: s and ℓ anticommute "
         "iff b₀ = 0. `inFlight_associative_even_where_alternator_nonzero` — (∃ x, assoc sedWitX sedWitX x ≠ 0) "
@@ -166,6 +178,8 @@ ANCHORS = [
             IF + "quatSpan_assoc",
             IF + "quatSpan_mul_expand",
             IF + "inFlight_independent",
+            IF + "inFlight_dependent_of_pOf_eq_zero",
+            IF + "inFlight_independent_iff",
             IF + "pOf_eq_zero_iff",
             IF + "ell_mul_eq",
             IF + "inFlight_associative_even_where_alternator_nonzero",
@@ -250,12 +264,14 @@ CHANGELOG = {
         "qbp-oppenheimer: PROOF anchors for the in-flight algebra (PR #689; #688 definition D) — "
         "encode-after-review (Red Team APPROVE-WITH-CONCERN M1–M4 applied, Gemini APPROVE, §I4 "
         "qbp-architecture APPROVE-WITH-CONCERN at b85df23 with C1–C4 applied, §I4 re-read at a38a0af "
-        "APPROVE-WITH-CONCERN with R1/R2 applied — the gradient theorem renamed "
+        "APPROVE-WITH-CONCERN with R1/R2 applied, Red Team re-check at a38a0af with M1 applied — the gradient theorem renamed "
         "gradV_mem_kernelAlgebra → gradVof_components_mem_kernelAlgebra, old name a deprecated alias): "
         "PROOF-in-flight-alternator-blind-to-ell ([s + tℓ, s + tℓ, ·] = [s, s, ·] for every s, t; "
         "Δ(s + tℓ) = Δ(s) for imaginary s; L_s² alone shifts by (N(s) − N(s + tℓ))·id), "
         "PROOF-in-flight-quaternion-closes-and-associates (ℍ_s = span{1, s, ℓ, sℓ} closed under the product and "
-        "associative at every imaginary s, 4-dimensional for unit imaginary s iff s ≠ ±ℓ, associative even at "
+        "associative at every imaginary s, 4-dimensional for unit imaginary s iff s ≠ ±ℓ — both directions of "
+        "the independence iff proved, `inFlight_independent` and `inFlight_dependent_of_pOf_eq_zero`, packaged "
+        "as `inFlight_independent_iff` (Red Team re-check M1) — associative even at "
         "e₁ + e₁₀ where the alternator is nonzero), PROOF-in-flight-span-in-alternator-kernel (ℍ_s ⊆ ker Δ(s); "
         "the hosting identity s(sx) = −N(s)x holds on ℍ_s; the four kernel witnesses), "
         "PROOF-gradient-lies-in-host-kernel-algebra (for every sedenion s = a + bℓ, gradVof(s) — the Foundations "
@@ -266,8 +282,8 @@ CHANGELOG = {
         "⊆ ker Δ(s); H_s a quaternion algebra in 𝕆; gradVof(s), s, α·s + β·gradVof(s) ∈ 𝕆_s. D itself — the foliation of "
         "InFlight = {V > 0} by the 6-dim leaves S⁶(𝕆_s) ∩ InFlight, leaf invariance under deterministic "
         "G₂-equivariant rules, the leaf space {ℍ ⊂ 𝕆} = G₂/SO(4) — is ARGUMENT / NUMERICAL and is NOT anchored. "
-        "Four anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound} on the 40 audited "
-        "declarations of InFlightAlgebra.lean (69 theorems incl. one deprecated alias + 10 defs); anchors 1–3 chained to "
+        "Four anchors, all 0-sorry, axiom closure {propext, Classical.choice, Quot.sound} on the 42 audited "
+        "declarations of InFlightAlgebra.lean (71 theorems incl. one deprecated alias + 10 defs); anchors 1–3 chained to "
         "PROOF-hosting-identity-fails-in-flight (whose NOT-claimed clause anchor 2 fills) and "
         "PROOF-alternator-vanishes-iff-commute; anchor 4 to PROOF-alternator-vanishes-iff-commute ONLY — the edge to "
         "PROOF-rule-gradient-and-tangent-field (Substrate/RuleFlow.lean) is withheld until the #683 bridge lemma "

@@ -49,13 +49,16 @@
      is associative.  The in-flight obstruction is the *spectrum* of `L_s`, not the
      existence of a hosted ℍ.
 
-  2. **Dimension is 4 except at the poles.**  `{1, s, ℓ, s·ℓ}` is linearly
-     independent iff `pOf s ≠ 0` (`inFlight_independent`), and for a unit imaginary
-     `s` that fails exactly at `s = ±ℓ` (`pOf_eq_zero_iff`), where the span
-     degenerates to the 2-dimensional `span{1, ℓ} ≅ ℂ`.  So "4-dimensional
-     associative subalgebra at every state" is FALSE as literally stated; the
-     correct statement is "closed and associative at every imaginary state,
-     4-dimensional away from the two poles `±ℓ`".
+  2. **Dimension is 4 except at the poles — both directions proved.**  For
+     imaginary `s`, `{1, s, ℓ, s·ℓ}` is linearly independent over ℝ **iff**
+     `pOf s ≠ 0` (`inFlight_independent_iff`; the `←` half is
+     `inFlight_independent`, the `→` half is the explicit dependence witness
+     `inFlight_dependent_of_pOf_eq_zero`, which needs no hypothesis on `s` at all).
+     For a unit imaginary `s` the condition `pOf s = 0` holds exactly at `s = ±ℓ`
+     (`pOf_eq_zero_iff`), where the span degenerates to the 2-dimensional
+     `span{1, ℓ} ≅ ℂ`.  So "4-dimensional associative subalgebra at every state" is
+     FALSE as literally stated; the correct statement is "closed and associative at
+     every imaginary state, 4-dimensional exactly away from the two poles `±ℓ`".
 
   3. **No `N s = 1` is needed** for closure, associativity, or `ℓ`-blindness: only
      `s.coord 0 = 0`.  `N s = 1` enters only in `pOf_eq_zero_iff`, to identify the
@@ -273,7 +276,8 @@ theorem inFlightSpan_assoc {s x y z : CDAlg ℝ 4} (hs : s.coord 0 = 0)
 /-- **F3, headline (honest form).**  At EVERY imaginary state `s` of 𝕊 the set
     `{1, s, ℓ, s·ℓ}` spans a subspace that is closed under multiplication and on
     which multiplication is associative.  Dimension is addressed separately
-    (`inFlight_independent` / `pOf_eq_zero_iff`): it is 4 away from `s = ±ℓ`. -/
+    (`inFlight_independent_iff` / `pOf_eq_zero_iff`): it is 4 exactly away from
+    `s = ±ℓ`. -/
 theorem inFlight_closed_associative {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) :
     (∀ x y, InFlightSpan s x → InFlightSpan s y → InFlightSpan s (x * y))
       ∧ (∀ x y z, InFlightSpan s x → InFlightSpan s y → InFlightSpan s z →
@@ -412,6 +416,45 @@ theorem pOf_eq_zero_iff {s : CDAlg ℝ 4} (hNs : N s = 1) :
     · rw [pOf_def, ell_coord_hiIdx_zero, one_smul, sub_self]
     · rw [pOf_def, neg_coord, ell_coord_hiIdx_zero]
       module
+
+/-- **The converse of `inFlight_independent`.**  Where `pOf s = 0` the four vectors
+    `{1, s, ℓ, s·ℓ}` are linearly DEPENDENT, with the explicit witness
+    `(α, β, γ, δ) = (b₀, 0, 0, 1)` where `b₀ = s.coord (hiIdx 0)`: from `pOf s = 0`
+    we get `s = b₀·ℓ`, hence `s·ℓ = b₀·(ℓ·ℓ) = −b₀·1`, so `b₀·1 + (s·ℓ) = 0` with
+    `δ = 1 ≠ 0`.  (Both degenerate cases are covered by the single witness: if
+    `b₀ = 0` then `s = 0` and the relation reads `1·(s·ℓ) = 0`.)  No hypothesis on
+    `s` is needed — in particular this holds without `s.coord 0 = 0`. -/
+theorem inFlight_dependent_of_pOf_eq_zero (s : CDAlg ℝ 4) (hp : pOf s = 0) :
+    ∃ α β γ δ : ℝ, (α ≠ 0 ∨ β ≠ 0 ∨ γ ≠ 0 ∨ δ ≠ 0) ∧
+      α • (1 : CDAlg ℝ 4) + β • s + γ • ell + δ • (s * ell) = 0 := by
+  have hsc : s = (s.coord (hiIdx 0)) • ell :=
+    sub_eq_zero.mp (by rw [← pOf_def]; exact hp)
+  have hsl : s * ell = (-(s.coord (hiIdx 0))) • (1 : CDAlg ℝ 4) := by
+    have h1 : s * ell = ((s.coord (hiIdx 0)) • ell) * ell := by rw [← hsc]
+    rw [h1, mul_smul_left, ell_sq]; module
+  refine ⟨s.coord (hiIdx 0), 0, 0, 1, Or.inr (Or.inr (Or.inr one_ne_zero)), ?_⟩
+  rw [hsl]; module
+
+/-- **Dimension, both directions.**  For an imaginary `s`, `{1, s, ℓ, s·ℓ}` is
+    linearly independent over ℝ **iff** `pOf s ≠ 0`.  `→` is
+    `inFlight_dependent_of_pOf_eq_zero` (contrapositive), `←` is
+    `inFlight_independent`.  Combined with `pOf_eq_zero_iff` this says: for a unit
+    imaginary `s` the in-flight span is 4-dimensional iff `s ≠ ±ℓ`. -/
+theorem inFlight_independent_iff {s : CDAlg ℝ 4} (hs : s.coord 0 = 0) :
+    (∀ α β γ δ : ℝ, α • (1 : CDAlg ℝ 4) + β • s + γ • ell + δ • (s * ell) = 0 →
+        α = 0 ∧ β = 0 ∧ γ = 0 ∧ δ = 0)
+      ↔ pOf s ≠ 0 := by
+  constructor
+  · intro hind h0
+    obtain ⟨α, β, γ, δ, hne, hrel⟩ := inFlight_dependent_of_pOf_eq_zero s h0
+    obtain ⟨hα, hβ, hγ, hδ⟩ := hind α β γ δ hrel
+    rcases hne with h | h | h | h
+    · exact h hα
+    · exact h hβ
+    · exact h hγ
+    · exact h hδ
+  · intro hp α β γ δ h
+    exact inFlight_independent hs hp h
 
 /-! ## 8. F4, easy inclusion: the in-flight span lies in `ker Δ(s)`
 
@@ -804,6 +847,8 @@ end KernelAlgebra
 #print axioms quatSpan_independent
 #print axioms inFlight_independent
 #print axioms pOf_eq_zero_iff
+#print axioms inFlight_dependent_of_pOf_eq_zero
+#print axioms inFlight_independent_iff
 #print axioms delta_vanishes_on_inFlightSpan
 #print axioms left_mul_sq_on_inFlightSpan
 #print axioms one_mem_ker_delta

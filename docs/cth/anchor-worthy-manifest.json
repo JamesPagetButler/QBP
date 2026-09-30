@@ -1321,6 +1321,8 @@
         "QBP.Foundations.InFlightAlgebra.quatSpan_assoc",
         "QBP.Foundations.InFlightAlgebra.quatSpan_mul_expand",
         "QBP.Foundations.InFlightAlgebra.inFlight_independent",
+        "QBP.Foundations.InFlightAlgebra.inFlight_dependent_of_pOf_eq_zero",
+        "QBP.Foundations.InFlightAlgebra.inFlight_independent_iff",
         "QBP.Foundations.InFlightAlgebra.pOf_eq_zero_iff",
         "QBP.Foundations.InFlightAlgebra.ell_mul_eq",
         "QBP.Foundations.InFlightAlgebra.inFlight_associative_even_where_alternator_nonzero"
