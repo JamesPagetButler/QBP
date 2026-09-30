@@ -1355,6 +1355,18 @@
         "QBP.Foundations.InFlightAlgebra.inQuatSpanOct_assoc",
         "QBP.Foundations.InFlightAlgebra.cdComm_eq_comm_imHi"
       ]
+    },
+    {
+      "anchor_id": "PROOF-rule-gradient-lies-in-host-kernel-algebra",
+      "declared_by": "#690-gradV-bridge",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlowBridge.gradV_mem_kernelAlgebra",
+        "QBP.Substrate.RuleFlowBridge.gradVlo_eq_cdLo_gradV",
+        "QBP.Substrate.RuleFlowBridge.gradVhi_eq_cdHi_gradV",
+        "QBP.Substrate.RuleFlowBridge.gradVof_eq_gradV",
+        "QBP.Substrate.RuleFlowBridge.smul_self_add_smul_gradV_mem_kernelAlgebra"
+      ]
     }
   ]
 }
