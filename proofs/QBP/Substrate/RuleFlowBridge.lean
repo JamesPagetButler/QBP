@@ -43,9 +43,15 @@ sides are in scope:
 * `smul_self_add_smul_gradV_mem_kernelAlgebra` — hence
   `α • s + β • RuleFlow.gradV s ∈ 𝕆_s` for all `α β : ℝ`.
 
-That closes the "#683 → #690" NOT-claimed clause of the ledger anchor
-`PROOF-gradient-lies-in-host-kernel-algebra`: the identity, and with it the
-pointwise containment `RuleFlow.gradV s ∈ 𝕆_s`, are now claimed as proved.
+This module is the proof behind ledger anchor
+`PROOF-rule-gradient-lies-in-host-kernel-algebra` (Substrate; PR #691), and it
+resolves the NOT-claimed pointer of `PROOF-gradient-lies-in-host-kernel-algebra`
+(Foundations): that anchor keeps its Foundations scope (`gradVof` only) and
+points here for the identity and the pointwise containment
+`RuleFlow.gradV s ∈ 𝕆_s`.  Under the import-direction edge rule
+(Foundations → Substrate is never a derivation edge) the Substrate anchor, not
+the Foundations one, carries the chain edge to
+`PROOF-rule-gradient-and-tangent-field`.
 
 ## What is still OPEN after this file (do not over-read)
 
