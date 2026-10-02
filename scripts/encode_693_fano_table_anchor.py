@@ -163,7 +163,7 @@ VERIFIER = (
     f"{F_AX} attestation line); statement re-read fully qualified (`#check` with full names) — "
     "Omul / e / signedBasis / fanoTableF4 all resolve in QBP.Foundations.FanoOrientationF3, Omul the F3 "
     "doubling on H × H; 0 sorry, 0 native_decide, 0 vacuous `True`; gates 0 — "
-    "check_lean_foundations.py exit 0, check_layer_imports.py exit 0 (qbp-implementor, 2026-10-02, "
+    "check_lean_foundations.py exit 0, check_layer_imports.py exit 0 (qbp-oppenheimer via lean-prover sub-agent, 2026-10-02, "
     "isolated worktree probe-692-pa, branch cth/692-pa-encoder-backfill; #693, ruling (b) on QBP#692 "
     "live-test seq 2315/2316/2323; pending Tier-3 review with the #692 PR — #693 AC3)"
 )

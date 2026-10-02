@@ -12282,7 +12282,7 @@
           }
         },
         "verified_at": "2026-10-02T00:00:00Z",
-        "verifier": "run-bounded 6G 1800 taskset -c 3-5 lake build QBP.Foundations.FanoOrientationF3 — exit 0, 2 jobs (fresh worktree .lake: one-time Mathlib cache fetch 8283 files / 422 s, then the module in 11 s; the module itself imports nothing); `#print axioms QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson` via `run-bounded 4G 600 lake env lean` on a scratch file = [propext] (matches the committed proofs/QBP/Foundations/fanoTableF4.axioms.txt attestation line); statement re-read fully qualified (`#check` with full names) — Omul / e / signedBasis / fanoTableF4 all resolve in QBP.Foundations.FanoOrientationF3, Omul the F3 doubling on H × H; 0 sorry, 0 native_decide, 0 vacuous `True`; gates 0 — check_lean_foundations.py exit 0, check_layer_imports.py exit 0 (qbp-implementor, 2026-10-02, isolated worktree probe-692-pa, branch cth/692-pa-encoder-backfill; #693, ruling (b) on QBP#692 live-test seq 2315/2316/2323; pending Tier-3 review with the #692 PR — #693 AC3)",
+        "verifier": "run-bounded 6G 1800 taskset -c 3-5 lake build QBP.Foundations.FanoOrientationF3 — exit 0, 2 jobs (fresh worktree .lake: one-time Mathlib cache fetch 8283 files / 422 s, then the module in 11 s; the module itself imports nothing); `#print axioms QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson` via `run-bounded 4G 600 lake env lean` on a scratch file = [propext] (matches the committed proofs/QBP/Foundations/fanoTableF4.axioms.txt attestation line); statement re-read fully qualified (`#check` with full names) — Omul / e / signedBasis / fanoTableF4 all resolve in QBP.Foundations.FanoOrientationF3, Omul the F3 doubling on H × H; 0 sorry, 0 native_decide, 0 vacuous `True`; gates 0 — check_lean_foundations.py exit 0, check_layer_imports.py exit 0 (qbp-oppenheimer via lean-prover sub-agent, 2026-10-02, isolated worktree probe-692-pa, branch cth/692-pa-encoder-backfill; #693, ruling (b) on QBP#692 live-test seq 2315/2316/2323; pending Tier-3 review with the #692 PR — #693 AC3)",
         "result": "verified",
         "axiom_closure": [
           "propext"
@@ -12903,6 +12903,11 @@
       "version": "6.16.0",
       "date": "2026-10-02T00:00:00Z",
       "note": "#692: PA backfill of 148 proof/derivation anchors (1 records changed) from 0 v2 notary evidence records at pinned master f4525328cc5361ffa04e6e215a03f0ec45181032. Grade distribution (pa_local/pa_effective: count) — 0/0: 148. pa_local = GradeClaim(...).pa on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain edges typed derivation (conservative); pinned_sha = claim-source manifest hash (sorted `path blob` lines, git hash-object --stdin; architecture ruling seq 2299), not stored. Computed by tools/cth-pa (confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158); never hand-set — a wrong grade is fixed by new or corrected evidence in inter/notary-evidence/, never by editing the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind proof/derivation anchors WITH evidence; internal-compute anchors (PROOF-hessian) carry grades only (cth ruling 2026-10-02)."
+    },
+    {
+      "version": "6.16.0",
+      "date": "2026-10-02",
+      "note": "#693 provenance fix: PROOF-fano-table-equals-cd-products verification.verifier mis-attributed the build to qbp-implementor; corrected to qbp-oppenheimer (lean-prover sub-agent). No other field changed; version unchanged (same batch)."
     }
   ],
   "last_updated": "2026-10-02T00:00:00Z",
