@@ -209,51 +209,16 @@
       "file": "proofs/QBP/Foundations/ArtinTrace.lean",
       "line": 120,
       "name": "cdAlg_mul_add_swap_pure"
-    },
-    {
-      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
-      "line": 173,
-      "name": "fanoTriple_oriented_123"
-    },
-    {
-      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
-      "line": 175,
-      "name": "fanoTriple_oriented_145"
-    },
-    {
-      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
-      "line": 177,
-      "name": "fanoTriple_oriented_167"
-    },
-    {
-      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
-      "line": 179,
-      "name": "fanoTriple_oriented_246"
-    },
-    {
-      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
-      "line": 181,
-      "name": "fanoTriple_oriented_257"
-    },
-    {
-      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
-      "line": 183,
-      "name": "fanoTriple_oriented_347"
-    },
-    {
-      "file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
-      "line": 185,
-      "name": "fanoTriple_oriented_356"
     }
   ],
   "phantoms": [],
   "stale": [],
   "stats": {
     "anchor_side_phantoms": 0,
-    "anchors_total": 344,
-    "anchors_with_proof_file": 122,
-    "anchors_with_theorems_list": 66,
-    "lean_side_orphans": 49,
+    "anchors_total": 345,
+    "anchors_with_proof_file": 123,
+    "anchors_with_theorems_list": 67,
+    "lean_side_orphans": 42,
     "stale_path_citations": 0,
     "theorems_total": 1903
   }

@@ -1,5 +1,5 @@
 {
-  "lean_side_orphans": 49,
+  "lean_side_orphans": 42,
   "per_file_theorems": {
     "proofs/QBP/Basic.lean": 6,
     "proofs/QBP/Cosmo/DenseMatter.lean": 6,
