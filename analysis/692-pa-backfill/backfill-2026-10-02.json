@@ -1,0 +1,3437 @@
+{
+  "issue": "QBP#692",
+  "generated": "2026-10-02T00:00:00Z",
+  "ledger": "/home/prime/Documents/QBP/.claude/worktrees/probe-692-pa/archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json",
+  "ledger_version_before": "6.13.0",
+  "ledger_version_after": "6.14.0",
+  "pinned_master_rev": "origin/master",
+  "pinned_master_commit": "f4525328cc5361ffa04e6e215a03f0ec45181032",
+  "engine": "confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158",
+  "verifier": "attestation.StubV0",
+  "policy": {
+    "require_signature": false
+  },
+  "evidence_dir": "/home/prime/Documents/inter/notary-evidence",
+  "v2_record_count": 0,
+  "target_anchor_count": 147,
+  "changed_anchor_count": 147,
+  "grade_distribution": {
+    "0/0": 147
+  },
+  "derivation_edges": [
+    {
+      "from": "PROOF-hessian",
+      "to": "PROOF-42zd",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-eigenratios",
+      "to": "PROOF-hessian",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-born",
+      "to": "PROOF-hurwitz",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-shells",
+      "to": "PROOF-eigenratios",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-su2-lie",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-su2-lie",
+      "to": "PROOF-eigenratios",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-kramers",
+      "to": "PROOF-su2-lie",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-kramers",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-hurwitz-quat",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-z2-cover",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-z2-cover",
+      "to": "PROOF-kramers",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-z3-cyclic",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-c2zt-square",
+      "to": "PROOF-kramers",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-c2zt-square",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-helicity-obstruction",
+      "to": "PROOF-z3-cyclic",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-helicity-obstruction",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-plaquette-z2",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-clifford-majorana",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-clifford-majorana",
+      "to": "PROOF-su2-lie",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-nonabelian-braid",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-bond-complete",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-bond-complete",
+      "to": "PROOF-3gen",
+      "type": "derivation"
+    },
+    {
+      "from": "PRED-ckm-cp-phase-arctan-sqrt7",
+      "to": "PROOF-cd-algebra-finrank-2n",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-loss-of-commutativity-C-to-H",
+      "to": "PROOF-su2-lie",
+      "type": "derivation"
+    },
+    {
+      "from": "PRED-a0-redshift-linear",
+      "to": "PROOF-M-proportional-to-a",
+      "type": "derivation"
+    },
+    {
+      "from": "PRED-btfr-mass-correction",
+      "to": "PRED-a0-redshift-linear",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-alpha-particle-quaternion",
+      "to": "PROOF-quat-closure",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-fano-choice-information",
+      "to": "PROOF-hurwitz",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-iron-56-double-octet",
+      "to": "PROOF-alpha-particle-quaternion",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-iron-56-double-octet",
+      "to": "PROOF-fano",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-iron-to-ns-bridge",
+      "to": "PROOF-iron-56-double-octet",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-oxygen-16-sedenion",
+      "to": "PROOF-alpha-particle-quaternion",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seed-mass-from-ln7",
+      "to": "PROOF-fano-choice-information",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-silicon-28-fano-ladder",
+      "to": "PROOF-alpha-particle-quaternion",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-silicon-28-fano-ladder",
+      "to": "PROOF-fano",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-spectral-action-moment-scaling",
+      "to": "PROOF-cd-algebra-finrank-2n",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-normed-division-tower-existence",
+      "to": "PROOF-cd-algebra-finrank-2n",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-octonion-zd-hypersurface-empty",
+      "to": "PROOF-normed-division-tower-existence",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-substrate-baryon-additive",
+      "to": "PROOF-s3-hspace",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-hosted-algebra-meets-cell-in-complex-line",
+      "to": "PROOF-crystal-hosts-quaternion",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-order-three-automorphism-fixes-ell",
+      "to": "PROOF-crystal-hosts-quaternion",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-order-three-automorphism-fixes-ell",
+      "to": "PROOF-alternator-vanishes-iff-commute",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-hosting-equivariant-under-order-three",
+      "to": "PROOF-order-three-automorphism-fixes-ell",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-hosting-equivariant-under-order-three",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-hosted-eq-quatspan-nonpole",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-universe-intersection-eq-complex",
+      "to": "PROOF-hosted-eq-quatspan-nonpole",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-quatdouble-rho-invariant-mul-closed",
+      "to": "PROOF-order-three-automorphism-fixes-ell",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-quatdouble-rho-invariant-mul-closed",
+      "to": "PROOF-quaternion-frame-maximal",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rho-moves-cd-half-as-set",
+      "to": "PROOF-order-three-automorphism-fixes-ell",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-vacuum-hessian-transverse-eigenvalue",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-transverse-space-dim-six-trace",
+      "to": "PROOF-vacuum-hessian-transverse-eigenvalue",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-vacuum-hessian-universe-level",
+      "to": "PROOF-vacuum-hessian-transverse-eigenvalue",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-vacuum-hessian-universe-level",
+      "to": "PROOF-hosted-eq-quatspan-nonpole",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-octonion-perp-module-span4-maximal",
+      "to": "PROOF-quaternion-frame-maximal",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-encoding-family-transitive-of-aut",
+      "to": "PROOF-encoding-family-u-mul-invariant",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-encoding-family-u-mul-invariant",
+      "to": "PROOF-quatdouble-rho-invariant-mul-closed",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-encoding-family-u-mul-invariant",
+      "to": "PROOF-hosted-eq-quatspan-nonpole",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-zd-witness-kernel-four",
+      "to": "PROOF-42zd",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-zd-witness-kernels-coincide",
+      "to": "PROOF-seam-zd-witness-kernel-four",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-zd-witness-kernel-not-subalgebra",
+      "to": "PROOF-seam-zd-witness-kernel-four",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-frobenius-basis-sum-general",
+      "to": "PROOF-42zd",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-encoding-copy-mul-injective",
+      "to": "PROOF-ops-norm-composition-ladder",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-encoding-copy-mul-injective",
+      "to": "PROOF-42zd",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-gradient-and-tangent-field",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-euler-step-injective",
+      "to": "PROOF-rule-gradient-and-tangent-field",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-flow-finite-time-uniqueness",
+      "to": "PROOF-rule-gradient-and-tangent-field",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-potential-descent-along-rule",
+      "to": "PROOF-rule-gradient-and-tangent-field",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-potential-bounded-by-normForm-sq-frozen-max",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-zero-divisors-sit-at-potential-max",
+      "to": "PROOF-ops-norm-composition-ladder",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-zero-divisors-sit-at-potential-max",
+      "to": "PROOF-42zd",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-zero-divisors-sit-at-potential-max",
+      "to": "PROOF-potential-bounded-by-normForm-sq-frozen-max",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-descent-avoids-zero-divisors",
+      "to": "PROOF-zero-divisors-sit-at-potential-max",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-descent-avoids-zero-divisors",
+      "to": "PROOF-potential-descent-along-rule",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-vacuum-sublocale-v-natural",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-sublevel-infimum-rule-independent",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-no-natural-valuation-model-case",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-in-flight-first-order-data-constrains-at-most-one-direction",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-level-set-invariants-rule-blind",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-hosting-identity-fails-in-flight",
+      "to": "PROOF-crystal-hosts-quaternion",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-hosting-identity-fails-in-flight",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-gram-invariants-ode",
+      "to": "PROOF-rule-gradient-and-tangent-field",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-gram-invariants-ode",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-descent-straight-ray",
+      "to": "PROOF-rule-gradient-and-tangent-field",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-descent-straight-ray",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-ell-coefficient-monotone-along-rule",
+      "to": "PROOF-rule-gradient-and-tangent-field",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-ell-coefficient-monotone-along-rule",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-quench-endpoint-closed-form-conditional",
+      "to": "PROOF-rule-gradient-and-tangent-field",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-quench-endpoint-closed-form-conditional",
+      "to": "PROOF-substrate-hosting-definition",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-zd-gram-spectrum-4-8-4",
+      "to": "PROOF-seam-zd-witness-kernel-four",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-zd-gram-spectrum-4-8-4",
+      "to": "PROOF-no-autonomous-algebraic-dynamics",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-top-plane-on-frozen-ridge",
+      "to": "PROOF-seam-zd-witness-kernel-four",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-top-plane-on-frozen-ridge",
+      "to": "PROOF-no-autonomous-algebraic-dynamics",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-right-gram-equals-left",
+      "to": "PROOF-seam-zd-witness-kernel-four",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-seam-right-gram-equals-left",
+      "to": "PROOF-no-autonomous-algebraic-dynamics",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-basis-pair-gram-uniform-bounds",
+      "to": "PROOF-seam-zd-witness-kernel-four",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-basis-pair-gram-uniform-bounds",
+      "to": "PROOF-no-autonomous-algebraic-dynamics",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-in-flight-alternator-blind-to-ell",
+      "to": "PROOF-hosting-identity-fails-in-flight",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-in-flight-alternator-blind-to-ell",
+      "to": "PROOF-alternator-vanishes-iff-commute",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-in-flight-quaternion-closes-and-associates",
+      "to": "PROOF-hosting-identity-fails-in-flight",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-in-flight-quaternion-closes-and-associates",
+      "to": "PROOF-alternator-vanishes-iff-commute",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-in-flight-span-in-alternator-kernel",
+      "to": "PROOF-hosting-identity-fails-in-flight",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-in-flight-span-in-alternator-kernel",
+      "to": "PROOF-alternator-vanishes-iff-commute",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-gradient-lies-in-host-kernel-algebra",
+      "to": "PROOF-alternator-vanishes-iff-commute",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-gradient-lies-in-host-kernel-algebra",
+      "to": "PROOF-gradient-lies-in-host-kernel-algebra",
+      "type": "derivation"
+    },
+    {
+      "from": "PROOF-rule-gradient-lies-in-host-kernel-algebra",
+      "to": "PROOF-rule-gradient-and-tangent-field",
+      "type": "derivation"
+    }
+  ],
+  "drops": [],
+  "ignored_non_v2": [
+    {
+      "file": "/home/prime/Documents/inter/notary-evidence/cycle-1-sandwich-mul-2026-05-29.yaml",
+      "reason": "not the engine v2 record shape (top-level keys: ['notary_metadata', 'verification_evidence'])"
+    },
+    {
+      "file": "/home/prime/Documents/inter/notary-evidence/cycle-2-verdandi-authority-tla-2026-05-29.yaml",
+      "reason": "not the engine v2 record shape (top-level keys: ['verification_evidence'])"
+    }
+  ],
+  "unmatched_claim": [],
+  "pinned_sha_convention": "claim-source manifest hash: S = {proof_file} ∪ {evidence_ref paths}; lines `path <git rev-parse <commit>:path>\\n` sorted by path; pinned_sha = git hash-object --stdin over the lines (ruling seq 2299)",
+  "anchors": [
+    {
+      "id": "PROOF-hurwitz",
+      "provenance_kind": "theory-external",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-42zd",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "aff344e5df8114736338106c807bfa25088936be",
+      "sources": [
+        {
+          "path": "proofs/Sprint12-Inherited/Sedenion.lean",
+          "blob": "70d57b77d4bb9f4089bd5aa4d517890d28626d1a"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-hessian",
+      "provenance_kind": "internal-compute",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "0f4f521f267fd3d29a205948b2c39ae5b4d69216",
+      "sources": [
+        {
+          "path": "proofs/Sprint12-Inherited/SedenionHessianTraceSq.lean",
+          "blob": "e97af14844bf7ecfa64d793e5bb08510886faf85"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-eigenratios",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e75b189c5b9585408d478fabe7c1ae7986cef763",
+      "sources": [
+        {
+          "path": "proofs/QBP/GaugeBosons.lean",
+          "blob": "6842d1ea21561553c74adb69e7a4131b09de7203"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-g2",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c9f338c07cf115041e2cdb253e7fa9a8f4aeea23",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/G2Transitivity.lean",
+          "blob": "597404736b96acda98e93be9ba7b9b3d318b40f5"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-fano",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-cl6",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e75b189c5b9585408d478fabe7c1ae7986cef763",
+      "sources": [
+        {
+          "path": "proofs/QBP/GaugeBosons.lean",
+          "blob": "6842d1ea21561553c74adb69e7a4131b09de7203"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-3gen",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e75b189c5b9585408d478fabe7c1ae7986cef763",
+      "sources": [
+        {
+          "path": "proofs/QBP/GaugeBosons.lean",
+          "blob": "6842d1ea21561553c74adb69e7a4131b09de7203"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-born",
+      "provenance_kind": "theory-external",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-shells",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b8e6653a359de9a5227d480250f19f7d29eec630",
+      "sources": [
+        {
+          "path": "proofs/Sprint12-Inherited/Elements.lean",
+          "blob": "5b41c7d90c98949ddb4c99e7461e047acd16ea5c"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-quat-closure",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-su2-lie",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "99a175ecbe567210ddb886c203bcdf5367852654",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/LieAlgebraIso.lean",
+          "blob": "7ca2213c89871aedae41deb13680e3a14f0ffa35"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-kramers",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-hurwitz-quat",
+      "provenance_kind": "theory-external",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-z2-cover",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-z3-cyclic",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-c2zt-square",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-helicity-obstruction",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-plaquette-z2",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-clifford-majorana",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-nonabelian-braid",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-majorana-charge",
+      "provenance_kind": "theory-external",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-bond-complete",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-stelle-no-linear",
+      "provenance_kind": "theory-external",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PRED-ckm-cp-phase-arctan-sqrt7",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "d0e9cec56f222d83e300b70c1b57e80b1b2d9fac",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CPPhase.lean",
+          "blob": "672ff5e1b42dde4787b34df9d29e58d13c569840"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-interpolation-function-derived",
+      "provenance_kind": "theory-external",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-M-proportional-to-a",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-division-algebra-entropy-cone-mapping",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-beta-function-3-times-7",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-loss-of-order-R-to-C",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-loss-of-commutativity-C-to-H",
+      "provenance_kind": "theory",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [
+        "no_proof_file"
+      ],
+      "changed": true,
+      "pinned_sha": "",
+      "sources": [],
+      "evidence_files": []
+    },
+    {
+      "id": "PRED-a0-redshift-linear",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "540e1fb34dce32c2d50599974fdd067c92858f56",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/RedshiftEvolution.lean",
+          "blob": "0d04aaf515e2981bae3ee8d79db46a9dcbf6ae12"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PRED-btfr-mass-correction",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "540e1fb34dce32c2d50599974fdd067c92858f56",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/RedshiftEvolution.lean",
+          "blob": "0d04aaf515e2981bae3ee8d79db46a9dcbf6ae12"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-alpha-particle-quaternion",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c30734f8152c3759afc091d329cfefef745f954a",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
+          "blob": "cb101c0ce7d1f0330c57a7afa62f299d7d2017ce"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-fano-choice-information",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "6b9eb4e8f1a855b88ca4efc36ca4192c5ef352a1",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/FanoChoiceInformation.lean",
+          "blob": "191bed6ef6cc60f6ea791c72d5708de4ce4d7fe0"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-iron-56-double-octet",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c30734f8152c3759afc091d329cfefef745f954a",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
+          "blob": "cb101c0ce7d1f0330c57a7afa62f299d7d2017ce"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-iron-to-ns-bridge",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "5d7f87cf34bfc5e41828b855a81882b4641d4af2",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/DenseMatter.lean",
+          "blob": "ef50351505189f73d4d032c5aec22965c5f8fd63"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-oxygen-16-sedenion",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c30734f8152c3759afc091d329cfefef745f954a",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
+          "blob": "cb101c0ce7d1f0330c57a7afa62f299d7d2017ce"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-seed-mass-from-ln7",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "04a37b44bad2541387b76066b02da3c66cbb984a",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/SeedMass.lean",
+          "blob": "ba0fe1408f456d76d6b57901ab5318038749aece"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-silicon-28-fano-ladder",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c30734f8152c3759afc091d329cfefef745f954a",
+      "sources": [
+        {
+          "path": "proofs/QBP/Cosmo/Nucleosynthesis.lean",
+          "blob": "cb101c0ce7d1f0330c57a7afa62f299d7d2017ce"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "INSIGHT-s2-dirac-eta-vanishes",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "d3e951e44b374014d928dea383fd94ba751ada0d",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
+          "blob": "2bba68ee687c2b525ababc56fdeed099cae65a75"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-vaidya-accreting-horizon-spacelike",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "d3e951e44b374014d928dea383fd94ba751ada0d",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
+          "blob": "2bba68ee687c2b525ababc56fdeed099cae65a75"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-hubble-half-entropy-factor",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "d3e951e44b374014d928dea383fd94ba751ada0d",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/QBPHorizonFoundations.lean",
+          "blob": "2bba68ee687c2b525ababc56fdeed099cae65a75"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "FIT-zeta-modulated-profile",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b13addb957c98c5e115356d95ed1c2a9ecf23e70",
+      "sources": [
+        {
+          "path": "proofs/QBP/SpectralAction/ProfileFit.lean",
+          "blob": "2e92ed321f668fd63d492109f3f8a327b41ec395"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-cd-algebra-finrank-2n",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "dd3c188d4cc40c2eada7a63faa8382301185f250",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CDDimension.lean",
+          "blob": "7e66ce2dbd831dab58e75375f84a931650017541"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-sp1-unit-quaternion-group",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "9d848b9704bbc8fee44b64add1272bc1e44ed5f7",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/UnitQuaternion.lean",
+          "blob": "5620e785235e2b2072de147d0b9a3d431751535d"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-spectral-action-moment-scaling",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "10dddfb665bc63d9edf08ec74cfd66b61971fe37",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SpectralMoments.lean",
+          "blob": "eda8008772af53d0946525f5283e91aa8e679024"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-fano-genesis",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "77bff0f5c81a382ad61df9588a4b9ed7a5efa44c",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/FanoGenesis.lean",
+          "blob": "9946ccacf38436b5fdab58c9825626a8a3572099"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-normed-division-tower-existence",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "3fd0c7e84f3984efad6b0fb7afb2d61ba0d70c51",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Hurwitz.lean",
+          "blob": "4848b076c0f5b8d2531216b36cfabeac244f4951"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-octonion-zd-hypersurface-empty",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c89c9ef8aa41bf10ea958dafe3b6928f1219d0f6",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/LeftMulDet.lean",
+          "blob": "93bbecc12df5b5fb1dc72ad02935bf4adbfa6f95"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-s3-hspace",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "357bdb2bbfe322473a1b00a965c81c17a5512b70",
+      "sources": [
+        {
+          "path": "proofs/agda-cubical/S3FromCD.agda",
+          "blob": "c062076bd0bd53ae08e6acec68a2b15313dbf6ce"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-skyrmion-baryon-complete-invariant",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c09c03f112da81d8174d44d41330bb5ace1e62a3",
+      "sources": [
+        {
+          "path": "proofs/agda-cubical/SkyrmionCharge.agda",
+          "blob": "3f211bbdc5eb6e39832424c25932dbd734ae54a9"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-substrate-baryon-additive",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "81c2b703a601e5c77e2512f097e07db4e10376a5",
+      "sources": [
+        {
+          "path": "proofs/agda-cubical/SubstrateCharge.agda",
+          "blob": "34230fb11fd6a509b34831c7a03ab0582755afd6"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-ops-order-ladder",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "5d8a768515b006cabae079da09077c798a0695a5",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Breakdown.lean",
+          "blob": "2990baf3afbc5c6b93ac21cd33f8d71477dc603e"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-ops-commutativity-ladder",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c4e9c44b9878a22bc2d5b0430c3078b80a7b426b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/TowerLaws.lean",
+          "blob": "96ac4d1b8b39b3b1774566dd3df93d083d89d34c"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-ops-associativity-ladder",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c4e9c44b9878a22bc2d5b0430c3078b80a7b426b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/TowerLaws.lean",
+          "blob": "96ac4d1b8b39b3b1774566dd3df93d083d89d34c"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-ops-alternativity-ladder",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c4e9c44b9878a22bc2d5b0430c3078b80a7b426b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/TowerLaws.lean",
+          "blob": "96ac4d1b8b39b3b1774566dd3df93d083d89d34c"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-ops-norm-composition-ladder",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c4e9c44b9878a22bc2d5b0430c3078b80a7b426b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/TowerLaws.lean",
+          "blob": "96ac4d1b8b39b3b1774566dd3df93d083d89d34c"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-ops-division-ladder",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c4e9c44b9878a22bc2d5b0430c3078b80a7b426b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/TowerLaws.lean",
+          "blob": "96ac4d1b8b39b3b1774566dd3df93d083d89d34c"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-ops-flexibility-ladder",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c4e9c44b9878a22bc2d5b0430c3078b80a7b426b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/TowerLaws.lean",
+          "blob": "96ac4d1b8b39b3b1774566dd3df93d083d89d34c"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-sedenion-zero-divisor-witnesses",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e2bbefa2352335bbd1eaf5069feff9488bbdf7fb",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+          "blob": "74f14e8b76b7936ea460f194701b61099123b4be"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-octonion-moufang",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "6387941e3095ef7a1ba5a4b8a90552e2d452f7f0",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/OctonionLaws.lean",
+          "blob": "04d88c1e068eb1e59787d4f42a6b4e8369fb5953"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-power-associativity",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "6387941e3095ef7a1ba5a4b8a90552e2d452f7f0",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/OctonionLaws.lean",
+          "blob": "04d88c1e068eb1e59787d4f42a6b4e8369fb5953"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-octonion-cross-product",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c6b4b086e164ecb2d1b419d70f094d1b34aec9cd",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CrossProduct.lean",
+          "blob": "cb9584cba0038ad5359cc9afa316b2993d0b0609"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-artin-theorem",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b0a1a129db5196363e4011a94622e08707831d9a",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Artin.lean",
+          "blob": "f57ac1550c7565cbe293ae60b91cd6b20eb50be2"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-cd-product-formula",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "454ab871f4cec5c5eb469afe87c6cbf6cbae39d6",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CDAlg.lean",
+          "blob": "f9181336cdfefad6e4550b2ddb0ad61db9a8d628"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-cd-structure-constant-tables",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "454ab871f4cec5c5eb469afe87c6cbf6cbae39d6",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CDAlg.lean",
+          "blob": "f9181336cdfefad6e4550b2ddb0ad61db9a8d628"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-cd-associativity-level2",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "f865fab747b2fd89286a53fcae30313a93176c91",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CDBridge.lean",
+          "blob": "3256ed0cef55e62da707ff93bf4cff3ac65ef1ea"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-cd-associator-formula",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "4ce326f6fe80aeb464856f21112cc3b8e785df89",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CDLifting.lean",
+          "blob": "05934676e654d746b04c23fd77b782fba8b70386"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-octonion-sedenion-exp-log",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "6383b16b8466373d01461bb60f329f6345d822e3",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Exp.lean",
+          "blob": "60304f7753209413d80fadbec062b55add87fde6"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-norm-form-bilinear",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "eaab2763d41b0475bdf63c34593400df7b2e9da2",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/NormForm.lean",
+          "blob": "bb52122ee0df9f9b37251e985084bb463b0b0289"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-sedenion-alternative-hyperplane-count",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e2bbefa2352335bbd1eaf5069feff9488bbdf7fb",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SedenionOctonionCount.lean",
+          "blob": "74f14e8b76b7936ea460f194701b61099123b4be"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-octonion-32dim-alternative-count",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "aa7248f0a3455183742baca3316755b656f24325",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Octonion32Count.lean",
+          "blob": "3236f716bb0b658ce7e5527cf3f659734429781e"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-bpm-si-round-trip",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "80b099cbeb9cfb5f9cb07eeba6174c744f198e5c",
+      "sources": [
+        {
+          "path": "proofs/QBP/Units/ScaleFactors.lean",
+          "blob": "da8e8e48f32f4a5a72afbd65bb9e8f81a23ada8d"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-doubleslit-quaternion-algebra",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "adaf4404a91d7522d222e3171fb42c80dbc969be",
+      "sources": [
+        {
+          "path": "proofs/QBP/Experiments/DoubleSlit.lean",
+          "blob": "df277e7a6a16d69045de504669ba79f7d34d2c76"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-doubleslit-visibility-bounds",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "adaf4404a91d7522d222e3171fb42c80dbc969be",
+      "sources": [
+        {
+          "path": "proofs/QBP/Experiments/DoubleSlit.lean",
+          "blob": "df277e7a6a16d69045de504669ba79f7d34d2c76"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-fraunhofer-optics",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "cf76c2699a8937df78f4c829bc61029d3ab332b9",
+      "sources": [
+        {
+          "path": "proofs/QBP/Optics/Fraunhofer.lean",
+          "blob": "be5c9c7ed6dfda28b5bd0df5cb6459f530796dc7"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-sterngerlach-qbp",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "3bb1e1291d08b38a6741ae83ebf2ba9e98c0bf33",
+      "sources": [
+        {
+          "path": "proofs/QBP/Experiments/SternGerlach.lean",
+          "blob": "d315f85dd5395f0caaa1a3bfc03d908bd993f626"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-angle-dependent-qbp",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "37d85ba0f50379730232f4d7b4d89fd40f417778",
+      "sources": [
+        {
+          "path": "proofs/QBP/Experiments/AngleDependent.lean",
+          "blob": "90ed9217805be797a58c5cd35c0521ce9bc2eef2"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-general3d-qbp",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "32043834f4c50fc00e6ff642de7df47cfd91ebe2",
+      "sources": [
+        {
+          "path": "proofs/QBP/Experiments/General3D.lean",
+          "blob": "5fa9c298cbf70079e3fba81c44dbf320d778952d"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-doubleslit-visibility-model",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "adaf4404a91d7522d222e3171fb42c80dbc969be",
+      "sources": [
+        {
+          "path": "proofs/QBP/Experiments/DoubleSlit.lean",
+          "blob": "df277e7a6a16d69045de504669ba79f7d34d2c76"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-measurement-ansatz-basic",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "1d94e62659f9241d2c73b7fd130f4715d08af84e",
+      "sources": [
+        {
+          "path": "proofs/QBP/Basic.lean",
+          "blob": "becb71d0190102da5060bc9a8dea2a0afd418199"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-code-si-constants",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "823b9d0089cfb199eb45f7cf6a7834133eb0f14a",
+      "sources": [
+        {
+          "path": "proofs/QBP/Units/Constants.lean",
+          "blob": "fa575d0c544d220e7c81b9faf6eb3f9a2b95bc53"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-kitaev-model",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "4a9fcd3a4bd4d2c120b07ff29e1d54ad4066f5e8",
+      "sources": [
+        {
+          "path": "proofs/Sprint12-Inherited/Kitaev.lean",
+          "blob": "d6d6553c66903d7e180417b1e49a6738e164c79a"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-graphene-model",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "877afaf8223389e6f4a73d002639715665a3014f",
+      "sources": [
+        {
+          "path": "proofs/Sprint12-Inherited/Graphene.lean",
+          "blob": "e6e2e1bd2210906b64590f9190d979b5ec8037e9"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-bi2se3-ti",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "0f3e84dbea9518109877688300b1c123fdab5053",
+      "sources": [
+        {
+          "path": "proofs/Sprint12-Inherited/Bi2Se3.lean",
+          "blob": "9f2cdb08a0afac16c05e1aef7f5a9dac8c24bc48"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-crystallisation-spectral-moments",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "6ac97154e8da33075b0b3308791dca633983dbc8",
+      "sources": [
+        {
+          "path": "proofs/Sprint12-Inherited/Crystallisation.lean",
+          "blob": "d59d203b0bc91528a3e46f0b6871ff3755c0b81c"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "DERIV-quaternion-physics-kramers",
+      "provenance_kind": "derivation",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "919fb98dbcb619fc0d86b606f5970b431c63a937",
+      "sources": [
+        {
+          "path": "proofs/Sprint12-Inherited/Quaternion.lean",
+          "blob": "5ee101843de63094699402eed02c72cd7cb1e7b6"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-sedenion-dirac-sum-kill",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "ac61ec68a262b1660ddf4283c95da0249adbb0b9",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Alternator.lean",
+          "blob": "a87fea3c55be35125d35d6b616240db2deddc1d8"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-alternator-vanishes-iff-commute",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "ac61ec68a262b1660ddf4283c95da0249adbb0b9",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Alternator.lean",
+          "blob": "a87fea3c55be35125d35d6b616240db2deddc1d8"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-associator-contraction-identity",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "ac61ec68a262b1660ddf4283c95da0249adbb0b9",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Alternator.lean",
+          "blob": "a87fea3c55be35125d35d6b616240db2deddc1d8"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-left-mul-sq-alternator",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "ac61ec68a262b1660ddf4283c95da0249adbb0b9",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/Alternator.lean",
+          "blob": "a87fea3c55be35125d35d6b616240db2deddc1d8"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-delta-landscape-descent",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "94b492c3748ac70289006f5d043f76abfe2b8b45",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/DeltaLandscape.lean",
+          "blob": "4950aaddf2fb5001acf7ff2d2e3809651310f3b5"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-spatial-first-link-condensed-locale",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "9b84b55f71d0460d985bbb5b884e72f5c06b57d5",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SpatialFirstLink.lean",
+          "blob": "769763de12f4c2c7f4392c186acec21b1163e341"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rot120-invariant-form-scalar",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "94b492c3748ac70289006f5d043f76abfe2b8b45",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/DeltaLandscape.lean",
+          "blob": "4950aaddf2fb5001acf7ff2d2e3809651310f3b5"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-no-autonomous-algebraic-dynamics",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "c3076b084b869f20d45fcaaa0cf5b43a4ea5daaf",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/NoAutonomousDynamics.lean",
+          "blob": "9ca794d3762a1a11734cb57ca569621c06882bf3"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-associative-composition-iff",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b93076d2ccd6d65a7abcc45e771bd4cab9f69c96",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+          "blob": "9c9002e1fdd94fb769a7213e33e09c4de1fd3c51"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-quaternion-frame-maximal",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b93076d2ccd6d65a7abcc45e771bd4cab9f69c96",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+          "blob": "9c9002e1fdd94fb769a7213e33e09c4de1fd3c51"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-quaternion-frame-codim-four",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b93076d2ccd6d65a7abcc45e771bd4cab9f69c96",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+          "blob": "9c9002e1fdd94fb769a7213e33e09c4de1fd3c51"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-vacuum-parametrisation",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "08390106eadd38ba07b06dc526b4fe891fd24cd1",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CrystalHosting.lean",
+          "blob": "945092410f617cdd55be1324cfaa90ec25aa5639"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-crystal-hosts-quaternion",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "08390106eadd38ba07b06dc526b4fe891fd24cd1",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CrystalHosting.lean",
+          "blob": "945092410f617cdd55be1324cfaa90ec25aa5639"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-local-spectrum-at-crystal",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "08390106eadd38ba07b06dc526b4fe891fd24cd1",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CrystalHosting.lean",
+          "blob": "945092410f617cdd55be1324cfaa90ec25aa5639"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-substrate-hosting-definition",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "554e87d7f65f2acd036a1f748b854efb75577211",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/Hosting.lean",
+          "blob": "9d9a1d9cf33be750824569d6fd1625b7b690d091"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-hosted-algebra-meets-cell-in-complex-line",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "08390106eadd38ba07b06dc526b4fe891fd24cd1",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CrystalHosting.lean",
+          "blob": "945092410f617cdd55be1324cfaa90ec25aa5639"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-order-three-automorphism-fixes-ell",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "08390106eadd38ba07b06dc526b4fe891fd24cd1",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CrystalHosting.lean",
+          "blob": "945092410f617cdd55be1324cfaa90ec25aa5639"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-hosting-equivariant-under-order-three",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "554e87d7f65f2acd036a1f748b854efb75577211",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/Hosting.lean",
+          "blob": "9d9a1d9cf33be750824569d6fd1625b7b690d091"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-hosted-eq-quatspan-nonpole",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "554e87d7f65f2acd036a1f748b854efb75577211",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/Hosting.lean",
+          "blob": "9d9a1d9cf33be750824569d6fd1625b7b690d091"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-universe-intersection-eq-complex",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "554e87d7f65f2acd036a1f748b854efb75577211",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/Hosting.lean",
+          "blob": "9d9a1d9cf33be750824569d6fd1625b7b690d091"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-quatdouble-rho-invariant-mul-closed",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b93076d2ccd6d65a7abcc45e771bd4cab9f69c96",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+          "blob": "9c9002e1fdd94fb769a7213e33e09c4de1fd3c51"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rho-moves-cd-half-as-set",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "08390106eadd38ba07b06dc526b4fe891fd24cd1",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CrystalHosting.lean",
+          "blob": "945092410f617cdd55be1324cfaa90ec25aa5639"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-vacuum-hessian-transverse-eigenvalue",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "08390106eadd38ba07b06dc526b4fe891fd24cd1",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/CrystalHosting.lean",
+          "blob": "945092410f617cdd55be1324cfaa90ec25aa5639"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-transverse-space-dim-six-trace",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b93076d2ccd6d65a7abcc45e771bd4cab9f69c96",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+          "blob": "9c9002e1fdd94fb769a7213e33e09c4de1fd3c51"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-vacuum-hessian-universe-level",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "554e87d7f65f2acd036a1f748b854efb75577211",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/Hosting.lean",
+          "blob": "9d9a1d9cf33be750824569d6fd1625b7b690d091"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-octonion-perp-module-span4-maximal",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b93076d2ccd6d65a7abcc45e771bd4cab9f69c96",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+          "blob": "9c9002e1fdd94fb769a7213e33e09c4de1fd3c51"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-encoding-family-transitive-of-aut",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b93076d2ccd6d65a7abcc45e771bd4cab9f69c96",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+          "blob": "9c9002e1fdd94fb769a7213e33e09c4de1fd3c51"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-encoding-family-u-mul-invariant",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "b93076d2ccd6d65a7abcc45e771bd4cab9f69c96",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/HolographicSubalgebra.lean",
+          "blob": "9c9002e1fdd94fb769a7213e33e09c4de1fd3c51"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-seam-zd-witness-kernel-four",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "52a9965afbaa98eb35cd47ce65ada06f1cf5c883",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamKernel.lean",
+          "blob": "b41b73f2dbca953988eac56569d02a2dab67588d"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-seam-zd-witness-kernels-coincide",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "52a9965afbaa98eb35cd47ce65ada06f1cf5c883",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamKernel.lean",
+          "blob": "b41b73f2dbca953988eac56569d02a2dab67588d"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-seam-zd-witness-kernel-not-subalgebra",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "52a9965afbaa98eb35cd47ce65ada06f1cf5c883",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamKernel.lean",
+          "blob": "b41b73f2dbca953988eac56569d02a2dab67588d"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-frobenius-basis-sum-general",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "52a9965afbaa98eb35cd47ce65ada06f1cf5c883",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamKernel.lean",
+          "blob": "b41b73f2dbca953988eac56569d02a2dab67588d"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-encoding-copy-mul-injective",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "52a9965afbaa98eb35cd47ce65ada06f1cf5c883",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamKernel.lean",
+          "blob": "b41b73f2dbca953988eac56569d02a2dab67588d"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rule-gradient-and-tangent-field",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "2341113be13e21805000f11476ae8ed89d6e6e80",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlow.lean",
+          "blob": "c770246be4d56ee6beeb7da69e51a14acc56ee9f"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rule-euler-step-injective",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "2341113be13e21805000f11476ae8ed89d6e6e80",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlow.lean",
+          "blob": "c770246be4d56ee6beeb7da69e51a14acc56ee9f"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rule-flow-finite-time-uniqueness",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "2341113be13e21805000f11476ae8ed89d6e6e80",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlow.lean",
+          "blob": "c770246be4d56ee6beeb7da69e51a14acc56ee9f"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-potential-descent-along-rule",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "2341113be13e21805000f11476ae8ed89d6e6e80",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlow.lean",
+          "blob": "c770246be4d56ee6beeb7da69e51a14acc56ee9f"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-potential-bounded-by-normForm-sq-frozen-max",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "2341113be13e21805000f11476ae8ed89d6e6e80",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlow.lean",
+          "blob": "c770246be4d56ee6beeb7da69e51a14acc56ee9f"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-zero-divisors-sit-at-potential-max",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "2341113be13e21805000f11476ae8ed89d6e6e80",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlow.lean",
+          "blob": "c770246be4d56ee6beeb7da69e51a14acc56ee9f"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rule-descent-avoids-zero-divisors",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "2341113be13e21805000f11476ae8ed89d6e6e80",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlow.lean",
+          "blob": "c770246be4d56ee6beeb7da69e51a14acc56ee9f"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-vacuum-sublocale-v-natural",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "83f7cd2a5f673a6aad7b6eeba7b1a48bd0d95a8b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/LocaleDynamics.lean",
+          "blob": "77c4be76a2279bd1c8b00f9594aeff6b69fddcbc"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-sublevel-infimum-rule-independent",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "83f7cd2a5f673a6aad7b6eeba7b1a48bd0d95a8b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/LocaleDynamics.lean",
+          "blob": "77c4be76a2279bd1c8b00f9594aeff6b69fddcbc"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-no-natural-valuation-model-case",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "83f7cd2a5f673a6aad7b6eeba7b1a48bd0d95a8b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/LocaleDynamics.lean",
+          "blob": "77c4be76a2279bd1c8b00f9594aeff6b69fddcbc"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-in-flight-first-order-data-constrains-at-most-one-direction",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "98085ae1d6ffd91b2d9f1b1b1ce19707460be9c9",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/TransitionState.lean",
+          "blob": "869ef9106300890ad5d8fed86de3fde16a2a2bfe"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-level-set-invariants-rule-blind",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "98085ae1d6ffd91b2d9f1b1b1ce19707460be9c9",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/TransitionState.lean",
+          "blob": "869ef9106300890ad5d8fed86de3fde16a2a2bfe"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-hosting-identity-fails-in-flight",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "554e87d7f65f2acd036a1f748b854efb75577211",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/Hosting.lean",
+          "blob": "9d9a1d9cf33be750824569d6fd1625b7b690d091"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rule-gram-invariants-ode",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "4982f40fc457df10d83bfbe64618a039bc15460b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlowInvariants.lean",
+          "blob": "a500cb424a9644bd39f5335203f75f8e33f99171"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rule-descent-straight-ray",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "4982f40fc457df10d83bfbe64618a039bc15460b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlowInvariants.lean",
+          "blob": "a500cb424a9644bd39f5335203f75f8e33f99171"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-ell-coefficient-monotone-along-rule",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "4982f40fc457df10d83bfbe64618a039bc15460b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlowInvariants.lean",
+          "blob": "a500cb424a9644bd39f5335203f75f8e33f99171"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-quench-endpoint-closed-form-conditional",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "4982f40fc457df10d83bfbe64618a039bc15460b",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlowInvariants.lean",
+          "blob": "a500cb424a9644bd39f5335203f75f8e33f99171"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-seam-zd-gram-spectrum-4-8-4",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "616a0ed8edcc0385fc332c0f6a3e8d9f766570ea",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamSpectrum.lean",
+          "blob": "241f27176cfc3e7297f39759d6f679938f63e371"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-seam-top-plane-on-frozen-ridge",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "616a0ed8edcc0385fc332c0f6a3e8d9f766570ea",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamSpectrum.lean",
+          "blob": "241f27176cfc3e7297f39759d6f679938f63e371"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-seam-right-gram-equals-left",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "616a0ed8edcc0385fc332c0f6a3e8d9f766570ea",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamSpectrum.lean",
+          "blob": "241f27176cfc3e7297f39759d6f679938f63e371"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-basis-pair-gram-uniform-bounds",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "616a0ed8edcc0385fc332c0f6a3e8d9f766570ea",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/SeamSpectrum.lean",
+          "blob": "241f27176cfc3e7297f39759d6f679938f63e371"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-in-flight-alternator-blind-to-ell",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e53fe237ffc9b69df1ad927f350b67745f30568e",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/InFlightAlgebra.lean",
+          "blob": "e6cccd35f34158bd5d28c72f6786a118939e244e"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-in-flight-quaternion-closes-and-associates",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e53fe237ffc9b69df1ad927f350b67745f30568e",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/InFlightAlgebra.lean",
+          "blob": "e6cccd35f34158bd5d28c72f6786a118939e244e"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-in-flight-span-in-alternator-kernel",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e53fe237ffc9b69df1ad927f350b67745f30568e",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/InFlightAlgebra.lean",
+          "blob": "e6cccd35f34158bd5d28c72f6786a118939e244e"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-gradient-lies-in-host-kernel-algebra",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "e53fe237ffc9b69df1ad927f350b67745f30568e",
+      "sources": [
+        {
+          "path": "proofs/QBP/Foundations/InFlightAlgebra.lean",
+          "blob": "e6cccd35f34158bd5d28c72f6786a118939e244e"
+        }
+      ],
+      "evidence_files": []
+    },
+    {
+      "id": "PROOF-rule-gradient-lies-in-host-kernel-algebra",
+      "provenance_kind": "proof",
+      "before_pa_local": null,
+      "before_pa_effective": null,
+      "after_pa_local": 0,
+      "after_pa_effective": 0,
+      "clean_count": 0,
+      "assistants": [],
+      "flags": [],
+      "changed": true,
+      "pinned_sha": "1805f190b119edbf90d21991e6f917d5f8d78723",
+      "sources": [
+        {
+          "path": "proofs/QBP/Substrate/RuleFlowBridge.lean",
+          "blob": "2badc9b59555251ab5272e772411c9253c0497d8"
+        }
+      ],
+      "evidence_files": []
+    }
+  ]
+}

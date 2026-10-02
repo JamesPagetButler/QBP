@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.13.0",
+  "version": "6.14.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -254,7 +254,9 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "Hurwitz 1898"
+      "theory_citation": "Hurwitz 1898",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -307,7 +309,9 @@
           "name": "prodIsZero_iff_cdAlg_mul_eq_zero",
           "status": "verified"
         }
-      ]
+      ],
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -324,7 +328,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "internal-compute"
+      "provenance_kind": "internal-compute",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -364,7 +370,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -404,7 +412,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -420,7 +430,9 @@
       "status": "killed",
       "provenance_kind": "theory",
       "killed_by": "PROOF-fano-genesis",
-      "killed_note": "superseded — octonion-Fano structure constants kernel-proven at PROOF-fano-genesis (#621); this anchor was vague with no lean_theorem. Redirect, not deletion; provenance_kind flipped proof->theory (a killed, no-witness pointer is not a proof)."
+      "killed_note": "superseded — octonion-Fano structure constants kernel-proven at PROOF-fano-genesis (#621); this anchor was vague with no lean_theorem. Redirect, not deletion; provenance_kind flipped proof->theory (a killed, no-witness pointer is not a proof).",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -461,7 +473,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -502,7 +516,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -520,7 +536,9 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "Hurwitz 1898, corollary"
+      "theory_citation": "Hurwitz 1898, corollary",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "sorry_count": 0,
@@ -558,7 +576,9 @@
         "axiom_closure": [
           "propext"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "predicted_value": 128.05,
@@ -1107,7 +1127,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-09-03T00:00:00Z",
@@ -1158,7 +1180,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1172,7 +1196,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1186,7 +1212,9 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "Hurwitz, A. (1898), Ueber die Composition der quadratischen Formen von beliebig vielen Variabeln — Lean re-verification of the H case is the evidence record; the claim originates externally (consistency with sibling PROOF-hurwitz)."
+      "theory_citation": "Hurwitz, A. (1898), Ueber die Composition der quadratischen Formen von beliebig vielen Variabeln — Lean re-verification of the H case is the evidence record; the claim originates externally (consistency with sibling PROOF-hurwitz).",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1200,7 +1228,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "predicted_value": 1,
@@ -1258,7 +1288,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1272,7 +1304,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1286,7 +1320,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "predicted_value": 2,
@@ -1361,7 +1397,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1375,7 +1413,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1388,7 +1428,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1403,7 +1445,9 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "CITATION-NEEDED (Majorana/Ising-CFT central charge c=1/2) -- Oppenheimer ruling (borderline; native ratio reading)"
+      "theory_citation": "CITATION-NEEDED (Majorana/Ising-CFT central charge c=1/2) -- Oppenheimer ruling (borderline; native ratio reading)",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1417,7 +1461,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "predicted_value": 0.5,
@@ -1920,7 +1966,9 @@
       "tier": 1,
       "provenance": "P",
       "status": "coherent",
-      "provenance_kind": "theory-external"
+      "provenance_kind": "theory-external",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-13T00:00:00Z",
@@ -2237,7 +2285,9 @@
           "Quot.sound"
         ]
       },
-      "foundation_batch": "#466"
+      "foundation_batch": "#466",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-18T00:00:00Z",
@@ -2527,7 +2577,9 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "Milgrom 1983 (ApJ 270, 365)"
+      "theory_citation": "Milgrom 1983 (ApJ 270, 365)",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "last_tested_at": "2026-04-27T00:00:00Z",
@@ -2542,7 +2594,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "predicted_value": 0.69,
@@ -2654,7 +2708,9 @@
       "status": "incoherent",
       "provenance_kind": "theory",
       "killed_by": "QBP/analysis/HQM-MMI-derive-or-die-report.md",
-      "killed_note": "Falsified (beekeeper-ratified). The 'ℂ→ℍ shrinks the entropy cone' mechanism is dead: multipartite ℍ-QM has no canonical tensor product; every definable repair builds on the complex projection (q=z+jz') so the achievable cone equals ℂ-QM's, and ℂ-QM's MMI violation (GHZ₄→I₃=+1>0) transports verbatim. Moretti-Oppio independently forces ℍ→ℂ under Poincaré+m²≥0. The genuinely-quaternionic regime gives super-Tsirelson (PR-box) correlations — a LARGER cone, opposite of the claim. Kept as a witnessed negative result. tier-1 flagged for review."
+      "killed_note": "Falsified (beekeeper-ratified). The 'ℂ→ℍ shrinks the entropy cone' mechanism is dead: multipartite ℍ-QM has no canonical tensor product; every definable repair builds on the complex projection (q=z+jz') so the achievable cone equals ℂ-QM's, and ℂ-QM's MMI violation (GHZ₄→I₃=+1>0) transports verbatim. Moretti-Oppio independently forces ℍ→ℂ under Poincaré+m²≥0. The genuinely-quaternionic regime gives super-Tsirelson (PR-box) correlations — a LARGER cone, opposite of the claim. Kept as a witnessed negative result. tier-1 flagged for review.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "predicted_value": 5.36,
@@ -2732,7 +2788,9 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "predicted_value": 0.04,
@@ -3001,7 +3059,9 @@
       "prediction_chain": [
         "DEFN-complex-structural-i"
       ],
-      "notes": "Lean targets: QBP.Foundations.Breakdown.Complex.noTotalOrder (not_started)"
+      "notes": "Lean targets: QBP.Foundations.Breakdown.Complex.noTotalOrder (not_started)",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-loss-of-commutativity-C-to-H",
@@ -3015,7 +3075,9 @@
         "DEFN-quaternion-structural-triad",
         "PROOF-su2-lie"
       ],
-      "notes": "Lean targets: QBP.Foundations.Breakdown.Quaternion.nonCommutativity (not_started); QBP.Foundations.Breakdown.Quaternion.commutator_ij (not_started)"
+      "notes": "Lean targets: QBP.Foundations.Breakdown.Quaternion.nonCommutativity (not_started); QBP.Foundations.Breakdown.Quaternion.commutator_ij (not_started)",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "WISDOM-algebra-restricts-state-class-not-scalar-field",
@@ -3261,7 +3323,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PRED-a0-saturating-Fmax-7",
@@ -3416,7 +3480,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PRED-hypergraph-cmb-camb-rerun",
@@ -3582,7 +3648,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-fano-choice-information",
@@ -3626,7 +3694,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-iron-56-double-octet",
@@ -3676,7 +3746,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-iron-to-ns-bridge",
@@ -3722,7 +3794,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-oxygen-16-sedenion",
@@ -3769,7 +3843,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-seed-mass-from-ln7",
@@ -3817,7 +3893,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-silicon-28-fano-ladder",
@@ -3866,7 +3944,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "REF-brink-condensed-group-cohomology",
@@ -4408,7 +4488,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-vaidya-accreting-horizon-spacelike",
@@ -4474,7 +4556,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-hubble-half-entropy-factor",
@@ -4528,7 +4612,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "FIT-zeta-modulated-profile",
@@ -4585,7 +4671,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "FLAG-ngc2683-mass-discrepancy",
@@ -5009,7 +5097,9 @@
       },
       "last_tested_at": "2026-08-21T23:35:01Z",
       "description": "finrank ℝ (CDAlg ℝ n) = 2ⁿ, Im submodule = 2ⁿ−1, via explicit basis/coordEquiv. Foundation: dim 𝕆=8, dim(Im 𝕆)=7 (n=3) — the 7 underlying the CKM CP-phase prediction. FAULT-S4-005 C5; resolves CPPhase's prediction_chain root.",
-      "notes": "Verbatim #print axioms (oppenheimer seq=950): finrank_cdAlg / even_tower_imDim / finrank_imSubmodule all subset [propext,Classical.choice,Quot.sound], Invariant-2 clean. status:coherent -> genuine structural theorem, not definitional. Specific-level instances (imDim quaternion=3/sedenion=15/level_six=63) verified & available, excluded as corollary instantiations. prediction_chain root DEFN-cayley-dickson-doubling is status:untested; does NOT gate this theorem's coherence (Lean proof stands alone). confluent-trust #96 AC3 / #466 item 2."
+      "notes": "Verbatim #print axioms (oppenheimer seq=950): finrank_cdAlg / even_tower_imDim / finrank_imSubmodule all subset [propext,Classical.choice,Quot.sound], Invariant-2 clean. status:coherent -> genuine structural theorem, not definitional. Specific-level instances (imDim quaternion=3/sedenion=15/level_six=63) verified & available, excluded as corollary instantiations. prediction_chain root DEFN-cayley-dickson-doubling is status:untested; does NOT gate this theorem's coherence (Lean proof stands alone). confluent-trust #96 AC3 / #466 item 2.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-sp1-unit-quaternion-group",
@@ -5068,7 +5158,9 @@
       },
       "last_tested_at": "2026-08-21T23:35:01Z",
       "description": "Unit quaternions form the compact group Sp(1)≅SU(2): norm-preserving iff unit (#585 Thm-1), closed under ×, = unit sphere. Distinct from PROOF-su2-lie (algebra) and PROOF-quat-closure (subalgebra). #466 item 4.",
-      "notes": "axioms subset [propext,Classical.choice,Quot.sound], Inv-2 clean -> coherent/PROVEN. root DEFN-quaternion-structural-triad. #96 AC3."
+      "notes": "axioms subset [propext,Classical.choice,Quot.sound], Inv-2 clean -> coherent/PROVEN. root DEFN-quaternion-structural-triad. #96 AC3.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-spectral-action-moment-scaling",
@@ -5127,7 +5219,9 @@
       },
       "last_tested_at": "2026-08-21T23:35:01Z",
       "description": "Dilation u -> f(u/Λ²) scales the m-th moment by Λ^(2(m+1)): f₄↔Λ⁴, f₂↔Λ², f₀ invariant — genuine analytic scaling theorem. status:marginal by scoping (see notes). #466 item 7.",
-      "notes": "Lean proves the convention-robust Λ-scaling of profileMoment (explicit exponent m) — the machine-verified backbone. The Chamseddine-Connes spectral-action identification is a CC-dictionary mapping, NOT Lean-derived; and paper VIII.B f_k k-indexing is inconsistent with its own scaling (OPEN erratum, ESCALATE-flagged in #466 report). status stays MARGINAL — no PROVEN flip. axioms subset [propext,Classical.choice,Quot.sound]. chain PROOF-cd-algebra-finrank-2n. #96 AC3."
+      "notes": "Lean proves the convention-robust Λ-scaling of profileMoment (explicit exponent m) — the machine-verified backbone. The Chamseddine-Connes spectral-action identification is a CC-dictionary mapping, NOT Lean-derived; and paper VIII.B f_k k-indexing is inconsistent with its own scaling (OPEN erratum, ESCALATE-flagged in #466 report). status stays MARGINAL — no PROVEN flip. axioms subset [propext,Classical.choice,Quot.sound]. chain PROOF-cd-algebra-finrank-2n. #96 AC3.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-fano-genesis",
@@ -5191,7 +5285,9 @@
       },
       "last_tested_at": "2026-08-21T23:35:01Z",
       "description": "Proven properties of the octonion multiplication table (CD level 3, mulCoeff/octSign): 7 imaginary units square to −1, 7 Fano-line triples multiplication-consistent, non-associative + anticommutative on imaginaries — kernel-verified. Properties of the structure defined at DEFN-octonion-structural-fano. #466 item 1.",
-      "notes": "Split from the DEFN per Gemini §I4 on #612. axioms: primary/non_assoc/anticomm subset [propext,Classical.choice,Quot.sound]; lines_units_consistent subset [propext]. Inv-2 clean -> PROVEN. chain DEFN-octonion-structural-fano (properties OF the defined object). #96 AC3."
+      "notes": "Split from the DEFN per Gemini §I4 on #612. axioms: primary/non_assoc/anticomm subset [propext,Classical.choice,Quot.sound]; lines_units_consistent subset [propext]. Inv-2 clean -> PROVEN. chain DEFN-octonion-structural-fano (properties OF the defined object). #96 AC3.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-normed-division-tower-existence",
@@ -5250,7 +5346,9 @@
       },
       "last_tested_at": "2026-08-23T23:09:55Z",
       "description": "ℝ,ℂ,ℍ,𝕆 are normed composition algebras (N(xy)=N(x)N(y)) of dims 1/2/4/8; 𝕊 is NOT (composition terminates at 𝕆). EXISTENCE + TERMINATION ONLY — explicitly NOT the uniqueness converse ('only 4 exist'). Distinct from PROOF-hurwitz (classical 1898 uniqueness citation). #466 item 6.",
-      "notes": "SCOPING GUARD (oppenheimer 973): #589 retired the uniqueness axiom — QBP does not commit to the closed menu (explores 𝕊/𝕋 zero-divisor branch), so 'only 4' is OPEN. MUST NOT be read as proving uniqueness. Do NOT fold into PROOF-hurwitz. axioms all 8 subset [propext,Classical.choice,Quot.sound]. #96 AC3."
+      "notes": "SCOPING GUARD (oppenheimer 973): #589 retired the uniqueness axiom — QBP does not commit to the closed menu (explores 𝕊/𝕋 zero-divisor branch), so 'only 4' is OPEN. MUST NOT be read as proving uniqueness. Do NOT fold into PROOF-hurwitz. axioms all 8 subset [propext,Classical.choice,Quot.sound]. #96 AC3.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-octonion-zd-hypersurface-empty",
@@ -5309,7 +5407,9 @@
       },
       "last_tested_at": "2026-08-31T13:29:00Z",
       "description": "det Lₓ = N(x)⁴ and det Lₓ = 0 ⟺ x = 0 → octonion zero-divisor hypersurface EMPTY (𝕆 has no zero divisors); det=N⁴ over every CommRing (ℤ-descent). #594 VML-ladder rung 1.",
-      "notes": "axioms all 10 subset [propext,Classical.choice,Quot.sound]. chain PROOF-normed-division-tower-existence (det polarizes #591's composition law) — within-batch, order #591 first. CONTRAST (note, NOT a chain edge): 𝕆 ZD-empty vs sedenion 42-assessor ZD cone (PROOF-42zd). Distinct from PROOF-42zd/PROOF-g2. #96 AC3."
+      "notes": "axioms all 10 subset [propext,Classical.choice,Quot.sound]. chain PROOF-normed-division-tower-existence (det polarizes #591's composition law) — within-batch, order #591 first. CONTRAST (note, NOT a chain edge): 𝕆 ZD-empty vs sedenion 42-assessor ZD cone (PROOF-42zd). Distinct from PROOF-42zd/PROOF-g2. #96 AC3.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-s3-hspace",
@@ -5351,7 +5451,9 @@
       },
       "last_tested_at": "2026-08-20T04:24:30Z",
       "description": "Genuine library HSpace record on S³ (HSpace (S₊∙ 3)) via transporting the concrete CD multiplication through S³-HSpace-from-join (not a refl stub); product = unit-quaternion mult. #575; #608's ⋆ instantiates this.",
-      "notes": "--safe transitive, exit 0, peak 0.39GB (oppenheimer 975) -> coherent/PROVEN. chain DEFN-quaternion-structural-triad (S³ H-space = unit-quaternion mult). #96 AC3."
+      "notes": "--safe transitive, exit 0, peak 0.39GB (oppenheimer 975) -> coherent/PROVEN. chain DEFN-quaternion-structural-triad (S³ H-space = unit-quaternion mult). #96 AC3.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-skyrmion-baryon-complete-invariant",
@@ -5407,7 +5509,9 @@
       },
       "last_tested_at": "2026-09-01T17:08:00Z",
       "description": "baryonNumber := degree 3; COMPLETE invariant ∥S³→S³∥₂≅ℤ (skyrmionSectorsIso), realized by baryonNumber. Non-vacuity: hedgehog->1, every ℤ-sector inhabited. #595.",
-      "notes": "GUARD RESOLVED (oppenheimer VERIFIED not asserted, 975): completeness is library-PROVEN not postulated — (a) --safe transitive incl pi3 machinery; (b) syntax grep zero forbidden constructs; (c) pi3S3=Z=Cubical PinSn + degree iso. -> coherent/PROVEN, NOT marginal. peak 0.55GB. chain [] (foundational homotopy, library-rooted). #96 AC3."
+      "notes": "GUARD RESOLVED (oppenheimer VERIFIED not asserted, 975): completeness is library-PROVEN not postulated — (a) --safe transitive incl pi3 machinery; (b) syntax grep zero forbidden constructs; (c) pi3S3=Z=Cubical PinSn + degree iso. -> coherent/PROVEN, NOT marginal. peak 0.55GB. chain [] (foundational homotopy, library-rooted). #96 AC3.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-substrate-baryon-additive",
@@ -5455,7 +5559,9 @@
       },
       "last_tested_at": "2026-09-01T17:16:48Z",
       "description": "baryonNumber additive under the substrate quaternion product ⋆: B(f⋆g)≡Bf+ℤBg = SubstrateLink.⋆∙-additive at the concrete S3FromCD.S³-HSpace (⋆ = HSpace.μ, pointwise quaternion mult). #595.",
-      "notes": "chain PROOF-s3-hspace (#575 — ⋆ IS its H-space mu), within-batch order #575 first. Scoping: plain HSpace only, NO AssocHSpace (S⁷/G₂-forward per #575/#579). Non-vacuity quaternionProduct-pointwise=refl. --safe transitive exit 0 peak 0.63GB -> coherent/PROVEN. #96 AC3."
+      "notes": "chain PROOF-s3-hspace (#575 — ⋆ IS its H-space mu), within-batch order #575 first. Scoping: plain HSpace only, NO AssocHSpace (S⁷/G₂-forward per #575/#579). Non-vacuity quaternionProduct-pointwise=refl. --safe transitive exit 0 peak 0.63GB -> coherent/PROVEN. #96 AC3.",
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-ops-order-ladder",
@@ -5513,7 +5619,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-ops-commutativity-ladder",
@@ -5576,7 +5684,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-ops-associativity-ladder",
@@ -5639,7 +5749,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-ops-alternativity-ladder",
@@ -5702,7 +5814,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-ops-norm-composition-ladder",
@@ -5765,7 +5879,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-ops-division-ladder",
@@ -5823,7 +5939,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-ops-flexibility-ladder",
@@ -5886,7 +6004,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-sedenion-zero-divisor-witnesses",
@@ -5957,7 +6077,9 @@
         "axiom_closure": [
           "propext"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-octonion-moufang",
@@ -6010,7 +6132,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-power-associativity",
@@ -6068,7 +6192,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-octonion-cross-product",
@@ -6156,7 +6282,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-artin-theorem",
@@ -6209,7 +6337,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-cd-product-formula",
@@ -6267,7 +6397,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-cd-structure-constant-tables",
@@ -6340,7 +6472,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-cd-associativity-level2",
@@ -6393,7 +6527,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-cd-associator-formula",
@@ -6435,7 +6571,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-octonion-sedenion-exp-log",
@@ -6568,7 +6706,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-norm-form-bilinear",
@@ -6646,7 +6786,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-sedenion-alternative-hyperplane-count",
@@ -6699,7 +6841,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-octonion-32dim-alternative-count",
@@ -6767,7 +6911,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-bpm-si-round-trip",
@@ -6815,7 +6961,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-doubleslit-quaternion-algebra",
@@ -6898,7 +7046,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-doubleslit-visibility-bounds",
@@ -6976,7 +7126,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-fraunhofer-optics",
@@ -7059,7 +7211,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-sterngerlach-qbp",
@@ -7112,7 +7266,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-angle-dependent-qbp",
@@ -7190,7 +7346,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-general3d-qbp",
@@ -7268,7 +7426,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-doubleslit-visibility-model",
@@ -7316,7 +7476,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-measurement-ansatz-basic",
@@ -7364,7 +7526,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-code-si-constants",
@@ -7447,7 +7611,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-kitaev-model",
@@ -7526,7 +7692,9 @@
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
         "result": "verified",
         "axiom_closure": []
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-graphene-model",
@@ -7590,7 +7758,9 @@
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
         "result": "verified",
         "axiom_closure": []
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-bi2se3-ti",
@@ -7649,7 +7819,9 @@
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
         "result": "verified",
         "axiom_closure": []
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-crystallisation-spectral-moments",
@@ -7703,7 +7875,9 @@
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
         "result": "verified",
         "axiom_closure": []
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "DERIV-quaternion-physics-kramers",
@@ -7752,7 +7926,9 @@
         "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
         "result": "verified",
         "axiom_closure": []
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-sedenion-dirac-sum-kill",
@@ -7849,7 +8025,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-alternator-vanishes-iff-commute",
@@ -7971,7 +8149,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-associator-contraction-identity",
@@ -8098,7 +8278,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-left-mul-sq-alternator",
@@ -8150,7 +8332,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-delta-landscape-descent",
@@ -8232,7 +8416,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-spatial-first-link-condensed-locale",
@@ -8284,7 +8470,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rot120-invariant-form-scalar",
@@ -8341,7 +8529,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "KILLED-locale-forcing-route",
@@ -8546,7 +8736,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-associative-composition-iff",
@@ -8613,7 +8805,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-quaternion-frame-maximal",
@@ -8720,7 +8914,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-quaternion-frame-codim-four",
@@ -8797,7 +8993,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-vacuum-parametrisation",
@@ -8884,7 +9082,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-crystal-hosts-quaternion",
@@ -9046,7 +9246,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-local-spectrum-at-crystal",
@@ -9113,7 +9315,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-substrate-hosting-definition",
@@ -9290,7 +9494,9 @@
           "Classical.choice",
           "Quot.sound"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-hosted-algebra-meets-cell-in-complex-line",
@@ -9343,7 +9549,9 @@
           "QBP.Foundations.CrystalHosting.inQuatSpan_ell_right",
           "QBP.Foundations.CrystalHosting.crystal_quatSpan_independent"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-order-three-automorphism-fixes-ell",
@@ -9414,7 +9622,9 @@
           "QBP.Foundations.CrystalHosting.reCoord_mul",
           "QBP.Foundations.CrystalHosting.mul_swap_eq"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-hosting-equivariant-under-order-three",
@@ -9465,7 +9675,9 @@
           "QBP.Substrate.Hosting.hosting_equivariant",
           "QBP.Substrate.Hosting.hosting_equivariant_grade"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-hosted-eq-quatspan-nonpole",
@@ -9519,7 +9731,9 @@
           "QBP.Foundations.CrystalHosting.genByPair_eq_quatSpan_of_param",
           "QBP.Substrate.Hosting.exists_nonPole_universe"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-universe-intersection-eq-complex",
@@ -9569,7 +9783,9 @@
           "QBP.Foundations.CrystalHosting.quatSpan_inter_eq_complex",
           "QBP.Foundations.CrystalHosting.inQuatSpan_neg_dir"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-quatdouble-rho-invariant-mul-closed",
@@ -9626,7 +9842,9 @@
           "QBP.Foundations.HolographicSubalgebra.ell_mem_quatDouble",
           "QBP.Foundations.HolographicSubalgebra.quatDouble_proper"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rho-moves-cd-half-as-set",
@@ -9678,7 +9896,9 @@
           "QBP.Foundations.CrystalHosting.exists_mem_lowHalf_rotAut3_not_mem",
           "QBP.Foundations.CrystalHosting.mem_lowHalf"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-vacuum-hessian-transverse-eigenvalue",
@@ -9738,7 +9958,9 @@
           "QBP.Foundations.CrystalHosting.hessQuad_eigenvalue_even_exists",
           "QBP.Foundations.CrystalHosting.hessQuad_flatDir"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-transverse-space-dim-six-trace",
@@ -9794,7 +10016,9 @@
           "QBP.Foundations.HolographicSubalgebra.hess_trace_transverse",
           "QBP.Foundations.HolographicSubalgebra.bil_eq_inner"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-vacuum-hessian-universe-level",
@@ -9849,7 +10073,9 @@
           "QBP.Substrate.Hosting.polePlus_hessian_eq_zero",
           "QBP.Substrate.Hosting.universe_hessian_eigenvalue_depends_only_on_b0_sq"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-octonion-perp-module-span4-maximal",
@@ -9907,7 +10133,9 @@
           "QBP.Foundations.HolographicSubalgebra.rMul_injective",
           "QBP.Foundations.HolographicSubalgebra.span4_sup_rMul_eq_top"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-encoding-family-transitive-of-aut",
@@ -9957,7 +10185,9 @@
           "QBP.Foundations.HolographicSubalgebra.autLin_apply",
           "QBP.Foundations.HolographicSubalgebra.map_span_gen4"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-encoding-family-u-mul-invariant",
@@ -10014,7 +10244,9 @@
           "QBP.Foundations.HolographicSubalgebra.encoding_family_member",
           "QBP.Foundations.HolographicSubalgebra.span_gen4_u_mul"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "FLAG-rule-flow-open",
@@ -10138,7 +10370,9 @@
           "QBP.Foundations.SeamKernel.seamX_mul_k3",
           "QBP.Foundations.SeamKernel.seamX_mul_k4"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-seam-zd-witness-kernels-coincide",
@@ -10194,7 +10428,9 @@
           "QBP.Foundations.SeamKernel.k3_mul_seamX",
           "QBP.Foundations.SeamKernel.k4_mul_seamX"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-seam-zd-witness-kernel-not-subalgebra",
@@ -10244,7 +10480,9 @@
           "QBP.Foundations.SeamKernel.k1_sq",
           "QBP.Foundations.SeamKernel.k1_mul_k3_coord2"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-frobenius-basis-sum-general",
@@ -10294,7 +10532,9 @@
           "QBP.Foundations.SeamKernel.zd_witness_frobenius_preserved",
           "QBP.Foundations.SeamKernel.N_seamX"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-encoding-copy-mul-injective",
@@ -10349,7 +10589,9 @@
           "QBP.Foundations.SeamKernel.octonion_copy_mul_eq_zero_imp_right",
           "QBP.Foundations.SeamKernel.seamX_not_in_octonion_copy"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rule-gradient-and-tangent-field",
@@ -10409,7 +10651,9 @@
           "QBP.Substrate.RuleFlow.ruleField_eq_zero_of_isVacuum",
           "QBP.Substrate.RuleFlow.exists_ruleField_ne_zero"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rule-euler-step-injective",
@@ -10461,7 +10705,9 @@
           "QBP.Substrate.RuleFlow.normForm_eulerStep",
           "QBP.Substrate.RuleFlow.renormStep_injOn_of_normForm_const"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rule-flow-finite-time-uniqueness",
@@ -10511,7 +10757,9 @@
           "QBP.Substrate.RuleFlow.flow_unique_of_mem_Icc",
           "QBP.Substrate.RuleFlow.flow_unique_of_endpoint"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-potential-descent-along-rule",
@@ -10565,7 +10813,9 @@
           "QBP.Substrate.RuleFlow.potential_le_initial_along_flow",
           "QBP.Substrate.RuleFlow.exists_rest_point_not_vacuum"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-potential-bounded-by-normForm-sq-frozen-max",
@@ -10617,7 +10867,9 @@
           "QBP.Substrate.RuleFlow.potential_le_normForm_sq",
           "QBP.Substrate.RuleFlow.exists_isMaxOn_potential_stateSphere"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-zero-divisors-sit-at-potential-max",
@@ -10675,7 +10927,9 @@
           "QBP.Substrate.RuleFlow.potential_eq_one_of_zeroDivisor",
           "QBP.Substrate.RuleFlow.crystal_not_zeroDivisor"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rule-descent-avoids-zero-divisors",
@@ -10726,7 +10980,9 @@
           "QBP.Substrate.RuleFlow.not_zeroDivisor_along_flow",
           "QBP.Substrate.RuleFlow.omega_avoids_locus"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "REF-efimov-kraemer-2006",
@@ -10929,7 +11185,9 @@
           "QBP.Foundations.LocaleDynamics.crack_vacNucleus_separates_inside_level_set",
           "QBP.Foundations.LocaleDynamics.crack_vacNucleus_not_defOpens"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-sublevel-infimum-rule-independent",
@@ -10977,7 +11235,9 @@
           "QBP.Foundations.LocaleDynamics.iInf_sublevel_eq_interior",
           "QBP.Foundations.LocaleDynamics.iInf_sublevel_eq_bot_of_interior_eq_empty"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-no-natural-valuation-model-case",
@@ -11027,7 +11287,9 @@
           "QBP.Foundations.LocaleDynamics.LocaleValuation.eq_zero_of_compressed",
           "QBP.Foundations.LocaleDynamics.LocaleValuation.card_mul_le_top"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-in-flight-first-order-data-constrains-at-most-one-direction",
@@ -11083,7 +11345,9 @@
           "QBP.Foundations.TransitionState.vNeutral_neg",
           "QBP.Foundations.TransitionState.hypotheses_satisfiable"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-level-set-invariants-rule-blind",
@@ -11133,7 +11397,9 @@
           "QBP.Foundations.TransitionState.add_vNeutral_ne",
           "QBP.Foundations.TransitionState.exists_vNeutral_ne_zero"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-hosting-identity-fails-in-flight",
@@ -11186,7 +11452,9 @@
           "QBP.Substrate.Hosting.mem_universeSpace_iff_complex_structure",
           "QBP.Substrate.Hosting.inFlight_nonempty"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rule-gram-invariants-ode",
@@ -11245,7 +11513,9 @@
           "QBP.Substrate.RuleFlowInvariants.gram_sum_hasDerivAt_zero",
           "QBP.Substrate.RuleFlowInvariants.bil_gradV_self"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rule-descent-straight-ray",
@@ -11306,7 +11576,9 @@
           "QBP.Substrate.RuleFlowInvariants.isRayCoord_ellSq",
           "QBP.Substrate.RuleFlowInvariants.isRayCoord_rayVec"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-ell-coefficient-monotone-along-rule",
@@ -11357,7 +11629,9 @@
           "QBP.Substrate.RuleFlowInvariants.quench_root_ge_initial",
           "QBP.Substrate.RuleFlowInvariants.ellSq_limit_ge_initial"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-quench-endpoint-closed-form-conditional",
@@ -11414,7 +11688,9 @@
           "QBP.Substrate.RuleFlowInvariants.quench_root_pick",
           "QBP.Substrate.RuleFlowInvariants.quench_root_pick_aux"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-seam-zd-gram-spectrum-4-8-4",
@@ -11481,7 +11757,9 @@
           "QBP.Foundations.SeamSpectrum.seamG_self_adjoint",
           "QBP.Foundations.SeamSpectrum.midSpan_sup_topSpan_sup_seamKerSpan"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-seam-top-plane-on-frozen-ridge",
@@ -11532,7 +11810,9 @@
           "QBP.Foundations.SeamSpectrum.top_plane_zero_divisor",
           "QBP.Foundations.SeamSpectrum.seamLm_ker_eq"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-seam-right-gram-equals-left",
@@ -11585,7 +11865,9 @@
           "QBP.Foundations.SeamSpectrum.seamRGram_eq",
           "QBP.Foundations.SeamSpectrum.seamRm_ker_eq"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-basis-pair-gram-uniform-bounds",
@@ -11654,7 +11936,9 @@
           "QBP.Foundations.SeamSpectrum.sbpG_seam",
           "QBP.Foundations.SeamSpectrum.sbpEig_seam"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-in-flight-alternator-blind-to-ell",
@@ -11707,7 +11991,9 @@
           "QBP.Foundations.InFlightAlgebra.left_mul_sq_ell_shift",
           "QBP.Foundations.InFlightAlgebra.delta_eq_neg_assoc"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-in-flight-quaternion-closes-and-associates",
@@ -11774,7 +12060,9 @@
           "QBP.Foundations.InFlightAlgebra.ell_mul_eq",
           "QBP.Foundations.InFlightAlgebra.inFlight_associative_even_where_alternator_nonzero"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-in-flight-span-in-alternator-kernel",
@@ -11831,7 +12119,9 @@
           "QBP.Foundations.InFlightAlgebra.ell_mem_ker_delta",
           "QBP.Foundations.InFlightAlgebra.s_mul_ell_mem_ker_delta"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-gradient-lies-in-host-kernel-algebra",
@@ -11891,7 +12181,9 @@
           "QBP.Foundations.InFlightAlgebra.inQuatSpanOct_assoc",
           "QBP.Foundations.InFlightAlgebra.cdComm_eq_comm_imHi"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     },
     {
       "id": "PROOF-rule-gradient-lies-in-host-kernel-algebra",
@@ -11947,7 +12239,9 @@
           "QBP.Substrate.RuleFlowBridge.gradVof_eq_gradV",
           "QBP.Substrate.RuleFlowBridge.smul_self_add_smul_gradV_mem_kernelAlgebra"
         ]
-      }
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     }
   ],
   "inputs": [
@@ -12539,9 +12833,14 @@
       "version": "6.13.0",
       "date": "2026-09-30T00:00:00Z",
       "note": "#690 / PR #691: PROOF-rule-gradient-lies-in-host-kernel-algebra minted (Substrate); anchor 4 NOT-claimed pointer updated; no other anchor changed. Detail — lean-prover / qbp-oppenheimer, option (b) of the import-direction edge rule (Foundations → Substrate is never a derivation edge; live-test seq 2120–2125, qbp-architecture + cth concur). MINTED: the bridge anchor for proofs/QBP/Substrate/RuleFlowBridge.lean (5 theorems, kernel-checked, axioms ⊆ {propext, Classical.choice, Quot.sound}, 0 sorry, no native_decide): `gradVof_eq_gradV` (QBP.Foundations.InFlightAlgebra.gradVof s = QBP.Substrate.RuleFlow.gradV s), its two CD halves `gradVlo_eq_cdLo_gradV` / `gradVhi_eq_cdHi_gradV`, and the transported memberships `gradV_mem_kernelAlgebra` (InKernelAlgebra s (RuleFlow.gradV s), the headline) and `smul_self_add_smul_gradV_mem_kernelAlgebra`; chain [PROOF-gradient-lies-in-host-kernel-algebra (Substrate → Foundations), PROOF-rule-gradient-and-tangent-field (Substrate → Substrate)]; manifest entry added. REVISED: PROOF-gradient-lies-in-host-kernel-algebra (anchor 4 of PR #689) in `name` and `description` only — its 'NOT stated in Lean (#683)' / 'bridge lemma owed' / 'withheld until the #683 bridge lemma lands' clauses become a pointer to the Substrate anchor; its prediction_chain stays [PROOF-alternator-vanishes-iff-commute] (the Foundations anchor does NOT regain the RuleFlow edge), and lean_theorem, proof_file, lean_companion_theorems and verification are byte-identical to 6.12.0. STILL NOT claimed by either anchor: the rule FIELD F(s) ∈ 𝕆_s (needs an unstated 1 ∈ 𝕆_s; ARGUMENT), flow existence / uniqueness and leaf invariance (FLAG-rule-flow-open, #635), 𝕆_s = ker Δ(s) (reverse inclusion OPEN), the leaf space G₂/SO(4), the anneal, the endpoint. Anchors 1–3 of PR #689 untouched; no root, principle, decision or kill touched; FLAG-rule-flow-open and CONJ-condensed-math-for-transition-state not touched. (Version 6.13.0: encoded on master 6.12.0/343 → 344.)"
+    },
+    {
+      "version": "6.14.0",
+      "date": "2026-10-02T00:00:00Z",
+      "note": "#692: PA backfill of 147 proof/derivation anchors (147 records changed) from 0 v2 notary evidence records at pinned master f4525328cc5361ffa04e6e215a03f0ec45181032. Grade distribution (pa_local/pa_effective: count) — 0/0: 147. pa_local = GradeClaim(...).pa on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain edges typed derivation (conservative); pinned_sha = claim-source manifest hash (sorted `path blob` lines, git hash-object --stdin; architecture ruling seq 2299), not stored. Computed by tools/cth-pa (confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158); never hand-set — a wrong grade is fixed by new or corrected evidence in inter/notary-evidence/, never by editing the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind proof/derivation anchors WITH evidence; internal-compute anchors (PROOF-hessian) carry grades only (cth ruling 2026-10-02)."
     }
   ],
-  "last_updated": "2026-09-30T00:00:00Z",
+  "last_updated": "2026-10-02T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
