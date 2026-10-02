@@ -27,6 +27,11 @@ Each test names the AC / ruling it pins:
   RT C7 / seq 2386  the engine counts assistants, not kernels: survivors collapse to one
             per prover kind before grading — [coq, coq] → 1 (mutant → 2); Fano → 2
   RT N18  the dry-run scratch cleanup is REGISTERED with atexit (not just callable)
+  seq 2394  S = the transitive closure over QBP-local `import QBP.…` lines (read at the
+            pinned commit) of {proof_file} ∪ {same-repo evidence files}: an imported
+            definition file changes pinned_sha, an unrelated file does not, Mathlib is
+            excluded, A→B→C includes C, a cycle terminates, a dangling import refuses;
+            real-repo reference values at f452532 (headline 6b972a7d, companion 0f32f714)
 """
 
 from __future__ import annotations
@@ -423,44 +428,218 @@ def test_pinned_sha_follows_file_not_commit(tmp_path):
     )
 
 
-def test_reference_manifest_hash_cd_structure_constant_tables():
-    """Reference value from the ruling (live-test seq 2299): PROOF-cd-structure-constant-tables
-    at master f452532 with S = {CDAlg.lean, FanoOrientationF3.lean}."""
-    commit_sha = "f4525328cc5361ffa04e6e215a03f0ec45181032"
+REF_COMMIT = "f4525328cc5361ffa04e6e215a03f0ec45181032"
+CD_FILE = "proofs/QBP/Foundations/CDAlg.lean"
+F3_FILE = "proofs/QBP/Foundations/FanoOrientationF3.lean"
+SOC_FILE = "proofs/QBP/Foundations/SedenionOctonionCount.lean"
+CD_BLOB = "f9181336cdfefad6e4550b2ddb0ad61db9a8d628"
+F3_BLOB = "4cd7a94f9b962ce49973d98be269ace7cc5b4387"
+SOC_BLOB = "74f14e8b76b7936ea460f194701b61099123b4be"
+HEADLINE_PINNED = "6b972a7d2c4febf398811b42d79a33ee46878930"
+COMPANION_PINNED = "0f32f71460763945ff2c6d0a9a713163b0ca4dca"
+
+
+def _needs_ref_commit():
     if (
         subprocess.run(
-            ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
+            ["git", "cat-file", "-e", f"{REF_COMMIT}^{{commit}}"],
             cwd=str(ROOT),
             capture_output=True,
         ).returncode
         != 0
     ):
         pytest.skip("reference commit not in this clone")
-    a = anchor(
-        "PROOF-cd-structure-constant-tables",
-        proof_file="proofs/QBP/Foundations/CDAlg.lean",
-    )
-    ev = [
-        {
-            "evidence_ref": "proofs/QBP/Foundations/FanoOrientationF3.lean@x#fanoTableF4_eq_cayleyDickson"
-        }
-    ]
-    pinned, sources, flags = enc.pinned_sha_for(a, ev, ROOT, commit_sha)
+
+
+def test_reference_manifest_hash_cd_structure_constant_tables():
+    """Reference value from the closure ruling (live-test seq 2394, recorded on QBP#692):
+    PROOF-cd-structure-constant-tables at master f452532. CDAlg.lean imports
+    QBP.Foundations.SedenionOctonionCount and QBP.Foundations.FanoOrientationF3 (and
+    Mathlib, excluded), so with NO evidence S = {CDAlg, FanoOrientationF3,
+    SedenionOctonionCount} → 6b972a7d. Supersedes the seq-2299 two-file value be505734.
+    """
+    _needs_ref_commit()
+    a = anchor("PROOF-cd-structure-constant-tables", proof_file=CD_FILE)
+    pinned, sources, flags = enc.pinned_sha_for(a, [], ROOT, REF_COMMIT)
     assert flags == []
     assert sources == [
-        {
-            "path": "proofs/QBP/Foundations/CDAlg.lean",
-            "blob": "f9181336cdfefad6e4550b2ddb0ad61db9a8d628",
-        },
-        {
-            "path": "proofs/QBP/Foundations/FanoOrientationF3.lean",
-            "blob": "4cd7a94f9b962ce49973d98be269ace7cc5b4387",
-        },
+        {"path": CD_FILE, "blob": CD_BLOB},
+        {"path": F3_FILE, "blob": F3_BLOB},
+        {"path": SOC_FILE, "blob": SOC_BLOB},
     ]
-    assert pinned == "be50573493f675d331606c3d752c3c9d15d8ffa4"
+    assert pinned == HEADLINE_PINNED
     assert pinned == enc.manifest_hash_py(
         [f"{s['path']} {s['blob']}\n" for s in sources]
     )
+    # the headline's own imports at that commit, read from the blob, not the checkout
+    assert enc.lean_local_imports_of_blob(ROOT, CD_BLOB) == [
+        "QBP.Foundations.SedenionOctonionCount",
+        "QBP.Foundations.FanoOrientationF3",
+    ]
+    # a Fano-companion evidence_ref on the headline adds nothing: F3 is already in the
+    # closure, so S (and pinned_sha) is unchanged — the closure deduplicates
+    ev = [{"evidence_ref": f"{F3_FILE}@x#fanoTableF4_eq_cayleyDickson"}]
+    pinned2, sources2, flags2 = enc.pinned_sha_for(a, ev, ROOT, REF_COMMIT)
+    assert (pinned2, sources2, flags2) == (HEADLINE_PINNED, sources, [])
+    # MUTANT GUARD: the pre-closure manifests are not the pinned_sha
+    assert pinned != enc.manifest_hash_py([f"{CD_FILE} {CD_BLOB}\n"])
+    assert pinned != enc.manifest_hash_py(
+        [f"{CD_FILE} {CD_BLOB}\n", f"{F3_FILE} {F3_BLOB}\n"]
+    )
+
+
+def test_reference_manifest_hash_fano_companion_unchanged():
+    """Companion PROOF-fano-table-equals-cd-products at f452532: FanoOrientationF3.lean
+    imports nothing, so S = {FanoOrientationF3} and the seq-2299 value 0f32f714 stands.
+    """
+    _needs_ref_commit()
+    a = anchor("PROOF-fano-table-equals-cd-products", proof_file=F3_FILE)
+    pinned, sources, flags = enc.pinned_sha_for(a, [], ROOT, REF_COMMIT)
+    assert flags == []
+    assert sources == [{"path": F3_FILE, "blob": F3_BLOB}]
+    assert pinned == COMPANION_PINNED
+    assert enc.lean_local_imports_of_blob(ROOT, F3_BLOB) == []
+
+
+# ---------------------------------------------------------------------------------------
+# seq 2394 — S closes over QBP-local imports
+# ---------------------------------------------------------------------------------------
+def test_lean_local_imports_header_only_comments_stripped():
+    text = (
+        "/- licence header\n   import QBP.InBlockComment -/\n"
+        "/-- doc: import QBP.InDocComment -/\n"
+        "prelude\n"
+        "import Mathlib.Tactic  -- import QBP.InTrailingComment\n"
+        "import Std.Data.List\n"
+        "import QBP.B\n"
+        "import «QBP.C»\n"
+        "import QBP\n"
+        "import QBP.B\n"
+        "-- import QBP.InLineComment\n"
+        "theorem t : True := trivial\n"
+        "import QBP.AfterHeader\n"
+    )
+    assert enc.lean_local_imports(text) == ["QBP.B", "QBP.C", "QBP"]
+    assert enc.lean_module_path("QBP.Foundations.CDAlg") == (
+        "proofs/QBP/Foundations/CDAlg.lean"
+    )
+    assert enc.lean_module_path("QBP") == "proofs/QBP.lean"
+    # a near-miss namespace is not QBP-local
+    assert enc.lean_local_imports("import QBPSprint12.X\nimport QBPX.Y\n") == []
+
+
+def test_manifest_closes_over_local_imports(tmp_path):
+    """A → B → C over `import QBP.…`; editing C (a definition the statement depends on)
+    changes pinned_sha, an unrelated QBP file does not, Mathlib never enters."""
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import Mathlib.Tactic\nimport QBP.B\ntheorem a : True := trivial\n",
+            "proofs/QBP/B.lean": "import QBP.C\ndef b := 1\n",
+            "proofs/QBP/C.lean": "def c := 1\n",
+            "proofs/QBP/U.lean": "import QBP.C\ndef u := 1\n",  # unrelated: nobody in S imports it
+            "proofs/B.v": "(* import QBP.NotScanned *)\n",  # a Coq ref is a leaf
+        },
+    )
+    a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
+    ev = [{"evidence_ref": "proofs/B.v@zzzz#thm"}]
+    c0 = git(repo, "rev-parse", "HEAD")
+    p0, s0, f0 = enc.pinned_sha_for(a, ev, repo, c0)
+    assert f0 == []
+    assert [s["path"] for s in s0] == [
+        "proofs/B.v",
+        "proofs/QBP/A.lean",
+        "proofs/QBP/B.lean",
+        "proofs/QBP/C.lean",
+    ]
+    assert not any("Mathlib" in s["path"] for s in s0)
+    # transitive member edited ⇒ pinned_sha moves
+    c1 = commit(repo, {"proofs/QBP/C.lean": "def c := 2\n"}, "edit C")
+    p1, _, _ = enc.pinned_sha_for(a, ev, repo, c1)
+    assert p1 != p0
+    # unrelated QBP file edited ⇒ unchanged
+    c2 = commit(repo, {"proofs/QBP/U.lean": "import QBP.C\ndef u := 2\n"}, "edit U")
+    p2, _, _ = enc.pinned_sha_for(a, ev, repo, c2)
+    assert p2 == p1
+    # the import set is read AT THE PINNED COMMIT, not from the working tree: adding an
+    # import in a later commit leaves the manifest at c1 untouched
+    c3 = commit(
+        repo,
+        {
+            "proofs/QBP/A.lean": "import QBP.B\nimport QBP.U\ntheorem a : True := trivial\n"
+        },
+        "A imports U",
+    )
+    p1_again, _, _ = enc.pinned_sha_for(a, ev, repo, c1)
+    assert p1_again == p1
+    p3, s3, _ = enc.pinned_sha_for(a, ev, repo, c3)
+    assert "proofs/QBP/U.lean" in [s["path"] for s in s3] and p3 != p1
+    # MUTANT GUARD: the seed-only manifest (no closure) is not the pinned_sha
+    seeds_only = [
+        f"{p} {enc.blob_sha(repo, c0, p)}\n"
+        for p in ("proofs/B.v", "proofs/QBP/A.lean")
+    ]
+    assert enc.manifest_hash_py(seeds_only) != p0
+    assert enc.manifest_hash_py([f"{s['path']} {s['blob']}\n" for s in s0]) == p0
+
+
+def test_manifest_import_cycle_terminates(tmp_path):
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import QBP.B\n",
+            "proofs/QBP/B.lean": "import QBP.C\n",
+            "proofs/QBP/C.lean": "import QBP.A\nimport QBP.B\n",
+        },
+    )
+    a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
+    c0 = git(repo, "rev-parse", "HEAD")
+    pinned, sources, flags = enc.pinned_sha_for(a, [], repo, c0)
+    assert flags == [] and len(pinned) == 40
+    assert [s["path"] for s in sources] == [
+        "proofs/QBP/A.lean",
+        "proofs/QBP/B.lean",
+        "proofs/QBP/C.lean",
+    ]
+
+
+def test_manifest_dangling_local_import_is_refused(tmp_path):
+    repo = mk_repo(tmp_path, {"proofs/QBP/A.lean": "import QBP.Missing\n"})
+    a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
+    c0 = git(repo, "rev-parse", "HEAD")
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(a, [], repo, c0, ["ev/rec.json"])
+    msg = str(ei.value)
+    assert "REFUSED" in msg and "PROOF-a" in msg and "ev/rec.json" in msg
+    assert "QBP.Missing" in msg and "proofs/QBP/Missing.lean" in msg
+    assert "proofs/QBP/A.lean" in msg  # the importing file is named
+
+
+def test_manifest_closure_end_to_end_report(tmp_path):
+    """Through `run`: the report's per-anchor S lists the imported file, and only it."""
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import QBP.Defs\ntheorem a : True := trivial\n",
+            "proofs/QBP/Defs.lean": "def d := 1\n",
+            "proofs/QBP/Other.lean": "def o := 1\n",
+        },
+    )
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/QBP/A.lean", lean_theorem="a")]
+    )
+    out = run_encoder(ledger, repo, tmp_path / "ev", tmp_path)
+    r = out["results"]["PROOF-a"]
+    assert [s["path"] for s in r["sources"]] == [
+        "proofs/QBP/A.lean",
+        "proofs/QBP/Defs.lean",
+    ]
+    assert r["pinned_sha"] == enc.manifest_hash_py(
+        [f"{s['path']} {s['blob']}\n" for s in r["sources"]]
+    )
+    md = (tmp_path / "report.md").read_text()
+    assert "proofs/QBP/Defs.lean" in md and "proofs/QBP/Other.lean" not in md
+    assert "transitive closure" in md
 
 
 def test_evidence_ref_path_parse():

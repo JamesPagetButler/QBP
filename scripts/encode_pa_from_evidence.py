@@ -24,9 +24,21 @@ Pipeline
    `attestation`/`expected_pa`/`flags` oracles are test-only and dropped).
 2. TARGETS. Anchors with `provenance_kind ∈ {proof, derivation}` ∪ ids starting `PROOF-`
    (147 at ledger 6.13.0, incl. `PROOF-hessian` which is `internal-compute`).
-3. pinned_sha (architecture ruling, live-test seq 2299 — FINAL): the claim-source MANIFEST
-   hash. S = {anchor proof_file} ∪ {SAME-REPO paths named by the claim's v2
-   evidence_refs}, deduplicated. evidence_ref grammar (§I4 ruling on PR #695, live-test
+3. pinned_sha (architecture ruling, live-test seq 2299; closure ruling live-test seq 2394
+   — FINAL): the claim-source MANIFEST hash. S = the TRANSITIVE CLOSURE, over QBP-local
+   `import QBP.…` lines, of {anchor proof_file} ∪ {SAME-REPO paths named by the claim's
+   v2 evidence_refs}, deduplicated — a claim's statement depends on the definitions its
+   file imports (the Fano headline names `fanoTableF4`, defined in FanoOrientationF3.lean),
+   so those files are part of what the evidence pinned. Module → file: `import QBP.A.B` →
+   `proofs/QBP/A/B.lean` (`LEAN_SRC_ROOT`; lakefile `lean_lib «QBP» roots := #[`QBP]`
+   under `proofs/`). Imports are read from the file content AT THE PINNED COMMIT (`git
+   cat-file blob`), never from a checkout; only `.lean` members are scanned; comments are
+   stripped and only the Lean header (imports precede every other command) is read
+   (`lean_local_imports`, `lean_module_path`). Mathlib / Std / Lean-core imports are
+   EXCLUDED — they are pinned by the lake manifest (inter#153). An imported QBP module
+   whose file does not exist at the pinned commit is a refusal naming the anchor, the
+   claim, the record and the importing file. The walk is a seen-set BFS, so an import
+   cycle terminates. evidence_ref grammar (§I4 ruling on PR #695, live-test
    seq 2342; RT C1): `[<owner>/<repo>:]<path>@<commit>#<target>` — no prefix means THIS
    repo (QBP) and only such refs enter S; a prefixed (cross-repo, e.g. the notary's Coq
    port `JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#…`) ref MUST
@@ -182,6 +194,14 @@ LEAN_ASSISTANT = "lean4"
 
 # The engine's own field names (pa.go JSON tags). Everything else on an evidence
 # assistant / record is an oracle or provenance annotation and is not an engine input.
+# seq 2394: the claim-source manifest closes over QBP-local Lean imports. Module path →
+# file under the Lake source root: `import QBP.Foundations.X` → proofs/QBP/Foundations/X.lean
+# (proofs/lakefile.lean: `lean_lib «QBP» where roots := #[`QBP]`, default srcDir "."). Only
+# modules in THIS namespace enter S; Mathlib / Std / Lean core are pinned by the lake
+# manifest (inter#153) and are excluded.
+LEAN_SRC_ROOT = "proofs"
+LEAN_LOCAL_MODULE = "QBP"
+
 ASSISTANT_KEYS = ("assistant", "evidence_ref", "producer", "trust_check", "source_sha")
 DECLARED_KEYS = ("mode", "output_hash", "axioms", "exit_code")
 DERIVED_KEYS = ("output_hash", "tactics_used", "axioms", "exit_code", "kernel_clean")
@@ -239,6 +259,97 @@ def blob_sha(repo: Path, commit: str, path: str) -> Optional[str]:
     if p.returncode != 0 or not HEX40.match(sha):
         return None
     return sha
+
+
+def blob_text(repo: Path, blob: str) -> str:
+    """Content of git blob `blob` (`git cat-file blob`) decoded as UTF-8 — the file AT the
+    pinned commit, never the working tree."""
+    p = subprocess.run(
+        ["git", "cat-file", "blob", blob],
+        cwd=str(repo),
+        capture_output=True,
+        check=False,
+    )
+    if p.returncode != 0:
+        raise Refusal(
+            f"git cat-file blob {blob} failed: {p.stderr.decode('utf-8', 'replace')}"
+        )
+    return p.stdout.decode("utf-8", errors="replace")
+
+
+def strip_lean_comments(text: str) -> str:
+    """Drop `/- … -/` block comments (nested, as Lean nests them; `/-- … -/` doc comments
+    included) and `-- …` line comments, so a commented-out `import` is never followed.
+    """
+    out: List[str] = []
+    i, n, depth = 0, len(text), 0
+    while i < n:
+        if text.startswith("/-", i):
+            depth += 1
+            i += 2
+            continue
+        if depth:
+            if text.startswith("-/", i):
+                depth -= 1
+                i += 2
+            else:
+                i += 1
+            continue
+        if text.startswith("--", i):
+            j = text.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        out.append(text[i])
+        i += 1
+    return "".join(out)
+
+
+def lean_local_imports(text: str) -> List[str]:
+    """The QBP-local modules a Lean file imports, in order, deduplicated (seq 2394).
+
+    Reads the HEADER only — Lean puts every `import` (after an optional `prelude`) before
+    the first other command, so the scan stops at the first non-import token. A module
+    counts iff it is `QBP` or starts with `QBP.`; `Mathlib.…`, `Std.…`, `Lean.…` and the
+    Sprint12-Inherited roots are not QBP-local and are skipped (pinned by the lake
+    manifest, inter#153). `import runtime X` and `«quoted»` names are tolerated."""
+    toks = strip_lean_comments(text).split()
+    mods: List[str] = []
+    i = 0
+    while i < len(toks):
+        t = toks[i]
+        if t == "prelude":
+            i += 1
+            continue
+        if t != "import":
+            break
+        i += 1
+        if i < len(toks) and toks[i] == "runtime":
+            i += 1
+        if i >= len(toks):
+            break
+        m = toks[i].replace("«", "").replace("»", "")
+        i += 1
+        if (
+            m == LEAN_LOCAL_MODULE or m.startswith(LEAN_LOCAL_MODULE + ".")
+        ) and m not in mods:
+            mods.append(m)
+    return mods
+
+
+def lean_module_path(module: str) -> str:
+    """`QBP.Foundations.X` → `proofs/QBP/Foundations/X.lean` (one rule; `LEAN_SRC_ROOT`)."""
+    return f"{LEAN_SRC_ROOT}/{module.replace('.', '/')}.lean"
+
+
+_IMPORTS_BY_BLOB: Dict[str, List[str]] = {}
+
+
+def lean_local_imports_of_blob(repo: Path, blob: str) -> List[str]:
+    """`lean_local_imports` of a git blob, memoised by blob sha (content-addressed, so
+    148 anchors sharing a few dozen files read each file once per run)."""
+    if blob not in _IMPORTS_BY_BLOB:
+        _IMPORTS_BY_BLOB[blob] = lean_local_imports(blob_text(repo, blob))
+    return _IMPORTS_BY_BLOB[blob]
 
 
 def manifest_hash(repo: Path, lines: List[str]) -> str:
@@ -702,9 +813,8 @@ def pinned_sha_for(
     )
     has_evidence = bool(assistants)
     proof_file = anchor.get("proof_file")
-    paths: Dict[str, str] = (
-        OrderedDict()
-    )  # path -> origin ("proof_file" | "evidence_ref")
+    # seeds: path -> origin ("proof_file" | "evidence_ref"); the closure adds "import"s
+    paths: Dict[str, str] = OrderedDict()
     if isinstance(proof_file, str) and proof_file:
         paths[proof_file] = "proof_file"
     for a in assistants:
@@ -718,16 +828,39 @@ def pinned_sha_for(
             continue
         p = evidence_ref_path(ref)
         paths.setdefault(p, "evidence_ref")
+    # seq 2394: S = the transitive closure of the seeds over QBP-local `import QBP.…`
+    # lines, read from each member's content AT the pinned commit. Seen-set BFS: a cycle
+    # terminates; a file reached twice enters once. Only `.lean` members are scanned (a
+    # Coq / Agda ref is a leaf); Mathlib / Std / Lean-core imports are not QBP modules and
+    # never enter (lake-manifest pinned, inter#153).
+    imported_from: Dict[str, Tuple[str, str]] = (
+        {}
+    )  # dep path -> (importer path, module)
     sources: List[Dict[str, str]] = []
-    for path in sorted(paths):
+    seen: set = set()
+    queue: List[str] = list(paths)
+    while queue:
+        path = queue.pop(0)
+        if path in seen:
+            continue
+        seen.add(path)
         blob = blob_sha(repo, commit, path)
         if blob is None:
-            if paths[path] == "evidence_ref":
+            origin = paths.get(path, "import")
+            if origin == "evidence_ref":
                 raise Refusal(
                     f"{anchor['id']}: evidence_ref path {path!r} does not exist at pinned "
                     f"master {commit[:12]}{where}; pinned_sha cannot be computed for "
                     "evidence that names a file the pinned tree does not have (S covers "
                     "every same-repo ref of the record, dropped or kept)"
+                )
+            if origin == "import":
+                importer, module = imported_from[path]
+                raise Refusal(
+                    f"{anchor['id']}: {importer!r} imports QBP module {module!r} → {path!r}, "
+                    f"which does not exist at pinned master {commit[:12]}{where}; the "
+                    "claim-source manifest S closes over QBP-local imports (seq 2394) and "
+                    "cannot be computed over a dangling import"
                 )
             if has_evidence:
                 raise Refusal(
@@ -738,6 +871,14 @@ def pinned_sha_for(
             flags.append("no_proof_file")
             continue
         sources.append({"path": path, "blob": blob})
+        if path.endswith(".lean"):
+            for module in lean_local_imports_of_blob(repo, blob):
+                dep = lean_module_path(module)
+                if dep in seen or dep in paths:
+                    continue
+                imported_from.setdefault(dep, (path, module))
+                queue.append(dep)
+    sources.sort(key=lambda s_: s_["path"])
     if not sources:
         if not has_evidence and "no_proof_file" not in flags:
             flags.append("no_proof_file")
@@ -851,8 +992,9 @@ def grade_ledger(
             else None
         )
         rflags: List[str] = []
-        # RT C4: S = proof_file ∪ the CLAIM's same-repo refs (seq 2299) — over EVERY
-        # assistant of the merged record, BEFORE the target filter. The filter decides
+        # RT C4: S = the QBP-local import closure of proof_file ∪ the CLAIM's same-repo
+        # refs (seq 2299 / 2394) — over EVERY assistant of the merged record, BEFORE the
+        # target filter. The filter decides
         # who reaches the engine; it never shrinks the manifest (a dropped companion
         # must not false-flag the on-target survivor `stale`).
         pinned, sources, pflags = pinned_sha_for(
@@ -1002,7 +1144,8 @@ def changelog_note(
         f"Grade distribution (pa_local/pa_effective: count) — {d}. pa_local = GradeClaim(...).pa "
         f"on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain "
         f"edges typed derivation (conservative); pinned_sha = claim-source manifest hash "
-        f"(sorted `path blob` lines, git hash-object --stdin; architecture ruling seq 2299), "
+        f"(S = QBP-local import closure of proof_file ∪ same-repo evidence files; sorted "
+        f"`path blob` lines, git hash-object --stdin; architecture rulings seq 2299/2394), "
         f"not stored. Computed by tools/cth-pa ({engine_id}); never hand-set — a wrong grade is "
         f"fixed by new or corrected evidence in inter/notary-evidence/, never by editing "
         f"the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind "
@@ -1150,9 +1293,12 @@ def build_report(
             ("evidence_for_non_target", non_target),
             (
                 "pinned_sha_convention",
-                "claim-source manifest hash: S = {proof_file} ∪ {SAME-REPO evidence_ref "
-                "paths — grammar [<owner>/<repo>:]<path>@<commit>#<target>, no prefix = "
-                "QBP; cross-repo refs never enter S (seq 2342)}; "
+                "claim-source manifest hash: S = the transitive closure, over QBP-local "
+                "`import QBP.…` lines read at the pinned commit (`import QBP.A.B` → "
+                "proofs/QBP/A/B.lean; Mathlib/Std/Lean-core excluded, lake-manifest "
+                "pinned), of {proof_file} ∪ {SAME-REPO evidence_ref paths — grammar "
+                "[<owner>/<repo>:]<path>@<commit>#<target>, no prefix = QBP; cross-repo "
+                "refs never enter S (seq 2342)} (ruling seq 2394); "
                 "lines `path <git rev-parse <commit>:path>\\n` sorted by path; "
                 "pinned_sha = git hash-object --stdin over the lines (ruling seq 2299)",
             ),
