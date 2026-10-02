@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.14.0",
+  "version": "6.16.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -12242,6 +12242,61 @@
       },
       "pa_local": 0,
       "pa_effective": 0
+    },
+    {
+      "id": "PROOF-fano-table-equals-cd-products",
+      "name": "The Fano/F3 multiplication table fanoTableF4 equals the Cayley–Dickson products at level 3: for all basis indices i, j, Omul (e i) (e j) = signedBasis (fanoTableF4 i j) — kernel decide, closure [propext]. This is the table qbp-compute-unit bakes into its octonion ROMs / FANO opcode (consumer pin: gcg-fano-proof-tie.yml checks out QBP and requires fanoTableF4.snapshot + fanoTableF4.axioms.txt, fail-closed)",
+      "tier": 1,
+      "layer_tag": "T",
+      "provenance": "T",
+      "status": "coherent",
+      "description": "proofs/QBP/Foundations/FanoOrientationF3.lean (Foundations layer, namespace QBP.Foundations.FanoOrientationF3; the file has NO imports — core Lean only, no Mathlib, so nothing in the ledger sits upstream of it). Statement: `fanoTableF4_eq_cayleyDickson : ∀ i j : Fin 8, Omul (e i) (e j) = signedBasis (fanoTableF4 i j)`, where `fanoTableF4 : Fin 8 → Fin 8 → Int × Fin 8` is the verbatim transcription of the F4 doc table (docs/conventions/fano-orientation.md: 64 entries (sign, index); 0 = e₀, 1..7 = e₁..e₇), `Omul` is the literal F3 doubling product (a₁,a₂)(b₁,b₂) = (a₁b₁ − conj(b₂)·a₂, b₂·a₁ + a₂·conj(b₁)) applied along ℝ → ℂ → ℍ → 𝕆 on nested Int pairs (docs/conventions/cd-doubling.md; ℍ-triad e₁ = i, e₂ = j, e₃ = k), `e i` the octonion with a 1 in coordinate i, and `signedBasis (s, k)` = s·e_k. Proof shape: one kernel `decide` over the 64 basis pairs — finite data with decidable equality; no native_decide, no sorry, no vacuous `True`; `#print axioms` = [propext] (Classical.choice and Quot.sound do not occur: nothing in the file is classical). Consequence: the F4 orientation (the seven oriented triples 123, 145, 167, 246, 257, 347, 356) is FORCED by F3, not pinned from the literature. Snapshot / attestation pipeline: proofs/FanoSnapshotGen.lean (`snapLines`; deliberately outside the QBP.Foundations aggregator, run via `lake env lean`) emits the 64 lines `i j sign index` from fanoTableF4 plus the `#print axioms` lines of fanoTableF4_eq_cayleyDickson and CDAlg.mulCoeff_three_eq_fano; scripts/regen_fano_snapshot.sh writes them to proofs/QBP/Foundations/fanoTableF4.snapshot and proofs/QBP/Foundations/fanoTableF4.axioms.txt; .github/workflows/fano-snapshot-drift.yml rebuilds FanoOrientationF3 + CDAlg on every change to those files and hard-fails on any diff (producer-side tamper evidence, QBP #604 / qbp-cu #65). Consumer pin — the reach of this anchor: qbp-compute-unit's required check `.github/workflows/gcg-fano-proof-tie.yml` (qbp-cu issue #59) checks out JamesPagetButler/QBP, hard-fails if fanoTableF4.snapshot is absent on a successful fetch or if fanoTableF4.axioms.txt is missing, does not reference fanoTableF4_eq_cayleyDickson, or lists any axiom outside {propext, Classical.choice, Quot.sound}, then runs emulator/fano_proof_tie_test.go (TestFanoProofTie_MatchesKernelProvenTable with FANO_SNAPSHOT set): it parses exactly 64 rows and compares every entry against the octonion ROMs (roms/octonion_idx.hex, 64 indices; roms/octonion_signs.hex, 49 imaginary signs) and the emulator fanoLUT behind the FANO ISA opcode, plus the XOR-index and identity-row invariants; only a failed QBP checkout soft-passes (infra, not drift; escalating to hard fail after 3 consecutive — qbp-cu #66/#68). The chain the silicon rests on is therefore CD product (kernel decide) → fanoTableF4 → snapshot → ROMs + fanoLUT → FANO opcode, and THIS theorem is the link the consumer pins; qbp-compute-unit#77 maps its ROM↔claim entry to this id. Relation to PROOF-cd-structure-constant-tables: that anchor's headline `QBP.Foundations.CDAlg.mulCoeff_three_eq_fano` states `mulCoeff 3 i j = (fanoTableF4 i j).1` — the structure-constant recursion agrees with the SIGN column of this same table (proofs/QBP/Foundations/CDAlg.lean imports FanoOrientationF3; one Lean kernel covers both today). Chain direction, read from the two statements (direction evidence): CDAlg.lean:33 imports FanoOrientationF3; CDAlg.lean:145-148 names the DEFINITION fanoTableF4, not this theorem, and is closed `by decide` (l.148); FanoOrientationF3.lean:150-152 is closed `by decide` and the file imports nothing. Neither proof uses the other theorem — two independent kernel decides over the same table definition — so there is NO derivation edge between the two anchors in either direction: this anchor's prediction_chain is empty and PROOF-cd-structure-constant-tables is not edited (#693 drafted the edge NEW → PROOF-cd-structure-constant-tables; as a derivation edge that would have let the #692 PA engine cap this anchor at the mulCoeff anchor's grade — the outcome ruling (b) exists to prevent — and no such dependence exists). The relation is recorded here in prose only; a typed relevance edge arrives with the Phase-1 edge typing. The two anchors are separate because they are pinned separately: the consumer pins the table (this anchor), the Coq cross-prover re-proves the table, and neither sees mulCoeff. NOT claimed: anything about `mulCoeff` or the structure-constant recursion (mulCoeff_three_eq_fano, mulCoeff_four_eq_sgnTable — the headline of PROOF-cd-structure-constant-tables; its second-kernel port is follow-up (a) of the QBP#692 ruling, the notary's call on cost); the other FanoOrientationF3 theorems (cayleyDickson8_sq_neg_one, cayleyDickson8_alternative_on_basis, fanoTriples_oriented, archiveTable_disagrees_cd) stay companions of PROOF-cd-structure-constant-tables and are not re-anchored here; the Coq cross-prover record (notary cycle 8) is EVIDENCE for this claim, attached via `proof_assistants` by the QBP#692 encoder (scripts/encode_pa_from_evidence.py) once promoted into inter/notary-evidence/, never claimed by this record; the ROM contents themselves (that is qbp-compute-unit's gate, not a QBP theorem).",
+      "prediction_chain": [],
+      "provenance_kind": "proof",
+      "proof_system": "lean4",
+      "proof_language": "lean4",
+      "proof_file": "proofs/QBP/Foundations/FanoOrientationF3.lean",
+      "sorry_count": 0,
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson",
+      "lean_companion_theorems": [
+        "QBP.Foundations.FanoOrientationF3.fanoTableF4",
+        "QBP.Foundations.FanoOrientationF3.Omul",
+        "QBP.Foundations.FanoOrientationF3.e",
+        "QBP.Foundations.FanoOrientationF3.signedBasis"
+      ],
+      "theorems": [
+        {
+          "name": "fanoTableF4_eq_cayleyDickson",
+          "status": "verified"
+        }
+      ],
+      "foundation_batch": "#693-fano-table-anchor",
+      "last_tested_at": "2026-10-02T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          }
+        },
+        "verified_at": "2026-10-02T00:00:00Z",
+        "verifier": "run-bounded 6G 1800 taskset -c 3-5 lake build QBP.Foundations.FanoOrientationF3 — exit 0, 2 jobs (fresh worktree .lake: one-time Mathlib cache fetch 8283 files / 422 s, then the module in 11 s; the module itself imports nothing); `#print axioms QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson` via `run-bounded 4G 600 lake env lean` on a scratch file = [propext] (matches the committed proofs/QBP/Foundations/fanoTableF4.axioms.txt attestation line); statement re-read fully qualified (`#check` with full names) — Omul / e / signedBasis / fanoTableF4 all resolve in QBP.Foundations.FanoOrientationF3, Omul the F3 doubling on H × H; 0 sorry, 0 native_decide, 0 vacuous `True`; gates 0 — check_lean_foundations.py exit 0, check_layer_imports.py exit 0 (qbp-implementor, 2026-10-02, isolated worktree probe-692-pa, branch cth/692-pa-encoder-backfill; #693, ruling (b) on QBP#692 live-test seq 2315/2316/2323; pending Tier-3 review with the #692 PR — #693 AC3)",
+        "result": "verified",
+        "axiom_closure": [
+          "propext"
+        ],
+        "witnesses": [
+          "QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson",
+          "QBP.Foundations.FanoOrientationF3.fanoTableF4",
+          "QBP.Foundations.FanoOrientationF3.Omul",
+          "QBP.Foundations.FanoOrientationF3.e",
+          "QBP.Foundations.FanoOrientationF3.signedBasis"
+        ]
+      },
+      "pa_local": 0,
+      "pa_effective": 0
     }
   ],
   "inputs": [
@@ -12838,6 +12893,16 @@
       "version": "6.14.0",
       "date": "2026-10-02T00:00:00Z",
       "note": "#692: PA backfill of 147 proof/derivation anchors (147 records changed) from 0 v2 notary evidence records at pinned master f4525328cc5361ffa04e6e215a03f0ec45181032. Grade distribution (pa_local/pa_effective: count) — 0/0: 147. pa_local = GradeClaim(...).pa on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain edges typed derivation (conservative); pinned_sha = claim-source manifest hash (sorted `path blob` lines, git hash-object --stdin; architecture ruling seq 2299), not stored. Computed by tools/cth-pa (confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158); never hand-set — a wrong grade is fixed by new or corrected evidence in inter/notary-evidence/, never by editing the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind proof/derivation anchors WITH evidence; internal-compute anchors (PROOF-hessian) carry grades only (cth ruling 2026-10-02)."
+    },
+    {
+      "version": "6.15.0",
+      "date": "2026-10-02T00:00:00Z",
+      "note": "#693: PROOF-fano-table-equals-cd-products minted (Foundations) — the companion Fano table the silicon pins; no existing anchor changed. Ruling (b) on QBP#692 (qbp-architecture, live-test seq 2315/2316/2323, 2026-10-02; staleness key = claim-source manifest, issuecomment-5954304165): an anchor must name what the consumer actually pins. qbp-compute-unit's gcg-fano-proof-tie.yml pins fanoTableF4.snapshot + fanoTableF4.axioms.txt, i.e. QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson (∀ i j : Fin 8, Omul (e i) (e j) = signedBasis (fanoTableF4 i j); kernel decide; #print axioms = [propext]) — not CDAlg.mulCoeff_three_eq_fano, the headline of PROOF-cd-structure-constant-tables. MINTED: proof_file proofs/QBP/Foundations/FanoOrientationF3.lean, companions fanoTableF4 / Omul / e / signedBasis (the declarations the statement names), verification from the bounded build of 2026-10-02, manifest entry added. CHAIN DIRECTION: #693 drafted the edge NEW → PROOF-cd-structure-constant-tables; read from the statements, CDAlg.lean:33 imports FanoOrientationF3, CDAlg.lean:145-148 names the DEFINITION fanoTableF4 (not this theorem) and is `by decide`, FanoOrientationF3.lean:150-152 is `by decide` with no imports — neither proof uses the other theorem, so no derivation edge exists in either direction (a chain entry is a derivation edge the #692 engine folds; the drafted direction would have let it cap the companion at the mulCoeff anchor's grade — the outcome ruling (b) prevents). Encoded accordingly: PROOF-fano-table-equals-cd-products.prediction_chain = [], PROOF-cd-structure-constant-tables untouched; the relation (same table definition, one kernel today, separately pinned) is prose in the new anchor's description; a typed relevance edge comes with the Phase-1 edge typing. NOT claimed by the new anchor: mulCoeff / the structure-constant recursion (follow-up (a) of the QBP#692 ruling, the mulCoeff n=3 Coq port, notary's call); the Coq cross-prover record (notary cycle 8) is evidence attached by the #692 encoder when promoted, not a claim here. pa_local / pa_effective on the new anchor are NOT set by this encode — the #692 encoder (scripts/encode_pa_from_evidence.py) grades it on the next run (0/0 until the cycle-8 v2 record lands). qbp-compute-unit#77: the silicon gate's ROM↔claim map targets this id. (Version 6.15.0: encoded on 6.14.0/344 → 345.)"
+    },
+    {
+      "version": "6.16.0",
+      "date": "2026-10-02T00:00:00Z",
+      "note": "#692: PA backfill of 148 proof/derivation anchors (1 records changed) from 0 v2 notary evidence records at pinned master f4525328cc5361ffa04e6e215a03f0ec45181032. Grade distribution (pa_local/pa_effective: count) — 0/0: 148. pa_local = GradeClaim(...).pa on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain edges typed derivation (conservative); pinned_sha = claim-source manifest hash (sorted `path blob` lines, git hash-object --stdin; architecture ruling seq 2299), not stored. Computed by tools/cth-pa (confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158); never hand-set — a wrong grade is fixed by new or corrected evidence in inter/notary-evidence/, never by editing the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind proof/derivation anchors WITH evidence; internal-compute anchors (PROOF-hessian) carry grades only (cth ruling 2026-10-02)."
     }
   ],
   "last_updated": "2026-10-02T00:00:00Z",

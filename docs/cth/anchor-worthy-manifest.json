@@ -1367,6 +1367,18 @@
         "QBP.Substrate.RuleFlowBridge.gradVof_eq_gradV",
         "QBP.Substrate.RuleFlowBridge.smul_self_add_smul_gradV_mem_kernelAlgebra"
       ]
+    },
+    {
+      "anchor_id": "PROOF-fano-table-equals-cd-products",
+      "declared_by": "#693-fano-table-anchor",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson",
+        "QBP.Foundations.FanoOrientationF3.fanoTableF4",
+        "QBP.Foundations.FanoOrientationF3.Omul",
+        "QBP.Foundations.FanoOrientationF3.e",
+        "QBP.Foundations.FanoOrientationF3.signedBasis"
+      ]
     }
   ]
 }
