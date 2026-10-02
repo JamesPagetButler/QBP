@@ -1,0 +1,60 @@
+# .github/workflows/pa-reconcile.yml
+# QBP#692 — the PA (proof-assurance) gate. Builds, vets and tests the vendored
+# confluent-trust engine and the pa-reconcile gate, then runs the vendor
+# check-of-record: a byte-diff of every vendored file against confluent-trust at
+# the pinned sha (the engine source, not just the schema, is byte-pinned), plus a
+# tamper mutant proving the check bites. confluent-trust is public, so CI fetches
+# upstream directly — the check is independent of whoever did the vendor copy.
+name: pa-reconcile
+
+on:
+  pull_request:
+    paths:
+      - 'tools/cth-pa/**'
+      - '.github/workflows/pa-reconcile.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'tools/cth-pa/**'
+      - '.github/workflows/pa-reconcile.yml'
+
+permissions:
+  contents: read
+
+env:
+  # The vendored engine's pin (confluent-trust#108 @ this sha). It must equal
+  # tools/cth-pa/VENDOR.meta.json's source_sha; the check-of-record enforces that.
+  CT_PIN: 13de2f728707cd4431e0116126c530247f132158
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout QBP
+        uses: actions/checkout@v4
+
+      - name: Checkout confluent-trust at the pin
+        uses: actions/checkout@v4
+        with:
+          repository: JamesPagetButler/confluent-trust
+          ref: ${{ env.CT_PIN }}
+          path: _upstream_ct
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+
+      - name: go vet + test
+        working-directory: tools/cth-pa
+        run: |
+          go vet ./...
+          go test ./...
+
+      - name: Vendor check-of-record (upstream byte-diff at the pin)
+        working-directory: tools/cth-pa
+        run: scripts/check_vendor_upstream.sh "$GITHUB_WORKSPACE/_upstream_ct" "$CT_PIN"
+
+      - name: Vendor tamper mutant test
+        working-directory: tools/cth-pa
+        run: scripts/check_vendor_upstream_test.sh "$GITHUB_WORKSPACE/_upstream_ct" "$CT_PIN"
