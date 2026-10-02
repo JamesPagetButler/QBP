@@ -24,6 +24,9 @@ Each test names the AC / ruling it pins:
   RT N10  a dry run never writes the committed report
   RT N11  an anchor without lean_theorem admits nothing — one flag `no_lean_theorem`
   N3   never an empty proof_assistants array; evidence for non-target anchors is reported
+  RT C7 / seq 2386  the engine counts assistants, not kernels: survivors collapse to one
+            per prover kind before grading — [coq, coq] → 1 (mutant → 2); Fano → 2
+  RT N18  the dry-run scratch cleanup is REGISTERED with atexit (not just callable)
 """
 
 from __future__ import annotations
@@ -1992,3 +1995,168 @@ def test_no_lean_theorem_anchor_admits_nothing_and_is_counted(tmp_path):
         if a["id"] == "PROOF-hurwitz"
     ][0]
     assert h["pa_local"] == 0 and "proof_assistants" not in h
+
+
+# ---------------------------------------------------------------------------------------
+# RT C7 (architecture ruling live-test seq 2386; Gemini concurs) — the engine's
+# GradeClaim counts clean ASSISTANTS, not kernels: collapse survivors to one per kind.
+# ---------------------------------------------------------------------------------------
+COQ_REF_2 = (
+    "JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#"
+    "fano_table_cross_prover_alt"
+)
+TWO_COQ_MAPS = GOOD_MAPS + [
+    {"target": "fano_table_cross_prover_alt", "lean_theorem": COMPANION}
+]
+
+
+def test_C7_collapse_unit():
+    coq1 = {"assistant": "coq", "evidence_ref": COQ_REF}
+    coq2 = {"assistant": "coq", "evidence_ref": COQ_REF_2}
+    lean = {"assistant": "lean4", "evidence_ref": FANO_LEAN_FQ}
+    agda = {"assistant": "agda", "evidence_ref": "x.agda@a#t"}
+    # first of a kind survives, in order; later same-kind entries are flagged
+    kept, flags = enc.collapse_to_one_per_kernel([coq1, coq2])
+    assert kept == [coq1] and flags == ["same_kernel_duplicate:coq"]
+    kept, flags = enc.collapse_to_one_per_kernel([coq1, coq1])  # listed twice
+    assert kept == [coq1] and flags == ["same_kernel_duplicate:coq"]
+    kept, flags = enc.collapse_to_one_per_kernel([lean, coq1, coq2, lean, agda])
+    assert kept == [lean, coq1, agda]
+    assert flags == ["same_kernel_duplicate:coq", "same_kernel_duplicate:lean4"]
+    # distinct kinds are untouched (the Fano pair)
+    assert enc.collapse_to_one_per_kernel([lean, coq1]) == ([lean, coq1], [])
+    assert enc.collapse_to_one_per_kernel([]) == ([], [])
+
+
+def _coq_only_record(claim, pin, refs, maps):
+    """Fixture-06 shape with the lean4 entry REMOVED and one Coq entry per ref (the
+    same Coq entry listed twice when refs repeat); maps planted; source_sha = pin."""
+    doc = fixture("06_valid_pair_fano.json")
+    doc["claim"] = claim
+    _lean, coq = doc["proof_assistants"]
+    out = []
+    for ref in refs:
+        c = json.loads(json.dumps(coq))
+        c["evidence_ref"] = ref
+        c["source_sha"] = pin
+        out.append(c)
+    doc["proof_assistants"] = out
+    doc["correspondence"]["maps"] = maps
+    return doc
+
+
+def test_C7_two_coq_assistants_are_one_kernel_end_to_end(tmp_path, monkeypatch):
+    """[coq, coq] (two distinct Coq lemmas, each with its own maps entry, no lean4)
+    → PA 1 with flag `same_kernel_duplicate:coq`, array carries ONE coq entry; the same
+    Coq assistant listed twice → PA 1; mutant (collapse removed) → the engine grades 2
+    from a single kernel; positive control: Fano lean4 + coq → 2 unchanged."""
+    cd_file = "proofs/QBP/Foundations/CDAlg.lean"
+    repo = mk_repo(tmp_path, {FANO_FILE: "decide\n", cd_file: "decide\n"})
+    head = git(repo, "rev-parse", "HEAD")
+    companion = fano_anchor()
+    pin, _, _ = enc.pinned_sha_for(
+        companion, [{"evidence_ref": COQ_REF}, {"evidence_ref": COQ_REF_2}], repo, head
+    )
+
+    def grade(sub, refs, maps):
+        ev = tmp_path / sub / "ev"
+        plant(ev, "fano.json", _coq_only_record(companion["id"], pin, refs, maps))
+        ledger = mk_ledger(tmp_path / sub, [companion])
+        out = run_encoder(ledger, repo, ev, tmp_path / sub)
+        by = {a["id"]: a for a in json.loads(ledger.read_text())["anchors"]}
+        return out["results"][companion["id"]], by[companion["id"]], out
+
+    # (1) two distinct Coq lemmas, both admissible via maps, no lean4 → ONE kernel → 1
+    (tmp_path / "two").mkdir()
+    r, a, out = grade("two", [COQ_REF, COQ_REF_2], TWO_COQ_MAPS)
+    assert (r["pa"], r["effective_pa"]) == (1, 1), r["flags"]
+    assert r["report_flags"].count("same_kernel_duplicate:coq") == 1
+    assert not any(f.startswith("target_not_headline") for f in r["report_flags"])
+    assert [x["evidence_ref"] for x in a["proof_assistants"]] == [COQ_REF]  # first
+    assert [x["assistant"] for x in r["assistants"]] == ["coq"]  # engine saw one
+    assert [
+        (d["assistant"], d["evidence_ref"]) for d in r["evidence"]["dropped_assistants"]
+    ] == [("coq", COQ_REF_2)]
+    md = (tmp_path / "two" / "report.md").read_text()
+    assert "same_kernel_duplicate:coq" in md and COQ_REF_2 in md
+    assert r["pinned_sha"] == pin  # C4: the collapse did not change S
+    # (2) the SAME Coq assistant listed twice → still 1, still flagged
+    (tmp_path / "same").mkdir()
+    r2, a2, _ = grade("same", [COQ_REF, COQ_REF], GOOD_MAPS)
+    assert (r2["pa"], r2["effective_pa"]) == (1, 1), r2["flags"]
+    assert "same_kernel_duplicate:coq" in r2["report_flags"]
+    assert len(a2["proof_assistants"]) == 1
+    # (3) MUTANT — collapse removed: the engine counts the two Coq assistants and grades
+    # 2 from one kernel. This is the defect C7 names; with the collapse in place the
+    # assertions above hold and this one shows the guard is load-bearing.
+    monkeypatch.setattr(enc, "collapse_to_one_per_kernel", lambda kept: (kept, []))
+    (tmp_path / "mut").mkdir()
+    r3, a3, _ = grade("mut", [COQ_REF, COQ_REF_2], TWO_COQ_MAPS)
+    assert r3["pa"] == 2 and len(a3["proof_assistants"]) == 2
+    assert "same_kernel_duplicate:coq" not in r3["report_flags"]
+    monkeypatch.undo()
+    # (4) positive control — the real Fano pair (lean4 + coq, two kinds) → 2 unchanged
+    (tmp_path / "pos").mkdir()
+    doc = fixture("06_valid_pair_fano.json")
+    doc["claim"] = companion["id"]
+    lean, coq = doc["proof_assistants"]
+    lean["evidence_ref"] = f"{FANO_FILE}@{head}#{COMPANION}"
+    coq["evidence_ref"] = COQ_REF
+    for x in (lean, coq):
+        x["source_sha"] = pin
+    doc["correspondence"]["maps"] = GOOD_MAPS
+    ev = tmp_path / "pos" / "ev"
+    plant(ev, "fano.json", doc)
+    ledger = mk_ledger(tmp_path / "pos", [companion])
+    r4 = run_encoder(ledger, repo, ev, tmp_path / "pos")["results"][companion["id"]]
+    assert (r4["pa"], r4["effective_pa"]) == (2, 2), r4["flags"]
+    assert not any(f.startswith("same_kernel_duplicate") for f in r4["report_flags"])
+    assert [
+        x["assistant"]
+        for x in json.loads(ledger.read_text())["anchors"][0]["proof_assistants"]
+    ] == ["lean4", "coq"]
+
+
+# ---------------------------------------------------------------------------------------
+# RT N18 — the dry-run scratch cleanup is REGISTERED with atexit, not merely callable
+# ---------------------------------------------------------------------------------------
+def test_N18_dry_run_registers_atexit_cleanup(tmp_path, monkeypatch):
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="t")]
+    )
+    monkeypatch.setattr(enc, "REPORT_DIR", tmp_path / "committed")
+    ev = tmp_path / "ev"
+    ev.mkdir()
+    enc.cleanup_dry_run_scratch()  # start from no scratch (registration is once-only)
+    assert enc._DRY_RUN_SCRATCH == []
+    registered: list = []
+    monkeypatch.setattr(
+        enc.atexit, "register", lambda fn, *a, **k: registered.append(fn)
+    )
+    base = [
+        "--evidence-dir",
+        str(ev),
+        "--pinned-master",
+        "HEAD",
+        "--ledger",
+        str(ledger),
+        "--repo",
+        str(repo),
+        "--dry-run",
+    ]
+    # --dry-run without --report: the scratch dir exists AND its cleanup is registered
+    assert enc.main(base) == 0
+    assert registered == [enc.cleanup_dry_run_scratch]
+    assert len(enc._DRY_RUN_SCRATCH) == 1 and enc._DRY_RUN_SCRATCH[0].exists()
+    # a second scratch dir in the same process registers nothing new (one hook suffices)
+    assert enc.main(base) == 0
+    assert registered == [enc.cleanup_dry_run_scratch]
+    assert len(enc._DRY_RUN_SCRATCH) == 2
+    gone = enc.cleanup_dry_run_scratch()
+    assert len(gone) == 2 and not any(d.exists() for d in gone)
+    # --dry-run WITH --report: nothing registered, no scratch dir
+    registered.clear()
+    assert enc.main(base + ["--report", str(tmp_path / "keep.md")]) == 0
+    assert registered == [] and enc._DRY_RUN_SCRATCH == []
+    assert (tmp_path / "keep.md").exists()

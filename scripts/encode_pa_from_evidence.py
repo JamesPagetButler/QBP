@@ -94,6 +94,16 @@ Pipeline
    side flag `no_lean_theorem` (RT N11: the defect is the anchor's, not the evidence's);
    the report counts these anchors (`targets_without_lean_theorem`; 22 at ledger 6.16.0,
    all `theory` / `theory-external` with no Lean `proof_file`).
+3c. KERNEL COLLAPSE (RT C7, issuecomment-5962978225; architecture ruling live-test seq
+   2386; Gemini concurs issuecomment-5963015465): the vendored engine's `GradeClaim`
+   counts clean ASSISTANTS, not distinct kernels — `[coq, coq]` (two Coq lemmas, or one
+   Coq entry listed twice) with no lean4 would grade PA 2 from a single kernel. PA 2
+   means "two independent kernels agree", so after the target filter the survivors are
+   collapsed to the FIRST admissible assistant per prover kind (the `assistant` field);
+   every later same-kind survivor is dropped with report flag
+   `same_kernel_duplicate:<kind>` (`collapse_to_one_per_kernel`, ONE function). The
+   collapse runs before the engine Claim is built and before the ledger array is planned,
+   so neither ever sees the duplicate. Fano lean4 + coq is untouched (two kinds).
 4. ENGINE. One `pa.Claim` per target anchor {claim, consumer "qbp#692-ci", pinned_sha,
    proof_assistants, correspondence, corroborated_by}. Edges: every `prediction_chain`
    entry (id → target) whose target is also a target anchor, typed `derivation`. This is
@@ -108,7 +118,7 @@ Pipeline
 5. WRITE (confined). For every target anchor `pa_local` = engine `pa`, `pa_effective` =
    engine `effective_pa` (integers). `proof_assistants` = the ledger-shape array
    [{assistant, evidence_ref, trust_check, source_sha, producer}] over the assistants that
-   SURVIVED the target filter, ONLY when (a) at least one did (an empty array is never
+   SURVIVED the target filter AND the kernel collapse (§3c), ONLY when (a) at least one did (an empty array is never
    written — the key is omitted and the report flags `no_admissible_evidence`; RT N3b)
    AND (b) `provenance_kind ∈ {proof, derivation}` — on
    `internal-compute` (PROOF-hessian) the two grades are written and the array NEVER is
@@ -636,6 +646,28 @@ def filter_assistants_by_target(
     return kept, dropped
 
 
+def collapse_to_one_per_kernel(
+    kept: List[Dict[str, Any]],
+) -> Tuple[List[Dict[str, Any]], List[str]]:
+    """RT C7 (architecture ruling seq 2386; module doc §3c): the engine's GradeClaim
+    counts clean ASSISTANTS, not kernels, so `[coq, coq]` with no lean4 would reach PA 2
+    from one kernel. Keep the FIRST admissible assistant per prover kind (`assistant`),
+    in order; every later same-kind survivor is dropped with flag
+    `same_kernel_duplicate:<kind>`. Runs AFTER `filter_assistants_by_target` and BEFORE
+    the engine Claim / ledger array are built. ONE function; a ruling flips it here."""
+    seen: set = set()
+    out: List[Dict[str, Any]] = []
+    flags: List[str] = []
+    for a in kept:
+        kind = a.get("assistant")
+        if kind in seen:
+            flags.append(f"same_kernel_duplicate:{kind if kind else '?'}")
+            continue
+        seen.add(kind)
+        out.append(a)
+    return out, flags
+
+
 # ---------------------------------------------------------------------------------------
 # targets, pinned_sha, edges
 # ---------------------------------------------------------------------------------------
@@ -834,6 +866,10 @@ def grade_ledger(
             kept, dropped = filter_assistants_by_target(
                 a, ev["assistants"], ev["correspondence"], ev["correspondence_maps"]
             )
+            # RT C7 (seq 2386): one assistant per prover kind reaches the engine and
+            # the ledger array — the engine counts assistants, not kernels.
+            kept, dups = collapse_to_one_per_kernel(kept)
+            dropped.extend(dups)
             ev["dropped_assistants"] = [
                 x for x in ev["assistants"] if not any(x is k for k in kept)
             ]
@@ -1131,7 +1167,11 @@ def build_report(
                 "lemma is named, any cross-repo ref) only via (b); else dropped, flag "
                 "target_not_headline:<assistant>; an anchor without lean_theorem admits "
                 "nothing, flag no_lean_theorem (RT C2; cth seq 2352, architecture seq "
-                "2353, §I4 round 2 seq 2367, RT C5/N11)",
+                "2353, §I4 round 2 seq 2367, RT C5/N11); the survivors are then "
+                "collapsed to the FIRST admissible assistant per prover kind — the "
+                "engine counts assistants, not kernels — later same-kind survivors "
+                "dropped with flag same_kernel_duplicate:<kind> (RT C7; architecture "
+                "seq 2386)",
             ),
             ("anchors", rows),
         ]
