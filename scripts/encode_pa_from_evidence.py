@@ -30,9 +30,13 @@ Pipeline
    seq 2342; RT C1): `[<owner>/<repo>:]<path>@<commit>#<target>` — no prefix means THIS
    repo (QBP) and only such refs enter S; a prefixed (cross-repo, e.g. the notary's Coq
    port `JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#…`) ref MUST
-   carry `@<commit>`, is pinned by that commit plus `reproduce`, never enters S, and is
-   reported with flag `cross_repo_evidence` (`parse_evidence_ref` / `evidence_ref_is_local`
-   / `evidence_ref_path`; a prefixed ref without a commit is a refusal). For p in
+   carry `@<commit>` — a 7–40 hex sha (RT N8: `@main` / `@HEAD` / a tag is a moving
+   ref, not a pin ⇒ refusal) — is pinned by that commit plus `reproduce`, never enters S,
+   and is reported with flag `cross_repo_evidence` (`parse_evidence_ref` /
+   `evidence_ref_is_local` / `evidence_ref_path`; a prefixed ref without a commit is a
+   refusal). The explicit self-prefix `JamesPagetButler/QBP:` names THIS repo and is
+   normalised to a local ref (RT N9: it enters S; a local commit token stays permissive —
+   same-repo files are resolved at the pinned master, never at the ref's token). For p in
    sorted(S) the manifest line is
    `f"{p} {git rev-parse <pinned-master>:p}\\n"` (the git BLOB sha1 — never hash-object on
    a working-tree file, which is filter-sensitive); pinned_sha = `git hash-object --stdin`
@@ -44,23 +48,40 @@ Pipeline
    No evidence and no resolvable proof_file ⇒ pinned_sha "" (inert: nothing to be stale),
    report flag `no_proof_file`. The convention lives in ONE function (`pinned_sha_for`) so
    it can be swapped; S and the per-file blobs go in the report, not the ledger
-   (`pinned_sha` has no ledger home at schema 0.3.5).
+   (`pinned_sha` has no ledger home at schema 0.3.5). S is computed over EVERY assistant
+   of the merged record BEFORE the target filter (RT C4): the filter decides who reaches
+   the engine, never what S is — a dropped same-repo companion must not shrink the
+   manifest and false-flag the on-target survivor `stale` (notary computes `source_sha`
+   over the record it emits, i.e. over all of them).
 3b. TARGET FILTER (RT C2 / ruling 3e-refined item 4; cth seq 2352 + architecture seq
-   2353 — FINAL): an assistant counts toward an anchor's grade only if it attests THAT
-   anchor's headline statement. `filter_assistants_by_target` keeps an assistant iff
-   (a) its evidence_ref `#target` names the anchor's `lean_theorem` (FQ strings compared;
-   a short name matches an FQ name iff it equals its last dotted component), OR (b) the
-   record's correspondence block has `corresponds: true`, a non-empty `checked_by` that is
-   not any assistant's `producer`, AND a STRUCTURED `maps[]` entry
+   2353; §I4 round 2 live-test seq 2367 + RT re-check C5 — FINAL): an assistant counts
+   toward an anchor's grade only if it attests THAT anchor's headline statement.
+   `filter_assistants_by_target` keeps an assistant iff
+   (a) DIRECT match (`direct_target_match`, no maps needed) — ONLY when the assistant is
+   `lean4` AND its evidence_ref is local (no owner/repo prefix) AND either its `#target`
+   is fully qualified (dotted) and equals `anchor.lean_theorem` verbatim, or its `#target`
+   is a short (dot-free) name equal to `lean_theorem`'s last dotted component AND the
+   ref's path equals `anchor.proof_file` (an unqualified name identifies the headline
+   only inside the headline's own file; P-D); OR
+   (b) CORRESPONDENCE — the record's block has `corresponds: true`, a non-empty
+   `checked_by` that is not any assistant's `producer`, AND a STRUCTURED `maps[]` entry
    `{target: <this assistant's #target>, lean_theorem: <this anchor's lean_theorem>}`
-   (same normalisation; `basis` stays prose and is never parsed). Everything else is
-   dropped with report flag `target_not_headline:<assistant>` and never reaches the
-   engine — so a companion theorem's evidence cannot lift a headline, and a misfiled
-   valid pair grades the headline 0, not 2. `maps` is encoder-side only: `pa-grade`'s
-   decoder is strict (`DisallowUnknownFields`), so the correspondence handed to the engine
-   is projected onto its four fields. The rule lives in ONE function so it can be
-   tightened or switched off by ruling. An anchor without `lean_theorem` can admit
-   evidence only through route (b).
+   (`names_match` normalisation on the pair; `basis` stays prose and is never parsed).
+   Every other assistant — coq/agda whatever its lemma is named (P-A: a Coq lemma
+   literally named `fanoTableF4_eq_cayleyDickson`; P-B: an Agda ref carrying the FQ Lean
+   name verbatim), any cross-repo ref, a local lean4 short name in another file (P-D) —
+   counts ONLY through route (b), else is dropped with report flag
+   `target_not_headline:<assistant>` and never reaches the engine — so a companion
+   theorem's evidence cannot lift a headline, a name coincidence across provers is not a
+   correspondence, and a misfiled valid pair grades the headline 0, not 2. `maps` is
+   encoder-side only: `pa-grade`'s decoder is strict (`DisallowUnknownFields`), so the
+   correspondence handed to the engine is projected onto its four fields. The rule lives
+   in ONE function so it can be tightened or switched off by ruling. An anchor WITHOUT
+   `lean_theorem` admits NOTHING — both routes need a headline (route (b) pairs a target
+   with THIS anchor's `lean_theorem`); its evidence is dropped under the single anchor-
+   side flag `no_lean_theorem` (RT N11: the defect is the anchor's, not the evidence's);
+   the report counts these anchors (`targets_without_lean_theorem`; 22 at ledger 6.16.0,
+   all `theory` / `theory-external` with no Lean `proof_file`).
 4. ENGINE. One `pa.Claim` per target anchor {claim, consumer "qbp#692-ci", pinned_sha,
    proof_assistants, correspondence, corroborated_by}. Edges: every `prediction_chain`
    entry (id → target) whose target is also a target anchor, typed `derivation`. This is
@@ -126,6 +147,14 @@ CONSUMER = "qbp#692-ci"
 POLICY = {"require_signature": False}
 TARGET_KINDS = ("proof", "derivation")  # kinds that may carry a proof_assistants array
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
+# RT N8: a cross-repo ref is pinned by its commit alone, so the token must BE a commit
+# (7–40 hex), never a branch / tag / HEAD. Local tokens stay permissive: same-repo files
+# are resolved at the pinned master, never at the ref's token.
+CROSS_REPO_COMMIT_RE = re.compile(r"^[0-9a-f]{7,40}$")
+# RT N9: the explicit self-prefix names THIS repo; such a ref is local and enters S.
+SELF_REPO = "JamesPagetButler/QBP"
+# The one assistant whose `#target` can name a Lean `lean_theorem` directly (seq 2367).
+LEAN_ASSISTANT = "lean4"
 
 # The engine's own field names (pa.go JSON tags). Everything else on an evidence
 # assistant / record is an oracle or provenance annotation and is not an engine input.
@@ -351,10 +380,17 @@ def parse_evidence_ref(ref: Any) -> Dict[str, Optional[str]]:
             f"evidence_ref does not match [<owner>/<repo>:]<path>@<commit>#<target>: {ref!r}"
         )
     d = m.groupdict()
+    if d["repo"] == SELF_REPO:
+        d["repo"] = None  # RT N9: `JamesPagetButler/QBP:<path>` IS this repo — local
     if d["repo"] is not None and d["commit"] is None:
         raise Refusal(
             f"cross-repo evidence_ref {ref!r} carries no @<commit>; a foreign file is "
             "pinned only by its commit (plus reproduce) and cannot be graded without one"
+        )
+    if d["repo"] is not None and not CROSS_REPO_COMMIT_RE.match(d["commit"] or ""):
+        raise Refusal(
+            f"cross-repo evidence_ref {ref!r}: @{d['commit']} is not a 7-40 hex commit "
+            "sha; a branch, tag or HEAD is a moving ref, not a pin (RT N8)"
         )
     return d
 
@@ -469,6 +505,41 @@ def assistant_target(a: Dict[str, Any]) -> Optional[str]:
     return parse_evidence_ref(a.get("evidence_ref"))["target"]
 
 
+def anchor_headline(anchor: Dict[str, Any]) -> Optional[str]:
+    """The anchor's `lean_theorem` when it has a non-empty one, else None."""
+    h = anchor.get("lean_theorem")
+    return h if isinstance(h, str) and h else None
+
+
+def direct_target_match(anchor: Dict[str, Any], a: Dict[str, Any]) -> bool:
+    """Route (a) — the DIRECT match, no maps needed (§I4 round 2, live-test seq 2367;
+    RT re-check C5 probes P-A / P-B / P-D). ONLY the Lean assistant, ONLY a same-repo ref:
+
+      assistant == "lean4"  and  the evidence_ref is local  and
+        ( target is fully qualified (dotted) and target == anchor.lean_theorem verbatim
+        | target is short (dot-free), equals lean_theorem's last dotted component,
+          AND the ref's path == anchor.proof_file )
+
+    A short name is unqualified: it identifies the headline only inside the headline's
+    own file (P-D). Every other assistant — coq / agda whatever its lemma is named (P-A,
+    P-B), any cross-repo ref — reaches the engine only through a correspondence maps[]
+    entry. A short `lean_theorem` (8 live anchors) therefore matches only a short target
+    in its own proof_file, never an FQ target in some namespace."""
+    headline = anchor_headline(anchor)
+    if headline is None or a.get("assistant") != LEAN_ASSISTANT:
+        return False
+    d = parse_evidence_ref(a.get("evidence_ref"))
+    target = d["target"]
+    if d["repo"] is not None or not target:
+        return False
+    if "." in target:
+        return target == headline
+    if target != headline.rsplit(".", 1)[-1]:
+        return False
+    proof_file = anchor.get("proof_file")
+    return isinstance(proof_file, str) and bool(proof_file) and d["path"] == proof_file
+
+
 def filter_assistants_by_target(
     anchor: Dict[str, Any],
     assistants: List[Dict[str, Any]],
@@ -477,16 +548,19 @@ def filter_assistants_by_target(
 ) -> Tuple[List[Dict[str, Any]], List[str]]:
     """THE target-vs-headline rule (module doc §3b). Returns (kept, dropped_flags).
 
-    keep iff  names_match(target, anchor.lean_theorem)
+    no lean_theorem on the anchor  ⇒  nothing kept, ONE flag `no_lean_theorem` (RT N11)
+    keep iff  direct_target_match(anchor, a)          # lean4 + local + FQ | short-in-own-file
           or  (correspondence.corresponds is True
                and correspondence.checked_by is non-empty
                and checked_by is not any assistant's producer
                and some maps entry has names_match(entry.target, target)
                                    and names_match(entry.lean_theorem, anchor.lean_theorem))
     else drop with flag `target_not_headline:<assistant>`.
-    Dropped assistants never reach the engine, the ledger array, or S."""
-    headline = anchor.get("lean_theorem")
-    headline = headline if isinstance(headline, str) and headline else None
+    Dropped assistants never reach the engine or the ledger array. S is NOT decided here
+    (RT C4): `pinned_sha_for` runs over the whole record before this filter."""
+    headline = anchor_headline(anchor)
+    if headline is None:
+        return [], (["no_lean_theorem"] if assistants else [])
     producers = {a.get("producer") for a in assistants if a.get("producer")}
     checked_by = correspondence.get("checked_by")
     corr_ok = (
@@ -499,10 +573,10 @@ def filter_assistants_by_target(
     dropped: List[str] = []
     for a in assistants:
         target = assistant_target(a)
-        if headline is not None and names_match(target, headline):
+        if direct_target_match(anchor, a):
             kept.append(a)
             continue
-        if corr_ok and headline is not None:
+        if corr_ok:
             if any(
                 names_match(m.get("target"), target)
                 and names_match(m.get("lean_theorem"), headline)
@@ -687,6 +761,13 @@ def grade_ledger(
             else None
         )
         rflags: List[str] = []
+        # RT C4: S = proof_file ∪ the CLAIM's same-repo refs (seq 2299) — over EVERY
+        # assistant of the merged record, BEFORE the target filter. The filter decides
+        # who reaches the engine; it never shrinks the manifest (a dropped companion
+        # must not false-flag the on-target survivor `stale`).
+        pinned, sources, pflags = pinned_sha_for(
+            a, ev["assistants"] if ev else [], repo, commit
+        )
         if ev:
             kept, dropped = filter_assistants_by_target(
                 a, ev["assistants"], ev["correspondence"], ev["correspondence_maps"]
@@ -699,7 +780,6 @@ def grade_ledger(
             if not kept:
                 rflags.append("no_admissible_evidence")
         assistants = ev["assistants"] if ev else []
-        pinned, sources, pflags = pinned_sha_for(a, assistants, repo, commit)
         rflags.extend(pflags)
         if ev:
             corr, corro = ev["correspondence"], ev["corroborated_by"]
@@ -939,6 +1019,8 @@ def build_report(
                     {"id": cid, "field": key, "before": before, "after": after}
                 )
 
+    # RT N11: anchors with no `lean_theorem` admit nothing (both routes need a headline)
+    no_headline = [cid for cid in results if anchor_headline(by_id[cid]) is None]
     rep: Dict[str, Any] = OrderedDict(
         [
             ("issue", "QBP#692"),
@@ -954,6 +1036,10 @@ def build_report(
             ("evidence_dir", meta["evidence_dir"]),
             ("v2_record_count", meta["v2_record_count"]),
             ("target_anchor_count", len(rows)),
+            (
+                "targets_without_lean_theorem",
+                {"count": len(no_headline), "ids": no_headline},
+            ),
             ("changed_anchor_count", sum(1 for r in rows if r["changed"])),
             (
                 "grade_distribution",
@@ -974,12 +1060,16 @@ def build_report(
             ),
             (
                 "target_filter",
-                "an assistant counts iff its evidence_ref #target names the anchor's "
-                "lean_theorem (FQ; a short name matches the last dotted component), or a "
-                "non-producer correspondence (corresponds true, checked_by set) carries a "
-                "maps[] entry {target, lean_theorem} pairing it with this anchor's "
-                "lean_theorem; else dropped, flag target_not_headline:<assistant> (RT C2; "
-                "cth seq 2352, architecture seq 2353)",
+                "an assistant counts iff (a) it is lean4 with a same-repo evidence_ref "
+                "whose #target equals the anchor's lean_theorem as an FQ name, or is the "
+                "short last component AND the ref's path is the anchor's proof_file; or "
+                "(b) a non-producer correspondence (corresponds true, checked_by set) "
+                "carries a maps[] entry {target, lean_theorem} pairing it with this "
+                "anchor's lean_theorem — every other assistant (coq/agda whatever its "
+                "lemma is named, any cross-repo ref) only via (b); else dropped, flag "
+                "target_not_headline:<assistant>; an anchor without lean_theorem admits "
+                "nothing, flag no_lean_theorem (RT C2; cth seq 2352, architecture seq "
+                "2353, §I4 round 2 seq 2367, RT C5/N11)",
             ),
             ("anchors", rows),
         ]
@@ -1003,6 +1093,10 @@ def build_report(
     md.append(f"| unmatched claims | {len(unmatched)} |")
     md.append(f"| evidence for non-target anchors | {len(non_target)} |")
     md.append(f"| target anchors | {len(rows)} |")
+    md.append(
+        f"| target anchors without `lean_theorem` (admit nothing; flag `no_lean_theorem`) "
+        f"| {len(no_headline)} |"
+    )
     md.append(f"| changed anchors | {rep['changed_anchor_count']} |")
     md.append(f"| derivation edges fed to the engine | {len(engine_out['_edges'])} |")
     md.append("")
@@ -1197,13 +1291,24 @@ def run(
         ledger_before, results, plan, engine_out, meta, ignored, unmatched, non_target
     )
     if write_report:
-        rp = report_path or (REPORT_DIR / f"backfill-{today[:10]}.md")
+        if report_path is not None:
+            rp = report_path
+        elif dry_run:
+            # RT N10: a dry run must never clobber the committed record under
+            # REPORT_DIR (the AC4 before/after table is the genuine record of the
+            # last applied run). Without --report it goes to a scratch directory.
+            rp = Path(tempfile.mkdtemp(prefix="qbp692-pa-dry-run-")) / (
+                f"backfill-{today[:10]}.dry-run.md"
+            )
+        else:
+            rp = REPORT_DIR / f"backfill-{today[:10]}.md"
         rp.parent.mkdir(parents=True, exist_ok=True)
         rp.write_text(md, encoding="utf-8")
         rp.with_suffix(".json").write_text(
             json.dumps(rep, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         rep["_report_md"] = str(rp)
+        rep["_report_scratch"] = bool(dry_run and report_path is None)
     return {
         "changed": changed,
         "version": version,
@@ -1238,8 +1343,18 @@ def main(argv: Optional[List[str]] = None) -> int:
         f"target anchors: {rep['target_anchor_count']}; distribution "
         f"(local/effective: n): {rep['grade_distribution']}; drops: {len(rep['drops'])}"
     )
+    print(
+        f"target anchors without lean_theorem (admit nothing): "
+        f"{rep['targets_without_lean_theorem']['count']}"
+    )
     if "_report_md" in rep:
-        print(f"report: {rep['_report_md']} (+ .json)")
+        where = (
+            " — DRY RUN: scratch path; the committed record under "
+            f"{REPORT_DIR} is untouched (pass --report to choose)"
+            if rep.get("_report_scratch")
+            else ""
+        )
+        print(f"report: {rep['_report_md']} (+ .json){where}")
     if not out["changed"]:
         print(
             "already applied: every target anchor carries exactly the computed grades"
