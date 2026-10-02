@@ -21,8 +21,12 @@
 //     NOT a failure: the gate stays green so the request — not red CI — carries
 //     the remediation. Only a reconcile diff fails the gate.
 //
-// Every claim's pinned_sha is REQUIRED (QBP#692 3c): an empty one is rejected
-// (exit 2), never graded as unknown-provenance and silently emitted as stale.
+// Every claim's pinned_sha is REQUIRED and must be a 40-hex blob (QBP#692 3c): a
+// missing, blank or non-hex one is rejected (exit 2), never graded as
+// unknown-provenance and silently emitted as stale. The emitted record's source_sha
+// is this same pinned_sha (R2 — one source of truth). By default every claim must
+// also carry both committed grades (R3); -allow-ungraded relaxes that for the
+// fixture slice and is never passed in CI.
 //
 // Input (stdin), one JSON object. The claim/edge/policy fields are the engine's
 // own JSON tags (pa.Claim, pa.Edge, pa.Policy); unknown fields are rejected so a
@@ -38,10 +42,9 @@
 //	  "expect": {
 //	    "<claim id>": {
 //	      "required_pa": 0|1|2,
-//	      "committed_pa_local": 0|1|2,        // optional; omit to skip the local diff
-//	      "committed_pa_effective": 0|1|2,    // optional; omit to skip the effective diff
-//	      "source_ref": "owner/repo@path",
-//	      "source_sha": "<40-hex blob of the attested source at the pinned ref>",
+//	      "committed_pa_local": 0|1|2,        // required unless -allow-ungraded (R3)
+//	      "committed_pa_effective": 0|1|2,    // required unless -allow-ungraded (R3)
+//	      "source_ref": "owner/repo@path",    // the record's source_sha = the claim's pinned_sha (R2)
 //	      "pinning_consumer": ["..."],        // [] for an unpinned critical claim
 //	      "detail": "..."                      // optional, short, human
 //	    }
@@ -63,8 +66,10 @@
 //
 // Exit codes: 0 reconciled clean (requests, if any, emitted); 1 usage or I/O
 // failure; 2 input rejected (malformed JSON, unknown field, duplicate claim id,
-// an edge whose endpoint is not a supplied claim, an empty pinned_sha, an empty
-// ledger_version, or a claim with no expect entry); 3 a reconcile diff.
+// an edge whose endpoint is not a supplied claim, an unknown edge type, a
+// pinned_sha that is not a 40-hex blob, an empty ledger_version, a claim with no
+// expect entry, or — absent -allow-ungraded — a claim missing a committed grade);
+// 3 a reconcile diff.
 package main
 
 import (
@@ -96,9 +101,23 @@ type Expect struct {
 	CommittedLocal     *pa.Grade `json:"committed_pa_local"`
 	CommittedEffective *pa.Grade `json:"committed_pa_effective"`
 	SourceRef          string    `json:"source_ref"`
-	SourceSHA          string    `json:"source_sha"`
 	PinningConsumer    []string  `json:"pinning_consumer"`
 	Detail             string    `json:"detail,omitempty"`
+}
+
+// isHexSHA reports whether s is a 40-char lowercase hex string — the shape of a
+// git blob/commit sha and the v1.3 source_sha. Used to reject an empty, blank, or
+// otherwise malformed pinned_sha, not just the empty string (§I4/Gemini break-3).
+func isHexSHA(s string) bool {
+	if len(s) != 40 {
+		return false
+	}
+	for _, c := range s {
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+			return false
+		}
+	}
+	return true
 }
 
 // Input is the stdin document: the engine's own types plus the expect map.
@@ -139,8 +158,11 @@ func inputErr(format string, args ...any) error {
 	return fmt.Errorf("%w: %s", errInput, fmt.Sprintf(format, args...))
 }
 
-// Decode parses and fail-closed-validates the stdin document.
-func Decode(r io.Reader) (Input, error) {
+// Decode parses and fail-closed-validates the stdin document. When
+// requireCommitted is true (the default; -allow-ungraded turns it off) every
+// claim must carry both committed grades, so a missing one is a loud error, not
+// a silently-skipped reconcile (§I4 R3 / Gemini break-1).
+func Decode(r io.Reader, requireCommitted bool) (Input, error) {
 	var in Input
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
@@ -161,14 +183,24 @@ func Decode(r io.Reader) (Input, error) {
 		if ids[c.ID] {
 			return in, inputErr("duplicate claim id %q", c.ID)
 		}
-		// QBP#692 3c: pinned_sha is never empty. An empty one would make the engine
-		// grade every assistant stale (unknown provenance) and silently emit it; we
-		// refuse instead, so a missing pin is a loud input error, not a quiet stale.
-		if c.PinnedSHA == "" {
-			return in, inputErr("claims[%d] %q: empty \"pinned_sha\" (3c: the pin comes from the ledger, never empty)", i, c.ID)
+		// QBP#692 3c: pinned_sha must be a real 40-hex blob, never empty/blank/
+		// non-hex. An unusable pin would make the engine grade every assistant stale
+		// (unknown provenance) and silently emit it; we refuse, so a bad pin is a
+		// loud input error, not a quiet stale. (A bare != "" check let a space or a
+		// null byte through — Gemini break-3.)
+		if !isHexSHA(c.PinnedSHA) {
+			return in, inputErr("claims[%d] %q: \"pinned_sha\" must be a 40-hex-lowercase blob, got %q (3c)", i, c.ID, c.PinnedSHA)
 		}
-		if _, ok := in.Expect[c.ID]; !ok {
+		ex, ok := in.Expect[c.ID]
+		if !ok {
 			return in, inputErr("claim %q has no \"expect\" entry (required_pa is mandatory)", c.ID)
+		}
+		// R3: committed grades are required unless explicitly running ungraded. A
+		// nil committed grade would skip the reconcile diff for that claim; with the
+		// backfill landed, an absent grade is a deleted/never-written value, not an
+		// "ungraded yet" one, so skipping it is the omission hole P3 found.
+		if requireCommitted && (ex.CommittedLocal == nil || ex.CommittedEffective == nil) {
+			return in, inputErr("claim %q: committed_pa_local and committed_pa_effective are required (R3); -allow-ungraded is for the fixture slice only and is never passed in CI", c.ID)
 		}
 		ids[c.ID] = true
 	}
@@ -233,9 +265,12 @@ func Reconcile(in Input, v attestation.Verifier) Output {
 		// nil vs record and sets reason/stale from the grade itself; we only stamp
 		// the emitter id (overwriting the engine's standalone default).
 		meta := pa.RequestMeta{
-			LedgerVersion:   in.LedgerVersion,
-			SourceRef:       ex.SourceRef,
-			SourceSHA:       ex.SourceSHA,
+			LedgerVersion: in.LedgerVersion,
+			SourceRef:     ex.SourceRef,
+			// R2: one source of truth for source_sha — the composite pin the gate
+			// actually evaluated (c.PinnedSHA), not a second field that could name a
+			// sha the staleness check never saw and wrong-key the dedupe tuple.
+			SourceSHA:       c.PinnedSHA,
 			EmittedAt:       in.EmittedAt,
 			Detail:          ex.Detail,
 			PinningConsumer: ex.PinningConsumer,
@@ -257,8 +292,8 @@ func Reconcile(in Input, v attestation.Verifier) Output {
 // Run decodes r, reconciles with StubV0, writes the verdict to w, and — if
 // emitPath is non-empty — writes the requests as JSON lines there for the filer.
 // It returns errDiff when any diff was found, so the caller exits 3.
-func Run(r io.Reader, w io.Writer, emitPath string, indent bool) error {
-	in, err := Decode(r)
+func Run(r io.Reader, w io.Writer, emitPath string, indent, requireCommitted bool) error {
+	in, err := Decode(r, requireCommitted)
 	if err != nil {
 		return err
 	}
@@ -302,6 +337,7 @@ func writeJSONLines(path string, reqs []pa.NotaryRequest) error {
 func main() {
 	indent := flag.Bool("indent", false, "pretty-print the stdout verdict")
 	emit := flag.String("emit", "", "write the notary-request records as JSON lines to this path")
+	allowUngraded := flag.Bool("allow-ungraded", false, "permit claims with no committed PA (fixture slice only; NEVER passed in CI — the real-ledger gate requires committed grades)")
 	version := flag.Bool("version", false, "print the vendored engine id and exit")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: pa-reconcile [-indent] [-emit requests.jsonl] < input.json > verdict.json\n\n")
@@ -317,7 +353,7 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
-	if err := Run(os.Stdin, os.Stdout, *emit, *indent); err != nil {
+	if err := Run(os.Stdin, os.Stdout, *emit, *indent, !*allowUngraded); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		switch {
 		case errors.Is(err, errInput):
