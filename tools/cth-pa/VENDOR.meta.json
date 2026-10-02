@@ -1,0 +1,462 @@
+{
+  "schema": "qbp-vendor-meta/1",
+  "purpose": "QBP#692 commit 1 — vendored confluent-trust PA engine (option A: real Go source, byte-identical modulo Go import-path rewrite)",
+  "source_repo": "https://github.com/JamesPagetButler/confluent-trust",
+  "source_sha": "13de2f728707cd4431e0116126c530247f132158",
+  "source_ref_at_vendoring": "origin/main",
+  "source_go_version": "1.24",
+  "source_go_mod_requires": [
+    "github.com/santhosh-tekuri/jsonschema/v6 v6.0.1 (used only by internal/pa/notary_request_seam_test.go; the engine itself is stdlib + attestation)"
+  ],
+  "vendored_module": "github.com/JamesPagetButler/QBP/tools/cth-pa",
+  "vendored_at": "2026-10-02T14:00:45Z",
+  "check_of_record": "scripts/check_vendor_upstream.sh <confluent-trust-checkout> 13de2f728707cd4431e0116126c530247f132158",
+  "import_rewrites": [
+    {
+      "from": "github.com/JamesPagetButler/confluent-trust/attestation/attestationtest",
+      "to": "github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/attestation/attestationtest"
+    },
+    {
+      "from": "github.com/JamesPagetButler/confluent-trust/attestation",
+      "to": "github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/attestation"
+    },
+    {
+      "from": "github.com/JamesPagetButler/confluent-trust/internal/pa",
+      "to": "github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/pa"
+    }
+  ],
+  "not_vendored": [
+    {
+      "upstream_path": "testdata/attestation/README.md",
+      "why": "not read by any vendored file (attestation_test.go uses attestationtest fakes, not these record fixtures)"
+    },
+    {
+      "upstream_path": "testdata/attestation/sample_record.json",
+      "why": "same"
+    },
+    {
+      "upstream_path": "internal/leanlink/",
+      "why": "not imported by internal/pa or attestation"
+    }
+  ],
+  "files": [
+    {
+      "upstream_path": "internal/pa/pa.go",
+      "vendored_path": "vendor-src/pa/pa.go",
+      "kind": "go",
+      "upstream_sha256": "d7400ce7a6e14cabd8b1db5053992869d2e74aa41d6d8d284e668b6c60e7c144",
+      "vendored_sha256": "0c441173f8dccbd4b263249d8aeac75fae82f45abeea8bcf5fd3a02916a4f268",
+      "byte_identical": false,
+      "import_rewrites": [
+        {
+          "line": 21,
+          "from": "\"github.com/JamesPagetButler/confluent-trust/attestation\"",
+          "to": "\"github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/attestation\""
+        }
+      ]
+    },
+    {
+      "upstream_path": "internal/pa/pa_test.go",
+      "vendored_path": "vendor-src/pa/pa_test.go",
+      "kind": "go",
+      "upstream_sha256": "dba906ce5923f26fad8119d240df33f7f3c079780769c9a453f867b98b380d74",
+      "vendored_sha256": "70585c9350a7fb8c140fa5096b78c302e8c515161adb05bdce5baa746716fce7",
+      "byte_identical": false,
+      "import_rewrites": [
+        {
+          "line": 11,
+          "from": "\"github.com/JamesPagetButler/confluent-trust/attestation\"",
+          "to": "\"github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/attestation\""
+        },
+        {
+          "line": 12,
+          "from": "\"github.com/JamesPagetButler/confluent-trust/internal/pa\"",
+          "to": "\"github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/pa\""
+        }
+      ]
+    },
+    {
+      "upstream_path": "internal/pa/notary_request_seam_test.go",
+      "vendored_path": "vendor-src/pa/notary_request_seam_test.go",
+      "kind": "go",
+      "upstream_sha256": "476ffa2299fe0ba315cae1bee21f4476af441f66a70d047a80f15609888f23e3",
+      "vendored_sha256": "b8fa120ad74201899353f179efc815847bdceadd9d244df17d871aba3c114ab3",
+      "byte_identical": false,
+      "import_rewrites": [
+        {
+          "line": 13,
+          "from": "\"github.com/JamesPagetButler/confluent-trust/internal/pa\"",
+          "to": "\"github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/pa\""
+        }
+      ]
+    },
+    {
+      "upstream_path": "attestation/attestation.go",
+      "vendored_path": "vendor-src/attestation/attestation.go",
+      "kind": "go",
+      "upstream_sha256": "c6a103476bae25a3b2588a00209c66e9c6cd96c6b6e38695b10d453294bc84cd",
+      "vendored_sha256": "c6a103476bae25a3b2588a00209c66e9c6cd96c6b6e38695b10d453294bc84cd",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "attestation/attestation_test.go",
+      "vendored_path": "vendor-src/attestation/attestation_test.go",
+      "kind": "go",
+      "upstream_sha256": "c1300e064fb5181ff7dc9d4e856340b985c6622929f38b3fe73e68d3f945f411",
+      "vendored_sha256": "41f09a1e0d793e32ed2d122e5c6b304be24744eda34789c46d391cc4a883ab8f",
+      "byte_identical": false,
+      "import_rewrites": [
+        {
+          "line": 6,
+          "from": "\"github.com/JamesPagetButler/confluent-trust/attestation\"",
+          "to": "\"github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/attestation\""
+        },
+        {
+          "line": 7,
+          "from": "\"github.com/JamesPagetButler/confluent-trust/attestation/attestationtest\"",
+          "to": "\"github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/attestation/attestationtest\""
+        }
+      ]
+    },
+    {
+      "upstream_path": "attestation/attestationtest/attestationtest.go",
+      "vendored_path": "vendor-src/attestation/attestationtest/attestationtest.go",
+      "kind": "go",
+      "upstream_sha256": "be10219b8363c541adfad017f396629a3d73e4b3f65c5b5a2981c438a08949cf",
+      "vendored_sha256": "bebe75b76ca339a7b2b365a8a1de91fb665d1c9d474deb3e07d208b11a8aa067",
+      "byte_identical": false,
+      "import_rewrites": [
+        {
+          "line": 14,
+          "from": "import \"github.com/JamesPagetButler/confluent-trust/attestation\"",
+          "to": "import \"github.com/JamesPagetButler/QBP/tools/cth-pa/vendor-src/attestation\""
+        }
+      ]
+    },
+    {
+      "upstream_path": "testdata/pa/01_lean_clean.json",
+      "vendored_path": "testdata/pa/01_lean_clean.json",
+      "kind": "testdata",
+      "upstream_sha256": "6479bbc82d88c999cfb2ac8f9302e7b6f40889f1cfdcd931e55dd47233320396",
+      "vendored_sha256": "6479bbc82d88c999cfb2ac8f9302e7b6f40889f1cfdcd931e55dd47233320396",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/02_lean_native_decide.json",
+      "vendored_path": "testdata/pa/02_lean_native_decide.json",
+      "kind": "testdata",
+      "upstream_sha256": "6ce190337592af49cebaf48be86ff24dae14648e0cd8100c0102aa9e208e83eb",
+      "vendored_sha256": "6ce190337592af49cebaf48be86ff24dae14648e0cd8100c0102aa9e208e83eb",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/03_coq_undeclared_vm_compute.json",
+      "vendored_path": "testdata/pa/03_coq_undeclared_vm_compute.json",
+      "kind": "testdata",
+      "upstream_sha256": "0f55ca59f64f869eab95042fb5e98b020d59a9cfd5b2742aab42a57e07faea18",
+      "vendored_sha256": "0f55ca59f64f869eab95042fb5e98b020d59a9cfd5b2742aab42a57e07faea18",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/04_agda_safe.json",
+      "vendored_path": "testdata/pa/04_agda_safe.json",
+      "kind": "testdata",
+      "upstream_sha256": "d1462f24e621a6d0dce460a76aed1a2f9feae556eba16b3507992d007e0ed09c",
+      "vendored_sha256": "d1462f24e621a6d0dce460a76aed1a2f9feae556eba16b3507992d007e0ed09c",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/05_uncorresponded_pair.json",
+      "vendored_path": "testdata/pa/05_uncorresponded_pair.json",
+      "kind": "testdata",
+      "upstream_sha256": "f3c0193d247a1f8c5626a424fd4779db8a01103ded03ebe54bf1a4a9868b1b71",
+      "vendored_sha256": "f3c0193d247a1f8c5626a424fd4779db8a01103ded03ebe54bf1a4a9868b1b71",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/06_valid_pair_fano.json",
+      "vendored_path": "testdata/pa/06_valid_pair_fano.json",
+      "kind": "testdata",
+      "upstream_sha256": "08bcc34b0b3ba1e5acc08150415c1dc3a5707ff857ecb35521670b16ed21e2f9",
+      "vendored_sha256": "08bcc34b0b3ba1e5acc08150415c1dc3a5707ff857ecb35521670b16ed21e2f9",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/07_lean_clean_coq_hashmismatch.json",
+      "vendored_path": "testdata/pa/07_lean_clean_coq_hashmismatch.json",
+      "kind": "testdata",
+      "upstream_sha256": "0f1f83e079758103b818ef01fad177ff1ccd74ac7e8cfa260780b77ff0cb11a9",
+      "vendored_sha256": "0f1f83e079758103b818ef01fad177ff1ccd74ac7e8cfa260780b77ff0cb11a9",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/07b_single_hashmismatch.json",
+      "vendored_path": "testdata/pa/07b_single_hashmismatch.json",
+      "kind": "testdata",
+      "upstream_sha256": "446e67f0b389e304f649d84d1addcc50b19b4aae2beb9298900d6a4531c0ec65",
+      "vendored_sha256": "446e67f0b389e304f649d84d1addcc50b19b4aae2beb9298900d6a4531c0ec65",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/08_independent_recomputation.json",
+      "vendored_path": "testdata/pa/08_independent_recomputation.json",
+      "kind": "testdata",
+      "upstream_sha256": "a6e67b5a8a87f05f0d9d043155f3cebdb932ba1860436029440d19f70f83b3fc",
+      "vendored_sha256": "a6e67b5a8a87f05f0d9d043155f3cebdb932ba1860436029440d19f70f83b3fc",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/09_mixed_pair.json",
+      "vendored_path": "testdata/pa/09_mixed_pair.json",
+      "kind": "testdata",
+      "upstream_sha256": "1e4fdb1c0390e32ccfb2b0fa0f7257147bfc3e8c55903509d686cf187dae8f11",
+      "vendored_sha256": "1e4fdb1c0390e32ccfb2b0fa0f7257147bfc3e8c55903509d686cf187dae8f11",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/10_edges.json",
+      "vendored_path": "testdata/pa/10_edges.json",
+      "kind": "testdata",
+      "upstream_sha256": "3ebb94783335d68daecda49e3ee97a0bb004dacc8359c556b7dbcf67b297e87f",
+      "vendored_sha256": "3ebb94783335d68daecda49e3ee97a0bb004dacc8359c556b7dbcf67b297e87f",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/10a_chain_head_pa2.json",
+      "vendored_path": "testdata/pa/10a_chain_head_pa2.json",
+      "kind": "testdata",
+      "upstream_sha256": "22359399a67d50e114c02e2adb603e96352a44a863db4f2864f368e5b1fd70cd",
+      "vendored_sha256": "22359399a67d50e114c02e2adb603e96352a44a863db4f2864f368e5b1fd70cd",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/10b_chain_dep_pa1.json",
+      "vendored_path": "testdata/pa/10b_chain_dep_pa1.json",
+      "kind": "testdata",
+      "upstream_sha256": "0479966d42337b9cf1bc403b8d8a1e7893351f544e9cd91825730ff58bbfd2aa",
+      "vendored_sha256": "0479966d42337b9cf1bc403b8d8a1e7893351f544e9cd91825730ff58bbfd2aa",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/10c_chain_relevance_pa0.json",
+      "vendored_path": "testdata/pa/10c_chain_relevance_pa0.json",
+      "kind": "testdata",
+      "upstream_sha256": "e8910e77774e602581b7c00964a5beeae28bd4c08c16ec9c594682e847e6de24",
+      "vendored_sha256": "e8910e77774e602581b7c00964a5beeae28bd4c08c16ec9c594682e847e6de24",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/11a_verified_wrong_role.json",
+      "vendored_path": "testdata/pa/11a_verified_wrong_role.json",
+      "kind": "testdata",
+      "upstream_sha256": "9d9ce2de7ac9564479d4dac2c739253280a25d655d6172d8c99b660f070ae1df",
+      "vendored_sha256": "9d9ce2de7ac9564479d4dac2c739253280a25d655d6172d8c99b660f070ae1df",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/11b_unsigned_reqsig_false.json",
+      "vendored_path": "testdata/pa/11b_unsigned_reqsig_false.json",
+      "kind": "testdata",
+      "upstream_sha256": "859ee1965b35101cfa59459e63b0358544c432182ba622d470265f68232880cb",
+      "vendored_sha256": "859ee1965b35101cfa59459e63b0358544c432182ba622d470265f68232880cb",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/11c_unsigned_reqsig_true.json",
+      "vendored_path": "testdata/pa/11c_unsigned_reqsig_true.json",
+      "kind": "testdata",
+      "upstream_sha256": "933388d4a0ed541d320ccb7fcc5a9d939248f1b6de5b7fab63fd5eb78df5163c",
+      "vendored_sha256": "933388d4a0ed541d320ccb7fcc5a9d939248f1b6de5b7fab63fd5eb78df5163c",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/12_expected_pa_wrong.json",
+      "vendored_path": "testdata/pa/12_expected_pa_wrong.json",
+      "kind": "testdata",
+      "upstream_sha256": "0b16571aa5e4ac69495ab5df1fbb1668ed46160beac9dfadce4addbe41504723",
+      "vendored_sha256": "0b16571aa5e4ac69495ab5df1fbb1668ed46160beac9dfadce4addbe41504723",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/13_self_attested_correspondence.json",
+      "vendored_path": "testdata/pa/13_self_attested_correspondence.json",
+      "kind": "testdata",
+      "upstream_sha256": "bad2ca29061ed3bb89fc8388df954ab847e8ab000d10ce2f4c1fdca27fefa418",
+      "vendored_sha256": "bad2ca29061ed3bb89fc8388df954ab847e8ab000d10ce2f4c1fdca27fefa418",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/14_self_attested_signer.json",
+      "vendored_path": "testdata/pa/14_self_attested_signer.json",
+      "kind": "testdata",
+      "upstream_sha256": "6659c9af8de0677eb8b220d7a1b83e6bf4b36a2b91e3414dc518c793f073d0e6",
+      "vendored_sha256": "6659c9af8de0677eb8b220d7a1b83e6bf4b36a2b91e3414dc518c793f073d0e6",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/15_stale_source.json",
+      "vendored_path": "testdata/pa/15_stale_source.json",
+      "kind": "testdata",
+      "upstream_sha256": "651ba5ab935bf21e8392480439f0d2e298be4a5c1eb25325a7a9028c8765e526",
+      "vendored_sha256": "651ba5ab935bf21e8392480439f0d2e298be4a5c1eb25325a7a9028c8765e526",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P10_kernel_clean_false.json",
+      "vendored_path": "testdata/pa/P10_kernel_clean_false.json",
+      "kind": "testdata",
+      "upstream_sha256": "ff750282749c5c602c10336b1e1e24225a29f2a9754fa577e75c07a83757dc05",
+      "vendored_sha256": "ff750282749c5c602c10336b1e1e24225a29f2a9754fa577e75c07a83757dc05",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P1_axiom_ofReduceBool.json",
+      "vendored_path": "testdata/pa/P1_axiom_ofReduceBool.json",
+      "kind": "testdata",
+      "upstream_sha256": "31edba6cc3ee24b30c79dd7ee71b72792f3b09c909d9ceb6f4e50c4e75aea2f0",
+      "vendored_sha256": "31edba6cc3ee24b30c79dd7ee71b72792f3b09c909d9ceb6f4e50c4e75aea2f0",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P1b_axiom_sorryAx.json",
+      "vendored_path": "testdata/pa/P1b_axiom_sorryAx.json",
+      "kind": "testdata",
+      "upstream_sha256": "d003ed4432da32e9db1e990c6d2e29765f3d36fdd3f8a6435b83d4df2c0f915c",
+      "vendored_sha256": "d003ed4432da32e9db1e990c6d2e29765f3d36fdd3f8a6435b83d4df2c0f915c",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P2_reexec_failed.json",
+      "vendored_path": "testdata/pa/P2_reexec_failed.json",
+      "kind": "testdata",
+      "upstream_sha256": "2f95c5f89efec30da97dcb04a9a5c20e48594c35863d9389286bb6b8cafdb383",
+      "vendored_sha256": "2f95c5f89efec30da97dcb04a9a5c20e48594c35863d9389286bb6b8cafdb383",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P3_missing_source_sha.json",
+      "vendored_path": "testdata/pa/P3_missing_source_sha.json",
+      "kind": "testdata",
+      "upstream_sha256": "52ac042d49cff1c862d20f105fc291b919bc7c79c9e42b66068e5f12a772f9ba",
+      "vendored_sha256": "52ac042d49cff1c862d20f105fc291b919bc7c79c9e42b66068e5f12a772f9ba",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P4_missing_declared_hash.json",
+      "vendored_path": "testdata/pa/P4_missing_declared_hash.json",
+      "kind": "testdata",
+      "upstream_sha256": "f048cd8afaac4124535bea900dd58899d8c445867768acb3787bb2996d1de5ef",
+      "vendored_sha256": "f048cd8afaac4124535bea900dd58899d8c445867768acb3787bb2996d1de5ef",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P5_trust_check_missing.json",
+      "vendored_path": "testdata/pa/P5_trust_check_missing.json",
+      "kind": "testdata",
+      "upstream_sha256": "270ea9889ade9702eba1666bec14fe761f7bcf3a323473fac1f9a59f1938285b",
+      "vendored_sha256": "270ea9889ade9702eba1666bec14fe761f7bcf3a323473fac1f9a59f1938285b",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P5b_trust_check_pending.json",
+      "vendored_path": "testdata/pa/P5b_trust_check_pending.json",
+      "kind": "testdata",
+      "upstream_sha256": "84d712c2d10587d0bbbd33ff949b11b99f70001d6184471a29de167bf9db4ce9",
+      "vendored_sha256": "84d712c2d10587d0bbbd33ff949b11b99f70001d6184471a29de167bf9db4ce9",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P6_both_hashes_empty.json",
+      "vendored_path": "testdata/pa/P6_both_hashes_empty.json",
+      "kind": "testdata",
+      "upstream_sha256": "a1d2c667304d86f485b91e2579c7f0549b07046cf973174e3dd5294edf776c5f",
+      "vendored_sha256": "a1d2c667304d86f485b91e2579c7f0549b07046cf973174e3dd5294edf776c5f",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P7_coq_declared_vm_compute.json",
+      "vendored_path": "testdata/pa/P7_coq_declared_vm_compute.json",
+      "kind": "testdata",
+      "upstream_sha256": "b2a0e78d72f128b6ae09161311cb4ab8b2654c7a1fe954929b75bab16a3afc83",
+      "vendored_sha256": "b2a0e78d72f128b6ae09161311cb4ab8b2654c7a1fe954929b75bab16a3afc83",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P8_coq_open_context.json",
+      "vendored_path": "testdata/pa/P8_coq_open_context.json",
+      "kind": "testdata",
+      "upstream_sha256": "a55206c50c214765c1cec68f39612d2c083504f2a74300720f236cbf630a7cad",
+      "vendored_sha256": "a55206c50c214765c1cec68f39612d2c083504f2a74300720f236cbf630a7cad",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P8b_agda_postulate.json",
+      "vendored_path": "testdata/pa/P8b_agda_postulate.json",
+      "kind": "testdata",
+      "upstream_sha256": "980721ce9786f428ab47e8887a5333272db8a2f527a2d9ff51fe3a47a217799a",
+      "vendored_sha256": "980721ce9786f428ab47e8887a5333272db8a2f527a2d9ff51fe3a47a217799a",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/P9_unknown_assistant.json",
+      "vendored_path": "testdata/pa/P9_unknown_assistant.json",
+      "kind": "testdata",
+      "upstream_sha256": "80ad9663a210495b12dcb6c0ce95d7c61b12b78039a30cc1d2608c467a2fad63",
+      "vendored_sha256": "80ad9663a210495b12dcb6c0ce95d7c61b12b78039a30cc1d2608c467a2fad63",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/notary-request.sample.jsonl",
+      "vendored_path": "testdata/pa/notary-request.sample.jsonl",
+      "kind": "testdata",
+      "upstream_sha256": "6042c8be55f2ca0babce7599189493a4773be81212556e253880418fa20839f3",
+      "vendored_sha256": "6042c8be55f2ca0babce7599189493a4773be81212556e253880418fa20839f3",
+      "byte_identical": true,
+      "import_rewrites": []
+    },
+    {
+      "upstream_path": "testdata/pa/notary-request.schema.json",
+      "vendored_path": "testdata/pa/notary-request.schema.json",
+      "kind": "testdata",
+      "upstream_sha256": "688e6287a343f7732687230094f62cfa180d69cc726c575d1a60a943ec543a63",
+      "vendored_sha256": "688e6287a343f7732687230094f62cfa180d69cc726c575d1a60a943ec543a63",
+      "byte_identical": true,
+      "import_rewrites": []
+    }
+  ]
+}
