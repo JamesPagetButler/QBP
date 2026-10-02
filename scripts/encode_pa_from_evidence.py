@@ -18,13 +18,22 @@ Pipeline
    NEVER parsed for grades: the encoder does not synthesise `declared`, `derived`,
    `trust_check`, `evidence_ref` or `source_sha` from prose (architecture ruling 2026-10-02
    item 1; cth-implementor finding 1). Records whose `claim` is not a ledger anchor id are
-   reported as `unmatched_claim`. Assistants are projected onto the engine's known fields
-   (the fixtures' `attestation`/`expected_pa`/`flags` oracles are test-only and dropped).
+   reported as `unmatched_claim`; records whose `claim` IS a ledger anchor but not a
+   target anchor (step 2) are reported as `evidence_for_non_target` and never graded (RT
+   N3a). Assistants are projected onto the engine's known fields (the fixtures'
+   `attestation`/`expected_pa`/`flags` oracles are test-only and dropped).
 2. TARGETS. Anchors with `provenance_kind ∈ {proof, derivation}` ∪ ids starting `PROOF-`
    (147 at ledger 6.13.0, incl. `PROOF-hessian` which is `internal-compute`).
 3. pinned_sha (architecture ruling, live-test seq 2299 — FINAL): the claim-source MANIFEST
-   hash. S = {anchor proof_file} ∪ {QBP paths named by the claim's v2 evidence_refs
-   (format path@sha#theorem)}, deduplicated. For p in sorted(S) the manifest line is
+   hash. S = {anchor proof_file} ∪ {SAME-REPO paths named by the claim's v2
+   evidence_refs}, deduplicated. evidence_ref grammar (§I4 ruling on PR #695, live-test
+   seq 2342; RT C1): `[<owner>/<repo>:]<path>@<commit>#<target>` — no prefix means THIS
+   repo (QBP) and only such refs enter S; a prefixed (cross-repo, e.g. the notary's Coq
+   port `JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#…`) ref MUST
+   carry `@<commit>`, is pinned by that commit plus `reproduce`, never enters S, and is
+   reported with flag `cross_repo_evidence` (`parse_evidence_ref` / `evidence_ref_is_local`
+   / `evidence_ref_path`; a prefixed ref without a commit is a refusal). For p in
+   sorted(S) the manifest line is
    `f"{p} {git rev-parse <pinned-master>:p}\\n"` (the git BLOB sha1 — never hash-object on
    a working-tree file, which is filter-sensitive); pinned_sha = `git hash-object --stdin`
    over the concatenated lines. The same form is used when S has one file, so there is one
@@ -36,10 +45,28 @@ Pipeline
    report flag `no_proof_file`. The convention lives in ONE function (`pinned_sha_for`) so
    it can be swapped; S and the per-file blobs go in the report, not the ledger
    (`pinned_sha` has no ledger home at schema 0.3.5).
+3b. TARGET FILTER (RT C2 / ruling 3e-refined item 4; cth seq 2352 + architecture seq
+   2353 — FINAL): an assistant counts toward an anchor's grade only if it attests THAT
+   anchor's headline statement. `filter_assistants_by_target` keeps an assistant iff
+   (a) its evidence_ref `#target` names the anchor's `lean_theorem` (FQ strings compared;
+   a short name matches an FQ name iff it equals its last dotted component), OR (b) the
+   record's correspondence block has `corresponds: true`, a non-empty `checked_by` that is
+   not any assistant's `producer`, AND a STRUCTURED `maps[]` entry
+   `{target: <this assistant's #target>, lean_theorem: <this anchor's lean_theorem>}`
+   (same normalisation; `basis` stays prose and is never parsed). Everything else is
+   dropped with report flag `target_not_headline:<assistant>` and never reaches the
+   engine — so a companion theorem's evidence cannot lift a headline, and a misfiled
+   valid pair grades the headline 0, not 2. `maps` is encoder-side only: `pa-grade`'s
+   decoder is strict (`DisallowUnknownFields`), so the correspondence handed to the engine
+   is projected onto its four fields. The rule lives in ONE function so it can be
+   tightened or switched off by ruling. An anchor without `lean_theorem` can admit
+   evidence only through route (b).
 4. ENGINE. One `pa.Claim` per target anchor {claim, consumer "qbp#692-ci", pinned_sha,
    proof_assistants, correspondence, corroborated_by}. Edges: every `prediction_chain`
    entry (id → target) whose target is also a target anchor, typed `derivation`. This is
-   CONSERVATIVE — a derivation edge can only LOWER effective PA; typed relevance / mention
+   CONSERVATIVE — a derivation edge can only LOWER effective PA: `EffectivePA(X)` is the
+   min over X and its derivation DEPENDENCIES (the anchors X's `prediction_chain` points
+   at), never over X's dependents (RT N2); typed relevance / mention
    edges (which the engine excludes from the min) arrive with the Phase-1 chain migration,
    and until then every chain entry is treated as a derivation. Anchors with no evidence
    enter the same invocation as empty claims (zero assistants ⇒ PA 0 by construction) so
@@ -47,8 +74,10 @@ Pipeline
    `require_signature: false` (inter#149 v0 — StubV0, every record unsigned).
 5. WRITE (confined). For every target anchor `pa_local` = engine `pa`, `pa_effective` =
    engine `effective_pa` (integers). `proof_assistants` = the ledger-shape array
-   [{assistant, evidence_ref, trust_check, source_sha, producer}] ONLY when (a) v2 evidence
-   exists for the anchor AND (b) `provenance_kind ∈ {proof, derivation}` — on
+   [{assistant, evidence_ref, trust_check, source_sha, producer}] over the assistants that
+   SURVIVED the target filter, ONLY when (a) at least one did (an empty array is never
+   written — the key is omitted and the report flags `no_admissible_evidence`; RT N3b)
+   AND (b) `provenance_kind ∈ {proof, derivation}` — on
    `internal-compute` (PROOF-hessian) the two grades are written and the array NEVER is
    (cth-implementor ruling 2026-10-02 3d, live-test seq 2290). New keys are appended at the
    end of the record (key order is content for the confined writer). A stale array whose
@@ -56,12 +85,15 @@ Pipeline
    applied". Version minor-bump, `last_updated` = today UTC, one changelog entry.
 6. REPORT. `--report` (default analysis/692-pa-backfill/backfill-<date>.md + .json): the
    AC4 before/after table for all target anchors, the drop list, ignored_non_v2 /
-   unmatched_claim, pinned master commit, per-anchor S + blobs + pinned_sha, engine pin.
+   unmatched_claim / evidence_for_non_target, pinned master commit, per-anchor S + blobs +
+   pinned_sha, engine pin, and every per-anchor flag (engine + encoder).
 
 Usage:
   python3 scripts/encode_pa_from_evidence.py [--evidence-dir DIR] [--pinned-master REV]
                                               [--dry-run] [--report PATH]
 There is NO --pa argument. --ledger / --repo exist for tests (paths, never grades).
+--evidence-dir defaults to the beekeeper's checkout of inter/notary-evidence; that is a
+default only — CI and other checkouts pass the path explicitly (RT N5).
 """
 
 from __future__ import annotations
@@ -101,6 +133,10 @@ ASSISTANT_KEYS = ("assistant", "evidence_ref", "producer", "trust_check", "sourc
 DECLARED_KEYS = ("mode", "output_hash", "axioms", "exit_code")
 DERIVED_KEYS = ("output_hash", "tactics_used", "axioms", "exit_code", "kernel_clean")
 CORRESPONDENCE_KEYS = ("corresponds", "basis", "checked_by", "checked_at")
+# Encoder-side ONLY (never handed to the engine, whose decoder rejects unknown fields):
+# correspondence.maps = [{target, lean_theorem}] — the structured per-target pairs the
+# target filter reads (architecture ruling seq 2353). `basis` is prose, never parsed.
+CORRESPONDENCE_MAPS_KEY = "maps"
 # The ledger-shape ProofAssistant record (schema 0.3.5 $defs/ProofAssistant): the three
 # required pointers plus the two provenance fields the reconcile job needs.
 LEDGER_ASSISTANT_KEYS = (
@@ -242,17 +278,41 @@ def load_evidence(
 
 
 def group_by_claim(
-    records: List[Tuple[Path, Dict[str, Any]]], anchor_ids: set
-) -> Tuple[Dict[str, List[Tuple[Path, Dict[str, Any]]]], List[Dict[str, str]]]:
+    records: List[Tuple[Path, Dict[str, Any]]],
+    anchor_ids: set,
+    target_ids: Optional[set] = None,
+    kinds: Optional[Dict[str, Any]] = None,
+) -> Tuple[
+    Dict[str, List[Tuple[Path, Dict[str, Any]]]],
+    List[Dict[str, str]],
+    List[Dict[str, Any]],
+]:
+    """(by_claim over TARGET anchors, unmatched_claim, evidence_for_non_target). A record
+    whose claim is a ledger anchor but not a target anchor (e.g. a MEAS-*) is listed, not
+    graded and not silently dropped (RT N3a). `target_ids=None` ⇒ every anchor is a target
+    (tests of the merge path)."""
     by_claim: Dict[str, List[Tuple[Path, Dict[str, Any]]]] = OrderedDict()
     unmatched: List[Dict[str, str]] = []
+    non_target: List[Dict[str, Any]] = []
     for p, doc in records:
         cid = doc["claim"]
         if cid not in anchor_ids:
             unmatched.append({"file": str(p), "claim": cid})
             continue
+        if target_ids is not None and cid not in target_ids:
+            non_target.append(
+                {
+                    "file": str(p),
+                    "claim": cid,
+                    "provenance_kind": (kinds or {}).get(cid),
+                    "assistants": [
+                        a.get("assistant") for a in doc.get("proof_assistants", [])
+                    ],
+                }
+            )
+            continue
         by_claim.setdefault(cid, []).append((p, doc))
-    return by_claim, unmatched
+    return by_claim, unmatched, non_target
 
 
 def _project(d: Dict[str, Any], keys: Tuple[str, ...]) -> Dict[str, Any]:
@@ -269,14 +329,51 @@ def engine_assistant(a: Dict[str, Any]) -> Dict[str, Any]:
     return out
 
 
-def evidence_ref_path(ref: Any) -> str:
-    """`path@sha#theorem` → `path`. Refuses an unparseable ref."""
+EVIDENCE_REF_RE = re.compile(
+    r"^(?:(?P<repo>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+):)?"  # optional <owner>/<repo>:
+    r"(?P<path>[^@#:\s]+)"  # path (no '@', '#', ':' or whitespace)
+    r"(?:@(?P<commit>[^#\s]+))?"  # optional @<commit> (any rev token; cross-repo must have one)
+    r"(?:#(?P<target>\S+))?$"  # optional #<target>
+)
+
+
+def parse_evidence_ref(ref: Any) -> Dict[str, Optional[str]]:
+    """`[<owner>/<repo>:]<path>@<commit>#<target>` (ruling: live-test seq 2342).
+
+    No prefix means this repo (QBP). A cross-repo ref MUST carry a commit — it is
+    pinned by that commit plus `reproduce`, and it never enters the claim-source
+    manifest S. Refuses anything unparseable."""
     if not isinstance(ref, str) or not ref:
         raise Refusal(f"evidence_ref is not a non-empty string: {ref!r}")
-    path = ref.split("@", 1)[0].split("#", 1)[0]
-    if not path:
-        raise Refusal(f"evidence_ref names no path: {ref!r}")
-    return path
+    m = EVIDENCE_REF_RE.match(ref)
+    if not m or not m.group("path"):
+        raise Refusal(
+            f"evidence_ref does not match [<owner>/<repo>:]<path>@<commit>#<target>: {ref!r}"
+        )
+    d = m.groupdict()
+    if d["repo"] is not None and d["commit"] is None:
+        raise Refusal(
+            f"cross-repo evidence_ref {ref!r} carries no @<commit>; a foreign file is "
+            "pinned only by its commit (plus reproduce) and cannot be graded without one"
+        )
+    return d
+
+
+def evidence_ref_is_local(ref: Any) -> bool:
+    """True iff the ref names a file in THIS repo (no <owner>/<repo>: prefix)."""
+    return parse_evidence_ref(ref)["repo"] is None
+
+
+def evidence_ref_path(ref: Any) -> str:
+    """Same-repo `path@sha#theorem` → `path`. Refuses a cross-repo ref: a foreign
+    path must never be looked up in the QBP tree (§I4 seam bug, seq 2342)."""
+    d = parse_evidence_ref(ref)
+    if d["repo"] is not None:
+        raise Refusal(
+            f"evidence_ref {ref!r} is cross-repo ({d['repo']}); it has no QBP path and "
+            "must not enter the claim-source manifest"
+        )
+    return d["path"]  # type: ignore[return-value]
 
 
 def merge_claim_records(
@@ -288,6 +385,7 @@ def merge_claim_records(
     assistants: List[Dict[str, Any]] = []
     corr: Optional[Dict[str, Any]] = None
     corr_src: Optional[Path] = None
+    maps: List[Dict[str, str]] = []
     corroborated: List[str] = []
     for p, doc in recs:
         for a in doc["proof_assistants"]:
@@ -300,6 +398,7 @@ def merge_claim_records(
                     f"({corr_src} and {p}); which pair corresponds is ambiguous"
                 )
             corr, corr_src = _project(c, CORRESPONDENCE_KEYS), p
+            maps = correspondence_maps(cid, p, c)
         for x in doc.get("corroborated_by") or []:
             if isinstance(x, str) and x not in corroborated:
                 corroborated.append(x)
@@ -314,10 +413,105 @@ def merge_claim_records(
         )
     return {
         "assistants": assistants,
-        "correspondence": corr,
+        "correspondence": corr,  # engine fields only
+        "correspondence_maps": maps,  # encoder-side target pairs (never sent)
         "corroborated_by": corroborated,
         "files": [str(p) for p, _ in recs],
     }
+
+
+def correspondence_maps(cid: str, src: Path, c: Dict[str, Any]) -> List[Dict[str, str]]:
+    """The structured `maps: [{target, lean_theorem}]` of a correspondence block (seq 2353).
+    Absent ⇒ []. Present but malformed ⇒ refusal (a pair the filter cannot read must not
+    silently become "no pair")."""
+    raw = c.get(CORRESPONDENCE_MAPS_KEY)
+    if raw is None:
+        return []
+    if not isinstance(raw, list):
+        raise Refusal(f"{cid}: correspondence.maps in {src} is not a list")
+    out: List[Dict[str, str]] = []
+    for i, m in enumerate(raw):
+        if (
+            not isinstance(m, dict)
+            or not isinstance(m.get("target"), str)
+            or not m["target"]
+            or not isinstance(m.get("lean_theorem"), str)
+            or not m["lean_theorem"]
+        ):
+            raise Refusal(
+                f"{cid}: correspondence.maps[{i}] in {src} is not "
+                "{target: <str>, lean_theorem: <str>}"
+            )
+        out.append({"target": m["target"], "lean_theorem": m["lean_theorem"]})
+    return out
+
+
+# ---------------------------------------------------------------------------------------
+# target filter (RT C2; cth seq 2352 + architecture seq 2353) — ONE function, swappable
+# ---------------------------------------------------------------------------------------
+def names_match(a: Optional[str], b: Optional[str]) -> bool:
+    """Fully-qualified theorem-name equality with ONE relaxation: a short (dot-free) name
+    matches an FQ name iff it equals that name's last dotted component. Two FQ names must
+    be identical; two short names must be identical."""
+    if not a or not b:
+        return False
+    if a == b:
+        return True
+    if "." not in a and "." in b:
+        return a == b.rsplit(".", 1)[-1]
+    if "." not in b and "." in a:
+        return b == a.rsplit(".", 1)[-1]
+    return False
+
+
+def assistant_target(a: Dict[str, Any]) -> Optional[str]:
+    """The `#target` of an assistant's evidence_ref (None when the ref carries none)."""
+    return parse_evidence_ref(a.get("evidence_ref"))["target"]
+
+
+def filter_assistants_by_target(
+    anchor: Dict[str, Any],
+    assistants: List[Dict[str, Any]],
+    correspondence: Dict[str, Any],
+    maps: Optional[List[Dict[str, str]]] = None,
+) -> Tuple[List[Dict[str, Any]], List[str]]:
+    """THE target-vs-headline rule (module doc §3b). Returns (kept, dropped_flags).
+
+    keep iff  names_match(target, anchor.lean_theorem)
+          or  (correspondence.corresponds is True
+               and correspondence.checked_by is non-empty
+               and checked_by is not any assistant's producer
+               and some maps entry has names_match(entry.target, target)
+                                   and names_match(entry.lean_theorem, anchor.lean_theorem))
+    else drop with flag `target_not_headline:<assistant>`.
+    Dropped assistants never reach the engine, the ledger array, or S."""
+    headline = anchor.get("lean_theorem")
+    headline = headline if isinstance(headline, str) and headline else None
+    producers = {a.get("producer") for a in assistants if a.get("producer")}
+    checked_by = correspondence.get("checked_by")
+    corr_ok = (
+        correspondence.get("corresponds") is True
+        and isinstance(checked_by, str)
+        and bool(checked_by)
+        and checked_by not in producers
+    )
+    kept: List[Dict[str, Any]] = []
+    dropped: List[str] = []
+    for a in assistants:
+        target = assistant_target(a)
+        if headline is not None and names_match(target, headline):
+            kept.append(a)
+            continue
+        if corr_ok and headline is not None:
+            if any(
+                names_match(m.get("target"), target)
+                and names_match(m.get("lean_theorem"), headline)
+                for m in (maps or [])
+            ):
+                kept.append(a)
+                continue
+        dropped.append(f"target_not_headline:{a.get('assistant', '?')}")
+    return kept, dropped
 
 
 # ---------------------------------------------------------------------------------------
@@ -351,7 +545,15 @@ def pinned_sha_for(
     if isinstance(proof_file, str) and proof_file:
         paths[proof_file] = "proof_file"
     for a in assistants:
-        p = evidence_ref_path(a.get("evidence_ref"))
+        ref = a.get("evidence_ref")
+        if not evidence_ref_is_local(ref):
+            # cross-repo evidence (e.g. the notary's Coq port): validated above
+            # (prefix + commit), pinned by its own commit + reproduce; it never
+            # enters S — the claim-source manifest is over THIS repo's files only.
+            if "cross_repo_evidence" not in flags:
+                flags.append("cross_repo_evidence")
+            continue
+        p = evidence_ref_path(ref)
         paths.setdefault(p, "evidence_ref")
     sources: List[Dict[str, str]] = []
     for path in sorted(paths):
@@ -484,8 +686,21 @@ def grade_ledger(
             if a["id"] in by_claim
             else None
         )
+        rflags: List[str] = []
+        if ev:
+            kept, dropped = filter_assistants_by_target(
+                a, ev["assistants"], ev["correspondence"], ev["correspondence_maps"]
+            )
+            ev["dropped_assistants"] = [
+                x for x in ev["assistants"] if not any(x is k for k in kept)
+            ]
+            ev["assistants"] = kept
+            rflags.extend(dropped)
+            if not kept:
+                rflags.append("no_admissible_evidence")
         assistants = ev["assistants"] if ev else []
-        pinned, sources, rflags = pinned_sha_for(a, assistants, repo, commit)
+        pinned, sources, pflags = pinned_sha_for(a, assistants, repo, commit)
+        rflags.extend(pflags)
         if ev:
             corr, corro = ev["correspondence"], ev["corroborated_by"]
         else:
@@ -557,15 +772,16 @@ def plan_writes(
     ledger: Dict[str, Any], results: Dict[str, Dict[str, Any]]
 ) -> Dict[str, Dict[str, Any]]:
     """{id: {pa_local, pa_effective, proof_assistants (list | None=absent), changed}}.
-    The array is planned only on proof/derivation anchors WITH evidence; on any other
-    kind with evidence it is refused (flag `array_refused_<kind>`) and only grades go.
+    The array is planned only on proof/derivation anchors with at least one ADMISSIBLE
+    assistant (an empty array is never written — RT N3b); on any other kind with
+    admissible evidence it is refused (flag `array_refused_<kind>`) and only grades go.
     """
     by_id = {a["id"]: a for a in ledger["anchors"]}
     plan: Dict[str, Dict[str, Any]] = OrderedDict()
     for cid, r in results.items():
         a = by_id[cid]
         arr: Optional[List[Dict[str, Any]]] = None
-        if r["evidence"] is not None:
+        if r["evidence"] is not None and r["evidence"]["assistants"]:
             if a.get("provenance_kind") in TARGET_KINDS:
                 arr = ledger_assistants(cid, r["evidence"])
             else:
@@ -675,7 +891,9 @@ def build_report(
     meta: Dict[str, Any],
     ignored: List[Dict[str, str]],
     unmatched: List[Dict[str, str]],
+    non_target: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[str, Dict[str, Any]]:
+    non_target = non_target or []
     by_id = {a["id"]: a for a in ledger_before["anchors"]}
     rows: List[Dict[str, Any]] = []
     drops: List[Dict[str, Any]] = []
@@ -701,6 +919,16 @@ def build_report(
                 ("pinned_sha", r["pinned_sha"]),
                 ("sources", r["sources"]),
                 ("evidence_files", (r["evidence"] or {}).get("files", [])),
+                (
+                    "dropped_assistants",
+                    [
+                        {
+                            "assistant": x.get("assistant"),
+                            "evidence_ref": x.get("evidence_ref"),
+                        }
+                        for x in (r["evidence"] or {}).get("dropped_assistants", [])
+                    ],
+                ),
             ]
         )
         rows.append(row)
@@ -735,11 +963,23 @@ def build_report(
             ("drops", drops),
             ("ignored_non_v2", ignored),
             ("unmatched_claim", unmatched),
+            ("evidence_for_non_target", non_target),
             (
                 "pinned_sha_convention",
-                "claim-source manifest hash: S = {proof_file} ∪ {evidence_ref paths}; "
+                "claim-source manifest hash: S = {proof_file} ∪ {SAME-REPO evidence_ref "
+                "paths — grammar [<owner>/<repo>:]<path>@<commit>#<target>, no prefix = "
+                "QBP; cross-repo refs never enter S (seq 2342)}; "
                 "lines `path <git rev-parse <commit>:path>\\n` sorted by path; "
                 "pinned_sha = git hash-object --stdin over the lines (ruling seq 2299)",
+            ),
+            (
+                "target_filter",
+                "an assistant counts iff its evidence_ref #target names the anchor's "
+                "lean_theorem (FQ; a short name matches the last dotted component), or a "
+                "non-producer correspondence (corresponds true, checked_by set) carries a "
+                "maps[] entry {target, lean_theorem} pairing it with this anchor's "
+                "lean_theorem; else dropped, flag target_not_headline:<assistant> (RT C2; "
+                "cth seq 2352, architecture seq 2353)",
             ),
             ("anchors", rows),
         ]
@@ -761,6 +1001,7 @@ def build_report(
     md.append(f"| v2 evidence records | {meta['v2_record_count']} |")
     md.append(f"| ignored (non-v2) files | {len(ignored)} |")
     md.append(f"| unmatched claims | {len(unmatched)} |")
+    md.append(f"| evidence for non-target anchors | {len(non_target)} |")
     md.append(f"| target anchors | {len(rows)} |")
     md.append(f"| changed anchors | {rep['changed_anchor_count']} |")
     md.append(f"| derivation edges fed to the engine | {len(engine_out['_edges'])} |")
@@ -833,6 +1074,32 @@ def build_report(
     else:
         md.append("None.")
     md.append("")
+    md.append(
+        "## Evidence for non-target anchors (v2 records whose `claim` is a ledger anchor "
+        "that is not proof/derivation/PROOF-*; listed, never graded)\n"
+    )
+    if non_target:
+        for u in non_target:
+            md.append(
+                f"- `{u['file']}` — claim `{u['claim']}` (provenance_kind "
+                f"`{u.get('provenance_kind')}`; assistants {u.get('assistants')})"
+            )
+    else:
+        md.append("None.")
+    md.append("")
+    md.append("## Target filter\n")
+    md.append(f"{rep['target_filter']}\n")
+    dropped_rows = [r for r in rows if r["dropped_assistants"]]
+    if dropped_rows:
+        for r in dropped_rows:
+            ds = "; ".join(
+                f"`{d['assistant']}` ← `{d['evidence_ref']}`"
+                for d in r["dropped_assistants"]
+            )
+            md.append(f"- `{r['id']}` dropped: {ds}")
+    else:
+        md.append("No assistant dropped.")
+    md.append("")
     md.append("## pinned_sha manifests (S and per-file blobs at the pinned commit)\n")
     md.append(f"{rep['pinned_sha_convention']}\n")
     md.append("<details><summary>per-anchor manifests</summary>\n")
@@ -861,7 +1128,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--evidence-dir",
         type=Path,
         default=DEFAULT_EVIDENCE_DIR,
-        help="directory of notary evidence records (v2 engine shape graded; others ignored)",
+        help="directory of notary evidence records (v2 engine shape graded; others "
+        "ignored). The default is the beekeeper's checkout of inter/notary-evidence — "
+        "a default only; CI and other checkouts pass the path explicitly",
     )
     ap.add_argument(
         "--pinned-master",
@@ -899,7 +1168,11 @@ def run(
     ledger_before = json.loads(ledger_path.read_text(encoding="utf-8"))
     records, ignored = load_evidence(evidence_dir)
     anchor_ids = {a["id"] for a in ledger_before["anchors"]}
-    by_claim, unmatched = group_by_claim(records, anchor_ids)
+    target_ids = {a["id"] for a in target_anchors(ledger_before)}
+    kinds = {a["id"]: a.get("provenance_kind") for a in ledger_before["anchors"]}
+    by_claim, unmatched, non_target = group_by_claim(
+        records, anchor_ids, target_ids, kinds
+    )
     results, engine_out = grade_ledger(ledger_before, by_claim, repo, commit)
     plan = plan_writes(ledger_before, results)
     dist: Counter = Counter((r["pa"], r["effective_pa"]) for r in results.values())
@@ -921,7 +1194,7 @@ def run(
         "version_after": version if changed else None,
     }
     md, rep = build_report(
-        ledger_before, results, plan, engine_out, meta, ignored, unmatched
+        ledger_before, results, plan, engine_out, meta, ignored, unmatched, non_target
     )
     if write_report:
         rp = report_path or (REPORT_DIR / f"backfill-{today[:10]}.md")
@@ -958,7 +1231,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     print(
         f"v2 evidence records: {rep['v2_record_count']}; ignored non-v2: "
-        f"{len(rep['ignored_non_v2'])}; unmatched claims: {len(rep['unmatched_claim'])}"
+        f"{len(rep['ignored_non_v2'])}; unmatched claims: {len(rep['unmatched_claim'])}; "
+        f"evidence for non-target anchors: {len(rep['evidence_for_non_target'])}"
     )
     print(
         f"target anchors: {rep['target_anchor_count']}; distribution "

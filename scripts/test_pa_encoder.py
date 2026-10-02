@@ -12,6 +12,11 @@ Each test names the AC / ruling it pins:
             every member of S counts)
   AC4  derivation edges lower effective PA (and only derivation edges, in the engine)
   AC5  badge golden (mutant: rendering an assistant count in place of pa_effective)
+  seq 2342  evidence_ref grammar [<owner>/<repo>:]<path>@<commit>#<target>; cross-repo
+            refs never enter S (RT C1)
+  C2 / seq 2353  target-vs-headline filter: a companion's evidence cannot lift a headline;
+            correspondence admits a foreign target only via a structured maps[] pair
+  N3   never an empty proof_assistants array; evidence for non-target anchors is reported
 """
 
 from __future__ import annotations
@@ -70,8 +75,8 @@ def commit(repo: Path, files: dict, msg: str) -> str:
     return git(repo, "rev-parse", "HEAD")
 
 
-def anchor(aid, kind="proof", proof_file=None, chain=()):
-    return {
+def anchor(aid, kind="proof", proof_file=None, chain=(), lean_theorem=None):
+    a = {
         "id": aid,
         "name": aid,
         "tier": 1,
@@ -80,6 +85,9 @@ def anchor(aid, kind="proof", proof_file=None, chain=()):
         "proof_file": proof_file,
         "prediction_chain": list(chain),
     }
+    if lean_theorem is not None:
+        a["lean_theorem"] = lean_theorem
+    return a
 
 
 def mk_ledger(tmp_path: Path, anchors: list) -> Path:
@@ -109,21 +117,31 @@ def plant(evidence_dir: Path, name: str, doc: dict) -> Path:
 
 
 def evidence_from_fixture(
-    fx: str, claim: str, path: str, source_sha: str = "", drop_attestation=False
+    fx: str,
+    claim: str,
+    path: str,
+    source_sha: str = "",
+    drop_attestation=False,
+    theorem: str | None = None,
+    maps: list | None = None,
 ) -> dict:
     """A v2 record shaped exactly like fixture `fx`, re-pointed at `claim` / `path`.
     Oracles (expected_pa, flags, policy, attestation) are left in place unless asked —
-    the encoder must drop them itself."""
+    the encoder must drop them itself. `theorem` overrides every assistant's `#target`
+    (the fixtures' targets are fictional; the target filter needs them to name the
+    anchor's lean_theorem); `maps` is planted into the correspondence block."""
     doc = fixture(fx)
     doc["claim"] = claim
     for a in doc["proof_assistants"]:
         ref = a["evidence_ref"]
-        theorem = ref.split("#", 1)[1] if "#" in ref else "thm"
-        a["evidence_ref"] = f"{path}@{source_sha or 'deadbeef'}#{theorem}"
+        t = theorem or (ref.split("#", 1)[1] if "#" in ref else "thm")
+        a["evidence_ref"] = f"{path}@{source_sha or 'deadbeef'}#{t}"
         if source_sha:
             a["source_sha"] = source_sha
         if drop_attestation:
             a.pop("attestation", None)
+    if maps is not None:
+        doc.setdefault("correspondence", {})["maps"] = maps
     return doc
 
 
@@ -237,7 +255,10 @@ def test_refuses_empty_pinned_sha_with_evidence(tmp_path):
         "r.json",
         evidence_from_fixture("01_lean_clean.json", "PROOF-a", "proofs/Missing.lean"),
     )
-    ledger = mk_ledger(tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean")])
+    ledger = mk_ledger(
+        tmp_path,
+        [anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="lemma_a")],
+    )
     with pytest.raises(SystemExit, match="REFUSED.*does not exist at pinned master"):
         run_encoder(ledger, repo, ev, tmp_path)
     assert json.loads(ledger.read_text())["version"] == "6.13.0"  # nothing written
@@ -249,7 +270,9 @@ def test_refuses_empty_pinned_sha_with_evidence(tmp_path):
         "r.json",
         evidence_from_fixture("01_lean_clean.json", "PROOF-b", "proofs/A.lean"),
     )
-    ledger = mk_ledger(tmp_path, [anchor("PROOF-b", proof_file="Hurwitz 1898")])
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-b", proof_file="Hurwitz 1898", lean_theorem="lemma_a")]
+    )
     with pytest.raises(SystemExit, match="REFUSED.*pinned_sha must never be empty"):
         run_encoder(ledger, repo, ev, tmp_path)
 
@@ -285,9 +308,14 @@ def test_internal_compute_never_gets_proof_assistants(tmp_path):
     )
     head = git(repo, "rev-parse", "HEAD")
     hess = anchor(
-        "PROOF-hessian", kind="internal-compute", proof_file="proofs/Hessian.lean"
+        "PROOF-hessian",
+        kind="internal-compute",
+        proof_file="proofs/Hessian.lean",
+        lean_theorem="hessian_psd",  # fixture 02's #target
     )
-    clean = anchor("PROOF-a", kind="proof", proof_file="proofs/A.lean")
+    clean = anchor(
+        "PROOF-a", kind="proof", proof_file="proofs/A.lean", lean_theorem="lemma_a"
+    )
     ledger = mk_ledger(tmp_path, [hess, clean])
     ev = tmp_path / "ev"
     # fixture 02 is literally the hessian shape (native_decide); give it a matching
@@ -532,19 +560,29 @@ def test_derivation_edge_lowers_effective(tmp_path):
         {"proofs/A.lean": "a\n", "proofs/B.lean": "b\n", "proofs/C.lean": "c\n"},
     )
     head = git(repo, "rev-parse", "HEAD")
-    A = anchor("PROOF-chain-A", proof_file="proofs/A.lean", chain=["PROOF-chain-B"])
-    B = anchor("PROOF-chain-B", proof_file="proofs/B.lean")
-    C = anchor("PROOF-chain-C", proof_file="proofs/C.lean")
+    # fixture targets: 10a lean `x` + coq `y` (correspondence), 10b `x`, 10c `z`
+    A = anchor(
+        "PROOF-chain-A",
+        proof_file="proofs/A.lean",
+        chain=["PROOF-chain-B"],
+        lean_theorem="x",
+    )
+    B = anchor("PROOF-chain-B", proof_file="proofs/B.lean", lean_theorem="x")
+    C = anchor("PROOF-chain-C", proof_file="proofs/C.lean", lean_theorem="z")
     ev = tmp_path / "ev"
-    for fx, an in (
-        ("10a_chain_head_pa2.json", A),
-        ("10b_chain_dep_pa1.json", B),
-        ("10c_chain_relevance_pa0.json", C),
+    for fx, an, maps in (
+        ("10a_chain_head_pa2.json", A, [{"target": "y", "lean_theorem": "x"}]),
+        ("10b_chain_dep_pa1.json", B, None),
+        ("10c_chain_relevance_pa0.json", C, None),
     ):
         pin, _, _ = enc.pinned_sha_for(
             an, [{"evidence_ref": an["proof_file"] + "@x#t"}], repo, head
         )
-        plant(ev, fx, evidence_from_fixture(fx, an["id"], an["proof_file"], pin))
+        plant(
+            ev,
+            fx,
+            evidence_from_fixture(fx, an["id"], an["proof_file"], pin, maps=maps),
+        )
     ledger = mk_ledger(tmp_path, [A, B, C])
     out = run_encoder(ledger, repo, ev, tmp_path)
     r = out["results"]
@@ -611,7 +649,7 @@ def test_engine_excludes_relevance_edges():
 def test_no_silent_pa_rise(tmp_path):
     repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n", "proofs/B.lean": "b\n"})
     head = git(repo, "rev-parse", "HEAD")
-    A = anchor("PROOF-a", proof_file="proofs/A.lean")
+    A = anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="lemma_a")
     B = anchor("PROOF-b", proof_file="proofs/B.lean")
     ev = tmp_path / "ev"
     pin, _, _ = enc.pinned_sha_for(
@@ -706,7 +744,9 @@ def test_schema_invalid_assistant_entry_refused(tmp_path):
         "p9.json",
         evidence_from_fixture("P9_unknown_assistant.json", "PROOF-a", "proofs/A.lean"),
     )
-    ledger = mk_ledger(tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean")])
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="t")]
+    )
     with pytest.raises(SystemExit, match="REFUSED.*ProofAssistant"):
         run_encoder(ledger, repo, ev, tmp_path)
 
@@ -786,3 +826,319 @@ def test_badge_golden(tmp_path):
 
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-v"]))
+
+
+# --- §I4 seam fix (live-test seq 2342): cross-repo evidence_ref grammar -------------
+
+
+def test_parse_evidence_ref_grammar():
+    d = enc.parse_evidence_ref("proofs/QBP/A.lean@abc1234#thm")
+    assert d == {
+        "repo": None,
+        "path": "proofs/QBP/A.lean",
+        "commit": "abc1234",
+        "target": "thm",
+    }
+    d = enc.parse_evidence_ref(
+        "JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#fano_table_cross_prover"
+    )
+    assert d["repo"] == "JamesPagetButler/notary"
+    assert d["path"] == "proofs/FanoTableCrossProver.v"
+    assert d["commit"] == "b4c92818"
+    assert not enc.evidence_ref_is_local(
+        "JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#t"
+    )
+    assert enc.evidence_ref_is_local("proofs/QBP/A.lean@abc1234#t")
+
+
+def test_cross_repo_ref_without_commit_is_refused():
+    with pytest.raises(enc.Refusal):
+        enc.parse_evidence_ref(
+            "JamesPagetButler/notary:proofs/FanoTableCrossProver.v#t"
+        )
+    with pytest.raises(enc.Refusal):
+        enc.evidence_ref_path(
+            "JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#t"
+        )
+
+
+def test_cross_repo_ref_never_enters_manifest(tmp_path):
+    """Fano shape: Lean (QBP) + Coq (notary). S = {the Lean file} only; the mutant
+    'treat a prefixed ref as a QBP path' would refuse (file missing) or change S."""
+    repo = mk_repo(tmp_path, {"proofs/F3.lean": "theorem t : True := trivial\n"})
+    head = git(repo, "rev-parse", "HEAD")
+    an = anchor("PROOF-x", proof_file="proofs/F3.lean")
+    local_only = [{"evidence_ref": "proofs/F3.lean@aaaa#t"}]
+    with_coq = local_only + [
+        {
+            "evidence_ref": "JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#t"
+        }
+    ]
+    sha1, src1, flags1 = enc.pinned_sha_for(an, local_only, repo, head)
+    sha2, src2, flags2 = enc.pinned_sha_for(an, with_coq, repo, head)
+    assert sha1 == sha2
+    assert [s["path"] for s in src2] == ["proofs/F3.lean"]
+    assert "cross_repo_evidence" in flags2 and "cross_repo_evidence" not in flags1
+
+
+# ---------------------------------------------------------------------------------------
+# RT C2 — target-vs-headline filter (cth seq 2352; architecture seq 2353 FINAL)
+# ---------------------------------------------------------------------------------------
+HEADLINE = "QBP.Foundations.CDAlg.mulCoeff_three_eq_fano"
+COMPANION = "QBP.Foundations.FanoOrientationF3.fanoTableF4_eq_cayleyDickson"
+COQ_REF = (
+    "JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818"
+    "#fano_table_cross_prover"
+)
+
+
+def test_names_match_normalisation():
+    assert enc.names_match(COMPANION, COMPANION)
+    assert enc.names_match("fanoTableF4_eq_cayleyDickson", COMPANION)  # short vs FQ
+    assert enc.names_match(COMPANION, "fanoTableF4_eq_cayleyDickson")
+    assert not enc.names_match("mulCoeff_three_eq_fano", COMPANION)
+    assert not enc.names_match(
+        "Other.Ns.fanoTableF4_eq_cayleyDickson", COMPANION
+    )  # FQ≠FQ
+    assert not enc.names_match(
+        "eq_cayleyDickson", COMPANION
+    )  # suffix is not a component
+    assert not enc.names_match(None, COMPANION) and not enc.names_match("", "")
+
+
+def fano_record(claim: str, lean_path: str, source_sha: str, maps):
+    """Fixture-06 shape re-pointed at the real Fano pair: Lean (QBP) targets the
+    companion theorem by SHORT name; Coq (notary, cross-repo) targets its own lemma."""
+    doc = fixture("06_valid_pair_fano.json")
+    doc["claim"] = claim
+    lean, coq = doc["proof_assistants"]
+    lean["evidence_ref"] = f"{lean_path}@aaaa111#fanoTableF4_eq_cayleyDickson"
+    coq["evidence_ref"] = COQ_REF
+    for a in (lean, coq):
+        a["source_sha"] = source_sha
+    if maps is None:
+        doc["correspondence"].pop("maps", None)
+    else:
+        doc["correspondence"]["maps"] = maps
+    return doc
+
+
+def test_target_filter_unit_rules():
+    an = anchor("PROOF-fano-table-equals-cd-products", lean_theorem=COMPANION)
+    doc = fano_record(an["id"], "proofs/F3.lean", "s", None)
+    merged = enc.merge_claim_records(an["id"], [(Path("r"), doc)])
+    corr = merged["correspondence"]
+    assert "maps" not in corr  # never handed to the engine
+    good = [{"target": "fano_table_cross_prover", "lean_theorem": COMPANION}]
+    # (iii) short #target vs FQ lean_theorem counts; Coq counts via the structured pair
+    kept, dropped = enc.filter_assistants_by_target(
+        an, merged["assistants"], corr, good
+    )
+    assert [a["assistant"] for a in kept] == ["lean4", "coq"] and dropped == []
+    # (ii) bare corresponds:true with NO matching maps entry → Coq dropped
+    kept, dropped = enc.filter_assistants_by_target(an, merged["assistants"], corr, [])
+    assert [a["assistant"] for a in kept] == ["lean4"]
+    assert dropped == ["target_not_headline:coq"]
+    # (iv) a maps entry naming a DIFFERENT lean_theorem → dropped
+    other = [{"target": "fano_table_cross_prover", "lean_theorem": HEADLINE}]
+    kept, dropped = enc.filter_assistants_by_target(
+        an, merged["assistants"], corr, other
+    )
+    assert dropped == ["target_not_headline:coq"]
+    # a pair naming the right lean_theorem but another target → dropped
+    wrong_t = [{"target": "some_other_lemma", "lean_theorem": COMPANION}]
+    _, dropped = enc.filter_assistants_by_target(
+        an, merged["assistants"], corr, wrong_t
+    )
+    assert dropped == ["target_not_headline:coq"]
+    # checked_by equal to a producer → the correspondence route is closed
+    self_checked = dict(corr, checked_by="deming")
+    _, dropped = enc.filter_assistants_by_target(
+        an, merged["assistants"], self_checked, good
+    )
+    assert dropped == ["target_not_headline:coq"]
+    # corresponds false / empty checked_by → closed
+    for bad in (dict(corr, corresponds=False), dict(corr, checked_by="")):
+        _, dropped = enc.filter_assistants_by_target(
+            an, merged["assistants"], bad, good
+        )
+        assert dropped == ["target_not_headline:coq"]
+    # misfiled under the headline: NOTHING matches, even with the valid pair → both dropped
+    head = anchor("PROOF-cd-structure-constant-tables", lean_theorem=HEADLINE)
+    kept, dropped = enc.filter_assistants_by_target(
+        head, merged["assistants"], corr, good
+    )
+    assert kept == [] and dropped == [
+        "target_not_headline:lean4",
+        "target_not_headline:coq",
+    ]
+    # an anchor with no lean_theorem admits nothing by route (a)
+    bare = anchor("PROOF-hurwitz")
+    kept, _ = enc.filter_assistants_by_target(bare, merged["assistants"], corr, good)
+    assert kept == []
+    # malformed maps are a refusal, not "no pair"
+    with pytest.raises(SystemExit, match="REFUSED.*maps"):
+        enc.correspondence_maps("x", Path("r"), {"maps": [{"target": "t"}]})
+    with pytest.raises(SystemExit, match="REFUSED.*maps"):
+        enc.correspondence_maps("x", Path("r"), {"maps": "t->l"})
+
+
+def test_companion_cannot_lift_headline_end_to_end(tmp_path, monkeypatch):
+    """The 3e-refined ruling's item-4 test. One Fano-shaped record (Lean + cross-repo
+    Coq, non-producer correspondence with a structured pair):
+      filed under the COMPANION anchor → both count → PA 2 (through pa-grade);
+      filed under the HEADLINE anchor   → both dropped → 0 assistants → PA 0, no array.
+    Mutant: bypass the filter → the misfiled record grades the headline 2 → must fail.
+    """
+    repo = mk_repo(
+        tmp_path, {"proofs/CDAlg.lean": "decide\n", "proofs/F3.lean": "decide\n"}
+    )
+    head = git(repo, "rev-parse", "HEAD")
+    companion = anchor(
+        "PROOF-fano-table-equals-cd-products",
+        proof_file="proofs/F3.lean",
+        lean_theorem=COMPANION,
+    )
+    headline = anchor(
+        "PROOF-cd-structure-constant-tables",
+        proof_file="proofs/CDAlg.lean",
+        lean_theorem=HEADLINE,
+    )
+    maps = [{"target": "fano_table_cross_prover", "lean_theorem": COMPANION}]
+
+    # --- correctly filed: S = {F3.lean} (the Coq ref never enters S) → PA 2 ---------------
+    pin_c, src_c, fl_c = enc.pinned_sha_for(
+        companion,
+        [{"evidence_ref": "proofs/F3.lean@x#t"}, {"evidence_ref": COQ_REF}],
+        repo,
+        head,
+    )
+    assert [s["path"] for s in src_c] == [
+        "proofs/F3.lean"
+    ] and "cross_repo_evidence" in fl_c
+    ev = tmp_path / "ev-ok"
+    plant(ev, "fano.json", fano_record(companion["id"], "proofs/F3.lean", pin_c, maps))
+    ledger = mk_ledger(tmp_path, [companion, headline])
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    r = out["results"][companion["id"]]
+    assert (r["pa"], r["effective_pa"]) == (2, 2), r["flags"]
+    assert "cross_repo_evidence" in r["report_flags"]
+    assert not any(f.startswith("target_not_headline") for f in r["report_flags"])
+    L = json.loads(ledger.read_text())
+    by = {a["id"]: a for a in L["anchors"]}
+    arr = by[companion["id"]]["proof_assistants"]
+    assert [a["assistant"] for a in arr] == ["lean4", "coq"]
+    assert arr[1]["evidence_ref"] == COQ_REF  # the foreign ref is recorded verbatim
+    assert (by[headline["id"]]["pa_local"], by[headline["id"]]["pa_effective"]) == (
+        0,
+        0,
+    )
+    assert "proof_assistants" not in by[headline["id"]]
+
+    # --- misfiled under the headline: both dropped → PA 0, NO array ---------------------
+    pin_h, src_h, _ = enc.pinned_sha_for(
+        headline,
+        [{"evidence_ref": "proofs/F3.lean@x#t"}, {"evidence_ref": COQ_REF}],
+        repo,
+        head,
+    )
+    assert [s["path"] for s in src_h] == ["proofs/CDAlg.lean", "proofs/F3.lean"]
+    ev2 = tmp_path / "ev-misfiled"
+    plant(ev2, "fano.json", fano_record(headline["id"], "proofs/F3.lean", pin_h, maps))
+    (tmp_path / "two").mkdir()
+    ledger2 = mk_ledger(tmp_path / "two", [companion, headline])
+    out2 = run_encoder(ledger2, repo, ev2, tmp_path / "two")
+    r2 = out2["results"][headline["id"]]
+    assert (r2["pa"], r2["effective_pa"]) == (0, 0)
+    assert r2["evidence"] is not None and r2["evidence"]["assistants"] == []
+    assert sorted(r2["report_flags"]) == sorted(
+        [
+            "target_not_headline:lean4",
+            "target_not_headline:coq",
+            "no_admissible_evidence",
+        ]
+    )
+    L2 = json.loads(ledger2.read_text())
+    h2 = [a for a in L2["anchors"] if a["id"] == headline["id"]][0]
+    assert h2["pa_local"] == 0 and "proof_assistants" not in h2
+    rep2 = out2["report"]
+    row = [x for x in rep2["anchors"] if x["id"] == headline["id"]][0]
+    assert [d["assistant"] for d in row["dropped_assistants"]] == ["lean4", "coq"]
+    assert "target_not_headline:coq" in row["flags"]
+
+    # --- MUTANT GUARD: with the filter bypassed the misfiled record grades 2 -------------
+    monkeypatch.setattr(
+        enc,
+        "filter_assistants_by_target",
+        lambda anchor, assistants, corr, maps=None: (list(assistants), []),
+    )
+    (tmp_path / "mut").mkdir()
+    ledger3 = mk_ledger(tmp_path / "mut", [companion, headline])
+    out3 = run_encoder(ledger3, repo, ev2, tmp_path / "mut")
+    assert out3["results"][headline["id"]]["pa"] == 2  # the hole the filter closes
+    monkeypatch.undo()
+    (tmp_path / "again").mkdir()
+    ledger4 = mk_ledger(tmp_path / "again", [companion, headline])
+    assert (
+        run_encoder(ledger4, repo, ev2, tmp_path / "again")["results"][headline["id"]][
+            "pa"
+        ]
+        == 0
+    )
+
+
+# ---------------------------------------------------------------------------------------
+# RT N3 — never `proof_assistants: []`; evidence for non-target anchors is reported
+# ---------------------------------------------------------------------------------------
+def test_empty_assistants_record_never_writes_empty_array(tmp_path):
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    ev = tmp_path / "ev"
+    plant(ev, "empty.json", {"claim": "PROOF-a", "proof_assistants": []})
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="t")]
+    )
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    assert out["report"]["v2_record_count"] == 1
+    r = out["results"]["PROOF-a"]
+    assert r["pa"] == 0 and "no_admissible_evidence" in r["report_flags"]
+    a = json.loads(ledger.read_text())["anchors"][0]
+    assert a["pa_local"] == 0 and "proof_assistants" not in a
+    # and a ledger that CARRIED an empty array has it removed, not rewritten
+    L = json.loads(ledger.read_text())
+    L["anchors"][0]["proof_assistants"] = []
+    ledger.write_text(canonical_dump(L), encoding="utf-8")
+    out2 = run_encoder(ledger, repo, ev, tmp_path)
+    assert out2["changed"]
+    assert "proof_assistants" not in json.loads(ledger.read_text())["anchors"][0]
+    # the plan never carries an empty list
+    assert all(p["proof_assistants"] != [] for p in out2["plan"].values())
+
+
+def test_evidence_for_non_target_anchor_is_reported_not_graded(tmp_path):
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    ev = tmp_path / "ev"
+    plant(
+        ev,
+        "meas.json",
+        evidence_from_fixture("01_lean_clean.json", "MEAS-x", "proofs/A.lean"),
+    )
+    meas = anchor("MEAS-x", kind="measurement", proof_file=None, lean_theorem="lemma_a")
+    ledger = mk_ledger(
+        tmp_path,
+        [meas, anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="z")],
+    )
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    rep = out["report"]
+    assert rep["unmatched_claim"] == []
+    assert rep["evidence_for_non_target"] == [
+        {
+            "file": str(ev / "meas.json"),
+            "claim": "MEAS-x",
+            "provenance_kind": "measurement",
+            "assistants": ["lean4"],
+        }
+    ]
+    assert "MEAS-x" not in out["results"]
+    m = [a for a in json.loads(ledger.read_text())["anchors"] if a["id"] == "MEAS-x"][0]
+    assert "pa_local" not in m and "proof_assistants" not in m
+    assert "Evidence for non-target anchors" in (tmp_path / "report.md").read_text()
