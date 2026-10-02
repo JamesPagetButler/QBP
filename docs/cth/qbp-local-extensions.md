@@ -140,3 +140,22 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions land formally with the foundations reb
 | `retired_axioms` / `retired_principles` | records retired as roots/principles, kept verbatim with a dated `notes` string saying where their content went (AXIOM-2 → POST-boundary-encoding + META-2 + DERIV-encoding-level; DERIV-holographic → the flag-3 split) | the record is the audit trail; nothing is deleted | reported (bucket-4), not gated |
 
 **No further record-level fields.** Records in these lists carry only the schema's fields, the two D3 fields, and — for INTERP — `provenance_kind`. Evidence-anchor lists and supersession pointers are prose in the pre-existing `notes` field, not new fields (PR #662 Red Team R1: a `kind` taxonomy was ruled out at #654 D3(b)).
+
+---
+
+## Anchor fields (QBP#692, PA grading — 2026-10-02)
+
+### CTH v0.3.5 canonical (vendored at confluent-trust 13de2f7)
+
+| Field | Where | Meaning |
+|---|---|---|
+| `proof_assistants[]` | `Anchor`, `DerivedPrinciple` | Evidence pointers `{assistant ∈ lean4\|coq\|agda, evidence_ref (path@sha#theorem), trust_check ∈ pass\|fail, …}`; the PA grade is DERIVED by the `internal/pa` engine from the evidence at `evidence_ref`, never from this record alone. Written only on `provenance_kind ∈ {proof, derivation}` anchors (cth ruling 2026-10-02; upstream restriction in confluent-trust#112). |
+
+### QBP-local extensions (require upstream issue + co-sign)
+
+| Field | Type | Meaning | Written by | Reconciled by | Upstream extension issue |
+|---|---|---|---|---|---|
+| `pa_local` | integer 0..2 | `GradeClaim(...).pa` for this anchor's own `proof_assistants` evidence at `pinned_sha` (= the anchor's `proof_file` at the pinned master sha; never empty) | `scripts/encode_pa_from_evidence.py` only (confined writer; reads `inter/notary-evidence/` records in the `testdata/pa/` v2 shape; no `--pa` argument exists) | CI `pa-reconcile` recomputes with the vendored engine (`tools/cth-pa`, pin 13de2f7) and fails on any diff | confluent-trust#113 (canon adoption; #111 superseded) |
+| `pa_effective` | integer 0..2 | `EffectivePA` = min over this anchor and its derivation-edge dependents (edges read from `prediction_chain`; relevance/mention edges never lower it) | same encoder | same job — a stale stored value is a red CI, never silent drift | confluent-trust#113 |
+
+**Rules.** Both grades are computed-not-declared: no human or script assigns them; a grade that looks wrong is fixed by new or corrected notary evidence, never by a hand edit (QBP#692 AC2/AC4). On anchors with no admissible evidence both are 0 (honest backfill, QBP#692 AC3; `PROOF-hessian` = 0 by absence — its `native_decide` is not kernel-clean and its python recomputation is `corroborated_by`-class, never an assistant). `pinned_sha` is NOT stored on the anchor (no ledger home at 0.3.5); the encoder derives it and the reconcile job re-derives it the same way. Anti-weakening: every drop between backfills is listed in the PR's before/after table. Rendered as the PA badge (local + effective + assistant names), QBP#692 AC5.
