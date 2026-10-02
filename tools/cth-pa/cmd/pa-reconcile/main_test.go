@@ -306,17 +306,37 @@ func TestRejectNonHexPinnedSHA(t *testing.T) {
 func TestRejectMissingExpect(t *testing.T) {
 	c := corrPair(pinnedSHA)
 	in := baseInput([]pa.Claim{c}, nil, map[string]Expect{}) // no expect entry
-	if err := decodeErr(t, in, true); !errors.Is(err, errInput) {
-		t.Errorf("missing expect: err = %v, want errInput", err)
+	// Run under -allow-ungraded so R3's require-committed doesn't mask this guard:
+	// the missing-expect rejection must stand on its own (§I4 r2 R4 gap).
+	if err := decodeErr(t, in, false); !errors.Is(err, errInput) {
+		t.Errorf("missing expect (ungraded mode): err = %v, want errInput", err)
 	}
 }
 
 func TestRejectUnsuppliedEdgeEndpoint(t *testing.T) {
 	c := corrPair(pinnedSHA)
-	edges := []pa.Edge{{From: c.ID, To: "PROOF-ghost", Type: pa.EdgeDerivation}}
-	in := baseInput([]pa.Claim{c}, edges, map[string]Expect{c.ID: {RequiredPA: pa.PA1, CommittedLocal: grade(pa.PA2), CommittedEffective: grade(pa.PA2), SourceRef: "o/r@p"}})
+	exp := map[string]Expect{c.ID: {RequiredPA: pa.PA1, CommittedLocal: grade(pa.PA2), CommittedEffective: grade(pa.PA2), SourceRef: "o/r@p"}}
+	for _, e := range []pa.Edge{
+		{From: c.ID, To: "PROOF-ghost", Type: pa.EdgeDerivation}, // unsupplied `to`
+		{From: "PROOF-ghost", To: c.ID, Type: pa.EdgeDerivation}, // unsupplied `from` (§I4 r2 R4 gap)
+	} {
+		in := baseInput([]pa.Claim{c}, []pa.Edge{e}, exp)
+		if err := decodeErr(t, in, true); !errors.Is(err, errInput) {
+			t.Errorf("unsupplied edge endpoint %+v: err = %v, want errInput", e, err)
+		}
+	}
+}
+
+// TestRejectStrayExpectKey (§I4 r2 R4 gap): an expect entry for a claim that isn't
+// supplied is a typo, not something to silently ignore.
+func TestRejectStrayExpectKey(t *testing.T) {
+	c := corrPair(pinnedSHA)
+	in := baseInput([]pa.Claim{c}, nil, map[string]Expect{
+		c.ID:          {RequiredPA: pa.PA1, CommittedLocal: grade(pa.PA2), CommittedEffective: grade(pa.PA2), SourceRef: "o/r@p"},
+		"PROOF-stray": {RequiredPA: pa.PA1, CommittedLocal: grade(pa.PA0), CommittedEffective: grade(pa.PA0), SourceRef: "o/r@p"},
+	})
 	if err := decodeErr(t, in, true); !errors.Is(err, errInput) {
-		t.Errorf("unsupplied edge endpoint: err = %v, want errInput", err)
+		t.Errorf("stray expect key: err = %v, want errInput", err)
 	}
 }
 
