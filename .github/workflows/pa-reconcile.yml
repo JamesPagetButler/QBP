@@ -55,6 +55,6 @@ jobs:
         working-directory: tools/cth-pa
         run: scripts/check_vendor_upstream.sh "$GITHUB_WORKSPACE/_upstream_ct" "$CT_PIN"
 
-      - name: Vendor tamper mutant test
+      - name: Vendor check mutation tests (R1/R5 — incl. the sed-injection payload)
         working-directory: tools/cth-pa
-        run: scripts/check_vendor_upstream_test.sh "$GITHUB_WORKSPACE/_upstream_ct" "$CT_PIN"
+        run: scripts/test_check_vendor_upstream.sh "$GITHUB_WORKSPACE/_upstream_ct" "$CT_PIN"
