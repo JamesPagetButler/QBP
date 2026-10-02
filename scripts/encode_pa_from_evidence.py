@@ -65,12 +65,24 @@ Pipeline
    only inside the headline's own file; P-D); OR
    (b) CORRESPONDENCE — the record's block has `corresponds: true`, a non-empty
    `checked_by` that is not any assistant's `producer`, AND a STRUCTURED `maps[]` entry
-   `{target: <this assistant's #target>, lean_theorem: <this anchor's lean_theorem>}`
-   (`names_match` normalisation on the pair; `basis` stays prose and is never parsed).
-   Every other assistant — coq/agda whatever its lemma is named (P-A: a Coq lemma
-   literally named `fanoTableF4_eq_cayleyDickson`; P-B: an Agda ref carrying the FQ Lean
-   name verbatim), any cross-repo ref, a local lean4 short name in another file (P-D) —
-   counts ONLY through route (b), else is dropped with report flag
+   `{target: <this assistant's #target>, lean_theorem: <this anchor's lean_theorem>}`,
+   BOTH compared VERBATIM (RT N14: no short-name relaxation inside maps — the map is the
+   machine-checked field; `basis` stays prose and is never parsed). Route (b) is open
+   ONLY across KERNELS (`maps_may_rescue`, RT C6; architecture seq 2372 + cth 2371 —
+   one function so a ruling flips it in a line): a correspondence attests that a
+   DIFFERENT prover's kernel checked the same statement, so the assistant's prover must
+   differ from the headline's — a `lean_theorem` headline is Lean 4, so `maps` may
+   rescue coq / agda, never `lean4`. A lean4 target that fails (a) is dropped REGARDLESS
+   of `maps`, same-repo or cross-repo: a Lean theorem that is not `lean_theorem` is a
+   different Lean statement, and a map from it to the headline carries zero kernel
+   diversity — it is a declared Lean→Lean derivation (a chain edge, seq 2338), never a
+   cross-prover correspondence. Repo-locality is a PROVENANCE axis only (`cross_repo_
+   evidence` flag, S membership, staleness), never a maps-eligibility criterion. So:
+   coq/agda whatever the lemma is named (P-A: a Coq lemma literally named
+   `fanoTableF4_eq_cayleyDickson`; P-B: an Agda ref carrying the FQ Lean name verbatim),
+   local or foreign, counts ONLY through route (b); a lean4 short name in another file
+   (P-D), a local lean4 companion theorem (C6) or a foreign Lean port counts through
+   NEITHER; else dropped with report flag
    `target_not_headline:<assistant>` and never reaches the engine — so a companion
    theorem's evidence cannot lift a headline, a name coincidence across provers is not a
    correspondence, and a misfiled valid pair grades the headline 0, not 2. `maps` is
@@ -120,11 +132,13 @@ default only — CI and other checkouts pass the path explicitly (RT N5).
 from __future__ import annotations
 
 import argparse
+import atexit
 import datetime as _dt
 import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -380,8 +394,10 @@ def parse_evidence_ref(ref: Any) -> Dict[str, Optional[str]]:
             f"evidence_ref does not match [<owner>/<repo>:]<path>@<commit>#<target>: {ref!r}"
         )
     d = m.groupdict()
-    if d["repo"] == SELF_REPO:
-        d["repo"] = None  # RT N9: `JamesPagetButler/QBP:<path>` IS this repo — local
+    if d["repo"] is not None and d["repo"].lower() == SELF_REPO.lower():
+        # RT N9: `JamesPagetButler/QBP:<path>` IS this repo — local. RT N15: GitHub
+        # owner/repo names are case-insensitive, so `jamespagetbutler/qbp:` is too.
+        d["repo"] = None
     if d["repo"] is not None and d["commit"] is None:
         raise Refusal(
             f"cross-repo evidence_ref {ref!r} carries no @<commit>; a foreign file is "
@@ -540,6 +556,39 @@ def direct_target_match(anchor: Dict[str, Any], a: Dict[str, Any]) -> bool:
     return isinstance(proof_file, str) and bool(proof_file) and d["path"] == proof_file
 
 
+def headline_kind(anchor: Dict[str, Any]) -> str:
+    """The prover whose kernel checked the anchor's headline. At schema 0.3.5 the only
+    headline field is `lean_theorem`, so every headline is Lean 4."""
+    return LEAN_ASSISTANT
+
+
+def maps_may_rescue(assistant_kind: Optional[str], headline_kind: str) -> bool:
+    """RT C6 (architecture seq 2372 + cth 2371) — may a correspondence `maps[]` entry
+    admit an assistant that failed the direct match? The criterion is KERNEL DIVERSITY:
+    a correspondence attests that a DIFFERENT prover's kernel checked the same statement,
+    so `maps` may rescue only an assistant whose prover differs from the headline's.
+    For a `lean_theorem` headline that means `assistant != "lean4"` — a Lean theorem
+    that is not `lean_theorem` is a different Lean statement, and a map from it to the
+    headline carries zero kernel diversity: it is a declared Lean→Lean derivation (a
+    chain edge, seq 2338), not a cross-prover correspondence, same-repo or cross-repo.
+    Repo-locality is a provenance axis (`cross_repo_evidence`, S, staleness), never a
+    maps-eligibility criterion. ONE function; a ruling flips it in a line."""
+    return bool(assistant_kind) and assistant_kind != headline_kind
+
+
+def maps_pair(
+    maps: Optional[List[Dict[str, str]]], target: Optional[str], headline: str
+) -> bool:
+    """Some `maps[]` entry equals {target, lean_theorem} VERBATIM (RT N14: the map is the
+    machine-checked field — no short-name relaxation on either side)."""
+    if not target:
+        return False
+    return any(
+        m.get("target") == target and m.get("lean_theorem") == headline
+        for m in (maps or [])
+    )
+
+
 def filter_assistants_by_target(
     anchor: Dict[str, Any],
     assistants: List[Dict[str, Any]],
@@ -550,11 +599,12 @@ def filter_assistants_by_target(
 
     no lean_theorem on the anchor  ⇒  nothing kept, ONE flag `no_lean_theorem` (RT N11)
     keep iff  direct_target_match(anchor, a)          # lean4 + local + FQ | short-in-own-file
-          or  (correspondence.corresponds is True
+          or  (maps_may_rescue(a.assistant, headline_kind)   # RT C6: prover ≠ headline's
+               and correspondence.corresponds is True
                and correspondence.checked_by is non-empty
                and checked_by is not any assistant's producer
-               and some maps entry has names_match(entry.target, target)
-                                   and names_match(entry.lean_theorem, anchor.lean_theorem))
+               and some maps entry == {target: a.#target, lean_theorem: anchor.lean_theorem}
+                                                      # RT N14: verbatim, both sides)
     else drop with flag `target_not_headline:<assistant>`.
     Dropped assistants never reach the engine or the ledger array. S is NOT decided here
     (RT C4): `pinned_sha_for` runs over the whole record before this filter."""
@@ -572,18 +622,16 @@ def filter_assistants_by_target(
     kept: List[Dict[str, Any]] = []
     dropped: List[str] = []
     for a in assistants:
-        target = assistant_target(a)
         if direct_target_match(anchor, a):
             kept.append(a)
             continue
-        if corr_ok:
-            if any(
-                names_match(m.get("target"), target)
-                and names_match(m.get("lean_theorem"), headline)
-                for m in (maps or [])
-            ):
-                kept.append(a)
-                continue
+        if (
+            corr_ok
+            and maps_may_rescue(a.get("assistant"), headline_kind(anchor))
+            and maps_pair(maps, assistant_target(a), headline)
+        ):
+            kept.append(a)
+            continue
         dropped.append(f"target_not_headline:{a.get('assistant', '?')}")
     return kept, dropped
 
@@ -606,11 +654,20 @@ def pinned_sha_for(
     assistants: List[Dict[str, Any]],
     repo: Path,
     commit: str,
+    record_files: Optional[List[str]] = None,
 ) -> Tuple[str, List[Dict[str, str]], List[str]]:
     """THE pinned_sha convention (one place; swap here if the ruling changes).
 
-    Returns (pinned_sha, sources=[{path, blob}], report_flags). See module doc §3."""
+    Returns (pinned_sha, sources=[{path, blob}], report_flags). See module doc §3.
+    `record_files` = the evidence record file(s) the assistants came from; a refusal
+    names them and the claim id (RT N13) so one malformed companion ref in a promoted
+    record can be found without re-running the whole batch."""
     flags: List[str] = []
+    where = (
+        f" (claim {anchor['id']!r} in record " + ", ".join(record_files) + ")"
+        if record_files
+        else f" (claim {anchor['id']!r})"
+    )
     has_evidence = bool(assistants)
     proof_file = anchor.get("proof_file")
     paths: Dict[str, str] = (
@@ -636,13 +693,14 @@ def pinned_sha_for(
             if paths[path] == "evidence_ref":
                 raise Refusal(
                     f"{anchor['id']}: evidence_ref path {path!r} does not exist at pinned "
-                    f"master {commit[:12]}; pinned_sha cannot be computed for evidence "
-                    "that names a file the pinned tree does not have"
+                    f"master {commit[:12]}{where}; pinned_sha cannot be computed for "
+                    "evidence that names a file the pinned tree does not have (S covers "
+                    "every same-repo ref of the record, dropped or kept)"
                 )
             if has_evidence:
                 raise Refusal(
                     f"{anchor['id']}: declared proof_file {path!r} does not exist at "
-                    f"pinned master {commit[:12]} while evidence is being graded; "
+                    f"pinned master {commit[:12]}{where} while evidence is being graded; "
                     "pinned_sha must never be empty when grading evidence"
                 )
             flags.append("no_proof_file")
@@ -766,7 +824,11 @@ def grade_ledger(
         # who reaches the engine; it never shrinks the manifest (a dropped companion
         # must not false-flag the on-target survivor `stale`).
         pinned, sources, pflags = pinned_sha_for(
-            a, ev["assistants"] if ev else [], repo, commit
+            a,
+            ev["assistants"] if ev else [],
+            repo,
+            commit,
+            ev["files"] if ev else None,
         )
         if ev:
             kept, dropped = filter_assistants_by_target(
@@ -1210,6 +1272,34 @@ def build_report(
 
 
 # ---------------------------------------------------------------------------------------
+# dry-run scratch (RT N10 + N16)
+# ---------------------------------------------------------------------------------------
+_DRY_RUN_SCRATCH: List[Path] = []
+
+
+def dry_run_scratch_dir() -> Path:
+    """A fresh scratch directory for a `--dry-run` report without `--report`. It exists
+    for the life of the process (callers may read the report back) and is removed at
+    interpreter exit (RT N16: a CI runner dry-running per PR must not accumulate them).
+    Pass `--report` to keep a dry-run report."""
+    d = Path(tempfile.mkdtemp(prefix="qbp692-pa-dry-run-"))
+    if not _DRY_RUN_SCRATCH:
+        atexit.register(cleanup_dry_run_scratch)
+    _DRY_RUN_SCRATCH.append(d)
+    return d
+
+
+def cleanup_dry_run_scratch() -> List[Path]:
+    """Remove every dry-run scratch directory made by this process; returns them."""
+    gone: List[Path] = []
+    while _DRY_RUN_SCRATCH:
+        d = _DRY_RUN_SCRATCH.pop()
+        shutil.rmtree(d, ignore_errors=True)
+        gone.append(d)
+    return gone
+
+
+# ---------------------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------------------
 def build_parser() -> argparse.ArgumentParser:
@@ -1296,10 +1386,9 @@ def run(
         elif dry_run:
             # RT N10: a dry run must never clobber the committed record under
             # REPORT_DIR (the AC4 before/after table is the genuine record of the
-            # last applied run). Without --report it goes to a scratch directory.
-            rp = Path(tempfile.mkdtemp(prefix="qbp692-pa-dry-run-")) / (
-                f"backfill-{today[:10]}.dry-run.md"
-            )
+            # last applied run). Without --report it goes to a scratch directory
+            # that is removed at exit (RT N16) — pass --report to keep one.
+            rp = dry_run_scratch_dir() / f"backfill-{today[:10]}.dry-run.md"
         else:
             rp = REPORT_DIR / f"backfill-{today[:10]}.md"
         rp.parent.mkdir(parents=True, exist_ok=True)
@@ -1347,14 +1436,15 @@ def main(argv: Optional[List[str]] = None) -> int:
         f"target anchors without lean_theorem (admit nothing): "
         f"{rep['targets_without_lean_theorem']['count']}"
     )
-    if "_report_md" in rep:
-        where = (
-            " — DRY RUN: scratch path; the committed record under "
-            f"{REPORT_DIR} is untouched (pass --report to choose)"
-            if rep.get("_report_scratch")
-            else ""
+    if rep.get("_report_scratch"):
+        # RT N16: the scratch report is removed at exit — name no path that will not
+        # exist when the operator looks for it.
+        print(
+            "report: DRY RUN — not kept (scratch, removed at exit; pass --report "
+            f"<path> to keep one); the committed record under {REPORT_DIR} is untouched"
         )
-        print(f"report: {rep['_report_md']} (+ .json){where}")
+    elif "_report_md" in rep:
+        print(f"report: {rep['_report_md']} (+ .json)")
     if not out["changed"]:
         print(
             "already applied: every target anchor carries exactly the computed grades"

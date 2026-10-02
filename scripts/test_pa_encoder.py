@@ -924,6 +924,52 @@ def test_names_match_normalisation():
     assert not enc.names_match(None, COMPANION) and not enc.names_match("", "")
 
 
+def test_maps_compared_verbatim_no_short_name_relaxation():
+    """RT N14: `maps` is the machine-checked field — `target` and `lean_theorem` are
+    compared VERBATIM against the assistant's `#target` and the anchor's `lean_theorem`;
+    the `names_match` short-name relaxation does not apply inside maps on either side.
+    """
+    an = fano_anchor()
+    # short lean_theorem in the map vs the anchor's FQ lean_theorem → no pair → dropped
+    A, corr, maps = pair(
+        FANO_LEAN_FQ,
+        COQ_REF,
+        maps=[{"target": "fano_table_cross_prover", "lean_theorem": SHORT}],
+    )
+    assert enc.names_match(SHORT, COMPANION)  # the relaxation WOULD have matched
+    assert not enc.maps_pair(maps, "fano_table_cross_prover", COMPANION)
+    kept, dropped = enc.filter_assistants_by_target(an, A, corr, maps)
+    assert names(kept) == ["lean4"] and dropped == ["target_not_headline:coq"]
+    # short map target vs an FQ-named foreign lemma → no pair either
+    coq_fq = "JamesPagetButler/notary:proofs/F.v@b4c92818#Ns.fano_table_cross_prover"
+    A, corr, maps = pair(FANO_LEAN_FQ, coq_fq, maps=GOOD_MAPS)
+    assert not enc.maps_pair(maps, "Ns.fano_table_cross_prover", COMPANION)
+    assert enc.filter_assistants_by_target(an, A, corr, maps)[1] == [
+        "target_not_headline:coq"
+    ]
+    # verbatim on both sides → pair
+    assert enc.maps_pair(GOOD_MAPS, "fano_table_cross_prover", COMPANION)
+    assert not enc.maps_pair(GOOD_MAPS, None, COMPANION)
+    assert not enc.maps_pair(None, "fano_table_cross_prover", COMPANION)
+    # a short lean_theorem anchor (8 live) pairs only with a short map lean_theorem
+    sh = anchor("PROOF-shells", proof_file="proofs/S.lean", lean_theorem="shells")
+    A, corr, maps = pair(
+        "proofs/S.lean@a#shells",
+        COQ_REF,
+        maps=[{"target": "fano_table_cross_prover", "lean_theorem": "shells"}],
+    )
+    assert names(enc.filter_assistants_by_target(sh, A, corr, maps)[0]) == [
+        "lean4",
+        "coq",
+    ]
+    A, corr, maps = pair(
+        "proofs/S.lean@a#shells",
+        COQ_REF,
+        maps=[{"target": "fano_table_cross_prover", "lean_theorem": "Any.Ns.shells"}],
+    )
+    assert names(enc.filter_assistants_by_target(sh, A, corr, maps)[0]) == ["lean4"]
+
+
 def fano_record(claim: str, lean_path: str, source_sha: str, maps):
     """Fixture-06 shape re-pointed at the real Fano pair: Lean (QBP) targets the
     companion theorem by SHORT name; Coq (notary, cross-repo) targets its own lemma."""
@@ -1363,13 +1409,17 @@ def test_probe_PD_short_lean_target_only_in_its_own_file(monkeypatch):
     assert enc.filter_assistants_by_target(an, A, corr, maps)[1] == [
         "target_not_headline:lean4"
     ]
-    # ... unless a maps entry pairs it (route (b) is prover-agnostic by design)
+    # ... and a maps entry does NOT rescue it either (RT C6, seq 2372: route (b) is
+    # open across kernels only — a Lean→Lean map carries no kernel diversity, same-repo
+    # or cross-repo; see test_C6_*)
     A, corr, maps = pair(
         f"JamesPagetButler/notary:proofs/Fano.lean@b4c92818#{COMPANION}",
         COQ_REF,
         maps=GOOD_MAPS + [{"target": COMPANION, "lean_theorem": COMPANION}],
     )
-    assert enc.filter_assistants_by_target(an, A, corr, maps)[1] == []
+    assert enc.filter_assistants_by_target(an, A, corr, maps)[1] == [
+        "target_not_headline:lean4"
+    ]
     # MUTANT = drop the path check on short names → the other-file target is kept
     monkeypatch.setattr(enc, "direct_target_match", no_path_check)
     A, corr, maps = pair(other_file, COQ_REF, maps=GOOD_MAPS)
@@ -1446,6 +1496,244 @@ def test_positive_control_real_fano_companion_shape_grades_2(tmp_path):
     r3 = run_encoder(ledger3, repo, ev3, tmp_path / "three")["results"][companion["id"]]
     assert r3["pa"] == 1 and "target_not_headline:coq" in r3["report_flags"]
     assert r3["pinned_sha"] == pin  # C4: the drop did not change S
+
+
+# ---------------------------------------------------------------------------------------
+# RT C6 (architecture seq 2372 + cth 2371) — maps rescues across KERNELS only
+# ---------------------------------------------------------------------------------------
+CROSS_REPO_LEAN = (
+    "JamesPagetButler/other:proofs/X.lean@"
+    "0123456789abcdef0123456789abcdef01234567#" + SHORT
+)
+
+
+def test_maps_may_rescue_is_kernel_diversity():
+    assert enc.headline_kind(fano_anchor()) == "lean4"
+    assert not enc.maps_may_rescue("lean4", "lean4")  # Lean→Lean: no kernel diversity
+    assert enc.maps_may_rescue("coq", "lean4")
+    assert enc.maps_may_rescue("agda", "lean4")
+    assert not enc.maps_may_rescue(None, "lean4") and not enc.maps_may_rescue(
+        "", "lean4"
+    )
+
+
+def test_C6_lean_target_never_rescued_by_maps_unit():
+    """(i) a LOCAL lean4 companion target paired to the headline by maps → dropped;
+    (ii) a CROSS-REPO lean4 ref paired by maps → dropped (repo-locality is provenance,
+    not maps-eligibility); the Coq assistant in the same record stays map-eligible."""
+    headline = anchor(
+        "PROOF-cd-structure-constant-tables",
+        proof_file="proofs/QBP/Foundations/CDAlg.lean",
+        lean_theorem=HEADLINE,
+    )
+    both_to_headline = [
+        {"target": COMPANION, "lean_theorem": HEADLINE},
+        {"target": SHORT, "lean_theorem": HEADLINE},
+        {"target": "fano_table_cross_prover", "lean_theorem": HEADLINE},
+    ]
+    # (i) local lean4 FQ companion + cross-repo Coq, both mapped to the headline
+    A, corr, maps = pair(FANO_LEAN_FQ, COQ_REF, maps=both_to_headline)
+    assert corr["corresponds"] is True and corr["checked_by"] == "qbp-architecture"
+    kept, dropped = enc.filter_assistants_by_target(headline, A, corr, maps)
+    assert names(kept) == ["coq"] and dropped == ["target_not_headline:lean4"]
+    # (ii) cross-repo lean4 (another repo's Lean port) mapped to the headline → dropped
+    A, corr, maps = pair(CROSS_REPO_LEAN, COQ_REF, maps=both_to_headline)
+    assert not enc.evidence_ref_is_local(CROSS_REPO_LEAN)
+    kept, dropped = enc.filter_assistants_by_target(headline, A, corr, maps)
+    assert names(kept) == ["coq"] and dropped == ["target_not_headline:lean4"]
+    # the same cross-repo ref as a Coq port of the same name IS map-eligible
+    A, corr, maps = pair(
+        FANO_LEAN_FQ, CROSS_REPO_LEAN.replace(".lean", ".v"), maps=both_to_headline
+    )
+    kept, dropped = enc.filter_assistants_by_target(headline, A, corr, maps)
+    assert names(kept) == ["coq"] and dropped == ["target_not_headline:lean4"]
+
+
+def test_C6_misfiled_lean_lean_map_cannot_lift_headline_end_to_end(
+    tmp_path, monkeypatch
+):
+    """The C6 reproduction (RT re-check @ 5cbcfd3), end-to-end through pa-grade: a record
+    filed under the HEADLINE anchor — local lean4 targeting the COMPANION theorem (a
+    different statement) + cross-repo Coq `fano_table_cross_prover`; `corresponds: true`,
+    non-producer `checked_by`.
+      shape A (the real Fano maps + a Lean→Lean map COMPANION→HEADLINE): both dropped —
+        the Lean→Lean map has no kernel diversity, the Coq map pairs the companion, not
+        the headline → headline PA 0, no array;
+      shape B (the RT's exact repro: BOTH maps → HEADLINE): lean4 dropped regardless of
+        its map; the Coq assistant is kernel-diverse and its map names the headline
+        verbatim, so it survives on the checker's word → headline PA 1 (one foreign
+        Coq assistant), never the 2 the probe produced with zero Lean proof of itself.
+    Positive control unchanged: the pair filed under the COMPANION → PA 2. Mutant (`maps`
+    rescues lean4) → shape B grades the misfiled headline 2 → must fail."""
+    cd_file = "proofs/QBP/Foundations/CDAlg.lean"
+    repo = mk_repo(tmp_path, {FANO_FILE: "decide\n", cd_file: "decide\n"})
+    head = git(repo, "rev-parse", "HEAD")
+    companion = fano_anchor()
+    headline = anchor(
+        "PROOF-cd-structure-constant-tables", proof_file=cd_file, lean_theorem=HEADLINE
+    )
+
+    def record(claim, pin, maps):
+        doc = fixture("06_valid_pair_fano.json")
+        doc["claim"] = claim
+        lean, coq = doc["proof_assistants"]
+        lean["evidence_ref"] = f"{FANO_FILE}@{head}#{COMPANION}"
+        coq["evidence_ref"] = COQ_REF
+        for a in (lean, coq):
+            a["source_sha"] = pin
+        doc["correspondence"]["maps"] = maps
+        return doc
+
+    pin_h, src_h, _ = enc.pinned_sha_for(
+        headline,
+        [{"evidence_ref": FANO_LEAN_FQ}, {"evidence_ref": COQ_REF}],
+        repo,
+        head,
+    )
+    assert [s["path"] for s in src_h] == [cd_file, FANO_FILE]
+    lean_lean = {"target": COMPANION, "lean_theorem": HEADLINE}
+
+    # --- shape A: real Fano maps + the Lean→Lean map → both dropped → PA 0, no array ----
+    ev_a = tmp_path / "ev-a"
+    plant(ev_a, "fano.json", record(headline["id"], pin_h, [lean_lean] + GOOD_MAPS))
+    ledger = mk_ledger(tmp_path, [companion, headline])
+    out = run_encoder(ledger, repo, ev_a, tmp_path)
+    r = out["results"][headline["id"]]
+    assert (r["pa"], r["effective_pa"]) == (0, 0), r["flags"]
+    assert r["evidence"]["assistants"] == []
+    assert sorted(r["report_flags"]) == sorted(
+        [
+            "target_not_headline:lean4",
+            "target_not_headline:coq",
+            "no_admissible_evidence",
+            "cross_repo_evidence",
+        ]
+    )
+    assert r["pinned_sha"] == pin_h  # C4: S over the whole record
+    by = {a["id"]: a for a in json.loads(ledger.read_text())["anchors"]}
+    assert (
+        by[headline["id"]]["pa_local"] == 0
+        and "proof_assistants" not in by[headline["id"]]
+    )
+    assert by[companion["id"]]["pa_local"] == 0
+    row = [x for x in out["report"]["anchors"] if x["id"] == headline["id"]][0]
+    assert [d["assistant"] for d in row["dropped_assistants"]] == ["lean4", "coq"]
+
+    # --- shape B: the RT's exact repro (both maps → HEADLINE) → lean4 dropped, PA 1 ----
+    ev = tmp_path / "ev-b"
+    both_to_headline = [
+        lean_lean,
+        {"target": "fano_table_cross_prover", "lean_theorem": HEADLINE},
+    ]
+    plant(ev, "fano.json", record(headline["id"], pin_h, both_to_headline))
+    (tmp_path / "b").mkdir()
+    ledger_b = mk_ledger(tmp_path / "b", [companion, headline])
+    out_b = run_encoder(ledger_b, repo, ev, tmp_path / "b")
+    rb = out_b["results"][headline["id"]]
+    assert (rb["pa"], rb["effective_pa"]) == (1, 1), rb["flags"]  # was 2 at 5cbcfd3
+    assert [a["assistant"] for a in rb["evidence"]["assistants"]] == ["coq"]
+    assert sorted(rb["report_flags"]) == [
+        "cross_repo_evidence",
+        "target_not_headline:lean4",
+    ]
+    by_b = {a["id"]: a for a in json.loads(ledger_b.read_text())["anchors"]}
+    assert [a["assistant"] for a in by_b[headline["id"]]["proof_assistants"]] == ["coq"]
+    assert (
+        by_b[headline["id"]]["pa_local"] == 1 and by_b[companion["id"]]["pa_local"] == 0
+    )
+
+    # --- positive control: the same pair filed under the companion → PA 2 ------------
+    pin_c, _, _ = enc.pinned_sha_for(
+        companion,
+        [{"evidence_ref": FANO_LEAN_FQ}, {"evidence_ref": COQ_REF}],
+        repo,
+        head,
+    )
+    ev2 = tmp_path / "ev-ok"
+    plant(ev2, "fano.json", record(companion["id"], pin_c, GOOD_MAPS))
+    (tmp_path / "ok").mkdir()
+    ledger2 = mk_ledger(tmp_path / "ok", [companion, headline])
+    out2 = run_encoder(ledger2, repo, ev2, tmp_path / "ok")
+    r2 = out2["results"][companion["id"]]
+    assert (r2["pa"], r2["effective_pa"]) == (2, 2), r2["flags"]
+    assert not any(f.startswith("target_not_headline") for f in r2["report_flags"])
+    by2 = {a["id"]: a for a in json.loads(ledger2.read_text())["anchors"]}
+    assert [a["assistant"] for a in by2[companion["id"]]["proof_assistants"]] == [
+        "lean4",
+        "coq",
+    ]
+    assert by2[headline["id"]]["pa_local"] == 0
+
+    # --- MUTANT: maps may rescue lean4 → shape B grades the misfiled headline 2 --------
+    monkeypatch.setattr(enc, "maps_may_rescue", lambda kind, hk: bool(kind))
+    (tmp_path / "mut").mkdir()
+    ledger3 = mk_ledger(tmp_path / "mut", [companion, headline])
+    r3 = run_encoder(ledger3, repo, ev, tmp_path / "mut")["results"][headline["id"]]
+    assert r3["pa"] == 2 and "target_not_headline:lean4" not in r3["report_flags"]
+    monkeypatch.undo()
+    (tmp_path / "again").mkdir()
+    ledger4 = mk_ledger(tmp_path / "again", [companion, headline])
+    r4 = run_encoder(ledger4, repo, ev, tmp_path / "again")["results"][headline["id"]]
+    assert r4["pa"] == 1 and "target_not_headline:lean4" in r4["report_flags"]
+
+
+# ---------------------------------------------------------------------------------------
+# RT N13 — a refusal over an unresolvable same-repo ref names the record and the claim
+# ---------------------------------------------------------------------------------------
+def test_refusal_names_record_file_and_claim(tmp_path):
+    """One record: on-target `#t` in proofs/A.lean + a second (would-be-dropped) assistant
+    at `proofs/DoesNotExist.lean`. S covers both (C4), so the run refuses — and the
+    message names the evidence record file and the claim id, not only the anchor."""
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    head = git(repo, "rev-parse", "HEAD")
+    doc = fixture("01_lean_clean.json")
+    doc["claim"] = "PROOF-a"
+    a0 = doc["proof_assistants"][0]
+    a1 = json.loads(json.dumps(a0))
+    a0["evidence_ref"] = "proofs/A.lean@x#t"
+    a1["evidence_ref"] = "proofs/DoesNotExist.lean@x#other"
+    doc["proof_assistants"] = [a0, a1]
+    ev = tmp_path / "ev"
+    rec = plant(ev, "companion-ref.json", doc)
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="t")]
+    )
+    with pytest.raises(SystemExit) as ei:
+        run_encoder(ledger, repo, ev, tmp_path)
+    msg = str(ei.value)
+    assert msg.startswith(
+        "REFUSED: PROOF-a: evidence_ref path 'proofs/DoesNotExist.lean'"
+    )
+    assert "does not exist at pinned master" in msg
+    assert f"claim 'PROOF-a' in record {rec}" in msg
+    assert "dropped or kept" in msg
+    # the unit function names the record(s) it is given; without them, the claim only
+    with pytest.raises(
+        SystemExit, match=r"claim 'PROOF-a' in record r1\.json, r2\.json"
+    ):
+        enc.pinned_sha_for(
+            anchor("PROOF-a", proof_file="proofs/A.lean"),
+            [{"evidence_ref": "proofs/Nope.lean@x#t"}],
+            repo,
+            head,
+            ["r1.json", "r2.json"],
+        )
+    with pytest.raises(SystemExit, match=r"\(claim 'PROOF-a'\); pinned_sha"):
+        enc.pinned_sha_for(
+            anchor("PROOF-a", proof_file="proofs/A.lean"),
+            [{"evidence_ref": "proofs/Nope.lean@x#t"}],
+            repo,
+            head,
+        )
+    # a missing proof_file while grading names the record too
+    with pytest.raises(SystemExit, match=r"declared proof_file .* in record r\.json"):
+        enc.pinned_sha_for(
+            anchor("PROOF-a", proof_file="proofs/Missing.lean"),
+            [{"evidence_ref": "proofs/A.lean@x#t"}],
+            repo,
+            head,
+            ["r.json"],
+        )
 
 
 # ---------------------------------------------------------------------------------------
@@ -1546,6 +1834,18 @@ def test_self_prefixed_ref_is_local_and_enters_manifest(tmp_path):
         "JamesPagetButler/QBP-fork:proofs/A.lean@b4c92818#t"
     )
     assert not enc.evidence_ref_is_local("someone/QBP:proofs/A.lean@b4c92818#t")
+    # RT N15: GitHub owner/repo names are case-insensitive — so is the self-prefix
+    for lc in (
+        "jamespagetbutler/qbp:",
+        "JAMESPAGETBUTLER/QBP:",
+        "jamesPagetButler/Qbp:",
+    ):
+        d_lc = enc.parse_evidence_ref(lc + "proofs/A.lean@x#t")
+        assert d_lc["repo"] is None and d_lc["path"] == "proofs/A.lean", lc
+        assert enc.evidence_ref_is_local(lc + "proofs/A.lean@x#t")
+    assert not enc.evidence_ref_is_local(
+        "jamespagetbutler/qbp-fork:proofs/A.lean@b4c92818#t"
+    )
     repo = mk_repo(tmp_path, {"proofs/F3.lean": "a\n", "proofs/A.lean": "b\n"})
     head = git(repo, "rev-parse", "HEAD")
     an = anchor("PROOF-x", proof_file="proofs/F3.lean")
@@ -1555,6 +1855,11 @@ def test_self_prefixed_ref_is_local_and_enters_manifest(tmp_path):
     p2, s2, f2 = enc.pinned_sha_for(an, [{"evidence_ref": ref}], repo, head)
     assert p1 == p2 and [s["path"] for s in s2] == ["proofs/A.lean", "proofs/F3.lean"]
     assert "cross_repo_evidence" not in f2
+    p3, s3, f3 = enc.pinned_sha_for(
+        an, [{"evidence_ref": "jamespagetbutler/qbp:proofs/A.lean@x#t"}], repo, head
+    )
+    assert p3 == p1 and [s["path"] for s in s3] == ["proofs/A.lean", "proofs/F3.lean"]
+    assert "cross_repo_evidence" not in f3  # N15: enters S like the canonical casing
 
 
 # ---------------------------------------------------------------------------------------
@@ -1600,6 +1905,49 @@ def test_dry_run_never_writes_the_committed_report(tmp_path, monkeypatch):
     assert out3["report"]["_report_scratch"] is False
     assert (committed / "backfill-2026-10-02.md").read_text() != "RECORD\n"
     assert (committed / "backfill-2026-10-02.json").exists()
+    # RT N16: the scratch dir is registered for removal at exit; an explicit --report is
+    # not. Run the registered cleanup now and check only the scratch one is gone.
+    assert rp.parent in enc._DRY_RUN_SCRATCH
+    assert (tmp_path / "mine.md").parent not in enc._DRY_RUN_SCRATCH
+    gone = enc.cleanup_dry_run_scratch()
+    assert rp.parent in gone and not rp.parent.exists() and not rp.exists()
+    assert (tmp_path / "mine.md").exists() and enc._DRY_RUN_SCRATCH == []
+    assert (committed / "backfill-2026-10-02.md").exists()
+
+
+def test_dry_run_cli_names_no_scratch_path(tmp_path, monkeypatch, capsys):
+    """RT N16 (CLI): without --report the dry-run line names no path (the scratch dir
+    is gone at exit); with --report the kept path is printed."""
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="t")]
+    )
+    monkeypatch.setattr(enc, "REPORT_DIR", tmp_path / "committed")
+    ev = tmp_path / "ev"
+    ev.mkdir()
+    base = [
+        "--evidence-dir",
+        str(ev),
+        "--pinned-master",
+        "HEAD",
+        "--ledger",
+        str(ledger),
+        "--repo",
+        str(repo),
+        "--dry-run",
+    ]
+    rc = enc.main(base)
+    out = capsys.readouterr().out
+    assert rc == 0 and "DRY applied" in out
+    assert "not kept" in out and "qbp692-pa-dry-run-" not in out
+    scratch = list(enc._DRY_RUN_SCRATCH)
+    assert len(scratch) == 1 and scratch[0].exists()
+    enc.cleanup_dry_run_scratch()
+    assert not scratch[0].exists()
+    rc = enc.main(base + ["--report", str(tmp_path / "keep.md")])
+    out = capsys.readouterr().out
+    assert rc == 0 and f"report: {tmp_path / 'keep.md'} (+ .json)" in out
+    assert (tmp_path / "keep.md").exists() and enc._DRY_RUN_SCRATCH == []
 
 
 # ---------------------------------------------------------------------------------------
