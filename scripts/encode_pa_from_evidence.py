@@ -25,20 +25,41 @@ Pipeline
 2. TARGETS. Anchors with `provenance_kind ∈ {proof, derivation}` ∪ ids starting `PROOF-`
    (147 at ledger 6.13.0, incl. `PROOF-hessian` which is `internal-compute`).
 3. pinned_sha (architecture ruling, live-test seq 2299; closure ruling live-test seq 2394
-   — FINAL): the claim-source MANIFEST hash. S = the TRANSITIVE CLOSURE, over QBP-local
-   `import QBP.…` lines, of {anchor proof_file} ∪ {SAME-REPO paths named by the claim's
-   v2 evidence_refs}, deduplicated — a claim's statement depends on the definitions its
-   file imports (the Fano headline names `fanoTableF4`, defined in FanoOrientationF3.lean),
-   so those files are part of what the evidence pinned. Module → file: `import QBP.A.B` →
-   `proofs/QBP/A/B.lean` (`LEAN_SRC_ROOT`; lakefile `lean_lib «QBP» roots := #[`QBP]`
-   under `proofs/`). Imports are read from the file content AT THE PINNED COMMIT (`git
-   cat-file blob`), never from a checkout; only `.lean` members are scanned; comments are
-   stripped and only the Lean header (imports precede every other command) is read
-   (`lean_local_imports`, `lean_module_path`). Mathlib / Std / Lean-core imports are
-   EXCLUDED — they are pinned by the lake manifest (inter#153). An imported QBP module
-   whose file does not exist at the pinned commit is a refusal naming the anchor, the
-   claim, the record and the importing file. The walk is a seen-set BFS, so an import
-   cycle terminates. evidence_ref grammar (§I4 ruling on PR #695, live-test
+   — FINAL; scope extended to every lake library + Agda by QBP#696): the claim-source
+   MANIFEST hash. S = the TRANSITIVE CLOSURE, over SAME-REPO imports, of {anchor
+   proof_file} ∪ {SAME-REPO paths named by the claim's v2 evidence_refs}, deduplicated —
+   a claim's statement depends on the definitions its file imports (the Fano headline
+   names `fanoTableF4`, defined in FanoOrientationF3.lean), so those files are part of
+   what the evidence pinned. LEAN module → file is DERIVED FROM `proofs/lakefile.lean` AT
+   THE PINNED COMMIT (`lake_module_map`, memoised per pin; `parse_lakefile`): every
+   `lean_lib «Name» where … roots := #[…] / srcDir := "…"` block maps each root module to
+   `proofs/<srcDir or .>`, so `import QBP.A.B` → `proofs/QBP/A/B.lean` (lib «QBP», roots
+   [QBP]) and `import Sedenion` → `proofs/Sprint12-Inherited/Sedenion.lean` (lib
+   «QBPSprint12», srcDir "Sprint12-Inherited", bare roots Bi2Se3 … SedenionHessianTraceSq);
+   a module whose first component is no lib root (Mathlib, Std, Lean, Aesop, …) is
+   non-local — pinned by the lake manifest (inter#153) — and skipped; no lakefile at the
+   pin while a `.lean` member has imports ⇒ refusal (the map cannot be guessed). AGDA
+   members (`.agda` / `.lagda.md` / `.lagda`) are scanned ANYWHERE in the file (Agda allows
+   imports after the module header) for `open import X.Y` / `import X.Y`, comments
+   (`--`, nested `{- -}`) stripped, and resolve against the member's OWN corpus root
+   (`agda_root_of`: the directory left when the file's `module A.B.C` name is peeled off
+   its path — `proofs/agda/` or `proofs/agda-cubical/`): `X/Y.agda`, else `.lagda.md`,
+   else `.lagda`, at the pin; a module not found under that root is a library import
+   (the pinned agda / cubical) → non-local, skipped; found → enters S and is scanned
+   transitively. Imports are read from the file content AT THE PINNED COMMIT (`git
+   cat-file blob`), never from a checkout; Lean reads the header only (imports precede
+   every other command) (`lean_header_imports`, `lean_module_path`, `local_imports_of`).
+   An imported LEAN module whose file does not exist at the pinned commit is a refusal
+   naming the anchor, the claim, the record and the importing file. OUT-OF-TREE GUARD
+   (architecture ruling live-test seq 2446): a path-valued `proof_file` or a same-repo
+   evidence_ref path that is absolute, contains a `..` segment, or does not start with
+   `proofs/` is a refusal naming the anchor and is NEVER a closure seed
+   (`check_in_tree`); a `proof_file` that is not a path at all (the literature citations
+   `PROOF-hurwitz` "Hurwitz 1898", `PROOF-born` "Hurwitz corollary") is `no_proof_file`,
+   inert; a path-valued `proof_file` that does not exist at the pin is `stale_proof_file`
+   (inert without evidence, refusal with it) and is listed in the report's
+   `stale_proof_file` section (AC5). The walk is a seen-set BFS, so an import cycle
+   terminates. evidence_ref grammar (§I4 ruling on PR #695, live-test
    seq 2342; RT C1): `[<owner>/<repo>:]<path>@<commit>#<target>` — no prefix means THIS
    repo (QBP) and only such refs enter S; a prefixed (cross-repo, e.g. the notary's Coq
    port `JamesPagetButler/notary:proofs/FanoTableCrossProver.v@b4c92818#…`) ref MUST
@@ -55,8 +76,9 @@ Pipeline
    over the concatenated lines. The same form is used when S has one file, so there is one
    rule. The engine compares every assistant's `source_sha` to this value (stale ⇒ counts
    0, fail-closed). Refusals: an evidence_ref path that does not exist at the pinned
-   commit; a declared proof_file that does not exist at the pinned commit while evidence is
-   being graded (pinned_sha must never be empty when grading evidence — architecture 3c).
+   commit; a declared proof_file that does not exist at the pinned commit — or is not a
+   path at all (a citation) — while evidence is being graded (pinned_sha must never be
+   empty when grading evidence — architecture 3c).
    No evidence and no resolvable proof_file ⇒ pinned_sha "" (inert: nothing to be stale),
    report flag `no_proof_file`. The convention lives in ONE function (`pinned_sha_for`) so
    it can be swapped; S and the per-file blobs go in the report, not the ledger
@@ -141,7 +163,11 @@ Pipeline
 6. REPORT. `--report` (default analysis/692-pa-backfill/backfill-<date>.md + .json): the
    AC4 before/after table for all target anchors, the drop list, ignored_non_v2 /
    unmatched_claim / evidence_for_non_target, pinned master commit, per-anchor S + blobs +
-   pinned_sha, engine pin, and every per-anchor flag (engine + encoder).
+   pinned_sha, engine pin, every per-anchor flag (engine + encoder), the EVIDENCE REPO
+   IDENTITY (RT N2 on PR #697: `git -C <evidence_dir> rev-parse HEAD` + `remote get-url
+   origin` + `--show-toplevel`; a directory that is not a git checkout is recorded as the
+   explicit string `unknown (not a git checkout)`, never omitted — `evidence_repo_identity`),
+   and the `stale_proof_file` / `no_proof_file` anchor lists (seq 2446, AC5).
 
 Usage:
   python3 scripts/encode_pa_from_evidence.py [--evidence-dir DIR] [--pinned-master REV]
@@ -159,6 +185,7 @@ import datetime as _dt
 import hashlib
 import json
 import os
+import posixpath
 import re
 import shutil
 import subprocess
@@ -194,13 +221,26 @@ LEAN_ASSISTANT = "lean4"
 
 # The engine's own field names (pa.go JSON tags). Everything else on an evidence
 # assistant / record is an oracle or provenance annotation and is not an engine input.
-# seq 2394: the claim-source manifest closes over QBP-local Lean imports. Module path →
-# file under the Lake source root: `import QBP.Foundations.X` → proofs/QBP/Foundations/X.lean
-# (proofs/lakefile.lean: `lean_lib «QBP» where roots := #[`QBP]`, default srcDir "."). Only
-# modules in THIS namespace enter S; Mathlib / Std / Lean core are pinned by the lake
-# manifest (inter#153) and are excluded.
+# seq 2394 + QBP#696: the claim-source manifest closes over SAME-REPO imports. The Lean
+# module → file map is DERIVED from `proofs/lakefile.lean` at the pinned commit (every
+# `lean_lib` block's `roots`, default the lib name, and `srcDir`, default "."): today
+# lib «QBP» (roots [QBP], srcDir .) → proofs/QBP/…, lib «QBPSprint12» (srcDir
+# "Sprint12-Inherited", bare roots Bi2Se3 … SedenionHessianTraceSq) → proofs/Sprint12-
+# Inherited/<Root>.lean. A module whose first component is no lib root (Mathlib, Std,
+# Lean, Aesop, …) is non-local: pinned by the lake manifest (inter#153), skipped. Agda
+# members resolve `open import X.Y` against their own corpus root (proofs/agda,
+# proofs/agda-cubical); a module not found there is a library import (agda / cubical).
 LEAN_SRC_ROOT = "proofs"
-LEAN_LOCAL_MODULE = "QBP"
+LAKEFILE = "proofs/lakefile.lean"
+LEAN_EXT = ".lean"
+AGDA_EXTS = (".agda", ".lagda.md", ".lagda")  # resolution order at the pin
+# seq 2446: every closure seed (proof_file, same-repo evidence_ref path) must live under
+# this tree; an absolute path, a `..` segment, or any other prefix is refused.
+LOCAL_TREE_PREFIX = "proofs/"
+# A proof_file is PATH-VALUED iff it looks like one: a separator or a proof-source
+# extension. The two literature citations (`PROOF-hurwitz` "Hurwitz 1898", `PROOF-born`
+# "Hurwitz corollary") are neither → `no_proof_file`, inert.
+PATH_EXTS = (LEAN_EXT, ".v", *AGDA_EXTS)
 
 ASSISTANT_KEYS = ("assistant", "evidence_ref", "producer", "trust_check", "source_sha")
 DECLARED_KEYS = ("mode", "output_hash", "axioms", "exit_code")
@@ -304,14 +344,14 @@ def strip_lean_comments(text: str) -> str:
     return "".join(out)
 
 
-def lean_local_imports(text: str) -> List[str]:
-    """The QBP-local modules a Lean file imports, in order, deduplicated (seq 2394).
+def lean_header_imports(text: str) -> List[str]:
+    """EVERY module a Lean file imports, in order, deduplicated — local or not.
 
     Reads the HEADER only — Lean puts every `import` (after an optional `prelude`) before
-    the first other command, so the scan stops at the first non-import token. A module
-    counts iff it is `QBP` or starts with `QBP.`; `Mathlib.…`, `Std.…`, `Lean.…` and the
-    Sprint12-Inherited roots are not QBP-local and are skipped (pinned by the lake
-    manifest, inter#153). `import runtime X` and `«quoted»` names are tolerated."""
+    the first other command, so the scan stops at the first non-import token. Comments
+    are stripped first. `import runtime X` and `«quoted»` names are tolerated. Which of
+    these are same-repo is decided by the lakefile-derived module map
+    (`lean_local_imports` / `lean_module_path`), never by a name prefix."""
     toks = strip_lean_comments(text).split()
     mods: List[str] = []
     i = 0
@@ -329,27 +369,268 @@ def lean_local_imports(text: str) -> List[str]:
             break
         m = toks[i].replace("«", "").replace("»", "")
         i += 1
-        if (
-            m == LEAN_LOCAL_MODULE or m.startswith(LEAN_LOCAL_MODULE + ".")
-        ) and m not in mods:
+        if m not in mods:
             mods.append(m)
     return mods
 
 
-def lean_module_path(module: str) -> str:
-    """`QBP.Foundations.X` → `proofs/QBP/Foundations/X.lean` (one rule; `LEAN_SRC_ROOT`)."""
-    return f"{LEAN_SRC_ROOT}/{module.replace('.', '/')}.lean"
+# ---- lakefile-derived module map (QBP#696) ---------------------------------------------
+LAKE_BLOCK_RE = re.compile(r"^(lean_lib|package)\s+(?:«([^»]+)»|([A-Za-z_][\w.]*))?")
+LAKE_NAME_RE = re.compile(r"`(?:«([^»]+)»|([A-Za-z_][\w.]*))")
+LAKE_SRCDIR_RE = re.compile(r"\bsrcDir\s*:=\s*\"([^\"]*)\"")
+LAKE_ROOTS_RE = re.compile(r"\broots\s*:=\s*#\[([^\]]*)\]")
+
+
+def parse_lakefile(text: str) -> "OrderedDict[str, str]":
+    """root module → source directory (relative to the lakefile's directory) from a Lake
+    DSL lakefile. For each top-level `lean_lib «Name» where` block: `roots := #[`A, `B]`
+    (default `[Name]`) and `srcDir := "dir"` (default "."), prefixed by the `package`
+    block's `srcDir` when it sets one (Lake resolves a library's srcDir under the
+    package's). `lean_exe` / `require` blocks define no library. The first lib to claim
+    a root wins. Zero `lean_lib` blocks ⇒ refusal: a lakefile this parser cannot read
+    must not silently make every import non-local and shrink S.
+
+    Today (516dfcb): {QBP: ".", Bi2Se3: "Sprint12-Inherited", …, SedenionHessianTraceSq:
+    "Sprint12-Inherited"}."""
+    blocks: List[List[str]] = []
+    for ln in strip_lean_comments(text).split("\n"):
+        if not ln.strip():
+            continue
+        if ln[0].isspace():
+            if blocks:
+                blocks[-1].append(ln)
+        else:
+            blocks.append([ln])
+    pkg_src = "."
+    libs: List[Tuple[str, str, List[str]]] = []  # (name, srcDir, roots)
+    for b in blocks:
+        m = LAKE_BLOCK_RE.match(b[0])
+        if not m:
+            continue
+        body = "\n".join(b)
+        sm = LAKE_SRCDIR_RE.search(body)
+        src = sm.group(1) if sm else "."
+        if m.group(1) == "package":
+            pkg_src = src
+            continue
+        name = m.group(2) or m.group(3) or ""
+        rm = LAKE_ROOTS_RE.search(body)
+        roots = (
+            [g1 or g2 for g1, g2 in LAKE_NAME_RE.findall(rm.group(1))] if rm else [name]
+        )
+        libs.append((name, src, [r for r in roots if r]))
+    if not libs:
+        raise Refusal(
+            f"{LAKEFILE} parsed to zero `lean_lib` blocks; the Lean module map cannot "
+            "be derived (parser stale against the lakefile format?) and no import can "
+            "be classified local / non-local"
+        )
+    out: "OrderedDict[str, str]" = OrderedDict()
+    for _name, src, roots in libs:
+        d = posixpath.normpath(posixpath.join(pkg_src, src))
+        for r in roots:
+            out.setdefault(r, d)
+    return out
+
+
+_MODULE_MAP_BY_COMMIT: Dict[Tuple[str, str], Dict[str, str]] = {}
+
+
+def lake_module_map(repo: Path, commit: str) -> Dict[str, str]:
+    """root module → directory under the repo (`proofs/<srcDir>`), from `proofs/lakefile.
+    lean` AT `commit` (read from the blob, never a checkout), memoised per (repo, pin).
+    No lakefile at the pin ⇒ refusal (the map is derived, never guessed)."""
+    key = (str(repo), commit)
+    if key not in _MODULE_MAP_BY_COMMIT:
+        blob = blob_sha(repo, commit, LAKEFILE)
+        if blob is None:
+            raise Refusal(
+                f"{LAKEFILE} does not exist at pinned master {commit[:12]}; the Lean "
+                "module map is derived from it and cannot be guessed, so no `import` "
+                "can be classified local / non-local"
+            )
+        _MODULE_MAP_BY_COMMIT[key] = {
+            root: posixpath.normpath(f"{LEAN_SRC_ROOT}/{d}")
+            for root, d in parse_lakefile(blob_text(repo, blob)).items()
+        }
+    return _MODULE_MAP_BY_COMMIT[key]
+
+
+def lean_module_path(module: str, module_map: Dict[str, str]) -> Optional[str]:
+    """`A.B.C` → `<dir of lib root A>/A/B/C.lean` when `A` is a lake-library root in
+    `module_map` (`QBP.Foundations.X` → proofs/QBP/Foundations/X.lean; `Sedenion` →
+    proofs/Sprint12-Inherited/Sedenion.lean; `QBP` → proofs/QBP.lean); None when it is
+    no root (Mathlib / Std / Lean / Aesop … — non-local, lake-manifest pinned)."""
+    d = module_map.get(module.split(".", 1)[0])
+    if d is None:
+        return None
+    return f"{d}/{module.replace('.', '/')}{LEAN_EXT}"
+
+
+def lean_local_imports(text: str, module_map: Dict[str, str]) -> List[str]:
+    """The SAME-REPO modules a Lean file imports (header only, comments stripped,
+    deduplicated): those of `lean_header_imports` whose first component is a lake-library
+    root in `module_map` — `QBP.…` and the «QBPSprint12» bare roots alike; a near-miss
+    namespace (`QBPX.Y`) or a library module (`Mathlib.…`) is not."""
+    return [m for m in lean_header_imports(text) if lean_module_path(m, module_map)]
 
 
 _IMPORTS_BY_BLOB: Dict[str, List[str]] = {}
 
 
-def lean_local_imports_of_blob(repo: Path, blob: str) -> List[str]:
-    """`lean_local_imports` of a git blob, memoised by blob sha (content-addressed, so
+def lean_header_imports_of_blob(repo: Path, blob: str) -> List[str]:
+    """`lean_header_imports` of a git blob, memoised by blob sha (content-addressed, so
     148 anchors sharing a few dozen files read each file once per run)."""
     if blob not in _IMPORTS_BY_BLOB:
-        _IMPORTS_BY_BLOB[blob] = lean_local_imports(blob_text(repo, blob))
+        _IMPORTS_BY_BLOB[blob] = lean_header_imports(blob_text(repo, blob))
     return _IMPORTS_BY_BLOB[blob]
+
+
+# ---- Agda (QBP#696) --------------------------------------------------------------------
+def strip_agda_comments(text: str) -> str:
+    """Drop `{- … -}` block comments (nested, as Agda nests them; `{-# … #-}` pragmas go
+    with them — they carry no import) and `-- …` line comments. A `{-` inside a line
+    comment does not open a block; a `--` inside a block is text."""
+    out: List[str] = []
+    i, n, depth = 0, len(text), 0
+    while i < n:
+        if depth:
+            if text.startswith("{-", i):
+                depth += 1
+                i += 2
+            elif text.startswith("-}", i):
+                depth -= 1
+                i += 2
+            else:
+                i += 1
+            continue
+        if text.startswith("--", i):
+            j = text.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        if text.startswith("{-", i):
+            depth += 1
+            i += 2
+            continue
+        out.append(text[i])
+        i += 1
+    return "".join(out)
+
+
+def agda_scan(text: str) -> Tuple[Optional[str], List[str]]:
+    """(declared top-level module name or None, imported modules in order, deduplicated)
+    of an Agda file. Imports are `open import X.Y …` / `import X.Y …` ANYWHERE in the
+    file (Agda allows them after the module header and inside nested modules); the
+    module name is the token after `import` (`using` / `hiding` / `renaming` / `as` /
+    `public` clauses follow it). Comments stripped first."""
+    toks = strip_agda_comments(text).split()
+    module: Optional[str] = None
+    mods: List[str] = []
+    for i, t in enumerate(toks[:-1]):
+        nxt = toks[i + 1]
+        if t == "module" and module is None and nxt != "_":
+            module = nxt
+        elif t == "import" and nxt not in mods:
+            mods.append(nxt)
+    return module, mods
+
+
+_AGDA_SCAN_BY_BLOB: Dict[str, Tuple[Optional[str], List[str]]] = {}
+
+
+def agda_scan_of_blob(repo: Path, blob: str) -> Tuple[Optional[str], List[str]]:
+    if blob not in _AGDA_SCAN_BY_BLOB:
+        _AGDA_SCAN_BY_BLOB[blob] = agda_scan(blob_text(repo, blob))
+    return _AGDA_SCAN_BY_BLOB[blob]
+
+
+def is_agda_path(path: str) -> bool:
+    return path.endswith(AGDA_EXTS)
+
+
+def agda_root_of(path: str, module: Optional[str]) -> str:
+    """The corpus root an Agda member resolves its imports against: the directory left
+    when the file's own declared `module A.B.C` name is peeled off its path (Agda: path
+    relative to an include root == module name) — `proofs/agda-cubical` for
+    `proofs/agda-cubical/S3FromCD.agda`, `proofs/agda` for `proofs/agda/QBPHSpace.agda`;
+    the file's own directory when no header matches."""
+    if module:
+        rel = module.replace(".", "/")
+        for ext in AGDA_EXTS:
+            suffix = f"/{rel}{ext}"
+            if path.endswith(suffix):
+                return path[: -len(suffix)]
+    return posixpath.dirname(path)
+
+
+def agda_candidate_paths(module: str, root: str) -> List[str]:
+    """`X.Y` under `root` → [`root/X/Y.agda`, `root/X/Y.lagda.md`, `root/X/Y.lagda`]; the
+    first that exists at the pin is the import's file; none ⇒ a library module."""
+    rel = module.replace(".", "/")
+    return [f"{root}/{rel}{ext}" for ext in AGDA_EXTS]
+
+
+def local_imports_of(
+    repo: Path, commit: str, path: str, blob: str
+) -> List[Tuple[str, str]]:
+    """The same-repo files `path` (content `blob`, at `commit`) imports, as
+    [(dep_path, module)]. `.lean`: header imports through the lakefile-derived module
+    map (a dep that does not exist at the pin is left for the caller to refuse);
+    `.agda`/`.lagda*`: imports resolved under the member's own corpus root, kept only
+    when found at the pin (not found = library module); anything else (Coq) is a leaf.
+    """
+    if path.endswith(LEAN_EXT):
+        mods = lean_header_imports_of_blob(repo, blob)
+        if not mods:
+            return []  # nothing to classify: no lakefile needed
+        module_map = lake_module_map(repo, commit)
+        out: List[Tuple[str, str]] = []
+        for m in mods:
+            dep = lean_module_path(m, module_map)
+            if dep is not None:
+                out.append((dep, m))
+        return out
+    if is_agda_path(path):
+        module, mods = agda_scan_of_blob(repo, blob)
+        root = agda_root_of(path, module)
+        found: List[Tuple[str, str]] = []
+        for m in mods:
+            for cand in agda_candidate_paths(m, root):
+                if blob_sha(repo, commit, cand) is not None:
+                    found.append((cand, m))
+                    break
+        return found
+    return []
+
+
+# ---- out-of-tree guard (architecture ruling live-test seq 2446) ------------------------
+def is_pathlike(value: Any) -> bool:
+    """True iff a `proof_file` value LOOKS like a file path (a separator or a proof-source
+    extension); "Hurwitz 1898" / "Hurwitz corollary" are citations, not paths."""
+    return (
+        isinstance(value, str)
+        and bool(value)
+        and ("/" in value or "\\" in value or value.endswith(PATH_EXTS))
+    )
+
+
+def check_in_tree(path: str, anchor_id: str, what: str, where: str = "") -> None:
+    """Refuse a closure seed that resolves outside the repo's proof tree: absolute, a
+    `..` segment, or not under `proofs/`. Never a closure seed; the anchor is named."""
+    segs = re.split(r"[\\/]", path)
+    if path.startswith(("/", "\\")) or re.match(r"^[A-Za-z]:", path):
+        why = "is an absolute path"
+    elif ".." in segs:
+        why = "contains a `..` segment"
+    elif not path.startswith(LOCAL_TREE_PREFIX):
+        why = f"is not under {LOCAL_TREE_PREFIX}"
+    else:
+        return
+    raise Refusal(
+        f"{anchor_id}: {what} {path!r} {why} — it resolves outside the repo's proof "
+        f"tree and is never a closure seed{where} (architecture ruling seq 2446; a "
+        "bare-root file is mapped via the lakefile, never guessed)"
+    )
 
 
 def manifest_hash(repo: Path, lines: List[str]) -> str:
@@ -812,11 +1093,24 @@ def pinned_sha_for(
         else f" (claim {anchor['id']!r})"
     )
     has_evidence = bool(assistants)
+    aid = anchor["id"]
     proof_file = anchor.get("proof_file")
-    # seeds: path -> origin ("proof_file" | "evidence_ref"); the closure adds "import"s
+    # seeds: path -> origin ("proof_file" | "evidence_ref"); the closure adds "import"s.
+    # seq 2446: every seed is checked to lie inside the proof tree BEFORE it can seed
+    # anything; a non-path proof_file (a literature citation) is not a seed at all.
     paths: Dict[str, str] = OrderedDict()
-    if isinstance(proof_file, str) and proof_file:
+    if is_pathlike(proof_file):
+        check_in_tree(proof_file, aid, "declared proof_file", where)
         paths[proof_file] = "proof_file"
+    elif has_evidence and isinstance(proof_file, str) and proof_file:
+        # today's behaviour kept: a citation cannot pin a claim that evidence is being
+        # graded against — the declared source is not a file (architecture 3c)
+        raise Refusal(
+            f"{aid}: declared proof_file {proof_file!r} is not a repo path (a literature "
+            f"citation) while evidence is being graded{where}; the evidence cannot be "
+            "tied to a declared source file and pinned_sha must never be empty when "
+            "grading evidence"
+        )
     for a in assistants:
         ref = a.get("evidence_ref")
         if not evidence_ref_is_local(ref):
@@ -827,12 +1121,14 @@ def pinned_sha_for(
                 flags.append("cross_repo_evidence")
             continue
         p = evidence_ref_path(ref)
+        check_in_tree(p, aid, "same-repo evidence_ref path", where)
         paths.setdefault(p, "evidence_ref")
-    # seq 2394: S = the transitive closure of the seeds over QBP-local `import QBP.…`
-    # lines, read from each member's content AT the pinned commit. Seen-set BFS: a cycle
-    # terminates; a file reached twice enters once. Only `.lean` members are scanned (a
-    # Coq / Agda ref is a leaf); Mathlib / Std / Lean-core imports are not QBP modules and
-    # never enter (lake-manifest pinned, inter#153).
+    # seq 2394 / QBP#696: S = the transitive closure of the seeds over SAME-REPO imports,
+    # read from each member's content AT the pinned commit — Lean through the lakefile-
+    # derived module map (every lake library), Agda through the member's own corpus root
+    # (`local_imports_of`). Seen-set BFS: a cycle terminates; a file reached twice enters
+    # once. A Coq ref is a leaf; library modules (Mathlib / Std / Lean core; the pinned
+    # agda / cubical) never enter (lake-manifest pinned, inter#153).
     imported_from: Dict[str, Tuple[str, str]] = (
         {}
     )  # dep path -> (importer path, module)
@@ -849,7 +1145,7 @@ def pinned_sha_for(
             origin = paths.get(path, "import")
             if origin == "evidence_ref":
                 raise Refusal(
-                    f"{anchor['id']}: evidence_ref path {path!r} does not exist at pinned "
+                    f"{aid}: evidence_ref path {path!r} does not exist at pinned "
                     f"master {commit[:12]}{where}; pinned_sha cannot be computed for "
                     "evidence that names a file the pinned tree does not have (S covers "
                     "every same-repo ref of the record, dropped or kept)"
@@ -857,30 +1153,31 @@ def pinned_sha_for(
             if origin == "import":
                 importer, module = imported_from[path]
                 raise Refusal(
-                    f"{anchor['id']}: {importer!r} imports QBP module {module!r} → {path!r}, "
+                    f"{aid}: {importer!r} imports local module {module!r} → {path!r}, "
                     f"which does not exist at pinned master {commit[:12]}{where}; the "
-                    "claim-source manifest S closes over QBP-local imports (seq 2394) and "
-                    "cannot be computed over a dangling import"
+                    "claim-source manifest S closes over same-repo imports (seq 2394, "
+                    "lake-library map per QBP#696) and cannot be computed over a "
+                    "dangling import"
                 )
             if has_evidence:
                 raise Refusal(
-                    f"{anchor['id']}: declared proof_file {path!r} does not exist at "
+                    f"{aid}: declared proof_file {path!r} does not exist at "
                     f"pinned master {commit[:12]}{where} while evidence is being graded; "
                     "pinned_sha must never be empty when grading evidence"
                 )
-            flags.append("no_proof_file")
+            # a path-valued proof_file the pinned tree does not have: inert (nothing
+            # to be stale) but NAMED — the report's `stale_proof_file` section (AC5)
+            flags.append("stale_proof_file")
             continue
         sources.append({"path": path, "blob": blob})
-        if path.endswith(".lean"):
-            for module in lean_local_imports_of_blob(repo, blob):
-                dep = lean_module_path(module)
-                if dep in seen or dep in paths:
-                    continue
-                imported_from.setdefault(dep, (path, module))
-                queue.append(dep)
+        for dep, module in local_imports_of(repo, commit, path, blob):
+            if dep in seen or dep in paths:
+                continue
+            imported_from.setdefault(dep, (path, module))
+            queue.append(dep)
     sources.sort(key=lambda s_: s_["path"])
     if not sources:
-        if not has_evidence and "no_proof_file" not in flags:
+        if not has_evidence and "stale_proof_file" not in flags:
             flags.append("no_proof_file")
         return "", sources, flags
     lines = [f"{s['path']} {s['blob']}\n" for s in sources]
@@ -1144,8 +1441,10 @@ def changelog_note(
         f"Grade distribution (pa_local/pa_effective: count) — {d}. pa_local = GradeClaim(...).pa "
         f"on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain "
         f"edges typed derivation (conservative); pinned_sha = claim-source manifest hash "
-        f"(S = QBP-local import closure of proof_file ∪ same-repo evidence files; sorted "
-        f"`path blob` lines, git hash-object --stdin; architecture rulings seq 2299/2394), "
+        f"(S = same-repo import closure of proof_file ∪ same-repo evidence files — Lean "
+        f"via the lakefile-derived module map over every lake library, Agda via the "
+        f"member's corpus root; sorted `path blob` lines, git hash-object --stdin; "
+        f"architecture rulings seq 2299/2394, scope QBP#696), "
         f"not stored. Computed by tools/cth-pa ({engine_id}); never hand-set — a wrong grade is "
         f"fixed by new or corrected evidence in inter/notary-evidence/, never by editing "
         f"the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind "
@@ -1262,6 +1561,18 @@ def build_report(
 
     # RT N11: anchors with no `lean_theorem` admit nothing (both routes need a headline)
     no_headline = [cid for cid in results if anchor_headline(by_id[cid]) is None]
+    # seq 2446 / AC5: path-valued proof_files that do not resolve at the pin (expected
+    # empty) and the non-path / absent ones (the two citation strings), both NAMED.
+    stale_pf = [
+        {"id": cid, "proof_file": by_id[cid].get("proof_file")}
+        for cid, r in results.items()
+        if "stale_proof_file" in r["report_flags"]
+    ]
+    no_pf = [
+        {"id": cid, "proof_file": by_id[cid].get("proof_file")}
+        for cid, r in results.items()
+        if "no_proof_file" in r["report_flags"]
+    ]
     rep: Dict[str, Any] = OrderedDict(
         [
             ("issue", "QBP#692"),
@@ -1275,12 +1586,18 @@ def build_report(
             ("verifier", engine_out["verifier"]),
             ("policy", engine_out["policy"]),
             ("evidence_dir", meta["evidence_dir"]),
+            # RT N2 (PR #697): the evidence store's identity — repo + HEAD — so the
+            # record is reproducible without out-of-band knowledge; `unknown (not a
+            # git checkout)` is written explicitly, never omitted.
+            ("evidence_repo", meta["evidence_repo"]),
             ("v2_record_count", meta["v2_record_count"]),
             ("target_anchor_count", len(rows)),
             (
                 "targets_without_lean_theorem",
                 {"count": len(no_headline), "ids": no_headline},
             ),
+            ("stale_proof_file", stale_pf),
+            ("no_proof_file", no_pf),
             ("changed_anchor_count", sum(1 for r in rows if r["changed"])),
             (
                 "grade_distribution",
@@ -1293,14 +1610,25 @@ def build_report(
             ("evidence_for_non_target", non_target),
             (
                 "pinned_sha_convention",
-                "claim-source manifest hash: S = the transitive closure, over QBP-local "
-                "`import QBP.…` lines read at the pinned commit (`import QBP.A.B` → "
-                "proofs/QBP/A/B.lean; Mathlib/Std/Lean-core excluded, lake-manifest "
-                "pinned), of {proof_file} ∪ {SAME-REPO evidence_ref paths — grammar "
-                "[<owner>/<repo>:]<path>@<commit>#<target>, no prefix = QBP; cross-repo "
-                "refs never enter S (seq 2342)} (ruling seq 2394); "
-                "lines `path <git rev-parse <commit>:path>\\n` sorted by path; "
-                "pinned_sha = git hash-object --stdin over the lines (ruling seq 2299)",
+                "claim-source manifest hash: S = the transitive closure, over SAME-REPO "
+                "imports read at the pinned commit, of {proof_file} ∪ {SAME-REPO "
+                "evidence_ref paths — grammar [<owner>/<repo>:]<path>@<commit>#<target>, "
+                "no prefix = QBP; cross-repo refs never enter S (seq 2342)} (ruling seq "
+                "2394; scope QBP#696). Lean: module → file from proofs/lakefile.lean at "
+                "the pin — each lean_lib's roots (default the lib name) + srcDir "
+                "(default .) — so `import QBP.A.B` → proofs/QBP/A/B.lean and `import "
+                "Sedenion` → proofs/Sprint12-Inherited/Sedenion.lean; a module in no "
+                "lake library (Mathlib/Std/Lean/Aesop) is non-local (lake-manifest "
+                "pinned, inter#153), skipped; a dangling local import refuses. Agda: "
+                "`open import X.Y` / `import X.Y` anywhere in a .agda/.lagda member, "
+                "comments stripped, resolved under the member's own corpus root "
+                "(proofs/agda, proofs/agda-cubical: X/Y.agda | .lagda.md | .lagda); not "
+                "found there = library module (agda/cubical), skipped. Seeds outside "
+                "proofs/ (absolute, `..`, other prefix) are refused (seq 2446); a "
+                "non-path proof_file (citation) is no_proof_file, a missing path-valued "
+                "one stale_proof_file. Lines `path <git rev-parse <commit>:path>\\n` "
+                "sorted by path; pinned_sha = git hash-object --stdin over the lines "
+                "(ruling seq 2299)",
             ),
             (
                 "target_filter",
@@ -1336,6 +1664,11 @@ def build_report(
     md.append(f"| engine | `{engine_out['engine']}` ({engine_out['verifier']}) |")
     md.append(f"| policy | `{json.dumps(engine_out['policy'])}` |")
     md.append(f"| evidence dir | `{meta['evidence_dir']}` |")
+    er = meta["evidence_repo"]
+    md.append(
+        f"| evidence repo (RT N2) | remote `{er['remote']}`; HEAD `{er['head']}`; "
+        f"toplevel `{er['toplevel']}` |"
+    )
     md.append(f"| v2 evidence records | {meta['v2_record_count']} |")
     md.append(f"| ignored (non-v2) files | {len(ignored)} |")
     md.append(f"| unmatched claims | {len(unmatched)} |")
@@ -1347,6 +1680,11 @@ def build_report(
     )
     md.append(f"| changed anchors | {rep['changed_anchor_count']} |")
     md.append(f"| derivation edges fed to the engine | {len(engine_out['_edges'])} |")
+    md.append(
+        f"| stale `proof_file` pointers (path-valued, missing at the pin; AC5) | "
+        f"{len(stale_pf)} |"
+    )
+    md.append(f"| no `proof_file` (non-path or absent; inert) | {len(no_pf)} |")
     md.append("")
     md.append("## Grade distribution (pa_local/pa_effective → count)\n")
     md.append("| grade | count |\n|---|---|")
@@ -1429,6 +1767,26 @@ def build_report(
     else:
         md.append("None.")
     md.append("")
+    md.append(
+        "## Stale proof_file pointers (path-valued `proof_file` that does not resolve at "
+        "the pinned master; seq 2446 / QBP#696 AC5 — expected empty)\n"
+    )
+    if stale_pf:
+        for s in stale_pf:
+            md.append(f"- `{s['id']}` — `{s['proof_file']}`")
+    else:
+        md.append("None.")
+    md.append("")
+    md.append(
+        "## No proof_file (not a path — a literature citation — or absent; inert, "
+        "pinned_sha empty)\n"
+    )
+    if no_pf:
+        for s in no_pf:
+            md.append(f"- `{s['id']}` — {s['proof_file']!r}")
+    else:
+        md.append("None.")
+    md.append("")
     md.append("## Target filter\n")
     md.append(f"{rep['target_filter']}\n")
     dropped_rows = [r for r in rows if r["dropped_assistants"]]
@@ -1455,6 +1813,49 @@ def build_report(
             )
     md.append("\n</details>\n")
     return "\n".join(md) + "\n", rep
+
+
+# ---------------------------------------------------------------------------------------
+# evidence repo identity (RT N2 on PR #697)
+# ---------------------------------------------------------------------------------------
+EVIDENCE_REPO_UNKNOWN = "unknown (not a git checkout)"
+
+
+def evidence_repo_identity(evidence_dir: Path) -> Dict[str, str]:
+    """{head, remote, toplevel} of the git checkout `evidence_dir` lives in — `git -C
+    <dir> rev-parse HEAD`, `remote get-url origin`, `rev-parse --show-toplevel` — so the
+    AC4 record names the canonical evidence commit (e.g. inter main `333134c`), not only
+    a local path. A directory that is not inside a git checkout records the explicit
+    string `unknown (not a git checkout)` in every field; nothing is ever omitted."""
+
+    def q(*args: str) -> Optional[str]:
+        p = subprocess.run(
+            ["git", "-C", str(evidence_dir), *args],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        s = p.stdout.strip()
+        return s if p.returncode == 0 and s else None
+
+    top = q("rev-parse", "--show-toplevel")
+    if top is None:
+        return OrderedDict(
+            [
+                ("head", EVIDENCE_REPO_UNKNOWN),
+                ("remote", EVIDENCE_REPO_UNKNOWN),
+                ("toplevel", EVIDENCE_REPO_UNKNOWN),
+            ]
+        )
+    head = q("rev-parse", "HEAD")
+    remote = q("remote", "get-url", "origin")
+    return OrderedDict(
+        [
+            ("head", head if head and HEX40.match(head) else "unknown (no commits)"),
+            ("remote", remote or "unknown (no origin remote)"),
+            ("toplevel", top),
+        ]
+    )
 
 
 # ---------------------------------------------------------------------------------------
@@ -1560,6 +1961,7 @@ def run(
         "pinned_master_rev": pinned_master,
         "pinned_master_commit": commit,
         "evidence_dir": str(evidence_dir),
+        "evidence_repo": evidence_repo_identity(evidence_dir),
         "v2_record_count": len(records),
         "version_after": version if changed else None,
     }
@@ -1621,6 +2023,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     print(
         f"target anchors without lean_theorem (admit nothing): "
         f"{rep['targets_without_lean_theorem']['count']}"
+    )
+    er = rep["evidence_repo"]
+    print(
+        f"evidence repo: {er['remote']} @ {er['head']} (toplevel {er['toplevel']}); "
+        f"stale proof_file pointers: {len(rep['stale_proof_file'])}; "
+        f"no proof_file: {len(rep['no_proof_file'])}"
     )
     if rep.get("_report_scratch"):
         # RT N16: the scratch report is removed at exit — name no path that will not

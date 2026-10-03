@@ -32,6 +32,16 @@ Each test names the AC / ruling it pins:
             definition file changes pinned_sha, an unrelated file does not, Mathlib is
             excluded, A→B→C includes C, a cycle terminates, a dangling import refuses;
             real-repo reference values at f452532 (headline 6b972a7d, companion 0f32f714)
+  QBP#696  the module map is DERIVED from proofs/lakefile.lean at the pin (every lean_lib's
+            roots + srcDir): `import Sedenion` from a Sprint12 file enters S, a root in no
+            lake lib is skipped, Mathlib is skipped, no lakefile + imports refuses; Agda
+            `open import` of a same-root module enters S, a cubical-library import does not;
+            out-of-tree proof_file / evidence_ref paths (`..`, absolute, not under proofs/,
+            bare root) are refused (seq 2446) while a citation string stays `no_proof_file`;
+            a missing path-valued proof_file is `stale_proof_file` and named in the report;
+            the report records the evidence repo HEAD/remote or `unknown (not a git
+            checkout)` (RT N2); real-repo values at 516dfcb: Fano headline/companion
+            UNCHANGED, PROOF-hessian + the 3 Agda anchors moved (old == seed-only manifest)
 """
 
 from __future__ import annotations
@@ -70,12 +80,40 @@ def git(repo: Path, *args: str) -> str:
     ).stdout.strip()
 
 
-def mk_repo(tmp_path: Path, files: dict) -> Path:
+# Mirrors proofs/lakefile.lean at 516dfcb: lib «QBP» (roots [QBP], srcDir .) and lib
+# «QBPSprint12» (srcDir Sprint12-Inherited, eight bare roots). The encoder derives its
+# module map from this file AT THE PIN (QBP#696), so every temp repo whose .lean members
+# import anything needs one; `lakefile=False` builds a repo without it.
+DEFAULT_LAKEFILE = """import Lake
+open Lake DSL
+
+package «QBPProofs» where
+
+@[default_target]
+lean_lib «QBP» where
+  roots := #[`QBP]
+
+-- Sprint 12 inherited corpus: bare roots under a srcDir
+@[default_target]
+lean_lib «QBPSprint12» where
+  srcDir := "Sprint12-Inherited"
+  roots := #[`Bi2Se3, `Crystallisation, `Elements, `Graphene, `Kitaev, `Quaternion, `Sedenion, `SedenionHessianTraceSq]
+
+@[default_target]
+lean_exe «oracle» where
+  root := `QBP.Oracle.Main
+"""
+
+
+def mk_repo(tmp_path: Path, files: dict, lakefile: bool = True) -> Path:
     repo = tmp_path / "repo"
     repo.mkdir()
     git(repo, "init", "-q")
     git(repo, "config", "user.email", "t@e.st")
     git(repo, "config", "user.name", "t")
+    files = dict(files)
+    if lakefile and "proofs/lakefile.lean" not in files:
+        files["proofs/lakefile.lean"] = DEFAULT_LAKEFILE
     commit(repo, files, "c0")
     return repo
 
@@ -471,11 +509,14 @@ def test_reference_manifest_hash_cd_structure_constant_tables():
     assert pinned == enc.manifest_hash_py(
         [f"{s['path']} {s['blob']}\n" for s in sources]
     )
-    # the headline's own imports at that commit, read from the blob, not the checkout
-    assert enc.lean_local_imports_of_blob(ROOT, CD_BLOB) == [
+    # the headline's own imports at that commit, read from the blob, not the checkout,
+    # classified through the lakefile-derived module map AT that commit (QBP#696)
+    mm = enc.lake_module_map(ROOT, REF_COMMIT)
+    assert enc.lean_local_imports(enc.blob_text(ROOT, CD_BLOB), mm) == [
         "QBP.Foundations.SedenionOctonionCount",
         "QBP.Foundations.FanoOrientationF3",
     ]
+    assert "Mathlib.Tactic" in enc.lean_header_imports_of_blob(ROOT, CD_BLOB)
     # a Fano-companion evidence_ref on the headline adds nothing: F3 is already in the
     # closure, so S (and pinned_sha) is unchanged — the closure deduplicates
     ev = [{"evidence_ref": f"{F3_FILE}@x#fanoTableF4_eq_cayleyDickson"}]
@@ -498,7 +539,7 @@ def test_reference_manifest_hash_fano_companion_unchanged():
     assert flags == []
     assert sources == [{"path": F3_FILE, "blob": F3_BLOB}]
     assert pinned == COMPANION_PINNED
-    assert enc.lean_local_imports_of_blob(ROOT, F3_BLOB) == []
+    assert enc.lean_header_imports_of_blob(ROOT, F3_BLOB) == []
 
 
 # ---------------------------------------------------------------------------------------
@@ -519,13 +560,31 @@ def test_lean_local_imports_header_only_comments_stripped():
         "theorem t : True := trivial\n"
         "import QBP.AfterHeader\n"
     )
-    assert enc.lean_local_imports(text) == ["QBP.B", "QBP.C", "QBP"]
-    assert enc.lean_module_path("QBP.Foundations.CDAlg") == (
+    MAP = {"QBP": "proofs", "Sedenion": "proofs/Sprint12-Inherited"}
+    assert enc.lean_header_imports(text) == [
+        "Mathlib.Tactic",
+        "Std.Data.List",
+        "QBP.B",
+        "QBP.C",
+        "QBP",
+    ]
+    assert enc.lean_local_imports(text, MAP) == ["QBP.B", "QBP.C", "QBP"]
+    assert enc.lean_module_path("QBP.Foundations.CDAlg", MAP) == (
         "proofs/QBP/Foundations/CDAlg.lean"
     )
-    assert enc.lean_module_path("QBP") == "proofs/QBP.lean"
-    # a near-miss namespace is not QBP-local
-    assert enc.lean_local_imports("import QBPSprint12.X\nimport QBPX.Y\n") == []
+    assert enc.lean_module_path("QBP", MAP) == "proofs/QBP.lean"
+    # a bare lake root maps through its library's srcDir (QBP#696), nested modules too
+    assert enc.lean_module_path("Sedenion", MAP) == (
+        "proofs/Sprint12-Inherited/Sedenion.lean"
+    )
+    assert enc.lean_module_path("Sedenion.Sub", MAP) == (
+        "proofs/Sprint12-Inherited/Sedenion/Sub.lean"
+    )
+    assert enc.lean_module_path("Mathlib.Tactic", MAP) is None
+    # a near-miss namespace is no lake root
+    assert enc.lean_local_imports("import QBPSprint12.X\nimport QBPX.Y\n", MAP) == []
+    # and the lib name itself is not a root unless `roots` says so (the map decides)
+    assert enc.lean_local_imports("import QBPSprint12\n", MAP) == []
 
 
 def test_manifest_closes_over_local_imports(tmp_path):
@@ -2339,3 +2398,471 @@ def test_N18_dry_run_registers_atexit_cleanup(tmp_path, monkeypatch):
     assert enc.main(base + ["--report", str(tmp_path / "keep.md")]) == 0
     assert registered == [] and enc._DRY_RUN_SCRATCH == []
     assert (tmp_path / "keep.md").exists()
+
+
+# ---------------------------------------------------------------------------------------
+# QBP#696 — closure over every lake library (lakefile-derived map) + Agda open imports;
+# out-of-tree guard (seq 2446); report records evidence repo (RT N2) + stale_proof_file
+# ---------------------------------------------------------------------------------------
+def test_parse_lakefile_two_libs_one_with_srcdir():
+    text = (
+        "import Lake\nopen Lake DSL\n\n"
+        "/- a block comment mentioning lean_lib «Ghost» where\n  roots := #[`Ghost] -/\n"
+        'package «P» where\n  -- srcDir := "commented"\n\n'
+        "@[default_target]\nlean_lib «QBP» where\n  roots := #[`QBP]\n\n"
+        "-- lean_lib «InComment» where roots := #[`InComment]\n"
+        "@[default_target]\nlean_lib «QBPSprint12» where\n"
+        '  srcDir := "Sprint12-Inherited"\n'
+        "  roots := #[`Sedenion, `SedenionHessianTraceSq, `«Quaternion»]\n\n"
+        "lean_lib Bare\n\n"  # no `where`, no roots: the root defaults to the lib name
+        "lean_exe «oracle» where\n  root := `QBP.Oracle.Main\n"
+    )
+    m = enc.parse_lakefile(text)
+    assert m == {
+        "QBP": ".",
+        "Sedenion": "Sprint12-Inherited",
+        "SedenionHessianTraceSq": "Sprint12-Inherited",
+        "Quaternion": "Sprint12-Inherited",
+        "Bare": ".",
+    }
+    assert "Ghost" not in m and "InComment" not in m and "oracle" not in m
+    # a package-level srcDir prefixes every library's (Lake resolves lib under package)
+    m2 = enc.parse_lakefile(
+        'package «P» where\n  srcDir := "src"\n'
+        'lean_lib «L» where\n  srcDir := "lib"\n  roots := #[`A]\n'
+        "lean_lib «M»\n"
+    )
+    assert m2 == {"A": "src/lib", "M": "src"}
+    # MUTANT GUARD: zero lean_lib blocks is a refusal, never "everything is non-local"
+    with pytest.raises(SystemExit, match="REFUSED.*zero `lean_lib`"):
+        enc.parse_lakefile(
+            "import Lake\nopen Lake DSL\nlean_exe «x» where\n  root := `X\n"
+        )
+
+
+def test_lake_module_map_read_at_pin_memoised_and_refuses_without_lakefile(tmp_path):
+    """The map is read from proofs/lakefile.lean AT the pinned commit: a later lakefile
+    edit changes the map at the later pin only; no lakefile at the pin refuses — but only
+    when a .lean member actually has an import to classify."""
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import Sedenion\ntheorem a : True := trivial\n",
+            "proofs/Sprint12-Inherited/Sedenion.lean": "def s := 1\n",
+        },
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    mm = enc.lake_module_map(repo, c0)
+    assert mm["QBP"] == "proofs" and mm["Sedenion"] == "proofs/Sprint12-Inherited"
+    assert enc.lake_module_map(repo, c0) is mm  # memoised per (repo, pin)
+    a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
+    p0, s0, _ = enc.pinned_sha_for(a, [], repo, c0)
+    assert [s["path"] for s in s0] == [
+        "proofs/QBP/A.lean",
+        "proofs/Sprint12-Inherited/Sedenion.lean",
+    ]
+    # drop lib «QBPSprint12» at c1: `import Sedenion` is non-local THERE, local at c0
+    c1 = commit(
+        repo,
+        {
+            "proofs/lakefile.lean": "import Lake\nopen Lake DSL\n"
+            "lean_lib «QBP» where\n  roots := #[`QBP]\n"
+        },
+        "drop lib",
+    )
+    assert "Sedenion" not in enc.lake_module_map(repo, c1)
+    p1, s1, _ = enc.pinned_sha_for(a, [], repo, c1)
+    assert [s["path"] for s in s1] == ["proofs/QBP/A.lean"] and p1 != p0
+    assert enc.pinned_sha_for(a, [], repo, c0)[0] == p0  # c0 unaffected
+    # no lakefile at the pin: a member WITH imports refuses (the map is never guessed) …
+    (tmp_path / "bare").mkdir()
+    bare = mk_repo(
+        tmp_path / "bare",
+        {"proofs/QBP/A.lean": "import QBP.B\n", "proofs/QBP/B.lean": "def b := 1\n"},
+        lakefile=False,
+    )
+    cb = git(bare, "rev-parse", "HEAD")
+    with pytest.raises(
+        SystemExit, match=r"REFUSED: proofs/lakefile\.lean does not exist at pinned"
+    ):
+        enc.pinned_sha_for(a, [], bare, cb)
+    # … a member WITHOUT imports needs no map
+    pinned, sources, flags = enc.pinned_sha_for(
+        anchor("PROOF-b", proof_file="proofs/QBP/B.lean"), [], bare, cb
+    )
+    assert flags == [] and [s["path"] for s in sources] == ["proofs/QBP/B.lean"]
+
+
+def test_sprint12_bare_root_enters_manifest_non_lib_root_and_mathlib_skipped(tmp_path):
+    """`import Sedenion` from SedenionHessianTraceSq.lean resolves through lib
+    «QBPSprint12» (srcDir Sprint12-Inherited) and enters S: PROOF-hessian's key moves
+    when Sedenion.lean changes, not otherwise. A module whose root is in no lake library
+    is skipped even though its file exists; Mathlib is skipped. A dangling LOCAL import
+    (a lake root whose file is missing) still refuses, naming the lakefile-mapped path.
+    """
+    HESS = "proofs/Sprint12-Inherited/SedenionHessianTraceSq.lean"
+    SED = "proofs/Sprint12-Inherited/Sedenion.lean"
+    repo = mk_repo(
+        tmp_path,
+        {
+            HESS: "import Mathlib.Tactic\nimport Sedenion\nimport NotALib.X\n"
+            "theorem h : True := trivial\n",
+            SED: "def sed := 1\n",
+            "proofs/Sprint12-Inherited/Quaternion.lean": "def q := 1\n",
+            "proofs/NotALib/X.lean": "def x := 1\n",  # exists; no lake lib roots it
+        },
+    )
+    a = anchor("PROOF-hessian", kind="internal-compute", proof_file=HESS)
+    c0 = git(repo, "rev-parse", "HEAD")
+    p0, s0, f0 = enc.pinned_sha_for(a, [], repo, c0)
+    assert f0 == [] and [s["path"] for s in s0] == [SED, HESS]
+    c1 = commit(repo, {SED: "def sed := 2\n"}, "edit Sedenion")
+    p1, _, _ = enc.pinned_sha_for(a, [], repo, c1)
+    assert p1 != p0
+    c2 = commit(
+        repo,
+        {
+            "proofs/Sprint12-Inherited/Quaternion.lean": "def q := 2\n",
+            "proofs/NotALib/X.lean": "def x := 2\n",
+        },
+        "unrelated lib file + non-lib module edited",
+    )
+    p2, _, _ = enc.pinned_sha_for(a, [], repo, c2)
+    assert p2 == p1
+    # MUTANT GUARD: the seed-only manifest (the pre-#696 rule) is not the pinned_sha
+    assert enc.manifest_hash_py([f"{HESS} {enc.blob_sha(repo, c0, HESS)}\n"]) != p0
+    c3 = commit(repo, {HESS: "import Kitaev\n"}, "dangling local import")
+    with pytest.raises(
+        SystemExit,
+        match=r"imports local module 'Kitaev' → 'proofs/Sprint12-Inherited/Kitaev\.lean'",
+    ):
+        enc.pinned_sha_for(a, [], repo, c3, ["r.json"])
+
+
+def test_agda_open_import_same_root_enters_manifest_library_import_does_not(tmp_path):
+    S3 = "proofs/agda-cubical/S3FromCD.agda"
+    repo = mk_repo(
+        tmp_path,
+        {
+            S3: (
+                "{-# OPTIONS --cubical --safe #-}\n"
+                "-- open import InLineComment\n"
+                "{- open import InBlock {- nested -} still a comment -}\n"
+                "module S3FromCD where\n\n"
+                "open import Cubical.Foundations.Prelude\n"  # cubical library: no file here
+                "open import QBPS3HSpace using (HSpace≃)\n"  # same root: enters S
+                "x : Set\nx = Set\n"
+                "import CDLawsBool as L\n"  # plain `import`, after other code
+                "open import Literate public\n"  # resolved as .lagda.md
+            ),
+            "proofs/agda-cubical/QBPS3HSpace.agda": "module QBPS3HSpace where\nopen import Diamond\n",
+            "proofs/agda-cubical/CDLawsBool.agda": "module CDLawsBool where\n",
+            "proofs/agda-cubical/Diamond.agda": "module Diamond where\n",
+            "proofs/agda-cubical/Literate.lagda.md": "# doc\n```agda\nmodule Literate where\n```\n",
+            "proofs/agda-cubical/Unrelated.agda": "module Unrelated where\nopen import Diamond\n",
+            "proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n",  # other root
+        },
+    )
+    a = anchor("PROOF-s3-hspace", proof_file=S3, lean_theorem="S3FromCD.S³-HSpace")
+    c0 = git(repo, "rev-parse", "HEAD")
+    p0, s0, f0 = enc.pinned_sha_for(a, [], repo, c0)
+    assert f0 == []
+    assert [s["path"] for s in s0] == [
+        "proofs/agda-cubical/CDLawsBool.agda",
+        "proofs/agda-cubical/Diamond.agda",
+        "proofs/agda-cubical/Literate.lagda.md",
+        "proofs/agda-cubical/QBPS3HSpace.agda",
+        S3,
+    ]
+    # transitive same-root member edited ⇒ moves; unrelated same-root file ⇒ unchanged
+    c1 = commit(
+        repo, {"proofs/agda-cubical/Diamond.agda": "module Diamond where\n-- v2\n"}, "D"
+    )
+    p1, _, _ = enc.pinned_sha_for(a, [], repo, c1)
+    assert p1 != p0
+    c2 = commit(
+        repo, {"proofs/agda-cubical/Unrelated.agda": "module Unrelated where\n"}, "U"
+    )
+    p2, _, _ = enc.pinned_sha_for(a, [], repo, c2)
+    assert p2 == p1
+    # the other corpus root is never consulted even for a same-named module
+    c3 = commit(
+        repo, {"proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n-- v2\n"}, "O"
+    )
+    p3, _, _ = enc.pinned_sha_for(a, [], repo, c3)
+    assert p3 == p1
+    # MUTANT GUARD: the seed-only manifest is not the pinned_sha
+    assert enc.manifest_hash_py([f"{S3} {enc.blob_sha(repo, c0, S3)}\n"]) != p0
+    # unit: the scan reads imports anywhere, comments stripped; the root rule
+    mod, mods = enc.agda_scan((repo / S3).read_text(encoding="utf-8"))
+    assert mod == "S3FromCD"
+    assert mods == [
+        "Cubical.Foundations.Prelude",
+        "QBPS3HSpace",
+        "CDLawsBool",
+        "Literate",
+    ]
+    assert enc.agda_root_of(S3, "S3FromCD") == "proofs/agda-cubical"
+    assert (
+        enc.agda_root_of("proofs/agda-cubical/Sub/M.agda", "Sub.M")
+        == "proofs/agda-cubical"
+    )
+    assert enc.agda_root_of("proofs/agda/X.agda", None) == "proofs/agda"
+    assert enc.strip_agda_comments("a -- b {- c\nd {- e {- f -} g -} h") == "a \nd  h"
+    assert enc.agda_candidate_paths("A.B", "proofs/agda") == [
+        "proofs/agda/A/B.agda",
+        "proofs/agda/A/B.lagda.md",
+        "proofs/agda/A/B.lagda",
+    ]
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "../x.lean",
+        "/etc/passwd",
+        "docs/x.lean",
+        "Sedenion.lean",
+        "proofs/../docs/x.lean",
+    ],
+)
+def test_out_of_tree_proof_file_or_evidence_path_is_refused_never_seeded(tmp_path, bad):
+    """seq 2446: absolute, `..`, not under proofs/, or a bare root (must be mapped via the
+    lakefile, never guessed) ⇒ refusal naming the anchor; `docs/x.lean` EXISTS in the
+    repo, so a mutant that seeds it would hash it."""
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n", "docs/x.lean": "d\n"})
+    c0 = git(repo, "rev-parse", "HEAD")
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(
+            anchor("PROOF-bad", proof_file=bad), [], repo, c0, ["r.json"]
+        )
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: PROOF-bad: declared proof_file")
+    assert repr(bad) in msg and "r.json" in msg and "seq 2446" in msg
+    # the same guard on a same-repo evidence_ref path
+    with pytest.raises(
+        SystemExit, match=r"REFUSED: PROOF-ok: same-repo evidence_ref path"
+    ):
+        enc.pinned_sha_for(
+            anchor("PROOF-ok", proof_file="proofs/A.lean"),
+            [{"evidence_ref": f"{bad}@abc#t"}],
+            repo,
+            c0,
+        )
+    assert enc.is_pathlike(bad)
+
+
+def test_citation_string_proof_file_is_inert_and_missing_path_is_stale(tmp_path):
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    c0 = git(repo, "rev-parse", "HEAD")
+    for cite in ("Hurwitz 1898", "Hurwitz corollary"):
+        assert not enc.is_pathlike(cite)
+        got = enc.pinned_sha_for(
+            anchor("PROOF-hurwitz", kind="theory-external", proof_file=cite),
+            [],
+            repo,
+            c0,
+        )
+        assert got == ("", [], ["no_proof_file"])
+    # with evidence graded, a citation cannot pin the claim: refusal (today's behaviour)
+    with pytest.raises(SystemExit, match="REFUSED.*pinned_sha must never be empty"):
+        enc.pinned_sha_for(
+            anchor("PROOF-born", proof_file="Hurwitz corollary"),
+            [{"evidence_ref": "proofs/A.lean@x#t"}],
+            repo,
+            c0,
+        )
+    # path-valued but missing at the pin: stale_proof_file (named), inert without evidence
+    got = enc.pinned_sha_for(
+        anchor("PROOF-gone", proof_file="proofs/Gone.lean"), [], repo, c0
+    )
+    assert got == ("", [], ["stale_proof_file"])
+
+
+def test_report_records_evidence_repo_identity_and_stale_proof_file(tmp_path):
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    ledger = mk_ledger(
+        tmp_path,
+        [
+            anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="t"),
+            anchor("PROOF-gone", proof_file="proofs/Gone.lean", lean_theorem="g"),
+            anchor("PROOF-hurwitz", kind="theory-external", proof_file="Hurwitz 1898"),
+        ],
+    )
+    # (1) the evidence dir is inside a git checkout: HEAD + origin + toplevel recorded
+    evrepo = tmp_path / "evrepo"
+    evrepo.mkdir()
+    git(evrepo, "init", "-q")
+    git(evrepo, "config", "user.email", "t@e.st")
+    git(evrepo, "config", "user.name", "t")
+    git(
+        evrepo,
+        "remote",
+        "add",
+        "origin",
+        "https://github.com/JamesPagetButler/inter.git",
+    )
+    ev = evrepo / "notary-evidence"
+    ev.mkdir()
+    (ev / ".keep").write_text("")
+    git(evrepo, "add", "-A")
+    git(evrepo, "commit", "-q", "-m", "ev")
+    head = git(evrepo, "rev-parse", "HEAD")
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    assert out["report"]["evidence_repo"] == {
+        "head": head,
+        "remote": "https://github.com/JamesPagetButler/inter.git",
+        "toplevel": str(evrepo.resolve()),
+    }
+    md = (tmp_path / "report.md").read_text()
+    assert head in md and "evidence repo (RT N2)" in md
+    # AC5: the stale pointer is named; the citation sits under no_proof_file; both in json + md
+    rep = out["report"]
+    assert rep["stale_proof_file"] == [
+        {"id": "PROOF-gone", "proof_file": "proofs/Gone.lean"}
+    ]
+    assert rep["no_proof_file"] == [
+        {"id": "PROOF-hurwitz", "proof_file": "Hurwitz 1898"}
+    ]
+    assert "stale_proof_file" in out["results"]["PROOF-gone"]["report_flags"]
+    assert out["results"]["PROOF-gone"]["pinned_sha"] == ""  # inert: nothing graded
+    assert "- `PROOF-gone` — `proofs/Gone.lean`" in md
+    assert "- `PROOF-hurwitz` — 'Hurwitz 1898'" in md
+    # (2) not a git checkout: `unknown` is recorded explicitly, never omitted
+    plain = tmp_path / "plain-ev"
+    plain.mkdir()
+    out2 = run_encoder(ledger, repo, plain, tmp_path)
+    assert out2["report"]["evidence_repo"] == {
+        "head": enc.EVIDENCE_REPO_UNKNOWN,
+        "remote": enc.EVIDENCE_REPO_UNKNOWN,
+        "toplevel": enc.EVIDENCE_REPO_UNKNOWN,
+    }
+    assert "unknown (not a git checkout)" in (tmp_path / "report.md").read_text()
+    assert enc.evidence_repo_identity(plain)["head"] == "unknown (not a git checkout)"
+
+
+# real-repo reference values at master 516dfcb (QBP#696): the Fano headline / companion
+# closures contain no Sprint12 / Agda file and are UNCHANGED; PROOF-hessian and the three
+# Agda anchors move — and each OLD value is exactly the seed-only (pre-#696) manifest.
+REF2_COMMIT = "516dfcb5d1fafb6421e09e68684837a11480689e"
+HESS_FILE = "proofs/Sprint12-Inherited/SedenionHessianTraceSq.lean"
+SED_FILE = "proofs/Sprint12-Inherited/Sedenion.lean"
+HESSIAN_OLD = "0f4f521f267fd3d29a205948b2c39ae5b4d69216"
+HESSIAN_NEW = "00e023dfd5bff1feed1c81586cd6bb9a2923c617"
+AGDA_REFS = (
+    (
+        "PROOF-s3-hspace",
+        "proofs/agda-cubical/S3FromCD.agda",
+        "357bdb2bbfe322473a1b00a965c81c17a5512b70",
+        "edb392b88cd8b2abaea2e2a3a4be0545ca47a9ca",
+        ["CDJoinBR", "CDLawsBool", "Diamond", "QBPS3HSpace", "S3FromCD"],
+    ),
+    (
+        "PROOF-skyrmion-baryon-complete-invariant",
+        "proofs/agda-cubical/SkyrmionCharge.agda",
+        "c09c03f112da81d8174d44d41330bb5ace1e62a3",
+        "ae2581967d8181b8dcd8a6b961d6b4fe081909d7",
+        [
+            "CDJoinBR",
+            "CDLawsBool",
+            "Diamond",
+            "QBPS3HSpace",
+            "S3FromCD",
+            "SkyrmionCharge",
+        ],
+    ),
+    (
+        "PROOF-substrate-baryon-additive",
+        "proofs/agda-cubical/SubstrateCharge.agda",
+        "81c2b703a601e5c77e2512f097e07db4e10376a5",
+        "d03797b22fad04c57fa1b9ea02e70db4914b34d9",
+        [
+            "CDJoinBR",
+            "CDLawsBool",
+            "Diamond",
+            "QBPS3HSpace",
+            "S3FromCD",
+            "SkyrmionCharge",
+            "SubstrateCharge",
+        ],
+    ),
+)
+
+
+def _needs_commit(c: str):
+    if (
+        subprocess.run(
+            ["git", "cat-file", "-e", f"{c}^{{commit}}"],
+            cwd=str(ROOT),
+            capture_output=True,
+        ).returncode
+        != 0
+    ):
+        pytest.skip(f"reference commit {c[:12]} not in this clone")
+
+
+def test_reference_values_at_516dfcb_fano_unchanged_hessian_and_agda_moved():
+    _needs_commit(REF2_COMMIT)
+    sprint12 = (
+        "Bi2Se3",
+        "Crystallisation",
+        "Elements",
+        "Graphene",
+        "Kitaev",
+        "Quaternion",
+        "Sedenion",
+        "SedenionHessianTraceSq",
+    )
+    assert enc.lake_module_map(ROOT, REF2_COMMIT) == {
+        "QBP": "proofs",
+        **{r: "proofs/Sprint12-Inherited" for r in sprint12},
+    }
+    # Fano headline + companion: UNCHANGED (no Sprint12 / Agda file in their closures)
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-cd-structure-constant-tables", proof_file=CD_FILE),
+        [],
+        ROOT,
+        REF2_COMMIT,
+    )
+    assert (p, f, [x["path"] for x in s]) == (
+        HEADLINE_PINNED,
+        [],
+        [CD_FILE, F3_FILE, SOC_FILE],
+    )
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-fano-table-equals-cd-products", proof_file=F3_FILE),
+        [],
+        ROOT,
+        REF2_COMMIT,
+    )
+    assert (p, f, [x["path"] for x in s]) == (COMPANION_PINNED, [], [F3_FILE])
+    # PROOF-hessian: `import Sedenion` resolves through lib «QBPSprint12» → moved
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-hessian", kind="internal-compute", proof_file=HESS_FILE),
+        [],
+        ROOT,
+        REF2_COMMIT,
+    )
+    assert f == [] and [x["path"] for x in s] == [SED_FILE, HESS_FILE]
+    assert p == HESSIAN_NEW and p != HESSIAN_OLD
+    assert HESSIAN_OLD == enc.manifest_hash_py([f"{HESS_FILE} {s[1]['blob']}\n"])
+    # the three Agda anchors: same-root `open import`s entered S → moved
+    for aid, pf, old, new, closure in AGDA_REFS:
+        p, s, f = enc.pinned_sha_for(anchor(aid, proof_file=pf), [], ROOT, REF2_COMMIT)
+        assert f == [] and [x["path"] for x in s] == [
+            f"proofs/agda-cubical/{m}.agda" for m in closure
+        ]
+        assert p == new and p != old, aid
+        assert old == enc.manifest_hash_py(
+            [f"{pf} {enc.blob_sha(ROOT, REF2_COMMIT, pf)}\n"]
+        ), aid
+    # Sprint12 files with no local import (Sedenion.lean, Elements.lean): unchanged
+    for pf, val in (
+        (SED_FILE, "aff344e5df8114736338106c807bfa25088936be"),
+        (
+            "proofs/Sprint12-Inherited/Elements.lean",
+            "b8e6653a359de9a5227d480250f19f7d29eec630",
+        ),
+    ):
+        p, s, _ = enc.pinned_sha_for(anchor("x", proof_file=pf), [], ROOT, REF2_COMMIT)
+        assert p == val and [x["path"] for x in s] == [pf]
