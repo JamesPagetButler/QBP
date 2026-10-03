@@ -62,6 +62,16 @@ Each test names the AC / ruling it pins:
             inert, any other body line refuses; N12: `{ … }` bodies parse; N11: an
             `.agda-lib` include root outside proofs/ refuses; N13: `module M where open
             import Q` on one line counts
+  PR #698 c5  Red Team N14 (BLOCKING — N10's fail-open one layer up, in block delimitation):
+            a body that BEGINS on a flush line (`{`, `where`, `where roots := …`) attaches
+            to the open block instead of opening a silently-ignored one — six Lake
+            v4.30.0-verified shapes (B3/B3s/B9/B10/W1/W2) parse to Lake's answer; a
+            `roots`/`srcDir` token in a block that is no `lean_lib`/`package` header
+            REFUSES naming the line (fail-closed splitter); N15: a second `:=` inside a
+            string literal is text; N16: unnamed `package where` is legal, `where` is
+            never a name (an unnamed `lean_lib` refuses); N17: the `where { … }` accept
+            rows (Lake-rejected) replaced by Lake-verified brace shapes; N18: a root
+            claimed by two libs refuses naming both (Lake builds both)
 """
 
 from __future__ import annotations
@@ -3203,18 +3213,22 @@ def test_parse_lakefile_allowlist_refuses_unconsumed_roots_srcdir(text, expected
 
 def test_parse_lakefile_allowlist_accepts_the_grammar_it_understands():
     """The allowlist's ACCEPT side (no false refusals): today's lakefile at 516dfcb parses
-    to the 9-root map; brace bodies `lean_lib «L» {` … `}` and `where { … }` parse
-    (RT N12 — commit 3 false-refused the `}` as a tail); a multi-line `roots := #[` ⏎
-    `A,` ⏎ `B]` literal parses to [A, B]; an unknown `foo := bar` and a multi-line
-    `leanOptions := #[ … ]` inside a block are accepted and ignored (only `roots` /
-    `srcDir` feed the map); a `package` body with only a comment, a bare `lean_lib Bare`
-    and a trailing `,` terminator all parse. The REFUSE side beyond N10's rows: any other
-    body line, a `}` closing no `{`, an unclosed `{`, a body with no `where`, a field
-    set twice, a comma-joined `foo := x, roots := #[`A]` (a map field hiding in an inert
-    field's value), and a backslash inside the srcDir string (N9, fail-closed)."""
+    to the 9-root map (9 DISTINCT roots — N18's duplicate rule has nothing to fire on);
+    the Lake v4.30.0-verified brace bodies `lean_lib «L» {` ⏎ `…` ⏎ `}` and `lean_lib «L»`
+    ⏎ `  { roots := #[`A] }` parse (RT N12 — commit 3 false-refused the `}` as a tail;
+    RT N17 — the `where { … }` rows commit 4 pinned here are Lake-REJECTED, `unexpected
+    token '{'`, and were replaced by these); a multi-line `roots := #[` ⏎ `A,` ⏎ `B]`
+    literal parses to [A, B]; an unknown `foo := bar` and a multi-line `leanOptions :=
+    #[ … ]` inside a block are accepted and ignored (only `roots` / `srcDir` feed the
+    map); a `package` body with only a comment and a bare `lean_lib Bare` parse. The
+    REFUSE side beyond N10's rows: any other body line, a `}` closing no `{`, an unclosed
+    `{`, a body with no `where`, a field set twice, a comma-joined `{ foo := x, roots :=
+    #[`A] }` (a map field hiding in an inert field's value), and a backslash inside the
+    srcDir string (N9, fail-closed)."""
     _needs_commit(REF2_COMMIT)
     today = git(ROOT, "show", f"{REF2_COMMIT}:proofs/lakefile.lean")
-    assert enc.parse_lakefile(today) == {
+    today_map = enc.parse_lakefile(today)
+    assert today_map == {
         "QBP": ".",
         **{
             r: "Sprint12-Inherited"
@@ -3230,12 +3244,17 @@ def test_parse_lakefile_allowlist_accepts_the_grammar_it_understands():
             )
         },
     }
-    # N12: brace syntax, flush `}` on its own line and inline `where { … }`
+    assert len(today_map) == 9  # 9 distinct roots: N18 does not fire on 516dfcb
+    # N12 / N17: the brace shapes Lake v4.30.0 ACCEPTS (Red Team-verified) — the
+    # `where { … }` rows commit 4 pinned here were Lake-rejected and are gone
     assert enc.parse_lakefile("lean_lib «L» {\n  roots := #[`A]\n}\n") == {"A": "."}
+    assert enc.parse_lakefile("lean_lib «L»\n  { roots := #[`A] }\nlean_lib «M»\n") == {
+        "A": ".",
+        "M": ".",
+    }
     assert enc.parse_lakefile(
-        "lean_lib «L» where {\n  roots := #[`A]\n}\nlean_lib «M»\n"
+        "lean_lib «L» {\n  roots := #[`A]\n}\nlean_lib «M»\n"
     ) == {"A": ".", "M": "."}
-    assert enc.parse_lakefile("lean_lib «L» where { roots := #[`A] }\n") == {"A": "."}
     # multi-line roots literal
     assert enc.parse_lakefile("lean_lib «L» where\n  roots := #[`A,\n    `B]\n") == {
         "A": ".",
@@ -3244,7 +3263,7 @@ def test_parse_lakefile_allowlist_accepts_the_grammar_it_understands():
     # unknown / inert fields, single- and multi-line, are accepted and ignored
     assert enc.parse_lakefile(
         "lean_lib «L» where\n  foo := bar\n  leanOptions := #[\n"
-        "    ⟨`autoImplicit, false⟩\n  ]\n  roots := #[`A],\n"
+        "    ⟨`autoImplicit, false⟩\n  ]\n  roots := #[`A]\n"
         'package «P» where\n  -- only a comment\n  name := "p"\n'
     ) == {"A": "."}
     assert "leanOptions" in enc.LAKE_INERT_FIELDS and "foo" not in enc.LAKE_INERT_FIELDS
@@ -3260,7 +3279,7 @@ def test_parse_lakefile_allowlist_accepts_the_grammar_it_understands():
             "`roots := #[`B]` sets `roots` a second time",
         ),
         (
-            "lean_lib «L» where { foo := x, roots := #[`A] }\n",
+            "lean_lib «L» {\n  foo := x, roots := #[`A]\n}\n",
             "`foo := x, roots := #[`A]` carries a second `:=`",
         ),
         ('lean_lib «L» where\n  srcDir := "a\\"b"\n', 'is not a fully-consumed "dir"'),
@@ -3272,6 +3291,147 @@ def test_parse_lakefile_allowlist_accepts_the_grammar_it_understands():
         with pytest.raises(SystemExit) as ei:
             enc.parse_lakefile(text)
         assert why in str(ei.value), (text, str(ei.value))
+
+
+# RT N14 (PR #698, blocking): a `lean_lib` / `package` body that BEGINS on a flush line.
+# Every row's expectation is Lake v4.30.0's answer (Red Team `lake run dump`,
+# issuecomment-5973121151, shapes B3 / B3s / B9 / B10 / W1 / W2). At f62e5ed each row
+# parsed to the silent default ({L: "."}; package srcDir `.`) with M1 balanced.
+N14_ROWS = [
+    pytest.param(
+        "lean_lib «L»\n{\n  roots := #[`A]\n}\n", {"A": "."}, id="B3-flush-brace"
+    ),
+    pytest.param(
+        'lean_lib «L»\n{\n  roots := #[`A]\n  srcDir := "q"\n}\n',
+        {"A": "q"},
+        id="B3s-flush-brace-srcdir",
+    ),
+    pytest.param(
+        'package P\n{\n  srcDir := "s"\n}\nlean_lib «L» where\n  roots := #[`A]\n',
+        {"A": "s"},
+        id="B9-package-flush-brace",
+    ),
+    pytest.param(
+        "lean_lib «L» where\n  roots := #[`A]\nlean_lib «M»\n{\n  roots := #[`B]\n"
+        '  srcDir := "q"\n}\n',
+        {"A": ".", "B": "q"},
+        id="B10-second-lib-flush-brace",
+    ),
+    pytest.param(
+        "lean_lib «L»\nwhere\n  roots := #[`A]\n", {"A": "."}, id="W1-flush-where"
+    ),
+    pytest.param(
+        "lean_lib «L»\nwhere roots := #[`A]\n", {"A": "."}, id="W2-flush-where-field"
+    ),
+]
+
+
+@pytest.mark.parametrize("text, expected", N14_ROWS)
+def test_parse_lakefile_flush_body_line_attaches_to_its_header(text, expected):
+    """RT N14 (PR #698, blocking). The splitter grouped blocks by indentation — a flush
+    line opened a new block unless it was exactly `}` — but a body may legally begin on a
+    flush `{` / `where` line. The header block then had an EMPTY body (default roots
+    [name], srcDir `.`) and the flush block, with every field in it, was silently
+    ignored: N10's symptom one layer up, invisible to M1 (1 token, 1 block). A flush
+    line starting with `{`, `}` or the `where` keyword now attaches to the open block.
+    MUTANT GUARD: revert the splitter to `ln.strip() == "}"` → every row here parses to
+    the silent default ({"L": "."} / `.`), and — because the orphan rule below then sees
+    the detached `roots` — the refusal fires instead; either way this assertion fails.
+    """
+    assert enc.parse_lakefile(text) == expected
+
+
+def test_parse_lakefile_refuses_map_field_outside_any_recognised_block():
+    """RT N14, the fail-closed half: a block whose first line is not a `lean_lib` /
+    `package` header is never read for the map, so a `roots` / `srcDir` token inside it
+    (strings blanked) is a refusal naming the line — whatever shape detached it. A flush
+    `roots := …` after a `def`, an indented `srcDir` continuing a `lean_exe` (legal Lake,
+    but the exe is not a library — fail-closed), and a bare top-level `srcDir := "x"` all
+    refuse; the token inside a STRING of a non-header block does not (`def d := "roots"`),
+    nor does `root :=` (`lean_exe … root := `X`, today's lakefile) or `myRoots`. MUTANT
+    GUARD: drop the orphan scan → the first three parse to {L: "."} silently."""
+    for text, line, tok in [
+        ("def x := 1\nroots := #[`Z]\nlean_lib «L»\n", "roots := #[`Z]", "roots"),
+        (
+            'lean_lib «L»\nlean_exe «e» where\n  srcDir := "x"\n  root := `E\n',
+            'srcDir := "x"',
+            "srcDir",
+        ),
+        ('srcDir := "x"\nlean_lib «L»\n', 'srcDir := "x"', "srcDir"),
+        ("lean_lib «L»\nfoo\n  roots := #[`A]\n", "roots := #[`A]", "roots"),
+    ]:
+        with pytest.raises(SystemExit) as ei:
+            enc.parse_lakefile(text)
+        msg = str(ei.value)
+        assert msg.startswith(
+            f"REFUSED: proofs/lakefile.lean: `{line}` carries a `{tok}` token outside "
+            "any `lean_lib` / `package` block (RT N14"
+        ), (text, msg)
+    assert enc.parse_lakefile(
+        'def d := "roots srcDir"\ndef myRoots := #[`A]\nlean_lib «L»\n'
+        "lean_exe «e» where\n  root := `E\n"
+    ) == {"L": "."}
+
+
+def test_parse_lakefile_second_assign_inside_string_is_text():
+    """RT N15 (PR #698): `description := "x := y"` is legal Lake; the second-`:=` rule
+    read inside the string and false-refused (fail-closed, but a false refusal). String
+    literals are blanked before the check; a REAL second `:=` outside a string still
+    refuses. MUTANT GUARD: drop the blanking → the accept line refuses."""
+    assert enc.parse_lakefile(
+        'lean_lib «L» where\n  description := "x := y"\n  roots := #[`A]\n'
+    ) == {"A": "."}
+    with pytest.raises(SystemExit, match=r"carries a second `:=`"):
+        enc.parse_lakefile('lean_lib «L» where\n  description := "x", roots := #[`A]\n')
+
+
+def test_parse_lakefile_unnamed_package_where_is_legal_and_unnamed_lib_refuses():
+    """RT N16 (PR #698): `package where` ⏎ `  srcDir := "s"` is legal Lake (v4.30.0
+    synthesises a name); the header regex captured `where` as the name and refused the
+    body as `package «where» … follows no where`. `where` is a keyword, never a name:
+    the package parses (its name is irrelevant to the map) and its srcDir prefixes every
+    library's. An unnamed `lean_lib` (not Lake-verified; its default root would be the
+    name) refuses naming the line. MUTANT GUARD: drop the `(?!where\\b)` → the package
+    row refuses with the misleading `package «where»` label."""
+    assert enc.parse_lakefile('package where\n  srcDir := "s"\nlean_lib «L»\n') == {
+        "L": "s"
+    }
+    assert enc.parse_lakefile("package\nlean_lib «L» where\n  roots := #[`A]\n") == {
+        "A": "."
+    }
+    with pytest.raises(SystemExit) as ei:
+        enc.parse_lakefile("lean_lib where\n  roots := #[`A]\n")
+    assert str(ei.value).startswith(
+        "REFUSED: proofs/lakefile.lean: `lean_lib where` is a `lean_lib` with no name"
+    )
+    # the misleading label is gone: an unnamed package body that is malformed is named
+    # as `package`, not `package «where»`
+    with pytest.raises(SystemExit) as ei:
+        enc.parse_lakefile("package where\n  myExpr\nlean_lib «L»\n")
+    assert "in `package`, `myExpr` is neither" in str(ei.value)
+
+
+def test_parse_lakefile_duplicate_root_across_libs_refuses():
+    """RT N18 (PR #698, S16): two libs claiming the same root both load in Lake; the
+    encoder kept the FIRST silently (`setdefault`). Fail-closed: a refusal naming both
+    libs and the root, whether the second claim is explicit (`roots := #[`A]`) or the
+    default root (= the lib name). Today's lakefile (516dfcb) has 9 distinct roots — see
+    the accept test's `len(today_map) == 9`. MUTANT GUARD: restore `setdefault` → both
+    rows parse to {A: "."} / {A: "q"} silently."""
+    with pytest.raises(SystemExit) as ei:
+        enc.parse_lakefile(
+            'lean_lib «A»\nlean_lib «B» where\n  srcDir := "q"\n  roots := #[`A]\n'
+        )
+    assert str(ei.value).startswith(
+        "REFUSED: proofs/lakefile.lean: root `A` is claimed by both `lean_lib «A»` and "
+        "`lean_lib «B»` (RT N18"
+    )
+    with pytest.raises(SystemExit, match=r"root `A` is claimed by both `lean_lib «L»`"):
+        enc.parse_lakefile("lean_lib «L» where\n  roots := #[`A]\nlean_lib «A»\n")
+    # distinct roots across libs, same srcDir: no refusal
+    assert enc.parse_lakefile(
+        "lean_lib «L» where\n  roots := #[`A, `B]\nlean_lib «M» where\n  roots := #[`C]\n"
+    ) == {"A": ".", "B": ".", "C": "."}
 
 
 def test_agda_lib_include_root_confined_to_proofs(tmp_path):

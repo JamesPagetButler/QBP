@@ -417,8 +417,14 @@ def lean_header_imports(text: str) -> List[str]:
 
 # ---- lakefile-derived module map (QBP#696) ---------------------------------------------
 LAKE_BLOCK_RE = re.compile(
-    r"^(?:@\[[^\]]*\]\s*)*(lean_lib|package)\s+(?:«([^»]+)»|([A-Za-z_][\w.]*))?"
-)  # a leading `@[default_target]` on the SAME line is tolerated (RT M1)
+    r"^(?:@\[[^\]]*\]\s*)*(lean_lib|package)(?:\s+(?:«([^»]+)»|(?!where\b)([A-Za-z_][\w.]*)))?"
+)  # a leading `@[default_target]` on the SAME line is tolerated (RT M1); `where` is a
+#    keyword, never the name — `package where` is legal, unnamed Lake (RT N16)
+# RT N14 (PR #698, blocking): a body may legally BEGIN on a flush line — `{`, `where`
+# or `where roots := …` — so a flush line starting with `{` / `}` / the `where` keyword
+# attaches to the OPEN block instead of opening a silently-ignored one.
+LAKE_BODY_FLUSH_RE = re.compile(r"^(?:[{}]|where(?!\w))")
+LAKE_MAP_FIELD_TOKEN_RE = re.compile(r"\b(roots|srcDir)\b")
 LAKE_STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
 LAKE_LIB_TOKEN_RE = re.compile(r"\blean_lib\b")
 LAKE_NAME_RE = re.compile(r"`(?:«([^»]+)»|([A-Za-z_][\w.]*))")
@@ -558,7 +564,7 @@ def _lake_block_fields(
             if not sm:
                 _lake_refuse(label, shown, 'is not a fully-consumed "dir" literal')
             src = sm.group(1) if sm else None  # the `if sm` is for mypy; refused above
-        elif ":=" in value:
+        elif ":=" in LAKE_STRING_RE.sub('""', value):  # strings blanked: N15
             _lake_refuse(label, shown, "carries a second `:=` (one field per line)")
     return src, roots
 
@@ -568,8 +574,9 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
     DSL lakefile. For each top-level `lean_lib «Name» where` block: `roots := #[`A, `B]`
     (default `[Name]`) and `srcDir := "dir"` (default "."), prefixed by the `package`
     block's `srcDir` when it sets one (Lake resolves a library's srcDir under the
-    package's). `lean_exe` / `require` blocks define no library. The first lib to claim
-    a root wins. FAILS CLOSED (RT M1 on PR #698): zero `lean_lib` blocks ⇒ refusal, and
+    package's). `lean_exe` / `require` blocks define no library. A root claimed by two
+    libs is a refusal naming both (RT N18 — Lake builds both; the map cannot pick).
+    FAILS CLOSED (RT M1 on PR #698): zero `lean_lib` blocks ⇒ refusal, and
     a `lean_lib` token count (comments stripped, string literals blanked) that differs
     from the number of blocks parsed ⇒ refusal naming both counts — a lakefile this
     parser only half-reads must never silently make an import non-local and shrink S.
@@ -580,6 +587,18 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
     `{ … }` body is accepted (N12), and any other body line refuses naming the block
     and the line. The `package` body gets the same allowlist because its `srcDir`
     prefixes every library's.
+    RT N14 (PR #698, blocking) — BLOCK DELIMITATION, the layer above N10: blocks are
+    split by indentation (a flush line opens a block, indented lines continue it), but a
+    body may legally begin on a FLUSH line (`lean_lib «L»` ⏎ `{` ⏎ `  roots := …` ⏎ `}`;
+    `lean_lib «L»` ⏎ `where` ⏎ `  roots := …`; `… ⏎ where roots := #[`A]`; the same for
+    `package` — all Lake v4.30.0-verified). So a flush line that starts with `{`, `}`
+    or the `where` keyword ATTACHES to the open block. And the splitter fails closed:
+    a block whose first line is not a `lean_lib` / `package` header is never read for
+    the map, so if (strings blanked) it carries a `roots` or `srcDir` token the file
+    refuses naming that line — a map field outside any recognised block is exactly the
+    silent-default symptom, whatever shape produced it. `where` is a keyword, never a
+    block's name (`package where` is legal unnamed Lake, N16); an unnamed `lean_lib`
+    refuses (its default root would be the name).
 
     Today (516dfcb): {QBP: ".", Bi2Se3: "Sprint12-Inherited", …, SedenionHessianTraceSq:
     "Sprint12-Inherited"}."""
@@ -588,11 +607,10 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
     for ln in stripped.split("\n"):
         if not ln.strip():
             continue
-        if (
-            ln[0].isspace() or ln.strip() == "}"
-        ):  # a flush `}` closes the open block (N12)
-            if blocks:
-                blocks[-1].append(ln)
+        # indented ⇒ continuation; a flush `{` / `}` / `where…` is a body that begins
+        # (or ends) on its own line and belongs to the open block (N12 / N14)
+        if blocks and (ln[0].isspace() or LAKE_BODY_FLUSH_RE.match(ln)):
+            blocks[-1].append(ln)
         else:
             blocks.append([ln])
     # M1 first — the block structure must account for every `lean_lib` token before any
@@ -613,13 +631,34 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
             "block(s) were parsed; a half-read lakefile would silently drop a library "
             "and shrink S (RT M1), so the module map is not derived"
         )
+    # N14 — a map field in a block the parser does not read is a refusal, not silence
+    header_blocks = {id(b) for b, _m in headers}
+    for b in blocks:
+        if id(b) in header_blocks:
+            continue
+        for ln in b:
+            tm = LAKE_MAP_FIELD_TOKEN_RE.search(LAKE_STRING_RE.sub('""', ln))
+            if tm:
+                raise Refusal(
+                    f"{LAKEFILE}: `{' '.join(ln.split())}` carries a `{tm.group(1)}` "
+                    "token outside any `lean_lib` / `package` block (RT N14 on PR "
+                    "#698) — a body the block splitter did not attach to its header "
+                    "would silently default the library's roots / srcDir and shrink S, "
+                    "so the module map is not derived"
+                )
     # N10 — every lean_lib / package body under the allowlist
     pkg_src = "."
     libs: List[Tuple[str, str, List[str]]] = []  # (name, srcDir, roots)
     for b, m in headers:
         kind = m.group(1)
         name = m.group(2) or m.group(3) or ""
-        src, roots = _lake_block_fields(b, m.end(), f"{kind} «{name}»")
+        label = f"{kind} «{name}»" if name else kind
+        if kind == "lean_lib" and not name:
+            raise Refusal(
+                f"{LAKEFILE}: `{' '.join(b[0].split())}` is a `lean_lib` with no name; "
+                "its default root is the name, so the module map is not derived"
+            )
+        src, roots = _lake_block_fields(b, m.end(), label)
         if kind == "package":
             pkg_src = "." if src is None else src
             continue
@@ -627,10 +666,18 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
             (name, "." if src is None else src, roots if roots is not None else [name])
         )
     out: "OrderedDict[str, str]" = OrderedDict()
-    for _name, src, roots in libs:
+    owner: Dict[str, str] = {}
+    for name, src, roots in libs:
         d = posixpath.normpath(posixpath.join(pkg_src, src))
         for r in roots:
-            out.setdefault(r, d)
+            if r in owner:  # N18 — Lake builds both; the map cannot pick one silently
+                raise Refusal(
+                    f"{LAKEFILE}: root `{r}` is claimed by both `lean_lib «{owner[r]}»` "
+                    f"and `lean_lib «{name}»` (RT N18 on PR #698) — the module map "
+                    "cannot pick one silently, so it is not derived"
+                )
+            owner[r] = name
+            out[r] = d
     return out
 
 
