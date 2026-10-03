@@ -8,10 +8,10 @@
 | Metric | Count |
 |---|---|
 | theorems total | 1903 |
-| anchors total | 344 |
-| anchors with theorems list | 66 |
-| anchors with proof file | 122 |
-| lean side orphans | 49 |
+| anchors total | 345 |
+| anchors with theorems list | 67 |
+| anchors with proof file | 123 |
+| lean side orphans | 42 |
 | anchor side phantoms | 0 |
 | stale path citations | 0 |
 
@@ -21,7 +21,7 @@
 
 | Directory | Orphan theorems |
 |---|---|
-| `proofs/QBP/Foundations` | 49 |
+| `proofs/QBP/Foundations` | 42 |
 
 ## 3. Anchor-side phantoms (cite a non-existent `.lean`)
 
@@ -33,4 +33,4 @@ _none_
 
 ## 5. Full orphan list
 
-See `analysis/foundations-inverse-anchor-audit.json` for the machine-readable per-theorem list (49 orphans). Classification (back-fill vs unanchored-by-design) is Phase B (#464).
+See `analysis/foundations-inverse-anchor-audit.json` for the machine-readable per-theorem list (42 orphans). Classification (back-fill vs unanchored-by-design) is Phase B (#464).
