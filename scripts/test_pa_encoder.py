@@ -42,6 +42,12 @@ Each test names the AC / ruling it pins:
             the report records the evidence repo HEAD/remote or `unknown (not a git
             checkout)` (RT N2); real-repo values at 516dfcb: Fano headline/companion
             UNCHANGED, PROOF-hessian + the 3 Agda anchors moved (old == seed-only manifest)
+  PR #698 c2  Red Team M1: parse_lakefile fails CLOSED (inline `@[…] lean_lib`, `--` inside
+            a srcDir string parse; `lean_lib` token count != blocks parsed refuses); N2:
+            `proofs//x.lean` / `proofs/./x.lean` normalise to the real seed, `..` still
+            refused on the original string; §I4 seq 2455: explicit absolute case + the
+            refusal names the arm; N4: no-commits / no-origin evidence repo, agda_root_of
+            dirname fallback; N5: `x = import` is not an import declaration
 """
 
 from __future__ import annotations
@@ -2440,6 +2446,39 @@ def test_parse_lakefile_two_libs_one_with_srcdir():
         )
 
 
+def test_parse_lakefile_fails_closed_on_half_parsed_file():
+    """RT M1 (PR #698): two legal spellings the first cut dropped SILENTLY when another lib
+    parsed — an inline `@[default_target] lean_lib «B» where …` and a `--` inside a
+    `srcDir` string — now parse; and ANY `lean_lib` token the block parser did not turn
+    into a block is a refusal naming both counts. MUTANT GUARD: drop the count check →
+    the malformed lakefile below is accepted as {A: "."} and `import Inner.X` goes
+    non-local without a word."""
+    m = enc.parse_lakefile(
+        "import Lake\nopen Lake DSL\n\npackage «P» where\n\n"
+        "@[default_target] lean_lib «B» where roots := #[`B]\n\n"
+        'lean_lib «A» where\n  srcDir := "a--b"\n  roots := #[`A, `A2]\n'
+    )
+    assert m == {"B": ".", "A": "a--b", "A2": "a--b"}
+    # the `--` inside the string is text, not a comment: the srcDir did not default to "."
+    assert enc.strip_lean_comments('s := "a--b" -- c\n/- d -/e', strings=True) == (
+        's := "a--b" \ne'
+    )
+    assert enc.strip_lean_comments('s := "a--b"') == 's := "a'  # default: unchanged
+    # a `lean_lib` the parser cannot place (indented into another block) ⇒ refusal
+    with pytest.raises(SystemExit) as ei:
+        enc.parse_lakefile(
+            "package «P» where\n  lean_lib «Inner» where\n    roots := #[`Inner]\n"
+            "lean_lib «A»\n"
+        )
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: proofs/lakefile.lean has 2 `lean_lib` token(s)")
+    assert "1 `lean_lib` block(s)" in msg and "RT M1" in msg
+    # a `lean_lib` inside a string or a comment is NOT counted (no false refusal)
+    assert enc.parse_lakefile(
+        'lean_lib «A» where\n  srcDir := "lean_lib"\n-- lean_lib «C»\n'
+    ) == {"A": "lean_lib"}
+
+
 def test_lake_module_map_read_at_pin_memoised_and_refuses_without_lakefile(tmp_path):
     """The map is read from proofs/lakefile.lean AT the pinned commit: a later lakefile
     edit changes the map at the later pin only; no lakefile at the pin refuses — but only
@@ -2621,15 +2660,19 @@ def test_agda_open_import_same_root_enters_manifest_library_import_does_not(tmp_
     [
         "../x.lean",
         "/etc/passwd",
+        "/proofs/A.lean",  # absolute AND would be in-tree if relative (§I4 seq 2455)
         "docs/x.lean",
         "Sedenion.lean",
         "proofs/../docs/x.lean",
+        "proofs/A/../A.lean",  # `..` refused on the ORIGINAL string, though it normalises in
     ],
 )
 def test_out_of_tree_proof_file_or_evidence_path_is_refused_never_seeded(tmp_path, bad):
     """seq 2446: absolute, `..`, not under proofs/, or a bare root (must be mapped via the
     lakefile, never guessed) ⇒ refusal naming the anchor; `docs/x.lean` EXISTS in the
-    repo, so a mutant that seeds it would hash it."""
+    repo, so a mutant that seeds it would hash it. The absolute arm is subsumed by the
+    `proofs/` prefix check (§I4 seq 2455: an equivalent mutant) and is kept for the
+    message, so the message's ARM is asserted here — dropping the arm is now visible."""
     repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n", "docs/x.lean": "d\n"})
     c0 = git(repo, "rev-parse", "HEAD")
     with pytest.raises(SystemExit) as ei:
@@ -2639,6 +2682,12 @@ def test_out_of_tree_proof_file_or_evidence_path_is_refused_never_seeded(tmp_pat
     msg = str(ei.value)
     assert msg.startswith("REFUSED: PROOF-bad: declared proof_file")
     assert repr(bad) in msg and "r.json" in msg and "seq 2446" in msg
+    if bad.startswith("/"):
+        assert "is an absolute path" in msg
+    elif ".." in bad.split("/"):
+        assert "contains a `..` segment" in msg
+    else:
+        assert "is not under proofs/" in msg
     # the same guard on a same-repo evidence_ref path
     with pytest.raises(
         SystemExit, match=r"REFUSED: PROOF-ok: same-repo evidence_ref path"
@@ -2650,6 +2699,84 @@ def test_out_of_tree_proof_file_or_evidence_path_is_refused_never_seeded(tmp_pat
             c0,
         )
     assert enc.is_pathlike(bad)
+
+
+def test_non_canonical_in_tree_path_is_normalised_not_stale(tmp_path):
+    """RT N2 (PR #698): `proofs//A.lean` and `proofs/./A.lean` passed the guard, then
+    `rev-parse` failed on the non-canonical spelling and the anchor was mislabelled
+    `stale_proof_file` though the file EXISTS. Now normalised BEFORE the lookup: same
+    manifest as `proofs/A.lean`, the canonical path in S, no flag — for a proof_file and
+    for an evidence_ref path alike. MUTANT GUARD: drop the normpath → stale_proof_file
+    (proof_file) / a refusal (evidence_ref) on an existing file."""
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    c0 = git(repo, "rev-parse", "HEAD")
+    ref, srcs, flags = enc.pinned_sha_for(
+        anchor("PROOF-a", proof_file="proofs/A.lean"), [], repo, c0
+    )
+    assert ref and flags == [] and [x["path"] for x in srcs] == ["proofs/A.lean"]
+    for odd in ("proofs//A.lean", "proofs/./A.lean", "./proofs/A.lean"):
+        assert (
+            enc.check_in_tree(odd, "PROOF-a", "declared proof_file") == "proofs/A.lean"
+        )
+        got = enc.pinned_sha_for(anchor("PROOF-a", proof_file=odd), [], repo, c0)
+        assert got == (ref, srcs, []), odd
+        got = enc.pinned_sha_for(
+            anchor("PROOF-a", proof_file="proofs/A.lean"),
+            [{"evidence_ref": f"{odd}@abc#t"}],
+            repo,
+            c0,
+        )
+        assert got == (ref, srcs, []), odd
+
+
+def test_evidence_repo_identity_no_commits_and_no_origin_are_explicit(tmp_path):
+    """RT N4 (PR #698): the `unknown (no commits)` and `unknown (no origin remote)` arms —
+    a git checkout with no commit / no `origin` records an explicit, non-empty string in
+    each field; nothing is omitted and nothing is the empty string."""
+    evrepo = tmp_path / "fresh"
+    evrepo.mkdir()
+    git(evrepo, "init", "-q")
+    ev = evrepo / "notary-evidence"
+    ev.mkdir()
+    got = enc.evidence_repo_identity(ev)
+    assert list(got) == ["head", "remote", "toplevel"]
+    assert got["head"] == "unknown (no commits)"
+    assert got["remote"] == "unknown (no origin remote)"
+    assert got["toplevel"] == str(evrepo.resolve())
+    assert all(isinstance(v, str) and v for v in got.values())
+    # a remote under another name is still "no origin"; adding `origin` resolves it
+    git(evrepo, "remote", "add", "upstream", "https://example.invalid/u.git")
+    assert enc.evidence_repo_identity(ev)["remote"] == "unknown (no origin remote)"
+    git(evrepo, "remote", "add", "origin", "https://example.invalid/o.git")
+    got2 = enc.evidence_repo_identity(ev)
+    assert got2["remote"] == "https://example.invalid/o.git"
+    assert got2["head"] == "unknown (no commits)"  # still no commit
+
+
+def test_agda_scan_import_leads_the_line_and_root_falls_back_to_dirname():
+    """RT N5 (PR #698): an identifier or value spelled `import` (`x = import`) is not an
+    import declaration — only a line whose first token (after an optional `open`) is
+    `import` declares one; so `open` never shows up as a "module". RT N4: `agda_root_of`
+    falls back to the file's own directory when the declared module name does not match
+    the path's tail (a mis-named file still resolves against SOMETHING, never ``)."""
+    mod, mods = enc.agda_scan(
+        "{-# OPTIONS --cubical #-}\nmodule M.N where\n"
+        "x = import\n"  # N5: not a declaration
+        "open import R using (a)\n"
+        "import S.T as U\n"
+        "open Foo\n"  # an `open` of an already-imported module: no import
+        "  open import  Nested public\n"  # indented (inside a nested module): counted
+        "y = foo import Z\n"  # `import` not first: not a declaration
+        "open import R\n"  # deduplicated
+    )
+    assert (mod, mods) == ("M.N", ["R", "S.T", "Nested"])
+    assert "open" not in mods and "Z" not in mods
+    # N4: dirname fallback when the header does not match the path
+    assert (
+        enc.agda_root_of("proofs/agda/Wrong/Name.agda", "Other") == "proofs/agda/Wrong"
+    )
+    assert enc.agda_root_of("proofs/agda/X.lagda.md", "X") == "proofs/agda"
+    assert enc.agda_root_of("proofs/agda/X.lagda", "X") == "proofs/agda"
 
 
 def test_citation_string_proof_file_is_inert_and_missing_path_is_stale(tmp_path):

@@ -317,13 +317,24 @@ def blob_text(repo: Path, blob: str) -> str:
     return p.stdout.decode("utf-8", errors="replace")
 
 
-def strip_lean_comments(text: str) -> str:
+def strip_lean_comments(text: str, strings: bool = False) -> str:
     """Drop `/- … -/` block comments (nested, as Lean nests them; `/-- … -/` doc comments
     included) and `-- …` line comments, so a commented-out `import` is never followed.
+    `strings=True` copies a `"…"` literal verbatim (`\"` escapes honoured) so a `--` or
+    `/-` INSIDE a string is text, as Lean's lexer has it — the lakefile parser needs this
+    (`srcDir := "a--b"`, RT M1 on PR #698); the import scanner does not (imports precede
+    every string literal in a Lean file) and keeps the default.
     """
     out: List[str] = []
     i, n, depth = 0, len(text), 0
     while i < n:
+        if strings and not depth and text[i] == '"':
+            j = i + 1
+            while j < n and text[j] != '"':
+                j += 2 if text[j] == "\\" else 1
+            out.append(text[i : min(j + 1, n)])
+            i = j + 1
+            continue
         if text.startswith("/-", i):
             depth += 1
             i += 2
@@ -375,7 +386,11 @@ def lean_header_imports(text: str) -> List[str]:
 
 
 # ---- lakefile-derived module map (QBP#696) ---------------------------------------------
-LAKE_BLOCK_RE = re.compile(r"^(lean_lib|package)\s+(?:«([^»]+)»|([A-Za-z_][\w.]*))?")
+LAKE_BLOCK_RE = re.compile(
+    r"^(?:@\[[^\]]*\]\s*)*(lean_lib|package)\s+(?:«([^»]+)»|([A-Za-z_][\w.]*))?"
+)  # a leading `@[default_target]` on the SAME line is tolerated (RT M1)
+LAKE_STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
+LAKE_LIB_TOKEN_RE = re.compile(r"\blean_lib\b")
 LAKE_NAME_RE = re.compile(r"`(?:«([^»]+)»|([A-Za-z_][\w.]*))")
 LAKE_SRCDIR_RE = re.compile(r"\bsrcDir\s*:=\s*\"([^\"]*)\"")
 LAKE_ROOTS_RE = re.compile(r"\broots\s*:=\s*#\[([^\]]*)\]")
@@ -387,13 +402,16 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
     (default `[Name]`) and `srcDir := "dir"` (default "."), prefixed by the `package`
     block's `srcDir` when it sets one (Lake resolves a library's srcDir under the
     package's). `lean_exe` / `require` blocks define no library. The first lib to claim
-    a root wins. Zero `lean_lib` blocks ⇒ refusal: a lakefile this parser cannot read
-    must not silently make every import non-local and shrink S.
+    a root wins. FAILS CLOSED (RT M1 on PR #698): zero `lean_lib` blocks ⇒ refusal, and
+    a `lean_lib` token count (comments stripped, string literals blanked) that differs
+    from the number of blocks parsed ⇒ refusal naming both counts — a lakefile this
+    parser only half-reads must never silently make an import non-local and shrink S.
 
     Today (516dfcb): {QBP: ".", Bi2Se3: "Sprint12-Inherited", …, SedenionHessianTraceSq:
     "Sprint12-Inherited"}."""
+    stripped = strip_lean_comments(text, strings=True)
     blocks: List[List[str]] = []
-    for ln in strip_lean_comments(text).split("\n"):
+    for ln in stripped.split("\n"):
         if not ln.strip():
             continue
         if ln[0].isspace():
@@ -424,6 +442,13 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
             f"{LAKEFILE} parsed to zero `lean_lib` blocks; the Lean module map cannot "
             "be derived (parser stale against the lakefile format?) and no import can "
             "be classified local / non-local"
+        )
+    n_tokens = len(LAKE_LIB_TOKEN_RE.findall(LAKE_STRING_RE.sub('""', stripped)))
+    if n_tokens != len(libs):
+        raise Refusal(
+            f"{LAKEFILE} has {n_tokens} `lean_lib` token(s) but {len(libs)} `lean_lib` "
+            "block(s) were parsed; a half-read lakefile would silently drop a library "
+            "and shrink S (RT M1), so the module map is not derived"
         )
     out: "OrderedDict[str, str]" = OrderedDict()
     for _name, src, roots in libs:
@@ -519,19 +544,26 @@ def strip_agda_comments(text: str) -> str:
 
 def agda_scan(text: str) -> Tuple[Optional[str], List[str]]:
     """(declared top-level module name or None, imported modules in order, deduplicated)
-    of an Agda file. Imports are `open import X.Y …` / `import X.Y …` ANYWHERE in the
-    file (Agda allows them after the module header and inside nested modules); the
+    of an Agda file. Imports are `open import X.Y …` / `import X.Y …` on ANY line of the
+    file (Agda allows them after the module header and inside nested modules) whose
+    first token, after an optional `open`, is `import` — so an identifier or value
+    named `import` elsewhere on a line (`x = import`) is not a declaration (RT N5); the
     module name is the token after `import` (`using` / `hiding` / `renaming` / `as` /
     `public` clauses follow it). Comments stripped first."""
-    toks = strip_agda_comments(text).split()
+    stripped = strip_agda_comments(text)
+    toks = stripped.split()
     module: Optional[str] = None
-    mods: List[str] = []
     for i, t in enumerate(toks[:-1]):
-        nxt = toks[i + 1]
-        if t == "module" and module is None and nxt != "_":
-            module = nxt
-        elif t == "import" and nxt not in mods:
-            mods.append(nxt)
+        if t == "module" and toks[i + 1] != "_":
+            module = toks[i + 1]
+            break
+    mods: List[str] = []
+    for ln in stripped.split("\n"):
+        w = ln.split()
+        if w[:1] == ["open"]:
+            w = w[1:]
+        if len(w) >= 2 and w[0] == "import" and w[1] not in mods:
+            mods.append(w[1])
     return module, mods
 
 
@@ -614,18 +646,28 @@ def is_pathlike(value: Any) -> bool:
     )
 
 
-def check_in_tree(path: str, anchor_id: str, what: str, where: str = "") -> None:
+def check_in_tree(path: str, anchor_id: str, what: str, where: str = "") -> str:
     """Refuse a closure seed that resolves outside the repo's proof tree: absolute, a
-    `..` segment, or not under `proofs/`. Never a closure seed; the anchor is named."""
+    `..` segment, or not under `proofs/`. Never a closure seed; the anchor is named.
+    Returns the seed to use: `posixpath.normpath(path)` (`proofs//x.lean`,
+    `proofs/./x.lean` → `proofs/x.lean`, so an existing file is never mislabelled
+    `stale_proof_file` — RT N2). The `..` rule is applied to the ORIGINAL string, as the
+    ruling words it ("a `..` segment ⇒ refusal"): `proofs/../docs/x.lean` is refused
+    even though it would normalise to `docs/x.lean` (and `proofs/x/../y.lean` even
+    though it would normalise back inside the tree)."""
     segs = re.split(r"[\\/]", path)
+    norm = posixpath.normpath(path)
+    # the absolute-path arm is subsumed by the `proofs/` prefix check (every absolute
+    # path fails it too — §I4 live-test seq 2455: an equivalent mutant) and is kept only
+    # so the refusal names the actual fault
     if path.startswith(("/", "\\")) or re.match(r"^[A-Za-z]:", path):
         why = "is an absolute path"
     elif ".." in segs:
         why = "contains a `..` segment"
-    elif not path.startswith(LOCAL_TREE_PREFIX):
+    elif not norm.startswith(LOCAL_TREE_PREFIX):
         why = f"is not under {LOCAL_TREE_PREFIX}"
     else:
-        return
+        return norm
     raise Refusal(
         f"{anchor_id}: {what} {path!r} {why} — it resolves outside the repo's proof "
         f"tree and is never a closure seed{where} (architecture ruling seq 2446; a "
@@ -1100,8 +1142,9 @@ def pinned_sha_for(
     # anything; a non-path proof_file (a literature citation) is not a seed at all.
     paths: Dict[str, str] = OrderedDict()
     if is_pathlike(proof_file):
-        check_in_tree(proof_file, aid, "declared proof_file", where)
-        paths[proof_file] = "proof_file"
+        paths[check_in_tree(proof_file, aid, "declared proof_file", where)] = (
+            "proof_file"
+        )
     elif has_evidence and isinstance(proof_file, str) and proof_file:
         # today's behaviour kept: a citation cannot pin a claim that evidence is being
         # graded against — the declared source is not a file (architecture 3c)
@@ -1120,8 +1163,9 @@ def pinned_sha_for(
             if "cross_repo_evidence" not in flags:
                 flags.append("cross_repo_evidence")
             continue
-        p = evidence_ref_path(ref)
-        check_in_tree(p, aid, "same-repo evidence_ref path", where)
+        p = check_in_tree(
+            evidence_ref_path(ref), aid, "same-repo evidence_ref path", where
+        )
         paths.setdefault(p, "evidence_ref")
     # seq 2394 / QBP#696: S = the transitive closure of the seeds over SAME-REPO imports,
     # read from each member's content AT the pinned commit — Lean through the lakefile-
