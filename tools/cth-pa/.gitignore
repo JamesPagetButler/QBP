@@ -1,0 +1,3 @@
+# Built command binaries (go build ./cmd/...). Source only is tracked.
+/pa-grade
+/pa-reconcile
