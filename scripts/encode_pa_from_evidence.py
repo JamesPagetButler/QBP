@@ -1374,7 +1374,7 @@ def build_report(
         ("PROOF-eigenratios", "derivation on PROOF-hessian; effective 0 via the edge"),
         (
             "PROOF-cd-structure-constant-tables",
-            "the Fano table; 2 only once the v2 cycle-8 record (Coq + Lean, correspondence) is promoted",
+            "the Fano table; 2 iff a promoted v2 record carries two distinct kernel-clean assistants on the headline (cycle-8: Lean decide + Coq mulCoeff port, cth correspondence); 0 while no such record is in the canonical store",
         ),
     ):
         r = results.get(cid)
