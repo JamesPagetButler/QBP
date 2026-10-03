@@ -422,30 +422,145 @@ LAKE_BLOCK_RE = re.compile(
 LAKE_STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
 LAKE_LIB_TOKEN_RE = re.compile(r"\blean_lib\b")
 LAKE_NAME_RE = re.compile(r"`(?:«([^»]+)»|([A-Za-z_][\w.]*))")
-LAKE_SRCDIR_RE = re.compile(r"\bsrcDir\s*:=\s*\"([^\"]*)\"")
-LAKE_ROOTS_RE = re.compile(r"\broots\s*:=\s*#\[([^\]]*)\]")
+_LAKE_NAME = r"`(?:«[^»]+»|[A-Za-z_][\w.]*)"
+# RT N10 (PR #698): a `lean_lib` / `package` body is read under an ALLOWLIST, not a
+# per-line tail check (N7's shape fix did not close the class: `#[`A]` ⏎ `++ #[`B]`,
+# `"a"` ⏎ `/ "b"` and `roots := myRoots` all half-read silently). After the header,
+# every non-blank body line must be a structure-instance field start `ident := …` or a
+# continuation line of the field above; a lone `}` may close a `{` body (N12). The two
+# fields that FEED THE MODULE MAP must be fully-consumed literals, whatever lines they
+# span: `roots := #[`A, `B]` and `srcDir := "dir"` (an optional `,` terminator allowed;
+# a backslash inside the string refuses — N9, fail-closed). Every OTHER `ident := …`
+# field is accepted and ignored — it cannot move the map — provided its value carries no
+# second `:=` (so a comma-joined `foo := x, roots := #[`A]` cannot hide a map field).
+LAKE_FIELD_START_RE = re.compile(r"^\s*([A-Za-z_][\w.'!?]*)\s*:=(.*)$")
+LAKE_ROOTS_LITERAL_RE = re.compile(
+    rf"#\[\s*(?:{_LAKE_NAME}\s*(?:,\s*{_LAKE_NAME}\s*)*)?\]\s*,?"
+)
+LAKE_SRCDIR_LITERAL_RE = re.compile(r'"([^"\\]*)"\s*,?')
+LAKE_WHERE_RE = re.compile(r"^where(?!\w)")
+LAKE_MAP_FIELDS = frozenset({"roots", "srcDir"})
+# The Lake fields a body commonly sets that do NOT feed the map (documentary — the rule
+# enforced is "not in LAKE_MAP_FIELDS", not membership here; an unlisted `foo := bar` is
+# accepted the same way). Kept so a reviewer can see the grammar the parser understands.
+LAKE_INERT_FIELDS = frozenset(
+    {
+        "name",
+        "version",
+        "root",
+        "globs",
+        "leanOptions",
+        "moreLeanArgs",
+        "moreServerArgs",
+        "weakLeanArgs",
+        "moreLinkArgs",
+        "precompileModules",
+        "defaultFacets",
+        "nativeFacets",
+        "extraDepTargets",
+        "buildType",
+        "platformIndependent",
+        "supportInterpreter",
+        "testDriver",
+        "lintDriver",
+        "buildDir",
+        "leanLibDir",
+        "nativeLibDir",
+        "binDir",
+        "irDir",
+        "libName",
+        "needs",
+        "readmeFile",
+        "description",
+        "license",
+        "licenseFiles",
+        "keywords",
+        "homepage",
+        "packagesDir",
+        "releaseRepo",
+        "buildArchive",
+        "preferReleaseBuild",
+        "dynlibs",
+        "plugins",
+    }
+)
 
 
-def _lake_field_tail_check(body: str, m: "Optional[re.Match[str]]") -> None:
-    """RT N7: refuse when anything but whitespace follows a matched `roots` / `srcDir`
-    literal on its physical line — the regex read a literal, Lake would evaluate an
-    expression (`#[`A] ++ #[`B]`, `"a" / "b"`), and the two must never disagree
-    silently."""
-    if m is None:
-        return
-    end = m.end()
-    nl = body.find("\n", end)
-    tail = body[end:] if nl < 0 else body[end:nl]
-    if tail.strip():
-        start = body.rfind("\n", 0, end) + 1
-        line = body[start:] if nl < 0 else body[start:nl]
-        raise Refusal(
-            f"{LAKEFILE}: `{line.strip()}` continues past the parsed literal with "
-            f"`{tail.strip()}` — the field is an expression this parser does not "
-            "evaluate (RT N7 on PR #698), and a half-read `roots` / `srcDir` would "
-            "silently make an import non-local and shrink S, so the module map is not "
-            "derived"
+def _lake_refuse(label: str, line: str, why: str) -> None:
+    raise Refusal(
+        f"{LAKEFILE}: in `{label}`, `{line}` {why} — inside a `lean_lib` / `package` "
+        "body every line must be a `field := …` assignment or its continuation, and "
+        '`roots` / `srcDir` must be fully-consumed `#[`A, `B]` / "dir" literals (RT '
+        "N10 on PR #698): a half-read field would silently make an import non-local "
+        "and shrink S, so the module map is not derived"
+    )
+
+
+def _lake_block_fields(
+    block: List[str], header_end: int, label: str
+) -> Tuple[Optional[str], Optional[List[str]]]:
+    """The (srcDir, roots) a `lean_lib` / `package` block sets — None where it does not —
+    read under the RT N10 allowlist (see the constants above). The body is everything
+    after the header's name: an optional `where`, an optional `{ … }` pair, then fields.
+    Anything the grammar does not fully understand is a `Refusal` naming the lakefile,
+    the block and the offending line (collapsed to one line when it spanned several)."""
+    body = (block[0][header_end:] + "".join("\n" + ln for ln in block[1:])).strip()
+    if not body:
+        return None, None
+    wm = LAKE_WHERE_RE.match(body)
+    if wm:
+        body = body[wm.end() :].lstrip()
+    elif not body.startswith("{"):
+        _lake_refuse(
+            label, " ".join(body.split("\n", 1)[0].split()), "follows no `where`"
         )
+    braced = body.startswith("{")
+    if braced:
+        body = body[1:]
+    if body.rstrip().endswith("}"):
+        if not braced:
+            _lake_refuse(label, "}", "closes no `{`")
+        body = body.rstrip()[:-1]
+    elif braced:
+        _lake_refuse(label, "{", "is never closed by a `}`")
+    fields: List[Tuple[str, List[str]]] = []
+    for ln in body.split("\n"):
+        if not ln.strip():
+            continue
+        fm = LAKE_FIELD_START_RE.match(ln)
+        if fm:
+            fields.append((fm.group(1), [fm.group(2)]))
+        elif fields:
+            fields[-1][1].append(ln)
+        else:
+            _lake_refuse(
+                label,
+                ln.strip(),
+                "is neither a `field := …` assignment nor a continuation of one",
+            )
+    src: Optional[str] = None
+    roots: Optional[List[str]] = None
+    seen: set = set()
+    for name, lines in fields:
+        value = "\n".join(lines).strip()
+        shown = " ".join(f"{name} := {value}".split())
+        if name in seen:
+            _lake_refuse(label, shown, f"sets `{name}` a second time")
+        seen.add(name)
+        if name == "roots":
+            if not LAKE_ROOTS_LITERAL_RE.fullmatch(value):
+                _lake_refuse(
+                    label, shown, "is not a fully-consumed `#[`A, `B]` literal"
+                )
+            roots = [g1 or g2 for g1, g2 in LAKE_NAME_RE.findall(value)]
+        elif name == "srcDir":
+            sm = LAKE_SRCDIR_LITERAL_RE.fullmatch(value)
+            if not sm:
+                _lake_refuse(label, shown, 'is not a fully-consumed "dir" literal')
+            src = sm.group(1) if sm else None  # the `if sm` is for mypy; refused above
+        elif ":=" in value:
+            _lake_refuse(label, shown, "carries a second `:=` (one field per line)")
+    return src, roots
 
 
 def parse_lakefile(text: str) -> "OrderedDict[str, str]":
@@ -458,10 +573,13 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
     a `lean_lib` token count (comments stripped, string literals blanked) that differs
     from the number of blocks parsed ⇒ refusal naming both counts — a lakefile this
     parser only half-reads must never silently make an import non-local and shrink S.
-    RT N7 (PR #698): the same rule for a half-read FIELD — after a matched `roots := #[…]`
-    or `srcDir := "…"` literal, anything but whitespace on the rest of that physical line
-    (`roots := #[`A] ++ #[`B]`, `srcDir := "a" / "b"` — legal Lake DSL whose tail the
-    literal regex would drop) ⇒ refusal naming the lakefile and the line.
+    RT N10 (PR #698, replacing N7's per-line tail check): every `lean_lib` AND `package`
+    body is read under an allowlist (`_lake_block_fields`) — `roots` / `srcDir` must be
+    fully-consumed literals whatever lines they span (`#[`A]` ⏎ `++ #[`B]`, `"a"` ⏎
+    `/ "b"`, `roots := myRoots` all refuse), any other `ident := …` field is inert, a
+    `{ … }` body is accepted (N12), and any other body line refuses naming the block
+    and the line. The `package` body gets the same allowlist because its `srcDir`
+    prefixes every library's.
 
     Today (516dfcb): {QBP: ".", Bi2Se3: "Sprint12-Inherited", …, SedenionHessianTraceSq:
     "Sprint12-Inherited"}."""
@@ -470,43 +588,43 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
     for ln in stripped.split("\n"):
         if not ln.strip():
             continue
-        if ln[0].isspace():
+        if (
+            ln[0].isspace() or ln.strip() == "}"
+        ):  # a flush `}` closes the open block (N12)
             if blocks:
                 blocks[-1].append(ln)
         else:
             blocks.append([ln])
-    pkg_src = "."
-    libs: List[Tuple[str, str, List[str]]] = []  # (name, srcDir, roots)
-    for b in blocks:
-        m = LAKE_BLOCK_RE.match(b[0])
-        if not m:
-            continue
-        body = "\n".join(b)
-        sm = LAKE_SRCDIR_RE.search(body)
-        src = sm.group(1) if sm else "."
-        _lake_field_tail_check(body, sm)
-        if m.group(1) == "package":
-            pkg_src = src
-            continue
-        name = m.group(2) or m.group(3) or ""
-        rm = LAKE_ROOTS_RE.search(body)
-        _lake_field_tail_check(body, rm)
-        roots = (
-            [g1 or g2 for g1, g2 in LAKE_NAME_RE.findall(rm.group(1))] if rm else [name]
-        )
-        libs.append((name, src, [r for r in roots if r]))
-    if not libs:
+    # M1 first — the block structure must account for every `lean_lib` token before any
+    # body is read (so a `lean_lib` indented into another block is named as such, not as
+    # a stray body line)
+    headers = [(b, m) for b in blocks for m in [LAKE_BLOCK_RE.match(b[0])] if m]
+    n_libs = sum(1 for _b, m in headers if m.group(1) == "lean_lib")
+    if not n_libs:
         raise Refusal(
             f"{LAKEFILE} parsed to zero `lean_lib` blocks; the Lean module map cannot "
             "be derived (parser stale against the lakefile format?) and no import can "
             "be classified local / non-local"
         )
     n_tokens = len(LAKE_LIB_TOKEN_RE.findall(LAKE_STRING_RE.sub('""', stripped)))
-    if n_tokens != len(libs):
+    if n_tokens != n_libs:
         raise Refusal(
-            f"{LAKEFILE} has {n_tokens} `lean_lib` token(s) but {len(libs)} `lean_lib` "
+            f"{LAKEFILE} has {n_tokens} `lean_lib` token(s) but {n_libs} `lean_lib` "
             "block(s) were parsed; a half-read lakefile would silently drop a library "
             "and shrink S (RT M1), so the module map is not derived"
+        )
+    # N10 — every lean_lib / package body under the allowlist
+    pkg_src = "."
+    libs: List[Tuple[str, str, List[str]]] = []  # (name, srcDir, roots)
+    for b, m in headers:
+        kind = m.group(1)
+        name = m.group(2) or m.group(3) or ""
+        src, roots = _lake_block_fields(b, m.end(), f"{kind} «{name}»")
+        if kind == "package":
+            pkg_src = "." if src is None else src
+            continue
+        libs.append(
+            (name, "." if src is None else src, roots if roots is not None else [name])
         )
     out: "OrderedDict[str, str]" = OrderedDict()
     for _name, src, roots in libs:
@@ -608,7 +726,9 @@ def agda_scan(text: str) -> Tuple[Optional[str], List[str]]:
     `open import X`, `private open import X`, `import X`; RT N8) — so an identifier or
     value named `import` elsewhere on a line (`x = import`, `y = foo import Z`) is not a
     declaration (RT N5); the module name is the token after `import` (`using` /
-    `hiding` / `renaming` / `as` / `public` clauses follow it). Comments stripped first.
+    `hiding` / `renaming` / `as` / `public` clauses follow it). A line that opens with a
+    module header, `module M … where`, is read from the token after `where` on (RT N13:
+    `module M where open import Q` is legal one-line layout). Comments stripped first.
     """
     stripped = strip_agda_comments(text)
     toks = stripped.split()
@@ -622,6 +742,12 @@ def agda_scan(text: str) -> Tuple[Optional[str], List[str]]:
         w = ln.split()
         if "import" not in w:
             continue
+        if w[0] == "module" and "where" in w:
+            # RT N13: `module M where open import Q` on ONE physical line is legal
+            # layout — the header through `where` is not a modifier, so strip it first
+            w = w[w.index("where") + 1 :]
+            if "import" not in w:
+                continue
         i = w.index("import")
         if not all(t in AGDA_IMPORT_MODIFIERS for t in w[:i]):
             continue
@@ -685,6 +811,31 @@ def parse_agda_lib(text: str) -> Tuple[List[str], List[str]]:
     return fields.get("include", []), fields.get("depend", [])
 
 
+def agda_include_root(lib_path: str, inc: str) -> str:
+    """The closure root an `.agda-lib` `include:` entry names: `inc` resolved relative to
+    the lib file's directory and normalised. RT N11 (PR #698): S lives under `proofs/`
+    (seq 2446), so a root that resolves outside it — absolute, a `..` segment surviving
+    normalisation, or any other prefix — is a `Refusal` naming the lib file and the
+    directory; `include: ../agda-cubical` from proofs/agda/ normalises back INSIDE the
+    tree and is accepted (the rule is on the resolved root, unlike `check_in_tree`'s on
+    the seed string, because the lib file's own location is what is being escaped)."""
+    root = posixpath.normpath(posixpath.join(posixpath.dirname(lib_path), inc))
+    if inc.startswith(("/", "\\")) or re.match(r"^[A-Za-z]:", inc):
+        why = "is an absolute path"
+    elif ".." in root.split("/"):
+        why = "escapes the repository"
+    elif not (root == LEAN_SRC_ROOT or root.startswith(LOCAL_TREE_PREFIX)):
+        why = f"is not under {LOCAL_TREE_PREFIX}"
+    else:
+        return root
+    raise Refusal(
+        f"{lib_path}: `include: {inc}` resolves to {root!r}, which {why} — an Agda "
+        "include root is a closure root and the claim-source manifest S lives under "
+        f"{LOCAL_TREE_PREFIX} (architecture ruling seq 2446; RT N11 on PR #698), so "
+        "the same-repo Agda roots are not derived"
+    )
+
+
 _AGDA_LIB_ROOTS_BY_COMMIT: Dict[Tuple[str, str], List[str]] = {}
 
 
@@ -692,9 +843,11 @@ def agda_lib_roots(repo: Path, commit: str) -> List[str]:
     """Every same-repo Agda include root declared at `commit`: the `include:` directories
     of every `*.agda-lib` under `proofs/` in the pinned tree (`git ls-tree -r`), resolved
     relative to the lib file's directory and normalised, sorted, deduplicated. Memoised
-    per (repo, pin). Today (516dfcb): proofs/agda-cubical/qbp-cubical.agda-lib has
-    `include: .` → ["proofs/agda-cubical"]; proofs/agda has no .agda-lib (its members
-    import only `Agda.*` builtins) and is reached only as a member's OWN root."""
+    per (repo, pin). An include root that resolves OUTSIDE `proofs/` is a refusal
+    (`agda_include_root`, RT N11 on PR #698). Today (516dfcb): proofs/agda-cubical/
+    qbp-cubical.agda-lib has `include: .` → ["proofs/agda-cubical"]; proofs/agda has no
+    .agda-lib (its members import only `Agda.*` builtins) and is reached only as a
+    member's OWN root."""
     key = (str(repo), commit)
     if key not in _AGDA_LIB_ROOTS_BY_COMMIT:
         p = _git(repo, "ls-tree", "-r", "--name-only", commit, "--", LEAN_SRC_ROOT)
@@ -707,9 +860,7 @@ def agda_lib_roots(repo: Path, commit: str) -> List[str]:
                 raise Refusal(f"{path} listed at {commit[:12]} but unreadable")
             includes, _depends = parse_agda_lib(blob_text(repo, blob))
             for inc in includes:
-                roots.add(
-                    posixpath.normpath(posixpath.join(posixpath.dirname(path), inc))
-                )
+                roots.add(agda_include_root(path, inc))
         _AGDA_LIB_ROOTS_BY_COMMIT[key] = sorted(roots)
     return _AGDA_LIB_ROOTS_BY_COMMIT[key]
 

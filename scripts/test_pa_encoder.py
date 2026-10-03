@@ -55,6 +55,13 @@ Each test names the AC / ruling it pins:
             Cubical), else REFUSES naming importer + module + roots searched; RT N7: an
             expression tail after a parsed `roots`/`srcDir` literal refuses; RT N8:
             `private open import X` (any prefix of open/private/abstract/instance) counts
+  PR #698 c4  Red Team N10 (BLOCKING — N7 closed by shape, not class): lean_lib / package
+            bodies read under an ALLOWLIST — `roots`/`srcDir` must be fully-consumed
+            literals whatever lines they span (`#[`A]` ⏎ `++ #[`B]`, `"a"` ⏎ `/ "b"`,
+            `roots := myRoots` refuse naming block + line), any other `ident := …` field is
+            inert, any other body line refuses; N12: `{ … }` bodies parse; N11: an
+            `.agda-lib` include root outside proofs/ refuses; N13: `module M where open
+            import Q` on one line counts
 """
 
 from __future__ import annotations
@@ -3116,22 +3123,26 @@ def test_parse_lakefile_refuses_expression_tail_after_roots_or_srcdir():
     """RT N7 (PR #698): legal Lake DSL whose `roots` / `srcDir` is an EXPRESSION — the
     literal regex consumed the first literal and silently dropped the tail
     (`roots := #[`A] ++ #[`B]` → [A]; `srcDir := "a" / "b"` → a) with equal token/block
-    counts, so M1's check never fired and `import B.X` went non-local. Now anything but
-    whitespace after the matched literal on its physical line refuses, naming the lakefile
-    and the line. MUTANT GUARD: drop `_lake_field_tail_check` → the first call returns
-    {A: "."} silently and `pytest.raises` fails."""
+    counts, so M1's check never fired and `import B.X` went non-local. Since commit 4 the
+    N10 allowlist (`_lake_block_fields`) covers these same-line shapes: the field's value
+    must FULLMATCH the literal, so the tail refuses naming the block and the line."""
     with pytest.raises(SystemExit) as ei:
         enc.parse_lakefile("lean_lib «L» where\n  roots := #[`A] ++ #[`B]\n")
     msg = str(ei.value)
-    assert msg.startswith("REFUSED: proofs/lakefile.lean: `roots := #[`A] ++ #[`B]`")
-    assert "`++ #[`B]`" in msg and "RT N7" in msg
-    with pytest.raises(SystemExit, match=r'REFUSED: .*`srcDir := "a" / "b"` continues'):
+    assert msg.startswith(
+        "REFUSED: proofs/lakefile.lean: in `lean_lib «L»`, `roots := #[`A] ++ #[`B]` "
+        "is not a fully-consumed"
+    )
+    assert "RT N10" in msg
+    with pytest.raises(
+        SystemExit, match=r'`srcDir := "a" / "b"` is not a fully-consumed'
+    ):
         enc.parse_lakefile(
             'lean_lib «L» where\n  srcDir := "a" / "b"\n  roots := #[`A]\n'
         )
     # the package block's srcDir is checked too (it prefixes every library's)
     with pytest.raises(
-        SystemExit, match=r"REFUSED: .*continues past the parsed literal"
+        SystemExit, match=r"in `package «P»`, `srcDir := \"s\" \+\+ \"t\"`"
     ):
         enc.parse_lakefile(
             'package «P» where\n  srcDir := "s" ++ "t"\nlean_lib «L» where\n  roots := #[`A]\n'
@@ -3142,13 +3153,186 @@ def test_parse_lakefile_refuses_expression_tail_after_roots_or_srcdir():
         'lean_lib «L» where\n  srcDir := "d"   \n  roots := #[`A,\n    `B] -- two roots\n'
         "@[default_target] lean_lib «M» where roots := #[`M1]\n"
     ) == {"A": "d", "B": "d", "M1": "."}
-    # the count check (M1) is unchanged alongside the tail check
+    # the count check (M1) is unchanged alongside the allowlist
     with pytest.raises(
         SystemExit, match="REFUSED: proofs/lakefile.lean has 2 `lean_lib`"
     ):
         enc.parse_lakefile(
             "package «P» where\n  lean_lib «I» where\n    roots := #[`I]\nlean_lib «A»\n"
         )
+
+
+# RT N10 (PR #698, blocking): the three legal Lake shapes — verified by the Red Team on
+# leanprover/lean4:v4.30.0 — that the per-line tail check (commit 3) still half-read
+# SILENTLY with equal token/block counts. Each must refuse, naming block + line.
+N10_ROWS = [
+    pytest.param(
+        "lean_lib «L» where\n  roots := #[`A]\n    ++ #[`B]\n",
+        "`roots := #[`A] ++ #[`B]` is not a fully-consumed `#[`A, `B]` literal",
+        id="roots-continuation-append",  # Lean: #[A, B]; old encoder: {A} — B silent
+    ),
+    pytest.param(
+        'lean_lib «L» where\n  srcDir := "a"\n    / "b"\n  roots := #[`A]\n',
+        '`srcDir := "a" / "b"` is not a fully-consumed "dir" literal',
+        id="srcdir-continuation-slash",  # Lean: a/b; old encoder: a
+    ),
+    pytest.param(
+        "def myRoots : Array Name := #[`C, `D]\n\nlean_lib «L» where\n  roots := myRoots\n",
+        "`roots := myRoots` is not a fully-consumed `#[`A, `B]` literal",
+        id="roots-identifier",  # Lean: #[C, D]; old encoder: {L} (default) silently
+    ),
+]
+
+
+@pytest.mark.parametrize("text, expected", N10_ROWS)
+def test_parse_lakefile_allowlist_refuses_unconsumed_roots_srcdir(text, expected):
+    """RT N10 (PR #698, blocking). Commit 3's `_lake_field_tail_check` looked only at the
+    rest of the literal's PHYSICAL line, so a continuation line (`++ #[`B]`, `/ "b"`)
+    or a non-literal value (`roots := myRoots`, no regex hit → default = lib name) still
+    half-read silently and shrank S. The body is now read under an allowlist: a
+    `roots` / `srcDir` value — whatever lines it spans — must FULLMATCH the literal
+    grammar, else a refusal naming the lakefile, the block and the (collapsed) line.
+    MUTANT GUARD: revert to the per-line tail check → all three rows parse silently
+    ({A: "."}, {A: "a"}, {L: "."}) and `pytest.raises` fails on each."""
+    with pytest.raises(SystemExit) as ei:
+        enc.parse_lakefile(text)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: proofs/lakefile.lean: in `lean_lib «L»`, ")
+    assert expected in msg and "RT N10" in msg
+
+
+def test_parse_lakefile_allowlist_accepts_the_grammar_it_understands():
+    """The allowlist's ACCEPT side (no false refusals): today's lakefile at 516dfcb parses
+    to the 9-root map; brace bodies `lean_lib «L» {` … `}` and `where { … }` parse
+    (RT N12 — commit 3 false-refused the `}` as a tail); a multi-line `roots := #[` ⏎
+    `A,` ⏎ `B]` literal parses to [A, B]; an unknown `foo := bar` and a multi-line
+    `leanOptions := #[ … ]` inside a block are accepted and ignored (only `roots` /
+    `srcDir` feed the map); a `package` body with only a comment, a bare `lean_lib Bare`
+    and a trailing `,` terminator all parse. The REFUSE side beyond N10's rows: any other
+    body line, a `}` closing no `{`, an unclosed `{`, a body with no `where`, a field
+    set twice, a comma-joined `foo := x, roots := #[`A]` (a map field hiding in an inert
+    field's value), and a backslash inside the srcDir string (N9, fail-closed)."""
+    _needs_commit(REF2_COMMIT)
+    today = git(ROOT, "show", f"{REF2_COMMIT}:proofs/lakefile.lean")
+    assert enc.parse_lakefile(today) == {
+        "QBP": ".",
+        **{
+            r: "Sprint12-Inherited"
+            for r in (
+                "Bi2Se3",
+                "Crystallisation",
+                "Elements",
+                "Graphene",
+                "Kitaev",
+                "Quaternion",
+                "Sedenion",
+                "SedenionHessianTraceSq",
+            )
+        },
+    }
+    # N12: brace syntax, flush `}` on its own line and inline `where { … }`
+    assert enc.parse_lakefile("lean_lib «L» {\n  roots := #[`A]\n}\n") == {"A": "."}
+    assert enc.parse_lakefile(
+        "lean_lib «L» where {\n  roots := #[`A]\n}\nlean_lib «M»\n"
+    ) == {"A": ".", "M": "."}
+    assert enc.parse_lakefile("lean_lib «L» where { roots := #[`A] }\n") == {"A": "."}
+    # multi-line roots literal
+    assert enc.parse_lakefile("lean_lib «L» where\n  roots := #[`A,\n    `B]\n") == {
+        "A": ".",
+        "B": ".",
+    }
+    # unknown / inert fields, single- and multi-line, are accepted and ignored
+    assert enc.parse_lakefile(
+        "lean_lib «L» where\n  foo := bar\n  leanOptions := #[\n"
+        "    ⟨`autoImplicit, false⟩\n  ]\n  roots := #[`A],\n"
+        'package «P» where\n  -- only a comment\n  name := "p"\n'
+    ) == {"A": "."}
+    assert "leanOptions" in enc.LAKE_INERT_FIELDS and "foo" not in enc.LAKE_INERT_FIELDS
+    assert enc.LAKE_MAP_FIELDS == frozenset({"roots", "srcDir"})
+    # the refuse side beyond the three N10 rows
+    for text, why in [
+        ("lean_lib «L» where\n  myExpr\n", "`myExpr` is neither a `field := …`"),
+        ("lean_lib «L» where\n  roots := #[`A]\n}\n", "`}` closes no `{`"),
+        ("lean_lib «L» {\n  roots := #[`A]\n", "`{` is never closed"),
+        ("lean_lib «L»\n  roots := #[`A]\n", "`roots := #[`A]` follows no `where`"),
+        (
+            "lean_lib «L» where\n  roots := #[`A]\n  roots := #[`B]\n",
+            "`roots := #[`B]` sets `roots` a second time",
+        ),
+        (
+            "lean_lib «L» where { foo := x, roots := #[`A] }\n",
+            "`foo := x, roots := #[`A]` carries a second `:=`",
+        ),
+        ('lean_lib «L» where\n  srcDir := "a\\"b"\n', 'is not a fully-consumed "dir"'),
+        (
+            "lean_lib «L» where\n  roots := #[`A, notAName]\n",
+            "`roots := #[`A, notAName]` is not a fully-consumed",
+        ),
+    ]:
+        with pytest.raises(SystemExit) as ei:
+            enc.parse_lakefile(text)
+        assert why in str(ei.value), (text, str(ei.value))
+
+
+def test_agda_lib_include_root_confined_to_proofs(tmp_path):
+    """RT N11 (PR #698): an `.agda-lib` `include:` that escapes `proofs/` was honoured
+    (`include: ../../outside` → root `outside`, `outside/Esc.agda` entered S). Fail
+    direction was over-inclusion, but S lives under proofs/ (seq 2446), so the resolved
+    root must be under it: absolute, `..`-escaping or any other prefix refuses naming the
+    lib file and the directory; `include: ../agda-cubical` from proofs/agda/ normalises
+    back INSIDE the tree and is accepted. MUTANT GUARD: drop the check → `agda_lib_roots`
+    returns ["outside", …] and `pytest.raises` fails."""
+    assert enc.agda_include_root("proofs/agda/x.agda-lib", "../agda-cubical") == (
+        "proofs/agda-cubical"
+    )
+    assert enc.agda_include_root("proofs/x.agda-lib", ".") == "proofs"
+    assert enc.agda_include_root("proofs/agda/x.agda-lib", "src/deep") == (
+        "proofs/agda/src/deep"
+    )
+    for inc, why in [
+        ("../../outside", "resolves to 'outside', which is not under proofs/"),
+        ("/abs/dir", "resolves to '/abs/dir', which is an absolute path"),
+        ("../../../up", "resolves to '../up', which escapes the repository"),
+    ]:
+        with pytest.raises(SystemExit) as ei:
+            enc.agda_include_root("proofs/agda/x.agda-lib", inc)
+        msg = str(ei.value)
+        assert msg.startswith(f"REFUSED: proofs/agda/x.agda-lib: `include: {inc}` ")
+        assert why in msg and "RT N11" in msg
+    # through the pinned-tree reader: the refusal fires before any root is returned
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/agda/qbp.agda-lib": "name: qbp\ninclude: . ../../outside\n",
+            "proofs/agda/A.agda": "module A where\nopen import Esc\n",
+            "outside/Esc.agda": "module Esc where\n",
+        },
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    with pytest.raises(
+        SystemExit,
+        match=r"REFUSED: proofs/agda/qbp\.agda-lib: `include: \.\./\.\./outside`",
+    ):
+        enc.agda_lib_roots(repo, c0)
+    with pytest.raises(SystemExit, match="RT N11"):
+        enc.pinned_sha_for(
+            anchor("PROOF-a", proof_file="proofs/agda/A.agda"), [], repo, c0
+        )
+
+
+def test_agda_scan_module_header_one_liner_import_counts():
+    """RT N13 (PR #698): `module M where open import Q` on ONE physical line is legal
+    Agda layout; the header tokens before `where` are not modifiers, so N8's rule yielded
+    nothing (under-inclusion). A line opening with `module … where` is now read from the
+    token after `where`. MUTANT GUARD: drop the strip → Q and R leave the list."""
+    mod, mods = enc.agda_scan(
+        "module M where open import Q\n"
+        "module N (A : Set) where import R as RR\n"  # parametrised header, plain import
+        "module Z where\n"  # header alone: nothing to import
+        "module W where x = import\n"  # N5 still: not a declaration after the header
+        "open import S\n"
+    )
+    assert (mod, mods) == ("M", ["Q", "R", "S"])
 
 
 def test_agda_scan_accepts_modifier_led_import_lines():
