@@ -40,13 +40,20 @@ Pipeline
    non-local — pinned by the lake manifest (inter#153) — and skipped; no lakefile at the
    pin while a `.lean` member has imports ⇒ refusal (the map cannot be guessed). AGDA
    members (`.agda` / `.lagda.md` / `.lagda`) are scanned ANYWHERE in the file (Agda allows
-   imports after the module header) for `open import X.Y` / `import X.Y`, comments
-   (`--`, nested `{- -}`) stripped, and resolve against the member's OWN corpus root
-   (`agda_root_of`: the directory left when the file's `module A.B.C` name is peeled off
-   its path — `proofs/agda/` or `proofs/agda-cubical/`): `X/Y.agda`, else `.lagda.md`,
-   else `.lagda`, at the pin; a module not found under that root is a library import
-   (the pinned agda / cubical) → non-local, skipped; found → enters S and is scanned
-   transitively. Imports are read from the file content AT THE PINNED COMMIT (`git
+   imports after the module header) for `import X.Y` led only by modifiers (`open` /
+   `private` / `abstract` / `instance` — RT N8), comments (`--`, nested `{- -}`)
+   stripped, and resolve against EVERY same-repo Agda root at the pin: the member's OWN
+   corpus root first (`agda_root_of`: the directory left when the file's `module A.B.C`
+   name is peeled off its path — `proofs/agda/` or `proofs/agda-cubical/`), then every
+   `include:` directory of every `*.agda-lib` under `proofs/` at the pinned commit
+   (`agda_lib_roots`; today `proofs/agda-cubical/qbp-cubical.agda-lib` → the same dir),
+   in a deterministic order: `X/Y.agda`, else `.lagda.md`, else `.lagda`. Found ⇒ enters
+   S and is scanned transitively. Found under NO root ⇒ accepted as a library import ONLY
+   when its first dotted component is in `AGDA_EXTERNAL_NAMESPACES` (`Agda` — the
+   compiler's builtins; `Cubical` — agda/cubical, the `depend: cubical-0.9` library);
+   any other unresolved module is a REFUSAL naming the importing file, the module and the
+   roots searched (Gemini on PR #698: a same-repo module the closure cannot see would
+   silently shrink S). Imports are read from the file content AT THE PINNED COMMIT (`git
    cat-file blob`), never from a checkout; Lean reads the header only (imports precede
    every other command) (`lean_header_imports`, `lean_module_path`, `local_imports_of`).
    An imported LEAN module whose file does not exist at the pinned commit is a refusal
@@ -228,12 +235,35 @@ LEAN_ASSISTANT = "lean4"
 # "Sprint12-Inherited", bare roots Bi2Se3 … SedenionHessianTraceSq) → proofs/Sprint12-
 # Inherited/<Root>.lean. A module whose first component is no lib root (Mathlib, Std,
 # Lean, Aesop, …) is non-local: pinned by the lake manifest (inter#153), skipped. Agda
-# members resolve `open import X.Y` against their own corpus root (proofs/agda,
-# proofs/agda-cubical); a module not found there is a library import (agda / cubical).
+# members resolve `import X.Y` against every same-repo Agda root at the pin — their own
+# corpus root first (proofs/agda, proofs/agda-cubical), then every `include:` dir of
+# every `*.agda-lib` under proofs/ — and a module found under none is a library import
+# ONLY when its namespace is listed in AGDA_EXTERNAL_NAMESPACES; otherwise a refusal.
 LEAN_SRC_ROOT = "proofs"
 LAKEFILE = "proofs/lakefile.lean"
 LEAN_EXT = ".lean"
 AGDA_EXTS = (".agda", ".lagda.md", ".lagda")  # resolution order at the pin
+AGDA_LIB_EXT = ".agda-lib"
+# The top-level namespaces an UNRESOLVED Agda import may belong to without refusing —
+# the libraries the corpus is checked against, pinned outside this repo (inter#153), so
+# their modules never enter S. Gathered from the corpus at 516dfcb (every `import` line
+# of the 17 `.agda` files under proofs/ + the one `.agda-lib`):
+#   `Agda`    — the compiler's own builtins (`Agda.Primitive`, `Agda.Builtin.Cubical.Path`):
+#               the only library the 4 proofs/agda members import; shipped with agda,
+#               never an .agda-lib `depend:`.
+#   `Cubical` — the agda/cubical library: proofs/agda-cubical/qbp-cubical.agda-lib has
+#               `depend: cubical-0.9`, whose library NAME (`cubical-0.9`) differs from
+#               the module namespace it exports (`Cubical.*`), so the namespace is listed
+#               explicitly — a `depend:` line cannot be mapped to a namespace mechanically.
+# A new external library needs a row here (and a review) before its modules are skipped;
+# until then its imports refuse. Same-repo modules are never listed: a module that exists
+# under a same-repo root is found there first, whatever its namespace.
+AGDA_EXTERNAL_NAMESPACES = frozenset({"Agda", "Cubical"})
+# RT N8 (PR #698): the tokens that may precede `import` on a declaration line. Agda
+# accepts `private open import X` / `abstract import X` / `instance open import X` on one
+# line (2.8.0 type-checks them); anything else before `import` (`x = import`,
+# `y = foo import Z`) makes it an identifier, not a declaration (RT N5).
+AGDA_IMPORT_MODIFIERS = frozenset({"open", "private", "abstract", "instance"})
 # seq 2446: every closure seed (proof_file, same-repo evidence_ref path) must live under
 # this tree; an absolute path, a `..` segment, or any other prefix is refused.
 LOCAL_TREE_PREFIX = "proofs/"
@@ -396,6 +426,28 @@ LAKE_SRCDIR_RE = re.compile(r"\bsrcDir\s*:=\s*\"([^\"]*)\"")
 LAKE_ROOTS_RE = re.compile(r"\broots\s*:=\s*#\[([^\]]*)\]")
 
 
+def _lake_field_tail_check(body: str, m: "Optional[re.Match[str]]") -> None:
+    """RT N7: refuse when anything but whitespace follows a matched `roots` / `srcDir`
+    literal on its physical line — the regex read a literal, Lake would evaluate an
+    expression (`#[`A] ++ #[`B]`, `"a" / "b"`), and the two must never disagree
+    silently."""
+    if m is None:
+        return
+    end = m.end()
+    nl = body.find("\n", end)
+    tail = body[end:] if nl < 0 else body[end:nl]
+    if tail.strip():
+        start = body.rfind("\n", 0, end) + 1
+        line = body[start:] if nl < 0 else body[start:nl]
+        raise Refusal(
+            f"{LAKEFILE}: `{line.strip()}` continues past the parsed literal with "
+            f"`{tail.strip()}` — the field is an expression this parser does not "
+            "evaluate (RT N7 on PR #698), and a half-read `roots` / `srcDir` would "
+            "silently make an import non-local and shrink S, so the module map is not "
+            "derived"
+        )
+
+
 def parse_lakefile(text: str) -> "OrderedDict[str, str]":
     """root module → source directory (relative to the lakefile's directory) from a Lake
     DSL lakefile. For each top-level `lean_lib «Name» where` block: `roots := #[`A, `B]`
@@ -406,6 +458,10 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
     a `lean_lib` token count (comments stripped, string literals blanked) that differs
     from the number of blocks parsed ⇒ refusal naming both counts — a lakefile this
     parser only half-reads must never silently make an import non-local and shrink S.
+    RT N7 (PR #698): the same rule for a half-read FIELD — after a matched `roots := #[…]`
+    or `srcDir := "…"` literal, anything but whitespace on the rest of that physical line
+    (`roots := #[`A] ++ #[`B]`, `srcDir := "a" / "b"` — legal Lake DSL whose tail the
+    literal regex would drop) ⇒ refusal naming the lakefile and the line.
 
     Today (516dfcb): {QBP: ".", Bi2Se3: "Sprint12-Inherited", …, SedenionHessianTraceSq:
     "Sprint12-Inherited"}."""
@@ -428,11 +484,13 @@ def parse_lakefile(text: str) -> "OrderedDict[str, str]":
         body = "\n".join(b)
         sm = LAKE_SRCDIR_RE.search(body)
         src = sm.group(1) if sm else "."
+        _lake_field_tail_check(body, sm)
         if m.group(1) == "package":
             pkg_src = src
             continue
         name = m.group(2) or m.group(3) or ""
         rm = LAKE_ROOTS_RE.search(body)
+        _lake_field_tail_check(body, rm)
         roots = (
             [g1 or g2 for g1, g2 in LAKE_NAME_RE.findall(rm.group(1))] if rm else [name]
         )
@@ -544,12 +602,14 @@ def strip_agda_comments(text: str) -> str:
 
 def agda_scan(text: str) -> Tuple[Optional[str], List[str]]:
     """(declared top-level module name or None, imported modules in order, deduplicated)
-    of an Agda file. Imports are `open import X.Y …` / `import X.Y …` on ANY line of the
-    file (Agda allows them after the module header and inside nested modules) whose
-    first token, after an optional `open`, is `import` — so an identifier or value
-    named `import` elsewhere on a line (`x = import`) is not a declaration (RT N5); the
-    module name is the token after `import` (`using` / `hiding` / `renaming` / `as` /
-    `public` clauses follow it). Comments stripped first."""
+    of an Agda file. Imports are `import X.Y …` on ANY line of the file (Agda allows them
+    after the module header and inside nested modules) where EVERY token before `import`
+    is a modifier in `AGDA_IMPORT_MODIFIERS` (`open`, `private`, `abstract`, `instance` —
+    `open import X`, `private open import X`, `import X`; RT N8) — so an identifier or
+    value named `import` elsewhere on a line (`x = import`, `y = foo import Z`) is not a
+    declaration (RT N5); the module name is the token after `import` (`using` /
+    `hiding` / `renaming` / `as` / `public` clauses follow it). Comments stripped first.
+    """
     stripped = strip_agda_comments(text)
     toks = stripped.split()
     module: Optional[str] = None
@@ -560,10 +620,13 @@ def agda_scan(text: str) -> Tuple[Optional[str], List[str]]:
     mods: List[str] = []
     for ln in stripped.split("\n"):
         w = ln.split()
-        if w[:1] == ["open"]:
-            w = w[1:]
-        if len(w) >= 2 and w[0] == "import" and w[1] not in mods:
-            mods.append(w[1])
+        if "import" not in w:
+            continue
+        i = w.index("import")
+        if not all(t in AGDA_IMPORT_MODIFIERS for t in w[:i]):
+            continue
+        if len(w) > i + 1 and w[i + 1] not in mods:
+            mods.append(w[i + 1])
     return module, mods
 
 
@@ -602,14 +665,77 @@ def agda_candidate_paths(module: str, root: str) -> List[str]:
     return [f"{root}/{rel}{ext}" for ext in AGDA_EXTS]
 
 
+def parse_agda_lib(text: str) -> Tuple[List[str], List[str]]:
+    """(`include:` directories, `depend:` library names) of an `.agda-lib` file: each
+    field is `key: v1 v2 …`, values whitespace-separated, continued on indented lines;
+    `--` line comments stripped. Relative directories are relative to the lib file's
+    own directory (resolved by the caller)."""
+    fields: Dict[str, List[str]] = {}
+    cur: Optional[str] = None
+    for raw in text.split("\n"):
+        ln = raw.split("--", 1)[0].rstrip()
+        if not ln.strip():
+            continue
+        m = re.match(r"^([A-Za-z][\w-]*)\s*:(.*)$", ln)
+        if m and not ln[0].isspace():
+            cur = m.group(1)
+            fields.setdefault(cur, []).extend(m.group(2).split())
+        elif cur is not None and ln[0].isspace():
+            fields[cur].extend(ln.split())
+    return fields.get("include", []), fields.get("depend", [])
+
+
+_AGDA_LIB_ROOTS_BY_COMMIT: Dict[Tuple[str, str], List[str]] = {}
+
+
+def agda_lib_roots(repo: Path, commit: str) -> List[str]:
+    """Every same-repo Agda include root declared at `commit`: the `include:` directories
+    of every `*.agda-lib` under `proofs/` in the pinned tree (`git ls-tree -r`), resolved
+    relative to the lib file's directory and normalised, sorted, deduplicated. Memoised
+    per (repo, pin). Today (516dfcb): proofs/agda-cubical/qbp-cubical.agda-lib has
+    `include: .` → ["proofs/agda-cubical"]; proofs/agda has no .agda-lib (its members
+    import only `Agda.*` builtins) and is reached only as a member's OWN root."""
+    key = (str(repo), commit)
+    if key not in _AGDA_LIB_ROOTS_BY_COMMIT:
+        p = _git(repo, "ls-tree", "-r", "--name-only", commit, "--", LEAN_SRC_ROOT)
+        roots: set = set()
+        for path in p.stdout.split("\n"):
+            if not path.endswith(AGDA_LIB_EXT):
+                continue
+            blob = blob_sha(repo, commit, path)
+            if blob is None:  # pragma: no cover — ls-tree just listed it
+                raise Refusal(f"{path} listed at {commit[:12]} but unreadable")
+            includes, _depends = parse_agda_lib(blob_text(repo, blob))
+            for inc in includes:
+                roots.add(
+                    posixpath.normpath(posixpath.join(posixpath.dirname(path), inc))
+                )
+        _AGDA_LIB_ROOTS_BY_COMMIT[key] = sorted(roots)
+    return _AGDA_LIB_ROOTS_BY_COMMIT[key]
+
+
+def agda_roots_for(
+    repo: Path, commit: str, path: str, module: Optional[str]
+) -> List[str]:
+    """The roots an Agda member's imports are resolved under, in resolution order: its
+    OWN corpus root (`agda_root_of`) first, then every other `.agda-lib` include root at
+    the pin (`agda_lib_roots`, sorted). Deterministic; the own root is never dropped even
+    when no .agda-lib declares it."""
+    own = agda_root_of(path, module)
+    return [own] + [r for r in agda_lib_roots(repo, commit) if r != own]
+
+
 def local_imports_of(
-    repo: Path, commit: str, path: str, blob: str
+    repo: Path, commit: str, path: str, blob: str, context: str = ""
 ) -> List[Tuple[str, str]]:
     """The same-repo files `path` (content `blob`, at `commit`) imports, as
     [(dep_path, module)]. `.lean`: header imports through the lakefile-derived module
     map (a dep that does not exist at the pin is left for the caller to refuse);
-    `.agda`/`.lagda*`: imports resolved under the member's own corpus root, kept only
-    when found at the pin (not found = library module); anything else (Coq) is a leaf.
+    `.agda`/`.lagda*`: imports resolved under every same-repo Agda root at the pin
+    (`agda_roots_for`: own root first, then the .agda-lib include roots); found ⇒ kept;
+    found nowhere ⇒ skipped as a library module ONLY when its first component is in
+    `AGDA_EXTERNAL_NAMESPACES`, else a refusal naming the importer, the module and the
+    roots searched (`context` names the anchor); anything else (Coq) is a leaf.
     """
     if path.endswith(LEAN_EXT):
         mods = lean_header_imports_of_blob(repo, blob)
@@ -624,13 +750,29 @@ def local_imports_of(
         return out
     if is_agda_path(path):
         module, mods = agda_scan_of_blob(repo, blob)
-        root = agda_root_of(path, module)
+        roots = agda_roots_for(repo, commit, path, module)
         found: List[Tuple[str, str]] = []
         for m in mods:
-            for cand in agda_candidate_paths(m, root):
-                if blob_sha(repo, commit, cand) is not None:
-                    found.append((cand, m))
-                    break
+            hit = next(
+                (
+                    cand
+                    for root in roots
+                    for cand in agda_candidate_paths(m, root)
+                    if blob_sha(repo, commit, cand) is not None
+                ),
+                None,
+            )
+            if hit is not None:
+                found.append((hit, m))
+            elif m.split(".", 1)[0] not in AGDA_EXTERNAL_NAMESPACES:
+                raise Refusal(
+                    f"{path!r} imports {m!r}, found under none of the same-repo Agda "
+                    f"roots at pinned master {commit[:12]} ({', '.join(roots)}) and its "
+                    f"namespace {m.split('.', 1)[0]!r} is not a known external library "
+                    f"({', '.join(sorted(AGDA_EXTERNAL_NAMESPACES))}){context}; a "
+                    "same-repo module the closure cannot see would silently shrink S "
+                    "(Gemini on PR #698), so the claim-source manifest is not computed"
+                )
         return found
     return []
 
@@ -1169,10 +1311,12 @@ def pinned_sha_for(
         paths.setdefault(p, "evidence_ref")
     # seq 2394 / QBP#696: S = the transitive closure of the seeds over SAME-REPO imports,
     # read from each member's content AT the pinned commit — Lean through the lakefile-
-    # derived module map (every lake library), Agda through the member's own corpus root
-    # (`local_imports_of`). Seen-set BFS: a cycle terminates; a file reached twice enters
-    # once. A Coq ref is a leaf; library modules (Mathlib / Std / Lean core; the pinned
-    # agda / cubical) never enter (lake-manifest pinned, inter#153).
+    # derived module map (every lake library), Agda through every same-repo Agda root at
+    # the pin — own corpus root first, then the .agda-lib include roots; an unresolved
+    # module outside a known external namespace refuses (`local_imports_of`). Seen-set
+    # BFS: a cycle terminates; a file reached twice enters once. A Coq ref is a leaf;
+    # library modules (Mathlib / Std / Lean core; the pinned agda / cubical) never enter
+    # (lake-manifest pinned, inter#153).
     imported_from: Dict[str, Tuple[str, str]] = (
         {}
     )  # dep path -> (importer path, module)
@@ -1214,7 +1358,9 @@ def pinned_sha_for(
             flags.append("stale_proof_file")
             continue
         sources.append({"path": path, "blob": blob})
-        for dep, module in local_imports_of(repo, commit, path, blob):
+        for dep, module in local_imports_of(
+            repo, commit, path, blob, f" (anchor {aid}{where})"
+        ):
             if dep in seen or dep in paths:
                 continue
             imported_from.setdefault(dep, (path, module))
@@ -1486,8 +1632,9 @@ def changelog_note(
         f"on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain "
         f"edges typed derivation (conservative); pinned_sha = claim-source manifest hash "
         f"(S = same-repo import closure of proof_file ∪ same-repo evidence files — Lean "
-        f"via the lakefile-derived module map over every lake library, Agda via the "
-        f"member's corpus root; sorted `path blob` lines, git hash-object --stdin; "
+        f"via the lakefile-derived module map over every lake library, Agda via every "
+        f"same-repo Agda root at the pin with unknown-namespace refusal; sorted `path "
+        f"blob` lines, git hash-object --stdin; "
         f"architecture rulings seq 2299/2394, scope QBP#696), "
         f"not stored. Computed by tools/cth-pa ({engine_id}); never hand-set — a wrong grade is "
         f"fixed by new or corrected evidence in inter/notary-evidence/, never by editing "
@@ -1663,11 +1810,16 @@ def build_report(
                 "(default .) — so `import QBP.A.B` → proofs/QBP/A/B.lean and `import "
                 "Sedenion` → proofs/Sprint12-Inherited/Sedenion.lean; a module in no "
                 "lake library (Mathlib/Std/Lean/Aesop) is non-local (lake-manifest "
-                "pinned, inter#153), skipped; a dangling local import refuses. Agda: "
-                "`open import X.Y` / `import X.Y` anywhere in a .agda/.lagda member, "
-                "comments stripped, resolved under the member's own corpus root "
-                "(proofs/agda, proofs/agda-cubical: X/Y.agda | .lagda.md | .lagda); not "
-                "found there = library module (agda/cubical), skipped. Seeds outside "
+                "pinned, inter#153), skipped; a dangling local import refuses; a "
+                "`roots`/`srcDir` field with an expression tail refuses (RT N7). Agda: "
+                "`import X.Y` led only by open/private/abstract/instance (RT N8), "
+                "anywhere in a .agda/.lagda member, comments stripped, resolved under "
+                "EVERY same-repo Agda root at the pin — the member's own corpus root "
+                "(proofs/agda, proofs/agda-cubical) first, then every `include:` dir of "
+                "every *.agda-lib under proofs/ (X/Y.agda | .lagda.md | .lagda); found "
+                "nowhere ⇒ skipped as a library module only if its namespace is in "
+                "AGDA_EXTERNAL_NAMESPACES (Agda, Cubical), else refusal naming importer, "
+                "module and roots searched (Gemini, PR #698). Seeds outside "
                 "proofs/ (absolute, `..`, other prefix) are refused (seq 2446); a "
                 "non-path proof_file (citation) is no_proof_file, a missing path-valued "
                 "one stale_proof_file. Lines `path <git rev-parse <commit>:path>\\n` "

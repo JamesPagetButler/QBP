@@ -48,6 +48,13 @@ Each test names the AC / ruling it pins:
             refused on the original string; §I4 seq 2455: explicit absolute case + the
             refusal names the arm; N4: no-commits / no-origin evidence repo, agda_root_of
             dirname fallback; N5: `x = import` is not an import declaration
+  PR #698 c3  Gemini round 1 (CHANGES REQUESTED, three fail-open items): Agda imports resolve
+            under EVERY same-repo Agda root at the pin (own corpus root first, then every
+            `.agda-lib` include root) — a cross-root import enters S; a module found nowhere
+            is skipped only when its namespace is in AGDA_EXTERNAL_NAMESPACES (Agda,
+            Cubical), else REFUSES naming importer + module + roots searched; RT N7: an
+            expression tail after a parsed `roots`/`srcDir` literal refuses; RT N8:
+            `private open import X` (any prefix of open/private/abstract/instance) counts
 """
 
 from __future__ import annotations
@@ -2624,7 +2631,9 @@ def test_agda_open_import_same_root_enters_manifest_library_import_does_not(tmp_
     )
     p2, _, _ = enc.pinned_sha_for(a, [], repo, c2)
     assert p2 == p1
-    # the other corpus root is never consulted even for a same-named module
+    # a same-named module under the OTHER corpus root never shadows the own-root hit: the
+    # own root is searched first (c3: other roots are consulted AFTER it, and only when a
+    # .agda-lib declares them — this fixture has none under proofs/agda)
     c3 = commit(
         repo, {"proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n-- v2\n"}, "O"
     )
@@ -2993,3 +3002,177 @@ def test_reference_values_at_516dfcb_fano_unchanged_hessian_and_agda_moved():
     ):
         p, s, _ = enc.pinned_sha_for(anchor("x", proof_file=pf), [], ROOT, REF2_COMMIT)
         assert p == val and [x["path"] for x in s] == [pf]
+
+
+# ---------------------------------------------------------------------------------------
+# PR #698 commit 3 — Gemini round 1 fail-open items + RT N7 / N8
+# ---------------------------------------------------------------------------------------
+def test_agda_cross_root_import_enters_manifest_and_unknown_namespace_refuses(tmp_path):
+    """Gemini on PR #698: a `proofs/agda/A.agda` that imports a module living under
+    `proofs/agda-cubical/` used to be treated as a cubical-library import and silently
+    dropped from S. Now every same-repo Agda root at the pin — the member's own corpus
+    root first, then every `include:` dir of every `*.agda-lib` under proofs/ — is
+    searched, in that order; a module found under none is skipped only when its first
+    component is a known external namespace (`Agda`, `Cubical`), else a refusal naming
+    the importer, the module and the roots searched. MUTANT GUARDS: (a) revert to
+    own-root-only → `proofs/agda-cubical/B.agda` leaves S and the sources assertion fails;
+    (b) drop the namespace check → `Mystery.Mod` is skipped and `pytest.raises` fails.
+    """
+    A = "proofs/agda/A.agda"
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/agda/qbp.agda-lib": "name: qbp\ninclude: .\n",
+            "proofs/agda-cubical/qbp-cubical.agda-lib": (
+                "name: qbp-cubical\ninclude: .\ndepend: cubical-0.9\n"
+                "flags: --cubical --safe\n"
+            ),
+            A: (
+                "module A where\n"
+                "open import Agda.Primitive using (Level)\n"  # builtins: skipped
+                "open import Cubical.Foundations.Prelude\n"  # cubical library: skipped
+                "open import B using (b)\n"  # OTHER root (proofs/agda-cubical): enters S
+                "private open import C\n"  # own root, modifier-led (N8): enters S
+                "open import Dup\n"  # in BOTH roots: the own root wins
+            ),
+            "proofs/agda-cubical/B.agda": "module B where\nopen import Dup\n",
+            "proofs/agda/C.agda": "module C where\n",
+            "proofs/agda/Dup.agda": "module Dup where\n",
+            "proofs/agda-cubical/Dup.agda": "module Dup where\n-- cubical twin\n",
+            "proofs/agda/D.agda": "module D where\nopen import Mystery.Mod\n",
+        },
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    # the roots at the pin, and the per-member resolution order (own first)
+    assert enc.agda_lib_roots(repo, c0) == ["proofs/agda", "proofs/agda-cubical"]
+    assert enc.agda_roots_for(repo, c0, A, "A") == [
+        "proofs/agda",
+        "proofs/agda-cubical",
+    ]
+    assert enc.agda_roots_for(repo, c0, "proofs/agda-cubical/B.agda", "B") == [
+        "proofs/agda-cubical",
+        "proofs/agda",
+    ]
+    a = anchor("PROOF-a", proof_file=A, lean_theorem="A.a")
+    p0, s0, f0 = enc.pinned_sha_for(a, [], repo, c0)
+    assert f0 == []
+    # B (cross-root) is in S; B's own `open import Dup` resolves under ITS own root first
+    # (proofs/agda-cubical/Dup.agda); A's resolves under proofs/agda/Dup.agda
+    assert [x["path"] for x in s0] == [  # codepoint sort: `-` < `/`
+        "proofs/agda-cubical/B.agda",
+        "proofs/agda-cubical/Dup.agda",
+        A,
+        "proofs/agda/C.agda",
+        "proofs/agda/Dup.agda",
+    ]
+    # editing the cross-root member moves the pin
+    c1 = commit(repo, {"proofs/agda-cubical/B.agda": "module B where\n-- v2\n"}, "B")
+    p1, s1, _ = enc.pinned_sha_for(a, [], repo, c1)
+    assert p1 != p0
+    assert [x["path"] for x in s1] == [
+        "proofs/agda-cubical/B.agda",
+        A,
+        "proofs/agda/C.agda",
+        "proofs/agda/Dup.agda",
+    ]
+    # an import found under NO root whose namespace is not a known external library
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(
+            anchor("PROOF-d", proof_file="proofs/agda/D.agda"), [], repo, c0
+        )
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: 'proofs/agda/D.agda' imports 'Mystery.Mod'")
+    assert "proofs/agda, proofs/agda-cubical" in msg  # the roots searched, in order
+    assert "'Mystery'" in msg and "Agda, Cubical" in msg and "PROOF-d" in msg
+    # the external namespaces are a module-level constant, not re-derived per run
+    assert enc.AGDA_EXTERNAL_NAMESPACES == frozenset({"Agda", "Cubical"})
+    # no .agda-lib anywhere: the member's own root is the only root (fallback) — a
+    # same-repo module under the other root is then unresolved and, being in no external
+    # namespace, REFUSES rather than silently leaving S
+    (tmp_path / "two").mkdir()
+    repo2 = mk_repo(
+        tmp_path / "two",
+        {
+            "proofs/agda/E.agda": "module E where\nopen import F\n",
+            "proofs/agda-cubical/F.agda": "module F where\n",
+        },
+    )
+    c2 = git(repo2, "rev-parse", "HEAD")
+    assert enc.agda_lib_roots(repo2, c2) == []
+    assert enc.agda_roots_for(repo2, c2, "proofs/agda/E.agda", "E") == ["proofs/agda"]
+    with pytest.raises(SystemExit, match=r"REFUSED: 'proofs/agda/E\.agda' imports 'F'"):
+        enc.pinned_sha_for(
+            anchor("PROOF-e", proof_file="proofs/agda/E.agda"), [], repo2, c2
+        )
+    # the .agda-lib parser: whitespace-separated values, indented continuation, comments
+    assert enc.parse_agda_lib(
+        "name: x -- the name\ninclude: src\n  lib/extra\ndepend: cubical-0.9 standard-library\n"
+        "flags: --safe\n"
+    ) == (["src", "lib/extra"], ["cubical-0.9", "standard-library"])
+    assert enc.parse_agda_lib("name: y\n") == ([], [])
+
+
+def test_parse_lakefile_refuses_expression_tail_after_roots_or_srcdir():
+    """RT N7 (PR #698): legal Lake DSL whose `roots` / `srcDir` is an EXPRESSION — the
+    literal regex consumed the first literal and silently dropped the tail
+    (`roots := #[`A] ++ #[`B]` → [A]; `srcDir := "a" / "b"` → a) with equal token/block
+    counts, so M1's check never fired and `import B.X` went non-local. Now anything but
+    whitespace after the matched literal on its physical line refuses, naming the lakefile
+    and the line. MUTANT GUARD: drop `_lake_field_tail_check` → the first call returns
+    {A: "."} silently and `pytest.raises` fails."""
+    with pytest.raises(SystemExit) as ei:
+        enc.parse_lakefile("lean_lib «L» where\n  roots := #[`A] ++ #[`B]\n")
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: proofs/lakefile.lean: `roots := #[`A] ++ #[`B]`")
+    assert "`++ #[`B]`" in msg and "RT N7" in msg
+    with pytest.raises(SystemExit, match=r'REFUSED: .*`srcDir := "a" / "b"` continues'):
+        enc.parse_lakefile(
+            'lean_lib «L» where\n  srcDir := "a" / "b"\n  roots := #[`A]\n'
+        )
+    # the package block's srcDir is checked too (it prefixes every library's)
+    with pytest.raises(
+        SystemExit, match=r"REFUSED: .*continues past the parsed literal"
+    ):
+        enc.parse_lakefile(
+            'package «P» where\n  srcDir := "s" ++ "t"\nlean_lib «L» where\n  roots := #[`A]\n'
+        )
+    # no false positive: trailing whitespace, a comment (stripped), a multi-line roots
+    # literal, and an inline `where … roots := #[…]` all parse
+    assert enc.parse_lakefile(
+        'lean_lib «L» where\n  srcDir := "d"   \n  roots := #[`A,\n    `B] -- two roots\n'
+        "@[default_target] lean_lib «M» where roots := #[`M1]\n"
+    ) == {"A": "d", "B": "d", "M1": "."}
+    # the count check (M1) is unchanged alongside the tail check
+    with pytest.raises(
+        SystemExit, match="REFUSED: proofs/lakefile.lean has 2 `lean_lib`"
+    ):
+        enc.parse_lakefile(
+            "package «P» where\n  lean_lib «I» where\n    roots := #[`I]\nlean_lib «A»\n"
+        )
+
+
+def test_agda_scan_accepts_modifier_led_import_lines():
+    """RT N8 (PR #698): N5's import-led rule moved the failure direction to under-inclusion
+    — `private open import X` on one line is legal Agda (2.8.0 type-checks it) and was
+    missed, shrinking S. Now `import` counts when EVERY preceding token on the line is in
+    {open, private, abstract, instance}; `x = import` / `y = foo import Z` still yield
+    nothing (N5 kept). MUTANT GUARD: revert to the optional-`open`-only rule → X, W and V
+    drop out of the list and the equality fails."""
+    mod, mods = enc.agda_scan(
+        "module M where\n"
+        "private open import X using (x)\n"
+        "open import Y\n"
+        "import Z as ZZ\n"
+        "abstract import W\n"
+        "instance open import V public\n"
+        "  private\n    open import Nested\n"  # layout-split modifier: the import line still counts
+        "x = import\n"  # N5: not a declaration
+        "y = foo import Z2\n"  # N5: `import` not modifier-led
+        "open Foo\n"  # no import token
+        "open import\n"  # nothing after `import`: nothing to resolve
+    )
+    assert (mod, mods) == ("M", ["X", "Y", "Z", "W", "V", "Nested"])
+    assert "Z2" not in mods and "open" not in mods
+    assert enc.AGDA_IMPORT_MODIFIERS == frozenset(
+        {"open", "private", "abstract", "instance"}
+    )
