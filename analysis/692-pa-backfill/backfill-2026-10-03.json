@@ -12,6 +12,7 @@
     "require_signature": false
   },
   "evidence_dir": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-main/notary-evidence",
+  "evidence_store_sha": "333134cb61eb12a405c67203859f090f64750df1",
   "v2_record_count": 3,
   "target_anchor_count": 148,
   "targets_without_lean_theorem": {

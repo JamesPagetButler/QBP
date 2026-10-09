@@ -230,6 +230,46 @@ def test_backfill_spot_values():
     ), f"exactly the two Fano anchors at PA2 at this pin; dist={dist}"
 
 
+# --- AC2, complete: the WHOLE ledger (not just the pinned subset the Go gate sees) ------
+
+
+def test_full_ledger_reconciles_clean():
+    """Complete AC2: EVERY target anchor's committed grade (all 148, graded or not) equals
+    the recompute — not only the graded+pinned subset the strict Go gate reconciles. This
+    closes the gap where a hand-edit raising an UN-pinned 0/0 anchor (which carries no
+    40-hex pinned_sha, so it is outside the gate's claim-set) would otherwise slip past.
+    Uses the encoder's own plan_writes on the real committed ledger."""
+    ev = _evidence_dir()
+    enc = _encoder()
+    ledger, results, _engine_out = _recompute(ev)
+    plan = enc.plan_writes(ledger, results)
+    changed = {cid: p for cid, p in plan.items() if p["changed"]}
+    assert not changed, f"committed != recompute for: {sorted(changed)}"
+
+
+def test_ungraded_hand_edit_caught_by_full_plan():
+    """A hand edit raising an un-pinned 0/0 anchor to 2 with NO evidence IS caught by the
+    full-ledger plan — the complement to test_planted_hand_edit_fails (which covers the
+    graded subset through the Go gate)."""
+    ev = _evidence_dir()
+    enc = _encoder()
+    ledger, results, _engine_out = _recompute(ev)
+    ungraded = [
+        cid for cid, r in results.items() if r["pa"] == 0 and r["effective_pa"] == 0
+    ]
+    assert ungraded, "need an ungraded target anchor to tamper"
+    victim = ungraded[0]
+    tampered = copy.deepcopy(ledger)
+    for a in tampered["anchors"]:
+        if a["id"] == victim:
+            a["pa_local"] = 2
+            a["pa_effective"] = 2
+    plan = enc.plan_writes(tampered, results)
+    assert plan[victim][
+        "changed"
+    ], f"a no-evidence hand edit on {victim} must be caught"
+
+
 # --- the pin invariant (needs no checkout) ---------------------------------------------
 
 
@@ -239,9 +279,11 @@ def _inter_pin_from_workflow():
     return m.group(1) if m else None
 
 
-def _latest_backfill_report_sha():
-    """The inter store sha named in the most recent dated backfill report JSON."""
-    reports = sorted(REPORT_DIR.glob("backfill-*.json"))
+def _latest_backfill_report_sha(report_dir=REPORT_DIR):
+    """The inter store sha named in the most recent dated backfill report JSON, or None if
+    there is no report or the latest one does not record it (report_dir is injectable so
+    the fail-closed mutant can exercise the absent-field path)."""
+    reports = sorted(report_dir.glob("backfill-*.json"))
     if not reports:
         return None
     rep = json.loads(reports[-1].read_text(encoding="utf-8"))
@@ -251,40 +293,59 @@ def _latest_backfill_report_sha():
     return None
 
 
-def _pin_matches(pin, store_sha):
-    """INTER_PIN and the store sha agree, allowing either to be an abbreviation of the
-    other (both name the same commit). Extracted so the mutant below can prove it bites.
+def _pin_invariant_ok(pin, report_sha):
+    """FAIL-CLOSED (architect seq 2583): the invariant holds only when BOTH the pin and the
+    store sha are present AND name the same commit (either may abbreviate the other). A
+    missing pin or a missing store sha is a FAILURE, never a pass-by-absence — that was the
+    type-B skip-when-input-absent gap. The sole matching rule, so a mutant flips it here.
     """
-    if not pin or not store_sha:
+    if not pin or not report_sha:
         return False
-    return pin == store_sha or store_sha.startswith(pin) or pin.startswith(store_sha)
+    return pin == report_sha or report_sha.startswith(pin) or pin.startswith(report_sha)
 
 
 def test_pin_invariant_bites():
-    """Mutation guard (architect seq 2554): the pin check must REJECT a mismatch, not wave
-    it through. A bare equality that always returned True would pass the real-pin test but
-    fail here."""
-    assert _pin_matches("333134c", "333134ca0b1c2d3e4f5061728394a5b6c7d8e9f0") is True
-    assert _pin_matches("333134c", "333134c") is True
-    assert _pin_matches("333134c", "e2ecce8f00ba12cd34ef5061728394a5b6c7d8e9") is False
-    assert _pin_matches("333134c", "") is False
-    assert _pin_matches("", "333134c") is False
+    """Mutant 1 (architect seq 2554): the check REJECTS a mismatch, not waves it through."""
+    assert (
+        _pin_invariant_ok("333134c", "333134ca0b1c2d3e4f5061728394a5b6c7d8e9f0") is True
+    )
+    assert _pin_invariant_ok("333134c", "333134c") is True
+    assert (
+        _pin_invariant_ok("333134c", "e2ecce8f00ba12cd34ef5061728394a5b6c7d8e9")
+        is False
+    )
+
+
+def test_pin_invariant_fails_closed_on_missing_store_sha(tmp_path):
+    """Mutant 2 (architect seq 2583, the type-B guard): a dated report that does NOT record
+    evidence_store_sha yields no store sha, and the invariant must be KILLED (fail), not
+    skipped. Exercises the real _latest_backfill_report_sha path against such a report.
+    """
+    (tmp_path / "backfill-2099-01-01.json").write_text(
+        json.dumps({"issue": "QBP#692", "ledger_version_after": "9.9.9"})
+    )
+    assert _latest_backfill_report_sha(tmp_path) is None
+    assert _pin_invariant_ok("333134c", None) is False
+    assert _pin_invariant_ok("333134c", _latest_backfill_report_sha(tmp_path)) is False
+    assert _pin_invariant_ok("", "333134c") is False
 
 
 @pytest.mark.skipif(not WORKFLOW.exists(), reason="pa-reconcile.yml not present")
 def test_inter_pin_matches_latest_backfill_report():
     """INTER_PIN must equal the store sha in the latest dated backfill report (architect
-    seq 2554): the pin moves atomically with the ledger. The mutant this kills is a pin
-    bump without a re-backfill (or vice versa) — committed != recompute silently."""
+    seq 2554 + 2583): the pin moves atomically with the ledger. FAIL-CLOSED — a report that
+    does not record evidence_store_sha is a failure, not a skip. The mutant this kills is a
+    pin bump without a re-backfill (or vice versa) — committed != recompute silently."""
     pin = _inter_pin_from_workflow()
     assert (
         pin
     ), "pa-reconcile.yml must declare INTER_PIN once the real-ledger step lands"
     report_sha = _latest_backfill_report_sha()
-    if report_sha is None:
-        pytest.skip(
-            "no backfill report records evidence_store_sha yet (lands with the next backfill)"
-        )
-    assert _pin_matches(
+    assert report_sha, (
+        "the latest dated backfill report MUST record evidence_store_sha (fail-closed, "
+        "architect seq 2583): a missing store sha is a FAILURE, not a skip — otherwise the "
+        "pin invariant is fail-open and a pin/ledger desync passes silently"
+    )
+    assert _pin_invariant_ok(
         pin, report_sha
     ), f"INTER_PIN {pin} != latest backfill report store sha {report_sha}"
