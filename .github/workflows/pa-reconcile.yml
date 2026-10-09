@@ -90,7 +90,9 @@ jobs:
           python-version: '3.12'
 
       - name: Install reconcile test deps
-        run: pip install pyyaml pytest
+        # pyyaml: evidence records are YAML; jsonschema: plan_writes -> ledger_assistants
+        # validates the ledger-shape array against the inventory schema.
+        run: pip install pyyaml pytest jsonschema
 
       - name: Real-ledger reconcile (AC2 + AC3 + the INTER_PIN invariant)
         env:
