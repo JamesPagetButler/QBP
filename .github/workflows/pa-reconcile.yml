@@ -38,7 +38,9 @@ env:
   # INVARIANT (test_pa_ledger.py): INTER_PIN must equal the store sha in the latest dated
   # backfill report — the pin moves ATOMICALLY with the ledger. A bump here without a
   # re-backfill (or vice versa) makes committed != recompute and the gate fails, by design.
-  INTER_PIN: 333134c
+  # Full 40-hex sha, not abbreviated: actions/checkout fetches a commit directly only for a
+  # full sha; an abbreviation is treated as a branch/tag pattern and the fetch fails.
+  INTER_PIN: 333134cb61eb12a405c67203859f090f64750df1
 
 jobs:
   gate:
