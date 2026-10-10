@@ -279,18 +279,56 @@ def _inter_pin_from_workflow():
     return m.group(1) if m else None
 
 
-def _latest_backfill_report_sha(report_dir=REPORT_DIR):
-    """The inter store sha named in the most recent dated backfill report JSON, or None if
-    there is no report or the latest one does not record it (report_dir is injectable so
-    the fail-closed mutant can exercise the absent-field path)."""
-    reports = sorted(report_dir.glob("backfill-*.json"))
+def _latest_backfill_report(report_dir=REPORT_DIR):
+    """The most-recently-GENERATED backfill report, chosen by its `generated` timestamp —
+    NOT a lexical filename sort. A report named non-chronologically (e.g. a `-rekey` suffix
+    or an un-zero-padded date) must not silently select an older report and make the pin
+    invariant compare a stale store sha. ISO `generated` strings sort chronologically; the
+    filename is the tiebreak / fallback when `generated` is absent or unparseable."""
+    reports = list(report_dir.glob("backfill-*.json"))
     if not reports:
         return None
-    rep = json.loads(reports[-1].read_text(encoding="utf-8"))
+
+    def _key(p):
+        try:
+            gen = json.loads(p.read_text(encoding="utf-8")).get("generated", "")
+        except Exception:  # noqa: BLE001 — a malformed report never wins the max
+            gen = ""
+        return (gen or "", p.name)
+
+    return max(reports, key=_key)
+
+
+def _latest_backfill_report_sha(report_dir=REPORT_DIR):
+    """The inter store sha named in the most-recently-generated backfill report, or None if
+    there is no report or the latest one does not record it (report_dir is injectable so
+    the fail-closed mutant can exercise the absent-field path)."""
+    rep_path = _latest_backfill_report(report_dir)
+    if rep_path is None:
+        return None
+    rep = json.loads(rep_path.read_text(encoding="utf-8"))
     for key in ("evidence_store_sha", "inter_pin", "evidence_pin", "store_sha"):
         if rep.get(key):
             return rep[key]
     return None
+
+
+def test_latest_report_picked_by_generated_not_filename(tmp_path):
+    """Guards the sorted()[-1] fragility (the Gemini-review question, self-addressed while
+    the Gemini leg is billing-blocked): the latest report is the most-recently-GENERATED
+    one, so a filename that sorts LAST lexically but is OLDER cannot win and feed the pin
+    invariant a stale store sha."""
+    (tmp_path / "backfill-zzz-old.json").write_text(  # sorts last lexically, but older
+        json.dumps(
+            {"generated": "2026-01-01T00:00:00Z", "evidence_store_sha": "0" * 40}
+        )
+    )
+    (tmp_path / "backfill-2026-10-10.json").write_text(  # sorts earlier, but newer
+        json.dumps(
+            {"generated": "2026-10-10T00:00:00Z", "evidence_store_sha": "a" * 40}
+        )
+    )
+    assert _latest_backfill_report_sha(tmp_path) == "a" * 40
 
 
 def _pin_invariant_ok(pin, report_sha):
