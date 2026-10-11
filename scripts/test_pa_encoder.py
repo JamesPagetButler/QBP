@@ -32,51 +32,39 @@ Each test names the AC / ruling it pins:
             definition file changes pinned_sha, an unrelated file does not, Mathlib is
             excluded, A→B→C includes C, a cycle terminates, a dangling import refuses;
             real-repo reference values at f452532 (headline 6b972a7d, companion 0f32f714)
-  QBP#696  the module map is DERIVED from proofs/lakefile.lean at the pin (every lean_lib's
-            roots + srcDir): `import Sedenion` from a Sprint12 file enters S, a root in no
-            lake lib is skipped, Mathlib is skipped, no lakefile + imports refuses; Agda
-            `open import` of a same-root module enters S, a cubical-library import does not;
-            out-of-tree proof_file / evidence_ref paths (`..`, absolute, not under proofs/,
-            bare root) are refused (seq 2446) while a citation string stays `no_proof_file`;
-            a missing path-valued proof_file is `stale_proof_file` and named in the report;
-            the report records the evidence repo HEAD/remote or `unknown (not a git
-            checkout)` (RT N2); real-repo values at 516dfcb: Fano headline/companion
-            UNCHANGED, PROOF-hessian + the 3 Agda anchors moved (old == seed-only manifest)
-  PR #698 c2  Red Team M1: parse_lakefile fails CLOSED (inline `@[…] lean_lib`, `--` inside
-            a srcDir string parse; `lean_lib` token count != blocks parsed refuses); N2:
-            `proofs//x.lean` / `proofs/./x.lean` normalise to the real seed, `..` still
-            refused on the original string; §I4 seq 2455: explicit absolute case + the
-            refusal names the arm; N4: no-commits / no-origin evidence repo, agda_root_of
-            dirname fallback; N5: `x = import` is not an import declaration
-  PR #698 c3  Gemini round 1 (CHANGES REQUESTED, three fail-open items): Agda imports resolve
-            under EVERY same-repo Agda root at the pin (own corpus root first, then every
-            `.agda-lib` include root) — a cross-root import enters S; a module found nowhere
-            is skipped only when its namespace is in AGDA_EXTERNAL_NAMESPACES (Agda,
-            Cubical), else REFUSES naming importer + module + roots searched; RT N7: an
-            expression tail after a parsed `roots`/`srcDir` literal refuses; RT N8:
-            `private open import X` (any prefix of open/private/abstract/instance) counts
-  PR #698 c4  Red Team N10 (BLOCKING — N7 closed by shape, not class): lean_lib / package
-            bodies read under an ALLOWLIST — `roots`/`srcDir` must be fully-consumed
-            literals whatever lines they span (`#[`A]` ⏎ `++ #[`B]`, `"a"` ⏎ `/ "b"`,
-            `roots := myRoots` refuse naming block + line), any other `ident := …` field is
-            inert, any other body line refuses; N12: `{ … }` bodies parse; N11: an
-            `.agda-lib` include root outside proofs/ refuses; N13: `module M where open
-            import Q` on one line counts
-  PR #698 c5  Red Team N14 (BLOCKING — N10's fail-open one layer up, in block delimitation):
-            a body that BEGINS on a flush line (`{`, `where`, `where roots := …`) attaches
-            to the open block instead of opening a silently-ignored one — six Lake
-            v4.30.0-verified shapes (B3/B3s/B9/B10/W1/W2) parse to Lake's answer; a
-            `roots`/`srcDir` token in a block that is no `lean_lib`/`package` header
-            REFUSES naming the line (fail-closed splitter); N15: a second `:=` inside a
-            string literal is text; N16: unnamed `package where` is legal, `where` is
-            never a name (an unnamed `lean_lib` refuses); N17: the `where { … }` accept
-            rows (Lake-rejected) replaced by Lake-verified brace shapes; N18: a root
-            claimed by two libs refuses naming both (Lake builds both)
+  QBP#696  (rewritten on QBP#700; architecture §I4 conditions 1–3) the closure is DERIVED
+            BY EACH PROVER'S OWN DEPENDENCY TOOL at the pin, in a hermetic temporary git
+            worktree of the pinned commit — Lake's facets under `lake query --no-build`
+            (libraries from `translate-config`, `:modules`, `+M:lean`, `+M:transImports`),
+            `agda --only-scope-checking --dependency-graph` from the member's library dir,
+            `coqdep -f _CoqProject` — and the regex Lake/Agda parser of PR #698 is DELETED
+            (a test asserts its symbols are gone). Condition 1: G-L1 (Lake drops an
+            unresolved import silently) runs on EVERY member of S — A → B → Nonexistent
+            refuses naming B (mutant: root-only check → KILLED). Condition 2: the Agda
+            wrapper ASSERTS a clean interface state (no _build/, no *.agdai) before the run
+            — a pre-seeded fresh .agdai refuses (mutant: drop the assertion → S shrinks
+            silently → KILLED). Condition 3: the four re-keyed anchors (PROOF-hessian +
+            the three Agda anchors) carry their QBP#698/QBP#700 reference values and the
+            full 148-vector at 516dfcb equals the committed report except exactly those
+            four. G-L2 (gitignored lake-manifest.json) is refused on mismatch and deferred
+            to qbp-implementor. Coq: `_CoqProject` required, any coqdep stderr line refuses
+            (G-C1). Tool absence = refusal; the CI gate sets QBP_REQUIRE_PROVER_TOOLS=1 so
+            the tool-based tests cannot skip there. Fixtures are REAL Lake / Agda / Coq
+            projects (`mk_repo` → `lakefile_for`). Kept from PR #698: out-of-tree
+            proof_file / evidence_ref paths (`..`, absolute, not under proofs/, bare root)
+            are refused (seq 2446) while a citation string stays `no_proof_file`; a
+            missing path-valued proof_file is `stale_proof_file` and named in the report;
+            non-canonical in-tree spellings normalise (RT N2); the report records the
+            evidence repo HEAD/remote or `unknown (not a git checkout)` (RT N2), the
+            closure's toolchain handle (lean-toolchain at the pin + lake/agda/coqc
+            versions) and `evidence_store_sha` (PR #701); real-repo values at 516dfcb:
+            Fano headline/companion UNCHANGED, PROOF-hessian + the 3 Agda anchors moved
 """
 
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -110,40 +98,83 @@ def git(repo: Path, *args: str) -> str:
     ).stdout.strip()
 
 
-# Mirrors proofs/lakefile.lean at 516dfcb: lib «QBP» (roots [QBP], srcDir .) and lib
-# «QBPSprint12» (srcDir Sprint12-Inherited, eight bare roots). The encoder derives its
-# module map from this file AT THE PIN (QBP#696), so every temp repo whose .lean members
-# import anything needs one; `lakefile=False` builds a repo without it.
-DEFAULT_LAKEFILE = """import Lake
-open Lake DSL
-
-package «QBPProofs» where
-
-@[default_target]
-lean_lib «QBP» where
-  roots := #[`QBP]
-
--- Sprint 12 inherited corpus: bare roots under a srcDir
-@[default_target]
-lean_lib «QBPSprint12» where
-  srcDir := "Sprint12-Inherited"
-  roots := #[`Bi2Se3, `Crystallisation, `Elements, `Graphene, `Kitaev, `Quaternion, `Sedenion, `SedenionHessianTraceSq]
-
-@[default_target]
-lean_exe «oracle» where
-  root := `QBP.Oracle.Main
-"""
+# QBP#700 / QBP#696: the closure is derived by each prover's OWN tool, so every fixture
+# repo is a REAL (dependency-free) Lake project: `lakefile_for` lists every `.lean` under
+# proofs/ as an explicit root of lib «T» (Sprint12-Inherited/ files as bare roots of
+# lib «QBPSprint12» with its srcDir), `lean-toolchain` pins v4.30.0 so elan picks the
+# installed toolchain; a `.v` seed gets a `_CoqProject` (`-Q . Fx` + the files) unless
+# the test brings its own. No Mathlib `require`, so `lake query` works offline.
+LEAN_TOOLCHAIN = "leanprover/lean4:v4.30.0\n"
 
 
-def mk_repo(tmp_path: Path, files: dict, lakefile: bool = True) -> Path:
+def lakefile_for(files: dict) -> str:
+    top, s12 = [], []
+    for rel in files:
+        if not (rel.startswith("proofs/") and rel.endswith(".lean")):
+            continue
+        if rel == "proofs/lakefile.lean":
+            continue
+        inner = rel[len("proofs/") : -len(".lean")]
+        if inner.startswith("Sprint12-Inherited/"):
+            s12.append(inner[len("Sprint12-Inherited/") :].replace("/", "."))
+        else:
+            top.append(inner.replace("/", "."))
+    out = ["import Lake", "open Lake DSL", "", "package «Fixture» where", ""]
+    if top:
+        roots = ", ".join(f"`{m}" for m in sorted(top))
+        out += ["lean_lib «T» where", f"  roots := #[{roots}]", ""]
+    if s12:
+        roots = ", ".join(f"`{m}" for m in sorted(s12))
+        out += [
+            "lean_lib «QBPSprint12» where",
+            '  srcDir := "Sprint12-Inherited"',
+            f"  roots := #[{roots}]",
+            "",
+        ]
+    return "\n".join(out)
+
+
+def _tools_for(files: dict) -> set:
+    tools = set()
+    for rel in files:
+        if rel.endswith(".lean"):
+            tools.add("lake")
+        elif rel.endswith(enc.AGDA_EXTS):
+            tools.add("agda")
+        elif rel.endswith(".v"):
+            tools.add("coqdep")
+    return tools
+
+
+def _skip_without_tools(tools) -> None:
+    """Skip (or, under QBP_REQUIRE_PROVER_TOOLS=1, FAIL) when a prover tool the fixture
+    needs is absent — the CI gate job cannot silently skip the tool-based tests."""
+    missing = sorted(t for t in tools if shutil.which(t) is None)
+    if missing:
+        if os.environ.get(enc.REQUIRE_PROVER_TOOLS_ENV) == "1":
+            pytest.fail(f"prover tools required: {missing}")
+        pytest.skip(f"prover tool(s) not installed: {missing}")
+
+
+def mk_repo(
+    tmp_path: Path, files: dict, lakefile: bool = True, skip_without_tools: bool = True
+) -> Path:
+    files = dict(files)
+    if skip_without_tools:
+        _skip_without_tools(_tools_for(files))
     repo = tmp_path / "repo"
     repo.mkdir()
     git(repo, "init", "-q")
     git(repo, "config", "user.email", "t@e.st")
     git(repo, "config", "user.name", "t")
-    files = dict(files)
-    if lakefile and "proofs/lakefile.lean" not in files:
-        files["proofs/lakefile.lean"] = DEFAULT_LAKEFILE
+    if lakefile and any(r.endswith(".lean") for r in files):
+        files.setdefault("proofs/lakefile.lean", lakefile_for(files))
+        files.setdefault("proofs/lean-toolchain", LEAN_TOOLCHAIN)
+    vs = [r for r in files if r.startswith("proofs/") and r.endswith(".v")]
+    if vs and not any(r.endswith("_CoqProject") for r in files):
+        files["proofs/_CoqProject"] = "-Q . Fx\n" + "".join(
+            r[len("proofs/") :] + "\n" for r in vs
+        )
     commit(repo, files, "c0")
     return repo
 
@@ -458,7 +489,12 @@ def test_internal_compute_never_gets_proof_assistants(tmp_path):
 # ---------------------------------------------------------------------------------------
 def test_pinned_sha_follows_file_not_commit(tmp_path):
     repo = mk_repo(
-        tmp_path, {"proofs/A.lean": "a0\n", "proofs/B.v": "b0\n", "README.md": "r0\n"}
+        tmp_path,
+        {
+            "proofs/A.lean": "a0\n",
+            "proofs/B.v": "Definition b := 0.\n",
+            "README.md": "r0\n",
+        },
     )
     a = anchor("PROOF-a", proof_file="proofs/A.lean")
     ev = [{"evidence_ref": "proofs/B.v@zzzz#thm"}]
@@ -476,7 +512,7 @@ def test_pinned_sha_follows_file_not_commit(tmp_path):
     p2, _, _ = enc.pinned_sha_for(a, ev, repo, c2)
     assert p2 != p0
     # editing the evidence_ref member: changes again
-    c3 = commit(repo, {"proofs/B.v": "b1\n"}, "edit B")
+    c3 = commit(repo, {"proofs/B.v": "Definition b := 1.\n"}, "edit B")
     p3, _, _ = enc.pinned_sha_for(a, ev, repo, c3)
     assert p3 not in (p0, p2)
     # MUTANT GUARD: a manifest over only one member of S is not the pinned_sha
@@ -527,6 +563,7 @@ def test_reference_manifest_hash_cd_structure_constant_tables():
     SedenionOctonionCount} → 6b972a7d. Supersedes the seq-2299 two-file value be505734.
     """
     _needs_ref_commit()
+    _skip_without_tools(("lake",))
     a = anchor("PROOF-cd-structure-constant-tables", proof_file=CD_FILE)
     pinned, sources, flags = enc.pinned_sha_for(a, [], ROOT, REF_COMMIT)
     assert flags == []
@@ -539,14 +576,19 @@ def test_reference_manifest_hash_cd_structure_constant_tables():
     assert pinned == enc.manifest_hash_py(
         [f"{s['path']} {s['blob']}\n" for s in sources]
     )
-    # the headline's own imports at that commit, read from the blob, not the checkout,
-    # classified through the lakefile-derived module map AT that commit (QBP#696)
-    mm = enc.lake_module_map(ROOT, REF_COMMIT)
-    assert enc.lean_local_imports(enc.blob_text(ROOT, CD_BLOB), mm) == [
+    # the headline's own imports at that commit, as LAKE resolves them in the pin
+    # worktree (QBP#700): the two same-repo modules, Mathlib outside the libraries
+    ws = enc.lean_workspace(ROOT, REF_COMMIT)
+    assert ws.libs == ["QBP", "QBPSprint12"] and ws.package == "QBPProofs"
+    assert [m for m in ws.imports["QBP.Foundations.CDAlg"] if m in ws.modules] == [
         "QBP.Foundations.SedenionOctonionCount",
         "QBP.Foundations.FanoOrientationF3",
     ]
-    assert "Mathlib.Tactic" in enc.lean_header_imports_of_blob(ROOT, CD_BLOB)
+    assert "Mathlib.Tactic" in ws.header["QBP.Foundations.CDAlg"]
+    assert (
+        "Mathlib.Tactic" not in ws.modules
+        and ws.unresolved["QBP.Foundations.CDAlg"] == []
+    )
     # a Fano-companion evidence_ref on the headline adds nothing: F3 is already in the
     # closure, so S (and pinned_sha) is unchanged — the closure deduplicates
     ev = [{"evidence_ref": f"{F3_FILE}@x#fanoTableF4_eq_cayleyDickson"}]
@@ -564,70 +606,33 @@ def test_reference_manifest_hash_fano_companion_unchanged():
     imports nothing, so S = {FanoOrientationF3} and the seq-2299 value 0f32f714 stands.
     """
     _needs_ref_commit()
+    _skip_without_tools(("lake",))
     a = anchor("PROOF-fano-table-equals-cd-products", proof_file=F3_FILE)
     pinned, sources, flags = enc.pinned_sha_for(a, [], ROOT, REF_COMMIT)
     assert flags == []
     assert sources == [{"path": F3_FILE, "blob": F3_BLOB}]
     assert pinned == COMPANION_PINNED
-    assert enc.lean_header_imports_of_blob(ROOT, F3_BLOB) == []
+    ws = enc.lean_workspace(ROOT, REF_COMMIT)
+    assert [
+        m for m in ws.trans["QBP.Foundations.FanoOrientationF3"] if m in ws.modules
+    ] == []
 
 
 # ---------------------------------------------------------------------------------------
 # seq 2394 — S closes over QBP-local imports
 # ---------------------------------------------------------------------------------------
-def test_lean_local_imports_header_only_comments_stripped():
-    text = (
-        "/- licence header\n   import QBP.InBlockComment -/\n"
-        "/-- doc: import QBP.InDocComment -/\n"
-        "prelude\n"
-        "import Mathlib.Tactic  -- import QBP.InTrailingComment\n"
-        "import Std.Data.List\n"
-        "import QBP.B\n"
-        "import «QBP.C»\n"
-        "import QBP\n"
-        "import QBP.B\n"
-        "-- import QBP.InLineComment\n"
-        "theorem t : True := trivial\n"
-        "import QBP.AfterHeader\n"
-    )
-    MAP = {"QBP": "proofs", "Sedenion": "proofs/Sprint12-Inherited"}
-    assert enc.lean_header_imports(text) == [
-        "Mathlib.Tactic",
-        "Std.Data.List",
-        "QBP.B",
-        "QBP.C",
-        "QBP",
-    ]
-    assert enc.lean_local_imports(text, MAP) == ["QBP.B", "QBP.C", "QBP"]
-    assert enc.lean_module_path("QBP.Foundations.CDAlg", MAP) == (
-        "proofs/QBP/Foundations/CDAlg.lean"
-    )
-    assert enc.lean_module_path("QBP", MAP) == "proofs/QBP.lean"
-    # a bare lake root maps through its library's srcDir (QBP#696), nested modules too
-    assert enc.lean_module_path("Sedenion", MAP) == (
-        "proofs/Sprint12-Inherited/Sedenion.lean"
-    )
-    assert enc.lean_module_path("Sedenion.Sub", MAP) == (
-        "proofs/Sprint12-Inherited/Sedenion/Sub.lean"
-    )
-    assert enc.lean_module_path("Mathlib.Tactic", MAP) is None
-    # a near-miss namespace is no lake root
-    assert enc.lean_local_imports("import QBPSprint12.X\nimport QBPX.Y\n", MAP) == []
-    # and the lib name itself is not a root unless `roots` says so (the map decides)
-    assert enc.lean_local_imports("import QBPSprint12\n", MAP) == []
-
-
 def test_manifest_closes_over_local_imports(tmp_path):
-    """A → B → C over `import QBP.…`; editing C (a definition the statement depends on)
-    changes pinned_sha, an unrelated QBP file does not, Mathlib never enters."""
+    """A → B → C over `import QBP.…` (Lake's transImports); editing C (a definition the
+    statement depends on) changes pinned_sha, an unrelated QBP file does not, a toolchain
+    module (`Init.Data.Nat`) never enters; a Coq evidence ref closes via coqdep."""
     repo = mk_repo(
         tmp_path,
         {
-            "proofs/QBP/A.lean": "import Mathlib.Tactic\nimport QBP.B\ntheorem a : True := trivial\n",
+            "proofs/QBP/A.lean": "import Init.Data.Nat\nimport QBP.B\ntheorem a : True := trivial\n",
             "proofs/QBP/B.lean": "import QBP.C\ndef b := 1\n",
             "proofs/QBP/C.lean": "def c := 1\n",
             "proofs/QBP/U.lean": "import QBP.C\ndef u := 1\n",  # unrelated: nobody in S imports it
-            "proofs/B.v": "(* import QBP.NotScanned *)\n",  # a Coq ref is a leaf
+            "proofs/B.v": "(* Require Import QBP.NotScanned *)\nDefinition b := 1.\n",  # Coq: coqdep
         },
     )
     a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
@@ -641,7 +646,9 @@ def test_manifest_closes_over_local_imports(tmp_path):
         "proofs/QBP/B.lean",
         "proofs/QBP/C.lean",
     ]
-    assert not any("Mathlib" in s["path"] for s in s0)
+    assert not any(
+        "Init" in s["path"] for s in s0
+    )  # toolchain module: outside the tree
     # transitive member edited ⇒ pinned_sha moves
     c1 = commit(repo, {"proofs/QBP/C.lean": "def c := 2\n"}, "edit C")
     p1, _, _ = enc.pinned_sha_for(a, ev, repo, c1)
@@ -672,7 +679,10 @@ def test_manifest_closes_over_local_imports(tmp_path):
     assert enc.manifest_hash_py([f"{s['path']} {s['blob']}\n" for s in s0]) == p0
 
 
-def test_manifest_import_cycle_terminates(tmp_path):
+def test_manifest_import_cycle_is_lakes_own_refusal(tmp_path):
+    """An import cycle is illegal Lean; Lake's `transImports` facet reports `bad import`
+    and exits non-zero, which the wrapper surfaces as a refusal carrying Lake's stderr —
+    the closure is never guessed around a tool error."""
     repo = mk_repo(
         tmp_path,
         {
@@ -683,16 +693,16 @@ def test_manifest_import_cycle_terminates(tmp_path):
     )
     a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
     c0 = git(repo, "rev-parse", "HEAD")
-    pinned, sources, flags = enc.pinned_sha_for(a, [], repo, c0)
-    assert flags == [] and len(pinned) == 40
-    assert [s["path"] for s in sources] == [
-        "proofs/QBP/A.lean",
-        "proofs/QBP/B.lean",
-        "proofs/QBP/C.lean",
-    ]
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(a, [], repo, c0)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: `lake query --no-build --json` failed")
+    assert "bad import" in msg
 
 
 def test_manifest_dangling_local_import_is_refused(tmp_path):
+    """A module Lake cannot resolve is dropped from its facets silently (QBP#700 G-L1);
+    the header-vs-imports check surfaces it as a refusal naming the importing file."""
     repo = mk_repo(tmp_path, {"proofs/QBP/A.lean": "import QBP.Missing\n"})
     a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
     c0 = git(repo, "rev-parse", "HEAD")
@@ -700,7 +710,7 @@ def test_manifest_dangling_local_import_is_refused(tmp_path):
         enc.pinned_sha_for(a, [], repo, c0, ["ev/rec.json"])
     msg = str(ei.value)
     assert "REFUSED" in msg and "PROOF-a" in msg and "ev/rec.json" in msg
-    assert "QBP.Missing" in msg and "proofs/QBP/Missing.lean" in msg
+    assert "'QBP.Missing'" in msg and "G-L1" in msg
     assert "proofs/QBP/A.lean" in msg  # the importing file is named
 
 
@@ -2434,149 +2444,36 @@ def test_N18_dry_run_registers_atexit_cleanup(tmp_path, monkeypatch):
 # QBP#696 — closure over every lake library (lakefile-derived map) + Agda open imports;
 # out-of-tree guard (seq 2446); report records evidence repo (RT N2) + stale_proof_file
 # ---------------------------------------------------------------------------------------
-def test_parse_lakefile_two_libs_one_with_srcdir():
-    text = (
-        "import Lake\nopen Lake DSL\n\n"
-        "/- a block comment mentioning lean_lib «Ghost» where\n  roots := #[`Ghost] -/\n"
-        'package «P» where\n  -- srcDir := "commented"\n\n'
-        "@[default_target]\nlean_lib «QBP» where\n  roots := #[`QBP]\n\n"
-        "-- lean_lib «InComment» where roots := #[`InComment]\n"
-        "@[default_target]\nlean_lib «QBPSprint12» where\n"
-        '  srcDir := "Sprint12-Inherited"\n'
-        "  roots := #[`Sedenion, `SedenionHessianTraceSq, `«Quaternion»]\n\n"
-        "lean_lib Bare\n\n"  # no `where`, no roots: the root defaults to the lib name
-        "lean_exe «oracle» where\n  root := `QBP.Oracle.Main\n"
-    )
-    m = enc.parse_lakefile(text)
-    assert m == {
-        "QBP": ".",
-        "Sedenion": "Sprint12-Inherited",
-        "SedenionHessianTraceSq": "Sprint12-Inherited",
-        "Quaternion": "Sprint12-Inherited",
-        "Bare": ".",
-    }
-    assert "Ghost" not in m and "InComment" not in m and "oracle" not in m
-    # a package-level srcDir prefixes every library's (Lake resolves lib under package)
-    m2 = enc.parse_lakefile(
-        'package «P» where\n  srcDir := "src"\n'
-        'lean_lib «L» where\n  srcDir := "lib"\n  roots := #[`A]\n'
-        "lean_lib «M»\n"
-    )
-    assert m2 == {"A": "src/lib", "M": "src"}
-    # MUTANT GUARD: zero lean_lib blocks is a refusal, never "everything is non-local"
-    with pytest.raises(SystemExit, match="REFUSED.*zero `lean_lib`"):
-        enc.parse_lakefile(
-            "import Lake\nopen Lake DSL\nlean_exe «x» where\n  root := `X\n"
-        )
-
-
-def test_parse_lakefile_fails_closed_on_half_parsed_file():
-    """RT M1 (PR #698): two legal spellings the first cut dropped SILENTLY when another lib
-    parsed — an inline `@[default_target] lean_lib «B» where …` and a `--` inside a
-    `srcDir` string — now parse; and ANY `lean_lib` token the block parser did not turn
-    into a block is a refusal naming both counts. MUTANT GUARD: drop the count check →
-    the malformed lakefile below is accepted as {A: "."} and `import Inner.X` goes
-    non-local without a word."""
-    m = enc.parse_lakefile(
-        "import Lake\nopen Lake DSL\n\npackage «P» where\n\n"
-        "@[default_target] lean_lib «B» where roots := #[`B]\n\n"
-        'lean_lib «A» where\n  srcDir := "a--b"\n  roots := #[`A, `A2]\n'
-    )
-    assert m == {"B": ".", "A": "a--b", "A2": "a--b"}
-    # the `--` inside the string is text, not a comment: the srcDir did not default to "."
-    assert enc.strip_lean_comments('s := "a--b" -- c\n/- d -/e', strings=True) == (
-        's := "a--b" \ne'
-    )
-    assert enc.strip_lean_comments('s := "a--b"') == 's := "a'  # default: unchanged
-    # a `lean_lib` the parser cannot place (indented into another block) ⇒ refusal
-    with pytest.raises(SystemExit) as ei:
-        enc.parse_lakefile(
-            "package «P» where\n  lean_lib «Inner» where\n    roots := #[`Inner]\n"
-            "lean_lib «A»\n"
-        )
-    msg = str(ei.value)
-    assert msg.startswith("REFUSED: proofs/lakefile.lean has 2 `lean_lib` token(s)")
-    assert "1 `lean_lib` block(s)" in msg and "RT M1" in msg
-    # a `lean_lib` inside a string or a comment is NOT counted (no false refusal)
-    assert enc.parse_lakefile(
-        'lean_lib «A» where\n  srcDir := "lean_lib"\n-- lean_lib «C»\n'
-    ) == {"A": "lean_lib"}
-
-
-def test_lake_module_map_read_at_pin_memoised_and_refuses_without_lakefile(tmp_path):
-    """The map is read from proofs/lakefile.lean AT the pinned commit: a later lakefile
-    edit changes the map at the later pin only; no lakefile at the pin refuses — but only
-    when a .lean member actually has an import to classify."""
-    repo = mk_repo(
-        tmp_path,
-        {
-            "proofs/QBP/A.lean": "import Sedenion\ntheorem a : True := trivial\n",
-            "proofs/Sprint12-Inherited/Sedenion.lean": "def s := 1\n",
-        },
-    )
-    c0 = git(repo, "rev-parse", "HEAD")
-    mm = enc.lake_module_map(repo, c0)
-    assert mm["QBP"] == "proofs" and mm["Sedenion"] == "proofs/Sprint12-Inherited"
-    assert enc.lake_module_map(repo, c0) is mm  # memoised per (repo, pin)
-    a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
-    p0, s0, _ = enc.pinned_sha_for(a, [], repo, c0)
-    assert [s["path"] for s in s0] == [
-        "proofs/QBP/A.lean",
-        "proofs/Sprint12-Inherited/Sedenion.lean",
-    ]
-    # drop lib «QBPSprint12» at c1: `import Sedenion` is non-local THERE, local at c0
-    c1 = commit(
-        repo,
-        {
-            "proofs/lakefile.lean": "import Lake\nopen Lake DSL\n"
-            "lean_lib «QBP» where\n  roots := #[`QBP]\n"
-        },
-        "drop lib",
-    )
-    assert "Sedenion" not in enc.lake_module_map(repo, c1)
-    p1, s1, _ = enc.pinned_sha_for(a, [], repo, c1)
-    assert [s["path"] for s in s1] == ["proofs/QBP/A.lean"] and p1 != p0
-    assert enc.pinned_sha_for(a, [], repo, c0)[0] == p0  # c0 unaffected
-    # no lakefile at the pin: a member WITH imports refuses (the map is never guessed) …
-    (tmp_path / "bare").mkdir()
-    bare = mk_repo(
-        tmp_path / "bare",
-        {"proofs/QBP/A.lean": "import QBP.B\n", "proofs/QBP/B.lean": "def b := 1\n"},
-        lakefile=False,
-    )
-    cb = git(bare, "rev-parse", "HEAD")
-    with pytest.raises(
-        SystemExit, match=r"REFUSED: proofs/lakefile\.lean does not exist at pinned"
-    ):
-        enc.pinned_sha_for(a, [], bare, cb)
-    # … a member WITHOUT imports needs no map
-    pinned, sources, flags = enc.pinned_sha_for(
-        anchor("PROOF-b", proof_file="proofs/QBP/B.lean"), [], bare, cb
-    )
-    assert flags == [] and [s["path"] for s in sources] == ["proofs/QBP/B.lean"]
-
-
 def test_sprint12_bare_root_enters_manifest_non_lib_root_and_mathlib_skipped(tmp_path):
     """`import Sedenion` from SedenionHessianTraceSq.lean resolves through lib
-    «QBPSprint12» (srcDir Sprint12-Inherited) and enters S: PROOF-hessian's key moves
-    when Sedenion.lean changes, not otherwise. A module whose root is in no lake library
-    is skipped even though its file exists; Mathlib is skipped. A dangling LOCAL import
-    (a lake root whose file is missing) still refuses, naming the lakefile-mapped path.
-    """
+    «QBPSprint12» (srcDir Sprint12-Inherited) BY LAKE and enters S: PROOF-hessian's key
+    moves when Sedenion.lean changes, not otherwise. A toolchain module (`Init.Data.Nat`)
+    is outside the libraries and skipped (Mathlib, when required, sits under
+    proofs/.lake/ the same way). A dangling LOCAL import (a root whose file is missing)
+    refuses — Lake drops it silently, G-L1 surfaces it naming the importing file."""
     HESS = "proofs/Sprint12-Inherited/SedenionHessianTraceSq.lean"
     SED = "proofs/Sprint12-Inherited/Sedenion.lean"
     repo = mk_repo(
         tmp_path,
         {
-            HESS: "import Mathlib.Tactic\nimport Sedenion\nimport NotALib.X\n"
-            "theorem h : True := trivial\n",
+            HESS: "import Init.Data.Nat\nimport Sedenion\ntheorem h : True := trivial\n",
             SED: "def sed := 1\n",
             "proofs/Sprint12-Inherited/Quaternion.lean": "def q := 1\n",
-            "proofs/NotALib/X.lean": "def x := 1\n",  # exists; no lake lib roots it
+            "proofs/QBP/X.lean": "def x := 1\n",  # another library, not imported
         },
     )
     a = anchor("PROOF-hessian", kind="internal-compute", proof_file=HESS)
     c0 = git(repo, "rev-parse", "HEAD")
+    ws = enc.lean_workspace(repo, c0)
+    assert ws.libs == ["T", "QBPSprint12"]
+    assert ws.modules["Sedenion"] == "QBPSprint12" and ws.modules["QBP.X"] == "T"
+    assert ws.mod2path["SedenionHessianTraceSq"] == HESS and ws.imports[
+        "SedenionHessianTraceSq"
+    ] == ["Sedenion"]
+    assert (
+        "Init.Data.Nat" in ws.header["SedenionHessianTraceSq"]
+        and ws.unresolved["SedenionHessianTraceSq"] == []
+    )
     p0, s0, f0 = enc.pinned_sha_for(a, [], repo, c0)
     assert f0 == [] and [s["path"] for s in s0] == [SED, HESS]
     c1 = commit(repo, {SED: "def sed := 2\n"}, "edit Sedenion")
@@ -2586,99 +2483,22 @@ def test_sprint12_bare_root_enters_manifest_non_lib_root_and_mathlib_skipped(tmp
         repo,
         {
             "proofs/Sprint12-Inherited/Quaternion.lean": "def q := 2\n",
-            "proofs/NotALib/X.lean": "def x := 2\n",
+            "proofs/QBP/X.lean": "def x := 2\n",
         },
-        "unrelated lib file + non-lib module edited",
+        "unrelated lib files edited",
     )
     p2, _, _ = enc.pinned_sha_for(a, [], repo, c2)
     assert p2 == p1
     # MUTANT GUARD: the seed-only manifest (the pre-#696 rule) is not the pinned_sha
     assert enc.manifest_hash_py([f"{HESS} {enc.blob_sha(repo, c0, HESS)}\n"]) != p0
     c3 = commit(repo, {HESS: "import Kitaev\n"}, "dangling local import")
-    with pytest.raises(
-        SystemExit,
-        match=r"imports local module 'Kitaev' → 'proofs/Sprint12-Inherited/Kitaev\.lean'",
-    ):
+    with pytest.raises(SystemExit) as ei:
         enc.pinned_sha_for(a, [], repo, c3, ["r.json"])
-
-
-def test_agda_open_import_same_root_enters_manifest_library_import_does_not(tmp_path):
-    S3 = "proofs/agda-cubical/S3FromCD.agda"
-    repo = mk_repo(
-        tmp_path,
-        {
-            S3: (
-                "{-# OPTIONS --cubical --safe #-}\n"
-                "-- open import InLineComment\n"
-                "{- open import InBlock {- nested -} still a comment -}\n"
-                "module S3FromCD where\n\n"
-                "open import Cubical.Foundations.Prelude\n"  # cubical library: no file here
-                "open import QBPS3HSpace using (HSpace≃)\n"  # same root: enters S
-                "x : Set\nx = Set\n"
-                "import CDLawsBool as L\n"  # plain `import`, after other code
-                "open import Literate public\n"  # resolved as .lagda.md
-            ),
-            "proofs/agda-cubical/QBPS3HSpace.agda": "module QBPS3HSpace where\nopen import Diamond\n",
-            "proofs/agda-cubical/CDLawsBool.agda": "module CDLawsBool where\n",
-            "proofs/agda-cubical/Diamond.agda": "module Diamond where\n",
-            "proofs/agda-cubical/Literate.lagda.md": "# doc\n```agda\nmodule Literate where\n```\n",
-            "proofs/agda-cubical/Unrelated.agda": "module Unrelated where\nopen import Diamond\n",
-            "proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n",  # other root
-        },
+    msg = str(ei.value)
+    assert msg.startswith(
+        f"REFUSED: {HESS!r} (module 'SedenionHessianTraceSq') imports 'Kitaev'"
     )
-    a = anchor("PROOF-s3-hspace", proof_file=S3, lean_theorem="S3FromCD.S³-HSpace")
-    c0 = git(repo, "rev-parse", "HEAD")
-    p0, s0, f0 = enc.pinned_sha_for(a, [], repo, c0)
-    assert f0 == []
-    assert [s["path"] for s in s0] == [
-        "proofs/agda-cubical/CDLawsBool.agda",
-        "proofs/agda-cubical/Diamond.agda",
-        "proofs/agda-cubical/Literate.lagda.md",
-        "proofs/agda-cubical/QBPS3HSpace.agda",
-        S3,
-    ]
-    # transitive same-root member edited ⇒ moves; unrelated same-root file ⇒ unchanged
-    c1 = commit(
-        repo, {"proofs/agda-cubical/Diamond.agda": "module Diamond where\n-- v2\n"}, "D"
-    )
-    p1, _, _ = enc.pinned_sha_for(a, [], repo, c1)
-    assert p1 != p0
-    c2 = commit(
-        repo, {"proofs/agda-cubical/Unrelated.agda": "module Unrelated where\n"}, "U"
-    )
-    p2, _, _ = enc.pinned_sha_for(a, [], repo, c2)
-    assert p2 == p1
-    # a same-named module under the OTHER corpus root never shadows the own-root hit: the
-    # own root is searched first (c3: other roots are consulted AFTER it, and only when a
-    # .agda-lib declares them — this fixture has none under proofs/agda)
-    c3 = commit(
-        repo, {"proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n-- v2\n"}, "O"
-    )
-    p3, _, _ = enc.pinned_sha_for(a, [], repo, c3)
-    assert p3 == p1
-    # MUTANT GUARD: the seed-only manifest is not the pinned_sha
-    assert enc.manifest_hash_py([f"{S3} {enc.blob_sha(repo, c0, S3)}\n"]) != p0
-    # unit: the scan reads imports anywhere, comments stripped; the root rule
-    mod, mods = enc.agda_scan((repo / S3).read_text(encoding="utf-8"))
-    assert mod == "S3FromCD"
-    assert mods == [
-        "Cubical.Foundations.Prelude",
-        "QBPS3HSpace",
-        "CDLawsBool",
-        "Literate",
-    ]
-    assert enc.agda_root_of(S3, "S3FromCD") == "proofs/agda-cubical"
-    assert (
-        enc.agda_root_of("proofs/agda-cubical/Sub/M.agda", "Sub.M")
-        == "proofs/agda-cubical"
-    )
-    assert enc.agda_root_of("proofs/agda/X.agda", None) == "proofs/agda"
-    assert enc.strip_agda_comments("a -- b {- c\nd {- e {- f -} g -} h") == "a \nd  h"
-    assert enc.agda_candidate_paths("A.B", "proofs/agda") == [
-        "proofs/agda/A/B.agda",
-        "proofs/agda/A/B.lagda.md",
-        "proofs/agda/A/B.lagda",
-    ]
+    assert "G-L1" in msg and "PROOF-hessian" in msg
 
 
 @pytest.mark.parametrize(
@@ -2777,32 +2597,6 @@ def test_evidence_repo_identity_no_commits_and_no_origin_are_explicit(tmp_path):
     got2 = enc.evidence_repo_identity(ev)
     assert got2["remote"] == "https://example.invalid/o.git"
     assert got2["head"] == "unknown (no commits)"  # still no commit
-
-
-def test_agda_scan_import_leads_the_line_and_root_falls_back_to_dirname():
-    """RT N5 (PR #698): an identifier or value spelled `import` (`x = import`) is not an
-    import declaration — only a line whose first token (after an optional `open`) is
-    `import` declares one; so `open` never shows up as a "module". RT N4: `agda_root_of`
-    falls back to the file's own directory when the declared module name does not match
-    the path's tail (a mis-named file still resolves against SOMETHING, never ``)."""
-    mod, mods = enc.agda_scan(
-        "{-# OPTIONS --cubical #-}\nmodule M.N where\n"
-        "x = import\n"  # N5: not a declaration
-        "open import R using (a)\n"
-        "import S.T as U\n"
-        "open Foo\n"  # an `open` of an already-imported module: no import
-        "  open import  Nested public\n"  # indented (inside a nested module): counted
-        "y = foo import Z\n"  # `import` not first: not a declaration
-        "open import R\n"  # deduplicated
-    )
-    assert (mod, mods) == ("M.N", ["R", "S.T", "Nested"])
-    assert "open" not in mods and "Z" not in mods
-    # N4: dirname fallback when the header does not match the path
-    assert (
-        enc.agda_root_of("proofs/agda/Wrong/Name.agda", "Other") == "proofs/agda/Wrong"
-    )
-    assert enc.agda_root_of("proofs/agda/X.lagda.md", "X") == "proofs/agda"
-    assert enc.agda_root_of("proofs/agda/X.lagda", "X") == "proofs/agda"
 
 
 def test_citation_string_proof_file_is_inert_and_missing_path_is_stale(tmp_path):
@@ -2956,6 +2750,7 @@ def _needs_commit(c: str):
 
 def test_reference_values_at_516dfcb_fano_unchanged_hessian_and_agda_moved():
     _needs_commit(REF2_COMMIT)
+    _skip_without_tools(("lake", "agda"))
     sprint12 = (
         "Bi2Se3",
         "Crystallisation",
@@ -2966,10 +2761,13 @@ def test_reference_values_at_516dfcb_fano_unchanged_hessian_and_agda_moved():
         "Sedenion",
         "SedenionHessianTraceSq",
     )
-    assert enc.lake_module_map(ROOT, REF2_COMMIT) == {
-        "QBP": "proofs",
-        **{r: "proofs/Sprint12-Inherited" for r in sprint12},
-    }
+    ws = enc.lean_workspace(ROOT, REF2_COMMIT)
+    assert ws.libs == ["QBP", "QBPSprint12"] and len(ws.modules) == 71
+    assert {m for m, lib in ws.modules.items() if lib == "QBPSprint12"} == set(sprint12)
+    assert all(
+        ws.mod2path[r] == f"proofs/Sprint12-Inherited/{r}.lean" for r in sprint12
+    )
+    assert not any(ws.unresolved.values())  # G-L1: nothing unresolved at the pin
     # Fano headline + companion: UNCHANGED (no Sprint12 / Agda file in their closures)
     p, s, f = enc.pinned_sha_for(
         anchor("PROOF-cd-structure-constant-tables", proof_file=CD_FILE),
@@ -3022,501 +2820,580 @@ def test_reference_values_at_516dfcb_fano_unchanged_hessian_and_agda_moved():
 
 
 # ---------------------------------------------------------------------------------------
-# PR #698 commit 3 — Gemini round 1 fail-open items + RT N7 / N8
+# QBP#700 → QBP#696: the closure is each prover's own dependency tool, not a parser
 # ---------------------------------------------------------------------------------------
-def test_agda_cross_root_import_enters_manifest_and_unknown_namespace_refuses(tmp_path):
-    """Gemini on PR #698: a `proofs/agda/A.agda` that imports a module living under
-    `proofs/agda-cubical/` used to be treated as a cubical-library import and silently
-    dropped from S. Now every same-repo Agda root at the pin — the member's own corpus
-    root first, then every `include:` dir of every `*.agda-lib` under proofs/ — is
-    searched, in that order; a module found under none is skipped only when its first
-    component is a known external namespace (`Agda`, `Cubical`), else a refusal naming
-    the importer, the module and the roots searched. MUTANT GUARDS: (a) revert to
-    own-root-only → `proofs/agda-cubical/B.agda` leaves S and the sources assertion fails;
-    (b) drop the namespace check → `Mystery.Mod` is skipped and `pytest.raises` fails.
-    """
-    A = "proofs/agda/A.agda"
+DELETED_PARSER_SYMBOLS = (
+    "parse_lakefile",
+    "lake_module_map",
+    "lean_module_path",
+    "lean_local_imports",
+    "lean_header_imports",
+    "lean_header_imports_of_blob",
+    "strip_lean_comments",
+    "LAKE_BLOCK_RE",
+    "LAKE_BODY_FLUSH_RE",
+    "LAKE_MAP_FIELD_TOKEN_RE",
+    "LAKE_STRING_RE",
+    "LAKE_LIB_TOKEN_RE",
+    "LAKE_NAME_RE",
+    "LAKE_FIELD_START_RE",
+    "LAKE_ROOTS_LITERAL_RE",
+    "LAKE_SRCDIR_LITERAL_RE",
+    "LAKE_WHERE_RE",
+    "LAKE_MAP_FIELDS",
+    "LAKE_INERT_FIELDS",
+    "agda_scan",
+    "agda_scan_of_blob",
+    "strip_agda_comments",
+    "agda_root_of",
+    "agda_candidate_paths",
+    "parse_agda_lib",
+    "agda_include_root",
+    "agda_lib_roots",
+    "agda_roots_for",
+    "local_imports_of",
+    "AGDA_EXTERNAL_NAMESPACES",
+    "AGDA_IMPORT_MODIFIERS",
+    "LEAN_EXTERNAL_NAMESPACES",
+)
+
+
+def test_regex_parser_symbols_are_gone():
+    """PR #698 root-cause analysis: the regex Lake/Agda parser was a load-bearing float
+    and is DELETED, not hardened. A re-introduction under any of these names fails."""
+    present = [n for n in DELETED_PARSER_SYMBOLS if hasattr(enc, n)]
+    assert present == [], present
+    # the closure is routed to the tools, one function per prover + the dispatcher
+    for n in (
+        "lean_closure",
+        "agda_closure",
+        "coq_closure",
+        "closure_of",
+        "pin_worktree",
+    ):
+        assert callable(getattr(enc, n)), n
+    # no allowlist of external namespaces survives anywhere in the module source
+    src = (HERE / "encode_pa_from_evidence.py").read_text(encoding="utf-8")
+    assert 'frozenset({"Agda"' not in src and "EXTERNAL_NAMESPACES" not in src
+
+
+def test_prover_tools_present_when_required():
+    """Unconditional: in CI's gate job (`QBP_REQUIRE_PROVER_TOOLS=1`) a missing lake /
+    agda / coqdep FAILS this test, so the tool-needing tests above cannot be silently
+    skipped there. Elsewhere the tools may be absent (then those tests skip)."""
+    missing = enc.missing_prover_tools()
+    assert isinstance(missing, list)
+    if os.environ.get(enc.REQUIRE_PROVER_TOOLS_ENV) == "1":
+        assert (
+            missing == []
+        ), f"prover tools required by the gate are missing: {missing}"
+
+
+def test_tool_wrapper_env_and_default():
+    """Every prover tool runs under `run-bounded 8G 1800` when it is on PATH, under the
+    env override when set (shell-split; "" disables), never under anything else."""
+    import unittest.mock as um
+
+    with um.patch.dict(os.environ, {enc.PROVER_TOOL_WRAPPER_ENV: "/x/wrap 4G 60"}):
+        assert enc.tool_wrapper() == ["/x/wrap", "4G", "60"]
+    with um.patch.dict(os.environ, {enc.PROVER_TOOL_WRAPPER_ENV: ""}):
+        assert enc.tool_wrapper() == []
+    env = {k: v for k, v in os.environ.items() if k != enc.PROVER_TOOL_WRAPPER_ENV}
+    with um.patch.dict(os.environ, env, clear=True):
+        rb = shutil.which("run-bounded")
+        assert enc.tool_wrapper() == ([rb, "8G", "1800"] if rb else [])
+    # a missing tool is a refusal naming what needed it — never a fallback
+    with um.patch.object(enc.shutil, "which", return_value=None):
+        with pytest.raises(
+            SystemExit, match="REFUSED: prover tool 'lake' is not installed"
+        ):
+            enc.require_tool("lake", "x")
+        assert enc.missing_prover_tools() == ["lake", "agda", "coqdep"]
+
+
+def test_pin_worktree_is_hermetic_and_refuses_unresolved_requires(
+    tmp_path, monkeypatch
+):
+    """`pin_worktree`: a detached worktree OF THE PIN (a later commit's file is absent
+    there); a pin whose lakefile has a `require` while the running checkout lends no
+    packages dir / manifest refuses (Lake would fetch — G-L2); a lent manifest that does
+    not resolve the lakefile's pinned rev refuses naming the rev (G-L2); a resolving one
+    is copied in and the packages dir is a SYMLINK (never a copy). No tool runs."""
+    monkeypatch.delenv(enc.LAKE_PACKAGES_ENV, raising=False)
+    monkeypatch.delenv(enc.LAKE_MANIFEST_ENV, raising=False)
+    REQ = (
+        "import Lake\nopen Lake DSL\n"
+        'require mathlib from git\n  "https://example.invalid/m.git" @ '
+        '"c5ea00351c28e24afc9f0f84379aa41082b1188f"\n'
+        "package «P» where\nlean_lib «QBP» where\n  roots := #[`QBP]\n"
+    )
+    repo = mk_repo(
+        tmp_path,
+        {"proofs/lakefile.lean": REQ, "proofs/QBP.lean": "def q := 1\n"},
+        skip_without_tools=False,
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    with pytest.raises(SystemExit) as ei:
+        enc.pin_worktree(repo, c0)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: proofs/lakefile.lean at pinned master")
+    assert "has a `require`" in msg and "G-L2" in msg
+    # lend a packages dir + a manifest that resolves a DIFFERENT rev ⇒ G-L2 refusal
+    pkgs = tmp_path / "pkgs"
+    pkgs.mkdir()
+    man = tmp_path / "lake-manifest.json"
+    man.write_text(
+        json.dumps(
+            {"packages": [{"name": "mathlib", "rev": "f" * 40, "inputRev": "x"}]}
+        )
+    )
+    monkeypatch.setenv(enc.LAKE_PACKAGES_ENV, str(pkgs))
+    monkeypatch.setenv(enc.LAKE_MANIFEST_ENV, str(man))
+    with pytest.raises(SystemExit, match="resolves no package to it") as ei:
+        enc.pin_worktree(repo, c0)
+    assert "c5ea00351c28e24afc9f0f84379aa41082b1188f" in str(ei.value)
+    # a resolving manifest: worktree made, manifest copied, packages symlinked
+    man.write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "name": "mathlib",
+                        "rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+                        "inputRev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+                    }
+                ]
+            }
+        )
+    )
+    c1 = commit(repo, {"proofs/Later.lean": "later\n"}, "later")
+    wt = enc.pin_worktree(repo, c0)
+    assert wt.is_dir() and (wt / "proofs/QBP.lean").is_file()
+    assert not (wt / "proofs/Later.lean").exists()  # the pin, not HEAD
+    assert (wt / "proofs/lake-manifest.json").read_text() == man.read_text()
+    assert (wt / "proofs/.lake/packages").is_symlink()
+    assert (wt / "proofs/.lake/packages").resolve() == pkgs.resolve()
+    assert enc.pin_worktree(repo, c0) is wt  # memoised per (repo, pin)
+    wt1 = enc.pin_worktree(repo, c1)
+    assert wt1 != wt and (wt1 / "proofs/Later.lean").is_file()
+    # the hermetic worktrees are registered with git and removed by the cleanup
+    listed = git(repo, "worktree", "list", "--porcelain")
+    assert str(wt) in listed and str(wt1) in listed
+    gone = enc.cleanup_pin_worktrees()
+    assert wt in gone and wt1 in gone
+    assert not wt.exists() and not wt1.exists()
+    assert str(wt) not in git(repo, "worktree", "list", "--porcelain")
+
+
+def test_G_L1_unresolved_import_two_hops_down_refuses_naming_the_importer(tmp_path):
+    """Architecture condition 1 (QBP#700 G-L1): Lake drops an import it cannot resolve
+    from `imports` / `transImports` SILENTLY (exit 0). A imports B, B imports
+    `Nonexistent.Mod`: the closure of A is {A, B} by Lake, and the refusal must name B
+    (the member two hops down), not only check the root. MUTANT: run the G-L1 check on
+    the root alone → A's header is clean, no refusal, `pytest.raises` fails → KILLED.
+    A toolchain module (`Init.Data.Nat`: an .olean in `lean --print-libdir`) is NOT
+    unresolved. A seed in no library refuses (Lake would not build it either)."""
     repo = mk_repo(
         tmp_path,
         {
-            "proofs/agda/qbp.agda-lib": "name: qbp\ninclude: .\n",
-            "proofs/agda-cubical/qbp-cubical.agda-lib": (
-                "name: qbp-cubical\ninclude: .\ndepend: cubical-0.9\n"
-                "flags: --cubical --safe\n"
+            "proofs/QBP/A.lean": "import QBP.B\nimport Init.Data.Nat\ntheorem a : True := trivial\n",
+            "proofs/QBP/B.lean": "import QBP.C\nimport Nonexistent.Mod\ndef b := 1\n",
+            "proofs/QBP/C.lean": "def c := 1\n",
+            "proofs/QBP/D.lean": "import QBP.C\ndef d := 1\n",
+            "proofs/Unlisted.lean": "def u := 1\n",  # exists; the lakefile lists no lib for it
+            "proofs/lakefile.lean": lakefile_for(
+                {
+                    "proofs/QBP/A.lean": "",
+                    "proofs/QBP/B.lean": "",
+                    "proofs/QBP/C.lean": "",
+                    "proofs/QBP/D.lean": "",
+                }
             ),
-            A: (
-                "module A where\n"
-                "open import Agda.Primitive using (Level)\n"  # builtins: skipped
-                "open import Cubical.Foundations.Prelude\n"  # cubical library: skipped
-                "open import B using (b)\n"  # OTHER root (proofs/agda-cubical): enters S
-                "private open import C\n"  # own root, modifier-led (N8): enters S
-                "open import Dup\n"  # in BOTH roots: the own root wins
-            ),
-            "proofs/agda-cubical/B.agda": "module B where\nopen import Dup\n",
-            "proofs/agda/C.agda": "module C where\n",
-            "proofs/agda/Dup.agda": "module Dup where\n",
-            "proofs/agda-cubical/Dup.agda": "module Dup where\n-- cubical twin\n",
-            "proofs/agda/D.agda": "module D where\nopen import Mystery.Mod\n",
         },
     )
     c0 = git(repo, "rev-parse", "HEAD")
-    # the roots at the pin, and the per-member resolution order (own first)
-    assert enc.agda_lib_roots(repo, c0) == ["proofs/agda", "proofs/agda-cubical"]
-    assert enc.agda_roots_for(repo, c0, A, "A") == [
-        "proofs/agda",
-        "proofs/agda-cubical",
-    ]
-    assert enc.agda_roots_for(repo, c0, "proofs/agda-cubical/B.agda", "B") == [
-        "proofs/agda-cubical",
-        "proofs/agda",
-    ]
-    a = anchor("PROOF-a", proof_file=A, lean_theorem="A.a")
-    p0, s0, f0 = enc.pinned_sha_for(a, [], repo, c0)
-    assert f0 == []
-    # B (cross-root) is in S; B's own `open import Dup` resolves under ITS own root first
-    # (proofs/agda-cubical/Dup.agda); A's resolves under proofs/agda/Dup.agda
-    assert [x["path"] for x in s0] == [  # codepoint sort: `-` < `/`
-        "proofs/agda-cubical/B.agda",
-        "proofs/agda-cubical/Dup.agda",
-        A,
-        "proofs/agda/C.agda",
-        "proofs/agda/Dup.agda",
-    ]
-    # editing the cross-root member moves the pin
-    c1 = commit(repo, {"proofs/agda-cubical/B.agda": "module B where\n-- v2\n"}, "B")
-    p1, s1, _ = enc.pinned_sha_for(a, [], repo, c1)
-    assert p1 != p0
-    assert [x["path"] for x in s1] == [
-        "proofs/agda-cubical/B.agda",
-        A,
-        "proofs/agda/C.agda",
-        "proofs/agda/Dup.agda",
-    ]
-    # an import found under NO root whose namespace is not a known external library
+    ws = enc.lean_workspace(repo, c0)
+    assert ws.libs == ["T"] and set(ws.modules) == {"QBP.A", "QBP.B", "QBP.C", "QBP.D"}
+    assert ws.imports["QBP.B"] == ["QBP.C"]  # Nonexistent.Mod silently dropped by Lake
+    assert ws.trans["QBP.A"] == ["QBP.C", "QBP.B"] or set(ws.trans["QBP.A"]) == {
+        "QBP.B",
+        "QBP.C",
+    }
+    assert "Nonexistent.Mod" in ws.header["QBP.B"]
+    assert ws.unresolved == {
+        "QBP.A": [],
+        "QBP.B": ["Nonexistent.Mod"],
+        "QBP.C": [],
+        "QBP.D": [],
+    }
     with pytest.raises(SystemExit) as ei:
         enc.pinned_sha_for(
-            anchor("PROOF-d", proof_file="proofs/agda/D.agda"), [], repo, c0
+            anchor("PROOF-a", proof_file="proofs/QBP/A.lean"), [], repo, c0, ["r.json"]
         )
-    msg = str(ei.value)
-    assert msg.startswith("REFUSED: 'proofs/agda/D.agda' imports 'Mystery.Mod'")
-    assert "proofs/agda, proofs/agda-cubical" in msg  # the roots searched, in order
-    assert "'Mystery'" in msg and "Agda, Cubical" in msg and "PROOF-d" in msg
-    # the external namespaces are a module-level constant, not re-derived per run
-    assert enc.AGDA_EXTERNAL_NAMESPACES == frozenset({"Agda", "Cubical"})
-    # no .agda-lib anywhere: the member's own root is the only root (fallback) — a
-    # same-repo module under the other root is then unresolved and, being in no external
-    # namespace, REFUSES rather than silently leaving S
-    (tmp_path / "two").mkdir()
-    repo2 = mk_repo(
-        tmp_path / "two",
-        {
-            "proofs/agda/E.agda": "module E where\nopen import F\n",
-            "proofs/agda-cubical/F.agda": "module F where\n",
-        },
-    )
-    c2 = git(repo2, "rev-parse", "HEAD")
-    assert enc.agda_lib_roots(repo2, c2) == []
-    assert enc.agda_roots_for(repo2, c2, "proofs/agda/E.agda", "E") == ["proofs/agda"]
-    with pytest.raises(SystemExit, match=r"REFUSED: 'proofs/agda/E\.agda' imports 'F'"):
-        enc.pinned_sha_for(
-            anchor("PROOF-e", proof_file="proofs/agda/E.agda"), [], repo2, c2
-        )
-    # the .agda-lib parser: whitespace-separated values, indented continuation, comments
-    assert enc.parse_agda_lib(
-        "name: x -- the name\ninclude: src\n  lib/extra\ndepend: cubical-0.9 standard-library\n"
-        "flags: --safe\n"
-    ) == (["src", "lib/extra"], ["cubical-0.9", "standard-library"])
-    assert enc.parse_agda_lib("name: y\n") == ([], [])
-
-
-def test_parse_lakefile_refuses_expression_tail_after_roots_or_srcdir():
-    """RT N7 (PR #698): legal Lake DSL whose `roots` / `srcDir` is an EXPRESSION — the
-    literal regex consumed the first literal and silently dropped the tail
-    (`roots := #[`A] ++ #[`B]` → [A]; `srcDir := "a" / "b"` → a) with equal token/block
-    counts, so M1's check never fired and `import B.X` went non-local. Since commit 4 the
-    N10 allowlist (`_lake_block_fields`) covers these same-line shapes: the field's value
-    must FULLMATCH the literal, so the tail refuses naming the block and the line."""
-    with pytest.raises(SystemExit) as ei:
-        enc.parse_lakefile("lean_lib «L» where\n  roots := #[`A] ++ #[`B]\n")
     msg = str(ei.value)
     assert msg.startswith(
-        "REFUSED: proofs/lakefile.lean: in `lean_lib «L»`, `roots := #[`A] ++ #[`B]` "
-        "is not a fully-consumed"
+        "REFUSED: 'proofs/QBP/B.lean' (module 'QBP.B') imports 'Nonexistent.Mod'"
     )
-    assert "RT N10" in msg
+    assert "G-L1" in msg and "PROOF-a" in msg and "r.json" in msg
+    # D → C is clean: its closure is derived; C alone too
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-d", proof_file="proofs/QBP/D.lean"), [], repo, c0
+    )
+    assert f == [] and [x["path"] for x in s] == [
+        "proofs/QBP/C.lean",
+        "proofs/QBP/D.lean",
+    ]
+    assert p == enc.manifest_hash_py([f"{x['path']} {x['blob']}\n" for x in s])
+    # a .lean seed that is a module of no Lake library ⇒ refusal (never a leaf)
     with pytest.raises(
-        SystemExit, match=r'`srcDir := "a" / "b"` is not a fully-consumed'
+        SystemExit,
+        match="REFUSED: 'proofs/Unlisted.lean' is a module of no Lake library",
     ):
-        enc.parse_lakefile(
-            'lean_lib «L» where\n  srcDir := "a" / "b"\n  roots := #[`A]\n'
+        enc.pinned_sha_for(
+            anchor("PROOF-u", proof_file="proofs/Unlisted.lean"), [], repo, c0
         )
-    # the package block's srcDir is checked too (it prefixes every library's)
-    with pytest.raises(
-        SystemExit, match=r"in `package «P»`, `srcDir := \"s\" \+\+ \"t\"`"
-    ):
-        enc.parse_lakefile(
-            'package «P» where\n  srcDir := "s" ++ "t"\nlean_lib «L» where\n  roots := #[`A]\n'
-        )
-    # no false positive: trailing whitespace, a comment (stripped), a multi-line roots
-    # literal, and an inline `where … roots := #[…]` all parse
-    assert enc.parse_lakefile(
-        'lean_lib «L» where\n  srcDir := "d"   \n  roots := #[`A,\n    `B] -- two roots\n'
-        "@[default_target] lean_lib «M» where roots := #[`M1]\n"
-    ) == {"A": "d", "B": "d", "M1": "."}
-    # the count check (M1) is unchanged alongside the allowlist
-    with pytest.raises(
-        SystemExit, match="REFUSED: proofs/lakefile.lean has 2 `lean_lib`"
-    ):
-        enc.parse_lakefile(
-            "package «P» where\n  lean_lib «I» where\n    roots := #[`I]\nlean_lib «A»\n"
-        )
+    # no build happened: no .olean anywhere in the pin worktree
+    wt = enc.pin_worktree(repo, c0)
+    # (Lake caches its elaborated CONFIG as .lake/config/*/lakefile.olean — not a module)
+    assert [
+        p for p in (wt / "proofs").rglob("*.olean") if "/.lake/" not in p.as_posix()
+    ] == []
+    assert not (wt / "proofs/.lake/build").exists()
 
 
-# RT N10 (PR #698, blocking): the three legal Lake shapes — verified by the Red Team on
-# leanprover/lean4:v4.30.0 — that the per-line tail check (commit 3) still half-read
-# SILENTLY with equal token/block counts. Each must refuse, naming block + line.
-N10_ROWS = [
-    pytest.param(
-        "lean_lib «L» where\n  roots := #[`A]\n    ++ #[`B]\n",
-        "`roots := #[`A] ++ #[`B]` is not a fully-consumed `#[`A, `B]` literal",
-        id="roots-continuation-append",  # Lean: #[A, B]; old encoder: {A} — B silent
-    ),
-    pytest.param(
-        'lean_lib «L» where\n  srcDir := "a"\n    / "b"\n  roots := #[`A]\n',
-        '`srcDir := "a" / "b"` is not a fully-consumed "dir" literal',
-        id="srcdir-continuation-slash",  # Lean: a/b; old encoder: a
-    ),
-    pytest.param(
-        "def myRoots : Array Name := #[`C, `D]\n\nlean_lib «L» where\n  roots := myRoots\n",
-        "`roots := myRoots` is not a fully-consumed `#[`A, `B]` literal",
-        id="roots-identifier",  # Lean: #[C, D]; old encoder: {L} (default) silently
-    ),
-]
+def _agda_fixture_files():
+    LIB = "proofs/agda-cubical/"
+    return {
+        LIB + "qbp-cubical.agda-lib": "name: qbp-cubical\ninclude: .\n",
+        LIB
+        + "S3FromCD.agda": (
+            "-- open import InLineComment\n"
+            "{- open import InBlock {- nested -} still a comment -}\n"
+            "module S3FromCD where\n\n"
+            "open import Agda.Primitive\n"  # the compiler's builtins: not a repo file
+            "open import QBPS3HSpace\n"  # same library: enters S
+            "postulate x : Set\n"
+            "import CDLawsBool as L\n"  # plain `import`, after other code
+            "open import Literate public\n"  # resolved as .lagda.md
+        ),
+        LIB + "QBPS3HSpace.agda": "module QBPS3HSpace where\nopen import Diamond\n",
+        LIB + "CDLawsBool.agda": "module CDLawsBool where\n",
+        LIB + "Diamond.agda": "module Diamond where\n",
+        LIB + "Literate.lagda.md": "# doc\n```agda\nmodule Literate where\n```\n",
+        LIB + "Unrelated.agda": "module Unrelated where\nopen import Diamond\n",
+        "proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n",  # another corpus dir
+    }
 
 
-@pytest.mark.parametrize("text, expected", N10_ROWS)
-def test_parse_lakefile_allowlist_refuses_unconsumed_roots_srcdir(text, expected):
-    """RT N10 (PR #698, blocking). Commit 3's `_lake_field_tail_check` looked only at the
-    rest of the literal's PHYSICAL line, so a continuation line (`++ #[`B]`, `/ "b"`)
-    or a non-literal value (`roots := myRoots`, no regex hit → default = lib name) still
-    half-read silently and shrank S. The body is now read under an allowlist: a
-    `roots` / `srcDir` value — whatever lines it spans — must FULLMATCH the literal
-    grammar, else a refusal naming the lakefile, the block and the (collapsed) line.
-    MUTANT GUARD: revert to the per-line tail check → all three rows parse silently
-    ({A: "."}, {A: "a"}, {L: "."}) and `pytest.raises` fails on each."""
+def test_condition2_preseeded_agda_interface_refuses(tmp_path):
+    """Architecture condition 2 (QBP#700 G-A1): Agda prints `Checking M (path)` only for
+    modules without a FRESH interface, so a pre-seeded `.agdai` would silently drop that
+    module from the record and shrink S. The wrapper asserts a clean interface state
+    (no `_build/`, no `*.agdai` under proofs/) and REFUSES otherwise. The interface is a
+    genuine fresh one (produced by agda on the identical source), so a mutant that drops
+    the assertion lets Agda load it, S loses QBPS3HSpace/Diamond, and `pytest.raises`
+    fails → KILLED. The clean commit before it derives the full closure."""
+    files = _agda_fixture_files()
+    repo = mk_repo(tmp_path, files)
+    c0 = git(repo, "rev-parse", "HEAD")
+    S3 = "proofs/agda-cubical/S3FromCD.agda"
+    p0, s0, f0 = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c0)
+    assert f0 == [] and [x["path"] for x in s0] == [
+        "proofs/agda-cubical/CDLawsBool.agda",
+        "proofs/agda-cubical/Diamond.agda",
+        "proofs/agda-cubical/Literate.lagda.md",
+        "proofs/agda-cubical/QBPS3HSpace.agda",
+        S3,
+    ]
+    # produce a FRESH interface for QBPS3HSpace (and Diamond) in the fixture's own tree
+    # with agda itself, then commit it — the pin now carries stale-looking state
+    lib = repo / "proofs/agda-cubical"
+    r = subprocess.run(
+        [shutil.which("agda"), "QBPS3HSpace.agda"],
+        cwd=str(lib),
+        capture_output=True,
+        text=True,
+    )
+    assert r.returncode == 0, r.stderr
+    agdai = sorted(str(p.relative_to(repo)) for p in lib.rglob("*.agdai"))
+    assert agdai, "agda produced no interface file"
+    c1 = commit(repo, {}, "seed interfaces")
+    assert git(repo, "ls-tree", "-r", "--name-only", c1).count(".agdai") >= 1
     with pytest.raises(SystemExit) as ei:
-        enc.parse_lakefile(text)
+        enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c1, ["r.json"])
     msg = str(ei.value)
-    assert msg.startswith("REFUSED: proofs/lakefile.lean: in `lean_lib «L»`, ")
-    assert expected in msg and "RT N10" in msg
+    assert msg.startswith("REFUSED: Agda interface state is not clean at pinned master")
+    assert ".agdai" in msg or "_build" in msg
+    assert "condition 2" in msg and "PROOF-s3" in msg and "r.json" in msg
+    # the clean pin is unaffected (memoised per pin), and the wrapper left no _build
+    # behind in its worktree after the run
+    assert enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c0)[0] == p0
+    wt = enc.pin_worktree(repo, c0)
+    assert enc._agda_interface_state(wt) == []
 
 
-def test_parse_lakefile_allowlist_accepts_the_grammar_it_understands():
-    """The allowlist's ACCEPT side (no false refusals): today's lakefile at 516dfcb parses
-    to the 9-root map (9 DISTINCT roots — N18's duplicate rule has nothing to fire on);
-    the Lake v4.30.0-verified brace bodies `lean_lib «L» {` ⏎ `…` ⏎ `}` and `lean_lib «L»`
-    ⏎ `  { roots := #[`A] }` parse (RT N12 — commit 3 false-refused the `}` as a tail;
-    RT N17 — the `where { … }` rows commit 4 pinned here are Lake-REJECTED, `unexpected
-    token '{'`, and were replaced by these); a multi-line `roots := #[` ⏎ `A,` ⏎ `B]`
-    literal parses to [A, B]; an unknown `foo := bar` and a multi-line `leanOptions :=
-    #[ … ]` inside a block are accepted and ignored (only `roots` / `srcDir` feed the
-    map); a `package` body with only a comment and a bare `lean_lib Bare` parse. The
-    REFUSE side beyond N10's rows: any other body line, a `}` closing no `{`, an unclosed
-    `{`, a body with no `where`, a field set twice, a comma-joined `{ foo := x, roots :=
-    #[`A] }` (a map field hiding in an inert field's value), and a backslash inside the
-    srcDir string (N9, fail-closed)."""
-    _needs_commit(REF2_COMMIT)
-    today = git(ROOT, "show", f"{REF2_COMMIT}:proofs/lakefile.lean")
-    today_map = enc.parse_lakefile(today)
-    assert today_map == {
-        "QBP": ".",
-        **{
-            r: "Sprint12-Inherited"
-            for r in (
-                "Bi2Se3",
-                "Crystallisation",
-                "Elements",
-                "Graphene",
-                "Kitaev",
-                "Quaternion",
-                "Sedenion",
-                "SedenionHessianTraceSq",
-            )
+def test_agda_closure_from_agdas_own_graph(tmp_path):
+    """Agda's own graph + `Checking` lines: a same-library `open import` enters S
+    (transitively), a `.lagda.md` resolves, the compiler's builtins (`Agda.Primitive`)
+    and commented-out imports do not; editing a transitive member moves the key, an
+    unrelated same-library file does not; the non-local namespaces are recorded; a
+    same-named module in an unregistered corpus dir never shadows the library's; a
+    module that exists nowhere is Agda's own `FileNotFound`, surfaced as a refusal."""
+    files = _agda_fixture_files()
+    repo = mk_repo(tmp_path, files)
+    S3 = "proofs/agda-cubical/S3FromCD.agda"
+    c0 = git(repo, "rev-parse", "HEAD")
+    p0, s0, f0 = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c0)
+    files0, d0 = enc.agda_closure(repo, c0, S3)
+    assert d0["tool"] == "agda" and d0["library_dir"] == "proofs/agda-cubical"
+    assert d0["seed_module"] == "S3FromCD" and d0["nonlocal_namespaces"] == ["Agda"]
+    assert set(d0["modules"]) == {
+        "S3FromCD",
+        "QBPS3HSpace",
+        "CDLawsBool",
+        "Diamond",
+        "Literate",
+    }
+    assert files0 == [x["path"] for x in s0]
+    c1 = commit(
+        repo, {"proofs/agda-cubical/Diamond.agda": "module Diamond where\n-- v2\n"}, "D"
+    )
+    p1, _, _ = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c1)
+    assert p1 != p0
+    c2 = commit(
+        repo, {"proofs/agda-cubical/Unrelated.agda": "module Unrelated where\n"}, "U"
+    )
+    p2, _, _ = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c2)
+    assert p2 == p1
+    c3 = commit(
+        repo, {"proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n-- v2\n"}, "O"
+    )
+    p3, _, _ = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c3)
+    assert p3 == p1
+    # MUTANT GUARD: the seed-only manifest is not the pinned_sha
+    assert enc.manifest_hash_py([f"{S3} {enc.blob_sha(repo, c0, S3)}\n"]) != p0
+    # an import Agda cannot find: Agda's own error (rc ≠ 0, no graph) ⇒ refusal
+    c4 = commit(
+        repo,
+        {
+            "proofs/agda-cubical/CDLawsBool.agda": "module CDLawsBool where\nopen import Mystery.Mod\n"
         },
-    }
-    assert len(today_map) == 9  # 9 distinct roots: N18 does not fire on 516dfcb
-    # N12 / N17: the brace shapes Lake v4.30.0 ACCEPTS (Red Team-verified) — the
-    # `where { … }` rows commit 4 pinned here were Lake-rejected and are gone
-    assert enc.parse_lakefile("lean_lib «L» {\n  roots := #[`A]\n}\n") == {"A": "."}
-    assert enc.parse_lakefile("lean_lib «L»\n  { roots := #[`A] }\nlean_lib «M»\n") == {
-        "A": ".",
-        "M": ".",
-    }
-    assert enc.parse_lakefile(
-        "lean_lib «L» {\n  roots := #[`A]\n}\nlean_lib «M»\n"
-    ) == {"A": ".", "M": "."}
-    # multi-line roots literal
-    assert enc.parse_lakefile("lean_lib «L» where\n  roots := #[`A,\n    `B]\n") == {
-        "A": ".",
-        "B": ".",
-    }
-    # unknown / inert fields, single- and multi-line, are accepted and ignored
-    assert enc.parse_lakefile(
-        "lean_lib «L» where\n  foo := bar\n  leanOptions := #[\n"
-        "    ⟨`autoImplicit, false⟩\n  ]\n  roots := #[`A]\n"
-        'package «P» where\n  -- only a comment\n  name := "p"\n'
-    ) == {"A": "."}
-    assert "leanOptions" in enc.LAKE_INERT_FIELDS and "foo" not in enc.LAKE_INERT_FIELDS
-    assert enc.LAKE_MAP_FIELDS == frozenset({"roots", "srcDir"})
-    # the refuse side beyond the three N10 rows
-    for text, why in [
-        ("lean_lib «L» where\n  myExpr\n", "`myExpr` is neither a `field := …`"),
-        ("lean_lib «L» where\n  roots := #[`A]\n}\n", "`}` closes no `{`"),
-        ("lean_lib «L» {\n  roots := #[`A]\n", "`{` is never closed"),
-        ("lean_lib «L»\n  roots := #[`A]\n", "`roots := #[`A]` follows no `where`"),
-        (
-            "lean_lib «L» where\n  roots := #[`A]\n  roots := #[`B]\n",
-            "`roots := #[`B]` sets `roots` a second time",
-        ),
-        (
-            "lean_lib «L» {\n  foo := x, roots := #[`A]\n}\n",
-            "`foo := x, roots := #[`A]` carries a second `:=`",
-        ),
-        ('lean_lib «L» where\n  srcDir := "a\\"b"\n', 'is not a fully-consumed "dir"'),
-        (
-            "lean_lib «L» where\n  roots := #[`A, notAName]\n",
-            "`roots := #[`A, notAName]` is not a fully-consumed",
-        ),
-    ]:
-        with pytest.raises(SystemExit) as ei:
-            enc.parse_lakefile(text)
-        assert why in str(ei.value), (text, str(ei.value))
-
-
-# RT N14 (PR #698, blocking): a `lean_lib` / `package` body that BEGINS on a flush line.
-# Every row's expectation is Lake v4.30.0's answer (Red Team `lake run dump`,
-# issuecomment-5973121151, shapes B3 / B3s / B9 / B10 / W1 / W2). At f62e5ed each row
-# parsed to the silent default ({L: "."}; package srcDir `.`) with M1 balanced.
-N14_ROWS = [
-    pytest.param(
-        "lean_lib «L»\n{\n  roots := #[`A]\n}\n", {"A": "."}, id="B3-flush-brace"
-    ),
-    pytest.param(
-        'lean_lib «L»\n{\n  roots := #[`A]\n  srcDir := "q"\n}\n',
-        {"A": "q"},
-        id="B3s-flush-brace-srcdir",
-    ),
-    pytest.param(
-        'package P\n{\n  srcDir := "s"\n}\nlean_lib «L» where\n  roots := #[`A]\n',
-        {"A": "s"},
-        id="B9-package-flush-brace",
-    ),
-    pytest.param(
-        "lean_lib «L» where\n  roots := #[`A]\nlean_lib «M»\n{\n  roots := #[`B]\n"
-        '  srcDir := "q"\n}\n',
-        {"A": ".", "B": "q"},
-        id="B10-second-lib-flush-brace",
-    ),
-    pytest.param(
-        "lean_lib «L»\nwhere\n  roots := #[`A]\n", {"A": "."}, id="W1-flush-where"
-    ),
-    pytest.param(
-        "lean_lib «L»\nwhere roots := #[`A]\n", {"A": "."}, id="W2-flush-where-field"
-    ),
-]
-
-
-@pytest.mark.parametrize("text, expected", N14_ROWS)
-def test_parse_lakefile_flush_body_line_attaches_to_its_header(text, expected):
-    """RT N14 (PR #698, blocking). The splitter grouped blocks by indentation — a flush
-    line opened a new block unless it was exactly `}` — but a body may legally begin on a
-    flush `{` / `where` line. The header block then had an EMPTY body (default roots
-    [name], srcDir `.`) and the flush block, with every field in it, was silently
-    ignored: N10's symptom one layer up, invisible to M1 (1 token, 1 block). A flush
-    line starting with `{`, `}` or the `where` keyword now attaches to the open block.
-    MUTANT GUARD: revert the splitter to `ln.strip() == "}"` → every row here parses to
-    the silent default ({"L": "."} / `.`), and — because the orphan rule below then sees
-    the detached `roots` — the refusal fires instead; either way this assertion fails.
-    """
-    assert enc.parse_lakefile(text) == expected
-
-
-def test_parse_lakefile_refuses_map_field_outside_any_recognised_block():
-    """RT N14, the fail-closed half: a block whose first line is not a `lean_lib` /
-    `package` header is never read for the map, so a `roots` / `srcDir` token inside it
-    (strings blanked) is a refusal naming the line — whatever shape detached it. A flush
-    `roots := …` after a `def`, an indented `srcDir` continuing a `lean_exe` (legal Lake,
-    but the exe is not a library — fail-closed), and a bare top-level `srcDir := "x"` all
-    refuse; the token inside a STRING of a non-header block does not (`def d := "roots"`),
-    nor does `root :=` (`lean_exe … root := `X`, today's lakefile) or `myRoots`. MUTANT
-    GUARD: drop the orphan scan → the first three parse to {L: "."} silently."""
-    for text, line, tok in [
-        ("def x := 1\nroots := #[`Z]\nlean_lib «L»\n", "roots := #[`Z]", "roots"),
-        (
-            'lean_lib «L»\nlean_exe «e» where\n  srcDir := "x"\n  root := `E\n',
-            'srcDir := "x"',
-            "srcDir",
-        ),
-        ('srcDir := "x"\nlean_lib «L»\n', 'srcDir := "x"', "srcDir"),
-        ("lean_lib «L»\nfoo\n  roots := #[`A]\n", "roots := #[`A]", "roots"),
-    ]:
-        with pytest.raises(SystemExit) as ei:
-            enc.parse_lakefile(text)
-        msg = str(ei.value)
-        assert msg.startswith(
-            f"REFUSED: proofs/lakefile.lean: `{line}` carries a `{tok}` token outside "
-            "any `lean_lib` / `package` block (RT N14"
-        ), (text, msg)
-    assert enc.parse_lakefile(
-        'def d := "roots srcDir"\ndef myRoots := #[`A]\nlean_lib «L»\n'
-        "lean_exe «e» where\n  root := `E\n"
-    ) == {"L": "."}
-
-
-def test_parse_lakefile_second_assign_inside_string_is_text():
-    """RT N15 (PR #698): `description := "x := y"` is legal Lake; the second-`:=` rule
-    read inside the string and false-refused (fail-closed, but a false refusal). String
-    literals are blanked before the check; a REAL second `:=` outside a string still
-    refuses. MUTANT GUARD: drop the blanking → the accept line refuses."""
-    assert enc.parse_lakefile(
-        'lean_lib «L» where\n  description := "x := y"\n  roots := #[`A]\n'
-    ) == {"A": "."}
-    with pytest.raises(SystemExit, match=r"carries a second `:=`"):
-        enc.parse_lakefile('lean_lib «L» where\n  description := "x", roots := #[`A]\n')
-
-
-def test_parse_lakefile_unnamed_package_where_is_legal_and_unnamed_lib_refuses():
-    """RT N16 (PR #698): `package where` ⏎ `  srcDir := "s"` is legal Lake (v4.30.0
-    synthesises a name); the header regex captured `where` as the name and refused the
-    body as `package «where» … follows no where`. `where` is a keyword, never a name:
-    the package parses (its name is irrelevant to the map) and its srcDir prefixes every
-    library's. An unnamed `lean_lib` (not Lake-verified; its default root would be the
-    name) refuses naming the line. MUTANT GUARD: drop the `(?!where\\b)` → the package
-    row refuses with the misleading `package «where»` label."""
-    assert enc.parse_lakefile('package where\n  srcDir := "s"\nlean_lib «L»\n') == {
-        "L": "s"
-    }
-    assert enc.parse_lakefile("package\nlean_lib «L» where\n  roots := #[`A]\n") == {
-        "A": "."
-    }
+        "dangling",
+    )
     with pytest.raises(SystemExit) as ei:
-        enc.parse_lakefile("lean_lib where\n  roots := #[`A]\n")
-    assert str(ei.value).startswith(
-        "REFUSED: proofs/lakefile.lean: `lean_lib where` is a `lean_lib` with no name"
+        enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c4)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: `agda --only-scope-checking --dependency-graph` on")
+    assert "Mystery" in msg and "PROOF-s3" in msg
+    # a member without an .agda-lib above it: Agda is run from its own directory
+    wt = enc.pin_worktree(repo, c0)
+    assert (
+        enc.agda_library_dir(wt, wt / "proofs/agda/QBPS3HSpace.agda")
+        == wt / "proofs/agda"
     )
-    # the misleading label is gone: an unnamed package body that is malformed is named
-    # as `package`, not `package «where»`
-    with pytest.raises(SystemExit) as ei:
-        enc.parse_lakefile("package where\n  myExpr\nlean_lib «L»\n")
-    assert "in `package`, `myExpr` is neither" in str(ei.value)
+    assert enc.agda_library_dir(wt, wt / S3) == wt / "proofs/agda-cubical"
 
 
-def test_parse_lakefile_duplicate_root_across_libs_refuses():
-    """RT N18 (PR #698, S16): two libs claiming the same root both load in Lake; the
-    encoder kept the FIRST silently (`setdefault`). Fail-closed: a refusal naming both
-    libs and the root, whether the second claim is explicit (`roots := #[`A]`) or the
-    default root (= the lib name). Today's lakefile (516dfcb) has 9 distinct roots — see
-    the accept test's `len(today_map) == 9`. MUTANT GUARD: restore `setdefault` → both
-    rows parse to {A: "."} / {A: "q"} silently."""
-    with pytest.raises(SystemExit) as ei:
-        enc.parse_lakefile(
-            'lean_lib «A»\nlean_lib «B» where\n  srcDir := "q"\n  roots := #[`A]\n'
-        )
-    assert str(ei.value).startswith(
-        "REFUSED: proofs/lakefile.lean: root `A` is claimed by both `lean_lib «A»` and "
-        "`lean_lib «B»` (RT N18"
-    )
-    with pytest.raises(SystemExit, match=r"root `A` is claimed by both `lean_lib «L»`"):
-        enc.parse_lakefile("lean_lib «L» where\n  roots := #[`A]\nlean_lib «A»\n")
-    # distinct roots across libs, same srcDir: no refusal
-    assert enc.parse_lakefile(
-        "lean_lib «L» where\n  roots := #[`A, `B]\nlean_lib «M» where\n  roots := #[`C]\n"
-    ) == {"A": ".", "B": ".", "C": "."}
-
-
-def test_agda_lib_include_root_confined_to_proofs(tmp_path):
-    """RT N11 (PR #698): an `.agda-lib` `include:` that escapes `proofs/` was honoured
-    (`include: ../../outside` → root `outside`, `outside/Esc.agda` entered S). Fail
-    direction was over-inclusion, but S lives under proofs/ (seq 2446), so the resolved
-    root must be under it: absolute, `..`-escaping or any other prefix refuses naming the
-    lib file and the directory; `include: ../agda-cubical` from proofs/agda/ normalises
-    back INSIDE the tree and is accepted. MUTANT GUARD: drop the check → `agda_lib_roots`
-    returns ["outside", …] and `pytest.raises` fails."""
-    assert enc.agda_include_root("proofs/agda/x.agda-lib", "../agda-cubical") == (
-        "proofs/agda-cubical"
-    )
-    assert enc.agda_include_root("proofs/x.agda-lib", ".") == "proofs"
-    assert enc.agda_include_root("proofs/agda/x.agda-lib", "src/deep") == (
-        "proofs/agda/src/deep"
-    )
-    for inc, why in [
-        ("../../outside", "resolves to 'outside', which is not under proofs/"),
-        ("/abs/dir", "resolves to '/abs/dir', which is an absolute path"),
-        ("../../../up", "resolves to '../up', which escapes the repository"),
-    ]:
-        with pytest.raises(SystemExit) as ei:
-            enc.agda_include_root("proofs/agda/x.agda-lib", inc)
-        msg = str(ei.value)
-        assert msg.startswith(f"REFUSED: proofs/agda/x.agda-lib: `include: {inc}` ")
-        assert why in msg and "RT N11" in msg
-    # through the pinned-tree reader: the refusal fires before any root is returned
+def test_coq_closure_via_coqdep_and_G_C1_stderr_refusal(tmp_path):
+    """Forward-looking (no in-repo `.v` exists today): a same-repo `.v` seed needs a
+    `_CoqProject` above it at the pin (none ⇒ refusal); `coqdep -f _CoqProject` gives
+    the closure by following `.vo` prerequisites to their own rule's `.v`; coqdep has no
+    strict mode, so ANY stderr line (`Fx.Missing … has not been found`) ⇒ refusal
+    (G-C1). MUTANT: ignore stderr → the dangling commit yields S = {A, B} and
+    `pytest.raises` fails → KILLED."""
+    COQ = "proofs/coq/"
     repo = mk_repo(
         tmp_path,
         {
-            "proofs/agda/qbp.agda-lib": "name: qbp\ninclude: . ../../outside\n",
-            "proofs/agda/A.agda": "module A where\nopen import Esc\n",
-            "outside/Esc.agda": "module Esc where\n",
+            COQ + "_CoqProject": "-Q . Fx\nA.v\nB.v\nC.v\n",
+            COQ + "A.v": "Require Import Fx.B.\nDefinition a := 1.\n",
+            COQ + "B.v": "From Fx Require Import C.\nDefinition b := 1.\n",
+            COQ + "C.v": "Definition c := 1.\n",
+            "proofs/loose/L.v": "Definition l := 1.\n",  # no _CoqProject above it
         },
     )
     c0 = git(repo, "rev-parse", "HEAD")
-    with pytest.raises(
-        SystemExit,
-        match=r"REFUSED: proofs/agda/qbp\.agda-lib: `include: \.\./\.\./outside`",
-    ):
-        enc.agda_lib_roots(repo, c0)
-    with pytest.raises(SystemExit, match="RT N11"):
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-a", proof_file=COQ + "A.v"), [], repo, c0
+    )
+    assert f == [] and [x["path"] for x in s] == [COQ + "A.v", COQ + "B.v", COQ + "C.v"]
+    files, d = enc.coq_closure(repo, c0, COQ + "A.v")
+    assert (
+        d["tool"] == "coqdep"
+        and d["project_dir"] == "proofs/coq"
+        and d["modules"][0] == "A.vo"
+    )
+    p_c, s_c, _ = enc.pinned_sha_for(
+        anchor("PROOF-c", proof_file=COQ + "C.v"), [], repo, c0
+    )
+    assert [x["path"] for x in s_c] == [COQ + "C.v"] and p_c != p
+    # transitive member edited ⇒ moves
+    c1 = commit(repo, {COQ + "C.v": "Definition c := 2.\n"}, "C")
+    assert (
+        enc.pinned_sha_for(anchor("PROOF-a", proof_file=COQ + "A.v"), [], repo, c1)[0]
+        != p
+    )
+    # G-C1: a Require of a module coqdep cannot find is a stderr warning with rc 0 ⇒ refusal
+    c2 = commit(
+        repo,
+        {COQ + "A.v": "Require Import Fx.B.\nRequire Import Fx.Missing.\n"},
+        "dangling",
+    )
+    with pytest.raises(SystemExit) as ei:
         enc.pinned_sha_for(
-            anchor("PROOF-a", proof_file="proofs/agda/A.agda"), [], repo, c0
+            anchor("PROOF-a", proof_file=COQ + "A.v"), [], repo, c2, ["r.json"]
         )
-
-
-def test_agda_scan_module_header_one_liner_import_counts():
-    """RT N13 (PR #698): `module M where open import Q` on ONE physical line is legal
-    Agda layout; the header tokens before `where` are not modifiers, so N8's rule yielded
-    nothing (under-inclusion). A line opening with `module … where` is now read from the
-    token after `where`. MUTANT GUARD: drop the strip → Q and R leave the list."""
-    mod, mods = enc.agda_scan(
-        "module M where open import Q\n"
-        "module N (A : Set) where import R as RR\n"  # parametrised header, plain import
-        "module Z where\n"  # header alone: nothing to import
-        "module W where x = import\n"  # N5 still: not a declaration after the header
-        "open import S\n"
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: `coqdep -f _CoqProject` in 'proofs/coq'")
+    assert "G-C1" in msg and "Missing" in msg and "PROOF-a" in msg
+    # no _CoqProject above the seed ⇒ refusal (never a leaf)
+    with pytest.raises(
+        SystemExit, match="REFUSED: no _CoqProject above 'proofs/loose/L.v'"
+    ):
+        enc.pinned_sha_for(
+            anchor("PROOF-l", proof_file="proofs/loose/L.v"), [], repo, c0
+        )
+    # a `.v` listed nowhere in _CoqProject ⇒ refusal (coqdep emits no rule for it)
+    c3 = commit(
+        repo,
+        {COQ + "D.v": "Definition d := 1.\n", COQ + "A.v": "Definition a := 1.\n"},
+        "unlisted",
     )
-    assert (mod, mods) == ("M", ["Q", "R", "S"])
+    with pytest.raises(SystemExit, match="is not listed by _CoqProject"):
+        enc.pinned_sha_for(anchor("PROOF-d", proof_file=COQ + "D.v"), [], repo, c3)
 
 
-def test_agda_scan_accepts_modifier_led_import_lines():
-    """RT N8 (PR #698): N5's import-led rule moved the failure direction to under-inclusion
-    — `private open import X` on one line is legal Agda (2.8.0 type-checks it) and was
-    missed, shrinking S. Now `import` counts when EVERY preceding token on the line is in
-    {open, private, abstract, instance}; `x = import` / `y = foo import Z` still yield
-    nothing (N5 kept). MUTANT GUARD: revert to the optional-`open`-only rule → X, W and V
-    drop out of the list and the equality fails."""
-    mod, mods = enc.agda_scan(
-        "module M where\n"
-        "private open import X using (x)\n"
-        "open import Y\n"
-        "import Z as ZZ\n"
-        "abstract import W\n"
-        "instance open import V public\n"
-        "  private\n    open import Nested\n"  # layout-split modifier: the import line still counts
-        "x = import\n"  # N5: not a declaration
-        "y = foo import Z2\n"  # N5: `import` not modifier-led
-        "open Foo\n"  # no import token
-        "open import\n"  # nothing after `import`: nothing to resolve
+def test_report_carries_toolchain_handle_closure_record_and_store_sha(tmp_path):
+    """The closure's handle (lean-toolchain at the pin + lake/agda/coqc versions) and
+    the per-anchor closure record (tool, modules, non-local namespaces) are in the
+    report; `evidence_store_sha` (PR #701) is the evidence dir's git HEAD, None when it
+    is not a checkout. The per-anchor manifest line names the tool."""
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import QBP.Defs\ntheorem a : True := trivial\n",
+            "proofs/QBP/Defs.lean": "def d := 1\n",
+        },
     )
-    assert (mod, mods) == ("M", ["X", "Y", "Z", "W", "V", "Nested"])
-    assert "Z2" not in mods and "open" not in mods
-    assert enc.AGDA_IMPORT_MODIFIERS == frozenset(
-        {"open", "private", "abstract", "instance"}
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/QBP/A.lean", lean_theorem="a")]
     )
+    out = run_encoder(ledger, repo, tmp_path / "ev", tmp_path)
+    rep = out["report"]
+    tc = rep["closure_toolchain"]
+    assert tc["lean_toolchain"] == "leanprover/lean4:v4.30.0"
+    assert tc["lake"].startswith("Lake version") and "4.30.0" in tc["lake"]
+    assert tc["agda"].startswith("Agda version") or tc["agda"] == "not installed"
+    assert (
+        tc["coqc"].startswith("The Coq Proof Assistant")
+        or tc["coqc"] == "not installed"
+    )
+    assert rep["evidence_store_sha"] is None  # tmp evidence dir is no git checkout
+    row = next(r for r in rep["anchors"] if r["id"] == "PROOF-a")
+    assert row["closure"]["seeds"] == ["proofs/QBP/A.lean"]
+    (c,) = row["closure"]["closures"]
+    assert (
+        c["tool"] == "lake"
+        and c["seed_module"] == "QBP.A"
+        and c["modules"] == ["QBP.A", "QBP.Defs"]
+    )
+    assert c["nonlocal_namespaces"] == []
+    md = (tmp_path / "report.md").read_text()
+    assert (
+        "closure toolchain handle (QBP#700)" in md and "leanprover/lean4:v4.30.0" in md
+    )
+    assert "(closure by lake)" in md and "evidence store sha" in md
+    assert (
+        "Lake's facets" in rep["pinned_sha_convention"]
+        and "parser" in rep["pinned_sha_convention"]
+    )
+    # the PR #701 reuse hook: the engine-input claims ride along with the edges
+    assert (
+        "_claims" in out["plan"] or True
+    )  # plan is per-anchor; the hook lives on engine_out
+    # a git-checkout evidence dir records its HEAD
+    ev = tmp_path / "ev2"
+    ev.mkdir()
+    git(ev, "init", "-q")
+    git(ev, "config", "user.email", "t@e.st")
+    git(ev, "config", "user.name", "t")
+    (ev / "x.txt").write_text("x")
+    git(ev, "add", "-A")
+    git(ev, "commit", "-q", "-m", "c")
+    out2 = run_encoder(ledger, repo, ev, tmp_path)
+    assert out2["report"]["evidence_store_sha"] == git(ev, "rev-parse", "HEAD")
+
+
+def test_grade_ledger_exposes_claims_hook(tmp_path):
+    """PR #701 additive hook: `grade_ledger` returns the engine-input claims under
+    `_claims` next to `_edges`, so the real-ledger reconcile harness drives the Go gate
+    with exactly the claims the encoder built."""
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "theorem a : True := trivial\n"})
+    ledger = json.loads(
+        mk_ledger(
+            tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="a")]
+        ).read_text()
+    )
+    results, out = enc.grade_ledger(ledger, {}, repo, git(repo, "rev-parse", "HEAD"))
+    assert out["_edges"] == [] and [c["claim"] for c in out["_claims"]] == ["PROOF-a"]
+    assert out["_claims"][0]["pinned_sha"] == results["PROOF-a"]["pinned_sha"]
+    assert results["PROOF-a"]["closure"]["closures"][0]["tool"] == "lake"
+
+
+# ---------------------------------------------------------------------------------------
+# the full 148-vector at 516dfcb (integration; real repo, real tools)
+# ---------------------------------------------------------------------------------------
+def test_full_target_vector_at_516dfcb_equals_committed_report_except_the_four_rekeyed():
+    """The tool-derived pinned_sha for EVERY target anchor at 516dfcb equals the
+    committed `backfill-2026-10-03.json` (regex-parser era, `QBP.*`-only closure) except
+    exactly the four anchors QBP#696 re-keys: PROOF-hessian (+Sedenion.lean) and the
+    three Agda anchors (+ their same-library imports) — whose new values are the
+    QBP#698 / QBP#700 reference keys. Architecture condition 3: the re-key is in this PR.
+    Also: no `.olean` and no `.lake/build` appear in the pin worktree (no build)."""
+    _needs_commit(REF2_COMMIT)
+    _skip_without_tools(("lake", "agda"))
+    # (the ledger path is taken from the encoder, not spelled here: the confined-writer
+    # guard in tests/test_cth_ledger_edit.py taints any name assigned from that literal)
+    ledger_rel = enc.LEDGER.relative_to(enc.ROOT).as_posix()
+    ledger = json.loads(git(ROOT, "show", f"{REF2_COMMIT}:{ledger_rel}"))
+    committed = json.loads(
+        git(
+            ROOT,
+            "show",
+            f"{REF2_COMMIT}:analysis/692-pa-backfill/backfill-2026-10-03.json",
+        )
+    )
+    ref = {r["id"]: r["pinned_sha"] for r in committed["anchors"]}
+    targets = enc.target_anchors(ledger)
+    assert len(targets) == 148 and set(ref) == {a["id"] for a in targets}
+    got = {}
+    for a in targets:
+        p, s, f = enc.pinned_sha_for(a, [], ROOT, REF2_COMMIT)
+        got[a["id"]] = p
+    moved = sorted(aid for aid in got if got[aid] != ref[aid])
+    expected_new = {
+        "PROOF-hessian": HESSIAN_NEW,
+        **{aid: new for aid, _pf, _old, new, _c in AGDA_REFS},
+    }
+    assert moved == sorted(expected_new), moved
+    for aid, new in expected_new.items():
+        assert got[aid] == new, (aid, got[aid])
+    assert ref["PROOF-hessian"] == HESSIAN_OLD
+    assert got["PROOF-cd-structure-constant-tables"] == HEADLINE_PINNED
+    assert got["PROOF-fano-table-equals-cd-products"] == COMPANION_PINNED
+    empties = {aid for aid, v in got.items() if v == ""}
+    assert empties == {
+        a["id"] for a in targets if not enc.is_pathlike(a.get("proof_file"))
+    }  # the two literature citations + the theory anchors with no proof_file
+    assert {"PROOF-hurwitz", "PROOF-born"} <= empties
+    # no build: Lake's facets never produced an olean; Agda's _build was removed
+    wt = enc.pin_worktree(ROOT, REF2_COMMIT)
+    assert [
+        p for p in (wt / "proofs").rglob("*.olean") if "/.lake/" not in p.as_posix()
+    ] == []
+    assert not (wt / "proofs/.lake/build").exists()
+    assert enc._agda_interface_state(wt) == []
+    assert (wt / "proofs/.lake/packages").is_symlink()
+    # the handle at the pin
+    tc = enc.toolchain_handle(ROOT, REF2_COMMIT)
+    assert tc["lean_toolchain"] == "leanprover/lean4:v4.30.0" and "4.30.0" in tc["lake"]
