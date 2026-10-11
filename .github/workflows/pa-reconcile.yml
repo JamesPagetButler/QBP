@@ -40,7 +40,7 @@ env:
   # re-backfill (or vice versa) makes committed != recompute and the gate fails, by design.
   # Full 40-hex sha, not abbreviated: actions/checkout fetches a commit directly only for a
   # full sha; an abbreviation is treated as a branch/tag pattern and the fetch fails.
-  INTER_PIN: 333134cb61eb12a405c67203859f090f64750df1
+  INTER_PIN: e2ecce841e1f2f2ecd38750bec17f60c441ab12a
 
 jobs:
   gate:
