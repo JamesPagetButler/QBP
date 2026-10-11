@@ -137,38 +137,23 @@ def _gate_pin(pinned_sha):
 
 
 def _reconcile_doc(ledger, engine_out, committed):
-    """Build the pa-reconcile stdin doc (ruling (c), architect seq 2651/2654/2657; owner
-    qbp-implementor). The gate reconciles every graded+pinned claim AND — so each
-    EffectivePA fold is representable — every target it transitively depends on via
-    derivation edges. An un-pinned PA-0 sink enters as the encoder's OWN no-assistant claim
-    with its gate pin mapped by _gate_pin; the engine folds it independently (EffectivePA
-    keys only on the grades map + edges, cth seq 2656). The FULL edge set among that claim
-    set is fed, so no folding edge is dropped. (QBP#702/cycle-9: alpha's effective is held
-    to 0 by the un-pinned theory sink PROOF-quat-closure — #701 was green by data, not
-    construction.) Un-pinned anchors NOT depended on by any pinned claim stay out; a
-    hand-edit on those is caught by test_full_ledger_reconciles_clean."""
-    all_claims = {c["claim"]: c for c in engine_out["_claims"]}
-    adj = {}
-    for e in engine_out["_edges"]:
-        adj.setdefault(e["from"], []).append(e["to"])
-    # seed with the graded+pinned claims (real 40-hex), then grow to their transitive
-    # derivation dependencies so every fold is representable in the gate.
-    needed = {
-        cid for cid, c in all_claims.items() if HEX40.match(c.get("pinned_sha") or "")
-    }
-    stack = list(needed)
-    while stack:
-        for t in adj.get(stack.pop(), []):
-            if t not in needed:
-                needed.add(t)
-                stack.append(t)
+    """Build the pa-reconcile stdin doc (ruling (c), architect seq 2651/2654/2657/2675;
+    owner qbp-implementor). Feed the gate the **FULL claim set** — every target anchor — so
+    the INDEPENDENT Go gate reconciles the whole ledger (all 148 at #701; 22 un-pinned sinks
+    enter at the empty-closure manifest, all derivation edges fed). `plan_writes`
+    (test_full_ledger) is then a SECOND line of defence, not the only check for an un-pinned,
+    non-depended-on anchor (architect seq 2675: feeding only the pinned closure left those to
+    the writer alone — option (a) for a subset). Un-pinned anchors enter as the encoder's own
+    no-assistant claims with their gate pin mapped by _gate_pin; the engine folds EffectivePA
+    independently (it keys on grades + edges, not pinned_sha — cth seq 2656), so alpha's edge
+    to the un-pinned theory sink PROOF-quat-closure folds its effective to 0 (QBP#702/cycle-9;
+    #701 was green by data, not construction)."""
     claims = []
-    for cid in sorted(needed):
-        c = all_claims.get(cid)
-        if c is None or cid not in committed:
-            # an edge target that is not a gradeable target anchor, or carries no committed
-            # grade, cannot be reconciled; leave it out (its edge is dropped below, so a
-            # fold that needed it surfaces as a diff — fail-closed, never silent).
+    for c in engine_out["_claims"]:
+        cid = c["claim"]
+        if cid not in committed:
+            # not a gradeable target with a committed grade; a dangling edge to it below
+            # surfaces as a reconcile diff (fail-closed), never a silent pass.
             continue
         claims.append({**c, "pinned_sha": _gate_pin(c.get("pinned_sha"))})
     ids = {c["claim"] for c in claims}
@@ -254,6 +239,35 @@ def test_planted_hand_edit_fails():
     assert any(
         d["claim_id"] == victim and d["field"] == "pa_effective" for d in diffs
     ), f"expected a pa_effective diff on {victim}, got {diffs}"
+
+
+def test_gate_catches_undepended_handedit():
+    """Architect seq 2675: the INDEPENDENT Go gate — not only plan_writes — must catch a
+    hand-edit on an un-pinned anchor that NO pinned claim depends on. Because the gate is fed
+    the full claim set, raising such an anchor's committed grade to 1/1 diffs against the
+    gate's own recompute (0/0, no evidence) => exit 3. Were the gate fed only the pinned
+    closure, this anchor would be checked by the writer (plan_writes) alone — option (a) for
+    a subset, which (c) rejects."""
+    ev = _evidence_dir()
+    ledger, results, engine_out = _recompute(ev)
+    committed = _committed_grades(ledger)
+    dep_targets = {e["to"] for e in engine_out["_edges"]}
+    cand = [
+        cid
+        for cid, r in results.items()
+        if r["pa"] == 0 and r["effective_pa"] == 0 and cid not in dep_targets
+    ]
+    assert cand, "need an un-pinned, non-depended-on anchor to tamper"
+    victim = cand[0]
+    tampered = copy.deepcopy(committed)
+    tampered[victim] = {"pa_local": 1, "pa_effective": 1}
+    code, out, err = _run_reconcile(_reconcile_doc(ledger, engine_out, tampered))
+    assert (
+        code == 3
+    ), f"the gate must catch an un-depended-on hand edit (exit 3); got {code}; err={err}"
+    assert any(
+        d["claim_id"] == victim for d in out.get("diffs", [])
+    ), f"expected a diff on {victim}; got {out.get('diffs')}"
 
 
 # --- AC3: spot values on the real ledger at INTER_PIN ----------------------------------
