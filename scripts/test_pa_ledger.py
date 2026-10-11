@@ -118,24 +118,71 @@ def _recompute(evidence_dir, pinned_master=None):
     return ledger, results, engine_out
 
 
+# The empty-closure manifest: git's empty-blob sha, i.e. `git hash-object --stdin` over
+# empty input — the LITERAL manifest of an empty import closure (encoder §seq-2394), not a
+# carve-out. A target with no proof file has an empty closure, so this is its correct
+# staleness key at the gate boundary (architect seq 2651/2657/2663). Strict 3c is preserved:
+# every gate claim's pinned_sha is a real 40-hex. The ledger keeps its empty value.
+EMPTY_CLOSURE_MANIFEST = "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+
+
+def _gate_pin(pinned_sha):
+    """Map a claim's pinned_sha to its GATE-INPUT value (architect seq 2663), fail-closed:
+    an EMPTY pin — None, a missing key, or "" — is the empty-closure manifest; a valid
+    40-hex passes through; a NON-EMPTY non-40-hex value (a malformed / short sha) is NEVER
+    mapped — it passes through unchanged so the gate rejects it (exit 2). Mapping any
+    non-40-hex to the manifest would be the KILLED mutant."""
+    s = pinned_sha or ""  # None / missing -> ""
+    return EMPTY_CLOSURE_MANIFEST if s == "" else s
+
+
 def _reconcile_doc(ledger, engine_out, committed):
-    """Build the pa-reconcile stdin doc for the graded+pinned subset.
-    `committed` maps claim id -> {pa_local, pa_effective}; the strict gate needs a 40-hex
-    pinned_sha, so the 146 un-pinned 0/0 anchors (nothing to verify) are out of the set —
-    a hand-edit on THOSE is caught by the encoder reconcile in test_pa_encoder.py."""
-    claims = [c for c in engine_out["_claims"] if HEX40.match(c.get("pinned_sha", ""))]
+    """Build the pa-reconcile stdin doc (ruling (c), architect seq 2651/2654/2657; owner
+    qbp-implementor). The gate reconciles every graded+pinned claim AND — so each
+    EffectivePA fold is representable — every target it transitively depends on via
+    derivation edges. An un-pinned PA-0 sink enters as the encoder's OWN no-assistant claim
+    with its gate pin mapped by _gate_pin; the engine folds it independently (EffectivePA
+    keys only on the grades map + edges, cth seq 2656). The FULL edge set among that claim
+    set is fed, so no folding edge is dropped. (QBP#702/cycle-9: alpha's effective is held
+    to 0 by the un-pinned theory sink PROOF-quat-closure — #701 was green by data, not
+    construction.) Un-pinned anchors NOT depended on by any pinned claim stay out; a
+    hand-edit on those is caught by test_full_ledger_reconciles_clean."""
+    all_claims = {c["claim"]: c for c in engine_out["_claims"]}
+    adj = {}
+    for e in engine_out["_edges"]:
+        adj.setdefault(e["from"], []).append(e["to"])
+    # seed with the graded+pinned claims (real 40-hex), then grow to their transitive
+    # derivation dependencies so every fold is representable in the gate.
+    needed = {
+        cid for cid, c in all_claims.items() if HEX40.match(c.get("pinned_sha") or "")
+    }
+    stack = list(needed)
+    while stack:
+        for t in adj.get(stack.pop(), []):
+            if t not in needed:
+                needed.add(t)
+                stack.append(t)
+    claims = []
+    for cid in sorted(needed):
+        c = all_claims.get(cid)
+        if c is None or cid not in committed:
+            # an edge target that is not a gradeable target anchor, or carries no committed
+            # grade, cannot be reconciled; leave it out (its edge is dropped below, so a
+            # fold that needed it surfaces as a diff — fail-closed, never silent).
+            continue
+        claims.append({**c, "pinned_sha": _gate_pin(c.get("pinned_sha"))})
     ids = {c["claim"] for c in claims}
     edges = [e for e in engine_out["_edges"] if e["from"] in ids and e["to"] in ids]
-    expect = {}
-    for c in claims:
-        cid = c["claim"]
-        expect[cid] = {
+    expect = {
+        cid: {
             "required_pa": 0,  # reconcile test: the EMIT path (required_pa) is not exercised
             "committed_pa_local": committed[cid]["pa_local"],
             "committed_pa_effective": committed[cid]["pa_effective"],
             "source_ref": f"JamesPagetButler/QBP@{cid}",
             "pinning_consumer": [],
         }
+        for cid in ids
+    }
     return {
         "policy": {"require_signature": False},
         "ledger_version": ledger.get("version", ""),
@@ -268,6 +315,154 @@ def test_ungraded_hand_edit_caught_by_full_plan():
     assert plan[victim][
         "changed"
     ], f"a no-evidence hand edit on {victim} must be caught"
+
+
+# --- (c) un-pinned-sink folding: synthetic, so it holds by construction, not by data -----
+# (QBP#702 cycle-9 ruling, architect seq 2651/2654/2657/2663.) A pinned claim P grades
+# local 1; a derivation edge P->U into an un-pinned PA-0 sink U must fold P's effective to 0.
+
+_CLEAN_HASH = "sha256:" + "1" * 64
+
+
+def _syn_clean_claim(cid, pin):
+    """A claim that grades PA1 — one clean lean4 assistant (source_sha == pin, kernel_clean,
+    declared == derived, trust pass), modelled on tools/cth-pa/testdata/pa/01_lean_clean.
+    Only engine pa.Claim/pa.Assistant fields (the gate decoder is DisallowUnknownFields).
+    """
+    return {
+        "claim": cid,
+        "consumer": "qbp#692-ci",
+        "pinned_sha": pin,
+        "proof_assistants": [
+            {
+                "assistant": "lean4",
+                "evidence_ref": f"proofs/QBP/Syn/{cid}.lean@{pin[:7]}#t",
+                "producer": "syn",
+                "source_sha": pin,
+                "trust_check": "pass",
+                "declared": {
+                    "mode": "decide",
+                    "axioms": ["propext"],
+                    "exit_code": 0,
+                    "output_hash": _CLEAN_HASH,
+                },
+                "derived": {
+                    "tactics_used": ["decide"],
+                    "axioms": ["propext"],
+                    "exit_code": 0,
+                    "output_hash": _CLEAN_HASH,
+                    "kernel_clean": True,
+                },
+            }
+        ],
+        "correspondence": {
+            "corresponds": False,
+            "basis": "",
+            "checked_by": "",
+            "checked_at": "",
+        },
+        "corroborated_by": [],
+    }
+
+
+def _syn_sink_claim(cid):
+    """A no-assistant PA-0 sink with the empty-closure manifest pin (the un-pinned sink as
+    the gate sees it under ruling (c))."""
+    return {
+        "claim": cid,
+        "consumer": "qbp#692-ci",
+        "pinned_sha": EMPTY_CLOSURE_MANIFEST,
+        "proof_assistants": [],
+        "correspondence": {
+            "corresponds": False,
+            "basis": "",
+            "checked_by": "",
+            "checked_at": "",
+        },
+        "corroborated_by": [],
+    }
+
+
+def _expect_term(cid, local, eff):
+    return {
+        "required_pa": 0,
+        "committed_pa_local": local,
+        "committed_pa_effective": eff,
+        "source_ref": f"JamesPagetButler/QBP@{cid}",
+        "pinning_consumer": [],
+    }
+
+
+def _syn_doc(claims, edges, expect):
+    return {
+        "policy": {"require_signature": False},
+        "ledger_version": "syn",
+        "emitted_at": "2026-01-01T00:00:00Z",
+        "claims": claims,
+        "edges": edges,
+        "expect": expect,
+    }
+
+
+def test_edge_into_unpinned_sink_folds():
+    """(c), the real gate: P (local 1) with a derivation edge into an un-pinned PA-0 sink U
+    folds to effective 0 and reconciles CLEAN against committed 1/0. U enters with the
+    empty-closure manifest, so 3c stays strict."""
+    doc = _syn_doc(
+        [_syn_clean_claim("SYN-P", "1" * 40), _syn_sink_claim("SYN-U")],
+        [{"from": "SYN-P", "to": "SYN-U", "type": "derivation"}],
+        {"SYN-P": _expect_term("SYN-P", 1, 0), "SYN-U": _expect_term("SYN-U", 0, 0)},
+    )
+    code, out, err = _run_reconcile(doc)
+    assert (
+        code == 0
+    ), f"clean fold expected exit 0; got {code}; diffs={out.get('diffs')}; err={err}"
+    assert out.get("diffs") == [], f"unexpected diffs: {out.get('diffs')}"
+
+
+def test_mutant_drop_sink_edge_killed():
+    """Mutant KILLED (herschel seq 2654): drop the edge into the un-pinned sink and the gate
+    recomputes P effective = its local 1 != committed 0 => exit 3. The edge is load-bearing.
+    """
+    doc = _syn_doc(
+        [_syn_clean_claim("SYN-P", "1" * 40), _syn_sink_claim("SYN-U")],
+        [],  # the sink edge DROPPED — the mutation
+        {"SYN-P": _expect_term("SYN-P", 1, 0), "SYN-U": _expect_term("SYN-U", 0, 0)},
+    )
+    code, out, err = _run_reconcile(doc)
+    assert (
+        code == 3
+    ), f"a dropped sink edge must fail the gate (exit 3); got {code}; err={err}"
+    assert any(
+        d["claim_id"] == "SYN-P" and d["field"] == "pa_effective"
+        for d in out.get("diffs", [])
+    ), f"expected a pa_effective diff on SYN-P; got {out.get('diffs')}"
+
+
+def test_mutant_omit_sink_claim_killed():
+    """Mutant KILLED: omit the sink claim but keep the edge => a dangling edge => gate exit 2.
+    The sink claim is load-bearing (an empty-pinned claim can't be dropped to "" either — 3c).
+    """
+    doc = _syn_doc(
+        [_syn_clean_claim("SYN-P", "1" * 40)],  # SYN-U omitted — the mutation
+        [{"from": "SYN-P", "to": "SYN-U", "type": "derivation"}],
+        {"SYN-P": _expect_term("SYN-P", 1, 0)},
+    )
+    code, _out, err = _run_reconcile(doc)
+    assert (
+        code == 2
+    ), f"a dangling edge (omitted sink) must be gate exit 2; got {code}; err={err}"
+
+
+def test_gate_pin_maps_empty_not_malformed():
+    """_gate_pin (architect seq 2663), fail-closed: None / missing / "" all map to the
+    empty-closure manifest; a valid 40-hex passes; a NON-EMPTY non-40-hex (malformed short
+    sha) is NEVER mapped — the KILLED mutant is "map any non-40-hex to e69de29b"."""
+    assert _gate_pin(None) == EMPTY_CLOSURE_MANIFEST
+    assert _gate_pin("") == EMPTY_CLOSURE_MANIFEST
+    assert _gate_pin("1" * 40) == "1" * 40
+    assert _gate_pin("abc123") == "abc123"  # malformed, non-empty -> never mapped
+    assert _gate_pin("deadbeef") == "deadbeef"
 
 
 # --- the pin invariant (needs no checkout) ---------------------------------------------
