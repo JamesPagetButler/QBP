@@ -12,11 +12,17 @@ on:
     paths:
       - 'tools/cth-pa/**'
       - '.github/workflows/pa-reconcile.yml'
+      - 'archive/cth-inventory/**'
+      - 'scripts/encode_pa_from_evidence.py'
+      - 'scripts/test_pa_ledger.py'
   push:
     branches: [master]
     paths:
       - 'tools/cth-pa/**'
       - '.github/workflows/pa-reconcile.yml'
+      - 'archive/cth-inventory/**'
+      - 'scripts/encode_pa_from_evidence.py'
+      - 'scripts/test_pa_ledger.py'
 
 permissions:
   contents: read
@@ -25,6 +31,16 @@ env:
   # The vendored engine's pin (confluent-trust#108 @ this sha). It must equal
   # tools/cth-pa/VENDOR.meta.json's source_sha; the check-of-record enforces that.
   CT_PIN: 13de2f728707cd4431e0116126c530247f132158
+  # The canonical PA-evidence store pin: JamesPagetButler/inter:notary-evidence/ at this
+  # inter sha (architect ruling, live-test seq 2554). inter is public, so no secret is
+  # needed; the private `notary` repo stays the record-of-origin (inter#168). The real-
+  # ledger reconcile recomputes every committed grade against the evidence AT THIS PIN.
+  # INVARIANT (test_pa_ledger.py): INTER_PIN must equal the store sha in the latest dated
+  # backfill report — the pin moves ATOMICALLY with the ledger. A bump here without a
+  # re-backfill (or vice versa) makes committed != recompute and the gate fails, by design.
+  # Full 40-hex sha, not abbreviated: actions/checkout fetches a commit directly only for a
+  # full sha; an abbreviation is treated as a branch/tag pattern and the fetch fails.
+  INTER_PIN: 333134cb61eb12a405c67203859f090f64750df1
 
 jobs:
   gate:
@@ -58,3 +74,28 @@ jobs:
       - name: Vendor check mutation tests (R1/R5 — incl. the sed-injection payload)
         working-directory: tools/cth-pa
         run: scripts/test_check_vendor_upstream.sh "$GITHUB_WORKSPACE/_upstream_ct" "$CT_PIN"
+
+      # --- QBP#692 strike-2: the real-ledger reconcile (the Go pa-reconcile gate on the
+      # committed ledger, against the canonical evidence store at INTER_PIN) -------------
+      - name: Checkout inter evidence store at the pin (public — no secret)
+        uses: actions/checkout@v4
+        with:
+          repository: JamesPagetButler/inter
+          ref: ${{ env.INTER_PIN }}
+          path: _inter
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install reconcile test deps
+        # pyyaml: evidence records are YAML; jsonschema: plan_writes -> ledger_assistants
+        # validates the ledger-shape array against the inventory schema.
+        run: pip install pyyaml pytest jsonschema
+
+      - name: Real-ledger reconcile (AC2 + AC3 + the INTER_PIN invariant)
+        env:
+          INTER_EVIDENCE_DIR: ${{ github.workspace }}/_inter/notary-evidence
+          PINNED_MASTER: HEAD  # the checked-out commit under test
+        run: python3 -m pytest scripts/test_pa_ledger.py -v

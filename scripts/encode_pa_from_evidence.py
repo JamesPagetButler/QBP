@@ -1052,6 +1052,11 @@ def grade_ledger(
         r["flags"] = list(g["flags"])
         r["assistants"] = list(g["assistants"])
     out["_edges"] = edges
+    # Additive reuse hook (no grading effect): the real-ledger reconcile harness
+    # (scripts/test_pa_ledger.py, QBP#692 strike-2) drives the Go `pa-reconcile` gate
+    # with the SAME engine-input claims this builds, so the checker and the writer
+    # never diverge on claim-construction. Mirrors `_edges` above.
+    out["_claims"] = claims
     return results, out
 
 
@@ -1275,6 +1280,7 @@ def build_report(
             ("verifier", engine_out["verifier"]),
             ("policy", engine_out["policy"]),
             ("evidence_dir", meta["evidence_dir"]),
+            ("evidence_store_sha", meta.get("evidence_store_sha")),
             ("v2_record_count", meta["v2_record_count"]),
             ("target_anchor_count", len(rows)),
             (
@@ -1554,12 +1560,23 @@ def run(
         engine_id=engine_out["engine"],
     )
     changed, version = apply_writes(ledger_path, plan, note_args, today, dry_run)
+    # The git sha of the evidence store this backfill graded against (QBP#692 strike-2
+    # invariant, architect seq 2554): pa-reconcile.yml's INTER_PIN must equal this, so the
+    # pin moves atomically with the ledger. Resolved when evidence_dir is a git checkout
+    # (it is in CI and in the beekeeper's inter checkout); None otherwise — never fatal.
+    _store = _git(evidence_dir, "rev-parse", "HEAD", check=False)
+    evidence_store_sha = (
+        _store.stdout.strip()
+        if _store.returncode == 0 and _store.stdout.strip()
+        else None
+    )
     meta = {
         "today": today,
         "ledger": str(ledger_path),
         "pinned_master_rev": pinned_master,
         "pinned_master_commit": commit,
         "evidence_dir": str(evidence_dir),
+        "evidence_store_sha": evidence_store_sha,
         "v2_record_count": len(records),
         "version_after": version if changed else None,
     }
