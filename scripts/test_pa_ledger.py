@@ -157,7 +157,12 @@ def _reconcile_doc(ledger, engine_out, committed):
             continue
         claims.append({**c, "pinned_sha": _gate_pin(c.get("pinned_sha"))})
     ids = {c["claim"] for c in claims}
-    edges = [e for e in engine_out["_edges"] if e["from"] in ids and e["to"] in ids]
+    # Feed the FULL edge set — do NOT filter to `ids` (Gemini review, QBP#701). If a target
+    # anchor's committed grade is DELETED (dropping it from `committed`, so its claim is
+    # skipped above), filtering the edge to it would silently drop the fold and let the
+    # source keep a fabricated-high effective. Feeding every edge instead makes that edge
+    # DANGLE, and the gate rejects a dangling edge (exit 2) — fail-closed, not silent.
+    edges = list(engine_out["_edges"])
     expect = {
         cid: {
             "required_pa": 0,  # reconcile test: the EMIT path (required_pa) is not exercised
@@ -468,6 +473,27 @@ def test_mutant_omit_sink_claim_killed():
     ), f"a dangling edge (omitted sink) must be gate exit 2; got {code}; err={err}"
 
 
+def test_reconcile_doc_feeds_dangling_edge_for_deleted_sink():
+    """Gemini review (QBP#701), the sink-evasion hole: if a sink's committed grade is DELETED
+    (dropping it from `committed`), _reconcile_doc skips its claim — but it must still FEED
+    the edge into it, so the gate sees a DANGLING edge and fails closed (exit 2), rather than
+    silently dropping the fold and letting the source keep a fabricated-high effective.
+    Exercises _reconcile_doc's edge handling directly (the fix is `edges = all`, not filtered
+    to `ids`)."""
+    P = _syn_clean_claim("SYN-P", "1" * 40)
+    edge = {"from": "SYN-P", "to": "SYN-U", "type": "derivation"}
+    engine_out = {"_claims": [P], "_edges": [edge]}
+    committed = {"SYN-P": {"pa_local": 1, "pa_effective": 0}}  # SYN-U deleted / absent
+    doc = _reconcile_doc({}, engine_out, committed)
+    assert (
+        edge in doc["edges"]
+    ), "the edge into the deleted sink must still be fed (dangling), not filtered out"
+    code, _out, err = _run_reconcile(doc)
+    assert (
+        code == 2
+    ), f"a dangling edge to a deleted sink must be gate exit 2; got {code}; err={err}"
+
+
 def test_gate_pin_maps_empty_not_malformed():
     """_gate_pin (architect seq 2663), fail-closed: None / missing / "" all map to the
     empty-closure manifest; a valid 40-hex passes; a NON-EMPTY non-40-hex (malformed short
@@ -541,25 +567,40 @@ def test_latest_report_picked_by_generated_not_filename(tmp_path):
 
 
 def _pin_invariant_ok(pin, report_sha):
-    """FAIL-CLOSED (architect seq 2583): the invariant holds only when BOTH the pin and the
-    store sha are present AND name the same commit (either may abbreviate the other). A
-    missing pin or a missing store sha is a FAILURE, never a pass-by-absence — that was the
-    type-B skip-when-input-absent gap. The sole matching rule, so a mutant flips it here.
-    """
-    if not pin or not report_sha:
+    """FAIL-CLOSED (architect seq 2583; hardened per Gemini review, QBP#701): the invariant
+    holds only when BOTH the pin and the store sha are **full 40-hex** AND exactly equal. A
+    missing/empty value is a FAILURE (the type-B skip-when-input-absent gap), and so is a
+    non-40-hex value — NO prefix match, so a short-sha report plus a crafted 40-hex pin that
+    merely SHARES a prefix cannot collide. INTER_PIN is full-40-hex in the workflow and
+    evidence_store_sha is full-40-hex from `git rev-parse`, so strict equality is exactly
+    right. The sole matching rule, so a mutant flips it here."""
+    if not (pin and report_sha and HEX40.match(pin) and HEX40.match(report_sha)):
         return False
-    return pin == report_sha or report_sha.startswith(pin) or pin.startswith(report_sha)
+    return pin == report_sha
+
+
+_PIN_A = "333134cb61eb12a405c67203859f090f64750df1"
+_PIN_B = "e2ecce84f00ba12cd34ef5061728394a5b6c7d8e9"
 
 
 def test_pin_invariant_bites():
     """Mutant 1 (architect seq 2554): the check REJECTS a mismatch, not waves it through."""
+    assert _pin_invariant_ok(_PIN_A, _PIN_A) is True
+    assert _pin_invariant_ok(_PIN_A, _PIN_B) is False
+
+
+def test_pin_invariant_rejects_prefix_match():
+    """Mutant 3 (Gemini review): a short-sha report + a crafted full-40-hex pin that merely
+    shares the short prefix must NOT match — the symmetric-startswith hazard is closed. Only
+    full-40-hex exact equality passes; any non-40-hex (abbreviation) on either side fails.
+    """
+    short = "333134c"
+    assert _pin_invariant_ok(_PIN_A, short) is False  # report abbreviated -> reject
+    assert _pin_invariant_ok(short, _PIN_A) is False  # pin abbreviated -> reject
+    assert _pin_invariant_ok(short, short) is False  # both abbreviated -> reject
+    # a full pin sharing the short prefix must not be accepted against the abbreviation
     assert (
-        _pin_invariant_ok("333134c", "333134ca0b1c2d3e4f5061728394a5b6c7d8e9f0") is True
-    )
-    assert _pin_invariant_ok("333134c", "333134c") is True
-    assert (
-        _pin_invariant_ok("333134c", "e2ecce8f00ba12cd34ef5061728394a5b6c7d8e9")
-        is False
+        _pin_invariant_ok(_PIN_A, "333134cffffffffffffffffffffffffffffffffff") is False
     )
 
 
