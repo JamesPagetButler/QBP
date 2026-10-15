@@ -124,7 +124,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: lake update
+        # --keep-toolchain: elan already selected the pin's proofs/lean-toolchain; Lake must
+        # not try to switch it on the runner (oppenheimer, #708 review).
+        run: lake update --keep-toolchain
 
       - name: Install Agda 2.8.0 + cubical-0.9 (agda/cubical @ 7b9019b2)
         run: |
@@ -153,10 +155,15 @@ jobs:
         # module olean. (Lake's elaborated CONFIG under .lake/config is not a module olean.)
         run: |
           set -euo pipefail
-          if find proofs -path '*/.lake/build/*' -name '*.olean' -print -quit | grep -q .; then
-            echo "::error::a module .olean was built under proofs/.lake/build — the closure must be --no-build"; exit 1
+          # No build anywhere under proofs/ — neither the project (proofs/.lake/build) nor
+          # any dependency (proofs/.lake/packages/*/.lake/build): Lake must not build a
+          # module olean for the project OR a dependency (oppenheimer, #708 review). Lake's
+          # elaborated CONFIG (.lake/config/*/lakefile.olean) is not a module build and is
+          # not a `.lake/build` directory, so it is correctly not matched.
+          builds=$(find proofs -type d -path '*/.lake/build' 2>/dev/null || true)
+          if [ -n "$builds" ]; then
+            echo "::error::a .lake/build directory exists — a build happened where only header-level --no-build facets should run:"
+            echo "$builds"
+            exit 1
           fi
-          if [ -d proofs/.lake/build ]; then
-            echo "::error::proofs/.lake/build exists — a build happened where only header-level facets should run"; exit 1
-          fi
-          echo "no module oleans and no proofs/.lake/build — --no-build confirmed"
+          echo "no .lake/build under proofs/ (project or dependencies) — --no-build confirmed"
