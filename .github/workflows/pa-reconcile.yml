@@ -155,15 +155,16 @@ jobs:
         # module olean. (Lake's elaborated CONFIG under .lake/config is not a module olean.)
         run: |
           set -euo pipefail
-          # No build anywhere under proofs/ — neither the project (proofs/.lake/build) nor
-          # any dependency (proofs/.lake/packages/*/.lake/build): Lake must not build a
-          # module olean for the project OR a dependency (oppenheimer, #708 review). Lake's
-          # elaborated CONFIG (.lake/config/*/lakefile.olean) is not a module build and is
-          # not a `.lake/build` directory, so it is correctly not matched.
-          builds=$(find proofs -type d -path '*/.lake/build' 2>/dev/null || true)
-          if [ -n "$builds" ]; then
-            echo "::error::a .lake/build directory exists — a build happened where only header-level --no-build facets should run:"
-            echo "$builds"
+          # The --no-build proof: a module build produces *.olean FILES. `lake update`
+          # creates EMPTY .lake/build scaffold dirs in each cloned package (batteries,
+          # mathlib, …) but compiles nothing — so the check is on module olean FILES, not the
+          # scaffold directories, covering the project AND every dependency
+          # (proofs/.lake/packages/*/.lake/...). Lake's elaborated CONFIG, `lakefile.olean`,
+          # is config elaboration, not a module build, and is excluded by name.
+          oleans=$(find proofs -path '*/.lake/*' -name '*.olean' ! -name 'lakefile.olean' 2>/dev/null || true)
+          if [ -n "$oleans" ]; then
+            echo "::error::module .olean files exist (project or dependency) — the closure must be --no-build:"
+            echo "$oleans"
             exit 1
           fi
-          echo "no .lake/build under proofs/ (project or dependencies) — --no-build confirmed"
+          echo "no module oleans under proofs/ (project or dependencies) — --no-build confirmed"
