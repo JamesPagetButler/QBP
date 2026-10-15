@@ -94,8 +94,69 @@ jobs:
         # validates the ledger-shape array against the inventory schema.
         run: pip install pyyaml pytest jsonschema
 
+      # --- QBP#703 coupling: the rewritten encoder derives each prover's import closure
+      # from that prover's OWN dependency tool at the pinned commit (Lake facets, Agda
+      # dependency-graph, coqdep) in a hermetic pin worktree that REFUSES to fetch over the
+      # network. So the runner must carry the prover tools on PATH AND have
+      # proofs/.lake/packages + proofs/lake-manifest.json already materialised — sources
+      # only (the `--no-build` facets never read oleans, so `lake exe cache get` is NOT run;
+      # the Red Team's offline test confirmed sources+manifest suffice). coqdep is omitted
+      # until an in-repo `.v` seed exists. These steps are inert while master still carries
+      # the regex encoder (the reconcile test then uses it, tools installed-unused, gate
+      # green) and go live when #703 lands. Ordering matters: elan (so `lake` exists) →
+      # materialise → agda.
+      - name: Install elan (lean toolchain from proofs/lean-toolchain)
+        run: |
+          set -euo pipefail
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain "$(cat proofs/lean-toolchain | sed 's#leanprover/lean4:##')"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Materialise Mathlib package sources + manifest (no oleans, no cache get)
+        # pin_worktree symlinks the running checkout's proofs/.lake/packages and copies the
+        # gitignored proofs/lake-manifest.json into the hermetic pin worktree, refusing a
+        # network fetch — so they must exist here first. `lake update` resolves the
+        # lakefile's pinned revs, git-clones the package SOURCES and writes the manifest,
+        # WITHOUT building any module .olean. (NOTE qbp-implementor→oppenheimer: confirm this
+        # is the command your pin_worktree expects vs. another — the toolchain PR's own CI
+        # runs the regex encoder so it cannot exercise this path; #703's re-run is the proof.)
+        working-directory: proofs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: lake update
+
+      - name: Install Agda 2.8.0 + cubical-0.9 (agda/cubical @ 7b9019b2)
+        run: |
+          set -euo pipefail
+          curl -fsSL https://github.com/agda/agda/releases/download/v2.8.0/Agda-v2.8.0-linux.tar.xz -o /tmp/agda.tar.xz
+          mkdir -p "$HOME/agda-2.8.0" && tar -xJf /tmp/agda.tar.xz -C "$HOME/agda-2.8.0"
+          echo "$HOME/agda-2.8.0" >> "$GITHUB_PATH"
+          git clone https://github.com/agda/cubical.git "$HOME/cubical"
+          git -C "$HOME/cubical" checkout 7b9019b2993535d6931991d87f5c762aee87a67a
+          mkdir -p "$HOME/.agda"
+          echo "$HOME/cubical/cubical.agda-lib" > "$HOME/.agda/libraries"
+          echo "cubical-0.9" > "$HOME/.agda/defaults"
+
       - name: Real-ledger reconcile (AC2 + AC3 + the INTER_PIN invariant)
         env:
           INTER_EVIDENCE_DIR: ${{ github.workspace }}/_inter/notary-evidence
           PINNED_MASTER: HEAD  # the checked-out commit under test
+          # QBP#703: a required prover tool absent must FAIL (not silently skip) the
+          # tool-based tests. coqdep is intentionally not installed (no in-repo `.v` seed),
+          # so the real-ledger suite must not need it — it uses lake + agda only.
+          QBP_REQUIRE_PROVER_TOOLS: "1"
         run: python3 -m pytest scripts/test_pa_ledger.py -v
+
+      - name: Assert no module oleans / no .lake/build were produced (the --no-build proof)
+        # QBP#703 conditions: the closure is header-level; the encoder must never build a
+        # module olean. (Lake's elaborated CONFIG under .lake/config is not a module olean.)
+        run: |
+          set -euo pipefail
+          if find proofs -path '*/.lake/build/*' -name '*.olean' -print -quit | grep -q .; then
+            echo "::error::a module .olean was built under proofs/.lake/build — the closure must be --no-build"; exit 1
+          fi
+          if [ -d proofs/.lake/build ]; then
+            echo "::error::proofs/.lake/build exists — a build happened where only header-level facets should run"; exit 1
+          fi
+          echo "no module oleans and no proofs/.lake/build — --no-build confirmed"
