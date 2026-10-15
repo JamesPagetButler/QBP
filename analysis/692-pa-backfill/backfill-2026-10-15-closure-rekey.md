@@ -8,8 +8,8 @@
 | engine | `confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158` (attestation.StubV0) |
 | policy | `{"require_signature": false}` |
 | evidence dir | `<evidence-repo>/notary-evidence` |
-| paths | paths are recorded relative to a named base, never as the absolute path of the checkout the encoder happened to run in (RT N5 on PR #703): `<repo>` = the QBP checkout (`--repo`), `<evidence-repo>` = the toplevel in the evidence-repo identity row, `<evidence-dir>` = `--evidence-dir`; a path under none of them is recorded as given |
-| evidence repo (RT N2) | remote `https://github.com/JamesPagetButler/inter.git`; HEAD `e2ecce841e1f2f2ecd38750bec17f60c441ab12a`; toplevel `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-e2ecce8` |
+| paths | paths are recorded relative to a named base, never as the absolute path of the checkout the encoder happened to run in (RT N5 on PR #703): `<repo>` = the QBP checkout (`--repo`), `<evidence-repo>` = the toplevel of the git checkout `--evidence-dir` lives in — the checkout the evidence-repo identity row (remote + HEAD) names; its own path is never recorded (RT N7) — `<evidence-dir>` = `--evidence-dir`; a path under none of them is recorded as given |
+| evidence repo (RT N2) | remote `https://github.com/JamesPagetButler/inter.git`; HEAD `e2ecce841e1f2f2ecd38750bec17f60c441ab12a` |
 | evidence store sha (QBP#701 INTER_PIN) | `e2ecce841e1f2f2ecd38750bec17f60c441ab12a` |
 | closure toolchain handle (QBP#700) | lean_toolchain `leanprover/lean4:v4.30.0`; lake `Lake version 5.0.0-src+d024af0 (Lean version 4.30.0)`; agda `Agda version 2.8.0`; coqc `The Coq Proof Assistant, version 8.15.0` |
 | v2 evidence records | 4 |

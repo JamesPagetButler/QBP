@@ -192,8 +192,10 @@ Pipeline
    unmatched_claim / evidence_for_non_target, pinned master commit, per-anchor S + blobs +
    pinned_sha, engine pin, every per-anchor flag (engine + encoder), the EVIDENCE REPO
    IDENTITY (RT N2 on PR #697: `git -C <evidence_dir> rev-parse HEAD` + `remote get-url
-   origin` + `--show-toplevel`; a directory that is not a git checkout is recorded as the
-   explicit string `unknown (not a git checkout)`, never omitted — `evidence_repo_identity`),
+   origin`; a directory that is not a git checkout is recorded as the explicit string
+   `unknown (not a git checkout)`, never omitted — `evidence_repo_identity`; the checkout's
+   own path — `--show-toplevel` — is the `<evidence-repo>` base of the record paths and is
+   never written into the report, RT N7 on PR #703),
    and the `stale_proof_file` / `no_proof_file` anchor lists (seq 2446, AC5).
 
 Usage:
@@ -216,6 +218,7 @@ import posixpath
 import re
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -422,15 +425,44 @@ def missing_prover_tools() -> List[str]:
     return [t for t in PROVER_TOOLS if shutil.which(t) is None]
 
 
+def signal_exit(rc: int) -> Optional[str]:
+    """`SIGSEGV (rc 139)` when `rc` is a death-by-signal exit code — negative from
+    `subprocess` (the tool process itself was killed) or 128+N (the tool's wrapper —
+    run-bounded / `timeout` / a shell — reporting its child's signal); None for an
+    ordinary exit, including rc 128 and a 128+N that names no signal (RT N8 on PR #703).
+    """
+    n = -rc if rc < 0 else rc - 128 if rc > 128 else 0
+    if n <= 0:
+        return None
+    try:
+        name = signal.Signals(n).name
+    except ValueError:
+        return None
+    return f"{name} (rc {128 + n})"
+
+
 def run_tool(argv: List[str], cwd: Path) -> subprocess.CompletedProcess:
-    """Run a prover tool (under `tool_wrapper`) with its stdout/stderr captured."""
-    return subprocess.run(
+    """Run a prover tool (under `tool_wrapper`) with its stdout/stderr captured. A tool
+    that exits BY SIGNAL (`signal_exit`) is a refusal naming the tool and the signal — an
+    operator reads a binary crash or an external kill (run-bounded's memory cap is
+    SIGKILL), not a logic error of the tool or the encoder; fail-closed, never retried
+    (RT N8 on PR #703). An ordinary non-zero exit is the caller's to interpret."""
+    p = subprocess.run(
         [*tool_wrapper(), *argv],
         cwd=str(cwd),
         capture_output=True,
         text=True,
         check=False,
     )
+    sig = signal_exit(p.returncode)
+    if sig is not None:
+        raise Refusal(
+            f"prover tool {Path(argv[0]).name!r} exited by signal {sig} — a binary crash "
+            "or an external kill (run-bounded's memory cap is SIGKILL), not a logic "
+            f"error of the tool or the encoder; argv `{shlex.join(argv)}` in {cwd}; "
+            f"stderr: {p.stderr.strip()[-2000:] or '(empty)'}"
+        )
+    return p
 
 
 def tool_version(name: str, cwd: Path) -> str:
@@ -1316,17 +1348,18 @@ def _load_doc(path: Path) -> Any:
 REPORT_PATH_CONVENTION = (
     "paths are recorded relative to a named base, never as the absolute path of the "
     "checkout the encoder happened to run in (RT N5 on PR #703): `<repo>` = the QBP "
-    "checkout (`--repo`), `<evidence-repo>` = the toplevel in the evidence-repo identity "
-    "row, `<evidence-dir>` = `--evidence-dir`; a path under none of them is recorded as "
-    "given"
+    "checkout (`--repo`), `<evidence-repo>` = the toplevel of the git checkout "
+    "`--evidence-dir` lives in — the checkout the evidence-repo identity row (remote + "
+    "HEAD) names; its own path is never recorded (RT N7) — `<evidence-dir>` = "
+    "`--evidence-dir`; a path under none of them is recorded as given"
 )
 
 
 def record_path(p: Path, bases: List[Tuple[str, Optional[Path]]]) -> str:
     """`p` for the report: `<label>/<relative>` under the first of `bases` that contains
     it (each base's identity is on record elsewhere in the report — the evidence repo's
-    remote + HEAD + toplevel, the ledger's repo), else `p` as given. An ephemeral scratch
-    checkout or a review worktree is not the record (RT N5)."""
+    remote + HEAD, the ledger's repo), else `p` as given. An ephemeral scratch checkout
+    or a review worktree is not the record (RT N5), nor is its path (RT N7)."""
     rp = p.resolve()
     for label, base in bases:
         if base is None:
@@ -2337,8 +2370,7 @@ def build_report(
     md.append(f"| paths | {REPORT_PATH_CONVENTION} |")
     er = meta["evidence_repo"]
     md.append(
-        f"| evidence repo (RT N2) | remote `{er['remote']}`; HEAD `{er['head']}`; "
-        f"toplevel `{er['toplevel']}` |"
+        f"| evidence repo (RT N2) | remote `{er['remote']}`; HEAD `{er['head']}` |"
     )
     md.append(
         f"| evidence store sha (QBP#701 INTER_PIN) | `{meta.get('evidence_store_sha')}` |"
@@ -2507,39 +2539,46 @@ def build_report(
 EVIDENCE_REPO_UNKNOWN = "unknown (not a git checkout)"
 
 
+def _git_q(evidence_dir: Path, *args: str) -> Optional[str]:
+    """Trimmed stdout of `git -C <evidence_dir> <args>`, or None on failure / no output."""
+    p = subprocess.run(
+        ["git", "-C", str(evidence_dir), *args],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    s = p.stdout.strip()
+    return s if p.returncode == 0 and s else None
+
+
+def evidence_repo_toplevel(evidence_dir: Path) -> Optional[Path]:
+    """The toplevel of the git checkout `evidence_dir` lives in (`rev-parse
+    --show-toplevel`) — the `<evidence-repo>` base of `record_path`, never itself written
+    into the report (RT N7 on PR #703: a scratch checkout's path is not the record; remote
+    + HEAD already identify the store). None when `evidence_dir` is not in a checkout.
+    """
+    top = _git_q(evidence_dir, "rev-parse", "--show-toplevel")
+    return Path(top) if top else None
+
+
 def evidence_repo_identity(evidence_dir: Path) -> Dict[str, str]:
-    """{head, remote, toplevel} of the git checkout `evidence_dir` lives in — `git -C
-    <dir> rev-parse HEAD`, `remote get-url origin`, `rev-parse --show-toplevel` — so the
-    AC4 record names the canonical evidence commit (e.g. inter main `333134c`), not only
-    a local path. A directory that is not inside a git checkout records the explicit
-    string `unknown (not a git checkout)` in every field; nothing is ever omitted."""
-
-    def q(*args: str) -> Optional[str]:
-        p = subprocess.run(
-            ["git", "-C", str(evidence_dir), *args],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        s = p.stdout.strip()
-        return s if p.returncode == 0 and s else None
-
-    top = q("rev-parse", "--show-toplevel")
-    if top is None:
+    """{head, remote} of the git checkout `evidence_dir` lives in — `git -C <dir>
+    rev-parse HEAD`, `remote get-url origin` — so the AC4 record names the canonical
+    evidence commit (e.g. inter main `333134c`), not a local path. A directory that is
+    not inside a git checkout records the explicit string `unknown (not a git checkout)`
+    in every field; nothing is ever omitted. The checkout's own path is deliberately NOT
+    a field (RT N7 on PR #703): it would be the ephemeral worktree the run happened to
+    use, and `<evidence-repo>` in the record paths already stands for it."""
+    if evidence_repo_toplevel(evidence_dir) is None:
         return OrderedDict(
-            [
-                ("head", EVIDENCE_REPO_UNKNOWN),
-                ("remote", EVIDENCE_REPO_UNKNOWN),
-                ("toplevel", EVIDENCE_REPO_UNKNOWN),
-            ]
+            [("head", EVIDENCE_REPO_UNKNOWN), ("remote", EVIDENCE_REPO_UNKNOWN)]
         )
-    head = q("rev-parse", "HEAD")
-    remote = q("remote", "get-url", "origin")
+    head = _git_q(evidence_dir, "rev-parse", "HEAD")
+    remote = _git_q(evidence_dir, "remote", "get-url", "origin")
     return OrderedDict(
         [
             ("head", head if head and HEX40.match(head) else "unknown (no commits)"),
             ("remote", remote or "unknown (no origin remote)"),
-            ("toplevel", top),
         ]
     )
 
@@ -2658,11 +2697,9 @@ def run(
             else None
         )
         evidence_repo = evidence_repo_identity(evidence_dir)
-        ev_top = (
-            Path(evidence_repo["toplevel"])
-            if evidence_repo["toplevel"] != EVIDENCE_REPO_UNKNOWN
-            else None
-        )
+        ev_top = evidence_repo_toplevel(
+            evidence_dir
+        )  # the base only; never recorded (N7)
         meta = {
             "today": today,
             # RT N5: paths relative to a named base (REPORT_PATH_CONVENTION), never the
@@ -2751,7 +2788,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         + "; ".join(f"{k} {v}" for k, v in (rep.get("closure_toolchain") or {}).items())
     )
     print(
-        f"evidence repo: {er['remote']} @ {er['head']} (toplevel {er['toplevel']}); "
+        f"evidence repo: {er['remote']} @ {er['head']}; "
         f"stale proof_file pointers: {len(rep['stale_proof_file'])}; "
         f"no proof_file: {len(rep['no_proof_file'])}"
     )

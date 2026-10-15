@@ -12,12 +12,11 @@
     "require_signature": false
   },
   "evidence_dir": "<evidence-repo>/notary-evidence",
-  "path_convention": "paths are recorded relative to a named base, never as the absolute path of the checkout the encoder happened to run in (RT N5 on PR #703): `<repo>` = the QBP checkout (`--repo`), `<evidence-repo>` = the toplevel in the evidence-repo identity row, `<evidence-dir>` = `--evidence-dir`; a path under none of them is recorded as given",
+  "path_convention": "paths are recorded relative to a named base, never as the absolute path of the checkout the encoder happened to run in (RT N5 on PR #703): `<repo>` = the QBP checkout (`--repo`), `<evidence-repo>` = the toplevel of the git checkout `--evidence-dir` lives in — the checkout the evidence-repo identity row (remote + HEAD) names; its own path is never recorded (RT N7) — `<evidence-dir>` = `--evidence-dir`; a path under none of them is recorded as given",
   "evidence_store_sha": "e2ecce841e1f2f2ecd38750bec17f60c441ab12a",
   "evidence_repo": {
     "head": "e2ecce841e1f2f2ecd38750bec17f60c441ab12a",
-    "remote": "https://github.com/JamesPagetButler/inter.git",
-    "toplevel": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-e2ecce8"
+    "remote": "https://github.com/JamesPagetButler/inter.git"
   },
   "closure_toolchain": {
     "lean_toolchain": "leanprover/lean4:v4.30.0",

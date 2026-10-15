@@ -2594,10 +2594,12 @@ def test_evidence_repo_identity_no_commits_and_no_origin_are_explicit(tmp_path):
     ev = evrepo / "notary-evidence"
     ev.mkdir()
     got = enc.evidence_repo_identity(ev)
-    assert list(got) == ["head", "remote", "toplevel"]
+    assert list(got) == ["head", "remote"]  # RT N7: the checkout's path is not a field
     assert got["head"] == "unknown (no commits)"
     assert got["remote"] == "unknown (no origin remote)"
-    assert got["toplevel"] == str(evrepo.resolve())
+    assert (
+        enc.evidence_repo_toplevel(ev) == evrepo.resolve()
+    )  # the base, not the record
     assert all(isinstance(v, str) and v for v in got.values())
     # a remote under another name is still "no origin"; adding `origin` resolves it
     git(evrepo, "remote", "add", "upstream", "https://example.invalid/u.git")
@@ -2645,7 +2647,8 @@ def test_report_records_evidence_repo_identity_and_stale_proof_file(tmp_path):
             anchor("PROOF-hurwitz", kind="theory-external", proof_file="Hurwitz 1898"),
         ],
     )
-    # (1) the evidence dir is inside a git checkout: HEAD + origin + toplevel recorded
+    # (1) the evidence dir is inside a git checkout: HEAD + origin recorded (never the
+    # checkout's own path — RT N7)
     evrepo = tmp_path / "evrepo"
     evrepo.mkdir()
     git(evrepo, "init", "-q")
@@ -2668,10 +2671,12 @@ def test_report_records_evidence_repo_identity_and_stale_proof_file(tmp_path):
     assert out["report"]["evidence_repo"] == {
         "head": head,
         "remote": "https://github.com/JamesPagetButler/inter.git",
-        "toplevel": str(evrepo.resolve()),
     }
     md = (tmp_path / "report.md").read_text()
     assert head in md and "evidence repo (RT N2)" in md
+    assert str(evrepo.resolve()) not in md and str(evrepo.resolve()) not in json.dumps(
+        out["report"]["evidence_repo"]
+    )
     # AC5: the stale pointer is named; the citation sits under no_proof_file; both in json + md
     rep = out["report"]
     assert rep["stale_proof_file"] == [
@@ -2691,10 +2696,10 @@ def test_report_records_evidence_repo_identity_and_stale_proof_file(tmp_path):
     assert out2["report"]["evidence_repo"] == {
         "head": enc.EVIDENCE_REPO_UNKNOWN,
         "remote": enc.EVIDENCE_REPO_UNKNOWN,
-        "toplevel": enc.EVIDENCE_REPO_UNKNOWN,
     }
     assert "unknown (not a git checkout)" in (tmp_path / "report.md").read_text()
     assert enc.evidence_repo_identity(plain)["head"] == "unknown (not a git checkout)"
+    assert enc.evidence_repo_toplevel(plain) is None
 
 
 # real-repo reference values at master 516dfcb (QBP#696): the Fano headline / companion
@@ -2918,6 +2923,52 @@ def test_tool_wrapper_env_and_default():
         ):
             enc.require_tool("lake", "x")
         assert enc.missing_prover_tools() == ["lake", "agda", "coqdep"]
+
+
+def test_RT_N8_prover_tool_exiting_by_signal_is_named_in_the_refusal(tmp_path):
+    """RT N8 (PR #703) / Gemini: a prover tool that dies by signal is a binary crash (or
+    an external kill), not a logic error, and the Refusal says so — naming the TOOL and
+    the SIGNAL — once, in `run_tool`, for every tool. Both exit conventions: the tool
+    itself killed (subprocess rc < 0) and a wrapper (run-bounded / timeout / a shell)
+    reporting its child's signal as 128+N. An ordinary non-zero exit (rc 1, Agda's 42,
+    timeout's 124, a shell's 255) is NOT a signal and is returned to the caller as before.
+    Mutant (drop the signal naming in `run_tool`) ⇒ KILLED."""
+    import unittest.mock as um
+
+    fake = tmp_path / "fakelake"
+    fake.write_text("#!/bin/sh\nkill -SEGV $$\n")
+    fake.chmod(0o755)
+    wrap = tmp_path / "wrap"  # a shell wrapper: child's signal death ⇒ rc 128+11
+    wrap.write_text('#!/bin/sh\n"$@"\nexit $?\n')
+    wrap.chmod(0o755)
+    assert enc.signal_exit(-11) == "SIGSEGV (rc 139)"
+    assert enc.signal_exit(139) == "SIGSEGV (rc 139)"
+    assert enc.signal_exit(137) == "SIGKILL (rc 137)"  # run-bounded's memory cap
+    for rc in (0, 1, 42, 124, 128, 255):
+        assert enc.signal_exit(rc) is None, rc
+    # (a) the tool itself is killed: subprocess reports -11
+    with um.patch.dict(os.environ, {enc.PROVER_TOOL_WRAPPER_ENV: ""}):
+        with pytest.raises(SystemExit) as ei:
+            enc.run_tool([str(fake), "query", "--no-build"], tmp_path)
+    msg = str(ei.value)
+    assert msg.startswith(
+        "REFUSED: prover tool 'fakelake' exited by signal SIGSEGV (rc 139)"
+    )
+    assert "binary crash" in msg and "not a logic error" in msg
+    assert "query --no-build" in msg and str(tmp_path) in msg
+    # (b) a wrapper reports the child's signal as 128+N (run-bounded's convention)
+    with um.patch.dict(os.environ, {enc.PROVER_TOOL_WRAPPER_ENV: str(wrap)}):
+        assert enc.tool_wrapper() == [str(wrap)]
+        with pytest.raises(
+            SystemExit, match=r"'fakelake' exited by signal SIGSEGV \(rc 139\)"
+        ):
+            enc.run_tool([str(fake)], tmp_path)
+        # an ordinary failure under the same wrapper is not a refusal here
+        plain = tmp_path / "fails"
+        plain.write_text("#!/bin/sh\necho boom >&2\nexit 42\n")
+        plain.chmod(0o755)
+        p = enc.run_tool([str(plain)], tmp_path)
+        assert p.returncode == 42 and p.stderr.strip() == "boom"
 
 
 def test_pin_worktree_is_hermetic_and_refuses_unresolved_requires(
@@ -3191,10 +3242,14 @@ def test_RT_N5_report_paths_are_relative_to_named_bases_never_the_scratch_checko
     tmp_path,
 ):
     """RT N5 (PR #703): the report records `ledger` as `<repo>/…`, `evidence_dir` as
-    `<evidence-repo>/…` (the toplevel is in the identity row) and every record `file` as
-    `<evidence-dir>/…` — never the absolute path of the scratch checkout / review
-    worktree the run happened to use; the convention is stated in the report. A path
-    under no named base is recorded as given. Mutant (`str(p)`) ⇒ KILLED."""
+    `<evidence-repo>/…` and every record `file` as `<evidence-dir>/…` — never the
+    absolute path of the scratch checkout / review worktree the run happened to use; the
+    convention is stated in the report. A path under no named base is recorded as given.
+    RT N7: the evidence-repo identity row is remote + HEAD only — the checkout's
+    toplevel (an ephemeral `/tmp/…` worktree in the committed re-key report) is the
+    `<evidence-repo>` base and is NOT a field, so the WHOLE report (json + md) carries
+    no `/tmp/` and no `tmp_path` string. Mutants: `str(p)` for the record paths ⇒
+    KILLED; writing the raw toplevel into the identity row ⇒ KILLED."""
     repo = mk_repo(tmp_path, {"proofs/QBP/A.lean": "theorem a : True := trivial\n"})
     ledger_outside = mk_ledger(
         tmp_path, [anchor("PROOF-a", proof_file="proofs/QBP/A.lean", lean_theorem="a")]
@@ -3223,7 +3278,8 @@ def test_RT_N5_report_paths_are_relative_to_named_bases_never_the_scratch_checko
     rep = out["report"]
     assert rep["ledger"] == "<repo>/work/ledger.json"
     assert rep["evidence_dir"] == "<evidence-repo>/notary-evidence"
-    assert rep["evidence_repo"]["toplevel"] == str(evrepo.resolve())  # identity kept
+    assert set(rep["evidence_repo"]) == {"head", "remote"}  # N7: no toplevel field
+    assert "<evidence-repo>` = the toplevel" in rep["path_convention"]
     assert [i["file"] for i in rep["ignored_non_v2"]] == ["<evidence-dir>/junk.yaml"]
     assert [u["file"] for u in rep["unmatched_claim"]] == ["<evidence-dir>/other.json"]
     plant(
@@ -3239,20 +3295,24 @@ def test_RT_N5_report_paths_are_relative_to_named_bases_never_the_scratch_checko
     md = (tmp_path / "report.md").read_text()
     assert "| evidence dir | `<evidence-repo>/notary-evidence` |" in md
     assert "| ledger | `<repo>/work/ledger.json` |" in md
-    for key in (
-        "ledger",
-        "evidence_dir",
-        "ignored_non_v2",
-        "unmatched_claim",
-        "anchors",
-    ):
-        assert str(tmp_path) not in json.dumps(rep[key])
+    # N7: the whole WRITTEN report — the .json record and the .md — is free of the
+    # scratch path and of any `/tmp/` string (pytest's tmp_path is under the system temp
+    # dir, so a raw toplevel anywhere in the record fails both assertions; this is the
+    # `grep -c '/tmp/' <report>.json → 0` gate the committed re-key report must meet)
+    whole = (tmp_path / "report.json").read_text()
+    assert set(json.loads(whole)) == {k for k in rep if not k.startswith("_")}
+    assert str(tmp_path) not in whole and "/tmp/" not in whole
+    assert str(tmp_path) not in md and "/tmp/" not in md
+    assert str(tmp_path).startswith("/tmp/")  # the assertion above is non-vacuous
     # under no named base ⇒ as given (the identity row says `unknown` for a non-checkout)
     plain = tmp_path / "plain-ev"
     out2 = run_encoder(ledger_outside, repo, plain, tmp_path)
     assert out2["report"]["ledger"] == str(ledger_outside)
     assert out2["report"]["evidence_dir"] == str(plain)
-    assert out2["report"]["evidence_repo"]["toplevel"] == enc.EVIDENCE_REPO_UNKNOWN
+    assert out2["report"]["evidence_repo"] == {
+        "head": enc.EVIDENCE_REPO_UNKNOWN,
+        "remote": enc.EVIDENCE_REPO_UNKNOWN,
+    }
 
 
 def test_G_L1_unresolved_import_two_hops_down_refuses_naming_the_importer(tmp_path):
