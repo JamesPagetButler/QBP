@@ -1,22 +1,23 @@
 {
   "issue": "QBP#692",
-  "generated": "2026-10-10T00:00:00Z",
-  "ledger": "/home/prime/Documents/QBP/.claude/worktrees/probe-696-closure/archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json",
-  "ledger_version_before": "6.17.0",
+  "generated": "2026-10-15T00:00:00Z",
+  "ledger": "<repo>/archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json",
+  "ledger_version_before": "6.18.0",
   "ledger_version_after": "(no change)",
   "pinned_master_rev": "origin/master",
-  "pinned_master_commit": "3b73b248181de9c872d7c73665d6b6ec90ac24a8",
+  "pinned_master_commit": "6e6a3f390f92dbc7e4a71783a34b83b81b83583e",
   "engine": "confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158",
   "verifier": "attestation.StubV0",
   "policy": {
     "require_signature": false
   },
-  "evidence_dir": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence",
-  "evidence_store_sha": "333134cb61eb12a405c67203859f090f64750df1",
+  "evidence_dir": "<evidence-repo>/notary-evidence",
+  "path_convention": "paths are recorded relative to a named base, never as the absolute path of the checkout the encoder happened to run in (RT N5 on PR #703): `<repo>` = the QBP checkout (`--repo`), `<evidence-repo>` = the toplevel in the evidence-repo identity row, `<evidence-dir>` = `--evidence-dir`; a path under none of them is recorded as given",
+  "evidence_store_sha": "e2ecce841e1f2f2ecd38750bec17f60c441ab12a",
   "evidence_repo": {
-    "head": "333134cb61eb12a405c67203859f090f64750df1",
+    "head": "e2ecce841e1f2f2ecd38750bec17f60c441ab12a",
     "remote": "https://github.com/JamesPagetButler/inter.git",
-    "toplevel": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c"
+    "toplevel": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-e2ecce8"
   },
   "closure_toolchain": {
     "lean_toolchain": "leanprover/lean4:v4.30.0",
@@ -24,7 +25,7 @@
     "agda": "Agda version 2.8.0",
     "coqc": "The Coq Proof Assistant, version 8.15.0"
   },
-  "v2_record_count": 3,
+  "v2_record_count": 4,
   "target_anchor_count": 148,
   "targets_without_lean_theorem": {
     "count": 22,
@@ -146,7 +147,8 @@
   ],
   "changed_anchor_count": 0,
   "grade_distribution": {
-    "0/0": 146,
+    "0/0": 145,
+    "1/0": 1,
     "2/2": 2
   },
   "derivation_edges": [
@@ -679,31 +681,31 @@
   "drops": [],
   "ignored_non_v2": [
     {
-      "file": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-1-sandwich-mul-2026-05-29.yaml",
+      "file": "<evidence-dir>/cycle-1-sandwich-mul-2026-05-29.yaml",
       "reason": "not the engine v2 record shape (top-level keys: ['notary_metadata', 'verification_evidence'])"
     },
     {
-      "file": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-2-verdandi-authority-tla-2026-05-29.yaml",
+      "file": "<evidence-dir>/cycle-2-verdandi-authority-tla-2026-05-29.yaml",
       "reason": "not the engine v2 record shape (top-level keys: ['verification_evidence'])"
     },
     {
-      "file": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-3-cth-schema-vendoring-differential-2026-08-20.yaml",
+      "file": "<evidence-dir>/cycle-3-cth-schema-vendoring-differential-2026-08-20.yaml",
       "reason": "not the engine v2 record shape (top-level keys: ['verification_evidence'])"
     },
     {
-      "file": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-3-cth-schema-vendoring-differential-CORRECTION-2026-09-30.yaml",
+      "file": "<evidence-dir>/cycle-3-cth-schema-vendoring-differential-CORRECTION-2026-09-30.yaml",
       "reason": "not the engine v2 record shape (top-level keys: ['correction'])"
     },
     {
-      "file": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-4-cd-convention-intertwiner-ac5-2026-08-20.yaml",
+      "file": "<evidence-dir>/cycle-4-cd-convention-intertwiner-ac5-2026-08-20.yaml",
       "reason": "not the engine v2 record shape (top-level keys: ['verification_evidence'])"
     },
     {
-      "file": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-4-cd-convention-intertwiner-ac5-CORRECTION-2026-09-30.yaml",
+      "file": "<evidence-dir>/cycle-4-cd-convention-intertwiner-ac5-CORRECTION-2026-09-30.yaml",
       "reason": "not the engine v2 record shape (top-level keys: ['correction'])"
     },
     {
-      "file": "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-5-verdandi-attestation-floor-revoke-2026-09-16.yaml",
+      "file": "<evidence-dir>/cycle-5-verdandi-attestation-floor-revoke-2026-09-16.yaml",
       "reason": "not the engine v2 record shape (top-level keys: ['containment_addendum', 'red_team_response', 'verification_evidence'])"
     }
   ],
@@ -813,7 +815,7 @@
         ]
       },
       "evidence_files": [
-        "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-7-hessian-recompute-v2-2026-10-02.yaml"
+        "<evidence-dir>/cycle-7-hessian-recompute-v2-2026-10-02.yaml"
       ],
       "dropped_assistants": []
     },
@@ -1772,12 +1774,14 @@
     {
       "id": "PROOF-alpha-particle-quaternion",
       "provenance_kind": "derivation",
-      "before_pa_local": 0,
+      "before_pa_local": 1,
       "before_pa_effective": 0,
-      "after_pa_local": 0,
+      "after_pa_local": 1,
       "after_pa_effective": 0,
-      "clean_count": 0,
-      "assistants": [],
+      "clean_count": 1,
+      "assistants": [
+        "lean4"
+      ],
       "flags": [],
       "changed": false,
       "pinned_sha": "5237e2b14467eec3c88b262f63298c7fe81b3009",
@@ -1832,7 +1836,9 @@
           }
         ]
       },
-      "evidence_files": [],
+      "evidence_files": [
+        "<evidence-dir>/cycle-9-alpha-pa1-referent-2026-10-03.yaml"
+      ],
       "dropped_assistants": []
     },
     {
@@ -3974,7 +3980,7 @@
         ]
       },
       "evidence_files": [
-        "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-8-cd-headline-v2-2026-10-02.yaml"
+        "<evidence-dir>/cycle-8-cd-headline-v2-2026-10-02.yaml"
       ],
       "dropped_assistants": []
     },
@@ -11628,7 +11634,7 @@
         ]
       },
       "evidence_files": [
-        "/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-8-fano-companion-v2-2026-10-02.yaml"
+        "<evidence-dir>/cycle-8-fano-companion-v2-2026-10-02.yaml"
       ],
       "dropped_assistants": []
     }

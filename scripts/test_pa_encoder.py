@@ -352,7 +352,7 @@ def test_unmatched_claim_is_reported_not_graded(tmp_path):
     ledger = mk_ledger(tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean")])
     out = run_encoder(ledger, repo, ev, tmp_path)
     assert out["report"]["unmatched_claim"] == [
-        {"file": str(ev / "r.json"), "claim": "PROOF-nope"}
+        {"file": "<evidence-dir>/r.json", "claim": "PROOF-nope"}  # RT N5
     ]
     assert out["results"]["PROOF-a"]["evidence"] is None
 
@@ -1489,7 +1489,7 @@ def test_evidence_for_non_target_anchor_is_reported_not_graded(tmp_path):
     assert rep["unmatched_claim"] == []
     assert rep["evidence_for_non_target"] == [
         {
-            "file": str(ev / "meas.json"),
+            "file": "<evidence-dir>/meas.json",  # RT N5
             "claim": "MEAS-x",
             "provenance_kind": "measurement",
             "assistants": ["lean4"],
@@ -1986,7 +1986,11 @@ def test_refusal_names_record_file_and_claim(tmp_path):
         "REFUSED: PROOF-a: evidence_ref path 'proofs/DoesNotExist.lean'"
     )
     assert "does not exist at pinned master" in msg
-    assert f"claim 'PROOF-a' in record {rec}" in msg
+    # RT N5 (PR #703): the record is named relative to the `--evidence-dir` the operator
+    # passed, the same spelling the report uses — never the scratch checkout's path
+    assert rec.name == "companion-ref.json"
+    assert "claim 'PROOF-a' in record <evidence-dir>/companion-ref.json" in msg
+    assert str(ev) not in msg
     assert "dropped or kept" in msg
     # the unit function names the record(s) it is given; without them, the claim only
     with pytest.raises(
@@ -2423,13 +2427,18 @@ def test_N18_dry_run_registers_atexit_cleanup(tmp_path, monkeypatch):
         str(repo),
         "--dry-run",
     ]
-    # --dry-run without --report: the scratch dir exists AND its cleanup is registered
+    # --dry-run without --report: the scratch dir exists AND its cleanup is registered.
+    # (RT C2, PR #703: the pin-worktree belt `cleanup_pin_worktrees` is registered at most
+    # once per process too — it appears here only if no earlier test made a pin worktree.)
     assert enc.main(base) == 0
-    assert registered == [enc.cleanup_dry_run_scratch]
+    scratch_hooks = [f for f in registered if f is not enc.cleanup_pin_worktrees]
+    assert scratch_hooks == [enc.cleanup_dry_run_scratch]
+    assert registered.count(enc.cleanup_pin_worktrees) <= 1
     assert len(enc._DRY_RUN_SCRATCH) == 1 and enc._DRY_RUN_SCRATCH[0].exists()
     # a second scratch dir in the same process registers nothing new (one hook suffices)
+    n = len(registered)
     assert enc.main(base) == 0
-    assert registered == [enc.cleanup_dry_run_scratch]
+    assert len(registered) == n
     assert len(enc._DRY_RUN_SCRATCH) == 2
     gone = enc.cleanup_dry_run_scratch()
     assert len(gone) == 2 and not any(d.exists() for d in gone)
@@ -2949,7 +2958,7 @@ def test_pin_worktree_is_hermetic_and_refuses_unresolved_requires(
     )
     monkeypatch.setenv(enc.LAKE_PACKAGES_ENV, str(pkgs))
     monkeypatch.setenv(enc.LAKE_MANIFEST_ENV, str(man))
-    with pytest.raises(SystemExit, match="resolves no package to it") as ei:
+    with pytest.raises(SystemExit, match="resolves 'mathlib' to .*, not to it") as ei:
         enc.pin_worktree(repo, c0)
     assert "c5ea00351c28e24afc9f0f84379aa41082b1188f" in str(ei.value)
     # a resolving manifest: worktree made, manifest copied, packages symlinked
@@ -2983,6 +2992,267 @@ def test_pin_worktree_is_hermetic_and_refuses_unresolved_requires(
     assert wt in gone and wt1 in gone
     assert not wt.exists() and not wt1.exists()
     assert str(wt) not in git(repo, "worktree", "list", "--porcelain")
+
+
+def test_RT_N3_manifest_check_is_per_named_package(tmp_path, monkeypatch):
+    """RT N3 (PR #703): the G-L2 manifest check matches the pinned rev against the NAMED
+    package's `rev` / `inputRev`, not any package's — a manifest whose `batteries` sits
+    at the wanted sha while `mathlib` is elsewhere refuses naming `mathlib` and the rev
+    it actually resolves to; a manifest that lists no `mathlib` at all refuses too.
+    Mutant (any-package match, the previous code) ⇒ no refusal ⇒ KILLED."""
+    REQ = (
+        "import Lake\nopen Lake DSL\n"
+        'require mathlib from git\n  "https://example.invalid/m.git" @ '
+        '"c5ea00351c28e24afc9f0f84379aa41082b1188f"\n'
+        "package «P» where\nlean_lib «QBP» where\n  roots := #[`QBP]\n"
+    )
+    repo = mk_repo(
+        tmp_path,
+        {"proofs/lakefile.lean": REQ, "proofs/QBP.lean": "def q := 1\n"},
+        skip_without_tools=False,
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    assert enc.lake_requires(repo, c0) == (
+        "proofs/lakefile.lean",
+        [("mathlib", "c5ea00351c28e24afc9f0f84379aa41082b1188f")],
+    )
+    pkgs = tmp_path / "pkgs"
+    pkgs.mkdir()
+    man = tmp_path / "lake-manifest.json"
+    monkeypatch.setenv(enc.LAKE_PACKAGES_ENV, str(pkgs))
+    monkeypatch.setenv(enc.LAKE_MANIFEST_ENV, str(man))
+    # another package at the wanted rev proves nothing about mathlib
+    man.write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "name": "batteries",
+                        "rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+                    },
+                    {"name": "mathlib", "rev": "f" * 40, "inputRev": "x"},
+                ]
+            }
+        )
+    )
+    with pytest.raises(SystemExit) as ei:
+        enc.pin_worktree(repo, c0)
+    msg = str(ei.value)
+    assert (
+        "requires package 'mathlib' at rev 'c5ea00351c28e24afc9f0f84379aa41082b1188f'"
+        in msg
+    )
+    assert "resolves 'mathlib' to '" + "f" * 40 + "', 'x', not to it" in msg
+    assert enc._PIN_SCRATCH == [] or enc.cleanup_pin_worktrees() is not None
+    # no package of that name at all
+    man.write_text(json.dumps({"packages": [{"name": "batteries", "rev": "a" * 40}]}))
+    with pytest.raises(SystemExit, match="lists no package named 'mathlib'"):
+        enc.pin_worktree(repo, c0)
+    enc.cleanup_pin_worktrees()
+    # a tag/branch pin is recorded as None and not checked (N1 — qbp-implementor's)
+    c1 = commit(
+        repo,
+        {
+            "proofs/lakefile.lean": REQ.replace(
+                "c5ea00351c28e24afc9f0f84379aa41082b1188f", "v4.30.0"
+            )
+        },
+        "tag pin",
+    )
+    assert enc.lake_requires(repo, c1) == ("proofs/lakefile.lean", [("mathlib", None)])
+    enc.cleanup_pin_worktrees()
+
+
+def test_RT_N2_pin_worktree_lends_dependencies_to_a_lakefile_toml_pin(
+    tmp_path, monkeypatch
+):
+    """RT N2 (PR #703): `lean_workspace` accepts `proofs/lakefile.toml`, so `pin_worktree`
+    must read its `[[require]]` tables too — otherwise a TOML pin got no lent packages /
+    manifest and Lake would fetch. Same refusals as the `.lean` form (nothing lent;
+    manifest resolving `mathlib` elsewhere), same lending when it resolves. Mutant
+    (`pin_worktree` reads only `lakefile.lean`) ⇒ no refusal, nothing lent ⇒ KILLED."""
+    monkeypatch.delenv(enc.LAKE_PACKAGES_ENV, raising=False)
+    monkeypatch.delenv(enc.LAKE_MANIFEST_ENV, raising=False)
+    TOML = (
+        'name = "P"\n\n[[require]]\nname = "mathlib"\n'
+        'git = "https://example.invalid/m.git"\n'
+        'rev = "c5ea00351c28e24afc9f0f84379aa41082b1188f"\n\n'
+        '[[lean_lib]]\nname = "QBP"\n'
+    )
+    repo = mk_repo(
+        tmp_path,
+        {"proofs/lakefile.toml": TOML, "proofs/QBP.lean": "def q := 1\n"},
+        lakefile=False,
+        skip_without_tools=False,
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    assert not (repo / "proofs/lakefile.lean").exists()
+    assert enc.lake_requires(repo, c0) == (
+        "proofs/lakefile.toml",
+        [("mathlib", "c5ea00351c28e24afc9f0f84379aa41082b1188f")],
+    )
+    with pytest.raises(SystemExit) as ei:
+        enc.pin_worktree(repo, c0)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: proofs/lakefile.toml at pinned master")
+    assert "has a `require`" in msg and "G-L2" in msg
+    enc.cleanup_pin_worktrees()
+    pkgs = tmp_path / "pkgs"
+    pkgs.mkdir()
+    man = tmp_path / "lake-manifest.json"
+    monkeypatch.setenv(enc.LAKE_PACKAGES_ENV, str(pkgs))
+    monkeypatch.setenv(enc.LAKE_MANIFEST_ENV, str(man))
+    man.write_text(json.dumps({"packages": [{"name": "mathlib", "rev": "f" * 40}]}))
+    with pytest.raises(SystemExit, match="proofs/lakefile.toml .* not to it"):
+        enc.pin_worktree(repo, c0)
+    enc.cleanup_pin_worktrees()
+    man.write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "name": "mathlib",
+                        "rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+                    }
+                ]
+            }
+        )
+    )
+    wt = enc.pin_worktree(repo, c0)
+    assert (wt / "proofs/lake-manifest.json").read_text() == man.read_text()
+    assert (wt / "proofs/.lake/packages").is_symlink()
+    assert (wt / "proofs/.lake/packages").resolve() == pkgs.resolve()
+    enc.cleanup_pin_worktrees()
+    # a `[[require]]` without a name cannot be checked ⇒ refusal, not a skipped check
+    c1 = commit(
+        repo, {"proofs/lakefile.toml": TOML.replace('name = "mathlib"\n', "")}, "n"
+    )
+    with pytest.raises(SystemExit, match="without a `name`"):
+        enc.lake_requires(repo, c1)
+
+
+def test_RT_N4_toml_fallback_refuses_a_non_string_array_element(monkeypatch):
+    """RT N4 (PR #703): with neither `tomllib` nor `tomli` importable, the fallback reader
+    of Lake's `translate-config toml` output refuses a non-string array element instead
+    of dropping it silently (the shape Lake emits is lists of strings only). Mutant
+    (findall the strings, ignore the rest — the previous code) ⇒ `["QBP"]` ⇒ KILLED."""
+    monkeypatch.setitem(sys.modules, "tomllib", None)
+    monkeypatch.setitem(sys.modules, "tomli", None)
+    good = 'name = "P"\n[[lean_lib]]\nname = "QBP"\nroots = ["QBP", "QBP.A"]\n'
+    assert enc.read_lake_toml(good) == {
+        "name": "P",
+        "lean_lib": [{"name": "QBP", "roots": ["QBP", "QBP.A"]}],
+    }
+    assert enc.read_lake_toml('roots = []\nx = ["a",]\n') == {"roots": [], "x": ["a"]}
+    for bad in (
+        'roots = ["QBP", 1]',
+        "roots = [QBP]",
+        'roots = ["QBP", true]',
+        'roots = ["QBP" "B"]',
+    ):
+        with pytest.raises(SystemExit, match="non-string array element") as ei:
+            enc.read_lake_toml(f'name = "P"\n[[lean_lib]]\n{bad}\n')
+        assert bad in str(ei.value)
+
+
+def test_RT_C2_run_removes_the_pin_worktree_in_finally_not_only_atexit(tmp_path):
+    """RT C2 (PR #703): `run()` removes the pin worktree(s) it made when it ends — on
+    success AND when it ends in a Refusal (a `SystemExit` raised two tool calls in) —
+    without waiting for atexit or for a caller's `cleanup_pin_worktrees()`. Checked on
+    git's own register (`git worktree list`): only the main worktree remains. Mutant
+    (no `finally`) ⇒ the pin worktree stays registered until exit ⇒ KILLED."""
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import QBP.Defs\ntheorem a : True := trivial\n",
+            "proofs/QBP/Defs.lean": "def d := 1\n",
+        },
+    )
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/QBP/A.lean", lean_theorem="a")]
+    )
+
+    def registered() -> int:
+        return git(repo, "worktree", "list", "--porcelain").count("worktree ")
+
+    assert registered() == 1
+    run_encoder(ledger, repo, tmp_path / "ev", tmp_path)
+    assert registered() == 1 and enc._PIN_SCRATCH == [] and enc._PIN_WORKTREES == {}
+    # a Refusal after the pin worktree exists (G-L1: an import Lake cannot resolve)
+    commit(
+        repo, {"proofs/QBP/Defs.lean": "import Nonexistent.Mod\ndef d := 1\n"}, "bad"
+    )
+    with pytest.raises(SystemExit, match="Nonexistent.Mod"):
+        run_encoder(ledger, repo, tmp_path / "ev", tmp_path)
+    assert registered() == 1 and enc._PIN_SCRATCH == [] and enc._PIN_WORKTREES == {}
+
+
+def test_RT_N5_report_paths_are_relative_to_named_bases_never_the_scratch_checkout(
+    tmp_path,
+):
+    """RT N5 (PR #703): the report records `ledger` as `<repo>/…`, `evidence_dir` as
+    `<evidence-repo>/…` (the toplevel is in the identity row) and every record `file` as
+    `<evidence-dir>/…` — never the absolute path of the scratch checkout / review
+    worktree the run happened to use; the convention is stated in the report. A path
+    under no named base is recorded as given. Mutant (`str(p)`) ⇒ KILLED."""
+    repo = mk_repo(tmp_path, {"proofs/QBP/A.lean": "theorem a : True := trivial\n"})
+    ledger_outside = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/QBP/A.lean", lean_theorem="a")]
+    )
+    ledger = repo / "work" / "ledger.json"
+    ledger.parent.mkdir()
+    ledger.write_text(ledger_outside.read_text())
+    evrepo = tmp_path / "evrepo"
+    evrepo.mkdir()
+    git(evrepo, "init", "-q")
+    git(evrepo, "config", "user.email", "t@e.st")
+    git(evrepo, "config", "user.name", "t")
+    ev = evrepo / "notary-evidence"
+    ev.mkdir()
+    (ev / "junk.yaml").write_text("a: 1\n")
+    plant(
+        ev,
+        "other.json",
+        evidence_from_fixture(
+            "01_lean_clean.json", "NOT-AN-ANCHOR", "proofs/QBP/A.lean"
+        ),
+    )
+    git(evrepo, "add", "-A")
+    git(evrepo, "commit", "-q", "-m", "c")
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    rep = out["report"]
+    assert rep["ledger"] == "<repo>/work/ledger.json"
+    assert rep["evidence_dir"] == "<evidence-repo>/notary-evidence"
+    assert rep["evidence_repo"]["toplevel"] == str(evrepo.resolve())  # identity kept
+    assert [i["file"] for i in rep["ignored_non_v2"]] == ["<evidence-dir>/junk.yaml"]
+    assert [u["file"] for u in rep["unmatched_claim"]] == ["<evidence-dir>/other.json"]
+    plant(
+        ev,
+        "a.json",
+        evidence_from_fixture("01_lean_clean.json", "PROOF-a", "proofs/QBP/A.lean"),
+    )
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    rep = out["report"]
+    row = next(r for r in rep["anchors"] if r["id"] == "PROOF-a")
+    assert row["evidence_files"] == ["<evidence-dir>/a.json"]  # per-anchor records too
+    assert "RT N5" in rep["path_convention"]
+    md = (tmp_path / "report.md").read_text()
+    assert "| evidence dir | `<evidence-repo>/notary-evidence` |" in md
+    assert "| ledger | `<repo>/work/ledger.json` |" in md
+    for key in (
+        "ledger",
+        "evidence_dir",
+        "ignored_non_v2",
+        "unmatched_claim",
+        "anchors",
+    ):
+        assert str(tmp_path) not in json.dumps(rep[key])
+    # under no named base ⇒ as given (the identity row says `unknown` for a non-checkout)
+    plain = tmp_path / "plain-ev"
+    out2 = run_encoder(ledger_outside, repo, plain, tmp_path)
+    assert out2["report"]["ledger"] == str(ledger_outside)
+    assert out2["report"]["evidence_dir"] == str(plain)
+    assert out2["report"]["evidence_repo"]["toplevel"] == enc.EVIDENCE_REPO_UNKNOWN
 
 
 def test_G_L1_unresolved_import_two_hops_down_refuses_naming_the_importer(tmp_path):

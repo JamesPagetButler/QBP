@@ -35,7 +35,8 @@ Pipeline
    re-implementation of module resolution is a load-bearing float): each prover's import
    closure is derived from THAT PROVER'S OWN DEPENDENCY TOOL at the pinned commit, never
    from a parser we maintain. The tools run in a HERMETIC PIN CHECKOUT (`pin_worktree`):
-   a temporary detached `git worktree` of the pin (one per run, removed at exit), with
+   a temporary detached `git worktree` of the pin (one per run, removed in `run()`'s
+   `finally` — atexit is the belt), with
    the running checkout's `proofs/.lake/packages` SYMLINKED in (never copied or fetched)
    and its gitignored `proofs/lake-manifest.json` COPIED in — refused if absent while the
    pin's lakefile has a `require`, and refused if the manifest does not resolve the revs
@@ -255,6 +256,9 @@ LEAN_ASSISTANT = "lean4"
 # resolution is a load-bearing float). See the module doc §3 and `pin_worktree`.
 LEAN_SRC_ROOT = "proofs"
 LAKEFILE = "proofs/lakefile.lean"
+LAKEFILE_TOML = (
+    "proofs/lakefile.toml"  # Lake accepts either; so does `pin_worktree` (RT N2)
+)
 LEAN_TOOLCHAIN_FILE = "proofs/lean-toolchain"
 LAKE_MANIFEST = "proofs/lake-manifest.json"
 LAKE_PACKAGES_DIR = "proofs/.lake/packages"
@@ -290,7 +294,14 @@ PROVER_TOOLS = ("lake", "agda", "coqdep")
 # into the shared packages checkout). Not a parser: a `require` is only ever recognised
 # as "present", and a rev only ever as "must be in the manifest".
 LAKE_REQUIRE_REV_RE = re.compile(r'@\s*"([0-9a-f]{7,40})"')
-LAKE_REQUIRE_RE = re.compile(r"^\s*require\b", re.M)
+# one `require` statement of a `lakefile.lean`: the package name (`«n»`, `"n"` or bare),
+# then its text up to the next column-0 declaration (RT N3: the manifest check is per NAMED
+# package — the pinned rev must be THAT package's rev, not any package's)
+LAKE_REQUIRE_STMT_RE = re.compile(
+    r'^[ \t]*require\s+(?:«([^»]+)»|"([^"]+)"|(\S+))', re.M
+)
+LAKE_DECL_START_RE = re.compile(r"^(?:[A-Za-z_]|@\[)", re.M)
+HEX_REV_RE = re.compile(r"^[0-9a-f]{7,40}$")
 # Agda's own module → file record: one `Checking <M> (<path>).` stdout line per module it
 # type-checks from source (G-A1: printed only when no fresh interface exists — hence the
 # clean-interface assertion in `agda_closure`, architecture condition 2).
@@ -436,6 +447,7 @@ def tool_version(name: str, cwd: Path) -> str:
 # ---- hermetic pin checkout --------------------------------------------------------------
 _PIN_WORKTREES: Dict[Tuple[str, str], Path] = {}
 _PIN_SCRATCH: List[Tuple[Path, Path, Path]] = []  # (repo, scratch parent, worktree)
+_PIN_ATEXIT_REGISTERED = False  # the belt is registered once per process (RT C2)
 
 
 def _main_worktree(repo: Path) -> Optional[Path]:
@@ -468,43 +480,106 @@ def lake_dependency_sources(repo: Path) -> Tuple[Optional[Path], Optional[Path]]
     return pkgs, man
 
 
+def lake_requires(
+    repo: Path, commit: str
+) -> Optional[Tuple[str, List[Tuple[str, Optional[str]]]]]:
+    """(lakefile path, [(package, pinned hex rev or None)]) for the Lake configuration at
+    the pin — `proofs/lakefile.lean` (each `require` statement: its name, and the
+    `@ "<hex>"` inside that statement) or, failing that, `proofs/lakefile.toml` (the
+    `[[require]]` tables via `read_lake_toml`: `name`, `rev`) — or None when the pin has
+    neither (RT N2: `pin_worktree` lends dependencies to a TOML pin too, and refuses on
+    the same conditions, so Lake can never be left to fetch). A rev that is not a hex sha
+    (a tag / branch — N1, qbp-implementor's G-L2 PR) is recorded as None, as before."""
+    blob = blob_sha(repo, commit, LAKEFILE)
+    if blob is not None:
+        text = blob_text(repo, blob)
+        out: List[Tuple[str, Optional[str]]] = []
+        starts = list(LAKE_REQUIRE_STMT_RE.finditer(text))
+        for i, m in enumerate(starts):
+            name = next(g for g in m.groups() if g is not None)
+            end = starts[i + 1].start() if i + 1 < len(starts) else len(text)
+            nxt = LAKE_DECL_START_RE.search(text, m.end(), end)
+            chunk = text[m.end() : nxt.start() if nxt else end]
+            revs = LAKE_REQUIRE_REV_RE.findall(chunk)
+            out.append((name, revs[0] if revs else None))
+        return LAKEFILE, out
+    blob = blob_sha(repo, commit, LAKEFILE_TOML)
+    if blob is None:
+        return None
+    cfg = read_lake_toml(blob_text(repo, blob))
+    out = []
+    for t in cfg.get("require", []) or []:
+        name = t.get("name") if isinstance(t, dict) else None
+        if not isinstance(name, str) or not name:
+            raise Refusal(
+                f"{LAKEFILE_TOML} at pinned master {commit[:12]} has a `[[require]]` "
+                f"without a `name` ({t!r}); the dependency cannot be checked against the "
+                "manifest — refusing (QBP#700 G-L2)"
+            )
+        rev = t.get("rev")
+        out.append(
+            (name, rev if isinstance(rev, str) and HEX_REV_RE.match(rev) else None)
+        )
+    return LAKEFILE_TOML, out
+
+
 def _check_manifest_resolves_pin(
-    lakefile_text: str, manifest_path: Path, commit: str
+    lakefile: str,
+    requires: List[Tuple[str, Optional[str]]],
+    manifest_path: Path,
+    commit: str,
 ) -> None:
-    """G-L2: every `@ "<rev>"` the pin's lakefile requires must already be a package rev
-    in the manifest Lake is handed; otherwise Lake would resolve over the network and the
-    result would not be the pin's. Documented, not solved here (owner qbp-implementor).
-    """
+    """G-L2: every package the pin's lakefile requires at an `@ "<rev>"` must be resolved
+    BY NAME in the manifest Lake is handed to a `rev` / `inputRev` matching that rev (RT
+    N3: another package at the wanted rev proves nothing); otherwise Lake would resolve
+    over the network and the result would not be the pin's. Documented, not solved here
+    (owner qbp-implementor)."""
     try:
         man = json.loads(manifest_path.read_text(encoding="utf-8"))
-        revs = set()
+        by_name: Dict[str, List[str]] = {}
         for pkg in man.get("packages", []):
-            for k in ("rev", "inputRev"):
-                v = pkg.get(k)
-                if isinstance(v, str):
-                    revs.add(v)
-    except (OSError, ValueError) as e:
+            if isinstance(pkg, dict) and isinstance(pkg.get("name"), str):
+                by_name[pkg["name"]] = [
+                    pkg[k] for k in ("rev", "inputRev") if isinstance(pkg.get(k), str)
+                ]
+    except (OSError, ValueError, AttributeError) as e:
         raise Refusal(f"{manifest_path} is not a readable Lake manifest: {e}")
-    for want in LAKE_REQUIRE_REV_RE.findall(lakefile_text):
-        if not any(r.startswith(want) or want.startswith(r) for r in revs):
+    why = (
+        f"the manifest {manifest_path} (copied in, since {LAKE_MANIFEST} is gitignored — "
+        "QBP#700 G-L2)"
+    )
+    tail = (
+        "; Lake would fetch over the network and the closure would not be the pin's — "
+        "refusing (track the manifest, or run against a checkout whose packages match "
+        "the pin)"
+    )
+    for name, want in requires:
+        if want is None:
+            continue
+        if name not in by_name:
             raise Refusal(
-                f"{LAKEFILE} at pinned master {commit[:12]} requires a dependency at rev "
-                f"{want!r} but the manifest {manifest_path} (copied in, since "
-                f"{LAKE_MANIFEST} is gitignored — QBP#700 G-L2) resolves no package to "
-                "it; Lake would fetch over the network and the closure would not be the "
-                "pin's — refusing (track the manifest, or run against a checkout whose "
-                "packages match the pin)"
+                f"{lakefile} at pinned master {commit[:12]} requires package {name!r} at "
+                f"rev {want!r} but {why} lists no package named {name!r}{tail}"
+            )
+        have = by_name[name]
+        if not any(r.startswith(want) or want.startswith(r) for r in have):
+            raise Refusal(
+                f"{lakefile} at pinned master {commit[:12]} requires package {name!r} at "
+                f"rev {want!r} but {why} resolves {name!r} to "
+                f"{', '.join(repr(r) for r in have) or 'no rev'}, not to it{tail}"
             )
 
 
 def pin_worktree(repo: Path, commit: str) -> Path:
     """A temporary, detached `git worktree` of `commit` (one per (repo, pin) per process,
-    removed at exit — `cleanup_pin_worktrees`), with the running checkout's Lake
+    removed by `run()`'s `finally` — `cleanup_pin_worktrees`; atexit is the belt for
+    callers that bypass `run()`), with the running checkout's Lake
     dependency sources SYMLINKED in (`proofs/.lake/packages`, 7 GB of Mathlib — never
     copied, never fetched) and its `proofs/lake-manifest.json` COPIED in (gitignored, so
-    the pin carries none; G-L2 verified by `_check_manifest_resolves_pin`). A pin whose
-    lakefile has a `require` while the running checkout has neither ⇒ refusal (Lake
-    would fetch). The prover tools run here, so every path they report is the pin's."""
+    the pin carries none; G-L2 verified by `_check_manifest_resolves_pin`, per named
+    package). A pin whose lakefile (`.lean` or `.toml` — RT N2) has a `require` while
+    the running checkout has neither ⇒ refusal (Lake would fetch). The prover tools run
+    here, so every path they report is the pin's."""
     key = (str(repo), commit)
     if key in _PIN_WORKTREES:
         return _PIN_WORKTREES[key]
@@ -516,17 +591,20 @@ def pin_worktree(repo: Path, commit: str) -> Path:
         raise Refusal(
             f"git worktree add of pinned master {commit[:12]} failed: {p.stderr.strip()}"
         )
-    if not _PIN_SCRATCH:
+    global _PIN_ATEXIT_REGISTERED
+    if not _PIN_ATEXIT_REGISTERED:
+        # the belt: `run()` removes its worktrees in `finally`; atexit covers a caller
+        # that uses `pin_worktree` directly and never cleans up
         atexit.register(cleanup_pin_worktrees)
+        _PIN_ATEXIT_REGISTERED = True
     _PIN_SCRATCH.append((repo, parent, wt))
-    lakefile_blob = blob_sha(repo, commit, LAKEFILE)
-    if lakefile_blob is not None:
-        text = blob_text(repo, lakefile_blob)
+    reqs = lake_requires(repo, commit)
+    if reqs is not None:
+        lakefile, requires = reqs
         pkgs, man = lake_dependency_sources(repo)
-        needs_deps = LAKE_REQUIRE_RE.search(text) is not None
-        if needs_deps and (pkgs is None or man is None):
+        if requires and (pkgs is None or man is None):
             raise Refusal(
-                f"{LAKEFILE} at pinned master {commit[:12]} has a `require`, but the "
+                f"{lakefile} at pinned master {commit[:12]} has a `require`, but the "
                 f"running checkout offers {'no ' + LAKE_PACKAGES_DIR if pkgs is None else ''}"
                 f"{' and ' if pkgs is None and man is None else ''}"
                 f"{'no ' + LAKE_MANIFEST if man is None else ''} to lend the pin "
@@ -539,7 +617,7 @@ def pin_worktree(repo: Path, commit: str) -> Path:
             if not dest.exists():
                 dest.symlink_to(pkgs.resolve(), target_is_directory=True)
         if man is not None:
-            _check_manifest_resolves_pin(text, man, commit)
+            _check_manifest_resolves_pin(lakefile, requires, man, commit)
             shutil.copyfile(man, wt / LAKE_MANIFEST)
     _PIN_WORKTREES[key] = wt
     return wt
@@ -634,8 +712,9 @@ def read_lake_toml(text: str) -> Dict[str, Any]:
     top-level keys and `[[table]]` arrays. `tomllib` (3.11+) or `tomli` when available;
     else a reader of exactly the shape Lake's own emitter writes — one `key = value`
     per line, values a `"string"`, `["array", "of", "strings"]`, `true`/`false` or a
-    number — refusing on any other line (Lake's output is machine-written, so an
-    unrecognised line means the emitter changed, not that a comment slipped in)."""
+    number — refusing on any other line or array element (Lake's output is
+    machine-written, so an unrecognised shape means the emitter changed, not that a
+    comment slipped in; RT N4: a non-string element is refused, never dropped)."""
     try:  # pragma: no cover — depends on the interpreter
         import tomllib  # type: ignore
 
@@ -670,6 +749,16 @@ def read_lake_toml(text: str) -> Dict[str, Any]:
         elif re.fullmatch(r'"(?:[^"\\]|\\.)*"', val):
             cur[key] = json.loads(val)
         elif val.startswith("[") and val.endswith("]"):
+            # exactly a list of strings (optional trailing comma); any other element —
+            # a bare word, a number, a nested table — is refused, never dropped (RT N4)
+            if not re.fullmatch(
+                r'\[\s*(?:"(?:[^"\\]|\\.)*"\s*(?:,\s*"(?:[^"\\]|\\.)*"\s*)*,?\s*)?\]',
+                val,
+            ):
+                raise Refusal(
+                    "non-string array element in Lake's translate-config output: "
+                    f"{ln!r}"
+                )
             items = re.findall(r'"(?:[^"\\]|\\.)*"', val)
             cur[key] = [json.loads(i) for i in items]
         elif re.fullmatch(r"-?\d+", val):
@@ -1224,6 +1313,32 @@ def _load_doc(path: Path) -> Any:
     return yaml.safe_load(text)
 
 
+REPORT_PATH_CONVENTION = (
+    "paths are recorded relative to a named base, never as the absolute path of the "
+    "checkout the encoder happened to run in (RT N5 on PR #703): `<repo>` = the QBP "
+    "checkout (`--repo`), `<evidence-repo>` = the toplevel in the evidence-repo identity "
+    "row, `<evidence-dir>` = `--evidence-dir`; a path under none of them is recorded as "
+    "given"
+)
+
+
+def record_path(p: Path, bases: List[Tuple[str, Optional[Path]]]) -> str:
+    """`p` for the report: `<label>/<relative>` under the first of `bases` that contains
+    it (each base's identity is on record elsewhere in the report — the evidence repo's
+    remote + HEAD + toplevel, the ledger's repo), else `p` as given. An ephemeral scratch
+    checkout or a review worktree is not the record (RT N5)."""
+    rp = p.resolve()
+    for label, base in bases:
+        if base is None:
+            continue
+        try:
+            rel = rp.relative_to(base.resolve())
+        except ValueError:
+            continue
+        return label if str(rel) == "." else f"{label}/{rel.as_posix()}"
+    return str(p)
+
+
 def load_evidence(
     evidence_dir: Path,
 ) -> Tuple[List[Tuple[Path, Dict[str, Any]]], List[Dict[str, str]]]:
@@ -1248,7 +1363,7 @@ def load_evidence(
             )
             ignored.append(
                 {
-                    "file": str(p),
+                    "file": record_path(p, [("<evidence-dir>", evidence_dir)]),
                     "reason": f"not the engine v2 record shape (top-level keys: {top})",
                 }
             )
@@ -1260,6 +1375,7 @@ def group_by_claim(
     anchor_ids: set,
     target_ids: Optional[set] = None,
     kinds: Optional[Dict[str, Any]] = None,
+    evidence_dir: Optional[Path] = None,
 ) -> Tuple[
     Dict[str, List[Tuple[Path, Dict[str, Any]]]],
     List[Dict[str, str]],
@@ -1268,19 +1384,21 @@ def group_by_claim(
     """(by_claim over TARGET anchors, unmatched_claim, evidence_for_non_target). A record
     whose claim is a ledger anchor but not a target anchor (e.g. a MEAS-*) is listed, not
     graded and not silently dropped (RT N3a). `target_ids=None` ⇒ every anchor is a target
-    (tests of the merge path)."""
+    (tests of the merge path). `evidence_dir` is the base the record paths are written
+    relative to (`<evidence-dir>/…`, RT N5); None ⇒ as given."""
     by_claim: Dict[str, List[Tuple[Path, Dict[str, Any]]]] = OrderedDict()
     unmatched: List[Dict[str, str]] = []
     non_target: List[Dict[str, Any]] = []
+    bases: List[Tuple[str, Optional[Path]]] = [("<evidence-dir>", evidence_dir)]
     for p, doc in records:
         cid = doc["claim"]
         if cid not in anchor_ids:
-            unmatched.append({"file": str(p), "claim": cid})
+            unmatched.append({"file": record_path(p, bases), "claim": cid})
             continue
         if target_ids is not None and cid not in target_ids:
             non_target.append(
                 {
-                    "file": str(p),
+                    "file": record_path(p, bases),
                     "claim": cid,
                     "provenance_kind": (kinds or {}).get(cid),
                     "assistants": [
@@ -1364,11 +1482,14 @@ def evidence_ref_path(ref: Any) -> str:
 
 
 def merge_claim_records(
-    cid: str, recs: List[Tuple[Path, Dict[str, Any]]]
+    cid: str,
+    recs: List[Tuple[Path, Dict[str, Any]]],
+    evidence_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Fold one anchor's v2 records into the engine inputs: assistants concatenated in
     file order; the correspondence block from the single record that asserts one (two
-    asserting records are ambiguous ⇒ refuse); corroborated_by unioned."""
+    asserting records are ambiguous ⇒ refuse); corroborated_by unioned. `files` are
+    recorded as `<evidence-dir>/…` when `evidence_dir` is given (RT N5)."""
     assistants: List[Dict[str, Any]] = []
     corr: Optional[Dict[str, Any]] = None
     corr_src: Optional[Path] = None
@@ -1403,7 +1524,7 @@ def merge_claim_records(
         "correspondence": corr,  # engine fields only
         "correspondence_maps": maps,  # encoder-side target pairs (never sent)
         "corroborated_by": corroborated,
-        "files": [str(p) for p, _ in recs],
+        "files": [record_path(p, [("<evidence-dir>", evidence_dir)]) for p, _ in recs],
     }
 
 
@@ -1805,16 +1926,18 @@ def grade_ledger(
     by_claim: Dict[str, List[Tuple[Path, Dict[str, Any]]]],
     repo: Path,
     commit: str,
+    evidence_dir: Optional[Path] = None,
 ) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:
     """Grade every target anchor. Returns ({id: result}, engine_output). A result carries
     pa, effective_pa, clean_count, flags (engine), assistants (engine split), evidence
-    (merged v2 inputs or None), pinned_sha, sources, report_flags."""
+    (merged v2 inputs or None), pinned_sha, sources, report_flags. `evidence_dir` is the
+    base the evidence file paths are recorded relative to (RT N5)."""
     targets = target_anchors(ledger)
     results: Dict[str, Dict[str, Any]] = OrderedDict()
     claims: List[Dict[str, Any]] = []
     for a in targets:
         ev = (
-            merge_claim_records(a["id"], by_claim[a["id"]])
+            merge_claim_records(a["id"], by_claim[a["id"]], evidence_dir)
             if a["id"] in by_claim
             else None
         )
@@ -2124,6 +2247,7 @@ def build_report(
             ("verifier", engine_out["verifier"]),
             ("policy", engine_out["policy"]),
             ("evidence_dir", meta["evidence_dir"]),
+            ("path_convention", REPORT_PATH_CONVENTION),
             ("evidence_store_sha", meta.get("evidence_store_sha")),
             # RT N2 (PR #697): the evidence store's identity — repo + HEAD — so the
             # record is reproducible without out-of-band knowledge; `unknown (not a
@@ -2210,6 +2334,7 @@ def build_report(
     md.append(f"| engine | `{engine_out['engine']}` ({engine_out['verifier']}) |")
     md.append(f"| policy | `{json.dumps(engine_out['policy'])}` |")
     md.append(f"| evidence dir | `{meta['evidence_dir']}` |")
+    md.append(f"| paths | {REPORT_PATH_CONVENTION} |")
     er = meta["evidence_repo"]
     md.append(
         f"| evidence repo (RT N2) | remote `{er['remote']}`; HEAD `{er['head']}`; "
@@ -2496,77 +2621,100 @@ def run(
 ) -> Dict[str, Any]:
     """The whole pipeline; returns {changed, version, report, results}."""
     today = today or _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT00:00:00Z")
-    commit = resolve_commit(repo, pinned_master)
-    ledger_before = json.loads(ledger_path.read_text(encoding="utf-8"))
-    records, ignored = load_evidence(evidence_dir)
-    anchor_ids = {a["id"] for a in ledger_before["anchors"]}
-    target_ids = {a["id"] for a in target_anchors(ledger_before)}
-    kinds = {a["id"]: a.get("provenance_kind") for a in ledger_before["anchors"]}
-    by_claim, unmatched, non_target = group_by_claim(
-        records, anchor_ids, target_ids, kinds
-    )
-    results, engine_out = grade_ledger(ledger_before, by_claim, repo, commit)
-    plan = plan_writes(ledger_before, results)
-    dist: Counter = Counter((r["pa"], r["effective_pa"]) for r in results.values())
-    note_args = dict(
-        n_targets=len(results),
-        n_records=len(records),
-        commit=commit,
-        dist=dist,
-        engine_id=engine_out["engine"],
-    )
-    changed, version = apply_writes(ledger_path, plan, note_args, today, dry_run)
-    # The git sha of the evidence store this backfill graded against (QBP#692 strike-2
-    # invariant, architect seq 2554): pa-reconcile.yml's INTER_PIN must equal this, so the
-    # pin moves atomically with the ledger. Resolved when evidence_dir is a git checkout
-    # (it is in CI and in the beekeeper's inter checkout); None otherwise — never fatal.
-    _store = _git(evidence_dir, "rev-parse", "HEAD", check=False)
-    evidence_store_sha = (
-        _store.stdout.strip()
-        if _store.returncode == 0 and _store.stdout.strip()
-        else None
-    )
-    meta = {
-        "today": today,
-        "ledger": str(ledger_path),
-        "pinned_master_rev": pinned_master,
-        "pinned_master_commit": commit,
-        "evidence_dir": str(evidence_dir),
-        "evidence_store_sha": evidence_store_sha,
-        "evidence_repo": evidence_repo_identity(evidence_dir),
-        "closure_toolchain": toolchain_handle(repo, commit),
-        "v2_record_count": len(records),
-        "version_after": version if changed else None,
-    }
-    md, rep = build_report(
-        ledger_before, results, plan, engine_out, meta, ignored, unmatched, non_target
-    )
-    if write_report:
-        if report_path is not None:
-            rp = report_path
-        elif dry_run:
-            # RT N10: a dry run must never clobber the committed record under
-            # REPORT_DIR (the AC4 before/after table is the genuine record of the
-            # last applied run). Without --report it goes to a scratch directory
-            # that is removed at exit (RT N16) — pass --report to keep one.
-            rp = dry_run_scratch_dir() / f"backfill-{today[:10]}.dry-run.md"
-        else:
-            rp = REPORT_DIR / f"backfill-{today[:10]}.md"
-        rp.parent.mkdir(parents=True, exist_ok=True)
-        rp.write_text(md, encoding="utf-8")
-        rp.with_suffix(".json").write_text(
-            json.dumps(rep, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    # RT C2 (PR #703): the pin worktree(s) this run made are removed when the run
+    # ends — normally, on a Refusal (a SystemExit) or on any other exception — not
+    # only at interpreter exit; `atexit` stays registered as the belt.
+    try:
+        commit = resolve_commit(repo, pinned_master)
+        ledger_before = json.loads(ledger_path.read_text(encoding="utf-8"))
+        records, ignored = load_evidence(evidence_dir)
+        anchor_ids = {a["id"] for a in ledger_before["anchors"]}
+        target_ids = {a["id"] for a in target_anchors(ledger_before)}
+        kinds = {a["id"]: a.get("provenance_kind") for a in ledger_before["anchors"]}
+        by_claim, unmatched, non_target = group_by_claim(
+            records, anchor_ids, target_ids, kinds, evidence_dir
         )
-        rep["_report_md"] = str(rp)
-        rep["_report_scratch"] = bool(dry_run and report_path is None)
-    return {
-        "changed": changed,
-        "version": version,
-        "report": rep,
-        "results": results,
-        "plan": plan,
-        "distribution": dist,
-    }
+        results, engine_out = grade_ledger(
+            ledger_before, by_claim, repo, commit, evidence_dir
+        )
+        plan = plan_writes(ledger_before, results)
+        dist: Counter = Counter((r["pa"], r["effective_pa"]) for r in results.values())
+        note_args = dict(
+            n_targets=len(results),
+            n_records=len(records),
+            commit=commit,
+            dist=dist,
+            engine_id=engine_out["engine"],
+        )
+        changed, version = apply_writes(ledger_path, plan, note_args, today, dry_run)
+        # The git sha of the evidence store this backfill graded against (QBP#692 strike-2
+        # invariant, architect seq 2554): pa-reconcile.yml's INTER_PIN must equal this, so the
+        # pin moves atomically with the ledger. Resolved when evidence_dir is a git checkout
+        # (it is in CI and in the beekeeper's inter checkout); None otherwise — never fatal.
+        _store = _git(evidence_dir, "rev-parse", "HEAD", check=False)
+        evidence_store_sha = (
+            _store.stdout.strip()
+            if _store.returncode == 0 and _store.stdout.strip()
+            else None
+        )
+        evidence_repo = evidence_repo_identity(evidence_dir)
+        ev_top = (
+            Path(evidence_repo["toplevel"])
+            if evidence_repo["toplevel"] != EVIDENCE_REPO_UNKNOWN
+            else None
+        )
+        meta = {
+            "today": today,
+            # RT N5: paths relative to a named base (REPORT_PATH_CONVENTION), never the
+            # absolute path of the checkout this run happened to use
+            "ledger": record_path(ledger_path, [("<repo>", repo)]),
+            "pinned_master_rev": pinned_master,
+            "pinned_master_commit": commit,
+            "evidence_dir": record_path(evidence_dir, [("<evidence-repo>", ev_top)]),
+            "evidence_store_sha": evidence_store_sha,
+            "evidence_repo": evidence_repo,
+            "closure_toolchain": toolchain_handle(repo, commit),
+            "v2_record_count": len(records),
+            "version_after": version if changed else None,
+        }
+        md, rep = build_report(
+            ledger_before,
+            results,
+            plan,
+            engine_out,
+            meta,
+            ignored,
+            unmatched,
+            non_target,
+        )
+        if write_report:
+            if report_path is not None:
+                rp = report_path
+            elif dry_run:
+                # RT N10: a dry run must never clobber the committed record under
+                # REPORT_DIR (the AC4 before/after table is the genuine record of the
+                # last applied run). Without --report it goes to a scratch directory
+                # that is removed at exit (RT N16) — pass --report to keep one.
+                rp = dry_run_scratch_dir() / f"backfill-{today[:10]}.dry-run.md"
+            else:
+                rp = REPORT_DIR / f"backfill-{today[:10]}.md"
+            rp.parent.mkdir(parents=True, exist_ok=True)
+            rp.write_text(md, encoding="utf-8")
+            rp.with_suffix(".json").write_text(
+                json.dumps(rep, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+            rep["_report_md"] = str(rp)
+            rep["_report_scratch"] = bool(dry_run and report_path is None)
+        return {
+            "changed": changed,
+            "version": version,
+            "report": rep,
+            "results": results,
+            "plan": plan,
+            "distribution": dist,
+        }
+    finally:
+        cleanup_pin_worktrees()
 
 
 def main(argv: Optional[List[str]] = None) -> int:

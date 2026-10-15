@@ -1,17 +1,18 @@
-# QBP#692 PA backfill — 2026-10-10
+# QBP#692 PA backfill — 2026-10-15
 
 | | |
 |---|---|
-| ledger | `/home/prime/Documents/QBP/.claude/worktrees/probe-696-closure/archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` |
-| version | 6.17.0 → (no change) |
-| pinned master | `origin/master` = `3b73b248181de9c872d7c73665d6b6ec90ac24a8` |
+| ledger | `<repo>/archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` |
+| version | 6.18.0 → (no change) |
+| pinned master | `origin/master` = `6e6a3f390f92dbc7e4a71783a34b83b81b83583e` |
 | engine | `confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158` (attestation.StubV0) |
 | policy | `{"require_signature": false}` |
-| evidence dir | `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence` |
-| evidence repo (RT N2) | remote `https://github.com/JamesPagetButler/inter.git`; HEAD `333134cb61eb12a405c67203859f090f64750df1`; toplevel `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c` |
-| evidence store sha (QBP#701 INTER_PIN) | `333134cb61eb12a405c67203859f090f64750df1` |
+| evidence dir | `<evidence-repo>/notary-evidence` |
+| paths | paths are recorded relative to a named base, never as the absolute path of the checkout the encoder happened to run in (RT N5 on PR #703): `<repo>` = the QBP checkout (`--repo`), `<evidence-repo>` = the toplevel in the evidence-repo identity row, `<evidence-dir>` = `--evidence-dir`; a path under none of them is recorded as given |
+| evidence repo (RT N2) | remote `https://github.com/JamesPagetButler/inter.git`; HEAD `e2ecce841e1f2f2ecd38750bec17f60c441ab12a`; toplevel `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-e2ecce8` |
+| evidence store sha (QBP#701 INTER_PIN) | `e2ecce841e1f2f2ecd38750bec17f60c441ab12a` |
 | closure toolchain handle (QBP#700) | lean_toolchain `leanprover/lean4:v4.30.0`; lake `Lake version 5.0.0-src+d024af0 (Lean version 4.30.0)`; agda `Agda version 2.8.0`; coqc `The Coq Proof Assistant, version 8.15.0` |
-| v2 evidence records | 3 |
+| v2 evidence records | 4 |
 | ignored (non-v2) files | 7 |
 | unmatched claims | 0 |
 | evidence for non-target anchors | 0 |
@@ -26,7 +27,8 @@
 
 | grade | count |
 |---|---|
-| 0/0 | 146 |
+| 0/0 | 145 |
+| 1/0 | 1 |
 | 2/2 | 2 |
 
 ## Drops (any decrease vs the committed value)
@@ -76,7 +78,7 @@ None.
 | PROOF-loss-of-commutativity-C-to-H | theory | 0/0 | 0/0 | — | no_proof_file | `—` |
 | PRED-a0-redshift-linear | derivation | 0/0 | 0/0 | — | — | `540e1fb34dce` |
 | PRED-btfr-mass-correction | derivation | 0/0 | 0/0 | — | — | `540e1fb34dce` |
-| PROOF-alpha-particle-quaternion | derivation | 0/0 | 0/0 | — | — | `5237e2b14467` |
+| PROOF-alpha-particle-quaternion | derivation | 1/0 | 1/0 | lean4 | — | `5237e2b14467` |
 | PROOF-fano-choice-information | proof | 0/0 | 0/0 | — | — | `99fc8cbdbfbc` |
 | PROOF-iron-56-double-octet | derivation | 0/0 | 0/0 | — | — | `5237e2b14467` |
 | PROOF-iron-to-ns-bridge | derivation | 0/0 | 0/0 | — | — | `340b499bc154` |
@@ -194,13 +196,13 @@ None.
 
 ## Ignored evidence files (not the engine v2 record shape; never parsed for grades)
 
-- `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-1-sandwich-mul-2026-05-29.yaml` — not the engine v2 record shape (top-level keys: ['notary_metadata', 'verification_evidence'])
-- `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-2-verdandi-authority-tla-2026-05-29.yaml` — not the engine v2 record shape (top-level keys: ['verification_evidence'])
-- `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-3-cth-schema-vendoring-differential-2026-08-20.yaml` — not the engine v2 record shape (top-level keys: ['verification_evidence'])
-- `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-3-cth-schema-vendoring-differential-CORRECTION-2026-09-30.yaml` — not the engine v2 record shape (top-level keys: ['correction'])
-- `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-4-cd-convention-intertwiner-ac5-2026-08-20.yaml` — not the engine v2 record shape (top-level keys: ['verification_evidence'])
-- `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-4-cd-convention-intertwiner-ac5-CORRECTION-2026-09-30.yaml` — not the engine v2 record shape (top-level keys: ['correction'])
-- `/tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/inter-333134c/notary-evidence/cycle-5-verdandi-attestation-floor-revoke-2026-09-16.yaml` — not the engine v2 record shape (top-level keys: ['containment_addendum', 'red_team_response', 'verification_evidence'])
+- `<evidence-dir>/cycle-1-sandwich-mul-2026-05-29.yaml` — not the engine v2 record shape (top-level keys: ['notary_metadata', 'verification_evidence'])
+- `<evidence-dir>/cycle-2-verdandi-authority-tla-2026-05-29.yaml` — not the engine v2 record shape (top-level keys: ['verification_evidence'])
+- `<evidence-dir>/cycle-3-cth-schema-vendoring-differential-2026-08-20.yaml` — not the engine v2 record shape (top-level keys: ['verification_evidence'])
+- `<evidence-dir>/cycle-3-cth-schema-vendoring-differential-CORRECTION-2026-09-30.yaml` — not the engine v2 record shape (top-level keys: ['correction'])
+- `<evidence-dir>/cycle-4-cd-convention-intertwiner-ac5-2026-08-20.yaml` — not the engine v2 record shape (top-level keys: ['verification_evidence'])
+- `<evidence-dir>/cycle-4-cd-convention-intertwiner-ac5-CORRECTION-2026-09-30.yaml` — not the engine v2 record shape (top-level keys: ['correction'])
+- `<evidence-dir>/cycle-5-verdandi-attestation-floor-revoke-2026-09-16.yaml` — not the engine v2 record shape (top-level keys: ['containment_addendum', 'red_team_response', 'verification_evidence'])
 
 ## Unmatched claims (v2 records whose `claim` is not a ledger anchor id)
 
