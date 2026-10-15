@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.17.0",
+  "version": "6.18.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -3649,8 +3649,17 @@
           "Quot.sound"
         ]
       },
-      "pa_local": 0,
-      "pa_effective": 0
+      "pa_local": 1,
+      "pa_effective": 0,
+      "proof_assistants": [
+        {
+          "assistant": "lean4",
+          "evidence_ref": "proofs/QBP/Cosmo/Nucleosynthesis.lean@516dfcb#alpha_particle_is_quaternionic",
+          "trust_check": "pass",
+          "source_sha": "5237e2b14467eec3c88b262f63298c7fe81b3009",
+          "producer": "qbp-oppenheimer"
+        }
+      ]
     },
     {
       "id": "PROOF-fano-choice-information",
@@ -12945,9 +12954,14 @@
       "version": "6.17.0",
       "date": "2026-10-03T00:00:00Z",
       "note": "#692: PA backfill of 148 proof/derivation anchors (2 records changed) from 3 v2 notary evidence records at pinned master 1d9c9f15ea46b7a4e9326f835e6153c117e34303. Grade distribution (pa_local/pa_effective: count) — 0/0: 146, 2/2: 2. pa_local = GradeClaim(...).pa on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain edges typed derivation (conservative); pinned_sha = claim-source manifest hash (S = QBP-local import closure of proof_file ∪ same-repo evidence files; sorted `path blob` lines, git hash-object --stdin; architecture rulings seq 2299/2394), not stored. Computed by tools/cth-pa (confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158); never hand-set — a wrong grade is fixed by new or corrected evidence in inter/notary-evidence/, never by editing the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind proof/derivation anchors WITH evidence; internal-compute anchors (PROOF-hessian) carry grades only (cth ruling 2026-10-02)."
+    },
+    {
+      "version": "6.18.0",
+      "date": "2026-10-11T00:00:00Z",
+      "note": "#692: PA backfill of 148 proof/derivation anchors (1 records changed) from 4 v2 notary evidence records at pinned master 3b73b248181de9c872d7c73665d6b6ec90ac24a8. Grade distribution (pa_local/pa_effective: count) — 0/0: 145, 1/0: 1, 2/2: 2. pa_local = GradeClaim(...).pa on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain edges typed derivation (conservative); pinned_sha = claim-source manifest hash (S = QBP-local import closure of proof_file ∪ same-repo evidence files; sorted `path blob` lines, git hash-object --stdin; architecture rulings seq 2299/2394), not stored. Computed by tools/cth-pa (confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158); never hand-set — a wrong grade is fixed by new or corrected evidence in inter/notary-evidence/, never by editing the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind proof/derivation anchors WITH evidence; internal-compute anchors (PROOF-hessian) carry grades only (cth ruling 2026-10-02)."
     }
   ],
-  "last_updated": "2026-10-03T00:00:00Z",
+  "last_updated": "2026-10-11T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
