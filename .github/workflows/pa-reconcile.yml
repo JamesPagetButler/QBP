@@ -149,22 +149,12 @@ jobs:
           # so the real-ledger suite must not need it — it uses lake + agda only.
           QBP_REQUIRE_PROVER_TOOLS: "1"
         run: python3 -m pytest scripts/test_pa_ledger.py -v
-
-      - name: Assert no module oleans / no .lake/build were produced (the --no-build proof)
-        # QBP#703 conditions: the closure is header-level; the encoder must never build a
-        # module olean. (Lake's elaborated CONFIG under .lake/config is not a module olean.)
-        run: |
-          set -euo pipefail
-          # The --no-build proof: a module build produces *.olean FILES. `lake update`
-          # creates EMPTY .lake/build scaffold dirs in each cloned package (batteries,
-          # mathlib, …) but compiles nothing — so the check is on module olean FILES, not the
-          # scaffold directories, covering the project AND every dependency
-          # (proofs/.lake/packages/*/.lake/...). Lake's elaborated CONFIG, `lakefile.olean`,
-          # is config elaboration, not a module build, and is excluded by name.
-          oleans=$(find proofs -path '*/.lake/*' -name '*.olean' ! -name 'lakefile.olean' 2>/dev/null || true)
-          if [ -n "$oleans" ]; then
-            echo "::error::module .olean files exist (project or dependency) — the closure must be --no-build:"
-            echo "$oleans"
-            exit 1
-          fi
-          echo "no module oleans under proofs/ (project or dependencies) — --no-build confirmed"
+        # NOTE on the --no-build proof: a workflow-level scan of the main checkout CANNOT
+        # prove the encoder's no-build, because `lake update` itself builds dependency
+        # artifacts here (e.g. proofs/.lake/packages/batteries/.lake/build/lib/lean/
+        # runLinter.olean), and the encoder's facet calls run in a TEMPORARY pin worktree
+        # that is created and removed inside grade_ledger (not inspectable post-hoc). The
+        # real --no-build guarantee lives in QBP#703's own pin-worktree assertions
+        # (test_pa_encoder.py: no *.olean and no .lake/build in the pin worktree), which run
+        # in #703's CI. The gate can additionally run those specific tests once the
+        # QBP_REQUIRE_PROVER_TOOLS/coqdep handling is settled (see the #708 thread).
