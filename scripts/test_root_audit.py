@@ -147,6 +147,19 @@ def test_forces_matches_sort_root():
     assert ra.forcing_grounds_pa(rec_v, v)[0]["forces"] is True
     assert ra.sort_root(rec_u, u)[0] is None  # weak: unsorted
     assert ra.forcing_grounds_pa(rec_u, u)[0]["forces"] is False
+    # widen (Gemini/Red Team N3): the dead-PROOF and MEAS branches too
+    d = _anchors(_anchor("PROOF-d", proof_state="verified", status="killed"))
+    mc = _anchors(_anchor("MEAS-c", status="converged"))
+    mm = _anchors(_anchor("MEAS-m", status="marginal"))
+    rec_d = {"id": "AXIOM-C", "forced_by": ["PROOF-d"]}
+    rec_mc = {"id": "AXIOM-D", "forced_by": ["MEAS-c"]}
+    rec_mm = {"id": "AXIOM-E", "forced_by": ["MEAS-m"]}
+    assert ra.sort_root(rec_d, d)[0] is None  # dead ground -> whole root rejected
+    assert ra.forcing_grounds_pa(rec_d, d)[0]["forces"] is False
+    assert ra.sort_root(rec_mc, mc)[0] == 2  # FORCED by a converged MEAS
+    assert ra.forcing_grounds_pa(rec_mc, mc)[0]["forces"] is True
+    assert ra.sort_root(rec_mm, mm)[0] is None  # marginal MEAS -> weak/unsorted
+    assert ra.forcing_grounds_pa(rec_mm, mm)[0]["forces"] is False
 
 
 def test_forcing_grounds_pa_missing_anchor():

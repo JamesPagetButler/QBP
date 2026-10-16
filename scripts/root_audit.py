@@ -436,7 +436,9 @@ def forcing_grounds_pa(rec, anchors):
     for aid in _as_list(rec.get("forced_by")):
         if not isinstance(aid, str) or not aid.startswith(TERMINAL_ANCHOR_PREFIXES):
             continue
-        a = anchors.get(aid, {})
+        a = anchors.get(aid)
+        if not isinstance(a, dict):  # missing or malformed anchor -> empty, never raise
+            a = {}
         forces = bool(
             a.get("status") not in DEAD_STATUSES
             and (
@@ -698,7 +700,10 @@ def write_report(res, path, ledger_path, register_path):
         "in-ledger but has no Notary PA-evidence recorded yet. Gating on PA is a separate, "
         "architecture-ruled decision (#692).",
         "",
-        f"### Chain terminators ({len(tpa)}) — the pool a live chain may terminate at",
+        f"### Chain terminator pool ({len(tpa)})",
+        "",
+        "Every non-dead PROOF-*/MEAS- anchor `is_terminal` accepts — the pool a live chain MAY "
+        "terminate at, not only those some chain currently reaches. (Count is the pool size.)",
         "",
         f"pa_effective tally: {_tally_str(ttally)}",
         "",
@@ -714,9 +719,13 @@ def write_report(res, path, ledger_path, register_path):
         "",
         f"### Root forcings ({sum(len(g) for g in fpa.values())}) — grounds a root is forced_by",
         "",
+        "`ground forces?` is this ground's per-ground forcing *capability* (the sort_root test), "
+        "NOT the root's outcome: sort_root rejects the whole root if any co-ground is dead/missing, "
+        "so a `yes` ground can still sit under an UNSORTED root (see the Roots table for the bucket).",
+        "",
         f"pa_effective tally (forcing grounds only): {_tally_str(fsum)}",
         "",
-        "| Root | ground | forces? | pa_local | pa_effective |",
+        "| Root | ground | ground forces? | pa_local | pa_effective |",
         "|---|---|---|---|---|",
     ]
     for rid, grounds in fpa.items():
