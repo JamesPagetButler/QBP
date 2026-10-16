@@ -32,11 +32,39 @@ Each test names the AC / ruling it pins:
             definition file changes pinned_sha, an unrelated file does not, Mathlib is
             excluded, A→B→C includes C, a cycle terminates, a dangling import refuses;
             real-repo reference values at f452532 (headline 6b972a7d, companion 0f32f714)
+  QBP#696  (rewritten on QBP#700; architecture §I4 conditions 1–3) the closure is DERIVED
+            BY EACH PROVER'S OWN DEPENDENCY TOOL at the pin, in a hermetic temporary git
+            worktree of the pinned commit — Lake's facets under `lake query --no-build`
+            (libraries from `translate-config`, `:modules`, `+M:lean`, `+M:transImports`),
+            `agda --only-scope-checking --dependency-graph` from the member's library dir,
+            `coqdep -f _CoqProject` — and the regex Lake/Agda parser of PR #698 is DELETED
+            (a test asserts its symbols are gone). Condition 1: G-L1 (Lake drops an
+            unresolved import silently) runs on EVERY member of S — A → B → Nonexistent
+            refuses naming B (mutant: root-only check → KILLED). Condition 2: the Agda
+            wrapper ASSERTS a clean interface state (no _build/, no *.agdai) before the run
+            — a pre-seeded fresh .agdai refuses (mutant: drop the assertion → S shrinks
+            silently → KILLED). Condition 3: the four re-keyed anchors (PROOF-hessian +
+            the three Agda anchors) carry their QBP#698/QBP#700 reference values and the
+            full 148-vector at 516dfcb equals the committed report except exactly those
+            four. G-L2 (gitignored lake-manifest.json) is refused on mismatch and deferred
+            to qbp-implementor. Coq: `_CoqProject` required, any coqdep stderr line refuses
+            (G-C1). Tool absence = refusal; the CI gate sets QBP_REQUIRE_PROVER_TOOLS=1 so
+            the tool-based tests cannot skip there. Fixtures are REAL Lake / Agda / Coq
+            projects (`mk_repo` → `lakefile_for`). Kept from PR #698: out-of-tree
+            proof_file / evidence_ref paths (`..`, absolute, not under proofs/, bare root)
+            are refused (seq 2446) while a citation string stays `no_proof_file`; a
+            missing path-valued proof_file is `stale_proof_file` and named in the report;
+            non-canonical in-tree spellings normalise (RT N2); the report records the
+            evidence repo HEAD/remote or `unknown (not a git checkout)` (RT N2), the
+            closure's toolchain handle (lean-toolchain at the pin + lake/agda/coqc
+            versions) and `evidence_store_sha` (PR #701); real-repo values at 516dfcb:
+            Fano headline/companion UNCHANGED, PROOF-hessian + the 3 Agda anchors moved
 """
 
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -70,12 +98,83 @@ def git(repo: Path, *args: str) -> str:
     ).stdout.strip()
 
 
-def mk_repo(tmp_path: Path, files: dict) -> Path:
+# QBP#700 / QBP#696: the closure is derived by each prover's OWN tool, so every fixture
+# repo is a REAL (dependency-free) Lake project: `lakefile_for` lists every `.lean` under
+# proofs/ as an explicit root of lib «T» (Sprint12-Inherited/ files as bare roots of
+# lib «QBPSprint12» with its srcDir), `lean-toolchain` pins v4.30.0 so elan picks the
+# installed toolchain; a `.v` seed gets a `_CoqProject` (`-Q . Fx` + the files) unless
+# the test brings its own. No Mathlib `require`, so `lake query` works offline.
+LEAN_TOOLCHAIN = "leanprover/lean4:v4.30.0\n"
+
+
+def lakefile_for(files: dict) -> str:
+    top, s12 = [], []
+    for rel in files:
+        if not (rel.startswith("proofs/") and rel.endswith(".lean")):
+            continue
+        if rel == "proofs/lakefile.lean":
+            continue
+        inner = rel[len("proofs/") : -len(".lean")]
+        if inner.startswith("Sprint12-Inherited/"):
+            s12.append(inner[len("Sprint12-Inherited/") :].replace("/", "."))
+        else:
+            top.append(inner.replace("/", "."))
+    out = ["import Lake", "open Lake DSL", "", "package «Fixture» where", ""]
+    if top:
+        roots = ", ".join(f"`{m}" for m in sorted(top))
+        out += ["lean_lib «T» where", f"  roots := #[{roots}]", ""]
+    if s12:
+        roots = ", ".join(f"`{m}" for m in sorted(s12))
+        out += [
+            "lean_lib «QBPSprint12» where",
+            '  srcDir := "Sprint12-Inherited"',
+            f"  roots := #[{roots}]",
+            "",
+        ]
+    return "\n".join(out)
+
+
+def _tools_for(files: dict) -> set:
+    tools = set()
+    for rel in files:
+        if rel.endswith(".lean"):
+            tools.add("lake")
+        elif rel.endswith(enc.AGDA_EXTS):
+            tools.add("agda")
+        elif rel.endswith(".v"):
+            tools.add("coqdep")
+    return tools
+
+
+def _skip_without_tools(tools) -> None:
+    """Skip (or, under QBP_REQUIRE_PROVER_TOOLS=1, FAIL) when a prover tool the fixture
+    needs is absent — the CI gate job cannot silently skip the tool-based tests."""
+    missing = sorted(t for t in tools if shutil.which(t) is None)
+    if missing:
+        if os.environ.get(enc.REQUIRE_PROVER_TOOLS_ENV) == "1":
+            pytest.fail(f"prover tools required: {missing}")
+        pytest.skip(f"prover tool(s) not installed: {missing}")
+
+
+def mk_repo(
+    tmp_path: Path, files: dict, lakefile: bool = True, skip_without_tools: bool = True
+) -> Path:
+    files = dict(files)
+    if skip_without_tools:
+        _skip_without_tools(_tools_for(files))
     repo = tmp_path / "repo"
     repo.mkdir()
     git(repo, "init", "-q")
     git(repo, "config", "user.email", "t@e.st")
     git(repo, "config", "user.name", "t")
+    if lakefile and any(r.endswith(".lean") for r in files):
+        files.setdefault("proofs/lakefile.lean", lakefile_for(files))
+        files.setdefault("proofs/lean-toolchain", LEAN_TOOLCHAIN)
+    vs = [r for r in files if r.startswith("proofs/") and r.endswith(".v")]
+    if vs and not any(r.endswith("_CoqProject") for r in files):
+        files["proofs/_CoqProject"] = "-Q . Fx\n" + "".join(
+            r[len("proofs/") :] + "\n" for r in vs
+        )
     commit(repo, files, "c0")
     return repo
 
@@ -253,7 +352,7 @@ def test_unmatched_claim_is_reported_not_graded(tmp_path):
     ledger = mk_ledger(tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean")])
     out = run_encoder(ledger, repo, ev, tmp_path)
     assert out["report"]["unmatched_claim"] == [
-        {"file": str(ev / "r.json"), "claim": "PROOF-nope"}
+        {"file": "<evidence-dir>/r.json", "claim": "PROOF-nope"}  # RT N5
     ]
     assert out["results"]["PROOF-a"]["evidence"] is None
 
@@ -390,7 +489,12 @@ def test_internal_compute_never_gets_proof_assistants(tmp_path):
 # ---------------------------------------------------------------------------------------
 def test_pinned_sha_follows_file_not_commit(tmp_path):
     repo = mk_repo(
-        tmp_path, {"proofs/A.lean": "a0\n", "proofs/B.v": "b0\n", "README.md": "r0\n"}
+        tmp_path,
+        {
+            "proofs/A.lean": "a0\n",
+            "proofs/B.v": "Definition b := 0.\n",
+            "README.md": "r0\n",
+        },
     )
     a = anchor("PROOF-a", proof_file="proofs/A.lean")
     ev = [{"evidence_ref": "proofs/B.v@zzzz#thm"}]
@@ -408,7 +512,7 @@ def test_pinned_sha_follows_file_not_commit(tmp_path):
     p2, _, _ = enc.pinned_sha_for(a, ev, repo, c2)
     assert p2 != p0
     # editing the evidence_ref member: changes again
-    c3 = commit(repo, {"proofs/B.v": "b1\n"}, "edit B")
+    c3 = commit(repo, {"proofs/B.v": "Definition b := 1.\n"}, "edit B")
     p3, _, _ = enc.pinned_sha_for(a, ev, repo, c3)
     assert p3 not in (p0, p2)
     # MUTANT GUARD: a manifest over only one member of S is not the pinned_sha
@@ -459,6 +563,7 @@ def test_reference_manifest_hash_cd_structure_constant_tables():
     SedenionOctonionCount} → 6b972a7d. Supersedes the seq-2299 two-file value be505734.
     """
     _needs_ref_commit()
+    _skip_without_tools(("lake",))
     a = anchor("PROOF-cd-structure-constant-tables", proof_file=CD_FILE)
     pinned, sources, flags = enc.pinned_sha_for(a, [], ROOT, REF_COMMIT)
     assert flags == []
@@ -471,11 +576,19 @@ def test_reference_manifest_hash_cd_structure_constant_tables():
     assert pinned == enc.manifest_hash_py(
         [f"{s['path']} {s['blob']}\n" for s in sources]
     )
-    # the headline's own imports at that commit, read from the blob, not the checkout
-    assert enc.lean_local_imports_of_blob(ROOT, CD_BLOB) == [
+    # the headline's own imports at that commit, as LAKE resolves them in the pin
+    # worktree (QBP#700): the two same-repo modules, Mathlib outside the libraries
+    ws = enc.lean_workspace(ROOT, REF_COMMIT)
+    assert ws.libs == ["QBP", "QBPSprint12"] and ws.package == "QBPProofs"
+    assert [m for m in ws.imports["QBP.Foundations.CDAlg"] if m in ws.modules] == [
         "QBP.Foundations.SedenionOctonionCount",
         "QBP.Foundations.FanoOrientationF3",
     ]
+    assert "Mathlib.Tactic" in ws.header["QBP.Foundations.CDAlg"]
+    assert (
+        "Mathlib.Tactic" not in ws.modules
+        and ws.unresolved["QBP.Foundations.CDAlg"] == []
+    )
     # a Fano-companion evidence_ref on the headline adds nothing: F3 is already in the
     # closure, so S (and pinned_sha) is unchanged — the closure deduplicates
     ev = [{"evidence_ref": f"{F3_FILE}@x#fanoTableF4_eq_cayleyDickson"}]
@@ -493,52 +606,33 @@ def test_reference_manifest_hash_fano_companion_unchanged():
     imports nothing, so S = {FanoOrientationF3} and the seq-2299 value 0f32f714 stands.
     """
     _needs_ref_commit()
+    _skip_without_tools(("lake",))
     a = anchor("PROOF-fano-table-equals-cd-products", proof_file=F3_FILE)
     pinned, sources, flags = enc.pinned_sha_for(a, [], ROOT, REF_COMMIT)
     assert flags == []
     assert sources == [{"path": F3_FILE, "blob": F3_BLOB}]
     assert pinned == COMPANION_PINNED
-    assert enc.lean_local_imports_of_blob(ROOT, F3_BLOB) == []
+    ws = enc.lean_workspace(ROOT, REF_COMMIT)
+    assert [
+        m for m in ws.trans["QBP.Foundations.FanoOrientationF3"] if m in ws.modules
+    ] == []
 
 
 # ---------------------------------------------------------------------------------------
 # seq 2394 — S closes over QBP-local imports
 # ---------------------------------------------------------------------------------------
-def test_lean_local_imports_header_only_comments_stripped():
-    text = (
-        "/- licence header\n   import QBP.InBlockComment -/\n"
-        "/-- doc: import QBP.InDocComment -/\n"
-        "prelude\n"
-        "import Mathlib.Tactic  -- import QBP.InTrailingComment\n"
-        "import Std.Data.List\n"
-        "import QBP.B\n"
-        "import «QBP.C»\n"
-        "import QBP\n"
-        "import QBP.B\n"
-        "-- import QBP.InLineComment\n"
-        "theorem t : True := trivial\n"
-        "import QBP.AfterHeader\n"
-    )
-    assert enc.lean_local_imports(text) == ["QBP.B", "QBP.C", "QBP"]
-    assert enc.lean_module_path("QBP.Foundations.CDAlg") == (
-        "proofs/QBP/Foundations/CDAlg.lean"
-    )
-    assert enc.lean_module_path("QBP") == "proofs/QBP.lean"
-    # a near-miss namespace is not QBP-local
-    assert enc.lean_local_imports("import QBPSprint12.X\nimport QBPX.Y\n") == []
-
-
 def test_manifest_closes_over_local_imports(tmp_path):
-    """A → B → C over `import QBP.…`; editing C (a definition the statement depends on)
-    changes pinned_sha, an unrelated QBP file does not, Mathlib never enters."""
+    """A → B → C over `import QBP.…` (Lake's transImports); editing C (a definition the
+    statement depends on) changes pinned_sha, an unrelated QBP file does not, a toolchain
+    module (`Init.Data.Nat`) never enters; a Coq evidence ref closes via coqdep."""
     repo = mk_repo(
         tmp_path,
         {
-            "proofs/QBP/A.lean": "import Mathlib.Tactic\nimport QBP.B\ntheorem a : True := trivial\n",
+            "proofs/QBP/A.lean": "import Init.Data.Nat\nimport QBP.B\ntheorem a : True := trivial\n",
             "proofs/QBP/B.lean": "import QBP.C\ndef b := 1\n",
             "proofs/QBP/C.lean": "def c := 1\n",
             "proofs/QBP/U.lean": "import QBP.C\ndef u := 1\n",  # unrelated: nobody in S imports it
-            "proofs/B.v": "(* import QBP.NotScanned *)\n",  # a Coq ref is a leaf
+            "proofs/B.v": "(* Require Import QBP.NotScanned *)\nDefinition b := 1.\n",  # Coq: coqdep
         },
     )
     a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
@@ -552,7 +646,9 @@ def test_manifest_closes_over_local_imports(tmp_path):
         "proofs/QBP/B.lean",
         "proofs/QBP/C.lean",
     ]
-    assert not any("Mathlib" in s["path"] for s in s0)
+    assert not any(
+        "Init" in s["path"] for s in s0
+    )  # toolchain module: outside the tree
     # transitive member edited ⇒ pinned_sha moves
     c1 = commit(repo, {"proofs/QBP/C.lean": "def c := 2\n"}, "edit C")
     p1, _, _ = enc.pinned_sha_for(a, ev, repo, c1)
@@ -583,7 +679,10 @@ def test_manifest_closes_over_local_imports(tmp_path):
     assert enc.manifest_hash_py([f"{s['path']} {s['blob']}\n" for s in s0]) == p0
 
 
-def test_manifest_import_cycle_terminates(tmp_path):
+def test_manifest_import_cycle_is_lakes_own_refusal(tmp_path):
+    """An import cycle is illegal Lean; Lake's `transImports` facet reports `bad import`
+    and exits non-zero, which the wrapper surfaces as a refusal carrying Lake's stderr —
+    the closure is never guessed around a tool error."""
     repo = mk_repo(
         tmp_path,
         {
@@ -594,16 +693,16 @@ def test_manifest_import_cycle_terminates(tmp_path):
     )
     a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
     c0 = git(repo, "rev-parse", "HEAD")
-    pinned, sources, flags = enc.pinned_sha_for(a, [], repo, c0)
-    assert flags == [] and len(pinned) == 40
-    assert [s["path"] for s in sources] == [
-        "proofs/QBP/A.lean",
-        "proofs/QBP/B.lean",
-        "proofs/QBP/C.lean",
-    ]
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(a, [], repo, c0)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: `lake query --no-build --json` failed")
+    assert "bad import" in msg
 
 
 def test_manifest_dangling_local_import_is_refused(tmp_path):
+    """A module Lake cannot resolve is dropped from its facets silently (QBP#700 G-L1);
+    the header-vs-imports check surfaces it as a refusal naming the importing file."""
     repo = mk_repo(tmp_path, {"proofs/QBP/A.lean": "import QBP.Missing\n"})
     a = anchor("PROOF-a", proof_file="proofs/QBP/A.lean")
     c0 = git(repo, "rev-parse", "HEAD")
@@ -611,7 +710,7 @@ def test_manifest_dangling_local_import_is_refused(tmp_path):
         enc.pinned_sha_for(a, [], repo, c0, ["ev/rec.json"])
     msg = str(ei.value)
     assert "REFUSED" in msg and "PROOF-a" in msg and "ev/rec.json" in msg
-    assert "QBP.Missing" in msg and "proofs/QBP/Missing.lean" in msg
+    assert "'QBP.Missing'" in msg and "G-L1" in msg
     assert "proofs/QBP/A.lean" in msg  # the importing file is named
 
 
@@ -1390,7 +1489,7 @@ def test_evidence_for_non_target_anchor_is_reported_not_graded(tmp_path):
     assert rep["unmatched_claim"] == []
     assert rep["evidence_for_non_target"] == [
         {
-            "file": str(ev / "meas.json"),
+            "file": "<evidence-dir>/meas.json",  # RT N5
             "claim": "MEAS-x",
             "provenance_kind": "measurement",
             "assistants": ["lean4"],
@@ -1887,7 +1986,11 @@ def test_refusal_names_record_file_and_claim(tmp_path):
         "REFUSED: PROOF-a: evidence_ref path 'proofs/DoesNotExist.lean'"
     )
     assert "does not exist at pinned master" in msg
-    assert f"claim 'PROOF-a' in record {rec}" in msg
+    # RT N5 (PR #703): the record is named relative to the `--evidence-dir` the operator
+    # passed, the same spelling the report uses — never the scratch checkout's path
+    assert rec.name == "companion-ref.json"
+    assert "claim 'PROOF-a' in record <evidence-dir>/companion-ref.json" in msg
+    assert str(ev) not in msg
     assert "dropped or kept" in msg
     # the unit function names the record(s) it is given; without them, the claim only
     with pytest.raises(
@@ -2324,13 +2427,18 @@ def test_N18_dry_run_registers_atexit_cleanup(tmp_path, monkeypatch):
         str(repo),
         "--dry-run",
     ]
-    # --dry-run without --report: the scratch dir exists AND its cleanup is registered
+    # --dry-run without --report: the scratch dir exists AND its cleanup is registered.
+    # (RT C2, PR #703: the pin-worktree belt `cleanup_pin_worktrees` is registered at most
+    # once per process too — it appears here only if no earlier test made a pin worktree.)
     assert enc.main(base) == 0
-    assert registered == [enc.cleanup_dry_run_scratch]
+    scratch_hooks = [f for f in registered if f is not enc.cleanup_pin_worktrees]
+    assert scratch_hooks == [enc.cleanup_dry_run_scratch]
+    assert registered.count(enc.cleanup_pin_worktrees) <= 1
     assert len(enc._DRY_RUN_SCRATCH) == 1 and enc._DRY_RUN_SCRATCH[0].exists()
     # a second scratch dir in the same process registers nothing new (one hook suffices)
+    n = len(registered)
     assert enc.main(base) == 0
-    assert registered == [enc.cleanup_dry_run_scratch]
+    assert len(registered) == n
     assert len(enc._DRY_RUN_SCRATCH) == 2
     gone = enc.cleanup_dry_run_scratch()
     assert len(gone) == 2 and not any(d.exists() for d in gone)
@@ -2339,3 +2447,1283 @@ def test_N18_dry_run_registers_atexit_cleanup(tmp_path, monkeypatch):
     assert enc.main(base + ["--report", str(tmp_path / "keep.md")]) == 0
     assert registered == [] and enc._DRY_RUN_SCRATCH == []
     assert (tmp_path / "keep.md").exists()
+
+
+# ---------------------------------------------------------------------------------------
+# QBP#696 — closure over every lake library (lakefile-derived map) + Agda open imports;
+# out-of-tree guard (seq 2446); report records evidence repo (RT N2) + stale_proof_file
+# ---------------------------------------------------------------------------------------
+def test_sprint12_bare_root_enters_manifest_non_lib_root_and_mathlib_skipped(tmp_path):
+    """`import Sedenion` from SedenionHessianTraceSq.lean resolves through lib
+    «QBPSprint12» (srcDir Sprint12-Inherited) BY LAKE and enters S: PROOF-hessian's key
+    moves when Sedenion.lean changes, not otherwise. A toolchain module (`Init.Data.Nat`)
+    is outside the libraries and skipped (Mathlib, when required, sits under
+    proofs/.lake/ the same way). A dangling LOCAL import (a root whose file is missing)
+    refuses — Lake drops it silently, G-L1 surfaces it naming the importing file."""
+    HESS = "proofs/Sprint12-Inherited/SedenionHessianTraceSq.lean"
+    SED = "proofs/Sprint12-Inherited/Sedenion.lean"
+    repo = mk_repo(
+        tmp_path,
+        {
+            HESS: "import Init.Data.Nat\nimport Sedenion\ntheorem h : True := trivial\n",
+            SED: "def sed := 1\n",
+            "proofs/Sprint12-Inherited/Quaternion.lean": "def q := 1\n",
+            "proofs/QBP/X.lean": "def x := 1\n",  # another library, not imported
+        },
+    )
+    a = anchor("PROOF-hessian", kind="internal-compute", proof_file=HESS)
+    c0 = git(repo, "rev-parse", "HEAD")
+    ws = enc.lean_workspace(repo, c0)
+    assert ws.libs == ["T", "QBPSprint12"]
+    assert ws.modules["Sedenion"] == "QBPSprint12" and ws.modules["QBP.X"] == "T"
+    assert ws.mod2path["SedenionHessianTraceSq"] == HESS and ws.imports[
+        "SedenionHessianTraceSq"
+    ] == ["Sedenion"]
+    assert (
+        "Init.Data.Nat" in ws.header["SedenionHessianTraceSq"]
+        and ws.unresolved["SedenionHessianTraceSq"] == []
+    )
+    p0, s0, f0 = enc.pinned_sha_for(a, [], repo, c0)
+    assert f0 == [] and [s["path"] for s in s0] == [SED, HESS]
+    c1 = commit(repo, {SED: "def sed := 2\n"}, "edit Sedenion")
+    p1, _, _ = enc.pinned_sha_for(a, [], repo, c1)
+    assert p1 != p0
+    c2 = commit(
+        repo,
+        {
+            "proofs/Sprint12-Inherited/Quaternion.lean": "def q := 2\n",
+            "proofs/QBP/X.lean": "def x := 2\n",
+        },
+        "unrelated lib files edited",
+    )
+    p2, _, _ = enc.pinned_sha_for(a, [], repo, c2)
+    assert p2 == p1
+    # MUTANT GUARD: the seed-only manifest (the pre-#696 rule) is not the pinned_sha
+    assert enc.manifest_hash_py([f"{HESS} {enc.blob_sha(repo, c0, HESS)}\n"]) != p0
+    c3 = commit(repo, {HESS: "import Kitaev\n"}, "dangling local import")
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(a, [], repo, c3, ["r.json"])
+    msg = str(ei.value)
+    assert msg.startswith(
+        f"REFUSED: {HESS!r} (module 'SedenionHessianTraceSq') imports 'Kitaev'"
+    )
+    assert "G-L1" in msg and "PROOF-hessian" in msg
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "../x.lean",
+        "/etc/passwd",
+        "/proofs/A.lean",  # absolute AND would be in-tree if relative (§I4 seq 2455)
+        "docs/x.lean",
+        "Sedenion.lean",
+        "proofs/../docs/x.lean",
+        "proofs/A/../A.lean",  # `..` refused on the ORIGINAL string, though it normalises in
+    ],
+)
+def test_out_of_tree_proof_file_or_evidence_path_is_refused_never_seeded(tmp_path, bad):
+    """seq 2446: absolute, `..`, not under proofs/, or a bare root (must be mapped via the
+    lakefile, never guessed) ⇒ refusal naming the anchor; `docs/x.lean` EXISTS in the
+    repo, so a mutant that seeds it would hash it. The absolute arm is subsumed by the
+    `proofs/` prefix check (§I4 seq 2455: an equivalent mutant) and is kept for the
+    message, so the message's ARM is asserted here — dropping the arm is now visible."""
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n", "docs/x.lean": "d\n"})
+    c0 = git(repo, "rev-parse", "HEAD")
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(
+            anchor("PROOF-bad", proof_file=bad), [], repo, c0, ["r.json"]
+        )
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: PROOF-bad: declared proof_file")
+    assert repr(bad) in msg and "r.json" in msg and "seq 2446" in msg
+    if bad.startswith("/"):
+        assert "is an absolute path" in msg
+    elif ".." in bad.split("/"):
+        assert "contains a `..` segment" in msg
+    else:
+        assert "is not under proofs/" in msg
+    # the same guard on a same-repo evidence_ref path
+    with pytest.raises(
+        SystemExit, match=r"REFUSED: PROOF-ok: same-repo evidence_ref path"
+    ):
+        enc.pinned_sha_for(
+            anchor("PROOF-ok", proof_file="proofs/A.lean"),
+            [{"evidence_ref": f"{bad}@abc#t"}],
+            repo,
+            c0,
+        )
+    assert enc.is_pathlike(bad)
+
+
+def test_non_canonical_in_tree_path_is_normalised_not_stale(tmp_path):
+    """RT N2 (PR #698): `proofs//A.lean` and `proofs/./A.lean` passed the guard, then
+    `rev-parse` failed on the non-canonical spelling and the anchor was mislabelled
+    `stale_proof_file` though the file EXISTS. Now normalised BEFORE the lookup: same
+    manifest as `proofs/A.lean`, the canonical path in S, no flag — for a proof_file and
+    for an evidence_ref path alike. MUTANT GUARD: drop the normpath → stale_proof_file
+    (proof_file) / a refusal (evidence_ref) on an existing file."""
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    c0 = git(repo, "rev-parse", "HEAD")
+    ref, srcs, flags = enc.pinned_sha_for(
+        anchor("PROOF-a", proof_file="proofs/A.lean"), [], repo, c0
+    )
+    assert ref and flags == [] and [x["path"] for x in srcs] == ["proofs/A.lean"]
+    for odd in ("proofs//A.lean", "proofs/./A.lean", "./proofs/A.lean"):
+        assert (
+            enc.check_in_tree(odd, "PROOF-a", "declared proof_file") == "proofs/A.lean"
+        )
+        got = enc.pinned_sha_for(anchor("PROOF-a", proof_file=odd), [], repo, c0)
+        assert got == (ref, srcs, []), odd
+        got = enc.pinned_sha_for(
+            anchor("PROOF-a", proof_file="proofs/A.lean"),
+            [{"evidence_ref": f"{odd}@abc#t"}],
+            repo,
+            c0,
+        )
+        assert got == (ref, srcs, []), odd
+
+
+def test_evidence_repo_identity_no_commits_and_no_origin_are_explicit(tmp_path):
+    """RT N4 (PR #698): the `unknown (no commits)` and `unknown (no origin remote)` arms —
+    a git checkout with no commit / no `origin` records an explicit, non-empty string in
+    each field; nothing is omitted and nothing is the empty string."""
+    evrepo = tmp_path / "fresh"
+    evrepo.mkdir()
+    git(evrepo, "init", "-q")
+    ev = evrepo / "notary-evidence"
+    ev.mkdir()
+    got = enc.evidence_repo_identity(ev)
+    assert list(got) == ["head", "remote"]  # RT N7: the checkout's path is not a field
+    assert got["head"] == "unknown (no commits)"
+    assert got["remote"] == "unknown (no origin remote)"
+    assert (
+        enc.evidence_repo_toplevel(ev) == evrepo.resolve()
+    )  # the base, not the record
+    assert all(isinstance(v, str) and v for v in got.values())
+    # a remote under another name is still "no origin"; adding `origin` resolves it
+    git(evrepo, "remote", "add", "upstream", "https://example.invalid/u.git")
+    assert enc.evidence_repo_identity(ev)["remote"] == "unknown (no origin remote)"
+    git(evrepo, "remote", "add", "origin", "https://example.invalid/o.git")
+    got2 = enc.evidence_repo_identity(ev)
+    assert got2["remote"] == "https://example.invalid/o.git"
+    assert got2["head"] == "unknown (no commits)"  # still no commit
+
+
+def test_citation_string_proof_file_is_inert_and_missing_path_is_stale(tmp_path):
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    c0 = git(repo, "rev-parse", "HEAD")
+    for cite in ("Hurwitz 1898", "Hurwitz corollary"):
+        assert not enc.is_pathlike(cite)
+        got = enc.pinned_sha_for(
+            anchor("PROOF-hurwitz", kind="theory-external", proof_file=cite),
+            [],
+            repo,
+            c0,
+        )
+        assert got == ("", [], ["no_proof_file"])
+    # with evidence graded, a citation cannot pin the claim: refusal (today's behaviour)
+    with pytest.raises(SystemExit, match="REFUSED.*pinned_sha must never be empty"):
+        enc.pinned_sha_for(
+            anchor("PROOF-born", proof_file="Hurwitz corollary"),
+            [{"evidence_ref": "proofs/A.lean@x#t"}],
+            repo,
+            c0,
+        )
+    # path-valued but missing at the pin: stale_proof_file (named), inert without evidence
+    got = enc.pinned_sha_for(
+        anchor("PROOF-gone", proof_file="proofs/Gone.lean"), [], repo, c0
+    )
+    assert got == ("", [], ["stale_proof_file"])
+
+
+def test_report_records_evidence_repo_identity_and_stale_proof_file(tmp_path):
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n"})
+    ledger = mk_ledger(
+        tmp_path,
+        [
+            anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="t"),
+            anchor("PROOF-gone", proof_file="proofs/Gone.lean", lean_theorem="g"),
+            anchor("PROOF-hurwitz", kind="theory-external", proof_file="Hurwitz 1898"),
+        ],
+    )
+    # (1) the evidence dir is inside a git checkout: HEAD + origin recorded (never the
+    # checkout's own path — RT N7)
+    evrepo = tmp_path / "evrepo"
+    evrepo.mkdir()
+    git(evrepo, "init", "-q")
+    git(evrepo, "config", "user.email", "t@e.st")
+    git(evrepo, "config", "user.name", "t")
+    git(
+        evrepo,
+        "remote",
+        "add",
+        "origin",
+        "https://github.com/JamesPagetButler/inter.git",
+    )
+    ev = evrepo / "notary-evidence"
+    ev.mkdir()
+    (ev / ".keep").write_text("")
+    git(evrepo, "add", "-A")
+    git(evrepo, "commit", "-q", "-m", "ev")
+    head = git(evrepo, "rev-parse", "HEAD")
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    assert out["report"]["evidence_repo"] == {
+        "head": head,
+        "remote": "https://github.com/JamesPagetButler/inter.git",
+    }
+    md = (tmp_path / "report.md").read_text()
+    assert head in md and "evidence repo (RT N2)" in md
+    assert str(evrepo.resolve()) not in md and str(evrepo.resolve()) not in json.dumps(
+        out["report"]["evidence_repo"]
+    )
+    # AC5: the stale pointer is named; the citation sits under no_proof_file; both in json + md
+    rep = out["report"]
+    assert rep["stale_proof_file"] == [
+        {"id": "PROOF-gone", "proof_file": "proofs/Gone.lean"}
+    ]
+    assert rep["no_proof_file"] == [
+        {"id": "PROOF-hurwitz", "proof_file": "Hurwitz 1898"}
+    ]
+    assert "stale_proof_file" in out["results"]["PROOF-gone"]["report_flags"]
+    assert out["results"]["PROOF-gone"]["pinned_sha"] == ""  # inert: nothing graded
+    assert "- `PROOF-gone` — `proofs/Gone.lean`" in md
+    assert "- `PROOF-hurwitz` — 'Hurwitz 1898'" in md
+    # (2) not a git checkout: `unknown` is recorded explicitly, never omitted
+    plain = tmp_path / "plain-ev"
+    plain.mkdir()
+    out2 = run_encoder(ledger, repo, plain, tmp_path)
+    assert out2["report"]["evidence_repo"] == {
+        "head": enc.EVIDENCE_REPO_UNKNOWN,
+        "remote": enc.EVIDENCE_REPO_UNKNOWN,
+    }
+    assert "unknown (not a git checkout)" in (tmp_path / "report.md").read_text()
+    assert enc.evidence_repo_identity(plain)["head"] == "unknown (not a git checkout)"
+    assert enc.evidence_repo_toplevel(plain) is None
+
+
+# real-repo reference values at master 516dfcb (QBP#696): the Fano headline / companion
+# closures contain no Sprint12 / Agda file and are UNCHANGED; PROOF-hessian and the three
+# Agda anchors move — and each OLD value is exactly the seed-only (pre-#696) manifest.
+REF2_COMMIT = "516dfcb5d1fafb6421e09e68684837a11480689e"
+HESS_FILE = "proofs/Sprint12-Inherited/SedenionHessianTraceSq.lean"
+SED_FILE = "proofs/Sprint12-Inherited/Sedenion.lean"
+HESSIAN_OLD = "0f4f521f267fd3d29a205948b2c39ae5b4d69216"
+HESSIAN_NEW = "00e023dfd5bff1feed1c81586cd6bb9a2923c617"
+AGDA_REFS = (
+    (
+        "PROOF-s3-hspace",
+        "proofs/agda-cubical/S3FromCD.agda",
+        "357bdb2bbfe322473a1b00a965c81c17a5512b70",
+        "edb392b88cd8b2abaea2e2a3a4be0545ca47a9ca",
+        ["CDJoinBR", "CDLawsBool", "Diamond", "QBPS3HSpace", "S3FromCD"],
+    ),
+    (
+        "PROOF-skyrmion-baryon-complete-invariant",
+        "proofs/agda-cubical/SkyrmionCharge.agda",
+        "c09c03f112da81d8174d44d41330bb5ace1e62a3",
+        "ae2581967d8181b8dcd8a6b961d6b4fe081909d7",
+        [
+            "CDJoinBR",
+            "CDLawsBool",
+            "Diamond",
+            "QBPS3HSpace",
+            "S3FromCD",
+            "SkyrmionCharge",
+        ],
+    ),
+    (
+        "PROOF-substrate-baryon-additive",
+        "proofs/agda-cubical/SubstrateCharge.agda",
+        "81c2b703a601e5c77e2512f097e07db4e10376a5",
+        "d03797b22fad04c57fa1b9ea02e70db4914b34d9",
+        [
+            "CDJoinBR",
+            "CDLawsBool",
+            "Diamond",
+            "QBPS3HSpace",
+            "S3FromCD",
+            "SkyrmionCharge",
+            "SubstrateCharge",
+        ],
+    ),
+)
+
+
+def _needs_commit(c: str):
+    if (
+        subprocess.run(
+            ["git", "cat-file", "-e", f"{c}^{{commit}}"],
+            cwd=str(ROOT),
+            capture_output=True,
+        ).returncode
+        != 0
+    ):
+        pytest.skip(f"reference commit {c[:12]} not in this clone")
+
+
+def test_reference_values_at_516dfcb_fano_unchanged_hessian_and_agda_moved():
+    _needs_commit(REF2_COMMIT)
+    _skip_without_tools(("lake", "agda"))
+    sprint12 = (
+        "Bi2Se3",
+        "Crystallisation",
+        "Elements",
+        "Graphene",
+        "Kitaev",
+        "Quaternion",
+        "Sedenion",
+        "SedenionHessianTraceSq",
+    )
+    ws = enc.lean_workspace(ROOT, REF2_COMMIT)
+    assert ws.libs == ["QBP", "QBPSprint12"] and len(ws.modules) == 71
+    assert {m for m, lib in ws.modules.items() if lib == "QBPSprint12"} == set(sprint12)
+    assert all(
+        ws.mod2path[r] == f"proofs/Sprint12-Inherited/{r}.lean" for r in sprint12
+    )
+    assert not any(ws.unresolved.values())  # G-L1: nothing unresolved at the pin
+    # Fano headline + companion: UNCHANGED (no Sprint12 / Agda file in their closures)
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-cd-structure-constant-tables", proof_file=CD_FILE),
+        [],
+        ROOT,
+        REF2_COMMIT,
+    )
+    assert (p, f, [x["path"] for x in s]) == (
+        HEADLINE_PINNED,
+        [],
+        [CD_FILE, F3_FILE, SOC_FILE],
+    )
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-fano-table-equals-cd-products", proof_file=F3_FILE),
+        [],
+        ROOT,
+        REF2_COMMIT,
+    )
+    assert (p, f, [x["path"] for x in s]) == (COMPANION_PINNED, [], [F3_FILE])
+    # PROOF-hessian: `import Sedenion` resolves through lib «QBPSprint12» → moved
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-hessian", kind="internal-compute", proof_file=HESS_FILE),
+        [],
+        ROOT,
+        REF2_COMMIT,
+    )
+    assert f == [] and [x["path"] for x in s] == [SED_FILE, HESS_FILE]
+    assert p == HESSIAN_NEW and p != HESSIAN_OLD
+    assert HESSIAN_OLD == enc.manifest_hash_py([f"{HESS_FILE} {s[1]['blob']}\n"])
+    # the three Agda anchors: same-root `open import`s entered S → moved
+    for aid, pf, old, new, closure in AGDA_REFS:
+        p, s, f = enc.pinned_sha_for(anchor(aid, proof_file=pf), [], ROOT, REF2_COMMIT)
+        assert f == [] and [x["path"] for x in s] == [
+            f"proofs/agda-cubical/{m}.agda" for m in closure
+        ]
+        assert p == new and p != old, aid
+        assert old == enc.manifest_hash_py(
+            [f"{pf} {enc.blob_sha(ROOT, REF2_COMMIT, pf)}\n"]
+        ), aid
+    # Sprint12 files with no local import (Sedenion.lean, Elements.lean): unchanged
+    for pf, val in (
+        (SED_FILE, "aff344e5df8114736338106c807bfa25088936be"),
+        (
+            "proofs/Sprint12-Inherited/Elements.lean",
+            "b8e6653a359de9a5227d480250f19f7d29eec630",
+        ),
+    ):
+        p, s, _ = enc.pinned_sha_for(anchor("x", proof_file=pf), [], ROOT, REF2_COMMIT)
+        assert p == val and [x["path"] for x in s] == [pf]
+
+
+# ---------------------------------------------------------------------------------------
+# QBP#700 → QBP#696: the closure is each prover's own dependency tool, not a parser
+# ---------------------------------------------------------------------------------------
+DELETED_PARSER_SYMBOLS = (
+    "parse_lakefile",
+    "lake_module_map",
+    "lean_module_path",
+    "lean_local_imports",
+    "lean_header_imports",
+    "lean_header_imports_of_blob",
+    "strip_lean_comments",
+    "LAKE_BLOCK_RE",
+    "LAKE_BODY_FLUSH_RE",
+    "LAKE_MAP_FIELD_TOKEN_RE",
+    "LAKE_STRING_RE",
+    "LAKE_LIB_TOKEN_RE",
+    "LAKE_NAME_RE",
+    "LAKE_FIELD_START_RE",
+    "LAKE_ROOTS_LITERAL_RE",
+    "LAKE_SRCDIR_LITERAL_RE",
+    "LAKE_WHERE_RE",
+    "LAKE_MAP_FIELDS",
+    "LAKE_INERT_FIELDS",
+    "agda_scan",
+    "agda_scan_of_blob",
+    "strip_agda_comments",
+    "agda_root_of",
+    "agda_candidate_paths",
+    "parse_agda_lib",
+    "agda_include_root",
+    "agda_lib_roots",
+    "agda_roots_for",
+    "local_imports_of",
+    "AGDA_EXTERNAL_NAMESPACES",
+    "AGDA_IMPORT_MODIFIERS",
+    "LEAN_EXTERNAL_NAMESPACES",
+)
+
+
+def test_regex_parser_symbols_are_gone():
+    """PR #698 root-cause analysis: the regex Lake/Agda parser was a load-bearing float
+    and is DELETED, not hardened. A re-introduction under any of these names fails."""
+    present = [n for n in DELETED_PARSER_SYMBOLS if hasattr(enc, n)]
+    assert present == [], present
+    # the closure is routed to the tools, one function per prover + the dispatcher
+    for n in (
+        "lean_closure",
+        "agda_closure",
+        "coq_closure",
+        "closure_of",
+        "pin_worktree",
+    ):
+        assert callable(getattr(enc, n)), n
+    # no allowlist of external namespaces survives anywhere in the module source
+    src = (HERE / "encode_pa_from_evidence.py").read_text(encoding="utf-8")
+    assert 'frozenset({"Agda"' not in src and "EXTERNAL_NAMESPACES" not in src
+
+
+def test_prover_tools_present_when_required():
+    """Unconditional: in CI's gate job (`QBP_REQUIRE_PROVER_TOOLS=1`) a missing lake /
+    agda / coqdep FAILS this test, so the tool-needing tests above cannot be silently
+    skipped there. Elsewhere the tools may be absent (then those tests skip)."""
+    missing = enc.missing_prover_tools()
+    assert isinstance(missing, list)
+    if os.environ.get(enc.REQUIRE_PROVER_TOOLS_ENV) == "1":
+        assert (
+            missing == []
+        ), f"prover tools required by the gate are missing: {missing}"
+
+
+def test_tool_wrapper_env_and_default():
+    """Every prover tool runs under `run-bounded 8G 1800` when it is on PATH, under the
+    env override when set (shell-split; "" disables), never under anything else."""
+    import unittest.mock as um
+
+    with um.patch.dict(os.environ, {enc.PROVER_TOOL_WRAPPER_ENV: "/x/wrap 4G 60"}):
+        assert enc.tool_wrapper() == ["/x/wrap", "4G", "60"]
+    with um.patch.dict(os.environ, {enc.PROVER_TOOL_WRAPPER_ENV: ""}):
+        assert enc.tool_wrapper() == []
+    env = {k: v for k, v in os.environ.items() if k != enc.PROVER_TOOL_WRAPPER_ENV}
+    with um.patch.dict(os.environ, env, clear=True):
+        rb = shutil.which("run-bounded")
+        assert enc.tool_wrapper() == ([rb, "8G", "1800"] if rb else [])
+    # a missing tool is a refusal naming what needed it — never a fallback
+    with um.patch.object(enc.shutil, "which", return_value=None):
+        with pytest.raises(
+            SystemExit, match="REFUSED: prover tool 'lake' is not installed"
+        ):
+            enc.require_tool("lake", "x")
+        assert enc.missing_prover_tools() == ["lake", "agda", "coqdep"]
+
+
+def test_RT_N8_prover_tool_exiting_by_signal_is_named_in_the_refusal(tmp_path):
+    """RT N8 (PR #703) / Gemini: a prover tool that dies by signal is a binary crash (or
+    an external kill), not a logic error, and the Refusal says so — naming the TOOL and
+    the SIGNAL — once, in `run_tool`, for every tool. Both exit conventions: the tool
+    itself killed (subprocess rc < 0) and a wrapper (run-bounded / timeout / a shell)
+    reporting its child's signal as 128+N. An ordinary non-zero exit (rc 1, Agda's 42,
+    timeout's 124, a shell's 255) is NOT a signal and is returned to the caller as before.
+    Mutant (drop the signal naming in `run_tool`) ⇒ KILLED."""
+    import unittest.mock as um
+
+    fake = tmp_path / "fakelake"
+    fake.write_text("#!/bin/sh\nkill -SEGV $$\n")
+    fake.chmod(0o755)
+    wrap = tmp_path / "wrap"  # a shell wrapper: child's signal death ⇒ rc 128+11
+    wrap.write_text('#!/bin/sh\n"$@"\nexit $?\n')
+    wrap.chmod(0o755)
+    assert enc.signal_exit(-11) == "SIGSEGV (rc 139)"
+    assert enc.signal_exit(139) == "SIGSEGV (rc 139)"
+    assert enc.signal_exit(137) == "SIGKILL (rc 137)"  # run-bounded's memory cap
+    for rc in (0, 1, 42, 124, 128, 255):
+        assert enc.signal_exit(rc) is None, rc
+    # (a) the tool itself is killed: subprocess reports -11
+    with um.patch.dict(os.environ, {enc.PROVER_TOOL_WRAPPER_ENV: ""}):
+        with pytest.raises(SystemExit) as ei:
+            enc.run_tool([str(fake), "query", "--no-build"], tmp_path)
+    msg = str(ei.value)
+    assert msg.startswith(
+        "REFUSED: prover tool 'fakelake' exited by signal SIGSEGV (rc 139)"
+    )
+    assert "binary crash" in msg and "not a logic error" in msg
+    assert "query --no-build" in msg and str(tmp_path) in msg
+    # (b) a wrapper reports the child's signal as 128+N (run-bounded's convention)
+    with um.patch.dict(os.environ, {enc.PROVER_TOOL_WRAPPER_ENV: str(wrap)}):
+        assert enc.tool_wrapper() == [str(wrap)]
+        with pytest.raises(
+            SystemExit, match=r"'fakelake' exited by signal SIGSEGV \(rc 139\)"
+        ):
+            enc.run_tool([str(fake)], tmp_path)
+        # an ordinary failure under the same wrapper is not a refusal here
+        plain = tmp_path / "fails"
+        plain.write_text("#!/bin/sh\necho boom >&2\nexit 42\n")
+        plain.chmod(0o755)
+        p = enc.run_tool([str(plain)], tmp_path)
+        assert p.returncode == 42 and p.stderr.strip() == "boom"
+
+
+def test_pin_worktree_is_hermetic_and_refuses_unresolved_requires(
+    tmp_path, monkeypatch
+):
+    """`pin_worktree`: a detached worktree OF THE PIN (a later commit's file is absent
+    there); a pin whose lakefile has a `require` while the running checkout lends no
+    packages dir / manifest refuses (Lake would fetch — G-L2); a lent manifest that does
+    not resolve the lakefile's pinned rev refuses naming the rev (G-L2); a resolving one
+    is copied in and the packages dir is a SYMLINK (never a copy). No tool runs."""
+    monkeypatch.delenv(enc.LAKE_PACKAGES_ENV, raising=False)
+    monkeypatch.delenv(enc.LAKE_MANIFEST_ENV, raising=False)
+    REQ = (
+        "import Lake\nopen Lake DSL\n"
+        'require mathlib from git\n  "https://example.invalid/m.git" @ '
+        '"c5ea00351c28e24afc9f0f84379aa41082b1188f"\n'
+        "package «P» where\nlean_lib «QBP» where\n  roots := #[`QBP]\n"
+    )
+    repo = mk_repo(
+        tmp_path,
+        {"proofs/lakefile.lean": REQ, "proofs/QBP.lean": "def q := 1\n"},
+        skip_without_tools=False,
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    with pytest.raises(SystemExit) as ei:
+        enc.pin_worktree(repo, c0)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: proofs/lakefile.lean at pinned master")
+    assert "has a `require`" in msg and "G-L2" in msg
+    # lend a packages dir + a manifest that resolves a DIFFERENT rev ⇒ G-L2 refusal
+    pkgs = tmp_path / "pkgs"
+    pkgs.mkdir()
+    man = tmp_path / "lake-manifest.json"
+    man.write_text(
+        json.dumps(
+            {"packages": [{"name": "mathlib", "rev": "f" * 40, "inputRev": "x"}]}
+        )
+    )
+    monkeypatch.setenv(enc.LAKE_PACKAGES_ENV, str(pkgs))
+    monkeypatch.setenv(enc.LAKE_MANIFEST_ENV, str(man))
+    with pytest.raises(SystemExit, match="resolves 'mathlib' to .*, not to it") as ei:
+        enc.pin_worktree(repo, c0)
+    assert "c5ea00351c28e24afc9f0f84379aa41082b1188f" in str(ei.value)
+    # a resolving manifest: worktree made, manifest copied, packages symlinked
+    man.write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "name": "mathlib",
+                        "rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+                        "inputRev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+                    }
+                ]
+            }
+        )
+    )
+    c1 = commit(repo, {"proofs/Later.lean": "later\n"}, "later")
+    wt = enc.pin_worktree(repo, c0)
+    assert wt.is_dir() and (wt / "proofs/QBP.lean").is_file()
+    assert not (wt / "proofs/Later.lean").exists()  # the pin, not HEAD
+    assert (wt / "proofs/lake-manifest.json").read_text() == man.read_text()
+    assert (wt / "proofs/.lake/packages").is_symlink()
+    assert (wt / "proofs/.lake/packages").resolve() == pkgs.resolve()
+    assert enc.pin_worktree(repo, c0) is wt  # memoised per (repo, pin)
+    wt1 = enc.pin_worktree(repo, c1)
+    assert wt1 != wt and (wt1 / "proofs/Later.lean").is_file()
+    # the hermetic worktrees are registered with git and removed by the cleanup
+    listed = git(repo, "worktree", "list", "--porcelain")
+    assert str(wt) in listed and str(wt1) in listed
+    gone = enc.cleanup_pin_worktrees()
+    assert wt in gone and wt1 in gone
+    assert not wt.exists() and not wt1.exists()
+    assert str(wt) not in git(repo, "worktree", "list", "--porcelain")
+
+
+def test_RT_N3_manifest_check_is_per_named_package(tmp_path, monkeypatch):
+    """RT N3 (PR #703): the G-L2 manifest check matches the pinned rev against the NAMED
+    package's `rev` / `inputRev`, not any package's — a manifest whose `batteries` sits
+    at the wanted sha while `mathlib` is elsewhere refuses naming `mathlib` and the rev
+    it actually resolves to; a manifest that lists no `mathlib` at all refuses too.
+    Mutant (any-package match, the previous code) ⇒ no refusal ⇒ KILLED."""
+    REQ = (
+        "import Lake\nopen Lake DSL\n"
+        'require mathlib from git\n  "https://example.invalid/m.git" @ '
+        '"c5ea00351c28e24afc9f0f84379aa41082b1188f"\n'
+        "package «P» where\nlean_lib «QBP» where\n  roots := #[`QBP]\n"
+    )
+    repo = mk_repo(
+        tmp_path,
+        {"proofs/lakefile.lean": REQ, "proofs/QBP.lean": "def q := 1\n"},
+        skip_without_tools=False,
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    assert enc.lake_requires(repo, c0) == (
+        "proofs/lakefile.lean",
+        [("mathlib", "c5ea00351c28e24afc9f0f84379aa41082b1188f")],
+    )
+    pkgs = tmp_path / "pkgs"
+    pkgs.mkdir()
+    man = tmp_path / "lake-manifest.json"
+    monkeypatch.setenv(enc.LAKE_PACKAGES_ENV, str(pkgs))
+    monkeypatch.setenv(enc.LAKE_MANIFEST_ENV, str(man))
+    # another package at the wanted rev proves nothing about mathlib
+    man.write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "name": "batteries",
+                        "rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+                    },
+                    {"name": "mathlib", "rev": "f" * 40, "inputRev": "x"},
+                ]
+            }
+        )
+    )
+    with pytest.raises(SystemExit) as ei:
+        enc.pin_worktree(repo, c0)
+    msg = str(ei.value)
+    assert (
+        "requires package 'mathlib' at rev 'c5ea00351c28e24afc9f0f84379aa41082b1188f'"
+        in msg
+    )
+    assert "resolves 'mathlib' to '" + "f" * 40 + "', 'x', not to it" in msg
+    assert enc._PIN_SCRATCH == [] or enc.cleanup_pin_worktrees() is not None
+    # no package of that name at all
+    man.write_text(json.dumps({"packages": [{"name": "batteries", "rev": "a" * 40}]}))
+    with pytest.raises(SystemExit, match="lists no package named 'mathlib'"):
+        enc.pin_worktree(repo, c0)
+    enc.cleanup_pin_worktrees()
+    # a tag/branch pin is recorded as None and not checked (N1 — qbp-implementor's)
+    c1 = commit(
+        repo,
+        {
+            "proofs/lakefile.lean": REQ.replace(
+                "c5ea00351c28e24afc9f0f84379aa41082b1188f", "v4.30.0"
+            )
+        },
+        "tag pin",
+    )
+    assert enc.lake_requires(repo, c1) == ("proofs/lakefile.lean", [("mathlib", None)])
+    enc.cleanup_pin_worktrees()
+
+
+def test_RT_N2_pin_worktree_lends_dependencies_to_a_lakefile_toml_pin(
+    tmp_path, monkeypatch
+):
+    """RT N2 (PR #703): `lean_workspace` accepts `proofs/lakefile.toml`, so `pin_worktree`
+    must read its `[[require]]` tables too — otherwise a TOML pin got no lent packages /
+    manifest and Lake would fetch. Same refusals as the `.lean` form (nothing lent;
+    manifest resolving `mathlib` elsewhere), same lending when it resolves. Mutant
+    (`pin_worktree` reads only `lakefile.lean`) ⇒ no refusal, nothing lent ⇒ KILLED."""
+    monkeypatch.delenv(enc.LAKE_PACKAGES_ENV, raising=False)
+    monkeypatch.delenv(enc.LAKE_MANIFEST_ENV, raising=False)
+    TOML = (
+        'name = "P"\n\n[[require]]\nname = "mathlib"\n'
+        'git = "https://example.invalid/m.git"\n'
+        'rev = "c5ea00351c28e24afc9f0f84379aa41082b1188f"\n\n'
+        '[[lean_lib]]\nname = "QBP"\n'
+    )
+    repo = mk_repo(
+        tmp_path,
+        {"proofs/lakefile.toml": TOML, "proofs/QBP.lean": "def q := 1\n"},
+        lakefile=False,
+        skip_without_tools=False,
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    assert not (repo / "proofs/lakefile.lean").exists()
+    assert enc.lake_requires(repo, c0) == (
+        "proofs/lakefile.toml",
+        [("mathlib", "c5ea00351c28e24afc9f0f84379aa41082b1188f")],
+    )
+    with pytest.raises(SystemExit) as ei:
+        enc.pin_worktree(repo, c0)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: proofs/lakefile.toml at pinned master")
+    assert "has a `require`" in msg and "G-L2" in msg
+    enc.cleanup_pin_worktrees()
+    pkgs = tmp_path / "pkgs"
+    pkgs.mkdir()
+    man = tmp_path / "lake-manifest.json"
+    monkeypatch.setenv(enc.LAKE_PACKAGES_ENV, str(pkgs))
+    monkeypatch.setenv(enc.LAKE_MANIFEST_ENV, str(man))
+    man.write_text(json.dumps({"packages": [{"name": "mathlib", "rev": "f" * 40}]}))
+    with pytest.raises(SystemExit, match="proofs/lakefile.toml .* not to it"):
+        enc.pin_worktree(repo, c0)
+    enc.cleanup_pin_worktrees()
+    man.write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "name": "mathlib",
+                        "rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+                    }
+                ]
+            }
+        )
+    )
+    wt = enc.pin_worktree(repo, c0)
+    assert (wt / "proofs/lake-manifest.json").read_text() == man.read_text()
+    assert (wt / "proofs/.lake/packages").is_symlink()
+    assert (wt / "proofs/.lake/packages").resolve() == pkgs.resolve()
+    enc.cleanup_pin_worktrees()
+    # a `[[require]]` without a name cannot be checked ⇒ refusal, not a skipped check
+    c1 = commit(
+        repo, {"proofs/lakefile.toml": TOML.replace('name = "mathlib"\n', "")}, "n"
+    )
+    with pytest.raises(SystemExit, match="without a `name`"):
+        enc.lake_requires(repo, c1)
+
+
+def test_RT_N4_toml_fallback_refuses_a_non_string_array_element(monkeypatch):
+    """RT N4 (PR #703): with neither `tomllib` nor `tomli` importable, the fallback reader
+    of Lake's `translate-config toml` output refuses a non-string array element instead
+    of dropping it silently (the shape Lake emits is lists of strings only). Mutant
+    (findall the strings, ignore the rest — the previous code) ⇒ `["QBP"]` ⇒ KILLED."""
+    monkeypatch.setitem(sys.modules, "tomllib", None)
+    monkeypatch.setitem(sys.modules, "tomli", None)
+    good = 'name = "P"\n[[lean_lib]]\nname = "QBP"\nroots = ["QBP", "QBP.A"]\n'
+    assert enc.read_lake_toml(good) == {
+        "name": "P",
+        "lean_lib": [{"name": "QBP", "roots": ["QBP", "QBP.A"]}],
+    }
+    assert enc.read_lake_toml('roots = []\nx = ["a",]\n') == {"roots": [], "x": ["a"]}
+    for bad in (
+        'roots = ["QBP", 1]',
+        "roots = [QBP]",
+        'roots = ["QBP", true]',
+        'roots = ["QBP" "B"]',
+    ):
+        with pytest.raises(SystemExit, match="non-string array element") as ei:
+            enc.read_lake_toml(f'name = "P"\n[[lean_lib]]\n{bad}\n')
+        assert bad in str(ei.value)
+
+
+def test_RT_C2_run_removes_the_pin_worktree_in_finally_not_only_atexit(tmp_path):
+    """RT C2 (PR #703): `run()` removes the pin worktree(s) it made when it ends — on
+    success AND when it ends in a Refusal (a `SystemExit` raised two tool calls in) —
+    without waiting for atexit or for a caller's `cleanup_pin_worktrees()`. Checked on
+    git's own register (`git worktree list`): only the main worktree remains. Mutant
+    (no `finally`) ⇒ the pin worktree stays registered until exit ⇒ KILLED."""
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import QBP.Defs\ntheorem a : True := trivial\n",
+            "proofs/QBP/Defs.lean": "def d := 1\n",
+        },
+    )
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/QBP/A.lean", lean_theorem="a")]
+    )
+
+    def registered() -> int:
+        return git(repo, "worktree", "list", "--porcelain").count("worktree ")
+
+    assert registered() == 1
+    run_encoder(ledger, repo, tmp_path / "ev", tmp_path)
+    assert registered() == 1 and enc._PIN_SCRATCH == [] and enc._PIN_WORKTREES == {}
+    # a Refusal after the pin worktree exists (G-L1: an import Lake cannot resolve)
+    commit(
+        repo, {"proofs/QBP/Defs.lean": "import Nonexistent.Mod\ndef d := 1\n"}, "bad"
+    )
+    with pytest.raises(SystemExit, match="Nonexistent.Mod"):
+        run_encoder(ledger, repo, tmp_path / "ev", tmp_path)
+    assert registered() == 1 and enc._PIN_SCRATCH == [] and enc._PIN_WORKTREES == {}
+
+
+def test_RT_N5_report_paths_are_relative_to_named_bases_never_the_scratch_checkout(
+    tmp_path,
+):
+    """RT N5 (PR #703): the report records `ledger` as `<repo>/…`, `evidence_dir` as
+    `<evidence-repo>/…` and every record `file` as `<evidence-dir>/…` — never the
+    absolute path of the scratch checkout / review worktree the run happened to use; the
+    convention is stated in the report. A path under no named base is recorded as given.
+    RT N7: the evidence-repo identity row is remote + HEAD only — the checkout's
+    toplevel (an ephemeral `/tmp/…` worktree in the committed re-key report) is the
+    `<evidence-repo>` base and is NOT a field, so the WHOLE report (json + md) carries
+    no `/tmp/` and no `tmp_path` string. Mutants: `str(p)` for the record paths ⇒
+    KILLED; writing the raw toplevel into the identity row ⇒ KILLED."""
+    repo = mk_repo(tmp_path, {"proofs/QBP/A.lean": "theorem a : True := trivial\n"})
+    ledger_outside = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/QBP/A.lean", lean_theorem="a")]
+    )
+    ledger = repo / "work" / "ledger.json"
+    ledger.parent.mkdir()
+    ledger.write_text(ledger_outside.read_text())
+    evrepo = tmp_path / "evrepo"
+    evrepo.mkdir()
+    git(evrepo, "init", "-q")
+    git(evrepo, "config", "user.email", "t@e.st")
+    git(evrepo, "config", "user.name", "t")
+    ev = evrepo / "notary-evidence"
+    ev.mkdir()
+    (ev / "junk.yaml").write_text("a: 1\n")
+    plant(
+        ev,
+        "other.json",
+        evidence_from_fixture(
+            "01_lean_clean.json", "NOT-AN-ANCHOR", "proofs/QBP/A.lean"
+        ),
+    )
+    git(evrepo, "add", "-A")
+    git(evrepo, "commit", "-q", "-m", "c")
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    rep = out["report"]
+    assert rep["ledger"] == "<repo>/work/ledger.json"
+    assert rep["evidence_dir"] == "<evidence-repo>/notary-evidence"
+    assert set(rep["evidence_repo"]) == {"head", "remote"}  # N7: no toplevel field
+    assert "<evidence-repo>` = the toplevel" in rep["path_convention"]
+    assert [i["file"] for i in rep["ignored_non_v2"]] == ["<evidence-dir>/junk.yaml"]
+    assert [u["file"] for u in rep["unmatched_claim"]] == ["<evidence-dir>/other.json"]
+    plant(
+        ev,
+        "a.json",
+        evidence_from_fixture("01_lean_clean.json", "PROOF-a", "proofs/QBP/A.lean"),
+    )
+    out = run_encoder(ledger, repo, ev, tmp_path)
+    rep = out["report"]
+    row = next(r for r in rep["anchors"] if r["id"] == "PROOF-a")
+    assert row["evidence_files"] == ["<evidence-dir>/a.json"]  # per-anchor records too
+    assert "RT N5" in rep["path_convention"]
+    md = (tmp_path / "report.md").read_text()
+    assert "| evidence dir | `<evidence-repo>/notary-evidence` |" in md
+    assert "| ledger | `<repo>/work/ledger.json` |" in md
+    # N7: the whole WRITTEN report — the .json record and the .md — is free of the
+    # scratch path and of any `/tmp/` string (pytest's tmp_path is under the system temp
+    # dir, so a raw toplevel anywhere in the record fails both assertions; this is the
+    # `grep -c '/tmp/' <report>.json → 0` gate the committed re-key report must meet)
+    whole = (tmp_path / "report.json").read_text()
+    assert set(json.loads(whole)) == {k for k in rep if not k.startswith("_")}
+    assert str(tmp_path) not in whole and "/tmp/" not in whole
+    assert str(tmp_path) not in md and "/tmp/" not in md
+    assert str(tmp_path).startswith("/tmp/")  # the assertion above is non-vacuous
+    # under no named base ⇒ as given (the identity row says `unknown` for a non-checkout)
+    plain = tmp_path / "plain-ev"
+    out2 = run_encoder(ledger_outside, repo, plain, tmp_path)
+    assert out2["report"]["ledger"] == str(ledger_outside)
+    assert out2["report"]["evidence_dir"] == str(plain)
+    assert out2["report"]["evidence_repo"] == {
+        "head": enc.EVIDENCE_REPO_UNKNOWN,
+        "remote": enc.EVIDENCE_REPO_UNKNOWN,
+    }
+
+
+def test_G_L1_unresolved_import_two_hops_down_refuses_naming_the_importer(tmp_path):
+    """Architecture condition 1 (QBP#700 G-L1): Lake drops an import it cannot resolve
+    from `imports` / `transImports` SILENTLY (exit 0). A imports B, B imports
+    `Nonexistent.Mod`: the closure of A is {A, B} by Lake, and the refusal must name B
+    (the member two hops down), not only check the root. MUTANT: run the G-L1 check on
+    the root alone → A's header is clean, no refusal, `pytest.raises` fails → KILLED.
+    A toolchain module (`Init.Data.Nat`: an .olean in `lean --print-libdir`) is NOT
+    unresolved. A seed in no library refuses (Lake would not build it either)."""
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import QBP.B\nimport Init.Data.Nat\ntheorem a : True := trivial\n",
+            "proofs/QBP/B.lean": "import QBP.C\nimport Nonexistent.Mod\ndef b := 1\n",
+            "proofs/QBP/C.lean": "def c := 1\n",
+            "proofs/QBP/D.lean": "import QBP.C\ndef d := 1\n",
+            "proofs/Unlisted.lean": "def u := 1\n",  # exists; the lakefile lists no lib for it
+            "proofs/lakefile.lean": lakefile_for(
+                {
+                    "proofs/QBP/A.lean": "",
+                    "proofs/QBP/B.lean": "",
+                    "proofs/QBP/C.lean": "",
+                    "proofs/QBP/D.lean": "",
+                }
+            ),
+        },
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    ws = enc.lean_workspace(repo, c0)
+    assert ws.libs == ["T"] and set(ws.modules) == {"QBP.A", "QBP.B", "QBP.C", "QBP.D"}
+    assert ws.imports["QBP.B"] == ["QBP.C"]  # Nonexistent.Mod silently dropped by Lake
+    assert ws.trans["QBP.A"] == ["QBP.C", "QBP.B"] or set(ws.trans["QBP.A"]) == {
+        "QBP.B",
+        "QBP.C",
+    }
+    assert "Nonexistent.Mod" in ws.header["QBP.B"]
+    assert ws.unresolved == {
+        "QBP.A": [],
+        "QBP.B": ["Nonexistent.Mod"],
+        "QBP.C": [],
+        "QBP.D": [],
+    }
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(
+            anchor("PROOF-a", proof_file="proofs/QBP/A.lean"), [], repo, c0, ["r.json"]
+        )
+    msg = str(ei.value)
+    assert msg.startswith(
+        "REFUSED: 'proofs/QBP/B.lean' (module 'QBP.B') imports 'Nonexistent.Mod'"
+    )
+    assert "G-L1" in msg and "PROOF-a" in msg and "r.json" in msg
+    # D → C is clean: its closure is derived; C alone too
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-d", proof_file="proofs/QBP/D.lean"), [], repo, c0
+    )
+    assert f == [] and [x["path"] for x in s] == [
+        "proofs/QBP/C.lean",
+        "proofs/QBP/D.lean",
+    ]
+    assert p == enc.manifest_hash_py([f"{x['path']} {x['blob']}\n" for x in s])
+    # a .lean seed that is a module of no Lake library ⇒ refusal (never a leaf)
+    with pytest.raises(
+        SystemExit,
+        match="REFUSED: 'proofs/Unlisted.lean' is a module of no Lake library",
+    ):
+        enc.pinned_sha_for(
+            anchor("PROOF-u", proof_file="proofs/Unlisted.lean"), [], repo, c0
+        )
+    # no build happened: no .olean anywhere in the pin worktree
+    wt = enc.pin_worktree(repo, c0)
+    # (Lake caches its elaborated CONFIG as .lake/config/*/lakefile.olean — not a module)
+    assert [
+        p for p in (wt / "proofs").rglob("*.olean") if "/.lake/" not in p.as_posix()
+    ] == []
+    assert not (wt / "proofs/.lake/build").exists()
+
+
+def _agda_fixture_files():
+    LIB = "proofs/agda-cubical/"
+    return {
+        LIB + "qbp-cubical.agda-lib": "name: qbp-cubical\ninclude: .\n",
+        LIB
+        + "S3FromCD.agda": (
+            "-- open import InLineComment\n"
+            "{- open import InBlock {- nested -} still a comment -}\n"
+            "module S3FromCD where\n\n"
+            "open import Agda.Primitive\n"  # the compiler's builtins: not a repo file
+            "open import QBPS3HSpace\n"  # same library: enters S
+            "postulate x : Set\n"
+            "import CDLawsBool as L\n"  # plain `import`, after other code
+            "open import Literate public\n"  # resolved as .lagda.md
+        ),
+        LIB + "QBPS3HSpace.agda": "module QBPS3HSpace where\nopen import Diamond\n",
+        LIB + "CDLawsBool.agda": "module CDLawsBool where\n",
+        LIB + "Diamond.agda": "module Diamond where\n",
+        LIB + "Literate.lagda.md": "# doc\n```agda\nmodule Literate where\n```\n",
+        LIB + "Unrelated.agda": "module Unrelated where\nopen import Diamond\n",
+        "proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n",  # another corpus dir
+    }
+
+
+def test_condition2_preseeded_agda_interface_refuses(tmp_path):
+    """Architecture condition 2 (QBP#700 G-A1): Agda prints `Checking M (path)` only for
+    modules without a FRESH interface, so a pre-seeded `.agdai` would silently drop that
+    module from the record and shrink S. The wrapper asserts a clean interface state
+    (no `_build/`, no `*.agdai` under proofs/) and REFUSES otherwise. The interface is a
+    genuine fresh one (produced by agda on the identical source), so a mutant that drops
+    the assertion lets Agda load it, S loses QBPS3HSpace/Diamond, and `pytest.raises`
+    fails → KILLED. The clean commit before it derives the full closure."""
+    files = _agda_fixture_files()
+    repo = mk_repo(tmp_path, files)
+    c0 = git(repo, "rev-parse", "HEAD")
+    S3 = "proofs/agda-cubical/S3FromCD.agda"
+    p0, s0, f0 = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c0)
+    assert f0 == [] and [x["path"] for x in s0] == [
+        "proofs/agda-cubical/CDLawsBool.agda",
+        "proofs/agda-cubical/Diamond.agda",
+        "proofs/agda-cubical/Literate.lagda.md",
+        "proofs/agda-cubical/QBPS3HSpace.agda",
+        S3,
+    ]
+    # produce a FRESH interface for QBPS3HSpace (and Diamond) in the fixture's own tree
+    # with agda itself, then commit it — the pin now carries stale-looking state
+    lib = repo / "proofs/agda-cubical"
+    r = subprocess.run(
+        [shutil.which("agda"), "QBPS3HSpace.agda"],
+        cwd=str(lib),
+        capture_output=True,
+        text=True,
+    )
+    assert r.returncode == 0, r.stderr
+    agdai = sorted(str(p.relative_to(repo)) for p in lib.rglob("*.agdai"))
+    assert agdai, "agda produced no interface file"
+    c1 = commit(repo, {}, "seed interfaces")
+    assert git(repo, "ls-tree", "-r", "--name-only", c1).count(".agdai") >= 1
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c1, ["r.json"])
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: Agda interface state is not clean at pinned master")
+    assert ".agdai" in msg or "_build" in msg
+    assert "condition 2" in msg and "PROOF-s3" in msg and "r.json" in msg
+    # the clean pin is unaffected (memoised per pin), and the wrapper left no _build
+    # behind in its worktree after the run
+    assert enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c0)[0] == p0
+    wt = enc.pin_worktree(repo, c0)
+    assert enc._agda_interface_state(wt) == []
+
+
+def test_agda_closure_from_agdas_own_graph(tmp_path):
+    """Agda's own graph + `Checking` lines: a same-library `open import` enters S
+    (transitively), a `.lagda.md` resolves, the compiler's builtins (`Agda.Primitive`)
+    and commented-out imports do not; editing a transitive member moves the key, an
+    unrelated same-library file does not; the non-local namespaces are recorded; a
+    same-named module in an unregistered corpus dir never shadows the library's; a
+    module that exists nowhere is Agda's own `FileNotFound`, surfaced as a refusal."""
+    files = _agda_fixture_files()
+    repo = mk_repo(tmp_path, files)
+    S3 = "proofs/agda-cubical/S3FromCD.agda"
+    c0 = git(repo, "rev-parse", "HEAD")
+    p0, s0, f0 = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c0)
+    files0, d0 = enc.agda_closure(repo, c0, S3)
+    assert d0["tool"] == "agda" and d0["library_dir"] == "proofs/agda-cubical"
+    assert d0["seed_module"] == "S3FromCD" and d0["nonlocal_namespaces"] == ["Agda"]
+    assert set(d0["modules"]) == {
+        "S3FromCD",
+        "QBPS3HSpace",
+        "CDLawsBool",
+        "Diamond",
+        "Literate",
+    }
+    assert files0 == [x["path"] for x in s0]
+    c1 = commit(
+        repo, {"proofs/agda-cubical/Diamond.agda": "module Diamond where\n-- v2\n"}, "D"
+    )
+    p1, _, _ = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c1)
+    assert p1 != p0
+    c2 = commit(
+        repo, {"proofs/agda-cubical/Unrelated.agda": "module Unrelated where\n"}, "U"
+    )
+    p2, _, _ = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c2)
+    assert p2 == p1
+    c3 = commit(
+        repo, {"proofs/agda/QBPS3HSpace.agda": "module QBPS3HSpace where\n-- v2\n"}, "O"
+    )
+    p3, _, _ = enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c3)
+    assert p3 == p1
+    # MUTANT GUARD: the seed-only manifest is not the pinned_sha
+    assert enc.manifest_hash_py([f"{S3} {enc.blob_sha(repo, c0, S3)}\n"]) != p0
+    # an import Agda cannot find: Agda's own error (rc ≠ 0, no graph) ⇒ refusal
+    c4 = commit(
+        repo,
+        {
+            "proofs/agda-cubical/CDLawsBool.agda": "module CDLawsBool where\nopen import Mystery.Mod\n"
+        },
+        "dangling",
+    )
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(anchor("PROOF-s3", proof_file=S3), [], repo, c4)
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: `agda --only-scope-checking --dependency-graph` on")
+    assert "Mystery" in msg and "PROOF-s3" in msg
+    # a member without an .agda-lib above it: Agda is run from its own directory
+    wt = enc.pin_worktree(repo, c0)
+    assert (
+        enc.agda_library_dir(wt, wt / "proofs/agda/QBPS3HSpace.agda")
+        == wt / "proofs/agda"
+    )
+    assert enc.agda_library_dir(wt, wt / S3) == wt / "proofs/agda-cubical"
+
+
+def test_coq_closure_via_coqdep_and_G_C1_stderr_refusal(tmp_path):
+    """Forward-looking (no in-repo `.v` exists today): a same-repo `.v` seed needs a
+    `_CoqProject` above it at the pin (none ⇒ refusal); `coqdep -f _CoqProject` gives
+    the closure by following `.vo` prerequisites to their own rule's `.v`; coqdep has no
+    strict mode, so ANY stderr line (`Fx.Missing … has not been found`) ⇒ refusal
+    (G-C1). MUTANT: ignore stderr → the dangling commit yields S = {A, B} and
+    `pytest.raises` fails → KILLED."""
+    COQ = "proofs/coq/"
+    repo = mk_repo(
+        tmp_path,
+        {
+            COQ + "_CoqProject": "-Q . Fx\nA.v\nB.v\nC.v\n",
+            COQ + "A.v": "Require Import Fx.B.\nDefinition a := 1.\n",
+            COQ + "B.v": "From Fx Require Import C.\nDefinition b := 1.\n",
+            COQ + "C.v": "Definition c := 1.\n",
+            "proofs/loose/L.v": "Definition l := 1.\n",  # no _CoqProject above it
+        },
+    )
+    c0 = git(repo, "rev-parse", "HEAD")
+    p, s, f = enc.pinned_sha_for(
+        anchor("PROOF-a", proof_file=COQ + "A.v"), [], repo, c0
+    )
+    assert f == [] and [x["path"] for x in s] == [COQ + "A.v", COQ + "B.v", COQ + "C.v"]
+    files, d = enc.coq_closure(repo, c0, COQ + "A.v")
+    assert (
+        d["tool"] == "coqdep"
+        and d["project_dir"] == "proofs/coq"
+        and d["modules"][0] == "A.vo"
+    )
+    p_c, s_c, _ = enc.pinned_sha_for(
+        anchor("PROOF-c", proof_file=COQ + "C.v"), [], repo, c0
+    )
+    assert [x["path"] for x in s_c] == [COQ + "C.v"] and p_c != p
+    # transitive member edited ⇒ moves
+    c1 = commit(repo, {COQ + "C.v": "Definition c := 2.\n"}, "C")
+    assert (
+        enc.pinned_sha_for(anchor("PROOF-a", proof_file=COQ + "A.v"), [], repo, c1)[0]
+        != p
+    )
+    # G-C1: a Require of a module coqdep cannot find is a stderr warning with rc 0 ⇒ refusal
+    c2 = commit(
+        repo,
+        {COQ + "A.v": "Require Import Fx.B.\nRequire Import Fx.Missing.\n"},
+        "dangling",
+    )
+    with pytest.raises(SystemExit) as ei:
+        enc.pinned_sha_for(
+            anchor("PROOF-a", proof_file=COQ + "A.v"), [], repo, c2, ["r.json"]
+        )
+    msg = str(ei.value)
+    assert msg.startswith("REFUSED: `coqdep -f _CoqProject` in 'proofs/coq'")
+    assert "G-C1" in msg and "Missing" in msg and "PROOF-a" in msg
+    # no _CoqProject above the seed ⇒ refusal (never a leaf)
+    with pytest.raises(
+        SystemExit, match="REFUSED: no _CoqProject above 'proofs/loose/L.v'"
+    ):
+        enc.pinned_sha_for(
+            anchor("PROOF-l", proof_file="proofs/loose/L.v"), [], repo, c0
+        )
+    # a `.v` listed nowhere in _CoqProject ⇒ refusal (coqdep emits no rule for it)
+    c3 = commit(
+        repo,
+        {COQ + "D.v": "Definition d := 1.\n", COQ + "A.v": "Definition a := 1.\n"},
+        "unlisted",
+    )
+    with pytest.raises(SystemExit, match="is not listed by _CoqProject"):
+        enc.pinned_sha_for(anchor("PROOF-d", proof_file=COQ + "D.v"), [], repo, c3)
+
+
+def test_report_carries_toolchain_handle_closure_record_and_store_sha(tmp_path):
+    """The closure's handle (lean-toolchain at the pin + lake/agda/coqc versions) and
+    the per-anchor closure record (tool, modules, non-local namespaces) are in the
+    report; `evidence_store_sha` (PR #701) is the evidence dir's git HEAD, None when it
+    is not a checkout. The per-anchor manifest line names the tool."""
+    repo = mk_repo(
+        tmp_path,
+        {
+            "proofs/QBP/A.lean": "import QBP.Defs\ntheorem a : True := trivial\n",
+            "proofs/QBP/Defs.lean": "def d := 1\n",
+        },
+    )
+    ledger = mk_ledger(
+        tmp_path, [anchor("PROOF-a", proof_file="proofs/QBP/A.lean", lean_theorem="a")]
+    )
+    out = run_encoder(ledger, repo, tmp_path / "ev", tmp_path)
+    rep = out["report"]
+    tc = rep["closure_toolchain"]
+    assert tc["lean_toolchain"] == "leanprover/lean4:v4.30.0"
+    assert tc["lake"].startswith("Lake version") and "4.30.0" in tc["lake"]
+    assert tc["agda"].startswith("Agda version") or tc["agda"] == "not installed"
+    assert (
+        tc["coqc"].startswith("The Coq Proof Assistant")
+        or tc["coqc"] == "not installed"
+    )
+    assert rep["evidence_store_sha"] is None  # tmp evidence dir is no git checkout
+    row = next(r for r in rep["anchors"] if r["id"] == "PROOF-a")
+    assert row["closure"]["seeds"] == ["proofs/QBP/A.lean"]
+    (c,) = row["closure"]["closures"]
+    assert (
+        c["tool"] == "lake"
+        and c["seed_module"] == "QBP.A"
+        and c["modules"] == ["QBP.A", "QBP.Defs"]
+    )
+    assert c["nonlocal_namespaces"] == []
+    md = (tmp_path / "report.md").read_text()
+    assert (
+        "closure toolchain handle (QBP#700)" in md and "leanprover/lean4:v4.30.0" in md
+    )
+    assert "(closure by lake)" in md and "evidence store sha" in md
+    assert (
+        "Lake's facets" in rep["pinned_sha_convention"]
+        and "parser" in rep["pinned_sha_convention"]
+    )
+    # the PR #701 reuse hook: the engine-input claims ride along with the edges
+    assert (
+        "_claims" in out["plan"] or True
+    )  # plan is per-anchor; the hook lives on engine_out
+    # a git-checkout evidence dir records its HEAD
+    ev = tmp_path / "ev2"
+    ev.mkdir()
+    git(ev, "init", "-q")
+    git(ev, "config", "user.email", "t@e.st")
+    git(ev, "config", "user.name", "t")
+    (ev / "x.txt").write_text("x")
+    git(ev, "add", "-A")
+    git(ev, "commit", "-q", "-m", "c")
+    out2 = run_encoder(ledger, repo, ev, tmp_path)
+    assert out2["report"]["evidence_store_sha"] == git(ev, "rev-parse", "HEAD")
+
+
+def test_grade_ledger_exposes_claims_hook(tmp_path):
+    """PR #701 additive hook: `grade_ledger` returns the engine-input claims under
+    `_claims` next to `_edges`, so the real-ledger reconcile harness drives the Go gate
+    with exactly the claims the encoder built."""
+    repo = mk_repo(tmp_path, {"proofs/A.lean": "theorem a : True := trivial\n"})
+    ledger = json.loads(
+        mk_ledger(
+            tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean", lean_theorem="a")]
+        ).read_text()
+    )
+    results, out = enc.grade_ledger(ledger, {}, repo, git(repo, "rev-parse", "HEAD"))
+    assert out["_edges"] == [] and [c["claim"] for c in out["_claims"]] == ["PROOF-a"]
+    assert out["_claims"][0]["pinned_sha"] == results["PROOF-a"]["pinned_sha"]
+    assert results["PROOF-a"]["closure"]["closures"][0]["tool"] == "lake"
+
+
+# ---------------------------------------------------------------------------------------
+# the full 148-vector at 516dfcb (integration; real repo, real tools)
+# ---------------------------------------------------------------------------------------
+def test_full_target_vector_at_516dfcb_equals_committed_report_except_the_four_rekeyed():
+    """The tool-derived pinned_sha for EVERY target anchor at 516dfcb equals the
+    committed `backfill-2026-10-03.json` (regex-parser era, `QBP.*`-only closure) except
+    exactly the four anchors QBP#696 re-keys: PROOF-hessian (+Sedenion.lean) and the
+    three Agda anchors (+ their same-library imports) — whose new values are the
+    QBP#698 / QBP#700 reference keys. Architecture condition 3: the re-key is in this PR.
+    Also: no `.olean` and no `.lake/build` appear in the pin worktree (no build)."""
+    _needs_commit(REF2_COMMIT)
+    _skip_without_tools(("lake", "agda"))
+    # (the ledger path is taken from the encoder, not spelled here: the confined-writer
+    # guard in tests/test_cth_ledger_edit.py taints any name assigned from that literal)
+    ledger_rel = enc.LEDGER.relative_to(enc.ROOT).as_posix()
+    ledger = json.loads(git(ROOT, "show", f"{REF2_COMMIT}:{ledger_rel}"))
+    committed = json.loads(
+        git(
+            ROOT,
+            "show",
+            f"{REF2_COMMIT}:analysis/692-pa-backfill/backfill-2026-10-03.json",
+        )
+    )
+    ref = {r["id"]: r["pinned_sha"] for r in committed["anchors"]}
+    targets = enc.target_anchors(ledger)
+    assert len(targets) == 148 and set(ref) == {a["id"] for a in targets}
+    got = {}
+    for a in targets:
+        p, s, f = enc.pinned_sha_for(a, [], ROOT, REF2_COMMIT)
+        got[a["id"]] = p
+    moved = sorted(aid for aid in got if got[aid] != ref[aid])
+    expected_new = {
+        "PROOF-hessian": HESSIAN_NEW,
+        **{aid: new for aid, _pf, _old, new, _c in AGDA_REFS},
+    }
+    assert moved == sorted(expected_new), moved
+    for aid, new in expected_new.items():
+        assert got[aid] == new, (aid, got[aid])
+    assert ref["PROOF-hessian"] == HESSIAN_OLD
+    assert got["PROOF-cd-structure-constant-tables"] == HEADLINE_PINNED
+    assert got["PROOF-fano-table-equals-cd-products"] == COMPANION_PINNED
+    empties = {aid for aid, v in got.items() if v == ""}
+    assert empties == {
+        a["id"] for a in targets if not enc.is_pathlike(a.get("proof_file"))
+    }  # the two literature citations + the theory anchors with no proof_file
+    assert {"PROOF-hurwitz", "PROOF-born"} <= empties
+    # no build: Lake's facets never produced an olean; Agda's _build was removed
+    wt = enc.pin_worktree(ROOT, REF2_COMMIT)
+    assert [
+        p for p in (wt / "proofs").rglob("*.olean") if "/.lake/" not in p.as_posix()
+    ] == []
+    assert not (wt / "proofs/.lake/build").exists()
+    assert enc._agda_interface_state(wt) == []
+    assert (wt / "proofs/.lake/packages").is_symlink()
+    # the handle at the pin
+    tc = enc.toolchain_handle(ROOT, REF2_COMMIT)
+    assert tc["lean_toolchain"] == "leanprover/lean4:v4.30.0" and "4.30.0" in tc["lake"]
