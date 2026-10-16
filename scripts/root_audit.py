@@ -419,6 +419,75 @@ def walk_chain(owner, start_ids, roots, principles, anchors):
     return unresolved, dangling, cycles
 
 
+def forcing_grounds_pa(rec, anchors):
+    """Report-only (Refs #692): the proof-assurance grade of each PROOF-*/MEAS- ground a
+    root is `forced_by`. For every such ground it reports pa_local / pa_effective (the
+    grades the encoder recomputes from Notary evidence and #701's reconcile guards against
+    hand-edits) and whether that ground currently forces — the same per-ground test
+    sort_root applies (`PROOF-*` verified / `MEAS-*` in a forcing status, and not dead).
+
+    This SURFACES PA next to the `proof_state` verdict sort_root already uses; it is
+    visibility ONLY and feeds nothing — not sort_root, not the buckets, not the failures,
+    not the exit code. A `verified` ground with pa_effective 0 (proof checks in-ledger but
+    carries no Notary PA-evidence yet) is exactly what this makes visible without changing
+    what forces. Gating forcing on PA is a separate, architecture-ruled decision (#692).
+    """
+    out = []
+    for aid in _as_list(rec.get("forced_by")):
+        if not isinstance(aid, str) or not aid.startswith(TERMINAL_ANCHOR_PREFIXES):
+            continue
+        a = anchors.get(aid)
+        if not isinstance(a, dict):  # missing or malformed anchor -> empty, never raise
+            a = {}
+        forces = bool(
+            a.get("status") not in DEAD_STATUSES
+            and (
+                (aid.startswith("PROOF-") and a.get("proof_state") == "verified")
+                or (aid.startswith("MEAS-") and a.get("status") in FORCING_STATUSES)
+            )
+        )
+        out.append(
+            {
+                "id": aid,
+                "pa_local": a.get("pa_local"),
+                "pa_effective": a.get("pa_effective"),
+                "forces": forces,
+            }
+        )
+    return out
+
+
+def terminator_pa(anchors):
+    """Report-only (Refs #692): PA grade of every PROOF-*/MEAS- anchor root_audit accepts as
+    a chain TERMINATOR (is_terminal: a PROOF-*/MEAS- id whose status is not dead). A live
+    chain that reaches such a node is treated as resolved-and-terminated regardless of PA;
+    this surfaces each terminator's pa_local / pa_effective so a `verified`-but-PA-0
+    terminator (proof checks in-ledger, no Notary PA-evidence recorded yet) is visible on the
+    report. Visibility ONLY — it feeds no termination verdict, no failure, no exit code. This
+    is the broad surface for #692: it is the terminator pool, not just root forcings."""
+    out = []
+    for aid, a in anchors.items():
+        if not (isinstance(aid, str) and aid.startswith(TERMINAL_ANCHOR_PREFIXES)):
+            continue
+        if not isinstance(a, dict) or a.get("status") in DEAD_STATUSES:
+            continue  # dead anchors are not terminators (is_terminal rejects them)
+        out.append(
+            {
+                "id": aid,
+                "proof_state": a.get("proof_state"),
+                "status": a.get("status"),
+                "pa_local": a.get("pa_local"),
+                "pa_effective": a.get("pa_effective"),
+            }
+        )
+    return out
+
+
+def _pa_tally(pa_rows, key="pa_effective"):
+    """Report-only: {pa value -> count} over PA rows, for the summary lines."""
+    return Counter(r.get(key) for r in pa_rows)
+
+
 def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
     roots, retired, principles, anchors, pop_problems, warnings, smuggled = collect(
         ledger
@@ -438,8 +507,14 @@ def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
             )
 
     sorted_roots = OrderedDict()
+    forcing_pa = (
+        OrderedDict()
+    )  # report-only (Refs #692): PA of each root's forcing grounds
     for rid, (where, rec) in roots.items():
         b, why = sort_root(rec, anchors)
+        fg = forcing_grounds_pa(rec, anchors)
+        if fg:
+            forcing_pa[rid] = fg
         reg = open_roots_reg.get(rid)
         if b is None and reg is None:
             failures.append(
@@ -555,6 +630,13 @@ def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
         "n_principles": len(principles),
         "n_anchors": len(anchors),
         "n_owners": len(owners),
+        # report-only (Refs #692): PA of forcing grounds + of the full terminator pool. Pure
+        # visibility — none of these feed failures or the exit code by design.
+        "forcing_pa": forcing_pa,
+        "forcing_pa_summary": Counter(
+            g["pa_effective"] for gs in forcing_pa.values() for g in gs if g["forces"]
+        ),
+        "terminator_pa": terminator_pa(anchors),
     }
 
 
@@ -593,6 +675,65 @@ def write_report(res, path, ledger_path, register_path):
         L.append(f"| {BUCKET[b]} | {cnt.get(b, 0)} |")
     L.append(f"| UNSORTED (registered or failing) | {cnt.get(None, 0)} |")
     L.append(f"| {BUCKET[4]} | {len(res['retired'])} |")
+    fpa = res.get("forcing_pa", {})
+    fsum = res.get("forcing_pa_summary", Counter())
+    tpa = res.get("terminator_pa", [])
+    ttally = _pa_tally(tpa)
+
+    def _tally_str(c):
+        return (
+            ", ".join(
+                f"PA-{k}×{v}" for k, v in sorted(c.items(), key=lambda kv: str(kv[0]))
+            )
+            or "none"
+        )
+
+    L += [
+        "",
+        "## PA of the grounds root_audit counts (report-only — Refs #692)",
+        "",
+        "Report-only: the proof-assurance grade (pa_local / pa_effective, recomputed from "
+        "Notary evidence and reconcile-guarded by #701) of the PROOF-*/MEAS- grounds this gate "
+        "relies on. It SURFACES PA next to the `proof_state` / `status` verdict the gate "
+        "already uses; it does NOT gate anything — no bucket, chain-termination verdict, failure "
+        "or exit code changes. A `verified` ground with pa_effective 0 means the proof checks "
+        "in-ledger but has no Notary PA-evidence recorded yet. Gating on PA is a separate, "
+        "architecture-ruled decision (#692).",
+        "",
+        f"### Chain terminator pool ({len(tpa)})",
+        "",
+        "Every non-dead PROOF-*/MEAS- anchor `is_terminal` accepts — the pool a live chain MAY "
+        "terminate at, not only those some chain currently reaches. (Count is the pool size.)",
+        "",
+        f"pa_effective tally: {_tally_str(ttally)}",
+        "",
+        "| terminator | proof_state | status | pa_local | pa_effective |",
+        "|---|---|---|---|---|",
+    ]
+    for t in tpa:
+        L.append(
+            f"| {t['id']} | {t.get('proof_state') or ''} | {t.get('status') or ''} | "
+            f"{t['pa_local']} | {t['pa_effective']} |"
+        )
+    L += [
+        "",
+        f"### Root forcings ({sum(len(g) for g in fpa.values())}) — grounds a root is forced_by",
+        "",
+        "`ground forces?` is this ground's per-ground forcing *capability* (the sort_root test), "
+        "NOT the root's outcome: sort_root rejects the whole root if any co-ground is dead/missing, "
+        "so a `yes` ground can still sit under an UNSORTED root (see the Roots table for the bucket).",
+        "",
+        f"pa_effective tally (forcing grounds only): {_tally_str(fsum)}",
+        "",
+        "| Root | ground | ground forces? | pa_local | pa_effective |",
+        "|---|---|---|---|---|",
+    ]
+    for rid, grounds in fpa.items():
+        for g in grounds:
+            L.append(
+                f"| {rid} | {g['id']} | {'yes' if g['forces'] else 'no'} | "
+                f"{g['pa_local']} | {g['pa_effective']} |"
+            )
     L += [
         "",
         f"## Chains: {res['n_principles']} principles + {res['n_anchors']} anchors; "
@@ -697,6 +838,16 @@ def main():
         f"cycles={len(res['cycles'])}, reported-only dangling="
         f"{sum(res['ungated_dangling'].values())} (registered chain_debt={len(chain_debt_reg)}); "
         f"warnings={len(res['warnings'])}"
+    )
+    ttally = _pa_tally(res.get("terminator_pa", []))
+    t_total = sum(ttally.values())
+    t_pa0 = ttally.get(0, 0)
+    t_ge1 = sum(v for k, v in ttally.items() if isinstance(k, int) and k >= 1)
+    n_forcings = sum(len(g) for g in res.get("forcing_pa", {}).values())
+    print(
+        f"PA (report-only, Refs #692): {t_total} chain terminators "
+        f"(pa_effective 0={t_pa0}, >=1={t_ge1}, other={t_total - t_pa0 - t_ge1}); "
+        f"{n_forcings} root-forcing grounds"
     )
     if res["failures"]:
         print(f"FAIL ({len(res['failures'])}):")

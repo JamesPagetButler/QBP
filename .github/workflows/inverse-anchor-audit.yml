@@ -63,3 +63,11 @@ jobs:
           # terminates in {root | PROOF | MEAS | experimental anchor} (seen-set cycle check).
           # Ledger-only; no baseline file exists for this gate (PATTERN-02).
           python3 scripts/root_audit.py
+      - name: root_audit report-only PA tests (PR-2, Refs #692)
+        run: |
+          # PR-2 surfaces each PROOF-*/MEAS- ground's PA grade (pa_local/pa_effective) next to
+          # the proof_state/status verdict — REPORT-ONLY, so these tests pin that it changes no
+          # bucket, chain-termination verdict, failure or exit code (a quiet turn into a PA-gate
+          # fails here). Co-located with the root_audit gate above.
+          pip install pytest
+          python3 -m pytest scripts/test_root_audit.py -v
