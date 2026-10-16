@@ -241,8 +241,23 @@ jobs:
           elif [ "$GATES_NFAIL" -gt 0 ]; then
             # ── TECH-GREEN: reviews owed ──
             add_label
-            BODY=$(printf '%s\n## 🟢 Tech-green — review-ready @ %s\n\nHead: `%s`. All non-review checks pass; review-completeness gates await artifacts.\n\n**Review checklist (sequential; each post must include `<!-- reviewed-sha: %s -->`):**\n- [ ] Red Team review (Sabine/Grothendieck/Knuth)\n- [ ] Gemini review (Furey/Feynman, real API)\n- [ ] Synthesis + fix rounds as needed (each fix push re-runs this cycle)\n- [ ] Human Visual Review (beekeeper)\n\nMachine-posted; updates per head SHA.' \
-              "$MARKER" "$TS" "$SHA" "$SHA")
+            # QBP#706: tick the Red Team / Gemini rows from the SAME detected review
+            # artifacts the Tier-3 gate uses, so this machine comment can never contradict
+            # the record (PR #705 showed all-unticked boxes although every leg was ticked
+            # with evidence in the PR body). Comments are joined by the gate's own boundary
+            # and the detection runs from the trusted master checkout (scripts/), reusing
+            # check_tier3_label's rule. A carried review (re-land case) counts like a fresh
+            # one. The "Synthesis + fix rounds" row is dropped — it is not a gate.
+            RT_BOX=" "; GM_BOX=" "
+            CF=$(mktemp)
+            gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate --jq '[.[].body]' \
+              | jq -s 'add // []' | jq -r 'join("\n===TIER3-COMMENT-BOUNDARY===\n")' > "$CF" 2>/dev/null || : > "$CF"
+            REVSTATE=$(python3 scripts/notifier_review_state.py --comments-file "$CF" 2>/dev/null || true)
+            printf '%s\n' "$REVSTATE" | grep -q '^red_team=1' && RT_BOX="x"
+            printf '%s\n' "$REVSTATE" | grep -q '^gemini=1'   && GM_BOX="x"
+            rm -f "$CF"
+            BODY=$(printf '%s\n## 🟢 Tech-green — review-ready @ %s\n\nHead: `%s`. All non-review checks pass; review-completeness gates await artifacts.\n\n**Review checklist** — mirrors detected review artifacts; the PR body is the record. Each review post must include `<!-- reviewed-sha: %s -->`:\n- [%s] Red Team review (Sabine/Grothendieck/Knuth)\n- [%s] Gemini review (Furey/Feynman, real API)\n- [ ] Human Visual Review (beekeeper)\n\nMachine-posted; updates per head SHA.' \
+              "$MARKER" "$TS" "$SHA" "$SHA" "$RT_BOX" "$GM_BOX")
           else
             # ── ALL-GREEN: tick the CI-green evidence box, then review-freshness ──
             # Every check (incl. review gates) passed → the "CI green" evidence
