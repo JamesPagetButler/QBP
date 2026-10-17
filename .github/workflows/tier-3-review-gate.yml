@@ -106,13 +106,18 @@ jobs:
           rc=$?
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           exit $rc
-      # #552: on comment/review events this run is NOT attached to the PR head sha by
-      # GitHub (it runs against the default branch), so branch protection would never see
-      # it. Publish the verdict as a check-run with the SAME name on the head sha, so the
-      # required check flips without an empty push. On pull_request events the job's own
-      # check-run already carries the verdict.
-      - name: Publish verdict as a check-run on the PR head (comment/review events)
-        if: always() && github.event_name != 'pull_request' && steps.pr.outputs.head != ''
+      # #552: an `issue_comment` run is NOT attached to the PR head sha by GitHub (it runs
+      # on the default branch, with the default branch's workflow + script), so the
+      # PR's checks would never see it. Publish the verdict as a check-run with the SAME
+      # name on the head sha, so the gate check flips without an empty push.
+      # `pull_request` and `pull_request_review` runs execute on refs/pull/N/merge and are
+      # natively attached to the PR head, so they do NOT republish (Red Team #717 F2).
+      # `!cancelled()` (not `always()`): a run superseded by the per-PR concurrency group
+      # must not post a stale `failure` on the head sha (Red Team #717 F1).
+      # Scope note: only ISSUE comments are read; PR *review* bodies (/pulls/N/reviews)
+      # are not, and never were — a review must be posted as a PR comment to count.
+      - name: Publish verdict as a check-run on the PR head (issue_comment events only)
+        if: ${{ !cancelled() && github.event_name == 'issue_comment' && steps.pr.outputs.head != '' }}
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD: ${{ steps.pr.outputs.head }}
@@ -127,5 +132,5 @@ jobs:
             -f details_url="$RUN_URL" \
             -f "output[title]=$S" \
             -f "output[summary]=Re-evaluated by tier-3-review-gate.yml on a ${{ github.event_name }} event (#552). Diff = merge-base three-dot (#580). Run: $RUN_URL" \
-            --silent
+            --jq '.id' | sed 's/^/check-run id: /'
           echo "check-run published: $C on $HEAD"
