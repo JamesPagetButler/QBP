@@ -451,7 +451,7 @@ The formulas in this document work identically at every row — only L_0 changes
 4. Procopio, L.M. et al. (2017). "Single-photon test of hyper-complex quantum theories using a metamaterial." *Nature Communications* 8, 15044.
 5. Tonomura, A. et al. (1989). "Demonstration of single-electron buildup of an interference pattern." *Am. J. Phys.* 57(2), 117-120.
 6. Furey, C. (2016). "Standard model physics from an algebra?" PhD thesis, University of Waterloo.
-7. Moretti, V. and Oppio, M. (2017). "Quantum theory in quaternionic Hilbert space: How Poincaré symmetry reduces the theory to the standard complex one." *Rev. Math. Phys.* 29(4), 1750021.
+7. Moretti, V. and Oppio, M. (2019). "Quantum theory in quaternionic Hilbert space: How Poincaré symmetry reduces the theory to the standard complex one." *Rev. Math. Phys.* 31, 1950013. arXiv:1709.09246. (Not to be confused with the same authors' *real*-Hilbert-space paper, *Rev. Math. Phys.* 29(4), 1750021 (2017), arXiv:1611.09029, which this document does not cite — corrected per #671; ledger record `REF-moretti-oppio-2019`.)
 8. ISO/IEC 80000. *Quantities and units.* International Organization for Standardization / International Electrotechnical Commission. https://en.wikipedia.org/wiki/ISO/IEC_80000
 9. Double-slit experiment. Wikipedia. https://en.wikipedia.org/wiki/Double-slit_experiment
 10. NIST. "Planck units." https://physics.nist.gov/cuu/Constants/
