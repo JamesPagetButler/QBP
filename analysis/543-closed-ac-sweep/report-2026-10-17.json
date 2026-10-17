@@ -1,0 +1,4426 @@
+{
+  "limit": 1000,
+  "repo": "JamesPagetButler/QBP",
+  "report_date": "2026-10-17",
+  "rows": [
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-10-16T17:34:35Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 700,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[spike] Can each prover's own dependency tool give the claim-source import closure at a pinned commit? (Lean / Agda / Coq) — blocks the QBP#696 decision",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/700"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 0,
+      "closedAt": "2026-10-16T17:34:30Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 696,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[cth] PA staleness key: extend the claim-source import closure to every lake library (QBPSprint12 bare roots) and to Agda open-import resolution — Red Team C8 on PR #695",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/696"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 0,
+      "closedAt": "2026-10-16T16:17:12Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#707"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 706,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[housekeeping] pr-check-status notifier: tick its review checklist from the detected review artifacts (it never ticks today and misreads as open work at the merge gate)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/706"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-10-15T02:55:08Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#701"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 692,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "ledger: record PA from Notary evidence via the encoder; CI rejects hand-typed PA; honest backfill",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/692"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 0,
+      "closedAt": "2026-10-03T17:21:23Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#695"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 693,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[cth] mint companion PROOF anchor for the Fano table the silicon pins (fanoTableF4_eq_cayleyDickson) — ruling (b) on QBP#692",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/693"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-30T21:12:03Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#691"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 690,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations] bridge lemma gradVof = RuleFlow.gradV (Substrate side) + re-scope anchor 4 of PR #689 and re-add its withheld chain edge",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/690"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-30T19:09:24Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#689"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 688,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[RESEARCH] #473: a positive account of the in-flight region — a definition, not a description (the spatial primitive question for Strategy C)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/688"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-28T02:56:20Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#687"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 668,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[cth] AXIOM-1 kill_condition[0] is defective in both directions: the DISCHARGE clause is satisfiable only by the zero flow; the KILL's first conjunct fires on any rest point of the zero-divisor locus",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/668"
+    },
+    {
+      "ac_total": 2,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-10T22:39:07Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 646,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[infra] CI `lake build` does not compile the lean_exe targets (oracle, gen_test_vectors) — their corpus is build-invisible to CI",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/646"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-10T22:39:06Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#645"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 625,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[infra] Extend check_layer_imports Rule-3 to physics dirs — build-invisibility gap (surfaced by #619)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/625"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-04T03:43:44Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#628"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 619,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations] Connect the orphan proofs back to the CTH — 1×1 validation, one large PR (oppenheimer)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/619"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-03T19:27:51Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 613,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations][audit] PROOF-fano: coherent/provenance_kind:proof but proof_state:written, no verification record (pre-AC3 legacy)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/613"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-03T18:17:48Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 615,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations][audit] 3 QBPHorizonFoundations anchors: DERIV/INSIGHT relabel half-applied — still provenance_kind:proof/coherent w/ phantom proof_file",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/615"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-03T18:17:46Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 617,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations][audit] Full-ledger audit: 17 phantom provenance_kind:proof anchors (proof_file 404, no verification)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/617"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 0,
+      "closedAt": "2026-09-01T17:41:45Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 607,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[substrate] #595: substrate-connection theorem B(f⋆g)=B(f)+B(g) — charge from the quaternion algebra (abstraction-barrier)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/607"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-08-31T13:29:02Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#603"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 594,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "[research] QBP-VML: CD-tower geometric objects — ZD hypersurface, norm quadric, associator variety",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/594"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-08-22T00:46:16Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 461,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations] [HOUSEKEEPING] Author docs/conventions/sedenion-indexing.md per F5 ratification",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/461"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 0,
+      "closedAt": "2026-08-20T04:26:22Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 578,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[substrate] Complete the CD-join step (S³ H-space) via the refinement loop — close the coherence square",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/578"
+    },
+    {
+      "ac_total": 7,
+      "ac_unticked": 0,
+      "closedAt": "2026-06-12T02:34:16Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#531"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 474,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations] [PHASE-1] Operations-complete tower ℝ→ℂ→ℍ→𝕆→𝕊 (proof-coverage manifest)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/474"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 0,
+      "closedAt": "2026-06-12T02:19:26Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#542"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 541,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[infra] review-gate integrity: tier-3 gate must verify real reviews (not just label) + autonomous fix-pass discipline (FAULT-S4-003)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/541"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-06-12T01:40:10Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#544"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 525,
+      "other_total": 5,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations] exp/log enhancements: full-ℝ one-parameter group law + left-inverse on the principal strip",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/525"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-06-08T13:59:53Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#533"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 530,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "[infra] markdown-link-check: harden against transient connection flakes (Status 0 / ESOCKETTIMEDOUT)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/530"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-06-05T16:21:47Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#512"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 509,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Post-foundations CTH reconciliation: v5.13 fold-in (24 anchors) + 74 provenance decisions + canonical README pointer",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/509"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-06-05T00:13:09Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#510"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 492,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[experiment] [HOUSEKEEPING] Oracle expectation field is 1-ULP inconsistent with prob_up−prob_down at 4 angles (surfaced by #490 PhysLean bridge)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/492"
+    },
+    {
+      "ac_total": 8,
+      "ac_unticked": 8,
+      "closedAt": "2026-06-04T21:40:47Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#493"
+      ],
+      "flagged": true,
+      "guard_unticked": 8,
+      "guard_would_catch": true,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 490,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[validation] Scoped pilot: PhysLean↔QBP differential test (Exp 01b cos²(θ/2)) — tooling + lean-prover deployment eval",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/490"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-06-04T21:38:03Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 503,
+      "other_total": 5,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "[foundations] 480-B: theorem inventory extracted from deleted #471 skeletons (rebuild plan of record)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/503"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 6,
+      "closedAt": "2026-06-04T20:03:25Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#485"
+      ],
+      "flagged": true,
+      "guard_unticked": 6,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 463,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations] [HOUSEKEEPING] CI lint: enforce status:untested ⟺ provenance:T invariant on CTH inventories",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/463"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-06-04T20:01:52Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#495"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 481,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "[foundations] [INFRA] Lean foundations CI gate (lake build + sorry/native_decide/stub ban + #print axioms)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/481"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-06-02T02:50:27Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#487"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 374,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Add sinc² diffraction envelope to Fraunhofer intensity formalization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/374"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-05-22T01:49:55Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "JamesPagetButler/qbp-systema#1"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 441,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "W1.2 — Bootstrap qbp-systema Go module + directory layout",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/441"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-05-22T01:45:06Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "JamesPagetButler/qbp-systema#2"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 445,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "W4.1 — Author qbp-systema scope-nodes.yaml per tenancy doc §3",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/445"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-05-22T01:40:54Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "JamesPagetButler/qbp-systema#3"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 442,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "W1.3 — Wire qbp-systema CI workflows (build-and-test, lint, CodeQL)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/442"
+    },
+    {
+      "ac_total": 13,
+      "ac_unticked": 13,
+      "closedAt": "2026-05-18T01:22:21Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 13,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 383,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Research: Design Sprint Mode with Oppenheimer AI gate",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/383"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-05-18T01:22:20Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 351,
+      "other_total": 18,
+      "other_unticked": 18,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Integrate Oppenheimer Strategic Lead persona into project workflow",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/351"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-05-15T20:58:47Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 317,
+      "other_total": 6,
+      "other_unticked": 6,
+      "stateReason": "COMPLETED",
+      "title": "Process: Evaluate parallel sub-agent workflow (Sprint 3 trial)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/317"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-05-15T20:38:43Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 365,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Complete review tier rework and activation matrix (#346 remaining ACs)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/365"
+    },
+    {
+      "ac_total": 9,
+      "ac_unticked": 9,
+      "closedAt": "2026-05-15T20:38:25Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#455"
+      ],
+      "flagged": true,
+      "guard_unticked": 9,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 346,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Process: Claude-Gemini Communication Patterns — structured collaboration with human tie-breaking",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/346"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-05-15T19:29:45Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 433,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: CI cross-reference linter for tenancy doc (PR #403 v0.2 A8 follow-up)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/433"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-05-15T19:29:44Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 427,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Add TOC to paper/wisdom_v1_4.md (PR #424 K3 follow-up)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/427"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-05-15T19:29:44Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 426,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Commit T1-T4 mp-arithmetic verification log as tracked anchor (PR #424 S2/F2 follow-up)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/426"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-05-15T17:49:46Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 408,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Pre-Sprint-4 Strategic Scoping: Lamb Shift vs Bell's Theorem priority decision",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/408"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-05-14T18:41:33Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#425"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: retrospective"
+      ],
+      "nil": 0,
+      "number": 192,
+      "other_total": 12,
+      "other_unticked": 12,
+      "stateReason": "COMPLETED",
+      "title": "Sprint 3 Retrospective: Experiment 03 (Double-Slit)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/192"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-05-14T13:50:11Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#416"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 81,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Sprint 3 Theory Refinement: Post Double-Slit Analysis",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/81"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-05-12T02:19:10Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "assignee: claude",
+        "phase: publication",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 65,
+      "other_total": 8,
+      "other_unticked": 8,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit - Phase 5: Publication",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/65"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-05-11T23:28:29Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#404"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 302,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Phase 4e — Verified Simulation Engine",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/302"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 6,
+      "closedAt": "2026-02-21T05:46:09Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#394"
+      ],
+      "flagged": true,
+      "guard_unticked": 6,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 379,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Migrate Python tooling from pip/venv to uv",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/379"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-21T04:44:51Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 377,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Refine Herschel Critical Path Audit to avoid GraphQL rate limit exhaustion",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/377"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-20T14:57:58Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 227,
+      "other_total": 2,
+      "other_unticked": 2,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Optimize layout algorithm sorting",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/227"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-20T14:57:35Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 376,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Resource log: Document API limits and account tiers",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/376"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 6,
+      "closedAt": "2026-02-20T07:53:17Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 6,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 380,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Add CI path filters to skip irrelevant jobs on docs-only PRs",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/380"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-20T02:43:48Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#392"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 301,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Phase 4d — Verified Differential Testing",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/301"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-20T01:56:59Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#391"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 261,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Phase 4c — Interactive Proof Visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/261"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-20T00:30:16Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#381"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 260,
+      "other_total": 5,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Phase 4b — Proof Review",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/260"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-19T23:42:13Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#386"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 388,
+      "other_total": 4,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Sprint 3 Rework: Level 1 — V(η) bridge theorems",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/388"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-19T20:49:11Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#373"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 259,
+      "other_total": 4,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Phase 4a — Formal Proof (Lean 4)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/259"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-19T18:21:05Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#371"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 369,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Process error: Far-field scale incomparability not caught by AI review",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/369"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-19T18:21:00Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#370"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 366,
+      "other_total": 2,
+      "other_unticked": 2,
+      "stateReason": "COMPLETED",
+      "title": "Update analysis/viz consumers to use CURRENT symlink (#341 follow-up)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/366"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-19T16:58:02Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#372"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 364,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Phase 4c: Update proof visualization to comply with design system",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/364"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-19T16:43:53Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 337,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Add free-space noise floor characterization for η",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/337"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 6,
+      "closedAt": "2026-02-19T03:14:06Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#368"
+      ],
+      "flagged": true,
+      "guard_unticked": 6,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: visualization",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 360,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Phase 3 Rework: Far-field QBP visualization + comparison plots (Exp 03)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/360"
+    },
+    {
+      "ac_total": 8,
+      "ac_unticked": 8,
+      "closedAt": "2026-02-17T20:38:50Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#361"
+      ],
+      "flagged": true,
+      "guard_unticked": 8,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: implementation",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 359,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Phase 2 Rework: Far-field QBP prediction via hybrid BPM + Fraunhofer FFT (Exp 03)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/359"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-17T19:49:45Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 238,
+      "other_total": 17,
+      "other_unticked": 17,
+      "stateReason": "COMPLETED",
+      "title": "Hypergraph: Research query library and CLI",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/238"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-17T19:49:45Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 229,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Visual emphasis on angle-dependent path in proof graph",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/229"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-17T19:49:44Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 228,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Add high-level conceptual overview to proof visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/228"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-16T19:17:37Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#358"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 353,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Add Inf/NaN defensive guards to Oracle.lean",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/353"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-16T19:17:37Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#358"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 352,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Fuzz-test or replace custom floatToScientific in Oracle.lean",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/352"
+    },
+    {
+      "ac_total": 1,
+      "ac_unticked": 1,
+      "closedAt": "2026-02-16T19:17:31Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#357"
+      ],
+      "flagged": true,
+      "guard_unticked": 1,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 356,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Normalize Panel C to common reference in analyze.py",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/356"
+    },
+    {
+      "ac_total": 8,
+      "ac_unticked": 8,
+      "closedAt": "2026-02-16T05:04:40Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#355",
+        "#367"
+      ],
+      "flagged": true,
+      "guard_unticked": 8,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: visualization",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 342,
+      "other_total": 16,
+      "other_unticked": 16,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit — Phase 3 Rework: Expected vs QBP Detector Comparison",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/342"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-15T16:16:54Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#347"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 348,
+      "other_total": 10,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Integrate issue lifecycle for housekeeping & research issues",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/348"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-15T15:45:50Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#345"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 339,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Update Operational Modes for Claude Opus 4.6 + Gemini 3 Pro capabilities",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/339"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-15T15:45:50Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#345"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 336,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Document diagnostic sampling frequency dependency",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/336"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-15T15:45:50Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#345"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 334,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Document η₀-independence of visibility in Phase 3 analysis",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/334"
+    },
+    {
+      "ac_total": 7,
+      "ac_unticked": 7,
+      "closedAt": "2026-02-15T07:01:39Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 7,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: visualization",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 338,
+      "other_total": 13,
+      "other_unticked": 13,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit — Phase 3: Visualization (SI Redo)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/338"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-15T07:01:38Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "assignee: claude",
+        "phase: visualization",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 37,
+      "other_total": 11,
+      "other_unticked": 11,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit - Phase 3: Visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/37"
+    },
+    {
+      "ac_total": 7,
+      "ac_unticked": 7,
+      "closedAt": "2026-02-15T06:40:08Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#343"
+      ],
+      "flagged": true,
+      "guard_unticked": 7,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: implementation",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 340,
+      "other_total": 15,
+      "other_unticked": 15,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit — Phase 2 Rework: Standardize Results Format for Fair Comparison",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/340"
+    },
+    {
+      "ac_total": 14,
+      "ac_unticked": 14,
+      "closedAt": "2026-02-15T03:53:10Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#333"
+      ],
+      "flagged": true,
+      "guard_unticked": 14,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: implementation",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 332,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit — Phase 2: Implementation (SI Redo)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/332"
+    },
+    {
+      "ac_total": 8,
+      "ac_unticked": 8,
+      "closedAt": "2026-02-14T23:47:21Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#331"
+      ],
+      "flagged": true,
+      "guard_unticked": 8,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: ground-truth",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 322,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit — Phase 1: Ground Truth (SI Redo)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/322"
+    },
+    {
+      "ac_total": 7,
+      "ac_unticked": 7,
+      "closedAt": "2026-02-14T20:51:14Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#330"
+      ],
+      "flagged": true,
+      "guard_unticked": 7,
+      "guard_would_catch": true,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 320,
+      "other_total": 20,
+      "other_unticked": 20,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: SI Standardization & Enforcement",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/320"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-14T15:52:59Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#328"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 321,
+      "other_total": 14,
+      "other_unticked": 14,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Implement Pivot Protocol for mid-sprint theory failures",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/321"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-14T15:52:35Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#327"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 324,
+      "other_total": 9,
+      "other_unticked": 9,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: SI test suite hardening",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/324"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-14T02:55:02Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#323"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 319,
+      "other_total": 2,
+      "other_unticked": 2,
+      "stateReason": "COMPLETED",
+      "title": "Research: Quaternionic SI Definitions",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/319"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 6,
+      "closedAt": "2026-02-13T21:51:09Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 6,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 289,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Enable Gemini Deep Research model (Interactions API)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/289"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-13T21:50:57Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#295"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 294,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Add --force flag to research_gate.py",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/294"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-13T21:50:57Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#295"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 293,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Add --exclude flag to research_gate.py for target claims",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/293"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-13T21:50:57Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#295"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 290,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Refine permission management for Sprint Mode and Project Mode",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/290"
+    },
+    {
+      "ac_total": 8,
+      "ac_unticked": 8,
+      "closedAt": "2026-02-13T21:50:57Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#295"
+      ],
+      "flagged": true,
+      "guard_unticked": 8,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 288,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Optimize Claude–Gemini communication for resolving QBP core premise",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/288"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-13T18:38:04Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 258,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Review: Evaluate knowledge graph workflow integration after Sprint 3",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/258"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-13T18:37:52Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#292"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping",
+        "type: docs"
+      ],
+      "nil": 0,
+      "number": 291,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Define when structured research occurs in sprint workflow",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/291"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-13T17:57:58Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#287"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "assignee: gemini",
+        "phase: implementation",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 36,
+      "other_total": 7,
+      "other_unticked": 7,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit - Phase 2: Implementation",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/36"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-13T05:05:05Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 286,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Retroactive Empirical Anchor sections for Sprints 1 & 2",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/286"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-13T05:02:59Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#116",
+        "#285"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "assignee: gemini",
+        "phase: ground-truth",
+        "priority: high",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 22,
+      "other_total": 8,
+      "other_unticked": 8,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 03: Double-Slit - Phase 1: Ground Truth",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/22"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-13T01:10:00Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#284"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 211,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "research: Generalize measurement to arbitrary 3D axes",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/211"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-13T00:49:40Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 255,
+      "other_total": 13,
+      "other_unticked": 13,
+      "stateReason": "COMPLETED",
+      "title": "Sprint 3 Pre-Sprint Research: Quaternionic Superposition Foundations",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/255"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-13T00:49:04Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 253,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Research: Visualization needs for quaternionic superposition intuition",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/253"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-13T00:48:57Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 252,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Research: Strengthen division algebra necessity argument",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/252"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 2,
+      "closedAt": "2026-02-13T00:15:39Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#262"
+      ],
+      "flagged": true,
+      "guard_unticked": 2,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 245,
+      "other_total": 16,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "feat: Phase 4e - Verified Simulation Engine with 3D Visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/245"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-13T00:15:39Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#262"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 242,
+      "other_total": 17,
+      "other_unticked": 17,
+      "stateReason": "COMPLETED",
+      "title": "feat: Implement Phase 4d - Verified Differential Testing",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/242"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T20:38:26Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 244,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: HyperNetX-based hypergraph visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/244"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-12T20:38:24Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 208,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "docs: Document physics/math rationale for axis color choices",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/208"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-12T20:38:09Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 225,
+      "other_total": 10,
+      "other_unticked": 10,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Knowledge graph integration with Lean 4 proofs",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/225"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-12T20:38:09Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 223,
+      "other_total": 11,
+      "other_unticked": 11,
+      "stateReason": "COMPLETED",
+      "title": "Hypergraph: HIF export and optional JSON-LD",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/223"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-12T20:38:08Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 217,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Deeper axiom justification documentation",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/217"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-12T20:38:08Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 207,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "docs: Add visual comparison of old vs new design palette",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/207"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T20:38:07Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#257"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 183,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Improve experiment validation script",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/183"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-12T20:37:22Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 248,
+      "other_total": 12,
+      "other_unticked": 12,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Integrate hypergraph knowledge tooling into workflow",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/248"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-12T19:55:22Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 209,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "NOT_PLANNED",
+      "title": "research: User test design palette with academic audience",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/209"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-12T18:15:00Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 220,
+      "other_total": 12,
+      "other_unticked": 12,
+      "stateReason": "COMPLETED",
+      "title": "Hypergraph: Schema validation for vertices and hyperedges",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/220"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T18:09:01Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 256,
+      "other_total": 7,
+      "other_unticked": 7,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Renumber experiments to align with sprint numbers",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/256"
+    },
+    {
+      "ac_total": 2,
+      "ac_unticked": 2,
+      "closedAt": "2026-02-12T18:08:53Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 2,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 231,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Update proof_graph_automation.md with viewport API",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/231"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T16:57:23Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 251,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Research: Moretti-Oppio scope and QBP falsification criteria",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/251"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T16:57:21Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 250,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Research: Physical motivation for quaternions in interference/superposition",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/250"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T16:57:19Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 249,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Research: Quaternionic wavefunction formalism for spatial superposition",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/249"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 1,
+      "closedAt": "2026-02-12T16:35:56Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 1,
+      "guard_would_catch": false,
+      "labels": [
+        "type: retrospective"
+      ],
+      "nil": 0,
+      "number": 191,
+      "other_total": 5,
+      "other_unticked": 1,
+      "stateReason": "COMPLETED",
+      "title": "Sprint 2 Retrospective: Experiment 01b (Angle-Dependent Measurement)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/191"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T16:32:27Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#243"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 165,
+      "other_total": 7,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Sprint 2 Theory Refinement",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/165"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T16:20:03Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: docs"
+      ],
+      "nil": 0,
+      "number": 254,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Process: Add Pre-Sprint Research Phase to workflow",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/254"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-12T15:55:21Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 215,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Add toolchain health check to session-start protocol",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/215"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T15:55:18Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 241,
+      "other_total": 7,
+      "other_unticked": 7,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Root Cause Analysis for CI Lint & Type Check Failures",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/241"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-12T04:56:22Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 222,
+      "other_total": 13,
+      "other_unticked": 13,
+      "stateReason": "NOT_PLANNED",
+      "title": "Hypergraph: Visualization with Hypergraph-DB and EasyHypergraph",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/222"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T04:33:33Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 212,
+      "other_total": 9,
+      "other_unticked": 9,
+      "stateReason": "COMPLETED",
+      "title": "Research Sprint 0R: Post-Sprint 1 Research Block",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/212"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T04:32:21Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "assignee: gemini",
+        "housekeeping",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 203,
+      "other_total": 17,
+      "other_unticked": 17,
+      "stateReason": "COMPLETED",
+      "title": "Research: 3D Interactive Experiment Visualizations with Go Game Engines",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/203"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T04:32:13Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 123,
+      "other_total": 6,
+      "other_unticked": 6,
+      "stateReason": "COMPLETED",
+      "title": "research: Investigate Lean 4 as verified experiment engine (Phase 4+)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/123"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-12T04:20:47Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 167,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Research: Identify where QBP predictions diverge from standard QM",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/167"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-12T04:20:39Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 234,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Research: Geometric interpretation of quaternions in spacetime context",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/234"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-12T04:20:37Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 233,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Research: Intuitive physical explanation for quaternion spin formulas",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/233"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-12T04:20:36Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 232,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Research: Division algebra justification for QBP",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/232"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-12T04:20:28Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "priority: medium",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 20,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Theoretical Investigation: Physical meaning of quaternion scalar component",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/20"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T04:20:27Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 136,
+      "other_total": 2,
+      "other_unticked": 2,
+      "stateReason": "COMPLETED",
+      "title": "Theory: Clarify quaternion observable relationship to operator formalism",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/136"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-12T04:20:25Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "status: triage",
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 6,
+      "other_total": 13,
+      "other_unticked": 13,
+      "stateReason": "COMPLETED",
+      "title": "Initial Project Premise & Setup Review",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/6"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-11T20:26:02Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#240"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 237,
+      "other_total": 18,
+      "other_unticked": 18,
+      "stateReason": "COMPLETED",
+      "title": "Hypergraph: YAML to Hypergraph-DB migration",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/237"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-11T20:23:09Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#240"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 236,
+      "other_total": 15,
+      "other_unticked": 15,
+      "stateReason": "COMPLETED",
+      "title": "Hypergraph: Core infrastructure and API wrapper",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/236"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-11T20:08:25Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 224,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Knowledge graph SQLite index",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/224"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-11T20:08:23Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 221,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Knowledge graph index auto-generation",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/221"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-11T19:00:41Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#230"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: publication",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 164,
+      "other_total": 14,
+      "other_unticked": 14,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01b: Angle-Dependent Measurement - Phase 5: Publication",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/164"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-11T18:38:37Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 163,
+      "other_total": 13,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01b: Angle-Dependent Measurement - Phase 4: Formal Verification",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/163"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-11T18:29:27Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#226"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 202,
+      "other_total": 10,
+      "other_unticked": 10,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01b: Phase 4c — Interactive Proof Visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/202"
+    },
+    {
+      "ac_total": 7,
+      "ac_unticked": 7,
+      "closedAt": "2026-02-11T16:09:43Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#219"
+      ],
+      "flagged": true,
+      "guard_unticked": 7,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 218,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Define Research Mode and research-focused personas",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/218"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-11T03:00:40Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#216"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 201,
+      "other_total": 10,
+      "other_unticked": 10,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01b: Phase 4b — Proof Review",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/201"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-10T23:37:58Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#214"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 213,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Fix mathlib toolchain mismatch in Lean proofs",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/213"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-10T22:11:18Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#210"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 200,
+      "other_total": 9,
+      "other_unticked": 9,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01b: Phase 4a — Formal Proof (Lean 4)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/200"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-10T20:17:03Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#205"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: visualization",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 162,
+      "other_total": 6,
+      "other_unticked": 6,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01b: Angle-Dependent Measurement - Phase 3: Visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/162"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-10T15:48:38Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#188"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "enhancement"
+      ],
+      "nil": 0,
+      "number": 142,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Automate proof graph generation from Lean environment",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/142"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-10T15:48:30Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#187"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 154,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping(proofs): Research strategy for cumulative Lean 4 libraries",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/154"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-10T15:47:38Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#186"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 126,
+      "other_total": 6,
+      "other_unticked": 6,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: Add CI check to enforce no-QBP-dependency in /libs/",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/126"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-10T15:46:44Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#185"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 158,
+      "other_total": 2,
+      "other_unticked": 2,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping(workflow): Define 'Full Project Mode' for Autonomous End-to-End Execution",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/158"
+    },
+    {
+      "ac_total": 7,
+      "ac_unticked": 7,
+      "closedAt": "2026-02-10T15:45:44Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#184"
+      ],
+      "flagged": true,
+      "guard_unticked": 7,
+      "guard_would_catch": true,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 156,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping(workflow): Define 'Sprint Mode' for AI Team Autonomy",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/156"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-10T15:41:31Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: retrospective"
+      ],
+      "nil": 0,
+      "number": 190,
+      "other_total": 13,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Sprint 1 Retrospective: Experiment 01 (Stern-Gerlach)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/190"
+    },
+    {
+      "ac_total": 10,
+      "ac_unticked": 10,
+      "closedAt": "2026-02-10T15:10:30Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#182"
+      ],
+      "flagged": true,
+      "guard_unticked": 10,
+      "guard_would_catch": true,
+      "labels": [
+        "priority: high",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 179,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Fix experiment numbering collision (02 duplicate)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/179"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-06T20:07:00Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#178"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: implementation",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 161,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01b: Angle-Dependent Measurement - Phase 2: Implementation",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/161"
+    },
+    {
+      "ac_total": 6,
+      "ac_unticked": 6,
+      "closedAt": "2026-02-06T19:47:38Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#176"
+      ],
+      "flagged": true,
+      "guard_unticked": 6,
+      "guard_would_catch": true,
+      "labels": [
+        "type: docs",
+        "type: infra"
+      ],
+      "nil": 0,
+      "number": 175,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Define Focus Mode (Single-Issue Development)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/175"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-06T19:47:36Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#174"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "documentation"
+      ],
+      "nil": 0,
+      "number": 168,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "docs: Make SU(2)/quaternion double-cover connection explicit in proofs",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/168"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-06T19:47:33Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#173"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "documentation"
+      ],
+      "nil": 0,
+      "number": 170,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "process: Update ground truth template to distinguish QM-matching vs novel predictions",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/170"
+    },
+    {
+      "ac_total": 3,
+      "ac_unticked": 3,
+      "closedAt": "2026-02-06T19:47:30Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#172"
+      ],
+      "flagged": true,
+      "guard_unticked": 3,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 169,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping: Evaluate workspace/gemini submodule for collaborator access",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/169"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T18:15:15Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#171"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 159,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Define Housekeeping Mode for autonomous batch cleanup",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/159"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T18:09:24Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 157,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping(workflow): Define 'Sprint Mode' for AI Team Autonomy",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/157"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-06T18:04:43Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#166"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "phase: ground-truth",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 160,
+      "other_total": 6,
+      "other_unticked": 6,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01b: Angle-Dependent Measurement - Phase 1: Ground Truth (Rework)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/160"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T17:11:32Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#153"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 152,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping: Consolidate architecture studies documentation",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/152"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T17:00:09Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "enhancement"
+      ],
+      "nil": 0,
+      "number": 143,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Generalize graph_layout() for multi-experiment support",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/143"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T17:00:06Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation"
+      ],
+      "nil": 0,
+      "number": 119,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "docs(paper): Update Theoretical Framework with corrected Axiom 3",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/119"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T16:59:54Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#155"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 125,
+      "other_total": 7,
+      "other_unticked": 7,
+      "stateReason": "COMPLETED",
+      "title": "Housekeeping: CONTRIBUTING.md follow-up improvements from PR #124 review",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/125"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T15:52:30Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 140,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Docs: Add simplified code example for probability calculation",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/140"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T15:52:28Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 139,
+      "other_total": 2,
+      "other_unticked": 2,
+      "stateReason": "COMPLETED",
+      "title": "Docs: Clarify statistical significance for synthetic experiments",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/139"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T15:41:44Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "enhancement",
+        "phase: publication",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 113,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "feat(paper): Embed analysis plot in Exp 1 Results section",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/113"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T05:46:58Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 138,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Theory: Algebraic justification for expectation value normalization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/138"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T05:45:53Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 137,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Theory: Justify dot product for probability extraction",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/137"
+    },
+    {
+      "ac_total": 5,
+      "ac_unticked": 5,
+      "closedAt": "2026-02-06T05:31:54Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#151"
+      ],
+      "flagged": true,
+      "guard_unticked": 5,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 150,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Workflow optimization: Reduce review overhead and increase velocity",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/150"
+    },
+    {
+      "ac_total": 7,
+      "ac_unticked": 7,
+      "closedAt": "2026-02-06T05:13:50Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#149"
+      ],
+      "flagged": true,
+      "guard_unticked": 7,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 148,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Security audit: Check for exposed secrets and implement best practices",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/148"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T05:02:05Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#147"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 80,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Sprint 1 Theory Refinement: Post Stern-Gerlach Analysis",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/80"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T04:28:41Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#112"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "assignee: claude",
+        "phase: publication",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 64,
+      "other_total": 17,
+      "other_unticked": 17,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 1: Stern-Gerlach - Phase 5: Publication",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/64"
+    },
+    {
+      "ac_total": 4,
+      "ac_unticked": 4,
+      "closedAt": "2026-02-06T04:17:04Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#145"
+      ],
+      "flagged": true,
+      "guard_unticked": 4,
+      "guard_would_catch": true,
+      "labels": [
+        "housekeeping",
+        "priority: high"
+      ],
+      "nil": 0,
+      "number": 144,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "[Housekeeping]: Review and validate AC Verification Protocol addition to CONTRIBUTING.md",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/144"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-06T03:55:09Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "assignee: gemini",
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 55,
+      "other_total": 27,
+      "other_unticked": 20,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 1: Stern-Gerlach - Phase 4: Formal Proof",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/55"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-05T23:40:40Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#134"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 133,
+      "other_total": 7,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 1: Phase 4c — Interactive Proof Visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/133"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-05T05:06:20Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 132,
+      "other_total": 5,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 1: Phase 4b — Proof Review",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/132"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-05T05:06:19Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 131,
+      "other_total": 4,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 1: Phase 4a — Formal Proof (Lean 4)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/131"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-05T04:35:24Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#129"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 122,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping: Reconcile persona definitions across CONTRIBUTING.md and workflow docs",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/122"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-05T04:08:31Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 128,
+      "other_total": 8,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "docs: Restructure Phase 4 into sub-phases 4a/4b/4c",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/128"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-05T02:41:33Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#121"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 120,
+      "other_total": 16,
+      "other_unticked": 16,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping: Add critical-path navigator to prevent lifecycle drift",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/120"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T06:53:07Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#115"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 114,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "housekeeping: Investigate robust cross-referencing for artifacts",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/114"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T06:37:33Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "bug"
+      ],
+      "nil": 0,
+      "number": 118,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "fix(proofs): Correct Axiom 3 in Basic.lean",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/118"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T06:37:31Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "bug"
+      ],
+      "nil": 0,
+      "number": 117,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "fix(physics): Correct Axiom 3 in qphysics.py",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/117"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T04:54:57Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#111"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "assignee: gemini",
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 108,
+      "other_total": 17,
+      "other_unticked": 17,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01: Stern-Gerlach - Phase 4: Formal Proof (Review)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/108"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T03:57:31Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#105"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: implementation",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 103,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01: Stern-Gerlach - Phase 2: Implementation (Retrofit)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/103"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T03:57:31Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#105"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: ground-truth",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 102,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01: Stern-Gerlach - Phase 1: Ground Truth (Retrofit)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/102"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T03:57:31Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#105"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 101,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Methodology Gap: Inconsistent Documentation of Experimental Ground Truths and Lack of Structured Analysis",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/101"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T03:50:58Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#107"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation",
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 106,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "docs: Add schema and plan for publication workflow",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/106"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T03:41:50Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#110"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: visualization",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 109,
+      "other_total": 7,
+      "other_unticked": 2,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01: Stern-Gerlach - Phase 3: Visualization & Analysis (Retrofit)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/109"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T03:00:11Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: proof",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 104,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 01: Stern-Gerlach - Phase 4: Formal Proof (Review)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/104"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-04T02:53:31Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#99"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 98,
+      "other_total": 7,
+      "other_unticked": 7,
+      "stateReason": "COMPLETED",
+      "title": "Verify Lean 4 proofs compile successfully",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/98"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T08:47:57Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 97,
+      "other_total": 5,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Add multi-agent git coordination documentation",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/97"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T08:47:56Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#96"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 93,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Add missing content from closed PR #92",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/93"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T07:52:22Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 91,
+      "other_total": 3,
+      "other_unticked": 3,
+      "stateReason": "COMPLETED",
+      "title": "Add housekeeping label guidelines to CONTRIBUTING.md",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/91"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T07:52:21Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#79"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 78,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "docs: Document Research Lifecycle (Sprint → Refine → Sprint)",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/78"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T07:32:15Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "nil": 0,
+      "number": 90,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Fix TODO.md: restore traceability and correct inaccuracies",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/90"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T06:32:12Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "assignee: claude",
+        "phase: visualization",
+        "priority: high",
+        "status: ready",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 29,
+      "other_total": 14,
+      "other_unticked": 14,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 1: Stern-Gerlach - Phase 3: Visualization",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/29"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T05:49:10Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#75"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "priority: low",
+        "type: docs"
+      ],
+      "nil": 0,
+      "number": 21,
+      "other_total": 14,
+      "other_unticked": 14,
+      "stateReason": "COMPLETED",
+      "title": "Document Lean 4 setup process for formal verification",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/21"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T04:26:48Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: implementation",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 53,
+      "other_total": 13,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 1: Stern-Gerlach - Phase 2: Implementation",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/53"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T04:26:46Z",
+      "closed_by": "manual",
+      "closing_prs": [],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "phase: ground-truth",
+        "type: experiment"
+      ],
+      "nil": 0,
+      "number": 52,
+      "other_total": 9,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Experiment 1: Stern-Gerlach - Phase 1: Ground Truth",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/52"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T03:25:58Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#73"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "type: research"
+      ],
+      "nil": 0,
+      "number": 54,
+      "other_total": 0,
+      "other_unticked": 0,
+      "stateReason": "COMPLETED",
+      "title": "Red Team Review: Proposed 5-Phase Experimental Lifecycle",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/54"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T02:27:09Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#28"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "enhancement"
+      ],
+      "nil": 0,
+      "number": 19,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Create angle-dependent measurement test experiment",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/19"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T02:17:35Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#27"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "enhancement"
+      ],
+      "nil": 0,
+      "number": 18,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Vectorize Stern-Gerlach simulation loop for performance",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/18"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T02:17:35Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#27"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "enhancement"
+      ],
+      "nil": 0,
+      "number": 17,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Add Python type hints to qphysics.py",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/17"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T02:17:35Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#27"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "enhancement"
+      ],
+      "nil": 0,
+      "number": 16,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Add seed parameter to measure() for reproducible tests",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/16"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T02:17:32Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#26"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "enhancement"
+      ],
+      "nil": 0,
+      "number": 25,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Automate black formatting to prevent CI failures",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/25"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-03T02:17:32Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#26"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [
+        "documentation"
+      ],
+      "nil": 0,
+      "number": 24,
+      "other_total": 5,
+      "other_unticked": 5,
+      "stateReason": "COMPLETED",
+      "title": "Add research/README.md documenting ground truth files",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/24"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-01T23:30:03Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#8"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 7,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Set up CI/CD testing infrastructure",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/7"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-01T22:46:21Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#4"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 3,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Create Futuristic Steampunk Design System",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/3"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "closedAt": "2026-02-01T22:45:02Z",
+      "closed_by": "pr",
+      "closing_prs": [
+        "#2"
+      ],
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_catch": false,
+      "labels": [],
+      "nil": 0,
+      "number": 1,
+      "other_total": 4,
+      "other_unticked": 4,
+      "stateReason": "COMPLETED",
+      "title": "Establish Visualization Framework",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/1"
+    }
+  ],
+  "summary": {
+    "any_unticked_box": 161,
+    "clean": 45,
+    "closedAt_max": "2026-10-16T17:34:35Z",
+    "closedAt_min": "2026-02-01T22:45:02Z",
+    "closed_by_pr": 117,
+    "closed_manually": 89,
+    "flagged_closed_by_pr": 54,
+    "flagged_closed_manually": 33,
+    "flagged_pr_guard_would_catch": 54,
+    "flagged_unticked_ac": 87,
+    "other_only_unticked": 74,
+    "scanned": 206,
+    "since": "",
+    "total_unticked_ac_boxes": 408
+  }
+}
