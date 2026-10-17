@@ -103,7 +103,10 @@ def strip_comments(text: str) -> str:
     `--` inside a block comment never starts a line comment, and `/-` inside a
     line comment never opens a block: the scanner is in exactly one state at a
     time. String literals are not modelled (an `import` can never follow one on
-    the same logical line in valid Lean, so this cannot create a false negative).
+    the same logical line in valid Lean, so this cannot create a false negative). Known, accepted
+    false-POSITIVE risk (Gemini, PR #719): a multi-line string literal whose body
+    starts a line with `import X` would be counted; no Foundations file does this,
+    and a false positive fails loud at review rather than silently passing.
     An unterminated block comment swallows the rest of the file, as Lean would.
     """
     out: list[str] = []
