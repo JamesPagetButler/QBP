@@ -1,7 +1,7 @@
 # QBP Facility Micro-Interior — Main Research Hallway
 
 > **Canonical home moved — this copy is a frozen pointer.**
-> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design/micro_interior_hallway.md` @ `74b072a` (craft PR #2, branch `import/port-design-corpus`; sha updates to the merge sha when it lands — QBP#711/#712).
+> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design/micro_interior_hallway.md` @ `4846aae` (craft PR #2, branch `import/port-design-corpus`; sha updates to the merge sha when it lands — QBP#711/#712).
 > This QBP copy is frozen at QBP master `18ec30e` (authored commit `3630aa0`, 2026-02-22). Edit the craft copy, not this one.
 >
 > **Visibility (beekeeper decision, 2026-10-17):** craft is private for now; the Port evolves there and **craft goes public once the Port is working**, rejoining the public record. Until then this frozen copy is the public record.
