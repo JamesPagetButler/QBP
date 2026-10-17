@@ -81,8 +81,13 @@ jobs:
           # reviewer signature AND a verdict (FAULT-S4-003 fix). The notifier's
           # reviewer-naming checklist carries a signature but no verdict, so it
           # cannot satisfy the gate.
-          gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
-            --jq '[.[].body] | join("\n===TIER3-COMMENT-BOUNDARY===\n")' > /tmp/comments.txt || true
+          # #552 security: pass the RAW comment JSON (incl. author_association) — the script
+          # keeps only OWNER/MEMBER/COLLABORATOR authors, so on a public repo an outsider's
+          # comment can trigger a re-run but can never count as review evidence.
+          gh api --paginate "repos/${{ github.repository }}/issues/${PR}/comments" \
+            --jq '[.[] | {body, author_association, user: {login: .user.login}}]' \
+            | python3 -c 'import json,sys; out=[]; [out.extend(json.loads(l)) for l in sys.stdin if l.strip()]; json.dump(out, sys.stdout)' \
+            > /tmp/comments.json || echo "[]" > /tmp/comments.json
           # FAULT-S4-006 fix: the PR body is DELIBERATELY NOT included. It is authored by
           # the PR author, not a reviewer — a signature-word + verdict-word co-occurring in
           # body prose (e.g. "clears the Red Team follow-up" next to "§I4 APPROVE") satisfied
@@ -97,7 +102,7 @@ jobs:
           python3 scripts/check_tier3_label.py \
             --changed-files /tmp/changed.txt \
             --labels-file /tmp/labels.txt \
-            --comments-file /tmp/comments.txt
+            --comments-json /tmp/comments.json
           rc=$?
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           exit $rc
