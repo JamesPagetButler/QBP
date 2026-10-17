@@ -1,5 +1,12 @@
 # QBP Facility — The Central Hub ("The Nexus")
 
+> **Canonical home moved — this copy is a frozen pointer.**
+> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `<CRAFT_PATH>` @ `<CRAFT_SHA>` (fill on import; see QBP#711).
+> This QBP copy is frozen at QBP master `18ec30e` (authored commit `3630aa0`, 2026-02-22). Edit the craft copy, not this one.
+>
+> **Provenance (travels with the file):** origin `JamesPagetButler/QBP`; authors — James Paget Butler (beekeeper), Gemini as **Paget** / Bio-Symmetry Design Group, Claude (engine cartography & editing). QBP retains its *reading* of the Port (the deepest-unknowns-in-both-directions metaphor) and construction of its own experiment spaces; the Port's definition is the craft copy.
+
+
 **Lead Bio-Synthesist:** Paget  
 **Status:** Concept Synthesized (Sprint 3)
 

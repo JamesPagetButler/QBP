@@ -1,5 +1,12 @@
 # QBP Research Facility — Location & World Reference
 
+> **Canonical home moved — this copy is a frozen pointer.**
+> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `<CRAFT_PATH>` @ `<CRAFT_SHA>` (fill on import; see QBP#711).
+> This QBP copy is frozen at QBP master `18ec30e` (authored commit `3630aa0`, 2026-02-22). Edit the craft copy, not this one.
+>
+> **Provenance (travels with the file):** origin `JamesPagetButler/QBP`; authors — James Paget Butler (beekeeper), Gemini as **Paget** / Bio-Symmetry Design Group, Claude (engine cartography & editing). QBP retains its *reading* of the Port (the deepest-unknowns-in-both-directions metaphor) and construction of its own experiment spaces; the Port's definition is the craft copy.
+
+
 ## Concept
 
 A floating island research station centered above the Challenger Deep — the deepest known point on Earth. The facility serves as the base for both a **space elevator** (reaching up) and an **undersea elevator** (reaching down to the trench floor). The metaphor: QBP explores the deepest unknowns in both directions.
