@@ -1,7 +1,7 @@
 # QBP Research Facility — Location & World Reference
 
 > **Canonical home moved — this copy is a frozen pointer.**
-> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design/facility_location.md` @ `4846aae` (craft PR #2, branch `import/port-design-corpus`; sha updates to the merge sha when it lands — QBP#711/#712).
+> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design/facility_location.md` @ `5c6955b` (craft PR #2, branch `import/port-design-corpus`; sha updates to the merge sha when it lands — QBP#711/#712).
 > This QBP copy is frozen at QBP master `18ec30e` (authored commit `3630aa0`, 2026-02-22). Edit the craft copy, not this one.
 >
 > **Visibility (beekeeper ruling, 2026-10-17; ratified by qbp-architecture):** the **canonical copy is private in craft for now**; the Port evolves there and **craft goes public once the Port is working**, rejoining the public record. The original public text is retained in full below and in QBP history at `18ec30e`.
@@ -325,3 +325,7 @@ The deepest point on Earth. A place where the boundary between known and unknown
 - For Phase 4e (Sprint 3), the scientist starts **inside the hallway** — no exterior yet
 - The coordinates and setting exist as lore/reference for signs, loading screens, and eventual exterior views
 - The space/undersea elevators are conceptual anchors — not built in Sprint 3
+
+---
+
+> *Frozen pointer — this QBP copy is not edited. Canonical copy: `JamesPagetButler/craft` (private for now; see header). QBP#711.*
