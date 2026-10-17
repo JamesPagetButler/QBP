@@ -41,6 +41,7 @@ labels: tier-2-review
      If this PR makes a quantitative physical claim, use the Tier-3 template
      instead (theory-element headline required there). -->
 
+- [ ] CI green at the head sha — evidence box: the notifier (`pr-check-status.yml`) ticks it at ALL-GREEN and un-ticks it at RED; do not hand-tick (#538)
 - [ ] Clean-checkout build/tests: <!-- CI run link -->
 - [ ] Gate scripts touched by this PR's paths: <!-- CI link -->
 - [ ] Differential oracle (if oracle-relevant paths touched): PASS / FAIL+table / N-A: <!-- link -->
