@@ -1,7 +1,7 @@
 # QBP Facility Exterior — Paget's Bio-Synthetic Concept
 
 > **Canonical home moved — this copy is a frozen pointer.**
-> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design/facility_exterior/paget_concept.md` @ `5c6955b` (craft PR #2, branch `import/port-design-corpus`; sha updates to the merge sha when it lands — QBP#711/#712).
+> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design/facility_exterior/paget_concept.md` @ `3e27615` (craft PR #2 merge commit on craft `main`, 2026-10-17 — QBP#711/#712).
 > This QBP copy is frozen at QBP master `18ec30e` (authored commit `3630aa0`, 2026-02-22). Edit the craft copy, not this one.
 >
 > **Visibility (beekeeper ruling, 2026-10-17; ratified by qbp-architecture):** the **canonical copy is private in craft for now**; the Port evolves there and **craft goes public once the Port is working**, rejoining the public record. The original public text is retained in full below and in QBP history at `18ec30e`.

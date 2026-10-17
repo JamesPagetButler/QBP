@@ -18,7 +18,7 @@
 | Spec-first rendering of a space in the shared design system | Port steward | craft render surfaces (inter#96 Squam/Cockpit, inter#152 Milano, …) |
 | Bespoke geometry (escape hatch) | QBP builds, Port loads | QBP Kaiju scene or equivalent; the Port only needs a scene handle (type to be named by the steward; nothing called `Scene` exists in `kaiju/game` today) |
 | **Design-system build inputs** `src/viz/theme.py`, `src/viz/interactive/src/theme.h` | **QBP** (live build inputs) | QBP `master`; craft `port/design-system/` holds snapshots; QBP re-syncs by PR when Port tokens change |
-| **Canonical home of experiment-space code** (e.g. `src/bakeoff/kaiju/game/`) | **QBP** | QBP `master`. Not imported into craft (craft PR #2 dropped `port/kaiju/` at `5c6955b`); the Port takes the versioned spec, not the Go — one home per artefact (hand-off condition b). Any reusable Port-substrate subset is a separate curated import |
+| **Canonical home of experiment-space code** (e.g. `src/bakeoff/kaiju/game/`) | **QBP** | QBP `master`. Not imported into craft (craft PR #2 dropped `port/kaiju/` at `3e27615`); the Port takes the versioned spec, not the Go — one home per artefact (hand-off condition b). Any reusable Port-substrate subset is a separate curated import |
 
 Working read agreed on the bridge (live-test seq 2915/2916): **spec-first**, Kaiju-scene-load as the escape hatch.
 
