@@ -21,7 +21,8 @@ Logic:
 
 Usage:
   check_tier3_label.py --changed-files changed.txt --labels-file labels.txt --comments-json comments.json
-  (legacy: --comments-file comments.txt — pre-joined bodies; trust filtering must happen upstream)
+  (the pre-joined --comments-file input was removed on Gemini review of PR #717: every
+   consumer must pass raw API JSON so the author-trust filter cannot be bypassed)
 """
 
 import argparse
@@ -118,29 +119,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--changed-files", required=True)
     ap.add_argument("--labels-file", required=True)
-    src = ap.add_mutually_exclusive_group(required=True)
-    src.add_argument(
-        "--comments-file",
-        help="pre-joined comment bodies (legacy; trust filtering must happen upstream)",
-    )
-    src.add_argument(
+    ap.add_argument(
         "--comments-json",
+        required=True,
         help="raw GitHub API JSON array of issue comments; only OWNER/MEMBER/COLLABORATOR "
-        "authors are evaluated (#552 security fix)",
+        "authors are evaluated (#552 security fix). There is deliberately NO pre-joined "
+        "text input: every consumer must go through the trust filter.",
     )
     args = ap.parse_args()
 
     changed = read_lines(args.changed_files)
     labels = set(read_lines(args.labels_file))
-    comments_blob = ""
-    if args.comments_json:
-        comments_blob = trusted_comment_blob(args.comments_json)
-    else:
-        try:
-            with open(args.comments_file, encoding="utf-8") as f:
-                comments_blob = f.read()
-        except FileNotFoundError:
-            pass
+    comments_blob = trusted_comment_blob(args.comments_json)
 
     theory_files = [f for f in changed if is_theory(f)]
     if not theory_files:

@@ -20,28 +20,18 @@ BOUND = "\n===TIER3-COMMENT-BOUNDARY===\n"
 
 
 def run(changed, labels, comments_blob):
-    with tempfile.TemporaryDirectory() as d:
-        cf = os.path.join(d, "changed.txt")
-        open(cf, "w").write("\n".join(changed))
-        lf = os.path.join(d, "labels.txt")
-        open(lf, "w").write("\n".join(labels))
-        mf = os.path.join(d, "comments.txt")
-        open(mf, "w").write(comments_blob)
-        r = subprocess.run(
-            [
-                sys.executable,
-                SCRIPT,
-                "--changed-files",
-                cf,
-                "--labels-file",
-                lf,
-                "--comments-file",
-                mf,
-            ],
-            capture_output=True,
-            text=True,
-        )
-        return r.returncode
+    """Legacy helper: a pre-joined blob is replayed as COLLABORATOR-authored JSON comments
+    (one per COMMENT_BOUNDARY block). The --comments-file input itself no longer exists
+    (removed on Gemini review of PR #717), so these cases now exercise the same trusted
+    path as everything else."""
+    blocks = (
+        [b for b in comments_blob.split(BOUND.strip()) if b.strip()]
+        if comments_blob
+        else []
+    )
+    return run_json(
+        changed, labels, [c(b.strip("\n"), "COLLABORATOR", "legacy") for b in blocks]
+    )
 
 
 def run_json(changed, labels, comments):
