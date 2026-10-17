@@ -17,6 +17,7 @@
 | **Plug-in point** for each space (berth, hallway door, altitude, orientation, footprint) | Port steward | the Port's manifest; returned to QBP as a `PlugIn` record (§4) |
 | Spec-first rendering of a space in the shared design system | Port steward | craft render surfaces (#96 Cockpit, Milano, …) |
 | Bespoke geometry (escape hatch) | QBP builds, Port loads | QBP Kaiju scene or equivalent; the Port only needs the `Scene` handle |
+| **Canonical home of experiment-space code** (e.g. `src/bakeoff/kaiju/game/`) | **QBP** | QBP `master`. A copy under craft `port/kaiju/` (import PR #2) is a reference snapshot @ `18ec30e`, not canonical — one home per artefact (hand-off condition b) |
 
 Working read agreed on the bridge (live-test seq 2915/2916): **spec-first**, Kaiju-scene-load as the escape hatch.
 
