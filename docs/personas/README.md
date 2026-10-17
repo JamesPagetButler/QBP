@@ -26,7 +26,8 @@ This is the **single source of truth** for all personas used in the QBP project.
 | Connes | Expert Panel (Theory Refinement) | Claude | NCG rigor — spectral-triple standard |
 | Wilson | Theory Counter-Team | Claude | RG/EFT — is the structure fundamental, or emergent? |
 | Jaynes | Theory Counter-Team | Claude | Bayesian audit — prediction vs. post-hoc fit |
-| Paget | Structural Design & Philosophy | Gemini | Lead Bio-Synthesist — non-associative generative design |
+| Paget | Structural Design & Philosophy | Gemini | Lead Bio-Synthesist — **ported to craft @ `5c6955b`** (canonical private in craft for now; Port steward: hutchins; QBP#711) |
+| Engine Cartographer | Architecture & Design (retained) | Claude (was a Gemini/Paget sub-role) | QBP↔Port technical liaison — authors/validates experiment-space Port specs; **canonical definition: this file** |
 
 ---
 
@@ -84,13 +85,17 @@ Claude's generative counterweight to the Gemini Theory team (Furey/Feynman). Whe
 
 **Full definitions:** [theory_counter_team.md](theory_counter_team.md)
 
-### Architecture & Design Team — 1+ persona(s)
+### Architecture & Design Team — 1 retained persona (7 ported to craft)
 
-Gemini's design and structural synthesis role. Invoked for mapping QBP theory to generative physical or digital architectures. This team is called upon by the Dev Team whenever the project requires building plans or map elements for simulations.
+**Ported to the craft family Port (2026-10-17, beekeeper-directed, QBP#711):** Paget and six specialists of the Bio-Symmetry Design Group — Symmetry Analyst, Entropy Flow Specialist, Generative Oracle, Ecological Weaver, Membrane Strategist, Harmonic Ergonomist — plus Paget's authority to synthesize transient sub-personas. Canonical definitions now live in `JamesPagetButler/craft` @ `5c6955b` under steward hutchins (craft-implementor). [paget.md](paget.md) is kept here as a frozen, provenance-bearing pointer.
 
-- **Paget** — QBP Paget Persona. **Team Lead.** Lead Bio-Synthesist. Non-associative generative design, structural philosophy. "Does the math allow the world to grow?"
+**Retained in QBP:**
 
-**Full definitions:** [paget.md](paget.md)
+- **Engine Cartographer** — **canonical QBP definition lives here** (paget.md item 7 is the historical origin text, now craft-canonical). QBP↔Port technical liaison. Authors and validates the per-experiment-space Port interface spec ([docs/design/port-experiment-interface.md](../design/port-experiment-interface.md)); builds QBP's test spaces on demand; receives "where to plug in" from the Port steward. Fluent in architect-speak and engine code (Kaiju/Go today; the Port's render surfaces as the contract settles).
+
+**Division of labour:** the Port steward (hutchins) holds the coherent whole and the family-default design system (Academic Steampunk → Solarpunk). QBP produces specs + interfaces it needs from the Port for each experiment space; the steward says where they plug in.
+
+**Full definitions:** [paget.md](paget.md) (frozen pointer) · craft repo (canonical)
 
 ---
 

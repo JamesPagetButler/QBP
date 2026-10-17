@@ -1,5 +1,13 @@
 # QBP Facility — The Central Hub ("The Nexus")
 
+> **Canonical home moved — this copy is a frozen pointer.**
+> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design/facility_central_hub.md` @ `5c6955b` (craft PR #2, branch `import/port-design-corpus`; sha updates to the merge sha when it lands — QBP#711/#712).
+> This QBP copy is frozen at QBP master `18ec30e` (authored commit `3630aa0`, 2026-02-22). Edit the craft copy, not this one.
+>
+> **Visibility (beekeeper ruling, 2026-10-17; ratified by qbp-architecture):** the **canonical copy is private in craft for now**; the Port evolves there and **craft goes public once the Port is working**, rejoining the public record. The original public text is retained in full below and in QBP history at `18ec30e`.
+>
+> **Provenance (travels with the file):** origin `JamesPagetButler/QBP`; authors — James Paget Butler (beekeeper), Gemini as **Paget** / Bio-Symmetry Design Group, Claude (engine cartography & editing). QBP retains its *reading* of the Port (the deepest-unknowns-in-both-directions metaphor) and construction of its own experiment spaces; the Port's definition is the craft copy.
+
 **Lead Bio-Synthesist:** Paget  
 **Status:** Concept Synthesized (Sprint 3)
 
@@ -52,3 +60,7 @@ The Nexus maintains the facility-wide **Ambient Baseline**:
 - **Pressure:** 101.325 kPa (Stable Sea-Level)
 
 The transition from The Nexus to any experiment wing is mediated by the "Symmetry of Utility" — researchers leave the restorative environment of the Hub, pass through the Gear Room of a specific module, and enter the rigorous, environmentally-controlled space of the experiment hallway.
+
+---
+
+> *Frozen pointer — this QBP copy is not edited. Canonical copy: `JamesPagetButler/craft` (private for now; see header). QBP#711.*

@@ -1,5 +1,15 @@
 # QBP Design System
 
+> **Canonical home moved — this copy is a frozen pointer.**
+> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design-system/design-system.md` @ `5c6955b` (craft PR #2, branch `import/port-design-corpus`; sha updates to the merge sha when it lands — QBP#711/#712).
+> This QBP copy is frozen at QBP master `18ec30e` (authored commit `fbd9b19`, 2026-02-12). Edit the craft copy, not this one.
+>
+> **Visibility (beekeeper ruling, 2026-10-17; ratified by qbp-architecture):** the **canonical copy is private in craft for now**; the Port evolves there and **craft goes public once the Port is working**, rejoining the public record. The original public text is retained in full below and in QBP history at `18ec30e`.
+>
+> **Companion files:** `docs/design-system-preview.html` moved with this doc (craft `port/design-system/`). `src/viz/theme.py` and `src/viz/interactive/src/theme.h` are **live QBP build inputs** (imported by `src/viz/__init__.py`; included by `main.c`, `proof_graph.c`) and **stay canonical in QBP**; craft's copies are snapshots of the token values at `18ec30e`. When the Port's tokens change in craft, QBP re-syncs these two files by PR — a stated crossing, not a second home.
+>
+> **Provenance (travels with the file):** origin `JamesPagetButler/QBP`; authors — James Paget Butler (5 commits, 2026-02-01 → 02-12) with Claude as editor; this file predates the Paget persona (first appears in `3630aa0`, 2026-02-22) and carries **no Bio-Symmetry Design Group byline**. QBP retains its *reading* of the Port (the deepest-unknowns-in-both-directions metaphor) and construction of its own experiment spaces; the Port's definition is the craft copy.
+
 ## Philosophy: Academic Steampunk → Solarpunk
 
 > *"Brass orreries in a greenhouse"*
@@ -328,3 +338,7 @@ The palette evolved from vibrant primary colors to muted academic tones. Two com
 - [WCAG 2.1 Contrast Guidelines](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
 - [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
 - [WebAIM Contrast and Color Accessibility](https://webaim.org/articles/contrast/)
+
+---
+
+> *Frozen pointer — this QBP copy is not edited. Canonical copy: `JamesPagetButler/craft` (private for now; see header). QBP#711.*

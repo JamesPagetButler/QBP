@@ -1,5 +1,13 @@
 # QBP Facility Micro-Interior — Main Research Hallway
 
+> **Canonical home moved — this copy is a frozen pointer.**
+> Stewarded as part of the **craft family Port** by hutchins (craft-implementor): `JamesPagetButler/craft` — path `port/design/micro_interior_hallway.md` @ `5c6955b` (craft PR #2, branch `import/port-design-corpus`; sha updates to the merge sha when it lands — QBP#711/#712).
+> This QBP copy is frozen at QBP master `18ec30e` (authored commit `3630aa0`, 2026-02-22). Edit the craft copy, not this one.
+>
+> **Visibility (beekeeper ruling, 2026-10-17; ratified by qbp-architecture):** the **canonical copy is private in craft for now**; the Port evolves there and **craft goes public once the Port is working**, rejoining the public record. The original public text is retained in full below and in QBP history at `18ec30e`.
+>
+> **Provenance (travels with the file):** origin `JamesPagetButler/QBP`; authors — James Paget Butler (beekeeper), Gemini as **Paget** / Bio-Symmetry Design Group, Claude (engine cartography & editing). QBP retains its *reading* of the Port (the deepest-unknowns-in-both-directions metaphor) and construction of its own experiment spaces; the Port's definition is the craft copy.
+
 **Lead Bio-Synthesist:** Paget
 **Status:** Concept Synthesized (Sprint 3 / Phase 4e)
 
@@ -34,3 +42,7 @@ At the far end of the hallway, the corridor opens into a bright, open gathering 
 ## Implementation Notes for Engine Cartographer
 - **Visual References:** Synthesize the curved arches and elegant greenhouse structure of `a_photorealistic_wideangle_inter.png` (Iteration 1) with the strict door/viewport/signage layout of `a_photorealistic_wideangle_inter_6.png` (Iteration 6).
 - **Lighting Dynamics:** Engine should utilize warm, natural directional light from the glass ceiling and atrium, creating dynamic reflections off the polished wood floors and brass accents.
+
+---
+
+> *Frozen pointer — this QBP copy is not edited. Canonical copy: `JamesPagetButler/craft` (private for now; see header). QBP#711.*
