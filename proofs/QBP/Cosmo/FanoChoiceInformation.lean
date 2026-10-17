@@ -30,8 +30,8 @@
   `S = ln 7` is GAUGE-FIXING information, NOT a physical genesis entropy.
   Strategy B (#548, `basisAuto_transitive_on_triples`) proved that the 7
   Fano-line quaternion subalgebras form a single Aut(𝕆) orbit, so "which of
-  the 7 lines" is an unobservable gauge choice (one labeling among the 7
-  orientations/labelings related by the basis automorphisms).  The number
+  the 7 lines" is an unobservable gauge choice (one of the 7 lines, i.e.
+  quaternionic subalgebras, all related by the basis automorphisms).  The number
   `log 7` is therefore the bookkeeping cost of fixing that gauge — the
   Shannon information of naming one orbit representative — and the theorems
   below remain true and useful as the combinatorial bridge to `SeedMass.lean`.

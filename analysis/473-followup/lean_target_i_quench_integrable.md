@@ -63,7 +63,7 @@ ellSq_tendsto_closed_form :
   L * (ellCoeff (γ t₀)^2 + √((1 - ellCoeff (γ t₀)^2)^2 - V (γ t₀))) = ellCoeff (γ t₀)^2
 ```
 
-with the division form `ellSq_limit_eq_closed_form` under a non-vanishing-denominator hypothesis (the denominator vanishes only in the degenerate case `b₀(t₀) = 0`, `V₀ = 1`). The root is *selected*, not assumed: `quench_root_pick` shows any `L ∈ [0,1]` solving the quadratic satisfies the relation for the root `B₀/(B₀ + D) ∈ [0,1]` (division-free form `L·(B₀ + D) = B₀`; the other root `B₀/(B₀ − D)` is not "larger" in general — it is negative for `B₀ < D` — and that branch collapses via `L·D = 0`), using `0 ≤ B₀`, `L ≤ 1` and the discriminant bound `V ≤ (1 − b₀²)²` proved in §1 of the module.
+with the division form `ellSq_limit_eq_closed_form` under a non-vanishing-denominator hypothesis (the denominator vanishes only in the degenerate case `b₀(t₀) = 0`, `V₀ = 1`). The root is *selected*, not assumed: `quench_root_pick` shows any `L ∈ [0,1]` solving the quadratic satisfies the relation for the root `B₀/(B₀ + D) ∈ [0,1]` (division-free form `L·(B₀ + D) = B₀`; the other root `B₀/(B₀ − D)` is not "larger" in general — it is `≤ 0` for `0 ≤ B₀ < D` — and that branch collapses via `L·D = 0`), using `0 ≤ B₀`, `L ≤ 1` and the discriminant bound `V ≤ (1 − b₀²)²` proved in §1 of the module.
 
 ## 3. What is NOT proved (unchanged, and stated in the module docstring)
 
