@@ -8,7 +8,6 @@
 >
 > **Provenance (travels with the file):** origin `JamesPagetButler/QBP`; authors — James Paget Butler (beekeeper), Gemini as **Paget** / Bio-Symmetry Design Group, Claude (engine cartography & editing). QBP retains its *reading* of the Port (the deepest-unknowns-in-both-directions metaphor) and construction of its own experiment spaces; the Port's definition is the craft copy.
 
-
 **Lead Bio-Synthesist:** Paget  
 **Status:** Concept Synthesized (Sprint 3)
 

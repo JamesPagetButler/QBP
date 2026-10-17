@@ -6,8 +6,9 @@
 >
 > **Visibility (beekeeper ruling, 2026-10-17; ratified by qbp-architecture):** the **canonical copy is private in craft for now**; the Port evolves there and **craft goes public once the Port is working**, rejoining the public record. The original public text is retained in full below and in QBP history at `18ec30e`.
 >
-> **Provenance (travels with the file):** origin `JamesPagetButler/QBP`; authors — James Paget Butler (beekeeper), Gemini as **Paget** / Bio-Symmetry Design Group, Claude (engine cartography & editing). QBP retains its *reading* of the Port (the deepest-unknowns-in-both-directions metaphor) and construction of its own experiment spaces; the Port's definition is the craft copy.
-
+> **Companion files:** `docs/design-system-preview.html` moved with this doc (craft `port/design-system/`). `src/viz/theme.py` and `src/viz/interactive/src/theme.h` are **live QBP build inputs** (imported by `src/viz/__init__.py`; included by `main.c`, `proof_graph.c`) and **stay canonical in QBP**; craft's copies are snapshots of the token values at `18ec30e`. When the Port's tokens change in craft, QBP re-syncs these two files by PR — a stated crossing, not a second home.
+>
+> **Provenance (travels with the file):** origin `JamesPagetButler/QBP`; authors — James Paget Butler (5 commits, 2026-02-01 → 02-12) with Claude as editor; this file predates the Paget persona (first appears in `3630aa0`, 2026-02-22) and carries **no Bio-Symmetry Design Group byline**. QBP retains its *reading* of the Port (the deepest-unknowns-in-both-directions metaphor) and construction of its own experiment spaces; the Port's definition is the craft copy.
 
 ## Philosophy: Academic Steampunk → Solarpunk
 

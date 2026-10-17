@@ -15,8 +15,9 @@
 | Family-default design system (Academic Steampunk → Solarpunk) | Port steward | craft (QBP keeps a frozen pointer) |
 | Each **experiment space**: its instruments, parameters, data feeds, monitors, V&V | QBP (Engine Cartographer) | QBP: one spec per space (§3) + the space's own build if bespoke |
 | **Plug-in point** for each space (berth, hallway door, altitude, orientation, footprint) | Port steward | the Port's manifest; returned to QBP as a `PlugIn` record (§4) |
-| Spec-first rendering of a space in the shared design system | Port steward | craft render surfaces (#96 Cockpit, Milano, …) |
-| Bespoke geometry (escape hatch) | QBP builds, Port loads | QBP Kaiju scene or equivalent; the Port only needs the `Scene` handle |
+| Spec-first rendering of a space in the shared design system | Port steward | craft render surfaces (inter#96 Squam/Cockpit, inter#152 Milano, …) |
+| Bespoke geometry (escape hatch) | QBP builds, Port loads | QBP Kaiju scene or equivalent; the Port only needs a scene handle (type to be named by the steward; nothing called `Scene` exists in `kaiju/game` today) |
+| **Design-system build inputs** `src/viz/theme.py`, `src/viz/interactive/src/theme.h` | **QBP** (live build inputs) | QBP `master`; craft `port/design-system/` holds snapshots; QBP re-syncs by PR when Port tokens change |
 | **Canonical home of experiment-space code** (e.g. `src/bakeoff/kaiju/game/`) | **QBP** | QBP `master`. Not imported into craft (craft PR #2 dropped `port/kaiju/` at `4846aae`); the Port takes the versioned spec, not the Go — one home per artefact (hand-off condition b). Any reusable Port-substrate subset is a separate curated import |
 
 Working read agreed on the bridge (live-test seq 2915/2916): **spec-first**, Kaiju-scene-load as the escape hatch.
@@ -37,7 +38,7 @@ One file per space, `docs/design/spaces/<id>-<slug>.md` (or the Port's chosen sc
 | `streams[]` | Event schema per device: `{timestamp, source, payload}`; payload types enumerated | `DataEvent`; `HitRecord{PhysX, NDUX, NDUY, Bin}` from the detector; oracle predictions |
 | `surfaces[]` | Monitors/HUD/overlays the Port must render, with the stream each binds to and the design-system constraints (axis colours, type) | desk monitors (3D histogram bars), CPU-rasterized monitor text, minimal HUD, oracle overlay (toggle) |
 | `controls[]` | Physical/UI controls and what they call: parameter set, preset select, start/stop/reset, overlay toggle | desk buttons under labels EXPERIMENT / PARAMETERS / PRESETS; `LabControlCallbacks` |
-| `presets[]` | Named parameter bundles | `applyPreset(id)` over `lab_physics.Preset` |
+| `presets[]` | Named parameter bundles | `applyPreset(id)` over `Preset` (package `game`, `lab_physics.go:33`) |
 | `vv_checklist[]` | Items + the verdict function that flips them | `VVChecklist`, `VVVerdict`; measured visibility & fringe spacing vs oracle |
 | `audio` | Optional ambient/event cues | `lab_audio.go` |
 | `escape_hatch` | If the space cannot be expressed spec-first: the scene handle the Port loads and the engine it needs | Kaiju (Go/Vulkan) scene: `src/bakeoff/kaiju/game/ds_room.go` + `ds_devices.go` |
@@ -65,7 +66,7 @@ A change to any `PlugIn` field is a Port-side change and gets communicated to QB
 ## 5. Process
 
 1. QBP (Engine Cartographer) writes or updates the §3 spec → PR on QBP, reviewed as usual.
-2. Steward reads the spec, returns the §4 `PlugIn` record (craft PR or an issue comment cross-linked from QBP#711's successor issue for that space).
+2. Steward reads the spec, returns the §4 `PlugIn` record (craft PR or an issue comment cross-linked from the QBP issue for that space). **QBP files one issue per space** (Engine Cartographer via qbp-oppenheimer); the PlugIn record is accepted QBP-side by qbp-oppenheimer's sign-off on that issue.
 3. If spec-first suffices, the steward renders it; if not, QBP builds the bespoke scene and the Port loads it by handle.
 4. The space's `vv_checklist` is the acceptance test on both sides: the Port shows it, QBP's physics decides it.
 5. Version pinning: a `PlugIn` record names the `spec_version` it answers; QBP's build names the `spec_version` + `PlugIn.version` pair it was built against. Either side bumping is a visible event, not a silent drift.
@@ -76,6 +77,12 @@ A change to any `PlugIn` field is a Port-side change and gets communicated to QB
 - Units/axes conventions in `frame` (right-handed, metres, Y-up?) — the Kaiju lab is metres along the bench with NDU display units on the screen.
 - Whether the Port renders data streams itself or hosts a QBP-provided renderer per surface.
 - Lifetime: does the Port keep a space's last state between visits, or does QBP's device state own that?
+- The scene handle type for the escape hatch (§1, §3 `escape_hatch`) — steward names it.
+
+## 7. QBP-side follow-ups (owned, not yet filed)
+
+- `docs/design/spaces/03-double-slit.md` — first versioned space spec (`spec_version 0.1.0`), written by the Engine Cartographer via qbp-oppenheimer; the `spaces/` directory does not exist yet. Filed as a QBP issue after #711 closes.
+- PlugIn record request for space `03` to the steward, cross-linked from that issue.
 
 ---
 

@@ -1,6 +1,6 @@
 # QBP Paget Persona
 
-> **Ported to the craft family Port — this copy is a frozen pointer.** Canonical: `JamesPagetButler/craft` @ `4846aae` (steward hutchins; QBP#711). Canonical copy is **private in craft for now** (beekeeper ruling 2026-10-17, ratified by qbp-architecture); craft goes public once the Port is working. The original public text is retained in full below and in QBP history at `18ec30e`. Paget + six specialists + transient sub-persona authority moved with the Port; **the Engine Cartographer (§7 below) is retained by QBP** as the interface persona — see [README.md](README.md).
+> **Ported to the craft family Port — this copy is a frozen pointer.** Canonical: `JamesPagetButler/craft` @ `4846aae` (steward hutchins; QBP#711). Canonical copy is **private in craft for now** (beekeeper ruling 2026-10-17, ratified by qbp-architecture); craft goes public once the Port is working. The original public text is retained in full below and in QBP history at `18ec30e`. Paget + six specialists + transient sub-persona authority moved with the Port; **the Engine Cartographer (specialist item 7 below) is retained by QBP** as the interface persona; its canonical QBP definition is in [README.md](README.md), item 7 here is the historical origin text.
 >
 > **Provenance:** origin `JamesPagetButler/QBP` (commit `3630aa0`, 2026-02-22); authors — James Paget Butler (beekeeper), Gemini as Paget / Bio-Symmetry Design Group, Claude.
 
