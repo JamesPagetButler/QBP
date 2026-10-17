@@ -6,13 +6,49 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
-      "closedAt": "2026-10-16T17:34:35Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
+      "closedAt": "2026-10-17T19:27:44Z",
+      "closed_how": "merged-pr",
+      "closing_pr": "#713",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
+      "labels": [
+        "housekeeping"
+      ],
+      "linked_prs": [
+        "#713"
+      ],
+      "merge_delta_s": 1,
+      "nil": 0,
+      "number": 711,
+      "other_total": 6,
+      "other_unticked": 6,
+      "stateReason": "COMPLETED",
+      "title": "Craft Port hand-off: QBP-side pointers, persona registry flips, experiment-space Port interface spec",
+      "url": "https://github.com/JamesPagetButler/QBP/issues/711"
+    },
+    {
+      "ac_total": 0,
+      "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
+      "closedAt": "2026-10-16T17:34:35Z",
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
+      "flagged": false,
+      "guard_unticked": 0,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 700,
       "other_total": 0,
@@ -24,15 +60,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-10-16T17:34:30Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 696,
       "other_total": 0,
@@ -44,17 +87,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-10-16T16:17:12Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#707"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#707",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#707"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 706,
       "other_total": 0,
@@ -66,15 +116,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-10-15T02:55:08Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#701"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#701",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#701"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 692,
       "other_total": 0,
@@ -86,17 +143,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-10-03T17:21:23Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#695"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#695",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#695"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 693,
       "other_total": 0,
@@ -108,17 +172,24 @@
     {
       "ac_total": 4,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-30T21:12:03Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#691"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#691",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#691"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 690,
       "other_total": 0,
@@ -130,17 +201,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-30T19:09:24Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#689"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#689",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#689"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 688,
       "other_total": 0,
@@ -152,18 +230,25 @@
     {
       "ac_total": 3,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-28T02:56:20Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#687"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: research"
       ],
+      "linked_prs": [
+        "#687"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 668,
       "other_total": 0,
@@ -175,13 +260,20 @@
     {
       "ac_total": 2,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-10T22:39:07Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 646,
       "other_total": 0,
@@ -193,15 +285,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-10T22:39:06Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#645"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#645",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#645"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 625,
       "other_total": 0,
@@ -213,15 +312,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-04T03:43:44Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#628"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#628",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#628"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 619,
       "other_total": 0,
@@ -233,13 +339,20 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-03T19:27:51Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 613,
       "other_total": 0,
@@ -251,13 +364,20 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-03T18:17:48Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 615,
       "other_total": 0,
@@ -269,13 +389,20 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-03T18:17:46Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 617,
       "other_total": 0,
@@ -287,16 +414,23 @@
     {
       "ac_total": 3,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-09-01T17:41:45Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 607,
       "other_total": 0,
@@ -308,18 +442,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-08-31T13:29:02Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#603"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#603",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: research"
       ],
+      "linked_prs": [
+        "#603"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 594,
       "other_total": 3,
@@ -331,16 +472,23 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-08-22T00:46:16Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 461,
       "other_total": 0,
@@ -352,15 +500,22 @@
     {
       "ac_total": 6,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-08-20T04:26:22Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 578,
       "other_total": 0,
@@ -372,17 +527,24 @@
     {
       "ac_total": 7,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-06-12T02:34:16Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#531"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#531"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 474,
       "other_total": 0,
@@ -394,18 +556,25 @@
     {
       "ac_total": 4,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-06-12T02:19:26Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#542"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#542",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: infra"
       ],
+      "linked_prs": [
+        "#542"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 541,
       "other_total": 0,
@@ -417,17 +586,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-06-12T01:40:10Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#544"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#544",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#544"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 525,
       "other_total": 5,
@@ -439,17 +615,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-06-08T13:59:53Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#533"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#533",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#533"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 530,
       "other_total": 3,
@@ -461,17 +644,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-06-05T16:21:47Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#512"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#512",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#512"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 509,
       "other_total": 0,
@@ -483,18 +673,25 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-06-05T00:13:09Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#510"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#510",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping",
         "type: infra"
       ],
+      "linked_prs": [
+        "#510"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 492,
       "other_total": 0,
@@ -506,17 +703,24 @@
     {
       "ac_total": 8,
       "ac_unticked": 8,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-06-04T21:40:47Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#493"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#493",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 8,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#493"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 490,
       "other_total": 0,
@@ -528,15 +732,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-06-04T21:38:03Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 503,
       "other_total": 5,
@@ -548,18 +759,25 @@
     {
       "ac_total": 6,
       "ac_unticked": 6,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-06-04T20:03:25Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#485"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#485",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 6,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping",
         "type: infra"
       ],
+      "linked_prs": [
+        "#485"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 463,
       "other_total": 0,
@@ -571,18 +789,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-06-04T20:01:52Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#495"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#495",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: infra"
       ],
+      "linked_prs": [
+        "#495"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 481,
       "other_total": 0,
@@ -594,17 +819,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-06-02T02:50:27Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#487"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#487",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#487"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 374,
       "other_total": 0,
@@ -616,17 +848,24 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-22T01:49:55Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "JamesPagetButler/qbp-systema#1"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "JamesPagetButler/qbp-systema#1",
+      "closing_pr_cross_repo": true,
+      "closing_pr_has_keyword": false,
+      "closing_pr_repo": "JamesPagetButler/qbp-systema",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": false,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "JamesPagetButler/qbp-systema#1"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 441,
       "other_total": 0,
@@ -638,17 +877,24 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-22T01:45:06Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "JamesPagetButler/qbp-systema#2"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "JamesPagetButler/qbp-systema#2",
+      "closing_pr_cross_repo": true,
+      "closing_pr_has_keyword": false,
+      "closing_pr_repo": "JamesPagetButler/qbp-systema",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": false,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "JamesPagetButler/qbp-systema#2"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 445,
       "other_total": 0,
@@ -660,17 +906,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-22T01:40:54Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "JamesPagetButler/qbp-systema#3"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "JamesPagetButler/qbp-systema#3",
+      "closing_pr_cross_repo": true,
+      "closing_pr_has_keyword": false,
+      "closing_pr_repo": "JamesPagetButler/qbp-systema",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": false,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "JamesPagetButler/qbp-systema#3"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 442,
       "other_total": 0,
@@ -682,16 +935,23 @@
     {
       "ac_total": 13,
       "ac_unticked": 13,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-18T01:22:21Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 13,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 383,
       "other_total": 4,
@@ -703,16 +963,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-05-18T01:22:20Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 351,
       "other_total": 18,
@@ -724,15 +991,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-15T20:58:47Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 317,
       "other_total": 6,
@@ -744,15 +1018,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-15T20:38:43Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 365,
       "other_total": 5,
@@ -764,17 +1045,24 @@
     {
       "ac_total": 9,
       "ac_unticked": 9,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-15T20:38:25Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#455"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#455",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 9,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#455"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 346,
       "other_total": 0,
@@ -786,15 +1074,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-15T19:29:45Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 433,
       "other_total": 0,
@@ -806,15 +1101,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-15T19:29:44Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 427,
       "other_total": 0,
@@ -826,15 +1128,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-15T19:29:44Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 426,
       "other_total": 0,
@@ -846,15 +1155,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-05-15T17:49:46Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 408,
       "other_total": 4,
@@ -866,17 +1182,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-05-14T18:41:33Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#425"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#425",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: retrospective"
       ],
+      "linked_prs": [
+        "#425"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 192,
       "other_total": 12,
@@ -888,17 +1211,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-05-14T13:50:11Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#416"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#416",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#416"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 81,
       "other_total": 3,
@@ -910,17 +1240,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-05-12T02:19:10Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: claude",
         "phase: publication",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 65,
       "other_total": 8,
@@ -932,18 +1269,25 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-05-11T23:28:29Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#404"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#404",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#404"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 302,
       "other_total": 4,
@@ -955,17 +1299,24 @@
     {
       "ac_total": 6,
       "ac_unticked": 6,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-21T05:46:09Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#394"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#394",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 6,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#394"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 379,
       "other_total": 0,
@@ -977,15 +1328,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-21T04:44:51Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 377,
       "other_total": 0,
@@ -997,15 +1355,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-20T14:57:58Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 227,
       "other_total": 2,
@@ -1017,15 +1382,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-20T14:57:35Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 376,
       "other_total": 0,
@@ -1037,16 +1409,23 @@
     {
       "ac_total": 6,
       "ac_unticked": 6,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-20T07:53:17Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 6,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: infra"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 380,
       "other_total": 0,
@@ -1058,18 +1437,25 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-20T02:43:48Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#392"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#392",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#392"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 301,
       "other_total": 4,
@@ -1081,18 +1467,25 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-20T01:56:59Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#391"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#391",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#391"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 261,
       "other_total": 4,
@@ -1104,18 +1497,25 @@
     {
       "ac_total": 5,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-20T00:30:16Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#381"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#381"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 260,
       "other_total": 5,
@@ -1127,18 +1527,25 @@
     {
       "ac_total": 6,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-19T23:42:13Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#386"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#386",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#386"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 388,
       "other_total": 4,
@@ -1150,18 +1557,25 @@
     {
       "ac_total": 3,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-19T20:49:11Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#373"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#373",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#373"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 259,
       "other_total": 4,
@@ -1173,17 +1587,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-19T18:21:05Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#371"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#371",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#371"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 369,
       "other_total": 0,
@@ -1195,17 +1616,24 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-19T18:21:00Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#370"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#370",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#370"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 366,
       "other_total": 2,
@@ -1217,17 +1645,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-19T16:58:02Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#372"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#372",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#372"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 364,
       "other_total": 0,
@@ -1239,15 +1674,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-19T16:43:53Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 337,
       "other_total": 0,
@@ -1259,18 +1701,25 @@
     {
       "ac_total": 6,
       "ac_unticked": 6,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-19T03:14:06Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#368"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#368",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 6,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: visualization",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#368"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 360,
       "other_total": 3,
@@ -1282,18 +1731,25 @@
     {
       "ac_total": 8,
       "ac_unticked": 8,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-17T20:38:50Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#361"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#361",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 8,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: implementation",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#361"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 359,
       "other_total": 4,
@@ -1305,16 +1761,23 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-17T19:49:45Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: infra"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 238,
       "other_total": 17,
@@ -1326,15 +1789,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-17T19:49:45Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 229,
       "other_total": 3,
@@ -1346,15 +1816,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-17T19:49:44Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 228,
       "other_total": 3,
@@ -1366,17 +1843,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-16T19:17:37Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#358"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#358",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#358"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 353,
       "other_total": 0,
@@ -1388,17 +1872,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-16T19:17:37Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#358"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#358",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#358"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 352,
       "other_total": 0,
@@ -1410,17 +1901,24 @@
     {
       "ac_total": 1,
       "ac_unticked": 1,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-16T19:17:31Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#357"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#357",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 1,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#357"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 356,
       "other_total": 4,
@@ -1432,19 +1930,26 @@
     {
       "ac_total": 8,
       "ac_unticked": 8,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-16T05:04:40Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#355",
-        "#367"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#355",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 8,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: visualization",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#355",
+        "#367"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 342,
       "other_total": 16,
@@ -1456,17 +1961,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-15T16:16:54Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#347"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#347",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#347"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 348,
       "other_total": 10,
@@ -1478,17 +1990,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-15T15:45:50Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#345"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#345",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "#345"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 339,
       "other_total": 0,
@@ -1500,17 +2019,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-15T15:45:50Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#345"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#345",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: experiment"
       ],
+      "linked_prs": [
+        "#345"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 336,
       "other_total": 0,
@@ -1522,17 +2048,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-15T15:45:50Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#345"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#345",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: experiment"
       ],
+      "linked_prs": [
+        "#345"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 334,
       "other_total": 0,
@@ -1544,16 +2077,23 @@
     {
       "ac_total": 7,
       "ac_unticked": 7,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-15T07:01:39Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 7,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: visualization",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 338,
       "other_total": 13,
@@ -1565,17 +2105,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-15T07:01:38Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: claude",
         "phase: visualization",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 37,
       "other_total": 11,
@@ -1587,18 +2134,25 @@
     {
       "ac_total": 7,
       "ac_unticked": 7,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-15T06:40:08Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#343"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#343",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 7,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: implementation",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#343"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 340,
       "other_total": 15,
@@ -1610,18 +2164,25 @@
     {
       "ac_total": 14,
       "ac_unticked": 14,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-15T03:53:10Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#333"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#333",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 14,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: implementation",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#333"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 332,
       "other_total": 3,
@@ -1633,18 +2194,25 @@
     {
       "ac_total": 8,
       "ac_unticked": 8,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-14T23:47:21Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#331"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#331",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 8,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: ground-truth",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#331"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 322,
       "other_total": 4,
@@ -1656,17 +2224,24 @@
     {
       "ac_total": 7,
       "ac_unticked": 7,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-14T20:51:14Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#330"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#330",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 7,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "#330"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 320,
       "other_total": 20,
@@ -1678,17 +2253,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-14T15:52:59Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#328"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#328",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "#328"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 321,
       "other_total": 14,
@@ -1700,17 +2282,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-14T15:52:35Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#327"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#327",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "#327"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 324,
       "other_total": 9,
@@ -1722,17 +2311,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-14T02:55:02Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#323"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#323",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#323"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 319,
       "other_total": 2,
@@ -1744,16 +2340,23 @@
     {
       "ac_total": 6,
       "ac_unticked": 6,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T21:51:09Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 6,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: infra"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 289,
       "other_total": 0,
@@ -1765,17 +2368,24 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T21:50:57Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#295"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#295",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#295"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 294,
       "other_total": 0,
@@ -1787,17 +2397,24 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T21:50:57Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#295"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#295",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#295"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 293,
       "other_total": 0,
@@ -1809,17 +2426,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T21:50:57Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#295"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#295",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#295"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 290,
       "other_total": 3,
@@ -1831,18 +2455,25 @@
     {
       "ac_total": 8,
       "ac_unticked": 8,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T21:50:57Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#295"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#295",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 8,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping",
         "type: infra"
       ],
+      "linked_prs": [
+        "#295"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 288,
       "other_total": 0,
@@ -1854,13 +2485,20 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T18:38:04Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 258,
       "other_total": 0,
@@ -1872,18 +2510,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-13T18:37:52Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#292"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#292",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping",
         "type: docs"
       ],
+      "linked_prs": [
+        "#292"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 291,
       "other_total": 5,
@@ -1895,19 +2540,26 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-13T17:57:58Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#287"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#287",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: gemini",
         "phase: implementation",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#287"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 36,
       "other_total": 7,
@@ -1919,13 +2571,20 @@
     {
       "ac_total": 4,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-13T05:05:05Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 286,
       "other_total": 0,
@@ -1937,21 +2596,28 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T05:02:59Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#116",
-        "#285"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#285",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": false,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: gemini",
         "phase: ground-truth",
         "priority: high",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#116",
+        "#285"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 22,
       "other_total": 8,
@@ -1963,17 +2629,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-13T01:10:00Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#284"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#284"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 211,
       "other_total": 4,
@@ -1985,15 +2658,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-13T00:49:40Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 255,
       "other_total": 13,
@@ -2005,16 +2685,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-13T00:49:04Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 253,
       "other_total": 3,
@@ -2026,15 +2713,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-13T00:48:57Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 252,
       "other_total": 3,
@@ -2046,17 +2740,24 @@
     {
       "ac_total": 6,
       "ac_unticked": 2,
+      "all_ac_unticked": false,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T00:15:39Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#262"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#262",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 2,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#262"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 245,
       "other_total": 16,
@@ -2068,17 +2769,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-13T00:15:39Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#262"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#262",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#262"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 242,
       "other_total": 17,
@@ -2090,15 +2798,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T20:38:26Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 244,
       "other_total": 5,
@@ -2110,16 +2825,23 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T20:38:24Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 208,
       "other_total": 0,
@@ -2131,15 +2853,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T20:38:09Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 225,
       "other_total": 10,
@@ -2151,15 +2880,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T20:38:09Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 223,
       "other_total": 11,
@@ -2171,15 +2907,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T20:38:08Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 217,
       "other_total": 0,
@@ -2191,16 +2934,23 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T20:38:08Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 207,
       "other_total": 0,
@@ -2212,15 +2962,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T20:38:07Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#257"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#257",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#257"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 183,
       "other_total": 3,
@@ -2232,15 +2989,22 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T20:37:22Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 248,
       "other_total": 12,
@@ -2252,15 +3016,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T19:55:22Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 209,
       "other_total": 0,
@@ -2272,15 +3043,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T18:15:00Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 220,
       "other_total": 12,
@@ -2292,15 +3070,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T18:09:01Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 256,
       "other_total": 7,
@@ -2312,16 +3097,23 @@
     {
       "ac_total": 2,
       "ac_unticked": 2,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T18:08:53Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 2,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 231,
       "other_total": 3,
@@ -2333,15 +3125,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T16:57:23Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 251,
       "other_total": 4,
@@ -2353,15 +3152,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T16:57:21Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 250,
       "other_total": 3,
@@ -2373,15 +3179,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T16:57:19Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 249,
       "other_total": 4,
@@ -2393,15 +3206,22 @@
     {
       "ac_total": 5,
       "ac_unticked": 1,
+      "all_ac_unticked": false,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T16:35:56Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 1,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: retrospective"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 191,
       "other_total": 5,
@@ -2413,17 +3233,24 @@
     {
       "ac_total": 6,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T16:32:27Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#243"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#243",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#243"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 165,
       "other_total": 7,
@@ -2435,15 +3262,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T16:20:03Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: docs"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 254,
       "other_total": 4,
@@ -2455,15 +3289,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T15:55:21Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 215,
       "other_total": 0,
@@ -2475,13 +3316,20 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T15:55:18Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 241,
       "other_total": 7,
@@ -2493,15 +3341,22 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T04:56:22Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 222,
       "other_total": 13,
@@ -2513,15 +3368,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T04:33:33Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 212,
       "other_total": 9,
@@ -2533,17 +3395,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T04:32:21Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: gemini",
         "housekeeping",
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 203,
       "other_total": 17,
@@ -2555,15 +3424,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T04:32:13Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 123,
       "other_total": 6,
@@ -2575,15 +3451,22 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T04:20:47Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 167,
       "other_total": 0,
@@ -2595,15 +3478,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T04:20:39Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 234,
       "other_total": 0,
@@ -2615,15 +3505,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T04:20:37Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 233,
       "other_total": 0,
@@ -2635,15 +3532,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T04:20:36Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 232,
       "other_total": 0,
@@ -2655,16 +3559,23 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-12T04:20:28Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "priority: medium",
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 20,
       "other_total": 0,
@@ -2676,15 +3587,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T04:20:27Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 136,
       "other_total": 2,
@@ -2696,16 +3614,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-12T04:20:25Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "status: triage",
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 6,
       "other_total": 13,
@@ -2717,17 +3642,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-11T20:26:02Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#240"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": false,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "#240"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 237,
       "other_total": 18,
@@ -2739,17 +3671,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-11T20:23:09Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#240"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": false,
       "labels": [
         "type: infra"
       ],
+      "linked_prs": [
+        "#240"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 236,
       "other_total": 15,
@@ -2761,15 +3700,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-11T20:08:25Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 224,
       "other_total": 4,
@@ -2781,15 +3727,22 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-11T20:08:23Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 221,
       "other_total": 5,
@@ -2801,18 +3754,25 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-11T19:00:41Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#230"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#230",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: publication",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#230"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 164,
       "other_total": 14,
@@ -2824,16 +3784,23 @@
     {
       "ac_total": 4,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-11T18:38:37Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 163,
       "other_total": 13,
@@ -2845,18 +3812,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-11T18:29:27Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#226"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#226",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#226"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 202,
       "other_total": 10,
@@ -2868,17 +3842,24 @@
     {
       "ac_total": 7,
       "ac_unticked": 7,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-11T16:09:43Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#219"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#219",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 7,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#219"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 218,
       "other_total": 0,
@@ -2890,18 +3871,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-11T03:00:40Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#216"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#216",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#216"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 201,
       "other_total": 10,
@@ -2913,17 +3901,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-10T23:37:58Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#214"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#214",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#214"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 213,
       "other_total": 0,
@@ -2935,18 +3930,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-10T22:11:18Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#210"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#210",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#210"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 200,
       "other_total": 9,
@@ -2958,18 +3960,25 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-10T20:17:03Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#205"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#205",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: visualization",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#205"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 162,
       "other_total": 6,
@@ -2981,17 +3990,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-10T15:48:38Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#188"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#188",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "enhancement"
       ],
+      "linked_prs": [
+        "#188"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 142,
       "other_total": 4,
@@ -3003,18 +4019,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-10T15:48:30Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#187"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#187",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [
+        "#187"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 154,
       "other_total": 4,
@@ -3026,17 +4049,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-10T15:47:38Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#186"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#186",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#186"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 126,
       "other_total": 6,
@@ -3048,18 +4078,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-10T15:46:44Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#185"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#185",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [
+        "#185"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 158,
       "other_total": 2,
@@ -3071,18 +4108,25 @@
     {
       "ac_total": 7,
       "ac_unticked": 7,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-10T15:45:44Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#184"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#184",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 7,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [
+        "#184"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 156,
       "other_total": 0,
@@ -3094,15 +4138,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-10T15:41:31Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: retrospective"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 190,
       "other_total": 13,
@@ -3114,18 +4165,25 @@
     {
       "ac_total": 10,
       "ac_unticked": 10,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-10T15:10:30Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#182"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#182",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 10,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "priority: high",
         "type: infra"
       ],
+      "linked_prs": [
+        "#182"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 179,
       "other_total": 4,
@@ -3137,18 +4195,25 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T20:07:00Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#178"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#178",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: implementation",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#178"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 161,
       "other_total": 5,
@@ -3160,18 +4225,25 @@
     {
       "ac_total": 6,
       "ac_unticked": 6,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T19:47:38Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#176"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#176",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 6,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "type: docs",
         "type: infra"
       ],
+      "linked_prs": [
+        "#176"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 175,
       "other_total": 3,
@@ -3183,17 +4255,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T19:47:36Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#174"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#174",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "documentation"
       ],
+      "linked_prs": [
+        "#174"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 168,
       "other_total": 0,
@@ -3205,17 +4284,24 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T19:47:33Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#173"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#173",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "documentation"
       ],
+      "linked_prs": [
+        "#173"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 170,
       "other_total": 0,
@@ -3227,17 +4313,24 @@
     {
       "ac_total": 3,
       "ac_unticked": 3,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T19:47:30Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#172"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#172",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 3,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#172"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 169,
       "other_total": 0,
@@ -3249,15 +4342,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T18:15:15Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#171"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#171",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#171"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 159,
       "other_total": 5,
@@ -3269,16 +4369,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T18:09:24Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 157,
       "other_total": 3,
@@ -3290,18 +4397,25 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T18:04:43Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#166"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#166",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "phase: ground-truth",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#166"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 160,
       "other_total": 6,
@@ -3313,18 +4427,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T17:11:32Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#153"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#153",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [
+        "#153"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 152,
       "other_total": 0,
@@ -3336,15 +4457,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T17:00:09Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "enhancement"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 143,
       "other_total": 4,
@@ -3356,15 +4484,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T17:00:06Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 119,
       "other_total": 3,
@@ -3376,17 +4511,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T16:59:54Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#155"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#155",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#155"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 125,
       "other_total": 7,
@@ -3398,13 +4540,20 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T15:52:30Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 140,
       "other_total": 3,
@@ -3416,13 +4565,20 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T15:52:28Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 139,
       "other_total": 2,
@@ -3434,17 +4590,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T15:41:44Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "enhancement",
         "phase: publication",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 113,
       "other_total": 0,
@@ -3456,15 +4619,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T05:46:58Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 138,
       "other_total": 3,
@@ -3476,15 +4646,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T05:45:53Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 137,
       "other_total": 4,
@@ -3496,17 +4673,24 @@
     {
       "ac_total": 5,
       "ac_unticked": 5,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T05:31:54Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#151"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#151",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 5,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#151"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 150,
       "other_total": 0,
@@ -3518,17 +4702,24 @@
     {
       "ac_total": 7,
       "ac_unticked": 7,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T05:13:50Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#149"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#149",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 7,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#149"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 148,
       "other_total": 0,
@@ -3540,17 +4731,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T05:02:05Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#147"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#147",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#147"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 80,
       "other_total": 3,
@@ -3562,19 +4760,26 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T04:28:41Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#112"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: claude",
         "phase: publication",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#112"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 64,
       "other_total": 17,
@@ -3586,18 +4791,25 @@
     {
       "ac_total": 4,
       "ac_unticked": 4,
+      "all_ac_unticked": true,
+      "body_check_would_trip": true,
       "closedAt": "2026-02-06T04:17:04Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#145"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#145",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": true,
       "guard_unticked": 4,
-      "guard_would_catch": true,
+      "guard_would_have_fired": true,
       "labels": [
         "housekeeping",
         "priority: high"
       ],
+      "linked_prs": [
+        "#145"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 144,
       "other_total": 3,
@@ -3609,17 +4821,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-06T03:55:09Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: gemini",
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 55,
       "other_total": 27,
@@ -3631,18 +4850,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-05T23:40:40Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#134"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#134",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#134"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 133,
       "other_total": 7,
@@ -3654,16 +4880,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-05T05:06:20Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 132,
       "other_total": 5,
@@ -3675,16 +4908,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-05T05:06:19Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 131,
       "other_total": 4,
@@ -3696,17 +4936,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-05T04:35:24Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#129"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#129",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#129"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 122,
       "other_total": 5,
@@ -3718,15 +4965,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-05T04:08:31Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 128,
       "other_total": 8,
@@ -3738,17 +4992,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-05T02:41:33Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#121"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#121",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#121"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 120,
       "other_total": 16,
@@ -3760,18 +5021,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T06:53:07Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#115"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#115",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [
+        "#115"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 114,
       "other_total": 0,
@@ -3783,15 +5051,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T06:37:33Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "bug"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 118,
       "other_total": 4,
@@ -3803,15 +5078,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T06:37:31Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "bug"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 117,
       "other_total": 3,
@@ -3823,19 +5105,26 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T04:54:57Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#111"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#111",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: gemini",
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#111"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 108,
       "other_total": 17,
@@ -3847,18 +5136,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T03:57:31Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#105"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#105",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: implementation",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#105"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 103,
       "other_total": 0,
@@ -3870,18 +5166,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T03:57:31Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#105"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#105",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: ground-truth",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#105"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 102,
       "other_total": 0,
@@ -3893,15 +5196,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T03:57:31Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#105"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#105",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": false,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#105"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 101,
       "other_total": 0,
@@ -3913,18 +5223,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T03:50:58Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#107"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#107",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation",
         "housekeeping"
       ],
+      "linked_prs": [
+        "#107"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 106,
       "other_total": 0,
@@ -3936,18 +5253,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T03:41:50Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#110"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: visualization",
         "type: experiment"
       ],
+      "linked_prs": [
+        "#110"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 109,
       "other_total": 7,
@@ -3959,16 +5283,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T03:00:11Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: proof",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 104,
       "other_total": 0,
@@ -3980,17 +5311,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-04T02:53:31Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#99"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#99",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#99"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 98,
       "other_total": 7,
@@ -4002,15 +5340,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T08:47:57Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 97,
       "other_total": 5,
@@ -4022,17 +5367,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T08:47:56Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#96"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#96",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#96"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 93,
       "other_total": 5,
@@ -4044,15 +5396,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T07:52:22Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 91,
       "other_total": 3,
@@ -4064,17 +5423,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T07:52:21Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#79"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#79",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [
+        "#79"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 78,
       "other_total": 5,
@@ -4086,15 +5452,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T07:32:15Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "housekeeping"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 90,
       "other_total": 5,
@@ -4106,12 +5479,17 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T06:32:12Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "assignee: claude",
         "phase: visualization",
@@ -4119,6 +5497,8 @@
         "status: ready",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 29,
       "other_total": 14,
@@ -4130,18 +5510,25 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T05:49:10Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#75"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#75",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "priority: low",
         "type: docs"
       ],
+      "linked_prs": [
+        "#75"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 21,
       "other_total": 14,
@@ -4153,16 +5540,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T04:26:48Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: implementation",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 53,
       "other_total": 13,
@@ -4174,16 +5568,23 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T04:26:46Z",
-      "closed_by": "manual",
-      "closing_prs": [],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "phase: ground-truth",
         "type: experiment"
       ],
+      "linked_prs": [],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 52,
       "other_total": 9,
@@ -4195,17 +5596,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T03:25:58Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#73"
-      ],
+      "closed_how": "manual",
+      "closing_pr": "",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": null,
+      "closing_pr_repo": "",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "type: research"
       ],
+      "linked_prs": [
+        "#73"
+      ],
+      "merge_delta_s": null,
       "nil": 0,
       "number": 54,
       "other_total": 0,
@@ -4217,17 +5625,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T02:27:09Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#28"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#28",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "enhancement"
       ],
+      "linked_prs": [
+        "#28"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 19,
       "other_total": 5,
@@ -4239,17 +5654,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T02:17:35Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#27"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#27",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "enhancement"
       ],
+      "linked_prs": [
+        "#27"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 18,
       "other_total": 4,
@@ -4261,17 +5683,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T02:17:35Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#27"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#27",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "enhancement"
       ],
+      "linked_prs": [
+        "#27"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 17,
       "other_total": 4,
@@ -4283,17 +5712,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T02:17:35Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#27"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#27",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "enhancement"
       ],
+      "linked_prs": [
+        "#27"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 16,
       "other_total": 5,
@@ -4305,17 +5741,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T02:17:32Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#26"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#26",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "enhancement"
       ],
+      "linked_prs": [
+        "#26"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 25,
       "other_total": 4,
@@ -4327,17 +5770,24 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-03T02:17:32Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#26"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#26",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [
         "documentation"
       ],
+      "linked_prs": [
+        "#26"
+      ],
+      "merge_delta_s": 2,
       "nil": 0,
       "number": 24,
       "other_total": 5,
@@ -4349,15 +5799,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-01T23:30:03Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#8"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#8",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#8"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 7,
       "other_total": 4,
@@ -4369,15 +5826,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-01T22:46:21Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#4"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#4",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#4"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 3,
       "other_total": 4,
@@ -4389,15 +5853,22 @@
     {
       "ac_total": 0,
       "ac_unticked": 0,
+      "all_ac_unticked": false,
+      "body_check_would_trip": false,
       "closedAt": "2026-02-01T22:45:02Z",
-      "closed_by": "pr",
-      "closing_prs": [
-        "#2"
-      ],
+      "closed_how": "merged-pr",
+      "closing_pr": "#2",
+      "closing_pr_cross_repo": false,
+      "closing_pr_has_keyword": true,
+      "closing_pr_repo": "JamesPagetButler/QBP",
       "flagged": false,
       "guard_unticked": 0,
-      "guard_would_catch": false,
+      "guard_would_have_fired": false,
       "labels": [],
+      "linked_prs": [
+        "#2"
+      ],
+      "merge_delta_s": 1,
       "nil": 0,
       "number": 1,
       "other_total": 4,
@@ -4408,19 +5879,33 @@
     }
   ],
   "summary": {
-    "any_unticked_box": 161,
+    "any_unticked_box": 162,
     "clean": 45,
-    "closedAt_max": "2026-10-16T17:34:35Z",
+    "closedAt_max": "2026-10-17T19:27:44Z",
     "closedAt_min": "2026-02-01T22:45:02Z",
-    "closed_by_pr": 117,
-    "closed_manually": 89,
-    "flagged_closed_by_pr": 54,
-    "flagged_closed_manually": 33,
-    "flagged_pr_guard_would_catch": 54,
+    "closed_by_merged_pr": 109,
+    "closed_manually": 98,
+    "closed_unknown": 0,
+    "flagged_all_ac_unticked": 85,
+    "flagged_body_check_would_trip": 87,
+    "flagged_closed_by_merged_pr": 52,
+    "flagged_closed_manually": 35,
+    "flagged_closed_unknown": 0,
+    "flagged_linked_but_hand_closed": 2,
+    "flagged_merged_pr_cross_repo": 3,
+    "flagged_merged_pr_guard_would_have_fired": 48,
+    "flagged_merged_pr_no_keyword": 1,
     "flagged_unticked_ac": 87,
-    "other_only_unticked": 74,
-    "scanned": 206,
+    "flagged_with_linked_pr": 54,
+    "merge_window_s": 120,
+    "merged_pr_repos": [
+      "JamesPagetButler/QBP",
+      "JamesPagetButler/qbp-systema"
+    ],
+    "other_only_unticked": 75,
+    "scanned": 207,
     "since": "",
-    "total_unticked_ac_boxes": 408
+    "total_unticked_ac_boxes": 408,
+    "with_linked_pr": 118
   }
 }

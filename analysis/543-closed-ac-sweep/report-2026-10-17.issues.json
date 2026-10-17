@@ -5541,5 +5541,36 @@
   "stateReason": "COMPLETED",
   "title": "[housekeeping] pr-check-status notifier: tick its review checklist from the detected review artifacts (it never ticks today and misreads as open work at the merge gate)",
   "url": "https://github.com/JamesPagetButler/QBP/issues/706"
+ },
+ {
+  "body": "## Summary\n\nBeekeeper-directed (2026-10-17, live-test seq 2914–2931 + direct): QBP's facility design docs, the \"Academic Steampunk → Solarpunk\" design system, and the Paget / Bio-Symmetry Design Group personas are repurposed as the **craft family's shared Port**, stewarded by hutchins (craft-implementor). QBP retains construction of its own experiment/test spaces and the **Engine Cartographer** persona as the interface.\n\nSearched open issues first (QBP + craft: \"port / craft / pointer / hutchins / facility\"): no existing issue. #393 (facility exterior build) is the adjacent housekeeping item and stays open — its scope moves to the Port steward's call.\n\n## Beekeeper framing (verbatim intent)\n\n> your team will produce a set of specs and interfaces that are needed from the port for each experiment space, with an expectation Hutchins will have to tell you where to \"plug in\" the experiment.\n\nhutchins's working read (seq 2916), ratified by qbp-architecture (seq 2929): **spec-first** — a test unit is a declarative, versioned spec the Port renders in the shared design system; Kaiju-scene-load stays as an escape hatch for bespoke geometry; the Engine Cartographer authors/validates the spec QBP-side.\n\n## Hand-off conditions (agreed seq 2915/2916; ratified seq 2929)\n\n- (a) **Per-file provenance** travels with every ported file: origin repo + commit, authors as supported by git history, Bio-Symmetry Design Group byline where the file carries it.\n- (b) **One canonical home per artefact via a commit pair**: craft PR #2 imports at QBP master `18ec30e`; QBP PR #712 keeps full text with pointer headers + flips the persona-registry rows. Experiment-space code (`src/bakeoff/kaiju/game/`) stays canonical in QBP (craft dropped `port/kaiju/` at `4846aae`).\n- **Visibility** (beekeeper ruling, seq 2923/2929): canonical copy is private in craft for now; craft goes public once the Port is working (tracked as craft#3); QBP keeps the full-text public record.\n\n## Acceptance criteria\n\n- [ ] AC1 — Pointer headers on `docs/design-system.md`, `docs/design/facility_location.md`, `docs/design/facility_exterior/paget_concept.md`, `docs/design/facility_central_hub.md`, `docs/design/micro_interior_hallway.md`: canonical home = craft `port/...` @ import sha; canonical private-in-craft-for-now statement; full text retained; provenance block.\n- [ ] AC2 — `docs/personas/README.md` + `docs/personas/paget.md`: Paget + 6 specialists marked \"ported to craft @ <sha>\"; Engine Cartographer retained as QBP's interface persona with its canonical remit stated in README.md.\n- [ ] AC3 — `docs/design/port-experiment-interface.md`: versioned template for what QBP needs from the Port per experiment space + the `PlugIn` record the Port returns + instance zero = the double-slit lab. Draft for hutchins's review as Port steward.\n- [ ] AC4 — Craft import PR cross-referenced (link + sha + path) in the QBP PR body.\n- [ ] AC5 — `src/bakeoff/kaiju/` untouched; `src/viz/theme.py` / `src/viz/interactive/src/theme.h` stay canonical in QBP as build inputs (craft copies are snapshots).\n- [ ] AC6 — **Merge order + sha bump:** craft PR #2 merges first (beekeeper); then one commit on #712 bumps the import sha to craft's merge sha (owner: qbp-oppenheimer; trigger: hutchins's merge ping); then #712 merges. If #712 merges first, the bump is a follow-up PR referencing this issue.\n\n## Plan\n\n1. PR #712 (branch `docs/craft-port-pointers`) carries AC1–AC5.\n2. Review cycle: Red Team → Gemini → §I4 (qbp-architecture coherence; hutchins as Port steward on the interface doc). Merge is the beekeeper's.\n3. AC6 on craft PR #2 landing.\n4. Follow-ups (separate issues, QBP-side, owner Engine Cartographer via qbp-oppenheimer): `docs/design/spaces/03-double-slit.md` as the first versioned space spec; a PlugIn record request to the steward for it.\n\nOwner: qbp-oppenheimer. Steward of the Port: hutchins (craft). Bridge thread: live-test seq 2914–2931.\n",
+  "closedAt": "2026-10-17T19:27:44Z",
+  "closedByPullRequestsReferences": [
+   {
+    "id": "PR_kwDORGXhXc8AAAABJD0zNg",
+    "number": 713,
+    "repository": {
+     "id": "R_kgDORGXhXQ",
+     "name": "QBP",
+     "owner": {
+      "id": "MDQ6VXNlcjc2NzQwMjU=",
+      "login": "JamesPagetButler"
+     }
+    },
+    "url": "https://github.com/JamesPagetButler/QBP/pull/713"
+   }
+  ],
+  "labels": [
+   {
+    "color": "c5def5",
+    "description": "Maintenance tasks outside main research workflow",
+    "id": "LA_kwDORGXhXc8AAAACW2zjhg",
+    "name": "housekeeping"
+   }
+  ],
+  "number": 711,
+  "stateReason": "COMPLETED",
+  "title": "Craft Port hand-off: QBP-side pointers, persona registry flips, experiment-space Port interface spec",
+  "url": "https://github.com/JamesPagetButler/QBP/issues/711"
  }
 ]
