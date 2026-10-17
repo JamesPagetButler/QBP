@@ -66,10 +66,13 @@ QUARANTINE_REL = "QBP/.build-visibility-quarantine.json"
 BUILD_VISIBILITY_DIRS = PHYSICS_DIRS + ["Sprint12-Inherited"]
 
 # Matched against COMMENT-STRIPPED text only (see `strip_comments` / `imports_of`):
-# a `/- ... -/` block or `-- ...` line comment holding an `import` at column 0 is
-# not an import, and must neither count as one (rules 1/2 false positive, #502) nor
-# feed the build-visibility closure (rule 5 false "visible").
-IMPORT_RE = re.compile(r"^import\s+([\w.]+)", re.MULTILINE)
+# a `/- ... -/` block or `-- ...` line comment holding an `import` is not an
+# import, and must neither count as one (rules 1/2 false positive, #502) nor feed
+# the build-visibility closure (rule 5 false "visible"). Lean accepts leading
+# whitespace before `import` (`  import X`) and a comment on the same line
+# (`/- c -/ import X`, `-/ import X`); on stripped text comments are spaces, so a
+# whitespace-tolerant anchor is both safe and necessary (PR #719 Red Team K1).
+IMPORT_RE = re.compile(r"^[ \t]*import\s+([\w.]+)", re.MULTILINE)
 QUARANTINE_RE = re.compile(r"^\|\s*`(QBP\.[\w.]+)`", re.MULTILINE)
 # Lakefile parsing: `lean_lib`/`lean_exe` target blocks, each with an optional
 # `srcDir := "X"` and roots given as `root := `Mod`` or `roots := #[`A, `B]`.
