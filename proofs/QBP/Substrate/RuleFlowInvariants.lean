@@ -650,9 +650,12 @@ theorem quench_relation {a b t₀ : ℝ} {γ : ℝ → CDAlg ℝ 4}
   linear_combination (2 * B * B0 - 2 * B ^ 2) * hc0
 
 /-- **Picking the root.**  If `L ∈ [0,1]` solves the quench quadratic with
-    `B₀ ∈ [0,1]` and non-negative discriminant, then `L` is the *smaller* root,
+    `B₀ ∈ [0,1]` and non-negative discriminant, then `L` is the root `B₀/(B₀ + D)`,
     in the division-free form `L·(B₀ + D) = B₀` with `D = √((1 − B₀)² − V₀)`.
-    (The other root is `> 1` whenever it is distinct, so `L ≤ 1` selects.) -/
+    (The other root `B₀/(B₀ − D)` is NOT in general `> 1` — for `B₀ < D` it is
+    negative — so the proof does not select by size: in the `L·(B₀ − D) = B₀`
+    branch the bounds `0 ≤ L ≤ 1`, `0 ≤ B₀`, `0 ≤ D` force `L·D = 0`, which
+    collapses that branch onto the same conclusion.  Docstring corrected per #683.) -/
 theorem quench_root_pick_aux {B0 V0 L D : ℝ} (hB0 : 0 ≤ B0) (hDnn : 0 ≤ D)
     (hDsq : D ^ 2 = (1 - B0) ^ 2 - V0) (hL0 : 0 ≤ L) (hL1 : L ≤ 1)
     (hq : L ^ 2 * (V0 + 2 * B0 - 1) - 2 * B0 ^ 2 * L + B0 ^ 2 = 0) :

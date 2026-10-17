@@ -137,7 +137,8 @@ the FOUNDATION (tower rungs = energy regimes). Concretely for the Lean file spli
 **FINDING 1 — The automorphism reconciliation is DEAD (Counter-Team kill, Theory
 Team concession).** Aut(𝕊) ≅ Aut(𝕆) × S₃ ≅ G₂ × S₃ (Eakin–Sathaye 1990; Wilson
 verified vs literature; Gemini marked UNVERIFIED — needs independent citation check
-if conjecture proceeds). Continuous-symmetry dimension ladder: 0, 0, 3, 14, **14**.
+if conjecture proceeds; **checked 2026-10-17, see the O3 note in §5.4 (#498): primary
+source is Brown 1967 Thm 1, dim 14 confirmed, S₃ factor contested by a 2025 preprint**). Continuous-symmetry dimension ladder: 0, 0, 3, 14, **14**.
 It stalls at exactly the 𝕆→𝕊 rung — maximum structure loss, zero new continuous
 symmetry. "Fewer laws = more symmetry" is false at the decisive rung. Additionally
 (Wilson): Aut(coefficient algebra) is categorically different from the dynamical/gauge
@@ -206,6 +207,19 @@ conditions:
 |---|---|---|---|
 | O1 | E(ℍ→ℂ) derivation via S² selection entropy, zero free parameters | theory teams (commission when beekeeper green-lights) | OPEN |
 | O2 | Find the monotone five-rung invariant (or prove none exists ⇒ arrow dies) | theory teams | OPEN |
-| O3 | Independent citation check: Aut(𝕊) ≅ G₂ × S₃ (Eakin–Sathaye 1990) | QBP-Herschel / lit task | OPEN |
+| O3 | Independent citation check: Aut(𝕊) ≅ G₂ × S₃ (Eakin–Sathaye 1990) | QBP-Herschel / lit task | **DONE 2026-10-17 (#498)** — dim 14 confirmed; primary source is Brown 1967 Thm 1, Eakin–Sathaye 1990 is the general-n extension; S₃ factor contested by one 2025 preprint. See O3 note below. |
 | O4 | Working-ontology doc v0.1 records the conjecture as NASCENT with this deliberation linked | Oppenheimer | OPEN |
 | O5 | Foundation↔physics Lean seam: adopt Finding 5 as the split rule | Oppenheimer + qbp-implementor | **READY TO ADOPT** |
+
+**O3 note — citation check (2026-10-17, #498).** Verdict: **the dimension claim holds; the attribution is corrected; the discrete S₃ factor is contested by one unrefereed 2025 preprint.**
+
+| Source | What it states | Bearing on Q2 |
+|---|---|---|
+| R. B. Brown, "On generalized Cayley–Dickson algebras", *Pacific J. Math.* **20**(3) (1967) 415–422, **Theorem 1** (proved in full for t = 4; t = 5, 6 sketched; all t ≥ 4 conjectured) | For t = 4, 5, 6 over fields of characteristic ≠ 2, 3: Aut(𝔄_t) = G with G ≅ Aut(𝔄_{t−1}) × S₃ when the ground field contains β = √(−3γ) (where 𝔄_t = 𝔄_{t−1}{γ}), and G ≅ Aut(𝔄_{t−1}) × S₂ otherwise. Real sedenions: γ = −1 ⇒ β = √3 ∈ ℝ ⇒ **Aut(𝕊) ≅ Aut(𝕆) × S₃ ≅ G₂ × S₃**. | **Primary source** for the sedenion statement. |
+| P. Eakin & A. Sathaye, "On automorphisms and derivations of Cayley–Dickson algebras", *J. Algebra* **129**(2) (1990) 263–278 (zbMATH 4146218, review A. H. Boers) | Proves Brown's conjecture for all n: Aut_F(A^Γ_{n+1}) ≅ Aut_F(A^Γ_n) ⊕ G with G ≅ ℤ/2 or S₃ according to the structure constants (char ≠ 2; ≠ 3 for the isomorphism criterion). | General-n extension; the sedenion case is Brown Thm 1. Read the deliberation's "(Eakin–Sathaye 1990)" as "Brown 1967 Thm 1; general n: Eakin–Sathaye 1990". Theorem number *inside* Eakin–Sathaye not located (primary PDF paywalled; zbMATH review used). |
+| K.-C. Chan & D. Ž. Đoković, "Conjugacy classes of subalgebras of the real sedenions", *Canad. Math. Bull.* **49**(4) (2006) 492–507, §1 | "In 1967 R. B. Brown [2] proved that G = G₂ × Σ₃. He also made a conjecture about the structure of the automorphism group of Aₙ for n ≥ 4 … His conjecture was later proved by Eakin and Sathaye [4]." | Independent secondary confirmation of both attributions, for the *real* sedenions with the standard doubling. |
+| G. P. Wilmot, "Automorphisms of Sedenions", arXiv:2512.07210 (Dec 2025, **unrefereed preprint**) | Argues via a Clifford/Pin-group calibration that Aut(𝕊) ≅ G₂ (siding with Schafer 1954) and that Brown's S₃ factor does not survive; does not cite Eakin–Sathaye. | Disputes only the **discrete** factor. Flagged for watch; not an escalation trigger (below). |
+
+- **dim = 14 confirmed.** S₃ (or ℤ/2, or trivial) is finite, so dim Aut(𝕊) = dim G₂ = 14 on every account above. The Q2 continuous-symmetry ladder 0, 0, 3, 14, **14** and its stall at the 𝕆→𝕊 rung stand; the FATAL ruling rests on the dimension, not on the discrete factor.
+- **Standard real doubling covered.** Brown's hypotheses (char ≠ 2, 3; β = √(−3γ) ∈ F) are met by ℝ with γ = −1; Chan–Đoković state the result for exactly the real Cayley–Dickson sedenions A₄.
+- **CTH inventory.** No existing anchor cites Brown or Eakin–Sathaye (repo grep 2026-10-17), so there is no inventory row to update; this note is the record of the check.
