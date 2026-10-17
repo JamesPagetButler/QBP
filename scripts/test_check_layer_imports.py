@@ -14,8 +14,15 @@ plants a build-invisible physics file and asserts the gate catches it (#625 AC2)
 
 Each case builds a minimal synthetic proofs/ tree in a tempdir and runs the real
 checker via `--proofs`. Run: python3 scripts/test_check_layer_imports.py
+(also pytest-collectible: `python3 -m pytest scripts/test_check_layer_imports.py`).
+
+#502 (PR #497 Tier-3 Red Team F4): `IMPORT_RE` used to run on raw text, so an
+`import QBP.Physics.X` at column 0 INSIDE a `/- ... -/` or `-- ...` comment counted
+as a real import (rule 1/2 false positive) and fed the build-visibility closure
+(rule 5 false "visible"). `test_comment_embedded_imports` is the regression test.
 """
 
+import importlib.util
 import json
 import os
 import subprocess
@@ -24,6 +31,16 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPT = os.path.join(HERE, "check_layer_imports.py")
+
+
+def _load_checker():
+    """Import check_layer_imports.py as a module (it is a script, not a package)."""
+    spec = importlib.util.spec_from_file_location("check_layer_imports", SCRIPT)
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
 
 # A minimal, fully-clean proofs tree: passes rules 1–5.
 #   - QBP lib (@[default_target]) root QBP.lean imports Foundations + one Experiments file.
@@ -215,8 +232,146 @@ def main():
     check("physics importing Substrate fails", rc == 1)
     check("forbidden-import violation explained", "forbidden" in out)
 
+    # 12. #502 regression: comment-embedded imports are not imports.
+    passed += _comment_embedded_import_cases()
+    passed += _strip_comments_unit_cases()
+
     print(f"check_layer_imports: {passed}/{passed} tests passed")
     return 0
+
+
+# A Foundations file whose only `import QBP.Physics...` / `import QBP.Substrate...`
+# lines sit at column 0 INSIDE comments: a one-line block comment, a NESTED
+# multi-line block comment, a `/-!` module docstring, and a `--` line comment.
+# None of these is an import; the file is clean under rule 1.
+COMMENTED_FOUNDATIONS_FILE = (
+    "/- import QBP.Physics.OneLine -/\n"
+    "/-! Module header. The following is what a Foundations file must NOT do:\n"
+    "import QBP.Physics.InModuleDoc\n"
+    "-/\n"
+    "/- outer comment\n"
+    "  /- nested comment, still inside the outer one\n"
+    "import QBP.Substrate.Nested\n"
+    "  -/ the inner comment is closed; the outer one continues -- still here\n"
+    "import QBP.Physics.StillInsideOuter\n"
+    "-/\n"
+    "-- import QBP.Physics.LineComment\n"
+    "theorem foundations_leaf : True := trivial\n"
+)
+
+
+def test_comment_embedded_imports() -> None:
+    """pytest entry point for the #502 regression (CI runs `main()` directly)."""
+    _comment_embedded_import_cases()
+
+
+def test_strip_comments_unit() -> None:
+    """pytest entry point for the `strip_comments` unit checks."""
+    _strip_comments_unit_cases()
+
+
+def _comment_embedded_import_cases() -> int:
+    """#502 AC2: comment-embedded forbidden imports must NOT trigger; real ones must."""
+    n = 0
+
+    # (a) Only comment-embedded forbidden imports → rule 1 does NOT fire.
+    files = dict(BASE_FILES)
+    files["QBP/Foundations/F1.lean"] = COMMENTED_FOUNDATIONS_FILE
+    rc, out = run(files)
+    assert rc == 0, f"comment-embedded imports counted as imports:\n{out}"
+    n += 1
+
+    # (b) The SAME file plus one REAL forbidden import → rule 1 fires on exactly
+    #     the real one, proving the stripper does not eat genuine import lines.
+    files = dict(BASE_FILES)
+    files["QBP/Foundations/F1.lean"] = (
+        COMMENTED_FOUNDATIONS_FILE + "import QBP.Physics.RealImport\n"
+    )
+    rc, out = run(files)
+    assert rc == 1, "real forbidden import after comments was not caught"
+    assert "QBP.Physics.RealImport" in out, out
+    for ghost in (
+        "OneLine",
+        "InModuleDoc",
+        "Nested",
+        "StillInsideOuter",
+        "LineComment",
+    ):
+        assert ghost not in out, f"comment-embedded import {ghost} reported:\n{out}"
+    n += 1
+
+    # (c) Rule 5: a physics file reached ONLY through a commented-out import in the
+    #     default root is build-INVISIBLE (lake does not follow comments) and must
+    #     be flagged — the stripped text, not the raw text, feeds the closure.
+    files = dict(BASE_FILES)
+    files["QBP.lean"] = (
+        "import QBP.Foundations\n"
+        "import QBP.Experiments.Exp1\n"
+        "-- import QBP.Experiments.Ghost\n"
+        "/- import QBP.Experiments.Ghost -/\n"
+    )
+    files["QBP/Experiments/Ghost.lean"] = "-- reachable only via commented imports\n"
+    rc, out = run(files)
+    assert rc == 1, "comment-only-reachable physics file passed as visible"
+    assert "QBP/Experiments/Ghost.lean" in out and "build-invisible" in out, out
+    n += 1
+
+    # (d) Rule 3: a Foundations module named only by a commented-out aggregator
+    #     import is NOT imported → build-invisibility is reported.
+    files = dict(BASE_FILES)
+    files["QBP/Foundations.lean"] = (
+        "import QBP.Foundations.F1\n-- import QBP.Foundations.F2\n"
+    )
+    files["QBP/Foundations/F2.lean"] = "-- named only in a comment\n"
+    rc, out = run(files)
+    assert rc == 1, "comment-only aggregator import counted as an import"
+    assert "QBP/Foundations/F2.lean" in out, out
+    n += 1
+
+    # (e) The quarantine table lives INSIDE the aggregator's comment block and
+    #     must still be read (it is parsed from raw, not stripped, text).
+    files = dict(BASE_FILES)
+    files["QBP/Foundations.lean"] = (
+        "import QBP.Foundations.F1\n"
+        "/-! Quarantine (build-invisibility, tracked):\n"
+        "| `QBP.Foundations.F2` | #000 | reason |\n"
+        "-/\n"
+    )
+    files["QBP/Foundations/F2.lean"] = "-- quarantined via the comment table\n"
+    rc, out = run(files)
+    assert rc == 0, f"quarantine table inside comment block not honoured:\n{out}"
+    n += 1
+    return n
+
+
+def _strip_comments_unit_cases() -> int:
+    """Direct checks on `strip_comments`: nesting, newline alignment, real lines kept."""
+    mod = _load_checker()
+    strip = mod.strip_comments
+    n = 0
+
+    src = "import A\n/- x /- y -/ z\nimport B\n-/\nimport C -- trailing\n-- import D\n"
+    out = strip(src)
+    assert out.count("\n") == src.count("\n"), "newlines must be preserved"
+    assert len(out) == len(src), "stripping must be length-preserving (column-aligned)"
+    assert mod.IMPORT_RE.findall(out) == ["A", "C"], mod.IMPORT_RE.findall(out)
+    n += 1
+
+    # `/-` inside a line comment does not open a block; the next line is code.
+    assert mod.imports_of_text("-- /- not a block\nimport E\n") == ["E"]
+    n += 1
+    # `--` inside a block comment does not end the block early.
+    assert mod.imports_of_text("/- a -- b\nimport F\n-/\nimport G\n") == ["G"]
+    n += 1
+    # Unterminated block comment swallows the rest, as Lean would.
+    assert mod.imports_of_text("/- open\nimport H\n") == []
+    n += 1
+    # Real-world shape: module docstring then imports (the Foundations norm).
+    assert mod.imports_of_text(
+        "/-!\n# Title\nimport QBP.Physics.Quoted is forbidden here\n-/\nimport Mathlib.Algebra.Ring.Basic\nimport QBP.Foundations.CDAlg\n"
+    ) == ["Mathlib.Algebra.Ring.Basic", "QBP.Foundations.CDAlg"]
+    n += 1
+    return n
 
 
 if __name__ == "__main__":
