@@ -86,7 +86,7 @@ Per discovery response action item §5 and QBP #433 (pending architect ratificat
 | `INSIGHT-*` | Synthesised insight |
 | `REF-*` | External reference |
 | `EXT-*` | External anchor |
-| `CONV-*` | Convention |
+| `CONV-*` | Convergence (independent external framework reaching the same structure; not "Convention" — corrected on PR #719 against the three ledger records) |
 | `COMP-*` | Computation |
 | `CONSTRAINT-*` | Constraint |
 | `WISDOM-*` | Wisdom-layer claim |
@@ -101,7 +101,7 @@ Per discovery response action item §5 and QBP #433 (pending architect ratificat
 | `CHAIN-*` | Chain (used in `chains`, not yet in `anchors`) |
 | `FORK-*` | Fork branch |
 
-The DEFN/AXIOM/CONJ/CHAIN/FORK extensions are formally documented in `docs/conventions/anchor-prefix-policy.md` §4 (DEFN-/AXIOM-/CONJ-/CHAIN- live in the ledger; FORK- reserved, zero records). Not yet upstream-registered; the confluent-trust schema extension adding them to the JSON Schema enum rides with QBP #494 (parallel to confluent-trust #88).
+The DEFN/AXIOM/CONJ/CHAIN/FORK extensions are formally documented in `docs/conventions/anchor-prefix-policy.md` §4 (DEFN-/AXIOM-/CONJ-/CHAIN- live in the ledger; FORK- is schema-supported upstream — `fork_points[]`/`ForkPoint`, schema v0.3.5 l.45/l.445 — but unused in QBP: zero records, reserved; minting one means populating `fork_points[]`, no schema change). The prefix semantics are not yet upstream-registered; that proposal is QBP #722 (schema-axis, co-sign @cth-implementor; parallel to confluent-trust #88).
 
 ---
 
@@ -110,7 +110,7 @@ The DEFN/AXIOM/CONJ/CHAIN/FORK extensions are formally documented in `docs/conve
 | Date | Author | Change |
 |---|---|---|
 | 2026-05-22 | qbp-implementor | v0.1 — initial canonicalisation post-Phase-0 discovery (D/I/P documented; confluent-trust #88 referenced) |
-| 2026-10-17 | qbp-implementor (housekeeping seat) | QBP#462 — §Anchor ID prefixes: cross-reference to `docs/conventions/anchor-prefix-policy.md`; the pending-extensions note now points at that document's §4 and names #494 as the upstream carrier |
+| 2026-10-17 | qbp-implementor (housekeeping seat) | QBP#462 — §Anchor ID prefixes: cross-reference to `docs/conventions/anchor-prefix-policy.md`; the pending-extensions note points at that document's §4; upstream carrier = #722 (PR #719 Red Team: FORK- is upstream `fork_points[]`, not a missing list; `CONV-` row corrected Convention → Convergence) |
 | 2026-10-15 | qbp-oppenheimer | QBP#696 PR #703 commit 2 (Red Team C1/C2 + N2–N6, issuecomment-6183391119) — §Anchor fields: the pin worktree is removed in `run()`'s `try/finally` (atexit as the belt); `pin_worktree` lends dependencies to a `proofs/lakefile.toml` pin as well as a `lakefile.lean` one (`lake_requires`); the G-L2 manifest check is per **named** package (`mathlib` at the lakefile's rev, not any package's); the fallback TOML reader refuses a non-string array element; report paths are relative to named bases (`<repo>` / `<evidence-repo>` / `<evidence-dir>`), never the scratch checkout's absolute path; the re-key report regenerated at `INTER_PIN` `e2ecce8` with the CLI's own `generated` stamp |
 | 2026-10-11 | qbp-oppenheimer | QBP#696 rewritten on QBP#700 (architecture §I4 conditions 1–3) — §Anchor fields: the claim-source closure is derived from each prover's own dependency tool in a hermetic pin worktree (Lake facets under `--no-build` with G-L1 on every member of S · `agda --dependency-graph` with the clean-interface state asserted · `coqdep` with stderr refusal); the PR #698 regex Lake/Agda parser (rows below) is deleted, not hardened; report records the closure toolchain handle, the per-anchor closure record and `evidence_store_sha`; PROOF-hessian + the three Agda keys re-keyed in `analysis/692-pa-backfill/backfill-2026-10-15-closure-rekey.*` (regenerated at `INTER_PIN` `e2ecce8` in PR #703 commit 2); G-L2 (gitignored lake-manifest) refused on mismatch, owner qbp-implementor |
 | 2026-10-03 | qbp-oppenheimer | QBP#696 PR #698 commit 5 — §Anchor fields: lakefile block splitter attaches a body that begins on a flush `{` / `where` line to its header (Red Team N14, blocking — six Lake v4.30.0-verified shapes previously parsed to the silent default) and refuses a `roots`/`srcDir` token in any non-`lean_lib`/`package` block; a second `:=` inside a string literal is text (N15); unnamed `package where` accepted, `where` never a name (N16); Lake-rejected `where { … }` test rows replaced by Lake-verified brace shapes (N17); a root claimed by two libs refuses naming both (N18) |
