@@ -20,11 +20,14 @@ Logic:
   4. else                                       -> PASS
 
 Usage:
-  check_tier3_label.py --changed-files changed.txt --labels-file labels.txt --comments-file comments.txt
+  check_tier3_label.py --changed-files changed.txt --labels-file labels.txt --comments-json comments.json
+  (the pre-joined --comments-file input was removed on Gemini review of PR #717: every
+   consumer must pass raw API JSON so the author-trust filter cannot be bypassed)
 """
 
 import argparse
 import fnmatch
+import json
 import re
 import sys
 
@@ -59,6 +62,10 @@ NOTIFIER_MARKER = "<!-- pr-check-status-notifier -->"
 # The workflow joins individual comment bodies with this boundary so the gate can
 # evaluate each comment separately (signature + verdict must co-occur in ONE).
 COMMENT_BOUNDARY = "===TIER3-COMMENT-BOUNDARY==="
+# #552 security fix (qbp-architecture §I4 on PR #717): with an `issue_comment` trigger on a
+# PUBLIC repo, any GitHub account could post signature+verdict words and re-run the gate.
+# Only comments whose author_association marks a repo insider may count as review evidence.
+TRUSTED_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 
 
 def is_theory(path):
@@ -73,21 +80,57 @@ def read_lines(p):
         return []
 
 
+def trusted_comment_blob(path):
+    """Load raw GitHub issue-comment JSON and keep only insider-authored bodies.
+
+    Returns the bodies joined with COMMENT_BOUNDARY so the per-comment matching below is
+    unchanged. Comments from authors outside TRUSTED_ASSOCIATIONS (NONE, CONTRIBUTOR,
+    FIRST_TIMER, FIRST_TIME_CONTRIBUTOR, MANNEQUIN, ...) are dropped and reported, so a
+    forged signature+verdict from a non-collaborator can never satisfy the gate.
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            items = json.load(f)
+    except FileNotFoundError:
+        return ""
+    if not isinstance(items, list):
+        return ""
+    kept, dropped = [], 0
+    for c in items:
+        if not isinstance(c, dict):
+            continue
+        assoc = str(c.get("author_association", "")).upper()
+        if assoc in TRUSTED_ASSOCIATIONS:
+            kept.append(str(c.get("body") or ""))
+        else:
+            dropped += 1
+            login = (c.get("user") or {}).get("login", "?")
+            print(
+                f"  (ignoring comment by @{login}: author_association={assoc or 'NONE'})"
+            )
+    if dropped:
+        print(
+            f"Ignored {dropped} comment(s) from non-collaborator authors (#552 trust filter)."
+        )
+    return ("\n" + COMMENT_BOUNDARY + "\n").join(kept)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--changed-files", required=True)
     ap.add_argument("--labels-file", required=True)
-    ap.add_argument("--comments-file", required=True)
+    ap.add_argument(
+        "--comments-json",
+        required=True,
+        help="raw GitHub API JSON array of issue comments; only OWNER/MEMBER/COLLABORATOR "
+        "authors are evaluated (#552 security fix). There is deliberately NO pre-joined "
+        "text input: every consumer must go through the trust filter.",
+    )
     args = ap.parse_args()
 
     changed = read_lines(args.changed_files)
     labels = set(read_lines(args.labels_file))
-    comments_blob = ""
-    try:
-        with open(args.comments_file, encoding="utf-8") as f:
-            comments_blob = f.read()
-    except FileNotFoundError:
-        pass
+    comments_blob = trusted_comment_blob(args.comments_json)
 
     theory_files = [f for f in changed if is_theory(f)]
     if not theory_files:
