@@ -1,6 +1,6 @@
 # CTH Anchor ID Prefix Policy
 
-**Status:** DRAFT — authored for QBP #462 (Sprint-4 housekeeping, tracking #714); ratification by qbp-architecture pending (#462 AC7)
+**Status:** RATIFIED — qbp-architecture, live-test seq 2972, 2026-10-18 (#462 AC7). R2 takes the **loose** reading, which also rules #494 AC1: the prefix classifies the claim, `provenance_kind` the evidence; the 16 `PROOF-`/theory anchors are not re-keyed (the PA grade — QBP#710's "ungraded" state — is the honest signal). Authored for QBP #462 (Sprint-4 housekeeping, tracking #714).
 **Resolves:** #462 (which cites "discovery response §7.F6 action item #5" — source document not in this repo; the on-disk source is the 22-row table in `docs/cth/qbp-local-extensions.md` §Anchor ID prefixes)
 **Author:** qbp-implementor (housekeeping seat)
 **Ledger surveyed:** `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` @ ledger 6.18.0 (schema 0.3.x)
@@ -17,7 +17,7 @@ Rules that hold for every prefix:
 | Rule | Statement |
 |---|---|
 | **R1 — one prefix, one meaning** | A prefix names a claim kind, never a topic, a sprint, or an author. `Q27-`/`Q28-` (topic-numbered) are grandfathered legacy, not a pattern to extend. |
-| **R2 — prefix ≠ provenance_kind** (*provisional*) | The prefix classifies the *claim*; `provenance_kind` classifies the *evidence*. They correlate (§2 "pairs with") but need not coincide: a `PROOF-` anchor whose evidence is a literature citation is `provenance_kind: theory-external` (`PROOF-hurwitz`), and a `PRED-` anchor can be `proof`, `theory`, `derivation` or `internal-compute`. **This is the "loose" reading that #494 AC1 leaves open** (strict = a `PROOF-` id requires `provenance_kind ∈ {proof, derivation}`; 16 `PROOF-`/`theory` anchors would then need re-keying). R2 *proposes* loose; it is settled only when #494 AC1 is ruled, and ratification of this document (§6) is that ruling's natural vehicle. |
+| **R2 — prefix ≠ provenance_kind** (RATIFIED, seq 2972) | The prefix classifies the *claim*; `provenance_kind` classifies the *evidence*. They correlate (§2 "pairs with") but need not coincide: a `PROOF-` anchor whose evidence is a literature citation is `provenance_kind: theory-external` (`PROOF-hurwitz`), and a `PRED-` anchor can be `proof`, `theory`, `derivation` or `internal-compute`. **This is the "loose" reading that #494 AC1 leaves open** (strict = a `PROOF-` id requires `provenance_kind ∈ {proof, derivation}`; 16 `PROOF-`/`theory` anchors would then need re-keying). R2 was ratified as the loose reading on 2026-10-18 (qbp-architecture, seq 2972), which rules #494 AC1; the 16 `PROOF-`/theory anchors stay as they are. |
 | **R3 — status lives in `status`, not the id** | Never encode lifecycle in the prefix. `KILLED-` is the one legacy exception and is **closed to new mints** — a killed anchor keeps its prefix and sets `status: killed`/`refuted`/`falsified`. |
 | **R4 — slug conventions** | Lower-case, hyphen-separated; algebra glyphs in Unicode (`DEFN-op-norm-𝕆`, not `-O`) per `docs/conventions/algebra-naming.md`. Short, stable, never renamed — ids are cited from chains, `discharge` fields, `evidence_ref`s and review threads. |
 | **R5 — ids are minted by encoders, not by hand** | Every anchor enters the ledger through a confined writer (`scripts/encode_*.py`, `scripts/encode_pa_from_evidence.py`) in a PR with Tier-2+ review; the root lists (§3) additionally need the architecture ratification that gates them. No prefix grants a seat write authority it does not otherwise hold. |
@@ -138,9 +138,9 @@ The extensions table (22 rows) and the ledger disagree in both directions. This 
 
 ## 6. Ratification and upstream
 
-- **#462 AC7 (qbp-architecture ratification):** pending. This document carries `Status: DRAFT` until the ratification seq is recorded here, mirroring `sedenion-indexing.md`.
+- **#462 AC7 (qbp-architecture ratification):** **done** — live-test seq 2972, 2026-10-18 ("The #462 anchor-prefix policy is RATIFIED (AC7). R2 takes the loose reading, which also rules #494 AC1").
 - **#462 AC6 (confluent-trust upstream proposal, schema-axis routing per `pr7_conflict_routing_rubric.md` v0.2):** carried by **QBP #722** (filed 2026-10-17; co-sign @cth-implementor), not by this document. When it lands, the upstream schema registers the prefix semantics (description-level, not pattern enforcement) and this document's §2–§4 become the QBP-side mirror of the canonical list, synced per `docs/cth/schema-change-propagation-checklist.md`.
-- **#494 (PROOF- naming vs `provenance_kind: theory`):** open; R2 proposes the loose reading and is marked provisional until #494 AC1 is ruled.
+- **#494 (PROOF- naming vs `provenance_kind: theory`):** AC1 ruled loose by the same ratification (seq 2972); remaining #494 items are qbp-implementor's.
 
 ## Change history
 
@@ -148,3 +148,4 @@ The extensions table (22 rows) and the ledger disagree in both directions. This 
 |---|---|---|
 | 2026-10-17 | qbp-implementor (housekeeping seat) | v0.1 — authored for #462 from the ledger census at 6.18.0; §4 formalises DEFN/AXIOM/CONJ/CHAIN, reserves FORK; §5 reconciles the extensions table against the ledger |
 | 2026-10-17 | qbp-implementor (housekeeping seat) | v0.2 — PR #719 Red Team (Grothendieck G1–G7): §4.5 FORK- rewritten against upstream `fork_points[]`/`ForkPoint` (schema-supported, unused in QBP; no upstream issue needed); AC6 re-routed from #494 to #722; R2 marked provisional pending #494 AC1; census PROOF-/proof 95, REF-/theory-external 31; §5 arithmetic redone, `CONV-` Convergence row added; META- anchor form closed per #657; unverifiable source pointers marked |
+| 2026-10-18 | qbp-oppenheimer | v1.0 — RATIFIED by qbp-architecture (live-test seq 2972): Status flipped; R2 fixed as the loose reading (rules #494 AC1); §6 updated |
