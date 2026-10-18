@@ -42,6 +42,7 @@ labels: tier-3-review
 <!-- Body claims are not evidence. Every box needs a pointer a reviewer can click.
      A claim without a link is treated by reviewers as UNVERIFIED. -->
 
+- [ ] CI green at the head sha — evidence box: the notifier (`pr-check-status.yml`) ticks it at ALL-GREEN and un-ticks it at RED; do not hand-tick (#538)
 - [ ] Clean-checkout build: <!-- CI run link — a green run from YOUR working dir does not count -->
 - [ ] Gate scripts (foundations ratchet / layer imports / anchor impact): <!-- CI link -->
 - [ ] Differential oracle (PhysLean↔QBP): PASS / FAIL+table / N-A: <!-- run output or link -->

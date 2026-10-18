@@ -43,6 +43,19 @@ green CI never got its box ticked because the watcher tail short-circuited.
 (The bma#245 lesson: bookkeeping automation that ticks judgment boxes destroys
 the provenance the boxes exist to protect.)
 
+### Canonical "CI green" box phrasing (#538)
+The notifier's self-tick (`pr-check-status.yml`, `set_ci_box`) matches the **first** checkbox line
+whose text contains `CI green` (case-insensitive) and does **not** contain any of
+`review`, `sign-off`, `visual`, `HVR`, `Red Team`, `Gemini`, `approve`. All three PR templates
+now carry the same line so the match can never miss:
+
+```
+- [ ] CI green at the head sha — evidence box: the notifier (`pr-check-status.yml`) ticks it at ALL-GREEN and un-ticks it at RED; do not hand-tick (#538)
+```
+
+Authors may edit the trailing note but must keep `CI green` in the line and keep the excluded
+words out of it. Hand-written PR bodies that drop the template should paste this line verbatim.
+
 ### Evidence discipline
 Every tick the box-keeper makes must be backed by a posted evidence artifact
 (the command output / audit table it ran), not a claim. A box ticked without a
