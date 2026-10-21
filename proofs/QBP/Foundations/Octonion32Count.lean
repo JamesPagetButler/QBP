@@ -49,8 +49,12 @@
   Proof architecture + resource note (housekeeping #633, 2026-10-18). The
   theorem statements are unchanged since b1bd7ae; the proofs were re-factored
   because the original monolithic `decide +kernel` sweeps needed > 12 GiB
-  (measured: killed at a 12 GiB cgroup cap, peak RSS 14.9 GiB — `lake build`
-  OOM-killed at 10 GB in #633 and at 6 GB in #683). Root cause: each kernel
+  (measured: killed at a 12 GiB cgroup cap; RSS at kill 14.9 GiB, still
+  climbing — a lower bound on the true peak; `lake build` OOM-killed at 10 GB
+  in #633 and at 6 GB in #683). Measured after the refactor, standalone `lean`
+  under `run-bounded 12G` / `8G`: exit 0, wall ≈ 1:37, peak RSS 4.42–4.58 GiB
+  (author, 2026-10-21), 4.52 GiB / 1:36.73 (Red Team review of PR #727); the
+  import floor alone is 3.35 GiB. Root cause: each kernel
   sign lookup through the `![...]` table (`Matrix.vecCons`/`Fin.cases`) costs
   ≈35 KB of never-freed kernel cache, ≈140 MB per 8-dim candidate. Now:
     • §4b `sgnFast` — a bit-packed copy of the table, kernel-checked equal to
@@ -527,8 +531,8 @@ through `Matrix.vecCons`/`Fin.cases` costs ≈35 KB of kernel whnf-cache, i.e.
 ≈140 MB and ≈1.7 s **per candidate** 8-dim subalgebra (8³ triples × 2 associator
 identities × 4 lookups). The kernel never frees that cache inside one
 declaration, so a single `decide +kernel` over all 155 candidates needed
-> 12 GiB (killed at the cap, peak RSS 14.9 GiB; measured 2026-10-18,
-`analysis/633-octonion32count/`). The heavy
+> 12 GiB (killed at the cap; RSS at kill 14.9 GiB, still climbing — a lower
+bound on the true peak; measured 2026-10-18, `analysis/633-octonion32count/`). The heavy
 sweeps below therefore run against `sgnFast`, a bit-packed copy of the same
 table (`sgnRowMask a` has bit `b` set iff `sgnTable a b = -1`; the lookup is a
 GMP-accelerated `Nat.testBit`), and `sgnTable_eq_sgnFast` kernel-checks that
@@ -822,7 +826,7 @@ the doubled half; `crossing_subspaces_eq_crossingData` kernel-checks that the
 140 crossing index lists of `subspaces` are *exactly* the index lists recorded in
 `crossingData`, in order, so their alternativity count is Theorem 5's 42; the 15
 base candidates are swept directly (8 pass); and the generic partition lemma
-`countP_and_add_countP_not_and` adds the two halves to the total. Before #633
+`countP_eq_add_of_parts` adds the two halves to the total. Before #633
 the total, the base part and the crossing part were three independent
 monolithic sweeps (155 + 15 + 140 candidates). -/
 
@@ -845,8 +849,8 @@ def crossAlternativeCount : Nat :=
 /-- The 140 crossing candidates of `subspaces` are exactly the candidate index
     lists of `crossingData`, in the same order (kernel-checked list equality).
     This is what lets Theorem 5's count stand in for the crossing part of the
-    155-count; before #633 the agreement of the two enumerations was only
-    asserted in a comment. -/
+    155-count; before #633 this identity was implicit and never stated (the old
+    proofs swept `subspaces` directly and never related it to `crossingData`). -/
 theorem crossing_subspaces_eq_crossingData :
     subspaces.filter (fun H => H.any (·.val ≥ 16)) = crossingData.map (·.2.2) := by
   decide +kernel

@@ -98,8 +98,8 @@ jobs:
           lake exe cache get || echo "::warning::lake exe cache get incomplete — build may compile more from source"
       # Pre-run resource estimate (workspace hard gate `pre-run-resource-estimate`; QBP#633):
       # the per-module peak-RSS table lives in docs/foundations/lean-build-resource-notes.md.
-      # Heaviest Foundations module today: Octonion32Count, 4.6 GiB standalone (was > 12 GiB,
-      # OOM-killed, before #633); the ubuntu-latest runner has 16 GB. A module that would push
+      # The one Foundations module with a measured peak so far (see that table): Octonion32Count,
+      # 4.4–4.6 GiB standalone (was > 12 GiB, OOM-killed, before #633); the ubuntu-latest runner has 16 GB. A module that would push
       # a standalone `lean` above ~8 GiB needs a row in that table before it lands.
       - name: lake build
         working-directory: proofs

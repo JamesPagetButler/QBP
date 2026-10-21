@@ -17,7 +17,7 @@ Command (from `W/proofs`): `run-bounded 12G 1800 /usr/bin/time -v lean QBP/Found
 
 | run | result | wall | user / sys | peak RSS |
 |---|---|---|---|---|
-| baseline, unmodified module | **killed at the 12 GiB cap (exit 137)** | 3:22.66 (killed) | 175.7 s / 28.5 s | **15 628 384 kB = 14.9 GiB** (still climbing) |
+| baseline, unmodified module | **killed at the 12 GiB cap (exit 137)** | 3:22.66 (killed) | 175.7 s / 28.5 s | **15 628 384 kB = 14.9 GiB RSS at kill** (still climbing — a lower bound on the true peak) |
 
 So the honest baseline figure is **> 12 GiB, killed at cap** (14.9 GiB RSS at the kill). This is the measurement #633 asked for; it exceeds the ~8 GB threshold, so factoring was required (AC 2).
 
@@ -79,9 +79,10 @@ Same command, same cap, same machine, same oleans:
 
 | | wall | user | peak RSS | exit |
 |---|---|---|---|---|
-| **before** (merged module, monolithic sweeps) | 3:22.66, killed | 175.7 s | **> 12 GiB cap; 15 628 384 kB = 14.9 GiB at the kill** | 137 |
+| **before** (merged module, monolithic sweeps) | 3:22.66, killed | 175.7 s | **> 12 GiB cap; 15 628 384 kB = 14.9 GiB RSS at kill, still climbing (lower bound on the true peak)** | 137 |
 | **after** (this PR, attempt 4) | **1:37.39** | 98.6 s | **4 799 656 kB = 4.58 GiB** | 0 |
 | **after** (this PR, final file, docstring-only edits) | **1:37.37** | 98.9 s | **4 637 692 kB = 4.42 GiB** | 0 |
+| **after** — independent re-measurement, Red Team review of PR #727 @ 1b677e1 (`run-bounded 8G 1200`, same recipe) | **1:36.73** | 98.4 s | **4 743 364 kB = 4.52 GiB** | 0 |
 
 The import floor alone is 3.35 GiB, so the module's own kernel work is now ≈ 1.1–1.3 GiB (down from > 11.5 GiB). The issue's thresholds: peak ≤ ~8 GB ✓; a 10 GB worktree cap suffices ✓ (so does the 6 GB cap of #683, with ≈ 1.5 GiB headroom).
 
