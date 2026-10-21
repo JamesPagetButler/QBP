@@ -25,27 +25,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-exec(open("dirac_probe.py").read().split("def spec")[0])  # cd_mul, basis, L, R
+from cdalg import D, basis, cd_mul
 
 rng = np.random.default_rng(473)
 e8 = basis(8)
-
-
-def Lm(x):
-    return L(x, 8)
-
-
-def Rm(x):
-    return R(x, 8)
-
-
-def D(x, y):
-    """Standard inner derivation of an alternative algebra."""
-    return (
-        (Lm(x) @ Lm(y) - Lm(y) @ Lm(x))
-        + (Lm(x) @ Rm(y) - Rm(y) @ Lm(x))
-        + (Rm(x) @ Rm(y) - Rm(y) @ Rm(x))
-    )
 
 
 ders = [D(e8[i], e8[j]) for i in range(1, 8) for j in range(i + 1, 8)]

@@ -1,6 +1,7 @@
 import numpy as np
 
-exec(open("dirac_probe.py").read().split("np.set_printoptions")[0])
+from cdalg import L, R, basis, cd_mul, spec
+
 E = basis(16)
 x = E[1] + E[10]
 y = E[4] - E[15]  # ZD pair (partner found earlier)

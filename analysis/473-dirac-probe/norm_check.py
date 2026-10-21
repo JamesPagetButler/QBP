@@ -14,7 +14,7 @@ dim-8 half of (2) `NormForm.octonion_norm_form_composition`; the dim-16 failure 
 
 import numpy as np
 
-exec(open("dirac_probe.py").read().split("def spec")[0])  # cd_mul, conj, basis
+from cdalg import cd_mul, conj
 
 rng = np.random.default_rng(473)
 NPAIRS = 2000

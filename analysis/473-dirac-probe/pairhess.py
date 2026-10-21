@@ -1,7 +1,7 @@
 import numpy as np
 
-exec(open("dirac_probe.py").read().split("np.set_printoptions")[0])
-exec(open("landscape.py").read().split("E=basis(16)")[0].split("def report")[0])
+from cdalg import basis, cd_mul, fd_hessian as hess
+
 n = 16
 E = basis(16)
 x = (E[1] + E[10]) / np.sqrt(2)

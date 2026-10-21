@@ -1,0 +1,19 @@
+dirac_probe rc=0 t=12s
+envelope rc=0 t=105s
+delta_formula rc=0 t=2s
+minpoly rc=0 t=10s
+ledgerhess rc=0 t=1s
+landscape rc=0 t=5s
+pairhess rc=0 t=26s
+norm_check rc=0 t=4s
+hvr_plots rc=0 t=37s
+orbit_space rc=0 t=5s
+lmaps_check rc=0 t=7s
+aut_s3 rc=0 t=79s
+flow rc=0 t=464s
+generic_maps_check rc=0 t=207s
+gibbs_check rc=0 t=20s
+s3_check_seed1 rc=0 t=470s
+s3_check_seed2 rc=0 t=473s
+flow_big rc=0 t=1571s
+ALLDONE

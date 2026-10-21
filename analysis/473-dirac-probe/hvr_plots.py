@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-exec(open("dirac_probe.py").read().split("def spec")[0])  # cd_mul, conj, basis, L, R
+from cdalg import L, basis, cd_mul
 
 rng = np.random.default_rng(473)
 N = 16

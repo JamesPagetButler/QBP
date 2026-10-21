@@ -1,6 +1,7 @@
 import numpy as np
 
-exec(open("dirac_probe.py").read().split("np.set_printoptions")[0])
+from cdalg import basis, cd_mul, fd_hessian as hess
+
 n = 16
 
 
@@ -12,21 +13,6 @@ def V(s):  # ||[a,b]||^2  with s=(a,b), a in O (first 8), b in O
 
 def Vsphere(s):
     return V(s / np.linalg.norm(s))
-
-
-def hess(f, s, h=1e-4):
-    m = len(s)
-    H = np.zeros((m, m))
-    for i in range(m):
-        for j in range(m):
-            ei = np.zeros(m)
-            ej = np.zeros(m)
-            ei[i] = h
-            ej[j] = h
-            H[i, j] = (
-                f(s + ei + ej) - f(s + ei - ej) - f(s - ei + ej) + f(s - ei - ej)
-            ) / (4 * h * h)
-    return H
 
 
 def report(name, s):

@@ -3,47 +3,14 @@ over the CD cascade H -> O -> S.  Numerical only (numpy); NOT a proof.
 
 CD recursion (Schafer convention, matches proofs/QBP/Foundations/CDAlg.lean):
   (a,b)(c,d) = (ac - conj(d) b,  d a + b conj(c))
+
+The algebra helpers live in cdalg.py (#632); this file keeps the report and re-exports them.
 """
 
-import numpy as np, itertools, sys
+import numpy as np
 
-
-def cd_mul(x, y):
-    n = len(x)
-    if n == 1:
-        return x * y
-    h = n // 2
-    a, b, c, d = x[:h], x[h:], y[:h], y[h:]
-    return np.concatenate(
-        [cd_mul(a, c) - cd_mul(conj(d), b), cd_mul(d, a) + cd_mul(b, conj(c))]
-    )
-
-
-def conj(x):
-    y = -x.copy()
-    y[0] = x[0]
-    return y
-
-
-def basis(n):
-    return [np.eye(n)[i] for i in range(n)]
-
-
-def L(s, n):
-    """matrix of left multiplication by s on the n-dim CD algebra"""
-    return np.column_stack([cd_mul(s, e) for e in basis(n)])
-
-
-def R(s, n):
-    return np.column_stack([cd_mul(e, s) for e in basis(n)])
-
-
-def spec(M, tol=1e-9):
-    w = np.linalg.eigvals(M)
-    w = np.sort_complex(np.round(w, 6))
-    vals, counts = np.unique(w, return_counts=True)
-    return list(zip(vals, counts))
-
+# re-exported: inflight_measure_check.py / p2_cell_torsor_check.py do `from dirac_probe import cd_mul`
+from cdalg import L, R, basis, cd_mul, conj, spec  # noqa: F401
 
 np.set_printoptions(linewidth=160, precision=4, suppress=True)
 
