@@ -1,0 +1,3 @@
+T_s^3 == ||[a,b]||^2 T_s (unit s): True  (any imaginary s, no |s| factor): True
+rank T_s generic: 8
+Haar <delta^2> = 0.6585   predicted 56/85 = 0.6588

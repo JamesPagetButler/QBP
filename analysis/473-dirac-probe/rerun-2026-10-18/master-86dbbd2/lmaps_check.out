@@ -1,0 +1,11 @@
+(1) dim span{1,ℓ,p,ℓp} = {4} (expect {4}); closure residual 3.3e-16
+(2) max |σ(w) − σ(s)| over Im ℍ_s: 1.4e-12  (σ = V/(1−b0²)²)
+(3) min V/(1−b0²)² over 2·10⁴ elements of Im ℍ_s with |b0|<0.99: 0.731194 vs σ(s) = 0.731194
+(4) maps on unit imaginary s (order None = not of finite order ≤ 4):
+  s·ℓ              max real part 7.7e-01  max|ΔV| 8.9e-16  order(±) ≤4 in first 50: [2]
+  ℓ·s              max real part 7.7e-01  max|ΔV| 8.9e-16  order(±) ≤4 in first 50: [2]
+  ℓ(sℓ)            max real part 0.0e+00  max|ΔV| 1.1e-15  order(±) ≤4 in first 50: [2]
+  [s,ℓ]            max real part 0.0e+00  max|ΔV| 8.0e-01  order(±) ≤4 in first 50: [None]
+  (s+ℓ)/‖s+ℓ‖      max real part 0.0e+00  max|ΔV| 7.8e-01  order(±) ≤4 in first 50: [None]
+    iterate (s+ℓ)/‖s+ℓ‖: b0 = 0.168 → 0.9990 → 1.000000;  V at end 2.6e-36  (→ vacuum ℓ)
+CD formulas sℓ = (−b, a), ℓs = (−b̄, −a), [s,ℓ] = −2c + 2aℓ: True

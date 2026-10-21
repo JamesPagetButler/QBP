@@ -1,9 +1,9 @@
 # Re-run 2026-10-18 — #632 `cdalg.py` extraction (branch `housekeeping/632-cdalg`, base master 86dbbd2)
 
-Captured stdout of every script in `analysis/473-dirac-probe/` after the `exec(open(...))` → `from cdalg import …`
+Captured stdout of 19 of the 20 scripts in `analysis/473-dirac-probe/` (20 runs; all 17 scripts touched by the refactor, plus the two that import through `dirac_probe.py`; `boundary_octonion_check.py` is unaffected and not run) after the `exec(open(...))` → `from cdalg import …`
 refactor, each under `run-bounded 8G 1800 python3 <script>` with `OPENBLAS_NUM_THREADS=OMP_NUM_THREADS=1`,
 run from a scratch cwd (so no committed `.png` was rewritten). The same set was run on a pristine master
-checkout under the same conditions; `_status-master-86dbbd2.txt` is that side's exit codes / wall times.
+checkout under the same conditions; `_status-master-86dbbd2.txt` is that side's exit codes / wall times and `master-86dbbd2/*.out` are that side's captures, so the IDENTICAL column is re-auditable from the repo alone (`for f in *.out; do cmp $f master-86dbbd2/$f; done`).
 
 ## 1. Byte-for-byte stdout, master vs branch
 
@@ -27,6 +27,10 @@ checkout under the same conditions; `_status-master-86dbbd2.txt` is that side's 
 | `s3_check_seed1` | `S3_CHECK_SEED=1 python3 s3_check.py` | 13 | 0 / 470s | 0 / 468s | IDENTICAL |
 | `s3_check_seed2` | `S3_CHECK_SEED=2 python3 s3_check.py` | 13 | 0 / 473s | 0 / 470s | IDENTICAL |
 | `flow_big` | `python3 flow_big.py` | 11 | 0 / 1571s | 0 / 1579s | IDENTICAL |
+| `inflight_measure_check` | `python3 inflight_measure_check.py` (†) | 4 | 0 / 55s | 0 / 56s | IDENTICAL |
+| `p2_cell_torsor_check` | `python3 p2_cell_torsor_check.py` (†) | 5 | 0 / 2s | 0 / 2s | IDENTICAL |
+
+(†) added after the PR #726 Red Team review (Sabine 1): these two import `cd_mul` through `dirac_probe.py`'s re-export; run under `run-bounded 4G 300` from a foreign cwd on both sides. Coverage: **19 of the 20 `.py` scripts** in the directory (20 runs; `s3_check.py` at two seeds). Not run: `boundary_octonion_check.py` (imports nothing from this PR's files; unaffected). `cdalg.py` is a library, not a script.
 
 ## 2. `docs/foundations/473-ac1-first-link-2026-09-04.md` §5 numbers vs this re-run
 

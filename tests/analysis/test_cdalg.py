@@ -1,6 +1,11 @@
-"""Unit checks for cdalg.py (#632) — the Cayley–Dickson helpers shared by the #473 probe scripts.
+"""Unit checks for analysis/473-dirac-probe/cdalg.py (#632) — the Cayley–Dickson helpers shared by
+the #473 probe scripts.
 
-Run from anywhere:  python3 -m pytest analysis/473-dirac-probe/test_cdalg.py -q
+Lives under tests/ so the existing CI invocation (`pytest tests/`) collects it and the `tests/**`
+change filter runs the Lint/Test jobs; cdalg.py itself stays next to the scripts that use it, so
+the path is inserted explicitly below (PR #726 Red Team, Knuth 1 & 3).
+
+Run from the repo root:  python3 -m pytest tests/analysis/test_cdalg.py -q
 
 The checks pin the helpers to known algebra facts (Schafer CD convention, as in
 proofs/QBP/Foundations/CDAlg.lean) and to the invariants the probe scripts' docstrings rely on.
@@ -10,11 +15,17 @@ Random samples are seeded, so every test is deterministic.
 from __future__ import annotations
 
 import itertools
+import sys
+from pathlib import Path
 
 import numpy as np
 import pytest
 
-from cdalg import (
+sys.path.insert(
+    0, str(Path(__file__).resolve().parents[2] / "analysis" / "473-dirac-probe")
+)
+
+from cdalg import (  # noqa: E402  (path insert above is deliberate)
     D,
     L,
     M8,
@@ -60,8 +71,9 @@ def test_quaternion_table():
     assert np.array_equal(cd_mul(j, i), -k)
     for u in (i, j, k):
         assert np.array_equal(cd_mul(u, u), -one)
-    # Schafer convention check: with ℓ = e2 = j, (a + bℓ)(c + dℓ) = (ac - d̄b) + (da + bc̄)ℓ
-    # so e1·e2 = (0 + 0ℓ)... concretely i·ℓ = ℓ·(conj i) ⇒ i j = -(j i) = k, consistent above.
+    # Convention-sensitive: in the Schafer doubling (a,b)(c,d) = (ac − d̄b, da + bc̄) with
+    # ℓ = e2 = j one gets e1·e2 = (i,0)(0,1) = (0, 1·i) = e3 = k.  Under the other common
+    # doubling (ac − d b̄, ād + cb) the same product is −k, so the table above would fail.
     assert np.array_equal(cd_mul(i, j), -cd_mul(j, i))
 
 
@@ -76,13 +88,16 @@ def test_units_square_to_minus_one_and_anticommute(n):
 
 @pytest.mark.parametrize("n", [2, 4, 8, 16])
 def test_identity_and_conjugation(n):
-    x = RNG.normal(size=n)
+    x, y = RNG.normal(size=n), RNG.normal(size=n)
     assert np.allclose(cd_mul(e(0, n), x), x)
     assert np.allclose(cd_mul(x, e(0, n)), x)
     # x x̄ = (N(x), 0, …, 0) at every doubling (positive-definiteness survives)
     xxbar = cd_mul(x, conj(x))
     assert np.allclose(xxbar, e(0, n) * N(x))
-    assert np.allclose(conj(cd_mul(x, x)), cd_mul(conj(x), conj(x)))
+    # conjugation is an anti-automorphism: conj(xy) = conj(y) conj(x) (order reversed)
+    assert np.allclose(conj(cd_mul(x, y)), cd_mul(conj(y), conj(x)))
+    if n >= 4:  # and NOT an automorphism once the algebra is non-commutative
+        assert not np.allclose(conj(cd_mul(x, y)), cd_mul(conj(x), conj(y)))
     assert np.array_equal(conj(conj(x)), x)
 
 
@@ -109,10 +124,12 @@ def test_norm_multiplicative_up_to_octonions(n):
 
 
 def test_norm_not_multiplicative_for_sedenions():
-    """Explicit zero divisor (e1 + e10)(e4 - e15) = 0 and a random witness with N(xy) ≠ N(x)N(y)."""
+    """Explicit zero divisor (e1 + e10)(e4 - e15) = 0 and random witnesses with N(xy) ≠ N(x)N(y)."""
     E = basis(16)
     x, y = E[1] + E[10], E[4] - E[15]
     assert np.allclose(cd_mul(x, y), 0)
+    # the product's norm is 0 while N(x)N(y) = 2·2 = 4: multiplicativity fails on this pair
+    assert N(cd_mul(x, y)) == 0.0
     assert N(x) * N(y) == 4.0
     ratios = []
     for _ in range(50):

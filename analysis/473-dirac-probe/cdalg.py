@@ -4,7 +4,12 @@ Extracted under #632 (housekeeping) at master 86dbbd2 so the scripts in this dir
 plain module instead of ``exec(open("dirac_probe.py").read().split(...)[0])`` — a convention that
 was cwd-dependent, marker-string-dependent and silently ran the exec'd prefix's side effects.
 
-Provenance — every function body below is lifted VERBATIM (numerics untouched) from:
+Provenance — every function body below is lifted verbatim (numerics untouched) from the files
+listed, except two equivalence-preserving edits: ``alternator`` uses ``n = len(s)`` where
+``delta_formula.py`` read a module-level ``n = 16`` (every caller passes 16-vectors), and
+``grad_fd_check`` RETURNS the two ``np.allclose`` booleans that ``flow_big.py`` printed (the
+callers print them in the original format). Renames only: ``E8→_E8``, ``M→M8``; ``D`` inlines
+the ``Lm``/``Rm`` wrappers with ``n=8`` as default.
 
   * ``dirac_probe.py`` (master 226a3b1, PR #629):  cd_mul, conj, basis, L, R, spec
   * ``flow_big.py``   (master 226a3b1, PR #629):  M8 (octonion structure tensor), omul, V, grad,

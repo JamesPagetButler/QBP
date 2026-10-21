@@ -1,0 +1,5 @@
+xy = False
+ledger-type Hessian spec: [(0j, 16), ((4+0j), 4), ((8+0j), 8), ((12+0j), 4)]
+Tr H, Tr H^2 = 128.0 1152.0
+block xx == -2 R_y^2 : True [(0j, 4), ((4+0j), 8), ((8+0j), 4)]
+block yy == -2 L_x^2 : True [(0j, 4), ((4+0j), 8), ((8+0j), 4)]

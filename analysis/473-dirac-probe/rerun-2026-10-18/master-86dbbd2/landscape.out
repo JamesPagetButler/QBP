@@ -1,0 +1,7 @@
+vac  s=e1        : V=0.0000  Hessian(V|S^14) spectrum: [(0.0, 10), (8.0, 6)]
+vac  s=(e1+e9)/√2: V=0.0000  Hessian(V|S^14) spectrum: [(-0.0, 10), (8.0, 6)]
+vac  s=ℓ=e8      : V=0.0000  Hessian(V|S^14) spectrum: [(0.0, 16)]
+vac  s=(e1+e8)/√2: V=0.0000  Hessian(V|S^14) spectrum: [(0.0, 10), (4.0, 6)]
+vac  generic a||Imb : V=0.0000  Hessian(V|S^14) spectrum: [(-0.0, 10), (6.971, 6)]
+max  s=(e1+e10)/√2: V=1.0000  Hessian(V|S^14) spectrum: [(-8.0, 2), (-4.0, 2), (-0.0, 12)]
+max  generic a⊥Imb: V=1.0000  Hessian(V|S^14) spectrum: [(-8.0, 2), (-4.0, 2), (-0.0, 12)]

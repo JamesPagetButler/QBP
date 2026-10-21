@@ -17,3 +17,5 @@ s3_check_seed1 rc=0 t=470s
 s3_check_seed2 rc=0 t=473s
 flow_big rc=0 t=1571s
 ALLDONE
+inflight_measure_check rc=0 t=55s
+p2_cell_torsor_check rc=0 t=2s
