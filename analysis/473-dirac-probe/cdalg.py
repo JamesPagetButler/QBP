@@ -72,8 +72,12 @@ def R(s, n):
     return np.column_stack([cd_mul(e, s) for e in basis(n)])
 
 
-def spec(M, tol=1e-9):
-    """Eigenvalues of M rounded to 6 places, as a list of (value, multiplicity)."""
+def spec(M):
+    """Eigenvalues of M rounded to 6 places, as a list of (value, multiplicity).
+
+    The rounding is fixed at 6 places on purpose: the committed stdout captures and the §5
+    numbers depend on it (a former unused ``tol`` argument was removed on Gemini review, PR #726).
+    """
     w = np.linalg.eigvals(M)
     w = np.sort_complex(np.round(w, 6))
     vals, counts = np.unique(w, return_counts=True)
@@ -180,6 +184,11 @@ def fd_hessian(f, s, h=1e-4):
 
 
 def D(x, y, n=8):
-    """Standard inner derivation D_{x,y} = [L_x,L_y] + [L_x,R_y] + [R_x,R_y] of an alternative algebra."""
+    """Standard inner derivation D_{x,y} = [L_x,L_y] + [L_x,R_y] + [R_x,R_y] of an alternative algebra.
+
+    Not to be confused with the *Dirac operator* of dirac_probe.py, which is left multiplication
+    ``L(s, n)`` by ``s = Σ_{a≥1} e_a`` and satisfies ``-L_s² = (n-1)·I``; a derivation has a
+    kernel (it kills 1 and both arguments) and is never a scalar multiple of the identity.
+    """
     Lx, Ly, Rx, Ry = L(x, n), L(y, n), R(x, n), R(y, n)
     return (Lx @ Ly - Ly @ Lx) + (Lx @ Ry - Ry @ Lx) + (Rx @ Ry - Ry @ Rx)

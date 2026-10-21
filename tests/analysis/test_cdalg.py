@@ -176,7 +176,10 @@ def test_L_R_are_the_multiplication_matrices(n):
 
 @pytest.mark.parametrize("n", [4, 8, 16])
 def test_sum_of_units_squares_to_minus_dim_minus_one(n):
-    """README §1: D² = -L_s² = (n-1)·I for s = Σ_{a≥1} e_a, at every level including 𝕊."""
+    """README §1: the Dirac operator D := L_s (left multiplication by s = Σ_{a≥1} e_a) satisfies
+    D² = -L_s² = (n-1)·I at every level including 𝕊. (This D is NOT the inner derivation
+    ``cdalg.D(x, y)``, which has a kernel — see test_derivations_span_g2_and_satisfy_leibniz.)
+    """
     E = basis(n)
     s = sum(E[1:])
     Ls = L(s, n)
