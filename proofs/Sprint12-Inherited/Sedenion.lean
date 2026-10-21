@@ -10,6 +10,16 @@
   units. `mulSign`/`mulIdx` below are indexed by these `Fin 16`/`Nat` values.
   Canonical reference: `docs/conventions/sedenion-indexing.md` (#461).
 
+  Fano-plane orientation convention (F4, RATIFIED 2026-05-29): the octonion
+  block e₁..e₇ of `mulSignData`/`mulIdxData` below realises the F3-forced
+  orientation with positive lines {1,2,3}, {1,4,5}, {1,7,6}, {2,4,6}, {2,5,7},
+  {3,4,7}, {3,6,5} (e.g. e₁e₂ = e₃, e₁e₇ = e₆, e₃e₆ = e₅), exactly the 7×7 table
+  in `docs/conventions/fano-orientation.md` (#460). Provenance: the doc table is
+  kernel-checked against the F3 doubling in `proofs/QBP/Foundations/FanoOrientationF3.lean`;
+  the 7 lines listed here were computed from `mulSignData`/`mulIdxData` by script
+  and match that table (no Lean theorem links this file's tables to F3). The full
+  16×16 table extends that block by the further doubling S = CD(𝕆) named above.
+
   Verified results:
     T1. Identity element (e_0 is the identity)
     T2. Imaginary units square to -e_0

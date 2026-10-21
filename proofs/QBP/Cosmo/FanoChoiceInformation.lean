@@ -25,6 +25,24 @@
 
   Completeness: zero `sorry`, zero `native_decide`, zero vacuous `True`.
   `#print axioms` audit at the bottom.
+
+  ── INTERPRETATION (#539 ruling, 2026-06-12; annotated per #550) ────────────
+  `S = ln 7` is GAUGE-FIXING information, NOT a physical genesis entropy.
+  Strategy B (#548, `basisAuto_transitive_on_triples`) proved that the 7
+  Fano-line quaternion subalgebras form a single Aut(𝕆) orbit, so "which of
+  the 7 lines" is an unobservable gauge choice (one of the 7 lines, i.e.
+  quaternionic subalgebras, all related by the basis automorphisms).  The number
+  `log 7` is therefore the bookkeeping cost of fixing that gauge — the
+  Shannon information of naming one orbit representative — and the theorems
+  below remain true and useful as the combinatorial bridge to `SeedMass.lean`.
+  What they do NOT establish is that `ln 7` is a physical selection entropy.
+  Per the #539 ruling, a physical genesis entropy must be reformulated in terms
+  of the symmetry-breaking structure itself (the quotient `G₂ / Stab`, i.e. the
+  stabiliser-pinning programme), not the count of gauge-equivalent labels.
+  Nothing is deleted here (forensic trail): the identity stands as proven; its
+  reading as "physical selection information" is withdrawn.
+  Cross-refs: issue #539 (ln-7 theory ruling), issue #548 (Strategy-B gauge
+  result), issue #550 (this annotation).
 -/
 import QBP.Foundations.FanoGenesis
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
@@ -46,7 +64,12 @@ theorem numFanoLines_eq_seven : numFanoLines = 7 := FanoGenesis.fano_lines_count
     lines equals `log 7`, because the *proven* number of Fano lines is 7.  The
     left side is `Real.log` of the combinatorial count `fanoLines.length`, tied
     to `7` through `fano_lines_count` — this is the genuine bridge from the
-    combinatorics to the `ln 7` entropy threshold. -/
+    combinatorics to the `ln 7` threshold.
+
+    **Interpretation (#539 ruling / #550):** this `log 7` is *gauge-fixing*
+    information — the 7 lines are one Aut(𝕆) orbit (#548), so the choice is
+    unobservable gauge — and NOT a physical genesis entropy; see the file
+    header. -/
 theorem fano_choice_information :
     Real.log (numFanoLines : ℝ) = Real.log 7 := by
   rw [numFanoLines_eq_seven]
@@ -55,9 +78,14 @@ theorem fano_choice_information :
 /-- **Natural-log form (nats):** the same identity spelled as the seed-mass
     threshold `ln 7`.  This is definitionally `fano_choice_information` (Mathlib's
     `Real.log` is the natural logarithm), recorded to make the bridge to
-    `SeedMass.S_BH_at_M_seed_log_seven` explicit: the crystallisation entropy
+    `SeedMass.S_BH_at_M_seed_log_seven` explicit: the crystallisation threshold
     `S_BH = ln 7` equals the information cost of selecting one of the 7 Fano
-    lines. -/
+    lines.
+
+    **Interpretation (#539 ruling / #550):** that "information cost" is the
+    gauge-fixing bookkeeping cost of naming one of 7 gauge-equivalent labels
+    (#548), not a physical entropy; the physical genesis entropy is to be
+    reformulated via the symmetry-breaking structure `G₂ / Stab` (#539). -/
 theorem fano_choice_information_nats :
     Real.log (numFanoLines : ℝ) = Real.log 7 := fano_choice_information
 
