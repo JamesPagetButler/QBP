@@ -15,6 +15,8 @@ on:
       - 'proofs/QBP/Foundations/CDAlg.lean'
       - 'scripts/regen_fano_snapshot.sh'
       - 'proofs/FanoSnapshotGen.lean'
+      - 'proofs/lakefile.lean'
+      - 'proofs/lean-toolchain'
       - 'scripts/test_fano_snapshot_guard.sh'
       - '.github/workflows/fano-snapshot-drift.yml'
   push:
@@ -26,15 +28,18 @@ on:
       - 'proofs/QBP/Foundations/FanoOrientationF3.lean'
       - 'proofs/QBP/Foundations/CDAlg.lean'
       - 'scripts/regen_fano_snapshot.sh'
+      - 'proofs/lakefile.lean'
+      - 'proofs/lean-toolchain'
 
 jobs:
   fano-snapshot-drift:
     name: fanoTableF4 snapshot <-> kernel-proof drift guard
     runs-on: ubuntu-latest
-    # #605 AC1: the two PRODUCER files (regen_fano_snapshot.sh + FanoSnapshotGen.lean) only
-    # FORMAT output — unlike the kernel-checked FanoOrientationF3/CDAlg they are not proven, so
-    # a PR could alter the snapshot AND its producer together and self-defeat the diff. We pin
-    # the producer to the trusted base before regenerating; a genuine producer change rides the
+    # #605 AC1: the regeneration trusts several NON-kernel-checked inputs — the producer scripts
+    # (regen_fano_snapshot.sh + FanoSnapshotGen.lean) AND the build config (lakefile + toolchain).
+    # Unlike the kernel-checked FanoOrientationF3/CDAlg (Lean verifies them), these are not proven,
+    # so a PR could alter the snapshot AND one of them together and self-defeat the diff. We pin all
+    # of them to the trusted base before regenerating; a genuine change rides the
     # `fano-producer-reviewed` label (human-reviewed), which skips the pin.
     env:
       FANO_PRODUCER_REVIEWED: ${{ contains(github.event.pull_request.labels.*.name, 'fano-producer-reviewed') }}
@@ -42,21 +47,34 @@ jobs:
       - uses: actions/checkout@v4
       - name: Negative control — producer-tamper self-defeat is caught (#605 AC2)
         run: bash scripts/test_fano_snapshot_guard.sh
-      - name: Pin producer scripts to the trusted base unless reviewed (#605 AC1)
+      - name: Pin regen inputs to the trusted base unless reviewed (#605 AC1)
         run: |
           set -euo pipefail
-          PRODUCERS="scripts/regen_fano_snapshot.sh proofs/FanoSnapshotGen.lean"
+          # Every NON-kernel-checked input the regeneration trusts: the producer scripts AND
+          # the build config (lakefile / toolchain). The kernel-proven modules FanoOrientationF3
+          # and CDAlg are deliberately NOT pinned — Lean verifies them (`lake build` below), so a
+          # tampered proof fails the build. FanoSnapshotGen imports only those two kernel modules,
+          # so there is no other local non-kernel .lean in the trust surface. These inputs are not
+          # proven, so a PR could tamper one AND the snapshot to self-defeat the diff; pin them.
+          TRUSTED="scripts/regen_fano_snapshot.sh proofs/FanoSnapshotGen.lean proofs/lakefile.lean proofs/lean-toolchain"
           if [ "${FANO_PRODUCER_REVIEWED}" = "true" ]; then
-            echo "::notice::fano-producer-reviewed label present — using the PR's own producer scripts (the producer change has been reviewed)"
-          else
-            # Default: regenerate with the base branch's producer, so a PR cannot reproduce a
-            # falsified snapshot by also editing its producer. A no-op when the producer is
-            # unchanged. If a legitimate producer change makes this fail, review it and add the
-            # `fano-producer-reviewed` label (absent label ⇒ pin always applies — fail-closed).
-            git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF:-master}"
-            git checkout FETCH_HEAD -- $PRODUCERS
-            echo "::notice::producer scripts pinned to origin/${GITHUB_BASE_REF:-master} (trusted); a reviewed producer change needs the fano-producer-reviewed label"
+            echo "::notice::fano-producer-reviewed label present — using the PR's own regen inputs (the change has been reviewed)"
+            exit 0
           fi
+          # Default (fail-closed, absent label): regenerate with the base branch's inputs, so a
+          # PR cannot reproduce a falsified snapshot by also editing a producer/build-config file.
+          # A no-op when they are unchanged. A legitimate change to any of them needs the
+          # `fano-producer-reviewed` label after review.
+          git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF:-master}"
+          for f in $TRUSTED; do
+            if git cat-file -e "FETCH_HEAD:$f" 2>/dev/null; then
+              git checkout FETCH_HEAD -- "$f"
+            else
+              echo "::error::$f is new in this PR (absent on the base) — a new/renamed regen input is a reviewed producer change; add the fano-producer-reviewed label after review"
+              exit 1
+            fi
+          done
+          echo "::notice::regen inputs pinned to origin/${GITHUB_BASE_REF:-master} (trusted): $TRUSTED"
       - name: Install elan (pinned toolchain from proofs/lean-toolchain)
         run: |
           set -euo pipefail
