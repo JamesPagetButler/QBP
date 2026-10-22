@@ -24,7 +24,9 @@ for `a = gramLo s` and `c = gramHi s`,
 * `cdLo (gradV s) = (8 * N c) • a - (8 * bil a c) • c`
 * `cdHi (gradV s) = (8 * N a) • c - (8 * bil a c) • a`
 Hence `∇V(s)` has **zero component along `1` and zero component along `a * c`**—it stays
-strictly inside the 2D plane `span_ℝ{a, c} ⊂ Im H_s`!
+strictly inside the 2D plane `span_ℝ{a, c} ⊂ Im H_s`. (This last sentence is a prose
+corollary of the two identities above, read off from the right-hand sides; it is not a
+separate Lean statement in this module.)
 4. **Theorem 4 (`liftLeaf_gradV_eq`, `liftLeaf_ruleField_eq`, `liftLeaf_rk4Step_eq`)**:
 Proves the **CASH P4 Lossless Intertwining Theorem** for the QBP-CU Leaf-Foliated engine:
 for any orthonormal imaginary octonion 2-frame `(u₁, u₂)` (`N u₁ = 1`, `N u₂ = 1`,
@@ -176,7 +178,10 @@ theorem ruleField_mem_fixed_leaf {s₀ x : CDAlg ℝ 4}
     (inKernelAlgebra_smul (4 * Hosting.potential x) hx)
     (inKernelAlgebra_smul (-1 : ℝ) (gradV_mem_fixed_leaf hx))
 
-/-- **Theorem 2c (Discrete Euler & RK4 steps preserve the fixed initial leaf `𝕆_{s₀}`).** -/
+/-- One classical RK4 stage of the P2 rule flow with the state renormalised to the unit
+sphere after each sub-step and at the end (the discrete integrator of the QBP-CU engine).
+The leaf-closure statement for this stage is `rk4Stage_mem_fixed_leaf` below; no Euler
+step is defined in this module. -/
 noncomputable def rk4Stage (x : CDAlg ℝ 4) (h : ℝ) : CDAlg ℝ 4 :=
   let k1 := ruleField x
   let x2 := (N (x + (h / 2) • k1))⁻¹.sqrt • (x + (h / 2) • k1)
@@ -361,7 +366,7 @@ def ruleFieldLeaf (q : LeafState) : LeafState :=
     c2 := v4 * q.c2 - g.c2
     b0 := v4 * q.b0 }
 
-@[simp] theorem imPart_one {n : ℕ} : imPart (1 : CDAlg ℝ n) = 0 := by
+theorem imPart_one {n : ℕ} : imPart (1 : CDAlg ℝ n) = 0 := by
   rw [imPart_def, one_coord, if_pos rfl, one_smul, sub_self]
 
 /-- **Theorem 4a (Gradient Intertwining / CASH P4 Gate Reflection).**
