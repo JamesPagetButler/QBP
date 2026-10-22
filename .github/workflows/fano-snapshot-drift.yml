@@ -14,6 +14,8 @@ on:
       - 'proofs/QBP/Foundations/FanoOrientationF3.lean'
       - 'proofs/QBP/Foundations/CDAlg.lean'
       - 'scripts/regen_fano_snapshot.sh'
+      - 'proofs/FanoSnapshotGen.lean'
+      - 'scripts/test_fano_snapshot_guard.sh'
       - '.github/workflows/fano-snapshot-drift.yml'
   push:
     branches: [master]
@@ -29,8 +31,32 @@ jobs:
   fano-snapshot-drift:
     name: fanoTableF4 snapshot <-> kernel-proof drift guard
     runs-on: ubuntu-latest
+    # #605 AC1: the two PRODUCER files (regen_fano_snapshot.sh + FanoSnapshotGen.lean) only
+    # FORMAT output — unlike the kernel-checked FanoOrientationF3/CDAlg they are not proven, so
+    # a PR could alter the snapshot AND its producer together and self-defeat the diff. We pin
+    # the producer to the trusted base before regenerating; a genuine producer change rides the
+    # `fano-producer-reviewed` label (human-reviewed), which skips the pin.
+    env:
+      FANO_PRODUCER_REVIEWED: ${{ contains(github.event.pull_request.labels.*.name, 'fano-producer-reviewed') }}
     steps:
       - uses: actions/checkout@v4
+      - name: Negative control — producer-tamper self-defeat is caught (#605 AC2)
+        run: bash scripts/test_fano_snapshot_guard.sh
+      - name: Pin producer scripts to the trusted base unless reviewed (#605 AC1)
+        run: |
+          set -euo pipefail
+          PRODUCERS="scripts/regen_fano_snapshot.sh proofs/FanoSnapshotGen.lean"
+          if [ "${FANO_PRODUCER_REVIEWED}" = "true" ]; then
+            echo "::notice::fano-producer-reviewed label present — using the PR's own producer scripts (the producer change has been reviewed)"
+          else
+            # Default: regenerate with the base branch's producer, so a PR cannot reproduce a
+            # falsified snapshot by also editing its producer. A no-op when the producer is
+            # unchanged. If a legitimate producer change makes this fail, review it and add the
+            # `fano-producer-reviewed` label (absent label ⇒ pin always applies — fail-closed).
+            git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF:-master}"
+            git checkout FETCH_HEAD -- $PRODUCERS
+            echo "::notice::producer scripts pinned to origin/${GITHUB_BASE_REF:-master} (trusted); a reviewed producer change needs the fano-producer-reviewed label"
+          fi
       - name: Install elan (pinned toolchain from proofs/lean-toolchain)
         run: |
           set -euo pipefail
