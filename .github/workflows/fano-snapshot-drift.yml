@@ -74,7 +74,17 @@ jobs:
               exit 1
             fi
           done
-          echo "::notice::regen inputs pinned to origin/${GITHUB_BASE_REF:-master} (trusted): $TRUSTED"
+          # Refuse PR-ADDED lake-config files that are absent on the base: the pin only
+          # OVERWRITES existing trusted files, so a newly added lakefile.toml / lake-manifest.json
+          # would survive and `lake` would read it (dependency remap / env hijack). A legitimate
+          # new lake-config file is a reviewed producer change — take the label. (Fail-closed.)
+          for c in proofs/lakefile.toml proofs/lake-manifest.json; do
+            if [ -e "$c" ] && ! git cat-file -e "FETCH_HEAD:$c" 2>/dev/null; then
+              echo "::error::$c was added by this PR (absent on the base) — a new lake-config file can hijack regeneration; it is a reviewed producer change, add the fano-producer-reviewed label"
+              exit 1
+            fi
+          done
+          echo "::notice::regen inputs pinned to origin/${GITHUB_BASE_REF:-master} (trusted): $TRUSTED; no PR-added lake-config present"
       - name: Install elan (pinned toolchain from proofs/lean-toolchain)
         run: |
           set -euo pipefail
