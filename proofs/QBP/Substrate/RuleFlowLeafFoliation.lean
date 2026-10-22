@@ -32,6 +32,67 @@ for any orthonormal imaginary octonion 2-frame `(u₁, u₂)` (`N u₁ = 1`, `N 
 via `liftLeaf u₁ u₂ q` intertwines `gradV`, `ruleField`, and `rk4Step` identically.
 
 Completeness target: zero `sorry`, zero `native_decide`, axioms ⊆ `{propext, Classical.choice, Quot.sound}`.
+## Provenance
+
+From the beekeeper's MDCU document ("The Case for the Multi-Dimensional Compute Unit",
+§4 "Ready-to-Compile Lean 4 Module"), 2026-10-17, Gemini & QBP/Edda collaboration; written
+against QBP head `2b9e5d2`.  Built by qbp-oppenheimer for inter#197 step 1 against master
+`a4d4383`.  The text above this section is the document's own header, kept verbatim; every
+theorem *statement* below is the document's, unchanged.  Changes are confined to proofs, to
+the `noncomputable` marker on `rk4Stage` (its body is unchanged; it uses `Real.sqrt` and
+`ruleField`), and to one added helper lemma (`comm_eq_gram_comm`).
+
+**Substrate-layer discipline** (beekeeper's lift, 2026-09-07, #473
+`issuecomment-5574256922`).  *What this file hosts:* algebraic closure facts about the rule
+field `RuleFlow.ruleField` and the rule's gradient `RuleFlow.gradV` (pointwise membership in
+`𝕆_s`, closure of a *fixed* `𝕆_{s₀}` under `gradV`, `ruleField` and one explicit RK4
+stage), the octonion double-commutator identity, the 2-plane closed form of `∇V`, and the
+gradient intertwining with a 5-coordinate leaf chart.  *What this file does NOT derive:* the
+rule itself (a POSTULATE, #635); existence or uniqueness of integral curves
+(`FLAG-rule-flow-open`); invariance of `𝕆_s` along a *continuous* trajectory (the RK4/closure
+results are statements about explicit discrete updates, not about the flow); the reverse
+inclusion `ker Δ(s) ⊆ 𝕆_s`; the leaf space `G₂/SO(4)`; the anneal or the endpoint.
+
+## Status of the document's four claims (as built)
+
+* **Theorem 1** (`ruleField_mem_kernelAlgebra`): **PROVED as stated**, for every
+  `s : CDAlg ℝ 4`, no hypothesis.  Proof repair: the name
+  `smul_self_add_smul_gradV_mem_kernelAlgebra` is ambiguous under the two `open`s (the
+  Foundations version is about `gradVof`, the Substrate one about `RuleFlow.gradV`, and they
+  are definitionally equal, so both elaborate); qualified as `RuleFlowBridge.…`.
+* **Theorem 2** (`gradV_mem_fixed_leaf`, `ruleField_mem_fixed_leaf`,
+  `rk4Stage_mem_fixed_leaf`): **PROVED as stated.**  `gradV_mem_fixed_leaf` and
+  `ruleField_mem_fixed_leaf` (and their component lemmas) compiled unchanged.  Repairs:
+  `rk4Stage` marked `noncomputable`; the `rk4Stage_mem_fixed_leaf` proof rewritten (the
+  document's `dsimp [rk4Stage]` unfolded `N` into coordinate sums and left `_` placeholders
+  unsynthesizable; a single closing `exact` on the zeta-reduced goal timed out in `isDefEq`)
+  as `unfold rk4Stage; lift_lets; intro …` followed by stage-by-stage closure.  The header's
+  names `inKernelAlgebra_fixed_leaf` and `rk4Step_mem_fixed_leaf`, and its "Discrete Euler …
+  trajectories stay in `𝕆_{s₀}` at every step by induction", have **no Lean counterpart in
+  the module text**: what is in Lean is closure under ONE RK4 stage (multi-step iteration
+  and an Euler step are not stated).
+* **Theorem 3** (`octonion_double_comm_pure`, `cdLo_gradV_eq_plane_comb`,
+  `cdHi_gradV_eq_plane_comb`): **PROVED as stated.**  Repairs: `sq_eq_neg_N_one` needed a
+  closing `neg_smul` (`-(N y • 1)` vs `-N y • 1`); `mul_right_self_pure`,
+  `mul_left_self_pure` drop the inapplicable `cd_mul_neg`/`cd_neg_mul` rewrites (the
+  negation sits on the scalar); `mul_swap_self_pure` uses `module` instead of `abel` for the
+  scalar-negation step and closes with `module`; the `hcomm` steps of 3a/3b (whose
+  `rw [← gramLo_comm, ← comm_gramHi]`/`exact cdComm_eq_comm_imHi _` failed or timed out)
+  are replaced by the added helper `comm_eq_gram_comm` (`[a, b] = [Im a, Im b]`, via
+  `gramLo_comm` and `InFlightAlgebra.comm_smul_one_add`).  `octonion_double_comm_pure` and
+  the rest of 3a/3b compiled unchanged.
+* **Theorem 4** (`liftLeaf_gradV_eq`): **PROVED as stated.**  Repairs: the `hlo`/`hhi`
+  `simp` calls replaced by explicit `rw` chains through `cdLo_loOf`/`cdLo_hiOf`/
+  `cdHi_loOf`/`cdHi_hiOf` and `imPart_one`; `N_smul` qualified as
+  `NoAutonomousDynamics.N_smul` (unqualified name not in scope); `hbil` via `simp only`
+  bilinearity then the frame rewrites; the final step compares Cayley–Dickson halves with
+  `CrystalHosting.eq_of_halves` (the document's `rw [gradV, …]` unfolded `gradV` and then
+  found no `cdLo (gradV _)` to rewrite).  The header's `liftLeaf_ruleField_eq` and
+  `liftLeaf_rk4Step_eq` are **not in the module text** (no Lean statement); `potentialLeaf`
+  and `ruleFieldLeaf` are defined but no theorem relates them to `Hosting.potential` /
+  `ruleField`.  Only the **gradient** intertwining is proved.
+
+No `sorry`, no `native_decide`, no new axioms; `#print axioms` audit in §5.
 -/
 
 namespace QBP.Substrate.RuleFlowLeafFoliation
@@ -61,7 +122,7 @@ theorem ruleField_mem_kernelAlgebra (s : CDAlg ℝ 4) :
   have h : ruleField s = (4 * Hosting.potential s) • s + (-1 : ℝ) • gradV s := by
     rw [ruleField_eq_smul_sub_gradV, neg_one_smul, sub_eq_add_neg]
   rw [h]
-  exact smul_self_add_smul_gradV_mem_kernelAlgebra s (4 * Hosting.potential s) (-1)
+  exact RuleFlowBridge.smul_self_add_smul_gradV_mem_kernelAlgebra s (4 * Hosting.potential s) (-1)
 
 /-! ## 2. Theorem 2 — Fixed-Leaf Subalgebra Closure (`∀ x ∈ 𝕆_{s₀}, F(x) ∈ 𝕆_{s₀}`) -/
 
@@ -116,7 +177,7 @@ theorem ruleField_mem_fixed_leaf {s₀ x : CDAlg ℝ 4}
     (inKernelAlgebra_smul (-1 : ℝ) (gradV_mem_fixed_leaf hx))
 
 /-- **Theorem 2c (Discrete Euler & RK4 steps preserve the fixed initial leaf `𝕆_{s₀}`).** -/
-def rk4Stage (x : CDAlg ℝ 4) (h : ℝ) : CDAlg ℝ 4 :=
+noncomputable def rk4Stage (x : CDAlg ℝ 4) (h : ℝ) : CDAlg ℝ 4 :=
   let k1 := ruleField x
   let x2 := (N (x + (h / 2) • k1))⁻¹.sqrt • (x + (h / 2) • k1)
   let k2 := ruleField x2
@@ -130,46 +191,48 @@ def rk4Stage (x : CDAlg ℝ 4) (h : ℝ) : CDAlg ℝ 4 :=
 theorem rk4Stage_mem_fixed_leaf {s₀ x : CDAlg ℝ 4} (h : ℝ)
     (hx : InKernelAlgebra s₀ x) :
     InKernelAlgebra s₀ (rk4Stage x h) := by
-  dsimp [rk4Stage]
-  have hk1 : InKernelAlgebra s₀ (ruleField x) := ruleField_mem_fixed_leaf hx
-  have hx2 : InKernelAlgebra s₀ ((N (x + (h / 2) • ruleField x))⁻¹.sqrt • (x + (h / 2) • ruleField x)) :=
+  -- Proof repair: the document's `dsimp [rk4Stage]` unfolded `N` into coordinate
+  -- sums, its `_` placeholders could not be synthesized, and closing the zeta-reduced
+  -- goal with one `exact` sent `isDefEq` into unfolding `ruleField`/`gradV` (heartbeat
+  -- timeout).  Instead lift the `let`s to the top of the goal (`lift_lets`), introduce
+  -- them as local definitions, and close each stage by the closure combinators.
+  unfold rk4Stage
+  lift_lets
+  intro k1 x2 k2 x3 k3 x4 k4 raw
+  have hk1 : InKernelAlgebra s₀ k1 := ruleField_mem_fixed_leaf hx
+  have hx2 : InKernelAlgebra s₀ x2 :=
     inKernelAlgebra_smul _ (inKernelAlgebra_add hx (inKernelAlgebra_smul _ hk1))
-  have hk2 := ruleField_mem_fixed_leaf hx2
-  have hx3 := inKernelAlgebra_smul (N (x + (h / 2) • ruleField _))⁻¹.sqrt
-    (inKernelAlgebra_add hx (inKernelAlgebra_smul (h / 2) hk2))
-  have hk3 := ruleField_mem_fixed_leaf hx3
-  have hx4 := inKernelAlgebra_smul (N (x + h • ruleField _))⁻¹.sqrt
-    (inKernelAlgebra_add hx (inKernelAlgebra_smul h hk3))
-  have hk4 := ruleField_mem_fixed_leaf hx4
-  exact inKernelAlgebra_smul _
-    (inKernelAlgebra_add hx
-      (inKernelAlgebra_smul (h / 6)
-        (inKernelAlgebra_add
-          (inKernelAlgebra_add
-            (inKernelAlgebra_add hk1 (inKernelAlgebra_smul 2 hk2))
-            (inKernelAlgebra_smul 2 hk3))
-          hk4)))
+  have hk2 : InKernelAlgebra s₀ k2 := ruleField_mem_fixed_leaf hx2
+  have hx3 : InKernelAlgebra s₀ x3 :=
+    inKernelAlgebra_smul _ (inKernelAlgebra_add hx (inKernelAlgebra_smul _ hk2))
+  have hk3 : InKernelAlgebra s₀ k3 := ruleField_mem_fixed_leaf hx3
+  have hx4 : InKernelAlgebra s₀ x4 :=
+    inKernelAlgebra_smul _ (inKernelAlgebra_add hx (inKernelAlgebra_smul _ hk3))
+  have hk4 : InKernelAlgebra s₀ k4 := ruleField_mem_fixed_leaf hx4
+  have hraw : InKernelAlgebra s₀ raw :=
+    inKernelAlgebra_add hx (inKernelAlgebra_smul _
+      (inKernelAlgebra_add (inKernelAlgebra_add (inKernelAlgebra_add hk1
+        (inKernelAlgebra_smul _ hk2)) (inKernelAlgebra_smul _ hk3)) hk4))
+  exact inKernelAlgebra_smul _ hraw
 
 /-! ## 3. Theorem 3 — The 2-Plane Double-Commutator Identity in `𝕆 = CDAlg ℝ 3` -/
 
 /-- For an imaginary octonion `y` (`y.coord 0 = 0`), `y * y = -(N y) • 1`. -/
 theorem sq_eq_neg_N_one {y : CDAlg ℝ 3} (hy : y.coord 0 = 0) :
     y * y = - (N y) • (1 : CDAlg ℝ 3) := by
-  rw [cdAlg_sq_eq, hy, mul_zero, zero_smul, zero_sub]
+  rw [cdAlg_sq_eq, hy, mul_zero, zero_smul, zero_sub, neg_smul]
 
 /-- Right-multiplying `x * y` by imaginary `y` collapses to `-(N y) • x` via
 right-alternativity `(x * y) * y = x * (y * y)`. -/
 theorem mul_right_self_pure (x : CDAlg ℝ 3) {y : CDAlg ℝ 3} (hy : y.coord 0 = 0) :
     (x * y) * y = - (N y) • x := by
-  rw [(octonion_alternative x y).2, sq_eq_neg_N_one hy,
-    CrystalHosting.cd_mul_neg, mul_smul_right, cd_mul_one]
+  rw [(octonion_alternative x y).2, sq_eq_neg_N_one hy, mul_smul_right, cd_mul_one]
 
 /-- Left-multiplying `y * x` by imaginary `y` collapses to `-(N y) • x` via
 left-alternativity `y * (y * x) = (y * y) * x`. -/
 theorem mul_left_self_pure (x : CDAlg ℝ 3) {y : CDAlg ℝ 3} (hy : y.coord 0 = 0) :
     y * (y * x) = - (N y) • x := by
-  rw [← (octonion_alternative y x).1, sq_eq_neg_N_one hy,
-    CrystalHosting.cd_neg_mul, mul_smul_left, cd_one_mul]
+  rw [← (octonion_alternative y x).1, sq_eq_neg_N_one hy, mul_smul_left, cd_one_mul]
 
 /-- For imaginary octonions `x, y`, `(y * x) * y = (N y) • x - (2 * bil x y) • y`
 via the pure swap identity `x * y + y * x = -(2 * bil x y) • 1`. -/
@@ -179,9 +242,10 @@ theorem mul_swap_self_pure {x y : CDAlg ℝ 3} (hx : x.coord 0 = 0) (hy : y.coor
     have h := cdAlg_mul_add_swap_pure x y hx hy
     calc y * x = (x * y + y * x) - x * y := by abel
       _ = - (2 * bil x y) • (1 : CDAlg ℝ 3) - x * y := by rw [h]
-      _ = - (x * y) - (2 * bil x y) • (1 : CDAlg ℝ 3) := by abel
+      _ = - (x * y) - (2 * bil x y) • (1 : CDAlg ℝ 3) := by module
   rw [hswap, CrystalHosting.cd_sub_mul, CrystalHosting.cd_neg_mul,
-    mul_right_self_pure x hy, neg_neg, mul_smul_left, cd_one_mul]
+    mul_right_self_pure x hy, mul_smul_left, cd_one_mul]
+  module
 
 /-- **Core Octonion Double-Commutator Identity.**
 For any imaginary octonions `x, y : CDAlg ℝ 3` (`x.coord 0 = 0`, `y.coord 0 = 0`),
@@ -199,6 +263,14 @@ theorem octonion_double_comm_pure {x y : CDAlg ℝ 3}
     mul_swap_self_pure hx hy]
   module
 
+/-- `C(s) = [a, b] = [Im a, Im b]`: the real parts of both CD components are central
+and drop out of the commutator.  (Helper added in proof repair.) -/
+theorem comm_eq_gram_comm (s : CDAlg ℝ 4) :
+    comm s = gramLo s * gramHi s - gramHi s * gramLo s := by
+  have hb : ((cdHi s).coord 0) • (1 : CDAlg ℝ 3) + gramHi s = cdHi s := by
+    rw [gramHi, imPart_def]; abel
+  rw [← gramLo_comm, ← comm_smul_one_add (gramLo s) (gramHi s) ((cdHi s).coord 0), hb]
+
 /-- **Theorem 3a (`cdLo (gradV s)` 2-Plane Formula).**
 For EVERY sedenion `s : CDAlg ℝ 4` (no imaginarity or norm hypothesis!), writing
 `a = gramLo s = imPart (cdLo s)` and `c = gramHi s = imPart (cdHi s)`:
@@ -207,9 +279,7 @@ theorem cdLo_gradV_eq_plane_comb (s : CDAlg ℝ 4) :
     cdLo (gradV s) = (8 * N (gramHi s)) • gramLo s - (8 * bil (gramLo s) (gramHi s)) • gramHi s := by
   have ha : (gramLo s).coord 0 = 0 := gramLo_coord_zero s
   have hc : (gramHi s).coord 0 = 0 := gramHi_coord_zero s
-  have hcomm : comm s = gramLo s * gramHi s - gramHi s * gramLo s := by
-    rw [← gramLo_comm, ← comm_gramHi]
-    exact cdComm_eq_comm_imHi _
+  have hcomm : comm s = gramLo s * gramHi s - gramHi s * gramLo s := comm_eq_gram_comm s
   have hconj : conj (cdHi s) = ((cdHi s).coord 0) • (1 : CDAlg ℝ 3) - gramHi s := by
     rw [conj_eq_sub, gramHi, imPart_def]; module
   rw [cdLo_gradV, hcomm, hconj]
@@ -233,8 +303,7 @@ theorem cdHi_gradV_eq_plane_comb (s : CDAlg ℝ 4) :
   have ha : (gramLo s).coord 0 = 0 := gramLo_coord_zero s
   have hc : (gramHi s).coord 0 = 0 := gramHi_coord_zero s
   have hcomm : comm s = - (gramHi s * gramLo s - gramLo s * gramHi s) := by
-    have h1 : comm s = gramLo s * gramHi s - gramHi s * gramLo s := by
-      rw [← gramLo_comm]; exact cdComm_eq_comm_imHi _
+    have h1 : comm s = gramLo s * gramHi s - gramHi s * gramLo s := comm_eq_gram_comm s
     rw [h1]; abel
   have hconj : conj (cdLo s) = ((cdLo s).coord 0) • (1 : CDAlg ℝ 3) - gramLo s := by
     rw [conj_eq_sub, gramLo, imPart_def]; module
@@ -306,30 +375,35 @@ theorem liftLeaf_gradV_eq {u1 u2 : CDAlg ℝ 3}
     (q : LeafState) :
     gradV (liftLeaf u1 u2 q) = liftLeaf u1 u2 (gradVLeaf q) := by
   have hlo : gramLo (liftLeaf u1 u2 q) = q.a1 • u1 + q.a2 • u2 := by
-    simp [gramLo, liftLeaf, imPart_add, imPart_smul, imPart_eq_self hu1_im, imPart_eq_self hu2_im]
+    rw [gramLo, liftLeaf, cdLo_add, CrystalHosting.cdLo_loOf, CrystalHosting.cdLo_hiOf, add_zero,
+      imPart_add, imPart_smul, imPart_smul, imPart_eq_self hu1_im, imPart_eq_self hu2_im]
   have hhi : gramHi (liftLeaf u1 u2 q) = q.c1 • u1 + q.c2 • u2 := by
-    simp [gramHi, liftLeaf, imPart_add, imPart_smul, imPart_eq_self hu1_im, imPart_eq_self hu2_im]
+    rw [gramHi, liftLeaf, cdHi_add, CrystalHosting.cdHi_loOf, CrystalHosting.cdHi_hiOf, zero_add,
+      imPart_add, imPart_add, imPart_smul, imPart_smul, imPart_smul, imPart_one, smul_zero,
+      zero_add, imPart_eq_self hu1_im, imPart_eq_self hu2_im]
   have hNa : N (gramLo (liftLeaf u1 u2 q)) = q.a1 ^ 2 + q.a2 ^ 2 := by
-    rw [hlo, N_add, N_smul, N_smul, bil_smul_left, bil_smul_right, hu1_N, hu2_N, hu12_orth]
+    rw [hlo, N_add, NoAutonomousDynamics.N_smul, NoAutonomousDynamics.N_smul, bil_smul_left, bil_smul_right, hu1_N, hu2_N, hu12_orth]
     ring
   have hNc : N (gramHi (liftLeaf u1 u2 q)) = q.c1 ^ 2 + q.c2 ^ 2 := by
-    rw [hhi, N_add, N_smul, N_smul, bil_smul_left, bil_smul_right, hu1_N, hu2_N, hu12_orth]
+    rw [hhi, N_add, NoAutonomousDynamics.N_smul, NoAutonomousDynamics.N_smul, bil_smul_left, bil_smul_right, hu1_N, hu2_N, hu12_orth]
     ring
   have hbil : bil (gramLo (liftLeaf u1 u2 q)) (gramHi (liftLeaf u1 u2 q))
       = q.a1 * q.c1 + q.a2 * q.c2 := by
-    rw [hlo, hhi, bil_add_left, bil_add_right, bil_add_right,
-      bil_smul_left, bil_smul_left, bil_smul_left, bil_smul_left,
-      bil_smul_right, bil_smul_right, bil_smul_right, bil_smul_right,
-      ← N_eq_bil u1, ← N_eq_bil u2, NormForm.bil_symm u2 u1, hu1_N, hu2_N, hu12_orth]
+    rw [hlo, hhi]
+    simp only [bil_add_left, bil_add_right, bil_smul_left, bil_smul_right]
+    rw [← N_eq_bil u1, ← N_eq_bil u2, NormForm.bil_symm u2 u1, hu1_N, hu2_N, hu12_orth]
     ring
-  rw [gradV, cdLo_gradV_eq_plane_comb, cdHi_gradV_eq_plane_comb,
-    hNa, hNc, hbil, hlo, hhi]
-  dsimp [liftLeaf, gradVLeaf]
-  rw [zero_smul, zero_add]
-  -- Both sides are loOf (...) + hiOf (...) of linear combinations of u1, u2; match coefficients
-  congr 1
-  · rw [← loOf_add]; congr 1; module
-  · rw [← hiOf_add]; congr 1; module
+  -- Proof repair: compare the two Cayley–Dickson halves (`eq_of_halves`) instead of
+  -- unfolding `gradV`; each half is a coefficient identity on `span_ℝ{u₁, u₂}`.
+  apply CrystalHosting.eq_of_halves
+  · rw [cdLo_gradV_eq_plane_comb, hNc, hbil, hlo, hhi, liftLeaf, cdLo_add,
+      CrystalHosting.cdLo_loOf, CrystalHosting.cdLo_hiOf, add_zero]
+    simp only [gradVLeaf]
+    module
+  · rw [cdHi_gradV_eq_plane_comb, hNa, hbil, hlo, hhi, liftLeaf, cdHi_add,
+      CrystalHosting.cdHi_loOf, CrystalHosting.cdHi_hiOf, zero_add]
+    simp only [gradVLeaf, zero_smul, zero_add]
+    module
 
 /-! ## 5. Completeness audit — `#print axioms` -/
 
@@ -341,5 +415,18 @@ theorem liftLeaf_gradV_eq {u1 u2 : CDAlg ℝ 3}
 #print axioms cdLo_gradV_eq_plane_comb
 #print axioms cdHi_gradV_eq_plane_comb
 #print axioms liftLeaf_gradV_eq
+
+-- Audit of the supporting lemmas (added at build time so that every theorem in the
+-- module is covered, not only the headline ones).
+#print axioms ruleField_eq_smul_sub_gradV
+#print axioms cdComm_mem_fixed_hostQuat
+#print axioms cdLo_gradV_mem_fixed_hostQuat
+#print axioms cdHi_gradV_mem_fixed_hostQuat
+#print axioms sq_eq_neg_N_one
+#print axioms mul_right_self_pure
+#print axioms mul_left_self_pure
+#print axioms mul_swap_self_pure
+#print axioms comm_eq_gram_comm
+#print axioms imPart_one
 
 end QBP.Substrate.RuleFlowLeafFoliation
