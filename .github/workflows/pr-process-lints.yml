@@ -1,0 +1,91 @@
+# PR process lints (#507 §1 §2 §3) — mechanical backstops for the evidence-first rules.
+#
+#   notifier-workflow-list  — BLOCKING. `.github/workflows/pr-check-status.yml`
+#                             `on.workflow_run.workflows` must list every workflow
+#                             that has a pull_request trigger (else that workflow's
+#                             completion can never finalise a verdict). Runs only
+#                             when a workflow file changes.
+#   evidence-first-prose    — ADVISORY (warning annotations, exit 0). §1 verdict
+#                             words in a theory-bearing PR title without a verdict
+#                             headline; §2 oracle citations without an in-repo
+#                             fixture path + pinned sha. Flip to blocking by passing
+#                             `--strict` below — that flip is the beekeeper's choice
+#                             (#507 AC "advisory-or-blocking per beekeeper choice").
+#                             Runs on every PR open/edit/sync because the PR body is
+#                             the review object.
+#
+# Both read the PR via `gh` with the default token (read-only on PR metadata).
+# Neither writes to the PR. This workflow is listed in the notifier's
+# workflow_run list (it is itself PR-triggered — the lint it carries checks that).
+
+name: PR Process Lints
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  notifier-workflow-list:
+    name: notifier workflow_run list in sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect workflow-file changes
+        id: wf
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          files=$(gh pr view "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" \
+                    --json files --jq '.files[].path')
+          if printf '%s\n' "$files" | grep -q '^\.github/workflows/\|^scripts/check_notifier_workflow_list\.py$\|^scripts/test_check_notifier_workflow_list\.py$'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install PyYAML
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 -m pip install --quiet pyyaml
+      - name: Unit tests
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 scripts/test_check_notifier_workflow_list.py
+      - name: Drift lint
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 scripts/check_notifier_workflow_list.py
+      - name: Skipped (no workflow files changed)
+        if: steps.wf.outputs.changed != 'true'
+        run: echo "no .github/workflows changes in this PR — drift lint not applicable"
+
+  evidence-first-prose:
+    name: evidence-first prose lint (advisory)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests
+        run: |
+          python3 scripts/test_pr_merge_blocking_boxes.py
+          python3 scripts/test_check_pr_prose_claims.py
+      - name: Collect PR title, body, labels, changed paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh pr view "$PR" --repo "$REPO" --json title --jq .title > /tmp/title.txt
+          gh pr view "$PR" --repo "$REPO" --json body --jq .body > /tmp/body.md
+          gh pr view "$PR" --repo "$REPO" --json labels --jq '[.labels[].name] | join(",")' > /tmp/labels.txt
+          gh pr view "$PR" --repo "$REPO" --json files --jq '.files[].path' > /tmp/changed.txt
+      - name: Lint (advisory — add --strict to make blocking; beekeeper's flip)
+        run: |
+          python3 scripts/check_pr_prose_claims.py \
+            --title "$(cat /tmp/title.txt)" \
+            --body-file /tmp/body.md \
+            --labels "$(cat /tmp/labels.txt)" \
+            --changed-file /tmp/changed.txt
+      - name: Merge-blocking box state (report only; nudge lives in the notifier)
+        run: python3 scripts/pr_merge_blocking_boxes.py --body-file /tmp/body.md

@@ -263,6 +263,26 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    commit messages enter the immutable git log, where they outlive their
    caveats.
 
+7. **Mechanical backstops (#507, 2026-10-22) — advisory unless the beekeeper
+   flips them:** `PR Process Lints` (`.github/workflows/pr-process-lints.yml`)
+   runs `scripts/check_pr_prose_claims.py` on every PR open/edit/sync:
+   (§1) a verdict word in the title of a theory-bearing PR (label
+   `tier-3-review` or paths under `proofs/`, `docs/theory/`, `docs/foundations/`)
+   with no verdict headline in the body; (§2) an "oracle" evidence line that
+   names no in-repo fixture/config path with a pinned sha. Both surface as
+   `::warning::` annotations and exit 0 — the reviewer stays the authority
+   (rule 6). Passing `--strict` in the workflow makes them blocking; that flip
+   is the beekeeper's choice and is recorded on #507. The same workflow holds
+   the blocking `workflow_run` drift lint (`scripts/check_notifier_workflow_list.py`):
+   every PR-triggered workflow must be in the notifier's list, or its completion
+   can never finalise a verdict. The notifier itself now (a) refuses the
+   merge-ready verdict when GitHub reports `mergeable: CONFLICTING` (resolve
+   first — #507 §6) and (b) posts a 🟡 nudge, not merge-ready, while any
+   merge-blocking sign-off box (github-best-practices §2.2 regions, parsed by
+   `scripts/pr_merge_blocking_boxes.py`) is unticked — auto-nudge, never
+   auto-tick (#507 §4). Making that nudge a required failing check (§7) gates
+   the beekeeper's own merges and awaits his ruling.
+
 Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
 checkout (missing root aggregator; both Tier-3 reviews read content only);
 `LieAlgebraIso.lean` never compiled since authoring (caught by aggregator
