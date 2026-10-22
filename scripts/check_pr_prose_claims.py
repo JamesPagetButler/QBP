@@ -41,7 +41,7 @@ VERDICT_WORDS = re.compile(
     re.I,
 )
 VERDICT_HEADLINE = re.compile(
-    r"^\s*(\*\*verdict\b|verdict\s*:|#{1,6}\s*verdict\b|\|\s*(claim|experimental evidence)\b)",
+    r"^[\s>*+-]*(\*\*verdict\b|verdict\s*:|#{1,6}\s*verdict\b|\|\s*(claim|experimental evidence)\b)",
     re.I | re.M,
 )
 THEORY_PATHS = ("proofs/", "docs/theory/", "docs/foundations/")
@@ -51,10 +51,16 @@ ORACLE_LINE = re.compile(r"\boracle\b", re.I)
 ORACLE_EVIDENCE = re.compile(
     r"https?://|\b(run|report|output|evidence|results?)\b", re.I
 )
+# An in-repo premise is a ROOT-RELATIVE repo path (G9): URLs (anything with "://")
+# and bare "*.json" tokens do not count — "out-of-band JSON is not a premise".
 FIXTURE_PATH = re.compile(
-    r"(tests?/fixtures?/\S+|tests?/\S+\.json|analysis/\S+|config/\S+|\S+\.(json|ya?ml|toml))\b"
+    r"(?<![\w/:.])(tests?|analysis|config|fixtures?|docs|proofs|archive|scripts|verification|results)/[\w./-]+"
 )
-PINNED_SHA = re.compile(r"\b[0-9a-f]{7,40}\b")
+# A pinned sha is 7–40 hex chars containing at least one letter AND one digit (G10):
+# pure decimals (Actions run ids, dates) and hex-looking words ("deadbee") do not count.
+PINNED_SHA = re.compile(
+    r"\b(?=[0-9a-f]{7,40}\b)(?![0-9]+\b)(?![a-f]+\b)[0-9a-f]{7,40}\b"
+)
 STRUCK = re.compile(r"~~.*~~")
 
 
@@ -91,7 +97,8 @@ def lint_oracle(body):
         if not (ORACLE_LINE.search(line) and ORACLE_EVIDENCE.search(line)):
             continue
         window = "\n".join(lines[i : i + 3])
-        has_path = bool(FIXTURE_PATH.search(window))
+        window_no_urls = re.sub(r"\S+://\S+", " ", window)
+        has_path = bool(FIXTURE_PATH.search(window_no_urls))
         has_sha = bool(PINNED_SHA.search(window))
         if has_path and has_sha:
             continue

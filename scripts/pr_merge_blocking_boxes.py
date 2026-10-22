@@ -5,19 +5,23 @@ Contract (inter `github-best-practices.md` §2.2, adopted by the QBP notifier):
 a reader-list splits sign-off-required from informational boxes.  A task-list box is
 MERGE-BLOCKING when it sits in a *merge-blocking region*, which starts at either
 
-  * a line whose text contains "sign-off required" or "merge-blocking"
-    (e.g. "Sign-off required (merge-blocking):"), or
+  * a LABEL line that starts with "sign-off required" or "merge-blocking" after any
+    heading/emphasis/blockquote marks (e.g. "Sign-off required (merge-blocking):",
+    "## Sign-off required (merge-blocking)", "**Merge-blocking:**"), or
   * an HTML sentinel `<!-- merge-blocking -->`,
 
-and ends at the next markdown heading (`#`…), the next region opener of the
-other kind (a line containing "informational" or "non-blocking", or a
-`<!-- /merge-blocking -->` / `<!-- informational -->` sentinel), or a blank line
-followed by a non-list line.  Everything outside such a region is informational
-and never counted.
+and ends at the next markdown heading that is not itself such a label, a label
+line starting with "informational" or "non-blocking", a `<!-- /merge-blocking -->`
+/ `<!-- informational -->` sentinel, or a blank line followed by a non-list line.
+Everything outside such a region is informational and never counted.  A prose
+sentence that merely mentions the words ("this is not merge-blocking") opens
+nothing.
 
-Box states: `- [x]` / `- [X]` ticked; `- [ ]` unticked.  An unticked box whose
-text is struck through (`~~…~~`) or carries the nil mark `⊘` is a deliberately
-nil'd option (QBP convention), not undone work, and is NOT counted as unticked.
+Box states: `- [x]` / `- [X]` ticked; `- [ ]` unticked.  An unticked box that
+carries the nil mark `⊘`, or whose WHOLE text is struck through (`~~…~~`), is a
+deliberately nil'd option (QBP convention `- [ ] ~~option~~ ⊘ reason`), not undone
+work, and is NOT counted as unticked.  A struck fragment inside a live ask stays
+unticked.
 
 This module is the ONE parser shared by (a) the notifier's nudge state and
 (b) the future required check (PR B, gated on the §7 beekeeper ruling).  It
@@ -39,9 +43,19 @@ BOX_RE = re.compile(r"^\s*[-*+]\s+\[(?P<mark>[ xX])\]\s*(?P<text>.*)$")
 HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s")
 OPEN_SENTINEL = re.compile(r"<!--\s*merge-blocking\s*-->", re.I)
 CLOSE_SENTINEL = re.compile(r"<!--\s*(/merge-blocking|informational)\s*-->", re.I)
-OPEN_WORDS = re.compile(r"sign-?off\s+required|merge-blocking", re.I)
-CLOSE_WORDS = re.compile(r"informational|non-blocking", re.I)
-NIL_RE = re.compile(r"~~.*~~|⊘")
+# Word openers/closers are LABEL LINES: after stripping markdown emphasis, heading
+# marks and blockquote marks, the line must START with the phrase (G2: a prose
+# sentence such as "This is not merge-blocking." never opens a region). The HTML
+# sentinel form is preferred and is unambiguous.
+_LABEL_PREFIX = r"^[\s#>*_`]*"
+OPEN_WORDS = re.compile(
+    _LABEL_PREFIX + r"(sign[- ]?off\s+required|merge-blocking)\b", re.I
+)
+CLOSE_WORDS = re.compile(_LABEL_PREFIX + r"(informational|non-blocking)\b", re.I)
+# A box is NIL (a deliberately unselected option, not undone work) when it carries
+# the nil mark ⊘, or when its WHOLE text is struck through. A struck fragment inside
+# a live ask ("@a — ~~old~~ still owed") stays unticked (G3).
+NIL_RE = re.compile(r"⊘|^~~[^~]*~~\s*$")
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
 
 
@@ -66,7 +80,9 @@ def parse(body: str):
             continue
         stripped = line.strip()
         if HEADING_RE.match(line):
-            in_region = False
+            # A heading ends the previous region; a heading that IS the §2.2 label
+            # ("## Sign-off required (merge-blocking)") opens a new one (G1).
+            in_region = bool(OPEN_WORDS.search(line)) and not CLOSE_WORDS.search(line)
             prev_blank = False
             continue
         if CLOSE_SENTINEL.search(line):
@@ -80,7 +96,7 @@ def parse(body: str):
         m = BOX_RE.match(line)
         if m is None:
             # a region opener / closer in prose (not itself a box line)
-            if OPEN_WORDS.search(line) and not CLOSE_WORDS.search(line):
+            if OPEN_WORDS.search(line):
                 in_region = True
             elif CLOSE_WORDS.search(line):
                 in_region = False

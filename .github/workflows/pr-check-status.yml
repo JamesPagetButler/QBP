@@ -341,7 +341,7 @@ jobs:
               BODY=$(printf '%s\n## 🟡 CI GREEN — %s merge-blocking sign-off box(es) unticked — NOT yet merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n**Open sign-off boxes (github-best-practices §2.2; the hand that owns each box ticks it — the notifier never does):**\n%s\n\nIf a posted APPROVE comment already covers a box, cite it and tick the box (auto-nudge, not auto-tick; #507 §4). Mergeable: `%s`.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
                 "$MARKER" "$NUNTICKED" "$TOTAL" "$TS" "$SHA" "$FRESH" "$UNTICKED_LIST" "$MERGEABLE")
             else
-              BODY=$(printf '%s\n## ✅ ALL GREEN — merge-ready pending beekeeper — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\nMergeable: `%s` (§6: merge-ready means one-click). No unticked merge-blocking sign-off boxes (§2.2 regions; §4).\n\nMachine-posted; canonical "CI green" evidence link (evidence-first rule, `docs/workflows/review_tiers.md`). Merge remains the beekeeper'"'"'s call.' \
+              BODY=$(printf '%s\n## ✅ ALL GREEN — merge-ready pending beekeeper — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\nMergeable: `%s` (§6: merge-ready means one-click). No unticked merge-blocking sign-off boxes DETECTED in §2.2 regions (label line or `<!-- merge-blocking -->` sentinel; §4 — a body using neither form is not parsed).\n\nMachine-posted; canonical "CI green" evidence link (evidence-first rule, `docs/workflows/review_tiers.md`). Merge remains the beekeeper'"'"'s call.' \
                 "$MARKER" "$TOTAL" "$TS" "$SHA" "$FRESH" "$MERGEABLE")
             fi
           fi

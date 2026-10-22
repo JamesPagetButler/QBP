@@ -137,6 +137,46 @@ def test_cli_strict_clean_exit_zero():
     assert rc == 0, out
 
 
+# ── Red Team round 1 (PR #731) regression cases ───────────────────────────────
+def test_url_ending_in_json_is_not_a_fixture_path():  # G9
+    f = m.lint_oracle("oracle run: https://gist.github.com/x/pred.json @ 1a2b3c4d\n")
+    assert len(f) == 1 and "fixture/config path" in f[0], f
+
+
+def test_workflow_yml_token_is_not_a_fixture_path():  # G9 (how #731's own body passed)
+    f = m.lint_oracle("oracle evidence in pr-process-lints.yml run 1a2b3c4d\n")
+    assert len(f) == 1 and "fixture/config path" in f[0], f
+
+
+def test_decimal_run_id_is_not_a_sha():  # G10
+    f = m.lint_oracle("oracle run 39845576520 — tests/fixtures/pred.json\n")
+    assert len(f) == 1 and "pinned commit sha" in f[0], f
+
+
+def test_hex_word_is_not_a_sha():  # G10
+    f = m.lint_oracle("oracle report deadbee — tests/fixtures/pred.json\n")
+    assert len(f) == 1 and "pinned commit sha" in f[0], f
+
+
+def test_real_sha_and_repo_path_pass():
+    assert (
+        m.lint_oracle("oracle run @ 38a193c against tests/fixtures/pred.json\n") == []
+    )
+    assert (
+        m.lint_oracle("oracle output: analysis/543/report.json, pinned e6d00ffd2cf7\n")
+        == []
+    )
+
+
+def test_verdict_bullet_form_counts_as_headline():  # G12
+    assert (
+        m.lint_title(
+            "proves X", "- **Verdict:** PROVED as stated", {"tier-3-review"}, []
+        )
+        == []
+    )
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

@@ -127,6 +127,45 @@ def test_never_edits_anything():
     )
 
 
+# ── Red Team round 1 (PR #731) regression cases ───────────────────────────────
+def test_heading_form_opener_counts_boxes():  # G1 (BLOCKING)
+    body = "## Sign-off required (merge-blocking)\n- [ ] @a\n- [x] @b\n\n## Informational\n- [ ] @c\n"
+    r = m.parse(body)
+    assert r["unticked"] == ["@a"] and r["ticked"] == ["@b"], r
+
+
+def test_prose_mention_does_not_open_region():  # G2
+    body = "Not merge-blocking: FYI.\n- [ ] informational\nThis is not merge-blocking either.\n- [ ] also informational\n"
+    r = m.parse(body)
+    assert r == {"ticked": [], "unticked": [], "nil": []}, r
+
+
+def test_bold_label_line_opens_region():  # G2 (label forms)
+    body = "**Merge-blocking:**\n- [ ] @a\n"
+    assert m.parse(body)["unticked"] == ["@a"]
+
+
+def test_struck_fragment_in_live_ask_stays_unticked():  # G3
+    body = "Sign-off required (merge-blocking):\n- [ ] @a — ~~old~~ still owed\n- [ ] ~~whole option struck~~\n- [ ] ~~x~~ ⊘ reason\n"
+    r = m.parse(body)
+    assert r["unticked"] == ["@a — ~~old~~ still owed"], r
+    assert len(r["nil"]) == 2, r
+
+
+def test_sign_off_spelling_variants():
+    for label in (
+        "Sign off required:",
+        "Signoff required:",
+        "Sign-off required (merge-blocking):",
+    ):
+        assert m.parse(label + "\n- [ ] @a\n")["unticked"] == ["@a"], label
+
+
+def test_heading_informational_closes_region():
+    body = "## Sign-off required (merge-blocking)\n- [ ] @a\n## Informational readers (non-blocking)\n- [ ] @b\n"
+    assert m.parse(body)["unticked"] == ["@a"]
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
