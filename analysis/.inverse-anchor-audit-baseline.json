@@ -56,6 +56,7 @@
     "proofs/QBP/Substrate/RuleFlow.lean": 168,
     "proofs/QBP/Substrate/RuleFlowBridge.lean": 5,
     "proofs/QBP/Substrate/RuleFlowInvariants.lean": 82,
+    "proofs/QBP/Substrate/RuleFlowLeafFoliation.lean": 18,
     "proofs/QBP/Units/Constants.lean": 9,
     "proofs/QBP/Units/ScaleFactors.lean": 14,
     "proofs/Sprint12-Inherited/Bi2Se3.lean": 6,

@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.18.0",
+  "version": "6.19.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -12338,6 +12338,102 @@
           "producer": "notary-implementor"
         }
       ]
+    },
+    {
+      "id": "PROOF-rule-field-in-kernel-algebra-leaf-foliation",
+      "name": "For every sedenion s the rule field RuleFlow.ruleField(s) lies in the host kernel algebra 𝕆_s (Theorem 1, unconditional, closing the pointwise gap from ∇V(s) ∈ 𝕆_s at #690 via (∇V s)₀ = 0); for a fixed seed s₀, gradV, ruleField and ONE RK4 stage preserve the fixed leaf 𝕆_{s₀} by subalgebra closure (Theorem 2); cdLo/cdHi(∇V s) = the 2-plane double-commutator closed forms in span{gramLo s, gramHi s} (Theorem 3); and the 5D leaf lift liftLeaf intertwines gradV for an orthonormal imaginary 2-frame (Theorem 4). ONE-STAGE closure, NOT trajectory invariance — the #688 leaf-invariance row stays open; liftLeaf_ruleField_eq / liftLeaf_rk4Step_eq, a multi-step iterate and an Euler step are NOT proved. Pointwise / single-step in s; nothing about the continuous flow.",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "proofs/QBP/Substrate/RuleFlowLeafFoliation.lean (Substrate layer, namespace QBP.Substrate.RuleFlowLeafFoliation; imports QBP.Substrate.RuleFlowBridge (#690) and QBP.Substrate.RuleFlowInvariants (#635)). The eight headline theorems, each kernel-checked with #print axioms ⊆ {propext, Classical.choice, Quot.sound}, 0 sorry, 0 native_decide: `ruleField_mem_kernelAlgebra` (Theorem 1) — ∀ s : CDAlg ℝ 4, InFlightAlgebra.InKernelAlgebra s (RuleFlow.ruleField s), no hypothesis; closes the gap from #690's ∇V(s) ∈ 𝕆_s to the full tangent rule field using (∇V s)₀ = 0 (RuleFlowInvariants.gradV_coord_zero). `gradV_mem_fixed_leaf`, `ruleField_mem_fixed_leaf`, `rk4Stage_mem_fixed_leaf` (Theorem 2) — for a FIXED seed s₀, x ∈ 𝕆_{s₀} ⇒ gradV x, ruleField x and one explicit RK4 stage stay in 𝕆_{s₀}, by closed-subalgebra closure (inQuatSpanOct_mul / _conj), no ODE/Grassmannian machinery. `octonion_double_comm_pure`, `cdLo_gradV_eq_plane_comb`, `cdHi_gradV_eq_plane_comb` (Theorem 3) — the 2-plane double-commutator identity, structural (cdAlg_sq_eq, cdAlg_mul_add_swap_pure, octonion_alternative, octonion_flexible; zero decide/native_decide): for a = gramLo s, c = gramHi s, cdLo(∇V s) = (8·N c)•a − (8·bil a c)•c and cdHi(∇V s) = (8·N a)•c − (8·bil a c)•a, so ∇V(s) stays in span_ℝ{a, c}. `liftLeaf_gradV_eq` (Theorem 4) — the CASH P4 intertwining: for an orthonormal imaginary octonion 2-frame (u₁, u₂) (N u₁ = N u₂ = 1, bil u₁ u₂ = 0) the 5D leaf lift liftLeaf u₁ u₂ q intertwines gradV. SCOPE (record-level, oppenheimer theory-axis): ONE-stage closure, NOT trajectory invariance — the #688 leaf-invariance row stays ARGUMENT; the header names inKernelAlgebra_fixed_leaf / rk4Step_mem_fixed_leaf / liftLeaf_ruleField_eq / liftLeaf_rk4Step_eq and an 'Euler step by induction' have NO Lean statement in the module (only one RK4 stage and liftLeaf for gradV). derived_from: PROOF-rule-gradient-lies-in-host-kernel-algebra (#690, the ∇V(s) ∈ 𝕆_s result Theorem 1 builds on; Substrate → Substrate). NOT claimed: the rule itself (POSTULATE #635); existence/uniqueness of integral curves (FLAG-rule-flow-open); invariance of 𝕆_s along a CONTINUOUS trajectory (the closure results are about explicit discrete updates, not the flow); the reverse inclusion ker Δ(s) ⊆ 𝕆_s; the leaf space G₂/SO(4); the anneal or the endpoint. PA (pa_local/pa_effective) computed by the encoder, never typed: 0/0, ungraded — no Notary proof-assistant evidence recorded for this anchor yet (QBP#710 'ungraded' state), as for the rest of the verified-but-ungraded corpus.",
+      "proof_file": "proofs/QBP/Substrate/RuleFlowLeafFoliation.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Substrate.RuleFlowLeafFoliation.ruleField_mem_kernelAlgebra",
+      "lean_companion_theorems": [
+        "QBP.Substrate.RuleFlowLeafFoliation.gradV_mem_fixed_leaf",
+        "QBP.Substrate.RuleFlowLeafFoliation.ruleField_mem_fixed_leaf",
+        "QBP.Substrate.RuleFlowLeafFoliation.rk4Stage_mem_fixed_leaf",
+        "QBP.Substrate.RuleFlowLeafFoliation.octonion_double_comm_pure",
+        "QBP.Substrate.RuleFlowLeafFoliation.cdLo_gradV_eq_plane_comb",
+        "QBP.Substrate.RuleFlowLeafFoliation.cdHi_gradV_eq_plane_comb",
+        "QBP.Substrate.RuleFlowLeafFoliation.liftLeaf_gradV_eq"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-rule-gradient-lies-in-host-kernel-algebra"
+      ],
+      "foundation_batch": "#697-leaf-foliation",
+      "last_tested_at": "2026-10-22T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-10-22T00:00:00Z",
+        "verifier": "PR #729 (inter#197 step 1), head bd652ec against master a4d4383. run-bounded 8G 1200 /usr/bin/time -v lake env lean QBP/Substrate/RuleFlowLeafFoliation.lean — exit 0, wall 6.06 s, peak RSS 3.49 GiB; lake build --no-build QBP.Substrate = all 3132 targets up-to-date (oleans match worktree sources by trace hash). #print axioms on all 18 theorems (file l.410–430) and the 5 defs ⊆ {propext, Classical.choice, Quot.sound}; grep native_decide/sorry = 0 (3 comment hits only); check_lean_foundations.py exit 0, check_layer_imports.py clean (Substrate→Substrate import, registered in QBP/Substrate.lean). PR #729 Red Team APPROVE (Grothendieck + Knuth; Sabine REQUEST-CHANGES was doc-only, resolved) and qbp-architecture §I4 APPROVE-WITH-CONCERN; CI lake build green. Anchor minted by qbp-implementor; theory axis co-signed by qbp-oppenheimer.",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Substrate.RuleFlowLeafFoliation.ruleField_mem_kernelAlgebra",
+          "QBP.Substrate.RuleFlowLeafFoliation.gradV_mem_fixed_leaf",
+          "QBP.Substrate.RuleFlowLeafFoliation.ruleField_mem_fixed_leaf",
+          "QBP.Substrate.RuleFlowLeafFoliation.rk4Stage_mem_fixed_leaf",
+          "QBP.Substrate.RuleFlowLeafFoliation.octonion_double_comm_pure",
+          "QBP.Substrate.RuleFlowLeafFoliation.cdLo_gradV_eq_plane_comb",
+          "QBP.Substrate.RuleFlowLeafFoliation.cdHi_gradV_eq_plane_comb",
+          "QBP.Substrate.RuleFlowLeafFoliation.liftLeaf_gradV_eq"
+        ]
+      },
+      "theorems": [
+        {
+          "name": "ruleField_mem_kernelAlgebra",
+          "status": "verified"
+        },
+        {
+          "name": "gradV_mem_fixed_leaf",
+          "status": "verified"
+        },
+        {
+          "name": "ruleField_mem_fixed_leaf",
+          "status": "verified"
+        },
+        {
+          "name": "rk4Stage_mem_fixed_leaf",
+          "status": "verified"
+        },
+        {
+          "name": "octonion_double_comm_pure",
+          "status": "verified"
+        },
+        {
+          "name": "cdLo_gradV_eq_plane_comb",
+          "status": "verified"
+        },
+        {
+          "name": "cdHi_gradV_eq_plane_comb",
+          "status": "verified"
+        },
+        {
+          "name": "liftLeaf_gradV_eq",
+          "status": "verified"
+        }
+      ],
+      "pa_local": 0,
+      "pa_effective": 0
     }
   ],
   "inputs": [
@@ -12959,9 +13055,14 @@
       "version": "6.18.0",
       "date": "2026-10-11T00:00:00Z",
       "note": "#692: PA backfill of 148 proof/derivation anchors (1 records changed) from 4 v2 notary evidence records at pinned master 3b73b248181de9c872d7c73665d6b6ec90ac24a8. Grade distribution (pa_local/pa_effective: count) — 0/0: 145, 1/0: 1, 2/2: 2. pa_local = GradeClaim(...).pa on the anchor's own evidence; pa_effective = EffectivePA over prediction_chain edges typed derivation (conservative); pinned_sha = claim-source manifest hash (S = QBP-local import closure of proof_file ∪ same-repo evidence files; sorted `path blob` lines, git hash-object --stdin; architecture rulings seq 2299/2394), not stored. Computed by tools/cth-pa (confluent-trust/internal/pa@13de2f728707cd4431e0116126c530247f132158); never hand-set — a wrong grade is fixed by new or corrected evidence in inter/notary-evidence/, never by editing the ledger (QBP#692 AC1/AC2/AC4). proof_assistants arrays only on provenance_kind proof/derivation anchors WITH evidence; internal-compute anchors (PROOF-hessian) carry grades only (cth ruling 2026-10-02)."
+    },
+    {
+      "version": "6.19.0",
+      "date": "2026-10-22T00:00:00Z",
+      "note": "#697 / inter#197 step 1 / PR #729: PROOF-rule-field-in-kernel-algebra-leaf-foliation minted (Substrate) — the CTH anchor for proofs/QBP/Substrate/RuleFlowLeafFoliation.lean, citing its eight headline theorems (ruleField_mem_kernelAlgebra; gradV/ruleField/rk4Stage_mem_fixed_leaf; octonion_double_comm_pure, cdLo/cdHi_gradV_eq_plane_comb; liftLeaf_gradV_eq), all kernel-checked, axioms ⊆ {propext, Classical.choice, Quot.sound}, 0 sorry, 0 native_decide. derived_from PROOF-rule-gradient-lies-in-host-kernel-algebra (#690: Theorem 1 closes the gap from ∇V(s) ∈ 𝕆_s to the full rule field). Scope: one-stage closure, NOT trajectory invariance — the #688 leaf-invariance row stays ARGUMENT; liftLeaf_ruleField_eq / liftLeaf_rk4Step_eq / multi-step / Euler NOT proved. PA 0/0 (ungraded — no Notary evidence yet, QBP#710). Manifest entry added; inverse-anchor baseline bumped in the same commit so the 18 theorems are no longer orphans. Mint-only — no existing anchor, root, principle, decision or kill touched. (Version 6.19.0: encoded on 6.18.0.)"
     }
   ],
-  "last_updated": "2026-10-11T00:00:00Z",
+  "last_updated": "2026-10-22T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
