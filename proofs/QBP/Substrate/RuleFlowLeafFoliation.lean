@@ -4,6 +4,13 @@ import QBP.Substrate.RuleFlowInvariants
 /-!
 # QBP.Substrate.RuleFlowLeafFoliation — Fixed-Leaf Closure, the 2-Plane Identity, and CASH P4 Intertwining
 
+> **Read this first.** The numbered list below is the source document's own header, kept
+> as written except for the bracketed `[editorial: …]` notes.  Several theorem names it
+> uses (`inKernelAlgebra_fixed_leaf`, `rk4Step_mem_fixed_leaf`, `liftLeaf_ruleField_eq`,
+> `liftLeaf_rk4Step_eq`) and its "Euler … by induction" clause have **no Lean statement in
+> this module**.  What is actually proved is listed under *Status of the document's four
+> claims* below; that section, not this header, is authoritative.
+
 **Target:** Ready-to-compile Substrate module extending `QBP.Substrate.RuleFlowBridge` (#690)
 and `QBP.Substrate.RuleFlowInvariants` (#635) with the four theorems underwriting the
 **QBP-CU Leaf-Foliated** (`𝕊 → H_s → 𝕊`) execution engine:
@@ -11,12 +18,14 @@ and `QBP.Substrate.RuleFlowInvariants` (#635) with the four theorems underwritin
 1. **Theorem 1 (`ruleField_mem_kernelAlgebra`)**: Closes the pointwise gap from `∇V(s) ∈ 𝕆_s`
 (#690) to the full tangent rule field `RuleFlow.ruleField s ∈ 𝕆_s`, unconditionally for all
 `s : CDAlg ℝ 4` (since `(∇V s)₀ = 0` by `RuleFlowInvariants.gradV_coord_zero`).
-2. **Theorem 2 (`inKernelAlgebra_fixed_leaf` & `rk4Step_mem_fixed_leaf`)**: Generalizes the
+2. **Theorem 2 (`inKernelAlgebra_fixed_leaf` & `rk4Step_mem_fixed_leaf`)** `[editorial: in Lean as
+`gradV_mem_fixed_leaf`, `ruleField_mem_fixed_leaf`, `rk4Stage_mem_fixed_leaf`]`: Generalizes the
 basepoint from moving `s` to a **fixed initial seed `s₀`**. Because `H_{s₀}` is a closed
 subalgebra (`inQuatSpanOct_mul`, `inQuatSpanOct_conj`), `x ∈ 𝕆_{s₀} ⇒ gradV x ∈ 𝕆_{s₀}`
 and `ruleField x ∈ 𝕆_{s₀}` hold by pure subalgebra closure—requiring **zero ODE existence
 or Grassmannian derivative machinery**. Discrete Euler and 4-stage RK4 trajectories stay in
-`𝕆_{s₀}` at every step by induction.
+`𝕆_{s₀}` at every step by induction. `[editorial: not in Lean — only ONE RK4 stage is stated; no
+Euler step, no multi-step iterate.]`
 3. **Theorem 3 (`cdLo_gradV_eq_plane_comb` & `cdHi_gradV_eq_plane_comb`)**: Proves structurally
 (from `cdAlg_sq_eq`, `cdAlg_mul_add_swap_pure`, `octonion_alternative`, and `octonion_flexible`
 — zero `decide`, zero `native_decide`) the exact **2-Plane Double-Commutator Identity**:
@@ -27,11 +36,13 @@ Hence `∇V(s)` has **zero component along `1` and zero component along `a * c`*
 strictly inside the 2D plane `span_ℝ{a, c} ⊂ Im H_s`. (This last sentence is a prose
 corollary of the two identities above, read off from the right-hand sides; it is not a
 separate Lean statement in this module.)
-4. **Theorem 4 (`liftLeaf_gradV_eq`, `liftLeaf_ruleField_eq`, `liftLeaf_rk4Step_eq`)**:
+4. **Theorem 4 (`liftLeaf_gradV_eq`, `liftLeaf_ruleField_eq`, `liftLeaf_rk4Step_eq`)** `[editorial:
+only `liftLeaf_gradV_eq` is in Lean; the other two names have no statement in this module]`:
 Proves the **CASH P4 Lossless Intertwining Theorem** for the QBP-CU Leaf-Foliated engine:
 for any orthonormal imaginary octonion 2-frame `(u₁, u₂)` (`N u₁ = 1`, `N u₂ = 1`,
 `bil u₁ u₂ = 0`), lifting a 5D leaf state `q = (a₁, a₂, c₁, c₂, b₀)` to `𝕊 = CDAlg ℝ 4`
-via `liftLeaf u₁ u₂ q` intertwines `gradV`, `ruleField`, and `rk4Step` identically.
+via `liftLeaf u₁ u₂ q` intertwines `gradV`, `ruleField`, and `rk4Step` identically. `[editorial:
+proved for `gradV` only.]`
 
 Completeness target: zero `sorry`, zero `native_decide`, axioms ⊆ `{propext, Classical.choice, Quot.sound}`.
 ## Provenance
@@ -39,7 +50,8 @@ Completeness target: zero `sorry`, zero `native_decide`, axioms ⊆ `{propext, C
 From the beekeeper's MDCU document ("The Case for the Multi-Dimensional Compute Unit",
 §4 "Ready-to-Compile Lean 4 Module"), 2026-10-17, Gemini & QBP/Edda collaboration; written
 against QBP head `2b9e5d2`.  Built by qbp-oppenheimer for inter#197 step 1 against master
-`a4d4383`.  The text above this section is the document's own header, kept verbatim; every
+`a4d4383`.  The text above this section is the document's own header, kept as written apart from the
+leading *Read this first* note and the bracketed `[editorial: …]` notes; every
 theorem *statement* below is the document's, unchanged.  Changes are confined to proofs, to
 the `noncomputable` marker on `rk4Stage` (its body is unchanged; it uses `Real.sqrt` and
 `ruleField`), and to one added helper lemma (`comm_eq_gram_comm`).
@@ -183,6 +195,13 @@ sphere after each sub-step and at the end (the discrete integrator of the QBP-CU
 The leaf-closure statement for this stage is `rk4Stage_mem_fixed_leaf` below; no Euler
 step is defined in this module. -/
 noncomputable def rk4Stage (x : CDAlg ℝ 4) (h : ℝ) : CDAlg ℝ 4 :=
+  -- Modelling caveat (Gemini review, PR #729): each renormalisation is `(N y)⁻¹.sqrt • y`
+  -- with NO hypothesis `N y ≠ 0`.  In Lean `(0 : ℝ)⁻¹ = 0`, so if an intermediate `y`
+  -- is the zero vector the stage silently returns `0` instead of a unit vector.  This is
+  -- harmless for `rk4Stage_mem_fixed_leaf` (`0 ∈ 𝕆_{s₀}`, and `•` preserves membership
+  -- whatever the scalar), but it means the definition papers over a `y = 0` singularity
+  -- of the engine's integrator; a unit-sphere statement about `rk4Stage` would need
+  -- `N y ≠ 0` at every sub-step as an explicit hypothesis.  Not claimed here.
   let k1 := ruleField x
   let x2 := (N (x + (h / 2) • k1))⁻¹.sqrt • (x + (h / 2) • k1)
   let k2 := ruleField x2
@@ -343,7 +362,12 @@ orthonormal imaginary 2-frame `(u₁, u₂)` in `𝕆 = CDAlg ℝ 3`. -/
 def liftLeaf (u1 u2 : CDAlg ℝ 3) (q : LeafState) : CDAlg ℝ 4 :=
   loOf (q.a1 • u1 + q.a2 • u2) + hiOf (q.b0 • (1 : CDAlg ℝ 3) + q.c1 • u1 + q.c2 • u2)
 
-/-- Leaf potential `V_leaf(q) = 4 * (a₁ c₂ - a₂ c₁)^2`. -/
+/-- Leaf potential `V_leaf(q) = 4 * (a₁ c₂ - a₂ c₁)^2`.
+
+OPEN (no theorem in this module): the intertwining `Hosting.potential (liftLeaf u₁ u₂ q) =
+potentialLeaf q` is named in the document's header but has no Lean statement here.  The
+definition is kept because it is the document's and the chart is the engine's interface;
+stating the theorem is a new statement and so a beekeeper decision (inter#197). -/
 def potentialLeaf (q : LeafState) : ℝ :=
   4 * (q.a1 * q.c2 - q.a2 * q.c1) ^ 2
 
@@ -356,7 +380,11 @@ def gradVLeaf (q : LeafState) : LeafState :=
     c2 := 8 * det * q.a1
     b0 := 0 }
 
-/-- Leaf tangent rule field `F_leaf(q) = 4 V_leaf(q) • q - gradVLeaf(q)`. -/
+/-- Leaf tangent rule field `F_leaf(q) = 4 V_leaf(q) • q - gradVLeaf(q)`.
+
+OPEN (no theorem in this module): `ruleField (liftLeaf u₁ u₂ q) = liftLeaf u₁ u₂ (ruleFieldLeaf q)`
+(the document's `liftLeaf_ruleField_eq`) is not stated.  Only the gradient intertwining
+`liftLeaf_gradV_eq` is proved.  Kept for the same reason as `potentialLeaf`. -/
 def ruleFieldLeaf (q : LeafState) : LeafState :=
   let v4 := 4 * potentialLeaf q
   let g := gradVLeaf q
