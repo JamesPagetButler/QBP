@@ -1,5 +1,9 @@
 # Kill-attack 5 — the condensed/Ext¹ route to Prop 13(b)
 
+> **Route status (ruling 2026-09-25, PR #680): OPEN — `FLAG-locale-forcing-route-reopened`.** In this
+> note, "kill" and "the kill survives" refer to the kill's **conclusion** (Prop 13(b) is *not* delivered
+> via the condensed/Ext¹ route), **not** to the route's status, which the ruling reopened. (#683, RT N3.)
+
 **Target.** `KILLED-locale-forcing-route`, reversal clause **Prop 13(b)**: *"a mechanism
 that supplies the dynamical rule from topological or measure-theoretic data."*
 **Vehicle.** The ledger's own surviving candidate `CONJ-condensed-math-for-transition-state`
