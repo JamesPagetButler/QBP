@@ -26,7 +26,7 @@ name: PR Process Lints
 
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+    types: [opened, edited, synchronize, reopened]   # labeled/unlabeled dropped (noise — Gemini NIT); `edited` kept: the body is the review object
 
 permissions:
   contents: read
@@ -49,6 +49,10 @@ jobs:
                     --paginate --jq '.[].filename')
           n_api=$(printf '%s\n' "$files" | grep -c . || true)
           n_pr=$(gh pr view "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" --json changedFiles --jq .changedFiles)
+          if [ "$n_pr" -gt 3000 ]; then
+            echo "::warning::PR has $n_pr changed files; the files API caps at 3000 — enumeration incomplete, drift lint forced ON"
+            echo "changed=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
           if [ "$n_api" != "$n_pr" ]; then
             echo "::error::changed-file enumeration mismatch (api=$n_api, pr=$n_pr) — failing closed"; exit 1
           fi
@@ -92,7 +96,9 @@ jobs:
           gh api "repos/$REPO/pulls/$PR/files?per_page=100" --paginate --jq '.[].filename' > /tmp/changed.txt
           n_api=$(grep -c . /tmp/changed.txt || true)
           n_pr=$(gh pr view "$PR" --repo "$REPO" --json changedFiles --jq .changedFiles)
-          if [ "$n_api" != "$n_pr" ]; then
+          if [ "$n_pr" -gt 3000 ]; then
+            echo "::warning::PR has $n_pr changed files; the files API caps at 3000 — theory-path detection may be incomplete (label still applies)"
+          elif [ "$n_api" != "$n_pr" ]; then
             echo "::error::changed-file enumeration mismatch (api=$n_api, pr=$n_pr) — failing closed"; exit 1
           fi
       - name: Lint (advisory — add --strict to make blocking; beekeeper's flip)

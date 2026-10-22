@@ -37,7 +37,7 @@ import sys
 
 VERDICT_WORDS = re.compile(
     r"\b(prove[sd]?|establish(?:es|ed)?|confirm(?:s|ed)?|verif(?:y|ies|ied)|"
-    r"demonstrate[sd]?|shows?|falsif(?:y|ies|ied)|refute[sd]?|rules?\s+out)\b",
+    r"demonstrate[sd]?|shows\s+that|falsif(?:y|ies|ied)|refute[sd]?|rules?\s+out)\b",
     re.I,
 )
 VERDICT_HEADLINE = re.compile(
@@ -56,12 +56,13 @@ ORACLE_EVIDENCE = re.compile(
 FIXTURE_PATH = re.compile(
     r"(?<![\w/:.])(tests?|analysis|config|fixtures?|docs|proofs|archive|scripts|verification|results)/[\w./-]+"
 )
-# A pinned sha is 7–40 hex chars containing at least one letter AND one digit (G10):
-# pure decimals (Actions run ids, dates) and hex-looking words ("deadbee") do not count.
-PINNED_SHA = re.compile(
-    r"\b(?=[0-9a-f]{7,40}\b)(?![0-9]+\b)(?![a-f]+\b)[0-9a-f]{7,40}\b"
-)
-STRUCK = re.compile(r"~~.*~~")
+# A pinned sha is 7–40 hex chars that are not a pure decimal (Actions run ids, dates
+# — Red Team G10). An all-letter prefix IS a valid sha prefix (Gemini BLOCKING on
+# PR #731), so it is accepted; the residual false positive — a 7+ letter English word
+# over {a–f} such as "defaced" — is the lesser error and is pinned by a test.
+PINNED_SHA = re.compile(r"\b(?=[0-9a-f]{7,40}\b)(?![0-9]+\b)[0-9a-f]{7,40}\b")
+STRUCK = re.compile(r"~~[^~]*~~")
+NIL_MARK = "⊘"
 
 
 def is_theory_bearing(labels, changed):
@@ -91,9 +92,11 @@ def lint_oracle(body):
     """§2: return a list of finding strings for oracle citations without an in-repo pinned premise."""
     findings = []
     lines = (body or "").splitlines()
-    for i, line in enumerate(lines):
-        if STRUCK.search(line):
-            continue  # a ⊘/struck line is a nil'd option, not a citation
+    for i, raw in enumerate(lines):
+        if NIL_MARK in raw:
+            continue  # a ⊘ line is a nil'd option, not a citation
+        # struck FRAGMENTS are removed, the rest of the line is still checked (Gemini S-F)
+        line = STRUCK.sub(" ", raw)
         if not (ORACLE_LINE.search(line) and ORACLE_EVIDENCE.search(line)):
             continue
         window = "\n".join(lines[i : i + 3])

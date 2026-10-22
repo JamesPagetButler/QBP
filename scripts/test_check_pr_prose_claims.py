@@ -153,9 +153,24 @@ def test_decimal_run_id_is_not_a_sha():  # G10
     assert len(f) == 1 and "pinned commit sha" in f[0], f
 
 
-def test_hex_word_is_not_a_sha():  # G10
-    f = m.lint_oracle("oracle report deadbee — tests/fixtures/pred.json\n")
-    assert len(f) == 1 and "pinned commit sha" in f[0], f
+def test_all_letter_sha_prefix_is_accepted():  # Gemini BLOCKING (reverses half of G10)
+    assert m.lint_oracle("oracle report @ abcdefa — tests/fixtures/pred.json\n") == []
+    # known residual false positive, accepted as the lesser error:
+    assert m.lint_oracle("oracle report defaced — tests/fixtures/pred.json\n") == []
+
+
+def test_struck_fragment_does_not_hide_a_live_oracle_claim():  # Gemini SHOULD-FIX
+    f = m.lint_oracle("~~old note~~ oracle run output attached below\n")
+    assert len(f) == 1, f
+
+
+def test_nil_marked_oracle_line_ignored():
+    assert m.lint_oracle("- [ ] ~~Differential oracle~~ ⊘ N/A, no oracle run\n") == []
+
+
+def test_shows_up_is_not_a_verdict_word():  # Gemini NIT
+    assert m.lint_title("fix: shows up twice in CI", "", {"tier-3-review"}, []) == []
+    assert len(m.lint_title("shows that X", "", {"tier-3-review"}, [])) == 1
 
 
 def test_real_sha_and_repo_path_pass():
