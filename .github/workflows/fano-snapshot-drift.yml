@@ -56,35 +56,38 @@ jobs:
           # tampered proof fails the build. FanoSnapshotGen imports only those two kernel modules,
           # so there is no other local non-kernel .lean in the trust surface. These inputs are not
           # proven, so a PR could tamper one AND the snapshot to self-defeat the diff; pin them.
-          TRUSTED="scripts/regen_fano_snapshot.sh proofs/FanoSnapshotGen.lean proofs/lakefile.lean proofs/lean-toolchain"
           if [ "${FANO_PRODUCER_REVIEWED}" = "true" ]; then
             echo "::notice::fano-producer-reviewed label present — using the PR's own regen inputs (the change has been reviewed)"
             exit 0
           fi
           # Default (fail-closed, absent label): regenerate with the base branch's inputs, so a
-          # PR cannot reproduce a falsified snapshot by also editing a producer/build-config file.
-          # A no-op when they are unchanged. A legitimate change to any of them needs the
-          # `fano-producer-reviewed` label after review.
+          # PR cannot reproduce a falsified snapshot by editing a producer/build-config file.
           git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF:-master}"
-          for f in $TRUSTED; do
+          # Producer scripts always exist on base → pin them (fail if newly added/renamed).
+          PRODUCERS="scripts/regen_fano_snapshot.sh proofs/FanoSnapshotGen.lean"
+          for f in $PRODUCERS; do
             if git cat-file -e "FETCH_HEAD:$f" 2>/dev/null; then
               git checkout FETCH_HEAD -- "$f"
             else
-              echo "::error::$f is new in this PR (absent on the base) — a new/renamed regen input is a reviewed producer change; add the fano-producer-reviewed label after review"
+              echo "::error::$f is new in this PR (absent on the base) — a new/renamed producer is a reviewed producer change; add the fano-producer-reviewed label"
               exit 1
             fi
           done
-          # Refuse PR-ADDED lake-config files that are absent on the base: the pin only
-          # OVERWRITES existing trusted files, so a newly added lakefile.toml / lake-manifest.json
-          # would survive and `lake` would read it (dependency remap / env hijack). A legitimate
-          # new lake-config file is a reviewed producer change — take the label. (Fail-closed.)
-          for c in proofs/lakefile.toml proofs/lake-manifest.json; do
-            if [ -e "$c" ] && ! git cat-file -e "FETCH_HEAD:$c" 2>/dev/null; then
+          # Lake config files: PIN whichever exist on base (trusted), and REFUSE any that the PR
+          # ADDS (present in the checkout, absent on base) — lake would read a new lakefile.toml /
+          # lake-manifest.json to remap deps / hijack the regen env, and the pin only overwrites
+          # files that exist. Pinning base-present ones future-proofs: a lake-manifest.json later
+          # committed to base is pinned, not silently skipped (Gemini review r3). Fail-closed.
+          CONFIG="proofs/lakefile.lean proofs/lakefile.toml proofs/lean-toolchain proofs/lake-manifest.json"
+          for c in $CONFIG; do
+            if git cat-file -e "FETCH_HEAD:$c" 2>/dev/null; then
+              git checkout FETCH_HEAD -- "$c"
+            elif [ -e "$c" ]; then
               echo "::error::$c was added by this PR (absent on the base) — a new lake-config file can hijack regeneration; it is a reviewed producer change, add the fano-producer-reviewed label"
               exit 1
             fi
           done
-          echo "::notice::regen inputs pinned to origin/${GITHUB_BASE_REF:-master} (trusted): $TRUSTED; no PR-added lake-config present"
+          echo "::notice::regen inputs pinned to origin/${GITHUB_BASE_REF:-master}; producers=[$PRODUCERS]; lake-config pinned-if-present, PR-additions refused"
       - name: Install elan (pinned toolchain from proofs/lean-toolchain)
         run: |
           set -euo pipefail
