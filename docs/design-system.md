@@ -84,6 +84,10 @@ Use the `TEXT` hierarchy from `viz/theme.py` to ensure compliance. Run `python s
 | **Sky** | `#87CEEB` | Openness, possibility | 10.0:1 AAA | 1.5:1 -- |
 | **Ivory** | `#FFFEF0` | Warm labels, accent text | 15.4:1 AAA | 1.1:1 -- |
 
+### Axis colour mappings are aesthetic, not mathematical *(#208 AC3; beekeeper ruling 2026-10-22)*
+
+The X → Terracotta/Clay, Y → Sage, Z → Verdigris/Patina assignments carry **no mathematical content**: they encode nothing about the quaternion basis (i, j, k), the Cayley–Dickson tower, or any QBP structure. They were chosen for the Victorian-mechanical / organic palette story and for WCAG contrast on both backgrounds. Any figure that needs a mathematically meaningful colouring (e.g. imaginary-unit identity, tier, or sign) must say so explicitly in its caption and must not rely on these axis colours to carry that meaning.
+
 ### Academic Axis Colors (Accessible on Dark)
 
 For axis elements on dark backgrounds, use these muted academic tones:

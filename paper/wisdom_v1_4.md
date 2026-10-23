@@ -522,7 +522,7 @@ The composition W-001 × W-002 × W-003 produces a PERSONA: someone who looks at
 
 **Session 13 finding (2026-05-11):** The Chamseddine-Connes-van Suijlekom 2018 paper ("Entropy and the Spectral Action", *Commun. Math. Phys.* 373) proves that the von Neumann entropy of the fermionic second quantisation of a spectral triple equals the spectral action for a *specific* universal test function χ(x) = h(√x), where h(x) = x/(1+eˣ) + log(1+e⁻ˣ) is the Fermi-Dirac vacuum entropy function. T1–T4 mp-arithmetic verification (50 digits) confirms:
 
-1. χ(u) is *not* QBP's f(u) — the function-level identity fails, and rescaling tests give inconsistent values (A = 0.69 from f₀, A = 1.80 from f₂).
+1. χ(u) is *not* QBP's f(u) — the function-level identity fails, and rescaling tests give inconsistent values (A = 0.69 from f₀, A = 1.80 from f₂). *(T1–T4 mp-arithmetic log: `archive/SESSION-13-WORKING-NOTES.md`, tracked — #426.)*
 2. The CCvS coefficients γ(−a) for positive integer a contain the *even-level Cayley-Dickson tower* dim Im 𝒜_(2a) = 2^(2a) − 1 as a numerator factor (𝒜_2 = ℍ at a=1, 𝒜_4 = 𝕊 [sedenions] at a=2, 𝒜_6 [64-dim hypercomplex algebra] at a=3, ...). Note: the even tower skips the odd Cayley-Dickson levels — in particular 𝒜_5 (chingons / trigintaduonions, 32-dim) does *not* appear in the γ(−a) factorisation.
 3. χ and f are different test functions for different observables on the same spectral triple. The spectral action principle (CCvS §1) explicitly allows arbitrary test functions.
 
