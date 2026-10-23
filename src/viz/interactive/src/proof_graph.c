@@ -679,18 +679,20 @@ void graph_viewport_update(ProofGraph *g)
     /* Only handle viewport input when mouse is in graph area */
     if (!CheckCollisionPointRec(mouse, g->view_area)) return;
 
-    /* Mouse wheel: vertical scroll (Shift+wheel for horizontal) */
+    /* Mouse wheel over the graph: ZOOM at the mouse, no modifier needed
+     * (beekeeper HVR 2026-10-22: "scroll should zoom without ctrl").
+     * Ctrl+wheel keeps zooming for muscle memory; Shift+wheel pans
+     * horizontally; vertical pan is middle-drag. The wheel is only read
+     * here, so the info panel never receives wheel events (its text does
+     * not scroll); over the panel the wheel is a no-op. */
     float wheel = GetMouseWheelMove();
     if (wheel != 0) {
-        if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
-            /* Ctrl+wheel = zoom */
-            graph_zoom(g, wheel, mouse);
-        } else if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
+        if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
             /* Shift+wheel = horizontal scroll */
             graph_pan(g, -wheel * 40.0f / g->viewport_zoom, 0);
         } else {
-            /* Wheel = vertical scroll */
-            graph_pan(g, 0, -wheel * 40.0f / g->viewport_zoom);
+            /* Wheel (with or without Ctrl) = zoom, focus at the mouse */
+            graph_zoom(g, wheel, mouse);
         }
     }
 
@@ -1142,8 +1144,18 @@ void graph_draw_step_bar(const ProofGraph *g, Rectangle bar)
 
     int text_w = MeasureTextQBP(buf, 20);
     float cx = bar.x + (bar.width - text_w) / 2;
-    float cy = bar.y + (bar.height - 20) / 2;
+    float cy = bar.y + 9;    /* nudged up from centre to leave room for the legend */
     DrawTextQBP(buf, (int)cx, (int)cy, 20, QBP_TEXT_PRIMARY);
+
+    /* Key legend, visible in normal mode (#741 round 2). Centred under the
+     * title; the Prev/Next buttons own x in [16,136] and [w-136,w-16], so
+     * the legend is drawn only when it fits between them with a margin. */
+    const char *legend = "[P] panel   [O] overview   [R] reset   wheel: zoom   mid-drag: pan";
+    int legend_w = MeasureTextQBP(legend, 11);
+    if (legend_w < bar.width - 2 * 150) {
+        DrawTextQBP(legend, (int)(bar.x + (bar.width - legend_w) / 2),
+                 (int)(bar.y + 36), 11, QBP_TEXT_DIM);
+    }
 
     /* Navigation buttons - larger and more visible */
     Rectangle prev_btn = { bar.x + 16, bar.y + 10, 120, bar.height - 20 };
@@ -1195,8 +1207,8 @@ void graph_toggle_panel(ProofGraph *g, int sw, int sh)
     g->panel_hidden = !g->panel_hidden;
     Rectangle area;
     graph_layout_regions(g, sw, sh, &area, NULL);
-    graph_reset_viewport(g);
     graph_layout(g, area);   /* nodes re-spread into the full width when the panel hides */
+    graph_pan(g, 0, 0);      /* keep the user's zoom + pan; just re-clamp to the new bounds */
 }
 
 void graph_toggle_overview(ProofGraph *g)
