@@ -1207,8 +1207,25 @@ void graph_toggle_panel(ProofGraph *g, int sw, int sh)
     g->panel_hidden = !g->panel_hidden;
     Rectangle area;
     graph_layout_regions(g, sw, sh, &area, NULL);
+
+    /* Keep the user's zoom and the same RELATIVE view. graph_layout() re-spreads
+     * the nodes into the new width (centred on graph_bounds.width/2), so carrying
+     * the raw viewport_x/y over would leave the camera on empty space (Gemini
+     * round-2 BLOCKING). Instead: remember where the view centre sits as a
+     * fraction of the old virtual canvas, re-layout, then map that fraction onto
+     * the new canvas and clamp. graph_bounds always starts at (0,0). */
+    float half_w = g->view_area.width  / g->viewport_zoom * 0.5f;
+    float half_h = g->view_area.height / g->viewport_zoom * 0.5f;
+    float fx = (g->graph_bounds.width  > 0.0f) ? (g->viewport_x + half_w) / g->graph_bounds.width  : 0.5f;
+    float fy = (g->graph_bounds.height > 0.0f) ? (g->viewport_y + half_h) / g->graph_bounds.height : 0.5f;
+
     graph_layout(g, area);   /* nodes re-spread into the full width when the panel hides */
-    graph_pan(g, 0, 0);      /* keep the user's zoom + pan; just re-clamp to the new bounds */
+
+    half_w = g->view_area.width  / g->viewport_zoom * 0.5f;
+    half_h = g->view_area.height / g->viewport_zoom * 0.5f;
+    g->viewport_x = fx * g->graph_bounds.width  - half_w;
+    g->viewport_y = fy * g->graph_bounds.height - half_h;
+    graph_pan(g, 0, 0);      /* clamp to the new bounds; zoom untouched */
 }
 
 void graph_toggle_overview(ProofGraph *g)
