@@ -1176,6 +1176,29 @@ void graph_toggle_angle_highlight(ProofGraph *g)
     g->angle_highlight = !g->angle_highlight;
 }
 
+void graph_layout_regions(const ProofGraph *g, int sw, int sh, Rectangle *graph_area, Rectangle *panel)
+{
+    float panel_w = g->panel_hidden ? 0.0f : (float)QBP_PANEL_WIDTH;
+    float gap     = g->panel_hidden ? 0.0f : 10.0f;
+    float h       = (float)(sh - QBP_TITLE_HEIGHT - QBP_BAR_HEIGHT - 20);
+    if (graph_area) {
+        *graph_area = (Rectangle){ 20, (float)QBP_TITLE_HEIGHT,
+                                   (float)sw - 40 - panel_w - gap, h };
+    }
+    if (panel) {
+        *panel = (Rectangle){ (float)sw - panel_w - 10, (float)QBP_TITLE_HEIGHT, panel_w, h };
+    }
+}
+
+void graph_toggle_panel(ProofGraph *g, int sw, int sh)
+{
+    g->panel_hidden = !g->panel_hidden;
+    Rectangle area;
+    graph_layout_regions(g, sw, sh, &area, NULL);
+    graph_reset_viewport(g);
+    graph_layout(g, area);   /* nodes re-spread into the full width when the panel hides */
+}
+
 void graph_toggle_overview(ProofGraph *g)
 {
     g->overview_mode = !g->overview_mode;
@@ -1306,6 +1329,8 @@ void graph_draw_overview(const ProofGraph *g, Rectangle panel)
 
     /* Controls hint */
     DrawTextQBP("[O] Toggle overview", (int)x, (int)y, 11, QBP_TEXT_DIM);
+    y += 14;
+    DrawTextQBP("[P] Hide/show panel", (int)x, (int)y, 11, QBP_TEXT_DIM);
     y += 14;
     DrawTextQBP("[T] Toggle angle emphasis", (int)x, (int)y, 11, QBP_TEXT_DIM);
 
