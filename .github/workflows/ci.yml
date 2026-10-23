@@ -14,6 +14,7 @@ jobs:
     outputs:
       code: ${{ steps.filter.outputs.code }}
       lean: ${{ steps.filter.outputs.lean }}
+      knowledge: ${{ steps.filter.outputs.knowledge }}
     steps:
       - uses: actions/checkout@v4
 
@@ -31,9 +32,32 @@ jobs:
               - 'requirements.txt'
               - '.pre-commit-config.yaml'
               - '.github/workflows/**'
+            knowledge:
+              - 'knowledge/**'
+              - 'scripts/validate_knowledge.py'
             lean:
               - 'proofs/**'
               - 'libs/**'
+
+  # #737 (re-filed #220 AC4): knowledge-graph validation runs on PRs that touch
+  # knowledge/** or the validator. Separate filter + light job so a knowledge-only
+  # change does not spin up the heavy manim/pytest jobs. Independent of the
+  # criticality-thread CI work (ci.yml untouched since #380) — nothing overwritten.
+  validate-knowledge:
+    name: Validate knowledge graph
+    needs: changes
+    if: needs.changes.outputs.knowledge == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate knowledge base
+        run: python3 scripts/validate_knowledge.py
 
   lint-and-type-check:
     name: Lint & Type Check
@@ -226,6 +250,7 @@ jobs:
     if: always()
     needs:
       - changes
+      - validate-knowledge
       - lint-and-type-check
       - test
       - physics-validation
@@ -237,6 +262,7 @@ jobs:
         run: |
           echo "=== CI Gate Summary ==="
           echo "changes:              ${{ needs.changes.result }}"
+          echo "validate-knowledge:   ${{ needs.validate-knowledge.result }}"
           echo "lint-and-type-check:  ${{ needs.lint-and-type-check.result }}"
           echo "test:                 ${{ needs.test.result }}"
           echo "physics-validation:   ${{ needs.physics-validation.result }}"
@@ -249,6 +275,7 @@ jobs:
           FAILED=false
           for result in \
             "${{ needs.changes.result }}" \
+            "${{ needs.validate-knowledge.result }}" \
             "${{ needs.lint-and-type-check.result }}" \
             "${{ needs.test.result }}" \
             "${{ needs.physics-validation.result }}" \
