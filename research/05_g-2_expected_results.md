@@ -35,3 +35,22 @@ This is an extremely advanced test. Our quaternionic formalism must have a rich 
 *   **Quantitative Goal (Aspirational):** The ultimate goal would be to develop a method to calculate the size of this anomaly within our formalism and show that it matches the first few terms of the QED prediction (e.g., the Schwinger term `α / 2π`).
 
 Achieving the primary goal would be a monumental success. Matching the quantitative value, even approximately, would be a revolutionary achievement for this theoretical framework.
+
+## 5. Prediction Classification
+
+Classification rule (#170 / #736): a row is **Validation** only where this document states that QBP reproduces the standard value; **Novel** only where it states a QBP-specific deviation with a number; otherwise **OPEN**, with the missing statement named. The Notes quote the line relied on.
+
+| Prediction | Type | Standard value (as stated here) | Notes |
+|------------|------|---------------------------------|-------|
+| g is not exactly 2 (g > 2) | OPEN | "`g ≈ 2.002319304...`" (§1) | Stated only as a goal: "Our formalism must naturally predict that the g-factor for a fundamental particle is **not exactly 2**" (§4). Missing: a QBP derivation of the self-interaction correction — no claim here that QBP reproduces it, and no QBP-specific number. |
+| Anomaly aₑ = (g − 2)/2, leading term α/2π | OPEN | "`(g - 2) / 2 ≈ 0.001159652...`" (§1); "the Schwinger term `α / 2π`" (§4) | Stated only as an aspiration: "Quantitative Goal (Aspirational): … show that it matches the first few terms of the QED prediction" (§4). Missing: a QBP-derived value of aₑ to compare against it. |
+
+### Classification Summary
+
+**Validation:** none decidable from this document. It records the QED/experimental ground truth (§1–§3) and the success criteria a QBP model must meet (§4); it does not state that QBP reproduces either quantity above.
+
+**Novel predictions:** none stated. No QBP-specific deviation with a number appears in this document.
+
+### Implications
+
+Both rows are **OPEN**: the classification cannot be made until the Phase 1 ground-truth work (#31) adds the QBP-side derivation of each quantity. A row becomes **Validation** if the document then states that QBP reproduces the standard value, or **Novel** if it states a QBP-specific deviation with a number; the §4 criteria are the gate. Indexed under #170 / #736 — cite, don't assert.

@@ -42,3 +42,23 @@ This is a profound test of our formalism's ability to handle multi-particle, non
 3.  **Violating the Inequality:** The primary success criterion is that the statistical correlations calculated from the simulation results **must violate the CHSH inequality**. The calculated `S` value must be significantly greater than 2 and should approach the quantum-predicted value of `2√2` for the chosen angles.
 
 Successfully modeling the violation of Bell's inequality would demonstrate that our quaternionic framework is not a classical "hidden variable" theory and can correctly reproduce one of the deepest and most counter-intuitive features of quantum reality.
+
+## 5. Prediction Classification
+
+Classification rule (#170 / #736): a row is **Validation** only where this document states that QBP reproduces the standard value; **Novel** only where it states a QBP-specific deviation with a number; otherwise **OPEN**, with the missing statement named. The Notes quote the line relied on.
+
+| Prediction | Type | Standard value (as stated here) | Notes |
+|------------|------|---------------------------------|-------|
+| A two-particle entangled state exists in the quaternionic framework | OPEN | Entangled pairs as the Bell-test source (§2 step 1) | Stated as an unsolved challenge: "Our first, and most significant, theoretical challenge is to define a **two-particle entangled state** within the quaternionic framework" (§4.1). Missing: the QBP construction itself. |
+| CHSH violation: S > 2 | OPEN | "`\|S\| ≤ 2`" — the classical limit (§3) | Stated only as a criterion: "the statistical correlations calculated from the simulation results **must violate the CHSH inequality**" (§4.3). Missing: a QBP-computed S — no claim here that QBP reproduces the violation. |
+| CHSH value at the optimal angles approaches 2√2 | OPEN | "`S` can reach up to `2√2 ≈ 2.828`" (§3) | Stated only as a criterion: "should approach the quantum-predicted value of `2√2` for the chosen angles" (§4.3). Missing: a QBP-computed S at those angles (Validation if it equals 2√2; Novel only if a numbered departure from 2√2 were stated — none is). |
+
+### Classification Summary
+
+**Validation:** none decidable from this document. It records the experimental ground truth (§1–§3) and the success criteria a QBP model must meet (§4); it does not state that QBP reproduces any quantity above.
+
+**Novel predictions:** none stated. No QBP-specific deviation with a number appears in this document.
+
+### Implications
+
+All rows are **OPEN**: the classification cannot be made until the Phase 1 ground-truth work (#23) adds the QBP-side construction and the derived correlations. A row becomes **Validation** if the document then states that QBP reproduces the standard value, or **Novel** if it states a QBP-specific deviation with a number; the §4 criteria are the gate. Indexed under #170 / #736 — cite, don't assert.

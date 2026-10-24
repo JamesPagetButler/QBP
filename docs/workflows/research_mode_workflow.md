@@ -185,6 +185,7 @@ Based on [computational science best practices](https://royalsocietypublishing.o
 **QBP application:**
 - All simulations version-controlled
 - Ground truth documents specify expected results
+- Check first (#170 / #736): before starting any experiment phase, confirm the expected-results doc's `## Prediction Classification` is present and current
 - CI enforces reproducibility
 
 ---

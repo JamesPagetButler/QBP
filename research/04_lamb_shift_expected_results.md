@@ -36,3 +36,22 @@ This is a highly advanced test for our quaternionic formalism. Success requires 
 *   **Quantitative Goal:** The formalism should produce a calculated energy split between these two states that is close to the experimentally observed value of **1057 MHz**.
 
 Successfully predicting a non-zero Lamb Shift would be a major validation of our model's ability to go beyond simple quantum mechanics and incorporate QED-like effects.
+
+## 5. Prediction Classification
+
+Classification rule (#170 / #736): a row is **Validation** only where this document states that QBP reproduces the standard value; **Novel** only where it states a QBP-specific deviation with a number; otherwise **OPEN**, with the missing statement named. The Notes quote the line relied on.
+
+| Prediction | Type | Standard value (as stated here) | Notes |
+|------------|------|---------------------------------|-------|
+| 2S₁/₂ and 2P₁/₂ are not degenerate (2S₁/₂ higher) | OPEN | "The 2S₁/₂ state is slightly *higher* in energy than the 2P₁/₂ state" (§1) | Stated only as a goal: "Our quaternionic model for the hydrogen atom must predict that the 2S₁/₂ and 2P₁/₂ energy levels are **not degenerate**" (§4). Missing: a QBP derivation of the splitting — no claim here that QBP reproduces it, and no QBP-specific number. |
+| Magnitude of the shift ≈ 1057 MHz | OPEN | "≈ 1057 MHz (or 4.37 x 10⁻⁶ eV)" (§1) | Stated only as a target: "The formalism should produce a calculated energy split … close to the experimentally observed value of **1057 MHz**" (§4). Missing: a QBP-derived value to compare against it. |
+
+### Classification Summary
+
+**Validation:** none decidable from this document. It records the QED/experimental ground truth (§1–§3) and the success criteria a QBP model must meet (§4); it does not state that QBP reproduces either quantity above.
+
+**Novel predictions:** none stated. No QBP-specific deviation with a number appears in this document.
+
+### Implications
+
+Both rows are **OPEN**: the classification cannot be made until the Phase 1 ground-truth work (#30) adds the QBP-side derivation of each quantity. A row becomes **Validation** if the document then states that QBP reproduces the standard value, or **Novel** if it states a QBP-specific deviation with a number; the §4 criteria are the gate. Indexed under #170 / #736 — cite, don't assert.
