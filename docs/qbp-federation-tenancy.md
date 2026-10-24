@@ -2,9 +2,9 @@
 
 **The QBP-specific instantiation of the Contextus Tenancy Pattern.** How Contextus + CTH + Wyrd run as a live system for the Quaternion-Based Physics programme, with BMA-the-instance observing.
 
-> **Authoring:** qbp-architecture (Claude Opus 4.7), James Paget Butler (Beekeeper), qbp-implementor (v0.2 revision pass, 2026-05-15)
-> **Date:** 2026-05-15 (v0.2 revision); 2026-05-08 (v0.1 design surface)
-> **Status:** **v0.2 — revision pass post-#81 close; ready for ratification.** R1-R16 review findings applied; BMA Addenda re-scoped to A18-only canonical; Stance vocab updated to reflect Session-13 W-003 revision.
+> **Authoring:** qbp-architecture (Claude Opus 4.7), James Paget Butler (Beekeeper), qbp-implementor (v0.2 revision pass, 2026-05-15), qbp-oppenheimer (v0.3 frame-discipline draft, 2026-10-22)
+> **Date:** 2026-10-22 (v0.3 draft); 2026-05-15 (v0.2 revision); 2026-05-08 (v0.1 design surface)
+> **Status:** **v0.3 — DRAFT for Human Visual Review (QBP #434).** v0.2 content unchanged except §0.2 (this provenance), §1.5, §2.1–2.4 (frame annotations), §2.6 (reference-frame discipline + `Lab` base case), new §8.6 (cross-project asks), §10 item 6 and the footer. Nothing in v0.3 is load-bearing for the first-tenancy daily-batch use case; it becomes load-bearing at Walk (multi-planet tenants, cosmological-source frame discipline, cross-tenant federation). Ratification is the beekeeper's.
 > **Generic pattern:** `~/Documents/Contextus/doc/contextus-tenancy-pattern.md`
 > **First tenant:** QBP
 
@@ -35,6 +35,18 @@ v0.2 incorporates all R-findings from the 2026-05-11 PR #403 review synthesis (q
 - **Operational milestones** (§9) — quantitative AC + observability hooks per R6/A7.
 
 The four BMA Theory Addenda 11/15/16/17 references in v0.1 are removed; v0.2 cites only existing artifacts on disk per the standing anchor rule (`docs/workflows/review_anchoring.md`, PR #413).
+
+### 0.2 v0.3 draft provenance *(QBP #434, 2026-10-22)*
+
+v0.3 answers the gap the beekeeper surfaced at the PR #403 v0.2 Human Visual Review (2026-05-15): §2.6's `BoundingBox4D` carried an **implicit Earth-fixed frame** (lat/lon), and `LabSet` recursed with **no `Lab` base case**. His test case — "a lab directly above Challenger Deep, 11°21′N 142°12′E" — encodes fine, but a lab on Mars, on the ISS, or at JWST's L2 halo does not, and a cosmological source (GRB 250702B, a LIGO source at 1.3 Gly) has no lat/lon at all. Changes, all confined to §1.5, §2.1–2.4 and §2.6:
+
+- **Three coordinate semantics named and separated** (§2.6.1): *observer placement* (where the instrument is), *event locus* (where/when the observed event is), *apparatus identity* (which instrument; provenance, not geometry). v0.2 mixed them inside one `Locale` ADT.
+- **`Frame` ADT** (§2.6.2) and a `frame` field on every geometric subtype; **`inside` dispatches on `Frame`** and refuses cross-frame comparison unless an explicit `transform` is on record (§2.6.4).
+- **`Lab` base case** (§2.6.3) resolving the `LabSet` recursion.
+- **Every v0.2 Locale declares its frame** (§2.1–2.4 annotations; table in §2.6.5).
+- **§1.5** states which frame the S³ Hopf-locale encoding operates in: per-`Frame`, with cross-frame motion as quaternion composition.
+
+Not changed in v0.3: §3.1 scope-node YAML (a `frame` key there is a **Wyrd scope-loader / Contextus config schema change**, tracked as a cross-project ask in §8.6, not edited unilaterally — the §3 schema-lock annotation from v0.2 R3 stands); §4 scouts; §5–§7; §8.1–8.5; §9; §11. Added: §8.6, §10 item 6.
 
 ---
 
@@ -103,6 +115,8 @@ A node enters the Subject axis if **any** of its types matches the Stance; other
 
 This is the bridge between the foundational `qbp:hopf-locale` Type-Node and the Locale geometries in §2. Future cleanup: factor a `pkg/hopf` Go module if multiple scouts re-implement this conversion.
 
+**Which frame does `q ∈ S³` live in? *(v0.3, #434 AC5)*** Per-`Frame` (§2.6.2). A unit quaternion is a rotation, and a rotation is only meaningful relative to a reference triad; the Hopf-locale encoding therefore carries its `Frame` with it: `(frame, q)`. Within one frame it is the canonical pole-free internal representation of orientation/position-direction. Across frames, the conversion is quaternion composition with the on-record frame transform `q_{A→B}` (§2.6.4) — and **which composition depends on what `q` encodes**: if `q` is an *orientation* (a rotation of the frame's triad, the `pointing` attitude of §2.6.3) the frame change is conjugation, `(A, q) ↦ (B, q_{A→B} · q · q_{A→B}*)`; if `q` encodes a *direction* through the v0.2 Hopf map `v ↦ q · v · q*` the frame change is the left action `(A, q) ↦ (B, q_{A→B} · q)` (Red Team G6). The translational part of the transform is applied to `coords` separately — S³ encodes orientation/direction, not displacement, so the transform record carries both. A scout never compares two `(frame, q)` pairs with different frames without composing through a recorded transform; absent one, the comparison is undefined (not false). For `Cosmological` the triad is the ICRS celestial frame (epoch-free; §2.6.2), where the S³ encoding removes the RA/Dec pole singularities at the celestial poles exactly as it removes the (θ, φ) ones on Earth.
+
 ---
 
 ## 2. QBP Locale Set
@@ -111,64 +125,193 @@ Per A18 §2.2, Locale defines spacetime cones in scope. QBP is multi-locale.
 
 ### 2.1 Earth-bound experimental locales
 
-- `ligo:hanford` — LIGO Hanford observatory; gravitational-wave observations
-- `ligo:livingston` — LIGO Livingston
-- `ligo:virgo` — Virgo (Italy)
-- `cascadia:subduction-zone` — lat 39-49 N, lon 122-128 W; ETS event source
-- `nist-boulder:trapped-ion` — NIST Boulder trapped-ion lab
-- `innsbruck:trapped-ion` — Universität Innsbruck trapped-ion lab
-- `oxford:trapped-ion` — Oxford trapped-ion experiments
-- `eth-zurich:trapped-ion` — ETH Zürich trapped-ion experiments
+- `ligo:hanford` — LIGO Hanford observatory; gravitational-wave observations — **frame: `EarthSurface`** *(v0.3)*
+- `ligo:livingston` — LIGO Livingston — **frame: `EarthSurface`**
+- `ligo:virgo` — Virgo (Italy) — **frame: `EarthSurface`**
+- `cascadia:subduction-zone` — lat 39-49 N, lon 122-128 W; ETS event source — **frame: `EarthSurface`** (here the Earth frame is the *event* frame too: the source is the crust itself)
+- `nist-boulder:trapped-ion` — NIST Boulder trapped-ion lab — **`Lab`, frame: `InstrumentLocal { instrument: nist-boulder:trapped-ion }`** (for the **current** Stance set the experiment's data are scored in the register's own axes, so Earth lat/lon is apparatus *provenance* on the `Lab` record, not geometry; a future sidereal-modulation analysis would need an on-record `InstrumentLocal → EarthSurface` transform — design call D9, §2.6.6)
+- `innsbruck:trapped-ion` — Universität Innsbruck trapped-ion lab — **`Lab`, frame: `InstrumentLocal`**
+- `oxford:trapped-ion` — Oxford trapped-ion experiments — **`Lab`, frame: `InstrumentLocal`**
+- `eth-zurich:trapped-ion` — ETH Zürich trapped-ion experiments — **`Lab`, frame: `InstrumentLocal`**
 
 ### 2.2 Astrophysical-data locales
 
-- `jwst:fov` — JWST field-of-view; spectroscopic + imaging
-- `alma:bands` — ALMA observations across bands 3-7
-- `fermi:gbm` — Fermi GBM gamma-ray bursts
-- `chandra:fov` — Chandra X-ray observations
-- `vla:radio` — VLA radio follow-up (per Adelle Goodwin GRB 250702B watch)
-- **`nicer:nicer-fov`** *(new in v0.2 per R13)* — NICER X-ray timing; neutron-star EOS / TOV-limit observations (Stance match: `qbp:cd-tower-zeta-numerator` for EOS-related f(u) moments)
-- **`nustar:fov`** *(new in v0.2 per R13)* — NuSTAR hard X-ray; neutron-star + AGN observations (cross-correlates with `nicer:nicer-fov`)
+- `jwst:fov` — JWST field-of-view; spectroscopic + imaging — **observer frame: `OrbitalReference { platform: JWST, body: Earth-Sun, orbit: L2-halo }`; event frame: `Cosmological`** *(v0.3; the v0.2 `SpacecraftFOV` carried neither)*
+- `alma:bands` — ALMA observations across bands 3-7 — **observer: `EarthSurface`; event: `Cosmological`**
+- `fermi:gbm` — Fermi GBM gamma-ray bursts — **observer: `OrbitalReference { platform: Fermi, body: Earth, orbit: LEO }`; event: `Cosmological`**
+- `chandra:fov` — Chandra X-ray observations — **observer: `OrbitalReference { platform: Chandra, body: Earth, orbit: HEO }`; event: `Cosmological`**
+- `vla:radio` — VLA radio follow-up (per Adelle Goodwin GRB 250702B watch) — **observer: `EarthSurface`; event: `Cosmological`**
+- **`nicer:nicer-fov`** *(new in v0.2 per R13)* — NICER X-ray timing; neutron-star EOS / TOV-limit observations (Stance match: `qbp:cd-tower-zeta-numerator` for EOS-related f(u) moments) — **observer: `OrbitalReference { platform: ISS, body: Earth, orbit: LEO/ISS }`; event: `Cosmological`** *(v0.3)*
+- **`nustar:fov`** *(new in v0.2 per R13)* — NuSTAR hard X-ray; neutron-star + AGN observations (cross-correlates with `nicer:nicer-fov`) — **observer: `OrbitalReference { platform: NuSTAR, body: Earth, orbit: LEO }`; event: `Cosmological`**
 
 ### 2.3 Specific objects under investigation
 
-- `grb:250702b` — three-episode structure follow-up (per ongoing arXiv watch)
+- `grb:250702b` — three-episode structure follow-up (per ongoing arXiv watch) — **`NamedObject`, event frame: `Cosmological` (ICRS RA/Dec; redshift/distance optional)** *(v0.3)*
 - (additional objects added as observation campaigns mature)
 
 ### 2.4 Particle-physics locales *(new in v0.2 per R13)*
 
-- **`cbelsa-taps:bonn`** — CBELSA/TAPS at Universität Bonn; η′ mass shift measurements (Stance match: `qbp:cd-tower-zeta-numerator` algebraic-identity 1/24 = (1/8)(1/3) per `paper/quaternion_physics.md` §VIII / §IX)
-- **`katrin:karlsruhe`** — KATRIN tritium decay; absolute neutrino mass bound (Stance match: future `qbp:neutrino-mass-bound` if a QBP prediction lands)
+- **`cbelsa-taps:bonn`** — CBELSA/TAPS at Universität Bonn; η′ mass shift measurements (Stance match: `qbp:cd-tower-zeta-numerator` algebraic-identity 1/24 = (1/8)(1/3) per `paper/quaternion_physics.md` §VIII / §IX) — **`Lab`, frame: `InstrumentLocal { instrument: cbelsa-taps:bonn }`** *(v0.3)*
+- **`katrin:karlsruhe`** — KATRIN tritium decay; absolute neutrino mass bound (Stance match: future `qbp:neutrino-mass-bound` if a QBP prediction lands) — **`Lab`, frame: `InstrumentLocal { instrument: katrin:karlsruhe }`**
 
 ### 2.5 Time bounds
 
 Default time window: **2024-01-01 to "now"** (rolling). Historical observations enter only if Seam-bypass triggers (e.g., re-analysis of older LIGO data reveals an anomaly).
 
-### 2.6 Locale composition rule
+### 2.6 Locale composition rule *(v0.3: reference-frame discipline + `Lab` base case, QBP #434)*
 
-**Formal predicate (per R2):** Let `Locale` be an algebraic data type with subtypes:
+**v0.2 recap and the two gaps.** v0.2 (per R2) gave `Locale` five subtypes and a per-subtype `inside` predicate. Two gaps surfaced at the v0.2 Human Visual Review: (1) `LabSet` recursed over `Locale` with **no `Lab` base case**, so the six labs of §2.1/§2.4 (four trapped-ion, two particle-physics) were never typed; (2) `BoundingBox4D { lat, lon, … }` carried an **implicit Earth-fixed frame** — correct for the first-tenancy daily-batch, wrong at federation scope (Mars rover sites, ISS/LEO instruments, JWST's L2 halo, and every cosmological source, which has no lat/lon at all). v0.3 fixes both without changing the composition rule's shape.
+
+#### 2.6.1 Three coordinate semantics, kept apart
+
+A QBP observation carries up to three *different* positional facts. v0.2 forced them through one ADT; v0.3 names them:
+
+| Semantics | Question it answers | Typical frame | Where it lives |
+|---|---|---|---|
+| **Observer placement** | where is the instrument that produced this datum? | `EarthSurface`, `OrbitalReference`, `PlanetSurface` | `Locale.observer` |
+| **Event locus** | where/when did the observed event happen? | `Cosmological` for GW/GRB/X-ray sources; `EarthSurface` for Cascadia; `InstrumentLocal` for a trapped-ion register | `Locale.event : Option Frame` on every geometric subtype (§2.6.3); unset ⇒ event frame = observer frame |
+| **Apparatus identity** | which specific instrument/run? | none — provenance, not geometry | `Lab.id`, `SpacecraftFOV.mission`, `NamedObject.id` |
+
+For a ground telescope observing a GRB the observer frame is `EarthSurface` and the event frame is `Cosmological`; for Cascadia both are `EarthSurface`; for a trapped-ion gate both collapse to `InstrumentLocal` and Earth lat/lon is apparatus provenance only. A `Locale` may leave `event` unset when the observer frame *is* the event frame (Cascadia) or when the Locale is apparatus-only (a `Lab`); `eventFrame L = L.event ?? frameOf L` (§2.6.4).
+
+#### 2.6.2 `Frame`
 
 ```
+type Frame =
+  | EarthSurface                                   -- WGS-84 lat/lon/depth (GPS-style); the v0.2 implicit default, now explicit
+  | PlanetSurface     { body: Body }               -- planetocentric lat/lon on another body (Mars: Gale Crater, Jezero)
+  | OrbitalReference  { platform: PlatformId, body: Body, orbit: Orbit }
+                                                   -- a *placement* frame tied to ONE platform's ephemeris (JWST, Fermi, …);
+                                                   -- `body`/`orbit` are descriptive attributes, `platform` is the identity (§2.6.2 e)
+  | InstrumentLocal   { instrument: InstrumentId } -- lab-internal coordinates; opaque to every other frame
+  | Cosmological                                   -- ICRS RA/Dec (+ optional redshift/luminosity distance); ICRS is epoch-free,
+                                                   -- so there is no epoch field (a J2000 *equinox* is a different, older convention)
+
+type Body  = Earth | Mars | Moon | Earth-Sun | …   -- the barycentre/surface the frame is tied to
+type Orbit = L2-halo | LEO | LEO/ISS | HEO | GEO | …
+```
+
+Design notes. *(a)* `EarthSurface` is written out rather than `PlanetSurface { body: Earth }` because it is the one frame with a GPS convention and the one every v0.2 Locale silently assumed; keeping it nominal makes the retrofit (§2.6.5) a one-token change per Locale. *(b)* `InstrumentLocal` is **opaque by default**: no `transform` out of it is on record unless a Stance needs one — for the *current* Stance set none does (trapped-ion data are scored in the register's own axes); whether a future Stance (e.g. a sidereal-modulation analysis) adds one is design call D9, the beekeeper's. *(c)* `Cosmological` has no `Body`: it is the frame events are *in*, never one an observer is *at*. *(d)* Frames are **nominal**, not structural: two `InstrumentLocal { nist-boulder }` values are the same frame; `Earth-Sun L2-halo` is a different frame from `Earth HEO` even though both are "space". *(e)* `OrbitalReference` is keyed on the **platform**, not the orbit class: Fermi and NuSTAR are both `{ Earth, LEO }` but their orbit-relative coordinates need *their own* ephemerides, so they are different frames (`platform` differs). The `body`/`orbit` attributes classify; they do not identify (Red Team G4; design call D5, §2.6.6).
+
+#### 2.6.3 `Locale`, with the `Lab` base case
+
+```
+type Dir(frame)  = a unit 3-vector in `frame`'s triad, carried internally as the S³ encoding
+                   `(frame, q)` of §1.5 via the Hopf map (`q` acts on a fixed reference axis)
+
+type Position = { frame: Frame, coords: Coords(frame), pointing: Option Dir(frame), time: T }
+   -- coords are frame-typed: lat/lon/depth, RA/Dec/z, orbit-relative, lab-local.
+   -- `pointing` (optional) is the attitude/boresight direction in the same frame — what a
+   -- location-to-pointing transform (§2.6.4) fills in.
+
 type Locale =
-  | BoundingBox4D { lat: (φ_min, φ_max), lon: (λ_min, λ_max), depth: (d_min, d_max), time: (t_min, t_max) }
-  | TripleLocale  { locales: [Locale] }                  // §3.1 ligo-network shape
-  | LabSet        { locales: [Locale] }                  // §3.1 trapped-ion-network shape
-  | SpacecraftFOV { mission: String, time: (t_min, t_max) }  // §3.1 jwst-survey shape
-  | NamedObject   { id: String }                         // §2.3 specific-object shape
+  | BoundingBox4D { frame: Frame, box: Box(frame), time: (t_min, t_max), event: Option Frame }   -- v0.2 shape + explicit observer frame + optional event frame
+  | Lab           { id: InstrumentId, institution: String, country: String,
+                    frame: InstrumentLocal { instrument: id }, window: (t_min, t_max),
+                    site: Option BoundingBox4D }                                                 -- NEW base case; `site` = Earth placement as provenance, NOT used by `inside`
+  | TripleLocale  { locales: [Locale], event: Option Frame }                                     -- §3.1 ligo-network shape; one event frame for the whole network
+  | LabSet        { locales: [Lab] }                                                             -- §3.1 trapped-ion-network shape; now non-recursive, base case = Lab
+                                                                                                 -- (field name `locales` kept = the §3.1 YAML key; only the element TYPE narrows)
+  | SpacecraftFOV { mission: String, observer: OrbitalReference, event: Frame, time: (t_min, t_max) } -- §3.1 jwst-survey shape + both frames
+  | NamedObject   { id: String, event: Frame }                                                   -- §2.3 specific-object shape + the frame the object is located in
 ```
 
-The membership predicate dispatches per-subtype:
+`LabSet` now ranges over `Lab`, not `Locale`: the recursion that hid the gap is gone, and a lab network is exactly a set of labs. The YAML key stays `locales:` (§3.1 is schema-locked; S2). v0.2's `TripleLocale` stays recursive on purpose: the LIGO network is three *sites*, each a `BoundingBox4D { EarthSurface, … }`, and the network-level `event: Some Cosmological` is where the GW *source* frame lives (Red Team G1) — v0.2 had no slot for it, which is exactly how the detector and the source got conflated.
+
+#### 2.6.4 `inside`, dispatching on `Frame`
+
+`inside` is **tri-state**: `Some true` / `Some false` / `None` (= undefined — the position and the Locale are not in a comparable frame). v0.2's `Bool` could not say "undefined", so a frame mismatch would have collapsed to a silent `False`; v0.3 makes the third value explicit (Red Team G2).
 
 ```
-inside : Position → Locale → Bool
-inside p (BoundingBox4D b)   = p.lat ∈ b.lat ∧ p.lon ∈ b.lon ∧ p.depth ∈ b.depth ∧ p.time ∈ b.time
-inside p (TripleLocale ts)   = ∃ l ∈ ts. inside p l
-inside p (LabSet ls)         = ∃ l ∈ ls. inside p l
-inside p (SpacecraftFOV s)   = withinFOV(p, s.mission) ∧ p.time ∈ s.time
-inside p (NamedObject n)     = associatedWith(p, n)
+frameOf    : Locale → Frame                       -- the frame a POSITION must be in to be compared with this Locale
+frameOf (BoundingBox4D b)  = b.frame
+frameOf (Lab l)            = l.frame
+frameOf (SpacecraftFOV s)  = s.event               -- a FOV is a region of the sky: compared in the event frame
+frameOf (NamedObject n)    = n.event
+-- composites have no single frame; `inside` recurses instead (below)
+
+eventFrame : Locale → Frame                       -- the frame the observed EVENT is located in
+eventFrame L = L.event ?? frameOf L               -- unset ⇒ same as the observer/placement frame (Cascadia)
+
+inside : Position → Locale → Option Bool
+inside p (BoundingBox4D b)  = if p.frame ≠ b.frame then None else Some (p.coords ∈ b.box ∧ p.time ∈ b.time)
+inside p (Lab l)            = if p.frame ≠ l.frame then None else Some (p.time ∈ l.window)
+inside p (SpacecraftFOV s)  = if p.frame ≠ s.event then None else Some (withinFOV(p, s.mission) ∧ p.time ∈ s.time)
+inside p (NamedObject n)    = if p.frame ≠ n.event then None else Some (associatedWith(p, n))
+inside p (TripleLocale ts)  = anyDefined (map (inside p) ts.locales)
+inside p (LabSet ls)        = anyDefined (map (inside p) ls.locales)
+
+anyDefined : [Option Bool] → Option Bool          -- Some true if any member is Some true; None if ALL are None; else Some false
 ```
 
-**Composition rule:** An observation at position `p` enters if `∃ L ∈ Locales. inside p L`. Outside all → rotated to imaginary by Reciprocal Focus (A18 v0.2 §3).
+`inside p (Lab l)` deliberately reduces to "p is expressed in the lab's own frame, inside its operational window": a `Lab` is an **apparatus** Locale, membership is provenance + time, and there is no spatial test (design call D7, §2.6.6). `anyDefined` keeps the v0.2 `∃` shape for composites while propagating undefinedness honestly: a GW alert in `Cosmological` against the LIGO `TripleLocale` of three `EarthSurface` boxes is `None` for every site — which is the correct answer for *placement*; the alert is matched against the network's **event** frame via `eventInside`, below (Red Team G1/G3; Gemini round for leaves).
+
+**Transforms.** A position in another frame is first moved by an explicit, on-record transform; transforms may change the *kind* of fact (a site + time → a pointing direction), which is why `Position` carries an optional `pointing` (Red Team G5):
+
+```
+transform : Frame → Frame → Option (Position → Position)
+transform F F                                                = Some id          -- every frame to itself (also InstrumentLocal)
+transform EarthSurface            (OrbitalReference {Earth, _}) = Some (ECEF → orbit-relative, platform ephemeris, dated)
+transform (OrbitalReference {JWST, Earth-Sun, L2-halo}) Cosmological = Some (placement + attitude → ICRS pointing; this is what a JWST FOV *is*)
+transform EarthSurface            Cosmological                 = Some (site + UTC + attitude → ICRS pointing; standard astrometry)
+transform (InstrumentLocal _)     G ≠ InstrumentLocal _        = None            -- opaque by default (§2.6.2 b; design call D9)
+transform _                       (InstrumentLocal _)          = None
+transform (PlanetSurface {Mars})  EarthSurface                 = None            -- not needed by any current QBP Stance; add with the tenant that needs it
+
+inside* : Position → Locale → Option Bool          -- `inside` lifted through AT MOST ONE on-record transform (design call D6)
+inside* p L = case inside p L of
+                Some b → Some b
+                None   → case transform p.frame (eventFrame L) of
+                           Some t → eventInside (t p) L   -- compare in the EVENT frame
+                           None   → None
+
+eventInside : Position → Locale → Option Bool      -- the EVENT-SIDE test, every subtype (Gemini round: leaves too, not only the network)
+eventInside p L
+  | p.frame ≠ eventFrame L     = None
+  | L.event is unset           = inside p L        -- event frame = placement frame (Cascadia, Lab): the placement test IS the event test
+  | otherwise, L a leaf        = Some (withinReach(p, L) ∧ p.time ∈ L.time)   -- BoundingBox4D / SpacecraftFOV / NamedObject with a distinct event frame
+  | otherwise, L a composite   = anyDefined (map (eventInside p) L.locales)   -- TripleLocale / LabSet: ∃ member reached
+```
+
+`withinReach(p, L)` is the Locale-specific *event-side* test`withinReach` is the Locale-specific *event-side* test (for LIGO: the source direction is in the network's antenna pattern at `p.time`; for a ground telescope: the pointing is above the horizon) — named here, defined with the tenant's scout, not in this doc.
+
+**Undefined is not `False`.** If `inside* p L = None` for every `L`, the observation is routed to the Reciprocal-Focus imaginary rotation with reason `frame-mismatch`, never silently dropped: a Mars-frame position cannot fall inside a Cascadia box by accident, and an `InstrumentLocal` datum cannot be scored against an Earth bounding box because someone wrote a lat/lon on the lab's record (that lat/lon is `Lab.site`, provenance, invisible to `inside`).
+
+**Composition rule.** Same `∃`-shape as v0.2, with a three-valued core: an observation at position `p` enters if `∃ L ∈ Locales. inside* p L = Some true`; if some `L` gives `Some false` and none gives `Some true`, it is outside (as in v0.2); if every `L` gives `None`, it is **undefined** → rotated to imaginary by Reciprocal Focus (A18 v0.2 §3) with the `frame-mismatch` reason recorded, so a missing transform is visible in the scout logs rather than lost as a non-match.
+
+#### 2.6.5 Retrofit of the v0.2 Locale set (AC4)
+
+| Locale(s) | v0.3 subtype | observer frame | event frame |
+|---|---|---|---|
+| `ligo:hanford`, `ligo:livingston`, `ligo:virgo` | `BoundingBox4D { EarthSurface }` ×3 in a `TripleLocale { event: Some Cosmological }` | `EarthSurface` (sites) | `Cosmological` on the **network** record (GW source; the detector network is the observer, not the locus — v0.2 conflated these) |
+| `cascadia:subduction-zone` | `BoundingBox4D` | `EarthSurface` | `EarthSurface` (same frame: the crust is the source) |
+| `nist-boulder`, `innsbruck`, `oxford`, `eth-zurich` `:trapped-ion` | `Lab` ×4 in a `LabSet` | `InstrumentLocal { lab-id }` | — (apparatus-only; Earth lat/lon = `Lab.site` provenance) |
+| `jwst:fov` | `SpacecraftFOV` | `OrbitalReference { JWST, Earth-Sun, L2-halo }` | `Cosmological` |
+| `alma:bands`, `vla:radio` | `BoundingBox4D { EarthSurface, event: Some Cosmological }` | `EarthSurface` | `Cosmological` |
+| `fermi:gbm` | `SpacecraftFOV` | `OrbitalReference { Fermi, Earth, LEO }` | `Cosmological` |
+| `chandra:fov` | `SpacecraftFOV` | `OrbitalReference { Chandra, Earth, HEO }` | `Cosmological` |
+| `nicer:nicer-fov` | `SpacecraftFOV` | `OrbitalReference { ISS, Earth, LEO/ISS }` | `Cosmological` |
+| `nustar:fov` | `SpacecraftFOV` | `OrbitalReference { NuSTAR, Earth, LEO }` | `Cosmological` |
+| `grb:250702b` | `NamedObject` | — | `Cosmological` (ICRS RA/Dec; z optional) |
+| `cbelsa-taps:bonn`, `katrin:karlsruhe` | `Lab` | `InstrumentLocal` | — (apparatus-only) |
+
+**The beekeeper's test case.** "A lab directly above Challenger Deep, 11°21′N 142°12′E" is `Lab { id, institution, country, frame: InstrumentLocal { id }, window, site: Some (BoundingBox4D { EarthSurface, lat 11.35, lon 142.2, depth 0 }) }`. `inside` sees the lab's own frame only; the Earth point is provenance. The same lab on Mars changes one token — `site: Some (BoundingBox4D { PlanetSurface { Mars }, … })` — and nothing about how its data are scored. A lab on the ISS has `site: Some (BoundingBox4D { OrbitalReference { ISS, Earth, LEO/ISS }, … })`. At JWST there is no lab; the instrument is a `SpacecraftFOV` and its placement is `OrbitalReference { JWST, Earth-Sun, L2-halo }`, which has no surface and therefore no lat/lon — exactly the case v0.2 could not write down.
+
+**What v0.3 does not do.** It does not change §3.1's scope-node YAML: adding a `frame:` key there is a Wyrd scope-loader (Wyrd #33) / Contextus config-schema (Contextus #9) change and is filed as a cross-project ask in §8.6, not edited here (the v0.2 R3 schema-lock stands). It does not implement `transform` — the table above lists which transforms are *on record as needed*; implementations arrive with the tenant that needs them. It does not touch §4 scouts, §5 CTH, or §6 BMA hooks.
+
+#### 2.6.6 Design calls for the Human Visual Review (all contestable; none decided here)
+
+| # | Call made in this draft | Alternative the beekeeper may prefer |
+|---|---|---|
+| D1 | `EarthSurface` kept nominal (not `PlanetSurface { Earth }`) | fold it into `PlanetSurface` |
+| D2 | `InstrumentLocal` opaque by default — no transform out | allow a per-lab recorded transform to `EarthSurface` |
+| D3 | cross-frame mismatch is **undefined → rotated with reason**, not `False` | treat as `False` (v0.2 behaviour, silent) |
+| D4 | `TripleLocale` stays recursive, `LabSet` does not | make both flat, or both recursive |
+| D5 | `OrbitalReference` keyed on **platform** (Fermi ≠ NuSTAR), body/orbit descriptive | key on orbit class and attach the ephemeris elsewhere |
+| D6 | `inside*` lifts through **at most one** on-record transform | allow composable chains (e.g. `InstrumentLocal → EarthSurface → Cosmological`) |
+| D7 | `Lab` membership = own frame + operational window (apparatus-only; no spatial test) | give `Lab` a spatial test via `site` |
+| D8 | QBP proposes a cross-tenant schema **default** (`frame: EarthSurface` for `bounding-box-4d`) to Wyrd/Contextus | propose the key with no default (every config must declare) |
+| D9 | the current Stance set needs no `InstrumentLocal → Earth/ICRS` transform (trapped-ion data scored in register axes) | a sidereal-modulation analysis of `qbp:fidelity-asymmetry-velocity-correlated` would need one — a Stance-contents question, flagged, not decided here |
 
 ---
 
@@ -492,6 +635,15 @@ Day-30 (steady-state):
 
 ---
 
+### 8.6 v0.3 cross-project asks *(QBP #434)*
+
+| Ask | Owner | Why not done here |
+|---|---|---|
+| ⊕ Extend the NT_SCOPE_PHYSICAL geometry schema with optional frame keys (values per §2.6.2): `frame:` + `event:` on `bounding-box-4d` and `triple-locale`; `observer:` (with `platform`, `body`, `orbit`) + `event:` on `spacecraft-fov`; `event:` on named objects; `lab-set` entries become `Lab` records (`frame: instrument-local`, optional `site:`), the `locales:` key unchanged. Proposed default `frame: EarthSurface` for `bounding-box-4d` (preserves every v0.2 config byte-for-byte) — the default itself is design call D8 | Wyrd scope-loader (Wyrd #33) + Contextus config schema (Contextus #9) | §3.1 is schema-locked (v0.2 R3); the fields are theirs to add, QBP's to then populate from §2.6.5 |
+| ⊕ `frame-mismatch` as a named Reciprocal-Focus rotation reason in the scout log schema | Contextus (InsightSignal pipeline, Spec v1.3 §4.4) | the reason code is what makes a missing `transform` visible instead of a silent non-match (§2.6.4) |
+
+---
+
 ## 9. Operational Handoff Milestones (QBP-Specific)
 
 **v0.2 update (per R6 / A7):** each milestone has a quantitative AC + observability hook (the command/query used to detect achievement).
@@ -519,6 +671,7 @@ When all M1–M9 pass, QBP federation tenancy is operational. qbp-implementor sh
 3. **Multi-scope-node observations.** A JWST observation might match `NT_SCOPE_PHYSICAL/jwst-survey` AND `NT_SCOPE_CONCEPTUAL/gw-em-coincidence`. Routing to multiple scope nodes: copy into both, or single canonical with cross-references?
 4. **Beekeeper-mediated Stance changes.** When James adds a new Type-Node to QBP Stance, what's the propagation latency? Does BMA pick up the change at next cycle, or require a manual reload?
 5. **QBP-web update integration.** Once `~/Documents/QBP/archive/` is populated, what does qbp-web's contribution change about this design? Surface in qbp-implementor's first post.
+6. **Frame transforms (v0.3, #434).** Which `transform` rows of §2.6.4 need implementations before Walk, who owns each (the tenant that needs it, per §2.6.5), and whether the one-hop rule (D6) survives the first multi-planet tenant.
 
 ---
 
@@ -551,7 +704,8 @@ When all M1–M9 pass, QBP federation tenancy is operational. qbp-implementor sh
 
 ---
 
-*QBP Federation Tenancy v0.2 | 2026-05-15*
+*QBP Federation Tenancy v0.3 DRAFT | 2026-10-22 (v0.2: 2026-05-15)*
 *Co-Authored-By: James Paget Butler (Beekeeper)*
 *Co-Authored-By: Claude Opus 4.7 (Architect, QBP-Compute-Unit) — v0.1 authorship*
 *Co-Authored-By: qbp-implementor (Claude Opus 4.7, Integration role) — v0.2 revision pass*
+*Co-Authored-By: qbp-oppenheimer (Claude Fable 5.1, QBP seat) — v0.3 frame-discipline draft (#434)*
