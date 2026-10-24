@@ -177,9 +177,10 @@ def test_rule_inst_cycle_terminates():
     )
 
 
-def test_rule_ext_requires_empty_chain_and_external_kind():
+def test_rule_ext_requires_empty_chain_external_kind_and_no_predicted_side():
     led = _ledger(
         [
+            # S1 guard: empty chain + experiment kind BUT a QBP-side predicted number -> default
             _anchor(
                 "OBS-e",
                 measured_value=5.0,
@@ -195,14 +196,21 @@ def test_rule_ext_requires_empty_chain_and_external_kind():
                 prediction_chain=["DERIV-z"],
             ),
             _anchor("OBS-g", measured_value=5.0, provenance_kind="theory"),
+            # the genuine R-EXT shape: measured only, empty chain, external kind
+            _anchor(
+                "OBS-h",
+                measured_value=5.0,
+                measured_error=0.1,
+                provenance_kind="experiment",
+            ),
         ]
     )
     r = _rows(led)
+    _check(r["OBS-e"]["rule"] == "default", "predicted-side number blocks R-EXT (S1)")
     _check(
-        r["OBS-e"]["rule"] == "R-EXT" and r["OBS-e"]["tag"] == "FORCED",
-        "experiment, empty chain",
+        r["REF-t"]["rule"] == "default",
+        "theory-external with a predicted number -> default",
     )
-    _check(r["REF-t"]["rule"] == "R-EXT", "theory-external, empty chain")
     _check(
         r["OBS-f"]["rule"] == "default",
         "non-empty chain with a predicted side => UNDECIDED",
@@ -210,6 +218,10 @@ def test_rule_ext_requires_empty_chain_and_external_kind():
     _check(
         r["OBS-g"]["rule"] == "R-MEAS",
         "theory kind: R-EXT does not fire; measured only => R-MEAS",
+    )
+    _check(
+        r["OBS-h"]["rule"] == "R-EXT" and r["OBS-h"]["tag"] == "FORCED",
+        "measured only, empty chain, experiment => R-EXT",
     )
 
 
