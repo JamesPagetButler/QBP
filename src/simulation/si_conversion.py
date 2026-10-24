@@ -299,7 +299,10 @@ STATUS_REGISTRY: Final[tuple[QuantityStatus, ...]] = (
         "H_SI", "constant", ESTABLISHED, f"h = 6.62607015e-34 J*s; {_SI_2019}"
     ),
     QuantityStatus(
-        "HBAR_SI", "constant", ESTABLISHED, "h/(2*pi), exact derivation of H_SI"
+        "HBAR_SI",
+        "constant",
+        ESTABLISHED,
+        "defined exactly as H_SI/(2*pi); the stored double is that value rounded to IEEE 754",
     ),
     QuantityStatus(
         "EV_IN_JOULES", "constant", ESTABLISHED, f"e = 1.602176634e-19 C; {_SI_2019}"

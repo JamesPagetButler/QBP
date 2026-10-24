@@ -18,6 +18,7 @@ tests/test_si_defining_constants.py (7 SI defining constants).  This file adds:
 from __future__ import annotations
 
 import ast
+import dataclasses
 import inspect
 import json
 import math
@@ -112,15 +113,30 @@ def _public_constants() -> dict[str, object]:
     }
 
 
-def _test_function_sources() -> list[str]:
-    """Unparsed source of every test_* function in tests/test_si*.py."""
-    sources: list[str] = []
-    for path in SI_TEST_FILES:
+def _names_referenced_in_tests(paths: list[Path]) -> set[str]:
+    """Identifiers *referenced* (ast.Name / ast.Attribute) inside test_* bodies.
+
+    String literals are deliberately NOT counted, so a test that merely lists
+    a name in a snapshot or message cannot satisfy the coverage check.
+    """
+    refs: set[str] = set()
+    n_tests = 0
+    for path in paths:
         tree = ast.parse(path.read_text(), filename=str(path))
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
-                sources.append(ast.unparse(node))
-    return sources
+                n_tests += 1
+                for sub in ast.walk(node):
+                    if isinstance(sub, ast.Name):
+                        refs.add(sub.id)
+                    elif isinstance(sub, ast.Attribute):
+                        refs.add(sub.attr)
+    assert n_tests > 100, "test discovery broke"
+    return refs
+
+
+def _uncovered(public_names: set[str], referenced: set[str]) -> list[str]:
+    return sorted(public_names - referenced)
 
 
 # ===================================================================
@@ -180,7 +196,7 @@ class TestVersionAndRegistry:
 
     def test_registry_is_immutable(self) -> None:
         rec = quantity_status("zeta")
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             rec.status = ESTABLISHED  # type: ignore[misc]
 
 
@@ -215,14 +231,30 @@ class TestPublicSurfaceCoverage:
     def test_every_public_callable_has_a_test(self) -> None:
         """Each public function/class must be named inside at least one test_*
         body in tests/test_si*.py.  A new public function without a test fails."""
-        sources = _test_function_sources()
-        assert len(sources) > 100, "test discovery broke"
-        untested = [
-            name
-            for name in _public_members()
-            if not any(re.search(rf"\b{re.escape(name)}\b", src) for src in sources)
-        ]
+        untested = _uncovered(
+            set(_public_members()), _names_referenced_in_tests(SI_TEST_FILES)
+        )
         assert not untested, f"public callables never exercised by a test: {untested}"
+
+    def test_coverage_check_detects_an_untested_function(self) -> None:
+        """Mechanical mutation check: a public name that no test references
+        must be reported. (Replaces a by-hand mutation run; see PR #767.)"""
+        public = set(_public_members()) | {"convert_mutant"}
+        assert _uncovered(public, _names_referenced_in_tests(SI_TEST_FILES)) == [
+            "convert_mutant"
+        ]
+
+    def test_string_mention_does_not_count_as_coverage(self) -> None:
+        """Guard against the self-satisfying check: the snapshot test below
+        spells every public name as a string literal; those must not count."""
+        src = 'def test_x():\n    assert names == ["only_in_a_string"]\n    f = real_call()\n'
+        tmp = TESTS_DIR / "_tmp_cov_probe.py"
+        tmp.write_text(src)
+        try:
+            refs = _names_referenced_in_tests(SI_TEST_FILES + [tmp])
+        finally:
+            tmp.unlink()
+        assert "real_call" in refs and "only_in_a_string" not in refs
 
     def test_public_surface_snapshot(self) -> None:
         """Explicit list so an accidental public addition/removal is visible in
