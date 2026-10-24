@@ -185,17 +185,22 @@ jobs:
           # "Tech-green — review-ready" and never reached ALL-GREEN / never ticked
           # the CI-green evidence box, while `gh pr checks` (latest per name) was
           # all green. The same class keeps a PR RED on a cancelled early CI run.
-          # Semantics: `gh pr checks` and the Checks tab show the newest attempt
-          # per name; this reduction matches them. Key = started_at (the newest
-          # ATTEMPT), id as tie-break (ids are monotonic). NOT completed_at: a
+          # Semantics: the raw API / GraphQL rollup lists every run (#733: 28
+          # contexts), but `gh pr checks` and the merge box show only the newest
+          # attempt per check identity — this reduction matches THOSE surfaces.
+          # Identity = (name, app id), as the merge box groups; two Actions jobs
+          # with the same display name in different workflows are therefore ONE
+          # identity here, exactly as in `gh pr checks` (repo-level job names
+          # must stay unique — tracked separately). Newest = started_at (the
+          # newest ATTEMPT), id as tie-break (ids are monotonic). NOT completed_at: a
           # cancelled run's completed_at can postdate its replacement's started_at
           # (A started 01:11, B started 01:12:20, A cancelled 01:12:30), which
           # would mask B's in-progress state. PENDING below runs on the deduped
           # set, so an in-progress latest run still blocks.
           RUNS=$(gh api "repos/$REPO/commits/$SHA/check-runs?per_page=100" --paginate \
-                 --jq '[.check_runs[] | {name, status, conclusion, html_url, id, started_at, completed_at}]' \
+                 --jq '[.check_runs[] | {name, status, conclusion, html_url, id, started_at, completed_at, app: .app.id}]' \
                  | jq -s 'add // [] | map(select(.name != "'"$SELF"'"))
-                          | group_by(.name) | map(max_by([(.started_at // ""), .id]))')
+                          | group_by([.name, .app]) | map(max_by([(.started_at // ""), .id]))')
 
           PENDING=$(echo "$RUNS" | jq '[.[] | select(.status != "completed")] | length')
           if [ "$PENDING" -gt 0 ]; then
