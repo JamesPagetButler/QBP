@@ -475,6 +475,276 @@ def test_markdown_render():
     assert "with ALL AC boxes unticked" in md
 
 
+# ----------------------------------------------------------------------- #739 timeline fallback
+
+
+def _tl_pr(number, merged_at, repo=REPO, merged=True):
+    return {
+        "number": number,
+        "merged": merged,
+        "mergedAt": merged_at,
+        "repository": {"nameWithOwner": repo},
+    }
+
+
+def _tl_node(n, closed_at, closer, events_before=()):
+    """Raw GraphQL issue node: the LAST closed event carries `closer`
+    (None = hand-close; a PullRequest or Commit dict otherwise)."""
+    nodes = [
+        {
+            "createdAt": at,
+            "stateReason": "COMPLETED",
+            "actor": {"login": "someone"},
+            "closer": c,
+        }
+        for at, c in events_before
+    ]
+    nodes.append(
+        {
+            "createdAt": closed_at,
+            "stateReason": "COMPLETED",
+            "actor": {"login": "someone"},
+            "closer": closer,
+        }
+    )
+    return {"number": n, "closedAt": closed_at, "timelineItems": {"nodes": nodes}}
+
+
+def _commit(oid, prs=()):
+    return {
+        "__typename": "Commit",
+        "oid": oid,
+        "committedDate": "2026-09-09T00:00:00Z",
+        "associatedPullRequests": {"nodes": list(prs)},
+    }
+
+
+def _pr_closer(number, merged_at, repo=REPO, merged=True):
+    return {"__typename": "PullRequest", **_tl_pr(number, merged_at, repo, merged)}
+
+
+T9 = "2026-09-09T00:00:02Z"  # close time of the timeline fixtures
+
+# Issues with EMPTY closedByPullRequestsReferences that the bulk pass leaves manual.
+TL_ISSUES = ISSUES + [
+    # #90 flagged; closed via the squash commit of PR #91 (keyword in commit msg only)
+    _issue(90, UNTICKED, T9),
+    # #100 clean; closer is the merged PR #101 itself
+    _issue(100, TICKED, T9),
+    # #110 flagged; hand-closed (closer null) — the #668 shape
+    _issue(110, ONE_UNTICKED, T9),
+    # #120 flagged; closed by a commit pushed straight to master (no PR) — #256 shape
+    _issue(120, UNTICKED, T9),
+    # #130 flagged; no timeline record at all
+    _issue(130, UNTICKED, T9),
+    # #140 flagged; timeline event is STALE (8 h off closedAt) -> ignored
+    _issue(140, UNTICKED, T9),
+    # #150 flagged; closed via a commit whose merged PR is in ANOTHER repo
+    _issue(150, UNTICKED, T9),
+    # #160 flagged; PR-closed, reopened, then hand-closed (#474 shape): last wins
+    _issue(160, UNTICKED, T9),
+]
+
+TL_MERGED = {
+    REPO: MERGED[REPO]
+    + [
+        # #91 does NOT list #90 in closingIssuesReferences and has no keyword in its text
+        _pr(91, "2026-09-09T00:00:00Z", closes=(), keyword=False),
+        _pr(101, "2026-09-09T00:00:01Z", closes=()),
+    ],
+    "x/other": MERGED["x/other"],
+}
+
+TIMELINE = {
+    "90": _tl_node(
+        90, T9, _commit("c0ffee0123456789", [_tl_pr(91, "2026-09-09T00:00:00Z")])
+    ),
+    "100": _tl_node(100, T9, _pr_closer(101, "2026-09-09T00:00:01Z")),
+    "110": _tl_node(110, T9, None),
+    "120": _tl_node(120, T9, _commit("deadbeef00000000", [])),
+    "140": _tl_node(
+        140, "2026-09-09T08:00:00Z", _pr_closer(101, "2026-09-09T08:00:00Z")
+    ),
+    "150": _tl_node(
+        150,
+        T9,
+        _commit("abc1234567890000", [_tl_pr(8, "2026-09-09T00:00:00Z", "x/other")]),
+    ),
+    "160": _tl_node(
+        160,
+        T9,
+        None,
+        events_before=[
+            ("2026-09-01T00:00:00Z", _pr_closer(11, "2026-09-01T00:00:00Z"))
+        ],
+    ),
+    # a contradicting record for a bulk-attributed row must be ignored
+    "10": _tl_node(10, "2026-09-01T00:00:01Z", None),
+}
+
+
+def _tl_rows(timeline=TIMELINE, **kw):
+    r = A.audit(TL_ISSUES, repo=REPO, merged=TL_MERGED, timeline=timeline, **kw)
+    return r["summary"], {row["number"]: row for row in r["rows"]}
+
+
+def test_timeline_empty_refs_commit_resolves_to_merged_pr():
+    _s, by = _tl_rows()
+    r = by[90]
+    assert r["linked_prs"] == []  # closedByPullRequestsReferences was empty
+    assert r["closed_how"] == "merged-pr" and r["closing_pr"] == "#91"
+    assert r["close_source"] == "timeline-commit-pr"
+    assert r["close_commit"] == "c0ffee0123456789"
+    assert r["closing_pr_repo"] == REPO and r["merge_delta_s"] == 2
+    # keyword lived in the commit message, not the PR text -> guard blind
+    assert r["closing_pr_has_keyword"] is False
+    assert r["guard_would_have_fired"] is False and r["flagged"] is True
+    assert "keyword in commit message" in A._guard_cell(r)
+    assert A._how_cell(r) == "merged-pr #91 (Δ2s) via commit c0ffee0"
+
+
+def test_timeline_empty_refs_pr_closer_resolves_to_merged_pr():
+    _s, by = _tl_rows()
+    r = by[100]
+    assert r["closed_how"] == "merged-pr" and r["closing_pr"] == "#101"
+    assert r["close_source"] == "timeline-pr" and r["close_commit"] == ""
+    assert r["closing_pr_has_keyword"] is False  # #101's text names no issue
+    assert A._how_cell(r) == "merged-pr #101 (Δ1s) via timeline"
+
+
+def test_timeline_empty_refs_no_resolvable_pr_stays_manual():
+    _s, by = _tl_rows()
+    # hand-close
+    assert by[110]["closed_how"] == "manual" and by[110]["close_source"] == "hand"
+    assert A._how_cell(by[110]) == "manual (hand)"
+    # commit pushed straight to master, no PR
+    assert by[120]["closed_how"] == "manual"
+    assert by[120]["close_source"] == "timeline-commit-only"
+    assert by[120]["close_commit"] == "deadbeef00000000"
+    assert A._how_cell(by[120]) == "manual (commit deadbee, no PR)"
+    # no timeline record
+    assert by[130]["closed_how"] == "manual" and by[130]["close_source"] == "none"
+    assert A._how_cell(by[130]) == "manual"
+    # stale record (event far from closedAt) is never trusted
+    assert by[140]["closed_how"] == "manual" and by[140]["close_source"] == "none"
+    for n in (110, 120, 130, 140):
+        assert by[n]["closing_pr"] == "" and by[n]["guard_would_have_fired"] is False
+        assert A._guard_cell(by[n]) == "n/a (manual)"
+
+
+def test_timeline_last_closed_event_wins():
+    _s, by = _tl_rows()
+    # PR-closed, reopened, hand-closed: the final close is manual (#474 shape)
+    assert by[160]["closed_how"] == "manual" and by[160]["close_source"] == "hand"
+
+
+def test_timeline_cross_repo_pr_is_qualified():
+    _s, by = _tl_rows()
+    r = by[150]
+    assert r["closed_how"] == "merged-pr" and r["closing_pr"] == "x/other#8"
+    assert r["closing_pr_repo"] == "x/other" and r["closing_pr_cross_repo"] is True
+    assert r["closing_pr_has_keyword"] is None  # PR not in the merged payload
+    assert r["guard_would_have_fired"] is False
+    assert "another repo" in A._guard_cell(r)
+
+
+def test_bulk_attributed_rows_unchanged_by_timeline():
+    _s0, without = _rows(issues=TL_ISSUES, merged=TL_MERGED)
+    _s1, with_tl = _tl_rows()
+    for n in (10, 20, 30, 40, 50, 60, 70, 80):
+        a, b = without[n], with_tl[n]
+        for k in (
+            "closed_how",
+            "closing_pr",
+            "closing_pr_repo",
+            "merge_delta_s",
+            "closing_pr_has_keyword",
+            "guard_would_have_fired",
+            "flagged",
+        ):
+            assert a[k] == b[k], (n, k)
+    # non-empty references + bulk match: pr-window, even with a contradicting record
+    assert with_tl[10]["close_source"] == "pr-window"
+    assert (
+        with_tl[10]["closed_how"] == "merged-pr" and with_tl[10]["closing_pr"] == "#11"
+    )
+    assert with_tl[30]["close_source"] == "pr-window"
+    # bulk-manual rows without a record: `none` (and `hand` is never guessed)
+    assert (
+        with_tl[20]["close_source"] == "none" and with_tl[50]["close_source"] == "none"
+    )
+    # without a timeline, nothing is attributed by it
+    assert all(r["close_source"] in ("pr-window", "none") for r in without.values())
+
+
+def test_timeline_not_applied_without_merged_payload():
+    r = A.audit(TL_ISSUES, repo=REPO, merged=None, timeline=TIMELINE)
+    assert all(row["closed_how"] == "unknown" for row in r["rows"])
+    assert all(row["close_source"] == "none" for row in r["rows"])
+
+
+def test_bulk_manual_numbers_is_the_fallback_set():
+    nums = A.bulk_manual_numbers(TL_ISSUES, TL_MERGED, REPO, A.DEFAULT_MERGE_WINDOW_S)
+    # #60 is NOT here: PR #61 names it in closingIssuesReferences (bulk pass)
+    assert nums == [20, 40, 50, 80, 90, 100, 110, 120, 130, 140, 150, 160]
+    assert A.bulk_manual_numbers(
+        TL_ISSUES, TL_MERGED, REPO, A.DEFAULT_MERGE_WINDOW_S, since="2026-09-09"
+    ) == [90, 100, 110, 120, 130, 140, 150, 160]
+
+
+def test_timeline_query_shape():
+    q = A._timeline_query("x", "y", [5, 7])
+    assert q.startswith('query { repository(owner: "x", name: "y") {')
+    assert "i5: issue(number: 5)" in q and "i7: issue(number: 7)" in q
+    assert "itemTypes: [CLOSED_EVENT]" in q and "associatedPullRequests" in q
+
+
+def test_timeline_summary_counts():
+    s, by = _tl_rows()
+    assert s["timeline_used"] is True and s["timeline_records"] == len(TIMELINE)
+    assert s["close_source_counts"] == {
+        "pr-window": 4,  # 10, 30, 60, 70
+        "timeline-pr": 1,  # 100
+        "timeline-commit-pr": 2,  # 90, 150
+        "timeline-commit-only": 1,  # 120
+        "hand": 2,  # 110, 160
+        "none": 6,  # 20, 40, 50, 80, 130, 140
+    }
+    assert s["closed_by_merged_pr"] == 7 and s["closed_manually"] == 9
+    assert s["closed_by_merged_pr_via_timeline"] == 3
+    assert s["flagged_closed_by_merged_pr_via_timeline"] == 2  # 90, 150 (100 is clean)
+    assert s["closed_by_commit_no_pr"] == 1
+    assert s["flagged_merged_pr_keyword_in_commit_only"] == 1  # 90 (150 is cross-repo)
+    assert s["flagged_merged_pr_no_keyword"] == 2  # 60 (manual link) + 90
+    # the partition still holds
+    assert (
+        s["closed_by_merged_pr"] + s["closed_manually"] + s["closed_unknown"]
+        == s["scanned"]
+    )
+    s_off, _ = _rows(issues=TL_ISSUES, merged=TL_MERGED)
+    assert s_off["timeline_used"] is False and s_off["timeline_records"] == 0
+    assert s_off["closed_by_merged_pr"] == 4 and s_off["closed_manually"] == 12
+
+
+def test_markdown_render_timeline_sections():
+    res = A.audit(TL_ISSUES, repo=REPO, merged=TL_MERGED, timeline=TIMELINE)
+    md = A.render_markdown(res, REPO, "2026-10-23", note="payload is a replay")
+    assert "**Timeline fallback (#739).**" in md
+    assert "**Note.** payload is a replay" in md
+    assert (
+        "| … … of which attributed by the timeline fallback (#739: commit-message keyword) | 2 |"
+        in md
+    )
+    assert "merged-pr #91 (Δ2s) via commit c0ffee0" in md
+    assert "manual (commit deadbee, no PR)" in md
+    assert "keyword in commit message, not PR text (guard blind)" in md
+    md_off = A.render_markdown(
+        A.audit(TL_ISSUES, repo=REPO, merged=TL_MERGED), REPO, "2026-10-23"
+    )
+    assert "**Timeline fallback (#739) not run**" in md_off
+    assert "**Note.**" not in md_off
+
+
 # ----------------------------------------------------------------------- CLI
 
 
@@ -514,6 +784,86 @@ def test_cli_from_caches_is_idempotent(tmp_path):
         "report-2026-10-17.json",
         "report-2026-10-17.md",
     ]
+
+
+def test_cli_three_caches_is_idempotent_and_reclassifies(tmp_path):
+    cache = tmp_path / "issues.json"
+    cache.write_text(json.dumps(TL_ISSUES), encoding="utf-8")
+    mcache = tmp_path / "merged.json"
+    mcache.write_text(json.dumps(TL_MERGED), encoding="utf-8")
+    tcache = tmp_path / "timeline.json"
+    tcache.write_text(json.dumps(TIMELINE), encoding="utf-8")
+    out = tmp_path / "sub" / "report-2026-10-23.md"
+    cmd = _cli(
+        "--repo",
+        REPO,
+        "--from-cache",
+        str(cache),
+        "--from-merged-cache",
+        str(mcache),
+        "--from-timeline-cache",
+        str(tcache),
+        "--note",
+        "replay note",
+        "--out",
+        str(out),
+    )
+    r1 = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    assert (
+        "timeline=on(records=8, merged_pr_via_timeline=3, commit_no_pr=1)" in r1.stdout
+    )
+    md1 = out.read_bytes()
+    js1 = (tmp_path / "sub" / "report-2026-10-23.json").read_bytes()
+    subprocess.run(cmd, capture_output=True, text=True, check=True)
+    assert out.read_bytes() == md1
+    assert (tmp_path / "sub" / "report-2026-10-23.json").read_bytes() == js1
+    data = json.loads(js1)
+    assert data["note"] == "replay note" and data["summary"]["timeline_used"] is True
+    by = {row["number"]: row for row in data["rows"]}
+    assert (
+        by[90]["closed_how"] == "merged-pr"
+        and by[90]["close_source"] == "timeline-commit-pr"
+    )
+    assert by[110]["closed_how"] == "manual" and by[110]["close_source"] == "hand"
+    assert b"**Note.** replay note" in md1
+    # the timeline cache is read, never rewritten, and nothing else is written
+    assert json.loads(tcache.read_text(encoding="utf-8")) == TIMELINE
+    assert sorted(p.name for p in (tmp_path / "sub").iterdir()) == [
+        "report-2026-10-23.json",
+        "report-2026-10-23.md",
+    ]
+
+
+def test_cli_replay_without_timeline_cache_leaves_bulk_attribution(tmp_path):
+    cache = tmp_path / "issues.json"
+    cache.write_text(json.dumps(TL_ISSUES), encoding="utf-8")
+    mcache = tmp_path / "merged.json"
+    mcache.write_text(json.dumps(TL_MERGED), encoding="utf-8")
+    out = tmp_path / "r.md"
+    r = subprocess.run(
+        _cli(
+            "--repo",
+            REPO,
+            "--from-cache",
+            str(cache),
+            "--from-merged-cache",
+            str(mcache),
+            "--out",
+            str(out),
+        ),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    # no gh call is made (offline replay); the fallback is reported as not run
+    assert (
+        "timeline=off(records=0, merged_pr_via_timeline=0, commit_no_pr=0)" in r.stdout
+    )
+    data = json.loads((tmp_path / "r.json").read_text(encoding="utf-8"))
+    assert data["summary"]["timeline_used"] is False
+    by = {row["number"]: row for row in data["rows"]}
+    assert by[90]["closed_how"] == "manual" and by[90]["close_source"] == "none"
+    assert "**Timeline fallback (#739) not run**" in out.read_text(encoding="utf-8")
 
 
 def test_cli_issues_only_cache_gives_unknown_attribution(tmp_path):
