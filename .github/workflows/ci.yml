@@ -35,6 +35,9 @@ jobs:
             knowledge:
               - 'knowledge/**'
               - 'scripts/validate_knowledge.py'
+              # the workflow that defines validate-knowledge: a job-definition
+              # edit must exercise the job it edits (self-test; ~20 s)
+              - '.github/workflows/ci.yml'
             lean:
               - 'proofs/**'
               - 'libs/**'
@@ -42,7 +45,7 @@ jobs:
   # #737 (re-filed #220 AC4): knowledge-graph validation runs on PRs that touch
   # knowledge/** or the validator. Separate filter + light job so a knowledge-only
   # change does not spin up the heavy manim/pytest jobs. Independent of the
-  # criticality-thread CI work (ci.yml untouched since #380) — nothing overwritten.
+  # criticality-thread CI work (ci.yml untouched since PR #394, f68a1e0) — nothing overwritten.
   validate-knowledge:
     name: Validate knowledge graph
     needs: changes
@@ -56,6 +59,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      # validate_knowledge.py returns 0 on an unreadable DB ("likely LFS pointer in
+      # CI" — written for the no-LFS pre-commit path). Here the fetch is the point:
+      # fail loudly if the smudge did not happen, so a quota/outage cannot pass green.
+      - name: Assert knowledge/qbp.db is a real SQLite file (LFS fetched, not a pointer)
+        run: |
+          # 15 bytes: the 16th header byte is NUL, which makes grep treat the input as binary
+          if ! head -c 15 knowledge/qbp.db | grep -q 'SQLite format 3'; then
+            echo "::error::knowledge/qbp.db is not a SQLite database — LFS smudge failed (pointer below)"
+            head -c 200 knowledge/qbp.db; echo
+            git lfs ls-files
+            exit 1
+          fi
+          echo "knowledge/qbp.db: SQLite header OK ($(stat -c %s knowledge/qbp.db) bytes)"
       - name: Validate knowledge base
         run: python3 scripts/validate_knowledge.py
 
