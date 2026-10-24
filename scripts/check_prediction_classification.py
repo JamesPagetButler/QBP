@@ -46,7 +46,8 @@ ALLOWED_TYPES = ("Validation", "Novel", "OPEN")
 HEADING_RE = re.compile(r"^##\s+(?:\d+\.\s+)?Prediction Classification\s*$")
 LEVEL2_RE = re.compile(r"^##\s+\S")
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
-SEPARATOR_CELL_RE = re.compile(r"^:?-{3,}:?$")
+# GFM delimiter-row cell: one or more dashes, optional alignment colons (K1).
+SEPARATOR_CELL_RE = re.compile(r"^:?-+:?$")
 
 
 def strip_fences(lines: Sequence[str]) -> List[str]:
@@ -140,6 +141,12 @@ def check_text(text: str) -> List[str]:
     return problems
 
 
+def display_path(path: str) -> str:
+    """Repo-relative when under the repo, else as given (K2: no `../../tmp/...`)."""
+    root = REPO_ROOT.rstrip(os.sep) + os.sep
+    return os.path.relpath(path, REPO_ROOT) if path.startswith(root) else path
+
+
 def find_docs(research_dir: str) -> List[str]:
     if not os.path.isdir(research_dir):
         return []
@@ -181,7 +188,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     n_fail = 0
     for path, problems in results:
-        rel = os.path.relpath(path, REPO_ROOT)
+        rel = display_path(path)
         if problems:
             n_fail += 1
             print(f"FAIL  {rel}")

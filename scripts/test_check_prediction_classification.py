@@ -136,6 +136,33 @@ def test_clean_doc_passes():
     _check("1/1 docs" in out, out)
 
 
+def test_one_dash_delimiter_row_passes():
+    """GFM delimiter cells need only one dash; `|-|-|-|-|` is a valid table (K1)."""
+    doc = CLEAN_DOC.replace(
+        "|------------|------|----------------|-------|", "|-|-|-|-|"
+    )
+    rc, out, _ = _run({"01_x_expected_results.md": doc})
+    _check(rc == 0, f"one-dash delimiter row must be recognised\n{out}")
+    doc = CLEAN_DOC.replace(
+        "|------------|------|----------------|-------|", "|:-|:-:|-:|-|"
+    )
+    rc, out, _ = _run({"01_x_expected_results.md": doc})
+    _check(rc == 0, f"aligned one-dash delimiter row must be recognised\n{out}")
+
+
+def test_display_path_outside_repo_is_not_relativised():
+    """K2: a --research-dir outside the repo prints as given, not `../../tmp/...`."""
+    mod = _load_checker()
+    inside = os.path.join(mod.REPO_ROOT, "research", "01_x_expected_results.md")
+    _check(
+        mod.display_path(inside)
+        == os.path.join("research", "01_x_expected_results.md"),
+        "inside",
+    )
+    outside = "/tmp/elsewhere/research/01_x_expected_results.md"
+    _check(mod.display_path(outside) == outside, "outside must be unchanged")
+
+
 def test_unnumbered_heading_passes():
     rc, out, _ = _run({"01_x_expected_results.md": UNNUMBERED_HEADING_DOC})
     _check(rc == 0, f"`## Prediction Classification` without a number must pass\n{out}")
