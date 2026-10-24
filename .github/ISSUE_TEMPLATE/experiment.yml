@@ -49,6 +49,7 @@ body:
       value: |
         ### Phase 1: Ground Truth
         **Goal:** Formally define the expected experimental outcome based on established theory.
+        - [ ] **Before start:** confirm `## Prediction Classification` is present and current in the expected-results doc (#170 / #736); every row is Validation / Novel / OPEN and cites the doc line it relies on.
         - [ ] **Task:** Research and cite relevant literature and theoretical derivations.
         - [ ] **Task:** Write a formal mathematical derivation of the quantitative predictions.
         - [ ] **Task:** Create the `research/[NN]_[name]_expected_results.md` document.

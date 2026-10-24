@@ -1,6 +1,12 @@
 # .github/workflows/tenancy-xref-lint.yml
 # Lints the QBP federation tenancy doc for stale filesystem cross-references.
 # Closes QBP #433 — adds CI check that catches broken in-repo refs.
+#
+# Also hosts the Prediction-Classification gate (#736, re-filed from #170 AC4):
+# every research/*_expected_results.md must carry a `## Prediction Classification`
+# section whose Type column is Validation / Novel / OPEN only. Lives here rather
+# than in a new workflow so pr-check-status.yml's workflow_run list is unchanged
+# ("Tenancy XRef Lint" is already on it).
 name: "Tenancy XRef Lint"
 
 on:
@@ -11,6 +17,9 @@ on:
       - "docs/qbp-federation-tenancy.md"
       - "scripts/tenancy_xref_linter.py"
       - ".github/workflows/tenancy-xref-lint.yml"
+      - "research/**"
+      - "scripts/check_prediction_classification.py"
+      - "scripts/test_check_prediction_classification.py"
   pull_request:
     branches:
       - master
@@ -18,6 +27,9 @@ on:
       - "docs/qbp-federation-tenancy.md"
       - "scripts/tenancy_xref_linter.py"
       - ".github/workflows/tenancy-xref-lint.yml"
+      - "research/**"
+      - "scripts/check_prediction_classification.py"
+      - "scripts/test_check_prediction_classification.py"
 
 jobs:
   tenancy-xref-lint:
@@ -33,3 +45,20 @@ jobs:
 
       - name: "Lint tenancy doc cross-references"
         run: python3 scripts/tenancy_xref_linter.py
+
+  prediction-classification-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Gate: every research/*_expected_results.md carries Prediction Classification (#736)"
+        run: python3 scripts/check_prediction_classification.py --list
+
+      - name: "Gate self-test (adversarial docs must FAIL)"
+        run: python3 scripts/test_check_prediction_classification.py
