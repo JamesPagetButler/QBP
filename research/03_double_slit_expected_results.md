@@ -593,17 +593,19 @@ If all predictions hold (expected), Sprint 3 confirms:
 
 ## 7. Prediction Classification
 
+Classification rule (`docs/schemas/ground_truth_schema.md` §6; #170 / #736 / #764): a row is **Validation** only where this document states that QBP reproduces the standard value; **Novel** only where it states a QBP-specific deviation with a number; otherwise **OPEN**, with the missing statement named. Each Notes cell cites the line relied on. Re-read against the §6 wording under #764 AC2 (2026-10-24): no Type changed; citations added.
+
 | Prediction | Type | Standard QM | QBP | Notes |
 |---|---|---|---|---|
-| Fringe spacing Δx = λL/d | Validation | λL/d = 5.0 × 10⁻⁵ m | λL/d = 5.0 × 10⁻⁵ m | Identical |
-| Intensity I(x) = 4A²cos²(πxd/λL) | Validation | cos² envelope | cos² envelope | Identical (Scenario A) |
-| Which-path → V = 0 | Validation | V = 0 | V = 0 | Identical (Scenario B) |
-| Far-field Scenario C | Validation | cos² at detector | cos² at detector | C(1,i) dynamically selected |
-| ψ₁ exponential decay | Novel | No ψ₁ sector | η(r) ∝ exp(−2κr) | Evanescent modes |
-| Decay rate κ = \|U₁\|/(ℏv) | Novel | N/A | κ in m⁻¹, simulation-testable | Adler 1988 |
-| Visibility recovery V(r) → 1 | Novel | V = 1 always | V < 1 near slits → 1 at detector | Mid-propagation |
+| Fringe spacing Δx = λL/d | Validation | λL/d = 5.0 × 10⁻⁵ m | λL/d = 5.0 × 10⁻⁵ m | Identical — §4.1 derives the QBP pattern for "ψ₁(x) = 0" and states "Δx = λL / d" with "5.0 × 10⁻⁵ m = 50 μm"; §6.1 row A lists the QBP prediction as "cos²(πxd/λL) fringes", equal to Standard QM, "MUST match" |
+| Intensity I(x) = 4A²cos²(πxd/λL) | Validation | cos² envelope | cos² envelope | Identical (Scenario A) — §4.1 "I(x) = 4A² · cos²(πxd / λL)" for the QBP state with "ψ₁(x) = 0"; §6.1 row A: QBP prediction "cos²(πxd/λL) fringes" = Standard QM |
+| Which-path → V = 0 | Validation | V = 0 | V = 0 | Identical (Scenario B) — §4.2 "For point sources: I(x) = A² (uniform, no fringes)"; §5.2 "Scenario B: V = 0.0 (which-path)"; §6.1 row B: QBP prediction "No fringes" = Standard QM |
+| Far-field Scenario C | Validation | cos² at detector | cos² at detector | C(1,i) dynamically selected — §4.3.4 "Total intensity converges to the standard pattern: I(x) → I₀(x)", stated "for L >> L_decay"; §6.1 row C: QBP prediction "Same as Scenario A". Doc caveat (§4.3.2): the ψ₁ mechanism is "a prediction to be tested by the simulation, not an established result" |
+| ψ₁ exponential decay | Novel | No ψ₁ sector | η(r) ∝ exp(−2κr) | Evanescent modes — Novel on the numbered statement, not the formula alone: §4.3.3 "η(r) ≈ η_slit · exp(-2κr)" with the worked values "104.4 m⁻¹" and "L_decay = 1/κ ≈ 9.58 × 10⁻³ m ≈ 9.6 mm" at U₁ = 10⁻⁶ eV (U₁ is "a free parameter", §8). Doc caveat (§4.3.2): "a prediction to be tested by the simulation, not an established result" |
+| Decay rate κ = \|U₁\|/(ℏv) | Novel | N/A | κ in m⁻¹, simulation-testable | §4.3.3 derivation sketch "following Adler 1988, §IV": "κ ≈ \|U₁\| / (ℏv)"; worked numbers "104.4 m⁻¹" at U₁ = 10⁻⁶ eV and "κ ≈ 3.1 × 10⁻⁶ m⁻¹" at the Kaiser bound |
+| Visibility recovery V(r) → 1 | Novel | V = 1 always | V < 1 near slits → 1 at detector | Mid-propagation — §4.3.6 accelerated test: "QBP: V ≈ 1 − 0.1 × 0.811 = 0.919" vs "Standard QM: V = 1.0" at z = 1 mm, stated as "the worst-case bound"; §5.2 "Scenario C near slits: V < 1.0" |
 
-**Classification summary:** Scenarios A and B are **validation** predictions — QBP must reproduce standard QM exactly for complex-only states. These establish that the simulation infrastructure works correctly. Scenario C produces three **novel** predictions unique to quaternionic quantum mechanics: the existence of evanescent ψ₁ modes, a specific decay rate formula, and distance-dependent fringe visibility recovery. These novel predictions are testable within the simulation but not yet by experiment (see §4.3.6 for the experimental prediction and its caveats).
+**Classification summary:** Scenarios A and B are **validation** predictions — QBP must reproduce standard QM exactly for complex-only states. These establish that the simulation infrastructure works correctly. Scenario C produces three **novel** predictions unique to quaternionic quantum mechanics: the existence of evanescent ψ₁ modes, a specific decay rate formula, and distance-dependent fringe visibility recovery. Under the §6 wording the three Novel rows rest on the numbered statements in §4.3.3 (κ = 104.4 m⁻¹, L_decay ≈ 9.6 mm at U₁ = 10⁻⁶ eV) and §4.3.6 (V ≈ 0.919 vs 1.0 at z = 1 mm), not on the formulas alone; the numbers are conditional on the free parameter U₁ (§8). These novel predictions are testable within the simulation but not yet by experiment (see §4.3.6 for the experimental prediction and its caveats).
 
 ## 8. What This Experiment Does NOT Test
 
