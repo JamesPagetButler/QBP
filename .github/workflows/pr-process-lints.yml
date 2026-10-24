@@ -1,0 +1,112 @@
+# PR process lints (#507 §1 §2 §3) — mechanical backstops for the evidence-first rules.
+#
+#   notifier-workflow-list  — RED CHECK (fails the PR's CI verdict; NOT a
+#                             branch-protection required check — master protection
+#                             requires only `CI Gate` + `lake build (zero errors)`;
+#                             wiring more is the beekeeper's #507 §7 call).
+#                             `.github/workflows/pr-check-status.yml`
+#                             `on.workflow_run.workflows` must list every workflow
+#                             that has a pull_request trigger (else that workflow's
+#                             completion can never finalise a verdict). Runs only
+#                             when a workflow file changes.
+#   evidence-first-prose    — ADVISORY (warning annotations, exit 0). §1 verdict
+#                             words in a theory-bearing PR title without a verdict
+#                             headline; §2 oracle citations without an in-repo
+#                             fixture path + pinned sha. Flip to blocking by passing
+#                             `--strict` below — that flip is the beekeeper's choice
+#                             (#507 AC "advisory-or-blocking per beekeeper choice").
+#                             Runs on every PR open/edit/sync because the PR body is
+#                             the review object.
+#
+# Both read the PR via `gh` with the default token (read-only on PR metadata).
+# Neither writes to the PR. This workflow is listed in the notifier's
+# workflow_run list (it is itself PR-triggered — the lint it carries checks that).
+
+name: PR Process Lints
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]   # labeled/unlabeled dropped (noise — Gemini NIT); `edited` kept: the body is the review object
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  notifier-workflow-list:
+    name: notifier workflow_run list in sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect workflow-file changes
+        id: wf
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # paginated REST (gh pr view --json files caps at 100 files — K10); fail closed on mismatch
+          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" \
+                    --paginate --jq '.[].filename')
+          n_api=$(printf '%s\n' "$files" | grep -c . || true)
+          n_pr=$(gh pr view "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" --json changedFiles --jq .changedFiles)
+          if [ "$n_pr" -gt 3000 ]; then
+            echo "::warning::PR has $n_pr changed files; the files API caps at 3000 — enumeration incomplete, drift lint forced ON"
+            echo "changed=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ "$n_api" != "$n_pr" ]; then
+            echo "::error::changed-file enumeration mismatch (api=$n_api, pr=$n_pr) — failing closed"; exit 1
+          fi
+          if printf '%s\n' "$files" | grep -q '^\.github/workflows/\|^scripts/check_notifier_workflow_list\.py$\|^scripts/test_check_notifier_workflow_list\.py$'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install PyYAML
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 -m pip install --quiet pyyaml
+      - name: Unit tests
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 scripts/test_check_notifier_workflow_list.py
+      - name: Drift lint
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 scripts/check_notifier_workflow_list.py
+      - name: Skipped (no workflow files changed)
+        if: steps.wf.outputs.changed != 'true'
+        run: echo "no .github/workflows changes in this PR — drift lint not applicable"
+
+  evidence-first-prose:
+    name: evidence-first prose lint (advisory)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests
+        run: |
+          python3 scripts/test_pr_merge_blocking_boxes.py
+          python3 scripts/test_check_pr_prose_claims.py
+      - name: Collect PR title, body, labels, changed paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh pr view "$PR" --repo "$REPO" --json title --jq .title > /tmp/title.txt
+          gh pr view "$PR" --repo "$REPO" --json body --jq .body > /tmp/body.md
+          gh pr view "$PR" --repo "$REPO" --json labels --jq '[.labels[].name] | join(",")' > /tmp/labels.txt
+          gh api "repos/$REPO/pulls/$PR/files?per_page=100" --paginate --jq '.[].filename' > /tmp/changed.txt
+          n_api=$(grep -c . /tmp/changed.txt || true)
+          n_pr=$(gh pr view "$PR" --repo "$REPO" --json changedFiles --jq .changedFiles)
+          if [ "$n_pr" -gt 3000 ]; then
+            echo "::warning::PR has $n_pr changed files; the files API caps at 3000 — theory-path detection may be incomplete (label still applies)"
+          elif [ "$n_api" != "$n_pr" ]; then
+            echo "::error::changed-file enumeration mismatch (api=$n_api, pr=$n_pr) — failing closed"; exit 1
+          fi
+      - name: Lint (advisory — add --strict to make blocking; beekeeper's flip)
+        run: |
+          python3 scripts/check_pr_prose_claims.py \
+            --title "$(cat /tmp/title.txt)" \
+            --body-file /tmp/body.md \
+            --labels "$(cat /tmp/labels.txt)" \
+            --changed-file /tmp/changed.txt
+      - name: Merge-blocking box state (report only; nudge lives in the notifier)
+        run: python3 scripts/pr_merge_blocking_boxes.py --body-file /tmp/body.md

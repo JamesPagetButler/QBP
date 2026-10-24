@@ -23,6 +23,17 @@
 # tier-3 review-label gate is itself a check that stays red until reviews
 # exist. TECH-GREEN excludes review gates; ALL-GREEN includes them.
 #
+# BOX CONTRACT (#507 §4, adopted from inter github-best-practices §2.2): a PR
+# body's merge-blocking sign-off boxes live under a line containing
+# "Sign-off required (merge-blocking)" or behind a `<!-- merge-blocking -->`
+# sentinel, up to the next heading / "Informational" line / closing sentinel.
+# ⊘ or ~~struck~~ lines are nil'd options, not undone work. ALL-GREEN with any
+# such box unticked posts a NUDGE (🟡, not merge-ready) naming the boxes; it
+# never ticks them. Parser: scripts/pr_merge_blocking_boxes.py (shared with the
+# future required check — PR B, gated on the §7 beekeeper ruling).
+# MERGEABLE (#507 §6): ALL-GREEN also requires `gh pr view --json mergeable` !=
+# CONFLICTING; a conflicting PR gets a resolve-first verdict instead.
+#
 # KNOWN LIMITATION: check_suite payloads carry an empty pull_requests[] for
 # FORK PRs, so fork PRs get no verdict comment (acceptable: solo maintainer +
 # agent sessions, same-repo branches only).
@@ -37,7 +48,10 @@ name: PR check-status notifier
 # check_suite trigger is kept for non-Actions apps (CodeQL etc.).
 # MAINTENANCE: a NEW workflow added to the repo must be appended to the
 # workflow_run list below, or its completion won't re-evaluate the verdict
-# (a later-finishing unlisted workflow = missed final event).
+# (a later-finishing unlisted workflow = missed final event). ENFORCED by
+# `scripts/check_notifier_workflow_list.py` (#507 §3, job "notifier-workflow-list"
+# in pr-process-lints.yml): every workflow with a pull_request trigger must be
+# listed here; push/dispatch-only workflows are exempt by trigger.
 on:
   workflow_run:
     workflows:
@@ -52,6 +66,13 @@ on:
       - Tenancy XRef Lint
       - Validate JSON
       - Closing-keyword AC guard
+      - Agda Cubical (library-dependent, --safe)
+      - Agda Substrate (Cubical type-check)
+      - Inverse Anchor Audit
+      - Pending-upgrade guard
+      - PR Process Lints
+      - Fano Snapshot Drift Guard
+      - pa-reconcile
     types: [completed]
   check_suite:
     types: [completed]
@@ -264,6 +285,25 @@ jobs:
             # box is now machine-true. Review FRESHNESS is reported separately
             # below; it does not gate this box (CI-green ≠ reviews-fresh).
             set_ci_box "x"
+            # ── #507 §6: merge-ready must mean ONE-CLICK ──
+            # A CONFLICTING PR is CI-green but not merge-ready: three sibling
+            # aggregator-import PRs were each stamped merge-ready and the last
+            # surfaced its conflict at the beekeeper's click (#520). Resolve BEFORE
+            # the beekeeper queue. UNKNOWN = GitHub still computing; reported as such.
+            MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable --jq .mergeable 2>/dev/null || echo UNKNOWN)
+            # ── #507 §4: box-state nudge (auto-nudge, never auto-tick) ──
+            # Unticked MERGE-BLOCKING sign-off boxes per github-best-practices §2.2
+            # ("Sign-off required (merge-blocking):" region or <!-- merge-blocking -->
+            # sentinel; ⊘/struck lines are nil'd options, not undone work). Parser:
+            # scripts/pr_merge_blocking_boxes.py — the ONE parser shared with the
+            # future required check (PR B, gated on the #507 §7 beekeeper ruling).
+            BODYFILE=$(mktemp)
+            gh pr view "$PR" --repo "$REPO" --json body --jq .body > "$BODYFILE" || true
+            BOXES=$(python3 scripts/pr_merge_blocking_boxes.py --body-file "$BODYFILE" 2>/dev/null || echo "unticked=0 ticked=0 nil=0")
+            NUNTICKED=$(printf '%s\n' "$BOXES" | sed -n 's/^unticked=\([0-9]*\).*/\1/p')
+            UNTICKED_LIST=$(printf '%s\n' "$BOXES" | sed -n 's/^UNTICKED: /- ⏸ /p')
+            rm -f "$BODYFILE"
+            : "${NUNTICKED:=0}"
             LASTREV=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
                       --jq '[.[] | .body]' | jq -s 'add // []' \
                       | jq -r '[.[] | capture("<!-- reviewed-sha: (?<s>[0-9a-f]{7,40}) -->").s] | last // empty')
@@ -292,8 +332,18 @@ jobs:
                 fi
               fi
             fi
-            BODY=$(printf '%s\n## ✅ ALL GREEN — merge-ready pending beekeeper — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\nMachine-posted; canonical "CI green" evidence link (evidence-first rule, `docs/workflows/review_tiers.md`). Merge remains the beekeeper'"'"'s call.' \
-              "$MARKER" "$TOTAL" "$TS" "$SHA" "$FRESH")
+            if [ "$MERGEABLE" = "CONFLICTING" ]; then
+              # §6: CI green, but NOT merge-ready — resolve-first, orchestrator's job
+              BODY=$(printf '%s\n## 🟡 CI GREEN but CONFLICTING — resolve first, NOT merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n⚠️ GitHub reports `mergeable: CONFLICTING` against the base branch. The orchestrator rebases/resolves and pushes BEFORE this PR enters the beekeeper queue (#507 §6; the #520 incident). Reviews stay valid if the patch-id survives the rebase.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
+                "$MARKER" "$TOTAL" "$TS" "$SHA" "$FRESH")
+            elif [ "$NUNTICKED" -gt 0 ]; then
+              # §4: CI green, sign-off boxes still open — nudge the named hands, do NOT escalate merge-ready
+              BODY=$(printf '%s\n## 🟡 CI GREEN — %s merge-blocking sign-off box(es) unticked — NOT yet merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n**Open sign-off boxes (github-best-practices §2.2; the hand that owns each box ticks it — the notifier never does):**\n%s\n\nIf a posted APPROVE comment already covers a box, cite it and tick the box (auto-nudge, not auto-tick; #507 §4). Mergeable: `%s`.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
+                "$MARKER" "$NUNTICKED" "$TOTAL" "$TS" "$SHA" "$FRESH" "$UNTICKED_LIST" "$MERGEABLE")
+            else
+              BODY=$(printf '%s\n## ✅ ALL GREEN — merge-ready pending beekeeper — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\nMergeable: `%s` (§6: merge-ready means one-click). No unticked merge-blocking sign-off boxes DETECTED in §2.2 regions (label line or `<!-- merge-blocking -->` sentinel; §4 — a body using neither form is not parsed).\n\nMachine-posted; canonical "CI green" evidence link (evidence-first rule, `docs/workflows/review_tiers.md`). Merge remains the beekeeper'"'"'s call.' \
+                "$MARKER" "$TOTAL" "$TS" "$SHA" "$FRESH" "$MERGEABLE")
+            fi
           fi
 
           CID=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \

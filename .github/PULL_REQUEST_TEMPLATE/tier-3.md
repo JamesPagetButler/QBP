@@ -50,6 +50,8 @@ labels: tier-3-review
 
 ## Type of Change
 
+<!-- PICK-ONE GROUP (#507 §5): tick the selected line and DELETE the unselected lines, or ⊘-strike them (`- [ ] ~~option~~ ⊘ reason`). An unticked box must always mean undone work, never "not selected". -->
+
 - [ ] New axiom or postulate
 - [ ] Formal proof (Lean 4)
 - [ ] Theory refinement
@@ -100,12 +102,14 @@ Routing rubric: docs/workflows/pr7_conflict_routing_rubric.md (v0.2)
 - **Anchors revised:** <!-- list anchor IDs with old → new state -->
 - **Anchors retired / killed:** <!-- list KILLED-* IDs with falsification basis -->
 - **Anchor-rule terminations** (per the 5 anchor types):
+  <!-- PICK-ONE GROUP (#507 §5): tick the selected line and DELETE the unselected lines, or ⊘-strike them (`- [ ] ~~option~~ ⊘ reason`). An unticked box must always mean undone work, never "not selected". -->
   - [ ] Lean file:line
   - [ ] simulation output + provenance
   - [ ] published experimental constraint
   - [ ] pre-registered ground-truth doc
   - [ ] derived dimensional / algebraic identity
 - **Routing axis** (per `docs/workflows/pr7_conflict_routing_rubric.md` v0.2):
+  <!-- PICK-ONE GROUP (#507 §5): tick the selected line and DELETE the unselected lines, or ⊘-strike them (`- [ ] ~~option~~ ⊘ reason`). An unticked box must always mean undone work, never "not selected". -->
   - [ ] theory-axis → co-sign by @qbp-oppenheimer needed (default for Tier 3)
   - [ ] schema-axis → co-sign by @cth-implementor needed
   - [ ] two-axis → both co-signs needed (schema first, then theory)
