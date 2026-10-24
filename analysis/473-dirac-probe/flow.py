@@ -4,60 +4,12 @@ Vectorised over samples via octonion structure tensor. Analytic gradient verifie
 
 import numpy as np
 
-exec(open("dirac_probe.py").read().split("np.set_printoptions")[0])
-E8 = basis(8)
-M = np.zeros((8, 8, 8))  # (x y)_k = M[i,j,k] x_i y_j
-for i in range(8):
-    for j in range(8):
-        M[i, j] = cd_mul(E8[i], E8[j])
-
-
-def omul(x, y):
-    return np.einsum("ni,nj,ijk->nk", x, y, M)
-
-
-def V(a, b):
-    c = omul(a, b) - omul(b, a)
-    return (c * c).sum(1)
-
-
-def grad(a, b):
-    # V=|c|^2, c=ab-ba ; dV = 2<c, da b - b da> + 2<c, a db - db a>
-    # <xy,z>=<x,z ybar>, <yx,z>=<x,ybar z>  (valid in every CD algebra)
-    c = omul(a, b) - omul(b, a)
-    bb = b.copy()
-    bb[:, 1:] *= -1
-    ab = a.copy()
-    ab[:, 1:] *= -1
-    ga = 2 * (omul(c, bb) - omul(bb, c))
-    ga[:, 0] = 0  # a imaginary: project
-    gb = 2 * (omul(ab, c) - omul(c, ab))
-    return ga, gb
-
+from cdalg import V, grad, grad_fd_check
 
 rng = np.random.default_rng(1)
-# --- FD check
-a = rng.normal(size=(1, 8))
-a[:, 0] = 0
-b = rng.normal(size=(1, 8))
-h = 1e-6
-ga, gb = grad(a, b)
-fd = []
-for k in range(8):
-    da = np.zeros((1, 8))
-    da[0, k] = h
-    fd.append(((V(a + da, b) - V(a - da, b)) / (2 * h))[0])
-fdb = []
-for k in range(8):
-    db = np.zeros((1, 8))
-    db[0, k] = h
-    fdb.append(((V(a, b + db) - V(a, b - db)) / (2 * h))[0])
-print(
-    "grad check a:",
-    np.allclose(ga[0], fd, atol=1e-5),
-    " b:",
-    np.allclose(gb[0], fdb, atol=1e-5),
-)
+# --- FD check  (two rng draws, consumed before the flow's sampling — do not reorder)
+ok_a, ok_b = grad_fd_check(rng)
+print("grad check a:", ok_a, " b:", ok_b)
 # --- flow
 N = 3000
 s = rng.normal(size=(N, 15))

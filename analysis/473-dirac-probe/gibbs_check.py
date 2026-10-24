@@ -17,7 +17,7 @@ vacuum manifold; out of scope for #631).
 
 import numpy as np
 
-exec(open("flow_big.py").read().split("# --- FD check")[0])  # omul, V
+from cdalg import V
 
 rng = np.random.default_rng(9)
 NTOT, CHUNK = 4_000_000, 250_000

@@ -1,0 +1,36 @@
+
+===== H (dim 4) =====
+e_a^2 = -1 for all a: True
+spectrum of D^2 = -L_s^2  (s = sum of imaginary units):
+   [((3+0j), 4)]
+  is D^2 = (n-1) I ? True
+  Delta = sum_{a<b} {L_a,L_b}  spectrum: [(0j, 4)]
+  D^2 == (n-1)I - Delta ? True
+  random imaginary unit s, spectrum of -L_s^2: [((1+0j), 4)]
+  random imaginary unit s, spectrum of -L_s^2: [((1+0j), 4)]
+  C = -sum_a L_a^2 spectrum: [((3+0j), 4)]
+  ad-Casimir -sum_a ad(e_a)^2 spectrum: [((-0+0j), 1), ((8+0j), 3)]
+
+===== O (dim 8) =====
+e_a^2 = -1 for all a: True
+spectrum of D^2 = -L_s^2  (s = sum of imaginary units):
+   [((7+0j), 8)]
+  is D^2 = (n-1) I ? True
+  Delta = sum_{a<b} {L_a,L_b}  spectrum: [(0j, 8)]
+  D^2 == (n-1)I - Delta ? True
+  random imaginary unit s, spectrum of -L_s^2: [((1+0j), 8)]
+  random imaginary unit s, spectrum of -L_s^2: [((1+0j), 8)]
+  C = -sum_a L_a^2 spectrum: [((7+0j), 8)]
+  ad-Casimir -sum_a ad(e_a)^2 spectrum: [((-0+0j), 1), ((24+0j), 7)]
+
+===== S (dim 16) =====
+e_a^2 = -1 for all a: True
+spectrum of D^2 = -L_s^2  (s = sum of imaginary units):
+   [((15+0j), 16)]
+  is D^2 = (n-1) I ? True
+  Delta = sum_{a<b} {L_a,L_b}  spectrum: [(0j, 16)]
+  D^2 == (n-1)I - Delta ? True
+  random imaginary unit s, spectrum of -L_s^2: [((0.173772+0j), 4), ((1+0j), 8), ((1.826228+0j), 4)]
+  random imaginary unit s, spectrum of -L_s^2: [((0.127913+0j), 4), ((1+0j), 8), ((1.872087+0j), 4)]
+  C = -sum_a L_a^2 spectrum: [((15+0j), 16)]
+  ad-Casimir -sum_a ad(e_a)^2 spectrum: [((-0+0j), 1), ((56+0j), 15)]

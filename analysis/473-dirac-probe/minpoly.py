@@ -1,6 +1,7 @@
 import numpy as np
 
-exec(open("delta_formula.py").read().split("# check symmetric")[0])
+from cdalg import alternator as T, cd_mul
+
 rng = np.random.default_rng(7)
 ok = True
 ok0 = True

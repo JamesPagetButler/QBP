@@ -1,18 +1,8 @@
 import numpy as np
 
-exec(open("dirac_probe.py").read().split("np.set_printoptions")[0])
-n = 16
+from cdalg import alternator as T, cd_mul, delta_max as delta
+
 rng = np.random.default_rng(3)
-
-
-def T(s):  # x -> [s,s,x] = (ss)x - s(sx)
-    ss = cd_mul(s, s)
-    return np.column_stack([cd_mul(ss, e) - cd_mul(s, cd_mul(s, e)) for e in basis(n)])
-
-
-def delta(s):
-    w = np.linalg.eigvalsh((T(s) + T(s).T) / 2)
-    return w.max()
 
 
 # check symmetric & traceless
