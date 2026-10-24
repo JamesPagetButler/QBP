@@ -65,7 +65,14 @@ QUARANTINE_REL = "QBP/.build-visibility-quarantine.json"
 # names it explicitly.
 BUILD_VISIBILITY_DIRS = PHYSICS_DIRS + ["Sprint12-Inherited"]
 
-IMPORT_RE = re.compile(r"^import\s+([\w.]+)", re.MULTILINE)
+# Matched against COMMENT-STRIPPED text only (see `strip_comments` / `imports_of`):
+# a `/- ... -/` block or `-- ...` line comment holding an `import` is not an
+# import, and must neither count as one (rules 1/2 false positive, #502) nor feed
+# the build-visibility closure (rule 5 false "visible"). Lean accepts leading
+# whitespace before `import` (`  import X`) and a comment on the same line
+# (`/- c -/ import X`, `-/ import X`); on stripped text comments are spaces, so a
+# whitespace-tolerant anchor is both safe and necessary (PR #719 Red Team K1).
+IMPORT_RE = re.compile(r"^[ \t]*import\s+([\w.]+)", re.MULTILINE)
 QUARANTINE_RE = re.compile(r"^\|\s*`(QBP\.[\w.]+)`", re.MULTILINE)
 # Lakefile parsing: `lean_lib`/`lean_exe` target blocks, each with an optional
 # `srcDir := "X"` and roots given as `root := `Mod`` or `roots := #[`A, `B]`.
@@ -76,8 +83,71 @@ LAKE_ROOTS_RE = re.compile(r"roots\s*:=\s*#\[([^\]]*)\]")
 BACKTICK_NAME_RE = re.compile(r"`([\w.]+)")
 
 
+def strip_comments(text: str) -> str:
+    """Blank out Lean comments, preserving every newline (so `^` anchors still hold).
+
+    Lean has two comment forms, both of which may hold the literal text `import`
+    at column 0 (a commented-out import, a worked example in a module docstring,
+    a `/-! ... -/` header quoting a forbidden import as the thing NOT to do):
+
+      * block comments `/- ... -/`, which NEST — `/- outer /- inner -/ still -/`
+        is one comment — and which include the `/-- doc -/` and `/-! mod -/` forms;
+      * line comments `-- ...` to end of line.
+
+    A raw `^import` regex (PR #497 Tier-3 Red Team F4, #502) sees through neither.
+    The scanner replaces comment characters with spaces and keeps newlines, so the
+    returned text is line-for-line aligned with the source; `IMPORT_RE` is applied
+    to this. The quarantine table (`QUARANTINE_RE`) is deliberately NOT read from
+    stripped text — it lives inside the aggregator's comment block by design.
+
+    `--` inside a block comment never starts a line comment, and `/-` inside a
+    line comment never opens a block: the scanner is in exactly one state at a
+    time. String literals are not modelled (an `import` can never follow one on
+    the same logical line in valid Lean, so this cannot create a false negative). Known, accepted
+    false-POSITIVE risk (Gemini, PR #719): a multi-line string literal whose body
+    starts a line with `import X` would be counted; no Foundations file does this,
+    and a false positive fails loud at review rather than silently passing.
+    An unterminated block comment swallows the rest of the file, as Lean would.
+    """
+    out: list[str] = []
+    i, n, depth = 0, len(text), 0
+    while i < n:
+        ch = text[i]
+        if depth > 0:
+            if text.startswith("/-", i):
+                depth += 1
+                out.append("  ")
+                i += 2
+            elif text.startswith("-/", i):
+                depth -= 1
+                out.append("  ")
+                i += 2
+            else:
+                out.append(ch if ch == "\n" else " ")
+                i += 1
+        elif text.startswith("/-", i):
+            depth = 1
+            out.append("  ")
+            i += 2
+        elif text.startswith("--", i):
+            end = text.find("\n", i)
+            if end == -1:
+                end = n
+            out.append(" " * (end - i))
+            i = end
+        else:
+            out.append(ch)
+            i += 1
+    return "".join(out)
+
+
+def imports_of_text(text: str) -> list[str]:
+    """Real `import X` lines of a Lean source, ignoring any inside comments."""
+    return IMPORT_RE.findall(strip_comments(text))
+
+
 def imports_of(path: Path) -> list[str]:
-    return IMPORT_RE.findall(path.read_text(encoding="utf-8"))
+    return imports_of_text(path.read_text(encoding="utf-8"))
 
 
 def module_of(path: Path, proofs: Path) -> str:
@@ -243,7 +313,7 @@ def check(proofs: Path) -> list[str]:
     aggregator = proofs / "QBP" / "Foundations.lean"
     if aggregator.is_file():
         text = aggregator.read_text(encoding="utf-8")
-        all_imports = IMPORT_RE.findall(text)
+        all_imports = imports_of_text(text)
         # Duplicate-import guard: the aggregator uses git merge=union (append-only,
         # order-independent), whose one failure mode is a duplicated import line
         # when two branches add the same module. `lake build` tolerates duplicate
@@ -257,6 +327,8 @@ def check(proofs: Path) -> list[str]:
                 )
             seen.add(imp)
         imported = set(all_imports)
+        # The quarantine table is a markdown table INSIDE the aggregator's comment
+        # block, so it is read from the raw (not comment-stripped) text.
         quarantined = set(QUARANTINE_RE.findall(text))
         # Stale-import guard (Gemini #527 point-5): union-merge's OTHER failure
         # mode is a divergent same-line edit (two branches rename the same

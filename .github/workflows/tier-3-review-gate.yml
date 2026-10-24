@@ -14,14 +14,29 @@ name: Tier-3 Review Gate
 on:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled, edited]
+  # #552: a review COMMENT posted after the last push must re-evaluate the gate —
+  # otherwise a PR that received its Red Team / Gemini / §I4 comments post-push sits
+  # red until someone pushes an empty commit (the stale-gate gap).
+  issue_comment:
+    types: [created, edited, deleted]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
 
 permissions:
   contents: read
   pull-requests: read
+  checks: write   # #552: publish the re-evaluated verdict as a check-run on the PR head sha
+
+# One evaluation per PR at a time; a newer event supersedes an in-flight one.
+concurrency:
+  group: tier3-gate-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
 
 jobs:
   tier-3-label:
     name: Tier-3 review-label required on theory-bearing diffs
+    # issue_comment also fires for plain issues — only PR comments are relevant.
+    if: github.event_name != 'issue_comment' || github.event.issue.pull_request
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,15 +45,35 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Collect changed files
+      - name: Resolve PR, base and head
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git diff --name-only "${{ github.event.pull_request.base.sha }}" \
-            "${{ github.event.pull_request.head.sha }}" > /tmp/changed.txt
+          case "${{ github.event_name }}" in
+            pull_request|pull_request_review) PR="${{ github.event.pull_request.number }}" ;;
+            issue_comment)                    PR="${{ github.event.issue.number }}" ;;
+          esac
+          BASE=$(gh pr view "$PR" --repo "${{ github.repository }}" --json baseRefName --jq .baseRefName)
+          HEAD=$(gh pr view "$PR" --repo "${{ github.repository }}" --json headRefOid --jq .headRefOid)
+          echo "pr=$PR"     >> "$GITHUB_OUTPUT"
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD" >> "$GITHUB_OUTPUT"
+          echo "PR #$PR  base=$BASE  head=$HEAD  event=${{ github.event_name }}"
+      - name: Collect changed files (merge-base / three-dot, #580)
+        run: |
+          # #580: two-dot base.sha..head.sha diffs every commit on master since the PR
+          # branched, so a stale-base PR false-positives on theory files it never touched.
+          # The merge-base (three-dot) diff is exactly what the PR would merge.
+          git fetch --no-tags origin "${{ steps.pr.outputs.base }}" "${{ steps.pr.outputs.head }}"
+          MB=$(git merge-base "origin/${{ steps.pr.outputs.base }}" "${{ steps.pr.outputs.head }}")
+          echo "merge-base: $MB"
+          git diff --name-only "$MB" "${{ steps.pr.outputs.head }}" > /tmp/changed.txt
           echo "changed files:"; cat /tmp/changed.txt
       - name: Collect labels + comments
         env:
           GH_TOKEN: ${{ github.token }}
-          PR: ${{ github.event.pull_request.number }}
+          PR: ${{ steps.pr.outputs.pr }}
         run: |
           gh api "repos/${{ github.repository }}/issues/${PR}/labels" --jq '.[].name' > /tmp/labels.txt || true
           # Join comment bodies with an explicit boundary so the gate can evaluate
@@ -46,8 +81,13 @@ jobs:
           # reviewer signature AND a verdict (FAULT-S4-003 fix). The notifier's
           # reviewer-naming checklist carries a signature but no verdict, so it
           # cannot satisfy the gate.
-          gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
-            --jq '[.[].body] | join("\n===TIER3-COMMENT-BOUNDARY===\n")' > /tmp/comments.txt || true
+          # #552 security: pass the RAW comment JSON (incl. author_association) — the script
+          # keeps only OWNER/MEMBER/COLLABORATOR authors, so on a public repo an outsider's
+          # comment can trigger a re-run but can never count as review evidence.
+          gh api --paginate "repos/${{ github.repository }}/issues/${PR}/comments" \
+            --jq '[.[] | {body, author_association, user: {login: .user.login}}]' \
+            | python3 -c 'import json,sys; out=[]; [out.extend(json.loads(l)) for l in sys.stdin if l.strip()]; json.dump(out, sys.stdout)' \
+            > /tmp/comments.json || echo "[]" > /tmp/comments.json
           # FAULT-S4-006 fix: the PR body is DELIBERATELY NOT included. It is authored by
           # the PR author, not a reviewer — a signature-word + verdict-word co-occurring in
           # body prose (e.g. "clears the Red Team follow-up" next to "§I4 APPROVE") satisfied
@@ -56,8 +96,41 @@ jobs:
           # own PR body can never stand in for one. Only issue/PR comments (minus the notifier)
           # are evaluated below.
       - name: Enforce Tier-3 review label
+        id: enforce
         run: |
+          set +e
           python3 scripts/check_tier3_label.py \
             --changed-files /tmp/changed.txt \
             --labels-file /tmp/labels.txt \
-            --comments-file /tmp/comments.txt
+            --comments-json /tmp/comments.json
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit $rc
+      # #552: an `issue_comment` run is NOT attached to the PR head sha by GitHub (it runs
+      # on the default branch, with the default branch's workflow + script), so the
+      # PR's checks would never see it. Publish the verdict as a check-run with the SAME
+      # name on the head sha, so the gate check flips without an empty push.
+      # `pull_request` and `pull_request_review` runs execute on refs/pull/N/merge and are
+      # natively attached to the PR head, so they do NOT republish (Red Team #717 F2).
+      # `!cancelled()` (not `always()`): a run superseded by the per-PR concurrency group
+      # must not post a stale `failure` on the head sha (Red Team #717 F1).
+      # Scope note: only ISSUE comments are read; PR *review* bodies (/pulls/N/reviews)
+      # are not, and never were — a review must be posted as a PR comment to count.
+      - name: Publish verdict as a check-run on the PR head (issue_comment events only)
+        if: ${{ !cancelled() && github.event_name == 'issue_comment' && steps.pr.outputs.head != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD: ${{ steps.pr.outputs.head }}
+          RC: ${{ steps.enforce.outputs.rc }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "${RC:-1}" = "0" ]; then C=success; S="Tier-3 gate satisfied (re-evaluated on ${{ github.event_name }})"; \
+          else C=failure; S="Tier-3 gate NOT satisfied (re-evaluated on ${{ github.event_name }})"; fi
+          gh api --method POST "repos/${{ github.repository }}/check-runs" \
+            -f name="Tier-3 review-label required on theory-bearing diffs" \
+            -f head_sha="$HEAD" -f status=completed -f conclusion="$C" \
+            -f details_url="$RUN_URL" \
+            -f "output[title]=$S" \
+            -f "output[summary]=Re-evaluated by tier-3-review-gate.yml on a ${{ github.event_name }} event (#552). Diff = merge-base three-dot (#580). Run: $RUN_URL" \
+            --jq '.id' | sed 's/^/check-run id: /'
+          echo "check-run published: $C on $HEAD"
