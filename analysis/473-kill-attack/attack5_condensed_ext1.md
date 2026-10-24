@@ -8,6 +8,11 @@ that supplies the dynamical rule from topological or measure-theoretic data."*
 DEFINITION and a KILL, so the conjecture can be tested.
 **Author.** lean-prover seat, worktree `probe-kill-5`, branch `research/473-kill-attack-5`,
 2026-09-24.
+**Route status (added per #683).** Per the 2026-09-25 ruling the locale-forcing route is
+**OPEN** research (`FLAG-locale-forcing-route-reopened`, PR #680, v0.6 addendum
+`docs/foundations/473-ac1-v0.6-addendum-2026-09-25.md`). Every "kill" / "the kill survives"
+below refers to the kill's *conclusion* — Prop 13(b) is not delivered via the condensed/Ext¹
+route — not to the route's status.
 
 ---
 
