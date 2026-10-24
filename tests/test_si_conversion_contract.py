@@ -244,16 +244,14 @@ class TestPublicSurfaceCoverage:
             "convert_mutant"
         ]
 
-    def test_string_mention_does_not_count_as_coverage(self) -> None:
+    def test_string_mention_does_not_count_as_coverage(self, tmp_path: Path) -> None:
         """Guard against the self-satisfying check: the snapshot test below
-        spells every public name as a string literal; those must not count."""
+        spells every public name as a string literal; those must not count.
+        Probe file lives in pytest's tmp_path (Gemini review, PR #767)."""
         src = 'def test_x():\n    assert names == ["only_in_a_string"]\n    f = real_call()\n'
-        tmp = TESTS_DIR / "_tmp_cov_probe.py"
+        tmp = tmp_path / "_tmp_cov_probe.py"
         tmp.write_text(src)
-        try:
-            refs = _names_referenced_in_tests(SI_TEST_FILES + [tmp])
-        finally:
-            tmp.unlink()
+        refs = _names_referenced_in_tests(SI_TEST_FILES + [tmp])
         assert "real_call" in refs and "only_in_a_string" not in refs
 
     def test_public_surface_snapshot(self) -> None:
