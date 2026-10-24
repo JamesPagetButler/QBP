@@ -1,13 +1,45 @@
-# Post-merge backstop (FAULT-S4-004 layer 2): auto-reopen any issue this push
-# closed via a closing keyword while it still has unchecked acceptance criteria.
-# Independent of branch protection — heals the false-complete signal even if the
-# PR-time guard (closing-ac-guard.yml) was bypassed or a fresh closing keyword was
-# typed in the squash-merge box at merge time.
+# Post-merge backstop (FAULT-S4-004 layer 2): auto-reopen any issue that was just
+# closed AUTOMATICALLY (by a merged PR or a commit — in this repo or any other)
+# while it still has unchecked acceptance criteria. Independent of branch
+# protection — heals the false-complete signal even if the PR-time guard
+# (closing-ac-guard.yml) was bypassed, a fresh closing keyword was typed in the
+# squash-merge box at merge time, or the closing PR lives in a sibling repo.
+#
+# Two triggers, one script (scripts/reopen_falsely_closed.py):
+#   push → master     scans the pushed commit messages for closing keywords
+#                     (original path, unchanged).
+#   issues: closed    (#753) asks the issue timeline WHO closed it. A null
+#                     `closer` = a human clicked Close → exempt. A PullRequest or
+#                     Commit closer, from ANY repository, is an automatic close →
+#                     reopen iff the issue is CLOSED/COMPLETED with ≥1 unchecked
+#                     `- [ ] **AC` box, naming the closing repo + PR in the comment.
+#
+# Coverage (measured by the #543 sweep, analysis/543-closed-ac-sweep/):
+#   COVERED   in-repo PR with a closing keyword in title/body       (48/52 cases; both paths)
+#   COVERED   keyword only in a squashed/merge commit message        (push path; #383/#433 class)
+#   COVERED   cross-repo close, e.g. qbp-systema PR "Closes JamesPagetButler/QBP#N"
+#             (#441/#442/#445 via qbp-systema#1–#3 — closer = PullRequest in
+#             JamesPagetButler/qbp-systema; issues path; replayed in
+#             scripts/test_reopen_falsely_closed.py)
+#   COVERED   manual Development-sidebar link, no keyword anywhere (#22 via PR #285):
+#             GitHub still records closer = PullRequest #285, so the issues path
+#             sees it — this class was out of reach of the PR-time guard only.
+#   EXEMPT    hand close (closer = null, e.g. #700) — a deliberate human action.
+#   EXEMPT    stateReason NOT_PLANNED — deliberate, not a completion claim.
+#   UNCOVERED closer not yet materialised when the webhook fires (retried 3× over
+#             ~10 s, then read as a hand close and logged); an in-repo keyword
+#             close is still caught by the push path in that case.
+#   UNCOVERED a body edited to tick boxes WITHOUT evidence — out of scope here
+#             (the backstop reads the box state, not its truth).
+# Both paths can fire on one in-repo close: the reopen is idempotent and the
+# comment is deduplicated via a hidden marker newer than the close event.
 name: Reopen falsely-closed issues
 
 on:
   push:
     branches: [master]
+  issues:
+    types: [closed]
   workflow_dispatch:
 
 permissions:
@@ -21,6 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Collect this push's commit messages
+        if: github.event_name != 'issues'
         run: |
           set -euo pipefail
           # messages of the commits in this push (before..after); fall back to HEAD
@@ -31,8 +64,16 @@ jobs:
             git log --format='%B' -1 "${{ github.sha }}" > /tmp/commits.txt
           fi
           echo "commit messages collected:"; cat /tmp/commits.txt
-      - name: Reopen any issue closed with unchecked ACs
+      - name: Reopen any issue closed with unchecked ACs (push path)
+        if: github.event_name != 'issues'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 scripts/reopen_falsely_closed.py --commits-file /tmp/commits.txt
+      - name: Reopen if this close was automatic and ACs are open (issues path)
+        if: github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 scripts/reopen_falsely_closed.py --issue "${{ github.event.issue.number }}"
