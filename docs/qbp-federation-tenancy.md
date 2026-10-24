@@ -4,7 +4,7 @@
 
 > **Authoring:** qbp-architecture (Claude Opus 4.7), James Paget Butler (Beekeeper), qbp-implementor (v0.2 revision pass, 2026-05-15), qbp-oppenheimer (v0.3 frame-discipline draft, 2026-10-22)
 > **Date:** 2026-10-22 (v0.3 draft); 2026-05-15 (v0.2 revision); 2026-05-08 (v0.1 design surface)
-> **Status:** **v0.3 — DRAFT for Human Visual Review (QBP #434).** v0.2 content unchanged except §0.2 (this provenance), §1.5, §2.1–2.4 (frame annotations), §2.6 (reference-frame discipline + `Lab` base case), new §8.6 (cross-project asks), §10 item 6 and the footer. Nothing in v0.3 is load-bearing for the first-tenancy daily-batch use case; it becomes load-bearing at Walk (multi-planet tenants, cosmological-source frame discipline, cross-tenant federation). Ratification is the beekeeper's.
+> **Status:** **v0.3 — RATIFIED by the beekeeper (Human Visual Review passed, 2026-10-24; QBP #434, PR #732).** v0.2 content unchanged except §0.2 (this provenance), §1.5, §2.1–2.4 (frame annotations), §2.6 (reference-frame discipline + `Lab` base case), new §8.6 (cross-project asks), §10 item 6 and the footer. Nothing in v0.3 is load-bearing for the first-tenancy daily-batch use case; it becomes load-bearing at Walk (multi-planet tenants, cosmological-source frame discipline, cross-tenant federation). Ratification is the beekeeper's.
 > **Generic pattern:** `~/Documents/Contextus/doc/contextus-tenancy-pattern.md`
 > **First tenant:** QBP
 
@@ -36,7 +36,7 @@ v0.2 incorporates all R-findings from the 2026-05-11 PR #403 review synthesis (q
 
 The four BMA Theory Addenda 11/15/16/17 references in v0.1 are removed; v0.2 cites only existing artifacts on disk per the standing anchor rule (`docs/workflows/review_anchoring.md`, PR #413).
 
-### 0.2 v0.3 draft provenance *(QBP #434, 2026-10-22)*
+### 0.2 v0.3 provenance *(QBP #434, drafted 2026-10-22, ratified 2026-10-24)*
 
 v0.3 answers the gap the beekeeper surfaced at the PR #403 v0.2 Human Visual Review (2026-05-15): §2.6's `BoundingBox4D` carried an **implicit Earth-fixed frame** (lat/lon), and `LabSet` recursed with **no `Lab` base case**. His test case — "a lab directly above Challenger Deep, 11°21′N 142°12′E" — encodes fine, but a lab on Mars, on the ISS, or at JWST's L2 halo does not, and a cosmological source (GRB 250702B, a LIGO source at 1.3 Gly) has no lat/lon at all. Changes, all confined to §1.5, §2.1–2.4 and §2.6:
 
@@ -704,7 +704,7 @@ When all M1–M9 pass, QBP federation tenancy is operational. qbp-implementor sh
 
 ---
 
-*QBP Federation Tenancy v0.3 DRAFT | 2026-10-22 (v0.2: 2026-05-15)*
+*QBP Federation Tenancy v0.3 | ratified 2026-10-24 (draft 2026-10-22; v0.2: 2026-05-15)*
 *Co-Authored-By: James Paget Butler (Beekeeper)*
 *Co-Authored-By: Claude Opus 4.7 (Architect, QBP-Compute-Unit) — v0.1 authorship*
 *Co-Authored-By: qbp-implementor (Claude Opus 4.7, Integration role) — v0.2 revision pass*
