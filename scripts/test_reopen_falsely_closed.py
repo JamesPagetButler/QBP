@@ -310,6 +310,34 @@ def test_decide_is_pure_and_ordered():
     assert R.decide(issue(1, BODY_OPEN_ACS), manual)["action"] == "exempt-manual"
 
 
+def test_should_retry_only_when_a_closer_could_be_lagging():
+    """Gemini SHOULD-FIX (PR #760): a hand close must not burn the retry budget.
+    Retry iff CLOSED + no closer yet + >=1 linked closing PR (possible webhook lag)."""
+    closed_no_refs = {
+        "state": "CLOSED",
+        "closedByPullRequestsReferences": {"totalCount": 0},
+    }
+    closed_refs = {
+        "state": "CLOSED",
+        "closedByPullRequestsReferences": {"totalCount": 1},
+    }
+    assert not R.should_retry(
+        closed_no_refs, closed_event(None)
+    ), "hand close: no retry"
+    assert not R.should_retry(closed_no_refs, None), "no event, no refs: no retry"
+    assert R.should_retry(
+        closed_refs, closed_event(None)
+    ), "linked PR, null closer: retry"
+    assert R.should_retry(closed_refs, None), "linked PR, no event yet: retry"
+    assert not R.should_retry(
+        closed_refs, closed_event(pr_closer(REPO, 1))
+    ), "closer seen"
+    assert not R.should_retry(
+        {"state": "OPEN", "closedByPullRequestsReferences": {"totalCount": 1}}, None
+    )
+    assert not R.should_retry({"state": "CLOSED"}, None), "field absent -> treated as 0"
+
+
 def test_comment_dedupe_marker():
     since = "2026-10-24T10:00:00Z"
     older = {"body": R.MARKER + " x", "createdAt": "2026-10-24T09:59:59Z"}
@@ -370,6 +398,7 @@ def main():
         test_historical_manual_link_case_is_covered,
         test_describe_closer_shapes,
         test_decide_is_pure_and_ordered,
+        test_should_retry_only_when_a_closer_could_be_lagging,
         test_comment_dedupe_marker,
         test_reopen_comment_names_repo_and_pr,
         test_push_path_unchanged_without_keywords,

@@ -68,7 +68,10 @@ from check_closing_acs import closing_refs, count_unchecked_acs
 MARKER = "<!-- fault-s4-004-backstop -->"
 
 # The ClosedEvent's `closer` can lag the `issues: closed` webhook by a moment;
-# retry a few times before concluding "no closer" (= hand close, exempt).
+# retry a few times before concluding "no closer" (= hand close, exempt). A hand
+# close and a lagging closer look identical on the ClosedEvent (closer: null), so
+# the retry is skipped only when the issue has NO linked closing PR at all
+# (`closedByPullRequestsReferences.totalCount == 0`) — then nothing can be lagging.
 CLOSER_RETRIES = 3
 CLOSER_RETRY_SLEEP_S = 5
 
@@ -76,6 +79,7 @@ CLOSED_EVENT_QUERY = (
     "query($owner: String!, $name: String!, $number: Int!) { "
     "repository(owner: $owner, name: $name) { issue(number: $number) { "
     "number state stateReason closedAt body "
+    "closedByPullRequestsReferences(first: 1) { totalCount } "
     "timelineItems(last: 1, itemTypes: [CLOSED_EVENT]) { nodes { "
     "... on ClosedEvent { createdAt stateReason actor { login } closer { __typename "
     "... on PullRequest { number merged url repository { nameWithOwner } } "
@@ -221,6 +225,19 @@ def already_commented(comments: List[Dict[str, Any]], since: str) -> bool:
     return False
 
 
+def should_retry(node: Dict[str, Any], ev: Optional[Dict[str, Any]]) -> bool:
+    """True iff a second look at the timeline could change the answer: the issue is
+    still CLOSED, no closer is visible yet, and at least one closing PR is linked
+    (so the null closer may be webhook lag rather than a hand close). A hand close
+    with no linked PR (the common case) returns False immediately — no sleep."""
+    if node.get("state") != "CLOSED":
+        return False
+    if ev is not None and ev.get("closer"):
+        return False
+    refs = node.get("closedByPullRequestsReferences") or {}
+    return int(refs.get("totalCount") or 0) > 0
+
+
 def fetch_issue_and_closed_event(repo: str, num: int) -> Optional[Dict[str, Any]]:
     owner, name = repo.split("/", 1)
     data = gh_json(
@@ -261,10 +278,7 @@ def run_issue_mode(
             return 0
         nodes = [e for e in ((node.get("timelineItems") or {}).get("nodes") or []) if e]
         ev = nodes[-1] if nodes else None
-        # stop retrying once we have a closer, or the issue is not CLOSED any more
-        # (already reopened by the push path) — only a CLOSED issue with no closer
-        # yet is worth a second look.
-        if node.get("state") != "CLOSED" or (ev is not None and ev.get("closer")):
+        if not should_retry(node, ev):
             break
         if attempt + 1 < retries:
             time.sleep(CLOSER_RETRY_SLEEP_S)
