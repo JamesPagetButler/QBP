@@ -1,0 +1,72 @@
+-- ============================================================================
+-- qbp_housekeeping_sprint4_gate.edda — lock file for QBP#714 (thread `qbp-housekeeping-sprint4-gate`)
+-- Beekeeper-directed 2026-10-24. Tracks QBP#714; language asks live on inter#197.
+--
+-- PURPOSE
+--   The QBP housekeeping-before-Sprint-4 gate written as Edda, so that the gate itself
+--   becomes an executable spec: the thread PATH (buckets A/B/C/D -> discharged -> unlock)
+--   as a `skill`, and the per-strike exit rule (settle the leg, THEN exercise the merge
+--   capability) as a `contract`.
+--
+-- WHAT COMPILES TODAY (stage-1)
+--   * `skill qbp_housekeeping_sprint4_gate` — the thread path as a scoped hypergraph of `op`s
+--     (inter#197 lowering row: thread / thread path -> skill).
+--   * `contract strike_exit` — the strike-exit grant-gate (theory v0.3 §4.13: exercisable
+--     authority = hold grant AND step witnessed-settled).
+--   Checked with Edda Main @9d571a5: `go run ./cmd/edda-stage-1 check <this file>`
+--     -> `ok: ... 1 contract(s), 1 skill(s) checked (stage-1)`, exit 0.
+--   Negative probe (drop the `settle` line, exercise with the open step) -> EDDA-AUTH-018, exit 1.
+--
+-- WHAT IS PSEUDO (NOT in this file; NOT in the parser)
+--   The lock proper — `lock { legs: [...] where { ... } invariants: [...] unlock := ... scope { ... } }`
+--   — is Edda-SHAPED pseudo-spec only. `lock { invariants }` is theory v0.3 §3.4 (unparsed);
+--   `legs`, `where{}`, `unlock`, `scope`, `evidence` are proposed forms. It is kept out of this
+--   file so the file stays compilable; it lives in 714-thread-and-lock-draft.md §B2 next to the
+--   8 questions for edda-implementor (bragi). See QBP#714 and inter#197.
+--
+-- BEEKEEPER'S GOAL (verbatim, 2026-10-24)
+--   "by the time we get to our next housekeeping session you can fully compile the edda and
+--    actually do an unlock by completing the housekeeping work that is in scope — Edda built by
+--    real use-case demand"
+-- ============================================================================
+-- QBP#714 thread `qbp-housekeeping-sprint4-gate` — the thread PATH as an Edda skill
+-- (inter#197 lowering row: thread / thread path -> `skill`, a scoped hypergraph of `op`s)
+-- and the strike-exit grant-gate as an Edda contract (theory v0.3 §4.13: exercisable
+-- authority = hold grant ∧ step witnessed-settled). Real stage-1 syntax (edda Main 9d571a5).
+module qbp.housekeeping.sprint4_gate
+
+skill qbp_housekeeping_sprint4_gate {
+    -- the warp this thread runs on: QBP master is the embodiment vessel
+    vessel qbp_master
+    node qbp_master : Vessel
+    -- one node per #714 bucket; quantities = open housekeeping issues at the 2026-10-24 read
+    node bucket_a : Vessel
+    node bucket_b : Vessel
+    node bucket_c : Vessel
+    node bucket_d : Vessel
+    node discharged : Vessel
+    -- control = the pr-merge-completeness gate; mechanisms = the lanes
+    node gate : Junction
+    node oppenheimer : Junction
+    node implementor : Junction
+    node beekeeper : Junction
+    -- strikes (E4 mass-balance: issues in == issues discharged, nothing relabelled away)
+    op close_a     : tails { bucket_a: 14 } heads { discharged: 14 } control { gate } mechanism { beekeeper }
+    op strike_b    : tails { bucket_b: 14 } heads { discharged: 14 } control { gate } mechanism { oppenheimer, implementor }
+    op lane_c      : tails { bucket_c: 10 } heads { discharged: 10 } control { gate } mechanism { implementor }
+    op reconcile_d : tails { bucket_d: 20 } heads { discharged: 20 } control { gate } mechanism { beekeeper }
+    -- the lock at the end of the thread path: 58 discharged -> the Sprint-4-ready warp
+    op unlock_714  : tails { discharged: 58 } heads { qbp_master: 58 } control { gate } mechanism { beekeeper }
+}
+
+-- the strike-exit gate for ONE strike: a leg is opened, settled (witnessed), and only then
+-- may the auto-mode merge capability be exercised. Exercise-before-settle is EDDA-AUTH-018.
+contract strike_exit {
+    tier: C
+    requires: cap(merge_housekeeping, scope = qbp.master)
+    body: {
+        open leg
+        settle leg as leg_witness
+        exercise merge_housekeeping with leg_witness
+    }
+}
