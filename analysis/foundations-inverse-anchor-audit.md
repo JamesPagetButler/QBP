@@ -1,16 +1,16 @@
 # Foundations Inverse Anchor Audit (#464)
 
-**Generated:** 2026-10-21 (#633 PR #727) · **Tool:** `scripts/anchor_inverse_audit.py` (re-runnable; replaces the hand-authored `scripts/inventory_verification_report.md`)
+**Generated:** 2026-10-23 (merge origin/master into PR #729 after #727) · **Tool:** `scripts/anchor_inverse_audit.py` (re-runnable; replaces the hand-authored `scripts/inventory_verification_report.md`)
 **Inputs:** `proofs/` Lean corpus · `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json`
 
 ## 1. Summary
 
 | Metric | Count |
 |---|---|
-| theorems total | 1927 |
-| anchors total | 345 |
-| anchors with theorems list | 67 |
-| anchors with proof file | 123 |
+| theorems total | 1945 |
+| anchors total | 346 |
+| anchors with theorems list | 68 |
+| anchors with proof file | 124 |
 | lean side orphans | 42 |
 | anchor side phantoms | 0 |
 | stale path citations | 0 |

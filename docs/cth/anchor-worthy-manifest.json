@@ -1379,6 +1379,21 @@
         "QBP.Foundations.FanoOrientationF3.e",
         "QBP.Foundations.FanoOrientationF3.signedBasis"
       ]
+    },
+    {
+      "anchor_id": "PROOF-rule-field-in-kernel-algebra-leaf-foliation",
+      "declared_by": "#697-leaf-foliation",
+      "proof_system": "lean4",
+      "witnesses": [
+        "QBP.Substrate.RuleFlowLeafFoliation.ruleField_mem_kernelAlgebra",
+        "QBP.Substrate.RuleFlowLeafFoliation.gradV_mem_fixed_leaf",
+        "QBP.Substrate.RuleFlowLeafFoliation.ruleField_mem_fixed_leaf",
+        "QBP.Substrate.RuleFlowLeafFoliation.rk4Stage_mem_fixed_leaf",
+        "QBP.Substrate.RuleFlowLeafFoliation.octonion_double_comm_pure",
+        "QBP.Substrate.RuleFlowLeafFoliation.cdLo_gradV_eq_plane_comb",
+        "QBP.Substrate.RuleFlowLeafFoliation.cdHi_gradV_eq_plane_comb",
+        "QBP.Substrate.RuleFlowLeafFoliation.liftLeaf_gradV_eq"
+      ]
     }
   ]
 }
