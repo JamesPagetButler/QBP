@@ -179,7 +179,7 @@ CASES = [
         "manual close (closer null), open ACs → EXEMPT, no reopen",
         case(900, BODY_OPEN_ACS, None),
         "exempt-manual",
-        ["closer_kind=manual"],
+        ["closer_kind=manual", "no closer visible"],
     ),
     (
         "no closed event at all (timeline empty) → treated as manual, exempt",
@@ -288,6 +288,12 @@ def test_describe_closer_shapes():
     d = R.describe_closer(commit_closer(REPO, "83bf23b060e6", 456), REPO)
     assert d["kind"] == "commit" and d["number"] == 456
     assert d["label"] == "JamesPagetButler/QBP@83bf23b (PR JamesPagetButler/QBP#456)"
+    unmerged = pr_closer(REPO, 1)
+    unmerged["merged"] = False
+    both = commit_closer(REPO, "deadbeef0000")
+    both["associatedPullRequests"]["nodes"] = [unmerged, pr_closer(REPO, 2)]
+    d = R.describe_closer(both, REPO)
+    assert d["number"] == 2, "label must prefer the MERGED associated PR"
     d = R.describe_closer({"__typename": "Something"}, REPO)
     assert d["kind"] == "unknown", "an unknown non-null closer is NOT a hand close"
 
@@ -346,6 +352,9 @@ def test_workflow_wires_both_paths():
     assert "issues:" in wf and "types: [closed]" in wf, "issues:closed trigger missing"
     assert "--issue" in wf and "github.event.issue.number" in wf
     assert "--commits-file /tmp/commits.txt" in wf, "push path must stay"
+    assert (
+        "GITHUB_REPOSITORY:" not in wf
+    ), "default GITHUB_* vars must not be overridden"
     assert "branches: [master]" in wf
     assert "issues: write" in wf
 

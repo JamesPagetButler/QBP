@@ -28,6 +28,9 @@ Two entry modes (both wired in .github/workflows/reopen-falsely-closed.yml):
                         the in-repo keyword rule — and the reopen comment names the
                         closing repo + PR (or commit). Cross-repo closes never produce
                         a QBP push, so this is the only path that sees them.
+                        Residual: a closer in a repo this token cannot read may
+                        come back null (-> read as a hand close, logged) or with
+                        no repository field (-> still automatic, repo shown as ?).
 
 SAFETY — only ever undoes an automatic close, never fights a deliberate one:
   - a hand close (closer == null) is exempt in --issue mode; in --commits-file
@@ -133,6 +136,8 @@ def describe_closer(closer: Optional[Dict[str, Any]], repo: str) -> Dict[str, An
             if p and p.get("number") is not None
         ]
         out["label"] = f"{out['repo']}@{out['oid'][:7]}"
+        # prefer the merged PR (a commit can sit in an unmerged PR too); label only
+        prs.sort(key=lambda p: 0 if p.get("merged") else 1)
         if prs:
             p = prs[0]
             p_repo = ((p.get("repository") or {}).get("nameWithOwner")) or out["repo"]
@@ -155,7 +160,8 @@ def decide(issue: Dict[str, Any], closer: Dict[str, Any]) -> Dict[str, Any]:
     if closer["kind"] == "manual":
         return {
             "action": "exempt-manual",
-            "reason": "closed by hand (no PR / commit closer) — never touched",
+            "reason": "no closer visible (hand close, or closer not yet materialised / "
+            "not readable by this token) — never touched",
             "n_unmet": n_unmet,
         }
     if state != "CLOSED":
@@ -236,8 +242,8 @@ def fetch_issue_and_closed_event(repo: str, num: int) -> Optional[Dict[str, Any]
     return ((data.get("data") or {}).get("repository") or {}).get("issue")
 
 
-def fetch_comments(num: int) -> List[Dict[str, Any]]:
-    info = gh_json(["issue", "view", str(num), "--json", "comments"])
+def fetch_comments(repo: str, num: int) -> List[Dict[str, Any]]:
+    info = gh_json(["issue", "view", str(num), "-R", repo, "--json", "comments"])
     if isinstance(info, dict):
         return list(info.get("comments") or [])
     return []
@@ -265,7 +271,7 @@ def run_issue_mode(
     if node is None:
         return 0
     return apply_decision(
-        repo, node, ev, fetch_comments(num) if not dry_run else [], dry_run
+        repo, node, ev, fetch_comments(repo, num) if not dry_run else [], dry_run
     )
 
 
@@ -289,7 +295,7 @@ def apply_decision(
     if dry_run:
         print(f"::warning::(dry-run) would auto-reopen #{num}")
         return 0
-    subprocess.run(["gh", "issue", "reopen", str(num)], timeout=60)
+    subprocess.run(["gh", "issue", "reopen", str(num), "-R", repo], timeout=60)
     since = (ev or {}).get("createdAt") or issue.get("closedAt") or ""
     if already_commented(comments, since):
         print(
@@ -302,6 +308,8 @@ def apply_decision(
                 "issue",
                 "comment",
                 str(num),
+                "-R",
+                repo,
                 "--body",
                 reopen_comment_issue_mode(num, d["n_unmet"], closer),
             ],

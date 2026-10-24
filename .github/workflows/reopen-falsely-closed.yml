@@ -16,7 +16,7 @@
 #
 # Coverage (measured by the #543 sweep, analysis/543-closed-ac-sweep/):
 #   COVERED   in-repo PR with a closing keyword in title/body       (48/52 cases; both paths)
-#   COVERED   keyword only in a squashed/merge commit message        (push path; #383/#433 class)
+#   COVERED   keyword only in a squashed/merge commit message        (both paths — closer = Commit; #383/#433 class)
 #   COVERED   cross-repo close, e.g. qbp-systema PR "Closes JamesPagetButler/QBP#N"
 #             (#441/#442/#445 via qbp-systema#1–#3 — closer = PullRequest in
 #             JamesPagetButler/qbp-systema; issues path; replayed in
@@ -29,6 +29,11 @@
 #   UNCOVERED closer not yet materialised when the webhook fires (retried 3× over
 #             ~10 s, then read as a hand close and logged); an in-repo keyword
 #             close is still caught by the push path in that case.
+#   UNCOVERED closer in a repository this repo's GITHUB_TOKEN cannot read (private
+#             sibling, no access): GraphQL may return closer = null → read as a
+#             hand close and logged. A closer with no readable `repository` field
+#             is still treated as automatic (repo shown as "?"). Both sibling
+#             repos in the #543 sweep are public.
 #   UNCOVERED a body edited to tick boxes WITHOUT evidence — out of scope here
 #             (the backstop reads the box state, not its truth).
 # Both paths can fire on one in-repo close: the reopen is idempotent and the
@@ -74,6 +79,6 @@ jobs:
         if: github.event_name == 'issues'
         env:
           GH_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
+          # --repo defaults to $GITHUB_REPOSITORY (a default runner variable)
           python3 scripts/reopen_falsely_closed.py --issue "${{ github.event.issue.number }}"
