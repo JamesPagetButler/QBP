@@ -9,6 +9,12 @@
 # section whose Type column is Validation / Novel / OPEN only. Lives here rather
 # than in a new workflow so pr-check-status.yml's workflow_run list is unchanged
 # ("Tenancy XRef Lint" is already on it).
+#
+# Also hosts the #479 numeric-anchor lister self-test (scripts/list_numeric_anchors.py):
+# the FORCED/SELECTED/UNDECIDED proposal's record-cited OVERRIDES are verified
+# verbatim against the ledger, so a ledger edit that moves a quoted field fails
+# here with the anchor named (fix = update the quote in OVERRIDES). Same
+# placement rationale as #736.
 name: "Tenancy XRef Lint"
 
 on:
@@ -23,6 +29,9 @@ on:
       - "research/**"
       - "scripts/check_prediction_classification.py"
       - "scripts/test_check_prediction_classification.py"
+      - "scripts/list_numeric_anchors.py"
+      - "scripts/test_list_numeric_anchors.py"
+      - "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
   pull_request:
     branches:
       - master
@@ -34,6 +43,9 @@ on:
       - "research/**"
       - "scripts/check_prediction_classification.py"
       - "scripts/test_check_prediction_classification.py"
+      - "scripts/list_numeric_anchors.py"
+      - "scripts/test_list_numeric_anchors.py"
+      - "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
 
 jobs:
   tenancy-xref-lint:
@@ -69,3 +81,20 @@ jobs:
 
       - name: "Gate self-test (adversarial docs must FAIL)"
         run: python3 scripts/test_check_prediction_classification.py
+
+  numeric-anchor-lister-selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "#479 lister: summary over the ledger (OVERRIDES quotes verified verbatim)"
+        run: python3 scripts/list_numeric_anchors.py --summary
+
+      - name: "#479 lister self-test (adversarial synthetic ledgers + real-ledger invariants)"
+        run: python3 scripts/test_list_numeric_anchors.py
