@@ -547,11 +547,14 @@ theorem universe_eigenvalue_unique (U : Universe) {x : CDAlg ℝ 4} (hx : x ≠ 
 
     **What this does NOT say (docstring reworded per #683 / issue #688 round 2).**  The
     theorem's NAME over-reads its statement: it proves only `L_s² ≠ −N(s)·id`.  It does
-    **not** prove that no quaternion-like subalgebra closes in flight — numerically
-    `span{1, s, ℓ, s·ℓ}` IS a 4-dimensional associative subalgebra at in-flight states
-    (`InFlightAlgebra`, #688), and the anchor's NOT-claimed clause already records this.
-    The name is kept for anchor/ledger stability; read it as "no *scalar* closure", not
-    "no quaternion closure". -/
+    **not** prove that no quaternion-like subalgebra closes in flight — on the contrary,
+    `QBP/Foundations/InFlightAlgebra.lean` PROVES that `span{1, s, ℓ, s·ℓ}` is closed and
+    associative for every imaginary `s` (`inFlight_closed_associative`) and is
+    4-dimensional iff `s ≠ ±ℓ` (`inFlight_independent_iff`, `pOf_eq_zero_iff`); every
+    in-flight state is ≠ ±ℓ (the poles are vacua), so a 4-dimensional associative
+    subalgebra DOES close at every in-flight state (#688).  The anchor's NOT-claimed
+    clause already records this.  The name is kept for anchor/ledger stability; read it
+    as "no *scalar* closure", not "no quaternion closure". -/
 theorem inFlight_no_quaternion_closure {s : CDAlg ℝ 4} (hs : s ∈ InFlight) :
     ¬ (∀ x, s * (s * x) = (-(N s)) • x) := by
   intro h

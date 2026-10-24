@@ -135,7 +135,7 @@ Correction to the brief this draft was written from: the AC1(a)/(b) witnesses ar
 | Ext¹ clause (b) "identically zero" | WITHDRAWN: HH²(ℍ, ℍ) = 0 rigidifies ℍ's product, but ℍ ↪ 𝕆 has 8-dimensional moduli T(G₂/SO(4)) | **OPEN** | PROOF-level-set-invariants-rule-blind (Red Team M3); CONJ-condensed-math-for-transition-state (marginal) |
 | Positive in-flight account | what the in-flight region IS as a space with configurations (hosting clause (c)'s "pointless" half); which of {orbit space of the rule, a locale/condensed object, a limit of finite approximations} is a definition | **OPEN** | **#688** (filed 2026-09-28; at v0.1 this had no issue — named only in the hosting definition §5 Q3 and the #473 plan §4) |
 
-**Stated honestly.** Everything proved here is negative or structural: V sees at most one of fourteen directions, so no functional of its level sets can select the rule. No positive account of the in-flight region is on record and no issue tracks one; the negatives say only that the potential alone does not describe its dynamics.
+**Stated honestly.** Everything proved here is negative or structural: V sees at most one of fourteen directions, so no functional of its level sets can select the rule. No positive account of the in-flight region is on record (#688 tracks one, filed 2026-09-28; none at v0.1); the negatives say only that the potential alone does not describe its dynamics.
 
 ## 5. Prediction candidate (AC2)
 
