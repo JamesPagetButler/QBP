@@ -5,7 +5,7 @@
 > **Authoring:** qbp-architecture (Claude Opus 4.7), James Paget Butler (Beekeeper), qbp-implementor (v0.2 revision pass, 2026-05-15), qbp-oppenheimer (v0.3 frame-discipline draft, 2026-10-22)
 > **Date:** 2026-10-22 (v0.3 draft); 2026-05-15 (v0.2 revision); 2026-05-08 (v0.1 design surface)
 > **Status:** **v0.3 — RATIFIED by the beekeeper (Human Visual Review passed, 2026-10-24; QBP #434, PR #732).** v0.2 content unchanged except §0.2 (this provenance), §1.5, §2.1–2.4 (frame annotations), §2.6 (reference-frame discipline + `Lab` base case), new §8.6 (cross-project asks), §10 item 6 and the footer. Nothing in v0.3 is load-bearing for the first-tenancy daily-batch use case; it becomes load-bearing at Walk (multi-planet tenants, cosmological-source frame discipline, cross-tenant federation). Ratification is the beekeeper's.
-> **Generic pattern:** `~/Documents/Contextus/doc/contextus-tenancy-pattern.md`
+> **Generic pattern:** `~/Documents/Contextus/doc/contextus-tenancy-pattern.md` <!-- expected-on-sibling: Contextus doc/contextus-tenancy-pattern.md -->
 > **First tenant:** QBP
 
 ---
@@ -14,7 +14,7 @@
 
 This is the QBP instantiation of the generic Contextus Tenancy Pattern (v0.1). It declares QBP's Stance Type-Nodes, Locale set, scope-node taxonomy, scout configuration, and BMA observation hooks. qbp-implementor reviewed and refined on bootstrap; v0.2 reflects the resolved design surface.
 
-**Architectural anchor:** BMA Theory Addendum 18 v0.2 (Hypergraph Access Pattern; `~/Documents/BMA/theory/hypergraph-inference/A18-v0.2-design-surface.md`) — Stance × Locale × Scout × Scoring. A18 §P12 formalises the Seam-threshold definition referenced throughout this doc.
+**Architectural anchor:** BMA Theory Addendum 18 v0.2 (Hypergraph Access Pattern; `~/Documents/BMA/theory/hypergraph-inference/A18-v0.2-design-surface.md`) — Stance × Locale × Scout × Scoring. <!-- expected-on-sibling: BMA theory/hypergraph-inference/A18-v0.2-design-surface.md --> A18 §P12 formalises the Seam-threshold definition referenced throughout this doc.
 
 **Operational pattern:** Contextus tenancy pattern v0.1 (sibling doc in `~/Documents/Contextus/doc/`).
 
@@ -681,11 +681,11 @@ When all M1–M9 pass, QBP federation tenancy is operational. qbp-implementor sh
 
 | Doc | Path | Status |
 |---|---|---|
-| Generic tenancy pattern | `~/Documents/Contextus/doc/contextus-tenancy-pattern.md` | exists |
-| Federation access pattern v0.1 | `~/Documents/BMA/theory/hypergraph-inference/BMA-Theory-Addendum-18_0-Hypergraph-Access-Pattern.md` | exists |
-| Federation access pattern v0.2 (current) | `~/Documents/BMA/theory/hypergraph-inference/A18-v0.2-design-surface.md` | exists; **§P12 Seam threshold formalization is canonical for v0.2** |
+| Generic tenancy pattern | `~/Documents/Contextus/doc/contextus-tenancy-pattern.md` <!-- expected-on-sibling: Contextus doc/contextus-tenancy-pattern.md --> | exists |
+| Federation access pattern v0.1 | `~/Documents/BMA/theory/hypergraph-inference/BMA-Theory-Addendum-18_0-Hypergraph-Access-Pattern.md` <!-- expected-on-sibling: BMA theory/hypergraph-inference/BMA-Theory-Addendum-18_0-Hypergraph-Access-Pattern.md --> | exists |
+| Federation access pattern v0.2 (current) | `~/Documents/BMA/theory/hypergraph-inference/A18-v0.2-design-surface.md` <!-- expected-on-sibling: BMA theory/hypergraph-inference/A18-v0.2-design-surface.md --> | exists; **§P12 Seam threshold formalization is canonical for v0.2** |
 | qbp-implementor onboarding | `~/Documents/QBP/docs/qbp-implementor-onboarding-prompt.md` | exists (same PR as this doc) |
-| Contextus Spec v1.3 | `~/Documents/Contextus/Contextus-Spec-v1.3.md` | exists; **§4.4 InsightSignal Pipeline + §4.6 Scope Nodes are canonical references** |
+| Contextus Spec v1.3 | `~/Documents/Contextus/Contextus-Spec-v1.3.md` <!-- expected-on-sibling: Contextus Contextus-Spec-v1.3.md --> | exists; **§4.4 InsightSignal Pipeline + §4.6 Scope Nodes are canonical references** |
 | CTH inventory baseline v5_3 (tracked) | `archive/cth-inventory/confluent-trust-inventory-v5_3.json` | tracked via QBP PR #422 |
 | CTH inventory federation-tenancy stream v5.13 | `archive/cth-inventory/confluent-trust-inventory-v5.13.json` | tracked via QBP PR #422 |
 | PR7 routing rubric v0.2 | `docs/workflows/pr7_conflict_routing_rubric.md` | tracked via QBP PR #423 |
