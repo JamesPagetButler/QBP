@@ -44,9 +44,14 @@ jobs:
       - name: Compute changed files
         id: changed
         run: |
-          # Base = merge-base of PR base + head; covers force-pushes.
-          BASE_REF="${{ github.event.pull_request.base.sha }}"
+          # #580 AC4: the comment below used to SAY merge-base while the command was a
+          # two-dot `git diff base.sha head.sha`, which on a stale-base PR also lists every
+          # file master changed since the branch point (false anchor-impact hits, same
+          # class as #569/#549 on the tier-3 gate). Now the base really is the merge-base,
+          # so the diff is exactly what the PR would merge; force-pushes are still covered.
           HEAD_REF="${{ github.event.pull_request.head.sha }}"
+          BASE_REF="$(git merge-base "${{ github.event.pull_request.base.sha }}" "$HEAD_REF")"
+          echo "merge-base: $BASE_REF (PR base tip ${{ github.event.pull_request.base.sha }})"
           echo "base=$BASE_REF" >> "$GITHUB_OUTPUT"
           echo "head=$HEAD_REF" >> "$GITHUB_OUTPUT"
           git diff --name-only "$BASE_REF" "$HEAD_REF" > /tmp/changed_files.txt
