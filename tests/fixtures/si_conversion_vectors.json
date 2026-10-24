@@ -1,0 +1,414 @@
+{
+ "generator": "scripts/gen_si_conversion_vectors.py",
+ "library": "src/simulation/si_conversion.py",
+ "library_version": "1.0.0",
+ "lean_side": "PENDING #354 \u2014 Python-side pin only. Overlap with the Lean oracle fixture tests/fixtures/si_test_vectors.json is asserted equal in tests/test_si_conversion_contract.py.",
+ "tolerance_rel": 1e-15,
+ "constants": [
+  {
+   "name": "H_SI",
+   "value": 6.62607015e-34,
+   "status": "ESTABLISHED"
+  },
+  {
+   "name": "HBAR_SI",
+   "value": 1.0545718176461565e-34,
+   "status": "ESTABLISHED"
+  },
+  {
+   "name": "EV_IN_JOULES",
+   "value": 1.602176634e-19,
+   "status": "ESTABLISHED"
+  },
+  {
+   "name": "C_SI",
+   "value": 299792458,
+   "status": "ESTABLISHED"
+  },
+  {
+   "name": "HBAR_CODE",
+   "value": 1.0,
+   "status": "ESTABLISHED"
+  },
+  {
+   "name": "M_CODE",
+   "value": 0.5,
+   "status": "ESTABLISHED"
+  },
+  {
+   "name": "K0_CODE",
+   "value": 20.0,
+   "status": "ESTABLISHED"
+  },
+  {
+   "name": "V_Z_CODE",
+   "value": 40.0,
+   "status": "ESTABLISHED"
+  }
+ ],
+ "vectors": [
+  {
+   "function": "compute_scales",
+   "status": "ESTABLISHED",
+   "particle": "electron",
+   "inputs": {
+    "m_si": 9.1093837015e-31,
+    "lambda_si": 5e-11
+   },
+   "outputs": {
+    "L0": 1.5915494309189535e-10,
+    "E0": 2.4098669608950283e-19,
+    "T0": 4.3760582420470503e-16,
+    "v_z_si": 14547790.206507418,
+    "k_si": 125663706143.59172
+   }
+  },
+  {
+   "function": "convert_position",
+   "status": "ESTABLISHED",
+   "particle": "electron",
+   "scales_from": {
+    "m_si": 9.1093837015e-31,
+    "lambda_si": 5e-11
+   },
+   "inputs": {
+    "x_code": 3.7
+   },
+   "output": 5.888732894400128e-10
+  },
+  {
+   "function": "convert_energy",
+   "status": "ESTABLISHED",
+   "particle": "electron",
+   "scales_from": {
+    "m_si": 9.1093837015e-31,
+    "lambda_si": 5e-11
+   },
+   "inputs": {
+    "E_code": 5.5
+   },
+   "output": 1.3254268284922655e-18
+  },
+  {
+   "function": "convert_potential",
+   "status": "ESTABLISHED",
+   "particle": "electron",
+   "scales_from": {
+    "m_si": 9.1093837015e-31,
+    "lambda_si": 5e-11
+   },
+   "inputs": {
+    "U_code": 10.0
+   },
+   "output": 601.64826018678
+  },
+  {
+   "function": "convert_length_to_code",
+   "status": "ESTABLISHED",
+   "particle": "electron",
+   "scales_from": {
+    "m_si": 9.1093837015e-31,
+    "lambda_si": 5e-11
+   },
+   "inputs": {
+    "val_m": 1e-09
+   },
+   "output": 6.283185307179586
+  },
+  {
+   "function": "convert_energy_to_code",
+   "status": "ESTABLISHED",
+   "particle": "electron",
+   "scales_from": {
+    "m_si": 9.1093837015e-31,
+    "lambda_si": 5e-11
+   },
+   "inputs": {
+    "val_J": 1e-18
+   },
+   "output": 4.149606663882385
+  },
+  {
+   "function": "compute_scales",
+   "status": "ESTABLISHED",
+   "particle": "neutron",
+   "inputs": {
+    "m_si": 1.67492749804e-27,
+    "lambda_si": 1.8e-10
+   },
+   "outputs": {
+    "L0": 5.729577951308232e-10,
+    "E0": 1.0113024259171091e-23,
+    "T0": 1.0427858083004281e-11,
+    "v_z_si": 2197.7966733730354,
+    "k_si": 34906585039.88659
+   }
+  },
+  {
+   "function": "convert_position",
+   "status": "ESTABLISHED",
+   "particle": "neutron",
+   "scales_from": {
+    "m_si": 1.67492749804e-27,
+    "lambda_si": 1.8e-10
+   },
+   "inputs": {
+    "x_code": 3.7
+   },
+   "output": 2.119943841984046e-09
+  },
+  {
+   "function": "convert_energy",
+   "status": "ESTABLISHED",
+   "particle": "neutron",
+   "scales_from": {
+    "m_si": 1.67492749804e-27,
+    "lambda_si": 1.8e-10
+   },
+   "inputs": {
+    "E_code": 5.5
+   },
+   "output": 5.5621633425441e-23
+  },
+  {
+   "function": "convert_potential",
+   "status": "ESTABLISHED",
+   "particle": "neutron",
+   "scales_from": {
+    "m_si": 1.67492749804e-27,
+    "lambda_si": 1.8e-10
+   },
+   "inputs": {
+    "U_code": 10.0
+   },
+   "output": 0.025248213073543278
+  },
+  {
+   "function": "convert_length_to_code",
+   "status": "ESTABLISHED",
+   "particle": "neutron",
+   "scales_from": {
+    "m_si": 1.67492749804e-27,
+    "lambda_si": 1.8e-10
+   },
+   "inputs": {
+    "val_m": 1e-09
+   },
+   "output": 1.7453292519943298
+  },
+  {
+   "function": "convert_energy_to_code",
+   "status": "ESTABLISHED",
+   "particle": "neutron",
+   "scales_from": {
+    "m_si": 1.67492749804e-27,
+    "lambda_si": 1.8e-10
+   },
+   "inputs": {
+    "val_J": 1e-18
+   },
+   "output": 98882.38912243691
+  },
+  {
+   "function": "compute_scales",
+   "status": "ESTABLISHED",
+   "particle": "muon",
+   "inputs": {
+    "m_si": 1.883531627e-28,
+    "lambda_si": 1e-12
+   },
+   "outputs": {
+    "L0": 3.1830988618379067e-12,
+    "E0": 2.9137289894257393e-18,
+    "T0": 3.619320195781145e-17,
+    "v_z_si": 3517896.941583981,
+    "k_si": 6283185307179.586
+   }
+  },
+  {
+   "function": "convert_position",
+   "status": "ESTABLISHED",
+   "particle": "muon",
+   "scales_from": {
+    "m_si": 1.883531627e-28,
+    "lambda_si": 1e-12
+   },
+   "inputs": {
+    "x_code": 3.7
+   },
+   "output": 1.1777465788800255e-11
+  },
+  {
+   "function": "convert_energy",
+   "status": "ESTABLISHED",
+   "particle": "muon",
+   "scales_from": {
+    "m_si": 1.883531627e-28,
+    "lambda_si": 1e-12
+   },
+   "inputs": {
+    "E_code": 5.5
+   },
+   "output": 1.6025509441841565e-17
+  },
+  {
+   "function": "convert_potential",
+   "status": "ESTABLISHED",
+   "particle": "muon",
+   "scales_from": {
+    "m_si": 1.883531627e-28,
+    "lambda_si": 1e-12
+   },
+   "inputs": {
+    "U_code": 10.0
+   },
+   "output": 7274.4263712080565
+  },
+  {
+   "function": "convert_length_to_code",
+   "status": "ESTABLISHED",
+   "particle": "muon",
+   "scales_from": {
+    "m_si": 1.883531627e-28,
+    "lambda_si": 1e-12
+   },
+   "inputs": {
+    "val_m": 1e-09
+   },
+   "output": 314.1592653589793
+  },
+  {
+   "function": "convert_energy_to_code",
+   "status": "ESTABLISHED",
+   "particle": "muon",
+   "scales_from": {
+    "m_si": 1.883531627e-28,
+    "lambda_si": 1e-12
+   },
+   "inputs": {
+    "val_J": 1e-18
+   },
+   "output": 0.3432028179796804
+  },
+  {
+   "function": "compute_scales",
+   "status": "ESTABLISHED",
+   "particle": "uranium238",
+   "inputs": {
+    "m_si": 3.95286e-25,
+    "lambda_si": 5e-12
+   },
+   "outputs": {
+    "L0": 1.5915494309189532e-11,
+    "E0": 5.553549282383013e-23,
+    "T0": 1.8989150253721033e-12,
+    "v_z_si": 335.25448156524646,
+    "k_si": 1256637061435.9172
+   }
+  },
+  {
+   "function": "convert_position",
+   "status": "ESTABLISHED",
+   "particle": "uranium238",
+   "scales_from": {
+    "m_si": 3.95286e-25,
+    "lambda_si": 5e-12
+   },
+   "inputs": {
+    "x_code": 3.7
+   },
+   "output": 5.888732894400127e-11
+  },
+  {
+   "function": "convert_energy",
+   "status": "ESTABLISHED",
+   "particle": "uranium238",
+   "scales_from": {
+    "m_si": 3.95286e-25,
+    "lambda_si": 5e-12
+   },
+   "inputs": {
+    "E_code": 5.5
+   },
+   "output": 3.054452105310657e-22
+  },
+  {
+   "function": "convert_potential",
+   "status": "ESTABLISHED",
+   "particle": "uranium238",
+   "scales_from": {
+    "m_si": 3.95286e-25,
+    "lambda_si": 5e-12
+   },
+   "inputs": {
+    "U_code": 10.0
+   },
+   "output": 0.13865011296583454
+  },
+  {
+   "function": "convert_length_to_code",
+   "status": "ESTABLISHED",
+   "particle": "uranium238",
+   "scales_from": {
+    "m_si": 3.95286e-25,
+    "lambda_si": 5e-12
+   },
+   "inputs": {
+    "val_m": 1e-09
+   },
+   "output": 62.83185307179588
+  },
+  {
+   "function": "convert_energy_to_code",
+   "status": "ESTABLISHED",
+   "particle": "uranium238",
+   "scales_from": {
+    "m_si": 3.95286e-25,
+    "lambda_si": 5e-12
+   },
+   "inputs": {
+    "val_J": 1e-18
+   },
+   "output": 18006.50267338409
+  },
+  {
+   "function": "compute_quaternionic_quantities",
+   "status": "PROVISIONAL",
+   "inputs": {
+    "U1_si": 1e-18,
+    "E_kin_si": 1e-17,
+    "v_g_si": 1000000.0
+   },
+   "outputs": {
+    "L_Q": 3.3130350749999994e-10,
+    "zeta": 0.1
+   }
+  },
+  {
+   "function": "compute_quaternionic_quantities",
+   "status": "PROVISIONAL",
+   "inputs": {
+    "U1_si": 5e-18,
+    "E_kin_si": 1e-17,
+    "v_g_si": 1000000.0
+   },
+   "outputs": {
+    "L_Q": 6.62607015e-11,
+    "zeta": 0.5
+   }
+  },
+  {
+   "function": "compute_quaternionic_quantities",
+   "status": "PROVISIONAL",
+   "inputs": {
+    "U1_si": 2e-18,
+    "E_kin_si": 1e-17,
+    "v_g_si": 1000000.0
+   },
+   "outputs": {
+    "L_Q": 1.6565175374999997e-10,
+    "zeta": 0.2
+   }
+  }
+ ]
+}

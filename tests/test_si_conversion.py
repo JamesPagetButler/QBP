@@ -338,6 +338,18 @@ class TestPropertyRoundTrip:
         assert E_back == pytest.approx(E_code, rel=1e-12, abs=1e-300)
 
 
+def _additive_abs_tol(a: float, b: float, scale: float) -> float:
+    """Absolute tolerance for f(a+b) vs f(a)+f(b) under IEEE 754 doubles.
+
+    Three roundings (a+b, two products, one sum) each contribute at most
+    0.5 ulp of a quantity <= max(|a|,|b|)*scale, so 4*eps*max*scale is a
+    safe bound that still catches any real linearity defect (which would be
+    of order |a|*scale, i.e. ~1e16 x larger).
+    """
+    eps = 2.220446049250313e-16  # sys.float_info.epsilon
+    return 4.0 * eps * max(abs(a), abs(b), 1e-300) * scale
+
+
 class TestPropertyLinearity:
     """Conversion functions are linear: f(a+b) = f(a) + f(b), f(αx) = αf(x).
 
@@ -349,14 +361,18 @@ class TestPropertyLinearity:
     def test_position_additive(
         self, x1: float, x2: float, m_si: float, lam_si: float
     ) -> None:
-        """f(x1+x2) = f(x1) + f(x2). Tolerance relaxed to 1e-10 to account
-        for catastrophic cancellation when x1 ≈ -x2 (inherent to IEEE 754,
-        not a code bug — Lean proves this exactly on Reals)."""
+        """f(x1+x2) = f(x1) + f(x2).
+
+        IEEE 754 bound: each side carries rounding error of order
+        eps * max(|x1|, |x2|) * L0, so when x1 ≈ -x2 the *relative* error of
+        the (tiny) sum is unbounded while the *absolute* error is not.  The
+        tolerance is therefore absolute, scaled by the operand magnitudes
+        (not a code bug — Lean proves additivity exactly on Reals)."""
         sc = compute_scales(m_si, lam_si)
         sum_then_convert = convert_position(x1 + x2, sc)
         convert_then_sum = convert_position(x1, sc) + convert_position(x2, sc)
         assert sum_then_convert == pytest.approx(
-            convert_then_sum, rel=1e-10, abs=1e-300
+            convert_then_sum, rel=1e-12, abs=_additive_abs_tol(x1, x2, sc.L0)
         )
 
     @given(E1=st_code_value, E2=st_code_value, m_si=st_mass, lam_si=st_wavelength)
@@ -364,11 +380,17 @@ class TestPropertyLinearity:
     def test_energy_additive(
         self, E1: float, E2: float, m_si: float, lam_si: float
     ) -> None:
-        """f(E1+E2) = f(E1) + f(E2). Same cancellation tolerance as position."""
+        """f(E1+E2) = f(E1) + f(E2). Same cancellation bound as position.
+
+        Baseline failure fixed in #329: hypothesis found E1=516068.0,
+        E2=-516067.9921875 (sum 7.8e-3 vs operands 5e5) where rel=1e-10 on
+        the cancelled sum is below the IEEE 754 floor; see _additive_abs_tol."""
         sc = compute_scales(m_si, lam_si)
         convert_then_sum = convert_energy(E1, sc) + convert_energy(E2, sc)
         result = convert_energy(E1 + E2, sc)
-        assert result == pytest.approx(convert_then_sum, rel=1e-10, abs=1e-300)
+        assert result == pytest.approx(
+            convert_then_sum, rel=1e-12, abs=_additive_abs_tol(E1, E2, sc.E0)
+        )
 
     @given(
         alpha=st.floats(
