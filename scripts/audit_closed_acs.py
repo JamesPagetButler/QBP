@@ -39,6 +39,39 @@ Close attribution — two DIFFERENT relations, both reported:
     `unknown` when no merged-PR payload is available (issues-only cache).
     Cross-repo closers (e.g. qbp-systema PRs closing QBP issues) are resolved by
     fetching the merged PRs of every repo that appears in `linked_prs`.
+  * `close_source` — HOW `closed_how` was decided (#739 timeline fallback). The
+    bulk pass above is blind to an issue closed by a closing keyword in the PR's
+    squash/merge COMMIT MESSAGE (not the PR text): GitHub then records the close
+    against the commit, `closedByPullRequestsReferences` is empty and the PR's
+    `closingIssuesReferences` does not name the issue (18 of 207 rows in the
+    2026-10-17 payload). So every row the bulk pass leaves `manual` gets a second
+    look at its last timeline `closed` event (GraphQL
+    `timelineItems(itemTypes: [CLOSED_EVENT]) { closer }`, batched 40 issues per
+    query by alias — still no per-issue REST loop):
+      - `pr-window`           bulk pass matched (closingIssuesReferences + window)
+      - `timeline-pr`         closer is a merged PullRequest        -> merged-pr
+      - `timeline-commit-pr`  closer is a Commit whose
+                              associatedPullRequests has a merged PR -> merged-pr
+      - `timeline-commit-only` closer is a Commit with NO PR (pushed straight to
+                              master)                                -> manual
+      - `timeline-unmerged-pr` closer is a PullRequest that is NOT merged (record
+                              present but unusable)                  -> manual
+      - `timeline-stale`      record present but its last closed event is further
+                              than --merge-window from the issue's closedAt (a
+                              mismatched/stale cache; never trusted)  -> manual
+      - `hand`                closed event has no closer (a human clicked Close)
+                              -> manual
+      - `none`                no timeline record for the row (fallback not run,
+                              `--no-timeline`, or an issues-only replay) -> manual
+    A `merged-pr` row attributed by the timeline carries `merge_delta_s` as
+    usual; `closing_pr_has_keyword` is read from the merged-PR payload text when
+    that PR is in it. For these rows the keyword normally sits in the commit
+    message (or the PR *title*, which GitHub does not parse for linking but which
+    flows into the squash commit), so the PR-time guard (`closing-ac-guard.yml`,
+    reads PR title+body) cannot see a body-less keyword — but the post-merge
+    backstop (`reopen-falsely-closed.yml`, FAULT-S4-004 layer 2) scans the pushed
+    commit messages on master and reopens exactly this case. The rows found
+    today predate layer 2; see `guard_would_have_fired`.
 
 Forward-guard retro-check (#543 AC5) — the guard fires iff BOTH
   (a) the PR title+body carries a closing keyword for #N   (`closing_refs`), and
@@ -53,9 +86,13 @@ Forward-guard retro-check (#543 AC5) — the guard fires iff BOTH
 
 Cache-first (#543 AC1): bulk fetches only (gh paginates internally), never a
 per-issue call: 1 issues call + 1 merged-PR call per repo seen in `linked_prs`
-(2 today: QBP + qbp-systema) = 3. `--from-cache` / `--from-merged-cache` replay
-saved payloads offline; `--save-cache` / `--save-merged-cache` keep them as
-evidence next to the report.
+(2 today: QBP + qbp-systema) + ceil(manual_rows / 40) batched GraphQL timeline
+calls (98 rows -> 3 today) = 6. `--from-cache` / `--from-merged-cache` /
+`--from-timeline-cache` replay saved payloads offline; `--save-cache` /
+`--save-merged-cache` / `--save-timeline-cache` keep them as evidence next to
+the report. The committed 2026-10-17 caches predate the timeline payload; the
+2026-10-23 replay re-fetched ONLY the timeline (for the 98 rows the bulk pass
+leaves `manual`) and committed it as `report-2026-10-23.timeline.json`.
 
 Deterministic: output depends only on the payloads and the flags; rows are
 sorted by closedAt desc, then issue number desc; JSON is key-sorted. Running
@@ -64,9 +101,13 @@ twice on the same payloads produces byte-identical files.
 Usage:
   audit_closed_acs.py --out analysis/543-closed-ac-sweep/report-YYYY-MM-DD.md \\
       --save-cache …/report-YYYY-MM-DD.issues.json \\
-      --save-merged-cache …/report-YYYY-MM-DD.merged-prs.json
+      --save-merged-cache …/report-YYYY-MM-DD.merged-prs.json \\
+      --save-timeline-cache …/report-YYYY-MM-DD.timeline.json
   audit_closed_acs.py --since 2026-06-01 --limit 200 --out /tmp/r.md
-  audit_closed_acs.py --from-cache issues.json --from-merged-cache prs.json --out /tmp/r.md
+  audit_closed_acs.py --from-cache issues.json --from-merged-cache prs.json \\
+      --from-timeline-cache timeline.json --out /tmp/r.md
+  audit_closed_acs.py --from-cache issues.json --from-merged-cache prs.json \\
+      --save-timeline-cache timeline.json --out /tmp/r.md   # replay + fetch timeline only
 """
 
 from __future__ import annotations
@@ -103,6 +144,18 @@ ISSUE_FIELDS = (
     "number,title,body,closedAt,labels,url,stateReason,closedByPullRequestsReferences"
 )
 PR_FIELDS = "number,title,body,mergedAt,closingIssuesReferences"
+TIMELINE_BATCH = 40  # issues per GraphQL query (aliases); well under the 500k-node cap
+TIMELINE_LAST = 3  # closed events per issue (reopen/close cycles); the LAST one counts
+CLOSE_SOURCES = (
+    "pr-window",
+    "timeline-pr",
+    "timeline-commit-pr",
+    "timeline-commit-only",
+    "timeline-unmerged-pr",
+    "timeline-stale",
+    "hand",
+    "none",
+)
 
 
 # --------------------------------------------------------------------------- parsing
@@ -250,6 +303,78 @@ def fetch_merged_prs(repo: str, limit: int) -> List[Dict[str, Any]]:
     return data
 
 
+def _timeline_query(numbers: List[int]) -> str:
+    """One GraphQL document fetching the last CLOSED_EVENTs of many issues by alias.
+    `$owner` / `$name` are variables (passed with `-F`), never interpolated."""
+    parts = []
+    for n in numbers:
+        parts.append(
+            f"i{int(n)}: issue(number: {int(n)}) {{ number closedAt "
+            f"timelineItems(last: {TIMELINE_LAST}, itemTypes: [CLOSED_EVENT]) {{ nodes {{ "
+            "... on ClosedEvent { createdAt stateReason actor { login } closer { __typename "
+            "... on PullRequest { number merged mergedAt repository { nameWithOwner } } "
+            "... on Commit { oid committedDate associatedPullRequests(first: 5) { nodes { "
+            "number merged mergedAt repository { nameWithOwner } } } } } } } } }"
+        )
+    return (
+        "query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { "
+        + " ".join(parts)
+        + " } }"
+    )
+
+
+def fetch_closed_events(repo: str, numbers: List[int]) -> Dict[str, Any]:
+    """{str(issue number): raw GraphQL issue node} for the last CLOSED_EVENTs
+    (#739 fallback). ceil(len(numbers)/TIMELINE_BATCH) calls; no per-issue call.
+    A per-alias NOT_FOUND error (transferred/deleted issue) is warned and skipped;
+    any other GraphQL error aborts."""
+    owner, name = repo.split("/", 1)
+    out: Dict[str, Any] = {}
+    nums = sorted(set(int(n) for n in numbers))
+    for i in range(0, len(nums), TIMELINE_BATCH):
+        chunk = nums[i : i + TIMELINE_BATCH]
+        r = subprocess.run(
+            [
+                "gh",
+                "api",
+                "graphql",
+                "-F",
+                f"owner={owner}",
+                "-F",
+                f"name={name}",
+                "-f",
+                f"query={_timeline_query(chunk)}",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+        data: Dict[str, Any] = {}
+        try:
+            data = json.loads(r.stdout) if r.stdout.strip() else {}
+        except json.JSONDecodeError:
+            data = {}
+        errors = data.get("errors") or []
+        hard = [e for e in errors if (e or {}).get("type") != "NOT_FOUND"]
+        if hard or (r.returncode != 0 and not errors):
+            raise SystemExit(
+                f"gh api graphql failed ({r.returncode}): "
+                f"{json.dumps(hard)[:500] if hard else r.stderr.strip()}"
+            )
+        for e in errors:
+            print(
+                f"WARNING: timeline NOT_FOUND for {'/'.join(map(str, e.get('path') or []))}"
+                f" — {e.get('message', '')}",
+                file=sys.stderr,
+            )
+        repo_data = (data.get("data") or {}).get("repository") or {}
+        for n in chunk:
+            node = repo_data.get(f"i{n}")
+            if node is not None:
+                out[str(n)] = node
+    return out
+
+
 def load_json(path: str) -> Any:
     with open(path, encoding="utf-8") as f:
         return json.load(f)
@@ -266,6 +391,15 @@ def load_merged_cache(path: str) -> Dict[str, List[Dict[str, Any]]]:
     data = load_json(path)
     if not isinstance(data, dict):
         raise SystemExit(f"{path}: expected a JSON object {{repo: [merged PRs]}}")
+    return data
+
+
+def load_timeline_cache(path: str) -> Dict[str, Any]:
+    data = load_json(path)
+    if not isinstance(data, dict):
+        raise SystemExit(
+            f"{path}: expected a JSON object {{issue number: timeline node}}"
+        )
     return data
 
 
@@ -333,59 +467,186 @@ def build_closer_index(
     return idx
 
 
+def _label_for(repo_full: str, number: int, repo: str) -> str:
+    owner, name = repo_full.split("/", 1)
+    _full, label = _pr_label(
+        {"number": number, "repository": {"owner": {"login": owner}, "name": name}},
+        repo,
+    )
+    return label
+
+
+def build_pr_text_index(
+    merged: Dict[str, List[Dict[str, Any]]],
+) -> Dict[Tuple[str, int], str]:
+    """(repo_full lower, pr number) -> 'title\\nbody' for keyword lookup."""
+    idx: Dict[Tuple[str, int], str] = {}
+    for pr_repo, prs in merged.items():
+        for pr in prs:
+            if pr.get("number") is None:
+                continue
+            idx[(pr_repo.lower(), int(pr["number"]))] = (
+                (pr.get("title") or "") + "\n" + (pr.get("body") or "")
+            )
+    return idx
+
+
+def resolve_timeline_close(
+    node: Optional[Dict[str, Any]], closed_at: Optional[datetime], window_s: int
+) -> Dict[str, Any]:
+    """Classify the LAST closed event of a raw timeline node (#739).
+
+    Returns {source, pr: (repo_full, number, mergedAt) | None, commit}.
+      source: timeline-pr | timeline-commit-pr | timeline-commit-only | hand | none
+    `none` also when the node is missing, has no closed event, or its last
+    closed event is further than `window_s` from the issue's `closedAt` (a stale
+    or mismatched cache — never trusted silently).
+    """
+    out: Dict[str, Any] = {"source": "none", "pr": None, "commit": ""}
+    if not node or closed_at is None:
+        return out
+    nodes = [ev for ev in ((node.get("timelineItems") or {}).get("nodes") or []) if ev]
+    if not nodes:
+        return out
+    ev = nodes[-1]
+    ev_at = _ts(ev.get("createdAt") or "")
+    if ev_at is None or abs((ev_at - closed_at).total_seconds()) > window_s:
+        out["source"] = "timeline-stale"
+        return out
+    closer = ev.get("closer")
+    if not closer:
+        out["source"] = "hand"
+        return out
+    kind = closer.get("__typename")
+    merged_prs: List[Tuple[str, int, str]] = []
+    if kind == "PullRequest":
+        cand = [closer]
+        source = "timeline-pr"
+    elif kind == "Commit":
+        out["commit"] = closer.get("oid") or ""
+        cand = list((closer.get("associatedPullRequests") or {}).get("nodes") or [])
+        source = "timeline-commit-pr"
+    else:
+        return out
+    for p in cand:
+        if not p or not p.get("merged") or p.get("number") is None:
+            continue
+        full = ((p.get("repository") or {}).get("nameWithOwner")) or ""
+        if not full:
+            continue
+        merged_prs.append((full, int(p["number"]), p.get("mergedAt") or ""))
+    if not merged_prs:
+        out["source"] = (
+            "timeline-commit-only" if kind == "Commit" else "timeline-unmerged-pr"
+        )
+        return out
+
+    def _delta(t: Tuple[str, int, str]) -> float:
+        m = _ts(t[2])
+        return abs((m - closed_at).total_seconds()) if m else float("inf")
+
+    out["pr"] = min(merged_prs, key=lambda t: (_delta(t), t[1]))
+    out["source"] = source
+    return out
+
+
 def attribute_close(
     issue: Dict[str, Any],
     closers: Dict[int, List[Dict[str, Any]]],
     repo: str,
     window_s: int,
     have_merged: bool,
+    timeline: Optional[Dict[str, Any]] = None,
+    pr_text: Optional[Dict[Tuple[str, int], str]] = None,
 ) -> Dict[str, Any]:
     """Return {closed_how, closing_pr, closing_pr_repo, merge_delta_s,
-    closing_pr_has_keyword}."""
+    closing_pr_has_keyword, close_source, close_commit}.
+
+    Pass 1 (bulk): a merged PR naming the issue in `closingIssuesReferences`
+    within `window_s` of `closedAt` -> merged-pr / `pr-window`.
+    Pass 2 (#739, only when pass 1 leaves `manual` and `timeline` is given):
+    the issue's last timeline `closed` event -> see `resolve_timeline_close`.
+    """
     res: Dict[str, Any] = {
         "closed_how": "unknown" if not have_merged else "manual",
         "closing_pr": "",
         "closing_pr_repo": "",
         "merge_delta_s": None,
         "closing_pr_has_keyword": None,
+        "close_source": "none",
+        "close_commit": "",
     }
     if not have_merged:
         return res
+    number = int(issue["number"])
     closed_at = _ts(issue.get("closedAt") or "")
     if closed_at is None:
         return res
     best: Optional[Tuple[float, Dict[str, Any]]] = None
-    for pr in closers.get(int(issue["number"]), []):
+    for pr in closers.get(number, []):
         merged_at = _ts(pr.get("mergedAt") or "")
         if merged_at is None:
             continue
         delta = abs((merged_at - closed_at).total_seconds())
         if delta <= window_s and (best is None or delta < best[0]):
             best = (delta, pr)
-    if best is None:
+    if best is not None:
+        delta, pr = best
+        text = (pr.get("title") or "") + "\n" + (pr.get("body") or "")
+        res.update(
+            {
+                "closed_how": "merged-pr",
+                "closing_pr": _label_for(pr["repo_full"], int(pr["number"]), repo),
+                "closing_pr_repo": pr["repo_full"],
+                "merge_delta_s": int(delta),
+                "closing_pr_has_keyword": number in closing_refs(text),
+                "close_source": "pr-window",
+            }
+        )
         return res
-    delta, pr = best
-    _full, label = _pr_label(
-        {
-            "number": pr["number"],
-            "repository": {
-                "owner": {"login": pr["repo_full"].split("/")[0]},
-                "name": pr["repo_full"].split("/")[1],
-            },
-        },
-        repo,
-    )
-    text = (pr.get("title") or "") + "\n" + (pr.get("body") or "")
+    if timeline is None:
+        return res
+    tl = resolve_timeline_close(timeline.get(str(number)), closed_at, window_s)
+    res["close_source"] = tl["source"]
+    res["close_commit"] = tl["commit"]
+    if tl["pr"] is None:
+        return res
+    full, pr_number, merged_at_s = tl["pr"]
+    merged_at = _ts(merged_at_s)
+    txt = (pr_text or {}).get((full.lower(), pr_number))
     res.update(
         {
             "closed_how": "merged-pr",
-            "closing_pr": label,
-            "closing_pr_repo": pr["repo_full"],
-            "merge_delta_s": int(delta),
-            "closing_pr_has_keyword": int(issue["number"]) in closing_refs(text),
+            "closing_pr": _label_for(full, pr_number, repo),
+            "closing_pr_repo": full,
+            "merge_delta_s": (
+                int(abs((merged_at - closed_at).total_seconds())) if merged_at else None
+            ),
+            "closing_pr_has_keyword": (
+                (number in closing_refs(txt)) if txt is not None else None
+            ),
         }
     )
     return res
+
+
+def bulk_manual_numbers(
+    issues: List[Dict[str, Any]],
+    merged: Dict[str, List[Dict[str, Any]]],
+    repo: str,
+    window_s: int,
+    since: Optional[str] = None,
+) -> List[int]:
+    """Issue numbers the bulk pass leaves `manual` — the timeline-fallback set."""
+    closers = build_closer_index(merged, repo)
+    out = []
+    for it in issues:
+        closed_at = it.get("closedAt") or ""
+        if since and closed_at[:10] < since:
+            continue
+        if attribute_close(it, closers, repo, window_s, True)["closed_how"] == "manual":
+            out.append(int(it["number"]))
+    return sorted(out)
 
 
 # --------------------------------------------------------------------------- audit
@@ -397,9 +658,11 @@ def audit(
     repo: str = DEFAULT_REPO,
     merged: Optional[Dict[str, List[Dict[str, Any]]]] = None,
     window_s: int = DEFAULT_MERGE_WINDOW_S,
+    timeline: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     have_merged = merged is not None
     closers = build_closer_index(merged or {}, repo)
+    pr_text = build_pr_text_index(merged or {})
     rows: List[Dict[str, Any]] = []
     for it in issues:
         closed_at = it.get("closedAt") or ""
@@ -407,7 +670,9 @@ def audit(
             continue
         counts = summarize_boxes(it.get("body"))
         links = linked_prs(it, repo)
-        attr = attribute_close(it, closers, repo, window_s, have_merged)
+        attr = attribute_close(
+            it, closers, repo, window_s, have_merged, timeline, pr_text
+        )
         body_trip = counts["guard_unticked"] >= 1
         rows.append(
             {
@@ -486,6 +751,32 @@ def audit(
         "since": since or "",
         "merge_window_s": window_s,
         "merged_pr_repos": sorted((merged or {}).keys()),
+        # #739 timeline fallback
+        "timeline_used": timeline is not None,
+        "timeline_records": len(timeline or {}),
+        "close_source_counts": {
+            src: sum(1 for r in rows if r["close_source"] == src)
+            for src in CLOSE_SOURCES
+        },
+        "closed_by_merged_pr_via_timeline": sum(
+            1
+            for r in rows
+            if r["close_source"].startswith("timeline-")
+            and r["closed_how"] == "merged-pr"
+        ),
+        "flagged_closed_by_merged_pr_via_timeline": sum(
+            1 for r in f_merged if r["close_source"].startswith("timeline-")
+        ),
+        "closed_by_commit_no_pr": sum(
+            1 for r in rows if r["close_source"] == "timeline-commit-only"
+        ),
+        "flagged_merged_pr_keyword_in_commit_only": sum(
+            1
+            for r in f_merged
+            if r["close_source"].startswith("timeline-commit")
+            and not r["closing_pr_has_keyword"]
+            and not r["closing_pr_cross_repo"]
+        ),
     }
     return {"summary": summary, "rows": rows}
 
@@ -498,12 +789,25 @@ def _md_escape(s: str) -> str:
 
 
 def _how_cell(r: Dict[str, Any]) -> str:
+    src = r.get("close_source", "none")
     if r["closed_how"] == "merged-pr":
         cell = f"merged-pr {r['closing_pr']}"
         if r["merge_delta_s"]:
             cell += f" (Δ{r['merge_delta_s']}s)"
+        if src == "timeline-commit-pr":
+            cell += f" via commit {r['close_commit'][:7]}"
+        elif src == "timeline-pr":
+            cell += " via timeline"
     else:
         cell = r["closed_how"]
+        if src == "timeline-commit-only":
+            cell += f" (commit {r['close_commit'][:7]}, no PR)"
+        elif src == "hand":
+            cell += " (hand)"
+        elif src == "timeline-unmerged-pr":
+            cell += " (unmerged PR closer)"
+        elif src == "timeline-stale":
+            cell += " (stale timeline record)"
     if r["stateReason"] == "NOT_PLANNED":
         cell += " (not planned)"
     return cell
@@ -520,6 +824,11 @@ def _guard_cell(r: Dict[str, Any]) -> str:
         if r["closing_pr_cross_repo"]:
             return "no — closing PR is in another repo (guard not installed there)"
         if not r["closing_pr_has_keyword"]:
+            if r.get("close_source", "").startswith("timeline-commit"):
+                return (
+                    "no — keyword in commit message, not PR body (PR-time guard "
+                    "blind; post-merge backstop reopen-falsely-closed.yml covers)"
+                )
             return "no — no keyword in PR text (manual link; guard blind)"
         return "no — body would not trip"
     if r["closed_how"] == "manual":
@@ -527,7 +836,9 @@ def _guard_cell(r: Dict[str, Any]) -> str:
     return "n/a (unknown)"
 
 
-def render_markdown(result: Dict[str, Any], repo: str, report_date: str) -> str:
+def render_markdown(
+    result: Dict[str, Any], repo: str, report_date: str, note: str = ""
+) -> str:
     s = result["summary"]
     rows = result["rows"]
     flagged = [r for r in rows if r["flagged"]]
@@ -564,6 +875,38 @@ def render_markdown(result: Dict[str, Any], repo: str, report_date: str) -> str:
         f"guard). Merged-PR payloads: {repos}."
     )
     L.append("")
+    if s.get("timeline_used"):
+        csc = s["close_source_counts"]
+        L.append(
+            "**Timeline fallback (#739).** Every row the bulk pass left `manual` was "
+            "re-checked against its last timeline `closed` event "
+            f"({s['timeline_records']} records fetched). A closing keyword in the PR's "
+            "squash/merge *commit message* closes the issue via the commit, leaving "
+            "`closedByPullRequestsReferences` empty and the PR's `closingIssuesReferences` "
+            "silent — invisible to the bulk pass. Resolution: closer = merged PR → "
+            f"`merged-pr … via timeline` ({csc['timeline-pr']}); closer = commit with a "
+            f"merged PR → `merged-pr … via commit` ({csc['timeline-commit-pr']}); commit "
+            f"with no PR → `manual (commit, no PR)` ({csc['timeline-commit-only']}); no "
+            f"closer → `manual (hand)` ({csc['hand']}); bulk-attributed → "
+            f"`pr-window` ({csc['pr-window']}); record present but unusable → "
+            f"`manual` (unmerged PR closer {csc['timeline-unmerged-pr']}, stale event "
+            f"{csc['timeline-stale']}); no record → plain `manual` ({csc['none']}). "
+            "Note for AC5: the PR-time guard (`closing-ac-guard.yml`) reads PR title+body, "
+            "so a keyword that sits only in the commit message is outside ITS view — but "
+            "the post-merge backstop (`reopen-falsely-closed.yml`, FAULT-S4-004 layer 2) "
+            "scans pushed commit messages on master and reopens exactly this case; the "
+            "rows found here predate layer 2."
+        )
+    else:
+        L.append(
+            "**Timeline fallback (#739) not run** (`--no-timeline` or a replay without "
+            "`--from-timeline-cache`): `manual` rows may include issues closed via a "
+            "closing keyword in a PR's squash/merge commit message."
+        )
+    L.append("")
+    if note:
+        L.append(f"**Note.** {note}")
+        L.append("")
     L.append("## Summary")
     L.append("")
     L.append("| Metric | Count |")
@@ -582,6 +925,11 @@ def render_markdown(result: Dict[str, Any], repo: str, report_date: str) -> str:
     L.append(
         f"| … closed by a merged PR (within window) | {s['flagged_closed_by_merged_pr']} |"
     )
+    if s.get("timeline_used"):
+        L.append(
+            f"| … … of which attributed by the timeline fallback (#739: commit-message "
+            f"keyword) | {s['flagged_closed_by_merged_pr_via_timeline']} |"
+        )
     L.append(
         f"| … closed manually (no merged PR within window) | {s['flagged_closed_manually']} |"
     )
@@ -600,9 +948,14 @@ def render_markdown(result: Dict[str, Any], repo: str, report_date: str) -> str:
         f"{s['flagged_closed_by_merged_pr']} merged-PR closes |"
     )
     L.append(
-        f"| AC5 — merged-PR close with NO closing keyword (manual link; guard blind) | "
-        f"{s['flagged_merged_pr_no_keyword']} |"
+        f"| AC5 — merged-PR close with NO closing keyword in PR text (manual link or "
+        f"commit-message keyword; guard blind) | {s['flagged_merged_pr_no_keyword']} |"
     )
+    if s.get("timeline_used"):
+        L.append(
+            f"| … … of which keyword in the commit message only (#739) | "
+            f"{s['flagged_merged_pr_keyword_in_commit_only']} |"
+        )
     L.append(
         f"| AC5 — merged-PR close from ANOTHER repo (QBP's guard never sees it) | "
         f"{s['flagged_merged_pr_cross_repo']} |"
@@ -623,6 +976,12 @@ def render_markdown(result: Dict[str, Any], repo: str, report_date: str) -> str:
         f"| All scanned: merged-pr / manual / unknown | {s['closed_by_merged_pr']} / "
         f"{s['closed_manually']} / {s['closed_unknown']} |"
     )
+    if s.get("timeline_used"):
+        L.append(
+            f"| All scanned: merged-pr via timeline fallback (#739) / manual via commit "
+            f"with no PR | {s['closed_by_merged_pr_via_timeline']} / "
+            f"{s['closed_by_commit_no_pr']} |"
+        )
     L.append(f"| All scanned: with a linked PR | {s['with_linked_pr']} |")
     L.append("")
     L.append("## Flagged issues (≥1 unticked `**AC` box) — sorted by closedAt desc")
@@ -716,6 +1075,26 @@ def main(argv: Optional[List[str]] = None) -> int:
         "--save-merged-cache", default=None, help="save the raw merged-PR payloads here"
     )
     ap.add_argument(
+        "--from-timeline-cache",
+        default=None,
+        help="read the closed-event timeline payload ({issue: node}) from this file (#739)",
+    )
+    ap.add_argument(
+        "--save-timeline-cache",
+        default=None,
+        help="save the raw closed-event timeline payload here (#739)",
+    )
+    ap.add_argument(
+        "--no-timeline",
+        action="store_true",
+        help="skip the #739 timeline fallback (bulk attribution only)",
+    )
+    ap.add_argument(
+        "--note",
+        default="",
+        help="one paragraph inserted into the report preamble (e.g. payload provenance)",
+    )
+    ap.add_argument(
         "--report-date",
         default=None,
         help="date label for the report header (default: from --out stem or closedAt max)",
@@ -745,15 +1124,40 @@ def main(argv: Optional[List[str]] = None) -> int:
             for r in repos_in_linked_prs(issues, args.repo)
         }
 
+    # #739 timeline fallback: replay from cache, or fetch ONLY for the rows the
+    # bulk pass leaves `manual` (also the path a cache-replay uses to add the
+    # timeline to older issue/PR payloads via --save-timeline-cache).
+    timeline: Optional[Dict[str, Any]] = None
+    if args.no_timeline or merged is None:
+        timeline = None
+    elif args.from_timeline_cache:
+        timeline = load_timeline_cache(args.from_timeline_cache)
+    elif args.from_cache and args.from_merged_cache and not args.save_timeline_cache:
+        timeline = None  # pure offline replay without a timeline payload
+        print(
+            "NOTE: offline replay without --from-timeline-cache / --save-timeline-cache; "
+            "the #739 timeline fallback was NOT run (closed_how may over-count manual).",
+            file=sys.stderr,
+        )
+    else:
+        timeline = fetch_closed_events(
+            args.repo,
+            bulk_manual_numbers(
+                issues, merged, args.repo, args.merge_window, since=args.since
+            ),
+        )
+
     result = audit(
         issues,
         since=args.since,
         repo=args.repo,
         merged=merged,
         window_s=args.merge_window,
+        timeline=timeline,
     )
     result["repo"] = args.repo
     result["limit"] = args.limit
+    result["note"] = args.note
 
     stem, _ = os.path.splitext(args.out)
     m = re.search(r"(\d{4}-\d{2}-\d{2})", os.path.basename(stem))
@@ -765,7 +1169,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     out_dir = os.path.dirname(os.path.abspath(args.out))
     os.makedirs(out_dir, exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:
-        f.write(render_markdown(result, args.repo, report_date))
+        f.write(render_markdown(result, args.repo, report_date, note=args.note))
     with open(stem + ".json", "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, sort_keys=True, ensure_ascii=False)
         f.write("\n")
@@ -789,6 +1193,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                 ensure_ascii=False,
             )
             f.write("\n")
+    if args.save_timeline_cache and timeline is not None:
+        with open(args.save_timeline_cache, "w", encoding="utf-8") as f:
+            json.dump(timeline, f, indent=1, sort_keys=True, ensure_ascii=False)
+            f.write("\n")
 
     s = result["summary"]
     print(
@@ -798,7 +1206,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         f"guard_would_have_fired={s['flagged_merged_pr_guard_would_have_fired']}, "
         f"merged_no_keyword={s['flagged_merged_pr_no_keyword']}, "
         f"linked_but_hand_closed={s['flagged_linked_but_hand_closed']}) "
-        f"any_unticked={s['any_unticked_box']} clean={s['clean']}"
+        f"any_unticked={s['any_unticked_box']} clean={s['clean']} "
+        f"timeline={'on' if s['timeline_used'] else 'off'}"
+        f"(records={s['timeline_records']}, "
+        f"merged_pr_via_timeline={s['closed_by_merged_pr_via_timeline']}, "
+        f"commit_no_pr={s['closed_by_commit_no_pr']})"
     )
     print(f"wrote {args.out} and {stem + '.json'}")
     return 0
