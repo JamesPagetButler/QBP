@@ -1,0 +1,1991 @@
+{
+ "104": {
+  "closedAt": "2026-02-04T03:00:11Z",
+  "number": 104,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-04T03:00:11Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "109": {
+  "closedAt": "2026-02-04T03:41:50Z",
+  "number": 109,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-04T03:41:50Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "113": {
+  "closedAt": "2026-02-06T15:41:44Z",
+  "number": 113,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T15:41:44Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "117": {
+  "closedAt": "2026-02-04T06:37:31Z",
+  "number": 117,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-04T06:37:31Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "118": {
+  "closedAt": "2026-02-04T06:37:33Z",
+  "number": 118,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-04T06:37:33Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "119": {
+  "closedAt": "2026-02-06T17:00:06Z",
+  "number": 119,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T17:00:06Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "123": {
+  "closedAt": "2026-02-12T04:32:13Z",
+  "number": 123,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:32:13Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "128": {
+  "closedAt": "2026-02-05T04:08:31Z",
+  "number": 128,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-05T04:08:31Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "131": {
+  "closedAt": "2026-02-05T05:06:19Z",
+  "number": 131,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-05T05:06:19Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "132": {
+  "closedAt": "2026-02-05T05:06:20Z",
+  "number": 132,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-05T05:06:20Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "136": {
+  "closedAt": "2026-02-12T04:20:27Z",
+  "number": 136,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:20:27Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "137": {
+  "closedAt": "2026-02-06T05:45:53Z",
+  "number": 137,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T05:45:53Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "138": {
+  "closedAt": "2026-02-06T05:46:58Z",
+  "number": 138,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T05:46:58Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "139": {
+  "closedAt": "2026-02-06T15:52:28Z",
+  "number": 139,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T15:52:28Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "140": {
+  "closedAt": "2026-02-06T15:52:30Z",
+  "number": 140,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T15:52:30Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "143": {
+  "closedAt": "2026-02-06T17:00:09Z",
+  "number": 143,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T17:00:09Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "157": {
+  "closedAt": "2026-02-06T18:09:24Z",
+  "number": 157,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T18:09:24Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "163": {
+  "closedAt": "2026-02-11T18:38:37Z",
+  "number": 163,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-11T18:38:38Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "167": {
+  "closedAt": "2026-02-12T04:20:47Z",
+  "number": 167,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:20:47Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "190": {
+  "closedAt": "2026-02-10T15:41:31Z",
+  "number": 190,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-10T15:41:31Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "191": {
+  "closedAt": "2026-02-12T16:35:56Z",
+  "number": 191,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T16:35:56Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "20": {
+  "closedAt": "2026-02-12T04:20:28Z",
+  "number": 20,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:20:29Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "203": {
+  "closedAt": "2026-02-12T04:32:21Z",
+  "number": 203,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:32:21Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "207": {
+  "closedAt": "2026-02-12T20:38:08Z",
+  "number": 207,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-12T20:38:06Z",
+         "number": 257,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-12T19:54:44Z",
+      "oid": "fbd9b190641db0823860d9cbe5457cf8523e5057"
+     },
+     "createdAt": "2026-02-12T20:38:08Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "208": {
+  "closedAt": "2026-02-12T20:38:24Z",
+  "number": 208,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T20:38:25Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "209": {
+  "closedAt": "2026-02-12T19:55:22Z",
+  "number": 209,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T19:55:22Z",
+     "stateReason": "NOT_PLANNED"
+    }
+   ]
+  }
+ },
+ "211": {
+  "closedAt": "2026-02-13T01:10:00Z",
+  "number": 211,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-13T01:10:01Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "212": {
+  "closedAt": "2026-02-12T04:33:33Z",
+  "number": 212,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:33:33Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "215": {
+  "closedAt": "2026-02-12T15:55:21Z",
+  "number": 215,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T15:55:21Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "217": {
+  "closedAt": "2026-02-12T20:38:08Z",
+  "number": 217,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-12T20:38:06Z",
+         "number": 257,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-12T19:56:33Z",
+      "oid": "09f90485d99169db731b25f2f49dbecfb439150f"
+     },
+     "createdAt": "2026-02-12T20:38:08Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "220": {
+  "closedAt": "2026-02-12T18:15:00Z",
+  "number": 220,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": []
+      },
+      "committedDate": "2026-02-12T18:14:15Z",
+      "oid": "fed2f594d26357b55eb50b65e1e9984dcb44bdaf"
+     },
+     "createdAt": "2026-02-12T18:15:00Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "221": {
+  "closedAt": "2026-02-11T20:08:23Z",
+  "number": 221,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-11T20:08:23Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "222": {
+  "closedAt": "2026-02-12T04:56:22Z",
+  "number": 222,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:56:22Z",
+     "stateReason": "NOT_PLANNED"
+    }
+   ]
+  }
+ },
+ "223": {
+  "closedAt": "2026-02-12T20:38:09Z",
+  "number": 223,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-12T20:38:06Z",
+         "number": 257,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-12T19:58:02Z",
+      "oid": "5a5132430c2c042a6173ebac04549be167177448"
+     },
+     "createdAt": "2026-02-12T20:38:09Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "224": {
+  "closedAt": "2026-02-11T20:08:25Z",
+  "number": 224,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-11T20:08:25Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "225": {
+  "closedAt": "2026-02-12T20:38:09Z",
+  "number": 225,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-12T20:38:06Z",
+         "number": 257,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-12T20:00:25Z",
+      "oid": "a34cecafb53b77e89e6bbf90f3a7305ca5d6d04c"
+     },
+     "createdAt": "2026-02-12T20:38:09Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "227": {
+  "closedAt": "2026-02-20T14:57:58Z",
+  "number": 227,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-20T14:57:58Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "228": {
+  "closedAt": "2026-02-17T19:49:44Z",
+  "number": 228,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-17T19:49:43Z",
+         "number": 363,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-17T19:49:42Z",
+      "oid": "da365a8ea19098210af5855ca48262072d74bfa1"
+     },
+     "createdAt": "2026-02-17T19:49:45Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "229": {
+  "closedAt": "2026-02-17T19:49:45Z",
+  "number": 229,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-17T19:49:43Z",
+         "number": 363,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-17T19:49:42Z",
+      "oid": "da365a8ea19098210af5855ca48262072d74bfa1"
+     },
+     "createdAt": "2026-02-17T19:49:45Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "231": {
+  "closedAt": "2026-02-12T18:08:53Z",
+  "number": 231,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T18:08:54Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "232": {
+  "closedAt": "2026-02-12T04:20:36Z",
+  "number": 232,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:20:36Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "233": {
+  "closedAt": "2026-02-12T04:20:37Z",
+  "number": 233,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:20:37Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "234": {
+  "closedAt": "2026-02-12T04:20:39Z",
+  "number": 234,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:20:39Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "236": {
+  "closedAt": "2026-02-11T20:23:09Z",
+  "number": 236,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-11T20:23:09Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "237": {
+  "closedAt": "2026-02-11T20:26:02Z",
+  "number": 237,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-11T20:26:02Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "238": {
+  "closedAt": "2026-02-17T19:49:45Z",
+  "number": 238,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-17T19:49:43Z",
+         "number": 363,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-17T19:49:42Z",
+      "oid": "da365a8ea19098210af5855ca48262072d74bfa1"
+     },
+     "createdAt": "2026-02-17T19:49:46Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "241": {
+  "closedAt": "2026-02-12T15:55:18Z",
+  "number": 241,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T15:55:19Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "244": {
+  "closedAt": "2026-02-12T20:38:26Z",
+  "number": 244,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T20:38:26Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "248": {
+  "closedAt": "2026-02-12T20:37:22Z",
+  "number": 248,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T20:37:23Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "249": {
+  "closedAt": "2026-02-12T16:57:19Z",
+  "number": 249,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T16:57:19Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "250": {
+  "closedAt": "2026-02-12T16:57:21Z",
+  "number": 250,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T16:57:21Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "251": {
+  "closedAt": "2026-02-12T16:57:23Z",
+  "number": 251,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T16:57:23Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "252": {
+  "closedAt": "2026-02-13T00:48:57Z",
+  "number": 252,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-13T00:48:57Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "253": {
+  "closedAt": "2026-02-13T00:49:04Z",
+  "number": 253,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-13T00:49:04Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "254": {
+  "closedAt": "2026-02-12T16:20:03Z",
+  "number": 254,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T16:20:03Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "255": {
+  "closedAt": "2026-02-13T00:49:40Z",
+  "number": 255,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-13T00:49:41Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "256": {
+  "closedAt": "2026-02-12T18:09:01Z",
+  "number": 256,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": []
+      },
+      "committedDate": "2026-02-12T18:08:26Z",
+      "oid": "b3f23c78434406207811af973546731c7c93065f"
+     },
+     "createdAt": "2026-02-12T18:09:02Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "258": {
+  "closedAt": "2026-02-13T18:38:04Z",
+  "number": 258,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-13T18:38:04Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "260": {
+  "closedAt": "2026-02-20T00:30:16Z",
+  "number": 260,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-19T22:12:37Z",
+     "stateReason": "COMPLETED"
+    },
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-20T00:30:16Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "286": {
+  "closedAt": "2026-02-13T05:05:05Z",
+  "number": 286,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-13T05:05:05Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "289": {
+  "closedAt": "2026-02-13T21:51:09Z",
+  "number": 289,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-13T21:51:09Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "29": {
+  "closedAt": "2026-02-03T06:32:12Z",
+  "number": 29,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-03T06:32:13Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "317": {
+  "closedAt": "2026-05-15T20:58:47Z",
+  "number": 317,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-05-15T20:58:47Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "337": {
+  "closedAt": "2026-02-19T16:43:53Z",
+  "number": 337,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-19T16:43:53Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "338": {
+  "closedAt": "2026-02-15T07:01:39Z",
+  "number": 338,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-15T07:01:40Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "351": {
+  "closedAt": "2026-05-18T01:22:20Z",
+  "number": 351,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-05-18T01:22:19Z",
+         "number": 456,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-05-18T01:22:18Z",
+      "oid": "83bf23b060e66f0f2a0261ccf88c95eb12e1e392"
+     },
+     "createdAt": "2026-05-18T01:22:20Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "365": {
+  "closedAt": "2026-05-15T20:38:43Z",
+  "number": 365,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-05-15T20:38:43Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "37": {
+  "closedAt": "2026-02-15T07:01:38Z",
+  "number": 37,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-15T07:01:38Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "376": {
+  "closedAt": "2026-02-20T14:57:35Z",
+  "number": 376,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-20T14:57:36Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "377": {
+  "closedAt": "2026-02-21T04:44:51Z",
+  "number": 377,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-21T04:44:51Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "380": {
+  "closedAt": "2026-02-20T07:53:17Z",
+  "number": 380,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-20T07:53:17Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "383": {
+  "closedAt": "2026-05-18T01:22:21Z",
+  "number": 383,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-05-18T01:22:19Z",
+         "number": 456,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-05-18T01:22:18Z",
+      "oid": "83bf23b060e66f0f2a0261ccf88c95eb12e1e392"
+     },
+     "createdAt": "2026-05-18T01:22:21Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "408": {
+  "closedAt": "2026-05-15T17:49:46Z",
+  "number": 408,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-05-15T17:49:45Z",
+         "number": 436,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-05-15T17:49:44Z",
+      "oid": "d6ed1470d2b38f1d8646bfe70514228519bdb91d"
+     },
+     "createdAt": "2026-05-15T17:49:47Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "426": {
+  "closedAt": "2026-05-15T19:29:44Z",
+  "number": 426,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-05-15T19:29:42Z",
+         "number": 454,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-05-15T19:29:42Z",
+      "oid": "1273749f5999246174a65216c7e8788aa57b26a4"
+     },
+     "createdAt": "2026-05-15T19:29:44Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "427": {
+  "closedAt": "2026-05-15T19:29:44Z",
+  "number": 427,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-05-15T19:29:42Z",
+         "number": 454,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-05-15T19:29:42Z",
+      "oid": "1273749f5999246174a65216c7e8788aa57b26a4"
+     },
+     "createdAt": "2026-05-15T19:29:44Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "433": {
+  "closedAt": "2026-05-15T19:29:45Z",
+  "number": 433,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-05-15T19:29:42Z",
+         "number": 454,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-05-15T19:29:42Z",
+      "oid": "1273749f5999246174a65216c7e8788aa57b26a4"
+     },
+     "createdAt": "2026-05-15T19:29:45Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "461": {
+  "closedAt": "2026-08-22T00:46:16Z",
+  "number": 461,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-08-22T00:46:16Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "474": {
+  "closedAt": "2026-06-12T02:34:16Z",
+  "number": 474,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "PullRequest",
+      "merged": true,
+      "mergedAt": "2026-06-11T18:31:47Z",
+      "number": 531,
+      "repository": {
+       "nameWithOwner": "JamesPagetButler/QBP"
+      }
+     },
+     "createdAt": "2026-06-11T18:31:48Z",
+     "stateReason": "COMPLETED"
+    },
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-06-12T02:19:25Z",
+         "number": 542,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-06-12T02:19:24Z",
+      "oid": "5e442015d38df5bdbe3732f68ce5115556d78047"
+     },
+     "createdAt": "2026-06-12T02:19:27Z",
+     "stateReason": "COMPLETED"
+    },
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-06-12T02:34:16Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "503": {
+  "closedAt": "2026-06-04T21:38:03Z",
+  "number": 503,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-06-04T21:38:01Z",
+         "number": 497,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-06-04T21:38:01Z",
+      "oid": "88f66b02b00c56d024e8574917263dba83cf610f"
+     },
+     "createdAt": "2026-06-04T21:38:03Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "52": {
+  "closedAt": "2026-02-03T04:26:46Z",
+  "number": 52,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-03T03:20:35Z",
+     "stateReason": "COMPLETED"
+    },
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-03T04:26:47Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "53": {
+  "closedAt": "2026-02-03T04:26:48Z",
+  "number": 53,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-03T03:20:37Z",
+     "stateReason": "COMPLETED"
+    },
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-03T04:26:48Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "54": {
+  "closedAt": "2026-02-03T03:25:58Z",
+  "number": 54,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-03T03:25:58Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "55": {
+  "closedAt": "2026-02-06T03:55:09Z",
+  "number": 55,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-05T05:00:47Z",
+         "number": 130,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-05T04:56:22Z",
+      "oid": "e09cbeed99b3bfdd27e77339d29ed79c10f16597"
+     },
+     "createdAt": "2026-02-05T05:00:49Z",
+     "stateReason": "COMPLETED"
+    },
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": []
+      },
+      "committedDate": "2026-02-05T05:07:07Z",
+      "oid": "cf1a1240826378473f5130379bc8e2c40ade0579"
+     },
+     "createdAt": "2026-02-05T05:07:11Z",
+     "stateReason": "COMPLETED"
+    },
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T03:55:10Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "578": {
+  "closedAt": "2026-08-20T04:26:22Z",
+  "number": 578,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-08-20T04:26:22Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "6": {
+  "closedAt": "2026-02-12T04:20:25Z",
+  "number": 6,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-12T04:20:25Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "607": {
+  "closedAt": "2026-09-01T17:41:45Z",
+  "number": 607,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-09-01T17:41:46Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "613": {
+  "closedAt": "2026-09-03T19:27:51Z",
+  "number": 613,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-09-03T19:27:51Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "615": {
+  "closedAt": "2026-09-03T18:17:48Z",
+  "number": 615,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-09-03T18:17:48Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "617": {
+  "closedAt": "2026-09-03T18:17:46Z",
+  "number": 617,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-09-03T18:17:46Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "64": {
+  "closedAt": "2026-02-06T04:28:41Z",
+  "number": 64,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "PullRequest",
+      "merged": true,
+      "mergedAt": "2026-02-04T05:29:26Z",
+      "number": 112,
+      "repository": {
+       "nameWithOwner": "JamesPagetButler/QBP"
+      }
+     },
+     "createdAt": "2026-02-04T05:29:28Z",
+     "stateReason": "COMPLETED"
+    },
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-06T04:28:41Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "646": {
+  "closedAt": "2026-09-10T22:39:07Z",
+  "number": 646,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-09-10T22:39:05Z",
+         "number": 645,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-09-10T22:39:05Z",
+      "oid": "4aba8ef686e3cbd03782a4a3e735a1e4449a7e4e"
+     },
+     "createdAt": "2026-09-10T22:39:07Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "65": {
+  "closedAt": "2026-05-12T02:19:10Z",
+  "number": 65,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-05-12T02:19:09Z",
+         "number": 405,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-05-12T02:19:09Z",
+      "oid": "0fd67a8acbaf3fdf8ae0a8ab6afaa40c6344d353"
+     },
+     "createdAt": "2026-05-12T02:19:11Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "668": {
+  "closedAt": "2026-09-28T02:56:20Z",
+  "number": 668,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-09-28T02:56:20Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "696": {
+  "closedAt": "2026-10-16T17:34:30Z",
+  "number": 696,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-10-16T17:34:31Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "700": {
+  "closedAt": "2026-10-16T17:34:35Z",
+  "number": 700,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-10-16T17:34:35Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "90": {
+  "closedAt": "2026-02-03T07:32:15Z",
+  "number": 90,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": null,
+     "createdAt": "2026-02-03T07:32:15Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "91": {
+  "closedAt": "2026-02-03T07:52:22Z",
+  "number": 91,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-03T07:52:20Z",
+         "number": 79,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-03T07:41:57Z",
+      "oid": "9efbc073b30869d35261df7589a96df0aff231c4"
+     },
+     "createdAt": "2026-02-03T07:52:22Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ },
+ "97": {
+  "closedAt": "2026-02-03T08:47:57Z",
+  "number": 97,
+  "timelineItems": {
+   "nodes": [
+    {
+     "actor": {
+      "login": "JamesPagetButler"
+     },
+     "closer": {
+      "__typename": "Commit",
+      "associatedPullRequests": {
+       "nodes": [
+        {
+         "merged": true,
+         "mergedAt": "2026-02-03T08:47:55Z",
+         "number": 96,
+         "repository": {
+          "nameWithOwner": "JamesPagetButler/QBP"
+         }
+        }
+       ]
+      },
+      "committedDate": "2026-02-03T08:44:53Z",
+      "oid": "b48596b028f5ff877e692574e463cfea99694948"
+     },
+     "createdAt": "2026-02-03T08:47:57Z",
+     "stateReason": "COMPLETED"
+    }
+   ]
+  }
+ }
+}

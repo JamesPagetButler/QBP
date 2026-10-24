@@ -1,0 +1,5 @@
+ρ: automorphism (residual 2.0e-14), order 3, ρ(ℓ) = ℓ ✓
+ρ(𝕆_low) is a closed octonion subalgebra ≠ 𝕆_low (rank of union 15) ✓
+V(ρ s) = V(s) on 200 random states (max dev 5.6e-16): the crystal does not pick a half ✓
+ℍ_s meets 𝕆_low and ρ(𝕆_low) in two DIFFERENT ℂ's (each 2-dim; common part = ℝ) ✓
+ALL ASSERTIONS PASSED — under P2′ 'the cell' is a ℤ/3-torsor choice, one discrete root

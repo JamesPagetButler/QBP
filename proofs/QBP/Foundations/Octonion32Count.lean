@@ -45,6 +45,30 @@
 
   Status: zero sorry, zero native_decide, zero vacuous True. `#print axioms`
   audited at the bottom.
+
+  Proof architecture + resource note (housekeeping #633, 2026-10-18). The
+  theorem statements are unchanged since b1bd7ae; the proofs were re-factored
+  because the original monolithic `decide +kernel` sweeps needed > 12 GiB
+  (measured: killed at a 12 GiB cgroup cap; RSS at kill 14.9 GiB, still
+  climbing — a lower bound on the true peak; `lake build` OOM-killed at 10 GB
+  in #633 and at 6 GB in #683). Measured after the refactor, standalone `lean`
+  under `run-bounded 12G` / `8G`: exit 0, wall ≈ 1:37, peak RSS 4.42–4.58 GiB
+  (author, 2026-10-21), 4.52 GiB / 1:36.73 (Red Team review of PR #727); the
+  import floor alone is 3.35 GiB. Root cause: each kernel
+  sign lookup through the `![...]` table (`Matrix.vecCons`/`Fin.cases`) costs
+  ≈35 KB of never-freed kernel cache, ≈140 MB per 8-dim candidate. Now:
+    • §4b `sgnFast` — a bit-packed copy of the table, kernel-checked equal to
+      `sgnTable` on all 1024 entries (`sgnTable_eq_sgnFast`); the brute-force
+      sweeps run on it and are transported by `isAlternative_iff_fast`.
+    • §7 the one unavoidable sweep (140 crossing candidates) runs in 7 kernel
+      chunks of 20, glued by `forall_mem_split`/`forall_mem_split_at`.
+    • §9 the 155-count is derived: `crossing_subspaces_eq_crossingData`
+      kernel-checks that the 140 crossing subspaces ARE the `crossingData`
+      index lists (in order), so cross = 42 from Theorem 5; the 15 base
+      candidates are swept (8 pass); a generic `countP` partition
+      (`countP_eq_add_of_parts`, over variables) adds them.
+  Measured after the refactor: see `analysis/633-octonion32count/` and
+  `docs/foundations/lean-build-resource-notes.md` (per-module peak-RSS table).
 -/
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Tactic
@@ -500,15 +524,161 @@ def crossingData : List ((List (Fin 32)) × (Fin 16) × (List (Fin 32))) :=
    ([7, 11, 12], 3, [7, 11, 12, 19, 20, 24, 31])]
 
 
+/-! ## 4b. Kernel-cheap sign lookup (housekeeping #633)
+
+The `![...]` table in §1 is the human-readable record, but every kernel lookup
+through `Matrix.vecCons`/`Fin.cases` costs ≈35 KB of kernel whnf-cache, i.e.
+≈140 MB and ≈1.7 s **per candidate** 8-dim subalgebra (8³ triples × 2 associator
+identities × 4 lookups). The kernel never frees that cache inside one
+declaration, so a single `decide +kernel` over all 155 candidates needed
+> 12 GiB (killed at the cap; RSS at kill 14.9 GiB, still climbing — a lower
+bound on the true peak; measured 2026-10-18, `analysis/633-octonion32count/`). The heavy
+sweeps below therefore run against `sgnFast`, a bit-packed copy of the same
+table (`sgnRowMask a` has bit `b` set iff `sgnTable a b = -1`; the lookup is a
+GMP-accelerated `Nat.testBit`), and `sgnTable_eq_sgnFast` kernel-checks that
+the two encodings agree on all 32 × 32 entries. Every theorem *statement* still
+refers to `sgnTable` through `sgn` / `assocCoeff` / `isAlternative`; the `Fast`
+variants appear only inside proofs, transported by `isAlternative_iff_fast` /
+`isAssociative_iff_fast`. -/
+
+/-- Row `a` of `sgnTable`, packed as a 32-bit mask: bit `b` is set iff
+    `sgnTable a b = -1`. (Row 0 and column 0 are all `+1`, so `sgnRowMask 0 = 0`
+    and every mask is even; `sgnTable a a = -1` for `a ≥ 1`, so bit `a` of mask
+    `a` is set.) Generated mechanically from the `![...]` table; equality with it
+    is the kernel-checked theorem `sgnTable_eq_sgnFast`, not an assumption. -/
+def sgnRowMask : Fin 32 → Nat := fun a =>
+  [0x00000000, 0x6996966a, 0xc33c3cc6, 0xa55a5aac, 0x0ff0f01e, 0x55aaaa74, 0x996666d8, 0x33ccccb2,
+   0xff0001fe, 0x6a6a9794, 0xc6c63d38, 0xacac5b52, 0x1e1ef1e0, 0x7474ab8a, 0xd8d86726, 0xb2b2cd4c,
+   0x0001fffe, 0x69976994, 0xc33dc338, 0xa55ba552, 0x0ff10fe0, 0x55ab558a, 0x99679926, 0x33cd334c,
+   0xff01fe00, 0x6a6b686a, 0xc6c7c2c6, 0xacada4ac, 0x1e1f0e1e, 0x74755474, 0xd8d998d8, 0xb2b332b2].getD a.val 0
+
+/-- Bit-packed sign lookup. `sgnTable_eq_sgnFast` proves it equals `sgnTable`. -/
+def sgnFast (a b : Fin 32) : Int := if (sgnRowMask a).testBit b.val then -1 else 1
+
+/-- The two encodings of the sign table agree on all 1024 entries (kernel-checked
+    over the `Nat` ranges; ≈0.5 GiB, ≈4 s). -/
+theorem sgnTable_eq_sgnFast :
+    ∀ a (ha : a < 32), ∀ b (hb : b < 32), sgnTable ⟨a, ha⟩ ⟨b, hb⟩ = sgnFast ⟨a, ha⟩ ⟨b, hb⟩ := by
+  decide +kernel
+
+theorem sgn_eq_sgnFast (a b : Fin 32) : sgn a b = sgnFast a b :=
+  sgnTable_eq_sgnFast a.1 a.2 b.1 b.2
+
+/-- `assocCoeff` computed through the bit-packed table. -/
+def assocCoeffFast (a b c : Fin 32) : Int :=
+  sgnFast a b * sgnFast (ixor a b) c - sgnFast b c * sgnFast a (ixor b c)
+
+theorem assocCoeff_eq_fast (a b c : Fin 32) : assocCoeff a b c = assocCoeffFast a b c := by
+  simp only [assocCoeff, assocCoeffFast, sgn_eq_sgnFast]
+
+/-- `isAlternative` with `assocCoeffFast` in place of `assocCoeff` (proof-internal). -/
+def isAlternativeFast (H : List (Fin 32)) : Prop :=
+  ∀ a ∈ H, ∀ b ∈ H, ∀ c ∈ H,
+    assocCoeffFast a b c = - assocCoeffFast b a c ∧
+    assocCoeffFast a b c = - assocCoeffFast a c b
+
+instance (H : List (Fin 32)) : Decidable (isAlternativeFast H) := by
+  unfold isAlternativeFast; infer_instance
+
+/-- `isAssociative` with `assocCoeffFast` in place of `assocCoeff` (proof-internal). -/
+def isAssociativeFast (H : List (Fin 32)) : Prop :=
+  ∀ a ∈ H, ∀ b ∈ H, ∀ c ∈ H, assocCoeffFast a b c = 0
+
+instance (H : List (Fin 32)) : Decidable (isAssociativeFast H) := by
+  unfold isAssociativeFast; infer_instance
+
+theorem isAlternative_iff_fast (H : List (Fin 32)) : isAlternative H ↔ isAlternativeFast H := by
+  simp only [isAlternative, isAlternativeFast, assocCoeff_eq_fast]
+
+theorem isAssociative_iff_fast (H : List (Fin 32)) : isAssociative H ↔ isAssociativeFast H := by
+  simp only [isAssociative, isAssociativeFast, assocCoeff_eq_fast]
+
+/-! ## 4c. Chunking helpers (housekeeping #633)
+
+A bounded universal over a literal list is split at `take`/`drop` positions so
+that each piece is kernel-decided in its **own** declaration; the kernel's
+whnf-cache is released between declarations, so peak memory is bounded by the
+largest chunk rather than by the whole list. -/
+
+/-- Split `∀ x ∈ l, p x` into the first `k` elements and the rest. -/
+private theorem forall_mem_split {α : Type} (l : List α) (k : Nat) {p : α → Prop}
+    (h₁ : ∀ x ∈ l.take k, p x) (h₂ : ∀ x ∈ l.drop k, p x) : ∀ x ∈ l, p x := by
+  intro x hx
+  rw [← List.take_append_drop k l, List.mem_append] at hx
+  exact hx.elim (h₁ x) (h₂ x)
+
+/-- Split `∀ x ∈ l.drop i, p x` into the `k` elements at offset `i` and the rest. -/
+private theorem forall_mem_split_at {α : Type} (l : List α) (i k : Nat) {p : α → Prop}
+    (h₁ : ∀ x ∈ (l.drop i).take k, p x) (h₂ : ∀ x ∈ l.drop (i + k), p x) :
+    ∀ x ∈ l.drop i, p x := by
+  intro x hx
+  rw [← List.take_append_drop k (l.drop i), List.mem_append, List.drop_drop] at hx
+  exact hx.elim (h₁ x) (h₂ x)
+
+/-- `countP` partition: a predicate `g` counted over the `f`-part and the `¬f`-part
+    of a list adds up to `g` counted over the whole list. -/
+private theorem countP_and_add_countP_not_and {α : Type} (f g : α → Bool) (l : List α) :
+    l.countP (fun x => f x && g x) + l.countP (fun x => !f x && g x) = l.countP g := by
+  induction l with
+  | nil => rfl
+  | cons x xs ih =>
+    simp only [List.countP_cons]
+    cases f x <;> cases g x <;> simp <;> omega
+
+
+/-- `countP` partition with the complement given as any pointwise-equal predicate `f'`. -/
+private theorem countP_partition {α : Type} (f g f' : α → Bool) (l : List α)
+    (hf' : ∀ x, f' x = !f x) :
+    l.countP (fun x => f x && g x) + l.countP (fun x => f' x && g x) = l.countP g := by
+  rw [← countP_and_add_countP_not_and f g l]
+  congr 1
+  exact List.countP_congr (fun x _ => by rw [hf' x])
+
+/-- A `g`-count equals `a + b` when the `f`-part counts `a` and the `f'`-part (`f'` =
+    pointwise `¬f`) counts `b`. Stated over variables on purpose: the concrete sum
+    `baseAlternativeCount + crossAlternativeCount` must never be unified or
+    kernel-compared against a non-identical term, because a `Nat.add` definitional
+    check makes both the elaborator (`reduceNat?`) and the kernel (`reduce_nat`)
+    `whnf` the summands — i.e. evaluate `isAlternative` on the `![...]` table
+    (#633 bisect: > 11 GB and climbing). Here only `a + b` on literals is ever
+    reduced. -/
+private theorem countP_eq_add_of_parts {α : Type} (f g f' : α → Bool) (l : List α)
+    (hf' : ∀ x, f' x = !f x) (a b : Nat)
+    (ha : l.countP (fun x => f x && g x) = a) (hb : l.countP (fun x => f' x && g x) = b) :
+    l.countP g = a + b := by
+  rw [← countP_partition f g f' l hf', ha, hb]
+
+/-- If the `q`-part of `l` is the `f`-image of `l'`, counting `p` on the `q`-part of `l`
+    is counting `p ∘ f` on `l'`. (Stated over variables so that instantiating it on the
+    155- and 140-element lists is first-order unification — no elaborator evaluation.) -/
+private theorem countP_and_eq_of_filter_eq_map {α β : Type} (p q : β → Bool) (l : List β)
+    (f : α → β) (l' : List α) (h : l.filter q = l'.map f) :
+    l.countP (fun x => q x && p x) = l'.countP (fun t => p (f t)) := by
+  have h1 : l.countP (fun x => q x && p x) = l.countP (fun x => p x && q x) :=
+    List.countP_congr (fun x _ => by rw [Bool.and_comm])
+  rw [h1, ← List.countP_filter, h, List.countP_map, Function.comp_def]
+
+/-- `any (≥ 16)` is the pointwise negation of `all (< 16)`. -/
+private theorem any_ge_eq_not_all_lt (H : List (Fin 32)) :
+    H.any (·.val ≥ 16) = !H.all (·.val < 16) := by
+  rw [List.any_eq_not_all_not]
+  have : (fun x : Fin 32 => !decide (x.val ≥ 16)) = (fun x => decide (x.val < 16)) := by
+    funext x; rw [← decide_not]; exact decide_eq_decide.2 Nat.not_le
+  rw [this]
+
 /-! ## 5. Theorem 3 — all 35 sedenion lines are associative (quaternionic) -/
 
 /-- **All 35 GF(2)-lines of the sedenion frame span associative subalgebras**
     (quaternion copies ℍ): every basis-triple associator coefficient vanishes.
-    Light check (35 lines × 4³ triples over the lower 16 indices). -/
+    Light check (35 lines × 4³ triples over the lower 16 indices), run on the
+    bit-packed table and transported by `isAssociative_iff_fast`. -/
 theorem all_sedenion_lines_associative :
     ∀ L ∈ sedLines, isAssociative (withUnit L) := by
-  unfold sedLines withUnit
-  decide +kernel
+  have h : ∀ L ∈ sedLines, isAssociativeFast (withUnit L) := by
+    decide +kernel
+  intro L hL
+  rw [isAssociative_iff_fast]
+  exact h L hL
 
 /-! ## 6. Theorem 2 — the 8 base octonion copies persist into 𝕋 -/
 
@@ -531,8 +701,11 @@ def baseCopies : List (List (Fin 32)) :=
     monotonicity k(5) ≥ k(4)). -/
 theorem base_copies_persist :
     ∀ H ∈ baseCopies, isAlternative H := by
-  unfold baseCopies
-  decide +kernel
+  have h : ∀ H ∈ baseCopies, isAlternativeFast H := by
+    decide +kernel
+  intro H hH
+  rw [isAlternative_iff_fast]
+  exact h H hH
 
 /-- The 8 base copies all live in the sedenion (all indices < 16). -/
 theorem base_copies_inside_sedenion :
@@ -540,7 +713,43 @@ theorem base_copies_inside_sedenion :
   unfold baseCopies
   decide +kernel
 
-/-! ## 7. Theorem 4 (D1) — crossing alternativity ⟺ the closed predicate -/
+/-! ## 7. Theorem 4 (D1) — crossing alternativity ⟺ the closed predicate
+
+This is the one unavoidable brute-force sweep (140 candidates × 8³ triples). It
+is run on the bit-packed table in seven chunks of 20 candidates, each its own
+kernel declaration (≈0.5 GiB each, from the measured ≈27 MB/candidate slope on
+the bit-packed table; the monolithic form needed > 12 GiB), and the
+chunks are glued by `forall_mem_split` / `forall_mem_split_at`. -/
+
+/-- The D1 discriminator on the bit-packed table, for one crossing candidate. -/
+private abbrev DiscriminatorFast (t : (List (Fin 32)) × (Fin 16) × (List (Fin 32))) : Prop :=
+  isAlternativeFast (withUnit t.2.2) ↔ predPass t.1 t.2.1 = true
+
+private theorem crossing_chunk₁ : ∀ t ∈ crossingData.take 20, DiscriminatorFast t := by
+  decide +kernel
+private theorem crossing_chunk₂ : ∀ t ∈ (crossingData.drop 20).take 20, DiscriminatorFast t := by
+  decide +kernel
+private theorem crossing_chunk₃ : ∀ t ∈ (crossingData.drop 40).take 20, DiscriminatorFast t := by
+  decide +kernel
+private theorem crossing_chunk₄ : ∀ t ∈ (crossingData.drop 60).take 20, DiscriminatorFast t := by
+  decide +kernel
+private theorem crossing_chunk₅ : ∀ t ∈ (crossingData.drop 80).take 20, DiscriminatorFast t := by
+  decide +kernel
+private theorem crossing_chunk₆ : ∀ t ∈ (crossingData.drop 100).take 20, DiscriminatorFast t := by
+  decide +kernel
+private theorem crossing_chunk₇ : ∀ t ∈ crossingData.drop 120, DiscriminatorFast t := by
+  decide +kernel
+
+/-- The seven chunks glued back together: the discriminator on the bit-packed
+    table holds for all 140 crossing candidates. -/
+private theorem crossing_pass_iff_discriminator_fast :
+    ∀ t ∈ crossingData, DiscriminatorFast t :=
+  forall_mem_split crossingData 20 crossing_chunk₁ <|
+  forall_mem_split_at crossingData 20 20 crossing_chunk₂ <|
+  forall_mem_split_at crossingData 40 20 crossing_chunk₃ <|
+  forall_mem_split_at crossingData 60 20 crossing_chunk₄ <|
+  forall_mem_split_at crossingData 80 20 crossing_chunk₅ <|
+  forall_mem_split_at crossingData 100 20 crossing_chunk₆ crossing_chunk₇
 
 /-- **D1 — the discriminator.** For every one of the 140 crossing (line × coset)
     candidates, the candidate 8-dim subalgebra (with `e₀` adjoined) is alternative
@@ -551,8 +760,9 @@ theorem base_copies_inside_sedenion :
 theorem crossing_pass_iff_discriminator :
     ∀ t ∈ crossingData,
       (isAlternative (withUnit t.2.2) ↔ predPass t.1 t.2.1 = true) := by
-  unfold crossingData
-  decide +kernel
+  intro t ht
+  rw [isAlternative_iff_fast]
+  exact crossing_pass_iff_discriminator_fast t ht
 
 /-! ## 8. Theorem 5 — the 42 = 35 + 7 split of passing crossing candidates -/
 
@@ -608,8 +818,17 @@ theorem forty_two_split :
   · decide +kernel
   · decide +kernel
 
+/-! ## 9. Theorem 1 (D3) — exactly 50 of the 155 subspaces are octonion copies
 
-/-! ## 9. Theorem 1 (D3) — exactly 50 of the 155 subspaces are octonion copies -/
+The count is **derived**, not re-swept (housekeeping #633): the 155 candidates
+split into the 15 that lie inside the base sedenion and the 140 that cross into
+the doubled half; `crossing_subspaces_eq_crossingData` kernel-checks that the
+140 crossing index lists of `subspaces` are *exactly* the index lists recorded in
+`crossingData`, in order, so their alternativity count is Theorem 5's 42; the 15
+base candidates are swept directly (8 pass); and the generic partition lemma
+`countP_eq_add_of_parts` adds the two halves to the total. Before #633
+the total, the base part and the crossing part were three independent
+monolithic sweeps (155 + 15 + 140 candidates). -/
 
 /-- The number of the 155 candidate 8-dim frame subalgebras (with `e₀` adjoined)
     that are alternative. (Each such 8-dim alternative subalgebra is ≅ 𝕆 by
@@ -627,13 +846,56 @@ def baseAlternativeCount : Nat :=
 def crossAlternativeCount : Nat :=
   subspaces.countP (fun H => H.any (·.val ≥ 16) && decide (isAlternative (withUnit H)))
 
+/-- The 140 crossing candidates of `subspaces` are exactly the candidate index
+    lists of `crossingData`, in the same order (kernel-checked list equality).
+    This is what lets Theorem 5's count stand in for the crossing part of the
+    155-count; before #633 this identity was implicit and never stated (the old
+    proofs swept `subspaces` directly and never related it to `crossingData`). -/
+theorem crossing_subspaces_eq_crossingData :
+    subspaces.filter (fun H => H.any (·.val ≥ 16)) = crossingData.map (·.2.2) := by
+  decide +kernel
+
+/-- The 15 base candidates, swept on the bit-packed table (the `&&` short-circuits
+    the 140 crossing candidates away before any alternativity check). -/
+private theorem baseAlternativeCount_eq_eight : baseAlternativeCount = 8 := by
+  have hfast : subspaces.countP
+      (fun H => H.all (·.val < 16) && decide (isAlternativeFast (withUnit H))) = 8 := by
+    decide +kernel
+  have hcongr : baseAlternativeCount = subspaces.countP
+      (fun H => H.all (·.val < 16) && decide (isAlternativeFast (withUnit H))) :=
+    List.countP_congr (fun H _ => by
+      simp only [Bool.and_eq_true, decide_eq_true_eq, isAlternative_iff_fast])
+  exact hcongr.trans hfast
+
+/-- The crossing part of the 155-count is the crossing-pair count of §8
+    (`countP_and_eq_of_filter_eq_map` instantiated on the kernel-checked list identity). -/
+private theorem crossAlternativeCount_eq_crossingAlternativeCount :
+    crossAlternativeCount = crossingAlternativeCount := by
+  unfold crossAlternativeCount crossingAlternativeCount
+  exact countP_and_eq_of_filter_eq_map
+    (fun H : List (Fin 32) => decide (isAlternative (withUnit H)))
+    (fun H : List (Fin 32) => H.any (·.val ≥ 16)) subspaces
+    (fun t : (List (Fin 32)) × (Fin 16) × (List (Fin 32)) => t.2.2) crossingData
+    crossing_subspaces_eq_crossingData
+
+/-- The crossing part of the 155-count is 42 (Theorem 5 through the list identity). -/
+private theorem crossAlternativeCount_eq_fortytwo : crossAlternativeCount = 42 := by
+  rw [crossAlternativeCount_eq_crossingAlternativeCount, forty_two_split.1]
+
 /-- **D3 — the count.** Exactly **50** of the 155 candidate 8-dim frame
     subalgebras of the 32-dim Cayley–Dickson algebra 𝕋 = CD(𝕊) are alternative.
     (Each such 8-dim alternative subalgebra is ≅ 𝕆 by Hurwitz/Zorn, cited not
-    proved in Lean.) So k(5) = 50, not 2⁵−1 = 31 and not 155. -/
+    proved in Lean.) So k(5) = 50, not 2⁵−1 = 31 and not 155.
+
+    Derived as 8 + 42 by the generic partition `countP_eq_add_of_parts`
+    (`all (< 16)` / `any (≥ 16)` split the 155 candidates), from the 15-candidate
+    base sweep and Theorem 5 via `crossing_subspaces_eq_crossingData`. -/
 theorem alternative_subspace_count_32_eq_fifty : alternativeSubspaceCount = 50 := by
-  unfold alternativeSubspaceCount
-  decide +kernel
+  have h := countP_eq_add_of_parts (fun H : List (Fin 32) => H.all (·.val < 16))
+    (fun H : List (Fin 32) => decide (isAlternative (withUnit H)))
+    (fun H : List (Fin 32) => H.any (·.val ≥ 16)) subspaces any_ge_eq_not_all_lt 8 42
+    baseAlternativeCount_eq_eight crossAlternativeCount_eq_fortytwo
+  exact h
 
 /-- **The 8 + 42 split of the 50.** Of the 50 octonion copies, 8 lie inside the
     base sedenion (the O1a result restated in 𝕋) and 42 cross into the doubled
@@ -642,10 +904,9 @@ theorem base_plus_crossing_eq_fifty :
     baseAlternativeCount = 8 ∧
     crossAlternativeCount = 42 ∧
     baseAlternativeCount + crossAlternativeCount = alternativeSubspaceCount := by
-  have hbase : baseAlternativeCount = 8 := by unfold baseAlternativeCount; decide +kernel
-  have hcross : crossAlternativeCount = 42 := by unfold crossAlternativeCount; decide +kernel
-  refine ⟨hbase, hcross, ?_⟩
-  rw [hbase, hcross, alternative_subspace_count_32_eq_fifty]
+  refine ⟨baseAlternativeCount_eq_eight, crossAlternativeCount_eq_fortytwo, ?_⟩
+  rw [baseAlternativeCount_eq_eight, crossAlternativeCount_eq_fortytwo,
+    alternative_subspace_count_32_eq_fifty]
 
 /-! ## 10. Completeness audit — `#print axioms` on every main theorem
 
@@ -661,5 +922,7 @@ theorem base_plus_crossing_eq_fifty :
 #print axioms crossing_pass_iff_discriminator
 #print axioms crossingAlternativeCount_eq_predCount
 #print axioms forty_two_split
+#print axioms sgnTable_eq_sgnFast
+#print axioms crossing_subspaces_eq_crossingData
 
 end QBP.Foundations.Octonion32Count

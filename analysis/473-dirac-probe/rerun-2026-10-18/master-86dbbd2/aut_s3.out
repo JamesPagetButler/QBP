@@ -1,0 +1,41 @@
+distinct automorphisms commuting with G2: 6 (expect 6 = |S3|)
+  s = -1.000   M = [[-0.5, -0.866], [-0.866, 0.5]]   det M = -1.000
+  s = -1.000   M = [[-0.5, 0.866], [0.866, 0.5]]   det M = -1.000
+  s = -1.000   M = [[1.0, 0.0], [-0.0, -1.0]]   det M = -1.000
+  s = +1.000   M = [[-0.5, -0.866], [0.866, -0.5]]   det M = +1.000
+  s = +1.000   M = [[-0.5, 0.866], [-0.866, -0.5]]   det M = +1.000
+  s = +1.000   M = [[1.0, -0.0], [-0.0, 1.0]]   det M = +1.000
+
+exact verification (256 basis pairs, residual = max |φ(xy) − φ(x)φ(y)|):
+  the six least-squares solutions:
+    s = -1  det M = -1  residual 2.2e-16
+    s = -1  det M = -1  residual 4.4e-16
+    s = -1  det M = -1  residual 4.4e-16
+    s = +1  det M = +1  residual 1.1e-16
+    s = +1  det M = +1  residual 1.1e-16
+    s = +1  det M = +1  residual 6.3e-17
+  closed-form D₃ (rot 0, ±120 with s=+1; the three reflections with s=−1):
+    [1.0, -0.0, 0.0, 1.0]  s = +1  residual 0.0e+00
+    [-0.5, -0.866, 0.866, -0.5]  s = +1  residual 5.6e-16
+    [-0.5, 0.866, -0.866, -0.5]  s = +1  residual 5.6e-16
+    [-0.5, -0.866, -0.866, 0.5]  s = -1  residual 5.6e-16
+    [-0.5, 0.866, 0.866, 0.5]  s = -1  residual 5.6e-16
+    [1.0, -0.0, -0.0, -1.0]  s = -1  residual 5.1e-17
+  all six exact (< 1e-12): True
+  non-members (must fail):
+    rot 60°, s=+1                    residual 1.73
+    rot 90°, s=+1                    residual 1.00
+    rot 37°, s=+1                    residual 1.56
+    rot 120°, s=−1                   residual 2.00
+    refl (axis of sol) with s=+1     residual 2.00
+
+action on the vacuum orbit space (θ = direction in the (a, Im b) plane, b0):
+  s=-1: θ ∈ (0°, 90°, 45°, -45°) ↦ [60.0, 150.0, 15.0, 105.0]   b0 ↦ -1·b0
+  s=-1: θ ∈ (0°, 90°, 45°, -45°) ↦ [120.0, 30.0, 75.0, 165.0]   b0 ↦ -1·b0
+  s=-1: θ ∈ (0°, 90°, 45°, -45°) ↦ [180.0, 90.0, 135.0, 45.0]   b0 ↦ -1·b0
+  s=+1: θ ∈ (0°, 90°, 45°, -45°) ↦ [120.0, 30.0, 165.0, 75.0]   b0 ↦ +1·b0
+  s=+1: θ ∈ (0°, 90°, 45°, -45°) ↦ [60.0, 150.0, 105.0, 15.0]   b0 ↦ +1·b0
+  s=+1: θ ∈ (0°, 90°, 45°, -45°) ↦ [180.0, 90.0, 45.0, 135.0]   b0 ↦ +1·b0
+
+zero-divisor ridge: G2-orbit dim at (e1+e2ℓ)/√2 = 11 (expect 11 = 14 - dim SU(2))
+  the ridge is the single orbit of orthonormal pairs (a, Im b) — no finite data without a basis

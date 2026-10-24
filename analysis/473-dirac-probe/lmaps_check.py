@@ -20,8 +20,7 @@ Numerical flashlight; the Lean statement is the next step (span closure of a 4-d
 
 import numpy as np
 
-exec(open("dirac_probe.py").read().split("def spec")[0])  # cd_mul, conj, basis
-exec(open("flow_big.py").read().split("# --- FD check")[0])  # omul, V
+from cdalg import V, cd_mul
 
 rng = np.random.default_rng(16)
 e = np.eye(16)

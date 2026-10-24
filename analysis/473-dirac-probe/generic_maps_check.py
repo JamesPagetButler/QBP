@@ -18,16 +18,10 @@ Numerical flashlight only.
 """
 
 import itertools
-import os
 
 import numpy as np
 
-os.chdir(
-    os.path.dirname(os.path.abspath(__file__))
-)  # exec() below is cwd-relative; run from anywhere
-
-exec(open("dirac_probe.py").read().split("def spec")[0])  # cd_mul
-exec(open("flow_big.py").read().split("# --- FD check")[0])  # omul, V
+from cdalg import V, cd_mul
 
 rng = np.random.default_rng(31)
 e = np.eye(16)

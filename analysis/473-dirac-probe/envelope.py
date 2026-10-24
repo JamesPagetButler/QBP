@@ -1,6 +1,6 @@
 import numpy as np
 
-exec(open("dirac_probe.py").read().split("np.set_printoptions")[0])
+from cdalg import L, basis
 
 
 def envelope_dim(gens, n):

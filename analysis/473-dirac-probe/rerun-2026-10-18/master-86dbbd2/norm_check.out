@@ -1,0 +1,2 @@
+dim  8: |x x̄ − (N(x),0,…)|_max = 0.0e+00   N(xy)/(N(x)N(y)) over 2000 Haar pairs: mean 1.0000  std 0.0000  min 1.000  max 1.000
+dim 16: |x x̄ − (N(x),0,…)|_max = 7.1e-15   N(xy)/(N(x)N(y)) over 2000 Haar pairs: mean 0.9959  std 0.1775  min 0.334  max 1.613

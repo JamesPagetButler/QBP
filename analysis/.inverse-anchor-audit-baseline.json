@@ -38,7 +38,7 @@
     "proofs/QBP/Foundations/LocaleDynamics.lean": 41,
     "proofs/QBP/Foundations/NoAutonomousDynamics.lean": 86,
     "proofs/QBP/Foundations/NormForm.lean": 10,
-    "proofs/QBP/Foundations/Octonion32Count.lean": 8,
+    "proofs/QBP/Foundations/Octonion32Count.lean": 32,
     "proofs/QBP/Foundations/OctonionLaws.lean": 55,
     "proofs/QBP/Foundations/QBPHorizonFoundations.lean": 8,
     "proofs/QBP/Foundations/SeamKernel.lean": 53,
