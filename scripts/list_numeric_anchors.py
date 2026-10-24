@@ -52,6 +52,7 @@ Usage
 from __future__ import annotations
 
 import argparse
+import glob
 import json
 import os
 import re
@@ -60,9 +61,25 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(HERE)
-DEFAULT_LEDGER = os.path.join(
-    REPO_ROOT, "archive", "cth-inventory", "confluent-trust-inventory-v5_3.v0.3.json"
-)
+LEDGER_DIR = os.path.join(REPO_ROOT, "archive", "cth-inventory")
+LEDGER_GLOB = "confluent-trust-inventory-*.v0.3.json"
+
+
+def discover_ledger(ledger_dir: str = LEDGER_DIR) -> str:
+    """The live v0.3 ledger: the lexically latest `confluent-trust-inventory-*.v0.3.json`.
+
+    Only the `.v0.3.json` family is the schema-v0.3 ledger (the bare `-v5_3.json` /
+    `-v5.13.json` files beside it are legacy raw inventories), so the glob is pinned to
+    that suffix rather than to one filename (Gemini SHOULD-FIX on PR #769). Falls back to
+    the historical filename if the directory is missing so error messages stay useful.
+    """
+    hits = sorted(glob.glob(os.path.join(ledger_dir, LEDGER_GLOB)))
+    if hits:
+        return hits[-1]
+    return os.path.join(ledger_dir, "confluent-trust-inventory-v5_3.v0.3.json")
+
+
+DEFAULT_LEDGER = discover_ledger()
 
 BOOKKEEPING_FIELDS = frozenset({"tier", "sorry_count", "pa_local", "pa_effective"})
 PREDICTED_SIDE_FIELDS = (

@@ -408,6 +408,29 @@ def test_real_ledger_invariants():
 # ── CLI ──────────────────────────────────────────────────────────────────────
 
 
+def test_discover_ledger_picks_latest_v03_only():
+    with tempfile.TemporaryDirectory() as td:
+        for name in (
+            "confluent-trust-inventory-v5_3.json",  # legacy raw: must be ignored
+            "confluent-trust-inventory-v5.13.json",  # legacy raw: must be ignored
+            "confluent-trust-inventory-v5_3.v0.3.json",
+            "confluent-trust-inventory-v6_0.v0.3.json",
+        ):
+            open(os.path.join(td, name), "w").close()
+        picked = os.path.basename(M.discover_ledger(td))
+        _check(
+            picked == "confluent-trust-inventory-v6_0.v0.3.json",
+            f"latest v0.3 picked: {picked}",
+        )
+    with tempfile.TemporaryDirectory() as empty:
+        _check(
+            M.discover_ledger(empty).endswith("v5_3.v0.3.json"),
+            "fallback name when none",
+        )
+    _check(os.path.isfile(M.DEFAULT_LEDGER), "discovered default exists in the repo")
+    _check(M.DEFAULT_LEDGER.endswith(".v0.3.json"), "default is the v0.3 ledger")
+
+
 def test_cli_md_json_summary():
     out = subprocess.run(
         [sys.executable, SCRIPT, "--summary"],

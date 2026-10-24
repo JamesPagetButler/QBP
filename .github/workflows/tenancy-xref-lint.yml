@@ -31,7 +31,7 @@ on:
       - "scripts/test_check_prediction_classification.py"
       - "scripts/list_numeric_anchors.py"
       - "scripts/test_list_numeric_anchors.py"
-      - "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
+      - "archive/cth-inventory/confluent-trust-inventory-*.v0.3.json"
   pull_request:
     branches:
       - master
@@ -45,7 +45,7 @@ on:
       - "scripts/test_check_prediction_classification.py"
       - "scripts/list_numeric_anchors.py"
       - "scripts/test_list_numeric_anchors.py"
-      - "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
+      - "archive/cth-inventory/confluent-trust-inventory-*.v0.3.json"
 
 jobs:
   tenancy-xref-lint:
