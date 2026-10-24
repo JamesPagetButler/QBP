@@ -11,12 +11,14 @@ Inclusion rule (#479 AC1 scope, applied mechanically — Grothendieck completene
   `experimental_backing` dict carrying a fit result counts — Red Team G1 on PR #769).
   String-typed numbers do not count (the schema types measured/predicted_value as number).
 
-Tag rules (first match wins; every rule cites a record field, never a physics judgement)
+OWN tag rules (first match wins; every rule reads the record's OWN fields, never a physics judgement,
+and never another record — AC4 ruling Q4, PR #769: the stored `alignment.tag` is the record's own basis)
   R-FIT   `independent: false` or id prefix `FIT-`           -> SELECTED (record declares the fit)
   R-OVR   id in OVERRIDES (verbatim quote of a record field) -> tag per table (quote is VERIFIED
           against the record at run time; drift = hard error, so the table cannot rot silently)
-  R-INST  prediction_chain closure reaches a free-parameter node (an `inputs[]` id, an `INST-`
-          anchor, or an R-OVR SELECTED anchor)                -> SELECTED (dof = distinct parameters)
+  R-FREE  the record's OWN `prediction_chain` directly names a free-parameter node (an
+          `inputs[]` id or an `INST-` anchor)                -> SELECTED (the record itself cites
+                                                                the fitted input; dof = inputs named)
   R-EXT   prediction_chain == [], provenance_kind in {experiment, theory-external}, and NO
           predicted-side field                               -> FORCED (external datum; no QBP
                                                                 number in the record at all).
@@ -35,17 +37,38 @@ Tag rules (first match wins; every rule cites a record field, never a physics ju
                                                                 chain => FORCED; a named selection
                                                                 step => SELECTED)
 
-Every row also carries `basis` — WHAT fixes or frees the number (algebra-identity /
-external-theorem / external-datum / measurement-only / fitted-input / calibrated-input /
-candidate-scan / unruled). The issue's FORCED means "uniquely determined by the algebra";
-no row today has basis algebra-* with tag FORCED — the basis column is what makes that visible
-(Red Team S4). AC3: every SELECTED row carries the fixed note G2_TRIVIAL_NOTE. Whether the "G₂-trivial" mechanism
-is the operative one (orientation choice) or the dof is a fitted input is shown in `free_params`.
+EFFECTIVE tag (derived, never stored — the ledger's `pa_local` / `pa_effective` split, AC4 Q4)
+  alignment_effective = weakest link = MIN over the record's own tag and its `prediction_chain`
+  DERIVATION closure, with SELECTED < UNDECIDED < FORCED. Closure nodes contribute:
+    a numeric anchor         -> its OWN tag
+    an `inputs[]` id / INST- -> SELECTED (a free parameter is a degree of freedom exercised;
+                                reached INDIRECTLY — the v0.2 "R-INST inherited" case — it
+                                lives here; named directly it is already the own tag, R-FREE)
+    a DANGLING id (resolves in NO ledger collection) -> UNDECIDED-until-resolved, id named
+    any other resolved node (non-numeric anchor, axiom, derived principle, interpretation ...)
+                             -> neutral (carries no alignment; the closure continues through
+                                anchors, as `EffectivePA` folds only over graded anchors)
+  So any SELECTED ancestor => effectively SELECTED; a FORCED row over an UNDECIDED or dangling
+  ancestor => effectively UNDECIDED. Only `prediction_chain` is an edge; relevance / mention
+  prose never counts (docs/cth/qbp-local-extensions.md, `pa_effective`).
+
+Every row also carries `basis` — WHAT fixes or frees the number on the record's own fields
+(algebra-identity / external-theorem / external-datum / measurement-only / fitted-input /
+calibrated-input / candidate-scan / unruled). The issue's FORCED means "uniquely determined by
+the algebra"; no row today has basis algebra-* with tag FORCED — the basis column is what makes
+that visible (Red Team S4); `basis_kind` is a REQUIRED companion of `tag` in the schema (AC4 Q9).
+AC3: every row whose EFFECTIVE tag is SELECTED carries the fixed note G2_TRIVIAL_NOTE (an inherited
+fitted input zeroes the row's independent evidential weight just as a direct one does). Whether
+the "G₂-trivial" mechanism is the operative one (orientation choice) or the dof is a fitted input
+is shown in `free_params` (closure-wide, for the AC2 count) and `free_params_own` (stored side).
 
 Usage
   python3 scripts/list_numeric_anchors.py                 # markdown table + summary
   python3 scripts/list_numeric_anchors.py --format json   # machine-readable rows
-  python3 scripts/list_numeric_anchors.py --summary       # counts only
+  python3 scripts/list_numeric_anchors.py --summary       # counts only (own AND effective)
+  python3 scripts/list_numeric_anchors.py --effective     # id | own | effective | set by | dangling
+  python3 scripts/list_numeric_anchors.py --dangling      # dangling prediction_chain ids, ledger-wide,
+                                                          #   with the numeric-scope reach of each
   python3 scripts/list_numeric_anchors.py --ledger PATH   # another ledger file
 """
 
@@ -57,6 +80,7 @@ import json
 import os
 import re
 import sys
+from collections import Counter, defaultdict
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -91,6 +115,10 @@ PREDICTED_SIDE_FIELDS = (
     "F_max_value",
 )
 TAGS = ("FORCED", "SELECTED", "UNDECIDED")
+# Weakest-link order for the effective tag: a number is no more FORCED than its
+# least-forced derivation ancestor (AC4 Q4).
+TAG_RANK = {"SELECTED": 0, "UNDECIDED": 1, "FORCED": 2}
+RANK_TAG = {v: k for k, v in TAG_RANK.items()}
 G2_TRIVIAL_NOTE = "G₂-trivial: zero independent evidential weight."
 ORIENTATION_RE = re.compile(r"furey|baez|orientation|fano", re.IGNORECASE)
 
@@ -246,14 +274,26 @@ def list_numeric_anchors(ledger: Dict[str, Any]) -> List[Dict[str, Any]]:
 # ── chain closure and free parameters ────────────────────────────────────────
 
 
-def free_parameter_nodes(ledger: Dict[str, Any]) -> Dict[str, str]:
-    """id -> parameter name for every node that introduces a free parameter."""
+def free_input_nodes(ledger: Dict[str, Any]) -> Dict[str, str]:
+    """id -> parameter name for the ledger's free INPUTS: `inputs[]` ids and INST- anchors.
+
+    These are the terminals that make a record's OWN tag SELECTED when its own chain names
+    one (R-FREE); an `inputs[]` record's `status: measurable|irreducible` IS the
+    free-parameter statement (AC4 Q8), so no `alignment` is needed on the input itself.
+    """
     nodes: Dict[str, str] = {}
     for inp in ledger.get("inputs", []):
         nodes[inp["id"]] = inp["id"]
     for a in ledger.get("anchors", []):
         if a["id"].startswith("INST-"):
             nodes[a["id"]] = a["id"]
+    return nodes
+
+
+def free_parameter_nodes(ledger: Dict[str, Any]) -> Dict[str, str]:
+    """id -> parameter name for every node that introduces a free parameter (closure side):
+    the free inputs plus every R-OVR SELECTED anchor (its quoted parameter)."""
+    nodes = free_input_nodes(ledger)
     for aid, (tag, _field, _quote, param, _basis) in OVERRIDES.items():
         if tag == "SELECTED" and param:
             nodes[aid] = param
@@ -271,6 +311,61 @@ def chain_closure(anchors_by_id: Dict[str, Dict[str, Any]], anchor_id: str) -> S
         seen.add(cur)
         stack.extend(anchors_by_id.get(cur, {}).get("prediction_chain", []))
     return seen
+
+
+def resolvable_ids(ledger: Dict[str, Any]) -> Dict[str, str]:
+    """id -> top-level collection name, for EVERY id-bearing record in the ledger.
+
+    `prediction_chain` entries point at anchors, `inputs[]`, `axioms`, `derived_principles`,
+    `interpretations`, ... — an id is DANGLING only if it resolves in none of them. (The v0.2
+    doc §7 count of 13 used this test; a count of 27 is what "not in `anchors[]`" gives, the
+    extra 14 being resolved non-anchor nodes such as AXIOM-1 and DERIV-crystallisation-asymptotic.)
+    """
+    out: Dict[str, str] = {}
+    for key, val in ledger.items():
+        if not isinstance(val, list):
+            continue
+        for rec in val:
+            if isinstance(rec, dict) and isinstance(rec.get("id"), str):
+                out.setdefault(rec["id"], key)
+    return out
+
+
+def dangling_report(ledger: Dict[str, Any]) -> Dict[str, Any]:
+    """Ledger-wide reconciliation of `prediction_chain` ids that are not anchors.
+
+    Returns {"dangling": [...], "resolved_elsewhere": [...]}, each row
+    {id, refs, referrers, collection (None when dangling), numeric_rows, in_numeric_scope}:
+    refs/referrers count every anchor whose chain names the id directly; numeric_rows are the
+    numeric anchors whose transitive closure reaches it (the #479 scope).
+    """
+    by_id = {a["id"]: a for a in ledger.get("anchors", [])}
+    resolv = resolvable_ids(ledger)
+    refs: Counter = Counter()
+    referrers: Dict[str, List[str]] = defaultdict(list)
+    for a in ledger.get("anchors", []):
+        for c in a.get("prediction_chain", []):
+            if c not in by_id:
+                refs[c] += 1
+                referrers[c].append(a["id"])
+    reach: Dict[str, List[str]] = defaultdict(list)
+    for a in list_numeric_anchors(ledger):
+        for c in chain_closure(by_id, a["id"]):
+            if c not in by_id:
+                reach[c].append(a["id"])
+    dangling: List[Dict[str, Any]] = []
+    elsewhere: List[Dict[str, Any]] = []
+    for cid in sorted(refs, key=lambda k: (-refs[k], k)):
+        row = {
+            "id": cid,
+            "refs": refs[cid],
+            "referrers": sorted(referrers[cid]),
+            "collection": resolv.get(cid),
+            "numeric_rows": sorted(reach.get(cid, [])),
+            "in_numeric_scope": bool(reach.get(cid)),
+        }
+        (elsewhere if cid in resolv else dangling).append(row)
+    return {"dangling": dangling, "resolved_elsewhere": elsewhere}
 
 
 # ── overrides ────────────────────────────────────────────────────────────────
@@ -317,21 +412,19 @@ def classify(
     by_id: Optional[Dict[str, Dict[str, Any]]] = None,
     free_nodes: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
-    """Propose a tag for one numeric anchor. Pure function of (anchor, ledger, OVERRIDES).
+    """Propose the OWN tag for one numeric anchor. Pure function of (anchor, OVERRIDES, inputs).
 
-    `by_id` / `free_nodes` may be precomputed by the caller (classify_all does) so the
-    per-anchor cost is the chain closure, not a rebuild of the ledger index (Red Team K1).
+    Reads the record's own fields only — never another anchor's (AC4 Q4: the stored
+    `alignment.tag` is the record's own basis; inheritance along `prediction_chain` is the
+    derived `tag_effective`, added by `annotate_effective`). The one chain read is R-FREE: a
+    free input the record's own chain names DIRECTLY is the record citing its own fitted
+    input. `free_nodes` (the free inputs) may be precomputed by the caller (Red Team K1);
+    `by_id` is accepted for call-site compatibility and unused here.
     """
-    if by_id is None:
-        by_id = {a["id"]: a for a in ledger.get("anchors", [])}
     if free_nodes is None:
-        free_nodes = free_parameter_nodes(ledger)
+        free_nodes = free_input_nodes(ledger)
     aid = anchor["id"]
     chain = list(anchor.get("prediction_chain", []))
-    closure = chain_closure(by_id, aid)
-    direct = sorted(c for c in chain if c in free_nodes)
-    inherited = sorted(c for c in closure if c in free_nodes and c not in direct)
-    params = sorted({free_nodes[c] for c in direct + inherited})
     pk = anchor.get("provenance_kind")
     nf = numeric_fields(anchor)
     has_pred = any(f in nf for f in PREDICTED_SIDE_FIELDS)
@@ -342,6 +435,7 @@ def classify(
     rule: str
     reason: str
     basis: str
+    own_params: List[str] = []
     if anchor.get("independent") is False or aid.startswith("FIT-"):
         tag, rule, basis = "SELECTED", "R-FIT", "fitted-input"
         which = (
@@ -350,20 +444,21 @@ def classify(
             else "`FIT-` prefix"
         )
         reason = f"record declares the fit ({which})"
+        # the fitted parameter itself is named by the chain (closure side), not invented here
     elif aid in OVERRIDES:
         tag, field, quote, param, basis = OVERRIDES[aid]
         rule = "R-OVR"
         reason = f"record `{field}`: “{quote}”"
         if param:
-            params = sorted(set(params) | {param})
-    elif direct or inherited:
-        tag, rule, basis = "SELECTED", "R-INST", "fitted-input"
-        via = []
-        if direct:
-            via.append("direct: " + ", ".join(direct))
-        if inherited:
-            via.append("inherited via chain: " + ", ".join(inherited))
-        reason = "`prediction_chain` reaches a free parameter (" + "; ".join(via) + ")"
+            own_params = [param]
+    elif any(c in free_nodes for c in chain):
+        tag, rule, basis = "SELECTED", "R-FREE", "fitted-input"
+        own_params = sorted({free_nodes[c] for c in chain if c in free_nodes})
+        reason = (
+            "record's own `prediction_chain` names a free input ("
+            + ", ".join(own_params)
+            + ")"
+        )
     elif not chain and pk in ("experiment", "theory-external") and not has_pred:
         tag, rule, basis = "FORCED", "R-EXT", "external-datum"
         reason = (
@@ -391,13 +486,15 @@ def classify(
     else:
         tag, rule, basis = "UNDECIDED", "default", "unruled"
         reason = (
-            f"`provenance_kind: {pk}`; no free parameter in `prediction_chain`, no kernel "
-            "theorem for the number — ruling: Lean derivation from the chain ⇒ FORCED, "
-            "a named selection step ⇒ SELECTED"
+            f"`provenance_kind: {pk}`; no fit, scan or calibration on the record's own "
+            "fields, no kernel theorem for the number — ruling: Lean derivation from the "
+            "chain ⇒ FORCED, a named selection step ⇒ SELECTED"
         )
 
     if tag == "FORCED":
-        params = []  # a FORCED number has no free parameter by definition (Red Team K2)
+        own_params = (
+            []
+        )  # a FORCED number has no free parameter by definition (Red Team K2)
 
     row = {
         "id": aid,
@@ -413,46 +510,116 @@ def classify(
         "rule": rule,
         "basis": basis,
         "reason": reason,
-        "free_params": params,
-        "dof": len(params),
+        "free_params_own": own_params,
+        # closure-side fields — filled by annotate_effective; defaults = "no chain effect"
+        "tag_effective": tag,
+        "effective_via": [],
+        "dangling": [],
+        "free_params": list(own_params),
+        "dof": len(own_params),
         "orientation_keyword": bool(ORIENTATION_RE.search(text)),
         "ac3_note": G2_TRIVIAL_NOTE if tag == "SELECTED" else None,
     }
     return row
 
 
+def annotate_effective(
+    rows: Sequence[Dict[str, Any]], ledger: Dict[str, Any]
+) -> List[Dict[str, Any]]:
+    """Derive `tag_effective` for every row: MIN over own tag + the derivation closure.
+
+    Closure contributions (module docstring, EFFECTIVE tag): numeric anchor -> its own tag;
+    free-parameter node (`inputs[]`, INST- anchor) -> SELECTED; dangling id -> UNDECIDED;
+    any other resolved node -> neutral. `effective_via` names the ancestors at the minimum
+    when the chain lowered the tag; `dangling` names every unresolved id in the closure
+    whether or not it moved the tag. `free_params` / `dof` are closure-wide (AC2 count).
+    """
+    by_id = {a["id"]: a for a in ledger.get("anchors", [])}
+    resolv = resolvable_ids(ledger)
+    free_nodes = free_parameter_nodes(ledger)
+    own = {r["id"]: r for r in rows}
+    out: List[Dict[str, Any]] = []
+    for r in rows:
+        closure = chain_closure(by_id, r["id"])
+        contrib: List[Tuple[str, str]] = []
+        params: Set[str] = set(r["free_params_own"])
+        dangling: List[str] = []
+        for c in sorted(closure):
+            if c in own:
+                contrib.append((own[c]["tag"], c))
+                params |= set(own[c]["free_params_own"])
+            elif c in free_nodes:
+                contrib.append(("SELECTED", c))
+                params.add(free_nodes[c])
+            elif c not in resolv:
+                contrib.append(("UNDECIDED", c))
+                dangling.append(c)
+            # else: resolved non-numeric node — neutral
+        own_rank = TAG_RANK[r["tag"]]
+        best = min([own_rank] + [TAG_RANK[t] for t, _ in contrib])
+        eff = RANK_TAG[best]
+        via = [c for t, c in contrib if TAG_RANK[t] == best] if best < own_rank else []
+        if eff == "FORCED":
+            params = set()  # K2 at the effective level: FORCED-effective ⇒ dof 0
+        new = dict(r)
+        new["tag_effective"] = eff
+        new["effective_via"] = via
+        new["dangling"] = dangling
+        new["free_params"] = sorted(params)
+        new["dof"] = len(new["free_params"])
+        new["ac3_note"] = G2_TRIVIAL_NOTE if eff == "SELECTED" else None
+        out.append(new)
+    return out
+
+
 def classify_all(ledger: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Classify every numeric anchor; raise if any override quote has drifted."""
+    """Own tag + effective tag for every numeric anchor; raise if any override quote drifted."""
     errors, _missing = verify_overrides(ledger)
     if errors:
         raise ValueError("OVERRIDES drifted from the ledger:\n  " + "\n  ".join(errors))
     by_id = {a["id"]: a for a in ledger.get("anchors", [])}
-    free_nodes = free_parameter_nodes(ledger)
-    return [
+    free_nodes = free_input_nodes(ledger)
+    rows = [
         classify(a, ledger, by_id, free_nodes) for a in list_numeric_anchors(ledger)
     ]
+    return annotate_effective(rows, ledger)
 
 
 def summarize(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     counts = {t: sum(1 for r in rows if r["tag"] == t) for t in TAGS}
+    eff_counts = {t: sum(1 for r in rows if r["tag_effective"] == t) for t in TAGS}
     by_rule: Dict[str, int] = {}
     by_basis: Dict[str, int] = {}
+    moves: Dict[str, int] = {}
     for r in rows:
         by_rule[r["rule"]] = by_rule.get(r["rule"], 0) + 1
         key = f"{r['tag']}/{r['basis']}"
         by_basis[key] = by_basis.get(key, 0) + 1
+        if r["tag"] != r["tag_effective"]:
+            mk = f"{r['tag']}→{r['tag_effective']}"
+            moves[mk] = moves.get(mk, 0) + 1
     params: Dict[str, List[str]] = {}
     for r in rows:
-        if r["tag"] == "SELECTED":
+        if r["tag_effective"] == "SELECTED":
             for p in r["free_params"]:
                 params.setdefault(p, []).append(r["id"])
+    dangling_rows = [r for r in rows if r["dangling"]]
+    dangling_ids: Dict[str, int] = {}
+    for r in dangling_rows:
+        for d in r["dangling"]:
+            dangling_ids[d] = dangling_ids.get(d, 0) + 1
     return {
         "numeric_anchors": len(rows),
         "tags": counts,
+        "tags_effective": eff_counts,
+        "moves": dict(sorted(moves.items())),
         "rules": dict(sorted(by_rule.items())),
         "tag_basis": dict(sorted(by_basis.items())),
-        "free_choice_count": counts["SELECTED"],
+        "free_choice_count": eff_counts["SELECTED"],
+        "free_choice_count_own": counts["SELECTED"],
         "distinct_free_parameters": {k: sorted(v) for k, v in sorted(params.items())},
+        "rows_with_dangling_ancestor": len(dangling_rows),
+        "dangling_ids_in_scope": dict(sorted(dangling_ids.items())),
         "orientation_keyword_rows": sum(1 for r in rows if r["orientation_keyword"]),
     }
 
@@ -473,9 +640,10 @@ def render_markdown(rows: Sequence[Dict[str, Any]], ledger: Dict[str, Any]) -> s
     out.append("")
     out.append(
         "| # | Anchor | Number(s) | Unit | External reference (`measured_source`) | "
-        "kind / status | Tag | Basis | Rule | Free params (dof) | Orient. kw | Reason |"
+        "kind / status | Own tag | Basis | Rule | Effective tag | Effective via | Dangling | "
+        "Free params (dof) | Orient. kw | Reason |"
     )
-    out.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
+    out.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for i, r in enumerate(rows, 1):
         nums = "; ".join(f"{k}={_fmt_num(v)}" for k, v in r["numeric_fields"].items())
         fp = (
@@ -484,12 +652,56 @@ def render_markdown(rows: Sequence[Dict[str, Any]], ledger: Dict[str, Any]) -> s
             else "— (0)"
         )
         reason = r["reason"] + (f" {r['ac3_note']}" if r["ac3_note"] else "")
+        eff = r["tag_effective"]
+        eff_s = f"**{eff}**" if eff != r["tag"] else eff
+        via = ", ".join(r["effective_via"]) if r["effective_via"] else "— (own)"
+        dang = ", ".join(r["dangling"]) if r["dangling"] else "—"
         out.append(
             f"| {i} | `{r['id']}` | {_esc(nums)} | {_esc(r['unit'] or '—')} | "
             f"{_esc(r['external_reference'] or '— (none on record)')} | "
             f"{_esc(r['provenance_kind'])} / {_esc(r['status'])} | **{r['tag']}** | "
-            f"{_esc(r['basis'])} | {r['rule']} | {_esc(fp)} | {'Y' if r['orientation_keyword'] else 'N'} | "
-            f"{_esc(reason)} |"
+            f"{_esc(r['basis'])} | {r['rule']} | {eff_s} | {_esc(via)} | {_esc(dang)} | "
+            f"{_esc(fp)} | {'Y' if r['orientation_keyword'] else 'N'} | {_esc(reason)} |"
+        )
+    return "\n".join(out)
+
+
+def render_effective(rows: Sequence[Dict[str, Any]]) -> str:
+    """Compact own -> effective view, one line per numeric anchor."""
+    out = ["| # | Anchor | Own | Effective | Set by (closure) | Dangling in closure |"]
+    out.append("|---|---|---|---|---|---|")
+    for i, r in enumerate(rows, 1):
+        via = ", ".join(r["effective_via"]) if r["effective_via"] else "— (own)"
+        dang = ", ".join(r["dangling"]) if r["dangling"] else "—"
+        mark = "**" if r["tag"] != r["tag_effective"] else ""
+        out.append(
+            f"| {i} | `{r['id']}` | {r['tag']} | {mark}{r['tag_effective']}{mark} | "
+            f"{_esc(via)} | {_esc(dang)} |"
+        )
+    return "\n".join(out)
+
+
+def render_dangling(report: Dict[str, Any]) -> str:
+    dang = report["dangling"]
+    elsewhere = report["resolved_elsewhere"]
+    n_scope = sum(1 for d in dang if d["in_numeric_scope"])
+    out = [
+        f"Dangling `prediction_chain` ids (resolve in NO ledger collection): "
+        f"{len(dang)} ledger-wide, {n_scope} reachable from the numeric anchors' closures.",
+        f"Chain ids outside `anchors[]` that DO resolve elsewhere: {len(elsewhere)} "
+        f"(total not-in-anchors = {len(dang) + len(elsewhere)}).",
+        "",
+        "| Chain id (not an anchor) | Resolves in | Direct refs | Referrers | "
+        "Numeric rows whose closure reaches it |",
+        "|---|---|---:|---|---|",
+    ]
+    for d in dang + elsewhere:
+        where = f"`{d['collection']}`" if d["collection"] else "**UNDEFINED**"
+        nrows = d["numeric_rows"]
+        reach = f"{len(nrows)}: " + _esc(", ".join(nrows)) if nrows else "0"
+        out.append(
+            f"| `{d['id']}` | {where} | {d['refs']} | {_esc(', '.join(d['referrers']))} | "
+            f"{reach} |"
         )
     return "\n".join(out)
 
@@ -497,14 +709,24 @@ def render_markdown(rows: Sequence[Dict[str, Any]], ledger: Dict[str, Any]) -> s
 def render_summary(summary: Dict[str, Any]) -> str:
     lines = [
         f"numeric anchors: {summary['numeric_anchors']}",
-        "tags: " + ", ".join(f"{t} {summary['tags'][t]}" for t in TAGS),
-        "rules: " + ", ".join(f"{k} {v}" for k, v in summary["rules"].items()),
-        "tag/basis: " + ", ".join(f"{k} {v}" for k, v in summary["tag_basis"].items()),
-        f"free-choice count (SELECTED tags): {summary['free_choice_count']}",
+        "own tags: " + ", ".join(f"{t} {summary['tags'][t]}" for t in TAGS),
+        "effective tags: "
+        + ", ".join(f"{t} {summary['tags_effective'][t]}" for t in TAGS),
+        "own→effective moves: "
+        + (", ".join(f"{k} {v}" for k, v in summary["moves"].items()) or "none"),
+        "rules (own): " + ", ".join(f"{k} {v}" for k, v in summary["rules"].items()),
+        "own tag/basis: "
+        + ", ".join(f"{k} {v}" for k, v in summary["tag_basis"].items()),
+        f"free-choice count (SELECTED tags): effective {summary['free_choice_count']}, "
+        f"own {summary['free_choice_count_own']}",
         f"distinct free parameters: {len(summary['distinct_free_parameters'])}",
     ]
     for p, ids in summary["distinct_free_parameters"].items():
         lines.append(f"  - {p}: {len(ids)} anchor(s) — {', '.join(ids)}")
+    lines.append(
+        f"rows with a dangling ancestor: {summary['rows_with_dangling_ancestor']} "
+        f"over {len(summary['dangling_ids_in_scope'])} dangling id(s)"
+    )
     lines.append(
         f"rows with an orientation keyword: {summary['orientation_keyword_rows']}"
     )
@@ -525,6 +747,16 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     mode = ap.add_mutually_exclusive_group()
     mode.add_argument("--format", choices=("md", "json"), default="md")
     mode.add_argument("--summary", action="store_true", help="print counts only")
+    mode.add_argument(
+        "--effective",
+        action="store_true",
+        help="compact own -> effective tag table (set-by ancestor, dangling ids)",
+    )
+    mode.add_argument(
+        "--dangling",
+        action="store_true",
+        help="reconcile prediction_chain ids outside anchors[]: dangling vs resolved elsewhere",
+    )
     args = ap.parse_args(list(argv) if argv is not None else None)
 
     try:
@@ -532,6 +764,9 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     except (OSError, json.JSONDecodeError) as exc:
         print(f"ERROR: cannot read ledger {args.ledger}: {exc}", file=sys.stderr)
         return 2
+    if args.dangling:
+        print(render_dangling(dangling_report(ledger)))
+        return 0
     errors, missing = verify_overrides(ledger)
     if errors:
         print(
@@ -548,9 +783,19 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     summary = summarize(rows)
     if args.summary:
         print(render_summary(summary))
+    elif args.effective:
+        print(render_effective(rows))
     elif args.format == "json":
         print(
-            json.dumps({"summary": summary, "rows": rows}, indent=1, ensure_ascii=False)
+            json.dumps(
+                {
+                    "summary": summary,
+                    "dangling": dangling_report(ledger),
+                    "rows": rows,
+                },
+                indent=1,
+                ensure_ascii=False,
+            )
         )
     else:
         print(render_markdown(rows, ledger))
