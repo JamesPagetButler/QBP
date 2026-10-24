@@ -6302,7 +6302,9 @@
       "pr-window": 109,
       "timeline-commit-only": 2,
       "timeline-commit-pr": 18,
-      "timeline-pr": 0
+      "timeline-pr": 0,
+      "timeline-stale": 0,
+      "timeline-unmerged-pr": 0
     },
     "closedAt_max": "2026-10-17T19:27:44Z",
     "closedAt_min": "2026-02-01T22:45:02Z",

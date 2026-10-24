@@ -543,6 +543,18 @@ TL_ISSUES = ISSUES + [
     _issue(150, UNTICKED, T9),
     # #160 flagged; PR-closed, reopened, then hand-closed (#474 shape): last wins
     _issue(160, UNTICKED, T9),
+    # #170 clean; commit whose only associated PR is NOT merged -> commit-only
+    _issue(170, TICKED, T9),
+    # #180 clean; commit with TWO merged PRs: the one merged nearer closedAt wins
+    _issue(180, TICKED, T9),
+    # #190 clean; two merged PRs at EQUAL Δ: lower number wins
+    _issue(190, TICKED, T9),
+    # #200 clean; event exactly --merge-window BEFORE closedAt: accepted (boundary)
+    _issue(200, TICKED, T9),
+    # #210 clean; event 8 h BEFORE closedAt: stale (sign-insensitive)
+    _issue(210, TICKED, T9),
+    # #220 clean; closer is a PullRequest that is NOT merged -> unusable record
+    _issue(220, TICKED, T9),
 ]
 
 TL_MERGED = {
@@ -578,6 +590,39 @@ TIMELINE = {
             ("2026-09-01T00:00:00Z", _pr_closer(11, "2026-09-01T00:00:00Z"))
         ],
     ),
+    "170": _tl_node(
+        170,
+        T9,
+        _commit(
+            "0000000000000001", [_tl_pr(171, "2026-09-09T00:00:00Z", merged=False)]
+        ),
+    ),
+    "180": _tl_node(
+        180,
+        T9,
+        _commit(
+            "0000000000000002",
+            [
+                _tl_pr(181, "2026-09-08T00:00:00Z"),  # a day earlier
+                _tl_pr(182, "2026-09-09T00:00:01Z"),  # 1 s from the close -> wins
+            ],
+        ),
+    ),
+    "190": _tl_node(
+        190,
+        T9,
+        _commit(
+            "0000000000000003",
+            [_tl_pr(192, "2026-09-09T00:00:02Z"), _tl_pr(191, "2026-09-09T00:00:02Z")],
+        ),
+    ),
+    "200": _tl_node(
+        200, "2026-09-08T23:58:02Z", _pr_closer(101, "2026-09-08T23:58:02Z")
+    ),
+    "210": _tl_node(
+        210, "2026-09-08T16:00:02Z", _pr_closer(101, "2026-09-08T16:00:02Z")
+    ),
+    "220": _tl_node(220, T9, _pr_closer(221, "", merged=False)),
     # a contradicting record for a bulk-attributed row must be ignored
     "10": _tl_node(10, "2026-09-01T00:00:01Z", None),
 }
@@ -600,6 +645,7 @@ def test_timeline_empty_refs_commit_resolves_to_merged_pr():
     assert r["closing_pr_has_keyword"] is False
     assert r["guard_would_have_fired"] is False and r["flagged"] is True
     assert "keyword in commit message" in A._guard_cell(r)
+    assert "post-merge backstop" in A._guard_cell(r)
     assert A._how_cell(r) == "merged-pr #91 (Δ2s) via commit c0ffee0"
 
 
@@ -625,8 +671,10 @@ def test_timeline_empty_refs_no_resolvable_pr_stays_manual():
     # no timeline record
     assert by[130]["closed_how"] == "manual" and by[130]["close_source"] == "none"
     assert A._how_cell(by[130]) == "manual"
-    # stale record (event far from closedAt) is never trusted
-    assert by[140]["closed_how"] == "manual" and by[140]["close_source"] == "none"
+    # stale record (event far from closedAt) is never trusted — and is distinguishable
+    assert by[140]["closed_how"] == "manual"
+    assert by[140]["close_source"] == "timeline-stale"
+    assert A._how_cell(by[140]) == "manual (stale timeline record)"
     for n in (110, 120, 130, 140):
         assert by[n]["closing_pr"] == "" and by[n]["guard_would_have_fired"] is False
         assert A._guard_cell(by[n]) == "n/a (manual)"
@@ -636,6 +684,106 @@ def test_timeline_last_closed_event_wins():
     _s, by = _tl_rows()
     # PR-closed, reopened, hand-closed: the final close is manual (#474 shape)
     assert by[160]["closed_how"] == "manual" and by[160]["close_source"] == "hand"
+
+
+def test_timeline_merged_gating_and_nearest_pr_selection():
+    _s, by = _tl_rows()
+    # only an UNMERGED associated PR -> not attributed; commit-only
+    assert by[170]["closed_how"] == "manual"
+    assert by[170]["close_source"] == "timeline-commit-only"
+    assert by[170]["closing_pr"] == ""
+    # two merged PRs: the one merged nearest closedAt wins
+    assert by[180]["closed_how"] == "merged-pr" and by[180]["closing_pr"] == "#182"
+    assert by[180]["merge_delta_s"] == 1
+    # equal Δ: lower PR number wins (deterministic tie-break)
+    assert by[190]["closed_how"] == "merged-pr" and by[190]["closing_pr"] == "#191"
+    # a PullRequest closer that is not merged is a present-but-unusable record
+    assert by[220]["closed_how"] == "manual"
+    assert by[220]["close_source"] == "timeline-unmerged-pr"
+    assert A._how_cell(by[220]) == "manual (unmerged PR closer)"
+
+
+def test_timeline_stale_guard_boundary_and_sign():
+    _s, by = _tl_rows()
+    # exactly --merge-window (120 s) BEFORE closedAt is still accepted
+    assert (
+        by[200]["closed_how"] == "merged-pr"
+        and by[200]["close_source"] == "timeline-pr"
+    )
+    # 8 h BEFORE is stale (abs(), not a one-sided check)
+    assert (
+        by[210]["closed_how"] == "manual"
+        and by[210]["close_source"] == "timeline-stale"
+    )
+    # 8 h AFTER (fixture #140) is stale too
+    assert by[140]["close_source"] == "timeline-stale"
+    # a tighter window flips the boundary case
+    _s2, by2 = _tl_rows(window_s=119)
+    assert by2[200]["close_source"] == "timeline-stale"
+
+
+def _fake_gh(responses):
+    """subprocess.run stand-in: pops one canned (stdout, returncode) per call and
+    records the argv so the test can check batching and variables."""
+    calls = []
+
+    def run(cmd, **_kw):
+        calls.append(cmd)
+        stdout, rc = responses.pop(0)
+
+        class R:
+            pass
+
+        r = R()
+        r.stdout = stdout
+        r.returncode = rc
+        r.stderr = "boom" if rc else ""
+        return r
+
+    return run, calls
+
+
+def test_fetch_closed_events_keys_batching_and_not_found(monkeypatch):
+    node5 = _tl_node(5, T9, None)
+    batch1 = {"data": {"repository": {"i5": node5, "i7": None}}}
+    batch2 = {
+        "data": {"repository": {"i999": None}},
+        "errors": [
+            {
+                "type": "NOT_FOUND",
+                "path": ["repository", "i999"],
+                "message": "Could not resolve to an Issue",
+            }
+        ],
+    }
+    run, calls = _fake_gh([(json.dumps(batch1), 0), (json.dumps(batch2), 0)])
+    monkeypatch.setattr(A.subprocess, "run", run)
+    monkeypatch.setattr(A, "TIMELINE_BATCH", 2)
+    out = A.fetch_closed_events("x/y", [7, 5, 999, 5])  # unsorted, duplicate
+    assert out == {"5": node5}  # string keys; missing alias absent; NOT_FOUND skipped
+    assert len(calls) == 2  # 3 unique numbers / batch 2 -> 2 calls
+    assert calls[0][:3] == ["gh", "api", "graphql"]
+    assert (
+        "owner=x" in calls[0] and "name=y" in calls[0]
+    )  # variables, not interpolation
+    q = [a for a in calls[0] if a.startswith("query=")][0]
+    assert "i5: issue(number: 5)" in q and "i7: issue(number: 7)" in q
+    q2 = [a for a in calls[1] if a.startswith("query=")][0]
+    assert "i999" not in q and "i999" in q2
+
+
+def test_fetch_closed_events_hard_error_aborts(monkeypatch):
+    err = {"errors": [{"type": "RATE_LIMITED", "message": "API rate limit exceeded"}]}
+    run, _calls = _fake_gh([(json.dumps(err), 1)])
+    monkeypatch.setattr(A.subprocess, "run", run)
+    with pytest.raises(SystemExit) as e:
+        A.fetch_closed_events("x/y", [5])
+    assert "RATE_LIMITED" in str(e.value)
+    run2, _ = _fake_gh([("", 1)])  # gh died with no JSON at all
+    monkeypatch.setattr(A.subprocess, "run", run2)
+    with pytest.raises(SystemExit) as e2:
+        A.fetch_closed_events("x/y", [5])
+    assert "boom" in str(e2.value)
 
 
 def test_timeline_cross_repo_pr_is_qualified():
@@ -686,15 +834,17 @@ def test_timeline_not_applied_without_merged_payload():
 def test_bulk_manual_numbers_is_the_fallback_set():
     nums = A.bulk_manual_numbers(TL_ISSUES, TL_MERGED, REPO, A.DEFAULT_MERGE_WINDOW_S)
     # #60 is NOT here: PR #61 names it in closingIssuesReferences (bulk pass)
-    assert nums == [20, 40, 50, 80, 90, 100, 110, 120, 130, 140, 150, 160]
+    assert nums == [20, 40, 50, 80] + list(range(90, 230, 10))
     assert A.bulk_manual_numbers(
         TL_ISSUES, TL_MERGED, REPO, A.DEFAULT_MERGE_WINDOW_S, since="2026-09-09"
-    ) == [90, 100, 110, 120, 130, 140, 150, 160]
+    ) == list(range(90, 230, 10))
 
 
 def test_timeline_query_shape():
-    q = A._timeline_query("x", "y", [5, 7])
-    assert q.startswith('query { repository(owner: "x", name: "y") {')
+    q = A._timeline_query([5, 7])
+    assert q.startswith(
+        "query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) {"
+    )
     assert "i5: issue(number: 5)" in q and "i7: issue(number: 7)" in q
     assert "itemTypes: [CLOSED_EVENT]" in q and "associatedPullRequests" in q
 
@@ -704,16 +854,18 @@ def test_timeline_summary_counts():
     assert s["timeline_used"] is True and s["timeline_records"] == len(TIMELINE)
     assert s["close_source_counts"] == {
         "pr-window": 4,  # 10, 30, 60, 70
-        "timeline-pr": 1,  # 100
-        "timeline-commit-pr": 2,  # 90, 150
-        "timeline-commit-only": 1,  # 120
+        "timeline-pr": 2,  # 100, 200
+        "timeline-commit-pr": 4,  # 90, 150, 180, 190
+        "timeline-commit-only": 2,  # 120, 170
+        "timeline-unmerged-pr": 1,  # 220
+        "timeline-stale": 2,  # 140, 210
         "hand": 2,  # 110, 160
-        "none": 6,  # 20, 40, 50, 80, 130, 140
+        "none": 5,  # 20, 40, 50, 80, 130
     }
-    assert s["closed_by_merged_pr"] == 7 and s["closed_manually"] == 9
-    assert s["closed_by_merged_pr_via_timeline"] == 3
-    assert s["flagged_closed_by_merged_pr_via_timeline"] == 2  # 90, 150 (100 is clean)
-    assert s["closed_by_commit_no_pr"] == 1
+    assert s["closed_by_merged_pr"] == 10 and s["closed_manually"] == 12
+    assert s["closed_by_merged_pr_via_timeline"] == 6
+    assert s["flagged_closed_by_merged_pr_via_timeline"] == 2  # 90, 150 (others clean)
+    assert s["closed_by_commit_no_pr"] == 2
     assert s["flagged_merged_pr_keyword_in_commit_only"] == 1  # 90 (150 is cross-repo)
     assert s["flagged_merged_pr_no_keyword"] == 2  # 60 (manual link) + 90
     # the partition still holds
@@ -723,7 +875,7 @@ def test_timeline_summary_counts():
     )
     s_off, _ = _rows(issues=TL_ISSUES, merged=TL_MERGED)
     assert s_off["timeline_used"] is False and s_off["timeline_records"] == 0
-    assert s_off["closed_by_merged_pr"] == 4 and s_off["closed_manually"] == 12
+    assert s_off["closed_by_merged_pr"] == 4 and s_off["closed_manually"] == 18
 
 
 def test_markdown_render_timeline_sections():
@@ -737,7 +889,11 @@ def test_markdown_render_timeline_sections():
     )
     assert "merged-pr #91 (Δ2s) via commit c0ffee0" in md
     assert "manual (commit deadbee, no PR)" in md
-    assert "keyword in commit message, not PR text (guard blind)" in md
+    assert (
+        "PR-time guard blind; post-merge backstop reopen-falsely-closed.yml covers"
+        in md
+    )
+    assert "manual (stale timeline record)" in md
     md_off = A.render_markdown(
         A.audit(TL_ISSUES, repo=REPO, merged=TL_MERGED), REPO, "2026-10-23"
     )
@@ -810,7 +966,7 @@ def test_cli_three_caches_is_idempotent_and_reclassifies(tmp_path):
     )
     r1 = subprocess.run(cmd, capture_output=True, text=True, check=True)
     assert (
-        "timeline=on(records=8, merged_pr_via_timeline=3, commit_no_pr=1)" in r1.stdout
+        "timeline=on(records=14, merged_pr_via_timeline=6, commit_no_pr=2)" in r1.stdout
     )
     md1 = out.read_bytes()
     js1 = (tmp_path / "sub" / "report-2026-10-23.json").read_bytes()
@@ -859,6 +1015,7 @@ def test_cli_replay_without_timeline_cache_leaves_bulk_attribution(tmp_path):
     assert (
         "timeline=off(records=0, merged_pr_via_timeline=0, commit_no_pr=0)" in r.stdout
     )
+    assert "timeline fallback was NOT run" in r.stderr
     data = json.loads((tmp_path / "r.json").read_text(encoding="utf-8"))
     assert data["summary"]["timeline_used"] is False
     by = {row["number"]: row for row in data["rows"]}

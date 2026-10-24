@@ -54,15 +54,24 @@ Close attribution — two DIFFERENT relations, both reported:
                               associatedPullRequests has a merged PR -> merged-pr
       - `timeline-commit-only` closer is a Commit with NO PR (pushed straight to
                               master)                                -> manual
+      - `timeline-unmerged-pr` closer is a PullRequest that is NOT merged (record
+                              present but unusable)                  -> manual
+      - `timeline-stale`      record present but its last closed event is further
+                              than --merge-window from the issue's closedAt (a
+                              mismatched/stale cache; never trusted)  -> manual
       - `hand`                closed event has no closer (a human clicked Close)
                               -> manual
       - `none`                no timeline record for the row (fallback not run,
                               `--no-timeline`, or an issues-only replay) -> manual
     A `merged-pr` row attributed by the timeline carries `merge_delta_s` as
     usual; `closing_pr_has_keyword` is read from the merged-PR payload text when
-    that PR is in it (the keyword is normally ONLY in the commit message for
-    these rows, so the forward guard — which reads PR title+body — is blind to
-    them; see `guard_would_have_fired`).
+    that PR is in it. For these rows the keyword normally sits in the commit
+    message (or the PR *title*, which GitHub does not parse for linking but which
+    flows into the squash commit), so the PR-time guard (`closing-ac-guard.yml`,
+    reads PR title+body) cannot see a body-less keyword — but the post-merge
+    backstop (`reopen-falsely-closed.yml`, FAULT-S4-004 layer 2) scans the pushed
+    commit messages on master and reopens exactly this case. The rows found
+    today predate layer 2; see `guard_would_have_fired`.
 
 Forward-guard retro-check (#543 AC5) — the guard fires iff BOTH
   (a) the PR title+body carries a closing keyword for #N   (`closing_refs`), and
@@ -142,6 +151,8 @@ CLOSE_SOURCES = (
     "timeline-pr",
     "timeline-commit-pr",
     "timeline-commit-only",
+    "timeline-unmerged-pr",
+    "timeline-stale",
     "hand",
     "none",
 )
@@ -292,24 +303,31 @@ def fetch_merged_prs(repo: str, limit: int) -> List[Dict[str, Any]]:
     return data
 
 
-def _timeline_query(owner: str, name: str, numbers: List[int]) -> str:
-    """One GraphQL document fetching the last CLOSED_EVENTs of many issues by alias."""
+def _timeline_query(numbers: List[int]) -> str:
+    """One GraphQL document fetching the last CLOSED_EVENTs of many issues by alias.
+    `$owner` / `$name` are variables (passed with `-F`), never interpolated."""
     parts = []
     for n in numbers:
         parts.append(
-            f"i{n}: issue(number: {n}) {{ number closedAt "
+            f"i{int(n)}: issue(number: {int(n)}) {{ number closedAt "
             f"timelineItems(last: {TIMELINE_LAST}, itemTypes: [CLOSED_EVENT]) {{ nodes {{ "
             "... on ClosedEvent { createdAt stateReason actor { login } closer { __typename "
             "... on PullRequest { number merged mergedAt repository { nameWithOwner } } "
             "... on Commit { oid committedDate associatedPullRequests(first: 5) { nodes { "
             "number merged mergedAt repository { nameWithOwner } } } } } } } } }"
         )
-    return f'query {{ repository(owner: "{owner}", name: "{name}") {{ {" ".join(parts)} }} }}'
+    return (
+        "query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { "
+        + " ".join(parts)
+        + " } }"
+    )
 
 
 def fetch_closed_events(repo: str, numbers: List[int]) -> Dict[str, Any]:
     """{str(issue number): raw GraphQL issue node} for the last CLOSED_EVENTs
-    (#739 fallback). ceil(len(numbers)/TIMELINE_BATCH) calls; no per-issue call."""
+    (#739 fallback). ceil(len(numbers)/TIMELINE_BATCH) calls; no per-issue call.
+    A per-alias NOT_FOUND error (transferred/deleted issue) is warned and skipped;
+    any other GraphQL error aborts."""
     owner, name = repo.split("/", 1)
     out: Dict[str, Any] = {}
     nums = sorted(set(int(n) for n in numbers))
@@ -320,21 +338,34 @@ def fetch_closed_events(repo: str, numbers: List[int]) -> Dict[str, Any]:
                 "gh",
                 "api",
                 "graphql",
+                "-F",
+                f"owner={owner}",
+                "-F",
+                f"name={name}",
                 "-f",
-                f"query={_timeline_query(owner, name, chunk)}",
+                f"query={_timeline_query(chunk)}",
             ],
             capture_output=True,
             text=True,
             timeout=300,
         )
-        if r.returncode != 0:
+        data: Dict[str, Any] = {}
+        try:
+            data = json.loads(r.stdout) if r.stdout.strip() else {}
+        except json.JSONDecodeError:
+            data = {}
+        errors = data.get("errors") or []
+        hard = [e for e in errors if (e or {}).get("type") != "NOT_FOUND"]
+        if hard or (r.returncode != 0 and not errors):
             raise SystemExit(
-                f"gh api graphql failed ({r.returncode}): {r.stderr.strip()}"
+                f"gh api graphql failed ({r.returncode}): "
+                f"{json.dumps(hard)[:500] if hard else r.stderr.strip()}"
             )
-        data = json.loads(r.stdout)
-        if data.get("errors"):
-            raise SystemExit(
-                f"gh api graphql errors: {json.dumps(data['errors'])[:500]}"
+        for e in errors:
+            print(
+                f"WARNING: timeline NOT_FOUND for {'/'.join(map(str, e.get('path') or []))}"
+                f" — {e.get('message', '')}",
+                file=sys.stderr,
             )
         repo_data = (data.get("data") or {}).get("repository") or {}
         for n in chunk:
@@ -480,6 +511,7 @@ def resolve_timeline_close(
     ev = nodes[-1]
     ev_at = _ts(ev.get("createdAt") or "")
     if ev_at is None or abs((ev_at - closed_at).total_seconds()) > window_s:
+        out["source"] = "timeline-stale"
         return out
     closer = ev.get("closer")
     if not closer:
@@ -504,7 +536,9 @@ def resolve_timeline_close(
             continue
         merged_prs.append((full, int(p["number"]), p.get("mergedAt") or ""))
     if not merged_prs:
-        out["source"] = "timeline-commit-only" if kind == "Commit" else "none"
+        out["source"] = (
+            "timeline-commit-only" if kind == "Commit" else "timeline-unmerged-pr"
+        )
         return out
 
     def _delta(t: Tuple[str, int, str]) -> float:
@@ -770,6 +804,10 @@ def _how_cell(r: Dict[str, Any]) -> str:
             cell += f" (commit {r['close_commit'][:7]}, no PR)"
         elif src == "hand":
             cell += " (hand)"
+        elif src == "timeline-unmerged-pr":
+            cell += " (unmerged PR closer)"
+        elif src == "timeline-stale":
+            cell += " (stale timeline record)"
     if r["stateReason"] == "NOT_PLANNED":
         cell += " (not planned)"
     return cell
@@ -787,7 +825,10 @@ def _guard_cell(r: Dict[str, Any]) -> str:
             return "no — closing PR is in another repo (guard not installed there)"
         if not r["closing_pr_has_keyword"]:
             if r.get("close_source", "").startswith("timeline-commit"):
-                return "no — keyword in commit message, not PR text (guard blind)"
+                return (
+                    "no — keyword in commit message, not PR body (PR-time guard "
+                    "blind; post-merge backstop reopen-falsely-closed.yml covers)"
+                )
             return "no — no keyword in PR text (manual link; guard blind)"
         return "no — body would not trip"
     if r["closed_how"] == "manual":
@@ -847,9 +888,14 @@ def render_markdown(
             f"merged PR → `merged-pr … via commit` ({csc['timeline-commit-pr']}); commit "
             f"with no PR → `manual (commit, no PR)` ({csc['timeline-commit-only']}); no "
             f"closer → `manual (hand)` ({csc['hand']}); bulk-attributed → "
-            f"`pr-window` ({csc['pr-window']}); no record → plain `manual` "
-            f"({csc['none']}). Note for AC5: the forward guard reads PR title+body only, "
-            "so a commit-message keyword is outside its view."
+            f"`pr-window` ({csc['pr-window']}); record present but unusable → "
+            f"`manual` (unmerged PR closer {csc['timeline-unmerged-pr']}, stale event "
+            f"{csc['timeline-stale']}); no record → plain `manual` ({csc['none']}). "
+            "Note for AC5: the PR-time guard (`closing-ac-guard.yml`) reads PR title+body, "
+            "so a keyword that sits only in the commit message is outside ITS view — but "
+            "the post-merge backstop (`reopen-falsely-closed.yml`, FAULT-S4-004 layer 2) "
+            "scans pushed commit messages on master and reopens exactly this case; the "
+            "rows found here predate layer 2."
         )
     else:
         L.append(
@@ -1086,8 +1132,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         timeline = None
     elif args.from_timeline_cache:
         timeline = load_timeline_cache(args.from_timeline_cache)
-    elif args.from_cache and not args.save_timeline_cache:
+    elif args.from_cache and args.from_merged_cache and not args.save_timeline_cache:
         timeline = None  # pure offline replay without a timeline payload
+        print(
+            "NOTE: offline replay without --from-timeline-cache / --save-timeline-cache; "
+            "the #739 timeline fallback was NOT run (closed_how may over-count manual).",
+            file=sys.stderr,
+        )
     else:
         timeline = fetch_closed_events(
             args.repo,
