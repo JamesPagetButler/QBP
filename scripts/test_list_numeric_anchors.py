@@ -19,6 +19,7 @@ import copy
 import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -81,7 +82,14 @@ def test_numeric_detection_excludes_bool_string_empty_and_bookkeeping():
         not M.is_numeric_value([]) and not M.is_numeric_value({}), "empty containers"
     )
     _check(M.is_numeric_value([1, 2.0]), "numeric list")
-    _check(not M.is_numeric_value([1, "x"]), "mixed list is not numeric")
+    _check(
+        M.is_numeric_value([1, "x"]), "mixed list with a numeric leaf IS numeric (G1)"
+    )
+    _check(not M.is_numeric_value(["x", {"a": "b"}]), "container with no numeric leaf")
+    _check(
+        M.is_numeric_value({"test_type": "IFU", "F_max_best_fit": 13.4}),
+        "mixed experimental_backing dict counts (PRED-a0-redshift-linear case)",
+    )
     _check(M.is_numeric_value({"a": {"b": 1}}), "nested numeric dict")
     a = _anchor("X-bookkeeping", tier=3, sorry_count=0, pa_local=2, pa_effective=1)
     _check(M.numeric_fields(a) == {}, "bookkeeping-only record is NOT numeric")
@@ -205,6 +213,41 @@ def test_rule_ext_requires_empty_chain_and_external_kind():
     )
 
 
+def test_rule_ext_guard_and_precedence_over_meas():
+    led = _ledger(
+        [
+            # experiment kind, measured only, empty chain -> R-EXT (before R-MEAS)
+            _anchor("OBS-p", measured_value=1.0, provenance_kind="experiment"),
+            # S1: empty chain + external kind but a QBP-side predicted number -> UNDECIDED
+            _anchor(
+                "INSIGHT-q",
+                measured_value=0.1111,
+                predicted_value=0.1111,
+                provenance_kind="theory-external",
+            ),
+        ]
+    )
+    r = _rows(led)
+    _check(r["OBS-p"]["rule"] == "R-EXT", "R-EXT precedes R-MEAS")
+    _check(
+        r["INSIGHT-q"]["rule"] == "default", "predicted-side number blocks R-EXT (S1)"
+    )
+
+
+def test_forced_rows_never_carry_free_params():
+    # A FORCED override whose chain reaches a free parameter must still report dof 0 (K2).
+    real = M.load_ledger(M.DEFAULT_LEDGER)
+    led = copy.deepcopy(real)
+    for a in led["anchors"]:
+        if a["id"] == "PROOF-stelle-no-linear":
+            a["prediction_chain"] = ["INST-f0"]
+    r = {x["id"]: x for x in M.classify_all(led)}["PROOF-stelle-no-linear"]
+    _check(
+        r["tag"] == "FORCED" and r["dof"] == 0 and r["free_params"] == [],
+        "K2 invariant",
+    )
+
+
 def test_rule_meas_needs_measured_and_no_predicted_side():
     led = _ledger(
         [
@@ -253,20 +296,21 @@ def test_rule_thm_needs_proof_kind_lean_zero_sorry_verified():
 
 def test_override_quote_drift_raises():
     real = M.load_ledger(M.DEFAULT_LEDGER)
-    aid, (_tag, field, _quote, _p) = next(iter(M.OVERRIDES.items()))
-    drifted = copy.deepcopy(real)
-    for a in drifted["anchors"]:
-        if a["id"] == aid:
-            a[field] = "text without the quote"
-    errs, missing = M.verify_overrides(drifted)
-    _check(any(aid in e for e in errs), "drifted quote must be reported")
-    _check(missing == [], "a drifted quote is drift, not a missing anchor")
-    try:
-        M.classify_all(drifted)
-    except ValueError as exc:
-        _check(aid in str(exc), "classify_all raises naming the anchor")
-    else:
-        raise AssertionError("classify_all must raise on override drift")
+    # Every override, not just the first (Red Team K7).
+    for aid, (_tag, field, _quote, _p, _b) in M.OVERRIDES.items():
+        drifted = copy.deepcopy(real)
+        for a in drifted["anchors"]:
+            if a["id"] == aid:
+                a[field] = "text without the quote"
+        errs, missing = M.verify_overrides(drifted)
+        _check(any(aid in e for e in errs), f"{aid}: drifted quote must be reported")
+        _check(missing == [], "a drifted quote is drift, not a missing anchor")
+        try:
+            M.classify_all(drifted)
+        except ValueError as exc:
+            _check(aid in str(exc), "classify_all raises naming the anchor")
+        else:
+            raise AssertionError(f"{aid}: classify_all must raise on override drift")
 
 
 def test_override_missing_anchor_reported():
@@ -313,11 +357,31 @@ def test_real_ledger_invariants():
         )
         _check(r["dof"] == len(r["free_params"]), f"{r['id']}: dof mismatch")
         _check(
+            r["tag"] != "FORCED" or r["dof"] == 0, f"{r['id']}: FORCED with dof>0 (K2)"
+        )
+        _check(
+            (r["tag"] == "FORCED")
+            == r["basis"].startswith(("external-", "measurement-only")),
+            f"{r['id']}: FORCED <-> external/measurement basis",
+        )
+        _check(
             r["tag"] != "SELECTED" or r["dof"] >= 1 or r["rule"] == "R-FIT",
             f"{r['id']}: SELECTED without a named free parameter",
         )
+    by_id = {r["id"]: r for r in rows}
+    # K3: R-OVR wins over R-INST on the same anchor, and the inherited parameter is kept.
+    r = by_id["PRED-inv-alpha-GUT-16pi"]
+    _check(
+        r["rule"] == "R-OVR" and r["dof"] == 2, "R-OVR precedence over R-INST, dof 2"
+    )
+    # G1: the two mixed-container anchors are in the census.
+    _check(
+        {"PRED-a0-redshift-linear", "PRED-btfr-mass-correction"} <= set(by_id),
+        "mixed experimental_backing anchors included (G1)",
+    )
     s = M.summarize(rows)
     _check(sum(s["tags"].values()) == len(rows), "tag counts sum to total")
+    _check(sum(s["tag_basis"].values()) == len(rows), "tag/basis counts sum to total")
     _check(
         s["free_choice_count"] == s["tags"]["SELECTED"], "free-choice count = SELECTED"
     )
@@ -354,14 +418,15 @@ def test_cli_md_json_summary():
         [sys.executable, SCRIPT], capture_output=True, text=True, check=True
     ).stdout
     _check(
-        md.count("| **") == data["summary"]["numeric_anchors"],
+        sum(1 for line in md.splitlines() if re.match(r"^\| \d+ \| `", line))
+        == data["summary"]["numeric_anchors"],
         "one table row per anchor",
     )
 
 
 def test_cli_fails_on_drifted_ledger():
     real = M.load_ledger(M.DEFAULT_LEDGER)
-    aid, (_t, field, _q, _p) = next(iter(M.OVERRIDES.items()))
+    aid, (_t, field, _q, _p, _b) = next(iter(M.OVERRIDES.items()))
     for a in real["anchors"]:
         if a["id"] == aid:
             a[field] = "drifted"
@@ -378,6 +443,21 @@ def test_cli_fails_on_drifted_ledger():
         res.returncode == 1 and "OVERRIDES drifted" in res.stderr,
         "CLI exits 1 on drift",
     )
+    res2 = subprocess.run(
+        [sys.executable, SCRIPT, "--ledger", "/nonexistent/ledger.json", "--summary"],
+        capture_output=True,
+        text=True,
+    )
+    _check(
+        res2.returncode == 2 and "cannot read ledger" in res2.stderr,
+        "CLI exits 2 on bad path",
+    )
+    res3 = subprocess.run(
+        [sys.executable, SCRIPT, "--summary", "--format", "json"],
+        capture_output=True,
+        text=True,
+    )
+    _check(res3.returncode == 2, "--summary and --format are mutually exclusive")
 
 
 if __name__ == "__main__":
