@@ -20,9 +20,8 @@ static int screen_width;
 static int screen_height;
 
 /* Layout constants */
-#define PANEL_WIDTH   440  /* Wider to fit 4-level descriptions */
-#define BAR_HEIGHT     56
-#define TITLE_HEIGHT   60
+#define BAR_HEIGHT     QBP_BAR_HEIGHT
+#define TITLE_HEIGHT   QBP_TITLE_HEIGHT
 
 static void ds_init(int sw, int sh)
 {
@@ -38,13 +37,9 @@ static void ds_init(int sw, int sh)
         ds_graph.current_step = 0;
     }
 
-    /* Graph occupies left portion, panel on the right */
-    Rectangle graph_area = {
-        20,
-        TITLE_HEIGHT,
-        (float)(sw - PANEL_WIDTH - 40),
-        (float)(sh - TITLE_HEIGHT - BAR_HEIGHT - 20)
-    };
+    /* Graph on the left, info panel on the right — one shared layout (#261 HVR) */
+    Rectangle graph_area;
+    graph_layout_regions(&ds_graph, sw, sh, &graph_area, NULL);
     graph_viewport_init(&ds_graph);
     graph_layout(&ds_graph, graph_area);
 }
@@ -68,6 +63,9 @@ static void ds_update(void)
     }
     if (IsKeyPressed(KEY_O)) {
         graph_toggle_overview(&ds_graph);
+    }
+    if (IsKeyPressed(KEY_P)) {
+        graph_toggle_panel(&ds_graph, screen_width, screen_height);
     }
     if (IsKeyPressed(KEY_T)) {
         graph_toggle_angle_highlight(&ds_graph);
@@ -113,13 +111,9 @@ static void ds_draw(void)
     DrawTextQBP("Experiment 03: V = 1 - eta (quaternionic visibility bridge)",
              24, 44, 16, QBP_TEXT_DIM);
 
-    /* Info panel area (right side) */
-    Rectangle panel = {
-        (float)(screen_width - PANEL_WIDTH - 10),
-        TITLE_HEIGHT,
-        PANEL_WIDTH,
-        (float)(screen_height - TITLE_HEIGHT - BAR_HEIGHT - 20)
-    };
+    /* Info panel area (right side); zero-width when hidden with P */
+    Rectangle panel;
+    graph_layout_regions(&ds_graph, screen_width, screen_height, NULL, &panel);
 
     if (ds_graph.overview_mode) {
         /* Overview replaces both graph and info panel */
@@ -132,7 +126,9 @@ static void ds_draw(void)
     } else {
         /* Normal mode: proof graph + info panel */
         graph_draw(&ds_graph);
-        graph_draw_info_panel(&ds_graph, panel);
+        if (!ds_graph.panel_hidden) {
+            graph_draw_info_panel(&ds_graph, panel);
+        }
     }
 
     /* Step bar (bottom) */
