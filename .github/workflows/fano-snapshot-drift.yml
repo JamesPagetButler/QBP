@@ -14,6 +14,10 @@ on:
       - 'proofs/QBP/Foundations/FanoOrientationF3.lean'
       - 'proofs/QBP/Foundations/CDAlg.lean'
       - 'scripts/regen_fano_snapshot.sh'
+      - 'proofs/FanoSnapshotGen.lean'
+      - 'proofs/lakefile.lean'
+      - 'proofs/lean-toolchain'
+      - 'scripts/test_fano_snapshot_guard.sh'
       - '.github/workflows/fano-snapshot-drift.yml'
   push:
     branches: [master]
@@ -24,13 +28,66 @@ on:
       - 'proofs/QBP/Foundations/FanoOrientationF3.lean'
       - 'proofs/QBP/Foundations/CDAlg.lean'
       - 'scripts/regen_fano_snapshot.sh'
+      - 'proofs/lakefile.lean'
+      - 'proofs/lean-toolchain'
 
 jobs:
   fano-snapshot-drift:
     name: fanoTableF4 snapshot <-> kernel-proof drift guard
     runs-on: ubuntu-latest
+    # #605 AC1: the regeneration trusts several NON-kernel-checked inputs — the producer scripts
+    # (regen_fano_snapshot.sh + FanoSnapshotGen.lean) AND the build config (lakefile + toolchain).
+    # Unlike the kernel-checked FanoOrientationF3/CDAlg (Lean verifies them), these are not proven,
+    # so a PR could alter the snapshot AND one of them together and self-defeat the diff. We pin all
+    # of them to the trusted base before regenerating; a genuine change rides the
+    # `fano-producer-reviewed` label (human-reviewed), which skips the pin.
+    env:
+      FANO_PRODUCER_REVIEWED: ${{ contains(github.event.pull_request.labels.*.name, 'fano-producer-reviewed') }}
     steps:
       - uses: actions/checkout@v4
+      - name: Negative control — producer-tamper self-defeat is caught (#605 AC2)
+        run: bash scripts/test_fano_snapshot_guard.sh
+      - name: Pin regen inputs to the trusted base unless reviewed (#605 AC1)
+        run: |
+          set -euo pipefail
+          # Every NON-kernel-checked input the regeneration trusts: the producer scripts AND
+          # the build config (lakefile / toolchain). The kernel-proven modules FanoOrientationF3
+          # and CDAlg are deliberately NOT pinned — Lean verifies them (`lake build` below), so a
+          # tampered proof fails the build. FanoSnapshotGen imports only those two kernel modules,
+          # so there is no other local non-kernel .lean in the trust surface. These inputs are not
+          # proven, so a PR could tamper one AND the snapshot to self-defeat the diff; pin them.
+          if [ "${FANO_PRODUCER_REVIEWED}" = "true" ]; then
+            echo "::notice::fano-producer-reviewed label present — using the PR's own regen inputs (the change has been reviewed)"
+            exit 0
+          fi
+          # Default (fail-closed, absent label): regenerate with the base branch's inputs, so a
+          # PR cannot reproduce a falsified snapshot by editing a producer/build-config file.
+          git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF:-master}"
+          # Producer scripts always exist on base → pin them (fail if newly added/renamed).
+          PRODUCERS="scripts/regen_fano_snapshot.sh proofs/FanoSnapshotGen.lean"
+          for f in $PRODUCERS; do
+            if git cat-file -e "FETCH_HEAD:$f" 2>/dev/null; then
+              git checkout FETCH_HEAD -- "$f"
+            else
+              echo "::error::$f is new in this PR (absent on the base) — a new/renamed producer is a reviewed producer change; add the fano-producer-reviewed label"
+              exit 1
+            fi
+          done
+          # Lake config files: PIN whichever exist on base (trusted), and REFUSE any that the PR
+          # ADDS (present in the checkout, absent on base) — lake would read a new lakefile.toml /
+          # lake-manifest.json to remap deps / hijack the regen env, and the pin only overwrites
+          # files that exist. Pinning base-present ones future-proofs: a lake-manifest.json later
+          # committed to base is pinned, not silently skipped (Gemini review r3). Fail-closed.
+          CONFIG="proofs/lakefile.lean proofs/lakefile.toml proofs/lean-toolchain proofs/lake-manifest.json"
+          for c in $CONFIG; do
+            if git cat-file -e "FETCH_HEAD:$c" 2>/dev/null; then
+              git checkout FETCH_HEAD -- "$c"
+            elif [ -e "$c" ]; then
+              echo "::error::$c was added by this PR (absent on the base) — a new lake-config file can hijack regeneration; it is a reviewed producer change, add the fano-producer-reviewed label"
+              exit 1
+            fi
+          done
+          echo "::notice::regen inputs pinned to origin/${GITHUB_BASE_REF:-master}; producers=[$PRODUCERS]; lake-config pinned-if-present, PR-additions refused"
       - name: Install elan (pinned toolchain from proofs/lean-toolchain)
         run: |
           set -euo pipefail
