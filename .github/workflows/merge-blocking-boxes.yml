@@ -1,0 +1,65 @@
+# Merge-blocking boxes — REQUIRED STATUS CHECK (#507 §7, beekeeper ruling 2026-10-27:
+# BLOCKING RATIFIED).
+#
+# Consumer 2 of the ONE §2.2 box parser (`scripts/pr_merge_blocking_boxes.py`):
+#   consumer 1 = the notifier's 🟡 nudge at ALL-GREEN (pr-check-status.yml, #507 §4)
+#   consumer 2 = THIS job: RED when any merge-blocking sign-off box is unticked.
+# The check name `Merge-blocking boxes` (workflow name == job name, kept stable on
+# purpose) is what the beekeeper adds to the master ruleset's required status
+# checks (repo-admin, #507 AC13). Once wired, an unticked box disables the merge
+# button for everyone — the beekeeper's own merges included (no --admin; the
+# process forbids it). Auto-nudge, never auto-tick: this job only reads the body.
+#
+# Contract (inter github-best-practices §2.2, adopted by QBP): a merge-blocking
+# region opens at a label line starting "Sign-off required (merge-blocking)" /
+# "Merge-blocking" (plain, bold or `##` heading) or at the `<!-- merge-blocking -->`
+# sentinel, and closes at the next heading / "Informational" label / closing
+# sentinel / blank line + prose. `- [x]` ticked; `- [ ]` unticked; ⊘ or a whole
+# ~~struck~~ text = nil'd option (not undone work).
+#
+# Verdict:   region=present & unticked>0  → exit 1 (red), every box named
+#            region=present & unticked=0  → exit 0 (green)
+#            region=absent                → exit 0 + ::warning:: (NOT blocking in
+#              PR B — notifier already shows 🟡 not-assessable for it, and the PR
+#              templates do not yet carry the region everywhere; beekeeper-confirmable
+#              choice recorded on #507). FLIP: add `--absent-blocks` to the check
+#              step below to make absence red as well (one line).
+#
+# Trigger: `edited` is essential — ticking a box edits the body and must re-run
+# the check; `synchronize` re-runs on every push. Fork PRs: body is read via the
+# API with the read-only default token, so the job runs for them too.
+#
+# Listed in the notifier's workflow_run list (enforced by #507 §3 drift lint).
+
+name: Merge-blocking boxes
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  merge-blocking-boxes:
+    name: Merge-blocking boxes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Self-test the parser + the check (a parser regression must fail loudly, not pass silently)
+        run: |
+          python3 scripts/test_pr_merge_blocking_boxes.py
+          python3 scripts/test_merge_blocking_check.py
+      - name: Fetch the PR body (latest, via API — not the event snapshot)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$REPO/pulls/$PR" --jq '.body // ""' > /tmp/body.md
+          echo "body: $(wc -c < /tmp/body.md) bytes for PR #$PR"
+      - name: Merge-blocking boxes (red iff an unticked box sits in a §2.2 region)
+        # beekeeper's flip: append `--absent-blocks` to also fail bodies with no §2.2 region
+        run: python3 scripts/merge_blocking_check.py --body-file /tmp/body.md
