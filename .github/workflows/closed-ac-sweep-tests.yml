@@ -1,6 +1,7 @@
 # Unit tests for the #543 closed-issue AC sweep tool (report-only; FAULT-S4-004
-# retroactive cleanup). Runs only when the tool, its test, or the forward guard
-# it shares the box convention with changes.
+# retroactive cleanup) and the FAULT-S4-004 layer-2 backstop (#753 cross-repo
+# path). Runs only when a tool, its test, or the forward guard they share the
+# box convention with changes.
 name: Closed-issue AC sweep tests
 
 on:
@@ -9,6 +10,8 @@ on:
       - 'scripts/audit_closed_acs.py'
       - 'scripts/test_audit_closed_acs.py'
       - 'scripts/check_closing_acs.py'
+      - 'scripts/reopen_falsely_closed.py'
+      - 'scripts/test_reopen_falsely_closed.py'
       - '.github/workflows/closed-ac-sweep-tests.yml'
   push:
     branches: [master]
@@ -16,6 +19,8 @@ on:
       - 'scripts/audit_closed_acs.py'
       - 'scripts/test_audit_closed_acs.py'
       - 'scripts/check_closing_acs.py'
+      - 'scripts/reopen_falsely_closed.py'
+      - 'scripts/test_reopen_falsely_closed.py'
 
 permissions:
   contents: read
@@ -31,3 +36,4 @@ jobs:
           python-version: '3.11'
       - run: python3 -m pip install --quiet pytest
       - run: python3 -m pytest scripts/test_audit_closed_acs.py -v
+      - run: python3 -m pytest scripts/test_reopen_falsely_closed.py -v
