@@ -49,13 +49,20 @@ w_I_r = sp.simplify(w_I.subs(B, r * A))  # depends on r = B/A only
 print("  w_eff(z) =", sp.factor(w_I))
 print("  with r = B/A:  w_eff(z) =", sp.factor(w_I_r))
 w_I_closed = -1 - sp.Rational(2, 3) * (opz**2 - r) / (opz**2 + r)
+closed_matches = sp.simplify(w_I_r - w_I_closed) == 0
 print(
     "  closed form -1 - (2/3)((1+z)^2 - r)/((1+z)^2 + r)  matches:",
-    sp.simplify(w_I_r - w_I_closed) == 0,
+    closed_matches,
 )
+assert closed_matches, "closed form does not match the derived w_eff"
+u = sp.symbols("u", positive=True)  # u = (1+z)^2
+crossing = sp.solve(sp.Eq(w_I_closed.subs(opz**2, u) + 1, 0), u)
 print(
-    "  w_eff(z) + 1 = 0  <=>  (1+z)^2 = r = B/A     (this is the mode-equality redshift)"
+    "  w_eff(z) + 1 = 0  solved for u=(1+z)^2:",
+    crossing,
+    "  => (1+z)^2 = r = B/A  (mode-equality redshift)",
 )
+assert crossing == [r], crossing
 print(
     "  limits: z=0 ->",
     sp.simplify(w_I_closed.subs(z, 0)),
@@ -112,13 +119,17 @@ a_s = sp.symbols("a", positive=True)
 H_a = A / a_s + B * a_s
 adot = H_a * a_s
 addot = sp.simplify(sp.diff(adot, a_s) * adot)
+addot_pos = sp.factor(addot).is_positive  # A, B, a declared positive -> decidable
 print(
-    "  pure H_B with no matter: adot =",
+    "  under (II) H(a) = A/a + B a IS the whole expansion history: adot =",
     sp.expand(adot),
     " addot =",
     sp.factor(addot),
-    " > 0 for all a  (never decelerates)",
+    " is_positive:",
+    addot_pos,
+    " (never decelerates, whatever is inside H)",
 )
+assert addot_pos is True, "addot positivity not decided"
 
 print("=" * 78)
 print(
@@ -175,16 +186,24 @@ def z_q0_for_r(rr):
     return 0.5 * (lo2 + hi2)
 
 
-scan = [(rr, z_q0_for_r(rr)) for rr in np.logspace(0, 3, 25)]
+scan = [(rr, z_q0_for_r(rr)) for rr in np.logspace(-1, 5, 49)]
 best = max(scan, key=lambda t: (t[1] if t[1] == t[1] else -1))
+z_q0_rinf = (
+    4 * OmL / Om_n
+) ** 0.2 - 1  # r->inf: H^2 = Om u^3 + OmL u^-2, q=0 at u^5 = 4 OmL/Om
 print(
-    "  scan of q=0 redshift vs r=B/A under (I): "
-    + ", ".join(f"r={rr:.1f}:z={zq:.3f}" for rr, zq in scan[::4])
+    "  scan of q=0 redshift vs r=B/A under (I), r in [0.1, 1e5] (nan = q(0)>=0, no acceleration today): "
+    + ", ".join(f"r={rr:.3g}:z={zq:.3f}" for rr, zq in scan[::6])
+)
+print(
+    f"  r->inf analytic limit (4 Omega_L/Omega_m)^(1/5) - 1 = {z_q0_rinf:.3f}; scan tail r=1e5: z={scan[-1][1]:.3f}"
 )
 print(
     f"  maximum attainable q=0 redshift under (I) with Omega_m=0.315: z = {best[1]:.3f} at r = {best[0]:.1f}"
     "  -> q(z=0.7)=0 is NOT attainable for any A/B; z_t=0.7 can only be the mode-equality redshift"
 )
+assert best[1] < 0.7, best
+assert abs(scan[-1][1] - z_q0_rinf) < 1e-3, (scan[-1], z_q0_rinf)
 print(
     "  H(z)/H_LCDM(z) under (I) with z_t=0.7:",
     ", ".join(
@@ -222,12 +241,29 @@ print(
     "; DESI CPL z =",
     round(float(sp.nsolve(w_CPL_desi + 1, z, 0.5)), 3),
 )
-print(
-    "sign of (w+1):  (I), DESI:    >0 below crossing (quintessence-like), <0 above (phantom-like)"
-)
-print(
-    "                COMP CPL:       <0 below crossing (phantom-like), >0 above (quintessence-like)  — OPPOSITE"
-)
+
+
+def sign_pattern(w_expr, z_cross):
+    """Sign of (w+1) just below / above the curve's own w=-1 crossing, computed."""
+    below = float((w_expr + 1).subs(z, 0.5 * z_cross))
+    above = float((w_expr + 1).subs(z, 2.0 * z_cross + 1))
+    lab = lambda v: "quintessence-like (w+1>0)" if v > 0 else "phantom-like (w+1<0)"
+    return (below > 0, above > 0), f"below: {lab(below)}, above: {lab(above)}"
+
+
+z_cross_I = r_t**0.5 - 1
+z_cross_comp = float(sp.nsolve(w_CPL_comp + 1, z, 0.5))
+z_cross_desi = float(sp.nsolve(w_CPL_desi + 1, z, 0.5))
+pat_I, txt_I = sign_pattern(w_I_num, z_cross_I)
+pat_comp, txt_comp = sign_pattern(w_CPL_comp, z_cross_comp)
+pat_desi, txt_desi = sign_pattern(w_CPL_desi, z_cross_desi)
+print("sign of (w+1), computed at z = crossing/2 and 2*crossing+1:")
+print("  (I) derived: ", txt_I)
+print("  DESI Y1 CPL: ", txt_desi)
+print("  COMP CPL:    ", txt_comp, " — OPPOSITE to (I)" if pat_comp != pat_I else "")
+assert pat_I == (True, False), pat_I
+assert pat_desi == pat_I, pat_desi
+assert pat_comp == (False, True), pat_comp
 print(
     "CPL tangent of (I) at z_t=0.7: w0 =",
     round(float(w_I_num.subs(z, 0)), 3),
