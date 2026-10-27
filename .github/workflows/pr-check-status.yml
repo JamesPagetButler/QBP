@@ -31,6 +31,10 @@
 # such box unticked posts a NUDGE (🟡, not merge-ready) naming the boxes; it
 # never ticks them. Parser: scripts/pr_merge_blocking_boxes.py (shared with the
 # future required check — PR B, gated on the §7 beekeeper ruling).
+# FAIL-CLOSED (federation rule R3, qbp-architecture §I4 on PR #731): a body with
+# NO §2.2 region at all (neither form), or a parser that could not run, is "sign-off
+# state not assessable" → 🟡, never ✅ ALL GREEN. The CI-green evidence box is
+# still ticked (CI is green); only the headline verdict is withheld.
 # MERGEABLE (#507 §6): ALL-GREEN also requires `gh pr view --json mergeable` !=
 # CONFLICTING; a conflicting PR gets a resolve-first verdict instead.
 #
@@ -299,11 +303,17 @@ jobs:
             # future required check (PR B, gated on the #507 §7 beekeeper ruling).
             BODYFILE=$(mktemp)
             gh pr view "$PR" --repo "$REPO" --json body --jq .body > "$BODYFILE" || true
-            BOXES=$(python3 scripts/pr_merge_blocking_boxes.py --body-file "$BODYFILE" 2>/dev/null || echo "unticked=0 ticked=0 nil=0")
+            # Fail-closed (R3): the parser's first line also carries `region=present|absent`;
+            # a missing/erroring parser (notifier runs from the default branch, so the
+            # script is absent until this lands) yields `region=unknown`. Anything other
+            # than `present` withholds the ✅ verdict below.
+            BOXES=$(python3 scripts/pr_merge_blocking_boxes.py --body-file "$BODYFILE" 2>/dev/null || echo "unticked=0 ticked=0 nil=0 region=unknown")
             NUNTICKED=$(printf '%s\n' "$BOXES" | sed -n 's/^unticked=\([0-9]*\).*/\1/p')
+            REGION=$(printf '%s\n' "$BOXES" | sed -n 's/^unticked=.*region=\([a-z]*\).*/\1/p')
             UNTICKED_LIST=$(printf '%s\n' "$BOXES" | sed -n 's/^UNTICKED: /- ⏸ /p')
             rm -f "$BODYFILE"
             : "${NUNTICKED:=0}"
+            : "${REGION:=unknown}"
             LASTREV=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
                       --jq '[.[] | .body]' | jq -s 'add // []' \
                       | jq -r '[.[] | capture("<!-- reviewed-sha: (?<s>[0-9a-f]{7,40}) -->").s] | last // empty')
@@ -340,8 +350,20 @@ jobs:
               # §4: CI green, sign-off boxes still open — nudge the named hands, do NOT escalate merge-ready
               BODY=$(printf '%s\n## 🟡 CI GREEN — %s merge-blocking sign-off box(es) unticked — NOT yet merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n**Open sign-off boxes (github-best-practices §2.2; the hand that owns each box ticks it — the notifier never does):**\n%s\n\nIf a posted APPROVE comment already covers a box, cite it and tick the box (auto-nudge, not auto-tick; #507 §4). Mergeable: `%s`.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
                 "$MARKER" "$NUNTICKED" "$TOTAL" "$TS" "$SHA" "$FRESH" "$UNTICKED_LIST" "$MERGEABLE")
+            elif [ "$REGION" != "present" ]; then
+              # R3 fail-closed (qbp-architecture §I4 on #731): no §2.2 region (or no parser)
+              # means the sign-off state was NOT assessed — withhold ✅, say why.
+              REGION_HEAD=$(printf '§2.2 parser unavailable')
+              if [ "$REGION" = "absent" ]; then
+                REGION_HEAD=$(printf 'no §2.2 region in the PR body')
+                REGION_NOTE=$(printf 'The PR body uses NEITHER §2.2 form, so merge-blocking sign-off boxes could not be assessed (reviewer boxes in any other shape are not read). Add a `Sign-off required (merge-blocking):` list or the `<!-- merge-blocking -->` sentinel (github-best-practices §2.2) and the notifier re-evaluates on the next head/edit.')
+              else
+                REGION_NOTE=$(printf 'The §2.2 box parser (`scripts/pr_merge_blocking_boxes.py`) was unavailable on the default-branch checkout, so merge-blocking sign-off boxes could not be assessed.')
+              fi
+              BODY=$(printf '%s\n## 🟡 CI GREEN — sign-off state not assessable: %s — NOT merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n%s\n\nMergeable: `%s`. Fail-closed per federation rule R3 (reject on absence); #507 §4.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
+                "$MARKER" "$REGION_HEAD" "$TOTAL" "$TS" "$SHA" "$FRESH" "$REGION_NOTE" "$MERGEABLE")
             else
-              BODY=$(printf '%s\n## ✅ ALL GREEN — merge-ready pending beekeeper — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\nMergeable: `%s` (§6: merge-ready means one-click). No unticked merge-blocking sign-off boxes DETECTED in §2.2 regions (label line or `<!-- merge-blocking -->` sentinel; §4 — a body using neither form is not parsed).\n\nMachine-posted; canonical "CI green" evidence link (evidence-first rule, `docs/workflows/review_tiers.md`). Merge remains the beekeeper'"'"'s call.' \
+              BODY=$(printf '%s\n## ✅ ALL GREEN — merge-ready pending beekeeper — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\nMergeable: `%s` (§6: merge-ready means one-click). §2.2 region present (label line or `<!-- merge-blocking -->` sentinel); no unticked merge-blocking sign-off boxes in it (§4).\n\nMachine-posted; canonical "CI green" evidence link (evidence-first rule, `docs/workflows/review_tiers.md`). Merge remains the beekeeper'"'"'s call.' \
                 "$MARKER" "$TOTAL" "$TS" "$SHA" "$FRESH" "$MERGEABLE")
             fi
           fi

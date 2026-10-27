@@ -27,9 +27,19 @@ This module is the ONE parser shared by (a) the notifier's nudge state and
 (b) the future required check (PR B, gated on the §7 beekeeper ruling).  It
 never edits anything.  Auto-nudge, never auto-tick.
 
+Region presence (fail-closed, federation rule R3 — qbp-architecture §I4 on PR
+#731): the result also says whether ANY §2.2 region opener (label line, heading
+form or sentinel) was seen at all.  `region=present` means the sign-off state
+was assessable; `region=absent` means the body uses neither form and the caller
+must NOT read `unticked=0` as "nothing owed" — reviewer boxes in some other
+shape (e.g. `- [ ] **§I4 @seat** (sign-off required)`) are not counted and the
+notifier reports "sign-off state not assessable" instead of ALL GREEN.
+
 CLI: pr_merge_blocking_boxes.py [--body-file F | reads stdin] [--json]
-Prints `unticked=<n> ticked=<n>` (or JSON) and exits 0 always; the CALLER
-decides whether unticked > 0 is a nudge or a failure.
+Prints `unticked=<n> ticked=<n> nil=<n> region=present|absent` (or JSON) and
+exits 0 always; the first-line prefix `unticked=<int> …` is the stable contract
+for callers (the notifier reads it with `sed`), and the CALLER decides whether
+unticked > 0 / region=absent is a nudge or a failure.
 """
 
 from __future__ import annotations
@@ -64,11 +74,18 @@ def _is_nil(text: str) -> bool:
 
 
 def parse(body: str):
-    """Return dict(ticked=[...], unticked=[...], nil=[...]) of merge-blocking box texts."""
+    """Return dict(ticked=[...], unticked=[...], nil=[...], region="present"|"absent").
+
+    `region` is "present" as soon as any §2.2 opener (label line, heading-form
+    label or `<!-- merge-blocking -->` sentinel) is seen, even if the region
+    holds no boxes; "absent" means the body uses neither form (fail-closed:
+    the caller must not treat unticked=0 as assessed).
+    """
     ticked: list[str] = []
     unticked: list[str] = []
     nil: list[str] = []
     in_region = False
+    region_seen = False
     in_fence = False
     prev_blank = False
     for raw in body.splitlines():
@@ -83,6 +100,7 @@ def parse(body: str):
             # A heading ends the previous region; a heading that IS the §2.2 label
             # ("## Sign-off required (merge-blocking)") opens a new one (G1).
             in_region = bool(OPEN_WORDS.search(line)) and not CLOSE_WORDS.search(line)
+            region_seen = region_seen or in_region
             prev_blank = False
             continue
         if CLOSE_SENTINEL.search(line):
@@ -91,6 +109,7 @@ def parse(body: str):
             continue
         if OPEN_SENTINEL.search(line):
             in_region = True
+            region_seen = True
             prev_blank = False
             continue
         m = BOX_RE.match(line)
@@ -98,6 +117,7 @@ def parse(body: str):
             # a region opener / closer in prose (not itself a box line)
             if OPEN_WORDS.search(line):
                 in_region = True
+                region_seen = True
             elif CLOSE_WORDS.search(line):
                 in_region = False
             elif in_region and prev_blank and stripped:
@@ -115,7 +135,12 @@ def parse(body: str):
             nil.append(text)
         else:
             unticked.append(text)
-    return {"ticked": ticked, "unticked": unticked, "nil": nil}
+    return {
+        "ticked": ticked,
+        "unticked": unticked,
+        "nil": nil,
+        "region": "present" if region_seen else "absent",
+    }
 
 
 def main(argv=None):
@@ -135,7 +160,8 @@ def main(argv=None):
         print(json.dumps(res, ensure_ascii=False))
     else:
         print(
-            f"unticked={len(res['unticked'])} ticked={len(res['ticked'])} nil={len(res['nil'])}"
+            f"unticked={len(res['unticked'])} ticked={len(res['ticked'])} "
+            f"nil={len(res['nil'])} region={res['region']}"
         )
         for t in res["unticked"]:
             print(f"UNTICKED: {t}")

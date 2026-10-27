@@ -82,7 +82,7 @@ def test_outside_region_ignored():
 - [ ] Theory aligns with QBP axioms
 """
     r = m.parse(body)
-    assert r == {"ticked": [], "unticked": [], "nil": []}, r
+    assert r == {"ticked": [], "unticked": [], "nil": [], "region": "absent"}, r
 
 
 def test_code_fence_ignored():
@@ -111,12 +111,14 @@ def test_cli_output():
         [sys.executable, SCRIPT], input=body, capture_output=True, text=True
     )
     assert r.returncode == 0, r.stderr
-    assert "unticked=1 ticked=1 nil=0" in r.stdout, r.stdout
+    assert "unticked=1 ticked=1 nil=0 region=present" in r.stdout, r.stdout
+    assert r.stdout.startswith("unticked=1 "), r.stdout  # first-line contract
     assert "UNTICKED: @a" in r.stdout, r.stdout
     r2 = subprocess.run(
         [sys.executable, SCRIPT, "--json"], input=body, capture_output=True, text=True
     )
     assert '"unticked": ["@a"]' in r2.stdout, r2.stdout
+    assert '"region": "present"' in r2.stdout, r2.stdout
 
 
 def test_never_edits_anything():
@@ -137,7 +139,7 @@ def test_heading_form_opener_counts_boxes():  # G1 (BLOCKING)
 def test_prose_mention_does_not_open_region():  # G2
     body = "Not merge-blocking: FYI.\n- [ ] informational\nThis is not merge-blocking either.\n- [ ] also informational\n"
     r = m.parse(body)
-    assert r == {"ticked": [], "unticked": [], "nil": []}, r
+    assert r == {"ticked": [], "unticked": [], "nil": [], "region": "absent"}, r
 
 
 def test_bold_label_line_opens_region():  # G2 (label forms)
@@ -164,6 +166,86 @@ def test_sign_off_spelling_variants():
 def test_heading_informational_closes_region():
     body = "## Sign-off required (merge-blocking)\n- [ ] @a\n## Informational readers (non-blocking)\n- [ ] @b\n"
     assert m.parse(body)["unticked"] == ["@a"]
+
+
+# ── qbp-architecture §I4 concern (PR #731 @ b045a28): no-region case must FAIL CLOSED ──
+def test_no_region_reports_absent():
+    """A body using neither §2.2 form: unticked=0 is NOT "nothing owed" — region=absent."""
+    body = """## Summary
+Some change.
+
+## Test plan
+- [ ] CI green
+- [x] unit tests
+"""
+    r = m.parse(body)
+    assert r["region"] == "absent", r
+    assert r["unticked"] == [] and r["ticked"] == [], r
+
+
+def test_empty_body_reports_absent():
+    assert m.parse("")["region"] == "absent"
+
+
+def test_label_form_reports_present():
+    body = "Sign-off required (merge-blocking):\n- [x] @a\n"
+    r = m.parse(body)
+    assert r["region"] == "present" and r["unticked"] == [], r
+
+
+def test_heading_form_reports_present():
+    assert (
+        m.parse("## Sign-off required (merge-blocking)\n- [x] @a\n")["region"]
+        == "present"
+    )
+
+
+def test_sentinel_form_reports_present():
+    body = "<!-- merge-blocking -->\n- [x] @a\n<!-- /merge-blocking -->\n"
+    r = m.parse(body)
+    assert r["region"] == "present" and r["unticked"] == [], r
+
+
+def test_present_even_when_region_holds_no_boxes():
+    """An opener with nothing under it is still an assessable (empty) region."""
+    assert (
+        m.parse("Sign-off required (merge-blocking):\n\nnothing here\n")["region"]
+        == "present"
+    )
+
+
+def test_other_shape_reviewer_boxes_are_absent_and_not_counted():
+    """inter-style boxes (`- [ ] **§I4 @seat** (sign-off required)`) are NOT a §2.2 region:
+    region=absent, and they are neither ticked-off nor counted as unticked."""
+    body = """## Reviewers
+- [ ] **§I4 @qbp-architecture** (sign-off required)
+- [x] **§I4 @cth-implementor** (sign-off required)
+- [ ] merge-blocking: @herschel
+"""
+    r = m.parse(body)
+    assert r == {"ticked": [], "unticked": [], "nil": [], "region": "absent"}, r
+
+
+def test_prose_mention_is_absent():
+    """A prose sentence mentioning the words opens nothing and leaves region=absent (G2)."""
+    assert m.parse("This is not merge-blocking.\n- [ ] x\n")["region"] == "absent"
+
+
+def test_cli_region_absent_line():
+    r = subprocess.run(
+        [sys.executable, SCRIPT],
+        input="- [ ] **§I4 @a** (sign-off required)\n",
+        capture_output=True,
+        text=True,
+    )
+    assert r.returncode == 0, r.stderr
+    assert (
+        r.stdout.splitlines()[0] == "unticked=0 ticked=0 nil=0 region=absent"
+    ), r.stdout
+    r2 = subprocess.run(
+        [sys.executable, SCRIPT, "--json"], input="", capture_output=True, text=True
+    )
+    assert '"region": "absent"' in r2.stdout, r2.stdout
 
 
 if __name__ == "__main__":

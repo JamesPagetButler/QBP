@@ -280,8 +280,11 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    first — #507 §6) and (b) posts a 🟡 nudge, not merge-ready, while any
    merge-blocking sign-off box (github-best-practices §2.2 regions, parsed by
    `scripts/pr_merge_blocking_boxes.py`) is unticked — auto-nudge, never
-   auto-tick (#507 §4). Making that nudge a required failing check (§7) gates
-   the beekeeper's own merges and awaits his ruling.
+   auto-tick (#507 §4) — and (c) fails closed (federation rule R3): a body
+   with **no** §2.2 region at all (neither the label line nor the sentinel)
+   gets 🟡 "sign-off state not assessable", never ✅, because reviewer boxes
+   in any other shape are not read. Making that nudge a required failing
+   check (§7) gates the beekeeper's own merges and awaits his ruling.
 
 Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
 checkout (missing root aggregator; both Tier-3 reviews read content only);
