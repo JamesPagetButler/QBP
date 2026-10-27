@@ -52,9 +52,21 @@ jobs:
               - 'scripts/test_check_layer_imports.py'
               - '.github/workflows/lean-foundations.yml'
 
+  # Fail-closed gating (#674, beekeeper ruling 2026-10-27). Every job that `needs: changes`
+  # uses the form:  if: always() && (needs.changes.result != 'success' || <output> == 'true')
+  #
+  #   changes.result | <output>  | gated job
+  #   ---------------+-----------+-----------
+  #   success        | 'true'    | RUNS   (relevant path changed)
+  #   success        | 'false'   | SKIPS  (filter answered "no relevant change")
+  #   failure        | (unset)   | RUNS   (filter broke -> do not trust the skip)
+  #   cancelled      | (unset)   | RUNS   (filter never answered -> do not trust the skip)
+  #
+  # A skipped job satisfies a required status check, so without `always()` a broken
+  # dorny/paths-filter step would silently pass the gate (Red Team F2 on PR #673).
   foundations-standard:
     needs: changes
-    if: needs.changes.outputs.lean == 'true'
+    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.lean == 'true')
     name: Foundations standard (no-sorry-increase / no native_decide / no vacuous stubs)
     runs-on: ubuntu-latest
     steps:
@@ -71,7 +83,7 @@ jobs:
 
   lake-build:
     needs: changes
-    if: needs.changes.outputs.lean == 'true'
+    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.lean == 'true')
     name: lake build (zero errors)
     runs-on: ubuntu-latest
     steps:
