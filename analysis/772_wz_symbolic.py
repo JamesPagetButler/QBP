@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""#772 AC2 — symbolic w_eff(z) for the QBP accretion model (DRAFT support script).
+"""#772 AC2 — symbolic w_eff(z) for the QBP accretion model (seat-reviewed v0.1 support script).
 
 Source records (archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json, v6.19.0):
   PRED-H-equals-Mdot-over-M : H = Mdot/M
@@ -10,7 +10,7 @@ Source records (archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json, 
   COMP-cmb-power-spectrum-accretion : CAMB used w(z) = -1.25 + 0.70 z/(1+z)
 
 Everything below is algebra on those statements. Modelling choices are marked ASSUMED
-in the companion analysis/772-accretion-wz-derivation-DRAFT.md.
+in the companion analysis/772-accretion-wz-derivation.md.
 Run:  run-bounded 2G 60 python3 analysis/772_wz_symbolic.py
 """
 

@@ -1,6 +1,6 @@
-# #772 AC2 — DRAFT: the accretion model's w(z), written down explicitly
+# #772 AC2 — the accretion model's w(z), written down explicitly
 
-**Status: DRAFT for @qbp-oppenheimer review. Nothing below is adopted theory.** Prepared 2026-10-26 by a delegated agent for the QBP seat (theory axis). Every step is tagged **DERIVED** (follows algebraically from the previous step or a quoted ledger record) or **ASSUMED** (a modelling choice the records do not fix; the alternative is named). Source dossier: `analysis/772-wz-ledger-dossier.md`. Script: `analysis/772_wz_symbolic.py` (sympy 1.13.1; `run-bounded 2G 60 python3 analysis/772_wz_symbolic.py`, 13 s wall, exit 0). Script output is reproduced in §9.
+**Status: v0.1 — seat-reviewed 2026-10-27 (qbp-oppenheimer); records' explicit form, not adopted physics.** Prepared 2026-10-26 by a delegated agent for the QBP seat (theory axis); the closed form in §4 step 7 was re-derived by hand by the seat before review. Every step is tagged **DERIVED** (follows algebraically from the previous step or a quoted ledger record) or **ASSUMED** (a modelling choice the records do not fix; the alternative is named). Source dossier: `analysis/772-wz-ledger-dossier.md`. Script: `analysis/772_wz_symbolic.py` (sympy 1.13.1; `run-bounded 2G 60 python3 analysis/772_wz_symbolic.py`, 13 s wall, exit 0). Script output is reproduced in §9.
 
 Ledger: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json` v6.19.0. Records: `PRED-H-equals-Mdot-over-M` (T3 untested), `PROOF-M-proportional-to-a` (T1 coherent), `PRED-lambda-as-cross-term` (T1 marginal), `PRED-w-not-minus-1` (T1 marginal), `COMP-cmb-power-spectrum-accretion` (T1 coherent, I).
 
@@ -105,13 +105,15 @@ H(z)/H_ΛCDM(z) under (I), z_t = 0.7: 1.000 (z=0), 0.954 (0.3), 0.955 (0.5), 0.9
 | 8 | z_t is the mode-equality redshift (1+z_t)² = B/A | z_t is the q=0 redshift | Record's numbers encode mode-equality; q=0 at 0.7 is unattainable under (I) |
 | 6 | Single-fluid w_eff definition | none standard | convention |
 
-## 8. Open items for @qbp-oppenheimer (decisions, not mine)
+## 8. Seat decisions (qbp-oppenheimer, 2026-10-27) — proposals to the ledger lanes, no physics adopted here
 
-1. Adopt reading (I) and write the "boundary sector only" sentence into `PRED-H-equals-Mdot-over-M` / `PROOF-M-proportional-to-a`, or reject (I) and reopen the model? (Step 5.)
-2. Record edit: "2AB ≈ 0.26 ≈ Ω_Λ" → "(A+B)² ≈ 0.69 ≈ Ω_Λ; 2AB ≈ 0.26 is the constant part"? (Step 8 side-finding.)
-3. Record edit: z_t gloss "deceleration-acceleration transition" → "mode-equality redshift (w = −1 crossing); q=0 falls at z ≈ 0.54 for this model"? (Step 8.)
-4. `COMP-cmb-power-spectrum-accretion`: its w(z) has the wrong sign pattern relative to the model it claims to approximate and no reproduce-path exists (`docs/conventions/anchor-prefix-policy.md:40` requires one). Status/notes change is the seat's call.
-5. Whether to pre-register w_eff(z) = −1 − (2/3)[(1+z)² − (1+z_t)²]/[(1+z)² + (1+z_t)²] as the explicit `PRED-w-not-minus-1` form (walking_the_chain:253 asked for exactly this before DESI Y2).
+1. **Reading (I) is taken as the explicit form the records' own numbers imply.** It is the only reading reproducing A ≈ 0.21, B ≈ 0.62, z_t ≈ 0.7 (step 8, script STEP C); reading (II) is excluded on a DERIVED fact: a pure two-mode H_B never decelerates (ä = 2Ba(A + Ba²) > 0 for all a, script STEP D). Status: this is the model's w(z) as written down, ASSUMED where tagged; adopting it as physics is not done here. *Proposed record note (steward lane — cth-implementor shape, qbp-implementor edit):* add to `PRED-H-equals-Mdot-over-M` and `PROOF-M-proportional-to-a` the sentence "H_B = Ṁ/M is the boundary (dark-energy) sector's rate; matter is added separately in the Friedmann sum (reading I); the alternative reading (H_B = total H) never decelerates and is excluded."
+2. *Proposed `review_flag` on `PRED-lambda-as-cross-term`:* "arithmetic: 2AB = 0.26 is 38 % of Ω_Λ = 0.685; it is (A+B)² = 0.69 that matches Ω_Λ; 2AB is the constant part of H_B²." (Step 8 side-finding.)
+3. *Proposed notes edit on `PRED-lambda-as-cross-term` / `PRED-w-not-minus-1`:* z_t ≈ 0.7 is the mode-equality redshift A(1+z_t) = B/(1+z_t), i.e. the w = −1 crossing; under reading (I) with Ω_m = 0.315 the deceleration→acceleration redshift (q = 0) is z ≈ 0.54, not 0.7 (script STEP E: 0.543).
+4. **`COMP-cmb-power-spectrum-accretion`:** #772 AC1 (`review_flag` + `status: contested`) is confirmed on two independent grounds: (a) wrong sign pattern relative to the model it approximates (§6 — opposite sign of w+1 on both sides of its crossing); (b) no reproduce-path in the repo (`docs/conventions/anchor-prefix-policy.md:40` requires one; dossier §2a: "Session 12 narrative text, no artefact on disk"). The CAMB raw outputs are ANCHOR-PENDING per `paper/quaternion_physics.md`.
+5. **The explicit form is the curve `qbp-desi-fit` pre-registers** (architect-directed spike, inter#224): w_eff(z) = −1 − (2/3)[(1+z)² − (1+z_t)²]/[(1+z)² + (1+z_t)²], with z_t the single shape parameter and (A+B)² = Ω_DE fixing the normalisation. It is proposed as the functional form in `PRED-w-not-minus-1`'s notes (#772 AC4). The CPL tangent (w₀, w_a) ≈ (−0.68, −0.51) is reported for comparison only — it is not the pre-registered curve (it misses the −5/3 plateau, step 7).
+
+**Not claimed.** Nothing here says the accretion model fits data; it says what the model's own curve is. Whether that curve survives DESI DR2 + Pantheon+ (AC5 / `qbp-desi-fit`) and the CAMB re-run (AC3) is not addressed in this document.
 
 ## 9. Script output (verbatim, `run-bounded 2G 60 python3 analysis/772_wz_symbolic.py`)
 

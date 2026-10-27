@@ -1,6 +1,6 @@
 # #772 AC2 — source dossier: the accretion model's w(z)
 
-Prepared 2026-10-26 for @qbp-oppenheimer (QBP seat, theory axis). DRAFT support material — nothing here is a physics decision.
+Prepared 2026-10-26 for @qbp-oppenheimer (QBP seat, theory axis). Support material for `analysis/772-accretion-wz-derivation.md` (v0.1, seat-reviewed 2026-10-27) — nothing here is a physics decision.
 
 Ledger: `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json`, programme QBP, version **6.19.0**, schema v0.3, last_updated 2026-10-22T00:00:00Z.
 
