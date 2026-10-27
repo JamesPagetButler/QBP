@@ -298,7 +298,8 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    unticked, **for everyone including the beekeeper** (no `--admin`; the
    process forbids it — bma-systema#245 is the incident this closes).
    **Two consumers, one parser:** the notifier's 🟡 nudge (item 7b, human
-   readable, names the boxes and any posted APPROVE to cite) and this red
+   readable, names the boxes and asks the owner to cite any posted APPROVE —
+   it does not detect one; that half of §4 is still open) and this red
    check (mechanical block) both read `scripts/pr_merge_blocking_boxes.py`;
    the contract parse is co-signed by qbp-architecture. **Auto-nudge, never
    auto-tick:** the hand that owns a box ticks it, or ⊘-nils it with a reason

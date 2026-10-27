@@ -54,8 +54,14 @@ ABSENT_FIX = (
 
 
 def _annot(level: str, msg: str) -> None:
-    # GitHub workflow command; one line (newlines would end the command)
-    print(f"::{level}::{msg}".replace("\n", " "))
+    """Emit a GitHub workflow command on one line.
+
+    The message part is percent-escaped per the Actions toolkit (`%`→`%25`,
+    `\r`→`%0D`, `\n`→`%0A`): a box text containing `%` or a line break must
+    neither truncate the annotation nor start a second command.
+    """
+    esc = msg.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+    print(f"::{level}::{esc}")
 
 
 def check(body: str, absent_blocks: bool = False) -> int:

@@ -99,6 +99,20 @@ def test_annotations_are_single_line():
             assert "\n" not in line and line.count("::") >= 2, line
 
 
+def test_annotation_escapes_percent_and_newline():
+    import contextlib
+    import io
+
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        c._annot("error", "100% done\r\nsecond line")
+    assert buf.getvalue() == "::error::100%25 done%0D%0Asecond line\n", buf.getvalue()
+    body = "Sign-off required (merge-blocking):\n- [ ] @a — 50% coverage\n"
+    r = run(body)
+    assert r.returncode == 1 and "50%25 coverage" in r.stdout, r.stdout
+    assert "- [ ] @a — 50% coverage" in r.stdout, r.stdout  # human listing unescaped
+
+
 def test_body_file_and_unreadable_file():
     import tempfile
 

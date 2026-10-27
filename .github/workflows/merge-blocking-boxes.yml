@@ -41,6 +41,12 @@ permissions:
   contents: read
   pull-requests: read
 
+# Rapid body edits fire several runs; cancel the stale one so an older body
+# cannot out-report the newest (the check result shown is the last to finish).
+concurrency:
+  group: merge-blocking-boxes-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   merge-blocking-boxes:
     name: Merge-blocking boxes
