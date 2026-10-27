@@ -67,6 +67,11 @@ CLOSE_WORDS = re.compile(_LABEL_PREFIX + r"(informational|non-blocking)\b", re.I
 # a live ask ("@a — ~~old~~ still owed") stays unticked (G3).
 NIL_RE = re.compile(r"⊘|^~~[^~]*~~\s*$")
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
+# Inline code spans are literal text, like fenced blocks: a prose mention of the
+# sentinel (`<!-- merge-blocking -->` in backticks, e.g. a PR that documents this
+# parser) must not open a region — otherwise region=present is reported for a
+# body that has no real §2.2 region, defeating the fail-closed verdict.
+CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
 
 
 def _is_nil(text: str) -> bool:
@@ -96,6 +101,8 @@ def parse(body: str):
         if in_fence:
             continue
         stripped = line.strip()
+        # sentinel checks run on the line with inline code spans removed
+        nospan = CODE_SPAN_RE.sub("", line)
         if HEADING_RE.match(line):
             # A heading ends the previous region; a heading that IS the §2.2 label
             # ("## Sign-off required (merge-blocking)") opens a new one (G1).
@@ -103,11 +110,11 @@ def parse(body: str):
             region_seen = region_seen or in_region
             prev_blank = False
             continue
-        if CLOSE_SENTINEL.search(line):
+        if CLOSE_SENTINEL.search(nospan):
             in_region = False
             prev_blank = False
             continue
-        if OPEN_SENTINEL.search(line):
+        if OPEN_SENTINEL.search(nospan):
             in_region = True
             region_seen = True
             prev_blank = False

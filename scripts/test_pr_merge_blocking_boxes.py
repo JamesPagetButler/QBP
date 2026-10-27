@@ -248,6 +248,30 @@ def test_cli_region_absent_line():
     assert '"region": "absent"' in r2.stdout, r2.stdout
 
 
+def test_backticked_sentinel_mention_does_not_open_region():
+    """A PR that DOCUMENTS the sentinel (in an inline code span) has no real region:
+    region=absent, and following boxes are not counted (found on #731's own body)."""
+    body = """| §4 | use the `<!-- merge-blocking -->` sentinel or `<!-- /merge-blocking -->` |
+- [ ] not a sign-off box
+"""
+    r = m.parse(body)
+    assert r == {"ticked": [], "unticked": [], "nil": [], "region": "absent"}, r
+
+
+def test_sentinel_at_end_of_prose_line_still_opens():
+    body = "Reviewers <!-- merge-blocking -->\n- [ ] @a\n"
+    r = m.parse(body)
+    assert r["region"] == "present" and r["unticked"] == ["@a"], r
+
+
+def test_backticked_close_sentinel_does_not_close_region():
+    body = "<!-- merge-blocking -->\n- [ ] @a — see `<!-- /merge-blocking -->` docs\n- [ ] @b\n"
+    assert m.parse(body)["unticked"] == [
+        "@a — see `<!-- /merge-blocking -->` docs",
+        "@b",
+    ]
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
