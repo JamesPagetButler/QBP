@@ -47,21 +47,24 @@ jobs:
   # change does not spin up the heavy manim/pytest jobs. Independent of the
   # criticality-thread CI work (ci.yml untouched since PR #394, f68a1e0) — nothing overwritten.
   # Fail-closed gating (#674, beekeeper ruling 2026-10-27). Every job that `needs: changes`
-  # uses the form:  if: always() && (needs.changes.result != 'success' || <output> == 'true')
+  # uses the form:  if: ${{ !cancelled() && (needs.changes.result != 'success' || <output> == 'true') }}
+  # (`${{ }}` is required: a bare leading `!` is a YAML tag. `!cancelled()` rather than `always()`
+  # per GitHub's own guidance: `always()` would start every gate job into a run a human cancelled.)
   #
   #   changes.result | <output>  | gated job
   #   ---------------+-----------+-----------
   #   success        | 'true'    | RUNS   (relevant path changed)
   #   success        | 'false'   | SKIPS  (filter answered "no relevant change")
   #   failure        | (unset)   | RUNS   (filter broke -> do not trust the skip)
-  #   cancelled      | (unset)   | RUNS   (filter never answered -> do not trust the skip)
+  #   cancelled      | (unset)   | does not start — a job is only cancelled when the whole run is,
+  #                  |           | and a cancelled run never satisfies a required check (still fail-closed)
   #
-  # A skipped job satisfies a required status check, so without `always()` a broken
+  # A skipped job satisfies a required status check, so without the `result != 'success'` leg a broken
   # dorny/paths-filter step would silently pass the gate (Red Team F2 on PR #673).
   validate-knowledge:
     name: Validate knowledge graph
     needs: changes
-    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.knowledge == 'true')
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.knowledge == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -90,7 +93,7 @@ jobs:
   lint-and-type-check:
     name: Lint & Type Check
     needs: changes
-    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true')
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -117,7 +120,7 @@ jobs:
   test:
     name: Run Tests
     needs: changes
-    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true')
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -151,7 +154,7 @@ jobs:
   physics-validation:
     name: Physics Validation Tests
     needs: changes
-    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true')
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -179,7 +182,7 @@ jobs:
   experiment-validation:
     name: Experiment Number Validation
     needs: changes
-    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true')
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -218,7 +221,7 @@ jobs:
   libs-dependency-check:
     name: Library Independence Check
     needs: changes
-    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.lean == 'true')
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.lean == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -254,7 +257,7 @@ jobs:
   code-quality:
     name: Code Quality Scan
     needs: changes
-    if: always() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true')
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.code == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       security-events: write
