@@ -38,3 +38,23 @@ This is a primary test of our formalism's ability to describe a real, 3D quantum
 3.  **Match the Rydberg Formula:** The calculated energy levels must follow the pattern of the Rydberg formula. The energy difference between any two calculated levels in our model must correspond to the energy of a photon in the observed spectrum. For example, the energy gaps between our calculated n=3,4,5... levels and our n=2 level must match the energies of the Balmer series lines.
 
 Reproducing the quantized spectrum of the hydrogen atom from our axiomatic framework would be a monumental achievement, proving its validity as a genuine quantum-mechanical theory.
+
+## 5. Prediction Classification
+
+Classification rule (#170 / #736): a row is **Validation** only where this document states that QBP reproduces the standard value; **Novel** only where it states a QBP-specific deviation with a number; otherwise **OPEN**, with the missing statement named. The Notes quote the line relied on.
+
+| Prediction | Type | Standard value (as stated here) | Notes |
+|------------|------|---------------------------------|-------|
+| Discrete, quantized energy levels (n = 1, 2, 3, …) | OPEN | "specific, discrete energy levels … (n=1, 2, 3, ...)" (§3) | Stated only as a criterion: "our formalism, when applied to this Hamiltonian, must produce a set of **discrete, quantized energy levels**" (§4.2). Missing: the QBP Hamiltonian and its spectrum — §4.1 lists defining `H` as a task still to do. |
+| Level spacing follows the Rydberg formula 1/λ = R (1/n₁² − 1/n₂²) | OPEN | "`1/λ = R * (1/n₁² - 1/n₂²)`" (§3) | Stated only as a criterion: "The calculated energy levels must follow the pattern of the Rydberg formula" (§4.3). Missing: a QBP-derived level formula — no claim here that QBP reproduces it. |
+| Balmer lines H-α ~656 nm, H-β ~486 nm, H-γ ~434 nm, H-δ ~410 nm | OPEN | "~656 nm … ~486 nm … ~434 nm … ~410 nm" (§1) | Stated only as a criterion: "the energy gaps between our calculated n=3,4,5... levels and our n=2 level must match the energies of the Balmer series lines" (§4.3). Missing: QBP-derived line energies to compare against them. |
+
+### Classification Summary
+
+**Validation:** none decidable from this document. It records the experimental ground truth (§1–§3) and the success criteria a QBP derivation must meet (§4); it does not state that QBP reproduces any quantity above.
+
+**Novel predictions:** none stated. No QBP-specific deviation with a number appears in this document.
+
+### Implications
+
+All rows are **OPEN**: the classification cannot be made until the Phase 1 ground-truth work (#34) adds the QBP-side Hamiltonian and derived spectrum. A row becomes **Validation** if the document then states that QBP reproduces the standard value, or **Novel** if it states a QBP-specific deviation with a number; the §4 criteria are the gate. Indexed under #170 / #736 — cite, don't assert.

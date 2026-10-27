@@ -600,7 +600,7 @@ If all predictions hold (expected), Sprint 3 confirms:
 | Which-path → V = 0 | Validation | V = 0 | V = 0 | Identical (Scenario B) |
 | Far-field Scenario C | Validation | cos² at detector | cos² at detector | C(1,i) dynamically selected |
 | ψ₁ exponential decay | Novel | No ψ₁ sector | η(r) ∝ exp(−2κr) | Evanescent modes |
-| Decay rate κ = |U₁|/(ℏv) | Novel | N/A | κ in m⁻¹, simulation-testable | Adler 1988 |
+| Decay rate κ = \|U₁\|/(ℏv) | Novel | N/A | κ in m⁻¹, simulation-testable | Adler 1988 |
 | Visibility recovery V(r) → 1 | Novel | V = 1 always | V < 1 near slits → 1 at detector | Mid-propagation |
 
 **Classification summary:** Scenarios A and B are **validation** predictions — QBP must reproduce standard QM exactly for complex-only states. These establish that the simulation infrastructure works correctly. Scenario C produces three **novel** predictions unique to quaternionic quantum mechanics: the existence of evanescent ψ₁ modes, a specific decay rate formula, and distance-dependent fringe visibility recovery. These novel predictions are testable within the simulation but not yet by experiment (see §4.3.6 for the experimental prediction and its caveats).

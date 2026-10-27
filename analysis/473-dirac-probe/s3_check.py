@@ -13,8 +13,9 @@ vacuum orbit space pinches at b₀ = ±1 (suspension of ℝP¹ = S²).  The actu
 the exact 256-basis-pair check in aut_s3.py.
 
 Seeding: same seed VALUE as flow_big.py (rng(1)) but an independent stream — flow_big.py
-consumes two FD-check draws before sampling, this script reseeds after the exec'd prefix — so
-the 24 000 initial points differ from #629's.  The endpoint ⟨b₀²⟩ printed below is therefore an
+consumes two FD-check draws before sampling, this script reseeds after the FD check (formerly
+the exec'd prefix of flow_big.py, now `cdalg.grad_fd_check`) — so the 24 000 initial points
+differ from #629's.  The endpoint ⟨b₀²⟩ printed below is therefore an
 independent re-measurement of #629's 0.1462 ± 0.0011 (1500 steps here vs 5000 there).
 Set S3_CHECK_N=3000 for a ~1 min validation run; S3_CHECK_MU=μ for a Q_μ-Gaussian initial
 state (radially projected to S¹⁴ — NOT the coarea measure on {Q_μ = 1}; the two agree only at
@@ -27,8 +28,12 @@ import os
 import numpy as np
 from scipy.stats import kstest
 
-src = open("flow_big.py").read()
-exec(src.split("# --- flow")[0])  # omul, V, grad, FD check
+from cdalg import V, grad, grad_fd_check
+
+# flow_big.py's FD gradient check, reproduced with its own rng(1) so this smoke test still
+# prints the grad-check line (it used to arrive via the exec'd prefix of flow_big.py).
+_ok_a, _ok_b = grad_fd_check(np.random.default_rng(1))
+print("grad check a:", _ok_a, " b:", _ok_b)
 
 N = int(os.environ.get("S3_CHECK_N", "24000"))
 SEED = int(os.environ.get("S3_CHECK_SEED", "1"))

@@ -1,0 +1,6 @@
+H dim <L_a> = 4  (full End = 16 )
+O dim <L_a> = 64  (full End = 64 )
+S dim <L_a> = 256  (full End = 256 )
+delta(s) over random unit s in Im S: min 0.1895 max 0.9984
+s=(e1+e10)/√2 spectrum of -L_s^2: [0. 0. 0. 0. 1. 1. 1. 1. 1. 1. 1. 1. 2. 2. 2. 2.]
+s in O-subalgebra: spectrum [1.]

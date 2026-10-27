@@ -1,0 +1,10 @@
+(1) dim span D_(ei,ej) = 14 (expect 14 = dim g2); Leibniz residual 2.7e-15
+(2) generic G2 orbit dim on Im S: [11, 11, 11, 11, 11] -> S^14/G2 has dim 3
+(3) max |delta^2 - 4(|a|^2|Im b|^2 - <a,Im b>^2)| over 2000 Haar samples: 6.7e-16
+(4) G2 orbit dim on the vacuum manifold V=0:
+      a≠0, b=0         -> 6
+      a=0, Im b≠0      -> 6
+      a ∥ Im b, b0≠0   -> 6
+      ±ℓ               -> 0
+(5) dim Fix(G2) on Im S = 1 (expect 1); kernel vector = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] (expect e_ℓ = index 7)
+wrote hvr_orbit_space.png

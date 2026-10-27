@@ -87,7 +87,7 @@ All five anchors are derivable from the tracked baselines (`v5_3.json` for the f
 - v1.3 baseline: `archive/historical/QBP-First-Wisdom-Theory-v1_3-original.md`
 - Cross-reference: `paper/DESIGN_RATIONALE.md` §12.4 (Session-13 integration touchpoints) — updated by this PR to forward-reference §9.7
 - CCvS 2018 source: Chamseddine, Connes, van Suijlekom — "Entropy and the Spectral Action", *Commun. Math. Phys.* 373 (2020)
-- T1–T4 mp-arithmetic verification: per `archive/SESSION-13-WORKING-NOTES.md` (untracked; verification log)
+- T1–T4 mp-arithmetic verification: per `archive/SESSION-13-WORKING-NOTES.md` (**tracked** on master since the archive transfer; verification log — #426)
 
 ---
 
@@ -98,7 +98,7 @@ Every substantive claim in §9.7:
 | Claim | Anchor type | Anchor |
 |---|---|---|
 | CCvS proves "entropy = spectral action(χ)" | published experimental constraint | Chamseddine-Connes-van Suijlekom 2018, *Commun. Math. Phys.* 373 |
-| χ(u) ≠ QBP's f(u) at function-level identity | simulation output + provenance | T1–T4 mp-arithmetic, 50-digit precision (results log: `archive/SESSION-13-WORKING-NOTES.md`; tracked-commit follow-up per S2) |
+| χ(u) ≠ QBP's f(u) at function-level identity | simulation output + provenance | T1–T4 mp-arithmetic, 50-digit precision (results log: `archive/SESSION-13-WORKING-NOTES.md`, tracked on master — #426 resolved) |
 | Rescaling gives inconsistent A values (0.69 vs 1.80) | simulation output + provenance | T1–T4 mp-arithmetic (same log) |
 | CCvS γ(−a) contains Cayley-Dickson tower 2^(2a)−1 | derived dimensional / algebraic identity | even-level dim Im 𝒜_(2a) algebraic structure (corrected label: 𝒜_2/ℍ, 𝒜_4/𝕊, 𝒜_6/64-dim; skips odd levels including 𝒜_5/chingons) |
 | **Both χ and f are valid test functions on the same triple** *(structural-claim anchor; added per Gemini F2 + Red Team G3)* | derived algebraic identity | **CCvS §1 spectral action principle** explicitly allows arbitrary test functions; the structural reading is forced by CCvS Definition 1.1 (spectral action = Tr(f(D/Λ))) being parameterised over arbitrary f, not by the χ ≠ f numerical disconfirmation alone |

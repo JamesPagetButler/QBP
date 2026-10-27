@@ -40,3 +40,24 @@ This is a critical test of our formalism's ability to handle multi-particle syst
 4.  **Quantitative Goal (Aspirational):** The calculated energy difference between the simulated p-Ps and o-Ps states should be reasonably close to the experimentally measured value of ~203 GHz.
 
 Successfully modeling the hyperfine splitting of Positronium would demonstrate our framework's potential to describe interacting particles, a crucial step beyond single-particle quantum mechanics.
+
+## 5. Prediction Classification
+
+Classification rule (#170 / #736): a row is **Validation** only where this document states that QBP reproduces the standard value; **Novel** only where it states a QBP-specific deviation with a number; otherwise **OPEN**, with the missing statement named. The Notes quote the line relied on.
+
+| Prediction | Type | Standard value (as stated here) | Notes |
+|------------|------|---------------------------------|-------|
+| Ground-state binding energy ≈ −6.8 eV | OPEN | "the simple Bohr model predicts a ground state binding energy of approximately -6.8 eV" (§2) | Stated as background only; not among the §4 success criteria. No QBP claim about this quantity appears in the document. |
+| Two-particle state representable as Ψ = ψ_electron ⊗ ψ_positron | OPEN | Combined two-body state (§1) | Stated as a proposal, not a result: "likely via a tensor product of two quaternionic states" (§4.1). Missing: the QBP construction itself. |
+| Hyperfine splitting exists; p-Ps (S=0) lies below o-Ps (S=1) | OPEN | p-Ps "the **lower** energy ground state", o-Ps "the **higher**" (§2) | Stated only as a criterion: "it must produce two distinct energy eigenvalues. The formalism must show that the state with anti-parallel spins (p-Ps) has a lower energy" (§4.3). Missing: a QBP derivation of the splitting. |
+| Splitting magnitude ≈ 203 GHz | OPEN | "approximately **203 GHz**" (§2) | Stated only as an aspiration (Quantitative Goal, Aspirational): "The calculated energy difference between the simulated p-Ps and o-Ps states should be reasonably close to the experimentally measured value of ~203 GHz" (§4.4). Missing: a QBP-derived value to compare against it. |
+
+### Classification Summary
+
+**Validation:** none decidable from this document. It records the experimental ground truth (§1–§3) and the success criteria a QBP model must meet (§4); it does not state that QBP reproduces any quantity above.
+
+**Novel predictions:** none stated. No QBP-specific deviation with a number appears in this document.
+
+### Implications
+
+All rows are **OPEN**: the classification cannot be made until the Phase 1 ground-truth work (#33) adds the QBP-side construction and derivations. A row becomes **Validation** if the document then states that QBP reproduces the standard value, or **Novel** if it states a QBP-specific deviation with a number; the §4 criteria are the gate. Indexed under #170 / #736 — cite, don't assert.

@@ -24,7 +24,7 @@ the closed-form D₃ they match — into a verification.
 import numpy as np
 from scipy.optimize import least_squares
 
-exec(open("dirac_probe.py").read().split("def spec")[0])  # cd_mul, basis, L, R
+from cdalg import D, basis, cd_mul
 
 rng = np.random.default_rng(7)
 
@@ -141,22 +141,6 @@ for q in sols:
 
 # unit zero-divisor locus: δ = 1 ⇔ b0 = 0, |a|² = |Im b|² = 1/2, a ⟂ Im b.  One G2-orbit?
 e8 = basis(8)
-
-
-def Lm(x):
-    return L(x, 8)
-
-
-def Rm(x):
-    return R(x, 8)
-
-
-def D(x, y):
-    return (
-        (Lm(x) @ Lm(y) - Lm(y) @ Lm(x))
-        + (Lm(x) @ Rm(y) - Rm(y) @ Lm(x))
-        + (Rm(x) @ Rm(y) - Rm(y) @ Rm(x))
-    )
 
 
 ders = [D(e8[i], e8[j]) for i in range(1, 8) for j in range(i + 1, 8)]

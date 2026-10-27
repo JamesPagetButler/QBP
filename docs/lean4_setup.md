@@ -131,7 +131,7 @@ Building mathlib from source can take hours; the cache reduces this to minutes.
 
 ### "error: no such file or directory" for QBP.lean
 
-Ensure you're in the `proofs/` directory when running `lake build`.
+Ensure you're in the `proofs/` directory when running `lake build`. **Running `lake` from the repo root (no `lakefile` there) is not a no-op:** elan treats the root as an unconfigured project and downloads an *unpinned* toolchain (observed 2026-09-29: a 3 GB `v4.34.1` plus a stray `v4.33.1`, ~6 GB under `~/.elan`), so the standing recipe is always `cd <worktree>/proofs && run-bounded <cap> lake build …` (#683). Deleting stray toolchains under `~/.elan` is the beekeeper's call.
 
 ## Next Steps
 

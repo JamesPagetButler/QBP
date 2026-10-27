@@ -1,0 +1,4 @@
+vacuum locus: Jacobian rank = 8 at 20 random points (8-dim in the 14-dim state sphere) ✓
+horn-1 ensemble, N = 20000: fraction with V < 1e-6 = 0.00000 ✓ (zero);  V < 1e-3: 0.00000
+V distribution: min 0.0301, median 0.6834, mean 0.6578, max 0.9999 (ridge V = 1)
+ALL ASSERTIONS PASSED — the kill 'born crystallised' cannot fire under horn 1

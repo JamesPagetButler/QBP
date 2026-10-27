@@ -74,6 +74,7 @@ typedef struct {
     /* Display modes (#228, #229) */
     int         angle_highlight;       /* 1 = emphasize angle-dependent nodes */
     int         overview_mode;         /* 1 = show overview panel instead of graph */
+    int         panel_hidden;          /* 1 = info panel hidden; graph takes the full width (#261 HVR) */
 } ProofGraph;
 
 /* Initialize the Stern-Gerlach proof graph (hardcoded from Lean files) */
@@ -114,6 +115,17 @@ void graph_toggle_angle_highlight(ProofGraph *g);
 
 /* Toggle overview mode (#228) */
 void graph_toggle_overview(ProofGraph *g);
+
+/* #261 HVR (beekeeper, 2026-10-22): the info panel must never crowd the graph.
+ * One shared layout: graph region on the left, panel on the right, computed
+ * from the screen size and the panel state; the scenes no longer hardcode it.
+ * graph_layout_regions() returns both rectangles (panel is zero-width when hidden);
+ * graph_toggle_panel() flips the panel and RE-LAYS-OUT the graph into the new region. */
+#define QBP_PANEL_WIDTH   360   /* was 440: ~40% of an 1100-px window read as "half the view" */
+#define QBP_BAR_HEIGHT     56
+#define QBP_TITLE_HEIGHT   60
+void graph_layout_regions(const ProofGraph *g, int sw, int sh, Rectangle *graph_area, Rectangle *panel);
+void graph_toggle_panel(ProofGraph *g, int sw, int sh);
 
 /* Check if a node has a specific tag */
 int graph_node_has_tag(const ProofNode *n, const char *tag);

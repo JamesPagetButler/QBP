@@ -145,6 +145,7 @@ Phase 1 (Ground Truth) is not complete until:
 2. **At least one primary source** with a measured value is cited — or the experiment has an explicit **Theoretical-derived** data type classification
 3. **Data type classification** is declared (Quantitative-precise, Quantitative-moderate, Qualitative-binary, Formula-confirmed, Theoretical-derived, or Constraint-based)
 4. **Null results** are cited if relevant experimental constraints exist
+5. **Check first (#170 / #736):** before starting any experiment phase, confirm the expected-results doc's `## Prediction Classification` section is present and current (Validation / Novel / OPEN per row, each row citing the doc line it relies on); CI gates its presence via `scripts/check_prediction_classification.py`
 
 These criteria are enforced by the [Empirical Grounding Verification](../../CONTRIBUTING.md#empirical-grounding-verification) checklist during review.
 

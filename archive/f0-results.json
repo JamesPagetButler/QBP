@@ -1,0 +1,31 @@
+{
+  "f0_candidate": 83.50966799187808,
+  "f0_best_fit": 100.0,
+  "delta_chi2": 1779964.60445695,
+  "f0_self_consistent": 4.193745559790753,
+  "k_data": 0.3836424798960337,
+  "k_theory": 7.639437268410976,
+  "k_ratio": 0.050218683185264554,
+  "Lambda_TeV": 0.24787359606079204,
+  "alpha_GUT_inv": 32.03785612369853,
+  "predictions": {
+    "alpha_em_inv": 82.516442373178,
+    "sin2tw": 0.4187990707722663,
+    "alpha_s": 0.026589889861548786
+  },
+  "higgs": {
+    "M_H_cc2012": 216.2488796126947,
+    "kappa_lambda_cc2012": 2.9809333307035892,
+    "M_H_simple": 387.92645527124057,
+    "kappa_lambda_simple": 9.59275443201006,
+    "M_H_measured": 125.25,
+    "lambda_SM": 0.12938347743146458,
+    "within_atlas": true
+  },
+  "unification": {
+    "alpha1_inv_at_Lambda": 59.672237134676756,
+    "alpha2_inv_at_Lambda": 29.08083956687566,
+    "alpha3_inv_at_Lambda": 7.3604916695431735,
+    "non_unification_pct": 66.97793682021621
+  }
+}

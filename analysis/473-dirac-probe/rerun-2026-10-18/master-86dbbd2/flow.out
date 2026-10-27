@@ -1,0 +1,11 @@
+grad check a: True  b: True
+0 max V 0.9985933924878012
+3000 max V 9.681420310926343e-24
+6000 max V 1.1290282816484073e-30
+9000 max V 1.1290282816484073e-30
+converged: max V = 1.1290282816484073e-30
+endpoint b0^2: mean 0.1437  (initial Haar mean 1/15=0.0667), <|b0|> 0.3132
+endpoint |a|^2 mean 0.4315, |Im b|^2 mean 0.4248
+transverse mass^2 = 8(1-b0^2): mean 6.8506
+|cos(a,Im b)| at end: min 1.0000
+b0 growth ratio: median 1.423  mean 1.568  max 7.471

@@ -137,12 +137,17 @@ Every experiment must declare its **data type**, which determines how "matching 
 
 **This section is mandatory for all ground truth documents.**
 
-Every prediction must be classified as either:
+Every prediction must be classified as exactly one of:
 
 | Type | Definition | Implication |
 |------|------------|-------------|
 | **Validation** | Matches standard QM exactly | Confirms QBP is consistent with known physics |
-| **Novel** | Differs from standard QM | Provides testable distinction between QBP and QM |
+| **Novel** | A QBP-specific prediction stated as a *numbered* deviation from the standard QM/QED/GR value. A bare "differs from QM" with no number is not Novel. | Provides testable distinction between QBP and the standard theory |
+| **OPEN** | Classification not decidable from this document; the Notes cell states what is missing | Names the statement (derivation or number) this document still owes before the row can be classified |
+
+**Citation rule (#736):** the classification is a research claim, not an assertion — every row's Notes cell cites the line of this document it rests on.
+
+**CI gate:** `scripts/check_prediction_classification.py` (landed in PR #762; runs in the "Tenancy XRef Lint" workflow) checks that every `research/*_expected_results.md` carries this section and that every Type cell is exactly one of `Validation`, `Novel`, `OPEN` (case-sensitive, no markup). The gate is structural only — whether a classification is correct is reviewed on the PR, not linted.
 
 **Template:**
 
@@ -151,14 +156,18 @@ Every prediction must be classified as either:
 
 | Prediction | Type | Standard QM | Notes |
 |------------|------|-------------|-------|
-| P(+) = cos²(θ/2) | Validation | cos²(θ/2) | Identical to QM |
+| P(+) = cos²(θ/2) | Validation | cos²(θ/2) | Identical to QM (cite the § / line this rests on) |
+| [QBP-specific quantity] | Novel | [standard value] | [the stated numbered deviation, with the § / line it rests on] |
+| [quantity] | OPEN | [standard value, as stated here] | [what is missing — e.g. no QBP derivation / no number stated; cite the § / line] |
 
 ### Classification Summary
 
 **Validation:** This experiment confirms QBP reproduces standard quantum mechanics
 for [specific scenario]. It does not distinguish QBP from QM.
 
-**Novel predictions (if any):** [None for this experiment / Description of QBP-specific predictions]
+**Novel predictions (if any):** [None for this experiment / Description of QBP-specific predictions, with the stated number]
+
+**OPEN (if any):** [None / For each OPEN row, the statement this document is missing]
 
 ### Implications
 

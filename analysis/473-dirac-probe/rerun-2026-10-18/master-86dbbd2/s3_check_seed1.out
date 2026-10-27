@@ -1,0 +1,13 @@
+grad check a: True  b: True
+N = 24000   seed = 1   mu = 1   initial <b0^2> = 0.0665  (BOTE (1/mu)/(14+1/mu) = 0.0667)
+converged: max V = 2.516295840181861e-06
+endpoint <b0^2> = 0.1436  (SE 0.0011)
+KS θ vs Uniform[0,180): D = 0.0098  p = 0.021
+   |b0| in [0.00,0.30): n=12847  KS D = 0.0129  p = 0.028
+   |b0| in [0.30,0.60): n= 8311  KS D = 0.0091  p = 0.500
+   |b0| in [0.60,0.99): n= 2841  KS D = 0.0115  p = 0.839
+θ in [0,60), [60,120), [120,180): [8076, 7892, 8032]  (expect equal within √N)
+chi² across the three sectors (12 bins each, dof≈22): 29.0
+<b0> = -0.0009  (SE 0.0024);  <b0^3> = -0.0003
+fraction within 5° of {0,60,120}: 0.165 ; of {30,90,150}: 0.170
+points with |b0|>0.99: 1 ; their max(|a|,|Im b|) = 9.555e-02
