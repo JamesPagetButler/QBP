@@ -26,6 +26,23 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Final
+
+# Library API version (semver). Bump MINOR when a public name is added,
+# MAJOR when a public name is removed/renamed or a numeric contract changes.
+# 1.0.0 — #329 Python slice: status registry + pinned test vectors.
+__version__: Final[str] = "1.0.0"
+
+# Trust status of every public quantity/function in this module (#329).
+#   ESTABLISHED — traceable to a 2019-SI exact defining constant, an exact
+#                 derivation thereof, or the documented Layer-1 BPM convention
+#                 whose algebra is proven in proofs/QBP/Units/ScaleFactors.lean.
+#   PROVISIONAL — depends on QBP model-dependent (Layer 2) physics that has
+#                 NOT been validated against peer-reviewed experiment.
+# The split follows the module's existing Layer 1 / Layer 2 line and
+# docs/conventions/units.md; it decides no physics.
+ESTABLISHED: Final[str] = "ESTABLISHED"
+PROVISIONAL: Final[str] = "PROVISIONAL"
 
 # ---------------------------------------------------------------------------
 # BPM code parameters (from quaternionic_si_definitions.md Section 7.1)
@@ -243,3 +260,119 @@ def compute_quaternionic_quantities(
     zeta = U1_si / E_kin_si
 
     return QuaternionicQuantities(L_Q=L_Q, zeta=zeta)
+
+
+# ---------------------------------------------------------------------------
+# Status registry (#329): ESTABLISHED vs PROVISIONAL, with the basis cited
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class QuantityStatus:
+    """Trust record for one public name of this module.
+
+    kind:   "constant" | "function" | "type" | "quantity" | "utility"
+    status: ESTABLISHED | PROVISIONAL (see module-level docstring)
+    basis:  the citation or reason a reviewer can check
+    """
+
+    name: str
+    kind: str
+    status: str
+    basis: str
+
+
+_SI_2019 = "2019 SI redefinition, exact (BIPM SI Brochure 9th ed., 2019)"
+_LAYER1 = (
+    "Layer 1 BPM convention (quaternionic_si_definitions.md S7.1; "
+    "docs/conventions/units.md); algebra proven on Reals in "
+    "proofs/QBP/Units/ScaleFactors.lean"
+)
+_LAYER2 = (
+    "Layer 2 MODEL-DEPENDENT quaternionic quantity; not validated against "
+    "peer-reviewed experiment (docs/conventions/units.md 'Layer 2')"
+)
+
+STATUS_REGISTRY: Final[tuple[QuantityStatus, ...]] = (
+    # --- physical constants ------------------------------------------------
+    QuantityStatus(
+        "H_SI", "constant", ESTABLISHED, f"h = 6.62607015e-34 J*s; {_SI_2019}"
+    ),
+    QuantityStatus(
+        "HBAR_SI",
+        "constant",
+        ESTABLISHED,
+        "defined exactly as H_SI/(2*pi); the stored double is that value rounded to IEEE 754",
+    ),
+    QuantityStatus(
+        "EV_IN_JOULES", "constant", ESTABLISHED, f"e = 1.602176634e-19 C; {_SI_2019}"
+    ),
+    QuantityStatus("C_SI", "constant", ESTABLISHED, f"c = 299792458 m/s; {_SI_2019}"),
+    # --- BPM code parameters (convention, not physics) -----------------------
+    QuantityStatus("HBAR_CODE", "constant", ESTABLISHED, _LAYER1),
+    QuantityStatus("M_CODE", "constant", ESTABLISHED, _LAYER1),
+    QuantityStatus("K0_CODE", "constant", ESTABLISHED, _LAYER1),
+    QuantityStatus(
+        "V_Z_CODE",
+        "constant",
+        ESTABLISHED,
+        f"{_LAYER1}; Lean theorem v_z_code_eq_40; PR #323",
+    ),
+    # --- Layer 1 types + conversions -----------------------------------------
+    QuantityStatus("ScaleFactors", "type", ESTABLISHED, _LAYER1),
+    QuantityStatus(
+        "compute_scales",
+        "function",
+        ESTABLISHED,
+        f"{_LAYER1}; L0_pos, E0_pos; Lean oracle vectors (si_test_vectors.json)",
+    ),
+    QuantityStatus(
+        "convert_position", "function", ESTABLISHED, f"{_LAYER1}; position_round_trip"
+    ),
+    QuantityStatus(
+        "convert_energy", "function", ESTABLISHED, f"{_LAYER1}; energy_round_trip"
+    ),
+    QuantityStatus(
+        "convert_potential",
+        "function",
+        ESTABLISHED,
+        f"{_LAYER1}; V_Z_CODE Jacobian, PR #323; Lean oracle potential_eV",
+    ),
+    QuantityStatus(
+        "convert_length_to_code", "function", ESTABLISHED, f"{_LAYER1}; inverse of L0"
+    ),
+    QuantityStatus(
+        "convert_energy_to_code", "function", ESTABLISHED, f"{_LAYER1}; inverse of E0"
+    ),
+    QuantityStatus(
+        "annotate_columns",
+        "utility",
+        ESTABLISHED,
+        "no physical content: DataFrame column renaming only",
+    ),
+    # --- Layer 2 (PROVISIONAL) ------------------------------------------------
+    QuantityStatus("QuaternionicQuantities", "type", PROVISIONAL, _LAYER2),
+    QuantityStatus("compute_quaternionic_quantities", "function", PROVISIONAL, _LAYER2),
+    QuantityStatus(
+        "L_Q", "quantity", PROVISIONAL, f"{_LAYER2}; L_Q = pi*hbar*v_g/U1 [m]"
+    ),
+    QuantityStatus("zeta", "quantity", PROVISIONAL, f"{_LAYER2}; zeta = U1/E_kin [1]"),
+)
+
+
+def quantity_status(name: str) -> QuantityStatus:
+    """Return the trust record for a public name; KeyError if unregistered."""
+    for rec in STATUS_REGISTRY:
+        if rec.name == name:
+            return rec
+    raise KeyError(f"{name!r} is not in si_conversion.STATUS_REGISTRY")
+
+
+def provisional_quantities() -> tuple[QuantityStatus, ...]:
+    """All PROVISIONAL (QBP model-dependent, unvalidated) names, in registry order."""
+    return tuple(r for r in STATUS_REGISTRY if r.status == PROVISIONAL)
+
+
+def established_quantities() -> tuple[QuantityStatus, ...]:
+    """All ESTABLISHED (SI-exact / exact-derivation / Layer-1 convention) names."""
+    return tuple(r for r in STATUS_REGISTRY if r.status == ESTABLISHED)
