@@ -30,7 +30,10 @@
 # ⊘ or ~~struck~~ lines are nil'd options, not undone work. ALL-GREEN with any
 # such box unticked posts a NUDGE (🟡, not merge-ready) naming the boxes; it
 # never ticks them. Parser: scripts/pr_merge_blocking_boxes.py (shared with the
-# future required check — PR B, gated on the §7 beekeeper ruling).
+# REQUIRED CHECK `Merge-blocking boxes` — .github/workflows/merge-blocking-boxes.yml,
+# #507 §7 PR B, ruling 2026-10-27: that check goes RED on the same unticked boxes
+# and, once in the master ruleset, disables the merge button; this nudge is the
+# human-readable twin of that red check — two consumers, one parser).
 # FAIL-CLOSED (federation rule R3, qbp-architecture §I4 on PR #731): a body with
 # NO §2.2 region at all (neither form), or a parser that could not run, is "sign-off
 # state not assessable" → 🟡, never ✅ ALL GREEN. The CI-green evidence box is
@@ -78,6 +81,7 @@ on:
       - Fano Snapshot Drift Guard
       - pa-reconcile
       - Closed-issue AC sweep tests
+      - Merge-blocking boxes
     types: [completed]
   check_suite:
     types: [completed]

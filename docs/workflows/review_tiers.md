@@ -283,8 +283,40 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    auto-tick (#507 §4) — and (c) fails closed (federation rule R3): a body
    with **no** §2.2 region at all (neither the label line nor the sentinel)
    gets 🟡 "sign-off state not assessable", never ✅, because reviewer boxes
-   in any other shape are not read. Making that nudge a required failing
-   check (§7) gates the beekeeper's own merges and awaits his ruling.
+   in any other shape are not read.
+
+8. **Merge-blocking boxes are a REQUIRED STATUS CHECK (#507 §7, beekeeper
+   ruling 2026-10-27: BLOCKING RATIFIED).** The check `Merge-blocking boxes`
+   (`.github/workflows/merge-blocking-boxes.yml` →
+   `scripts/merge_blocking_check.py`) goes **red** on every PR whose body has
+   an unticked box inside a §2.2 merge-blocking region (label line
+   `Sign-off required (merge-blocking):` / `Merge-blocking:` / `##` heading
+   form, or the `<!-- merge-blocking -->` sentinel); it re-runs on
+   `pull_request: edited`, so ticking the box clears it. Once the beekeeper
+   adds that exact check name to the master ruleset's required status checks
+   (repo-admin — #507 AC13), the merge button is disabled while a box is
+   unticked, **for everyone including the beekeeper** (no `--admin`; the
+   process forbids it — bma-systema#245 is the incident this closes).
+   **Two consumers, one parser:** the notifier's 🟡 nudge (item 7b, human
+   readable, names the boxes and asks the owner to cite any posted APPROVE —
+   it does not detect one; that half of §4 is still open) and this red
+   check (mechanical block) both read `scripts/pr_merge_blocking_boxes.py`;
+   the contract parse is co-signed by qbp-architecture. **Auto-nudge, never
+   auto-tick:** the hand that owns a box ticks it, or ⊘-nils it with a reason
+   (`- [ ] ~~option~~ ⊘ reason`); a struck fragment inside a live ask stays
+   unticked. **No-region policy:** a body with no §2.2 region at all passes
+   this check with a `::warning::` naming the fix (the notifier still withholds
+   ✅ for it, item 7c) — not blocking until the PR templates carry the region
+   everywhere; the beekeeper flips absence to blocking by adding
+   `--absent-blocks` to the check step (one line; tracked as #781, AC: every
+   PR template carries the region). **The judge is not the evidence:** the
+   check runs from a checkout of the PR's *base* sha (`base/scripts/…`), so a
+   PR that edits the check or the parser is still judged by the base copy;
+   the head copy judges only when the base lacks a script (first landing,
+   `::warning::` + `verdict-source=head(bootstrap)` in the log). An unticked box in a
+   PR's *test plan* or *checklist* (outside the region) never blocks — only
+   sign-off boxes do. Wiring step (beekeeper): Settings → Rules → master
+   ruleset → *Require status checks to pass* → add `Merge-blocking boxes`.
 
 Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
 checkout (missing root aggregator; both Tier-3 reviews read content only);
