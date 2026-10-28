@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""#772 AC2 — symbolic w_eff(z) for the QBP accretion model (seat-reviewed v0.1 support script).
+"""#772 AC2 — symbolic w_eff(z) for the QBP accretion model (v0.2 support script, sign-corrected 2026-10-28).
+
+CORRECTION v0.2: v0.1 defined w_eff = -1 - (1/3) d ln rho / d ln(1+z). The correct identity is
+  w_eff = -1 + (1/3) d ln rho / d ln(1+z)      (rho ∝ (1+z)^{3(1+w)}; const -> -1, matter (1+z)^3 -> 0).
+Every sign conclusion of v0.1 was inverted by it; the asserts below now enforce the correct pattern and
+the identity is checked against the two textbook limits AND by finite differences on rho (STEP B').
 
 Source records (archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json, v6.19.0):
   PRED-H-equals-Mdot-over-M : H = Mdot/M
@@ -21,8 +26,31 @@ opz = 1 + z
 
 
 def w_eff_from_rho(rho):
-    """w_eff = -1 - (1/3) d ln rho / d ln(1+z)   (rho as a function of z)."""
-    return sp.simplify(-1 - sp.Rational(1, 3) * opz * sp.diff(rho, z) / rho)
+    """w_eff = -1 + (1/3) d ln rho / d ln(1+z)   (rho as a function of z).
+
+    From rho_dot = -3H(1+w)rho with d/dt = -(1+z)H d/dz:  (1+z) drho/dz = 3(1+w) rho.
+    """
+    return sp.simplify(-1 + sp.Rational(1, 3) * opz * sp.diff(rho, z) / rho)
+
+
+# --- sanity: the identity against the textbook fluids (v0.2; v0.1 had the sign of the 1/3 term wrong)
+_c = sp.symbols("c", positive=True)
+assert sp.simplify(w_eff_from_rho(_c) + 1) == 0, "rho = const must give w = -1"
+assert (
+    sp.simplify(w_eff_from_rho(_c * opz**3)) == 0
+), "rho ∝ (1+z)^3 (matter) must give w = 0"
+assert (
+    sp.simplify(w_eff_from_rho(_c * opz**4) - sp.Rational(1, 3)) == 0
+), "radiation -> +1/3"
+assert (
+    sp.simplify(w_eff_from_rho(_c * opz**2) + sp.Rational(1, 3)) == 0
+), "(1+z)^2 -> -1/3"
+assert (
+    sp.simplify(w_eff_from_rho(_c * opz**-2) + sp.Rational(5, 3)) == 0
+), "(1+z)^-2 -> -5/3"
+print(
+    "sanity: w[const] = -1, w[(1+z)^3] = 0, w[(1+z)^4] = +1/3, w[(1+z)^2] = -1/3, w[(1+z)^-2] = -5/3  OK"
+)
 
 
 print("=" * 78)
@@ -48,10 +76,10 @@ w_I = w_eff_from_rho(rho_I)
 w_I_r = sp.simplify(w_I.subs(B, r * A))  # depends on r = B/A only
 print("  w_eff(z) =", sp.factor(w_I))
 print("  with r = B/A:  w_eff(z) =", sp.factor(w_I_r))
-w_I_closed = -1 - sp.Rational(2, 3) * (opz**2 - r) / (opz**2 + r)
+w_I_closed = -1 + sp.Rational(2, 3) * (opz**2 - r) / (opz**2 + r)
 closed_matches = sp.simplify(w_I_r - w_I_closed) == 0
 print(
-    "  closed form -1 - (2/3)((1+z)^2 - r)/((1+z)^2 + r)  matches:",
+    "  closed form -1 + (2/3)((1+z)^2 - r)/((1+z)^2 + r)  matches:",
     closed_matches,
 )
 assert closed_matches, "closed form does not match the derived w_eff"
@@ -68,7 +96,19 @@ print(
     sp.simplify(w_I_closed.subs(z, 0)),
     " ; z->inf ->",
     sp.limit(w_I_closed, z, sp.oo),
+    " ; z->-1 (far future) ->",
+    sp.limit(w_I_closed, z, -1),
 )
+assert sp.limit(w_I_closed, z, sp.oo) == -sp.Rational(
+    1, 3
+), "high-z limit must be the A^2(1+z)^2 fluid, w=-1/3"
+assert sp.limit(w_I_closed, z, -1) == -sp.Rational(
+    5, 3
+), "far-future limit must be the B^2(1+z)^-2 fluid, w=-5/3"
+# monotonicity: dw/dz > 0 for all z > -1 (phantom-like today, quintessence-like in the past)
+dw = sp.simplify(sp.diff(w_I_closed, z))
+print("  dw/dz =", sp.factor(dw), " (positive for z > -1: w rises with z)")
+assert sp.factor(dw).is_positive is True, dw
 zt = sp.symbols("z_t", positive=True)
 w_I_zt = w_I_closed.subs(r, (1 + zt) ** 2)
 print("  in terms of z_t ((1+z_t)^2 = B/A):  w_eff =", sp.simplify(w_I_zt))
@@ -82,6 +122,45 @@ print(
         ).subs(sp.Symbol("s"), 0)
     ),
 )
+
+print("=" * 78)
+print(
+    "STEP B'  independent check of the sign: finite differences on rho (no identity used)"
+)
+import math
+
+r_chk = (1 + 0.7) ** 2
+rho_num = sp.lambdify(z, rho_I.subs({A: 1, B: r_chk}), "math")
+w_cl_num = sp.lambdify(z, w_I_closed.subs(r, r_chk), "math")
+fd_rows = []
+for zz in [0.0, 0.3, 0.7, 1.0, 2.0]:
+    h = 1e-5
+    # d ln rho / d ln(1+z) by central difference in ln(1+z)
+    lx = math.log(1 + zz)
+    dlnrho = (
+        math.log(rho_num(math.exp(lx + h) - 1))
+        - math.log(rho_num(math.exp(lx - h) - 1))
+    ) / (2 * h)
+    w_fd = -1 + dlnrho / 3  # rho ∝ (1+z)^{3(1+w)}  <=>  d ln rho / d ln(1+z) = 3(1+w)
+    w_cl = w_cl_num(zz)
+    fd_rows.append((zz, w_fd, w_cl))
+    assert abs(w_fd - w_cl) < 1e-6, (zz, w_fd, w_cl)
+print(
+    "  z, w_FD, w_closed: "
+    + "; ".join(f"{zz}: {wf:+.4f}, {wc:+.4f}" for zz, wf, wc in fd_rows)
+    + "   (agree to 1e-6)"
+)
+# the same finite-difference check on the two textbook fluids
+for name, f, w_ref in [
+    ("const", lambda x: 1.0, -1.0),
+    ("(1+z)^3", lambda x: (1 + x) ** 3, 0.0),
+]:
+    lx = math.log(1.5)
+    d = (
+        math.log(f(math.exp(lx + 1e-5) - 1)) - math.log(f(math.exp(lx - 1e-5) - 1))
+    ) / 2e-5
+    assert abs(-1 + d / 3 - w_ref) < 1e-6, (name, -1 + d / 3)
+print("  FD on rho=const -> w=-1 ; FD on rho=(1+z)^3 -> w=0   OK")
 
 print("=" * 78)
 print(
@@ -143,7 +222,8 @@ def q_of_z(Hsq, zz):
 
 
 Hsq_I = Om_n * opz**3 + (A_n * opz + B_n / opz) ** 2
-import math
+# NOTE: q(z) below is -1 + (1+z) (H^2)'/(2 H^2) from the Friedmann sum directly; w_eff is not used,
+# so STEP E is unaffected by the v0.2 sign correction.
 
 # find q=0 by bisection
 lo, hi = 0.0, 3.0
@@ -259,14 +339,29 @@ pat_comp, txt_comp = sign_pattern(w_CPL_comp, z_cross_comp)
 pat_desi, txt_desi = sign_pattern(w_CPL_desi, z_cross_desi)
 print("sign of (w+1), computed at z = crossing/2 and 2*crossing+1:")
 print("  (I) derived: ", txt_I)
-print("  DESI Y1 CPL: ", txt_desi)
-print("  COMP CPL:    ", txt_comp, " — OPPOSITE to (I)" if pat_comp != pat_I else "")
-assert pat_I == (True, False), pat_I
-assert pat_desi == pat_I, pat_desi
-assert pat_comp == (False, True), pat_comp
+print(
+    "  COMP CPL:    ",
+    txt_comp,
+    " — SAME pattern as (I)" if pat_comp == pat_I else " — OPPOSITE to (I)",
+)
+print(
+    "  DESI Y1 CPL: ",
+    txt_desi,
+    " — OPPOSITE to (I)" if pat_desi != pat_I else " — SAME pattern as (I)",
+)
+# v0.2: phantom-like below the crossing, quintessence-like above (v0.1 asserted the reverse, from the sign slip)
+assert pat_I == (False, True), pat_I
+assert pat_comp == pat_I, pat_comp
+assert pat_desi == (True, False) and pat_desi != pat_I, pat_desi
+wa_exact = sp.Rational(8, 3) * r_t / (1 + r_t) ** 2
+wa_sym = sp.diff(
+    w_I_num.subs(z, sp.Symbol("s") / (1 - sp.Symbol("s"))), sp.Symbol("s")
+).subs(sp.Symbol("s"), 0)
+assert abs(float(wa_sym) - float(wa_exact)) < 1e-12, (wa_sym, wa_exact)
 print(
     "CPL tangent of (I) at z_t=0.7: w0 =",
     round(float(w_I_num.subs(z, 0)), 3),
-    " wa =",
-    round(float(-sp.Rational(8, 3) * r_t / (1 + r_t) ** 2), 3),
+    " wa = +8r/(3(1+r)^2) =",
+    round(float(wa_exact), 3),
+    "  (COMP record: -1.25, +0.70 ; DESI Y1: -0.55, -1.3)",
 )
