@@ -1,0 +1,15 @@
+{
+  "source": "Chen, Huang & Wang 2019, JCAP 02 (2019) 028, arXiv:1808.05724 (v2 e-print tarball fetched 2026-10-28T00:02:50Z), Table 1 row 'LambdaCDM, Planck TT,TE,EE+lowE' and Appendix CosmoMC distance.ini / Distance_invcov.txt (base_plikHM_TTTEEE_lowE)",
+  "parameters": ["R", "l_A", "omega_b"],
+  "mean": [1.750235, 301.4707, 0.02235976],
+  "sigma_table": [0.0046, 0.0895, 0.00015],
+  "correlation_table": [[1.0, 0.46, -0.66], [0.46, 1.0, -0.33], [-0.66, -0.33, 1.0]],
+  "inverse_covariance": [[94392.3971, -1360.4913, 1664517.2916], [-1360.4913, 161.4349, 3671.618], [1664517.2916, 3671.618, 79719182.5162]],
+  "conventions": {
+    "l_A": "(1+z*) pi D_A(z*) / r_s(z*)",
+    "R": "(1+z*) D_A(z*) sqrt(Omega_m) H0 / c",
+    "z_star": "Hu & Sugiyama 1996 fitting formula (paper eq. for z_*)",
+    "r_s": "(c/H0) int_0^{a*} da / (a^2 E(a) sqrt(3(1 + R_b a))), R_b = 31500 omega_b (T_CMB/2.7)^-4, T_CMB = 2.7255 K",
+    "Omega_r": "Omega_m / (1 + z_eq), z_eq = 2.5e4 omega_m (T_CMB/2.7)^-4"
+  }
+}
