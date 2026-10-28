@@ -308,7 +308,12 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    this check with a `::warning::` naming the fix (the notifier still withholds
    ✅ for it, item 7c) — not blocking until the PR templates carry the region
    everywhere; the beekeeper flips absence to blocking by adding
-   `--absent-blocks` to the check step (one line). An unticked box in a
+   `--absent-blocks` to the check step (one line; tracked as #781, AC: every
+   PR template carries the region). **The judge is not the evidence:** the
+   check runs from a checkout of the PR's *base* sha (`base/scripts/…`), so a
+   PR that edits the check or the parser is still judged by the base copy;
+   the head copy judges only when the base lacks a script (first landing,
+   `::warning::` + `verdict-source=head(bootstrap)` in the log). An unticked box in a
    PR's *test plan* or *checklist* (outside the region) never blocks — only
    sign-off boxes do. Wiring step (beekeeper): Settings → Rules → master
    ruleset → *Require status checks to pass* → add `Merge-blocking boxes`.
