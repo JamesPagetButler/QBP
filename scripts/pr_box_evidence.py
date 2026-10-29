@@ -40,7 +40,9 @@ Rules (all of them load-bearing):
   negation shapes, scoped so a legitimate verdict line survives:
     - HARD — anywhere on the verdict line: `remains open`, `still open`, `not
       yet`, `left unticked`, `requested`, `outstanding`, `owed`, `awaiting`,
-      `ask`/`asks`/`asked`/`asking` (word-bounded).
+      `ask`/`asks`/`asked`/`asking`, `waiting`, `need`/`needs`/`needed`,
+      `require`/`required`, `missing` (word-bounded; Gemini r3 on PR #785, F1:
+      "We need an APPROVE", "Waiting for @h to APPROVE", "Required: APPROVE by @h").
     - PRE — only when it PRECEDES the verdict token on the line: `please`, `for
       your` ("@qbp-architecture please APPROVE", "for your APPROVE" are asks;
       "APPROVE — please merge", "APPROVE — for your records" are verdicts).
@@ -117,7 +119,8 @@ APPROVE_RE = re.compile(r"\bAPPROVE(?:-WITH-CONCERN)?\b")
 # HARD negators: anywhere on the line (see the module docstring for the scoping).
 NEGATION_RE = re.compile(
     r"remains?\s+open|still\s+open|not\s+yet|left\s+unticked|requested|outstanding"
-    r"|owed|\bawaiting\b|\bask(?:s|ed|ing)?\b",
+    r"|owed|\bawaiting\b|\bwaiting\b|\bask(?:s|ed|ing)?\b"
+    r"|\bneed(?:s|ed)?\b|\brequired?\b|\bmissing\b",
     re.I,
 )
 # PRE negators: a request shape only when they come BEFORE the verdict token
@@ -127,7 +130,7 @@ PRE_NEGATION_RE = re.compile(r"\bplease\b|\bfor\s+your\b", re.I)
 # ADJACENT negator: `pending` touching the verdict token or an @handle, with only
 # whitespace/punctuation between ("APPROVE pending from …", "pending @arch APPROVE");
 # "APPROVE — the pending item is tracked in #781" keeps its verdict.
-_ADJ_ANCHOR = r"(?:\bAPPROVE(?:-WITH-CONCERN)?\b|@[A-Za-z0-9][A-Za-z0-9-]*)"
+_ADJ_ANCHOR = r"(?:\bAPPROVE(?:-WITH-CONCERN)?\b|@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)"  # handle shape mirrors HANDLE_RE (no trailing hyphen) — Gemini r3 on PR #785, F2
 ADJ_NEGATION_RE = re.compile(
     rf"{_ADJ_ANCHOR}[\W_]*\bpending\b|\bpending\b[\W_]*{_ADJ_ANCHOR}", re.I
 )

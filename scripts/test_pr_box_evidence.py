@@ -5,6 +5,7 @@ Run: python3 scripts/test_pr_box_evidence.py   (or pytest -q)
 Fixtures mirror the real posts on PR #780 (2026-10-27/28).
 """
 
+import re
 import json
 import os
 import subprocess
@@ -367,6 +368,38 @@ def test_legitimate_verdict_lines_still_cite():
         assert ev is not None, line
         assert ev["sha"].startswith("abc1234") and ev["sha_vs_head"] == "same", line
         assert m._negated(line) is False, line
+
+
+def test_gemini_r3_request_phrasings_are_not_evidence():
+    # Gemini round 3 on PR #785 (F1): conversational asks that slipped the r2 set
+    for line in (
+        "We need an APPROVE from @qbp-architecture.",
+        "Waiting for @qbp-architecture to APPROVE.",
+        "Required: APPROVE by @qbp-architecture.",
+        "@qbp-architecture APPROVE still missing",
+        "needed: @qbp-architecture APPROVE at head",
+    ):
+        r = _detect(
+            [
+                _c(
+                    line
+                    + "\n<!-- reviewed-sha: cdda215a0000000000000000000000000000beef -->"
+                )
+            ]
+        )
+        assert r["boxes"][1]["evidence"] is None, line
+        assert m._negated(line) is True, line
+    # positive control survives the wider set
+    ok = "§I4 @qbp-architecture: APPROVE at head cdda215 — nothing else to add"
+    assert m._negated(ok) is False
+
+
+def test_adj_anchor_handle_shape_matches_handle_re():
+    # Gemini r3 (F2): a trailing hyphen is not part of a handle, so "@a- pending" is
+    # not an adjacent negation anchored on "@a-"; the bare APPROVE token still is.
+    assert re.search(m._ADJ_ANCHOR, "@qbp-architecture") is not None
+    assert re.fullmatch(m._ADJ_ANCHOR, "@qbp-architecture-") is None
+    assert m._negated("APPROVE pending") is True
 
 
 def test_negation_scoping_unit():
