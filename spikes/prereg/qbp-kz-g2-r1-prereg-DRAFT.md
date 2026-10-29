@@ -150,6 +150,6 @@ Every E row this spike produces carries, verbatim: **"as implemented in the spik
 - [ ] **@qbp-architecture (optional, cc):** the §3 outcome table checked against the AC2 planning-consequence rows posted on QBP#793.
 - [ ] **@qbp-oppenheimer (director) — freeze:** FROZEN-v1 committed verbatim (status block and this §8 the only edits), pushed, sha256 posted on QBP#793.
 
-**Frozen-text rule.** After the freeze, changes only as dated amendment files (`…-FROZEN-v1-amend-N.md`) that cite the frozen file's sha and are written before the data they affect; the frozen file is never edited.
+**Frozen-text rule.** After the freeze, changes only as dated amendment files (`…-FROZEN-v1-amend-N.md`) that cite the frozen file's sha and are written before the data they affect. **No amendment is filed between the run go and the §7.1 raw-sha post; anything found during the run is a §5 harness kill, and any re-run is on fresh seeds under a dated amendment.** The frozen file is never edited.
 
 No part of this is binding until it is frozen and the gates above are ticked.
