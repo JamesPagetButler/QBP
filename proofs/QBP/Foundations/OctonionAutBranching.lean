@@ -88,8 +88,13 @@ directions), `gamma_id_iff` (γ(a,b) = id ⇔ a = b ∧ a real, i.e. the kernel
 `{(1,1), (−1,−1)}` of `Spin(4) → SO(4)`).
 
 **Not claimed:** the `(3,1) ⊕ (2,2)` irrep branching of `G₂ ⊃ SO(4)`; that `SO(4)` is the
-*full* stabiliser of `ℍ` in `G₂` (which needs `Aut(𝕆) ≅ G₂`, QBP#622); that `γ(a,b)` is
-additive/`ℝ`-linear as a packaged `CDAut` (true by construction but not stated here).
+*full* stabiliser of `ℍ` in `G₂` (which needs `Aut(𝕆) ≅ G₂`, QBP#622); that
+`(a,b) ↦ γ(a,b)` is a group homomorphism `Spin(4) → Aut(𝕆)` (composition law not stated).
+
+§3 (added in the port by qbp-oppenheimer, not part of the Sonnet arm's proof) packages
+`γ(a,b)` as a `CDAut 3` (`gammaAut`): ℝ-linear (`gamma_add`, `gamma_smul`) and bijective
+(`gamma_bijective`, inverse `γ(ā, b̄)`), so `γ(a,b) ∈ Aut(𝕆)` is stated, not only
+multiplicativity.
 -/
 
 namespace QBP.Foundations.OctonionAutBranching
@@ -612,8 +617,91 @@ theorem gamma_id_iff (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1) :
     · rw [oLo_gamma, ← hac]; exact key (oLo x)
     · rw [oHi_gamma, ← hac]; exact key (oHi x)
 
+/-! ## 3. Packaging `γ(a,b)` as an element of `Aut(𝕆)` (`CDAut 3`)
+
+**Added by qbp-oppenheimer in the port (QBP#755); not part of the Sonnet arm's proof.**
+`gamma_mul` is multiplicativity only. Membership in `Aut(𝕆)` — QBP's `CDAut 3`, an
+ℝ-linear multiplicative bijection (`CrystalHosting.lean`) — also needs additivity,
+ℝ-homogeneity and bijectivity. They are proved here from the same `oLo`/`oHi` split;
+the two-sided inverse of `γ(a,b)` is `γ(ā, b̄)`. As in `gamma_mul`, only associativity
+of `ℍ = CDAlg ℝ 2` is used. -/
+
+section AutPackaging
+
+theorem oLo_add (x y : CDAlg ℝ 3) : oLo (x + y) = oLo x + oLo y := by
+  ext p
+  simp only [oLo_coord, add_coord]
+
+theorem oHi_add (x y : CDAlg ℝ 3) : oHi (x + y) = oHi x + oHi y := by
+  ext q
+  simp only [oHi_coord, add_coord]
+
+theorem oLo_smul (r : ℝ) (x : CDAlg ℝ 3) : oLo (r • x) = r • oLo x := by
+  ext p
+  simp only [oLo_coord, smul_coord]
+
+theorem oHi_smul (r : ℝ) (x : CDAlg ℝ 3) : oHi (r • x) = r • oHi x := by
+  ext q
+  simp only [oHi_coord, smul_coord]
+
+/-- `γ(a,b)` is additive (no unit hypothesis needed). -/
+theorem gamma_add (a b : CDAlg ℝ 2) (x y : CDAlg ℝ 3) :
+    gamma a b (x + y) = gamma a b x + gamma a b y := by
+  apply eq_of_oHalves
+  · rw [oLo_gamma, oLo_add, oLo_add, oLo_gamma, oLo_gamma, mul_add, add_mul]
+  · rw [oHi_gamma, oHi_add, oHi_add, oHi_gamma, oHi_gamma, mul_add, add_mul]
+
+/-- `γ(a,b)` is ℝ-homogeneous (no unit hypothesis needed). -/
+theorem gamma_smul (a b : CDAlg ℝ 2) (r : ℝ) (x : CDAlg ℝ 3) :
+    gamma a b (r • x) = r • gamma a b x := by
+  apply eq_of_oHalves
+  · rw [oLo_gamma, oLo_smul, oLo_smul, oLo_gamma, mul_smul_right, mul_smul_left]
+  · rw [oHi_gamma, oHi_smul, oHi_smul, oHi_gamma, mul_smul_right, mul_smul_left]
+
+/-- `γ(ā, b̄)` is a left inverse of `γ(a,b)` for unit `a, b`. -/
+theorem gamma_conj_gamma (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1)
+    (x : CDAlg ℝ 3) : gamma (conj a) (conj b) (gamma a b x) = x := by
+  apply eq_of_oHalves
+  · rw [oLo_gamma, oLo_gamma, conj_conj_two]
+    simp only [mul_assoc, conj_mul_one_of_unit ha, mul_one, cancelL ha]
+  · rw [oHi_gamma, oHi_gamma, conj_conj_two]
+    simp only [mul_assoc, conj_mul_one_of_unit ha, mul_one, cancelL hb]
+
+/-- `γ(ā, b̄)` is a right inverse of `γ(a,b)` for unit `a, b`. -/
+theorem gamma_gamma_conj (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1)
+    (y : CDAlg ℝ 3) : gamma a b (gamma (conj a) (conj b) y) = y := by
+  apply eq_of_oHalves
+  · rw [oLo_gamma, oLo_gamma, conj_conj_two]
+    simp only [mul_assoc, mul_conj_one_of_unit ha, mul_one, cancelL' ha]
+  · rw [oHi_gamma, oHi_gamma, conj_conj_two]
+    simp only [mul_assoc, mul_conj_one_of_unit ha, mul_one, cancelL' hb]
+
+/-- `γ(a,b)` is a bijection of `𝕆` for unit `a, b`. -/
+theorem gamma_bijective (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1) :
+    Function.Bijective (gamma a b) :=
+  Function.bijective_iff_has_inverse.mpr
+    ⟨gamma (conj a) (conj b), gamma_conj_gamma a b ha hb, gamma_gamma_conj a b ha hb⟩
+
+/-- **`γ(a,b) ∈ Aut(𝕆)`.** For unit quaternions `a, b`, `γ(a,b)` packaged as an
+    element of `CDAut 3` (an ℝ-linear multiplicative bijection of `𝕆 = CDAlg ℝ 3`). -/
+def gammaAut (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1) :
+    QBP.Foundations.CrystalHosting.CDAut 3 where
+  toFun := gamma a b
+  map_add := gamma_add a b
+  map_smul := gamma_smul a b
+  map_mul := gamma_mul a b ha hb
+  bijective := gamma_bijective a b ha hb
+
+/-- The packaged automorphism acts as `γ(a,b)`. -/
+theorem gammaAut_apply (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1)
+    (x : CDAlg ℝ 3) : gammaAut a b ha hb x = gamma a b x := rfl
+
+end AutPackaging
+
 #print axioms gamma_mul
 #print axioms gamma_fixes_hosted
 #print axioms gamma_id_iff
+#print axioms gamma_bijective
+#print axioms gammaAut
 
 end QBP.Foundations.OctonionAutBranching

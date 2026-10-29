@@ -161,6 +161,16 @@ Name-level heuristic, for scale only (Appendix A (a)). **388** of the 1945 are n
 
 **What would satisfy AC1 without writing 1945 rows by hand.** Have the tool emit one row per theorem: `name · file:line · anchored-by ∈ {name, qualified-name, file-only, none} · anchor id(s)`. That is mechanical (the data is already in `anchor_inverse_audit.py`'s `theorems`/`ref_names`/`ref_files`). It belongs with #627, since the allowlist needs the same per-theorem join. The alternative is a scope ruling: qbp-oppenheimer (theory) or the beekeeper (process) re-reads AC1 as "the orphan set is exhaustive at file granularity". This PR does neither. It records the gap.
 
+## 7. Pending anchor: `OctonionAutBranching.lean` (#755), 2026-10-29
+
+`proofs/QBP/Foundations/OctonionAutBranching.lean` (#755 AC1) adds **55** theorem declarations (41 public, 14 `private`). None are cited by a ledger anchor yet. On the #755 branch the audit therefore reports `orphans=97` (42 + 55) and fails the per-file ratchet for this file (55 > 0).
+
+| Disposition | Theorems | Status |
+|---|---:|---|
+| **ANCHOR — anchor pending #755 AC4** | 55 (whole file) | The AC4 PROOF anchor (`INSIGHT-octonion-quaternion-branching` core, minted by the confined writer, qbp-implementor) cites this file as `proof_file`. That anchors all 55 for the tool. Headline witnesses: `gamma_mul`, `gamma_fixes_hosted`, `gamma_id_iff`, `gamma_bijective` (plus the `gammaAut : CDAut 3` definition). NOT-claimed clauses: the module docstring and #755 AC4. |
+
+**The baseline is not bumped on the #755 Lean PR.** The inverse-audit job stays red on that PR until the AC4 anchor lands. Only then is `--update-baseline` run, recording the anchored per-file growth, as the tool's own message requires ("New theorems must ship with a CTH anchor; then run --update-baseline"). Axiom closures for all 41 public theorems: `proofs/QBP/Foundations/OctonionAutBranching.axioms.txt`.
+
 ## Appendix A. Reproduce the derived figures
 
 Run from the repo root with `python3`. It is read-only and imports the audit tool's own enumerator. Output at `656d462`:
