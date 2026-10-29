@@ -53,7 +53,9 @@ CLI:
 
 `COMMENTS.json` is the object `gh pr view N --json comments,reviews` prints
 (`comments[].author.login/body/createdAt/url`, `reviews[].author.login/state/body/
-submittedAt/url`); a bare list is read as comments.  Default output is one
+submittedAt/url`); the paginated REST shapes (`user.login`, `html_url`,
+`created_at` / `submitted_at` — what the notifier fetches, so no 100-comment cap)
+are read too; a bare list is read as comments.  Default output is one
 machine line per unticked box after a summary line
 `boxes=<n> with_evidence=<n> head=<sha>`:
     EVIDENCE   box=<i> hand=<@handle|role> url=<url> sha=<sha|none> sha_vs_head=<same|differs|unknown> posts=<k>
@@ -91,6 +93,11 @@ REVIEWED_SHA_RE = re.compile(r"<!--\s*reviewed-sha:\s*([0-9a-fA-F]{7,40})\s*-->"
 LOOSE_SHA_RE = re.compile(
     r"(?:\bat\b|@|\bhead(?:\s+sha)?)\s*[`'\"]?\b([0-9a-f]{7,40})\b", re.I
 )
+# A loose sha must carry a hex LETTER: "at 20261028" (a date) or "at 40604935020"
+# (a run id) is not a commit. Real 7-char shas with no letter are ~4% — accepted
+# as a miss; the `reviewed-sha` marker form is exact and unaffected.
+HEX_LETTER_RE = re.compile(r"[a-f]", re.I)
+HEX_TOKEN_RE = re.compile(r"[0-9a-f]{7,40}", re.I)
 # Role fallbacks for handle-less boxes (same words the Tier-3 gate uses).
 ROLE_SIGS = {
     "red-team": re.compile(r"Red Team|Sabine|Grothendieck|Knuth", re.I),
@@ -108,15 +115,22 @@ def _norm_posts(data) -> list[dict]:
     else:
         comments = data.get("comments") or []
         reviews = data.get("reviews") or []
+
+    # Both shapes are read: `gh pr view --json` (author.login / url / createdAt /
+    # submittedAt) and the paginated REST endpoints the notifier already uses
+    # (user.login / html_url / created_at / submitted_at).
+    def _login(x):
+        return (((x.get("author") or x.get("user")) or {}).get("login") or "").strip()
+
     posts = []
     for c in comments:
         posts.append(
             {
                 "kind": "comment",
-                "author": ((c.get("author") or {}).get("login") or "").strip(),
+                "author": _login(c),
                 "body": c.get("body") or "",
-                "url": c.get("url") or "",
-                "when": c.get("createdAt") or "",
+                "url": c.get("html_url") or c.get("url") or "",
+                "when": c.get("createdAt") or c.get("created_at") or "",
                 "state": "",
             }
         )
@@ -124,10 +138,10 @@ def _norm_posts(data) -> list[dict]:
         posts.append(
             {
                 "kind": "review",
-                "author": ((r.get("author") or {}).get("login") or "").strip(),
+                "author": _login(r),
                 "body": r.get("body") or "",
-                "url": r.get("url") or "",
-                "when": r.get("submittedAt") or "",
+                "url": r.get("html_url") or r.get("url") or "",
+                "when": r.get("submittedAt") or r.get("submitted_at") or "",
                 "state": (r.get("state") or "").upper(),
             }
         )
@@ -140,9 +154,10 @@ def _is_bot(post: dict) -> bool:
 
 def box_hand(box_text: str):
     """Return ("handle", "qbp-architecture") | ("role", "red-team") | (None, None)."""
-    m = HANDLE_RE.search(box_text)
-    if m:
-        return "handle", m.group(1)
+    for m in HANDLE_RE.finditer(box_text):
+        # "folded @a0ca562" is a sha cite, not a hand
+        if not HEX_TOKEN_RE.fullmatch(m.group(1)):
+            return "handle", m.group(1)
     for role, sig in ROLE_SIGS.items():
         if sig.search(box_text):
             return "role", role
@@ -198,8 +213,10 @@ def cited_sha(post: dict):
     m = REVIEWED_SHA_RE.search(post["body"])
     if m:
         return m.group(1).lower()
-    m = LOOSE_SHA_RE.search(post["body"])
-    return m.group(1).lower() if m else None
+    for m in LOOSE_SHA_RE.finditer(post["body"]):
+        if HEX_LETTER_RE.search(m.group(1)):
+            return m.group(1).lower()
+    return None
 
 
 def sha_vs_head(sha, head):

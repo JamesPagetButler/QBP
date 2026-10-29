@@ -35,8 +35,8 @@
 # and, once in the master ruleset, disables the merge button; this nudge is the
 # human-readable twin of that red check — two consumers, one parser).
 # EVIDENCE HALF (#507 AC4): the nudge also DETECTS evidence — for each unticked
-# box, scripts/pr_box_evidence.py scans the PR's comments + reviews (`gh pr view
-# --json comments,reviews`, newest 100) for an APPROVE-class post by/for the
+# box, scripts/pr_box_evidence.py scans the PR's comments + reviews (paginated
+# REST, same endpoints as the freshness check) for an APPROVE-class post by/for the
 # box's hand (author.login, or `@handle` on the verdict line — personas post via
 # the beekeeper's account; review state APPROVED) and rewrites that box's nudge
 # line to cite it with its reviewed-sha vs this head. Detection is nudge-only:
@@ -357,8 +357,12 @@ jobs:
             # this head). Boxes without evidence keep the plain ⏸ line; a missing
             # module or an API hiccup leaves the parser's list untouched. It never
             # ticks — nudge-only enrichment, the owner's hand ticks.
+            # Paginated REST (same endpoints/pattern as LASTREV below; `gh pr view --json
+            # comments` is capped at 100 and unpaginated). The module reads both shapes.
             EVFILE=$(mktemp)
-            gh pr view "$PR" --repo "$REPO" --json comments,reviews > "$EVFILE" 2>/dev/null \
+            EV_C=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate --jq '.' 2>/dev/null | jq -s 'add // []' 2>/dev/null || echo '[]')
+            EV_R=$(gh api "repos/$REPO/pulls/$PR/reviews?per_page=100" --paginate --jq '.' 2>/dev/null | jq -s 'add // []' 2>/dev/null || echo '[]')
+            jq -n --argjson c "${EV_C:-[]}" --argjson r "${EV_R:-[]}" '{comments: $c, reviews: $r}' > "$EVFILE" 2>/dev/null \
               || printf '{"comments":[],"reviews":[]}' > "$EVFILE"
             EVLIST=$(python3 scripts/pr_box_evidence.py --body "$BODYFILE" --comments "$EVFILE" --head "$SHA" --human 2>/dev/null || true)
             if [ -n "$EVLIST" ]; then

@@ -96,6 +96,12 @@ def test_box_hand_handle_role_none():
     assert m.box_hand("Gemini review (real API)") == ("role", "gemini")
     assert m.box_hand("Red Team (Sabine/Grothendieck/Knuth)") == ("role", "red-team")
     assert m.box_hand("Human Visual Review (beekeeper)") == (None, None)
+    # a sha cite is not a hand; the real handle after it still is
+    assert m.box_hand("Red Team — folded @a0ca562") == ("role", "red-team")
+    assert m.box_hand("fixed @486ad51 — §I4 @qbp-architecture") == (
+        "handle",
+        "qbp-architecture",
+    )
 
 
 def test_only_unticked_boxes_are_assessed_via_the_shared_parser():
@@ -251,6 +257,9 @@ def test_cited_sha_marker_beats_loose_and_loose_forms_work():
     assert m.cited_sha({"body": "APPROVE @ a0ca562 thanks"}) == "a0ca562"
     assert m.cited_sha({"body": "APPROVE at head sha cdda215."}) == "cdda215"
     assert m.cited_sha({"body": "APPROVE, no sha here"}) is None
+    # digit runs after "at" are dates / run ids, not commits (G2)
+    assert m.cited_sha({"body": "Reviewed at 20261028, run at 40604935020"}) is None
+    assert m.cited_sha({"body": "at 20261028 then at `a0ca562`"}) == "a0ca562"
     assert m.sha_vs_head("cdda215", HEAD) == "same"
     assert m.sha_vs_head("486ad51", HEAD) == "differs"
     assert m.sha_vs_head(None, HEAD) == "unknown"
@@ -308,6 +317,33 @@ def test_box_label_shortens_long_box_text():
 def test_bare_list_is_read_as_comments():
     r = m.detect(BODY, [ARCH_APPROVE], HEAD)
     assert r["boxes"][1]["evidence"] is not None
+
+
+def test_rest_api_shape_is_read_like_gh_pr_view_shape():
+    # the notifier fetches the paginated REST endpoints: user.login / html_url /
+    # created_at / submitted_at — must give the same result as the gh pr view keys
+    rest_c = {
+        "user": {"login": "JamesPagetButler"},
+        "body": ARCH_APPROVE["body"],
+        "created_at": "2026-10-28T00:14:01Z",
+        "url": "https://api.github.com/repos/x/y/issues/comments/1",  # API link
+        "html_url": URL + "rest",  # the human link wins
+    }
+    rest_r = {
+        "user": {"login": "qbp-architecture"},
+        "body": "fine",
+        "state": "APPROVED",
+        "submitted_at": "2026-10-28T00:20:00Z",
+        "html_url": URL + "restreview",
+    }
+    r = m.detect(BODY, {"comments": [rest_c], "reviews": [rest_r]}, HEAD)
+    arch = r["boxes"][1]
+    assert arch["posts"] == 2
+    # the comment carries the hand on its lead line → cited over the bare review
+    assert arch["evidence"]["url"].endswith("rest"), arch
+    assert arch["evidence"]["author"] == "JamesPagetButler"
+    r2 = m.detect(BODY, {"comments": [], "reviews": [rest_r]}, HEAD)
+    assert r2["boxes"][1]["evidence"]["url"].endswith("restreview")
 
 
 def test_cli_human_and_machine_modes():
