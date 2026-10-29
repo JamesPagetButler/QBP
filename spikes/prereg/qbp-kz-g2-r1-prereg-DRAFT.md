@@ -1,4 +1,4 @@
-# `qbp-kz-g2` round 1 (ex `mdcu-kz-r2`): pre-registration — DRAFT r2
+# `qbp-kz-g2` round 1 (ex `mdcu-kz-r2`): pre-registration — DRAFT r3
 
 Status: **DRAFT r1 (2026-10-29). Nothing built, nothing run.** Stage-0b-only hysteresis probe, H-first vs H-slow, for the G₂/SO(4) plane-field sigma model. Spike / napkin grade (Go harness on the qbp-compute-unit spike branch, pre-registered). Tracking issue: **QBP#793** (typed `research`). Director: @qbp-oppenheimer. Runner: @antigravity (accepted, mdcu-spike seq 254: "available to build and run it once those exist"). Feasibility: @qbp-cu-implementor. Box-safety: @deming. E-verify: @notary-implementor. Merges (this pre-reg, the record, the write-back): the beekeeper's (QBP lane; mdcu-spike seq 284).
 
@@ -80,7 +80,7 @@ Everything else in the harness is called, not edited; the bit-identity check on 
 Let **gap(τ)** = max over the 41 grid points of |mean S_cool − mean S_heat| / S_max at that τ_Q (S_max = 1; this is `max_gap` on the common grid, as in round 1).
 
 - **(a)** gap(12800) ≥ 0.6 · gap(1600) → **H-first**.
-  *Claim scope of (a) (director, 2026-10-29):* under a pure power law gap ∝ τ_Q^−α over this 8× span, (a) fires iff α ≤ log(1/0.6)/log 8 ≈ 0.25, so "H-first" here means operationally **"the gap decays no faster than τ_Q^−0.25 over 1600–12800"**; a genuinely first-order gap saturates (α → 0). (b) with gap(1600) ≈ 0.52 needs α ≥ 1.12. The thresholds are unchanged; this sentence fixes what the verdict words claim.
+  *Claim scope of (a) (director, 2026-10-29):* under a pure power law gap ∝ τ_Q^−α over this 8× span, (a) fires iff α ≤ log(1/0.6)/log 8 ≈ 0.246, so "H-first" here means operationally **"the gap decays no faster than τ_Q^−0.25 over 1600–12800"**; a genuinely first-order gap saturates (α → 0). (b) with gap(1600) ≈ 0.52 needs α ≥ 1.12. The thresholds are unchanged; this sentence fixes what the verdict words claim.
 - **(b)** gap(12800) < 0.05 → **H-slow**, and the KZ premise is restored at the **smallest τ_Q in the set with gap(τ_Q) < 0.05** (report that τ_Q; a future ladder would start there).
 - **(c)** otherwise → **inconclusive (rate)**.
 
@@ -91,12 +91,12 @@ Let **gap(τ)** = max over the 41 grid points of |mean S_cool − mean S_heat| /
 - The **jump clause**: a single recorded-step jump of the seed-mean S > 0.10·S_max in either direction at any τ_Q is reported as **"jump observed at τ_Q = …"** (supports H-first) but **does not override (a)–(c)**.
 - gap(τ_Q) with the seed spread (per-seed max gap, min/max) at every rung, and the 41-point curves plotted cool vs heat per τ_Q (Human Visual Review material).
 
-**What each outcome does and does not claim** (these rows are the pre-data planning-consequence table for QBP#793 AC2; the table is posted on the issue before any data):
+**What each outcome does and does not claim** (these are the four outcome rows of the QBP#793 AC2 planning-consequence table, posted on the issue before any data; the AC2 table adds two secondary rows, "jump observed" and "P4 fails", from §3's secondaries and §4, with no rule consequence):
 
 | Outcome | Claims | Does not claim | Write-back (§7) |
 |---|---|---|---|
 | H-first | For this sigma model (chordal energy, Model A, this window, L = 16), the hysteresis does not close with ramp length over 1600–12800: consistent with a first-order transition. | Nothing about the topology of G₂/SO(4); no KZ exponent; no statement about other energies, dynamics or L; not a proof of first order (a 0.9-decade span cannot exclude slow convergence). | QBP#776 E6 note: the round-1 falsification of "continuous" stands and is sharpened ("not continuous on this rate scale; hysteresis persists to τ_Q = 12800"). KZ ladder on this model stays closed. |
-| H-slow | The gap falls below the frozen 5 % tolerance at the reported τ_Q: the round-1 Stage 0b failure was a rate effect, and the KZ premise ("a continuous transition the ramp can cross quasi-statically") is restored for ramps at or above that τ_Q. | Nothing about topology or exponents; no reading of the round-1 E-move being wrong (it was about τ_Q = 1600 and stands as recorded). | QBP#776 E6 note; new research-queue item for a ladder starting at the reported τ_Q (its own pre-reg; beekeeper re-approval, off the approved list). |
+| H-slow | The gap falls below the frozen 5 % tolerance at the reported τ_Q: the round-1 Stage 0b failure was a rate effect, and the KZ premise ("a continuous transition the ramp can cross quasi-statically") is restored for ramps at or above that τ_Q. | Nothing about topology or exponents; no reading of the round-1 E-move being wrong (it was about τ_Q = 1600 and stands as recorded). | QBP#776 E6 note; new research-queue item for a ladder starting at the reported τ_Q (its own pre-reg; beekeeper re-approval, off the approved list).; the Landau-cubic prior is recorded as a second pre-data miss (the QBP#776 E6 note's a-priori expectation is annotated, not "retracted": no H-first row exists there) |
 | inconclusive (rate) | The gap falls with τ_Q but neither saturates (per (a)) nor closes (per (b)) within the set. | Either hypothesis. | QBP#776 note recording the four gap values and the slope; any extension to larger τ_Q is a new pre-reg (cost doubles per rung). |
 | harness kill (any §5 abort) | Nothing. "harness kill, no reading." | Anything. | None; the abort is recorded on QBP#793. |
 
