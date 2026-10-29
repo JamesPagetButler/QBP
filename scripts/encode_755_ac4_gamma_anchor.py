@@ -59,11 +59,42 @@ TOOLCHAIN = (ROOT / "proofs/lean-toolchain").read_text().strip()
 
 ANCHOR_ID = "INSIGHT-octonion-quaternion-branching"
 PROOF_FILE = "proofs/QBP/Foundations/OctonionAutBranching.lean"
-PREV_VERSION = "6.20.0"
-NEW_VERSION = "6.21.0"
 DATE = "2026-10-29T00:00:00Z"
 BATCH = "#755-ac4-gamma"
 ALLOWED_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
+
+# Revised name — @qbp-oppenheimer's PHYSICS-SIGNED wording (PR #787, resolving cth's
+# seq3953 over-claim concern + arch F3): headline = the proven γ-core; the (3,1)⊕(2,2)
+# branching demoted to computationally-verified-only (#559), explicitly NOT claimed — so
+# the id+name+kind consumption point no longer reads "branching proven" atop
+# provenance_kind:proof. cth confirms exact wording at the final-head co-sign; --name overrides.
+NEW_NAME = (
+    "γ(a,b) ∈ Aut(𝕆) for pairs fixing the hosted ℍ — kernel-proven (OctonionAutBranching: "
+    "gamma_mul, gamma_fixes_hosted, gamma_id_iff, gamma_bijective, gammaAut). The "
+    "7 = (3,1)⊕(2,2) branching under that action is computationally verified only (#559) "
+    "and is NOT claimed by this anchor."
+)
+
+# derived_from edges from the proof-term closure of gammaAut (220 decls) ∩ ledger witnesses,
+# re-derived by @qbp-oppenheimer (seq3955) and CONFIRMED by arch (seq3956) + cth (seq3957).
+# The calibration header's "free to use" list was the WRONG source (availability ≠
+# dependency): octonion_artin / quatSpan_assoc / cdAlg2_norm_composition / cdAlg_mul_add_swap
+# are NOT in the closure — oppenheimer's seq3950 edges (and my seq3949 candidates) withdrawn.
+# mul_coord_matrix is in the closure but homed under PROOF-sedenion-dirac-sum-kill — a
+# witness-home-collision, NOT a dependency; excluded + re-home filed as a hygiene issue.
+# --derived-from overrides; default is these three (each guarded to exist in the ledger).
+DERIVED_FROM = [
+    "PROOF-cd-product-formula",  # cdAlg_sq_eq / basis_expansion / e_mul_e / mulCoeff_props
+    "PROOF-cd-associativity-level2",  # cdAlg_two_assoc + unit laws
+    "PROOF-cd-associator-formula",  # assoc_e
+]
+
+
+def next_minor(ver):
+    """6.X.Y -> 6.(X+1).0 (ledger convention: minor bump per content edit)."""
+    parts = ver.split(".")
+    return f"{parts[0]}.{int(parts[1]) + 1}.0"
+
 
 # short name -> (kind, source line) for the witness-resolution guard
 WITNESS_DECLS = {
@@ -137,6 +168,18 @@ def resolves(short):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--axioms-file", required=True)
+    ap.add_argument(
+        "--derived-from",
+        nargs="*",
+        default=None,
+        help="prediction_chain ids (closure-derived); default = DERIVED_FROM",
+    )
+    ap.add_argument(
+        "--name", default=None, help="anchor name override; default = NEW_NAME"
+    )
+    ap.add_argument(
+        "--version", default=None, help="ledger version to set; default = next-minor"
+    )
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -162,6 +205,10 @@ def main():
 
     fq = {s: cap[s]["fq"] for s in WITNESS_DECLS}
     witnesses = [fq[HEADLINE]] + [fq[c] for c in COMPANIONS]
+    edges = (
+        list(args.derived_from) if args.derived_from is not None else list(DERIVED_FROM)
+    )
+    name = args.name or NEW_NAME
 
     verifier = (
         f"QBP#755 AC4 (qbp-implementor writer lane), PR #787 branch "
@@ -175,18 +222,30 @@ def main():
 
     with ledger_edit(LEDGER, dry_run=args.dry_run) as ed:
         L = ed.ledger
+        have = {x["id"] for x in L["anchors"]}
+        for d in edges:
+            if d not in have:
+                raise SystemExit(
+                    f"derived_from target missing from ledger (dangling edge): {d}. "
+                    f"If this is PROOF-cd-* at #787's pre-#788 base, run on the merged head."
+                )
+        version = args.version or next_minor(L["version"])
+
+        # Idempotent: set proof fields + name + edges regardless of current state (a
+        # re-run where a field is already final is a no-op on that field). The confined
+        # writer rejects a wholly-unchanged record, which correctly signals "already final".
         a = ed.record("anchors", ANCHOR_ID)
-        if a.get("provenance_kind") == "proof":
-            raise SystemExit("already upgraded: provenance_kind already proof")
         a["provenance_kind"] = "proof"
         a["proof_file"] = PROOF_FILE
         a["proof_language"] = "lean4"
         a["proof_state"] = "verified"
         a["sorry_count"] = 0
+        a["name"] = name
         a["lean_theorem"] = fq[HEADLINE]
         a["lean_companion_theorems"] = [fq[c] for c in COMPANIONS]
         a["theorems"] = [{"name": s, "status": "verified"} for s in WITNESS_DECLS]
         a["description"] = NEW_DESCRIPTION
+        a["prediction_chain"] = edges
         a["verification"] = {
             "toolchain": TOOLCHAIN,
             "libraries": LIBS,
@@ -198,27 +257,28 @@ def main():
         }
         a.setdefault("pa_local", 0)
         a.setdefault("pa_effective", 0)
-        # prediction_chain left as-is (candidate edges flagged to oppenheimer, not invented)
-        L["version"] = NEW_VERSION
+        L["version"] = version
         ed.touch("version")
         if L.get("last_updated") != DATE:
             L["last_updated"] = DATE
             ed.touch("last_updated")
         L["changelog"].append(
             {
-                "version": NEW_VERSION,
+                "version": version,
                 "date": DATE,
                 "note": (
                     f"QBP#755 AC4: {ANCHOR_ID} CORE promoted theory→PROOF — γ(a,b) ∈ Aut(𝕆) "
                     f"(OctonionAutBranching.lean, PR #787). Witnesses gamma_mul / "
                     f"gamma_fixes_hosted / gamma_id_iff / gamma_bijective / gammaAut, all "
                     f"#print axioms ⊆ {{propext, Classical.choice, Quot.sound}} (run-bounded "
-                    f"capture @ 43ae30a). NOT claimed (kept): the (3,1)⊕(2,2) irrep branching "
-                    f"(computational #559) and 'SO(4) = full stabiliser of ℍ in G₂' (needs "
-                    f"#622). Classical math; novel only as a CDAlg kernel formalization. "
-                    f"Attribution (AC5): claude-sonnet-5 Sonnet arm of deming's 2026-09-30 "
-                    f"harness, deming-verified. #697-shaped, pa 0/0; prediction_chain unchanged "
-                    f"([], candidate edges deferred to theory §I4). Schema co-sign "
+                    f"capture @ 43ae30a). Name leads with the proven γ-core; the (3,1)⊕(2,2) "
+                    f"branching marked computationally-verified-only (#559), NOT claimed "
+                    f"(cth seq3953 + arch F3). derived_from {edges} — from gammaAut's "
+                    f"proof-term closure ∩ ledger witnesses (arch/cth confirmed seq3956/3957), "
+                    f"NOT the header 'free to use' list. Also NOT claimed: 'SO(4) = full "
+                    f"stabiliser of ℍ in G₂' (needs #622). Classical math; novel only as a "
+                    f"CDAlg kernel formalization. AC5: claude-sonnet-5 Sonnet arm of deming's "
+                    f"2026-09-30 harness, deming-verified. #697-shaped, pa 0/0. Schema co-sign "
                     f"@cth-implementor; theory co-sign @qbp-oppenheimer."
                 ),
             }
@@ -227,7 +287,8 @@ def main():
 
     print(
         f"{'DRY ' if args.dry_run else ''}upgraded {ANCHOR_ID} theory→proof: "
-        f"headline {fq[HEADLINE]}, {len(witnesses)} witnesses; ledger {NEW_VERSION}"
+        f"headline {fq[HEADLINE]}, {len(witnesses)} witnesses, "
+        f"prediction_chain {edges}; ledger {version}"
     )
 
 
