@@ -161,15 +161,15 @@ Name-level heuristic, for scale only (Appendix A (a)). **388** of the 1945 are n
 
 **What would satisfy AC1 without writing 1945 rows by hand.** Have the tool emit one row per theorem: `name · file:line · anchored-by ∈ {name, qualified-name, file-only, none} · anchor id(s)`. That is mechanical (the data is already in `anchor_inverse_audit.py`'s `theorems`/`ref_names`/`ref_files`). It belongs with #627, since the allowlist needs the same per-theorem join. The alternative is a scope ruling: qbp-oppenheimer (theory) or the beekeeper (process) re-reads AC1 as "the orphan set is exhaustive at file granularity". This PR does neither. It records the gap.
 
-## 7. Pending anchor: `OctonionAutBranching.lean` (#755), 2026-10-29
+## 7. Anchored: `OctonionAutBranching.lean` (#755), 2026-10-29
 
-`proofs/QBP/Foundations/OctonionAutBranching.lean` (#755 AC1) adds **55** theorem declarations (41 public, 14 `private`). None are cited by a ledger anchor yet. On the #755 branch the audit therefore reports `orphans=97` (42 + 55) and fails the per-file ratchet for this file (55 > 0).
+`proofs/QBP/Foundations/OctonionAutBranching.lean` (#755 AC1) adds **55** theorem declarations (41 public, 14 `private`). Before the #755 AC4 anchor landed, the audit on the #755 branch (PR #787, head `43ae30a`) reported `orphans=97` (42 + 55) and failed the per-file ratchet for this file (55 > 0), by design.
 
 | Disposition | Theorems | Status |
 |---|---:|---|
-| **ANCHOR — anchor pending #755 AC4** | 55 (whole file) | The AC4 PROOF anchor (`INSIGHT-octonion-quaternion-branching` core, minted by the confined writer, qbp-implementor) cites this file as `proof_file`. That anchors all 55 for the tool. Headline witnesses: `gamma_mul`, `gamma_fixes_hosted`, `gamma_id_iff`, `gamma_bijective` (plus the `gammaAut : CDAut 3` definition). NOT-claimed clauses: the module docstring and #755 AC4. |
+| **ANCHOR — #755 AC4, landed at PR #787 commit `8ad0978`** | 55 (whole file) | The AC4 PROOF anchor (`INSIGHT-octonion-quaternion-branching` core, minted by the confined writer, qbp-implementor) cites this file as `proof_file`. That anchors all 55 for the tool. Headline witnesses: `gamma_mul`, `gamma_fixes_hosted`, `gamma_id_iff`, `gamma_bijective` (plus the `gammaAut : CDAut 3` definition). The other 50 declarations are by-design helpers with no standalone claim: `Fin 4`/`Fin 8` index combinatorics, the `oLo`/`oHi` Cayley–Dickson doubling law, the ℍ-conjugation anti-automorphism, unit-quaternion middle-cancellation, and additivity/homogeneity of the halves. They exist only to prove the five witnesses and are anchored through `proof_file`. NOT-claimed clauses: the module docstring and the anchor description. |
 
-**The baseline is not bumped on the #755 Lean PR.** The inverse-audit job stays red on that PR until the AC4 anchor lands. Only then is `--update-baseline` run, recording the anchored per-file growth, as the tool's own message requires ("New theorems must ship with a CTH anchor; then run --update-baseline"). Axiom closures for all 41 public theorems: `proofs/QBP/Foundations/OctonionAutBranching.axioms.txt`.
+**Sequencing honoured, not bypassed.** The baseline was **not** bumped on the Lean-only commits (`50da2e8`, `43ae30a`); the inverse-audit job stayed red there until the AC4 anchor landed (`8ad0978`). `--update-baseline` was then run once, in its own commit (`8bcc073`), recording `OctonionAutBranching.lean: 55` as anchored per-file growth, as the tool's own message requires ("New theorems must ship with a CTH anchor; then run --update-baseline"). The job passes at `8bcc073`. Axiom closures for all 41 public theorems: `proofs/QBP/Foundations/OctonionAutBranching.axioms.txt`.
 
 ## Appendix A. Reproduce the derived figures
 
