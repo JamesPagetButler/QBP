@@ -248,6 +248,43 @@ def test_newest_of_several_candidates_is_cited_and_counted():
     assert arch["evidence"]["sha"] == "486ad51"
 
 
+# ── quoted text (Gemini review on PR #785, finding 1) ──────────────────────
+
+
+def test_quoted_approve_line_is_not_evidence():
+    # GitHub "quote reply" of the architect's APPROVE, with no live verdict: the
+    # quoted line must not be read as a verdict authored by the replier.
+    reply = _c(
+        "> **§I4 contract co-sign — @qbp-architecture: APPROVE at head `486ad51`.**\n"
+        "\nThanks — still reading the parse, no verdict from me yet.",
+        when="2026-10-28T01:00:00Z",
+        n="quote",
+    )
+    assert _detect([reply])["boxes"][1]["evidence"] is None
+    # same for a quoted role header + verdict (Gemini box)
+    q = _c(
+        "> ## Gemini review (Furey/Feynman)\n> **Verdict: APPROVE**\n\nnoted, thanks"
+    )
+    assert _detect([q])["boxes"][0]["evidence"] is None
+    # an APPROVED review whose only mention of the handle is quoted is not the hand's
+    rv = _r("> @qbp-architecture asked for this\n\nlgtm", "APPROVED")
+    assert _detect(reviews=[rv])["boxes"][1]["evidence"] is None
+    # quoted negation does not cancel a live same-line verdict; quoted sha is ignored
+    live = _c(
+        "> §I4 @qbp-architecture co-sign remains open at `a0ca562`\n\n"
+        "§I4 @qbp-architecture: APPROVE at `cdda215`."
+    )
+    ev = _detect([live])["boxes"][1]["evidence"]
+    assert ev and ev["sha"] == "cdda215" and ev["sha_vs_head"] == "same"
+    # the lead line skips quoted lines too
+    rt = {"body": "> old thread\n## Red Team — PR #785\n**Verdict: APPROVE**"}
+    assert m._hand_in_lead_line(rt, "role", "red-team") is True
+    # a quoted reviewed-sha marker is not this post's marker
+    assert (
+        m.cited_sha({"body": "> <!-- reviewed-sha: 486ad51f1085 -->\nAPPROVE"}) is None
+    )
+
+
 # ── sha extraction ─────────────────────────────────────────────────────────
 
 
@@ -260,6 +297,9 @@ def test_cited_sha_marker_beats_loose_and_loose_forms_work():
     # digit runs after "at" are dates / run ids, not commits (G2)
     assert m.cited_sha({"body": "Reviewed at 20261028, run at 40604935020"}) is None
     assert m.cited_sha({"body": "at 20261028 then at `a0ca562`"}) == "a0ca562"
+    # hex-only English words are not commits either (Gemini #785, finding 2)
+    assert m.cited_sha({"body": "APPROVE at defaced head, at `accede` too"}) is None
+    assert m.cited_sha({"body": "at defaced then at `a0ca562`"}) == "a0ca562"
     assert m.sha_vs_head("cdda215", HEAD) == "same"
     assert m.sha_vs_head("486ad51", HEAD) == "differs"
     assert m.sha_vs_head(None, HEAD) == "unknown"

@@ -38,9 +38,15 @@ Rules (all of them load-bearing):
 * **The notifier's own comment** (`<!-- pr-check-status-notifier -->`) and
   `github-actions` posts are never evidence.
 * **Sha.**  The post's `<!-- reviewed-sha: … -->` marker wins; otherwise a 7–40 hex
-  sha after `at` / `@` / `head` in the body.  The human line says when the cited
-  sha ≠ the current head (the owner re-reviews at head rather than ticking on a
-  stale review), and says so when no sha was cited.
+  sha after `at` / `@` / `head` in the body — one that carries at least one hex
+  LETTER and one DIGIT (`20261028` is a date, `defaced` is a word; neither is a
+  commit).  The human line says when the cited sha ≠ the current head (the owner
+  re-reviews at head rather than ticking on a stale review), and says so when no
+  sha was cited.
+* **Quoted text is not the post's own voice.**  Markdown blockquote lines (`> …`,
+  what GitHub's "quote reply" produces) are dropped before any rule runs — a reply
+  that quotes an earlier `APPROVE` line, a role header or a `reviewed-sha` marker
+  is not itself a verdict (Gemini review on PR #785, finding 1).
 * **Deterministic.**  When several posts qualify, the cited one is chosen by: the
   hand on the post's LEAD line (`## Red Team — PR #N …`, `**§I4 … @handle:
   APPROVE**` — the federation header convention) over a passing mention; then a
@@ -93,10 +99,15 @@ REVIEWED_SHA_RE = re.compile(r"<!--\s*reviewed-sha:\s*([0-9a-fA-F]{7,40})\s*-->"
 LOOSE_SHA_RE = re.compile(
     r"(?:\bat\b|@|\bhead(?:\s+sha)?)\s*[`'\"]?\b([0-9a-f]{7,40})\b", re.I
 )
-# A loose sha must carry a hex LETTER: "at 20261028" (a date) or "at 40604935020"
-# (a run id) is not a commit. Real 7-char shas with no letter are ~4% — accepted
-# as a miss; the `reviewed-sha` marker form is exact and unaffected.
+# A loose sha must carry a hex LETTER and a DIGIT: "at 20261028" (a date) or "at
+# 40604935020" (a run id) is not a commit, and neither is "at defaced" (an English
+# word made of hex letters — Gemini on PR #785, finding 2). Real 7-char shas that
+# are all digits (~4%) or all letters (~0.1%) are accepted as a miss; the
+# `reviewed-sha` marker form is exact and unaffected.
 HEX_LETTER_RE = re.compile(r"[a-f]", re.I)
+HEX_DIGIT_RE = re.compile(r"[0-9]")
+# Markdown blockquote (GitHub "quote reply"): quoted text is not the post's own voice.
+QUOTE_RE = re.compile(r"^\s*>")
 HEX_TOKEN_RE = re.compile(r"[0-9a-f]{7,40}", re.I)
 # Role fallbacks for handle-less boxes (same words the Tier-3 gate uses).
 ROLE_SIGS = {
@@ -152,6 +163,15 @@ def _is_bot(post: dict) -> bool:
     return post["author"].lower() in BOT_LOGINS or NOTIFIER_MARKER in post["body"]
 
 
+def _live_lines(body: str) -> list[str]:
+    """The post's own lines — markdown blockquotes (`> …`) dropped (Gemini #785 F1)."""
+    return [ln for ln in body.splitlines() if not QUOTE_RE.match(ln)]
+
+
+def _live_text(post: dict) -> str:
+    return "\n".join(_live_lines(post["body"]))
+
+
 def box_hand(box_text: str):
     """Return ("handle", "qbp-architecture") | ("role", "red-team") | (None, None)."""
     for m in HANDLE_RE.finditer(box_text):
@@ -171,7 +191,7 @@ def _handle_in_line(handle: str, line: str) -> bool:
 def _verdict_lines(post: dict) -> list[str]:
     """Lines of the post that carry an APPROVE-class verdict (not negated)."""
     out: list[str] = []
-    for line in post["body"].splitlines():
+    for line in _live_lines(post["body"]):
         if APPROVE_RE.search(line) and not NEGATION_RE.search(line):
             out.append(line)
     return out
@@ -186,20 +206,20 @@ def post_is_evidence(post: dict, kind, hand) -> bool:
     if kind == "handle":
         if post["author"].lower() == hand.lower():
             return bool(lines) or approved_review
-        if approved_review and _handle_in_line(hand, post["body"]):
-            return not NEGATION_RE.search(post["body"])
+        if approved_review and _handle_in_line(hand, _live_text(post)):
+            return not NEGATION_RE.search(_live_text(post))
         return any(_handle_in_line(hand, ln) for ln in lines)
     # role fallback: the Tier-3 gate's co-occurrence rule — the role signature
     # (usually the review's header line) and a verdict in the SAME post.
     sig = ROLE_SIGS[hand]
-    if not sig.search(post["body"]):
+    if not sig.search(_live_text(post)):
         return False
     return approved_review or bool(lines)
 
 
 def _hand_in_lead_line(post: dict, kind, hand) -> bool:
-    """Does the post's first content line (skipping HTML markers) carry the hand?"""
-    for line in post["body"].splitlines():
+    """Does the post's first content line (skipping HTML markers, quotes) carry the hand?"""
+    for line in _live_lines(post["body"]):
         s = line.strip()
         if not s or s.startswith("<!--"):
             continue
@@ -210,12 +230,14 @@ def _hand_in_lead_line(post: dict, kind, hand) -> bool:
 
 
 def cited_sha(post: dict):
-    m = REVIEWED_SHA_RE.search(post["body"])
+    text = _live_text(post)
+    m = REVIEWED_SHA_RE.search(text)
     if m:
         return m.group(1).lower()
-    for m in LOOSE_SHA_RE.finditer(post["body"]):
-        if HEX_LETTER_RE.search(m.group(1)):
-            return m.group(1).lower()
+    for m in LOOSE_SHA_RE.finditer(text):
+        tok = m.group(1)
+        if HEX_LETTER_RE.search(tok) and HEX_DIGIT_RE.search(tok):
+            return tok.lower()
     return None
 
 
@@ -254,7 +276,7 @@ def detect(body: str, posts_json, head: str) -> dict:
         hits.sort(
             key=lambda p: (
                 _hand_in_lead_line(p, kind, hand),
-                bool(REVIEWED_SHA_RE.search(p["body"])),
+                bool(REVIEWED_SHA_RE.search(_live_text(p))),
                 p["when"],
                 p["url"],
             )
