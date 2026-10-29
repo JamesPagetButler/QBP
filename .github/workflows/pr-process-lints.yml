@@ -9,6 +9,14 @@
 #                             that has a pull_request trigger (else that workflow's
 #                             completion can never finalise a verdict). Runs only
 #                             when a workflow file changes.
+#   job-display-names       — RED CHECK (same standing as notifier-workflow-list).
+#                             Every job's display name (`name:` else job id) must
+#                             be unique repo-wide (#757): `gh pr checks`, the merge
+#                             box and the notifier identify a check by display
+#                             name, so two same-named jobs in two workflows
+#                             collapse into one check and a failure can hide
+#                             behind the other's later success. Runs only when a
+#                             workflow file changes.
 #   evidence-first-prose    — ADVISORY (warning annotations, exit 0). §1 verdict
 #                             words in a theory-bearing PR title without a verdict
 #                             headline; §2 oracle citations without an in-repo
@@ -18,8 +26,8 @@
 #                             Runs on every PR open/edit/sync because the PR body is
 #                             the review object.
 #
-# Both read the PR via `gh` with the default token (read-only on PR metadata).
-# Neither writes to the PR. This workflow is listed in the notifier's
+# All three read the PR via `gh` with the default token (read-only on PR metadata).
+# None writes to the PR. This workflow is listed in the notifier's
 # workflow_run list (it is itself PR-triggered — the lint it carries checks that).
 
 name: PR Process Lints
@@ -73,6 +81,47 @@ jobs:
       - name: Skipped (no workflow files changed)
         if: steps.wf.outputs.changed != 'true'
         run: echo "no .github/workflows changes in this PR — drift lint not applicable"
+
+  job-display-names:
+    name: job display names unique repo-wide
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect workflow-file changes
+        id: wf
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # same fail-closed enumeration as notifier-workflow-list above (paginated REST; K10)
+          files=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" \
+                    --paginate --jq '.[].filename')
+          n_api=$(printf '%s\n' "$files" | grep -c . || true)
+          n_pr=$(gh pr view "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" --json changedFiles --jq .changedFiles)
+          if [ "$n_pr" -gt 3000 ]; then
+            echo "::warning::PR has $n_pr changed files; the files API caps at 3000 — enumeration incomplete, display-name lint forced ON"
+            echo "changed=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ "$n_api" != "$n_pr" ]; then
+            echo "::error::changed-file enumeration mismatch (api=$n_api, pr=$n_pr) — failing closed"; exit 1
+          fi
+          if printf '%s\n' "$files" | grep -q '^\.github/workflows/\|^scripts/check_job_display_names\.py$\|^scripts/test_check_job_display_names\.py$'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install PyYAML
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 -m pip install --quiet pyyaml
+      - name: Unit tests
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 scripts/test_check_job_display_names.py
+      - name: Display-name uniqueness lint (#757)
+        if: steps.wf.outputs.changed == 'true'
+        run: python3 scripts/check_job_display_names.py
+      - name: Skipped (no workflow files changed)
+        if: steps.wf.outputs.changed != 'true'
+        run: echo "no .github/workflows changes in this PR — display-name lint not applicable"
 
   evidence-first-prose:
     name: evidence-first prose lint (advisory)
