@@ -217,6 +217,66 @@ def test_no_jobs_is_usage_error():
         assert "no workflow jobs found" in out, out
 
 
+def test_reusable_workflow_uses_job():
+    """A `uses:` job (reusable-workflow call, no runs-on/steps) follows the same rule."""
+    with tempfile.TemporaryDirectory() as d:
+        write(
+            d,
+            "a.yml",
+            "name: Alpha\non:\n  pull_request:\njobs:\n  shared:\n    uses: org/repo/.github/workflows/x.yml@main\n",
+        )
+        write(
+            d,
+            "b.yml",
+            "name: Beta\non:\n  pull_request:\njobs:\n  shared:\n    uses: org/repo/.github/workflows/y.yml@main\n",
+        )
+        rc, out = run(d)
+        assert rc == 1, out  # same job id, no name: → collision, not a crash
+        assert "'shared' is defined 2 times" in out, out
+    with tempfile.TemporaryDirectory() as d:
+        write(
+            d,
+            "a.yml",
+            "name: Alpha\non:\n  pull_request:\njobs:\n  shared:\n    name: Alpha shared\n    uses: org/repo/.github/workflows/x.yml@main\n",
+        )
+        write(
+            d,
+            "b.yml",
+            "name: Beta\non:\n  pull_request:\njobs:\n  shared:\n    uses: org/repo/.github/workflows/y.yml@main\n",
+        )
+        rc, out = run(d)
+        assert rc == 0, out
+
+
+def test_expression_name_compared_literally():
+    """`name:` with a `${{ }}` expression is compared as its literal template, never evaluated."""
+    with tempfile.TemporaryDirectory() as d:
+        expr = """\
+            name: {wf}
+            on:
+              pull_request:
+            jobs:
+              t:
+                name: Lint ${{{{ matrix.os }}}}
+                runs-on: x
+                strategy:
+                  matrix:
+                    os: [ubuntu, macos]
+            """
+        write(d, "a.yml", expr.format(wf="Alpha"))
+        write(d, "b.yml", expr.format(wf="Beta"))
+        rc, out = run(d)
+        assert rc == 1, out
+        assert "'Lint ${{ matrix.os }}' is defined 2 times" in out, out
+    with tempfile.TemporaryDirectory() as d:
+        # two DIFFERENT templates are distinct base names (documented limit: the
+        # lint does not evaluate expressions, so render-time equality is not seen)
+        write(d, "a.yml", expr.format(wf="Alpha"))
+        write(d, "b.yml", expr.format(wf="Beta").replace("matrix.os", "matrix.py"))
+        rc, out = run(d)
+        assert rc == 0, out
+
+
 def test_live_repo_in_sync():
     """Every job display name in this repo's .github/workflows must be unique (#757 AC1)."""
     r = subprocess.run(

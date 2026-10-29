@@ -20,6 +20,9 @@ confusingly; this lint compares the BASE name only (the `name:` text or the job
 id, `${{ }}` expressions left as their literal template) and treats two equal
 base names as a collision.
 
+Reusable-workflow calls (`uses:` jobs with no `runs-on`/`steps`) are ordinary
+entries under `jobs:` and follow the same rule (`name:` else job id).
+
 Usage: check_job_display_names.py [--workflows-dir .github/workflows]
 Exit 0 when every display name is unique, 1 on a collision, 2 on a usage/parse
 error.
@@ -38,17 +41,6 @@ import yaml
 
 class WorkflowParseError(Exception):
     """A workflow file is not valid YAML or has no usable `jobs:` mapping."""
-
-
-def _on_block(doc):
-    """PyYAML parses the bare key `on` as boolean True; accept both spellings."""
-    if not isinstance(doc, dict):
-        return None
-    if "on" in doc:
-        return doc["on"]
-    if True in doc:
-        return doc[True]
-    return None
 
 
 def display_name(job_id, job):
@@ -83,9 +75,9 @@ def load_jobs(workflows_dir):
                 raise WorkflowParseError(f"{p}: YAML parse error: {e}") from e
         if not isinstance(doc, dict):
             continue
-        # Touch the on-block so a bare `on:` (parsed as True) is accepted, not
-        # mistaken for a malformed file.
-        _on_block(doc)
+        # NB: PyYAML parses a bare `on:` key as the boolean True. This lint never
+        # reads the trigger block, so the spelling is irrelevant here (the
+        # notifier-list lint, which does read it, handles both).
         wf_name = doc.get("name") or os.path.relpath(p)
         jobs = doc.get("jobs")
         if jobs is None:
