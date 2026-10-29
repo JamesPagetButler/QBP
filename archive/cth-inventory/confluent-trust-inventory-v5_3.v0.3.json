@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.19.0",
+  "version": "6.20.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -5391,7 +5391,8 @@
       ],
       "foundation_batch": "#594",
       "prediction_chain": [
-        "PROOF-normed-division-tower-existence"
+        "PROOF-normed-division-tower-existence",
+        "PROOF-norm-form-bilinear"
       ],
       "verification": {
         "toolchain": "leanprover/lean4:v4.30.0",
@@ -6741,7 +6742,7 @@
       "tier": 1,
       "provenance": "T",
       "status": "coherent",
-      "description": "The polar/bilinear form of the CD norm: bil = reCoord(x * conj y), symmetry, the 𝕆/𝕊 bilinear forms, non-negativity, N(x)=0 iff x=0 (Euclidean signature, D10), and composition holding for 𝕆 but not 𝕊. Kernel-verified (NormForm.lean). Cross-ref PROOF-ops-norm-composition-ladder.",
+      "description": "The polar/bilinear form of the CD norm: bil = reCoord(x * conj y), symmetry, the 𝕆/𝕊 bilinear forms, non-negativity, N(x)=0 iff x=0 (Euclidean signature, D10), and composition holding for 𝕆 but not 𝕊. Kernel-verified (NormForm.lean). Cross-ref PROOF-ops-norm-composition-ladder. Also witnesses the additive polarization N(x+y) = N x + N y + 2⟨x,y⟩ over ℝ (CDAlg.N_add; a general-CommRing copy lives at CrossProduct.N_add).",
       "prediction_chain": [],
       "provenance_kind": "proof",
       "proof_system": "lean4",
@@ -6757,7 +6758,8 @@
         "QBP.Foundations.NormForm.N_nonneg",
         "QBP.Foundations.NormForm.N_eq_zero_iff",
         "QBP.Foundations.NormForm.octonion_norm_form_composition",
-        "QBP.Foundations.NormForm.sedenion_norm_form_not_composition"
+        "QBP.Foundations.NormForm.sedenion_norm_form_not_composition",
+        "QBP.Foundations.CDAlg.N_add"
       ],
       "theorems": [
         {
@@ -6791,6 +6793,10 @@
         {
           "name": "sedenion_norm_form_not_composition",
           "status": "verified"
+        },
+        {
+          "name": "N_add",
+          "status": "verified"
         }
       ],
       "foundation_batch": "#619",
@@ -6801,15 +6807,22 @@
           "mathlib": {
             "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
             "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
           }
         },
-        "verified_at": "2026-09-03T00:00:00Z",
-        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #619 orphan-anchoring); pending cth §I4",
+        "verified_at": "2026-10-29T00:00:00Z",
+        "verifier": "#464 Phase C cohort C (qbp-implementor writer lane). capture 2026-10-29 @ head 539f7456 (branch qbp/464-phase-c-anchors off master 539f745): run-bounded 6G 1200 taskset -c 2-6 lake build QBP.Foundations.{ArtinTrace,ArtinSpan,ArtinCore} (peak RSS 4.86 GiB, wall 3:34, exit 0, 2952 jobs) + run-bounded 6G 1200 lake env lean <scratch> (peak 3.31 GiB, wall 4.3s, exit 0); #print axioms on all five theorems captured to analysis/464-phasec-axioms.json, every closure = {propext, Classical.choice, Quot.sound} (C3-FULL PASS, no sorryAx / ofReduceBool / native_decide). Theorems added this cohort: {N_add}. Theory-axis co-sign qbp-oppenheimer.",
         "result": "verified",
         "axiom_closure": [
           "propext",
           "Classical.choice",
           "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.CDAlg.N_add"
         ]
       },
       "pa_local": 0,
@@ -12363,7 +12376,8 @@
       "sorry_count": 0,
       "provenance": "T",
       "prediction_chain": [
-        "PROOF-rule-gradient-lies-in-host-kernel-algebra"
+        "PROOF-rule-gradient-lies-in-host-kernel-algebra",
+        "PROOF-norm-form-bilinear"
       ],
       "foundation_batch": "#697-leaf-foliation",
       "last_tested_at": "2026-10-22T00:00:00Z",
@@ -13060,9 +13074,14 @@
       "version": "6.19.0",
       "date": "2026-10-22T00:00:00Z",
       "note": "#697 / inter#197 step 1 / PR #729: PROOF-rule-field-in-kernel-algebra-leaf-foliation minted (Substrate) — the CTH anchor for proofs/QBP/Substrate/RuleFlowLeafFoliation.lean, citing its eight headline theorems (ruleField_mem_kernelAlgebra; gradV/ruleField/rk4Stage_mem_fixed_leaf; octonion_double_comm_pure, cdLo/cdHi_gradV_eq_plane_comb; liftLeaf_gradV_eq), all kernel-checked, axioms ⊆ {propext, Classical.choice, Quot.sound}, 0 sorry, 0 native_decide. derived_from PROOF-rule-gradient-lies-in-host-kernel-algebra (#690: Theorem 1 closes the gap from ∇V(s) ∈ 𝕆_s to the full rule field). Scope: one-stage closure, NOT trajectory invariance — the #688 leaf-invariance row stays ARGUMENT; liftLeaf_ruleField_eq / liftLeaf_rk4Step_eq / multi-step / Euler NOT proved. PA 0/0 (ungraded — no Notary evidence yet, QBP#710). Manifest entry added; inverse-anchor baseline bumped in the same commit so the 18 theorems are no longer orphans. Mint-only — no existing anchor, root, principle, decision or kill touched. (Version 6.19.0: encoded on 6.18.0.)"
+    },
+    {
+      "version": "6.20.0",
+      "date": "2026-10-29T00:00:00Z",
+      "note": "#464 Phase C / cohort C: PROOF-norm-form-bilinear extended with CDAlg.N_add (ArtinTrace.lean:57), the additive polarization of the CD norm; the qualified name is required (bare N_add also names CrossProduct.N_add). Consumers octonion-zd-hypersurface-empty and rule-field-in-kernel-algebra-leaf-foliation gain a derived_from edge to it. #print axioms on the added theorem captured under run-bounded, closure ⊆ {propext, Classical.choice, Quot.sound}. No provenance_kind / proof_file / status change. Composite import-closure manifest for this anchor MOVES @ this source_sha (prior PA stale; notary#3 AC3 re-notarise). Theory-axis co-sign @qbp-oppenheimer."
     }
   ],
-  "last_updated": "2026-10-22T00:00:00Z",
+  "last_updated": "2026-10-29T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
