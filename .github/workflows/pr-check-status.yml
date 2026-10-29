@@ -21,7 +21,9 @@
 #
 # Why two thresholds: "trigger reviews when ALL checks pass" deadlocks — the
 # tier-3 review-label gate is itself a check that stays red until reviews
-# exist. TECH-GREEN excludes review gates; ALL-GREEN includes them.
+# exist, and so is `Merge-blocking boxes` (red while a sign-off box is unticked).
+# TECH-GREEN excludes both review gates; ALL-GREEN includes them. The CI-green
+# evidence box ticks at ALL-GREEN, so it waits for the sign-offs by design.
 #
 # BOX CONTRACT (#507 §4, adopted from inter github-best-practices §2.2): a PR
 # body's merge-blocking sign-off boxes live under a line containing
@@ -209,7 +211,13 @@ jobs:
           # review-completeness gates excluded from TECH-GREEN (they cannot be
           # green before reviews exist — the deadlock this design dissolves).
           # Single source of truth for the excluded list:
-          REVIEW_GATES='["Tier-3 review-label required on theory-bearing diffs"]'
+          # `Merge-blocking boxes` (#507 §7, PR #780) is a review-completeness gate too: it is
+          # RED exactly while a §2.2 sign-off box (HVR, §I4) is unticked, i.e. before
+          # reviews exist. Counting it as TECH made the notifier post "Checks FAILED —
+          # review-ready revoked" on PR #785 for an open HVR box (live, 2026-10-29). It
+          # belongs with the Tier-3 gate: out of TECH-GREEN, in ALL-GREEN. Guarded by
+          # scripts/test_notifier_review_gates.py (every merge-blocking check name is listed).
+          REVIEW_GATES='["Tier-3 review-label required on theory-bearing diffs","Merge-blocking boxes"]'
 
           # Per-SHA check runs minus self (pagination: one array per page -> slurp+add),
           # then reduced to the LATEST check-run per name (#721 AC1).
