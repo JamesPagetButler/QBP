@@ -9621,7 +9621,8 @@
       "provenance": "T",
       "prediction_chain": [
         "PROOF-crystal-hosts-quaternion",
-        "PROOF-alternator-vanishes-iff-commute"
+        "PROOF-alternator-vanishes-iff-commute",
+        "PROOF-cd-trace-swap-identity"
       ],
       "foundation_batch": "#649-p2-lean",
       "last_tested_at": "2026-09-10T00:00:00Z",
@@ -12377,7 +12378,8 @@
       "provenance": "T",
       "prediction_chain": [
         "PROOF-rule-gradient-lies-in-host-kernel-algebra",
-        "PROOF-norm-form-bilinear"
+        "PROOF-norm-form-bilinear",
+        "PROOF-cd-trace-swap-identity"
       ],
       "foundation_batch": "#697-leaf-foliation",
       "last_tested_at": "2026-10-22T00:00:00Z",
@@ -12443,6 +12445,67 @@
         },
         {
           "name": "liftLeaf_gradV_eq",
+          "status": "verified"
+        }
+      ],
+      "pa_local": 0,
+      "pa_effective": 0
+    },
+    {
+      "id": "PROOF-cd-trace-swap-identity",
+      "name": "Cayley-Dickson trace/swap polarization identity. For x, y ∈ CDAlg ℝ n: x·y + y·x = (2 Re x)·y + (2 Re y)·x − 2⟨x,y⟩·1 (cdAlg_mul_add_swap); and for Re x = Re y = 0, x·y + y·x = −2⟨x,y⟩·1 (cdAlg_mul_add_swap_pure). Over ℝ only.",
+      "tier": 1,
+      "layer_tag": "T",
+      "status": "coherent",
+      "provenance_kind": "proof",
+      "description": "proofs/QBP/Foundations/ArtinTrace.lean (Foundations layer, namespace QBP.Foundations.CDAlg). The polarization of the square law at every level n: x·y + y·x = (2 Re x)·y + (2 Re y)·x − 2⟨x,y⟩·1 (cdAlg_mul_add_swap, ArtinTrace.lean:86), and its pure-imaginary specialization x·y + y·x = −2⟨x,y⟩·1 for Re x = Re y = 0 (cdAlg_mul_add_swap_pure, ArtinTrace.lean:120). Both stated for CDAlg ℝ n (over ℝ only). derived_from: PROOF-cd-product-formula (the doubling product / square law cdAlg_sq_eq the identity polarizes) and PROOF-norm-form-bilinear (the bilinear form ⟨x,y⟩ = bil x y it is stated in; N_add, Cohort C). FALLBACK MINT (oppenheimer seq 3928): split out of PROOF-cd-product-formula to keep one statement per anchor — the swap identity is a derived trace identity, not the doubling-product statement. Side effect (U5, cohort-plan): the inverse-anchor audit's file-level match for ArtinTrace.lean now also covers reCoord_add and mul_self_add; that is the coarse file-granularity semantics the report already labels a lower bound. NOT claimed: any statement about 𝕊-specific behaviour beyond the general-n form; the Artin assembly (PROOF-artin-theorem, which consumes this). PA 0/0, ungraded — no Notary proof-assistant evidence recorded yet (QBP#710 'ungraded' state).",
+      "proof_file": "proofs/QBP/Foundations/ArtinTrace.lean",
+      "proof_language": "lean4",
+      "proof_state": "verified",
+      "lean_theorem": "QBP.Foundations.CDAlg.cdAlg_mul_add_swap",
+      "lean_companion_theorems": [
+        "QBP.Foundations.CDAlg.cdAlg_mul_add_swap_pure"
+      ],
+      "sorry_count": 0,
+      "provenance": "T",
+      "prediction_chain": [
+        "PROOF-cd-product-formula",
+        "PROOF-norm-form-bilinear"
+      ],
+      "foundation_batch": "#464-phase-c",
+      "last_tested_at": "2026-10-29T00:00:00Z",
+      "verification": {
+        "toolchain": "leanprover/lean4:v4.30.0",
+        "libraries": {
+          "mathlib": {
+            "ref": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+            "sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+          },
+          "batteries": {
+            "ref": "main",
+            "sha": "32dc18cde3684679f3c003de608743b57498c56f"
+          }
+        },
+        "verified_at": "2026-10-29T00:00:00Z",
+        "verifier": "#464 Phase C cohort B (qbp-implementor writer lane). capture 2026-10-29 @ head 539f7456 (branch qbp/464-phase-c-anchors off master 539f745): run-bounded 6G 1200 taskset -c 2-6 lake build QBP.Foundations.{ArtinTrace,ArtinSpan,ArtinCore} (peak RSS 4.86 GiB, wall 3:34, exit 0, 2952 jobs) + run-bounded 6G 1200 lake env lean <scratch> (peak 3.31 GiB, wall 4.3s, exit 0); #print axioms on all five theorems captured to analysis/464-phasec-axioms.json, every closure = {propext, Classical.choice, Quot.sound} (C3-FULL PASS, no sorryAx / ofReduceBool / native_decide). Theorems added this cohort: {cdAlg_mul_add_swap, cdAlg_mul_add_swap_pure}. Theory-axis co-sign qbp-oppenheimer; schema-axis co-sign cth-implementor (R6, new id).",
+        "result": "verified",
+        "axiom_closure": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "witnesses": [
+          "QBP.Foundations.CDAlg.cdAlg_mul_add_swap",
+          "QBP.Foundations.CDAlg.cdAlg_mul_add_swap_pure"
+        ]
+      },
+      "theorems": [
+        {
+          "name": "cdAlg_mul_add_swap",
+          "status": "verified"
+        },
+        {
+          "name": "cdAlg_mul_add_swap_pure",
           "status": "verified"
         }
       ],
@@ -13079,6 +13142,11 @@
       "version": "6.20.0",
       "date": "2026-10-29T00:00:00Z",
       "note": "#464 Phase C / cohort C: PROOF-norm-form-bilinear extended with CDAlg.N_add (ArtinTrace.lean:57), the additive polarization of the CD norm; the qualified name is required (bare N_add also names CrossProduct.N_add). Consumers octonion-zd-hypersurface-empty and rule-field-in-kernel-algebra-leaf-foliation gain a derived_from edge to it. #print axioms on the added theorem captured under run-bounded, closure ⊆ {propext, Classical.choice, Quot.sound}. No provenance_kind / proof_file / status change. Composite import-closure manifest for this anchor MOVES @ this source_sha (prior PA stale; notary#3 AC3 re-notarise). Theory-axis co-sign @qbp-oppenheimer."
+    },
+    {
+      "version": "6.20.0",
+      "date": "2026-10-29T00:00:00Z",
+      "note": "#464 Phase C / cohort B (FALLBACK, oppenheimer seq 3928): minted PROOF-cd-trace-swap-identity (Foundations) for the two trace/swap polarization lemmas cdAlg_mul_add_swap (ArtinTrace.lean:86) and cdAlg_mul_add_swap_pure (:120), split out of PROOF-cd-product-formula to keep one statement per anchor. prediction_chain [PROOF-cd-product-formula, PROOF-norm-form-bilinear]. Consumers order-three-automorphism-fixes-ell and rule-field-in-kernel-algebra-leaf-foliation edge to it. #print axioms on both theorems captured under run-bounded, closure ⊆ {propext, Classical.choice, Quot.sound}. Schema-axis co-sign @cth-implementor (R6, new id); theory-axis co-sign @qbp-oppenheimer. Fresh mint — no prior PA; EffectivePA = min(self, parents). Audit side effect: ArtinTrace.lean file match now also covers reCoord_add/mul_self_add (U5)."
     }
   ],
   "last_updated": "2026-10-29T00:00:00Z",
