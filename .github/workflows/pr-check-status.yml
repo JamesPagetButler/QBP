@@ -34,6 +34,15 @@
 # #507 §7 PR B, ruling 2026-10-27: that check goes RED on the same unticked boxes
 # and, once in the master ruleset, disables the merge button; this nudge is the
 # human-readable twin of that red check — two consumers, one parser).
+# EVIDENCE HALF (#507 AC4): the nudge also DETECTS evidence — for each unticked
+# box, scripts/pr_box_evidence.py scans the PR's comments + reviews (`gh pr view
+# --json comments,reviews`, newest 100) for an APPROVE-class post by/for the
+# box's hand (author.login, or `@handle` on the verdict line — personas post via
+# the beekeeper's account; review state APPROVED) and rewrites that box's nudge
+# line to cite it with its reviewed-sha vs this head. Detection is nudge-only:
+# it NEVER ticks; the owner verifies and ticks, or re-reviews at head. Boxes
+# with no evidence keep the plain ⏸ line; a module/API failure leaves the
+# parser's list untouched. Same ONE parser underneath.
 # FAIL-CLOSED (federation rule R3, qbp-architecture §I4 on PR #731): a body with
 # NO §2.2 region at all (neither form), or a parser that could not run, is "sign-off
 # state not assessable" → 🟡, never ✅ ALL GREEN. The CI-green evidence box is
@@ -341,6 +350,21 @@ jobs:
             NUNTICKED=$(printf '%s\n' "$BOXES" | sed -n 's/^unticked=\([0-9]*\).*/\1/p')
             REGION=$(printf '%s\n' "$BOXES" | sed -n 's/^unticked=.*region=\([a-z]*\).*/\1/p')
             UNTICKED_LIST=$(printf '%s\n' "$BOXES" | sed -n 's/^UNTICKED: /- ⏸ /p')
+            # ── #507 AC4: comment-evidence vs unticked box (the other half of §4) ──
+            # scripts/pr_box_evidence.py (same ONE parser underneath) looks through the
+            # PR's comments + reviews for an APPROVE-class post by/for each unticked
+            # box's hand and rewrites that box's line to cite it (url + reviewed-sha vs
+            # this head). Boxes without evidence keep the plain ⏸ line; a missing
+            # module or an API hiccup leaves the parser's list untouched. It never
+            # ticks — nudge-only enrichment, the owner's hand ticks.
+            EVFILE=$(mktemp)
+            gh pr view "$PR" --repo "$REPO" --json comments,reviews > "$EVFILE" 2>/dev/null \
+              || printf '{"comments":[],"reviews":[]}' > "$EVFILE"
+            EVLIST=$(python3 scripts/pr_box_evidence.py --body "$BODYFILE" --comments "$EVFILE" --head "$SHA" --human 2>/dev/null || true)
+            if [ -n "$EVLIST" ]; then
+              UNTICKED_LIST="$EVLIST"
+            fi
+            rm -f "$EVFILE"
             rm -f "$BODYFILE"
             : "${NUNTICKED:=0}"
             : "${REGION:=unknown}"
@@ -378,7 +402,7 @@ jobs:
                 "$MARKER" "$TOTAL" "$TS" "$SHA" "$FRESH")
             elif [ "$NUNTICKED" -gt 0 ]; then
               # §4: CI green, sign-off boxes still open — nudge the named hands, do NOT escalate merge-ready
-              BODY=$(printf '%s\n## 🟡 CI GREEN — %s merge-blocking sign-off box(es) unticked — NOT yet merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n**Open sign-off boxes (github-best-practices §2.2; the hand that owns each box ticks it — the notifier never does):**\n%s\n\nIf a posted APPROVE comment already covers a box, cite it and tick the box (auto-nudge, not auto-tick; #507 §4). Mergeable: `%s`.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
+              BODY=$(printf '%s\n## 🟡 CI GREEN — %s merge-blocking sign-off box(es) unticked — NOT yet merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n**Open sign-off boxes (github-best-practices §2.2; the hand that owns each box ticks it — the notifier never does):**\n%s\n\n🟡 lines cite a detected APPROVE-class post by/for the box hand (candidate evidence, #507 AC4: verify it covers this head, then tick). If a posted APPROVE covers a box and is not cited, cite it and tick the box (auto-nudge, not auto-tick; #507 §4). Mergeable: `%s`.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
                 "$MARKER" "$NUNTICKED" "$TOTAL" "$TS" "$SHA" "$FRESH" "$UNTICKED_LIST" "$MERGEABLE")
             elif [ "$REGION" != "present" ]; then
               # R3 fail-closed (qbp-architecture §I4 on #731): no §2.2 region (or no parser)
