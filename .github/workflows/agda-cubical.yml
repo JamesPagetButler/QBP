@@ -11,6 +11,8 @@ on:
       - '.github/workflows/agda-cubical.yml'
 jobs:
   typecheck:
+    # #757: display name unique repo-wide (`typecheck` also exists in agda-substrate.yml)
+    name: Agda Cubical typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
