@@ -21,7 +21,9 @@
 #
 # Why two thresholds: "trigger reviews when ALL checks pass" deadlocks — the
 # tier-3 review-label gate is itself a check that stays red until reviews
-# exist. TECH-GREEN excludes review gates; ALL-GREEN includes them.
+# exist, and so is `Merge-blocking boxes` (red while a sign-off box is unticked).
+# TECH-GREEN excludes both review gates; ALL-GREEN includes them. The CI-green
+# evidence box ticks at ALL-GREEN, so it waits for the sign-offs by design.
 #
 # BOX CONTRACT (#507 §4, adopted from inter github-best-practices §2.2): a PR
 # body's merge-blocking sign-off boxes live under a line containing
@@ -34,6 +36,15 @@
 # #507 §7 PR B, ruling 2026-10-27: that check goes RED on the same unticked boxes
 # and, once in the master ruleset, disables the merge button; this nudge is the
 # human-readable twin of that red check — two consumers, one parser).
+# EVIDENCE HALF (#507 AC4): the nudge also DETECTS evidence — for each unticked
+# box, scripts/pr_box_evidence.py scans the PR's comments + reviews (paginated
+# REST, same endpoints as the freshness check) for an APPROVE-class post by/for the
+# box's hand (author.login, or `@handle` on the verdict line — personas post via
+# the beekeeper's account; review state APPROVED) and rewrites that box's nudge
+# line to cite it with its reviewed-sha vs this head. Detection is nudge-only:
+# it NEVER ticks; the owner verifies and ticks, or re-reviews at head. Boxes
+# with no evidence keep the plain ⏸ line; a module/API failure leaves the
+# parser's list untouched. Same ONE parser underneath.
 # FAIL-CLOSED (federation rule R3, qbp-architecture §I4 on PR #731): a body with
 # NO §2.2 region at all (neither form), or a parser that could not run, is "sign-off
 # state not assessable" → 🟡, never ✅ ALL GREEN. The CI-green evidence box is
@@ -200,7 +211,13 @@ jobs:
           # review-completeness gates excluded from TECH-GREEN (they cannot be
           # green before reviews exist — the deadlock this design dissolves).
           # Single source of truth for the excluded list:
-          REVIEW_GATES='["Tier-3 review-label required on theory-bearing diffs"]'
+          # `Merge-blocking boxes` (#507 §7, PR #780) is a review-completeness gate too: it is
+          # RED exactly while a §2.2 sign-off box (HVR, §I4) is unticked, i.e. before
+          # reviews exist. Counting it as TECH made the notifier post "Checks FAILED —
+          # review-ready revoked" on PR #785 for an open HVR box (live, 2026-10-29). It
+          # belongs with the Tier-3 gate: out of TECH-GREEN, in ALL-GREEN. Guarded by
+          # scripts/test_notifier_review_gates.py (every merge-blocking check name is listed).
+          REVIEW_GATES='["Tier-3 review-label required on theory-bearing diffs","Merge-blocking boxes"]'
 
           # Per-SHA check runs minus self (pagination: one array per page -> slurp+add),
           # then reduced to the LATEST check-run per name (#721 AC1).
@@ -341,6 +358,25 @@ jobs:
             NUNTICKED=$(printf '%s\n' "$BOXES" | sed -n 's/^unticked=\([0-9]*\).*/\1/p')
             REGION=$(printf '%s\n' "$BOXES" | sed -n 's/^unticked=.*region=\([a-z]*\).*/\1/p')
             UNTICKED_LIST=$(printf '%s\n' "$BOXES" | sed -n 's/^UNTICKED: /- ⏸ /p')
+            # ── #507 AC4: comment-evidence vs unticked box (the other half of §4) ──
+            # scripts/pr_box_evidence.py (same ONE parser underneath) looks through the
+            # PR's comments + reviews for an APPROVE-class post by/for each unticked
+            # box's hand and rewrites that box's line to cite it (url + reviewed-sha vs
+            # this head). Boxes without evidence keep the plain ⏸ line; a missing
+            # module or an API hiccup leaves the parser's list untouched. It never
+            # ticks — nudge-only enrichment, the owner's hand ticks.
+            # Paginated REST (same endpoints/pattern as LASTREV below; `gh pr view --json
+            # comments` is capped at 100 and unpaginated). The module reads both shapes.
+            EVFILE=$(mktemp)
+            EV_C=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate --jq '.' 2>/dev/null | jq -s 'add // []' 2>/dev/null || echo '[]')
+            EV_R=$(gh api "repos/$REPO/pulls/$PR/reviews?per_page=100" --paginate --jq '.' 2>/dev/null | jq -s 'add // []' 2>/dev/null || echo '[]')
+            jq -n --argjson c "${EV_C:-[]}" --argjson r "${EV_R:-[]}" '{comments: $c, reviews: $r}' > "$EVFILE" 2>/dev/null \
+              || printf '{"comments":[],"reviews":[]}' > "$EVFILE"
+            EVLIST=$(python3 scripts/pr_box_evidence.py --body "$BODYFILE" --comments "$EVFILE" --head "$SHA" --human 2>/dev/null || true)
+            if [ -n "$EVLIST" ]; then
+              UNTICKED_LIST="$EVLIST"
+            fi
+            rm -f "$EVFILE"
             rm -f "$BODYFILE"
             : "${NUNTICKED:=0}"
             : "${REGION:=unknown}"
@@ -378,7 +414,7 @@ jobs:
                 "$MARKER" "$TOTAL" "$TS" "$SHA" "$FRESH")
             elif [ "$NUNTICKED" -gt 0 ]; then
               # §4: CI green, sign-off boxes still open — nudge the named hands, do NOT escalate merge-ready
-              BODY=$(printf '%s\n## 🟡 CI GREEN — %s merge-blocking sign-off box(es) unticked — NOT yet merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n**Open sign-off boxes (github-best-practices §2.2; the hand that owns each box ticks it — the notifier never does):**\n%s\n\nIf a posted APPROVE comment already covers a box, cite it and tick the box (auto-nudge, not auto-tick; #507 §4). Mergeable: `%s`.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
+              BODY=$(printf '%s\n## 🟡 CI GREEN — %s merge-blocking sign-off box(es) unticked — NOT yet merge-ready — `%s` checks @ %s\n\nHead: `%s`\n\n%s\n\n**Open sign-off boxes (github-best-practices §2.2; the hand that owns each box ticks it — the notifier never does):**\n%s\n\n🟡 lines cite a detected APPROVE-class post by/for the box hand (candidate evidence, #507 AC4: verify it covers this head, then tick). If a posted APPROVE covers a box and is not cited, cite it and tick the box (auto-nudge, not auto-tick; #507 §4). Mergeable: `%s`.\n\nMachine-posted; canonical "CI green" evidence link. Merge remains the beekeeper'"'"'s call.' \
                 "$MARKER" "$NUNTICKED" "$TOTAL" "$TS" "$SHA" "$FRESH" "$UNTICKED_LIST" "$MERGEABLE")
             elif [ "$REGION" != "present" ]; then
               # R3 fail-closed (qbp-architecture §I4 on #731): no §2.2 region (or no parser)

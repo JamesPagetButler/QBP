@@ -298,9 +298,10 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    unticked, **for everyone including the beekeeper** (no `--admin`; the
    process forbids it — bma-systema#245 is the incident this closes).
    **Two consumers, one parser:** the notifier's 🟡 nudge (item 7b, human
-   readable, names the boxes and asks the owner to cite any posted APPROVE —
-   it does not detect one; that half of §4 is still open) and this red
-   check (mechanical block) both read `scripts/pr_merge_blocking_boxes.py`;
+   readable, names the boxes and — since #507 AC4, `scripts/pr_box_evidence.py`
+   — cites any detected APPROVE-class post by/for a box's hand, with its
+   reviewed-sha vs head; detection is nudge-only, the owner still ticks) and
+   this red check (mechanical block) both read `scripts/pr_merge_blocking_boxes.py`;
    the contract parse is co-signed by qbp-architecture. **Auto-nudge, never
    auto-tick:** the hand that owns a box ticks it, or ⊘-nils it with a reason
    (`- [ ] ~~option~~ ⊘ reason`); a struck fragment inside a live ask stays
@@ -317,6 +318,21 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    PR's *test plan* or *checklist* (outside the region) never blocks — only
    sign-off boxes do. Wiring step (beekeeper): Settings → Rules → master
    ruleset → *Require status checks to pass* → add `Merge-blocking boxes`.
+
+   **Three-layer defense (#507 AC17).** Box truth on a PR is held by three
+   layers that fail independently: a mechanical layer that owns the evidence
+   boxes it can prove and makes every other unticked box visible, a scheduled
+   sweep that backstops it, and the hand that owns each judgment box ticking
+   it the moment its evidence lands — never as the tail of a merge or a
+   watcher (FAULT-S4-002). No layer ticks a sign-off, Human-Visual-Review or
+   merge-blocking box but its owner; the first two only surface an unticked
+   box and cite what would justify ticking it (auto-nudge, never auto-tick).
+
+   | Layer | What it does | Record |
+   |---|---|---|
+   | 1. Notifier (mechanical) | Self-ticks the `CI green` evidence box at ALL-GREEN and un-ticks it at RED (PR #534 `07accf8`); posts the 🟡 nudge naming each unticked §2.2 box (PR #731 `cae9386`) and cites a detected APPROVE-class post by/for the box's hand with its reviewed-sha vs head (#507 AC4, `scripts/pr_box_evidence.py`); the red `Merge-blocking boxes` required check disables the merge button while a box is unticked (PR #780 `369905e`) | `.github/workflows/pr-check-status.yml`, `.github/workflows/merge-blocking-boxes.yml` |
+   | 2. Herschel sweep (backstop) | The box-keeper sweep ticks machine-verifiable EVIDENCE boxes only — CI green after `gh pr checks` shows 0 non-pass, axioms clean, gate exit-0 — once the evidence is in hand; it never ticks a sign-off, HVR or merge-blocking box (PR #536 `b38235c`) | `docs/workflows/herschel_box_keeper.md` §2 |
+   | 3. In-the-moment (the hand) | The hand that owns a box ticks it when the evidence lands — a deliberate, decoupled step, never the tail of a watcher or a merge; the box line cites the evidence (FAULT-S4-002 fix 3) | `docs/process_violation_log.md` FAULT-S4-002 |
 
 Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
 checkout (missing root aggregator; both Tier-3 reviews read content only);

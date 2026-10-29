@@ -82,6 +82,8 @@ jobs:
       - name: Unit tests
         run: |
           python3 scripts/test_pr_merge_blocking_boxes.py
+          python3 scripts/test_pr_box_evidence.py
+          python3 scripts/test_notifier_review_gates.py
           python3 scripts/test_check_pr_prose_claims.py
       - name: Collect PR title, body, labels, changed paths
         env:
