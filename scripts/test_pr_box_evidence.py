@@ -248,6 +248,143 @@ def test_newest_of_several_candidates_is_cited_and_counted():
     assert arch["evidence"]["sha"] == "486ad51"
 
 
+# ── shared login is non-identifying (arch §I4 on PR #785, item 1) ──────────
+
+BEEKEEPER_BODY = """## Sign-off required (merge-blocking):
+- [ ] Human Visual Review @JamesPagetButler — plots eyeballed
+- [ ] §I4 @qbp-architecture — contract co-sign
+"""
+
+
+def test_shared_login_never_author_matches_the_beekeeper_box():
+    # every persona posts as JamesPagetButler: the architect's APPROVE (handle on
+    # the verdict line) must NOT satisfy a box whose hand is @JamesPagetButler …
+    r = _detect([ARCH_APPROVE], body=BEEKEEPER_BODY)
+    hvr, arch = r["boxes"]
+    assert hvr["hand"] == "@JamesPagetButler" and hvr["evidence"] is None, hvr
+    # … while the same post still satisfies the architect's box by the same-line rule
+    assert arch["evidence"] and arch["evidence"]["url"].endswith("6457064279")
+    # a bare APPROVE / an APPROVED review by the shared login names no hand at all
+    r2 = _detect(
+        [_c("APPROVE at `cdda215`.", login="JamesPagetButler")],
+        [_r("lgtm", "APPROVED", login="JamesPagetButler")],
+        body=BEEKEEPER_BODY,
+    )
+    assert all(b["evidence"] is None for b in r2["boxes"]), r2
+    # case of the login does not matter
+    r3 = _detect([_c("APPROVE", login="jamespagetbutler")], body=BEEKEEPER_BODY)
+    assert r3["boxes"][0]["evidence"] is None
+    assert m._author_is({"author": "JamesPagetButler"}, "JamesPagetButler") is False
+
+
+def test_shared_login_satisfies_persona_box_only_with_handle_on_verdict_line():
+    on_line = _c(
+        "§I4 @qbp-architecture: APPROVE at `cdda215`.", login="JamesPagetButler"
+    )
+    assert _detect([on_line])["boxes"][1]["evidence"] is not None
+    off_line = _c(
+        "@qbp-architecture — thanks for the read.\n\nVerdict: APPROVE at `cdda215`.",
+        login="JamesPagetButler",
+    )
+    assert _detect([off_line])["boxes"][1]["evidence"] is None
+    # the same-line rule also carries the @JamesPagetButler box when the hand is named
+    named = _c(
+        "HVR @JamesPagetButler: APPROVE — plots eyeballed.", login="JamesPagetButler"
+    )
+    assert _detect([named], body=BEEKEEPER_BODY)["boxes"][0]["evidence"] is not None
+
+
+def test_non_shared_login_still_author_matches_its_own_box():
+    body = "## Sign-off required (merge-blocking):\n- [ ] @someone-else — outside reviewer\n"
+    c = _c(
+        "<!-- reviewed-sha: cdda215a0000000000000000000000000000beef -->\nAPPROVE",
+        login="someone-else",
+    )
+    ev = _detect([c], body=body)["boxes"][0]["evidence"]
+    assert ev and ev["author"] == "someone-else" and ev["sha_vs_head"] == "same"
+    assert m._author_is({"author": "Someone-Else"}, "someone-else") is True
+    # someone else's login does not carry a box it does not own
+    assert (
+        _detect([_c("APPROVE", login="someone-else")])["boxes"][1]["evidence"] is None
+    )
+
+
+# ── request phrasing is negation (arch §I4 on PR #785, item 2) ──────────────
+
+REQUEST_LINES = [
+    "@qbp-architecture please APPROVE",
+    "awaiting @qbp-architecture APPROVE",
+    "APPROVE pending from @qbp-architecture",
+    "for your APPROVE @qbp-architecture",
+    "I ask @qbp-architecture to APPROVE",
+    "asked @qbp-architecture to APPROVE at `cdda215`",
+    "asking @qbp-architecture for an APPROVE",
+    "@qbp-architecture asks for changes before APPROVE",
+    "pending @qbp-architecture APPROVE",
+    "§I4 @qbp-architecture: APPROVE — pending",
+    "Could @qbp-architecture please take a look and APPROVE at head `cdda215`",
+]
+
+
+def test_request_phrasings_are_not_evidence():
+    for line in REQUEST_LINES:
+        r = _detect(
+            [
+                _c(
+                    line
+                    + "\n<!-- reviewed-sha: cdda215a0000000000000000000000000000beef -->"
+                )
+            ]
+        )
+        assert r["boxes"][1]["evidence"] is None, line
+        assert m._negated(line) is True, line
+    # an APPROVED review by a persona whose text is an ask is not the hand's verdict
+    rv = _r("awaiting @qbp-architecture APPROVE", "APPROVED", login="JamesPagetButler")
+    assert _detect(reviews=[rv])["boxes"][1]["evidence"] is None
+
+
+VERDICT_LINES = [
+    # the positive control the architect asked for
+    "§I4 @qbp-architecture: APPROVE at head abc1234",
+    # a bare "pending" away from the verdict token / handle is not a request
+    "§I4 @qbp-architecture: APPROVE — the pending item is tracked in #781",
+    # PRE negators AFTER the verdict token are part of a verdict, not an ask
+    "§I4 @qbp-architecture: APPROVE — please merge at your convenience",
+    "§I4 @qbp-architecture: APPROVE — for your records, reviewed at abc1234",
+    # "task"/"basket"/"spending"/"independent" must not trip word-bounded negators
+    "§I4 @qbp-architecture: APPROVE — the task list and basket of spending items are independent",
+]
+
+
+def test_legitimate_verdict_lines_still_cite():
+    for line in VERDICT_LINES:
+        c = _c(
+            line + "\n<!-- reviewed-sha: abc1234f0000000000000000000000000000beef -->"
+        )
+        ev = _detect([c], head="abc1234f0000000000000000000000000000beef")["boxes"][1][
+            "evidence"
+        ]
+        assert ev is not None, line
+        assert ev["sha"].startswith("abc1234") and ev["sha_vs_head"] == "same", line
+        assert m._negated(line) is False, line
+
+
+def test_negation_scoping_unit():
+    # HARD: anywhere on the line
+    assert m._negated("APPROVE awaiting the architect")
+    assert m._negated("APPROVE — I asked for a re-read")
+    # PRE: only before the verdict token
+    assert m._negated("please APPROVE") and not m._negated("APPROVE, please merge")
+    assert m._negated("for your APPROVE") and not m._negated("APPROVE for your records")
+    # ADJACENT: pending touching the verdict or an @handle only
+    assert m._negated("APPROVE pending") and m._negated("APPROVE: pending")
+    assert m._negated("@qbp-architecture — pending") and m._negated(
+        "pending @qbp-architecture"
+    )
+    assert not m._negated("APPROVE — the pending item")
+    assert not m._negated("APPROVE; one pending nit, non-blocking")
+
+
 # ── quoted text (Gemini review on PR #785, finding 1) ──────────────────────
 
 

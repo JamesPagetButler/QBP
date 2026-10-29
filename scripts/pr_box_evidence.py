@@ -26,9 +26,28 @@ Rules (all of them load-bearing):
   personas post through the beekeeper's account, so author alone is not enough).
   Same-line is a precision rule, not pedantry: on PR #780 the Gemini disposition
   said `VERDICT: APPROVE` and, three lines later, `§I4 @qbp-architecture co-sign
-  remains open` — that comment is NOT evidence for the architect's box.  A line
-  that also says the box is still owed (`remains open`, `left unticked`,
-  `requested`, …) is skipped for the same reason.
+  remains open` — that comment is NOT evidence for the architect's box.
+* **The shared login is non-identifying** (`SHARED_LOGINS`).  Every federation
+  persona posts through the one GitHub account `JamesPagetButler`, so that login
+  says nothing about WHICH hand wrote the post.  The `author.login` match is
+  never taken for a shared login — not even for a box whose hand is literally
+  `@JamesPagetButler` — so a persona's APPROVE cannot satisfy the beekeeper's box
+  (arch §I4 on PR #785, item 1).  For a shared-login post only the same-line
+  `@handle` rule applies; a non-shared login (a reviewer with their own account)
+  still author-matches its own box anywhere in the post.
+* **A verdict word in a request is not a verdict** (arch §I4 on PR #785, item 2).
+  A line that carries `APPROVE` but says the box is still owed is skipped.  Three
+  negation shapes, scoped so a legitimate verdict line survives:
+    - HARD — anywhere on the verdict line: `remains open`, `still open`, `not
+      yet`, `left unticked`, `requested`, `outstanding`, `owed`, `awaiting`,
+      `ask`/`asks`/`asked`/`asking` (word-bounded).
+    - PRE — only when it PRECEDES the verdict token on the line: `please`, `for
+      your` ("@qbp-architecture please APPROVE", "for your APPROVE" are asks;
+      "APPROVE — please merge", "APPROVE — for your records" are verdicts).
+    - ADJACENT — only when it touches the verdict token or an `@handle` with
+      nothing but whitespace/punctuation between: `pending` ("APPROVE pending
+      from @qbp-architecture", "pending @qbp-architecture APPROVE" are asks;
+      "APPROVE — the pending item is tracked in #781" is a verdict).
 * **Boxes without an `@handle`** fall back to the Red Team / Gemini role
   signatures used by the Tier-3 gate (Sabine/Grothendieck/Knuth, Furey/Feynman)
   with the gate's own co-occurrence rule — signature (usually the review's
@@ -84,14 +103,33 @@ from pr_merge_blocking_boxes import parse  # noqa: E402  (the ONE §2.2 parser)
 
 NOTIFIER_MARKER = "<!-- pr-check-status-notifier -->"
 BOT_LOGINS = {"github-actions", "github-actions[bot]"}
+# Logins that identify NO hand: every federation persona (@qbp-architecture,
+# @qbp-implementor, @herschel, …) posts through this one account, so a post by it
+# could be any seat's — the same-line `@handle` rule is the only identification
+# (arch §I4 on PR #785, item 1). Compared case-insensitively.
+SHARED_LOGINS = {"JamesPagetButler"}
+_SHARED_LOGINS_LC = {s.lower() for s in SHARED_LOGINS}
 
 # APPROVE-class verdicts only. `\bAPPROVE\b` does not match APPROVED/APPROVES;
 # review state APPROVED is handled as a state, not as text.
 APPROVE_RE = re.compile(r"\bAPPROVE(?:-WITH-CONCERN)?\b")
 # A line that carries the verdict but says the box is still owed is not evidence.
+# HARD negators: anywhere on the line (see the module docstring for the scoping).
 NEGATION_RE = re.compile(
-    r"remains?\s+open|still\s+open|not\s+yet|left\s+unticked|requested|outstanding|owed",
+    r"remains?\s+open|still\s+open|not\s+yet|left\s+unticked|requested|outstanding"
+    r"|owed|\bawaiting\b|\bask(?:s|ed|ing)?\b",
     re.I,
+)
+# PRE negators: a request shape only when they come BEFORE the verdict token
+# ("please APPROVE", "for your APPROVE"); after it they are part of a verdict
+# ("APPROVE — please merge").
+PRE_NEGATION_RE = re.compile(r"\bplease\b|\bfor\s+your\b", re.I)
+# ADJACENT negator: `pending` touching the verdict token or an @handle, with only
+# whitespace/punctuation between ("APPROVE pending from …", "pending @arch APPROVE");
+# "APPROVE — the pending item is tracked in #781" keeps its verdict.
+_ADJ_ANCHOR = r"(?:\bAPPROVE(?:-WITH-CONCERN)?\b|@[A-Za-z0-9][A-Za-z0-9-]*)"
+ADJ_NEGATION_RE = re.compile(
+    rf"{_ADJ_ANCHOR}[\W_]*\bpending\b|\bpending\b[\W_]*{_ADJ_ANCHOR}", re.I
 )
 HANDLE_RE = re.compile(r"@([A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)")
 REVIEWED_SHA_RE = re.compile(r"<!--\s*reviewed-sha:\s*([0-9a-fA-F]{7,40})\s*-->")
@@ -188,13 +226,29 @@ def _handle_in_line(handle: str, line: str) -> bool:
     return any(h.lower() == handle.lower() for h in HANDLE_RE.findall(line))
 
 
+def _negated(text: str) -> bool:
+    """Does the text say the verdict is still owed (HARD / PRE / ADJACENT shapes)?"""
+    if NEGATION_RE.search(text):
+        return True
+    m = APPROVE_RE.search(text)
+    if m and PRE_NEGATION_RE.search(text[: m.start()]):
+        return True
+    return bool(ADJ_NEGATION_RE.search(text))
+
+
 def _verdict_lines(post: dict) -> list[str]:
     """Lines of the post that carry an APPROVE-class verdict (not negated)."""
     out: list[str] = []
     for line in _live_lines(post["body"]):
-        if APPROVE_RE.search(line) and not NEGATION_RE.search(line):
+        if APPROVE_RE.search(line) and not _negated(line):
             out.append(line)
     return out
+
+
+def _author_is(post: dict, handle: str) -> bool:
+    """author.login identifies the hand — never for a shared (multi-persona) login."""
+    login = post["author"].lower()
+    return login == handle.lower() and login not in _SHARED_LOGINS_LC
 
 
 def post_is_evidence(post: dict, kind, hand) -> bool:
@@ -204,10 +258,10 @@ def post_is_evidence(post: dict, kind, hand) -> bool:
     lines = _verdict_lines(post)
     approved_review = post["kind"] == "review" and post["state"] == "APPROVED"
     if kind == "handle":
-        if post["author"].lower() == hand.lower():
+        if _author_is(post, hand):
             return bool(lines) or approved_review
         if approved_review and _handle_in_line(hand, _live_text(post)):
-            return not NEGATION_RE.search(_live_text(post))
+            return not _negated(_live_text(post))
         return any(_handle_in_line(hand, ln) for ln in lines)
     # role fallback: the Tier-3 gate's co-occurrence rule — the role signature
     # (usually the review's header line) and a verdict in the SAME post.
