@@ -1,4 +1,4 @@
-# `qbp-kz-g2` round 1 (ex `mdcu-kz-r2`): pre-registration — DRAFT r1
+# `qbp-kz-g2` round 1 (ex `mdcu-kz-r2`): pre-registration — DRAFT r2
 
 Status: **DRAFT r1 (2026-10-29). Nothing built, nothing run.** Stage-0b-only hysteresis probe, H-first vs H-slow, for the G₂/SO(4) plane-field sigma model. Spike / napkin grade (Go harness on the qbp-compute-unit spike branch, pre-registered). Tracking issue: **QBP#793** (typed `research`). Director: @qbp-oppenheimer. Runner: @antigravity (accepted, mdcu-spike seq 254: "available to build and run it once those exist"). Feasibility: @qbp-cu-implementor. Box-safety: @deming. E-verify: @notary-implementor. Merges (this pre-reg, the record, the write-back): the beekeeper's (QBP lane; mdcu-spike seq 284).
 
@@ -80,10 +80,11 @@ Everything else in the harness is called, not edited; the bit-identity check on 
 Let **gap(τ)** = max over the 41 grid points of |mean S_cool − mean S_heat| / S_max at that τ_Q (S_max = 1; this is `max_gap` on the common grid, as in round 1).
 
 - **(a)** gap(12800) ≥ 0.6 · gap(1600) → **H-first**.
+  *Claim scope of (a) (director, 2026-10-29):* under a pure power law gap ∝ τ_Q^−α over this 8× span, (a) fires iff α ≤ log(1/0.6)/log 8 ≈ 0.25, so "H-first" here means operationally **"the gap decays no faster than τ_Q^−0.25 over 1600–12800"**; a genuinely first-order gap saturates (α → 0). (b) with gap(1600) ≈ 0.52 needs α ≥ 1.12. The thresholds are unchanged; this sentence fixes what the verdict words claim.
 - **(b)** gap(12800) < 0.05 → **H-slow**, and the KZ premise is restored at the **smallest τ_Q in the set with gap(τ_Q) < 0.05** (report that τ_Q; a future ladder would start there).
 - **(c)** otherwise → **inconclusive (rate)**.
 
-**Precedence (DRAFT r1 proposal, director to confirm at freeze).** (a) and (b) can both hold only if gap(1600) < 0.05/0.6 = 0.0833, i.e. only if round 1's 0.5176 is not reproduced (a P4 miss). In that case **(b) governs**: a gap below the frozen 5 % tolerance at the slowest rung is the premise-restoration criterion, and the P4 miss is reported alongside. No other overlap exists; the three outcomes partition the data.
+**Precedence (ruled by the director, 2026-10-29).** The clauses are evaluated in the order **(b), then (a), then (c)**. (a) and (b) can both hold only if gap(1600) < 0.05/0.6 = 0.0833, i.e. only if round 1's 0.5176 is not reproduced (a P4 miss); in that case **(b) governs**: a gap below the frozen 5 % tolerance restores the premise regardless of its ratio to a small gap(1600), and the P4 miss is reported beside it. This makes the rule total and keeps H-slow reachable from data alone.
 
 **Secondary, non-gating:**
 - OLS fit of log gap(τ_Q) against log τ_Q over the 4 points; report the slope with its standard error (2 degrees of freedom). A gap of exactly 0 at any rung is reported and excluded from the fit (the fit is then on the remaining points, and labelled so). Under H-first the slope tends to 0; under H-slow it is negative. The slope is descriptive and decides nothing.
