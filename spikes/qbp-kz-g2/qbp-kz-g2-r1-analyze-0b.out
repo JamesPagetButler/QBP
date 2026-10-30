@@ -1,0 +1,26 @@
+qbp-kz-g2 round 1 — raw files:
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau1600.jsonl  tau_Q=1600  mode=0b  complete  sha256 37102cc855412e1bd51c31a8bb650ca2eb1885bccd398e745b6caf47abd975bd
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau3200.jsonl  tau_Q=3200  mode=0b  complete  sha256 397a39cc96198a459664c103b46e27f06a05b8ba021093cdb89617e28a75e788
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau6400.jsonl  tau_Q=6400  mode=0b  complete  sha256 80d710130e6b7e7343d53950bc394d2cc8db47c1e0915d700bb61848b9c58f30
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau12800.jsonl  tau_Q=12800  mode=0b  complete  sha256 cae83fdc60a63534b153546cae5e781a0237216606251ad9e4d316dbce69468f
+
+qbp-kz-g2 round 1 — Stage-0b-only analysis (FROZEN-v1 §3)
+tc = 1.066626221998682  seeds per rung = 10  grid = 41 points
+
+| tau_Q | gap(tau) | at grid pt | T | seed gap min/max (n) | cool jump (rec, T) | heat jump (rec, T) | jump > 10% | file |
+|---|---|---|---|---|---|---|---|---|
+| 1600 | 0.5171 | 21 | 1.0933 | 0.5098 / 0.5363 (10) | 0.0350 (87, 1.0200) | 0.0480 (106, 1.2400) | no | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau1600.jsonl |
+| 3200 | 0.4933 | 21 | 1.0933 | 0.4854 / 0.5224 (10) | 0.0334 (162, 1.0600) | 0.0403 (207, 1.2233) | no | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau3200.jsonl |
+| 6400 | 0.4805 | 22 | 1.1200 | 0.4515 / 0.5018 (10) | 0.0271 (312, 1.0800) | 0.0353 (404, 1.2066) | no | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau6400.jsonl |
+| 12800 | 0.4769 | 22 | 1.1200 | 0.4617 / 0.5036 (10) | 0.0252 (603, 1.0975) | 0.0256 (794, 1.1950) | no | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau12800.jsonl |
+
+rule (precedence (b) -> (a) -> (c)):
+  (b) gap(12800) = 0.4769 < 0.05 ?  false
+  (a) gap(12800) = 0.4769 >= 0.6 * gap(1600) = 0.3102 ?  true
+
+OUTCOME: H-first by rule (a)
+
+secondaries (non-gating):
+  P4: gap(1600) = 0.5171 vs round 1's 0.5176 +/- 0.05 -> hit
+  OLS slope of ln gap on ln tau_Q: -0.0388 +/- 0.0090 (SE, n = 4, 2 dof)
+  jump clause: no seed-mean single-step jump > 0.10 S_max at any tau_Q
