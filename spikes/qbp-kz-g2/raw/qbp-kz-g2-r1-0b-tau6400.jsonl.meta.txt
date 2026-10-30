@@ -1,0 +1,21 @@
+# mdcu-kz 0b meta
+# started: 2026-10-30T15:13:26-04:00
+# load_start: 0.62 1.14 1.10
+# cpu: AMD FX(tm)-8350 Eight-Core Processor
+# go: go version go1.24.2 linux/amd64
+# binary_sha256: 51a2ed9c69f2827a65bc40aa21e8c64ba60941f0091c40aa5b56a89f3900e7f7
+# code_sha: aa041391e934e6b41f02cf8f79a4e489ca928360  dirty_files: 0
+# tau_Q: 6400
+# tc: 1.0666262219986817
+# frozen_file: /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/FROZEN-v1.md
+# prereg_sha256: 785e0ee2c81740b25fbeb9dfa5bb26e22159d8b7b221de2bdb75c2f7a6f51e28
+# rerun_amend_sha256: none
+# pause_file: /home/prime/.federation-watcher/box-pause/mdcu (absent at start)
+# pinned: GOMAXPROCS=1 nice -n 19 taskset -c 7
+# unit tests: go test ./mdcu -run TestKZ passed
+# exit: 0
+# wall_s: 1548
+# load_end: 1.60 1.52 1.45
+# pause_file_present_at_end: no
+# finished: 2026-10-30T15:39:14-04:00
+# raw_sha256: 80d710130e6b7e7343d53950bc394d2cc8db47c1e0915d700bb61848b9c58f30  (written to /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-g2-run/qbp-kz-g2-r1-0b-tau6400.jsonl.sha256)
