@@ -50,6 +50,19 @@ def seed_mean_jump(series):
     return best
 
 
+def per_seed_jump(series):
+    """POST-HOC SUPPLEMENTARY (Gemini r1 on PR #796; not pre-registered, non-gating):
+    largest |step| over consecutive recorded steps for EACH seed's own series, returned as
+    (max over seeds, min over seeds, count of seeds whose largest step > JUMP)."""
+    per = []
+    for row in series:
+        best = 0.0
+        for i in range(1, len(row)):
+            best = max(best, abs(row[i] - row[i - 1]))
+        per.append(best)
+    return max(per), min(per), sum(1 for b in per if b > JUMP)
+
+
 def main():
     gaps, data, rows = {}, {}, []
     for tau in TAUS:
@@ -113,6 +126,20 @@ def main():
     )
     p4 = abs(g[1600] - 0.5176) < 0.05
     print(f"P4: gap(1600)={g[1600]:.4f} vs round-1 0.5176 -> {'hit' if p4 else 'miss'}")
+    print(
+        "post-hoc supplementary, NOT pre-registered, decides nothing (Gemini r1 on PR #796): per-seed largest single-step |dS|"
+    )
+    print(
+        "| tau_Q | cool: max / min over seeds | cool seeds > 0.10 | heat: max / min over seeds | heat seeds > 0.10 |"
+    )
+    print("|---|---|---|---|---|")
+    for tau in TAUS:
+        _, s, _ = load(tau)
+        cmax, cmin, cn = per_seed_jump(s["cool_series"])
+        hmax, hmin, hn = per_seed_jump(s["heat_series"])
+        print(
+            f"| {tau} | {cmax:.4f} / {cmin:.4f} | {cn}/{len(s['seeds'])} | {hmax:.4f} / {hmin:.4f} | {hn}/{len(s['seeds'])} |"
+        )
     if "--plots" in sys.argv:
         import matplotlib
 

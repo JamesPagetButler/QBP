@@ -72,7 +72,16 @@ Secondaries (non-gating, as frozen):
 | P4 | gap(1600) ∈ [0.4676, 0.5676] on fresh seeds | ≈ 85 % | **hit** (0.5171; Δ from round 1's 0.5176 = 0.0005) |
 | P5 | jump clause fires at some τ_Q ≥ 6400, given H-first | ≈ 50 % | **miss** (largest step 0.035 at τ_Q = 6400, 0.026 at 12800; the seed-mean drops over several recorded steps, not one) |
 
-Reading of the P5 miss (director, post-data, not a rule): the seed-mean curve averages ten seeds whose individual drops occur at slightly different T, which smears any single-seed discontinuity over several recorded steps; a per-seed jump scan was not pre-registered and is not evaluated here. It is a candidate secondary for any future round, filed as a note, not a claim.
+Reading of the P5 miss (director, post-data, not a rule). My first reading was that the seed-mean curve smears single-seed discontinuities. Gemini round 1 on PR #796 asked for the per-seed scan instead of the excuse, so it was run as a **post-hoc, non-gating supplementary** (`qbp-kz-g2-r1-recompute.py`, not pre-registered, decides nothing), and it **refutes the smearing reading**: no individual seed shows a single-recorded-step jump > 0.10·S_max either.
+
+| τ_Q | cool: per-seed largest step, max / min over seeds | seeds > 0.10 | heat: max / min | seeds > 0.10 |
+|---|---|---|---|---|
+| 1600 | 0.0500 / 0.0326 | 0/10 | 0.0617 / 0.0464 | 0/10 |
+| 3200 | 0.0555 / 0.0309 | 0/10 | 0.0506 / 0.0402 | 0/10 |
+| 6400 | 0.0475 / 0.0283 | 0/10 | 0.0462 / 0.0344 | 0/10 |
+| 12800 | 0.0503 / 0.0315 | 0/10 | 0.0408 / 0.0303 | 0/10 |
+
+So the honest reading is that, under Model-A relaxation at this record cadence (one record per 10 plane-steps), each seed's drop takes several recorded steps even though the two branches drop at well-separated temperatures; the pre-registered jump clause (> 0.10·S_max in one recorded step) is insensitive to this dynamics, which is a limitation of P5 as written, not evidence against H-first (the gating rule (a) does not use it). Any future round wanting a discontinuity secondary should pre-register a per-seed, per-temperature-window criterion rather than a single-step threshold. Filed as a note, not a claim.
 
 ## Claim scope (frozen AC2 row for H-first, verbatim)
 
