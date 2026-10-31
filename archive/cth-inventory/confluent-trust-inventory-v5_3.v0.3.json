@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.20.0",
+  "version": "6.22.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -12541,6 +12541,19 @@
       ],
       "pa_local": 0,
       "pa_effective": 0
+    },
+    {
+      "id": "HYP-g2so4-planefield-continuous-transition",
+      "name": "G₂/SO(4) plane-field continuous-transition hypothesis (Kibble–Zurek premise)",
+      "tier": 3,
+      "provenance": "H",
+      "provenance_kind": "hypothesis",
+      "status": "contested",
+      "description": "The G₂/SO(4) plane-field sigma model (chordal energy, Model-A relaxation, L = 16 reference lattice) has a continuous ordering transition at its T_c, so a slow temperature ramp crosses it quasi-statically (the Kibble–Zurek premise).",
+      "prediction_chain": [],
+      "layer_tag": "H",
+      "last_tested_at": "2026-10-30T00:00:00Z",
+      "notes": "QBP#797 (qbp-kz-g2 spike; director qbp-oppenheimer, minted via the qbp-implementor writer lane per the beekeeper's 2026-10-30 approved-list ruling). FIRST hypothesis-kind anchor in the ledger. F = napkin (qbp-compute-unit#94: every MDCU-derived result is F = napkin — research is only the ceiling after the engineering path, not the current grade; arch #801 §I4 seq425. The two-axis FormalityF has no typed schema field yet — inter#241 ontology-adopted, not schema-realized; migrates to a typed F-field when it lands). CONFRONTATION — two claims, two E rows (arch seq4058 / cth seq4063; E-axis not yet schema-typed, recorded as scoped prose): (i) the quasi-static-crossing claim over τ_Q 1600–12800 → E = falsified, as implemented in the spike harness at qbp-compute-unit aa04139 (notary VERIFIED, QBP PR#796; rounds 1–2 hysteresis 0.52 → 0.48 of S_max over τ_Q 1600–12800). (ii) the anchor's own claim (continuous ordering transition in EQUILIBRIUM) → E = unconfronted, until round 3. APPEND-ONLY: a continuous round-3 reading ADDS a new E row on the dynamics claim; it NEVER edits row (i); rounds 1–2 verdicts are immutable. EVIDENCE (rows, not edges): Landau-cubic argument — the projector order parameter ⇒ tr(Π³) ⇒ first-order a priori (inter#249 wisdom); round records qbp-compute-unit#92/#93 + QBP PR#796. OPEN QUESTION (decision_state:open convention — typed decision_state/kill_condition are unenforced on anchors, so recorded here pending cth's typed-hypothesis-key schema surface): \"Is the ordering transition first-order or continuous in equilibrium (no ramp)?\" KILL: a pre-registered equilibrium finite-size test (energy/S histograms + Binder cumulant at L = 8, 12, 16) reads first-order by its frozen rule ⇒ the hypothesis is falsified; reads continuous ⇒ the rate-scale falsification (row i) is reclassified as dynamics and the KZ premise is restored (this reclassification branch is legitimate only because it is FROZEN into the kill before round 3 runs — arch seq4058 point 2). CLOSURE: measurement (the equilibrium finite-size test). DISCHARGE: QBP#797. SUBSTRATE GAP: no existing anchor carries the G₂/SO(4) associative-3-plane-field model (oppenheimer checked 0/346) — filed as a substrate-doc item, not minted in passing; prediction_chain stays [] until one is minted. Physics signed qbp-oppenheimer; encoding with cth-implementor (schema) + qbp-architecture (ontology, inter#241); cth schema co-sign on the mint PR."
     }
   ],
   "inputs": [
@@ -13182,9 +13195,14 @@
       "version": "6.20.0",
       "date": "2026-10-29T00:00:00Z",
       "note": "#464 Phase C / cohort A: PROOF-artin-theorem extended with span4_mul_closed (ArtinSpan.lean:312) and assoc_vanishes_on_span4 (ArtinCore.lean:349) — the two halves (product closure + associator vanishing on span ℝ {1,x,y,x·y}) the Artin proof assembles. derived_from set to [PROOF-ops-alternativity-ladder, PROOF-ops-flexibility-ladder, PROOF-cd-product-formula (cdAlg_sq_eq), PROOF-cd-trace-swap-identity (the swap identity, re-targeted to the Cohort-B fallback anchor)]; NOT PROOF-octonion-moufang (never invoked — cohort-plan flexibility-edge resolution). Five consumers (quaternion-frame-maximal, quatdouble-rho-invariant-mul-closed, octonion-perp-module-span4-maximal, associative-composition-iff, gradient-lies-in-host-kernel-algebra) gain a derived_from edge to it. #print axioms on both added theorems captured under run-bounded, closure ⊆ {propext, Classical.choice, Quot.sound}. Composite import-closure manifest MOVES @ this source_sha (prior PA stale; notary#3 AC3 re-notarise). Theory-axis co-sign @qbp-oppenheimer."
+    },
+    {
+      "version": "6.22.0",
+      "date": "2026-10-30T00:00:00Z",
+      "note": "QBP#797: minted HYP-g2so4-planefield-continuous-transition — the ledger's first provenance_kind:hypothesis anchor (G₂/SO(4) plane-field continuous-transition / Kibble–Zurek premise), before the qbp-kz-g2 round-3 run. tier 3, status contested; F=napkin (notes + qbp-compute-unit#94); two E rows in notes [(i) rate-scale quasi-static-crossing τ_Q 1600–12800 = falsified @ harness aa04139, notary VERIFIED PR#796; (ii) equilibrium-continuity = unconfronted until round 3]; open-question + kill + closure=measurement + discharge-#797 in notes (convention route — decision_state/kill_condition unenforced on anchors, cth typed-key surface pending); prediction_chain [] (no substrate anchor carries the G₂/SO(4) associative-3-plane-field model — substrate-doc gap, oppenheimer-filed). Physics qbp-oppenheimer; encoding cth (schema) + arch (ontology inter#241); cth schema co-sign on the mint PR."
     }
   ],
-  "last_updated": "2026-10-29T00:00:00Z",
+  "last_updated": "2026-10-30T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
