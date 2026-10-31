@@ -22,6 +22,7 @@ import QBP.Foundations.NoAutonomousDynamics
 import QBP.Foundations.SpectralMoments
 import QBP.Foundations.UnitQuaternion
 import QBP.Foundations.OctonionLaws
+import QBP.Foundations.OctonionAutBranching
 import QBP.Foundations.FanoOrientationF3
 import QBP.Foundations.FanoSubalgebras
 import QBP.Foundations.TowerLaws
