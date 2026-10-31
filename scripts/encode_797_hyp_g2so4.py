@@ -22,9 +22,9 @@ schema reality):
   * decision_state/kill_condition are typed only on root $defs, UNENFORCED on anchors —
     so the open-question + kill + closure=measurement + discharge QBP#797 go in `notes`
     (convention route), until cth's typed-hypothesis-key schema surface lands.
-  * F = research — the two-axis FormalityF has no typed schema field yet (inter#241
-    ontology-adopted, not schema-realized); recorded in `notes` + the qbp-compute-unit#94
-    qualifier (MDCU is spike code, F capped at research).
+  * F = napkin — qbp-compute-unit#94: MDCU-derived ⇒ F=napkin (research is only the
+    engineering-path ceiling); recorded in `notes` + the #94 qualifier. The two-axis
+    FormalityF has no typed schema field yet (inter#241); migrates when it lands.
   * The confrontation is TWO claims → TWO E rows in notes (arch seq4058, cth seq4063;
     the E-axis has no typed field yet): (i) the rate-scale quasi-static-crossing claim →
     E = falsified @ spike-harness aa04139 (notary VERIFIED, QBP PR#796); (ii) the anchor's
@@ -53,8 +53,7 @@ PREV_VERSION = "6.20.0"
 NEW_VERSION = (
     "6.22.0"  # 6.21.0 left for oppenheimer's #787/#755 re-run (collision-free)
 )
-DATE = "2026-10-30T00:00:00Z"  # mint date (pre-round-3)
-DISCHARGE_DATE = "2026-10-31T00:00:00Z"  # round-3 equilibrium test confronted it (#801)
+DATE = "2026-10-30T00:00:00Z"
 HARNESS_SHA = (
     "aa04139"  # qbp-compute-unit spike harness @ rounds 1–2 (oppenheimer seq4061)
 )
@@ -72,41 +71,38 @@ STATEMENT = (
 
 NOTES = (
     "QBP#797 (qbp-kz-g2 spike; director qbp-oppenheimer, minted via the qbp-implementor "
-    "writer lane per the beekeeper's 2026-10-30 approved-list ruling, BEFORE round 3 per "
-    "the 'mint the anchor the run discharges before the run' rule). FIRST hypothesis-kind "
-    "anchor in the ledger. "
+    "writer lane per the beekeeper's 2026-10-30 approved-list ruling). FIRST hypothesis-"
+    "kind anchor in the ledger. "
     "F = napkin (qbp-compute-unit#94: every MDCU-derived result is F = napkin — research is "
     "only the ceiling after the engineering path, not the current grade; arch #801 §I4 "
-    "seq425). The two-axis FormalityF has no typed schema field yet (inter#241 ontology-"
-    "adopted, not schema-realized); migrates to a typed F-field when it lands. "
+    "seq425. The two-axis FormalityF has no typed schema field yet — inter#241 ontology-"
+    "adopted, not schema-realized; migrates to a typed F-field when it lands). "
     "CONFRONTATION — two claims, two E rows (arch seq4058 / cth seq4063; E-axis not yet "
     "schema-typed, recorded as scoped prose): "
     "(i) the quasi-static-crossing claim over τ_Q 1600–12800 → E = falsified, as "
     "implemented in the spike harness at qbp-compute-unit " + HARNESS_SHA + " (notary "
     "VERIFIED, QBP PR#796; rounds 1–2 hysteresis 0.52 → 0.48 of S_max over τ_Q 1600–12800). "
     "(ii) the anchor's own claim (continuous ordering transition in EQUILIBRIUM) → E = "
-    "FALSIFIED at round 3 (QBP PR#801, 'H-FO by frozen rule (a)': the pre-registered "
-    "equilibrium finite-size test — energy/S histograms + Binder cumulant at L = 8, 12, 16 — "
-    "read FIRST-ORDER). This is the claim's first confrontation (unconfronted → falsified), "
-    "not an edit of row (i); APPEND-ONLY intact — row (i)'s rounds-1–2 verdicts are "
-    "immutable, and because round 3 read first-order (not continuous) the frozen "
-    "reclassification branch did NOT fire. "
+    "unconfronted, until round 3. APPEND-ONLY: a continuous round-3 reading ADDS a new E "
+    "row on the dynamics claim; it NEVER edits row (i); rounds 1–2 verdicts are immutable. "
     "EVIDENCE (rows, not edges): Landau-cubic argument — the projector order parameter ⇒ "
-    "tr(Π³) ⇒ first-order a priori (inter#249 wisdom; borne out at round 3); round records "
-    "qbp-compute-unit#92/#93 + QBP PR#796 (r1/r2) + QBP PR#801 (r3). "
-    'KILL — FIRED (decision settled): the pre-registered question "Is the ordering '
-    'transition first-order or continuous in equilibrium (no ramp)?" was answered FIRST-'
-    "ORDER by its frozen rule (a) at round 3 ⇒ the hypothesis is FALSIFIED. (The frozen "
-    "alternative branch — reads continuous ⇒ rate-scale falsification reclassified as "
-    "dynamics, KZ premise restored — did not trigger; it was legitimate only because frozen "
-    "before round 3, arch seq4058 point 2.) CLOSURE: the equilibrium finite-size test "
-    "(measurement), delivered at #801. DISCHARGE: QBP#797. "
+    "tr(Π³) ⇒ first-order a priori (inter#249 wisdom); round records qbp-compute-unit#92/"
+    "#93 + QBP PR#796. "
+    "OPEN QUESTION (decision_state:open convention — typed decision_state/kill_condition "
+    "are unenforced on anchors, so recorded here pending cth's typed-hypothesis-key schema "
+    'surface): "Is the ordering transition first-order or continuous in equilibrium (no '
+    'ramp)?" '
+    "KILL: a pre-registered equilibrium finite-size test (energy/S histograms + Binder "
+    "cumulant at L = 8, 12, 16) reads first-order by its frozen rule ⇒ the hypothesis is "
+    "falsified; reads continuous ⇒ the rate-scale falsification (row i) is reclassified as "
+    "dynamics and the KZ premise is restored (this reclassification branch is legitimate "
+    "only because it is FROZEN into the kill before round 3 runs — arch seq4058 point 2). "
+    "CLOSURE: measurement (the equilibrium finite-size test). DISCHARGE: QBP#797. "
     "SUBSTRATE GAP: no existing anchor carries the G₂/SO(4) associative-3-plane-field model "
     "(oppenheimer checked 0/346) — filed as a substrate-doc item, not minted in passing; "
     "prediction_chain stays [] until one is minted. "
     "Physics signed qbp-oppenheimer; encoding with cth-implementor (schema) + qbp-"
-    "architecture (ontology, inter#241); minted contested pre-round-3, discharged to "
-    "FALSIFIED on the round-3 record (#801); cth schema co-sign on the PR."
+    "architecture (ontology, inter#241); cth schema co-sign on the mint PR."
 )
 
 
@@ -117,11 +113,11 @@ def new_anchor():
         "tier": 3,
         "provenance": "H",
         "provenance_kind": "hypothesis",
-        "status": "falsified",
+        "status": "contested",
         "description": STATEMENT,
         "prediction_chain": [],
         "layer_tag": "H",
-        "last_tested_at": DISCHARGE_DATE,
+        "last_tested_at": DATE,
         "notes": NOTES,
     }
 
@@ -146,33 +142,29 @@ def main():
         L["changelog"].append(
             {
                 "version": NEW_VERSION,
-                "date": DISCHARGE_DATE,
+                "date": DATE,
                 "note": (
                     f"QBP#797: minted {NEW_ID} — the ledger's first provenance_kind:hypothesis "
                     f"anchor (G₂/SO(4) plane-field continuous-transition / Kibble–Zurek "
-                    f"premise). Minted contested BEFORE the qbp-kz-g2 round-3 run (beekeeper "
-                    f"'mint before the run' rule); discharged to **status: falsified** on the "
-                    f"round-3 record (QBP PR#801, 'H-FO by frozen rule (a)' — the pre-registered "
-                    f"equilibrium finite-size test at L=8,12,16 read FIRST-ORDER, firing the "
-                    f"kill). tier 3; F=napkin (qbp-compute-unit#94, not research — arch #801 §I4 "
-                    f"seq425); two E rows in notes [(i) rate-scale quasi-static-crossing τ_Q "
-                    f"1600–12800 = falsified @ harness {HARNESS_SHA}, notary VERIFIED PR#796; "
-                    f"(ii) equilibrium-continuity = falsified @ round 3 PR#801 — first "
-                    f"confrontation, append-only intact]; kill FIRED / decision settled / "
-                    f"discharge QBP#797 in notes (convention route — decision_state/"
-                    f"kill_condition unenforced on anchors, cth typed-key surface pending); "
-                    f"prediction_chain [] (no substrate anchor carries the G₂/SO(4) associative-"
-                    f"3-plane-field model — substrate-doc gap, oppenheimer-filed). Physics qbp-"
-                    f"oppenheimer; encoding cth (schema) + arch (ontology inter#241); cth schema "
-                    f"co-sign on the PR."
+                    f"premise), before the qbp-kz-g2 round-3 run. tier 3, status contested; "
+                    f"F=research (notes + qbp-compute-unit#94); two E rows in notes "
+                    f"[(i) rate-scale quasi-static-crossing τ_Q 1600–12800 = falsified @ "
+                    f"harness {HARNESS_SHA}, notary VERIFIED PR#796; (ii) equilibrium-"
+                    f"continuity = unconfronted until round 3]; open-question + kill + "
+                    f"closure=measurement + discharge-#797 in notes (convention route — "
+                    f"decision_state/kill_condition unenforced on anchors, cth typed-key "
+                    f"surface pending); prediction_chain [] (no substrate anchor carries the "
+                    f"G₂/SO(4) associative-3-plane-field model — substrate-doc gap, "
+                    f"oppenheimer-filed). Physics qbp-oppenheimer; encoding cth (schema) + "
+                    f"arch (ontology inter#241); cth schema co-sign on the mint PR."
                 ),
             }
         )
         ed.touch("changelog")
 
     print(
-        f"{'DRY ' if args.dry_run else ''}minted {NEW_ID}: tier 3, status FALSIFIED "
-        f"(discharged at round 3), prediction_chain []; ledger {NEW_VERSION}"
+        f"{'DRY ' if args.dry_run else ''}minted {NEW_ID}: tier 3, status contested, "
+        f"prediction_chain []; ledger {NEW_VERSION}"
     )
 
 
