@@ -147,7 +147,7 @@ def main():
                     f"QBP#797: minted {NEW_ID} — the ledger's first provenance_kind:hypothesis "
                     f"anchor (G₂/SO(4) plane-field continuous-transition / Kibble–Zurek "
                     f"premise), before the qbp-kz-g2 round-3 run. tier 3, status contested; "
-                    f"F=research (notes + qbp-compute-unit#94); two E rows in notes "
+                    f"F=napkin (notes + qbp-compute-unit#94); two E rows in notes "
                     f"[(i) rate-scale quasi-static-crossing τ_Q 1600–12800 = falsified @ "
                     f"harness {HARNESS_SHA}, notary VERIFIED PR#796; (ii) equilibrium-"
                     f"continuity = unconfronted until round 3]; open-question + kill + "
