@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.22.0",
+  "version": "6.21.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -13252,11 +13252,6 @@
     },
     {
       "version": "6.21.0",
-      "date": "2026-10-29T00:00:00Z",
-      "note": "QBP#755 AC4: INSIGHT-octonion-quaternion-branching CORE promoted theory→PROOF — γ(a,b) ∈ Aut(𝕆) (OctonionAutBranching.lean, PR #787). Witnesses gamma_mul / gamma_fixes_hosted / gamma_id_iff / gamma_bijective / gammaAut, all #print axioms ⊆ {propext, Classical.choice, Quot.sound} (run-bounded capture @ 43ae30a). NOT claimed (kept): the (3,1)⊕(2,2) irrep branching (computational #559) and 'SO(4) = full stabiliser of ℍ in G₂' (needs #622). Classical math; novel only as a CDAlg kernel formalization. Attribution (AC5): claude-sonnet-5 Sonnet arm of deming's 2026-09-30 harness, deming-verified. #697-shaped, pa 0/0; prediction_chain unchanged ([], candidate edges deferred to theory §I4). Schema co-sign @cth-implementor; theory co-sign @qbp-oppenheimer."
-    },
-    {
-      "version": "6.22.0",
       "date": "2026-10-29T00:00:00Z",
       "note": "QBP#755 AC4: INSIGHT-octonion-quaternion-branching CORE promoted theory→PROOF — γ(a,b) ∈ Aut(𝕆) (OctonionAutBranching.lean, PR #787). Witnesses gamma_mul / gamma_fixes_hosted / gamma_id_iff / gamma_bijective / gammaAut, all #print axioms ⊆ {propext, Classical.choice, Quot.sound} (run-bounded capture @ 43ae30a). Name leads with the proven γ-core; the (3,1)⊕(2,2) branching marked computationally-verified-only (#559), NOT claimed (cth seq3953 + arch F3). derived_from ['PROOF-cd-product-formula', 'PROOF-cd-associativity-level2', 'PROOF-cd-associator-formula'] — from gammaAut's proof-term closure ∩ ledger witnesses (arch/cth confirmed seq3956/3957), NOT the header 'free to use' list. Also NOT claimed: 'SO(4) = full stabiliser of ℍ in G₂' (needs #622). Classical math; novel only as a CDAlg kernel formalization. AC5: claude-sonnet-5 Sonnet arm of deming's 2026-09-30 harness, deming-verified. #697-shaped, pa 0/0. Schema co-sign @cth-implementor; theory co-sign @qbp-oppenheimer."
     }
