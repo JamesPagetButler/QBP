@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.21.0",
+  "version": "6.22.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -4794,14 +4794,18 @@
     },
     {
       "id": "INSIGHT-octonion-quaternion-branching",
-      "name": "𝕆→ℍ crystallisation: 7 = (3,1) ⊕ (2,2), lost generators = (2,2) bi-doublet (verified)",
+      "name": "γ(a,b) ∈ Aut(𝕆) for pairs fixing the hosted ℍ — kernel-proven (OctonionAutBranching: gamma_mul, gamma_fixes_hosted, gamma_id_iff, gamma_bijective, gammaAut). The 7 = (3,1)⊕(2,2) branching under that action is computationally verified only (#559) and is NOT claimed by this anchor.",
       "description": "γ(a,b) ∈ Aut(𝕆) — the SO(4) ⊂ G₂ octonion-automorphism family, CORE kernel-PROVED (QBP#755, proofs/QBP/Foundations/OctonionAutBranching.lean, namespace QBP.Foundations.OctonionAutBranching). For unit quaternions a,b : CDAlg ℝ 2 (N a = N b = 1) the coordinate-packaged map γ(a,b)(x₁,x₂) = (a·x₁·ā, b·x₂·ā) on 𝕆 = CDAlg ℝ 3 is: multiplicative on ALL of 𝕆 (`gamma_mul`) — the hard, non-vacuous fact, proved through the four-term Cayley–Dickson expansion using associativity of ℍ = CDAlg ℝ 2 ONLY, never associativity of 𝕆 (which fails, cf. Artin.lean); fixes the hosted quaternion subalgebra {x | oHi x = 0} setwise (`gamma_fixes_hosted`); equals the identity iff trivial (`gamma_id_iff`); is bijective (`gamma_bijective`); packaged as `gammaAut : CDAut 3` (def). Each kernel-checked, 0 sorry, 0 native_decide, #print axioms ⊆ {propext, Classical.choice, Quot.sound}. HONEST FRAMING (#755): the mathematics is CLASSICAL — the standard Spin(4) → SO(4) ⊂ G₂ = Aut(𝕆) construction (Conway–Smith / Baez). What is new is ONLY the kernel-checked formalization in QBP's CDAlg framework proving multiplicativity via ℍ-associativity alone; NOT a novel mathematical result. NOT CLAIMED (AC4 exclusions — these remain theory/computational, NOT upgraded by this proof): (1) the 7 = (3,1) ⊕ (2,2) imaginary-octonion irrep branching (retained Im(ℍ) = (3,1), lost (2,2) bi-doublet) — VERIFIED only computationally (#559 analysis/559-generator-dof-map/verify_g2_so4_branching.py, 2000-trial), NOT kernel-proven; (2) 'SO(4) is the FULL stabiliser of ℍ in G₂' — needs Aut(𝕆) ≅ G₂ (#622), unproven here (γ gives the ⊆ direction: an SO(4) worth of automorphisms fixing ℍ, not maximality). ATTRIBUTION (AC5): the Lean proof was authored by claude-sonnet-5 as the Sonnet arm of deming's 2026-09-30 cost-calibration harness (~10 iterations; Gemini-pro failed, Opus skipped) and independently kernel-verified by deming (Nidavellir-bench-staging/results/VERIFICATION-RECORD-octonion-node.md). Provenance metadata only — does not affect the PA grade. PA (pa_local/pa_effective) 0/0, ungraded — no Notary proof-assistant evidence recorded yet (Seam: PA stays 0/0 until Notary evidence lands; research-tier). Prior computational branching result retained as the node's theory context (#559/#539/#560); this upgrade promotes ONLY the γ-family core.",
       "tier": 1,
       "provenance": "T",
       "provenance_kind": "proof",
       "status": "coherent",
       "measured_source": "QBP internal result, 2026-06-13/14 (#559/#539/#560)",
-      "prediction_chain": [],
+      "prediction_chain": [
+        "PROOF-cd-product-formula",
+        "PROOF-cd-associativity-level2",
+        "PROOF-cd-associator-formula"
+      ],
       "last_tested_at": "2026-06-14T00:00:00Z",
       "notes": "analysis/559-generator-dof-map/verify_g2_so4_branching.py. The (2,2) is the SO(4)-VECTOR rep.",
       "proof_file": "proofs/QBP/Foundations/OctonionAutBranching.lean",
@@ -13250,6 +13254,11 @@
       "version": "6.21.0",
       "date": "2026-10-29T00:00:00Z",
       "note": "QBP#755 AC4: INSIGHT-octonion-quaternion-branching CORE promoted theory→PROOF — γ(a,b) ∈ Aut(𝕆) (OctonionAutBranching.lean, PR #787). Witnesses gamma_mul / gamma_fixes_hosted / gamma_id_iff / gamma_bijective / gammaAut, all #print axioms ⊆ {propext, Classical.choice, Quot.sound} (run-bounded capture @ 43ae30a). NOT claimed (kept): the (3,1)⊕(2,2) irrep branching (computational #559) and 'SO(4) = full stabiliser of ℍ in G₂' (needs #622). Classical math; novel only as a CDAlg kernel formalization. Attribution (AC5): claude-sonnet-5 Sonnet arm of deming's 2026-09-30 harness, deming-verified. #697-shaped, pa 0/0; prediction_chain unchanged ([], candidate edges deferred to theory §I4). Schema co-sign @cth-implementor; theory co-sign @qbp-oppenheimer."
+    },
+    {
+      "version": "6.22.0",
+      "date": "2026-10-29T00:00:00Z",
+      "note": "QBP#755 AC4: INSIGHT-octonion-quaternion-branching CORE promoted theory→PROOF — γ(a,b) ∈ Aut(𝕆) (OctonionAutBranching.lean, PR #787). Witnesses gamma_mul / gamma_fixes_hosted / gamma_id_iff / gamma_bijective / gammaAut, all #print axioms ⊆ {propext, Classical.choice, Quot.sound} (run-bounded capture @ 43ae30a). Name leads with the proven γ-core; the (3,1)⊕(2,2) branching marked computationally-verified-only (#559), NOT claimed (cth seq3953 + arch F3). derived_from ['PROOF-cd-product-formula', 'PROOF-cd-associativity-level2', 'PROOF-cd-associator-formula'] — from gammaAut's proof-term closure ∩ ledger witnesses (arch/cth confirmed seq3956/3957), NOT the header 'free to use' list. Also NOT claimed: 'SO(4) = full stabiliser of ℍ in G₂' (needs #622). Classical math; novel only as a CDAlg kernel formalization. AC5: claude-sonnet-5 Sonnet arm of deming's 2026-09-30 harness, deming-verified. #697-shaped, pa 0/0. Schema co-sign @cth-implementor; theory co-sign @qbp-oppenheimer."
     }
   ],
   "last_updated": "2026-10-29T00:00:00Z",
