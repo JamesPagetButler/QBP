@@ -1,5 +1,5 @@
 {
-  "lean_side_orphans": 42,
+  "lean_side_orphans": 35,
   "per_file_theorems": {
     "proofs/QBP/Basic.lean": 6,
     "proofs/QBP/Cosmo/DenseMatter.lean": 6,
@@ -39,6 +39,7 @@
     "proofs/QBP/Foundations/NoAutonomousDynamics.lean": 86,
     "proofs/QBP/Foundations/NormForm.lean": 10,
     "proofs/QBP/Foundations/Octonion32Count.lean": 32,
+    "proofs/QBP/Foundations/OctonionAutBranching.lean": 55,
     "proofs/QBP/Foundations/OctonionLaws.lean": 55,
     "proofs/QBP/Foundations/QBPHorizonFoundations.lean": 8,
     "proofs/QBP/Foundations/SeamKernel.lean": 53,
