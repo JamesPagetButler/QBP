@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.22.0",
+  "version": "6.23.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -362,8 +362,8 @@
             "sha": "32dc18cde3684679f3c003de608743b57498c56f"
           }
         },
-        "verified_at": "2026-09-02T23:46:49Z",
-        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "verified_at": "2026-11-01T00:00:00Z",
+        "verifier": "#465 AC5 (qbp-implementor writer lane): theorems[] populated from qbp-oppenheimer's locate table @ current master; all names resolve in proofs/QBP/GaugeBosons.lean. Theory statements signed by qbp-oppenheimer on the batch PR.",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -372,7 +372,30 @@
         ]
       },
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "theorems": [
+        {
+          "name": "eigenvalue_ratios",
+          "status": "verified"
+        },
+        {
+          "name": "eigenvalue_ratio_factor",
+          "status": "verified"
+        },
+        {
+          "name": "nonzero_eigenspace_dims",
+          "status": "verified"
+        },
+        {
+          "name": "hessian_spectrum_moments",
+          "status": "verified"
+        },
+        {
+          "name": "hessian_multiplicities_unique",
+          "status": "verified"
+        }
+      ],
+      "notes": "theorems[] populated per #465 AC5 (oppenheimer locate table, GaugeBosons.lean §A l.73–140). Caveat: the operator spectrum is inherited from PROOF-hessian as hypotheses, not re-derived here (GaugeBosons.lean header item 1)."
     },
     {
       "sorry_count": 0,
@@ -465,8 +488,8 @@
             "sha": "32dc18cde3684679f3c003de608743b57498c56f"
           }
         },
-        "verified_at": "2026-09-02T23:46:49Z",
-        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "verified_at": "2026-11-01T00:00:00Z",
+        "verifier": "#465 AC5 (qbp-implementor writer lane): theorems[] populated from qbp-oppenheimer's locate table @ current master; all names resolve in proofs/QBP/GaugeBosons.lean. Theory statements signed by qbp-oppenheimer on the batch PR.",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -475,7 +498,34 @@
         ]
       },
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "theorems": [
+        {
+          "name": "charge_spectrum",
+          "status": "verified"
+        },
+        {
+          "name": "charge_quantisation",
+          "status": "verified"
+        },
+        {
+          "name": "charge_multiplicities",
+          "status": "verified"
+        },
+        {
+          "name": "total_state_count",
+          "status": "verified"
+        },
+        {
+          "name": "particle_charge_sum_value",
+          "status": "verified"
+        },
+        {
+          "name": "anomaly_cancellation",
+          "status": "verified"
+        }
+      ],
+      "notes": "theorems[] populated per #465 AC5 (oppenheimer locate table, GaugeBosons.lean §B l.142–212). Caveat: the 1/3-charge-quantisation's rational consequences are proven; the Cl(6) ⊗ 𝕆 action itself is NOT formalised (GaugeBosons.lean header item 2)."
     },
     {
       "sorry_count": 0,
@@ -508,8 +558,8 @@
             "sha": "32dc18cde3684679f3c003de608743b57498c56f"
           }
         },
-        "verified_at": "2026-09-02T23:46:49Z",
-        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
+        "verified_at": "2026-11-01T00:00:00Z",
+        "verifier": "#465 AC5 (qbp-implementor writer lane): theorems[] populated from qbp-oppenheimer's locate table @ current master; all names resolve in proofs/QBP/GaugeBosons.lean. Theory statements signed by qbp-oppenheimer on the batch PR.",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -518,7 +568,14 @@
         ]
       },
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "theorems": [
+        {
+          "name": "im_quaternion_dim_three",
+          "status": "verified"
+        }
+      ],
+      "notes": "theorems[] populated per #465 AC5 (oppenheimer locate table, GaugeBosons.lean §C l.214–235). Caveat: only dim(Im ℍ) = 3 is proven; 'three generations' is an interpretation (already in the description)."
     },
     {
       "sorry_count": 0,
@@ -3161,32 +3218,6 @@
       "synthetic_separation_sigma": 6.7,
       "notes": "\n[Session 17, cross-platform Γ test] Synthetic 7-platform test with platform-specific non-exponential bumps gives 6.7σ separation between QBP (universal Γ) and null (platform-specific Γ) medians. 100% of QBP trials below null 5%-threshold. Pipeline characterised; real-data extension awaits IBM/NIST/Lukin/PHAIDRA curves (not just T_decay summaries).\n[Session 21] Refined: cross-platform pooling works WITHIN a feature class, not ACROSS. The variance metric washes out when feature shapes vary between platforms. Right design: group by feature class (revival/oscillation, gaussian/Lorentzian, power-law) and test universality within each.",
       "provenance_kind": "internal-compute",
-      "intake_batch": "509-A",
-      "intake_source": "v5.13 (federation-tenancy stream)"
-    },
-    {
-      "id": "META-physical-mapping-status-field",
-      "name": "CTH schema extension: physical_mapping_status field on PRED-* anchors",
-      "tier": 3,
-      "provenance": "P",
-      "status": "coherent",
-      "description": "Distinguishes algebraic identity (Lean-formal rational fact) from physical-claim status (does the algebra → mapping → observation chain hold). Three values: verified, conjectural, falsified. First applied this session: PRED-TOV-limit-sqrt-7-over-3 = falsified. Same pattern likely applies to PROOF-cl6 (algebra real, physical chain has caveats) and the CKM-chain anchors (algebra real, trials-factor mitigates).",
-      "last_tested_at": "2026-05-01T00:00:00Z",
-      "prediction_chain": [],
-      "provenance_kind": "theory",
-      "intake_batch": "509-A",
-      "intake_source": "v5.13 (federation-tenancy stream)"
-    },
-    {
-      "id": "META-regime-of-validity-field",
-      "name": "CTH schema extension: regime_of_validity field",
-      "tier": 3,
-      "provenance": "P",
-      "status": "coherent",
-      "description": "Each PRED-* anchor that wraps an algebraic identity has an implicit regime of validity (bump_peak, virial_saturation, de_era, etc.). The regime is what makes the prediction a precise statement about a specific configuration rather than a vague universal claim. Adding this field makes the regime explicit and lets the engine test predictions in their proper context.",
-      "last_tested_at": "2026-05-01T00:00:00Z",
-      "prediction_chain": [],
-      "provenance_kind": "theory",
       "intake_batch": "509-A",
       "intake_source": "v5.13 (federation-tenancy stream)"
     },
@@ -6459,7 +6490,8 @@
       "lean_companion_theorems": [
         "QBP.Foundations.CDAlg.basis_expansion",
         "QBP.Foundations.CDAlg.mulCoeff_props",
-        "QBP.Foundations.CDAlg.cdAlg_sq_eq"
+        "QBP.Foundations.CDAlg.cdAlg_sq_eq",
+        "QBP.Foundations.CDAlg.mul_coord_matrix"
       ],
       "theorems": [
         {
@@ -6476,6 +6508,10 @@
         },
         {
           "name": "cdAlg_sq_eq",
+          "status": "verified"
+        },
+        {
+          "name": "mul_coord_matrix",
           "status": "verified"
         }
       ],
@@ -8082,8 +8118,7 @@
         "QBP.Foundations.CDAlg.sAll_coord_zero",
         "QBP.Foundations.CDAlg.sAll_components_commute",
         "QBP.Foundations.CDAlg.N_sAll",
-        "QBP.Foundations.CDAlg.sAll_left_mul_sq_via_T2c",
-        "QBP.Foundations.CDAlg.mul_coord_matrix"
+        "QBP.Foundations.CDAlg.sAll_left_mul_sq_via_T2c"
       ],
       "theorems": [
         {
@@ -8124,10 +8159,6 @@
         },
         {
           "name": "sAll_left_mul_sq_via_T2c",
-          "status": "verified"
-        },
-        {
-          "name": "mul_coord_matrix",
           "status": "verified"
         }
       ],
@@ -12621,6 +12652,38 @@
       "layer_tag": "H",
       "last_tested_at": "2026-10-30T00:00:00Z",
       "notes": "QBP#797 (qbp-kz-g2 spike; director qbp-oppenheimer, minted via the qbp-implementor writer lane per the beekeeper's 2026-10-30 approved-list ruling). FIRST hypothesis-kind anchor in the ledger. F = napkin (qbp-compute-unit#94: every MDCU-derived result is F = napkin — research is only the ceiling after the engineering path, not the current grade; arch #801 §I4 seq425. The two-axis FormalityF has no typed schema field yet — inter#241 ontology-adopted, not schema-realized; migrates to a typed F-field when it lands). CONFRONTATION — two claims, two E rows (arch seq4058 / cth seq4063; E-axis not yet schema-typed, recorded as scoped prose): (i) the quasi-static-crossing claim over τ_Q 1600–12800 → E = falsified, as implemented in the spike harness at qbp-compute-unit aa04139 (notary VERIFIED, QBP PR#796; rounds 1–2 hysteresis 0.52 → 0.48 of S_max over τ_Q 1600–12800). (ii) the anchor's own claim (continuous ordering transition in EQUILIBRIUM) → E = unconfronted, until round 3. APPEND-ONLY: a continuous round-3 reading ADDS a new E row on the dynamics claim; it NEVER edits row (i); rounds 1–2 verdicts are immutable. EVIDENCE (rows, not edges): Landau-cubic argument — the projector order parameter ⇒ tr(Π³) ⇒ first-order a priori (inter#249 wisdom); round records qbp-compute-unit#92/#93 + QBP PR#796. OPEN QUESTION (decision_state:open convention — typed decision_state/kill_condition are unenforced on anchors, so recorded here pending cth's typed-hypothesis-key schema surface): \"Is the ordering transition first-order or continuous in equilibrium (no ramp)?\" KILL: a pre-registered equilibrium finite-size test (energy/S histograms + Binder cumulant at L = 8, 12, 16) reads first-order by its frozen rule ⇒ the hypothesis is falsified; reads continuous ⇒ the rate-scale falsification (row i) is reclassified as dynamics and the KZ premise is restored (this reclassification branch is legitimate only because it is FROZEN into the kill before round 3 runs — arch seq4058 point 2). CLOSURE: measurement (the equilibrium finite-size test). DISCHARGE: QBP#797. SUBSTRATE GAP: no existing anchor carries the G₂/SO(4) associative-3-plane-field model (oppenheimer checked 0/346) — filed as a substrate-doc item, not minted in passing; prediction_chain stays [] until one is minted. Physics signed qbp-oppenheimer; encoding with cth-implementor (schema) + qbp-architecture (ontology, inter#241); cth schema co-sign on the mint PR."
+    },
+    {
+      "id": "DEFN-physical-mapping-status-field",
+      "name": "CTH schema extension: physical_mapping_status field on PRED-* anchors",
+      "tier": 3,
+      "provenance": "P",
+      "status": "coherent",
+      "description": "Distinguishes algebraic identity (Lean-formal rational fact) from physical-claim status (does the algebra → mapping → observation chain hold). Three values: verified, conjectural, falsified. First applied this session: PRED-TOV-limit-sqrt-7-over-3 = falsified. Same pattern likely applies to PROOF-cl6 (algebra real, physical chain has caveats) and the CKM-chain anchors (algebra real, trials-factor mitigates).",
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "prediction_chain": [],
+      "provenance_kind": "theory",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "id_history": [
+        "META-physical-mapping-status-field"
+      ]
+    },
+    {
+      "id": "DEFN-regime-of-validity-field",
+      "name": "CTH schema extension: regime_of_validity field",
+      "tier": 3,
+      "provenance": "P",
+      "status": "coherent",
+      "description": "Each PRED-* anchor that wraps an algebraic identity has an implicit regime of validity (bump_peak, virial_saturation, de_era, etc.). The regime is what makes the prediction a precise statement about a specific configuration rather than a vague universal claim. Adding this field makes the regime explicit and lets the engine test predictions in their proper context.",
+      "last_tested_at": "2026-05-01T00:00:00Z",
+      "prediction_chain": [],
+      "provenance_kind": "theory",
+      "intake_batch": "509-A",
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "id_history": [
+        "META-regime-of-validity-field"
+      ]
     }
   ],
   "inputs": [
@@ -13272,9 +13335,19 @@
       "version": "6.22.0",
       "date": "2026-10-30T00:00:00Z",
       "note": "QBP#797: minted HYP-g2so4-planefield-continuous-transition — the ledger's first provenance_kind:hypothesis anchor (G₂/SO(4) plane-field continuous-transition / Kibble–Zurek premise), before the qbp-kz-g2 round-3 run. tier 3, status contested; F=napkin (notes + qbp-compute-unit#94); two E rows in notes [(i) rate-scale quasi-static-crossing τ_Q 1600–12800 = falsified @ harness aa04139, notary VERIFIED PR#796; (ii) equilibrium-continuity = unconfronted until round 3]; open-question + kill + closure=measurement + discharge-#797 in notes (convention route — decision_state/kill_condition unenforced on anchors, cth typed-key surface pending); prediction_chain [] (no substrate anchor carries the G₂/SO(4) associative-3-plane-field model — substrate-doc gap, oppenheimer-filed). Physics qbp-oppenheimer; encoding cth (schema) + arch (ontology inter#241); cth schema co-sign on the mint PR."
+    },
+    {
+      "version": "6.23.0",
+      "date": "2026-11-01T00:00:00Z",
+      "note": "Housekeeping close-out batch (oppenheimer seq4276). #465 AC5: theorems[] populated on PROOF-eigenratios / PROOF-cl6 / PROOF-3gen from the GaugeBosons.lean §A/§B/§C locate table (all names resolve @ master; caveats in notes; derivation anchors, proof_file unchanged; theory statements signed by qbp-oppenheimer). #657 (#654 D1): META-physical-mapping-status-field / META-regime-of-validity-field renamed out of the root prefix space to DEFN-* (id_history kept, citations re-pointed) — field-documentation, not roots; the two open_roots register entries are removed in the companion root-audit-register.json edit (shrink-only). cth-implementor schema co-sign on the PR."
+    },
+    {
+      "version": "6.23.0",
+      "date": "2026-11-01T00:00:00Z",
+      "note": "QBP#789: re-home mul_coord_matrix (Alternator.lean, generic CDAlg structural lemma) off PROOF-sedenion-dirac-sum-kill (witness-home-collision, not a kill dependency) to PROOF-cd-product-formula — cth-named target home (seq4279/4281), oppenheimer conditional met (seq4280). Rides the #804 housekeeping batch; cth schema co-signs the re-home."
     }
   ],
-  "last_updated": "2026-10-30T00:00:00Z",
+  "last_updated": "2026-11-01T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
