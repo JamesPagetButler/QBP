@@ -1,0 +1,22 @@
+{
+  "gamma_mul": {
+    "fq": "QBP.Foundations.OctonionAutBranching.gamma_mul",
+    "axioms": ["propext", "Classical.choice", "Quot.sound"]
+  },
+  "gamma_fixes_hosted": {
+    "fq": "QBP.Foundations.OctonionAutBranching.gamma_fixes_hosted",
+    "axioms": ["propext", "Classical.choice", "Quot.sound"]
+  },
+  "gamma_id_iff": {
+    "fq": "QBP.Foundations.OctonionAutBranching.gamma_id_iff",
+    "axioms": ["propext", "Classical.choice", "Quot.sound"]
+  },
+  "gamma_bijective": {
+    "fq": "QBP.Foundations.OctonionAutBranching.gamma_bijective",
+    "axioms": ["propext", "Classical.choice", "Quot.sound"]
+  },
+  "gammaAut": {
+    "fq": "QBP.Foundations.OctonionAutBranching.gammaAut",
+    "axioms": ["propext", "Classical.choice", "Quot.sound"]
+  }
+}

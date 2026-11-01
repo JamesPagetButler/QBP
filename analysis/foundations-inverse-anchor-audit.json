@@ -181,10 +181,10 @@
   "stats": {
     "anchor_side_phantoms": 0,
     "anchors_total": 347,
-    "anchors_with_proof_file": 125,
-    "anchors_with_theorems_list": 69,
+    "anchors_with_proof_file": 126,
+    "anchors_with_theorems_list": 70,
     "lean_side_orphans": 35,
     "stale_path_citations": 0,
-    "theorems_total": 1945
+    "theorems_total": 2000
   }
 }
