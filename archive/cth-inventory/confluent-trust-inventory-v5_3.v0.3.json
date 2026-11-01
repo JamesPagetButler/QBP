@@ -6490,7 +6490,8 @@
       "lean_companion_theorems": [
         "QBP.Foundations.CDAlg.basis_expansion",
         "QBP.Foundations.CDAlg.mulCoeff_props",
-        "QBP.Foundations.CDAlg.cdAlg_sq_eq"
+        "QBP.Foundations.CDAlg.cdAlg_sq_eq",
+        "QBP.Foundations.CDAlg.mul_coord_matrix"
       ],
       "theorems": [
         {
@@ -6507,6 +6508,10 @@
         },
         {
           "name": "cdAlg_sq_eq",
+          "status": "verified"
+        },
+        {
+          "name": "mul_coord_matrix",
           "status": "verified"
         }
       ],
@@ -8113,8 +8118,7 @@
         "QBP.Foundations.CDAlg.sAll_coord_zero",
         "QBP.Foundations.CDAlg.sAll_components_commute",
         "QBP.Foundations.CDAlg.N_sAll",
-        "QBP.Foundations.CDAlg.sAll_left_mul_sq_via_T2c",
-        "QBP.Foundations.CDAlg.mul_coord_matrix"
+        "QBP.Foundations.CDAlg.sAll_left_mul_sq_via_T2c"
       ],
       "theorems": [
         {
@@ -8155,10 +8159,6 @@
         },
         {
           "name": "sAll_left_mul_sq_via_T2c",
-          "status": "verified"
-        },
-        {
-          "name": "mul_coord_matrix",
           "status": "verified"
         }
       ],
@@ -13340,6 +13340,11 @@
       "version": "6.23.0",
       "date": "2026-11-01T00:00:00Z",
       "note": "Housekeeping close-out batch (oppenheimer seq4276). #465 AC5: theorems[] populated on PROOF-eigenratios / PROOF-cl6 / PROOF-3gen from the GaugeBosons.lean §A/§B/§C locate table (all names resolve @ master; caveats in notes; derivation anchors, proof_file unchanged; theory statements signed by qbp-oppenheimer). #657 (#654 D1): META-physical-mapping-status-field / META-regime-of-validity-field renamed out of the root prefix space to DEFN-* (id_history kept, citations re-pointed) — field-documentation, not roots; the two open_roots register entries are removed in the companion root-audit-register.json edit (shrink-only). cth-implementor schema co-sign on the PR."
+    },
+    {
+      "version": "6.23.0",
+      "date": "2026-11-01T00:00:00Z",
+      "note": "QBP#789: re-home mul_coord_matrix (Alternator.lean, generic CDAlg structural lemma) off PROOF-sedenion-dirac-sum-kill (witness-home-collision, not a kill dependency) to PROOF-cd-product-formula — cth-named target home (seq4279/4281), oppenheimer conditional met (seq4280). Rides the #804 housekeeping batch; cth schema co-signs the re-home."
     }
   ],
   "last_updated": "2026-11-01T00:00:00Z",
