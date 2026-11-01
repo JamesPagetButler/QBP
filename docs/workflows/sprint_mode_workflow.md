@@ -456,6 +456,9 @@ Rules:
   on the issue, not by deletion.
 - Tags never substitute for the ledger or the pre-registration sha256; they locate the commit the
   recorded sha256 belongs to.
+- **Authority note.** A tag push by a seat is a new write category not covered by the standing
+  federation authorizations. Until the beekeeper ratifies this section, every tag in the table is
+  created and pushed by the beekeeper (seats may *propose* the tag name + commit on the issue).
 
 ### Revert-vs-reset decision tree
 
@@ -508,7 +511,8 @@ verdict; before the merge the gate ticks all four groups, citing the artifact fo
   - [ ] every statement in the PR matches its proof or evidence (theorem text = the claim; a
         number in prose = the number in the measurement file)
   - [ ] every derived formula or sign is checked against two known limits and the check is
-        asserted in the PR (the w_eff sign error in PR #774 passed review unnoticed)
+        asserted in the PR (the w_eff sign in PR #774 was missed by both reviewers and caught only by
+        a two-limit check)
   - [ ] the anchoring rule holds: no unanchored BLOCKING claim in any review (`review_tiers.md`)
 - **Scope**
   - [ ] the diff is a subset of the tracked issue's ACs; anything else is split out or named as
