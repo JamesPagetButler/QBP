@@ -8,3 +8,4 @@ import QBP.Substrate.RuleFlow
 import QBP.Substrate.RuleFlowInvariants
 import QBP.Substrate.RuleFlowBridge
 import QBP.Substrate.RuleFlowLeafFoliation
+import QBP.Substrate.HostingSeamBridge

@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.22.0",
+  "version": "6.23.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -9492,7 +9492,9 @@
         "QBP.Substrate.Hosting.universeSpace_ne_stateSphere",
         "QBP.Substrate.Hosting.normalise_mem_stateSphere",
         "QBP.Substrate.Hosting.isVacuum_smul_iff",
-        "QBP.Substrate.Hosting.hosting_equivariant_grade"
+        "QBP.Substrate.Hosting.hosting_equivariant_grade",
+        "QBP.Substrate.HostingSeamBridge.potential_eq_potV",
+        "QBP.Substrate.HostingSeamBridge.potential_eq_potV_fun"
       ],
       "theorems": [
         {
@@ -9601,6 +9603,14 @@
         },
         {
           "name": "hosting_equivariant_grade",
+          "status": "verified"
+        },
+        {
+          "name": "potential_eq_potV",
+          "status": "verified"
+        },
+        {
+          "name": "potential_eq_potV_fun",
           "status": "verified"
         }
       ],
@@ -11947,7 +11957,8 @@
         ]
       },
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "notes": "QBP#683 AC6 bridge: Hosting.potential = SeamSpectrum.potV (rfl, definitional), proofs/QBP/Substrate/HostingSeamBridge.lean (potential_eq_potV / potential_eq_potV_fun) — witnessed on PROOF-substrate-hosting-definition; this seam anchor's potV is the bridged target."
     },
     {
       "id": "PROOF-seam-right-gram-equals-left",
@@ -13272,9 +13283,14 @@
       "version": "6.22.0",
       "date": "2026-10-30T00:00:00Z",
       "note": "QBP#797: minted HYP-g2so4-planefield-continuous-transition — the ledger's first provenance_kind:hypothesis anchor (G₂/SO(4) plane-field continuous-transition / Kibble–Zurek premise), before the qbp-kz-g2 round-3 run. tier 3, status contested; F=napkin (notes + qbp-compute-unit#94); two E rows in notes [(i) rate-scale quasi-static-crossing τ_Q 1600–12800 = falsified @ harness aa04139, notary VERIFIED PR#796; (ii) equilibrium-continuity = unconfronted until round 3]; open-question + kill + closure=measurement + discharge-#797 in notes (convention route — decision_state/kill_condition unenforced on anchors, cth typed-key surface pending); prediction_chain [] (no substrate anchor carries the G₂/SO(4) associative-3-plane-field model — substrate-doc gap, oppenheimer-filed). Physics qbp-oppenheimer; encoding cth (schema) + arch (ontology inter#241); cth schema co-sign on the mint PR."
+    },
+    {
+      "version": "6.23.0",
+      "date": "2026-11-01T00:00:00Z",
+      "note": "QBP#683 AC6: HostingSeamBridge witness — potential_eq_potV / potential_eq_potV_fun (rfl, QBP.Substrate.HostingSeamBridge) added to PROOF-substrate-hosting-definition.theorems[] + companions; one-line bridge note on PROOF-seam-top-plane-on-frozen-ridge. Rides PR #803; inverse-anchor baseline bumped so the new module's theorems are no longer orphans. cth co-sign queued."
     }
   ],
-  "last_updated": "2026-10-30T00:00:00Z",
+  "last_updated": "2026-11-01T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
