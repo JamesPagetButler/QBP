@@ -1,0 +1,24 @@
+# mdcu-kz eq meta
+# started: 2026-10-30T22:26:36-04:00
+# load_start: 0.64 1.19 1.41
+# cpu: AMD FX(tm)-8350 Eight-Core Processor
+# go: go version go1.24.2 linux/amd64
+# binary_sha256: 89e7fd539a507ec7d94c00fd12c54bd741de5c14c60135244e3f2afb9a98b899
+# code_sha: 45639ed11ff516c70be7263136c1cb0a794295b2  dirty_files: 0
+# L: 8
+# t_index: 1
+# max_out_mb: 10
+# frozen_file: /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/FROZEN-v1.md
+# prereg_sha256: 132f6a4251ab3ff9ecb8f9b56c607ba1a1dd7e7ed4256fd4fb6f952c0fe1a623
+# rerun_amend_sha256: none
+# pause_file: /home/prime/.federation-watcher/box-pause/mdcu (absent at start)
+# box_lease: /home/prime/.federation-watcher/state/box-lease.lock acquired; holder=qbp-oppenheimer purpose=qbp-kz-g2-r3:eq:L8:t1 pid=2811690
+# pinned: GOMAXPROCS=1 nice -n 19 taskset -c 7
+# unit tests: go test ./mdcu -run TestKZ passed
+# exit: 0
+# wall_s: 255
+# load_end: 1.84 1.69 1.58
+# pause_file_present_at_end: no
+# finished: 2026-10-30T22:30:51-04:00
+# raw_sha256: 24817f203d481905d141a0d893300d8c895e218f8c34eea017bca661cb7638da  (written to /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t01.jsonl.sha256)
+# driver_end: eq L=8 t=1 done: wall 254.7s  steps 165000  ms/step 1.544  peak Sys 14.7 MB  exit 0
