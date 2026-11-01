@@ -484,9 +484,13 @@ A bad change has landed. Where?
      │    └─ yes → NEW FORWARD COMMIT that bumps the version (ledger-vX.Y.Z+1,
      │             prereg …-frozen-vN+1). Closed versions are never un-closed.
      │
-     └─ otherwise → git revert <sha> --no-edit, one revert per bad commit, oldest
-                    first; keep the auto message, add the rationale in the log entry.
-                    A revert of a merge commit uses -m 1 and is a PR like any other.
+     └─ otherwise → git revert <sha> --no-edit, one revert per bad commit, NEWEST
+                    first (reverse chronological: C, then B, then A — reverting the
+                    oldest while its dependants stand guarantees conflicts); keep the
+                    auto message, add the rationale in the log entry. A revert of a
+                    TRUE merge commit uses -m 1 (parent 1 = the target branch); this
+                    repo squash-merges, so a landed PR is one ordinary commit and
+                    needs no -m. Either way the revert is a PR like any other.
 ```
 
 - Expect a conflict when neighbouring commits touch adjacent lines (the #734 test reverted the
