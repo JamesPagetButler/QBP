@@ -362,8 +362,15 @@ def load_register(path):
     return out[0], out[1], problems
 
 
-def is_terminal(node, roots, anchors):
+def is_terminal(node, roots, anchors, inputs_ids=frozenset()):
     if node in roots:
+        return True
+    if node in inputs_ids:
+        # #656 (AC-R): a chain target that is a DECLARED input/instrument constant in the
+        # ledger's inputs[] list grounds the chain — an experimental/instrument datum is a
+        # legitimate terminal, same class as a root / PROOF / MEAS / provenance:E anchor.
+        # Fail-closed: only ids ACTUALLY present in inputs[] terminate here; an id absent
+        # from inputs[] (and not a root/terminal anchor) still falls through to unresolved.
         return True
     a = anchors.get(node)
     if a is None:
@@ -373,7 +380,7 @@ def is_terminal(node, roots, anchors):
     return node.startswith(TERMINAL_ANCHOR_PREFIXES) or a.get("provenance") == "E"
 
 
-def walk_chain(owner, start_ids, roots, principles, anchors):
+def walk_chain(owner, start_ids, roots, principles, anchors, inputs_ids=frozenset()):
     """DFS from the owner's chain. Returns (unresolved_ids, dangling_paths, cycles)."""
     unresolved, dangling, cycles = [], [], []
 
@@ -381,7 +388,7 @@ def walk_chain(owner, start_ids, roots, principles, anchors):
         if node in path:
             cycles.append(" -> ".join(path[path.index(node) :] + [node]))
             return
-        if is_terminal(node, roots, anchors):
+        if is_terminal(node, roots, anchors, inputs_ids):
             return
         if node in principles:
             nxt = _as_list(principles[node].get("derived_from"))
@@ -412,7 +419,7 @@ def walk_chain(owner, start_ids, roots, principles, anchors):
         unresolved.append((node, " -> ".join(path + [node])))
 
     starts = [x for x in start_ids if x != owner]
-    if not starts and not is_terminal(owner, roots, anchors):
+    if not starts and not is_terminal(owner, roots, anchors, inputs_ids):
         dangling.append(f"{owner} (empty chain)")
     for s in starts:
         visit(s, [owner])
@@ -491,6 +498,13 @@ def _pa_tally(pa_rows, key="pa_effective"):
 def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
     roots, retired, principles, anchors, pop_problems, warnings, smuggled = collect(
         ledger
+    )
+    # #656 (AC-R): ids declared in the ledger's inputs[] list are valid chain terminators
+    # (input/instrument constants). Fail-closed — only ids literally present here terminate.
+    inputs_ids = frozenset(
+        r["id"]
+        for r in _as_list(ledger.get("inputs"))
+        if isinstance(r, dict) and isinstance(r.get("id"), str)
     )
     failures = list(pop_problems) + list(register_problems)
     for sid, (where, _) in smuggled.items():
@@ -572,7 +586,7 @@ def audit(ledger, open_roots_reg, chain_debt_reg, register_problems):
                 dead_terminators_hit[node] += 1
     for owner, chain in owners:
         unresolved, dangling, cycles = walk_chain(
-            owner, chain, roots, principles, anchors
+            owner, chain, roots, principles, anchors, inputs_ids
         )
         for mid, path in unresolved:
             unresolved_by_id.setdefault(mid, []).append(path)

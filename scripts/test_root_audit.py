@@ -210,6 +210,49 @@ def test_pa_tally():
     assert t[0] == 2 and t[2] == 1 and t[None] == 1
 
 
+# ---- #656 AC-R: inputs[] ids are chain terminators (fail-CLOSED) ---------------------
+
+
+def test_inputs_id_terminates_chain():
+    """A chain target present in inputs[] resolves — MEAS-alpha -> INST-f0 grounds when
+    INST-f0 is a declared input."""
+    anchors = _anchors(_anchor("MEAS-alpha", status="coherent"))
+    unresolved, dangling, cycles = ra.walk_chain(
+        "MEAS-alpha", ["INST-f0"], {}, {}, anchors, inputs_ids=frozenset({"INST-f0"})
+    )
+    assert unresolved == [] and cycles == []
+
+
+def test_is_terminal_true_for_inputs_id():
+    assert ra.is_terminal("INST-f0", {}, {}, frozenset({"INST-f0"})) is True
+
+
+def test_fail_closed_id_not_in_inputs_stays_unresolved():
+    """FAIL-OPEN MUTANT GUARD: an id that is NOT in inputs[] (and not a root / terminal
+    anchor) must still be UNRESOLVED. If the resolver ever terminated on an arbitrary id
+    rather than one literally in inputs_ids, this is the test that catches it."""
+    anchors = _anchors(_anchor("MEAS-alpha", status="coherent"))
+    # empty inputs_ids: the same chain target must NOT resolve
+    unresolved, _dangling, _cycles = ra.walk_chain(
+        "MEAS-alpha", ["INST-f0"], {}, {}, anchors, inputs_ids=frozenset()
+    )
+    assert [m for m, _p in unresolved] == ["INST-f0"]
+    assert ra.is_terminal("INST-f0", {}, {}, frozenset()) is False
+    # a DIFFERENT id, with INST-f0 in inputs, also does not resolve (only the exact id does)
+    unresolved2, _d2, _c2 = ra.walk_chain(
+        "MEAS-alpha", ["INST-other"], {}, {}, anchors, inputs_ids=frozenset({"INST-f0"})
+    )
+    assert [m for m, _p in unresolved2] == ["INST-other"]
+
+
+def test_inputs_terminator_default_backward_compatible():
+    """is_terminal/walk_chain default inputs_ids=frozenset() so existing callers are
+    unchanged: with no inputs_ids, behaviour is the pre-#656 resolver."""
+    assert (
+        ra.is_terminal("INST-f0", {}, {}) is False
+    )  # no inputs_ids arg -> not terminal
+
+
 if __name__ == "__main__":
     import sys
 
