@@ -54,9 +54,12 @@ each restatement cites its original.
   not formalised here**; nothing below transports it.
 
 * **In-flight region.**  `InFlight` — the imaginary unit non-vacua.
-  `inFlight_no_quaternion_closure` makes "not yet crystallised" a *theorem*
-  rather than a slogan: on `InFlight` the scalar-spectrum identity
-  `−L_s² = N(s)·id` provably FAILS (`CrystalHosting.left_mul_sq_scalar_iff_vacuum`).
+  `inFlight_no_quaternion_closure` proves only that on `InFlight` the
+  scalar-spectrum identity `−L_s² = N(s)·id` FAILS
+  (`CrystalHosting.left_mul_sq_scalar_iff_vacuum`) — "no *scalar* closure".  Its
+  NAME over-reads it (kept for anchor/ledger stability; #683 AC12): a 4-dimensional
+  associative subalgebra `span{1, s, ℓ, s·ℓ}` DOES close at every in-flight state
+  (`QBP/Foundations/InFlightAlgebra.lean`, #688).  See the theorem's docstring.
 
 * **Poles.**  `polePlus`/`poleMinus` (`±ℓ`) are crystals whose hosted algebra is
   exactly `span{1, ℓ} ≅ ℂ` — the honest degeneration of the parametrisation
