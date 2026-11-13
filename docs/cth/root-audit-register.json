@@ -30,38 +30,12 @@
   ],
   "chain_debt": [
     {
-      "id": "INST-f0",
-      "kind": "unresolved-id",
-      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
-      "cited_via": [
-        "MEAS-alpha -> INST-f0",
-        "MEAS-sin2tw -> INST-f0",
-        "MEAS-alphas -> INST-f0",
-        "OBS-f0-2alpha -> INST-f0",
-        "CONSTRAINT-ynu -> INST-f0"
-      ],
-      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
-      "added": "2026-09-11",
-      "added_by": "#654 D6 first run"
-    },
-    {
       "id": "DERIV-rge",
       "kind": "unresolved-id",
       "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
       "cited_via": [
         "MEAS-sin2tw -> DERIV-rge",
         "MEAS-alphas -> DERIV-rge"
-      ],
-      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
-      "added": "2026-09-11",
-      "added_by": "#654 D6 first run"
-    },
-    {
-      "id": "INST-theta",
-      "kind": "unresolved-id",
-      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
-      "cited_via": [
-        "MEAS-koide -> INST-theta"
       ],
       "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
       "added": "2026-09-11",
@@ -183,17 +157,6 @@
       "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
       "cited_via": [
         "MEAS-tolfac -> DERIV-tolerance"
-      ],
-      "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
-      "added": "2026-09-11",
-      "added_by": "#654 D6 first run"
-    },
-    {
-      "id": "INST-TcJ-ratio",
-      "kind": "unresolved-id",
-      "issue": "https://github.com/JamesPagetButler/QBP/issues/656",
-      "cited_via": [
-        "FLAG-Tc -> INST-TcJ-ratio"
       ],
       "resolution": "ENCODE the object with its evidence, RE-POINT the citing chains, or KILL the citing claim",
       "added": "2026-09-11",
