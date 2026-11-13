@@ -196,7 +196,7 @@ The drafting direction phrased the lesson as "a test that passes only because it
 | Protocol hypotheses carried | A / B / C carried with kills K1–K4 as physics questions, not ruled; horn-1 alternatives' (Q_μ, thermal family) numbers computed if funded; #637 negative stands unless a second observable appears | #635; #473 horn-1 audit |
 | G2 landed | AXIOM-1 kill_condition[0] in positive-measure form (PR #687): the wording ratified on the review axes (§I4 + schema); the ROOT-record edit itself is a **process** authorisation (a constitutional-layer write, the beekeeper's by federation rule), not a ruling on the kill's physics; lands before or with any `POST-…` encode | #668 (+ #647) |
 | G5 merged | PR #682 on master, so the remaining four "pending merge" citations resolve (PR #681's four anchors already landed, ledger 6.9.0) | #684 G5 |
-| Positive in-flight account | a definition (not a description) of the in-flight region consistent with §4's negatives; needs an issue first | none yet |
+| Positive in-flight account | a definition (not a description) of the in-flight region consistent with §4's negatives | **#688** (filed 2026-09-28; at v0.1 this needed an issue first) |
 | AC2 candidate | a Prop 13(b)-class mechanism passing the relocation test, or a b₀ observable with a distributional statement | FLAG-locale-forcing-route-reopened; #637; #638 |
 | Existence | local existence of integral curves and convergence V → 0, discharging §2's conditionals | FLAG-rule-flow-open; #635 |
 | Carrier numerics into Lean | vacuum topology; ridge dimension | #634 |
