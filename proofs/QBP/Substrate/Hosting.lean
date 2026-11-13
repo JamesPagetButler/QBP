@@ -61,7 +61,7 @@ each restatement cites its original.
   associative subalgebra `span{1, s, ℓ, s·ℓ}` DOES close at every in-flight state
   (`QBP/Foundations/InFlightAlgebra.lean`, #688).  See the theorem's docstring.
 
-* **Poles.**  `polePlus`/`poleMinus` (`±ℓ`) are crystals whose hosted algebra is
+* **Poles.**  `polePlus` (`ℓ`) and its negative `−ℓ` are crystals whose hosted algebra is
   exactly `span{1, ℓ} ≅ ℂ` — the honest degeneration of the parametrisation
   (`CrystalHosting.vacuum_pole_of_dir_zero`).  `pole_hosts_complex` states this
   for the normalisation of any `b₀ • ℓ`, `b₀ ≠ 0`.
