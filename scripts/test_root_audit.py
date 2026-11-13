@@ -253,6 +253,68 @@ def test_inputs_terminator_default_backward_compatible():
     )  # no inputs_ids arg -> not terminal
 
 
+# ---- #656 AC-R: audit() wiring — inputs_ids built from the ledger (Gemini F2, PR #805) --
+
+
+def _inputs_ledger(target, inputs):
+    """Minimal ledger: one gated principle whose derived_from cites `target`."""
+    return {
+        "derived_principles": [{"id": "PRIN-x", "derived_from": [target]}],
+        "anchors": [],
+        "inputs": inputs,
+    }
+
+
+def test_audit_wires_inputs_ids_from_ledger():
+    """End-to-end: audit() must build inputs_ids from ledger["inputs"] and pass it down, so
+    a gated chain citing a declared input resolves with NO failure. Unit tests on
+    is_terminal/walk_chain alone do not cover this wiring (an audit() that forgot to pass
+    inputs_ids, or built it empty, would still pass them) — this test fails in that case.
+    """
+    res = ra.audit(_inputs_ledger("INST-f0", [{"id": "INST-f0"}]), {}, {}, [])
+    assert res["failures"] == []
+    assert "INST-f0" not in res["unresolved"]
+    assert "PRIN-x" not in res["dangling"]
+
+
+def test_audit_negative_control_id_in_neither_inputs_nor_anchors():
+    """Negative control: same chain, but the target is in NEITHER inputs[] nor anchors —
+    audit() must report it CHAIN UNRESOLVED (fail-closed at the top level)."""
+    res = ra.audit(_inputs_ledger("INST-ghost", [{"id": "INST-f0"}]), {}, {}, [])
+    assert "INST-ghost" in res["unresolved"]
+    assert any(f.startswith("CHAIN UNRESOLVED INST-ghost") for f in res["failures"])
+
+
+def test_audit_inputs_ignores_malformed_records():
+    """Wiring is fail-closed on record shape: a bare string or a non-string id in inputs[]
+    declares nothing, so the cited id stays unresolved."""
+    res = ra.audit(_inputs_ledger("INST-f0", ["INST-f0", {"id": 5}, {}]), {}, {}, [])
+    assert "INST-f0" in res["unresolved"]
+
+
+def test_inputs_and_anchor_overlap_current_behaviour_pinned():
+    """PINNED PENDING A RULING (Gemini F3, PR #805): an id present in BOTH inputs[] and
+    anchors is terminal via the inputs[] branch of is_terminal, which runs BEFORE the
+    anchor status check — so even a DEAD (killed) anchor terminates a chain that cites it,
+    where without the inputs[] entry it would dangle. The real ledger has 0 such overlaps
+    today. The overlapping id's OWN prediction_chain is still walked as an owner (only its
+    role as a chain TARGET short-circuits). If the ruling is "anchor status wins", flip the
+    first assertion and reorder is_terminal; do not delete this test."""
+    dead = {"id": "MEAS-d", "status": "killed", "prediction_chain": []}
+    both = {
+        "derived_principles": [{"id": "PRIN-x", "derived_from": ["MEAS-d"]}],
+        "anchors": [dead],
+        "inputs": [{"id": "MEAS-d"}],
+    }
+    anchor_only = dict(both, inputs=[])
+    assert (
+        "PRIN-x" not in ra.audit(both, {}, {}, [])["dangling"]
+    )  # inputs[] wins (current)
+    assert (
+        "PRIN-x" in ra.audit(anchor_only, {}, {}, [])["dangling"]
+    )  # dead anchor dangles
+
+
 if __name__ == "__main__":
     import sys
 
