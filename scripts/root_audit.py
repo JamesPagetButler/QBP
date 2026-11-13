@@ -371,6 +371,8 @@ def is_terminal(node, roots, anchors, inputs_ids=frozenset()):
         # legitimate terminal, same class as a root / PROOF / MEAS / provenance:E anchor.
         # Fail-closed: only ids ACTUALLY present in inputs[] terminate here; an id absent
         # from inputs[] (and not a root/terminal anchor) still falls through to unresolved.
+        # Terminating here means the chain is GROUNDED (resolved), not FORCED (derived): e.g.
+        # INST-f0 is a free input — #479's SELECTED tag carries its evidential weight, not this audit.
         return True
     a = anchors.get(node)
     if a is None:
