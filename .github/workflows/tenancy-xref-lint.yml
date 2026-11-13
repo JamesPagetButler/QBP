@@ -32,20 +32,12 @@ on:
       - "scripts/list_numeric_anchors.py"
       - "scripts/test_list_numeric_anchors.py"
       - "archive/cth-inventory/confluent-trust-inventory-*.v0.3.json"
+  # No paths filter on pull_request: this check is a required status check
+  # (#738 AC3), and a path-filtered required check never starts on PRs
+  # outside its paths, so those PRs would wait forever. It runs in ~10 s.
   pull_request:
     branches:
       - master
-    paths:
-      - "docs/qbp-federation-tenancy.md"
-      - "scripts/tenancy_xref_linter.py"
-      - "scripts/test_tenancy_xref_linter.py"
-      - ".github/workflows/tenancy-xref-lint.yml"
-      - "research/**"
-      - "scripts/check_prediction_classification.py"
-      - "scripts/test_check_prediction_classification.py"
-      - "scripts/list_numeric_anchors.py"
-      - "scripts/test_list_numeric_anchors.py"
-      - "archive/cth-inventory/confluent-trust-inventory-*.v0.3.json"
 
 jobs:
   tenancy-xref-lint:
