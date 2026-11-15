@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/JamesPagetButler/confluent-trust/schema/inventory.schema.v0.3.5.json",
-  "x-schema-semver": "0.3.5",
+  "$id": "https://github.com/JamesPagetButler/confluent-trust/schema/inventory.schema.v0.3.6.json",
+  "x-schema-semver": "0.3.6",
   "title": "CTH Inventory",
-  "description": "Confluent Trust Hypergraph inventory document. Conforms to Theory v0.2 §4.1 plus the §2.9 fork extension. Both v0.1 (path_a/path_b) and v0.2 (paths[]) confluence shapes are accepted; the Go store normalizes to N-ary on load. The schema-document semver (x-schema-semver, mirrored in $id) is distinct from both the programme content version and the schema_version generation — see doc/design/schema-change-propagation.md §4. 0.3.1 (minor, additive): killed_by/killed_note/review_flag (#93), foundation_batch (#96), class_floors (contextus PR #32 Q1). 0.3.2 (minor, additive): axis_trust/locale_domain/cluster_state (sheaf trust, #95/inter#41 Decision 2). 0.3.3 (minor, additive): 'derivation' provenance_kind + C1 relaxed to admit proof-fields (proof_state/proof_language/theorems/verification) on {proof, derivation} so a kernel-verified derivation can SHOW its Lean (FAULT-S4-005 burn-down, QBP#621; cth-implementor ruling live-test seq=1041). 0.3.4 (minor, additive): decision_state (open|settled) + kill_condition (array of {kill, closure, discharge} Impasse Records) on roots; four QBP-general top-level root lists (meta_principles, interpretations, retired_axioms, retired_principles) promoted to $defs; the decision_state:open ⇒ non-empty kill_condition invariant is schema-enforced (FAULT-S4-005 four-bucket / #654 D3; cth-implementor, confluent-trust #102/#103). 0.3.5 (minor, additive): proof_assistants [{assistant∈{lean4,coq,agda}, evidence_ref, trust_check}] on proof + derivation anchors — PA (proof-assistant count) grading, DERIVED from Notary evidence at evidence_ref, never typed; trust_check is veto-only (confluent-trust#108 / inter#150 PA grading; cth-implementor).",
+  "description": "Confluent Trust Hypergraph inventory document. Conforms to Theory v0.2 §4.1 plus the §2.9 fork extension. Both v0.1 (path_a/path_b) and v0.2 (paths[]) confluence shapes are accepted; the Go store normalizes to N-ary on load. The schema-document semver (x-schema-semver, mirrored in $id) is distinct from both the programme content version and the schema_version generation — see doc/design/schema-change-propagation.md §4. 0.3.1 (minor, additive): killed_by/killed_note/review_flag (#93), foundation_batch (#96), class_floors (contextus PR #32 Q1). 0.3.2 (minor, additive): axis_trust/locale_domain/cluster_state (sheaf trust, #95/inter#41 Decision 2). 0.3.3 (minor, additive): 'derivation' provenance_kind + C1 relaxed to admit proof-fields (proof_state/proof_language/theorems/verification) on {proof, derivation} so a kernel-verified derivation can SHOW its Lean (FAULT-S4-005 burn-down, QBP#621; cth-implementor ruling live-test seq=1041). 0.3.4 (minor, additive): decision_state (open|settled) + kill_condition (array of {kill, closure, discharge} Impasse Records) on roots; four QBP-general top-level root lists (meta_principles, interpretations, retired_axioms, retired_principles) promoted to $defs; the decision_state:open ⇒ non-empty kill_condition invariant is schema-enforced (FAULT-S4-005 four-bucket / #654 D3; cth-implementor, confluent-trust #102/#103). 0.3.5 (minor, additive): proof_assistants [{assistant∈{lean4,coq,agda}, evidence_ref, trust_check}] on proof + derivation anchors — PA (proof-assistant count) grading, DERIVED from Notary evidence at evidence_ref, never typed; trust_check is veto-only (confluent-trust#108 / inter#150 PA grading; cth-implementor). 0.3.6 (minor, additive; QBP-local-awaiting-upstream — QBP#809 phase 1, beekeeper ruling 2026-11-13, inter#238 D3 'fed-sigma-v1' threshold refinement; cth-implementor schema-axis co-sign requested): measured_error documented as 1σ (68% CL); optional asymmetric measured_error_plus/measured_error_minus; measured_source gets a minLength:1 floor (must be a non-empty citation string; content-filling is phase 2); computed fit_sigma (number|null) with a required fit_sigma_reason when null (FitSigmaNeedsReason conditional, same shape as OpenNeedsKill); append-only fit_history[] of {date, predicted_value, source, ledger_version, fit_sigma} FitHistoryEntry records. fit_sigma/fit_history are COMPUTED by scripts/compute_fit_sigma.py, never hand-entered.",
   "type": "object",
   "required": ["programme", "version", "axioms", "anchors", "chains"],
   "additionalProperties": true,
@@ -106,6 +106,24 @@
       "description": "Shared conditional (v0.3.4): a root with decision_state 'open' must carry a non-empty kill_condition. Referenced from the allOf of Axiom, MetaPrinciple and Interpretation.",
       "if":   { "properties": { "decision_state": { "const": "open" } }, "required": ["decision_state"] },
       "then": { "required": ["kill_condition"], "properties": { "kill_condition": { "type": "array", "minItems": 1 } } }
+    },
+    "FitSigmaNeedsReason": {
+      "description": "Shared conditional (v0.3.6, QBP#809 phase 1): when an anchor's computed fit_sigma is explicitly null (no usable 1σ measured error yet, or an undefined zero-denominator case), fit_sigma_reason must say why — never a silent null. Mirrors OpenNeedsKill's shape. Referenced from the allOf of Anchor.",
+      "if":   { "properties": { "fit_sigma": { "const": null } }, "required": ["fit_sigma"] },
+      "then": { "required": ["fit_sigma_reason"], "properties": { "fit_sigma_reason": { "type": "string", "minLength": 1 } } }
+    },
+    "FitHistoryEntry": {
+      "type": "object",
+      "description": "One append-only fit_sigma evaluation record on an Anchor (v0.3.6, QBP#809 phase 1; computed by scripts/compute_fit_sigma.py, never hand-entered). `fit_history` is append-only: an existing entry is never edited or removed, only a new one appended — a future PR may read its length as a trials count.",
+      "required": ["date", "predicted_value", "source", "ledger_version", "fit_sigma"],
+      "properties": {
+        "date":            { "type": "string", "description": "Timestamp of this evaluation run (ISO 8601)." },
+        "predicted_value": { "type": "number", "description": "The anchor's predicted_value at evaluation time." },
+        "source":          { "type": "string", "minLength": 1, "description": "Reference to the PR/spike/'leader' that produced the predicted value being evaluated — best-effort from existing provenance fields (theory_citation/theory_url/theory_doi/foundation_batch) until AC2 backfills a real per-anchor citation; an honest 'unresolved' placeholder is valid here, never omitted." },
+        "ledger_version":  { "type": "string", "description": "The inventory `version` this evaluation was computed against/written into." },
+        "fit_sigma":        { "type": ["number", "null"], "description": "The fit_sigma computed on this run; null if undefined at that time (mirrors the anchor-level field at the moment of this evaluation)." }
+      },
+      "additionalProperties": true
     },
     "ProofState": {
       "type": "string",
@@ -271,9 +289,14 @@
         "predicted_value":           { "type": "number" },
         "predicted_unit":            { "type": "string" },
         "measured_value":            { "type": "number" },
-        "measured_error":            { "type": "number" },
-        "measured_source":           { "type": "string" },
+        "measured_error":            { "type": "number", "description": "1σ (68% CL) symmetric measurement uncertainty on measured_value (v0.3.6 convention, QBP#809 phase 1). Use measured_error_plus/measured_error_minus instead when the error is asymmetric." },
+        "measured_error_plus":       { "type": "number", "description": "1σ (68% CL) upper (positive-direction) measurement uncertainty, for an asymmetric error bar (v0.3.6). Paired with measured_error_minus; measured_error is the symmetric case." },
+        "measured_error_minus":      { "type": "number", "description": "1σ (68% CL) lower (negative-direction) measurement uncertainty, for an asymmetric error bar (v0.3.6). Paired with measured_error_plus." },
+        "measured_source":           { "type": "string", "minLength": 1, "description": "The specific paper/PDG table+edition (or equivalent) this measured_value/measured_error was pinned from. Free text; non-empty is schema-enforced (v0.3.6), the citation's actual content is a phase-2 backfill concern (QBP#809 AC2), not validated here." },
         "discrepancy_pct":           { "type": "number" },
+        "fit_sigma":                 { "type": ["number", "null"], "description": "Computed (never hand-entered, v0.3.6, QBP#809 phase 1): |predicted_value - measured_value| / sqrt(sigma_meas^2 + sigma_pred^2), sigma_meas from measured_error (or the measured_error_plus/measured_error_minus pair), sigma_pred = 0 until a prediction-error field exists. null when no usable 1σ measured error is pinned yet, or the zero-denominator case is undefined — see fit_sigma_reason. Drives the one-way status cap in scripts/compute_fit_sigma.py (never raises status, only lowers/caps it)." },
+        "fit_sigma_reason":          { "type": "string", "minLength": 1, "description": "Required when fit_sigma is null (FitSigmaNeedsReason conditional, v0.3.6): why fit_sigma could not be computed on the last evaluation." },
+        "fit_history":               { "type": "array", "items": { "$ref": "#/$defs/FitHistoryEntry" }, "description": "Append-only log of fit_sigma evaluations (v0.3.6, QBP#809 phase 1) — never overwritten, only appended by scripts/compute_fit_sigma.py." },
         "last_tested_at":            { "type": ["string", "null"], "format": "date-time" },
         "inherited_from":            { "type": "string" },
         "inherited_at":              { "type": "string" },
@@ -333,7 +356,8 @@
               }
             }
           }
-        }
+        },
+        { "$ref": "#/$defs/FitSigmaNeedsReason" }
       ]
     },
     "Input": {
