@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.23.1",
+  "version": "6.24.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -657,7 +657,17 @@
       "tier": 2,
       "provenance": "P",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 5.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 128.05,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 5.0
+        }
+      ]
     },
     {
       "predicted_value": 0.2347,
@@ -678,7 +688,17 @@
       "tier": 2,
       "provenance": "P",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 17.4,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.2347,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 17.4
+        }
+      ]
     },
     {
       "predicted_value": 0.114,
@@ -699,7 +719,17 @@
       "tier": 2,
       "provenance": "P",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 4.333333333,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.114,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 4.333333333
+        }
+      ]
     },
     {
       "predicted_value": 0.666667,
@@ -720,7 +750,17 @@
       "tier": 2,
       "provenance": "P",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.6,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.666667,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.6
+        }
+      ]
     },
     {
       "predicted_value": 7.6,
@@ -742,7 +782,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.333333333,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 7.6,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.333333333
+        }
+      ]
     },
     {
       "predicted_value": 1.53,
@@ -764,7 +814,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 1.1,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 1.53,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 1.1
+        }
+      ]
     },
     {
       "predicted_value": 46,
@@ -789,7 +849,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.2,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 46,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.2
+        }
+      ]
     },
     {
       "predicted_value": 11,
@@ -811,7 +881,17 @@
       "tier": 3,
       "provenance": "D",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 11,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "predicted_value": 76,
@@ -833,7 +913,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "incoherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 5.4,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 76,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 5.4
+        }
+      ]
     },
     {
       "predicted_value": 53,
@@ -853,7 +943,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "incoherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 39.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 53,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 39.0
+        }
+      ]
     },
     {
       "predicted_value": 6.7,
@@ -873,7 +973,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "incoherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 7.4,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 6.7,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 7.4
+        }
+      ]
     },
     {
       "predicted_value": 28,
@@ -892,7 +1002,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "incoherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 4.6,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 28,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 4.6
+        }
+      ]
     },
     {
       "predicted_value": 0,
@@ -912,7 +1032,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "incoherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "testable_when": "EXP-11 (now), IR1 (2026), O5 (2028-2031), LISA (2035+)",
@@ -1019,7 +1149,17 @@
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 2.28,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 2.28
+        }
+      ]
     },
     {
       "predicted_value": 0,
@@ -1041,7 +1181,17 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "Chamseddine, Connes & van Suijlekom 2013; Aydemir et al. 2018"
+      "theory_citation": "Chamseddine, Connes & van Suijlekom 2013; Aydemir et al. 2018",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "theory_citation:Chamseddine, Connes & van Suijlekom 2013; Aydemir et al. 2018",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "testable_when": "Hyper-K (2027+), DUNE (2028+)",
@@ -1106,7 +1256,17 @@
       "tier": 2,
       "provenance": "P",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.37,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 83.51,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.37
+        }
+      ]
     },
     {
       "predicted_value": 0.666667,
@@ -1127,7 +1287,17 @@
       "tier": 2,
       "provenance": "P",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 2.778,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.666667,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 2.778
+        }
+      ]
     },
     {
       "predicted_value": 0.214,
@@ -1149,7 +1319,17 @@
       "tier": 3,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 1.361702128,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.214,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 1.361702128
+        }
+      ]
     },
     {
       "predicted_value": 0.76,
@@ -1170,7 +1350,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 21.333333333,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.76,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 21.333333333
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1309,7 +1499,17 @@
       "tier": 3,
       "provenance": "D",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 1,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "predicted_value": 0,
@@ -1332,7 +1532,17 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "Schnyder, Ryu, Furusaki & Ludwig 2008 (Altland-Zirnbauer tenfold way)"
+      "theory_citation": "Schnyder, Ryu, Furusaki & Ludwig 2008 (Altland-Zirnbauer tenfold way)",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "theory_citation:Schnyder, Ryu, Furusaki & Ludwig 2008 (Altland-Zirnbauer tenfold way)",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1400,7 +1610,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 2,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "predicted_value": 0.5774,
@@ -1420,7 +1640,17 @@
       "tier": 3,
       "provenance": "P",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.86,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.5774,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.86
+        }
+      ]
     },
     {
       "predicted_value": 0,
@@ -1441,7 +1671,17 @@
       "tier": 3,
       "provenance": "T",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1541,7 +1781,17 @@
       "tier": 2,
       "provenance": "D",
       "status": "coherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.5,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "predicted_value": 0,
@@ -1564,7 +1814,17 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "Kitaev 2006 (Ann. Phys. 321, 2)"
+      "theory_citation": "Kitaev 2006 (Ann. Phys. 321, 2)",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "theory_citation:Kitaev 2006 (Ann. Phys. 321, 2)",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "predicted_value": 0.5,
@@ -1586,7 +1846,17 @@
       "provenance": "T",
       "status": "marginal",
       "provenance_kind": "theory-external",
-      "theory_citation": "Kasahara et al. 2018 (Nature); Yokoi et al. 2021 (Science)"
+      "theory_citation": "Kasahara et al. 2018 (Nature); Yokoi et al. 2021 (Science)",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.5,
+          "source": "theory_citation:Kasahara et al. 2018 (Nature); Yokoi et al. 2021 (Science)",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1636,7 +1906,17 @@
       "tier": 3,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 1.999986,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.07,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 1.999986
+        }
+      ]
     },
     {
       "predicted_value": -0.556,
@@ -1657,7 +1937,17 @@
       "tier": 3,
       "provenance": "P",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.028571429,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": -0.556,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.028571429
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-08T00:00:00Z",
@@ -1729,7 +2019,17 @@
       "tier": 2,
       "provenance": "E",
       "status": "coherent",
-      "provenance_kind": "experiment"
+      "provenance_kind": "experiment",
+      "fit_sigma": 0.285714286,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.285714286
+        }
+      ]
     },
     {
       "predicted_value": 0,
@@ -1749,7 +2049,17 @@
       "tier": 2,
       "provenance": "E",
       "status": "coherent",
-      "provenance_kind": "experiment"
+      "provenance_kind": "experiment",
+      "fit_sigma": 0.285714286,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.285714286
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-10T00:00:00Z",
@@ -1802,7 +2112,17 @@
       "tier": 2,
       "provenance": "E",
       "status": "coherent",
-      "provenance_kind": "experiment"
+      "provenance_kind": "experiment",
+      "fit_sigma": 0.2,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 1,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.2
+        }
+      ]
     },
     {
       "predicted_value": 1,
@@ -1822,7 +2142,17 @@
       "tier": 2,
       "provenance": "E",
       "status": "coherent",
-      "provenance_kind": "experiment"
+      "provenance_kind": "experiment",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 1,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "predicted_value": 0,
@@ -1842,7 +2172,17 @@
       "tier": 2,
       "provenance": "E",
       "status": "coherent",
-      "provenance_kind": "experiment"
+      "provenance_kind": "experiment",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-12T00:00:00Z",
@@ -1880,7 +2220,17 @@
       "tier": 2,
       "provenance": "E",
       "status": "coherent",
-      "provenance_kind": "experiment"
+      "provenance_kind": "experiment",
+      "fit_sigma": 0.039215686,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.039215686
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-12T00:00:00Z",
@@ -1929,7 +2279,17 @@
       "tier": 2,
       "provenance": "E",
       "status": "coherent",
-      "provenance_kind": "experiment"
+      "provenance_kind": "experiment",
+      "fit_sigma": 0.4,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.26,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.4
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-12T00:00:00Z",
@@ -2025,7 +2385,17 @@
       "status": "coherent",
       "provenance_kind": "theory-external",
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "theory_citation:Stelle 1977 (Phys.Rev.D 16, 953); Stelle 1978 (Gen.Rel.Grav. 9, 353)",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-13T00:00:00Z",
@@ -2122,7 +2492,17 @@
       "tier": 2,
       "provenance": "E",
       "status": "coherent",
-      "provenance_kind": "experiment"
+      "provenance_kind": "experiment",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "predicted_value": 3e-10,
@@ -2143,7 +2523,17 @@
       "tier": 3,
       "provenance": "T",
       "status": "untested",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 6.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 3e-10,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 6.0
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-13T00:00:00Z",
@@ -2196,7 +2586,17 @@
       "provenance": "T",
       "status": "marginal",
       "provenance_kind": "theory-external",
-      "theory_citation": "CITATION-NEEDED (external birefringence measurement, e.g. Minami & Komatsu 2020 PRL) -- Oppenheimer ruling"
+      "theory_citation": "CITATION-NEEDED (external birefringence measurement, e.g. Minami & Komatsu 2020 PRL) -- Oppenheimer ruling",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.35,
+          "source": "theory_citation:CITATION-NEEDED (external birefringence measurement, e.g. Minami & Komatsu 2020 PRL) -- Oppenheimer ruling",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-14T00:00:00Z",
@@ -2259,7 +2659,17 @@
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 1.222222222,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.2222222222222222,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 1.222222222
+        }
+      ]
     },
     {
       "predicted_value": 0.8165,
@@ -2278,7 +2688,17 @@
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.3125,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.8165,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.3125
+        }
+      ]
     },
     {
       "predicted_value": 69.3,
@@ -2344,7 +2764,17 @@
       },
       "foundation_batch": "#466",
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "fit_sigma": 0.65,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 69.3,
+          "source": "foundation_batch:#466",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.65
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-18T00:00:00Z",
@@ -2444,7 +2874,17 @@
       "tier": 2,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.075,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 39.9,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.075
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-27T00:00:00Z",
@@ -2483,7 +2923,17 @@
       "status": "marginal",
       "provenance_kind": "theory",
       "physical_mapping_status": "falsified-as-global",
-      "regime_of_validity": "bump-peak rho_c only — see PRED-tov-mass-at-bump-peak (the regime-specific re-scope that survives). Global M_max reading falsified by the stream's own EOS-integration results (INSIGHT-eos-integration-shifts-tov-by-30pct: robust QBP TOV in [2.6, 2.8] M_sun, mutually exclusive with 2.20)."
+      "regime_of_validity": "bump-peak rho_c only — see PRED-tov-mass-at-bump-peak (the regime-specific re-scope that survives). Global M_max reading falsified by the stream's own EOS-integration results (INSIGHT-eos-integration-shifts-tov-by-30pct: robust QBP TOV in [2.6, 2.8] M_sun, mutually exclusive with 2.20).",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 2.2,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "predicted_value": 3,
@@ -2517,7 +2967,18 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "CITATION-NEEDED (standard QCD conformal limit c_s^2=1/3 for massless quarks) -- Oppenheimer ruling"
+      "theory_citation": "CITATION-NEEDED (standard QCD conformal limit c_s^2=1/3 for massless quarks) -- Oppenheimer ruling",
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.3333,
+          "source": "theory_citation:CITATION-NEEDED (standard QCD conformal limit c_s^2=1/3 for massless quarks) -- Oppenheimer ruling",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "predicted_value": 0.6667,
@@ -2598,7 +3059,18 @@
       "provenance": "T",
       "status": "coherent",
       "provenance_kind": "theory-external",
-      "theory_citation": "CITATION-NEEDED (direct-URCA threshold, e.g. Lattimer, Pethick, Prakash & Haensel 1991 PRL 66, 2701) -- Oppenheimer ruling"
+      "theory_citation": "CITATION-NEEDED (direct-URCA threshold, e.g. Lattimer, Pethick, Prakash & Haensel 1991 PRL 66, 2701) -- Oppenheimer ruling",
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.1111,
+          "source": "theory_citation:CITATION-NEEDED (direct-URCA threshold, e.g. Lattimer, Pethick, Prakash & Haensel 1991 PRL 66, 2701) -- Oppenheimer ruling",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "predicted_value": 3,
@@ -2672,7 +3144,17 @@
       "tier": 1,
       "provenance": "T",
       "status": "marginal",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.714285714,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.69,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.714285714
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-27T00:00:00Z",
@@ -2788,7 +3270,17 @@
       "provenance": "T",
       "status": "untested",
       "provenance_kind": "theory",
-      "review_flag": "prediction_chain depends on PROOF-division-algebra-entropy-cone-mapping which is now incoherent (2026-06-01). Re-evaluate basis; do not treat as 'untested' with a dead dependency. @cth-implementor judgment."
+      "review_flag": "prediction_chain depends on PROOF-division-algebra-entropy-cone-mapping which is now incoherent (2026-06-01). Re-evaluate basis; do not treat as 'untested' with a dead dependency. @cth-implementor judgment.",
+      "fit_sigma": 0.08,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 5.36,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.08
+        }
+      ]
     },
     {
       "last_tested_at": "2026-04-30T00:00:00Z",
@@ -2847,7 +3339,18 @@
       "status": "coherent",
       "provenance_kind": "theory",
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 21,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "predicted_value": 0.04,
@@ -2866,7 +3369,17 @@
       "tier": 2,
       "provenance": "T",
       "status": "incoherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.04,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.0
+        }
+      ]
     },
     {
       "last_tested_at": "2026-05-04T00:00:00Z",
@@ -2964,7 +3477,17 @@
       "tier": 2,
       "provenance": "T",
       "status": "untested",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": 0.7,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 50.27,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.7
+        }
+      ]
     },
     {
       "last_tested_at": "2026-05-08T00:00:00Z",
@@ -3025,7 +3548,18 @@
       "tier": 3,
       "provenance": "T",
       "status": "incoherent",
-      "provenance_kind": "theory"
+      "provenance_kind": "theory",
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "id": "DEFN-cayley-dickson-doubling",
@@ -3164,7 +3698,18 @@
       "last_tested_at": "2026-05-01T00:00:00Z",
       "provenance_kind": "internal-compute",
       "intake_batch": "509-A",
-      "intake_source": "v5.13 (federation-tenancy stream)"
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 2.2,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "id": "INSIGHT-cross-platform-per-feature-class",
@@ -3425,7 +3970,18 @@
       "notes": "\n[Session 20] First-principles derivation attempt: parent-BH dynamical retardation gives saturation form 1/(1+(1+z)/F_max). Empirical best-fit F_max = 7 = dim(Im 𝕆) (number of Fano lines). BTFR RMS sensitivity table: F_max=7 gives 0.047 dex (best), F_max=10 gives 0.051 dex, F_max=14 gives 0.054 dex. The number of Fano lines is the empirically-best AND cleanest QBP-algebraic saturation factor. Pre-registered: a₀(14)/a₀(0) = 4.69.",
       "provenance_kind": "internal-compute",
       "intake_batch": "509-A",
-      "intake_source": "v5.13 (federation-tenancy stream)"
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.051,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "id": "PRED-a0-saturation-factor-fano",
@@ -3446,7 +4002,18 @@
       "provenance_kind": "internal-compute",
       "intake_note": "Reconciled to match PRED-a0-saturating-Fmax-7 downgrade (7-vs-13.4 tension recorded).",
       "intake_batch": "509-A",
-      "intake_source": "v5.13 (federation-tenancy stream)"
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 7,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "id": "PRED-btfr-mass-correction",
@@ -3635,7 +4202,18 @@
       "last_tested_at": "2026-05-01T00:00:00Z",
       "provenance_kind": "internal-compute",
       "intake_batch": "509-A",
-      "intake_source": "v5.13 (federation-tenancy stream)"
+      "intake_source": "v5.13 (federation-tenancy stream)",
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 2.2,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "id": "PROOF-alpha-particle-quaternion",
@@ -4713,7 +5291,18 @@
         ]
       },
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "fit_sigma": null,
+      "fit_sigma_reason": "no usable measured 1σ error recorded (measured_error / measured_error_plus+measured_error_minus absent) — pending AC2/AC3 backfill (QBP#809 phase 2)",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 3.0,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "id": "FLAG-ngc2683-mass-discrepancy",
@@ -4737,7 +5326,18 @@
       "last_tested_at": "2026-05-26T12:30:00Z",
       "provenance_kind": "experiment",
       "intake_batch": "509-C",
-      "intake_source": "v5_24 (QBP-web continued lineage)"
+      "intake_source": "v5_24 (QBP-web continued lineage)",
+      "fit_sigma": null,
+      "fit_sigma_reason": "measured_error is 0 but predicted_value != measured_value (discrepancy=69.80000000000001) — fit_sigma undefined at zero denominator",
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 145.2,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": null
+        }
+      ]
     },
     {
       "id": "FLAG-seam-dynamics-open",
@@ -11166,7 +11766,17 @@
       "measured_error": 0.09,
       "predicted_value": 0.96,
       "predicted_unit": "a₊/|a₋| (dimensionless)",
-      "notes": "a₋ = −850(20) a₀; a₊ = 1060(70) a₀. The 0.96(3) is the zero-range universal prediction; the ≈3σ gap is understood in the subsequent literature through finite-range corrections to that baseline. The record's status describes the ledger record (an external result on file), not agreement with zero-range theory."
+      "notes": "a₋ = −850(20) a₀; a₊ = 1060(70) a₀. The 0.96(3) is the zero-range universal prediction; the ≈3σ gap is understood in the subsequent literature through finite-range corrections to that baseline. The record's status describes the ledger record (an external result on file), not agreement with zero-range theory.",
+      "fit_sigma": 3.222222222,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.96,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 3.222222222
+        }
+      ]
     },
     {
       "id": "REF-efimov-gross-2009",
@@ -11183,7 +11793,17 @@
       "measured_value": 0.92,
       "measured_error": 0.14,
       "predicted_value": 0.96,
-      "predicted_unit": "a₊/|a₋| (dimensionless)"
+      "predicted_unit": "a₊/|a₋| (dimensionless)",
+      "fit_sigma": 0.285714286,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 0.96,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.285714286
+        }
+      ]
     },
     {
       "id": "REF-efimov-pollack-2009",
@@ -11201,7 +11821,17 @@
       "measured_error": 2.2,
       "predicted_value": 22.694,
       "predicted_unit": "ratio of consecutive Efimov feature positions a_{n+1}/a_n (dimensionless)",
-      "notes": "Two independent ratios: 22.5(22)(11) and 21.1(11)(24) (statistical)(systematic); measured_error is the statistical error of the first. Caveat: the same group reanalysed exactly these positions with finite-range corrections — Dyke, Pollack & Hulet, Phys. Rev. A 88, 023625 (2013) — recorded here as a caveat only (not re-read in the sweep). Universal prediction from zero-range three-body theory (Efimov 1970; Braaten & Hammer, Phys. Rep. 428, 259 (2006)): consecutive Efimov features scale by e^{π/s₀} = 22.694 for three identical bosons (s₀ = 1.00624)."
+      "notes": "Two independent ratios: 22.5(22)(11) and 21.1(11)(24) (statistical)(systematic); measured_error is the statistical error of the first. Caveat: the same group reanalysed exactly these positions with finite-range corrections — Dyke, Pollack & Hulet, Phys. Rev. A 88, 023625 (2013) — recorded here as a caveat only (not re-read in the sweep). Universal prediction from zero-range three-body theory (Efimov 1970; Braaten & Hammer, Phys. Rep. 428, 259 (2006)): consecutive Efimov features scale by e^{π/s₀} = 22.694 for three identical bosons (s₀ = 1.00624).",
+      "fit_sigma": 0.088181818,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 22.694,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 0.088181818
+        }
+      ]
     },
     {
       "id": "REF-efimov-huang-2014",
@@ -11219,7 +11849,17 @@
       "measured_error": 1.3,
       "predicted_value": 22.694,
       "predicted_unit": "Efimov scaling factor λ = a₋⁽¹⁾/a₋⁽⁰⁾ (dimensionless)",
-      "notes": "Universal prediction from zero-range three-body theory (Efimov 1970; Braaten & Hammer, Phys. Rep. 428, 259 (2006)): consecutive Efimov features scale by e^{π/s₀} = 22.694 for three identical bosons (s₀ = 1.00624)."
+      "notes": "Universal prediction from zero-range three-body theory (Efimov 1970; Braaten & Hammer, Phys. Rep. 428, 259 (2006)): consecutive Efimov features scale by e^{π/s₀} = 22.694 for three identical bosons (s₀ = 1.00624).",
+      "fit_sigma": 1.303076923,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 22.694,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 1.303076923
+        }
+      ]
     },
     {
       "id": "REF-efimov-li6-three-component-2009",
@@ -11250,7 +11890,17 @@
       "measured_value": 4.0,
       "measured_error": 0.3,
       "predicted_value": 4.9,
-      "predicted_unit": "heteronuclear Efimov scaling factor (dimensionless)"
+      "predicted_unit": "heteronuclear Efimov scaling factor (dimensionless)",
+      "fit_sigma": 3.0,
+      "fit_history": [
+        {
+          "date": "2026-11-15T17:59:52Z",
+          "predicted_value": 4.9,
+          "source": "unresolved — pre-#809 ledger value; phase-2 backfill (QBP#809 AC2) will cite the originating PR/spike/leader per anchor",
+          "ledger_version": "6.24.0",
+          "fit_sigma": 3.0
+        }
+      ]
     },
     {
       "id": "REF-moretti-oppio-2019",
@@ -13350,9 +14000,14 @@
       "version": "6.23.1",
       "date": "2026-11-15T00:00:00Z",
       "note": "PR #804 Gemini F1 fix (issuecomment-6863989282): encode_housekeeping_batch.py overwrote `verification.verified_at`/`verifier` on PROOF-eigenratios / PROOF-cl6 / PROOF-3gen when it populated theorems[]/notes for #465 AC5. Restored both fields to their original Lean proof-checking provenance (2026-09-02, #621 FAULT-S4-005) byte-for-byte; the housekeeping attribution stays in notes/changelog, which already carry it. No other field on these anchors changes."
+    },
+    {
+      "version": "6.24.0",
+      "date": "2026-11-15T17:59:52Z",
+      "note": "QBP#809 phase 1 (AC4): scripts/compute_fit_sigma.py evaluated all 64 anchors with both a numeric predicted_value and measured_value — 54 got a real fit_sigma, 10 got fit_sigma:null + fit_sigma_reason (no usable 1σ error yet, pending AC2/AC3 phase-2 backfill). REPORT MODE (T1, qbp-oppenheimer issuecomment-6886846959): status is NOT written here — 7 anchor(s) would be capped once AC2 pins a real source (listed in the PR/run output), by the fed-sigma-v1 thresholds (fit_sigma > 5.0 -> incoherent-or-worse; > 2.0 -> marginal-or-worse; inter#238 D3). fit_history[] appended on every evaluated anchor. AC1 schema fields (measured_error 1σ convention, measured_error_plus/minus, measured_source minLength, fit_sigma/fit_sigma_reason/fit_history) in docs/cth/inventory.schema.v0.3.json 0.3.6. AC2/AC3/AC5/AC6 remain phase 2."
     }
   ],
-  "last_updated": "2026-11-15T00:00:00Z",
+  "last_updated": "2026-11-15T17:59:52Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
