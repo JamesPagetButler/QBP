@@ -12,7 +12,9 @@ Run: python3 -m pytest scripts/test_compute_fit_sigma.py -v
 """
 
 import importlib.util
+import json
 import pathlib
+import sys
 
 _spec = importlib.util.spec_from_file_location(
     "compute_fit_sigma",
@@ -324,6 +326,128 @@ def test_mutant_fit_history_overwrite_loses_prior_entries():
     assert len(buggy) == 1
     assert correct != buggy
     assert len(correct) != len(buggy), "the mutant must diverge: it loses prior entries"
+
+
+# ---- idempotent re-run (Gemini G1/G2, PR #814 review) --------------------------------
+
+
+def test_history_is_idempotent_true_when_last_entry_matches():
+    history = [{"date": "d0", "predicted_value": 10.0, "fit_sigma": 1.0}]
+    entry = {"date": "d1", "predicted_value": 10.0, "fit_sigma": 1.0}
+    assert cfs.history_is_idempotent(history, entry) is True
+
+
+def test_history_is_idempotent_false_when_fit_sigma_differs():
+    # a genuine phase-2 re-pin (changed measured_error -> changed fit_sigma) IS a new
+    # trial under inter#238 D3 and must still be appended, not suppressed.
+    history = [{"date": "d0", "predicted_value": 10.0, "fit_sigma": 1.0}]
+    entry = {"date": "d1", "predicted_value": 10.0, "fit_sigma": 1.5}
+    assert cfs.history_is_idempotent(history, entry) is False
+
+
+def test_history_is_idempotent_false_when_predicted_value_differs():
+    history = [{"date": "d0", "predicted_value": 10.0, "fit_sigma": 1.0}]
+    entry = {"date": "d1", "predicted_value": 11.0, "fit_sigma": 1.0}
+    assert cfs.history_is_idempotent(history, entry) is False
+
+
+def test_history_is_idempotent_false_on_empty_history():
+    assert (
+        cfs.history_is_idempotent([], {"predicted_value": 10.0, "fit_sigma": 1.0})
+        is False
+    )
+
+
+def test_append_fit_history_skips_append_on_idempotent_repeat():
+    a = {
+        "id": "X",
+        "fit_history": [{"date": "d0", "predicted_value": 10.0, "fit_sigma": 1.0}],
+    }
+    entry = {"date": "d1", "predicted_value": 10.0, "fit_sigma": 1.0}
+    result = cfs.append_fit_history(a, entry)
+    assert len(result) == 1  # not 2 — the repeat is not a new entry
+    assert result == [{"date": "d0", "predicted_value": 10.0, "fit_sigma": 1.0}]
+
+
+def test_mutant_unconditional_append_would_duplicate_on_a_repeat_evaluation():
+    """Mutant test: an append_fit_history that always appends, ignoring
+    history_is_idempotent, duplicates the entry on a repeat run with an identical
+    predicted_value/fit_sigma — exactly the Gemini G1 regression this fix prevents."""
+    a = {
+        "id": "X",
+        "fit_history": [{"date": "d0", "predicted_value": 10.0, "fit_sigma": 1.0}],
+    }
+    entry = {"date": "d1", "predicted_value": 10.0, "fit_sigma": 1.0}
+
+    correct = cfs.append_fit_history(a, entry)
+    assert len(correct) == 1
+
+    def buggy_unconditional_append(anchor, entry):
+        existing = anchor.get("fit_history")
+        return (list(existing) if existing else []) + [entry]
+
+    buggy = buggy_unconditional_append(a, entry)
+    assert len(buggy) == 2  # the mutant: duplicates a no-op re-run
+    assert len(correct) != len(
+        buggy
+    ), "the mutant must diverge: it inflates the trials count"
+
+
+def _write_canonical_ledger(path, ledger):
+    path.write_text(
+        json.dumps(ledger, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
+
+def _minimal_candidate_ledger():
+    return {
+        "programme": "test",
+        "version": "1.0.0",
+        "last_updated": "2026-01-01T00:00:00Z",
+        "changelog": [],
+        "axioms": [],
+        "anchors": [
+            {
+                "id": "PRED-test-idempotency",
+                "name": "test fixture",
+                "tier": 1,
+                "provenance": "T",
+                "status": "untested",
+                "description": "test fixture, not a real anchor",
+                "prediction_chain": [],
+                "predicted_value": 10.0,
+                "measured_value": 9.0,
+                "measured_error": 1.0,
+            }
+        ],
+        "chains": [],
+    }
+
+
+def test_two_consecutive_main_runs_write_one_fit_history_entry_and_one_version_bump(
+    tmp_path, monkeypatch
+):
+    """Gemini G1/G2 (PR #814 review): a no-op re-run must not duplicate fit_history or
+    bump the ledger version a second time — a repeat evaluation is not a new trial."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+
+    monkeypatch.setattr(
+        sys, "argv", ["compute_fit_sigma.py", "--ledger", str(ledger_path)]
+    )
+    cfs.main()
+    after_first = json.loads(ledger_path.read_text())
+    anchor = after_first["anchors"][0]
+    assert len(anchor["fit_history"]) == 1
+    assert after_first["version"] == "1.1.0"
+    assert len(after_first["changelog"]) == 1
+
+    cfs.main()
+    after_second = json.loads(ledger_path.read_text())
+    anchor2 = after_second["anchors"][0]
+    assert len(anchor2["fit_history"]) == 1  # NOT 2 — the no-op must not re-append
+    assert after_second["version"] == "1.1.0"  # NOT bumped a second time
+    assert len(after_second["changelog"]) == 1  # NOT a second changelog entry
 
 
 # ---- is_candidate: only anchors with BOTH numeric fields are touched -----------------

@@ -46,9 +46,15 @@ fit_sigma/fit_history):
      (the phase-2 PR's job, once AC2 pins real sources) — never the default.
 
   3. fit_history[] gets one APPENDED entry per evaluation (never overwritten, never
-     edited in place — append_fit_history() refuses to replace an existing list). This
-     happens in BOTH modes — fit_sigma itself is real, computed data; only the status
-     WRITE is gated on --apply-caps.
+     edited in place — append_fit_history() refuses to replace an existing list), UNLESS
+     the run is idempotent: the existing last entry already has the same predicted_value
+     AND the same fit_sigma, meaning this evaluation produced no new information (Gemini
+     G1, PR #814 review). A trial under inter#238 D3 is a distinct predicted value tried
+     against the measurement, not a script invocation — a no-op re-run must not inflate
+     that count. When every candidate is idempotent, NOTHING is written: no fit_history
+     append, no version bump, no changelog entry (G2). This happens the same way in BOTH
+     modes — fit_sigma itself is real, computed data; only the status WRITE is gated on
+     --apply-caps.
 
 Usage: python3 scripts/compute_fit_sigma.py [--dry-run] [--apply-caps] [--ledger PATH]
 Exit 0 always on a clean run (confinement failures raise and exit non-zero via
@@ -205,17 +211,36 @@ def prediction_source(anchor):
     return _UNRESOLVED_SOURCE
 
 
+def history_is_idempotent(history, entry):
+    """True iff history's last entry already represents this exact evaluation (same
+    predicted_value and fit_sigma) — a repeat run with no new information, not a new
+    trial under inter#238 D3 (Gemini G1, PR #814 review). Only these two fields are
+    compared: date/source/ledger_version legitimately differ run-to-run without the
+    evaluation itself having changed."""
+    if not history:
+        return False
+    last = history[-1]
+    return last.get("predicted_value") == entry.get("predicted_value") and last.get(
+        "fit_sigma"
+    ) == entry.get("fit_sigma")
+
+
 def append_fit_history(anchor, entry):
-    """Append-only: refuses to replace an existing fit_history list, only extends it.
-    Returns the new list (a fresh list object: old entries + the new one — the old
-    list itself is never mutated or dropped)."""
+    """Append-only: refuses to replace an existing fit_history list, only extends it —
+    unless the evaluation is idempotent (history_is_idempotent), in which case the
+    existing list is returned unchanged rather than appending a duplicate-looking entry
+    (Gemini G1). Returns a list with the same contents either way (a fresh list object
+    when it does append; the old list's contents, untouched, when idempotent)."""
     existing = anchor.get("fit_history")
     if existing is not None and not isinstance(existing, list):
         raise TypeError(
             f"fit_history on {anchor.get('id')} is not a list (got {type(existing)}) "
             f"— refusing to overwrite"
         )
-    return (list(existing) if existing else []) + [entry]
+    history = list(existing) if existing else []
+    if history_is_idempotent(history, entry):
+        return history
+    return history + [entry]
 
 
 def evaluate(anchor, ledger_version, date, apply_caps):
@@ -281,30 +306,33 @@ def main():
 
     date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    n_candidates = n_computed = n_null = n_capped = n_would_cap = 0
+    n_candidates = n_computed = n_null = n_capped = n_would_cap = n_written = 0
     with ledger_edit(args.ledger, dry_run=args.dry_run) as ed:
         L = ed.ledger
-        # bump the ledger version — every run that touches a record is a real evaluation
         old_version = L["version"]
         major_minor, patch = old_version.rsplit(".", 1)
         major, minor = major_minor.split(".")
         new_version = f"{major}.{int(minor) + 1}.0"
-        L["version"] = new_version
-        ed.touch("version")
-        if L.get("last_updated") != date:
-            L["last_updated"] = date
-            ed.touch("last_updated")
 
-        # snapshot ids first: we mutate L["anchors"] records in place via ed.record()
+        # snapshot ids first: we look records up by id as we go via ed.record()
         candidate_ids = [a["id"] for a in L["anchors"] if is_candidate(a)]
         n_candidates = len(candidate_ids)
+        by_id = {a["id"]: a for a in L["anchors"]}
 
         touched = []
         would_caps = []
         for aid in candidate_ids:
-            a = ed.record("anchors", aid)
-            old_status = a.get("status")
-            upd = evaluate(a, new_version, date, args.apply_caps)
+            raw = by_id[aid]
+            old_status = raw.get("status")
+            old_fit_sigma = raw.get("fit_sigma")
+            old_fit_sigma_reason = raw.get("fit_sigma_reason")
+            old_history = raw.get("fit_history") or []
+
+            # Read-only evaluation first (evaluate() does not mutate): decide whether
+            # this candidate actually changes BEFORE declaring it to ed.record(), so an
+            # idempotent re-run (Gemini G1/G2) declares nothing and raises no silent-
+            # no-op ConfinementError.
+            upd = evaluate(raw, new_version, date, args.apply_caps)
             touched.append(upd["summary"])
             if upd["fit_sigma"] is None:
                 n_null += 1
@@ -313,8 +341,20 @@ def main():
             if upd["would_cap"] != old_status:
                 n_would_cap += 1
                 would_caps.append((aid, old_status, upd["would_cap"], upd["fit_sigma"]))
+
+            will_change = (
+                upd["fit_sigma"] != old_fit_sigma
+                or upd["fit_sigma_reason"] != old_fit_sigma_reason
+                or upd["status"] != old_status
+                or upd["fit_history"] != old_history
+            )
+            if not will_change:
+                continue
+
+            n_written += 1
             if upd["status"] != old_status:
                 n_capped += 1
+            a = ed.record("anchors", aid)
             a["fit_sigma"] = upd["fit_sigma"]
             if upd["fit_sigma_reason"] is not None:
                 a["fit_sigma_reason"] = upd["fit_sigma_reason"]
@@ -323,44 +363,62 @@ def main():
             a["status"] = upd["status"]
             a["fit_history"] = upd["fit_history"]
 
-        mode_note = (
-            f"{n_capped} had their status one-way capped (never raised, only "
-            f"lowered/capped) by the fed-sigma-v1 thresholds"
-            if args.apply_caps
-            else (
-                f"REPORT MODE (T1, qbp-oppenheimer issuecomment-6886846959): status "
-                f"is NOT written here — {n_would_cap} anchor(s) would be capped once "
-                f"AC2 pins a real source (listed in the PR/run output), by the "
-                f"fed-sigma-v1 thresholds"
+        if n_written:
+            L["version"] = new_version
+            ed.touch("version")
+            if L.get("last_updated") != date:
+                L["last_updated"] = date
+                ed.touch("last_updated")
+
+            mode_note = (
+                f"{n_capped} had their status one-way capped (never raised, only "
+                f"lowered/capped) by the fed-sigma-v1 thresholds"
+                if args.apply_caps
+                else (
+                    f"REPORT MODE (T1, qbp-oppenheimer issuecomment-6886846959): status "
+                    f"is NOT written here — {n_would_cap} anchor(s) would be capped once "
+                    f"AC2 pins a real source (listed in the PR/run output), by the "
+                    f"fed-sigma-v1 thresholds"
+                )
             )
-        )
-        changelog_note = (
-            f"QBP#809 phase 1 (AC4): scripts/compute_fit_sigma.py evaluated all "
-            f"{n_candidates} anchors with both a numeric predicted_value and "
-            f"measured_value — {n_computed} got a real fit_sigma, {n_null} got "
-            f"fit_sigma:null + fit_sigma_reason (no usable 1σ error yet, pending "
-            f"AC2/AC3 phase-2 backfill). {mode_note} "
-            f"(fit_sigma > {FIT_SIGMA_INCOHERENT_CAP} -> incoherent-or-worse; "
-            f"> {FIT_SIGMA_MARGINAL_CAP} -> marginal-or-worse; inter#238 D3). "
-            f"fit_history[] appended on every evaluated anchor. AC1 schema fields "
-            f"(measured_error 1σ convention, measured_error_plus/minus, "
-            f"measured_source minLength, fit_sigma/fit_sigma_reason/fit_history) in "
-            f"docs/cth/inventory.schema.v0.3.json 0.3.6. AC2/AC3/AC5/AC6 remain phase 2."
-        )
-        L["changelog"].append(
-            {"version": new_version, "date": date, "note": changelog_note}
-        )
-        ed.touch("changelog")
+            changelog_note = (
+                f"QBP#809 phase 1 (AC4): scripts/compute_fit_sigma.py evaluated "
+                f"{n_candidates} candidate anchor(s); {n_written} actually changed "
+                f"({n_computed} real fit_sigma, {n_null} null + fit_sigma_reason "
+                f"among all candidates; the rest were idempotent re-evaluations, "
+                f"Gemini G1/G2, and wrote nothing). {mode_note} "
+                f"(fit_sigma > {FIT_SIGMA_INCOHERENT_CAP} -> incoherent-or-worse; "
+                f"> {FIT_SIGMA_MARGINAL_CAP} -> marginal-or-worse; inter#238 D3). "
+                f"fit_history[] appended only where the evaluation changed — a repeat "
+                f"run with the same predicted_value/fit_sigma is not a new trial under "
+                f"inter#238 D3 and does not inflate the trials count. AC1 schema fields "
+                f"(measured_error 1σ convention, measured_error_plus/minus, "
+                f"measured_source minLength, fit_sigma/fit_sigma_reason/fit_history) in "
+                f"docs/cth/inventory.schema.v0.3.json 0.3.6. AC2/AC3/AC5/AC6 remain phase 2."
+            )
+            L["changelog"].append(
+                {"version": new_version, "date": date, "note": changelog_note}
+            )
+            ed.touch("changelog")
 
     mode = (
         "APPLY-CAPS" if args.apply_caps else "REPORT MODE (default, status not written)"
     )
-    print(
-        f"{'DRY-RUN ' if args.dry_run else ''}compute_fit_sigma [{mode}]: "
-        f"{n_candidates} candidate(s) ({n_computed} computed, {n_null} null), "
-        f"{n_would_cap} would-be cap(s), {n_capped} status cap(s) actually applied; "
-        f"ledger {old_version} -> {new_version}"
-    )
+    if n_written:
+        print(
+            f"{'DRY-RUN ' if args.dry_run else ''}compute_fit_sigma [{mode}]: "
+            f"{n_candidates} candidate(s) ({n_computed} computed, {n_null} null), "
+            f"{n_written} changed, {n_would_cap} would-be cap(s), {n_capped} status "
+            f"cap(s) actually applied; ledger {old_version} -> {new_version}"
+        )
+    else:
+        print(
+            f"{'DRY-RUN ' if args.dry_run else ''}compute_fit_sigma [{mode}]: "
+            f"{n_candidates} candidate(s) ({n_computed} computed, {n_null} null) — "
+            f"no-op: every candidate's evaluation already matches its stored "
+            f"fit_sigma/fit_history/status at ledger {old_version}; nothing written "
+            f"(Gemini G1/G2, a repeat evaluation is not a new trial)."
+        )
     print()
     for line in touched:
         print(line)
