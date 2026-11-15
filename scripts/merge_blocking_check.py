@@ -68,7 +68,13 @@ def check(body: str, absent_blocks: bool = False) -> int:
     """Return the exit code for `body` and print the actionable report."""
     res = parse(body)
     n_un, n_t, n_nil = len(res["unticked"]), len(res["ticked"]), len(res["nil"])
-    print(f"unticked={n_un} ticked={n_t} nil={n_nil} region={res['region']}")
+    n_ev = len(res.get("evidence", []))
+    # `evidence=` (the notifier-owned CI-green box, #815) is appended AFTER
+    # `region=` so the stable `unticked=<n> …` prefix is unchanged.
+    print(
+        f"unticked={n_un} ticked={n_t} nil={n_nil} region={res['region']} "
+        f"evidence={n_ev}"
+    )
     if res["region"] == "absent":
         msg = f"Merge-blocking boxes: no §2.2 region in the PR body — {ABSENT_FIX}."
         if absent_blocks:
@@ -91,7 +97,7 @@ def check(body: str, absent_blocks: bool = False) -> int:
     _annot(
         "notice",
         f"Merge-blocking boxes: all clear ({n_t} ticked, {n_nil} ⊘-nil'd, "
-        f"0 unticked in the §2.2 region).",
+        f"{n_ev} notifier-owned CI-green evidence, 0 unticked in the §2.2 region).",
     )
     return 0
 

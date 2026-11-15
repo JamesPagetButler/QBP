@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/JamesPagetButler/confluent-trust/schema/inventory.schema.v0.3.5.json",
-  "x-schema-semver": "0.3.5",
+  "$id": "https://github.com/JamesPagetButler/confluent-trust/schema/inventory.schema.v0.3.8.json",
+  "x-schema-semver": "0.3.8",
   "title": "CTH Inventory",
-  "description": "Confluent Trust Hypergraph inventory document. Conforms to Theory v0.2 §4.1 plus the §2.9 fork extension. Both v0.1 (path_a/path_b) and v0.2 (paths[]) confluence shapes are accepted; the Go store normalizes to N-ary on load. The schema-document semver (x-schema-semver, mirrored in $id) is distinct from both the programme content version and the schema_version generation — see doc/design/schema-change-propagation.md §4. 0.3.1 (minor, additive): killed_by/killed_note/review_flag (#93), foundation_batch (#96), class_floors (contextus PR #32 Q1). 0.3.2 (minor, additive): axis_trust/locale_domain/cluster_state (sheaf trust, #95/inter#41 Decision 2). 0.3.3 (minor, additive): 'derivation' provenance_kind + C1 relaxed to admit proof-fields (proof_state/proof_language/theorems/verification) on {proof, derivation} so a kernel-verified derivation can SHOW its Lean (FAULT-S4-005 burn-down, QBP#621; cth-implementor ruling live-test seq=1041). 0.3.4 (minor, additive): decision_state (open|settled) + kill_condition (array of {kill, closure, discharge} Impasse Records) on roots; four QBP-general top-level root lists (meta_principles, interpretations, retired_axioms, retired_principles) promoted to $defs; the decision_state:open ⇒ non-empty kill_condition invariant is schema-enforced (FAULT-S4-005 four-bucket / #654 D3; cth-implementor, confluent-trust #102/#103). 0.3.5 (minor, additive): proof_assistants [{assistant∈{lean4,coq,agda}, evidence_ref, trust_check}] on proof + derivation anchors — PA (proof-assistant count) grading, DERIVED from Notary evidence at evidence_ref, never typed; trust_check is veto-only (confluent-trust#108 / inter#150 PA grading; cth-implementor).",
+  "description": "Confluent Trust Hypergraph inventory document. Conforms to Theory v0.2 §4.1 plus the §2.9 fork extension. Both v0.1 (path_a/path_b) and v0.2 (paths[]) confluence shapes are accepted; the Go store normalizes to N-ary on load. The schema-document semver (x-schema-semver, mirrored in $id) is distinct from both the programme content version and the schema_version generation — see doc/design/schema-change-propagation.md §4. 0.3.1 (minor, additive): killed_by/killed_note/review_flag (#93), foundation_batch (#96), class_floors (contextus PR #32 Q1). 0.3.2 (minor, additive): axis_trust/locale_domain/cluster_state (sheaf trust, #95/inter#41 Decision 2). 0.3.3 (minor, additive): 'derivation' provenance_kind + C1 relaxed to admit proof-fields (proof_state/proof_language/theorems/verification) on {proof, derivation} so a kernel-verified derivation can SHOW its Lean (FAULT-S4-005 burn-down, QBP#621; cth-implementor ruling live-test seq=1041). 0.3.4 (minor, additive): decision_state (open|settled) + kill_condition (array of {kill, closure, discharge} Impasse Records) on roots; four QBP-general top-level root lists (meta_principles, interpretations, retired_axioms, retired_principles) promoted to $defs; the decision_state:open ⇒ non-empty kill_condition invariant is schema-enforced (FAULT-S4-005 four-bucket / #654 D3; cth-implementor, confluent-trust #102/#103). 0.3.5 (minor, additive): proof_assistants [{assistant∈{lean4,coq,agda}, evidence_ref, trust_check}] on proof + derivation anchors — PA (proof-assistant count) grading, DERIVED from Notary evidence at evidence_ref, never typed; trust_check is veto-only (confluent-trust#108 / inter#150 PA grading; cth-implementor). 0.3.6 (minor, additive, partial — inter#238 landing, confluent-trust#132 AC1/AC2/AC5/AC7; AC3/AC4/AC6/AC8 follow once the cross-repo leg-graph design note with Edda lands): e_axis (EAxis: unconfronted/consistent/validated/falsified, post_hoc/tension flags, sigma_pred/trials; post_hoc never validated, no sigma_pred caps at consistent) and evidence_ref[] (EvidenceRecord: internal/external, value/uncertainty/coverage/systematics/threshold/measurement_chain; pre_registered:true requires pre_reg_ref on either kind, external additionally requires a timestamp) on Anchor — both additive and optional. trl[] (TRLRecord: environment∈{lab,relevant,operational} required except at trl_criterion.level 1-2, environment:lab caps level at 4, trl_criterion{level,text}, satisfies as a required non-empty string, fl_at_sha, optional release_id/evidence_ref[]) and remediation[] (RemediationRecord: unfixed_ref+fixed_ref+scope_review_ref required, reproducible:false requires soak_ref in place of regression_test_ref, otherwise regression_test_ref is required) on Anchor (qbp-architecture §I4 fix round, confluent-trust#133). 0.3.7 (minor, additive — inter#238 R11.1'; confluent-trust#132 AC6, qbp-architecture §I4 fix round): adverse_finding[] (AdverseFindingRecord: record_kind∈{finding,flag}; record_kind:finding requires filer, severity (the full vector, structurally requiring a ':' or '/' so a bare class word can't pass), severity_class∈{critical,major,minor}, affects {from,to,provenance} (none empty-string), state∈{reported,confirmed,dismissed,not-reproduced}, and at least one of reproducer/external_ref (neither empty-string); state:dismissed additionally requires dismissal_evidence — a record missing any of these is only ever record_kind:flag, per R11.1' 'a report missing these is a flag, never a hold') on Anchor. 0.3.8 (minor, additive; QBP-local-awaiting-upstream — QBP#809 phase 1, beekeeper ruling 2026-11-13, inter#238 D3 'fed-sigma-v1' threshold refinement; cth-implementor schema-axis co-sign given, confluent-trust#135 filed as the canonical upstream tracking issue): measured_error documented as 1σ (68% CL); optional asymmetric measured_error_plus/measured_error_minus; measured_source gets a minLength:1 floor (must be a non-empty citation string; content-filling is phase 2); computed fit_sigma (number|null) with a required fit_sigma_reason when null (FitSigmaNeedsReason conditional, same shape as OpenNeedsKill); append-only fit_history[] of {date, predicted_value, source, ledger_version, fit_sigma} FitHistoryEntry records. fit_sigma/fit_history are COMPUTED by scripts/compute_fit_sigma.py, never hand-entered. Vendored base re-synced to real upstream 0.3.7 in this same PR (confluent-trust#135 catch): the prior vendored copy called itself '0.3.6' while carrying only this fit_sigma delta on a stale Oct-2 0.3.5 base, colliding with upstream's real 0.3.6 (confluent-trust#133, e_axis/evidence_ref/trl/remediation) and 0.3.7 (confluent-trust#134, adverse_finding).",
   "type": "object",
   "required": ["programme", "version", "axioms", "anchors", "chains"],
   "additionalProperties": true,
@@ -106,6 +106,24 @@
       "description": "Shared conditional (v0.3.4): a root with decision_state 'open' must carry a non-empty kill_condition. Referenced from the allOf of Axiom, MetaPrinciple and Interpretation.",
       "if":   { "properties": { "decision_state": { "const": "open" } }, "required": ["decision_state"] },
       "then": { "required": ["kill_condition"], "properties": { "kill_condition": { "type": "array", "minItems": 1 } } }
+    },
+    "FitSigmaNeedsReason": {
+      "description": "Shared conditional (v0.3.8, QBP#809 phase 1): when an anchor's computed fit_sigma is explicitly null (no usable 1σ measured error yet, or an undefined zero-denominator case), fit_sigma_reason must say why — never a silent null. Mirrors OpenNeedsKill's shape. Referenced from the allOf of Anchor.",
+      "if":   { "properties": { "fit_sigma": { "const": null } }, "required": ["fit_sigma"] },
+      "then": { "required": ["fit_sigma_reason"], "properties": { "fit_sigma_reason": { "type": "string", "minLength": 1 } } }
+    },
+    "FitHistoryEntry": {
+      "type": "object",
+      "description": "One append-only fit_sigma evaluation record on an Anchor (v0.3.8, QBP#809 phase 1; computed by scripts/compute_fit_sigma.py, never hand-entered). `fit_history` is append-only: an existing entry is never edited or removed, only a new one appended — a future PR may read its length as a trials count.",
+      "required": ["date", "predicted_value", "source", "ledger_version", "fit_sigma"],
+      "properties": {
+        "date":            { "type": "string", "description": "Timestamp of this evaluation run (ISO 8601)." },
+        "predicted_value": { "type": "number", "description": "The anchor's predicted_value at evaluation time." },
+        "source":          { "type": "string", "minLength": 1, "description": "Reference to the PR/spike/'leader' that produced the predicted value being evaluated — best-effort from existing provenance fields (theory_citation/theory_url/theory_doi/foundation_batch) until AC2 backfills a real per-anchor citation; an honest 'unresolved' placeholder is valid here, never omitted." },
+        "ledger_version":  { "type": "string", "description": "The inventory `version` this evaluation was computed against/written into." },
+        "fit_sigma":        { "type": ["number", "null"], "description": "The fit_sigma computed on this run; null if undefined at that time (mirrors the anchor-level field at the moment of this evaluation)." }
+      },
+      "additionalProperties": true
     },
     "ProofState": {
       "type": "string",
@@ -256,6 +274,170 @@
       },
       "additionalProperties": true
     },
+    "EAxis": {
+      "type": "object",
+      "description": "Empirical-confrontation axis, kept separate from the logical/lifecycle 'status' axis (v0.3.6, inter#238 R1/R2; confluent-trust#132 AC1). 'falsified' is a terminal outcome, outside the unconfronted<consistent<validated order. post_hoc can never reach validated; a reading with no stated uncertainty (sigma_pred) is capped at consistent.",
+      "required": ["value"],
+      "properties": {
+        "value":      { "type": "string", "enum": ["unconfronted", "consistent", "validated", "falsified"] },
+        "post_hoc":   { "type": "boolean", "description": "Set when the confrontation was not pre-registered before the result was known. A post_hoc reading can never be validated." },
+        "tension":    { "type": "boolean" },
+        "sigma_pred": { "type": "number", "description": "Stated predictive uncertainty backing this reading. Required for value:validated (R2)." },
+        "trials":     { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if":   { "properties": { "post_hoc": { "const": true } }, "required": ["post_hoc"] },
+          "then": { "properties": { "value": { "not": { "const": "validated" } } } }
+        },
+        {
+          "if":   { "not": { "required": ["sigma_pred"] } },
+          "then": { "properties": { "value": { "not": { "const": "validated" } } } }
+        }
+      ]
+    },
+    "EvidenceRecord": {
+      "type": "object",
+      "description": "One piece of evidence backing an e_axis grade, derived not declared (v0.3.6, inter#238 R3; confluent-trust#132 AC2). 'internal' is our own confrontation; 'external' is someone else's result. Either kind claiming a pre-registration must point to it (pre_reg_ref) — prose alone does not qualify, and a bare claim with no pointer is the laundering R3 forbids. An external record additionally needs a timestamp predating the result's public release. A record with no such claim is treated as post_hoc by the deriving checker (edda#103 / notary#8) — this schema does not derive that itself.",
+      "required": ["kind"],
+      "properties": {
+        "kind":               { "type": "string", "enum": ["internal", "external"] },
+        "value":              { "type": "number" },
+        "uncertainty":        { "type": "number" },
+        "coverage":           { "type": "string", "description": "e.g. '1σ / 68%'." },
+        "systematics":        { "type": "string", "description": "A systematics budget, or 'none-stated'." },
+        "threshold":          { "type": "string", "description": "The pre-registered pass/fail threshold this record was read against." },
+        "measurement_chain":  { "type": "string", "description": "instrument → selection → calibration → analysis → result, at whatever depth the source exposes. A missing link is recorded as missing, never assumed." },
+        "pre_registered":     { "type": "boolean" },
+        "pre_reg_ref":        { "type": "string", "description": "Frozen pre-registration artefact: repo, path, sha256." },
+        "pre_reg_timestamp":  { "type": "string", "format": "date-time", "description": "Commit time of the pre-reg artefact; must predate the result's public release for an external record." },
+        "publication_ref":    { "type": "string", "description": "DOI or arXiv id, plus version (external only)." },
+        "dataset_ref":        { "type": "string" },
+        "independence_group": { "type": "string", "description": "Collaboration or instrument, used to count replication (external only)." }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if":   { "properties": { "pre_registered": { "const": true } }, "required": ["pre_registered"] },
+          "then": { "required": ["pre_reg_ref"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "external" }, "pre_registered": { "const": true } },
+            "required": ["kind", "pre_registered"]
+          },
+          "then": { "required": ["pre_reg_ref", "pre_reg_timestamp"] }
+        }
+      ]
+    },
+    "TRLRecord": {
+      "type": "object",
+      "description": "A technology-readiness-level reading, carrying its own evidence per R3 (v0.3.6, inter#238 R9'; confluent-trust#132 AC5). trl_criterion names the NASA NPR 7123.1D App. E level and quotes its text. environment is required except at the documentary TRL 1-2 stages, which have no physical environment to state. At environment:lab the criterion cannot read above TRL 4 (a CI/lab record never earns relevant- or operational-environment TRL on its own — defense in depth beside edda#103 AC4). Host-installed artefacts carry a release id.",
+      "required": ["trl_criterion", "satisfies", "fl_at_sha"],
+      "properties": {
+        "environment": { "type": "string", "enum": ["lab", "relevant", "operational"] },
+        "trl_criterion": {
+          "type": "object",
+          "required": ["level", "text"],
+          "properties": {
+            "level": { "type": "integer", "minimum": 1, "maximum": 9 },
+            "text":  { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": true
+        },
+        "satisfies":    { "type": "string", "minLength": 1, "description": "A short statement of why this run meets trl_criterion — notary verifies the substance (notary#8 AC3). Not a boolean: a bare yes/no has no argument to check." },
+        "fl_at_sha":    { "type": "string", "minLength": 1 },
+        "release_id":   { "type": "string" },
+        "evidence_ref": { "type": "array", "items": { "$ref": "#/$defs/EvidenceRecord" } }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "trl_criterion": { "properties": { "level": { "not": { "enum": [1, 2] } } }, "required": ["level"] }
+            },
+            "required": ["trl_criterion"]
+          },
+          "then": { "required": ["environment"] }
+        },
+        {
+          "if":   { "properties": { "environment": { "const": "lab" } }, "required": ["environment"] },
+          "then": { "properties": { "trl_criterion": { "properties": { "level": { "maximum": 4 } } } } }
+        }
+      ]
+    },
+    "RemediationRecord": {
+      "type": "object",
+      "description": "Closure record for a confirmed, fixed adverse finding (v0.3.6, inter#238 R11.1'/R11.3'; confluent-trust#132 AC7). Both the unfixed and fixed references are required — a single sha proves nothing was compared. reproducible:false (a hardware or intermittent fault, e.g. the HIP 700s) requires soak_ref IN PLACE OF regression_test_ref — the soak is the evidence there, since a deterministic regression test can't exercise an intermittent condition. Otherwise (reproducible:true or unstated) regression_test_ref is required, as for an ordinary fix. 'not-reproduced' is a finding state (R11.1') that never reaches this record at all — it stays 'not-reproduced', which is not a dismissal and does not lift a safety hold.",
+      "required": ["unfixed_ref", "fixed_ref", "scope_review_ref"],
+      "properties": {
+        "unfixed_ref":         { "type": "string", "minLength": 1, "description": "The pre-fix sha or release id." },
+        "fixed_ref":           { "type": "string", "minLength": 1, "description": "The post-fix sha or release id." },
+        "regression_test_ref": { "type": "string" },
+        "scope_review_ref":    { "type": "string", "description": "A non-author scope-review reference." },
+        "soak_ref":            { "type": "string" },
+        "reproducible":        { "type": "boolean", "description": "false for a hardware or intermittent fault that a deterministic regression test cannot exercise; soak_ref replaces regression_test_ref in that case." }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if":   { "properties": { "reproducible": { "const": false } }, "required": ["reproducible"] },
+          "then": { "required": ["soak_ref"] }
+        },
+        {
+          "if":   { "not": { "properties": { "reproducible": { "const": false } }, "required": ["reproducible"] } },
+          "then": { "required": ["regression_test_ref"] }
+        }
+      ]
+    },
+    "AdverseFindingRecord": {
+      "type": "object",
+      "description": "An adverse finding against this anchor (v0.3.7, inter#238 R11.1'; confluent-trust#132 AC6, qbp-architecture §I4 fix round). A finding takes effect only when a seat files it as record_kind:'finding' — external or tool-fetched text (a web page, an issue body, a research result) is evidence attached to a record, never a filer itself. record_kind:'finding' requires filer, severity (the full vector of the cited scale, e.g. a complete CVSS string — structurally distinguished from a bare class word by requiring a ':' or '/' separator, so 'critical' alone can never pass), severity_class (the triage anchor used by the cap table: critical/major/minor), affects (the version or release-id range with provenance), state, and at least one of reproducer/external_ref — none of which may be the empty string. state:'dismissed' additionally requires dismissal_evidence (R11.1': a dismissal must cite evidence, a failed reproduction or a proof the precondition doesn't hold). A record missing any of those is only ever record_kind:'flag' — R11.1': 'a report missing these is a flag, never a hold.' A flag carries no cap (R11.2') and never blocks. Downstream note for the QBP#811 cap fold: only record_kind:'finding' rows ever feed a cap; 'flag' rows are read-only context.",
+      "required": ["record_kind"],
+      "properties": {
+        "record_kind":        { "type": "string", "enum": ["finding", "flag"] },
+        "filer":              { "type": "string", "minLength": 1, "description": "The seat of record that filed this finding." },
+        "reproducer":         { "type": "string", "minLength": 1 },
+        "external_ref":       { "type": "string", "minLength": 1, "description": "In place of a reproducer: an advisory id or an incident report." },
+        "severity":           { "type": "string", "minLength": 1, "pattern": ".*[:/].*", "description": "The full severity vector of the cited scale (e.g. a complete CVSS vector string). The ':'/'/' requirement structurally excludes a bare class word like 'critical' — that belongs in severity_class, never here." },
+        "severity_class":     { "type": "string", "enum": ["critical", "major", "minor"] },
+        "affects": {
+          "type": "object",
+          "required": ["from", "to", "provenance"],
+          "properties": {
+            "from":              { "type": "string", "minLength": 1 },
+            "to":                { "type": "string", "minLength": 1 },
+            "provenance":        { "type": "string", "minLength": 1, "description": "A boundary-version reproduction, or a code-provenance argument (the introducing and removing commits)." },
+            "sha256sums_sha256": { "type": "string", "minLength": 1, "description": "For host-installed tools: the range is of release ids, provenanced by the sha256 of SHA256SUMS." }
+          },
+          "additionalProperties": true
+        },
+        "state":              { "type": "string", "enum": ["reported", "confirmed", "dismissed", "not-reproduced"] },
+        "dismissal_evidence": { "type": "string", "minLength": 1, "description": "Cited evidence for a dismissal — a failed reproduction under the stated conditions, or a proof the precondition doesn't hold (R11.1')." }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if":   { "properties": { "record_kind": { "const": "finding" } }, "required": ["record_kind"] },
+          "then": {
+            "required": ["filer", "severity", "severity_class", "affects", "state"],
+            "anyOf": [
+              { "required": ["reproducer"] },
+              { "required": ["external_ref"] }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": { "record_kind": { "const": "finding" }, "state": { "const": "dismissed" } },
+            "required": ["record_kind", "state"]
+          },
+          "then": { "required": ["dismissal_evidence"] }
+        }
+      ]
+    },
     "Anchor": {
       "type": "object",
       "description": "A Tier 1-3 node: proof, measurement, prediction, or hypothesis. The `id` field follows the workspace ID-prefix convention (see schema docs): `PROOF-*` for Tier 1 theoretical proofs, `MEAS-*` for Tier 2 measurements, `PRED-*` for Tier 3 predictions awaiting observation (or Tier 2 once the observation arrives and the anchor is scored via `compute.ScorePrediction`), `FLAG-*` / `KILLED-*` for special states. The prefix is convention, not schema-enforced.",
@@ -271,9 +453,14 @@
         "predicted_value":           { "type": "number" },
         "predicted_unit":            { "type": "string" },
         "measured_value":            { "type": "number" },
-        "measured_error":            { "type": "number" },
-        "measured_source":           { "type": "string" },
+        "measured_error":            { "type": "number", "description": "1σ (68% CL) symmetric measurement uncertainty on measured_value (v0.3.8 convention, QBP#809 phase 1). Use measured_error_plus/measured_error_minus instead when the error is asymmetric." },
+        "measured_error_plus":       { "type": "number", "description": "1σ (68% CL) upper (positive-direction) measurement uncertainty, for an asymmetric error bar (v0.3.8). Paired with measured_error_minus; measured_error is the symmetric case." },
+        "measured_error_minus":      { "type": "number", "description": "1σ (68% CL) lower (negative-direction) measurement uncertainty, for an asymmetric error bar (v0.3.8). Paired with measured_error_plus." },
+        "measured_source":           { "type": "string", "minLength": 1, "description": "The specific paper/PDG table+edition (or equivalent) this measured_value/measured_error was pinned from. Free text; non-empty is schema-enforced (v0.3.8), the citation's actual content is a phase-2 backfill concern (QBP#809 AC2), not validated here." },
         "discrepancy_pct":           { "type": "number" },
+        "fit_sigma":                 { "type": ["number", "null"], "description": "Computed (never hand-entered, v0.3.8, QBP#809 phase 1): |predicted_value - measured_value| / sqrt(sigma_meas^2 + sigma_pred^2), sigma_meas from measured_error (or the measured_error_plus/measured_error_minus pair), sigma_pred = 0 until a prediction-error field exists. null when no usable 1σ measured error is pinned yet, or the zero-denominator case is undefined — see fit_sigma_reason. Drives the one-way status cap in scripts/compute_fit_sigma.py (never raises status, only lowers/caps it)." },
+        "fit_sigma_reason":          { "type": "string", "minLength": 1, "description": "Required when fit_sigma is null (FitSigmaNeedsReason conditional, v0.3.8): why fit_sigma could not be computed on the last evaluation." },
+        "fit_history":               { "type": "array", "items": { "$ref": "#/$defs/FitHistoryEntry" }, "description": "Append-only log of fit_sigma evaluations (v0.3.8, QBP#809 phase 1) — never overwritten, only appended by scripts/compute_fit_sigma.py." },
         "last_tested_at":            { "type": ["string", "null"], "format": "date-time" },
         "inherited_from":            { "type": "string" },
         "inherited_at":              { "type": "string" },
@@ -302,7 +489,12 @@
         "additional_verifications":  { "type": "array", "items": { "$ref": "#/$defs/AdditionalVerification" } },
         "axis_trust":                { "$ref": "#/$defs/AxisTrust" },
         "locale_domain":             { "type": "string", "description": "Locale-topology domain identifier (v0.3.2 sheaf trust, inter#41 Decision 2; Sprint 3 minimum-viable — Walk-α full sheaf schema via wyrd)." },
-        "cluster_state":             { "$ref": "#/$defs/ClusterState" }
+        "cluster_state":             { "$ref": "#/$defs/ClusterState" },
+        "e_axis":                    { "$ref": "#/$defs/EAxis" },
+        "evidence_ref":              { "type": "array", "items": { "$ref": "#/$defs/EvidenceRecord" } },
+        "trl":                       { "type": "array", "items": { "$ref": "#/$defs/TRLRecord" } },
+        "remediation":               { "type": "array", "items": { "$ref": "#/$defs/RemediationRecord" } },
+        "adverse_finding":           { "type": "array", "items": { "$ref": "#/$defs/AdverseFindingRecord" } }
       },
       "additionalProperties": true,
       "allOf": [
@@ -333,7 +525,8 @@
               }
             }
           }
-        }
+        },
+        { "$ref": "#/$defs/FitSigmaNeedsReason" }
       ]
     },
     "Input": {
