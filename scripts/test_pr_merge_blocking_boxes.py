@@ -384,31 +384,74 @@ def test_predicate_matches_set_ci_box_awk():
         assert not f(bad), bad
 
 
-def test_predicate_agrees_with_the_workflow_awk():
-    """Run set_ci_box's real awk (extracted from the workflow) on the same lines."""
+def _workflow_awk_program() -> str:
+    """The awk program of set_ci_box, extracted verbatim between its markers."""
     wf = os.path.join(HERE, "..", ".github", "workflows", "pr-check-status.yml")
     src = open(wf, encoding="utf-8").read()
-    assert (
-        "ci green/" in src
-        and "review|sign.?off|visual|hvr|red team|gemini|approve" in src
-    )
-    lines = [
-        f"- [ ] {CI_BOX}",
-        "- [ ] CI green — Gemini review",
-        "- [ ] Red Team review once CI green",
-        "* [ ] CI green",
-        "  - [x] CI green at head",
-        "- [ ] Human Visual Review",
-    ]
-    prog = (
-        "{ l=$0; if (l ~ /^[[:space:]]*-[[:space:]]\\[[ xX]\\]/ && tolower(l) ~ /ci green/ "
-        "&& tolower(l) !~ /review|sign.?off|visual|hvr|red team|gemini|approve/) "
-        'print "1"; else print "0" }'
-    )
+    start = src.index("# BEGIN set_ci_box-awk")
+    end = src.index("# END set_ci_box-awk")
+    prog = src[start:end]
+    assert "'" not in prog, "awk program must stay single-quote free"
+    return prog
+
+
+def _awk_ticked_index(body: str):
+    """Run the workflow's real awk (-v m=x) on body; index of the line it changed."""
     out = subprocess.run(
-        ["awk", prog], input="\n".join(lines) + "\n", capture_output=True, text=True
-    ).stdout.split()
-    assert out == ["1" if m.is_ci_green_evidence_box(x) else "0" for x in lines], out
+        ["awk", "-v", "m=x", _workflow_awk_program()],
+        input=body,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    old, new = body.splitlines(), out.splitlines()
+    assert len(old) == len(new), (old, new)
+    changed = [i for i, (a, b) in enumerate(zip(old, new)) if a != b]
+    assert len(changed) <= 1, changed
+    return changed[0] if changed else None
+
+
+def test_workflow_awk_and_parser_pick_the_same_box():
+    """N1/G1: the REAL awk from pr-check-status.yml vs _ci_box_index, same bodies."""
+    fenced = f"""Template quoted for reference:
+```markdown
+- [ ] {CI_BOX}
+```
+
+Sign-off required (merge-blocking):
+- [ ] {CI_BOX}
+- [ ] Merge authorized (beekeeper)
+"""
+    plain = f"## Evidence\n- [ ] {CI_BOX}\n- [ ] other\n"
+    review = "- [ ] Red Team review once CI green\n- [ ] Human Visual Review\n"
+    two = f"- [ ] {CI_BOX}\n- [ ] CI green on the downstream repo too\n"
+    tilde = f"~~~\n- [ ] {CI_BOX}\n~~~\n- [ ] {CI_BOX}\n"
+    cases = {
+        "fenced": (fenced, 6),
+        "plain": (plain, 1),
+        "review": (review, None),
+        "two": (two, 0),
+        "tilde": (tilde, 3),
+    }
+    for name, (body, want) in cases.items():
+        got_awk = _awk_ticked_index(body)
+        got_py = m._ci_box_index(body.splitlines())
+        assert got_awk == got_py == want, (name, got_awk, got_py, want)
+
+
+def test_fenced_ci_box_above_region_does_not_steal_evidence():
+    """G1: a fenced template copy above the region must not make the real box unticked."""
+    body = f"""```
+- [ ] {CI_BOX}
+```
+
+Sign-off required (merge-blocking):
+- [ ] {CI_BOX}
+- [ ] Merge authorized (beekeeper)
+"""
+    r = m.parse(body)
+    assert r["evidence"] == [CI_BOX], r
+    assert r["unticked"] == ["Merge authorized (beekeeper)"], r
 
 
 def test_cli_line_keeps_notifier_sed_contract():

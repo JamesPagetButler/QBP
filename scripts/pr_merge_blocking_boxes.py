@@ -25,8 +25,8 @@ unticked.
 
 The notifier-owned CI-green EVIDENCE box (#538, #507 §8a, #815) is its own class:
 `evidence`.  It is the box `set_ci_box` in `.github/workflows/pr-check-status.yml`
-ticks/unticks — the FIRST line of the body that is a `- [ ]`/`- [x]` box whose
-lowercased text contains "ci green" and none of review / sign-off / visual / hvr /
+ticks/unticks — the FIRST line of the body (fenced code blocks skipped) that is a
+`- [ ]`/`- [x]` box whose lowercased text contains "ci green" and none of review / sign-off / visual / hvr /
 red team / gemini / approve (`is_ci_green_evidence_box`, kept in sync with that awk).
 Inside a merge-blocking region it is counted as neither ticked nor unticked: its
 truth is the CI state, which the required checks already enforce, and counting it
@@ -88,7 +88,8 @@ CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
 # The notifier's set_ci_box (pr-check-status.yml) awk predicate, byte-for-byte in
 # intent: box regex `^[[:space:]]*-[[:space:]]\[[ xX]\]`, then on the lowercased
 # WHOLE line `ci green` and NOT `review|sign.?off|visual|hvr|red team|gemini|approve`.
-# The awk scans every line (fences included) and owns only the FIRST match.
+# The awk skips fenced code blocks (same FENCE_RE toggle as parse(), #815 G1) and
+# owns only the FIRST match outside them.
 _CI_BOX_RE = re.compile(r"^\s*-\s\[[ xX]\]")
 _CI_EXCLUDE_RE = re.compile(r"review|sign.?off|visual|hvr|red team|gemini|approve")
 
@@ -110,9 +111,16 @@ def is_ci_green_evidence_box(line: str) -> bool:
 
 
 def _ci_box_index(lines: list[str]):
-    """Index of the box set_ci_box owns (its FIRST match, fences included), or None."""
+    """Index of the box set_ci_box owns (its FIRST match, fences skipped), or None.
+
+    The fence toggle is the one parse() uses (FENCE_RE), mirrored in the awk.
+    """
+    in_fence = False
     for i, line in enumerate(lines):
-        if is_ci_green_evidence_box(line):
+        if FENCE_RE.match(line):
+            in_fence = not in_fence
+            continue
+        if not in_fence and is_ci_green_evidence_box(line):
             return i
     return None
 
