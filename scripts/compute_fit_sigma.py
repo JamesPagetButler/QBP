@@ -394,7 +394,7 @@ def main():
                 f"inter#238 D3 and does not inflate the trials count. AC1 schema fields "
                 f"(measured_error 1σ convention, measured_error_plus/minus, "
                 f"measured_source minLength, fit_sigma/fit_sigma_reason/fit_history) in "
-                f"docs/cth/inventory.schema.v0.3.json 0.3.6. AC2/AC3/AC5/AC6 remain phase 2."
+                f"docs/cth/inventory.schema.v0.3.json 0.3.8. AC2/AC3/AC5/AC6 remain phase 2."
             )
             L["changelog"].append(
                 {"version": new_version, "date": date, "note": changelog_note}
