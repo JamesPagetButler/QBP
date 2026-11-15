@@ -26,8 +26,10 @@ unticked.
 The notifier-owned CI-green EVIDENCE box (#538, #507 §8a, #815) is its own class:
 `evidence`.  It is the box `set_ci_box` in `.github/workflows/pr-check-status.yml`
 ticks/unticks — the FIRST line of the body (fenced code blocks skipped) that is a
-`- [ ]`/`- [x]` box whose lowercased text contains "ci green" and none of review / sign-off / visual / hvr /
-red team / gemini / approve (`is_ci_green_evidence_box`, kept in sync with that awk).
+`- [ ]`/`- [x]` box whose lowercased text contains both "ci green at the head sha" and "evidence box" (the
+template wording) and none of review / sign-off / visual / hvr / red team / gemini /
+approve / merge / authori[sz] / §i4 / i4 / beekeeper / notar / confirm
+(`is_ci_green_evidence_box`, kept in sync with that awk; narrowed by #815 B1).
 Inside a merge-blocking region it is counted as neither ticked nor unticked: its
 truth is the CI state, which the required checks already enforce, and counting it
 would deadlock (`Merge-blocking boxes` red on the box ↔ the notifier ticking it only
@@ -87,11 +89,19 @@ FENCE_RE = re.compile(r"^\s*(```|~~~)")
 CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
 # The notifier's set_ci_box (pr-check-status.yml) awk predicate, byte-for-byte in
 # intent: box regex `^[[:space:]]*-[[:space:]]\[[ xX]\]`, then on the lowercased
-# WHOLE line `ci green` and NOT `review|sign.?off|visual|hvr|red team|gemini|approve`.
+# WHOLE line BOTH `ci green at the head sha` and `evidence box` (the template's own
+# wording, #815 B1) and NOT the exclusion list below. Narrow on purpose: this box is
+# auto-ticked at TECH-GREEN and exempt from the §2.2 count, so a sign-off box that
+# matched ("Merge authorized — once CI green", "§I4 … confirms CI green") would be
+# machine-ticked and stop blocking.
 # The awk skips fenced code blocks (same FENCE_RE toggle as parse(), #815 G1) and
 # owns only the FIRST match outside them.
 _CI_BOX_RE = re.compile(r"^\s*-\s\[[ xX]\]")
-_CI_EXCLUDE_RE = re.compile(r"review|sign.?off|visual|hvr|red team|gemini|approve")
+_CI_REQUIRE = ("ci green at the head sha", "evidence box")
+_CI_EXCLUDE_RE = re.compile(
+    r"review|sign.?off|visual|hvr|red team|gemini|approve"
+    r"|merge|authori[sz]|§i4|i4|beekeeper|notar|confirm"
+)
 
 
 def _is_nil(text: str) -> bool:
@@ -106,7 +116,9 @@ def is_ci_green_evidence_box(line: str) -> bool:
     """
     low = line.lower()
     return bool(
-        _CI_BOX_RE.match(line) and "ci green" in low and not _CI_EXCLUDE_RE.search(low)
+        _CI_BOX_RE.match(line)
+        and all(req in low for req in _CI_REQUIRE)
+        and not _CI_EXCLUDE_RE.search(low)
     )
 
 

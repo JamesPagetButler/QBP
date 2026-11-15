@@ -426,7 +426,11 @@ Sign-off required (merge-blocking):
     review = "- [ ] Red Team review once CI green\n- [ ] Human Visual Review\n"
     two = f"- [ ] {CI_BOX}\n- [ ] CI green on the downstream repo too\n"
     tilde = f"~~~\n- [ ] {CI_BOX}\n~~~\n- [ ] {CI_BOX}\n"
+    both_ci = f"- [ ] {CI_BOX}\n- [ ] {CI_BOX}\n"
     cases = {
+        "probe-merge": (B1_PROBE_MERGE, 2),
+        "probe-i4": (B1_PROBE_I4, None),  # real box already [x]: awk changes nothing
+        "first-of-two": (both_ci, 0),
         "fenced": (fenced, 6),
         "plain": (plain, 1),
         "review": (review, None),
@@ -434,6 +438,11 @@ Sign-off required (merge-blocking):
         "tilde": (tilde, 3),
     }
     for name, (body, want) in cases.items():
+        if name == "probe-i4":
+            # awk must leave the §I4 box alone; the parser owns the real [x] box
+            assert _awk_ticked_index(body) is None, name
+            assert m._ci_box_index(body.splitlines()) == 2, name
+            continue
         got_awk = _awk_ticked_index(body)
         got_py = m._ci_box_index(body.splitlines())
         assert got_awk == got_py == want, (name, got_awk, got_py, want)
@@ -468,6 +477,107 @@ def test_cli_line_keeps_notifier_sed_contract():
             ["sed", "-n", expr], input=line, capture_output=True, text=True
         ).stdout.strip()
         assert got == want, (expr, line, got)
+
+
+# ── #815 B1 (Red Team): a sign-off box mentioning CI green must never be the
+# evidence box — it would be auto-ticked at TECH-GREEN AND exempt from the count.
+B1_PROBE_MERGE = f"""Sign-off required (merge-blocking):
+- [ ] Merge authorized (beekeeper) — once CI green
+- [ ] {CI_BOX}
+"""
+B1_PROBE_I4 = f"""Sign-off required (merge-blocking):
+- [ ] §I4 architect: confirms CI green and the diff
+- [x] {CI_BOX}
+"""
+
+
+def _assert_b1_rows_hold():
+    r = m.parse(B1_PROBE_MERGE)
+    assert r["unticked"] == ["Merge authorized (beekeeper) — once CI green"], r
+    assert r["evidence"] == [CI_BOX], r
+    r = m.parse(B1_PROBE_I4)
+    assert r["unticked"] == ["§I4 architect: confirms CI green and the diff"], r
+    assert r["evidence"] == [CI_BOX], r
+
+
+def test_b1_signoff_box_mentioning_ci_green_stays_unticked():
+    _assert_b1_rows_hold()
+
+
+def test_b1_workflow_awk_never_ticks_the_signoff_probe():
+    for body in (B1_PROBE_MERGE, B1_PROBE_I4):
+        idx = _awk_ticked_index(body)
+        if idx is not None:
+            assert "CI green at the head sha" in body.splitlines()[idx], (body, idx)
+    # merge probe: the awk ticks the REAL box (line 2), not the merge box (line 1)
+    assert _awk_ticked_index(B1_PROBE_MERGE) == 2
+
+
+def test_b1_predicate_accepts_every_known_template_wording():
+    tpl_dir = os.path.join(HERE, "..", ".github", "PULL_REQUEST_TEMPLATE")
+    lines = []
+    for t in (1, 2, 3):
+        with open(os.path.join(tpl_dir, f"tier-{t}.md"), encoding="utf-8") as fh:
+            lines += [ln.rstrip("\n") for ln in fh if "CI green" in ln]
+    assert len(lines) == 3, lines
+    # OLD wording still on open PRs, and PR #814's line
+    lines += [
+        "- [ ] CI green at the head sha — evidence box: the notifier "
+        "(`pr-check-status.yml`) ticks it at ALL-GREEN and un-ticks it at RED; "
+        "do not hand-tick (#538)",
+        "- [x] CI green at the head sha — evidence box: the notifier ticks it at "
+        "ALL-GREEN and un-ticks it at RED; do not hand-tick (#538)",
+    ]
+    for ln in lines:
+        assert m.is_ci_green_evidence_box(ln), ln
+        assert _awk_ticked_index(ln.replace("[x]", "[ ]") + "\n") == 0, ln
+
+
+def test_b1_exclusions_each_block_alone():
+    base = "- [ ] CI green at the head sha — evidence box {}"
+    for word in (
+        "merge",
+        "authorised",
+        "authorized",
+        "§I4",
+        "I4",
+        "beekeeper",
+        "notary",
+        "confirms",
+        "review",
+        "sign-off",
+        "HVR",
+        "approve",
+    ):
+        line = base.format(word)
+        assert not m.is_ci_green_evidence_box(line), line
+        assert _awk_ticked_index(line + "\n") is None, line
+
+
+def test_b1_mutant_loose_predicate_is_killed():
+    """Revert to the pre-B1 loose rule: the B1 regression rows must FAIL under it."""
+    import re
+
+    loose_ex = re.compile(r"review|sign.?off|visual|hvr|red team|gemini|approve")
+
+    def loose(line):
+        low = line.lower()
+        return bool(
+            m._CI_BOX_RE.match(line) and "ci green" in low and not loose_ex.search(low)
+        )
+
+    real = m.is_ci_green_evidence_box
+    m.is_ci_green_evidence_box = loose
+    try:
+        try:
+            _assert_b1_rows_hold()
+            killed = False
+        except AssertionError:
+            killed = True
+    finally:
+        m.is_ci_green_evidence_box = real
+    assert killed, "mutant (loose predicate) survived the B1 regression rows"
+    _assert_b1_rows_hold()  # and the real predicate still passes
 
 
 if __name__ == "__main__":

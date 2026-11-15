@@ -283,8 +283,12 @@ jobs:
           # because the watcher tail short-circuited). Deterministic, idempotent.
           #
           # GUARDRAIL (bma#245 / box-keeper spec): touches ONLY a checkbox line
-          # whose text contains "CI green"; the exclusion regex hard-blocks any
-          # review / sign-off / Human-Visual-Review box. Evidence boxes only —
+          # whose text carries the template's own wording ("CI green at the head
+          # sha" AND "evidence box", #815 B1); the exclusion regex hard-blocks any
+          # review / sign-off / Human-Visual-Review / merge-authorized / §I4 /
+          # beekeeper / notary / "confirms" box. Since #815 the box ticks at
+          # TECH-GREEN and is exempt from the §2.2 count, so a sign-off box that
+          # matched would be machine-ticked AND stop blocking — a gate bypass. Evidence boxes only —
           # never a judgment box. Ticks at most ONE box (the first match outside
           # fenced code blocks — fences skipped, #815 G1).
           # KEEP IN SYNC with is_ci_green_evidence_box() in
@@ -304,8 +308,9 @@ jobs:
                 if (line ~ /^[[:space:]]*(```|~~~)/) { infence = !infence; print line; next }
                 if (!done && !infence \
                     && line ~ /^[[:space:]]*-[[:space:]]\[[ xX]\]/ \
-                    && tolower(line) ~ /ci green/ \
-                    && tolower(line) !~ /review|sign.?off|visual|hvr|red team|gemini|approve/) {
+                    && tolower(line) ~ /ci green at the head sha/ \
+                    && tolower(line) ~ /evidence box/ \
+                    && tolower(line) !~ /review|sign.?off|visual|hvr|red team|gemini|approve|merge|authori[sz]|§i4|i4|beekeeper|notar|confirm/) {
                   sub(/\[[ xX]\]/, "[" m "]", line)
                   done = 1
                 }
