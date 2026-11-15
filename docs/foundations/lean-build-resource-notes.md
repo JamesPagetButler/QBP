@@ -27,6 +27,7 @@ sum of the modules building at the same time — under a tight cap use `lake bui
 | import floor (`Mathlib.Data.Fin.VecNotation` + `Mathlib.Tactic`, definitions only) | — | 3 514 720 kB = 3.35 GiB | 8 s | — | 2026-10-18, lean 4.30.0 |
 | `Foundations/Octonion32Count.lean` **before #633** (b1bd7ae…master 2026-10-18) | 3 monolithic `decide +kernel` sweeps over 155/15/140 eight-dim candidates on a `![...]` table | **> 12 GiB — killed at cap; 15 628 384 kB = 14.9 GiB at the kill** | 3:23 (killed) | none ≤ 12 GiB (`lake build` OOM at 10 GB #633, 6 GB #683) | 2026-10-18 |
 | `Foundations/Octonion32Count.lean` **after #633** | bit-packed table + 7 kernel chunks of 20 candidates + derived 155-count | **4 637 692 – 4 799 656 kB = 4.4 – 4.6 GiB** | 1:37 | 6 GiB (module alone); 10 GB worktree cap ✓ | 2026-10-21 |
+| `Foundations/OctonionAutBranching.lean` (#755) | small kernel `decide`s over `Fin (2^2)`/`Fin (2^3)` index tables (XOR splits, `mulCoeff 3` doubling rows, `halfEquivQ`) | **3 541 408 kB = 3.38 GiB** (≈ import floor) | 0:06 (module alone); clean-cache `lake build` of its closure 4:53, peak 5 480 916 kB = 5.2 GiB (dependency modules) | 8 GiB module, 9 GiB closure `run-bounded` ✓ | 2026-10-29 |
 
 Every other Foundations module built green under the 10 GB cap in #633 (29 modules); none has a
 written figure yet — add a row when one is measured or when a new kernel-heavy module lands. A
