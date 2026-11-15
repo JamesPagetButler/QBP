@@ -10,22 +10,6 @@
       "reason": "epistemic meta-principle; no forcing, no kill_condition — classify (root / reclassify / kill)",
       "added": "2026-09-11",
       "added_by": "#654 D6 first run"
-    },
-    {
-      "id": "META-physical-mapping-status-field",
-      "lives_in": "anchors",
-      "issue": "https://github.com/JamesPagetButler/QBP/issues/657",
-      "reason": "smuggled root: META- prefixed field-documentation anchor — rename out of the root prefix space",
-      "added": "2026-09-11",
-      "added_by": "#654 D6 first run"
-    },
-    {
-      "id": "META-regime-of-validity-field",
-      "lives_in": "anchors",
-      "issue": "https://github.com/JamesPagetButler/QBP/issues/657",
-      "reason": "smuggled root: META- prefixed field-documentation anchor — rename out of the root prefix space",
-      "added": "2026-09-11",
-      "added_by": "#654 D6 first run"
     }
   ],
   "chain_debt": [
