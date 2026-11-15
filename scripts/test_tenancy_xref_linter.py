@@ -21,7 +21,9 @@ CTX_REF = "`~/Documents/Contextus/doc/contextus-tenancy-pattern.md`"
 CTX_ANN = "<!-- expected-on-sibling: Contextus doc/contextus-tenancy-pattern.md -->"
 
 
-def run(doc_text, repo_files=(), siblings=(), sibling_root=True, env=None):
+def run(
+    doc_text, repo_files=(), siblings=(), sibling_root=True, env=None, extra_args=None
+):
     """Run the linter on `doc_text`.
 
     repo_files: in-repo relative paths to create under the temp repo root.
@@ -29,6 +31,8 @@ def run(doc_text, repo_files=(), siblings=(), sibling_root=True, env=None):
     sibling_root: False → point the linter at an EMPTY sibling root (all absent).
     env:        extra environment (e.g. QBP_SIBLING_ROOT); when it carries
                 QBP_SIBLING_ROOT the --sibling-root flag is omitted.
+    extra_args: additional CLI flags appended to the linter invocation
+                (e.g. ["--fail-on-unverifiable"], #761).
     Returns (exit code, stdout).
     """
     with tempfile.TemporaryDirectory() as d:
@@ -57,6 +61,7 @@ def run(doc_text, repo_files=(), siblings=(), sibling_root=True, env=None):
             full_env.update({k: v.replace("{sroot}", sroot) for k, v in env.items()})
         if "QBP_SIBLING_ROOT" not in (env or {}):
             cmd += ["--sibling-root", sroot if sibling_root else os.path.join(d, "no")]
+        cmd += list(extra_args or [])
         r = subprocess.run(cmd, capture_output=True, text=True, env=full_env)
         return r.returncode, r.stdout + r.stderr
 
@@ -254,6 +259,53 @@ CASES = [
 ]
 
 
+def test_fail_on_unverifiable():
+    """--fail-on-unverifiable (#761): the CI-only strict mode.
+
+    exit 1 when an annotated federation ref is still 'not verifiable here'
+    after linting (sibling absent); exit 0 once it VERIFIES (sibling
+    present); exit 0 when there is nothing annotated to fail on. Local dev
+    never passes this flag, so the default (flag omitted) behaviour above is
+    unchanged.
+    """
+    results = []
+
+    got, out = run(
+        f"Pattern: {CTX_REF} {CTX_ANN}\n",
+        siblings=(),
+        sibling_root=False,
+        extra_args=["--fail-on-unverifiable"],
+    )
+    ok = (
+        got == 1
+        and "not verifiable here" in out
+        and "FAIL: --fail-on-unverifiable" in out
+    )
+    results.append(("--fail-on-unverifiable + sibling absent -> exit 1", ok, got, 1))
+
+    got, out = run(
+        f"Pattern: {CTX_REF} {CTX_ANN}\n",
+        siblings=(("Contextus", "doc/contextus-tenancy-pattern.md"),),
+        sibling_root=True,
+        extra_args=["--fail-on-unverifiable"],
+    )
+    ok = got == 0 and "VERIFIED on sibling Contextus" in out
+    results.append(("--fail-on-unverifiable + verified -> exit 0", ok, got, 0))
+
+    got, out = run(
+        "No federation refs here.\n",
+        extra_args=["--fail-on-unverifiable"],
+    )
+    ok = got == 0
+    results.append(("--fail-on-unverifiable + no refs -> exit 0", ok, got, 0))
+
+    failures = 0
+    for name, ok, got, exp in results:
+        print(f"  [{'PASS' if ok else 'FAIL'}] {name}  (exit {got}, expected {exp})")
+        failures += not ok
+    return failures
+
+
 def main():
     failures = 0
     for name, doc, files, sibs, sroot, env, exp, must, must_not in CASES:
@@ -273,6 +325,11 @@ def main():
                 print(f"         {ln}")
         failures += not ok
 
+    total_cases = len(CASES)
+
+    failures += test_fail_on_unverifiable()
+    total_cases += 3
+
     # The CI workflow must run this test file alongside the linter so the
     # contract above is enforced, not just documented.
     wf = open(WORKFLOW).read()
@@ -281,11 +338,47 @@ def main():
         f"  [{'PASS' if wf_ok else 'FAIL'}] workflow runs test_tenancy_xref_linter.py"
     )
     failures += not wf_ok
+    total_cases += 1
+
+    # #761: the CI workflow must actually pass --fail-on-unverifiable to the
+    # real lint step, and must checkout the siblings the annotations declare
+    # (BMA, Contextus) using SIBLING_READ_TOKEN -- not just claim to in a
+    # comment.
+    wf_strict_ok = "--fail-on-unverifiable" in wf
+    print(
+        f"  [{'PASS' if wf_strict_ok else 'FAIL'}] workflow lint step passes --fail-on-unverifiable"
+    )
+    failures += not wf_strict_ok
+    total_cases += 1
+
+    wf_token_ok = "SIBLING_READ_TOKEN" in wf
+    print(
+        f"  [{'PASS' if wf_token_ok else 'FAIL'}] workflow references SIBLING_READ_TOKEN"
+    )
+    failures += not wf_token_ok
+    total_cases += 1
+
+    wf_bma_ok = "bma-systema" in wf
+    wf_contextus_ok = "JamesPagetButler/Contextus" in wf
+    print(f"  [{'PASS' if wf_bma_ok else 'FAIL'}] workflow checks out bma-systema")
+    print(f"  [{'PASS' if wf_contextus_ok else 'FAIL'}] workflow checks out Contextus")
+    failures += not wf_bma_ok
+    failures += not wf_contextus_ok
+    total_cases += 2
+
+    # #761 point 6 / Red Team note on PR #808: the missing-secret negative
+    # control must exist as an actual job, not just be asserted in prose.
+    wf_negctrl_ok = "tenancy-xref-lint-missing-secret-negative-control" in wf
+    print(
+        f"  [{'PASS' if wf_negctrl_ok else 'FAIL'}] workflow has the missing-secret negative-control job"
+    )
+    failures += not wf_negctrl_ok
+    total_cases += 1
 
     if failures:
         print(f"\n{failures} test(s) FAILED")
         return 1
-    print(f"\nAll {len(CASES) + 1} tenancy xref linter tests passed.")
+    print(f"\nAll {total_cases} tenancy xref linter tests passed.")
     return 0
 
 
