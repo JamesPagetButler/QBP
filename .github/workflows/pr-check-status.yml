@@ -23,7 +23,12 @@
 # tier-3 review-label gate is itself a check that stays red until reviews
 # exist, and so is `Merge-blocking boxes` (red while a sign-off box is unticked).
 # TECH-GREEN excludes both review gates; ALL-GREEN includes them. The CI-green
-# evidence box ticks at ALL-GREEN, so it waits for the sign-offs by design.
+# evidence box ticks at TECH-GREEN (#815): "CI green" means the technical checks,
+# and the review gates are not CI. The beekeeper needs to see CI green BEFORE
+# ticking `Merge authorized`, and ticking only at ALL-GREEN deadlocked when the
+# box sat inside a §2.2 region (`Merge-blocking boxes` red on the box ↔ the box
+# ticked only once that check is green — PR #814). The parser also reports that
+# box as `evidence`, never `unticked`, so it can never hold the region red.
 #
 # BOX CONTRACT (#507 §4, adopted from inter github-best-practices §2.2): a PR
 # body's merge-blocking sign-off boxes live under a line containing
@@ -269,7 +274,11 @@ jobs:
 
           # ── CI-green evidence-box self-tick (#507 §8a, FAULT-S4-002 fix) ──
           # The notifier owns the "CI green" EVIDENCE box on the PR body: tick at
-          # ALL-GREEN, un-tick at RED. This removes the orchestrator/watcher
+          # TECH-GREEN (#815; re-ticked idempotently at ALL-GREEN), un-tick at RED.
+          # TECH-GREEN, not ALL-GREEN: the beekeeper must see CI green before ticking
+          # `Merge authorized`, and an ALL-GREEN-only tick deadlocked PR #814 (box in
+          # the §2.2 region kept `Merge-blocking boxes` red, which blocked ALL-GREEN).
+          # This removes the orchestrator/watcher
           # dependency that failed on #533 (a green CI whose box never got ticked
           # because the watcher tail short-circuited). Deterministic, idempotent.
           #
@@ -277,6 +286,9 @@ jobs:
           # whose text contains "CI green"; the exclusion regex hard-blocks any
           # review / sign-off / Human-Visual-Review box. Evidence boxes only —
           # never a judgment box. Ticks at most ONE box (the first match).
+          # KEEP IN SYNC with is_ci_green_evidence_box() in
+          # scripts/pr_merge_blocking_boxes.py, which classifies this same box as
+          # `evidence` (not unticked) inside a merge-blocking region (#815).
           set_ci_box() {  # $1 = mark: "x" (tick) or " " (untick)
             local mark="$1" body newbody tmp
             body=$(gh pr view "$PR" --repo "$REPO" --json body --jq .body) || return 0
@@ -311,8 +323,11 @@ jobs:
             BODY=$(printf '%s\n## ❌ Checks FAILED — %s of %s @ %s\n\nHead: `%s`\n\n%s\n\n`review-ready` revoked: not reviewable until tech-green again. Machine-posted; updates per head SHA.' \
               "$MARKER" "$NTECHFAIL" "$TOTAL" "$TS" "$SHA" "$LIST")
           elif [ "$GATES_NFAIL" -gt 0 ]; then
-            # ── TECH-GREEN: reviews owed ──
+            # ── TECH-GREEN: reviews owed; tick the CI-green evidence box (#815) ──
+            # Every non-review check passed → "CI green" is machine-true now; the
+            # review gates are not CI. ALL-GREEN re-ticks idempotently below.
             add_label
+            set_ci_box "x"
             # QBP#706: tick the Red Team / Gemini rows from the SAME detected review
             # artifacts the Tier-3 gate uses, so this machine comment can never contradict
             # the record (PR #705 showed all-unticked boxes although every leg was ticked
@@ -331,9 +346,10 @@ jobs:
             BODY=$(printf '%s\n## 🟢 Tech-green — review-ready @ %s\n\nHead: `%s`. All non-review checks pass; review-completeness gates await artifacts.\n\n**Review checklist** — mirrors detected review artifacts; the PR body is the record. Each review post must include `<!-- reviewed-sha: %s -->`:\n- [%s] Red Team review (Sabine/Grothendieck/Knuth)\n- [%s] Gemini review (Furey/Feynman, real API)\n- [ ] Human Visual Review (beekeeper)\n\nMachine-posted; updates per head SHA.' \
               "$MARKER" "$TS" "$SHA" "$SHA" "$RT_BOX" "$GM_BOX")
           else
-            # ── ALL-GREEN: tick the CI-green evidence box, then review-freshness ──
+            # ── ALL-GREEN: (re-)tick the CI-green evidence box, then review-freshness ──
             # Every check (incl. review gates) passed → the "CI green" evidence
-            # box is now machine-true. Review FRESHNESS is reported separately
+            # box is machine-true (already ticked at TECH-GREEN, #815; this call is
+            # idempotent and covers a PR that went straight from RED to ALL-GREEN). Review FRESHNESS is reported separately
             # below; it does not gate this box (CI-green ≠ reviews-fresh).
             set_ci_box "x"
             # ── #507 §6: merge-ready must mean ONE-CLICK ──

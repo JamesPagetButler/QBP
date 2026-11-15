@@ -82,7 +82,13 @@ def test_outside_region_ignored():
 - [ ] Theory aligns with QBP axioms
 """
     r = m.parse(body)
-    assert r == {"ticked": [], "unticked": [], "nil": [], "region": "absent"}, r
+    assert r == {
+        "ticked": [],
+        "unticked": [],
+        "nil": [],
+        "evidence": [],
+        "region": "absent",
+    }, r
 
 
 def test_code_fence_ignored():
@@ -139,7 +145,13 @@ def test_heading_form_opener_counts_boxes():  # G1 (BLOCKING)
 def test_prose_mention_does_not_open_region():  # G2
     body = "Not merge-blocking: FYI.\n- [ ] informational\nThis is not merge-blocking either.\n- [ ] also informational\n"
     r = m.parse(body)
-    assert r == {"ticked": [], "unticked": [], "nil": [], "region": "absent"}, r
+    assert r == {
+        "ticked": [],
+        "unticked": [],
+        "nil": [],
+        "evidence": [],
+        "region": "absent",
+    }, r
 
 
 def test_bold_label_line_opens_region():  # G2 (label forms)
@@ -223,7 +235,13 @@ def test_other_shape_reviewer_boxes_are_absent_and_not_counted():
 - [ ] merge-blocking: @herschel
 """
     r = m.parse(body)
-    assert r == {"ticked": [], "unticked": [], "nil": [], "region": "absent"}, r
+    assert r == {
+        "ticked": [],
+        "unticked": [],
+        "nil": [],
+        "evidence": [],
+        "region": "absent",
+    }, r
 
 
 def test_prose_mention_is_absent():
@@ -240,7 +258,7 @@ def test_cli_region_absent_line():
     )
     assert r.returncode == 0, r.stderr
     assert (
-        r.stdout.splitlines()[0] == "unticked=0 ticked=0 nil=0 region=absent"
+        r.stdout.splitlines()[0] == "unticked=0 ticked=0 nil=0 region=absent evidence=0"
     ), r.stdout
     r2 = subprocess.run(
         [sys.executable, SCRIPT, "--json"], input="", capture_output=True, text=True
@@ -255,7 +273,13 @@ def test_backticked_sentinel_mention_does_not_open_region():
 - [ ] not a sign-off box
 """
     r = m.parse(body)
-    assert r == {"ticked": [], "unticked": [], "nil": [], "region": "absent"}, r
+    assert r == {
+        "ticked": [],
+        "unticked": [],
+        "nil": [],
+        "evidence": [],
+        "region": "absent",
+    }, r
 
 
 def test_sentinel_at_end_of_prose_line_still_opens():
@@ -270,6 +294,137 @@ def test_backticked_close_sentinel_does_not_close_region():
         "@a — see `<!-- /merge-blocking -->` docs",
         "@b",
     ]
+
+
+# ── #815: notifier-owned CI-green evidence box ─────────────────────────────
+CI_BOX = (
+    "CI green at the head sha — evidence box: the notifier (`pr-check-status.yml`) "
+    "ticks it once every technical check passes (TECH-GREEN) and un-ticks it at "
+    "RED; do not hand-tick (#538)"
+)
+
+
+def test_ci_green_box_unticked_in_region_is_evidence_not_unticked():
+    body = f"""Sign-off required (merge-blocking):
+- [ ] Red Team review (@qbp-architecture)
+- [ ] {CI_BOX}
+"""
+    r = m.parse(body)
+    assert r["unticked"] == ["Red Team review (@qbp-architecture)"], r
+    assert r["evidence"] == [CI_BOX], r
+    assert r["ticked"] == [], r
+
+
+def test_region_with_only_evidence_box_unticked_is_clear():
+    body = f"""Sign-off required (merge-blocking):
+- [x] Red Team review (@qbp-architecture)
+- [ ] {CI_BOX}
+- [x] Merge authorized (beekeeper)
+"""
+    r = m.parse(body)
+    assert r["unticked"] == [] and len(r["evidence"]) == 1, r
+    out = subprocess.run(
+        [sys.executable, SCRIPT], input=body, capture_output=True, text=True
+    ).stdout.splitlines()[0]
+    assert out == "unticked=0 ticked=2 nil=0 region=present evidence=1", out
+
+
+def test_ticked_ci_green_box_in_region_is_evidence_not_ticked():
+    body = f"Sign-off required (merge-blocking):\n- [x] {CI_BOX}\n"
+    r = m.parse(body)
+    assert r["ticked"] == [] and r["evidence"] == [CI_BOX], r
+
+
+def test_review_box_mentioning_ci_green_stays_a_normal_box():
+    body = """Sign-off required (merge-blocking):
+- [ ] Red Team review once CI green (@qbp-architecture)
+- [ ] Human Visual Review after CI green (beekeeper)
+"""
+    r = m.parse(body)
+    assert r["evidence"] == [], r
+    assert len(r["unticked"]) == 2, r
+
+
+def test_ci_green_box_outside_region_unchanged():
+    body = f"""## Mechanical verification evidence
+- [ ] {CI_BOX}
+
+Sign-off required (merge-blocking):
+- [ ] Merge authorized (beekeeper)
+"""
+    r = m.parse(body)
+    assert r["unticked"] == ["Merge authorized (beekeeper)"], r
+    assert r["evidence"] == [] and r["ticked"] == [], r
+
+
+def test_only_first_ci_green_box_is_notifier_owned():
+    """set_ci_box ticks only the FIRST match; a second CI-green box is a human box."""
+    body = f"""- [ ] {CI_BOX}
+
+Sign-off required (merge-blocking):
+- [ ] CI green on the downstream repo too
+"""
+    r = m.parse(body)
+    assert r["unticked"] == ["CI green on the downstream repo too"], r
+    assert r["evidence"] == [], r
+
+
+def test_predicate_matches_set_ci_box_awk():
+    f = m.is_ci_green_evidence_box
+    assert f(f"- [ ] {CI_BOX}") and f(f"  - [X] {CI_BOX}")
+    for bad in (
+        "- [ ] CI green — Gemini review",
+        "- [ ] CI green sign-off",
+        "- [ ] CI green signoff",
+        "- [ ] CI green HVR",
+        "- [ ] CI green, approve",
+        "* [ ] CI green",  # awk box regex is dash-only
+        "- [ ] CI is green",
+    ):
+        assert not f(bad), bad
+
+
+def test_predicate_agrees_with_the_workflow_awk():
+    """Run set_ci_box's real awk (extracted from the workflow) on the same lines."""
+    wf = os.path.join(HERE, "..", ".github", "workflows", "pr-check-status.yml")
+    src = open(wf, encoding="utf-8").read()
+    assert (
+        "ci green/" in src
+        and "review|sign.?off|visual|hvr|red team|gemini|approve" in src
+    )
+    lines = [
+        f"- [ ] {CI_BOX}",
+        "- [ ] CI green — Gemini review",
+        "- [ ] Red Team review once CI green",
+        "* [ ] CI green",
+        "  - [x] CI green at head",
+        "- [ ] Human Visual Review",
+    ]
+    prog = (
+        "{ l=$0; if (l ~ /^[[:space:]]*-[[:space:]]\\[[ xX]\\]/ && tolower(l) ~ /ci green/ "
+        "&& tolower(l) !~ /review|sign.?off|visual|hvr|red team|gemini|approve/) "
+        'print "1"; else print "0" }'
+    )
+    out = subprocess.run(
+        ["awk", prog], input="\n".join(lines) + "\n", capture_output=True, text=True
+    ).stdout.split()
+    assert out == ["1" if m.is_ci_green_evidence_box(x) else "0" for x in lines], out
+
+
+def test_cli_line_keeps_notifier_sed_contract():
+    """The notifier's two seds must still extract unticked + region."""
+    body = f"Sign-off required (merge-blocking):\n- [ ] @a\n- [ ] {CI_BOX}\n"
+    line = subprocess.run(
+        [sys.executable, SCRIPT], input=body, capture_output=True, text=True
+    ).stdout.splitlines()[0]
+    for expr, want in (
+        (r"s/^unticked=\([0-9]*\).*/\1/p", "1"),
+        (r"s/^unticked=.*region=\([a-z]*\).*/\1/p", "present"),
+    ):
+        got = subprocess.run(
+            ["sed", "-n", expr], input=line, capture_output=True, text=True
+        ).stdout.strip()
+        assert got == want, (expr, line, got)
 
 
 if __name__ == "__main__":

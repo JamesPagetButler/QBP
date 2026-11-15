@@ -23,6 +23,17 @@ deliberately nil'd option (QBP convention `- [ ] ~~option~~ ⊘ reason`), not un
 work, and is NOT counted as unticked.  A struck fragment inside a live ask stays
 unticked.
 
+The notifier-owned CI-green EVIDENCE box (#538, #507 §8a, #815) is its own class:
+`evidence`.  It is the box `set_ci_box` in `.github/workflows/pr-check-status.yml`
+ticks/unticks — the FIRST line of the body that is a `- [ ]`/`- [x]` box whose
+lowercased text contains "ci green" and none of review / sign-off / visual / hvr /
+red team / gemini / approve (`is_ci_green_evidence_box`, kept in sync with that awk).
+Inside a merge-blocking region it is counted as neither ticked nor unticked: its
+truth is the CI state, which the required checks already enforce, and counting it
+would deadlock (`Merge-blocking boxes` red on the box ↔ the notifier ticking it only
+once that check is green — PR #814).  A second "CI green" box the notifier does not
+own stays a normal box.
+
 This module is the ONE parser shared by (a) the notifier's nudge state and
 (b) the future required check (PR B, gated on the §7 beekeeper ruling).  It
 never edits anything.  Auto-nudge, never auto-tick.
@@ -36,9 +47,11 @@ shape (e.g. `- [ ] **§I4 @seat** (sign-off required)`) are not counted and the
 notifier reports "sign-off state not assessable" instead of ALL GREEN.
 
 CLI: pr_merge_blocking_boxes.py [--body-file F | reads stdin] [--json]
-Prints `unticked=<n> ticked=<n> nil=<n> region=present|absent` (or JSON) and
+Prints `unticked=<n> ticked=<n> nil=<n> region=present|absent evidence=<n>` (or
+JSON, which adds an `evidence` list) and
 exits 0 always; the first-line prefix `unticked=<int> …` is the stable contract
-for callers (the notifier reads it with `sed`), and the CALLER decides whether
+for callers (the notifier reads it with `sed`; `evidence=` is appended AFTER
+`region=` so `s/^unticked=.*region=\([a-z]*\).*/` still extracts the region), and the CALLER decides whether
 unticked > 0 / region=absent is a nudge or a failure.
 """
 
@@ -72,14 +85,44 @@ FENCE_RE = re.compile(r"^\s*(```|~~~)")
 # parser) must not open a region — otherwise region=present is reported for a
 # body that has no real §2.2 region, defeating the fail-closed verdict.
 CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
+# The notifier's set_ci_box (pr-check-status.yml) awk predicate, byte-for-byte in
+# intent: box regex `^[[:space:]]*-[[:space:]]\[[ xX]\]`, then on the lowercased
+# WHOLE line `ci green` and NOT `review|sign.?off|visual|hvr|red team|gemini|approve`.
+# The awk scans every line (fences included) and owns only the FIRST match.
+_CI_BOX_RE = re.compile(r"^\s*-\s\[[ xX]\]")
+_CI_EXCLUDE_RE = re.compile(r"review|sign.?off|visual|hvr|red team|gemini|approve")
 
 
 def _is_nil(text: str) -> bool:
     return bool(NIL_RE.search(text))
 
 
+def is_ci_green_evidence_box(line: str) -> bool:
+    """True iff `line` matches set_ci_box's awk predicate in pr-check-status.yml.
+
+    KEEP IN SYNC with `set_ci_box()` in .github/workflows/pr-check-status.yml
+    (#815): change one, change the other.
+    """
+    low = line.lower()
+    return bool(
+        _CI_BOX_RE.match(line) and "ci green" in low and not _CI_EXCLUDE_RE.search(low)
+    )
+
+
+def _ci_box_index(lines: list[str]):
+    """Index of the box set_ci_box owns (its FIRST match, fences included), or None."""
+    for i, line in enumerate(lines):
+        if is_ci_green_evidence_box(line):
+            return i
+    return None
+
+
 def parse(body: str):
-    """Return dict(ticked=[...], unticked=[...], nil=[...], region="present"|"absent").
+    """Return dict(ticked=[...], unticked=[...], nil=[...], evidence=[...],
+    region="present"|"absent").
+
+    `evidence` lists the notifier-owned CI-green box when it sits in a region
+    (ticked or not); it is never in `ticked` / `unticked`.
 
     `region` is "present" as soon as any §2.2 opener (label line, heading-form
     label or `<!-- merge-blocking -->` sentinel) is seen, even if the region
@@ -89,11 +132,14 @@ def parse(body: str):
     ticked: list[str] = []
     unticked: list[str] = []
     nil: list[str] = []
+    evidence: list[str] = []
+    lines = body.splitlines()
+    ci_idx = _ci_box_index(lines)
     in_region = False
     region_seen = False
     in_fence = False
     prev_blank = False
-    for raw in body.splitlines():
+    for idx, raw in enumerate(lines):
         line = raw.rstrip("\n")
         if FENCE_RE.match(line):
             in_fence = not in_fence
@@ -136,7 +182,9 @@ def parse(body: str):
         if not in_region:
             continue
         text = m.group("text").strip()
-        if m.group("mark").lower() == "x":
+        if idx == ci_idx:
+            evidence.append(text)
+        elif m.group("mark").lower() == "x":
             ticked.append(text)
         elif _is_nil(text):
             nil.append(text)
@@ -146,6 +194,7 @@ def parse(body: str):
         "ticked": ticked,
         "unticked": unticked,
         "nil": nil,
+        "evidence": evidence,
         "region": "present" if region_seen else "absent",
     }
 
@@ -168,7 +217,8 @@ def main(argv=None):
     else:
         print(
             f"unticked={len(res['unticked'])} ticked={len(res['ticked'])} "
-            f"nil={len(res['nil'])} region={res['region']}"
+            f"nil={len(res['nil'])} region={res['region']} "
+            f"evidence={len(res['evidence'])}"
         )
         for t in res["unticked"]:
             print(f"UNTICKED: {t}")
