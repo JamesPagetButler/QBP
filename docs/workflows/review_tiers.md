@@ -263,6 +263,77 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    commit messages enter the immutable git log, where they outlive their
    caveats.
 
+7. **Mechanical backstops (#507, 2026-10-22) — advisory unless the beekeeper
+   flips them:** `PR Process Lints` (`.github/workflows/pr-process-lints.yml`)
+   runs `scripts/check_pr_prose_claims.py` on every PR open/edit/sync:
+   (§1) a verdict word in the title of a theory-bearing PR (label
+   `tier-3-review` or paths under `proofs/`, `docs/theory/`, `docs/foundations/`)
+   with no verdict headline in the body; (§2) an "oracle" evidence line that
+   names no in-repo fixture/config path with a pinned sha. Both surface as
+   `::warning::` annotations and exit 0 — the reviewer stays the authority
+   (rule 6). Passing `--strict` in the workflow makes them blocking; that flip
+   is the beekeeper's choice and is recorded on #507. The same workflow holds
+   the blocking `workflow_run` drift lint (`scripts/check_notifier_workflow_list.py`):
+   every PR-triggered workflow must be in the notifier's list, or its completion
+   can never finalise a verdict. The notifier itself now (a) refuses the
+   merge-ready verdict when GitHub reports `mergeable: CONFLICTING` (resolve
+   first — #507 §6) and (b) posts a 🟡 nudge, not merge-ready, while any
+   merge-blocking sign-off box (github-best-practices §2.2 regions, parsed by
+   `scripts/pr_merge_blocking_boxes.py`) is unticked — auto-nudge, never
+   auto-tick (#507 §4) — and (c) fails closed (federation rule R3): a body
+   with **no** §2.2 region at all (neither the label line nor the sentinel)
+   gets 🟡 "sign-off state not assessable", never ✅, because reviewer boxes
+   in any other shape are not read.
+
+8. **Merge-blocking boxes are a REQUIRED STATUS CHECK (#507 §7, beekeeper
+   ruling 2026-10-27: BLOCKING RATIFIED).** The check `Merge-blocking boxes`
+   (`.github/workflows/merge-blocking-boxes.yml` →
+   `scripts/merge_blocking_check.py`) goes **red** on every PR whose body has
+   an unticked box inside a §2.2 merge-blocking region (label line
+   `Sign-off required (merge-blocking):` / `Merge-blocking:` / `##` heading
+   form, or the `<!-- merge-blocking -->` sentinel); it re-runs on
+   `pull_request: edited`, so ticking the box clears it. Once the beekeeper
+   adds that exact check name to the master ruleset's required status checks
+   (repo-admin — #507 AC13), the merge button is disabled while a box is
+   unticked, **for everyone including the beekeeper** (no `--admin`; the
+   process forbids it — bma-systema#245 is the incident this closes).
+   **Two consumers, one parser:** the notifier's 🟡 nudge (item 7b, human
+   readable, names the boxes and — since #507 AC4, `scripts/pr_box_evidence.py`
+   — cites any detected APPROVE-class post by/for a box's hand, with its
+   reviewed-sha vs head; detection is nudge-only, the owner still ticks) and
+   this red check (mechanical block) both read `scripts/pr_merge_blocking_boxes.py`;
+   the contract parse is co-signed by qbp-architecture. **Auto-nudge, never
+   auto-tick:** the hand that owns a box ticks it, or ⊘-nils it with a reason
+   (`- [ ] ~~option~~ ⊘ reason`); a struck fragment inside a live ask stays
+   unticked. **No-region policy:** a body with no §2.2 region at all passes
+   this check with a `::warning::` naming the fix (the notifier still withholds
+   ✅ for it, item 7c) — not blocking until the PR templates carry the region
+   everywhere; the beekeeper flips absence to blocking by adding
+   `--absent-blocks` to the check step (one line; tracked as #781, AC: every
+   PR template carries the region). **The judge is not the evidence:** the
+   check runs from a checkout of the PR's *base* sha (`base/scripts/…`), so a
+   PR that edits the check or the parser is still judged by the base copy;
+   the head copy judges only when the base lacks a script (first landing,
+   `::warning::` + `verdict-source=head(bootstrap)` in the log). An unticked box in a
+   PR's *test plan* or *checklist* (outside the region) never blocks — only
+   sign-off boxes do. Wiring step (beekeeper): Settings → Rules → master
+   ruleset → *Require status checks to pass* → add `Merge-blocking boxes`.
+
+   **Three-layer defense (#507 AC17).** Box truth on a PR is held by three
+   layers that fail independently: a mechanical layer that owns the evidence
+   boxes it can prove and makes every other unticked box visible, a scheduled
+   sweep that backstops it, and the hand that owns each judgment box ticking
+   it the moment its evidence lands — never as the tail of a merge or a
+   watcher (FAULT-S4-002). No layer ticks a sign-off, Human-Visual-Review or
+   merge-blocking box but its owner; the first two only surface an unticked
+   box and cite what would justify ticking it (auto-nudge, never auto-tick).
+
+   | Layer | What it does | Record |
+   |---|---|---|
+   | 1. Notifier (mechanical) | Self-ticks the `CI green` evidence box at ALL-GREEN and un-ticks it at RED (PR #534 `07accf8`); posts the 🟡 nudge naming each unticked §2.2 box (PR #731 `cae9386`) and cites a detected APPROVE-class post by/for the box's hand with its reviewed-sha vs head (#507 AC4, `scripts/pr_box_evidence.py`); the red `Merge-blocking boxes` required check disables the merge button while a box is unticked (PR #780 `369905e`) | `.github/workflows/pr-check-status.yml`, `.github/workflows/merge-blocking-boxes.yml` |
+   | 2. Herschel sweep (backstop) | The box-keeper sweep ticks machine-verifiable EVIDENCE boxes only — CI green after `gh pr checks` shows 0 non-pass, axioms clean, gate exit-0 — once the evidence is in hand; it never ticks a sign-off, HVR or merge-blocking box (PR #536 `b38235c`) | `docs/workflows/herschel_box_keeper.md` §2 |
+   | 3. In-the-moment (the hand) | The hand that owns a box ticks it when the evidence lands — a deliberate, decoupled step, never the tail of a watcher or a merge; the box line cites the evidence (FAULT-S4-002 fix 3) | `docs/process_violation_log.md` FAULT-S4-002 |
+
 Precedent incidents (all 2026-06-04): PR #493 did not build from a clean
 checkout (missing root aggregator; both Tier-3 reviews read content only);
 `LieAlgebraIso.lean` never compiled since authoring (caught by aggregator

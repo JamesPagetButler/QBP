@@ -1,0 +1,24 @@
+# `qbp-desi-fit` round 1 — data pins
+
+Frozen pre-registration: `spikes/prereg/qbp-desi-fit-r1-prereg-FROZEN-v1.md`, sha256 `f6a186169d9dae577d61f626578bc0d166314b6d1f8041bcbd3f3c788337090a`.
+All fetches: public, credential-free HTTPS, from this box, 2026-10-28 00:02 UTC (= 2026-10-27 evening local). Nothing was typed in by hand; every number used by the fit is read from these files. Cached under `spikes/qbp-desi-fit/data/`.
+
+| # | Dataset | File (in `data/`) | Source URL (pinned) | Retrieved (UTC) | Bytes | sha256 |
+|---|---|---|---|---|---|---|
+| 1 | DESI DR2 BAO means (13 values: D_V/r_d at z=0.295; D_M/r_d, D_H/r_d at z=0.510, 0.706, 0.934, 1.321, 1.484, 2.33) | `desi_gaussian_bao_ALL_GCcomb_mean.txt` | `https://raw.githubusercontent.com/CobayaSampler/bao_data/b7b8a36e9bccb063081f811f323cada21ab5fbdd/desi_bao_dr2/desi_gaussian_bao_ALL_GCcomb_mean.txt` | 2026-10-28T00:02:13Z | 472 | `9ac154ab583ce759c0f7eef3c978c7c70a6ead2d18774caceadf1a350a640585` |
+| 2 | DESI DR2 BAO covariance (13×13) | `desi_gaussian_bao_ALL_GCcomb_cov.txt` | `https://raw.githubusercontent.com/CobayaSampler/bao_data/b7b8a36e9bccb063081f811f323cada21ab5fbdd/desi_bao_dr2/desi_gaussian_bao_ALL_GCcomb_cov.txt` | 2026-10-28T00:02:13Z | 2547 | `252a143274c8a07c78694c119617d36594f6d7965d00319ca611c6ffb886e509` |
+| 3 | Pantheon+ distances (1701 light curves) | `Pantheon+SH0ES.dat` | `https://raw.githubusercontent.com/PantheonPlusSH0ES/DataRelease/7fc680548d1ea9fe6ee983a89d8b5635bb5784a8/Pantheon%2B_Data/4_DISTANCES_AND_COVAR/Pantheon%2BSH0ES.dat` | 2026-10-28T00:02:34Z | 579283 | `1cb0fc379ef066afdc2ffd1857681cc478024570d8a3eba284fb645775198cf8` |
+| 4 | Pantheon+ STAT+SYS covariance (1701×1701) | `Pantheon+SH0ES_STAT+SYS.cov` (**not committed**, 33 MB) | `https://raw.githubusercontent.com/PantheonPlusSH0ES/DataRelease/7fc680548d1ea9fe6ee983a89d8b5635bb5784a8/Pantheon%2B_Data/4_DISTANCES_AND_COVAR/Pantheon%2BSH0ES_STAT%2BSYS.cov` | 2026-10-28T00:02:34Z | 33284960 | `abf806d966485e64afdb359c87bffc0ecc00d05eff0a31ced66f247385df0fdc` |
+| 5 | Pantheon+ release README (column definitions) | `Pantheon+_README` | `https://raw.githubusercontent.com/PantheonPlusSH0ES/DataRelease/7fc680548d1ea9fe6ee983a89d8b5635bb5784a8/Pantheon%2B_Data/4_DISTANCES_AND_COVAR/README` | 2026-10-28T00:02:36Z | 4056 | `e2b0d262757f01c1794a938c78d32600a21e289b2a0320e5c660c4c6fc9aa87e` |
+| 6 | Planck 2018 compressed distance priors — paper source (Chen, Huang & Wang 2019, JCAP 02 (2019) 028, arXiv:1808.05724) | `arXiv-1808.05724-eprint.tar.gz` (**not committed**, 5.8 MB) | `https://arxiv.org/e-print/1808.05724` | 2026-10-28T00:02:50Z | 5832773 | `9a01121d3a36ff2fd00b39023906e030a4044b9581a5596b7c0e7b535ec4a110` |
+| 7 | Planck 2018 compressed priors — numbers transcribed from #6 (`distance-priors-2018.tex`, Table 1 ΛCDM row + Appendix `distance.ini` / `Distance_invcov.txt`, `base_plikHM_TTTEEE_lowE`) | `planck2018_distance_priors_chen2019.json` | derived from #6 | 2026-10-28 | 997 | `d2ae5a3501a213588ab863aa4f8e972a875f226e9f674b2c05b7fe23b6f38b70` |
+
+## Provenance notes
+- **DESI DR2 BAO.** The DESI data portal (`data.desi.lbl.gov/public/dr2/`) returns HTTP 401 from this box (DR2 proper is not yet public). The DR2 BAO paper's (DESI Collaboration 2025, arXiv:2503.14738) Gaussian BAO likelihood files are published in the `CobayaSampler/bao_data` repository (`desi_bao_dr2/`, committed `b7b8a36` on 2025-03-20, the DR2 BAO release day). Pinned to that commit. These are the DR2 files (`DH_over_rs` at z=2.33 = 8.6315…, `DV_over_rs` at z=0.295 = 7.9417…), not DR1.
+- **Pantheon+.** Official release repository `PantheonPlusSH0ES/DataRelease`, pinned to commit `7fc6805` (2022-07-05). Fit uses `zHD`, `zHEL`, `m_b_corr`, `IS_CALIBRATOR`; rows with `IS_CALIBRATOR = 1` are dropped (no SH0ES calibration, frozen §2) and the standard Pantheon+ cosmology cut `zHD > 0.01` is applied (Brout et al. 2022). The covariance submatrix is selected by the same mask.
+- **Planck 2018 compressed priors.** The frozen text names no paper; the standard published set is Chen, Huang & Wang 2019 (arXiv:1808.05724) for Planck 2018 TT,TE,EE+lowE, base ΛCDM: means R = 1.750235, ℓ_A = 301.4707, ω_b = 0.02235976, with the appendix's un-normalised inverse covariance (used verbatim). Their conventions (ℓ_A, R, z_* fitting formula, r_s integral, Ω_r = Ω_m/(1+z_eq)) are followed exactly so the prior is used the way it was calibrated.
+- **r_d.** Computed in every model from (ω_b, ω_m = Ω_m h²) — the Planck early-time prior fixes ω_b; the fitting form and its check against the CAMB Planck-2018 reference value are in `cosmo.py` / `test_desi_fit.py`.
+
+## Uncommitted (size rule, > 5 MB)
+- `data/Pantheon+SH0ES_STAT+SYS.cov` (33 284 960 bytes) — re-fetch from the pinned URL; sha above.
+- `data/arXiv-1808.05724-eprint.tar.gz` (5 832 773 bytes) — re-fetch from the pinned URL; sha above.

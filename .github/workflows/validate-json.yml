@@ -11,6 +11,8 @@ on:
 
 jobs:
   validate:
+    # #757: display name unique repo-wide (`validate` also exists in cth-schema-lint.yml)
+    name: Validate JSON (validate)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

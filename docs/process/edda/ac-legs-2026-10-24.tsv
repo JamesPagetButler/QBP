@@ -1,0 +1,149 @@
+# ac-legs-2026-10-24.tsv — the leg set the QBP#714 lock keys on (D1 ruled, inter#196): every AC of every in-scope housekeeping issue.
+# Provenance: generated 2026-10-24 by qbp-oppenheimer's AC-numbering pass from the live issue bodies (28 issues); ids are `#<issue>-AC<k>` (issue + ac_id columns).
+# 145 legs: 102 open, 41 ticked, 2 nil. Columns: issue, ac_id, tick (open|ticked|nil), text80 (first 80 chars of the AC line). Snapshot, not live state.
+issue	ac_id	tick	text80
+341	AC1	open	Survey current results directory structure across all experiments
+341	AC2	open	Design versioning protocol (subdirectories, naming conventions, or manif
+341	AC3	open	Define how consumers discover the "latest" results (symlink? manifest? g
+341	AC4	open	Define archival policy (when to delete old versions, if ever)
+341	AC5	open	Document protocol in `docs/workflows/results_versioning.md`
+341	AC6	open	Integrate into sprint workflow — each Phase 2 rework automatically follo
+341	AC7	open	Protocol documented and reviewed
+341	AC8	open	At least one experiment migrated to the new protocol as proof-of-concept
+341	AC9	open	Viz and analysis tools updated to use the protocol's discovery mechanism
+385	AC1	open	Claude Code permission settings updated to allow `gh pr comment` and `gh
+385	AC2	open	Documented in CLAUDE.md or .claude/settings.json
+385	AC3	open	Verified: other actions (merge, close, create) still require approval
+390	AC1	open	Document which option(s) are feasible for our solo-dev + AI workflow
+390	AC2	open	If `workflow_run` approach chosen: implement a CI notification workflow 
+390	AC3	open	If auto-merge approach chosen: define when it's acceptable (e.g., Tier 1
+390	AC4	open	Update PR review workflow docs with the chosen approach
+457	AC1	open	`confluent-trust #71` receives ratification from `@cth-implementor` + `@
+457	AC2	open	Schema migration path for QBP's `archive/cth-inventory/confluent-trust-i
+457	AC3	open	Audit script (`scripts/audit_proof_anchors.py`) authored on QBP repo usi
+457	AC4	open	Per-anchor re-grading PR opened on QBP repo (single PR covering all 28 a
+457	AC5	open	Foundations-rebuild instantiation prompt received from QBP-web Red Team 
+462	AC1	ticked	`docs/conventions/anchor-prefix-policy.md` authored
+462	AC2	ticked	Full enumeration of 22 existing prefixes with semantic meaning + usage e
+462	AC3	ticked	Formal documentation of DEFN-/AXIOM-/CONJ- additions per foundations reb
+462	AC4	ticked	CHAIN-/FORK- prefixes documented for `chains` + `forks` extension
+462	AC5	ticked	Cross-reference from `docs/cth/qbp-local-extensions.md`
+462	AC6	open	Confluent-trust upstream proposal for the 5 new prefixes (schema-axis ro
+462	AC7	ticked	Ratified by qbp-architecture
+466	AC1	open	`proofs/QBP/Foundations/FanoGenesis.lean` exists, containing the 14 the
+466	AC2	open	`proofs/QBP/Foundations/CayleyDicksonTower.lean` exists with `dim_im_cd
+466	AC3	open	`proofs/QBP/Foundations/SpectralTriple.lean` exists (Sprint 4 Phase 1 e
+466	AC4	open	`proofs/QBP/Foundations/TheoremOne.lean` exists with `psi_in_Sp1` found
+466	AC5	open	`proofs/QBP/Foundations/CKMPhase.lean` (or extend `Cosmo/AlgebraicIdent
+466	AC6	open	Hurwitz classification cite-wrapper exists in `Foundations/` OR explici
+466	AC7	open	`proofs/QBP/Foundations/SpectralActionMoments.lean` exists with at mini
+466	AC8	open	Each new file passes `lake build` (`lakefile.lean` updated, no `sorry` 
+466	AC9	open	Each new file has the standard QBP anchor-citation block at the top (pe
+488	AC1	open	`docs/cth/schema-change-propagation.md` authored — the manual ve
+488	AC2	open	Schema-change semver convention defined (minor = additive/back-c
+488	AC3	open	confluent-trust **#92** is run through the Crawl process as the 
+488	AC4	open	`schema-sync-check` CI job spec'd — pins upstr
+488	AC5	open	Walk single-source design noted — schema consume
+494	AC1	ticked	Naming policy decision recorded: does `PROOF-` imply `provenance_kind: proof` or
+494	AC2	nil	~~If strict: list of anchors needing prefix reconcile or promotion published~~ (
+494	AC3	ticked	If loose: document the convention explicitly so future audits don't flag it repe
+516	AC1	open	Config landed; the flaky domains no longer fail per-PR runs
+516	AC2	open	Real dead-link detection still verified working (test with a deliberate dead lin
+538	AC1	ticked	Document the canonical CI-green box text (`- [ ] CI green ← notifier ver
+538	AC2	ticked	Add the convention to `docs/workflows/herschel_box_keeper.md` (the box-k
+538	AC3	open	the box-keeper sweep / a lint warns if a PR has a CI-evidence 
+552	AC1	ticked	Add an `issue_comment` (and/or `pull_request_review`) trigger to `tier-3
+552	AC2	ticked	Confirm no double-run / race with the existing PR-event trigger (concurr
+576	AC1	open	`agda --version` reports **2.6.4.3** (match CI) on PATH.
+576	AC2	open	`cd proofs/agda && agda --safe QBPSubstrate.agda` type-checks locally with **no 
+576	AC3	open	Record the install method + a `pre-run-resource-estimate` (disk + RAM upper boun
+576	AC4	open	(Optional) the `cubical` library installed + an `.agda-lib`, if later substrate 
+577	AC1	open	A real Gemini review path works headlessly again — `~/.claude/scripts/gemini ask
+577	AC2	open	Verify with a live test call (record the output).
+577	AC3	open	Update `memory/tooling_gemini_and_commit_gotchas.md` to mark the path restored.
+605	AC1	ticked	the drift CI evaluates the PR's snapshot using a **trusted** generator/
+605	AC2	ticked	a negative-control check: a deliberately falsified snapshot fails the g
+396	AC1	open	Gemini MCP server venv at `~/.claude/mcp-servers/gemini/venv/` managed b
+396	AC2	open	`pyproject.toml` or equivalent config added for the server's dependencie
+396	AC3	open	Fallback script (`~/.claude/scripts/gemini`) updated if needed
+396	AC4	open	Server starts correctly after migration
+507	AC1	open	Both checks exist, are advisory-or-blocking per beekeeper choice
+507	AC2	open	Documented in review_tiers.md evidence-first section
+507	AC3	open	ALL-GREEN gated on box-state per §2.2 sections
+507	AC4	open	nudge state implemented (comment-evidence-vs-unticked-box detection)
+507	AC5	open	adopted format documented in the workflow header
+507	AC6	open	templates updated with delete-unselected instruction
+507	AC7	open	notifier self-ticks the CI evidence box at ALL-GREEN
+507	AC8	open	mergeable-state is a verdict condition
+507	AC9	open	conflicting state posts the resolve-first message instead
+507	AC10	open	box-parse module (shared by nudge + required-check)
+507	AC11	open	required-check CI job: red on unticked merge-blocking boxes
+507	AC12	open	beekeeper ruling recorded: escalate to merge-block (gates beekeeper too) — Y/N
+507	AC13	open	branch protection wired (beekeeper) if Y
+507	AC14	open	notifier self-ticks the CI-green box at ALL-GREEN
+507	AC15	open	QBP-Herschel box-keeper sweep defined (evidence boxes only; sign-off boxes never
+507	AC16	open	Herschel subrole spec names scrum-master/scheduler as PRIMARY, box-keeper as sec
+507	AC17	open	three-layer defense recorded (notifier mechanical + Herschel sweep + in-the-mome
+543	AC1	ticked	Enumerate all CLOSED issues in `JamesPagetButler/QBP` (cache-first, ≤3 
+543	AC2	ticked	For each, count unchecked `- [ ] **AC` boxes in the body. Flag any with
+543	AC3	open	Triage each flagged issue: genuinely-incomplete (→ **reopen**, like #47
+543	AC4	ticked	Produce a short report (table: issue · #unchecked · verdict · action) f
+543	AC5	ticked	Confirm the forward guard would have caught each auto-closed case (vali
+674	AC1	open	decide fail-closed vs current pattern for both workflows (beekeeper)
+674	AC2	open	if adopted, apply to `ci.yml` and `lean-foundations.yml` in one PR; veri
+683	AC1	open	`analysis/473-kill-attack/attack5_condensed_ext1.md` — add one header sentence: 
+683	AC2	ticked	*(on master: l.9 and l.36 read "18 theorems … count corrected 16→18 per #683"; v
+683	AC3	open	While there: `verification.verifier` strings in the #679/#681 anchors date the b
+683	AC4	ticked	*(on master: l.655 ends "Docstring corrected per #683"; verified 2026-10-23, PR 
+683	AC5	ticked	*(on master: "smaller root" 0 hits; l.66 reads "The root is *selected*…"; verifi
+683	AC6	open	Substrate-side bridging `rfl`: `Hosting.potential = SeamSpectrum.potV` (RT #682 
+683	AC7	open	Counting convention: 42 planes vs 84 basis-sum elements — align `PROOF-42zd` wor
+683	AC8	ticked	*(on master: l.17 "**Tier 3** (re-tiered from Tier 2 at PR #685 …)"; verified 20
+683	AC9	open	#647 body: its Definition-of-Done still quotes the OLD AXIOM-1 kill criterion (ω
+683	AC10	open	`FLAG-rule-flow-open` description text still describes the old kill mechanics (n
+683	AC11	open	`docs/foundations/substrate-first-draft-v0.1.md` §4 row 'Positive in-flight acco
+683	AC12	open	`proofs/QBP/Substrate/Hosting.lean` docstring on `inFlight_no_quaternion_closure
+683	AC13	open	Resource: `lake build QBP.Foundations` OOM-kills at `Octonion32Count` under the 
+683	AC14	nil	~~Bridge theorem (Substrate side, two lines): `Foundations.InFlightAlgebra.gradV
+683	AC15	open	Standing build recipe: always `cd <worktree>/proofs` before `lake build`; runnin
+734	AC1	open	sizing record: estimate (tokens, wall, builders) agreed with @deming BEFORE disp
+734	AC2	open	`sprint_mode_workflow.md` §Git Revert Safety: tagging strategy (what gets tagged
+734	AC3	open	revert-vs-reset decision tree (reset forbidden on shared branches; revert defaul
+734	AC4	open	dummy-branch revert test executed and its log committed under `analysis/` or lin
+734	AC5	open	Oppenheimer-gate checklist stated (correctness, scope, tests, AC verification)
+734	AC6	open	logging format gains rationale / alternatives / risk + phase-boundary summary
+734	AC7	open	#383 cross-linked (closed issue stays closed; this is the record)
+735	AC1	ticked	`lean-prover.md` updated with the lessons above (resource recipe, decide-chunkin
+735	AC2	ticked	`inter/lean-proof-best-practices.md` updated with the general (non-agent) half; 
+735	AC3	ticked	wisdoms check: list of wisdom files the agent has written (or an explicit "none;
+735	AC4	ticked	performance eval: table over ≥3 past lean-prover runs (task, tokens, wall, outco
+735	AC5	ticked	#490 cross-linked — this issue ↔ #490 ↔ PR #763 / inter #214
+736	AC1	ticked	each of the six docs carries a `## Prediction Classification` table + the Valida
+736	AC2	ticked	a validator or lint flags any `research/*_expected_results.md` without the secti
+736	AC3	ticked	**check-first note:** the first (ground-truth) issue of every experiment carries
+736	AC4	ticked	#170 cross-linked — PR #762 Tracks #170; comment left on #170
+737	AC1	ticked	`knowledge/**` (and `scripts/validate_knowledge.py`) added to the `ci.yml` paths
+737	AC2	ticked	a PR touching only `knowledge/qbp.db` (or its schema) demonstrably runs the vali
+737	AC3	ticked	notifier `workflow_run` list unchanged (same workflow) — confirmed by the #507 d
+737	AC4	ticked	#220 cross-linked — #220 ← #737 ← PR #740
+738	AC1	ticked	`expected-on-sibling:` annotation implemented: a federation ref may declare the 
+738	AC2	ticked	tests for both branches — PR #759: `scripts/test_tenancy_xref_linter.py` 18/18, 
+738	AC3	open	**beekeeper:** `Tenancy XRef Lint` added to the master ruleset's required checks
+738	AC4	open	#433 cross-linked; PR #732 (v0.3 draft) re-linted once this lands
+753	AC1	ticked	decide the mechanism: (a) the FAULT-S4-004 backstop (`reopen-falsely-closed.yml`
+753	AC2	ticked	implementation + tests (replay the 3 historical cases from the committed #543 pa
+753	AC3	ticked	the manual-link miss (#22 class) documented as out of reach (no PR text to inspe
+753	AC4	ticked	`docs/workflows/review_tiers.md` or the guard's header documents the covered/unc
+755	AC1	open	the proof is ported into a proper module (n
+755	AC2	open	`gamma_mul`, `gamma_fixes_hosted` and `gamma_id_iff` hav
+755	AC3	open	the theorem signatures match the calibration stub. The p
+755	AC4	open	a CTH PROOF anchor is minted that upgrades the node's core fro
+755	AC5	open	the PR and the anchor state that the proof was authored b
+755	AC6	open	standard Tier-3: Red Team → Gemini → §I4 (theory) → beek
+757	AC1	open	rename the four jobs (or set `name:`) so every job display name is unique 
+757	AC2	open	a lint (candidate: alongside `scripts/check_notifier_workflow_list.py` in 
+757	AC3	open	one PR observed with both members of a former pair running and both visibl
+761	AC1	open	`tenancy-xref-lint.yml` checks out the annotated sibling repos (Contextus, BMA; 
+761	AC2	open	the linter's summary on CI shows `verified N / unverifiable 0` for the annotated
+761	AC3	open	token scope documented in the workflow header (read-only, no write)
+761	AC4	open	#738 AC3 (required check) remains the beekeeper's repo-admin action, tracked on 

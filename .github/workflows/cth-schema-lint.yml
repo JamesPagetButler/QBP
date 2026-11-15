@@ -32,6 +32,8 @@ permissions:
 
 jobs:
   validate:
+    # #757: display name unique repo-wide (`validate` also exists in validate-json.yml)
+    name: CTH schema lint (validate)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -1,0 +1,7 @@
+{
+  "span4_mul_closed": ["propext", "Classical.choice", "Quot.sound"],
+  "assoc_vanishes_on_span4": ["propext", "Classical.choice", "Quot.sound"],
+  "cdAlg_mul_add_swap": ["propext", "Classical.choice", "Quot.sound"],
+  "cdAlg_mul_add_swap_pure": ["propext", "Classical.choice", "Quot.sound"],
+  "N_add": ["propext", "Classical.choice", "Quot.sound"]
+}

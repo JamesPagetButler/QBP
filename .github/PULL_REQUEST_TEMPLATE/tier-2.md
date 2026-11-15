@@ -10,6 +10,8 @@ labels: tier-2-review
 
 ## Type of Change
 
+<!-- PICK-ONE GROUP (#507 §5): tick the selected line and DELETE the unselected lines, or ⊘-strike them (`- [ ] ~~option~~ ⊘ reason`). An unticked box must always mean undone work, never "not selected". -->
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Test addition/update
@@ -67,6 +69,7 @@ Routing rubric: docs/workflows/pr7_conflict_routing_rubric.md (v0.2)
 - **Anchors revised:** <!-- e.g., WISDOM-003 (statement narrowed per §9.7); PRED-foo (status: open → falsified) -->
 - **Anchors retired:** <!-- e.g., KILLED-f4-info-theoretic-justification -->
 - **Routing axis** (per `docs/workflows/pr7_conflict_routing_rubric.md` v0.2):
+  <!-- PICK-ONE GROUP (#507 §5): tick the selected line and DELETE the unselected lines, or ⊘-strike them (`- [ ] ~~option~~ ⊘ reason`). An unticked box must always mean undone work, never "not selected". -->
   - [ ] theory-axis → co-sign by @qbp-oppenheimer needed
   - [ ] schema-axis → co-sign by @cth-implementor needed
   - [ ] two-axis → both co-signs needed (schema first, then theory)
