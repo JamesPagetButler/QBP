@@ -395,10 +395,10 @@ def _workflow_awk_program() -> str:
     return prog
 
 
-def _awk_ticked_index(body: str):
+def _awk_ticked_index(body: str, prog: str | None = None):
     """Run the workflow's real awk (-v m=x) on body; index of the line it changed."""
     out = subprocess.run(
-        ["awk", "-v", "m=x", _workflow_awk_program()],
+        ["awk", "-v", "m=x", prog if prog is not None else _workflow_awk_program()],
         input=body,
         capture_output=True,
         text=True,
@@ -431,6 +431,8 @@ Sign-off required (merge-blocking):
         "probe-merge": (B1_PROBE_MERGE, 2),
         "probe-i4": (B1_PROBE_I4, None),  # real box already [x]: awk changes nothing
         "first-of-two": (both_ci, 0),
+        "t1-oracle": (T1_PROBE_ORACLE, 2),
+        "t1-lean": (T1_PROBE_LEAN, 2),
         "fenced": (fenced, 6),
         "plain": (plain, 1),
         "review": (review, None),
@@ -578,6 +580,69 @@ def test_b1_mutant_loose_predicate_is_killed():
         m.is_ci_green_evidence_box = real
     assert killed, "mutant (loose predicate) survived the B1 regression rows"
     _assert_b1_rows_hold()  # and the real predicate still passes
+
+
+# ── #815 T1 (Red Team re-confirm): rows with "ci green" and NO excluded word, so
+# ONLY the wording rule (_CI_REQUIRE / the two narrowed awk clauses) rejects them.
+T1_ROWS = (
+    "Differential oracle: CI green on PhysLean",
+    "Lean build CI green (oppenheimer)",
+)
+T1_PROBE_ORACLE = f"""Sign-off required (merge-blocking):
+- [ ] {T1_ROWS[0]}
+- [ ] {CI_BOX}
+"""
+T1_PROBE_LEAN = f"""Sign-off required (merge-blocking):
+- [ ] {T1_ROWS[1]}
+- [ ] {CI_BOX}
+"""
+
+
+def test_t1_rows_carry_no_excluded_word():
+    for row in T1_ROWS:
+        assert "ci green" in row.lower()
+        assert not m._CI_EXCLUDE_RE.search(row.lower()), row
+
+
+def _assert_t1_rows_hold():
+    for row, body in zip(T1_ROWS, (T1_PROBE_ORACLE, T1_PROBE_LEAN)):
+        r = m.parse(body)
+        assert r["unticked"] == [row], r
+        assert r["evidence"] == [CI_BOX], r
+
+
+def test_t1_wording_rule_keeps_rows_unticked():
+    _assert_t1_rows_hold()
+    for body in (T1_PROBE_ORACLE, T1_PROBE_LEAN):
+        assert _awk_ticked_index(body) == 2, body  # real box, not the row (line 1)
+
+
+def test_t1_python_wording_only_mutant_is_killed():
+    """Loosen ONLY _CI_REQUIRE back to "ci green" (exclusions kept): must fail."""
+    real = m._CI_REQUIRE
+    m._CI_REQUIRE = ("ci green",)
+    try:
+        try:
+            _assert_t1_rows_hold()
+            killed = False
+        except AssertionError:
+            killed = True
+    finally:
+        m._CI_REQUIRE = real
+    assert killed, "wording-only mutant survived the T1 rows"
+    _assert_t1_rows_hold()
+
+
+def test_t1_awk_wording_only_mutant_is_killed():
+    """Revert the two narrowed awk clauses to /ci green/: it must tick the T1 row."""
+    prog = _workflow_awk_program()
+    a, b = "/ci green at the head sha/", "tolower(line) ~ /evidence box/"
+    assert prog.count(a) == 1 and prog.count(b) == 1, prog
+    mutant = prog.replace(a, "/ci green/").replace(b, "tolower(line) ~ /ci green/")
+    assert mutant != prog and "head sha" not in mutant and "evidence box" not in mutant
+    for body in (T1_PROBE_ORACLE, T1_PROBE_LEAN):
+        assert _awk_ticked_index(body, mutant) == 1, body  # mutant ticks the WRONG row
+        assert _awk_ticked_index(body) == 2, body  # real program ticks the real box
 
 
 if __name__ == "__main__":
