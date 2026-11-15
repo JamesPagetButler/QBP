@@ -10,6 +10,15 @@
 # not only on the beekeeper's box. See `scripts/tenancy_xref_linter.py`'s
 # module docstring for the annotation contract and exit-code semantics.
 #
+# Checkout shape: SHALLOW (fetch-depth: 1), not sparse. Both repos are a few
+# hundred KB to a few MB, so a full shallow clone costs nothing meaningful;
+# `sparse-checkout` was tried first but drops out because actions/checkout
+# adds a `--filter=blob:none` partial-clone fetch whenever sparse-checkout is
+# set, and GitHub rejects that filtered fetch with a 403 "Write access to
+# repository not granted" for this fine-grained, Contents:read-only PAT (a
+# known fine-grained-PAT + partial-clone interaction, confirmed on this PR's
+# own CI run — not a sign the token's scope is wrong).
+#
 # Token: `SIBLING_READ_TOKEN` is a fine-grained GitHub PAT created 2026-11-13,
 # scoped to `bma-systema` ONLY, with Contents: read-only and no write scope of
 # any kind. Contextus is a public repo and needs no token. GitHub does not
@@ -98,28 +107,38 @@ jobs:
       - name: "Fail loud if SIBLING_READ_TOKEN is missing (#761)"
         run: scripts/check_sibling_token_present.sh
 
-      - name: "Checkout bma-systema sibling (sparse, shallow, read-only token)"
+      - name: "Checkout bma-systema sibling (shallow, read-only token)"
+        # Full (non-sparse) checkout: bma-systema is ~2.3 MB (gh api
+        # repos/.../bma-systema .size, 2026-11-14), so the bandwidth cost of
+        # skipping sparse-checkout is negligible. actions/checkout only adds
+        # a `--filter=blob:none` partial-clone fetch when `sparse-checkout`
+        # is set, and that filtered fetch gets rejected by GitHub with a 403
+        # "Write access to repository not granted" for this fine-grained,
+        # Contents:read-only PAT (observed on this PR's own CI run) — a known
+        # fine-grained-PAT + partial-clone interaction, not a token-scope
+        # bug. Shallow (fetch-depth: 1) is kept; sparse is dropped.
         uses: actions/checkout@v4
         with:
           repository: JamesPagetButler/bma-systema
           token: ${{ env.SIBLING_READ_TOKEN }}
           ref: main
           path: .ci-siblings/BMA
-          sparse-checkout: |
-            /theory/hypergraph-inference/
-          sparse-checkout-cone-mode: false
           fetch-depth: 1
 
-      - name: "Checkout Contextus sibling (public, no token, sparse, shallow)"
+      - name: "Checkout Contextus sibling (public, anonymous, shallow)"
+        # Contextus is ~380 KB (gh api repos/.../Contextus .size, 2026-11-14)
+        # — same rationale as the bma-systema step above: full shallow clone,
+        # no sparse-checkout, to avoid the blob:none partial-clone filter.
+        # `token: ''` forces a genuinely anonymous clone of this PUBLIC repo
+        # (the implicit default github.token is scoped to THIS repo, QBP, and
+        # is not valid credentials for Contextus; passing it unintentionally
+        # can make an otherwise-anonymous-eligible public clone fail auth).
         uses: actions/checkout@v4
         with:
           repository: JamesPagetButler/Contextus
+          token: ""
           ref: main
           path: .ci-siblings/Contextus
-          sparse-checkout: |
-            /doc/
-            /Contextus-Spec-v1.3.md
-          sparse-checkout-cone-mode: false
           fetch-depth: 1
 
       - name: "Confirm the bma-systema checkout actually landed (fail loud, not silent)"
