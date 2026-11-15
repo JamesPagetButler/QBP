@@ -12,8 +12,10 @@ fit_sigma/fit_history):
 
   1. fit_sigma = |predicted_value - measured_value| / sqrt(sigma_meas**2 + sigma_pred**2)
      sigma_pred = 0.0 (no prediction-error field exists yet).
-     sigma_meas = measured_error if present, else the symmetrised mean of
-     measured_error_plus/measured_error_minus if BOTH are present, else None.
+     sigma_meas = measured_error if present, else the side of measured_error_plus/
+     measured_error_minus facing the prediction if BOTH are present (plus when
+     predicted_value > measured_value, else minus — not a symmetrised average,
+     T3 ruling, issuecomment-6886846959), else None.
      Rounded to FIT_SIGMA_ROUND_NDIGITS before storage/comparison so IEEE-754 float
      noise on the predicted/measured subtraction can't push a mathematically-exact
      boundary value (e.g. MEAS-alpha's exact 5.0σ, 128.05-127.95 computed as
