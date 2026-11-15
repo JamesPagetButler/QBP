@@ -115,14 +115,6 @@ def main():
             a["notes"] = (
                 (cur.rstrip() + " " + caveat) if isinstance(cur, str) else caveat
             )
-            v = a.get("verification")
-            if isinstance(v, dict):
-                v["verified_at"] = DATE
-                v["verifier"] = (
-                    f"#465 AC5 (qbp-implementor writer lane): theorems[] populated from "
-                    f"qbp-oppenheimer's locate table @ current master; all names resolve in "
-                    f"{GAUGE}. Theory statements signed by qbp-oppenheimer on the batch PR."
-                )
 
         # ---- #657 rename (remove + re-append with id_history), re-point citations ----
         for old, new in RENAMES_657.items():

@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.23.0",
+  "version": "6.23.1",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -362,8 +362,8 @@
             "sha": "32dc18cde3684679f3c003de608743b57498c56f"
           }
         },
-        "verified_at": "2026-11-01T00:00:00Z",
-        "verifier": "#465 AC5 (qbp-implementor writer lane): theorems[] populated from qbp-oppenheimer's locate table @ current master; all names resolve in proofs/QBP/GaugeBosons.lean. Theory statements signed by qbp-oppenheimer on the batch PR.",
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -488,8 +488,8 @@
             "sha": "32dc18cde3684679f3c003de608743b57498c56f"
           }
         },
-        "verified_at": "2026-11-01T00:00:00Z",
-        "verifier": "#465 AC5 (qbp-implementor writer lane): theorems[] populated from qbp-oppenheimer's locate table @ current master; all names resolve in proofs/QBP/GaugeBosons.lean. Theory statements signed by qbp-oppenheimer on the batch PR.",
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -558,8 +558,8 @@
             "sha": "32dc18cde3684679f3c003de608743b57498c56f"
           }
         },
-        "verified_at": "2026-11-01T00:00:00Z",
-        "verifier": "#465 AC5 (qbp-implementor writer lane): theorems[] populated from qbp-oppenheimer's locate table @ current master; all names resolve in proofs/QBP/GaugeBosons.lean. Theory statements signed by qbp-oppenheimer on the batch PR.",
+        "verified_at": "2026-09-02T23:46:49Z",
+        "verifier": "lake build + #print axioms, leanprover/lean4:v4.30.0 (qbp-oppenheimer, #621 FAULT-S4-005 burn-down); encoded by qbp-implementor; pending tier-3 review + §I4",
         "result": "verified",
         "axiom_closure": [
           "propext",
@@ -13345,9 +13345,14 @@
       "version": "6.23.0",
       "date": "2026-11-01T00:00:00Z",
       "note": "QBP#789: re-home mul_coord_matrix (Alternator.lean, generic CDAlg structural lemma) off PROOF-sedenion-dirac-sum-kill (witness-home-collision, not a kill dependency) to PROOF-cd-product-formula — cth-named target home (seq4279/4281), oppenheimer conditional met (seq4280). Rides the #804 housekeeping batch; cth schema co-signs the re-home."
+    },
+    {
+      "version": "6.23.1",
+      "date": "2026-11-15T00:00:00Z",
+      "note": "PR #804 Gemini F1 fix (issuecomment-6863989282): encode_housekeeping_batch.py overwrote `verification.verified_at`/`verifier` on PROOF-eigenratios / PROOF-cl6 / PROOF-3gen when it populated theorems[]/notes for #465 AC5. Restored both fields to their original Lean proof-checking provenance (2026-09-02, #621 FAULT-S4-005) byte-for-byte; the housekeeping attribution stays in notes/changelog, which already carry it. No other field on these anchors changes."
     }
   ],
-  "last_updated": "2026-11-01T00:00:00Z",
+  "last_updated": "2026-11-15T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
