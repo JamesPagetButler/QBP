@@ -1,6 +1,6 @@
 {
   "programme": "QBP",
-  "version": "6.24.0",
+  "version": "6.25.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
   "meta_axiom": {
@@ -10123,7 +10123,9 @@
         "QBP.Substrate.Hosting.universeSpace_ne_stateSphere",
         "QBP.Substrate.Hosting.normalise_mem_stateSphere",
         "QBP.Substrate.Hosting.isVacuum_smul_iff",
-        "QBP.Substrate.Hosting.hosting_equivariant_grade"
+        "QBP.Substrate.Hosting.hosting_equivariant_grade",
+        "QBP.Substrate.HostingSeamBridge.potential_eq_potV",
+        "QBP.Substrate.HostingSeamBridge.potential_eq_potV_fun"
       ],
       "theorems": [
         {
@@ -10232,6 +10234,14 @@
         },
         {
           "name": "hosting_equivariant_grade",
+          "status": "verified"
+        },
+        {
+          "name": "potential_eq_potV",
+          "status": "verified"
+        },
+        {
+          "name": "potential_eq_potV_fun",
           "status": "verified"
         }
       ],
@@ -12628,7 +12638,8 @@
         ]
       },
       "pa_local": 0,
-      "pa_effective": 0
+      "pa_effective": 0,
+      "notes": "QBP#683 AC6 bridge: Hosting.potential = SeamSpectrum.potV (rfl, definitional), proofs/QBP/Substrate/HostingSeamBridge.lean (potential_eq_potV / potential_eq_potV_fun) — witnessed on PROOF-substrate-hosting-definition; this seam anchor's potV is the bridged target."
     },
     {
       "id": "PROOF-seam-right-gram-equals-left",
@@ -14005,9 +14016,14 @@
       "version": "6.24.0",
       "date": "2026-11-15T17:59:52Z",
       "note": "QBP#809 phase 1 (AC4): scripts/compute_fit_sigma.py evaluated all 64 anchors with both a numeric predicted_value and measured_value — 54 got a real fit_sigma, 10 got fit_sigma:null + fit_sigma_reason (no usable 1σ error yet, pending AC2/AC3 phase-2 backfill). REPORT MODE (T1, qbp-oppenheimer issuecomment-6886846959): status is NOT written here — 7 anchor(s) would be capped once AC2 pins a real source (listed in the PR/run output), by the fed-sigma-v1 thresholds (fit_sigma > 5.0 -> incoherent-or-worse; > 2.0 -> marginal-or-worse; inter#238 D3). fit_history[] appended on every evaluated anchor. AC1 schema fields (measured_error 1σ convention, measured_error_plus/minus, measured_source minLength, fit_sigma/fit_sigma_reason/fit_history) in docs/cth/inventory.schema.v0.3.json 0.3.6. AC2/AC3/AC5/AC6 remain phase 2."
+    },
+    {
+      "version": "6.25.0",
+      "date": "2026-11-16T00:00:00Z",
+      "note": "QBP#683 AC6: HostingSeamBridge witness — potential_eq_potV / potential_eq_potV_fun (rfl, QBP.Substrate.HostingSeamBridge) added to PROOF-substrate-hosting-definition.theorems[] + companions; one-line bridge note on PROOF-seam-top-plane-on-frozen-ridge. Rides PR #803; inverse-anchor baseline bumped so the new module's theorems are no longer orphans. Rebased onto master post-#814 (6.24.0 -> 6.25.0); re-run fresh against the new baseline rather than hand-edited."
     }
   ],
-  "last_updated": "2026-11-15T17:59:52Z",
+  "last_updated": "2026-11-16T00:00:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {

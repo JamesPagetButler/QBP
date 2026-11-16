@@ -9,7 +9,7 @@
 |---|---|
 | theorems total | 2002 |
 | anchors total | 348 |
-| anchors with theorems list | 70 |
+| anchors with theorems list | 73 |
 | anchors with proof file | 126 |
 | lean side orphans | 35 |
 | anchor side phantoms | 0 |
