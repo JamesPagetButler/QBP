@@ -14019,11 +14019,11 @@
     },
     {
       "version": "6.25.0",
-      "date": "2026-11-16T00:00:00Z",
+      "date": "2026-11-16T16:41:48Z",
       "note": "QBP#683 AC6: HostingSeamBridge witness — potential_eq_potV / potential_eq_potV_fun (rfl, QBP.Substrate.HostingSeamBridge) added to PROOF-substrate-hosting-definition.theorems[] + companions; one-line bridge note on PROOF-seam-top-plane-on-frozen-ridge. Rides PR #803; inverse-anchor baseline bumped so the new module's theorems are no longer orphans. Rebased onto master post-#814 (6.24.0 -> 6.25.0); re-run fresh against the new baseline rather than hand-edited."
     }
   ],
-  "last_updated": "2026-11-16T00:00:00Z",
+  "last_updated": "2026-11-16T16:41:48Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {

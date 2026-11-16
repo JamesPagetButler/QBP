@@ -1,6 +1,6 @@
 # Foundations Inverse Anchor Audit (#464)
 
-**Generated:** (unstamped) · **Tool:** `scripts/anchor_inverse_audit.py` (re-runnable; replaces the hand-authored `scripts/inventory_verification_report.md`)
+**Generated:** 2026-11-16 post-#803 rebase (QBP#683 AC6) · **Tool:** `scripts/anchor_inverse_audit.py` (re-runnable; replaces the hand-authored `scripts/inventory_verification_report.md`)
 **Inputs:** `proofs/` Lean corpus · `archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json`
 
 ## 1. Summary
