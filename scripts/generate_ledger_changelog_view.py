@@ -15,7 +15,7 @@ design removes, just moved from the ledger into this file, and a squash merge
 would leave its `Merged` column stale the moment the next unrelated PR runs
 `--check` against it. `scripts/ledger_bookkeeping_lint.py` instead forbids
 this file from ever appearing in a content PR's diff at all — see
-`FORBIDDEN_PATHS` there. The durable, "readable without running anything"
+`FORBIDDEN_PATHS` there. The "readable without running anything"
 copy (the beekeeper's requirement) is published by a POST-MERGE job on
 `push: branches: [master]` — see `.github/workflows/ledger-bookkeeping-
 frozen.yml`'s `publish-ledger-changelog-view` job, which writes this render
@@ -39,9 +39,15 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 from pathlib import Path
 
-from ledger_version import LEDGER, fragment_versions, frozen_base_version
+# F8 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): without this, the
+# bare `from ledger_version import ...` below fails under `python3 -I`
+# (ModuleNotFoundError) -- matches the same insert ledger_bookkeeping_lint.py
+# already has.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from ledger_version import LEDGER, fragment_versions, frozen_base_version  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 

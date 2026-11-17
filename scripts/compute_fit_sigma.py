@@ -411,27 +411,34 @@ def main():
                 f"measured_source minLength, fit_sigma/fit_sigma_reason/fit_history) in "
                 f"docs/cth/inventory.schema.v0.3.json 0.3.8. AC2/AC3/AC5/AC6 remain phase 2."
             )
-            if not args.dry_run:
-                if not args.pr:
-                    raise SystemExit(
-                        "this run changed anchors, so it needs --pr <number> to write "
-                        "its changes.d/ fragment (QBP#817 variant A)"
-                    )
-                slug = args.slug or datetime.now(timezone.utc).strftime(
-                    "run-%Y%m%d-%H%M%S"
+            # F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): the fragment
+            # write must NOT happen in here. `ledger_edit()`'s verify()/write() run
+            # only after this `with` block exits cleanly -- writing the fragment
+            # inside it means a failing verify() leaves an orphan fragment (on
+            # disk, claiming ids) with no matching ledger change at all, which is
+            # exactly the hole F2's lint fix had to start catching. Refusing
+            # --pr still happens in here (before any write, confined or not), so
+            # a doomed run never gets as far as writing anything.
+            if not args.dry_run and not args.pr:
+                raise SystemExit(
+                    "this run changed anchors, so it needs --pr <number> to write "
+                    "its changes.d/ fragment (QBP#817 variant A)"
                 )
-                # changes.d/ is a sibling of the ledger actually in use (not a
-                # hardcoded repo-root default) — matters for tests pointed at a
-                # tmp_path ledger, same bug class as generate_ledger_changelog_view.
-                write_fragment(
-                    issue=809,
-                    slug=slug,
-                    pr=args.pr,
-                    encoder="scripts/compute_fit_sigma.py",
-                    note=fragment_note,
-                    touched_ids=touched_ids,
-                    changes_dir=Path(args.ledger).resolve().parent / "changes.d",
-                )
+
+    if n_written and not args.dry_run:
+        slug = args.slug or datetime.now(timezone.utc).strftime("run-%Y%m%d-%H%M%S")
+        # changes.d/ is a sibling of the ledger actually in use (not a
+        # hardcoded repo-root default) — matters for tests pointed at a
+        # tmp_path ledger, same bug class as generate_ledger_changelog_view.
+        write_fragment(
+            issue=809,
+            slug=slug,
+            pr=args.pr,
+            encoder="scripts/compute_fit_sigma.py",
+            note=fragment_note,
+            touched_ids=touched_ids,
+            changes_dir=Path(args.ledger).resolve().parent / "changes.d",
+        )
 
     mode = (
         "APPLY-CAPS" if args.apply_caps else "REPORT MODE (default, status not written)"

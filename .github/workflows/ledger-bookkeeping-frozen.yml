@@ -18,10 +18,12 @@
 #     re-committed by every later content PR just to pass a drift check,
 #     reintroducing the exact bookkeeping collision this design removes. This
 #     job instead publishes a fresh render to the push's own Actions job
-#     summary ($GITHUB_STEP_SUMMARY) — durable, linked from the commit's check
-#     list, and readable without running anything, without a new bot/writer on
-#     protected master (the real durable publish target is James's call; the
-#     step summary is the zero-new-moving-parts default).
+#     summary ($GITHUB_STEP_SUMMARY) — linked from the commit's check list and
+#     readable without running anything, without a new bot/writer on
+#     protected master. NOT durable (qbp-architecture, QBP#817 PR-1 review,
+#     2026-11-17): step summaries expire with the run's log retention (90
+#     days by default), so this is a zero-new-moving-parts default, not the
+#     permanent record — a genuinely durable publish target is James's call.
 #
 # Full history needed (fetch-depth: 0) — ledger_version.py derives merge order
 # from `git log --first-parent -m`, which a shallow clone can't give it.
@@ -38,6 +40,19 @@ on:
       - 'scripts/ledger_version.py'
       - 'scripts/ledger_bookkeeping_lint.py'
       - 'scripts/generate_ledger_changelog_view.py'
+      # F7 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): the two live
+      # encoders migrated off hand-written version bumps, plus the script
+      # that reports the derived version, plus every test file for all of
+      # the above — a PR editing only one of these used to skip the unit
+      # tests job entirely.
+      - 'scripts/compute_fit_sigma.py'
+      - 'scripts/encode_pa_from_evidence.py'
+      - 'scripts/list_numeric_anchors.py'
+      - 'scripts/test_ledger_fragment.py'
+      - 'scripts/test_ledger_version.py'
+      - 'scripts/test_generate_ledger_changelog_view.py'
+      - 'scripts/test_ledger_bookkeeping_lint.py'
+      - 'tests/test_cth_ledger_edit.py'
       - '.github/workflows/ledger-bookkeeping-frozen.yml'
   push:
     branches: [master]
@@ -62,7 +77,11 @@ jobs:
           python-version: '3.11'
       - name: scripts/ledger_bookkeeping_lint.py
         run: |
-          git fetch origin ${{ github.base_ref }} --depth=1000
+          # No --depth here (qbp-architecture, QBP#817 PR-1 review, 2026-11-17,
+          # F1): a depth-limited fetch can write .git/shallow even into an
+          # already-full clone, which ledger_version.py's merge-order walk now
+          # refuses outright rather than silently misordering.
+          git fetch origin ${{ github.base_ref }}
           python3 scripts/ledger_bookkeeping_lint.py \
             --base "origin/${{ github.base_ref }}" \
             --head HEAD

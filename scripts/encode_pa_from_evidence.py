@@ -2167,21 +2167,27 @@ def apply_writes(
                 a["proof_assistants"] = p["proof_assistants"]
             elif "proof_assistants" in a:
                 del a["proof_assistants"]
-        if not dry_run:
-            if not pr:
-                raise SystemExit(
-                    "this run changed anchors, so it needs pr=<number> to write "
-                    "its changes.d/ fragment (QBP#817 variant A)"
-                )
-            write_fragment(
-                issue=692,
-                slug=_dt.datetime.now(_dt.timezone.utc).strftime("run-%Y%m%d-%H%M%S"),
-                pr=pr,
-                encoder="scripts/encode_pa_from_evidence.py",
-                note=changelog_note(n_changed=len(changed_ids), **note_args),
-                touched_ids=changed_ids,
-                changes_dir=Path(ledger_path).resolve().parent / "changes.d",
+        # F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): refusing a
+        # missing `pr` still happens in here (before any write), but the actual
+        # fragment write must not — ledger_edit()'s verify()/write() run only
+        # after this `with` block exits cleanly, so writing the fragment inside
+        # it would leave an orphan fragment on disk if verify() ever failed.
+        if not dry_run and not pr:
+            raise SystemExit(
+                "this run changed anchors, so it needs pr=<number> to write "
+                "its changes.d/ fragment (QBP#817 variant A)"
             )
+
+    if not dry_run:
+        write_fragment(
+            issue=692,
+            slug=_dt.datetime.now(_dt.timezone.utc).strftime("run-%Y%m%d-%H%M%S"),
+            pr=pr,
+            encoder="scripts/encode_pa_from_evidence.py",
+            note=changelog_note(n_changed=len(changed_ids), **note_args),
+            touched_ids=changed_ids,
+            changes_dir=Path(ledger_path).resolve().parent / "changes.d",
+        )
     return True, frozen_base
 
 

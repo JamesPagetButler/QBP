@@ -58,6 +58,24 @@ class LintFailure(RuntimeError):
     pass
 
 
+def _merge_base(base: str, head: str) -> str:
+    """The commit `base` and `head` actually diverged from — F4' (qbp-
+    architecture, QBP#817 PR-1 review, 2026-11-17): `_show(base, ...)` used to
+    read `base`'s literal tip, same bug class as the two-dot/F4 diff fix, just
+    not yet applied to the frozen-field and touched_ids content comparisons.
+    `main()` resolves this once and passes it as the effective base to every
+    check, so a `--base` that has moved further ahead than this branch's own
+    divergence point (e.g. a stale local `origin/master`) can't make an
+    unrelated master-side edit look like this branch's own change."""
+    return subprocess.run(
+        ["git", "merge-base", base, head],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+
 def _show(ref: str, rel_path: str) -> str | None:
     result = subprocess.run(
         ["git", "show", f"{ref}:{rel_path}"],
@@ -119,7 +137,18 @@ def check_fragment_count(base: str, head: str) -> list:
         base_raw is not None and head_raw is not None and base_raw != head_raw
     )
 
-    rows = _diff_status(base, head, CHANGES_DIR_REL)
+    # Only *.json paths are fragments — changes.d/README.md documents the
+    # convention and is not one (found while verifying this PR's own diff
+    # against master: this PR's own one-time README.md addition showed up as
+    # "A" here and crashed check_fragment_claims_diff trying to json.loads()
+    # a markdown file). README.md stays freely editable (a typo fix is not an
+    # append-only violation); it is simply outside the fragment-counting and
+    # touched_ids-claim rules entirely.
+    rows = [
+        (s, p)
+        for s, p in _diff_status(base, head, CHANGES_DIR_REL)
+        if p.endswith(".json")
+    ]
     added = [p for s, p in rows if s == "A"]
     # D4: anything other than a clean "A" is a touch of an existing fragment —
     # M(odified), D(eleted), any R(ename) regardless of similarity score
@@ -146,13 +175,20 @@ def check_fragment_count(base: str, head: str) -> list:
 
 
 def check_fragment_claims_diff(base: str, head: str) -> list:
+    """F2 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): this no longer
+    early-returns just because the ledger is byte-identical at base/head. A
+    fragment added with the ledger UNCHANGED is always an over-claim — a
+    fragment's touched_ids can never legitimately be non-empty
+    (ledger_fragment.py's build_fragment() refuses an empty list) if nothing
+    in the ledger actually changed, so skipping the check there let a bogus
+    fragment (claiming ids, with no matching edit) through CI, and it then
+    earned a real derived version bump in the published view."""
     errors: list = []
-    base_raw = _show(base, LEDGER_REL)
-    head_raw = _show(head, LEDGER_REL)
-    if base_raw is None or head_raw is None or base_raw == head_raw:
-        return errors  # no ledger change to claim anything about
-
-    rows = _diff_status(base, head, CHANGES_DIR_REL)
+    rows = [
+        (s, p)
+        for s, p in _diff_status(base, head, CHANGES_DIR_REL)
+        if p.endswith(".json")
+    ]
     added = [p for s, p in rows if s == "A"]
     if len(added) != 1:
         return errors  # already flagged by check_fragment_count
@@ -168,6 +204,11 @@ def check_fragment_claims_diff(base: str, head: str) -> list:
     )
     claimed = set(fragment["touched_ids"])
 
+    base_raw = _show(base, LEDGER_REL)
+    head_raw = _show(head, LEDGER_REL)
+    if base_raw is None or head_raw is None:
+        return errors  # ledger doesn't exist at one of the refs — nothing to compare
+
     b_recs, _ = _records(json.loads(base_raw))
     a_recs, _ = _records(json.loads(head_raw))
     actually_changed = set()
@@ -177,17 +218,21 @@ def check_fragment_claims_diff(base: str, head: str) -> list:
             if json.dumps(bi.get(rid)) != json.dumps(ai.get(rid)):
                 actually_changed.add(rid)
 
-    under = claimed - actually_changed
-    over = actually_changed - claimed
-    if under:
+    # F8 (qbp-architecture): names were inverted relative to their meaning —
+    # `over_claimed` is what's claimed but didn't change (an OVER-claim);
+    # `under_claimed` is what changed but wasn't claimed (an UNDER-claim).
+    # The messages were already correct; only the variable names were swapped.
+    over_claimed = claimed - actually_changed
+    under_claimed = actually_changed - claimed
+    if over_claimed:
         errors.append(
-            f"fragment {added[0]} claims touched_ids {sorted(under)} that did not "
-            f"actually change"
+            f"fragment {added[0]} claims touched_ids {sorted(over_claimed)} that did "
+            f"not actually change"
         )
-    if over:
+    if under_claimed:
         errors.append(
-            f"fragment {added[0]} is missing touched_ids for {sorted(over)}, which "
-            f"did actually change"
+            f"fragment {added[0]} is missing touched_ids for {sorted(under_claimed)}, "
+            f"which did actually change"
         )
     return errors
 
@@ -209,11 +254,16 @@ def main():
     ap.add_argument("--head", default="HEAD")
     args = ap.parse_args()
 
+    # F4' — resolve once, use everywhere: every check below compares against
+    # the true divergence point, never against --base's literal (possibly
+    # stale-locally-ahead) tip.
+    merge_base = _merge_base(args.base, args.head)
+
     errors = (
-        check_frozen_fields(args.base, args.head)
-        + check_fragment_count(args.base, args.head)
-        + check_fragment_claims_diff(args.base, args.head)
-        + check_changelog_view_not_committed(args.base, args.head)
+        check_frozen_fields(merge_base, args.head)
+        + check_fragment_count(merge_base, args.head)
+        + check_fragment_claims_diff(merge_base, args.head)
+        + check_changelog_view_not_committed(merge_base, args.head)
     )
     if errors:
         for e in errors:

@@ -68,6 +68,7 @@ import os
 import shutil
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -77,6 +78,7 @@ ROOT = HERE.parent
 sys.path.insert(0, str(HERE))
 import encode_pa_from_evidence as enc  # noqa: E402
 import render_pa_badge as badge  # noqa: E402
+import cth_ledger_edit  # noqa: E402
 from cth_ledger_edit import canonical_dump  # noqa: E402
 
 FIXTURES = ROOT / "tools/cth-pa/testdata/pa"
@@ -947,6 +949,68 @@ def test_engine_excludes_relevance_edges():
 # ---------------------------------------------------------------------------------------
 # AC2 — no silent rise
 # ---------------------------------------------------------------------------------------
+def _minimal_apply_writes_args(ledger: Path):
+    """A minimal (plan, note_args) pair for apply_writes() directly -- bypasses
+    the full evidence-matching pipeline (pinned sha, Lean fixtures, etc.) since
+    T1/F5 are about apply_writes()'s own write-ordering, not grading."""
+    plan = {
+        "PRED-a": {
+            "changed": True,
+            "pa_local": 1,
+            "pa_effective": 1,
+            "proof_assistants": None,
+        }
+    }
+    note_args = dict(
+        n_targets=1,
+        n_records=1,
+        commit="deadbeef",
+        dist=Counter({(1, 1): 1}),
+        engine_id="test-engine",
+    )
+    return plan, note_args
+
+
+def test_apply_writes_real_run_without_pr_refuses(tmp_path):
+    """T1 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): mutant M8 (drop
+    the `if not pr: raise` guard) SURVIVED all 81 scripts/test_pa_encoder.py
+    tests because none of them exercised a real (non-dry-run) write with `pr`
+    actually omitted -- every test that writes passes pr=900/901/etc. This
+    test is the twin of
+    test_compute_fit_sigma.py::test_main_without_pr_refuses_on_a_real_change,
+    and kills M8."""
+    ledger = mk_ledger(tmp_path, [anchor("PRED-a")])
+    plan, note_args = _minimal_apply_writes_args(ledger)
+    changes_dir = ledger.parent / "changes.d"
+    with pytest.raises(SystemExit, match="pr=<number>"):
+        enc.apply_writes(ledger, plan, note_args, "2026-11-17T00:00:00Z", dry_run=False)
+    assert not changes_dir.exists() or list(changes_dir.glob("*.json")) == []
+    assert json.loads(ledger.read_text())["anchors"][0].get("pa_local") is None
+
+
+def test_apply_writes_failed_verify_writes_no_orphan_fragment(tmp_path, monkeypatch):
+    """F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): same class as
+    compute_fit_sigma's F5 fix -- the fragment write must happen only after
+    `ledger_edit()`'s verify()/write() already succeeded, not inside the
+    `with` block. Forces verify() to fail and asserts no orphan fragment."""
+    ledger = mk_ledger(tmp_path, [anchor("PRED-a")])
+    plan, note_args = _minimal_apply_writes_args(ledger)
+    changes_dir = ledger.parent / "changes.d"
+
+    monkeypatch.setattr(
+        cth_ledger_edit.LedgerEdit,
+        "verify",
+        lambda self: (_ for _ in ()).throw(
+            cth_ledger_edit.ConfinementError("simulated verify() failure")
+        ),
+    )
+    with pytest.raises(cth_ledger_edit.ConfinementError, match="simulated"):
+        enc.apply_writes(
+            ledger, plan, note_args, "2026-11-17T00:00:00Z", dry_run=False, pr=900
+        )
+    assert not changes_dir.exists() or list(changes_dir.glob("*.json")) == []
+
+
 def test_no_silent_pa_rise(tmp_path):
     repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n", "proofs/B.lean": "b\n"})
     head = git(repo, "rev-parse", "HEAD")

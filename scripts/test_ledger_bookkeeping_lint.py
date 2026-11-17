@@ -224,6 +224,75 @@ def test_fragment_over_claiming_touched_ids_is_rejected(tmp_path, monkeypatch):
     assert any("claims touched_ids ['PRED-b']" in e for e in errors)
 
 
+def test_non_json_file_in_changes_dir_is_never_treated_as_a_fragment(
+    tmp_path, monkeypatch
+):
+    """Real bug, found by running this lint against this PR's own diff
+    against master (not by any throwaway-repo test): changes.d/README.md
+    documents the convention and is not a fragment, but the original code
+    filtered `_diff_status` by status ("A") only, with no path/extension
+    check -- so adding README.md alongside a real `.json` fragment (exactly
+    what this PR's own first commit did) made `added` contain TWO paths
+    (`['...changes.d/1-a.json', '...changes.d/README.md']`), tripping the
+    "more than one fragment" check, and `check_fragment_claims_diff` would
+    try (and crash) `json.loads()`-ing the Markdown file if README.md were
+    ever the only or last "A" row. A content PR must still pass cleanly when
+    changes.d/README.md is introduced alongside its one real fragment."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    L = json.loads(_ledger_path(repo).read_text())
+    L["anchors"][0]["status"] = "coherent"
+    _ledger_path(repo).write_text(json.dumps(L, indent=2) + "\n")
+    changes_dir = repo / CHANGES_DIR_REL
+    lf.write_fragment(
+        issue=1,
+        slug="a",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["PRED-a"],
+        changes_dir=changes_dir,
+    )
+    changes_dir.mkdir(parents=True, exist_ok=True)
+    (changes_dir / "README.md").write_text("# fragment convention\n")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature")
+
+    errors = (
+        lbl.check_frozen_fields("master", "feature")
+        + lbl.check_fragment_count("master", "feature")
+        + lbl.check_fragment_claims_diff("master", "feature")
+        + lbl.check_changelog_view_not_committed("master", "feature")
+    )
+    assert errors == []
+
+
+def test_fragment_with_no_ledger_change_at_all_is_rejected(tmp_path, monkeypatch):
+    """F2 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): a PR that adds a
+    fragment claiming touched_ids, but never actually changes the ledger,
+    used to slip past this check entirely (it early-returned whenever the
+    ledger was byte-identical at base/head). touched_ids can never
+    legitimately be non-empty with zero real changes, so this must always be
+    an over-claim, not a silent pass."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    # the ledger itself is NOT touched on this branch at all
+    lf.write_fragment(
+        issue=1,
+        slug="bogus",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["NOT-A-REAL-ID"],
+        changes_dir=repo / CHANGES_DIR_REL,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature")
+
+    errors = lbl.check_fragment_claims_diff("master", "feature")
+    assert any("claims touched_ids ['NOT-A-REAL-ID']" in e for e in errors)
+
+
 def test_partial_rename_of_an_existing_fragment_is_rejected(tmp_path, monkeypatch):
     """D4 (qbp-oppenheimer, QBP#817 PR-1 review): a partial-content rename
     (git's "R087", not the byte-identical "R100" the original check only
@@ -336,6 +405,35 @@ def test_base_ahead_of_merge_base_does_not_falsely_fail_append_only(
 
     errors = lbl.check_fragment_count("master", "feature")
     assert errors == []
+
+
+def test_main_resolves_merge_base_so_an_unrelated_master_ledger_edit_does_not_false_fail(
+    tmp_path, monkeypatch, capsys
+):
+    """F4' (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): `_show(base,
+    ...)` used to read `--base`'s literal tip, same bug class as the two-dot
+    diff fix (F4) but not yet applied to the frozen-field/touched_ids content
+    comparisons. A branch that never touched the ledger, run against a
+    `--base` that has since gained an unrelated ledger edit, must still pass
+    -- `main()` now resolves the merge-base once and uses it everywhere."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    # feature touches nothing ledger-related at all
+    (repo / "unrelated.txt").write_text("x\n")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature, unrelated to the ledger")
+
+    # master, meanwhile, gets its OWN unrelated ledger edit that feature never saw
+    _git(repo, "checkout", "-q", "master")
+    L = json.loads(_ledger_path(repo).read_text())
+    L["anchors"][0]["status"] = "coherent"
+    _ledger_path(repo).write_text(json.dumps(L, indent=2) + "\n")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "unrelated master-side ledger edit")
+
+    monkeypatch.setattr(sys, "argv", ["lint", "--base", "master", "--head", "feature"])
+    lbl.main()  # must not raise SystemExit
+    assert "OK:" in capsys.readouterr().out
 
 
 def test_main_exits_nonzero_on_any_failure(tmp_path, monkeypatch, capsys):

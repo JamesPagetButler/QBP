@@ -195,3 +195,36 @@ def test_true_merge_commit_does_not_renumber_an_already_issued_version(tmp_path)
     # than X's, so this only passes under true first-parent merge order.
     assert [r["data"]["issue"] for r in rows] == [101, 100]
     assert [r["derived_version"] for r in rows] == ["6.25.0", "6.26.0"]
+
+
+def test_shallow_clone_refuses_rather_than_silently_misordering(tmp_path):
+    """F1 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17), reproduced with
+    a REAL shallow clone (not simulated): in a `--depth 1` clone, the graft
+    root reports every file as freshly "A"dded, so every fragment collapses
+    onto the graft commit and ties fall back to filename order -- the
+    original "not on this branch's history" LedgerVersionError never fired
+    in exactly this case, because every fragment WAS found, just all wrongly
+    attributed to one commit. Must refuse explicitly instead."""
+    repo, ledger_path = _init_repo(tmp_path)
+    changes_dir = repo / "data/ledgerdir/changes.d"
+    _add_fragment_commit(repo, changes_dir, 100, "first", 900, "n1", ["A"])
+    _add_fragment_commit(repo, changes_dir, 101, "second", 901, "n2", ["B"])
+
+    shallow = tmp_path / "shallow-clone"
+    _git(tmp_path, "clone", "--depth", "1", f"file://{repo}", str(shallow))
+    shallow_ledger = shallow / "data/ledgerdir/ledger.json"
+    shallow_changes_dir = shallow / "data/ledgerdir/changes.d"
+
+    assert (
+        subprocess.run(
+            ["git", "rev-parse", "--is-shallow-repository"],
+            cwd=shallow,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+        == "true"
+    ), "test setup didn't actually produce a shallow clone"
+
+    with pytest.raises(lv.LedgerVersionError, match="shallow"):
+        lv.fragment_versions(shallow_ledger, shallow_changes_dir, shallow)

@@ -59,6 +59,32 @@ def bump_minor(version: str, n: int) -> str:
     return f"{major}.{int(minor) + n}.0"
 
 
+def _refuse_if_shallow(repo_root: Path) -> None:
+    """F1 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): a shallow clone
+    (`git fetch --depth=N`) degrades `git log --first-parent -m` silently —
+    the graft root reports every file as freshly "A"dded, so every fragment
+    gets the SAME (tip) commit and time, and ties fall back to filename
+    order, not true merge order. `fragment_versions()`'s own `LedgerVersionError`
+    for "not on this branch's history" never fires in exactly this case,
+    because every fragment DOES show up — just all attributed to one wrong
+    commit. Check directly instead of hoping the symptom surfaces."""
+    is_shallow = subprocess.run(
+        ["git", "rev-parse", "--is-shallow-repository"],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    if is_shallow == "true":
+        raise LedgerVersionError(
+            f"{repo_root} is a shallow git clone — merge order from "
+            f"'git log --first-parent -m' is unreliable here (every fragment "
+            f"collapses onto the graft root's commit/time, breaking order). "
+            f"Fetch full history first (git fetch --unshallow, or checkout "
+            f"with fetch-depth: 0 in CI)."
+        )
+
+
 def _fragment_merge_order(changes_dir: Path, repo_root: Path) -> dict:
     """{relative posix path: (commit sha, commit ISO time, position)} for every
     fragment ever ADDED to **master's first-parent history**, in true merge
@@ -70,6 +96,7 @@ def _fragment_merge_order(changes_dir: Path, repo_root: Path) -> dict:
     master, never to whichever original commit on the merged-in branch first
     wrote it. `position` is this function's own encounter order, which IS
     final merge order — callers must not re-derive order from timestamps."""
+    _refuse_if_shallow(repo_root)
     try:
         rel = changes_dir.relative_to(repo_root).as_posix()
     except ValueError:

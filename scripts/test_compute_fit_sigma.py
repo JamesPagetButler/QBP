@@ -25,6 +25,7 @@ _spec = importlib.util.spec_from_file_location(
 cfs = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(cfs)
 
+import cth_ledger_edit  # noqa: E402  (scripts/ is on sys.path via cfs's own insert)
 
 # ---- sigma_meas_for ------------------------------------------------------------------
 
@@ -470,6 +471,39 @@ def test_main_without_pr_refuses_on_a_real_change(tmp_path, monkeypatch):
     with pytest.raises(SystemExit, match="--pr"):
         cfs.main()
     # nothing was written at all — the ledger_edit context raises before exit
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
+
+
+def test_a_failed_ledger_verify_writes_no_orphan_fragment(tmp_path, monkeypatch):
+    """F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): the fragment
+    write must happen only after `ledger_edit()`'s `verify()`/`write()` have
+    already succeeded, never inside the `with` block itself — otherwise a
+    failing verify() (any ConfinementError, not just a missing --pr) leaves
+    an orphan fragment on disk, claiming ids, with no matching ledger write
+    at all. Forces a verify() failure directly (an UNDECLARED-change style
+    failure, simulated by making verify() always raise) and asserts the
+    changes.d/ directory stays empty."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    changes_dir = tmp_path / "changes.d"
+
+    monkeypatch.setattr(
+        cth_ledger_edit.LedgerEdit,
+        "verify",
+        lambda self: (_ for _ in ()).throw(
+            cth_ledger_edit.ConfinementError("simulated verify() failure")
+        ),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["compute_fit_sigma.py", "--ledger", str(ledger_path), "--pr", "900"],
+    )
+    with pytest.raises(cth_ledger_edit.ConfinementError, match="simulated"):
+        cfs.main()
+
+    assert not changes_dir.exists() or list(changes_dir.glob("*.json")) == []
+    # the ledger itself is also untouched, same as any other failed ledger_edit
     assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
 
 

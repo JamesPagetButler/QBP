@@ -80,6 +80,7 @@ import json
 import os
 import pathlib
 import re
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
@@ -645,8 +646,14 @@ def render_markdown(
 
     if ledger_path is not None:
         try:
-            version = _lv.current_version(pathlib.Path(ledger_path))
-        except _lv.LedgerVersionError as exc:
+            # F6 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): derive
+            # changes_dir/repo_root from ledger_path itself -- calling
+            # current_version() with only the path let changes_dir/repo_root
+            # default to ledger_version.py's OWN module constants (the real
+            # repo), same bug class the generator already had to fix.
+            lp = pathlib.Path(ledger_path).resolve()
+            version = _lv.current_version(lp, lp.parent / "changes.d", lp.parents[2])
+        except (_lv.LedgerVersionError, subprocess.CalledProcessError) as exc:
             print(
                 f"WARNING: could not derive the ledger version: {exc}", file=sys.stderr
             )
