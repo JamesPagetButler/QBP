@@ -75,7 +75,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pytest
+      # numpy: tests/conftest.py imports it at collection time for the whole
+      # session, even though the ledger-bookkeeping tests below don't use it
+      # themselves (caught when this job first ran: ModuleNotFoundError).
+      - run: pip install pytest numpy
       - run: |
           git config --global user.email "ci@example.com"
           git config --global user.name "ci"
