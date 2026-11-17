@@ -16,6 +16,8 @@ import json
 import pathlib
 import sys
 
+import pytest
+
 _spec = importlib.util.spec_from_file_location(
     "compute_fit_sigma",
     pathlib.Path(__file__).resolve().parent / "compute_fit_sigma.py",
@@ -424,30 +426,61 @@ def _minimal_candidate_ledger():
     }
 
 
-def test_two_consecutive_main_runs_write_one_fit_history_entry_and_one_version_bump(
+def test_two_consecutive_main_runs_write_one_fit_history_entry_and_one_fragment(
     tmp_path, monkeypatch
 ):
-    """Gemini G1/G2 (PR #814 review): a no-op re-run must not duplicate fit_history or
-    bump the ledger version a second time — a repeat evaluation is not a new trial."""
+    """Gemini G1/G2 (PR #814 review): a no-op re-run must not duplicate fit_history —
+    a repeat evaluation is not a new trial. QBP#817 variant A: version/changelog are
+    frozen now, so "bumped" becomes "exactly one changes.d/ fragment written"."""
     ledger_path = tmp_path / "ledger.json"
     _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    changes_dir = tmp_path / "changes.d"
 
     monkeypatch.setattr(
-        sys, "argv", ["compute_fit_sigma.py", "--ledger", str(ledger_path)]
+        sys,
+        "argv",
+        ["compute_fit_sigma.py", "--ledger", str(ledger_path), "--pr", "900"],
     )
     cfs.main()
     after_first = json.loads(ledger_path.read_text())
     anchor = after_first["anchors"][0]
     assert len(anchor["fit_history"]) == 1
-    assert after_first["version"] == "1.1.0"
-    assert len(after_first["changelog"]) == 1
+    assert after_first["version"] == "1.0.0"  # frozen — never bumped
+    assert len(after_first["changelog"]) == 0  # frozen — never appended
+    fragments_after_first = list(changes_dir.glob("*.json"))
+    assert len(fragments_after_first) == 1
+    frag = json.loads(fragments_after_first[0].read_text())
+    assert frag["pr"] == 900 and frag["touched_ids"] == [anchor["id"]]
 
     cfs.main()
     after_second = json.loads(ledger_path.read_text())
     anchor2 = after_second["anchors"][0]
     assert len(anchor2["fit_history"]) == 1  # NOT 2 — the no-op must not re-append
-    assert after_second["version"] == "1.1.0"  # NOT bumped a second time
-    assert len(after_second["changelog"]) == 1  # NOT a second changelog entry
+    assert list(changes_dir.glob("*.json")) == fragments_after_first  # no 2nd fragment
+
+
+def test_main_without_pr_refuses_on_a_real_change(tmp_path, monkeypatch):
+    """QBP#817 variant A: a real change needs a fragment, which needs a PR number —
+    refuse loudly rather than writing an unlinked fragment or silently skipping it."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    monkeypatch.setattr(
+        sys, "argv", ["compute_fit_sigma.py", "--ledger", str(ledger_path)]
+    )
+    with pytest.raises(SystemExit, match="--pr"):
+        cfs.main()
+    # nothing was written at all — the ledger_edit context raises before exit
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
+
+
+def test_main_dry_run_without_pr_does_not_raise(tmp_path, monkeypatch):
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    monkeypatch.setattr(
+        sys, "argv", ["compute_fit_sigma.py", "--ledger", str(ledger_path), "--dry-run"]
+    )
+    cfs.main()  # must not raise even though --pr is absent
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
 
 
 # ---- is_candidate: only anchors with BOTH numeric fields are touched -----------------

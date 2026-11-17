@@ -98,6 +98,7 @@ on:
       - pa-reconcile
       - Closed-issue AC sweep tests
       - Merge-blocking boxes
+      - Ledger Bookkeeping Frozen
     types: [completed]
   check_suite:
     types: [completed]

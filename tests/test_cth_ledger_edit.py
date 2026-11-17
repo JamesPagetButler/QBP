@@ -48,14 +48,35 @@ def test_confined_edit_writes_only_declared_records(tmp_path):
             "anchors", {"id": "PRED-c", "status": "untested", "prediction_chain": []}
         )
         e.remove("axioms", "AXIOM-1")
-        e.ledger["changelog"].append({"version": "1.1.0", "note": "x"})
-        e.touch("changelog")
-        e.ledger["last_updated"] = "2026-09-11T00:00:00Z"
-        e.touch("last_updated")
     L = json.load(open(p))
     assert [a["id"] for a in L["anchors"]] == ["PRED-a", "PRED-b", "PRED-c"]
     assert L["anchors"][0]["status"] == "coherent" and L["axioms"] == []
     assert "PRED-a" in e.summary and "AXIOM-1" in e.summary
+
+
+def test_version_changelog_last_updated_cannot_be_touched(tmp_path):
+    """QBP#817 variant A (beekeeper-ruled 2026-11-16): a content edit never
+    authors these three fields any more — touch() refuses them outright,
+    before any mutation, so the ledger is never even written."""
+    p = _mini(tmp_path)
+    before = open(p).read()
+    for key in ("version", "changelog", "last_updated"):
+        with pytest.raises(cle.ConfinementError, match=f"{key!r} is frozen"):
+            with cle.ledger_edit(p) as e:
+                e.record("anchors", "PRED-a")["status"] = "coherent"
+                e.touch(key)
+        assert open(p).read() == before
+
+
+def test_frozen_key_mutated_without_touch_is_still_caught_as_undeclared(tmp_path):
+    """Belt and braces: even bypassing touch() entirely and mutating the frozen
+    key directly still trips the existing undeclared-change detection."""
+    p = _mini(tmp_path)
+    before = open(p).read()
+    with pytest.raises(cle.ConfinementError, match="UNDECLARED.*version"):
+        with cle.ledger_edit(p) as e:
+            e.ledger["version"] = "9.9.9"
+    assert open(p).read() == before
 
 
 def test_undeclared_change_is_refused_and_nothing_written(tmp_path):

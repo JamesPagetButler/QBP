@@ -69,6 +69,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cth_ledger_edit import ledger_edit  # noqa: E402
+from ledger_fragment import write_fragment  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
@@ -302,6 +303,21 @@ def main():
         ),
     )
     ap.add_argument("--ledger", default=str(LEDGER))
+    ap.add_argument(
+        "--pr",
+        type=int,
+        help=(
+            "The PR number this run's fragment belongs to (QBP#817 variant A: "
+            "required whenever this run actually changes anything — the ledger's "
+            "version/changelog/last_updated are frozen, so a real change is "
+            "recorded as a fragment under archive/cth-inventory/changes.d/ "
+            "instead, and the changelog view needs a PR number to link)."
+        ),
+    )
+    ap.add_argument(
+        "--slug",
+        help="Fragment slug (default: a timestamp, unique per real run).",
+    )
     args = ap.parse_args()
 
     date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -309,10 +325,10 @@ def main():
     n_candidates = n_computed = n_null = n_capped = n_would_cap = n_written = 0
     with ledger_edit(args.ledger, dry_run=args.dry_run) as ed:
         L = ed.ledger
-        old_version = L["version"]
-        major_minor, patch = old_version.rsplit(".", 1)
-        major, minor = major_minor.split(".")
-        new_version = f"{major}.{int(minor) + 1}.0"
+        # QBP#817 variant A: version is frozen, read-only here — never bumped,
+        # never touched. Still a legitimate per-anchor fit_history provenance
+        # value: "this evaluation ran when the ledger's frozen base was X".
+        frozen_base = L["version"]
 
         # snapshot ids first: we look records up by id as we go via ed.record()
         candidate_ids = [a["id"] for a in L["anchors"] if is_candidate(a)]
@@ -320,6 +336,7 @@ def main():
         by_id = {a["id"]: a for a in L["anchors"]}
 
         touched = []
+        touched_ids = []
         would_caps = []
         for aid in candidate_ids:
             raw = by_id[aid]
@@ -332,7 +349,7 @@ def main():
             # this candidate actually changes BEFORE declaring it to ed.record(), so an
             # idempotent re-run (Gemini G1/G2) declares nothing and raises no silent-
             # no-op ConfinementError.
-            upd = evaluate(raw, new_version, date, args.apply_caps)
+            upd = evaluate(raw, frozen_base, date, args.apply_caps)
             touched.append(upd["summary"])
             if upd["fit_sigma"] is None:
                 n_null += 1
@@ -352,6 +369,7 @@ def main():
                 continue
 
             n_written += 1
+            touched_ids.append(aid)
             if upd["status"] != old_status:
                 n_capped += 1
             a = ed.record("anchors", aid)
@@ -364,12 +382,9 @@ def main():
             a["fit_history"] = upd["fit_history"]
 
         if n_written:
-            L["version"] = new_version
-            ed.touch("version")
-            if L.get("last_updated") != date:
-                L["last_updated"] = date
-                ed.touch("last_updated")
-
+            # QBP#817 variant A: version/changelog/last_updated are frozen — a real
+            # change is recorded as a fragment instead (ed.touch() on any of the
+            # three would now raise ConfinementError by construction).
             mode_note = (
                 f"{n_capped} had their status one-way capped (never raised, only "
                 f"lowered/capped) by the fed-sigma-v1 thresholds"
@@ -381,7 +396,7 @@ def main():
                     f"fed-sigma-v1 thresholds"
                 )
             )
-            changelog_note = (
+            fragment_note = (
                 f"QBP#809 phase 1 (AC4): scripts/compute_fit_sigma.py evaluated "
                 f"{n_candidates} candidate anchor(s); {n_written} actually changed "
                 f"({n_computed} real fit_sigma, {n_null} null + fit_sigma_reason "
@@ -396,10 +411,27 @@ def main():
                 f"measured_source minLength, fit_sigma/fit_sigma_reason/fit_history) in "
                 f"docs/cth/inventory.schema.v0.3.json 0.3.8. AC2/AC3/AC5/AC6 remain phase 2."
             )
-            L["changelog"].append(
-                {"version": new_version, "date": date, "note": changelog_note}
-            )
-            ed.touch("changelog")
+            if not args.dry_run:
+                if not args.pr:
+                    raise SystemExit(
+                        "this run changed anchors, so it needs --pr <number> to write "
+                        "its changes.d/ fragment (QBP#817 variant A)"
+                    )
+                slug = args.slug or datetime.now(timezone.utc).strftime(
+                    "run-%Y%m%d-%H%M%S"
+                )
+                # changes.d/ is a sibling of the ledger actually in use (not a
+                # hardcoded repo-root default) — matters for tests pointed at a
+                # tmp_path ledger, same bug class as generate_ledger_changelog_view.
+                write_fragment(
+                    issue=809,
+                    slug=slug,
+                    pr=args.pr,
+                    encoder="scripts/compute_fit_sigma.py",
+                    note=fragment_note,
+                    touched_ids=touched_ids,
+                    changes_dir=Path(args.ledger).resolve().parent / "changes.d",
+                )
 
     mode = (
         "APPLY-CAPS" if args.apply_caps else "REPORT MODE (default, status not written)"
@@ -409,15 +441,16 @@ def main():
             f"{'DRY-RUN ' if args.dry_run else ''}compute_fit_sigma [{mode}]: "
             f"{n_candidates} candidate(s) ({n_computed} computed, {n_null} null), "
             f"{n_written} changed, {n_would_cap} would-be cap(s), {n_capped} status "
-            f"cap(s) actually applied; ledger {old_version} -> {new_version}"
+            f"cap(s) actually applied; ledger frozen base {frozen_base} "
+            f"(version is derived, QBP#817: see scripts/ledger_version.py)"
         )
     else:
         print(
             f"{'DRY-RUN ' if args.dry_run else ''}compute_fit_sigma [{mode}]: "
             f"{n_candidates} candidate(s) ({n_computed} computed, {n_null} null) — "
             f"no-op: every candidate's evaluation already matches its stored "
-            f"fit_sigma/fit_history/status at ledger {old_version}; nothing written "
-            f"(Gemini G1/G2, a repeat evaluation is not a new trial)."
+            f"fit_sigma/fit_history/status at ledger frozen base {frozen_base}; "
+            f"nothing written (Gemini G1/G2, a repeat evaluation is not a new trial)."
         )
     print()
     for line in touched:

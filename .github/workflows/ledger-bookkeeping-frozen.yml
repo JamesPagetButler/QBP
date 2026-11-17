@@ -1,0 +1,88 @@
+# QBP#817 variant A (beekeeper-ruled 2026-11-16): a content PR authors its anchor
+# edits plus one fragment, never the ledger's version/changelog/last_updated (those
+# are frozen by construction — scripts/cth_ledger_edit.py). Removes the collision
+# where two PRs editing completely disjoint anchors still fought over those three
+# shared fields, forcing a rebase and a full reviewer re-confirm for zero semantic
+# reason.
+#
+# Jobs:
+#   - ledger-bookkeeping-lint: scripts/ledger_bookkeeping_lint.py (frozen fields
+#     untouched, exactly one fragment when the ledger changed, changes.d/ is
+#     append-only, the fragment's touched_ids matches the actual diff).
+#   - ledger-changelog-view: scripts/generate_ledger_changelog_view.py --check
+#     (the generated analysis/cth-ledger-changelog.md regenerates byte-identically;
+#     same shape as inverse-anchor-audit.yml's regen-and-diff check).
+#
+# Full history needed (fetch-depth: 0) — ledger_version.py derives merge order
+# from `git log`, which a shallow clone can't give it.
+
+name: Ledger Bookkeeping Frozen
+
+on:
+  pull_request:
+    paths:
+      - 'archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json'
+      - 'archive/cth-inventory/changes.d/**'
+      - 'analysis/cth-ledger-changelog.md'
+      - 'scripts/cth_ledger_edit.py'
+      - 'scripts/ledger_fragment.py'
+      - 'scripts/ledger_version.py'
+      - 'scripts/ledger_bookkeeping_lint.py'
+      - 'scripts/generate_ledger_changelog_view.py'
+      - '.github/workflows/ledger-bookkeeping-frozen.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  ledger-bookkeeping-lint:
+    name: Ledger bookkeeping frozen (version/changelog/last_updated + fragment convention)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: scripts/ledger_bookkeeping_lint.py
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1000
+          python3 scripts/ledger_bookkeeping_lint.py \
+            --base "origin/${{ github.base_ref }}" \
+            --head HEAD
+
+  ledger-changelog-view:
+    name: CTH ledger changelog view (regen check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: scripts/generate_ledger_changelog_view.py --check
+        run: python3 scripts/generate_ledger_changelog_view.py --check
+
+  ledger-unit-tests:
+    name: Ledger bookkeeping unit tests (fragment, version, changelog view, lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest
+      - run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "ci"
+          python3 -m pytest \
+            scripts/test_ledger_fragment.py \
+            scripts/test_ledger_version.py \
+            scripts/test_generate_ledger_changelog_view.py \
+            scripts/test_ledger_bookkeeping_lint.py \
+            tests/test_cth_ledger_edit.py \
+            -v

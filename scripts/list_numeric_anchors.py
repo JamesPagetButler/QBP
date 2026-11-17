@@ -78,6 +78,7 @@ import argparse
 import glob
 import json
 import os
+import pathlib
 import re
 import sys
 from collections import Counter, defaultdict
@@ -85,6 +86,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)  # sibling scripts/ledger_version.py
 LEDGER_DIR = os.path.join(REPO_ROOT, "archive", "cth-inventory")
 LEDGER_GLOB = "confluent-trust-inventory-*.v0.3.json"
 
@@ -631,10 +633,28 @@ def _esc(s: Any) -> str:
     return str(s).replace("|", "\\|").replace("\n", " ")
 
 
-def render_markdown(rows: Sequence[Dict[str, Any]], ledger: Dict[str, Any]) -> str:
+def render_markdown(
+    rows: Sequence[Dict[str, Any]], ledger: Dict[str, Any], ledger_path: str = None
+) -> str:
     out: List[str] = []
+    # QBP#817 variant A: the ledger's own `version` field is frozen — report the
+    # derived current version (scripts/ledger_version.py) when the path to derive
+    # it from is known, falling back to the frozen field only when it isn't (e.g.
+    # a caller that already parsed the dict with no path on hand).
+    import ledger_version as _lv
+
+    if ledger_path is not None:
+        try:
+            version = _lv.current_version(pathlib.Path(ledger_path))
+        except _lv.LedgerVersionError as exc:
+            print(
+                f"WARNING: could not derive the ledger version: {exc}", file=sys.stderr
+            )
+            version = f"{ledger.get('version')} (derivation failed)"
+    else:
+        version = ledger.get("version")
     out.append(
-        f"Ledger `{ledger.get('programme')}` version `{ledger.get('version')}` "
+        f"Ledger `{ledger.get('programme')}` version `{version}` "
         f"(schema `{ledger.get('schema_version')}`), {len(rows)} numeric anchors."
     )
     out.append("")
@@ -798,7 +818,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             )
         )
     else:
-        print(render_markdown(rows, ledger))
+        print(render_markdown(rows, ledger, ledger_path=args.ledger))
         print()
         print("```")
         print(render_summary(summary))
