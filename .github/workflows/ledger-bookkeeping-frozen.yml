@@ -8,13 +8,23 @@
 # Jobs:
 #   - ledger-bookkeeping-lint: scripts/ledger_bookkeeping_lint.py (frozen fields
 #     untouched, exactly one fragment when the ledger changed, changes.d/ is
-#     append-only, the fragment's touched_ids matches the actual diff).
-#   - ledger-changelog-view: scripts/generate_ledger_changelog_view.py --check
-#     (the generated analysis/cth-ledger-changelog.md regenerates byte-identically;
-#     same shape as inverse-anchor-audit.yml's regen-and-diff check).
+#     append-only, the fragment's touched_ids matches the actual diff, the
+#     changelog view is never committed).
+#   - ledger-unit-tests: the unit tests for all of the above.
+#   - publish-ledger-changelog-view: runs on `push` to master ONLY, not on PRs.
+#     The generated changelog view (scripts/generate_ledger_changelog_view.py)
+#     is deliberately NEVER committed (D1, qbp-oppenheimer, QBP#817 PR-1 review,
+#     2026-11-17) — a committed copy would have to be regenerated and
+#     re-committed by every later content PR just to pass a drift check,
+#     reintroducing the exact bookkeeping collision this design removes. This
+#     job instead publishes a fresh render to the push's own Actions job
+#     summary ($GITHUB_STEP_SUMMARY) — durable, linked from the commit's check
+#     list, and readable without running anything, without a new bot/writer on
+#     protected master (the real durable publish target is James's call; the
+#     step summary is the zero-new-moving-parts default).
 #
 # Full history needed (fetch-depth: 0) — ledger_version.py derives merge order
-# from `git log`, which a shallow clone can't give it.
+# from `git log --first-parent -m`, which a shallow clone can't give it.
 
 name: Ledger Bookkeeping Frozen
 
@@ -23,13 +33,17 @@ on:
     paths:
       - 'archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json'
       - 'archive/cth-inventory/changes.d/**'
-      - 'analysis/cth-ledger-changelog.md'
       - 'scripts/cth_ledger_edit.py'
       - 'scripts/ledger_fragment.py'
       - 'scripts/ledger_version.py'
       - 'scripts/ledger_bookkeeping_lint.py'
       - 'scripts/generate_ledger_changelog_view.py'
       - '.github/workflows/ledger-bookkeeping-frozen.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json'
+      - 'archive/cth-inventory/changes.d/**'
 
 permissions:
   contents: read
@@ -37,6 +51,7 @@ permissions:
 jobs:
   ledger-bookkeeping-lint:
     name: Ledger bookkeeping frozen (version/changelog/last_updated + fragment convention)
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -52,21 +67,9 @@ jobs:
             --base "origin/${{ github.base_ref }}" \
             --head HEAD
 
-  ledger-changelog-view:
-    name: CTH ledger changelog view (regen check)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: scripts/generate_ledger_changelog_view.py --check
-        run: python3 scripts/generate_ledger_changelog_view.py --check
-
   ledger-unit-tests:
     name: Ledger bookkeeping unit tests (fragment, version, changelog view, lint)
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -89,3 +92,17 @@ jobs:
             scripts/test_ledger_bookkeeping_lint.py \
             tests/test_cth_ledger_edit.py \
             -v
+
+  publish-ledger-changelog-view:
+    name: Publish CTH ledger changelog view (post-merge, never committed)
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: scripts/generate_ledger_changelog_view.py --step-summary
+        run: python3 scripts/generate_ledger_changelog_view.py --step-summary

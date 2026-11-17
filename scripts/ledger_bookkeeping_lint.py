@@ -12,7 +12,11 @@ Checks, comparing `--base` to `--head`:
   1. The ledger's `version`/`changelog`/`last_updated` are byte-identical to base.
   2. If the ledger changed at all, exactly one fragment was added under
      archive/cth-inventory/changes.d/ (never zero, never more than one).
-  3. No fragment already on base was modified or removed (changes.d/ is append-only).
+  3. No fragment already on base was touched at all — added, modified, removed,
+     renamed (any similarity score) or type-changed; changes.d/ is append-only,
+     so anything other than a clean new addition fails (D4, qbp-oppenheimer,
+     QBP#817 PR-1 review, 2026-11-17: a partial-similarity rename, e.g. git's
+     "R087", slipped past the original "M/D/R100-only" check).
   4. The new fragment's `touched_ids` is exactly the set of anchor/record ids that
      actually changed — not a subset (an under-claimed fragment hides what the
      reviewer actually needs to re-derive) and not a superset (an over-claimed
@@ -23,6 +27,11 @@ Checks, comparing `--base` to `--head`:
      PR's encoder against a fresh master and diffing the result — has no shared
      CLI contract across encoders to automate generically; it stays a documented,
      one-command-per-encoder manual recipe (docs/cth/qbp-local-extensions.md).
+  5. analysis/cth-ledger-changelog.md never appears in the diff at all (D1,
+     qbp-oppenheimer, QBP#817 PR-1 review, 2026-11-17): that view is CI-published
+     post-merge, never committed (scripts/generate_ledger_changelog_view.py) — a
+     hand-committed copy would have to be kept in sync by every later content PR,
+     reintroducing the exact bookkeeping collision this design removes.
 
 Usage:
     python3 scripts/ledger_bookkeeping_lint.py --base origin/master --head HEAD
@@ -42,6 +51,7 @@ from cth_ledger_edit import _records  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parent.parent
 LEDGER_REL = "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
 CHANGES_DIR_REL = "archive/cth-inventory/changes.d"
+CHANGELOG_VIEW_REL = "analysis/cth-ledger-changelog.md"
 
 
 class LintFailure(RuntimeError):
@@ -103,7 +113,12 @@ def check_fragment_count(base: str, head: str) -> list:
 
     rows = _diff_status(base, head, CHANGES_DIR_REL)
     added = [p for s, p in rows if s == "A"]
-    modified_or_removed = [p for s, p in rows if s in ("M", "D", "R100")]
+    # D4: anything other than a clean "A" is a touch of an existing fragment —
+    # M(odified), D(eleted), any R(ename) regardless of similarity score
+    # (git reports "R100" only for a byte-identical rename; a partial-content
+    # rename like "R087" slipped past an "s == 'R100'" check), C(opy), T(ype
+    # change). Append-only means append-only.
+    modified_or_removed = [p for s, p in rows if s != "A"]
 
     if modified_or_removed:
         errors.append(
@@ -169,6 +184,17 @@ def check_fragment_claims_diff(base: str, head: str) -> list:
     return errors
 
 
+def check_changelog_view_not_committed(base: str, head: str) -> list:
+    rows = _diff_status(base, head, CHANGELOG_VIEW_REL)
+    if rows:
+        return [
+            f"{CHANGELOG_VIEW_REL} must never be committed (D1): it is CI-published "
+            f"post-merge, never a tracked file — remove it from this PR's diff "
+            f"({[s for s, _ in rows]})"
+        ]
+    return []
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--base", default="origin/master")
@@ -179,6 +205,7 @@ def main():
         check_frozen_fields(args.base, args.head)
         + check_fragment_count(args.base, args.head)
         + check_fragment_claims_diff(args.base, args.head)
+        + check_changelog_view_not_committed(args.base, args.head)
     )
     if errors:
         for e in errors:

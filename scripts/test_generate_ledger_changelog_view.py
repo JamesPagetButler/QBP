@@ -70,19 +70,44 @@ def test_render_acceptance_check(tmp_path):
     assert "issues/101" in out and "pull/901" in out
 
 
-def test_check_mode_passes_on_fresh_write(tmp_path):
+def test_render_is_deterministic_for_the_same_state(tmp_path):
     _repo, ledger_path = _init_repo(tmp_path)
-    out_md = tmp_path / "view.md"
-    rendered = glcv.render(ledger_path)
-    out_md.write_text(rendered)
-    assert out_md.read_text() == glcv.render(ledger_path)
+    assert glcv.render(ledger_path) == glcv.render(ledger_path)
 
 
-def test_check_mode_detects_drift(tmp_path):
+def test_render_changes_once_a_new_fragment_merges(tmp_path):
+    """D1 (qbp-oppenheimer, QBP#817 PR-1 review): this is exactly why the view
+    is never committed -- a fresh render legitimately differs the moment a new
+    fragment merges, so a `--check`-against-a-committed-copy would fail on
+    every later PR for a reason that isn't that PR's own change."""
     repo, ledger_path = _init_repo(tmp_path)
     changes_dir = repo / "data/ledgerdir/changes.d"
-    out_md = tmp_path / "view.md"
-    out_md.write_text(glcv.render(ledger_path))
+    before = glcv.render(ledger_path)
     _add_fragment_commit(repo, changes_dir, 100, "first", 900, "n", ["A"])
-    # out_md is now stale relative to a fresh render (a new fragment merged)
-    assert out_md.read_text() != glcv.render(ledger_path)
+    assert glcv.render(ledger_path) != before
+
+
+def test_step_summary_appends_to_the_env_var_path(tmp_path, monkeypatch):
+    _repo, ledger_path = _init_repo(tmp_path)
+    summary = tmp_path / "summary.md"
+    summary.write_text("PRE-EXISTING CONTENT\n")
+    monkeypatch.setattr(glcv, "LEDGER", ledger_path)
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    monkeypatch.setattr(
+        sys, "argv", ["generate_ledger_changelog_view.py", "--step-summary"]
+    )
+    glcv.main()
+    out = summary.read_text()
+    assert out.startswith("PRE-EXISTING CONTENT\n")  # appended, not overwritten
+    assert "no merged fragments yet" in out
+
+
+def test_step_summary_without_env_var_refuses(tmp_path, monkeypatch):
+    _repo, ledger_path = _init_repo(tmp_path)
+    monkeypatch.setattr(glcv, "LEDGER", ledger_path)
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+    monkeypatch.setattr(
+        sys, "argv", ["generate_ledger_changelog_view.py", "--step-summary"]
+    )
+    with pytest.raises(SystemExit, match="GITHUB_STEP_SUMMARY"):
+        glcv.main()

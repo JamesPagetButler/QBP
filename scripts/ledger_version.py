@@ -9,10 +9,23 @@ scripts/generate_ledger_changelog_view.py's acceptance check reads directly
 (two merges -> 6.25.0, 6.26.0, in merge order, per the beekeeper's ruling).
 
 Merge order comes from git history, not from any field inside a fragment: each
-fragment's "position" is the position of the commit that first added it, walked
-in `git log --reverse` order over the fragments directory. A fragment never
-claims its own ordinal — that would just reintroduce the collision this design
-removes (two fragments both claiming "I am 6.25.0").
+fragment's "position" is the position of the commit that first added it, on
+**master's first-parent chain** (qbp-oppenheimer, D2, QBP#817 PR-1 review,
+2026-11-17, reproduced in a throwaway repo): a plain `git log --reverse`
+walk orders by each fragment-adding commit's own date, which for a true merge
+commit is NOT the order the fragments actually landed on master — a branch
+merged first can still show a later-dated commit than a branch merged second,
+if the second branch's commits were authored earlier and sat unmerged longer.
+That would renumber a version already issued the moment a second, earlier-
+dated branch merges, which breaks "a derived version never moves" the same
+way the original bookkeeping collision did. `git log --first-parent -m`
+instead walks the sequence of commits actually reachable by always following
+a merge's first parent — i.e., the order things actually appeared on master,
+attributing a merge's own introduced files to the merge commit itself, not to
+whichever original commit on the merged-in branch first wrote them. A
+fragment never claims its own ordinal either way — that would just
+reintroduce the collision this design removes (two fragments both claiming
+"I am 6.25.0").
 
 Usage:
     python3 scripts/ledger_version.py                      # current version
@@ -47,11 +60,16 @@ def bump_minor(version: str, n: int) -> str:
 
 
 def _fragment_merge_order(changes_dir: Path, repo_root: Path) -> dict:
-    """{relative posix path: (commit sha, commit ISO time)} for every fragment
-    ever ADDED to the repo, in the commit order git log replays them — oldest
-    first. A rebase that replays a fragment-adding commit keeps that commit's
-    own authored/committed time, which is what we want here: the time the
-    content was actually written, not when some later rebase touched it."""
+    """{relative posix path: (commit sha, commit ISO time, position)} for every
+    fragment ever ADDED to **master's first-parent history**, in true merge
+    order (D2, QBP#817 PR-1 review) — oldest first. `--first-parent -m` walks
+    only the commits actually reachable by always following a merge's first
+    parent (the sequence things actually appeared on master), and `-m` makes a
+    merge commit show the files it introduced relative to that first parent —
+    so a fragment is attributed to the merge commit that brought it onto
+    master, never to whichever original commit on the merged-in branch first
+    wrote it. `position` is this function's own encounter order, which IS
+    final merge order — callers must not re-derive order from timestamps."""
     try:
         rel = changes_dir.relative_to(repo_root).as_posix()
     except ValueError:
@@ -60,6 +78,8 @@ def _fragment_merge_order(changes_dir: Path, repo_root: Path) -> dict:
         [
             "git",
             "log",
+            "--first-parent",
+            "-m",
             "--reverse",
             "--diff-filter=A",
             "--name-status",
@@ -74,6 +94,7 @@ def _fragment_merge_order(changes_dir: Path, repo_root: Path) -> dict:
     ).stdout
     order = {}
     commit_sha = commit_time = None
+    position = 0
     for line in out.splitlines():
         if line.startswith("COMMIT:"):
             _, commit_sha, commit_time = line.split(":", 2)
@@ -81,7 +102,8 @@ def _fragment_merge_order(changes_dir: Path, repo_root: Path) -> dict:
         if line.startswith("A\t"):
             path = line[2:]
             if path not in order:  # first-added commit wins (should be the only one)
-                order[path] = (commit_sha, commit_time)
+                order[path] = (commit_sha, commit_time, position)
+                position += 1
     return order
 
 
@@ -90,9 +112,9 @@ def fragment_versions(
     changes_dir: Path = CHANGES_DIR,
     repo_root: Path = REPO_ROOT,
 ) -> list:
-    """[{path, data, derived_version, merge_commit, merge_time}, ...] in merge
-    order — oldest fragment first, so the list's last entry is the current
-    state."""
+    """[{path, data, derived_version, merge_commit, merge_time}, ...] in true
+    first-parent merge order (D2) — oldest fragment first, so the list's last
+    entry is the current state."""
     base = frozen_base_version(ledger_path)
     fragments = read_fragments(changes_dir)
     merge_order = _fragment_merge_order(changes_dir, repo_root)
@@ -104,29 +126,26 @@ def fragment_versions(
             rel = str(path)
         if rel not in merge_order:
             raise LedgerVersionError(
-                f"{path} has no 'git log --diff-filter=A' commit on this branch's "
-                f"history — run from a checkout with full history, not a shallow clone"
+                f"{path} has no 'git log --first-parent -m --diff-filter=A' commit "
+                f"on this branch's history — run from a checkout with full history, "
+                f"not a shallow clone"
             )
+        commit_sha, commit_time, position = merge_order[rel]
         rows.append(
             {
                 "path": path,
                 "data": data,
-                "merge_commit": merge_order[rel][0],
-                "merge_time": merge_order[rel][1],
+                "merge_commit": commit_sha,
+                "merge_time": commit_time,
+                "_position": position,
             }
         )
-    # order by the commit's position in overall history, not by filename
-    commit_order = subprocess.run(
-        ["git", "log", "--reverse", "--format=%H"],
-        cwd=repo_root,
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.splitlines()
-    position = {sha: i for i, sha in enumerate(commit_order)}
-    rows.sort(key=lambda r: position.get(r["merge_commit"], len(commit_order)))
+    # _fragment_merge_order's own encounter order IS correct first-parent merge
+    # order (D2) — no second, separately-ordered git log call needed.
+    rows.sort(key=lambda r: r["_position"])
     for i, row in enumerate(rows, start=1):
         row["derived_version"] = bump_minor(base, i)
+        del row["_position"]
     return rows
 
 
