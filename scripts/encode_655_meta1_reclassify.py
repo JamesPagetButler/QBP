@@ -75,9 +75,12 @@ Fix round 2 (qbp-architecture Red Team, issuecomment on #812, 2026-11-17,
 previous fix round patched last_updated/the changelog date directly on the
 ledger via a one-off script WITHOUT updating this constant, so this script
 and the ledger it's supposed to reproduce drifted apart. Fixed by setting
-DATE here to the real value (2026-11-16T16:45:00Z) and re-running fresh
-from master, rather than patching the ledger again out of band — the
-committed encoder and the committed ledger are back in lockstep.
+DATE here to a nominal, minute-rounded stand-in (2026-11-16T16:45:00Z —
+qbp-architecture, issuecomment on #812, 2026-11-17, C1: the commit that
+first wrote this value, f640663, landed at 16:44:16Z, not 16:45:00Z exactly)
+and re-running fresh from master, rather than patching the ledger again out
+of band — the committed encoder and the committed ledger are back in
+lockstep.
 
 Usage: python3 scripts/encode_655_meta1_reclassify.py [--dry-run]
 """
