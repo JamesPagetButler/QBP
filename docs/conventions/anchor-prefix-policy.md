@@ -58,7 +58,7 @@ Root records are the ledger's Layer-0 objects. Their prefixes are fixed by the l
 
 | Prefix | List | Meaning | Count | Examples |
 |---|---|---|---|---|
-| `META-n` | `meta_axiom` (singular), `meta_principles[]` | The meta-axiom and meta-principles the axioms sit under | 1 + 1 | `META-1` (meta_axiom), `META-2` "Level saturation" |
+| `META-n` | `meta_axiom` (singular, removed (#655)), `meta_principles[]` | The meta-axiom and meta-principles the axioms sit under. `meta_axiom` held `META-1` until #655 reclassified it to `WISDOM-change-is-constant` in `anchors[]` (an epistemic meta-principle about the ledger, not a physical root; the key is removed, not nulled, since it isn't schema-required) | 0 + 1 | `META-2` "Level saturation" (`meta_principles`); `META-1` continues as `WISDOM-change-is-constant`, #655 |
 | `AXIOM-n` | `axioms[]`, `retired_axioms[]` | A foundational axiom (`derivable: false`), numbered. Carries `decision_state` + `kill_condition` when open. Formal documentation of the prefix: §4 | 1 + 1 retired | `AXIOM-1` "Information is preserved"; `AXIOM-2` (retired 2026-09-09, demotion record in `docs/foundations/axiom2-demotion-*.md`) |
 | `POST-` | `axioms[]` | A postulate: an axiom-list record that is a hosting/existence posit rather than a numbered axiom (introduced on the AXIOM-2 demotion) | 4 | `POST-boundary-encoding`, `POST-hosting`, `POST-observer-associativity`, `POST-observation` |
 | `DERIV-` | `derived_principles[]`, `retired_principles[]` | Derived principle (schema-enforced `^DERIV-`) | 12 + 1 | `DERIV-observation`, `DERIV-arrow` |
