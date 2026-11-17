@@ -54,6 +54,7 @@
     "proofs/QBP/Optics/Fraunhofer.lean": 10,
     "proofs/QBP/SpectralAction/ProfileFit.lean": 4,
     "proofs/QBP/Substrate/Hosting.lean": 71,
+    "proofs/QBP/Substrate/HostingSeamBridge.lean": 2,
     "proofs/QBP/Substrate/RuleFlow.lean": 168,
     "proofs/QBP/Substrate/RuleFlowBridge.lean": 5,
     "proofs/QBP/Substrate/RuleFlowInvariants.lean": 82,
