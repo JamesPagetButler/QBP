@@ -295,6 +295,49 @@ def test_changelog_view_absent_on_both_refs_passes(tmp_path, monkeypatch):
     assert lbl.check_changelog_view_not_committed("master", "feature") == []
 
 
+def test_base_ahead_of_merge_base_does_not_falsely_fail_append_only(
+    tmp_path, monkeypatch
+):
+    """qbp-oppenheimer, QBP#817 PR-1 re-confirm nit, 2026-11-17: a two-dot
+    `base..head` diff compares literal trees, so if `--base` (e.g.
+    origin/master) has moved further ahead than this branch's own merge-base
+    -- gaining its OWN fragments in the meantime -- those fragments look like
+    they were "modified or removed" relative to head's tree, even though this
+    branch never touched them. Three-dot (merge-base) diff must not."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    changes_dir = repo / CHANGES_DIR_REL
+
+    _checkout_branch(repo, "feature")
+    lf.write_fragment(
+        issue=1,
+        slug="mine",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["X"],
+        changes_dir=changes_dir,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature fragment")
+
+    # master gains its OWN later fragment that `feature` never saw.
+    _git(repo, "checkout", "-q", "master")
+    lf.write_fragment(
+        issue=2,
+        slug="masters-own",
+        pr=2,
+        encoder="e",
+        note="n",
+        touched_ids=["Y"],
+        changes_dir=changes_dir,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "unrelated master fragment")
+
+    errors = lbl.check_fragment_count("master", "feature")
+    assert errors == []
+
+
 def test_main_exits_nonzero_on_any_failure(tmp_path, monkeypatch, capsys):
     repo = _init_repo(tmp_path, monkeypatch)
     _checkout_branch(repo, "feature")

@@ -69,9 +69,17 @@ def _show(ref: str, rel_path: str) -> str | None:
 
 
 def _diff_status(base: str, head: str, rel_path: str) -> list:
-    """[(status, path), ...] for rel_path (a file or a directory) between base and head."""
+    """[(status, path), ...] for rel_path (a file or a directory) between base and
+    head. Three-dot (merge-base) diff, not two-dot (qbp-oppenheimer, QBP#817 PR-1
+    re-confirm, 2026-11-17, nit): two-dot diffs base's literal tree against head's,
+    so a local checkout whose `base` ref (e.g. `origin/master`) has moved further
+    ahead than this branch's own merge-base would falsely report every fragment
+    master gained in between as "modified" on this branch — the append-only check
+    would then fail for a reason that isn't this branch's own change. Three-dot
+    diffs against the merge-base instead, so only what THIS branch actually did
+    since it diverged ever shows up, regardless of how far base has moved since."""
     out = subprocess.run(
-        ["git", "diff", "--name-status", f"{base}..{head}", "--", rel_path],
+        ["git", "diff", "--name-status", f"{base}...{head}", "--", rel_path],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
