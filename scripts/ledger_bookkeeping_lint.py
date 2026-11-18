@@ -241,9 +241,16 @@ def _materialize_changes_dir(ref: str) -> Path:
     """Writes CHANGES_DIR_REL's content AT `ref` (not whatever happens to be
     checked out locally) into a fresh throwaway directory, preserving each
     entry's real git mode — a symlink blob becomes a real (possibly
-    dangling) symlink, not a text file — and returns the path to the
-    materialized changes.d/ itself. Caller must `shutil.rmtree` the
-    returned path's parent when done. Used only by
+    dangling) symlink, not a text file — and returns the throwaway ROOT
+    directory (never `root / CHANGES_DIR_REL` itself): CHANGES_DIR_REL is
+    several directories deep, so a caller that `shutil.rmtree`s the
+    returned path's `.parent` instead of this root leaks every directory
+    above CHANGES_DIR_REL's own immediate parent (caught as a leaked
+    `/tmp/ledger-lint-*/archive/` on every single run — qbp-architecture,
+    QBP#817 PR-1 re-confirm, 2026-11-17, nit). Caller passes
+    `root / CHANGES_DIR_REL` to `read_fragments` and `shutil.rmtree(root)`
+    when done — that one call always removes everything this function
+    wrote, regardless of how deep CHANGES_DIR_REL is. Used only by
     `check_accepted_matches_real_reader` (requirement 3 of the N1/N2
     structural fix) to run the REAL `ledger_fragment.read_fragments()`
     against `head`'s actual tree, not a re-implementation of its logic."""
@@ -272,7 +279,7 @@ def _materialize_changes_dir(ref: str) -> Path:
                 target.write_bytes(content)
                 if mode == "100755":
                     target.chmod(target.stat().st_mode | 0o111)
-    return tmp / CHANGES_DIR_REL
+    return tmp
 
 
 def check_frozen_fields(base: str, head: str) -> list:
@@ -411,31 +418,46 @@ def check_accepted_matches_real_reader(base: str, head: str) -> list:
     (never from whatever happens to be checked out locally — the test
     suite routinely calls these checks while sitting on a different branch
     than either `base` or `head`), runs the actual `read_fragments()`
-    against each, and requires the set of fragments new at `head` (by
-    filename) to equal exactly what this lint's own classification
-    accepted. This is the backstop for the failure mode E1/E3 actually
-    were: two independently-maintained notions of "fragment" drifting
-    apart — not a replacement for `check_fragment_count`'s own per-row
-    rejection above, which is what actually blocks a specific bad PR."""
+    against each, and requires head's real fragment set to equal EXACTLY
+    base's real fragment set plus what this lint's own classification
+    accepted as new — not merely that the two SETS' difference matches
+    `added` (C1, qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17: that
+    weaker comparison is blind to an EXISTING fragment disappearing from
+    the reader's view at head — e.g. renamed into something read_fragments
+    no longer recognizes, such as `changes.d/README.md` — since set
+    subtraction can't see a removal that isn't also masked by an addition).
+    This is the backstop for the failure mode E1/E3 actually were: two
+    independently-maintained notions of "fragment" drifting apart — not a
+    replacement for `check_fragment_count`'s own per-row rejection above,
+    which is what actually blocks a specific bad PR."""
     errors: list = []
     added, _touched, _invalid = _classify_fragment_rows(base, head)
     added_names = {Path(p).name for p in added}
 
-    base_dir = _materialize_changes_dir(base)
-    head_dir = _materialize_changes_dir(head)
+    base_root = _materialize_changes_dir(base)
+    head_root = _materialize_changes_dir(head)
     try:
-        base_names = {p.name for p, _ in lf.read_fragments(changes_dir=base_dir)}
-        head_names = {p.name for p, _ in lf.read_fragments(changes_dir=head_dir)}
+        base_names = {
+            p.name
+            for p, _ in lf.read_fragments(changes_dir=base_root / CHANGES_DIR_REL)
+        }
+        head_names = {
+            p.name
+            for p, _ in lf.read_fragments(changes_dir=head_root / CHANGES_DIR_REL)
+        }
     finally:
-        shutil.rmtree(base_dir.parent, ignore_errors=True)
-        shutil.rmtree(head_dir.parent, ignore_errors=True)
+        shutil.rmtree(base_root, ignore_errors=True)
+        shutil.rmtree(head_root, ignore_errors=True)
 
-    new_per_reader = head_names - base_names
-    if new_per_reader != added_names:
+    expected_head_names = base_names | added_names
+    if head_names != expected_head_names:
         errors.append(
-            f"the lint accepted {sorted(added_names)} as new fragment(s), but "
             f"ledger_fragment.read_fragments() against the real {head} tree "
-            f"sees {sorted(new_per_reader)} as new — these must match exactly"
+            f"sees {sorted(head_names)}, but base's real fragments "
+            f"{sorted(base_names)} plus the lint's accepted new fragment(s) "
+            f"{sorted(added_names)} give {sorted(expected_head_names)} — these "
+            f"must match exactly (something besides a clean, newly-accepted "
+            f"fragment changed what the real reader would return)"
         )
     return errors
 

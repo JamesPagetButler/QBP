@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -655,6 +656,61 @@ def test_accepted_matches_real_reader_catches_a_classification_regression(
     assert any("must match exactly" in e for e in errors)
 
 
+def test_accepted_matches_real_reader_catches_a_fragment_renamed_into_readme(
+    tmp_path, monkeypatch
+):
+    """C1 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): the
+    weaker "new_per_reader == added_names" comparison is blind to an
+    EXISTING fragment disappearing from the reader's view at head -- e.g.
+    renamed into something read_fragments no longer recognizes (here,
+    1-a.json -> README.md: base has one real fragment, head has none, and
+    no fragment was newly added either, so a difference-only comparison
+    sees "nothing new" and passes). The stronger "head == base | added"
+    assertion must still catch it, independent of check_fragment_count's
+    own append-only rejection of the same row."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    changes_dir = repo / CHANGES_DIR_REL
+    lf.write_fragment(
+        issue=1,
+        slug="a",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["X"],
+        changes_dir=changes_dir,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "fragment on master")
+
+    _checkout_branch(repo, "feature")
+    (changes_dir / "1-a.json").rename(changes_dir / "README.md")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature renames the fragment into README.md")
+
+    errors = lbl.check_accepted_matches_real_reader("master", "feature")
+    assert any("must match exactly" in e for e in errors)
+
+
+def test_materialize_changes_dir_returns_the_removable_root_not_a_subdirectory(
+    tmp_path, monkeypatch
+):
+    """Nit (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): the
+    return value must itself be the whole throwaway tree (the
+    `tempfile.mkdtemp` root), never `root / CHANGES_DIR_REL` -- the old
+    version returned that several-levels-deep subdirectory instead, so a
+    caller doing `shutil.rmtree(returned.parent)` only removed
+    CHANGES_DIR_REL's own immediate parent, leaking every directory above
+    it (e.g. a bare `archive/`) under `/tmp` on every single run. Asserting
+    the returned path's OWN name carries the `ledger-lint-` prefix --
+    rather than, say, `changes.d` -- is what actually distinguishes the
+    fixed shape from the leaky one."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    root = lbl._materialize_changes_dir("master")
+    assert root.name.startswith("ledger-lint-")
+    shutil.rmtree(root)
+    assert not root.exists()
+
+
 def test_main_exits_nonzero_on_any_failure(tmp_path, monkeypatch, capsys):
     repo = _init_repo(tmp_path, monkeypatch)
     _checkout_branch(repo, "feature")
@@ -668,3 +724,42 @@ def test_main_exits_nonzero_on_any_failure(tmp_path, monkeypatch, capsys):
     with pytest.raises(SystemExit) as exc:
         lbl.main()
     assert exc.value.code == 1
+
+
+def test_main_fails_on_a_cross_check_mismatch_alone(tmp_path, monkeypatch, capsys):
+    """C2 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): a test
+    that fails ONLY if `check_accepted_matches_real_reader` is actually
+    wired into `main()`'s own error aggregation, not merely correct when
+    called directly (the `CXmain` mutant -- dropping it from `main()`'s sum
+    of checks -- survived every other test, since none of them call
+    `main()` on a scenario where every OTHER check passes but this one
+    alone would fail). Everything else about this branch is a clean,
+    valid single-fragment add; only the forced cross-check error should
+    make `main()` exit nonzero."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    L = json.loads(_ledger_path(repo).read_text())
+    L["anchors"][0]["status"] = "coherent"
+    _ledger_path(repo).write_text(json.dumps(L, indent=2) + "\n")
+    lf.write_fragment(
+        issue=1,
+        slug="a",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["PRED-a"],
+        changes_dir=repo / CHANGES_DIR_REL,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature")
+
+    monkeypatch.setattr(
+        lbl,
+        "check_accepted_matches_real_reader",
+        lambda base, head: ["forced cross-check mismatch"],
+    )
+    monkeypatch.setattr(sys, "argv", ["lint", "--base", "master", "--head", "feature"])
+    with pytest.raises(SystemExit) as exc:
+        lbl.main()
+    assert exc.value.code == 1
+    assert "forced cross-check mismatch" in capsys.readouterr().out
