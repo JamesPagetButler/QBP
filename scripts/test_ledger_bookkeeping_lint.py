@@ -691,6 +691,41 @@ def test_accepted_matches_real_reader_catches_a_fragment_renamed_into_readme(
     assert any("must match exactly" in e for e in errors)
 
 
+def test_fragment_renamed_into_readme_is_rejected_by_fragment_count_too(
+    tmp_path, monkeypatch
+):
+    """qbp-architecture, QBP#819 Red Team re-confirm, 2026-11-17: the C1
+    rename test above only exercised check_accepted_matches_real_reader,
+    leaving the E1o/E1q mutants (around the README exemption's exact-match
+    condition in _fragment_rows / _classify_fragment_rows) SURVIVING,
+    since nothing ran the same `1-a.json -> README.md` scenario through
+    check_fragment_count itself. The row's old path isn't README.md (only
+    its NEW path is), so _fragment_rows' "both ends must equal README.md"
+    exemption must not treat it as exempt -- this must still fail as an
+    append-only violation here too."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    changes_dir = repo / CHANGES_DIR_REL
+    lf.write_fragment(
+        issue=1,
+        slug="a",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["X"],
+        changes_dir=changes_dir,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "fragment on master")
+
+    _checkout_branch(repo, "feature")
+    (changes_dir / "1-a.json").rename(changes_dir / "README.md")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature renames the fragment into README.md")
+
+    errors = lbl.check_fragment_count("master", "feature")
+    assert any("append-only" in e for e in errors)
+
+
 def test_materialize_changes_dir_returns_the_removable_root_not_a_subdirectory(
     tmp_path, monkeypatch
 ):
