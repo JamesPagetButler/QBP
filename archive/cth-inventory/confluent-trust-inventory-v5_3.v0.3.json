@@ -1,13 +1,8 @@
 {
   "programme": "QBP",
-  "version": "6.24.0",
+  "version": "6.25.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
-  "meta_axiom": {
-    "id": "META-1",
-    "name": "Change is constant",
-    "statement": "No framework is guaranteed complete. All knowledge is provisional within its axiomatic system."
-  },
   "axioms": [
     {
       "id": "AXIOM-1",
@@ -13334,6 +13329,22 @@
       "id_history": [
         "META-regime-of-validity-field"
       ]
+    },
+    {
+      "id": "WISDOM-change-is-constant",
+      "name": "Change is constant",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "description": "No framework is guaranteed complete. All knowledge is provisional within its axiomatic system.",
+      "prediction_chain": [],
+      "statement": "No framework is guaranteed complete. All knowledge is provisional within its axiomatic system.",
+      "id_history": [
+        "META-1"
+      ],
+      "last_tested_at": "2026-11-16T16:45:00Z",
+      "notes": "QBP#655 (#654 D6): reclassified out of the root population per qbp-oppenheimer's theory ruling — META-1 is an epistemic meta-principle about the ledger itself, not a physical root; grepping the ledger confirms no record cites META-1 via derived_from/prediction_chain/forced_by. Moved from the single-object `meta_axiom` top-level key (now removed entirely — not in inventory.schema.v0.3.json's top-level `required` list) into `anchors[]` under a WISDOM- id: `anchors[]` is not one of root_audit.py's ROOT_LISTS, so this removes META-1 from the D1 root gate structurally. `name`/`statement` text unchanged from META-1 (also carried as `description` to satisfy the Anchor schema's required field). `id_history: [\"META-1\"]` preserves the prior id. Register: docs/cth/root-audit-register.json's open_roots META-1 entry removed in the same PR (shrink-only)."
     }
   ],
   "inputs": [
@@ -14005,9 +14016,14 @@
       "version": "6.24.0",
       "date": "2026-11-15T17:59:52Z",
       "note": "QBP#809 phase 1 (AC4): scripts/compute_fit_sigma.py evaluated all 64 anchors with both a numeric predicted_value and measured_value — 54 got a real fit_sigma, 10 got fit_sigma:null + fit_sigma_reason (no usable 1σ error yet, pending AC2/AC3 phase-2 backfill). REPORT MODE (T1, qbp-oppenheimer issuecomment-6886846959): status is NOT written here — 7 anchor(s) would be capped once AC2 pins a real source (listed in the PR/run output), by the fed-sigma-v1 thresholds (fit_sigma > 5.0 -> incoherent-or-worse; > 2.0 -> marginal-or-worse; inter#238 D3). fit_history[] appended on every evaluated anchor. AC1 schema fields (measured_error 1σ convention, measured_error_plus/minus, measured_source minLength, fit_sigma/fit_sigma_reason/fit_history) in docs/cth/inventory.schema.v0.3.json 0.3.6. AC2/AC3/AC5/AC6 remain phase 2."
+    },
+    {
+      "version": "6.25.0",
+      "date": "2026-11-16T16:45:00Z",
+      "note": "QBP#655 (#654 D6): reclassified META-1 out of the root population — removed the single-object `meta_axiom` top-level key (not schema-required) and minted WISDOM-change-is-constant in `anchors[]` (not a ROOT_LISTS key) carrying the same name/statement text + id_history:['META-1']. Theory ruling: qbp-oppenheimer (META-1 is an epistemic meta-principle about the ledger, cited by nothing via derived_from/prediction_chain/forced_by). Encoding: qbp-implementor writer lane. docs/cth/root-audit-register.json's open_roots META-1 entry removed in the same PR (shrink-only)."
     }
   ],
-  "last_updated": "2026-11-15T17:59:52Z",
+  "last_updated": "2026-11-16T16:45:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {
