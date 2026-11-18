@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -52,6 +53,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 LEDGER_REL = "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
 CHANGES_DIR_REL = "archive/cth-inventory/changes.d"
 CHANGELOG_VIEW_REL = "analysis/cth-ledger-changelog.md"
+
+# A fragment's real naming convention (ledger_fragment.fragment_path /
+# _SLUG_RE): "<issue>-<slug>.json", lowercase-ascii-and-digits only, directly
+# under CHANGES_DIR_REL — never a subdirectory. E3 (qbp-architecture, QBP#817
+# PR-1 re-confirm, 2026-11-17) requires every added path to match this
+# exactly, not merely end in ".json".
+_FRAGMENT_FILENAME_RE = re.compile(r"^[0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*\.json$")
 
 
 class LintFailure(RuntimeError):
@@ -98,51 +106,73 @@ def _diff_status(base: str, head: str, rel_path: str) -> list:
     merge-base instead, so only what THIS branch actually did since it
     diverged ever shows up, regardless of how far base has moved since.
 
-    For a rename/copy row, `git diff --name-status` prints three tab-separated
-    fields (status, old path, new path); every other status prints two. E1
-    (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): the previous
-    version did `line.split("\\t", 1)`, which for a rename row left `path` as
-    the literal string `"<old>\\t<new>"` — callers then checked only whether
-    that combined string's SUFFIX ended in ".json", i.e. only the new path's
-    extension. Renaming an issued fragment to `.json.bak` or `.md` therefore
-    read as "not a fragment" and silently dropped out of the append-only and
-    touched_ids checks. Both paths are now returned explicitly so a caller can
-    look at either end of a rename."""
+    For a rename/copy row, `git diff --name-status` prints three fields
+    (status, old path, new path); every other status prints two. Run with
+    `-z` (NUL-delimited, no C-style quoting) rather than the default
+    newline/tab-delimited form — E3 (qbp-architecture, QBP#817 PR-1
+    re-confirm, 2026-11-17): git quotes-and-octal-escapes a non-ASCII path by
+    default (wrapping it in literal double quotes), so a caller checking a
+    plain `.endswith(".json")` suffix on the returned string silently missed
+    a real `changes.d/2-é.json` row — invisible to every check in this file
+    while still fully visible to `ledger_fragment.read_fragments()`'s real
+    filesystem glob, which doesn't go through git at all. `-z` sidesteps the
+    quoting entirely rather than trying to un-quote it. (E1, same file, same
+    review round: a rename row's old/new paths are both returned explicitly
+    too, so a rename away from the fragment naming convention is still
+    caught, not just a rename into it.)"""
     out = subprocess.run(
-        ["git", "diff", "--name-status", f"{base}...{head}", "--", rel_path],
+        ["git", "diff", "--name-status", "-z", f"{base}...{head}", "--", rel_path],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
         check=True,
     ).stdout
+    tokens = out.split("\0")
+    if tokens and tokens[-1] == "":
+        tokens.pop()
     rows = []
-    for line in out.splitlines():
-        parts = line.split("\t")
-        status = parts[0]
-        if len(parts) == 3:
-            rows.append((status, parts[1], parts[2]))
+    i = 0
+    while i < len(tokens):
+        status = tokens[i]
+        i += 1
+        if status[:1] in ("R", "C"):
+            old_path, new_path = tokens[i], tokens[i + 1]
+            i += 2
         else:
-            rows.append((status, parts[1], parts[1]))
+            old_path = new_path = tokens[i]
+            i += 1
+        rows.append((status, old_path, new_path))
     return rows
 
 
+def _is_fragment_path(path: str) -> bool:
+    """True iff `path` is exactly `<issue>-<slug>.json` directly under
+    CHANGES_DIR_REL — never a subdirectory (E2) and never anything a mere
+    `.endswith(".json")` would have let through (E3)."""
+    prefix = CHANGES_DIR_REL + "/"
+    if not path.startswith(prefix):
+        return False
+    return bool(_FRAGMENT_FILENAME_RE.match(path[len(prefix) :]))
+
+
 def _fragment_rows(base: str, head: str) -> list:
-    """[(status, old_path, new_path), ...] under CHANGES_DIR_REL that are
-    actually fragments — shared by every fragment-counting/claims check so
-    the filter can't drift between them (E1). A row counts as a fragment if
-    EITHER end of it is a `.json` path (so a rename away from `.json` is
-    still caught, not just a rename into it); the one exemption is
-    changes.d/README.md itself, by exact path on both ends, since it is
-    never a fragment and freely editable (E1 also folds in the earlier
-    README.md-not-a-fragment fix, which previously lived as a bare
-    `.endswith(".json")` filter on the old 2-tuple rows)."""
+    """[(status, old_path, new_path), ...] under CHANGES_DIR_REL, minus
+    changes.d/README.md itself (by exact path on both ends — it documents
+    the convention and is never a fragment) — shared by every
+    fragment-counting/claims check so the filter can't drift between them
+    (E1). E3 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): this no
+    longer filters by `.endswith(".json")` at all — every surviving row is
+    "fragment-relevant" for append-only purposes, and `check_fragment_count`
+    separately validates any ADDED row's path against `_is_fragment_path`,
+    so a badly-named addition (wrong extension, wrong directory, non-ASCII)
+    is rejected outright instead of silently excluded from `added` and never
+    checked at all."""
     readme = f"{CHANGES_DIR_REL}/README.md"
     rows = []
     for status, old_path, new_path in _diff_status(base, head, CHANGES_DIR_REL):
         if old_path == readme and new_path == readme:
             continue
-        if old_path.endswith(".json") or new_path.endswith(".json"):
-            rows.append((status, old_path, new_path))
+        rows.append((status, old_path, new_path))
     return rows
 
 
@@ -173,15 +203,12 @@ def check_fragment_count(base: str, head: str) -> list:
         base_raw is not None and head_raw is not None and base_raw != head_raw
     )
 
-    # Only *.json paths are fragments — changes.d/README.md documents the
-    # convention and is not one (found while verifying this PR's own diff
-    # against master: this PR's own one-time README.md addition showed up as
-    # "A" here and crashed check_fragment_claims_diff trying to json.loads()
-    # a markdown file). README.md stays freely editable (a typo fix is not an
-    # append-only violation); it is simply outside the fragment-counting and
-    # touched_ids-claim rules entirely. E1: the filter is now `_fragment_rows`,
-    # a shared helper that looks at both ends of a rename row, not just a
-    # suffix check on whichever string `_diff_status` happened to return.
+    # changes.d/README.md documents the convention and is not a fragment
+    # (found while verifying this PR's own diff against master: this PR's
+    # own one-time README.md addition showed up as "A" here and crashed
+    # check_fragment_claims_diff trying to json.loads() a markdown file).
+    # README.md stays freely editable; `_fragment_rows` already exempts it
+    # by exact path. Every other row under changes.d/ is fragment-relevant.
     rows = _fragment_rows(base, head)
     added = [new for s, old, new in rows if s == "A"]
     # D4: anything other than a clean "A" is a touch of an existing fragment —
@@ -205,18 +232,21 @@ def check_fragment_count(base: str, head: str) -> list:
             f"the ledger changed but {len(added)} fragment(s) were added under "
             f"{CHANGES_DIR_REL}/ — exactly one is required"
         )
-    # E2 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): a fragment
-    # added in a subdirectory (e.g. changes.d/sub/x.json) passes every check
-    # above — the diff pathspec is recursive — but
+    # E2/E3 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): every
+    # added path must be exactly "<issue>-<slug>.json" directly under
+    # CHANGES_DIR_REL. E2: a subdirectory path (changes.d/sub/x.json) passes
+    # every check above — the diff pathspec is recursive — but
     # ledger_fragment.read_fragments() only globs changes.d/*.json directly,
-    # so it never sees it: the fragment is invisible to version derivation
-    # and the changelog view even though CI said the PR was clean.
-    misplaced = [p for p in added if Path(p).parent != Path(CHANGES_DIR_REL)]
-    if misplaced:
+    # so it never sees it there. E3: a non-ASCII or otherwise malformed name
+    # must not be silently dropped out of `added` either (that was this
+    # check's OWN earlier mistake, before E3's fix to `_fragment_rows`) — it
+    # is rejected outright as an invalid name instead.
+    invalid = [p for p in added if not _is_fragment_path(p)]
+    if invalid:
         errors.append(
-            f"fragment(s) not directly under {CHANGES_DIR_REL}/: {misplaced} — "
-            f"read_fragments() only looks at that directory's own *.json files, "
-            f"never a subdirectory"
+            f"fragment(s) not named '<issue>-<slug>.json' directly under "
+            f"{CHANGES_DIR_REL}/: {invalid} — read_fragments() only recognizes "
+            f"that exact pattern in that exact directory"
         )
     return errors
 

@@ -52,6 +52,12 @@ on:
       - 'scripts/test_ledger_version.py'
       - 'scripts/test_generate_ledger_changelog_view.py'
       - 'scripts/test_ledger_bookkeeping_lint.py'
+      # nit (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17, same
+      # round as E3): F7 listed the two encoders themselves but missed their
+      # OWN test files, so a PR touching only test_compute_fit_sigma.py or
+      # test_pa_encoder.py still skipped this job entirely.
+      - 'scripts/test_compute_fit_sigma.py'
+      - 'scripts/test_pa_encoder.py'
       - 'tests/test_cth_ledger_edit.py'
       - '.github/workflows/ledger-bookkeeping-frozen.yml'
   push:

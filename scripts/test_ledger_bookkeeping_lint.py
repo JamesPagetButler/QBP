@@ -498,7 +498,72 @@ def test_fragment_added_in_a_subdirectory_of_changes_dir_is_rejected(
     _git(repo, "commit", "-q", "-m", "feature")
 
     errors = lbl.check_fragment_count("master", "feature")
-    assert any("not directly under" in e for e in errors)
+    assert any("not named" in e for e in errors)
+
+
+def test_non_ascii_fragment_filename_is_rejected_not_silently_invisible(
+    tmp_path, monkeypatch
+):
+    """E3 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): git's
+    default `--name-status` C-style-quotes a non-ASCII path (wrapping it in
+    literal double quotes and octal-escaping the character), so a bogus
+    `changes.d/2-é.json` -- claiming an id with the ledger UNCHANGED --
+    used to never show up as a `.json` row at all, passing the lint while
+    `ledger_fragment.read_fragments()`'s real filesystem glob still picked it
+    up and gave it a real derived version. `-z` output has no quoting, and
+    the filename must now match the real naming convention exactly, so this
+    must be rejected on both counts: an invalid name AND (since it's still
+    recognized as "added" now) an over-claim against an unchanged ledger."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    # the ledger itself is NOT touched on this branch at all
+    changes_dir = repo / CHANGES_DIR_REL
+    changes_dir.mkdir(parents=True, exist_ok=True)
+    bogus = {
+        "issue": 2,
+        "slug": "e9",
+        "pr": 2,
+        "encoder": "e",
+        "note": "n",
+        "touched_ids": ["NOT-A-REAL-ID"],
+        "version": None,
+        "date": None,
+    }
+    (changes_dir / "2-é.json").write_text(json.dumps(bogus, indent=2))
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature adds a non-ASCII-named bogus fragment")
+
+    count_errors = lbl.check_fragment_count("master", "feature")
+    assert any("not named" in e for e in count_errors)
+    claims_errors = lbl.check_fragment_claims_diff("master", "feature")
+    assert any("claims touched_ids ['NOT-A-REAL-ID']" in e for e in claims_errors)
+
+
+def test_readme_added_alone_with_no_ledger_change_passes_cleanly(tmp_path, monkeypatch):
+    """Kills the J1b mutant (qbp-architecture): deleting `_fragment_rows`'s
+    README.md exemption SURVIVED all 18 pre-E3 tests, because every existing
+    README-adjacent test also added a real fragment, which already produced
+    an error of its own (two "A" rows) independent of whether README.md was
+    exempted. Isolated here with NOTHING else changing: changes.d/README.md
+    is added on its own, with the ledger untouched and no other fragment in
+    the diff at all. Without the exemption, README.md itself would be
+    treated as an "added" row and immediately fail `_is_fragment_path`
+    (wrong name, wrong pattern) -- this must still pass cleanly."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    changes_dir = repo / CHANGES_DIR_REL
+    changes_dir.mkdir(parents=True, exist_ok=True)
+    (changes_dir / "README.md").write_text("# fragment convention\n")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature adds only the README")
+
+    errors = (
+        lbl.check_frozen_fields("master", "feature")
+        + lbl.check_fragment_count("master", "feature")
+        + lbl.check_fragment_claims_diff("master", "feature")
+        + lbl.check_changelog_view_not_committed("master", "feature")
+    )
+    assert errors == []
 
 
 def test_main_exits_nonzero_on_any_failure(tmp_path, monkeypatch, capsys):
