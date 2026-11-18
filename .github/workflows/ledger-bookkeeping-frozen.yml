@@ -1,0 +1,135 @@
+# QBP#817 variant A (beekeeper-ruled 2026-11-16): a content PR authors its anchor
+# edits plus one fragment, never the ledger's version/changelog/last_updated (those
+# are frozen by construction — scripts/cth_ledger_edit.py). Removes the collision
+# where two PRs editing completely disjoint anchors still fought over those three
+# shared fields, forcing a rebase and a full reviewer re-confirm for zero semantic
+# reason.
+#
+# Jobs:
+#   - ledger-bookkeeping-lint: scripts/ledger_bookkeeping_lint.py (frozen fields
+#     untouched, exactly one fragment when the ledger changed, changes.d/ is
+#     append-only, the fragment's touched_ids matches the actual diff, the
+#     changelog view is never committed).
+#   - ledger-unit-tests: the unit tests for all of the above.
+#   - publish-ledger-changelog-view: runs on `push` to master ONLY, not on PRs.
+#     The generated changelog view (scripts/generate_ledger_changelog_view.py)
+#     is deliberately NEVER committed (D1, qbp-oppenheimer, QBP#817 PR-1 review,
+#     2026-11-17) — a committed copy would have to be regenerated and
+#     re-committed by every later content PR just to pass a drift check,
+#     reintroducing the exact bookkeeping collision this design removes. This
+#     job instead publishes a fresh render to the push's own Actions job
+#     summary ($GITHUB_STEP_SUMMARY) — linked from the commit's check list and
+#     readable without running anything, without a new bot/writer on
+#     protected master. NOT durable (qbp-architecture, QBP#817 PR-1 review,
+#     2026-11-17): step summaries expire with the run's log retention (90
+#     days by default), so this is a zero-new-moving-parts default, not the
+#     permanent record — a genuinely durable publish target is James's call.
+#
+# Full history needed (fetch-depth: 0) — ledger_version.py derives merge order
+# from `git log --first-parent -m`, which a shallow clone can't give it.
+
+name: Ledger Bookkeeping Frozen
+
+on:
+  pull_request:
+    paths:
+      - 'archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json'
+      - 'archive/cth-inventory/changes.d/**'
+      - 'scripts/cth_ledger_edit.py'
+      - 'scripts/ledger_fragment.py'
+      - 'scripts/ledger_version.py'
+      - 'scripts/ledger_bookkeeping_lint.py'
+      - 'scripts/generate_ledger_changelog_view.py'
+      # F7 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): the two live
+      # encoders migrated off hand-written version bumps, plus the script
+      # that reports the derived version, plus every test file for all of
+      # the above — a PR editing only one of these used to skip the unit
+      # tests job entirely.
+      - 'scripts/compute_fit_sigma.py'
+      - 'scripts/encode_pa_from_evidence.py'
+      - 'scripts/list_numeric_anchors.py'
+      - 'scripts/test_ledger_fragment.py'
+      - 'scripts/test_ledger_version.py'
+      - 'scripts/test_generate_ledger_changelog_view.py'
+      - 'scripts/test_ledger_bookkeeping_lint.py'
+      # nit (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17, same
+      # round as E3): F7 listed the two encoders themselves but missed their
+      # OWN test files, so a PR touching only test_compute_fit_sigma.py or
+      # test_pa_encoder.py still skipped this job entirely.
+      - 'scripts/test_compute_fit_sigma.py'
+      - 'scripts/test_pa_encoder.py'
+      - 'tests/test_cth_ledger_edit.py'
+      - '.github/workflows/ledger-bookkeeping-frozen.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json'
+      - 'archive/cth-inventory/changes.d/**'
+
+permissions:
+  contents: read
+
+jobs:
+  ledger-bookkeeping-lint:
+    name: Ledger bookkeeping frozen (version/changelog/last_updated + fragment convention)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: scripts/ledger_bookkeeping_lint.py
+        run: |
+          # No --depth here (qbp-architecture, QBP#817 PR-1 review, 2026-11-17,
+          # F1): a depth-limited fetch can write .git/shallow even into an
+          # already-full clone, which ledger_version.py's merge-order walk now
+          # refuses outright rather than silently misordering.
+          git fetch origin ${{ github.base_ref }}
+          python3 scripts/ledger_bookkeeping_lint.py \
+            --base "origin/${{ github.base_ref }}" \
+            --head HEAD
+
+  ledger-unit-tests:
+    name: Ledger bookkeeping unit tests (fragment, version, changelog view, lint)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      # numpy: tests/conftest.py imports it at collection time for the whole
+      # session, even though the ledger-bookkeeping tests below don't use it
+      # themselves (caught when this job first ran: ModuleNotFoundError).
+      - run: pip install pytest numpy
+      - run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "ci"
+          python3 -m pytest \
+            scripts/test_ledger_fragment.py \
+            scripts/test_ledger_version.py \
+            scripts/test_generate_ledger_changelog_view.py \
+            scripts/test_ledger_bookkeeping_lint.py \
+            tests/test_cth_ledger_edit.py \
+            scripts/test_compute_fit_sigma.py \
+            scripts/test_pa_encoder.py \
+            -v
+
+  publish-ledger-changelog-view:
+    name: Publish CTH ledger changelog view (post-merge, never committed)
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: scripts/generate_ledger_changelog_view.py --step-summary
+        run: python3 scripts/generate_ledger_changelog_view.py --step-summary

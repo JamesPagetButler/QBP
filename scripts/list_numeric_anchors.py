@@ -78,13 +78,16 @@ import argparse
 import glob
 import json
 import os
+import pathlib
 import re
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)  # sibling scripts/ledger_version.py
 LEDGER_DIR = os.path.join(REPO_ROOT, "archive", "cth-inventory")
 LEDGER_GLOB = "confluent-trust-inventory-*.v0.3.json"
 
@@ -631,10 +634,34 @@ def _esc(s: Any) -> str:
     return str(s).replace("|", "\\|").replace("\n", " ")
 
 
-def render_markdown(rows: Sequence[Dict[str, Any]], ledger: Dict[str, Any]) -> str:
+def render_markdown(
+    rows: Sequence[Dict[str, Any]], ledger: Dict[str, Any], ledger_path: str = None
+) -> str:
     out: List[str] = []
+    # QBP#817 variant A: the ledger's own `version` field is frozen — report the
+    # derived current version (scripts/ledger_version.py) when the path to derive
+    # it from is known, falling back to the frozen field only when it isn't (e.g.
+    # a caller that already parsed the dict with no path on hand).
+    import ledger_version as _lv
+
+    if ledger_path is not None:
+        try:
+            # F6 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): derive
+            # changes_dir/repo_root from ledger_path itself -- calling
+            # current_version() with only the path let changes_dir/repo_root
+            # default to ledger_version.py's OWN module constants (the real
+            # repo), same bug class the generator already had to fix.
+            lp = pathlib.Path(ledger_path).resolve()
+            version = _lv.current_version(lp, lp.parent / "changes.d", lp.parents[2])
+        except (_lv.LedgerVersionError, subprocess.CalledProcessError) as exc:
+            print(
+                f"WARNING: could not derive the ledger version: {exc}", file=sys.stderr
+            )
+            version = f"{ledger.get('version')} (derivation failed)"
+    else:
+        version = ledger.get("version")
     out.append(
-        f"Ledger `{ledger.get('programme')}` version `{ledger.get('version')}` "
+        f"Ledger `{ledger.get('programme')}` version `{version}` "
         f"(schema `{ledger.get('schema_version')}`), {len(rows)} numeric anchors."
     )
     out.append("")
@@ -798,7 +825,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             )
         )
     else:
-        print(render_markdown(rows, ledger))
+        print(render_markdown(rows, ledger, ledger_path=args.ledger))
         print()
         print("```")
         print(render_summary(summary))

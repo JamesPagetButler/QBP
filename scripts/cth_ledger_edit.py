@@ -109,12 +109,33 @@ class LedgerEdit:
 
     SENTINELS = ("<record order>", "<top-level key order>")
 
+    # QBP#817 (variant A, beekeeper-ruled 2026-11-16): version/changelog/last_updated
+    # are frozen forever — no content edit ever authors them again, by construction,
+    # not by an external lint a script could forget to run. The ledger's current
+    # state going forward is master's commit sha plus the merge-ordered fragments
+    # under archive/cth-inventory/changes.d/ (scripts/ledger_version.py derives the
+    # reporting number; scripts/generate_ledger_changelog_view.py renders the human
+    # view). See docs/cth/qbp-local-extensions.md's "Frozen ledger bookkeeping" note.
+    FROZEN_KEYS = ("version", "changelog", "last_updated")
+
     def touch(self, key, rid=None):
         """Declare an edit to a non-record top-level key (changelog, last_updated, …) or,
         with rid, to a record you mutate through another reference. Order sentinels cannot
-        be declared: reordering is never a confined edit (PR #658 round-2 NF-5)."""
+        be declared: reordering is never a confined edit (PR #658 round-2 NF-5). version/
+        changelog/last_updated cannot be declared at all (QBP#817): add a fragment under
+        archive/cth-inventory/changes.d/ instead (scripts/ledger_fragment.py)."""
         if key in self.SENTINELS or rid in self.SENTINELS:
             raise ConfinementError(f"order changes cannot be declared: {(key, rid)}")
+        if key in self.FROZEN_KEYS and rid is None:
+            raise ConfinementError(
+                f"{key!r} is frozen (QBP#817, variant A, beekeeper-ruled 2026-11-16): "
+                f"no content edit authors version/changelog/last_updated any more. "
+                f"Write a fragment via scripts/ledger_fragment.write_fragment(...) "
+                f"under archive/cth-inventory/changes.d/ instead — "
+                f"scripts/ledger_version.py derives the current reporting version from "
+                f"it, and scripts/generate_ledger_changelog_view.py renders the human "
+                f"view. See docs/cth/qbp-local-extensions.md."
+            )
         self.declared.add((key, rid))
 
     # --- verification -------------------------------------------------------------
