@@ -69,7 +69,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cth_ledger_edit import ledger_edit  # noqa: E402
-from ledger_fragment import write_fragment  # noqa: E402
+from ledger_fragment import _SLUG_RE, write_fragment  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
@@ -346,6 +346,17 @@ def main():
     # (if anything changed) must share this exact same id. See evaluate()'s
     # docstring for why a fragment id, not a commit sha or the frozen base.
     slug = args.slug or datetime.now(timezone.utc).strftime("run-%Y%m%d-%H%M%S")
+    # Nit (qbp-architecture, QBP#819 Red Team re-confirm, 2026-11-18): a bad
+    # --slug used to fail only inside write_fragment()'s fragment_path() call,
+    # AFTER the `with ledger_edit(...)` block above it had already run
+    # verify()/write() for real — leaving the ledger changed with no
+    # fragment ever written, the mirror image of the orphan-fragment hole
+    # F5 fixed (an orphan LEDGER CHANGE instead of an orphan fragment).
+    # Validated here, before any write is even attempted.
+    if not _SLUG_RE.match(slug):
+        raise SystemExit(
+            f"--slug {slug!r} must be kebab-case (lowercase, digits, hyphens)"
+        )
     fragment_id = f"{FRAGMENT_ISSUE}-{slug}"
 
     n_candidates = n_computed = n_null = n_capped = n_would_cap = n_written = 0

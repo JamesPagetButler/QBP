@@ -523,6 +523,36 @@ def test_main_without_pr_refuses_on_a_real_change(tmp_path, monkeypatch):
     assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
 
 
+def test_main_refuses_a_bad_slug_before_touching_the_ledger_at_all(
+    tmp_path, monkeypatch
+):
+    """Nit (qbp-architecture, QBP#819 Red Team re-confirm, 2026-11-18): a bad
+    --slug used to fail only inside write_fragment()'s fragment_path() call,
+    AFTER the ledger_edit() block had already run verify()/write() for
+    real -- an orphan LEDGER CHANGE with no fragment ever written, the
+    mirror image of F5's orphan-fragment hole. Must now refuse before the
+    ledger is touched at all."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "compute_fit_sigma.py",
+            "--ledger",
+            str(ledger_path),
+            "--pr",
+            "900",
+            "--slug",
+            "Not_Kebab",
+        ],
+    )
+    with pytest.raises(SystemExit, match="kebab-case"):
+        cfs.main()
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
+    assert not (tmp_path / "changes.d").exists()
+
+
 def test_a_failed_ledger_verify_writes_no_orphan_fragment(tmp_path, monkeypatch):
     """F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): the fragment
     write must happen only after `ledger_edit()`'s `verify()`/`write()` have
