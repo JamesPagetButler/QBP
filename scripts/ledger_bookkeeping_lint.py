@@ -87,15 +87,27 @@ def _show(ref: str, rel_path: str) -> str | None:
 
 
 def _diff_status(base: str, head: str, rel_path: str) -> list:
-    """[(status, path), ...] for rel_path (a file or a directory) between base and
-    head. Three-dot (merge-base) diff, not two-dot (qbp-oppenheimer, QBP#817 PR-1
-    re-confirm, 2026-11-17, nit): two-dot diffs base's literal tree against head's,
-    so a local checkout whose `base` ref (e.g. `origin/master`) has moved further
-    ahead than this branch's own merge-base would falsely report every fragment
-    master gained in between as "modified" on this branch — the append-only check
-    would then fail for a reason that isn't this branch's own change. Three-dot
-    diffs against the merge-base instead, so only what THIS branch actually did
-    since it diverged ever shows up, regardless of how far base has moved since."""
+    """[(status, old_path, new_path), ...] for rel_path (a file or a directory)
+    between base and head. Three-dot (merge-base) diff, not two-dot
+    (qbp-oppenheimer, QBP#817 PR-1 re-confirm, 2026-11-17, nit): two-dot diffs
+    base's literal tree against head's, so a local checkout whose `base` ref
+    (e.g. `origin/master`) has moved further ahead than this branch's own
+    merge-base would falsely report every fragment master gained in between
+    as "modified" on this branch — the append-only check would then fail for
+    a reason that isn't this branch's own change. Three-dot diffs against the
+    merge-base instead, so only what THIS branch actually did since it
+    diverged ever shows up, regardless of how far base has moved since.
+
+    For a rename/copy row, `git diff --name-status` prints three tab-separated
+    fields (status, old path, new path); every other status prints two. E1
+    (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): the previous
+    version did `line.split("\\t", 1)`, which for a rename row left `path` as
+    the literal string `"<old>\\t<new>"` — callers then checked only whether
+    that combined string's SUFFIX ended in ".json", i.e. only the new path's
+    extension. Renaming an issued fragment to `.json.bak` or `.md` therefore
+    read as "not a fragment" and silently dropped out of the append-only and
+    touched_ids checks. Both paths are now returned explicitly so a caller can
+    look at either end of a rename."""
     out = subprocess.run(
         ["git", "diff", "--name-status", f"{base}...{head}", "--", rel_path],
         cwd=REPO_ROOT,
@@ -105,8 +117,32 @@ def _diff_status(base: str, head: str, rel_path: str) -> list:
     ).stdout
     rows = []
     for line in out.splitlines():
-        status, path = line.split("\t", 1)
-        rows.append((status, path))
+        parts = line.split("\t")
+        status = parts[0]
+        if len(parts) == 3:
+            rows.append((status, parts[1], parts[2]))
+        else:
+            rows.append((status, parts[1], parts[1]))
+    return rows
+
+
+def _fragment_rows(base: str, head: str) -> list:
+    """[(status, old_path, new_path), ...] under CHANGES_DIR_REL that are
+    actually fragments — shared by every fragment-counting/claims check so
+    the filter can't drift between them (E1). A row counts as a fragment if
+    EITHER end of it is a `.json` path (so a rename away from `.json` is
+    still caught, not just a rename into it); the one exemption is
+    changes.d/README.md itself, by exact path on both ends, since it is
+    never a fragment and freely editable (E1 also folds in the earlier
+    README.md-not-a-fragment fix, which previously lived as a bare
+    `.endswith(".json")` filter on the old 2-tuple rows)."""
+    readme = f"{CHANGES_DIR_REL}/README.md"
+    rows = []
+    for status, old_path, new_path in _diff_status(base, head, CHANGES_DIR_REL):
+        if old_path == readme and new_path == readme:
+            continue
+        if old_path.endswith(".json") or new_path.endswith(".json"):
+            rows.append((status, old_path, new_path))
     return rows
 
 
@@ -143,19 +179,17 @@ def check_fragment_count(base: str, head: str) -> list:
     # "A" here and crashed check_fragment_claims_diff trying to json.loads()
     # a markdown file). README.md stays freely editable (a typo fix is not an
     # append-only violation); it is simply outside the fragment-counting and
-    # touched_ids-claim rules entirely.
-    rows = [
-        (s, p)
-        for s, p in _diff_status(base, head, CHANGES_DIR_REL)
-        if p.endswith(".json")
-    ]
-    added = [p for s, p in rows if s == "A"]
+    # touched_ids-claim rules entirely. E1: the filter is now `_fragment_rows`,
+    # a shared helper that looks at both ends of a rename row, not just a
+    # suffix check on whichever string `_diff_status` happened to return.
+    rows = _fragment_rows(base, head)
+    added = [new for s, old, new in rows if s == "A"]
     # D4: anything other than a clean "A" is a touch of an existing fragment —
     # M(odified), D(eleted), any R(ename) regardless of similarity score
     # (git reports "R100" only for a byte-identical rename; a partial-content
     # rename like "R087" slipped past an "s == 'R100'" check), C(opy), T(ype
     # change). Append-only means append-only.
-    modified_or_removed = [p for s, p in rows if s != "A"]
+    modified_or_removed = [new for s, old, new in rows if s != "A"]
 
     if modified_or_removed:
         errors.append(
@@ -171,6 +205,19 @@ def check_fragment_count(base: str, head: str) -> list:
             f"the ledger changed but {len(added)} fragment(s) were added under "
             f"{CHANGES_DIR_REL}/ — exactly one is required"
         )
+    # E2 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): a fragment
+    # added in a subdirectory (e.g. changes.d/sub/x.json) passes every check
+    # above — the diff pathspec is recursive — but
+    # ledger_fragment.read_fragments() only globs changes.d/*.json directly,
+    # so it never sees it: the fragment is invisible to version derivation
+    # and the changelog view even though CI said the PR was clean.
+    misplaced = [p for p in added if Path(p).parent != Path(CHANGES_DIR_REL)]
+    if misplaced:
+        errors.append(
+            f"fragment(s) not directly under {CHANGES_DIR_REL}/: {misplaced} — "
+            f"read_fragments() only looks at that directory's own *.json files, "
+            f"never a subdirectory"
+        )
     return errors
 
 
@@ -184,12 +231,8 @@ def check_fragment_claims_diff(base: str, head: str) -> list:
     fragment (claiming ids, with no matching edit) through CI, and it then
     earned a real derived version bump in the published view."""
     errors: list = []
-    rows = [
-        (s, p)
-        for s, p in _diff_status(base, head, CHANGES_DIR_REL)
-        if p.endswith(".json")
-    ]
-    added = [p for s, p in rows if s == "A"]
+    rows = _fragment_rows(base, head)
+    added = [new for s, old, new in rows if s == "A"]
     if len(added) != 1:
         return errors  # already flagged by check_fragment_count
 
@@ -243,7 +286,7 @@ def check_changelog_view_not_committed(base: str, head: str) -> list:
         return [
             f"{CHANGELOG_VIEW_REL} must never be committed (D1): it is CI-published "
             f"post-merge, never a tracked file — remove it from this PR's diff "
-            f"({[s for s, _ in rows]})"
+            f"({[s for s, _, _ in rows]})"
         ]
     return []
 

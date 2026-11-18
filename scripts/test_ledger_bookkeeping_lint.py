@@ -322,7 +322,7 @@ def test_partial_rename_of_an_existing_fragment_is_rejected(tmp_path, monkeypatc
 
     rows = lbl._diff_status("master", "feature", CHANGES_DIR_REL)
     assert any(
-        s.startswith("R") and s != "R100" for s, _ in rows
+        s.startswith("R") and s != "R100" for s, _, _ in rows
     ), f"test setup didn't produce a partial-similarity rename: {rows}"
     errors = lbl.check_fragment_count("master", "feature")
     assert any("append-only" in e for e in errors)
@@ -434,6 +434,71 @@ def test_main_resolves_merge_base_so_an_unrelated_master_ledger_edit_does_not_fa
     monkeypatch.setattr(sys, "argv", ["lint", "--base", "master", "--head", "feature"])
     lbl.main()  # must not raise SystemExit
     assert "OK:" in capsys.readouterr().out
+
+
+def test_renaming_an_issued_fragment_out_of_json_is_still_an_append_only_violation(
+    tmp_path, monkeypatch
+):
+    """E1 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): renaming an
+    already-merged fragment to `.json.bak` (or `.md`) must still be caught as
+    a touch of an existing fragment. The old filter checked only whether the
+    diff row's string ended in `.json`, which for a rename row was really
+    only checking the NEW path's suffix -- so a rename OUT of `.json` read as
+    "not a fragment at all" and silently vanished from the append-only
+    check, exactly the gap that (in a throwaway repo) moved a derived
+    version backwards."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    changes_dir = repo / CHANGES_DIR_REL
+    lf.write_fragment(
+        issue=1,
+        slug="a",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["X"],
+        changes_dir=changes_dir,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "fragment on master")
+
+    _checkout_branch(repo, "feature")
+    old_path = changes_dir / "1-a.json"
+    old_path.rename(changes_dir / "1-a.json.bak")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature renames the fragment out of .json")
+
+    errors = lbl.check_fragment_count("master", "feature")
+    assert any("append-only" in e for e in errors)
+
+
+def test_fragment_added_in_a_subdirectory_of_changes_dir_is_rejected(
+    tmp_path, monkeypatch
+):
+    """E2 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): a fragment
+    added under changes.d/sub/ passes every diff-based check (the pathspec
+    is recursive) but ledger_fragment.read_fragments() only globs
+    changes.d/*.json directly, so it is invisible to version derivation and
+    the changelog view even though CI said the PR was clean."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    L = json.loads(_ledger_path(repo).read_text())
+    L["anchors"][0]["status"] = "coherent"
+    _ledger_path(repo).write_text(json.dumps(L, indent=2) + "\n")
+    sub_dir = repo / CHANGES_DIR_REL / "sub"
+    lf.write_fragment(
+        issue=1,
+        slug="a",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["PRED-a"],
+        changes_dir=sub_dir,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature")
+
+    errors = lbl.check_fragment_count("master", "feature")
+    assert any("not directly under" in e for e in errors)
 
 
 def test_main_exits_nonzero_on_any_failure(tmp_path, monkeypatch, capsys):

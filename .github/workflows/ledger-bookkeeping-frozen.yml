@@ -110,6 +110,8 @@ jobs:
             scripts/test_generate_ledger_changelog_view.py \
             scripts/test_ledger_bookkeeping_lint.py \
             tests/test_cth_ledger_edit.py \
+            scripts/test_compute_fit_sigma.py \
+            scripts/test_pa_encoder.py \
             -v
 
   publish-ledger-changelog-view:
