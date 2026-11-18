@@ -74,6 +74,10 @@ from ledger_fragment import write_fragment  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
 
+# QBP#809 — this script's own tracking issue; every fragment it writes is filed
+# under this issue number, and (F8, below) every fragment id it mints shares it.
+FRAGMENT_ISSUE = 809
+
 # fed-sigma-v1 (inter#238 D3): named constants, not inlined — a future PR reuses these.
 FIT_SIGMA_MARGINAL_CAP = 2.0
 FIT_SIGMA_INCOHERENT_CAP = 5.0
@@ -249,7 +253,22 @@ def evaluate(anchor, ledger_version, date, apply_caps):
     always real, computed data. `status` is only actually changed when apply_caps is
     True (T1: phase 1 defaults to report mode — the #809 ruling caps only where a
     PINNED 1σ error exists, and pinning is AC2/phase 2, not this PR). Returns a dict of
-    the field values to apply, plus a one-line summary string for the run report."""
+    the field values to apply, plus a one-line summary string for the run report.
+
+    `ledger_version` here is tagged by shape, not a single meaning (F8,
+    cth-implementor's schema-axis call on QBP#817 PR-1, revised 2026-11-18
+    after qbp-oppenheimer caught the squash/rebase problem with the first
+    revision, "the run's commit sha" — QBP allows squash/rebase merges,
+    which leave a PR-branch commit unreachable from master, so an
+    append-only record citing it would cite a permanently dangling commit):
+    on a pre-freeze row it's a real semver (`\\d+\\.\\d+\\.\\d+`, the ledger's
+    own `version` field at the time, back when that field still bumped); on
+    every row from here on it's this run's fragment id (`"<issue>-<slug>"`,
+    never matching the semver shape — `issue` is a bare int, `slug` is never
+    three dot-separated numbers), which survives any merge mode because it
+    names the fragment file's own identity rather than a commit, and
+    `scripts/ledger_version.py`'s `fragment_versions()` already resolves a
+    fragment to its issued derived version once it actually merges."""
     fit_sigma, reason = compute_fit_sigma_and_reason(anchor)
     old_status = anchor.get("status")
     would_cap = capped_status(old_status, fit_sigma)
@@ -321,13 +340,19 @@ def main():
     args = ap.parse_args()
 
     date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # F8 (cth-implementor's schema-axis call, revised 2026-11-18): the fragment
+    # id this run would write, decided up front — every fit_history[] entry
+    # this run appends (below) and the fragment actually written at the end
+    # (if anything changed) must share this exact same id. See evaluate()'s
+    # docstring for why a fragment id, not a commit sha or the frozen base.
+    slug = args.slug or datetime.now(timezone.utc).strftime("run-%Y%m%d-%H%M%S")
+    fragment_id = f"{FRAGMENT_ISSUE}-{slug}"
 
     n_candidates = n_computed = n_null = n_capped = n_would_cap = n_written = 0
     with ledger_edit(args.ledger, dry_run=args.dry_run) as ed:
         L = ed.ledger
         # QBP#817 variant A: version is frozen, read-only here — never bumped,
-        # never touched. Still a legitimate per-anchor fit_history provenance
-        # value: "this evaluation ran when the ledger's frozen base was X".
+        # never touched. Still used for this run's own printed summary below.
         frozen_base = L["version"]
 
         # snapshot ids first: we look records up by id as we go via ed.record()
@@ -349,7 +374,7 @@ def main():
             # this candidate actually changes BEFORE declaring it to ed.record(), so an
             # idempotent re-run (Gemini G1/G2) declares nothing and raises no silent-
             # no-op ConfinementError.
-            upd = evaluate(raw, frozen_base, date, args.apply_caps)
+            upd = evaluate(raw, fragment_id, date, args.apply_caps)
             touched.append(upd["summary"])
             if upd["fit_sigma"] is None:
                 n_null += 1
@@ -426,12 +451,16 @@ def main():
                 )
 
     if n_written and not args.dry_run:
-        slug = args.slug or datetime.now(timezone.utc).strftime("run-%Y%m%d-%H%M%S")
+        # `slug` (and therefore `fragment_id`) was already fixed before the
+        # `with` block above, NOT re-derived here — F8's discriminator rule
+        # only holds if the fragment this writes carries the exact same id
+        # every fit_history[] entry above was stamped with; re-deriving a
+        # fresh timestamp here would silently mint a second, different id.
         # changes.d/ is a sibling of the ledger actually in use (not a
         # hardcoded repo-root default) — matters for tests pointed at a
         # tmp_path ledger, same bug class as generate_ledger_changelog_view.
         write_fragment(
-            issue=809,
+            issue=FRAGMENT_ISSUE,
             slug=slug,
             pr=args.pr,
             encoder="scripts/compute_fit_sigma.py",

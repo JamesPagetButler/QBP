@@ -14,6 +14,7 @@ Run: python3 -m pytest scripts/test_compute_fit_sigma.py -v
 import importlib.util
 import json
 import pathlib
+import re
 import sys
 
 import pytest
@@ -458,6 +459,54 @@ def test_two_consecutive_main_runs_write_one_fit_history_entry_and_one_fragment(
     anchor2 = after_second["anchors"][0]
     assert len(anchor2["fit_history"]) == 1  # NOT 2 — the no-op must not re-append
     assert list(changes_dir.glob("*.json")) == fragments_after_first  # no 2nd fragment
+
+
+def test_fit_history_ledger_version_is_the_exact_fragment_id_this_run_wrote(
+    tmp_path, monkeypatch
+):
+    """F8 (cth-implementor's schema-axis call on QBP#817 PR-1, revised
+    2026-11-18 after qbp-oppenheimer caught the squash/rebase problem with
+    the first revision, "the run's commit sha" -- a PR-branch commit is
+    unreachable from master after a squash/rebase merge, so an append-only
+    record citing it would cite a permanently dangling commit): the stored
+    `ledger_version` must be the EXACT fragment id ("<issue>-<slug>") the
+    same run wrote -- not merely something shaped like one -- so a
+    mismatch between the two writes fails loud (qbp-oppenheimer,
+    issuecomment seq5356). It must also never match the pre-freeze semver
+    shape, the discriminator the docs rely on."""
+    ledger_path = tmp_path / "ledger.json"
+    ledger = _minimal_candidate_ledger()
+    ledger["version"] = "9.9.9"  # the frozen base -- must never be stored either
+    _write_canonical_ledger(ledger_path, ledger)
+    changes_dir = tmp_path / "changes.d"
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "compute_fit_sigma.py",
+            "--ledger",
+            str(ledger_path),
+            "--pr",
+            "900",
+            "--slug",
+            "some-run",
+        ],
+    )
+    cfs.main()
+    after = json.loads(ledger_path.read_text())
+    stored = after["anchors"][0]["fit_history"][0]["ledger_version"]
+
+    fragments = list(changes_dir.glob("*.json"))
+    assert len(fragments) == 1
+    expected_fragment_id = fragments[0].stem  # "<issue>-<slug>", filename minus .json
+
+    assert stored == expected_fragment_id
+    assert stored != "9.9.9"
+    assert not re.fullmatch(r"\d+\.\d+\.\d+", stored), (
+        f"fragment id {stored!r} must never collide with the pre-freeze "
+        f"semver shape the docs use to discriminate the two row kinds"
+    )
 
 
 def test_main_without_pr_refuses_on_a_real_change(tmp_path, monkeypatch):

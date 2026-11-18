@@ -179,6 +179,15 @@ def test_is_fragment_rejects_a_non_ascii_name():
     assert lf.is_fragment("2-é.json", "100644") is False
 
 
+def test_is_fragment_rejects_a_leading_zero_or_zero_issue_number():
+    """Gemini real-API review, PR #819, 2026-11-18: a bare `[0-9]+` accepted
+    a leading-zero or zero-valued issue number as a valid fragment name --
+    more permissive than write_fragment() ever produces (Python int
+    formatting never pads) and no real GitHub issue is numbered 0."""
+    assert lf.is_fragment("007-a.json", "100644") is False
+    assert lf.is_fragment("0-a.json", "100644") is False
+
+
 def test_fs_mode_distinguishes_file_symlink_and_executable(tmp_path):
     regular = tmp_path / "1-a.json"
     regular.write_text("{}")

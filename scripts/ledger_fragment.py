@@ -52,7 +52,13 @@ _SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 # (a non-ASCII filename quoting gap) and N2 (a dangling symlink passing CI
 # and then breaking read_fragments after merge): a single shared `is_fragment`
 # below is the only place either caller decides "is this a real fragment".
-_FRAGMENT_FILENAME_RE = re.compile(r"[0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*\.json")
+# `[1-9][0-9]*`, not `[0-9]+` (Gemini real-API review, PR #819, 2026-11-18):
+# a bare `[0-9]+` accepts a leading-zero or zero-valued issue number
+# ("0-a.json", "007-a.json") as a valid fragment name -- more permissive
+# than write_fragment() ever produces (Python int formatting never pads)
+# and no real GitHub issue is numbered 0 -- a real looseness in the exact
+# acceptance criteria six rounds of review were tightening.
+_FRAGMENT_FILENAME_RE = re.compile(r"[1-9][0-9]*-[a-z0-9]+(?:-[a-z0-9]+)*\.json")
 REGULAR_FILE_MODE = "100644"
 
 
