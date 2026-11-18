@@ -50,6 +50,11 @@ def test_fragment_path_rejects_non_kebab_slug():
         lf.fragment_path(1, "Not_Kebab")
 
 
+def test_fragment_path_rejects_a_slug_with_a_trailing_newline():
+    with pytest.raises(lf.FragmentError, match="kebab-case"):
+        lf.fragment_path(1, "ok-slug\n")
+
+
 def test_write_fragment_round_trips(tmp_path):
     path = lf.write_fragment(
         issue=817,

@@ -553,6 +553,33 @@ def test_main_refuses_a_bad_slug_before_touching_the_ledger_at_all(
     assert not (tmp_path / "changes.d").exists()
 
 
+def test_main_refuses_a_slug_with_a_trailing_newline(tmp_path, monkeypatch):
+    """Consistency nit (qbp-oppenheimer, QBP#819, 2026-11-18, same class as
+    N1): the old `_SLUG_RE.match(slug + "$")` check accepted a slug with a
+    trailing newline, since `$` matches just before a final trailing
+    newline. Must refuse it the same way as any other non-kebab slug,
+    before the ledger is touched at all."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "compute_fit_sigma.py",
+            "--ledger",
+            str(ledger_path),
+            "--pr",
+            "900",
+            "--slug",
+            "ok-slug\n",
+        ],
+    )
+    with pytest.raises(SystemExit, match="kebab-case"):
+        cfs.main()
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
+    assert not (tmp_path / "changes.d").exists()
+
+
 def test_a_failed_ledger_verify_writes_no_orphan_fragment(tmp_path, monkeypatch):
     """F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): the fragment
     write must happen only after `ledger_edit()`'s `verify()`/`write()` have

@@ -44,7 +44,7 @@ REQUIRED_KEYS = (
     "date",
 )
 
-_SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+_SLUG_RE = re.compile(r"[a-z0-9]+(-[a-z0-9]+)*")
 
 # The fragment naming convention itself, as a single pattern both
 # `read_fragments` (below) and `ledger_bookkeeping_lint.py` fullmatch
@@ -106,7 +106,13 @@ def is_fragment(path: str, mode: str) -> bool:
 
 
 def fragment_path(issue: int, slug: str, changes_dir: Path = CHANGES_DIR) -> Path:
-    if not _SLUG_RE.match(slug):
+    # `.fullmatch`, not `.match` (qbp-oppenheimer, QBP#819, 2026-11-18, for
+    # consistency with N1 above): `.match` plus trailing `"$"` accepts a
+    # slug with a trailing newline, since `$` matches just before a final
+    # trailing newline. This fails safe downstream (the written filename
+    # would never fullmatch `_FRAGMENT_FILENAME_RE`), but putting every
+    # slug/name check on one matching rule closes the gap at the source.
+    if not _SLUG_RE.fullmatch(slug):
         raise FragmentError(
             f"slug {slug!r} must be kebab-case (lowercase, digits, hyphens)"
         )

@@ -353,7 +353,10 @@ def main():
     # fragment ever written, the mirror image of the orphan-fragment hole
     # F5 fixed (an orphan LEDGER CHANGE instead of an orphan fragment).
     # Validated here, before any write is even attempted.
-    if not _SLUG_RE.match(slug):
+    # `.fullmatch`, not `.match` (qbp-oppenheimer, QBP#819, 2026-11-18): see
+    # ledger_fragment.fragment_path's comment -- same consistency fix, same
+    # trailing-newline gap, same reason.
+    if not _SLUG_RE.fullmatch(slug):
         raise SystemExit(
             f"--slug {slug!r} must be kebab-case (lowercase, digits, hyphens)"
         )
