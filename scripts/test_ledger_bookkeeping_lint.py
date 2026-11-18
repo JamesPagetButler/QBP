@@ -498,22 +498,24 @@ def test_fragment_added_in_a_subdirectory_of_changes_dir_is_rejected(
     _git(repo, "commit", "-q", "-m", "feature")
 
     errors = lbl.check_fragment_count("master", "feature")
-    assert any("not named" in e for e in errors)
+    assert any("not a real fragment" in e for e in errors)
 
 
 def test_non_ascii_fragment_filename_is_rejected_not_silently_invisible(
     tmp_path, monkeypatch
 ):
-    """E3 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): git's
+    """E3/N1 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): git's
     default `--name-status` C-style-quotes a non-ASCII path (wrapping it in
     literal double quotes and octal-escaping the character), so a bogus
     `changes.d/2-é.json` -- claiming an id with the ledger UNCHANGED --
     used to never show up as a `.json` row at all, passing the lint while
     `ledger_fragment.read_fragments()`'s real filesystem glob still picked it
     up and gave it a real derived version. `-z` output has no quoting, and
-    the filename must now match the real naming convention exactly, so this
-    must be rejected on both counts: an invalid name AND (since it's still
-    recognized as "added" now) an over-claim against an unchanged ledger."""
+    `ledger_fragment.is_fragment()`'s naming check now rejects the name
+    outright (it never passes `_FRAGMENT_FILENAME_RE.fullmatch`) -- it fails
+    closed as "not a real fragment" and is never even reachable from
+    `check_fragment_claims_diff`'s claims logic at all, since it's never in
+    `added`."""
     repo = _init_repo(tmp_path, monkeypatch)
     _checkout_branch(repo, "feature")
     # the ledger itself is NOT touched on this branch at all
@@ -534,9 +536,12 @@ def test_non_ascii_fragment_filename_is_rejected_not_silently_invisible(
     _git(repo, "commit", "-q", "-m", "feature adds a non-ASCII-named bogus fragment")
 
     count_errors = lbl.check_fragment_count("master", "feature")
-    assert any("not named" in e for e in count_errors)
+    assert any("not a real fragment" in e for e in count_errors)
+    # never reaches the claims-diff logic at all -- it was already rejected
+    # structurally, so there is nothing left for check_fragment_claims_diff
+    # to flag (it early-returns since `added` is empty).
     claims_errors = lbl.check_fragment_claims_diff("master", "feature")
-    assert any("claims touched_ids ['NOT-A-REAL-ID']" in e for e in claims_errors)
+    assert claims_errors == []
 
 
 def test_readme_added_alone_with_no_ledger_change_passes_cleanly(tmp_path, monkeypatch):
@@ -564,6 +569,90 @@ def test_readme_added_alone_with_no_ledger_change_passes_cleanly(tmp_path, monke
         + lbl.check_changelog_view_not_committed("master", "feature")
     )
     assert errors == []
+
+
+def test_dangling_symlink_named_like_a_fragment_is_rejected(tmp_path, monkeypatch):
+    """N2 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): a dangling
+    symlink named exactly like a real fragment must fail closed here --
+    not be silently excluded from every check the way it used to be before
+    any check looked at the git mode at all -- since it would otherwise
+    pass CI and then crash `ledger_fragment.read_fragments()` the moment
+    anything tries to actually read fragments after merge."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    changes_dir = repo / CHANGES_DIR_REL
+    changes_dir.mkdir(parents=True, exist_ok=True)
+    (changes_dir / "2-b.json").symlink_to(changes_dir / "does-not-exist")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature adds a dangling symlink fragment")
+
+    errors = lbl.check_fragment_count("master", "feature")
+    assert any("not a real fragment" in e for e in errors)
+
+
+def test_accepted_matches_real_reader_passes_on_a_clean_add(tmp_path, monkeypatch):
+    """Requirement 3 of the N1/N2/N3 structural fix: a normal, valid single
+    fragment add must agree between the lint's own classification and the
+    real `ledger_fragment.read_fragments()` run against the materialized
+    head tree."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    L = json.loads(_ledger_path(repo).read_text())
+    L["anchors"][0]["status"] = "coherent"
+    _ledger_path(repo).write_text(json.dumps(L, indent=2) + "\n")
+    lf.write_fragment(
+        issue=1,
+        slug="a",
+        pr=1,
+        encoder="e",
+        note="n",
+        touched_ids=["PRED-a"],
+        changes_dir=repo / CHANGES_DIR_REL,
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature")
+
+    assert lbl.check_accepted_matches_real_reader("master", "feature") == []
+
+
+def test_accepted_matches_real_reader_catches_a_classification_regression(
+    tmp_path, monkeypatch
+):
+    """Requirement 3's actual purpose: even if `check_fragment_count`'s own
+    classification regressed back to the exact shape of the original
+    E1/E3 bug (a bare `.endswith(".json")` check, bypassing
+    `ledger_fragment.is_fragment` entirely), this independent check -- which
+    runs the REAL read_fragments() against the materialized head tree --
+    must still catch the disagreement on its own, since read_fragments()
+    itself was never touched by the regression."""
+    repo = _init_repo(tmp_path, monkeypatch)
+    _checkout_branch(repo, "feature")
+    changes_dir = repo / CHANGES_DIR_REL
+    changes_dir.mkdir(parents=True, exist_ok=True)
+    bogus = {
+        "issue": 2,
+        "slug": "e9",
+        "pr": 2,
+        "encoder": "e",
+        "note": "n",
+        "touched_ids": ["NOT-A-REAL-ID"],
+        "version": None,
+        "date": None,
+    }
+    (changes_dir / "2-é.json").write_text(json.dumps(bogus, indent=2))
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature adds a non-ASCII-named bogus fragment")
+
+    def naive_classify(base, head):
+        rows = lbl._fragment_rows(base, head)
+        added = [
+            new for s, _om, _nm, _old, new in rows if s == "A" and new.endswith(".json")
+        ]
+        return added, [], []
+
+    monkeypatch.setattr(lbl, "_classify_fragment_rows", naive_classify)
+    errors = lbl.check_accepted_matches_real_reader("master", "feature")
+    assert any("must match exactly" in e for e in errors)
 
 
 def test_main_exits_nonzero_on_any_failure(tmp_path, monkeypatch, capsys):

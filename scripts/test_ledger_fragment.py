@@ -144,3 +144,78 @@ def test_validate_fragment_rejects_extra_keys():
     data["extra"] = "nope"
     with pytest.raises(lf.FragmentError, match="unexpected key"):
         lf.validate_fragment(data)
+
+
+def test_is_fragment_accepts_the_real_shape():
+    assert lf.is_fragment("817-example.json", "100644") is True
+
+
+def test_is_fragment_rejects_a_symlink_mode():
+    """N2 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): a
+    correctly-named entry with any mode but 100644 (a symlink's 120000
+    above all) is never a fragment -- a dangling symlink must never reach
+    read_fragments()'s json.loads() at all."""
+    assert lf.is_fragment("1-a.json", "120000") is False
+
+
+def test_is_fragment_rejects_an_executable_mode():
+    assert lf.is_fragment("1-a.json", "100755") is False
+
+
+def test_is_fragment_rejects_a_subdirectory_path():
+    assert lf.is_fragment("sub/1-a.json", "100644") is False
+
+
+def test_is_fragment_rejects_a_trailing_newline_in_the_name():
+    """N1: a bare `.match(pattern + "$")` lets a filename with a trailing
+    newline through, because `$` matches just before a final trailing
+    newline too. `is_fragment` uses `re.fullmatch`, which requires the
+    match to consume the entire string -- the stray `\\n` can't be
+    consumed by a zero-width assertion, so this must be rejected."""
+    assert lf.is_fragment("1-a.json\n", "100644") is False
+
+
+def test_is_fragment_rejects_a_non_ascii_name():
+    assert lf.is_fragment("2-é.json", "100644") is False
+
+
+def test_fs_mode_distinguishes_file_symlink_and_executable(tmp_path):
+    regular = tmp_path / "1-a.json"
+    regular.write_text("{}")
+    assert lf._fs_mode(regular) == "100644"
+
+    executable = tmp_path / "2-b.json"
+    executable.write_text("{}")
+    executable.chmod(executable.stat().st_mode | 0o111)
+    assert lf._fs_mode(executable) == "100755"
+
+    link = tmp_path / "3-c.json"
+    link.symlink_to(tmp_path / "nonexistent-target")
+    assert lf._fs_mode(link) == "120000"
+
+
+def test_read_fragments_skips_a_dangling_symlink_instead_of_crashing(tmp_path):
+    """N2: a dangling symlink named like a real fragment must never reach
+    json.loads() -- confirmed by reverting is_fragment's mode check and
+    seeing this test fail with FileNotFoundError instead of returning []."""
+    (tmp_path / "1-a.json").symlink_to(tmp_path / "does-not-exist")
+    assert lf.read_fragments(tmp_path) == []
+
+
+def test_read_fragments_skips_a_trailing_newline_named_file(tmp_path):
+    bad_name = "2-b.json\n"
+    (tmp_path / bad_name).write_text(
+        json.dumps(
+            {
+                "issue": 2,
+                "slug": "b",
+                "pr": 1,
+                "encoder": "e",
+                "note": "n",
+                "touched_ids": ["X"],
+                "version": None,
+                "date": None,
+            }
+        )
+    )
+    assert lf.read_fragments(tmp_path) == []

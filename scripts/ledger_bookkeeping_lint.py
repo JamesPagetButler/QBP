@@ -32,6 +32,13 @@ Checks, comparing `--base` to `--head`:
      post-merge, never committed (scripts/generate_ledger_changelog_view.py) — a
      hand-committed copy would have to be kept in sync by every later content PR,
      reintroducing the exact bookkeeping collision this design removes.
+  6. Every row this lint "accepts" as the one new fragment is exactly what
+     scripts/ledger_fragment.read_fragments() itself would pick up from the
+     real head tree (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17,
+     requirement 3 of the N1/N2/N3 structural fix) — asserted, not assumed.
+     Checks 2/3/4 above all classify a row via ledger_fragment.is_fragment(),
+     the SAME function read_fragments() calls, so there is exactly one
+     definition of "fragment" for the lint and the reader to agree on.
 
 Usage:
     python3 scripts/ledger_bookkeeping_lint.py --base origin/master --head HEAD
@@ -41,25 +48,20 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cth_ledger_edit import _records  # noqa: E402
+import ledger_fragment as lf  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 LEDGER_REL = "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
 CHANGES_DIR_REL = "archive/cth-inventory/changes.d"
 CHANGELOG_VIEW_REL = "analysis/cth-ledger-changelog.md"
-
-# A fragment's real naming convention (ledger_fragment.fragment_path /
-# _SLUG_RE): "<issue>-<slug>.json", lowercase-ascii-and-digits only, directly
-# under CHANGES_DIR_REL — never a subdirectory. E3 (qbp-architecture, QBP#817
-# PR-1 re-confirm, 2026-11-17) requires every added path to match this
-# exactly, not merely end in ".json".
-_FRAGMENT_FILENAME_RE = re.compile(r"^[0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*\.json$")
 
 
 class LintFailure(RuntimeError):
@@ -104,22 +106,10 @@ def _diff_status(base: str, head: str, rel_path: str) -> list:
     as "modified" on this branch — the append-only check would then fail for
     a reason that isn't this branch's own change. Three-dot diffs against the
     merge-base instead, so only what THIS branch actually did since it
-    diverged ever shows up, regardless of how far base has moved since.
-
-    For a rename/copy row, `git diff --name-status` prints three fields
-    (status, old path, new path); every other status prints two. Run with
-    `-z` (NUL-delimited, no C-style quoting) rather than the default
-    newline/tab-delimited form — E3 (qbp-architecture, QBP#817 PR-1
-    re-confirm, 2026-11-17): git quotes-and-octal-escapes a non-ASCII path by
-    default (wrapping it in literal double quotes), so a caller checking a
-    plain `.endswith(".json")` suffix on the returned string silently missed
-    a real `changes.d/2-é.json` row — invisible to every check in this file
-    while still fully visible to `ledger_fragment.read_fragments()`'s real
-    filesystem glob, which doesn't go through git at all. `-z` sidesteps the
-    quoting entirely rather than trying to un-quote it. (E1, same file, same
-    review round: a rename row's old/new paths are both returned explicitly
-    too, so a rename away from the fragment naming convention is still
-    caught, not just a rename into it.)"""
+    diverged ever shows up, regardless of how far base has moved since. `-z`
+    (NUL-delimited, no C-style quoting) rather than the default
+    newline/tab-delimited form, so a non-ASCII path is never silently
+    quote-and-octal-escaped into something a suffix check would miss."""
     out = subprocess.run(
         ["git", "diff", "--name-status", "-z", f"{base}...{head}", "--", rel_path],
         cwd=REPO_ROOT,
@@ -145,35 +135,144 @@ def _diff_status(base: str, head: str, rel_path: str) -> list:
     return rows
 
 
-def _is_fragment_path(path: str) -> bool:
-    """True iff `path` is exactly `<issue>-<slug>.json` directly under
-    CHANGES_DIR_REL — never a subdirectory (E2) and never anything a mere
-    `.endswith(".json")` would have let through (E3)."""
-    prefix = CHANGES_DIR_REL + "/"
-    if not path.startswith(prefix):
-        return False
-    return bool(_FRAGMENT_FILENAME_RE.match(path[len(prefix) :]))
+def _diff_raw(base: str, head: str, rel_path: str) -> list:
+    """[(status, old_mode, new_mode, old_path, new_path), ...] for rel_path
+    between base and head, via `git diff --raw -z` rather than
+    `--name-status`: `--raw` additionally gives each row's git file mode on
+    both sides in the SAME call — needed to reject a symlink or an
+    executable masquerading as a fragment (N2, qbp-architecture, QBP#817
+    PR-1 re-confirm, 2026-11-17: a dangling symlink named like a real
+    fragment passed every prior check here, since none of them looked at
+    the entry's mode at all, and then broke `ledger_fragment.read_fragments()`
+    after merge). Still three-dot and still `-z`, for the same reasons as
+    `_diff_status`."""
+    out = subprocess.run(
+        ["git", "diff", "--raw", "-z", f"{base}...{head}", "--", rel_path],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    tokens = out.split("\0")
+    if tokens and tokens[-1] == "":
+        tokens.pop()
+    rows = []
+    i = 0
+    while i < len(tokens):
+        meta = tokens[i]
+        i += 1
+        old_mode, new_mode, _old_sha, _new_sha, status = meta.lstrip(":").split()
+        old_path = tokens[i]
+        i += 1
+        if status[:1] in ("R", "C"):
+            new_path = tokens[i]
+            i += 1
+        else:
+            new_path = old_path
+        rows.append((status, old_mode, new_mode, old_path, new_path))
+    return rows
 
 
 def _fragment_rows(base: str, head: str) -> list:
-    """[(status, old_path, new_path), ...] under CHANGES_DIR_REL, minus
-    changes.d/README.md itself (by exact path on both ends — it documents
-    the convention and is never a fragment) — shared by every
-    fragment-counting/claims check so the filter can't drift between them
-    (E1). E3 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): this no
-    longer filters by `.endswith(".json")` at all — every surviving row is
-    "fragment-relevant" for append-only purposes, and `check_fragment_count`
-    separately validates any ADDED row's path against `_is_fragment_path`,
-    so a badly-named addition (wrong extension, wrong directory, non-ASCII)
-    is rejected outright instead of silently excluded from `added` and never
-    checked at all."""
+    """[(status, old_mode, new_mode, old_path, new_path), ...] under
+    CHANGES_DIR_REL, minus changes.d/README.md itself (by exact path on
+    both ends — it documents the convention and is never a fragment) —
+    shared by every fragment-counting/claims check so the filter can't
+    drift between them (E1). This does not itself decide what counts as a
+    fragment; `_classify_fragment_rows` below does that, via
+    `ledger_fragment.is_fragment` — the same function `read_fragments()`
+    uses."""
     readme = f"{CHANGES_DIR_REL}/README.md"
     rows = []
-    for status, old_path, new_path in _diff_status(base, head, CHANGES_DIR_REL):
+    for status, old_mode, new_mode, old_path, new_path in _diff_raw(
+        base, head, CHANGES_DIR_REL
+    ):
         if old_path == readme and new_path == readme:
             continue
-        rows.append((status, old_path, new_path))
+        rows.append((status, old_mode, new_mode, old_path, new_path))
     return rows
+
+
+def _bare_name(path: str) -> str:
+    """`path` relative to CHANGES_DIR_REL itself — what `ledger_fragment.
+    is_fragment` expects (it never sees a full repo-relative path)."""
+    prefix = CHANGES_DIR_REL + "/"
+    return path[len(prefix) :] if path.startswith(prefix) else path
+
+
+def _classify_fragment_rows(base: str, head: str):
+    """Splits `_fragment_rows` into three buckets using the ONE shared
+    `ledger_fragment.is_fragment` definition — the same function
+    `read_fragments()` itself calls — so the lint and the reader can never
+    independently decide "fragment or not" and drift apart again (N1/N2,
+    qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17; this replaces
+    E1's and E3's own separately-maintained suffix/name filters, which were
+    exactly that kind of drift):
+
+      - `added`: a clean "A" row whose new path/mode passes `is_fragment` —
+        a real, newly-added fragment.
+      - `touched`: anything other than a clean "A" (a deletion, a
+        modification, any rename/copy regardless of similarity score, a
+        type change) — changes.d/ is append-only, so any of these is a
+        violation regardless of what's now at the path.
+      - `invalid`: any row (added OR touched) whose resulting path, at
+        `head`, is NOT a real fragment by `is_fragment` — fails closed
+        (requirement 2 of the N1/N2 structural fix) instead of silently
+        falling out of every bucket the way a badly-named/badly-moded path
+        used to."""
+    added: list = []
+    touched: list = []
+    invalid: list = []
+    for status, old_mode, new_mode, old_path, new_path in _fragment_rows(base, head):
+        if status == "D":
+            touched.append(old_path)
+            continue
+        valid = lf.is_fragment(_bare_name(new_path), new_mode)
+        if status == "A":
+            (added if valid else invalid).append(new_path)
+        else:
+            touched.append(new_path)
+            if not valid:
+                invalid.append(new_path)
+    return added, touched, invalid
+
+
+def _materialize_changes_dir(ref: str) -> Path:
+    """Writes CHANGES_DIR_REL's content AT `ref` (not whatever happens to be
+    checked out locally) into a fresh throwaway directory, preserving each
+    entry's real git mode — a symlink blob becomes a real (possibly
+    dangling) symlink, not a text file — and returns the path to the
+    materialized changes.d/ itself. Caller must `shutil.rmtree` the
+    returned path's parent when done. Used only by
+    `check_accepted_matches_real_reader` (requirement 3 of the N1/N2
+    structural fix) to run the REAL `ledger_fragment.read_fragments()`
+    against `head`'s actual tree, not a re-implementation of its logic."""
+    tmp = Path(tempfile.mkdtemp(prefix="ledger-lint-"))
+    listing = subprocess.run(
+        ["git", "ls-tree", "-r", ref, "--", CHANGES_DIR_REL],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if listing.returncode == 0:
+        for line in listing.stdout.splitlines():
+            meta, name = line.split("\t", 1)
+            mode, _obj_type, sha = meta.split()
+            content = subprocess.run(
+                ["git", "cat-file", "blob", sha],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                check=True,
+            ).stdout
+            target = tmp / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if mode == "120000":
+                target.symlink_to(content.decode())
+            else:
+                target.write_bytes(content)
+                if mode == "100755":
+                    target.chmod(target.stat().st_mode | 0o111)
+    return tmp / CHANGES_DIR_REL
 
 
 def check_frozen_fields(base: str, head: str) -> list:
@@ -208,20 +307,30 @@ def check_fragment_count(base: str, head: str) -> list:
     # own one-time README.md addition showed up as "A" here and crashed
     # check_fragment_claims_diff trying to json.loads() a markdown file).
     # README.md stays freely editable; `_fragment_rows` already exempts it
-    # by exact path. Every other row under changes.d/ is fragment-relevant.
-    rows = _fragment_rows(base, head)
-    added = [new for s, old, new in rows if s == "A"]
-    # D4: anything other than a clean "A" is a touch of an existing fragment —
-    # M(odified), D(eleted), any R(ename) regardless of similarity score
-    # (git reports "R100" only for a byte-identical rename; a partial-content
-    # rename like "R087" slipped past an "s == 'R100'" check), C(opy), T(ype
-    # change). Append-only means append-only.
-    modified_or_removed = [new for s, old, new in rows if s != "A"]
-
-    if modified_or_removed:
+    # by exact path.
+    added, touched, invalid = _classify_fragment_rows(base, head)
+    # D4: anything other than a clean, valid "A" is a touch of an existing
+    # fragment — M(odified), D(eleted), any R(ename) regardless of
+    # similarity score (git reports "R100" only for a byte-identical rename;
+    # a partial-content rename like "R087" slipped past an "s == 'R100'"
+    # check), C(opy), T(ype change). Append-only means append-only.
+    if touched:
         errors.append(
-            f"{CHANGES_DIR_REL}/ is append-only: modified/removed fragment(s) "
-            f"{modified_or_removed}"
+            f"{CHANGES_DIR_REL}/ is append-only: modified/removed/touched "
+            f"entr(y/ies) {touched}"
+        )
+    # N1/N2/N3 structural fix, requirement 2 (qbp-architecture, QBP#817 PR-1
+    # re-confirm, 2026-11-17): any row that introduces or leaves behind a
+    # path under changes.d/ which ISN'T a real fragment by
+    # ledger_fragment.is_fragment()'s own definition fails closed here —
+    # never silently excluded from every bucket the way a non-ASCII name
+    # (E3), a subdirectory path (E2), a trailing-newline name (N1), or a
+    # dangling symlink (N2) each used to be in turn.
+    if invalid:
+        errors.append(
+            f"path(s) under {CHANGES_DIR_REL}/ are not a real fragment — must "
+            f"be a regular file (mode 100644), named '<issue>-<slug>.json' "
+            f"exactly, directly in that directory: {invalid}"
         )
     if len(added) > 1:
         errors.append(
@@ -231,22 +340,6 @@ def check_fragment_count(base: str, head: str) -> list:
         errors.append(
             f"the ledger changed but {len(added)} fragment(s) were added under "
             f"{CHANGES_DIR_REL}/ — exactly one is required"
-        )
-    # E2/E3 (qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17): every
-    # added path must be exactly "<issue>-<slug>.json" directly under
-    # CHANGES_DIR_REL. E2: a subdirectory path (changes.d/sub/x.json) passes
-    # every check above — the diff pathspec is recursive — but
-    # ledger_fragment.read_fragments() only globs changes.d/*.json directly,
-    # so it never sees it there. E3: a non-ASCII or otherwise malformed name
-    # must not be silently dropped out of `added` either (that was this
-    # check's OWN earlier mistake, before E3's fix to `_fragment_rows`) — it
-    # is rejected outright as an invalid name instead.
-    invalid = [p for p in added if not _is_fragment_path(p)]
-    if invalid:
-        errors.append(
-            f"fragment(s) not named '<issue>-<slug>.json' directly under "
-            f"{CHANGES_DIR_REL}/: {invalid} — read_fragments() only recognizes "
-            f"that exact pattern in that exact directory"
         )
     return errors
 
@@ -261,8 +354,7 @@ def check_fragment_claims_diff(base: str, head: str) -> list:
     fragment (claiming ids, with no matching edit) through CI, and it then
     earned a real derived version bump in the published view."""
     errors: list = []
-    rows = _fragment_rows(base, head)
-    added = [new for s, old, new in rows if s == "A"]
+    added, _touched, _invalid = _classify_fragment_rows(base, head)
     if len(added) != 1:
         return errors  # already flagged by check_fragment_count
 
@@ -310,6 +402,44 @@ def check_fragment_claims_diff(base: str, head: str) -> list:
     return errors
 
 
+def check_accepted_matches_real_reader(base: str, head: str) -> list:
+    """Requirement 3 of the N1/N2/N3 structural fix (qbp-architecture,
+    QBP#817 PR-1 re-confirm, 2026-11-17): don't just trust that
+    `_classify_fragment_rows`'s `added` list and
+    `ledger_fragment.read_fragments()`'s real output agree — assert it.
+    Materializes CHANGES_DIR_REL at both `base` and `head` from git itself
+    (never from whatever happens to be checked out locally — the test
+    suite routinely calls these checks while sitting on a different branch
+    than either `base` or `head`), runs the actual `read_fragments()`
+    against each, and requires the set of fragments new at `head` (by
+    filename) to equal exactly what this lint's own classification
+    accepted. This is the backstop for the failure mode E1/E3 actually
+    were: two independently-maintained notions of "fragment" drifting
+    apart — not a replacement for `check_fragment_count`'s own per-row
+    rejection above, which is what actually blocks a specific bad PR."""
+    errors: list = []
+    added, _touched, _invalid = _classify_fragment_rows(base, head)
+    added_names = {Path(p).name for p in added}
+
+    base_dir = _materialize_changes_dir(base)
+    head_dir = _materialize_changes_dir(head)
+    try:
+        base_names = {p.name for p, _ in lf.read_fragments(changes_dir=base_dir)}
+        head_names = {p.name for p, _ in lf.read_fragments(changes_dir=head_dir)}
+    finally:
+        shutil.rmtree(base_dir.parent, ignore_errors=True)
+        shutil.rmtree(head_dir.parent, ignore_errors=True)
+
+    new_per_reader = head_names - base_names
+    if new_per_reader != added_names:
+        errors.append(
+            f"the lint accepted {sorted(added_names)} as new fragment(s), but "
+            f"ledger_fragment.read_fragments() against the real {head} tree "
+            f"sees {sorted(new_per_reader)} as new — these must match exactly"
+        )
+    return errors
+
+
 def check_changelog_view_not_committed(base: str, head: str) -> list:
     rows = _diff_status(base, head, CHANGELOG_VIEW_REL)
     if rows:
@@ -336,6 +466,7 @@ def main():
         check_frozen_fields(merge_base, args.head)
         + check_fragment_count(merge_base, args.head)
         + check_fragment_claims_diff(merge_base, args.head)
+        + check_accepted_matches_real_reader(merge_base, args.head)
         + check_changelog_view_not_committed(merge_base, args.head)
     )
     if errors:

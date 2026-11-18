@@ -46,9 +46,57 @@ REQUIRED_KEYS = (
 
 _SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
+# The fragment naming convention itself, as a single pattern both
+# `read_fragments` (below) and `ledger_bookkeeping_lint.py` fullmatch
+# against — qbp-architecture, QBP#817 PR-1 re-confirm, 2026-11-17, after N1
+# (a non-ASCII filename quoting gap) and N2 (a dangling symlink passing CI
+# and then breaking read_fragments after merge): a single shared `is_fragment`
+# below is the only place either caller decides "is this a real fragment".
+_FRAGMENT_FILENAME_RE = re.compile(r"[0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*\.json")
+REGULAR_FILE_MODE = "100644"
+
 
 class FragmentError(ValueError):
     pass
+
+
+def is_fragment(path: str, mode: str) -> bool:
+    """True iff `path` is a real ledger fragment. `path` must already be
+    expressed RELATIVE TO changes.d/ itself (e.g. `"1-a.json"`) — never a
+    full repo-relative path; a caller working with full paths (the lint)
+    strips its own known `changes.d/` prefix before calling this. `mode`
+    must be the exact git-style mode string `"100644"` (a plain regular
+    file) — never a symlink (`"120000"`), an executable (`"100755"`), or
+    anything else (N2: a dangling symlink passed CI and then broke
+    `read_fragments()` after merge, since nothing checked the entry's mode
+    at all).
+
+    Three conditions, all required:
+      1. `mode == REGULAR_FILE_MODE` — a plain regular file, nothing else.
+      2. No `"/"` in `path` at all — directly in changes.d/, never a
+         subdirectory (the fragment-count side of the old E2 gap).
+      3. `path` fullmatches the naming convention `<issue>-<slug>.json`
+         exactly, via `re.fullmatch` — NOT `.match()` plus a trailing `"$"`
+         (N1: `$`, by default, matches just before a FINAL trailing
+         newline too, so `.match(pattern + "$", "1-a.json\\n")` succeeds
+         even though the real name has a stray newline appended; a
+         `git diff` row can produce exactly this for a maliciously- or
+         accidentally-named path. `fullmatch` requires the match to
+         consume the entire string, which that trailing `\\n` can't
+         satisfy, closing the gap outright rather than patching it
+         filename-shape by filename-shape).
+
+    This is the ONLY place either `read_fragments` (the real filesystem
+    reader) or `ledger_bookkeeping_lint.py` (the CI backstop, reading git
+    diff rows) decides what counts as a fragment — so there is exactly one
+    definition for the two to agree on, instead of two independently
+    maintained filters that can silently drift apart (E1/E3's actual root
+    cause)."""
+    if mode != REGULAR_FILE_MODE:
+        return False
+    if "/" in path:
+        return False
+    return bool(_FRAGMENT_FILENAME_RE.fullmatch(path))
 
 
 def fragment_path(issue: int, slug: str, changes_dir: Path = CHANGES_DIR) -> Path:
@@ -126,14 +174,37 @@ def validate_fragment(data: dict, source: str = "<fragment>") -> None:
         raise FragmentError(f"{source}: note must be a non-empty string")
 
 
+def _fs_mode(path: Path) -> str:
+    """The real filesystem entry's mode, expressed as the same git-style
+    string `is_fragment` checks against — a symlink is `"120000"`
+    regardless of what it points at (N2: never followed, never read), an
+    executable regular file is `"100755"`, anything else that isn't a
+    plain file (a directory, a fifo, ...) is `"040000"` (never a fragment
+    either way), and a plain non-executable regular file is
+    `REGULAR_FILE_MODE`."""
+    if path.is_symlink():
+        return "120000"
+    if not path.is_file():
+        return "040000"
+    if path.stat().st_mode & 0o111:
+        return "100755"
+    return REGULAR_FILE_MODE
+
+
 def read_fragments(changes_dir: Path = CHANGES_DIR) -> list:
     """All fragments on disk, each `(path, data)`, validated. Unordered — caller
     (scripts/ledger_version.py) derives merge order from git history, not from
-    anything in this directory listing."""
+    anything in this directory listing. Each entry must pass `is_fragment` —
+    the same check `ledger_bookkeeping_lint.py` runs against the git diff —
+    so a dangling symlink (N2) or anything else that isn't a plain,
+    correctly-named regular file is skipped here rather than attempted
+    and crashing."""
     if not changes_dir.exists():
         return []
     out = []
-    for path in sorted(changes_dir.glob("*.json")):
+    for path in sorted(changes_dir.iterdir()):
+        if not is_fragment(path.name, _fs_mode(path)):
+            continue
         data = json.loads(path.read_text(encoding="utf-8"))
         validate_fragment(data, source=str(path))
         out.append((path, data))
