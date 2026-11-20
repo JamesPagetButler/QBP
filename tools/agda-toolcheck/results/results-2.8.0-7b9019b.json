@@ -3,6 +3,7 @@
   "version": 1,
   "toolchain": {
     "agda": "2.8.0",
+    "agda_faked": false,
     "ci_agda": "2.8.0",
     "agda_match": true,
     "cubical_ci_pin": "7b9019b2993535d6931991d87f5c762aee87a67a",
@@ -12,10 +13,10 @@
     "lib_flags": "--cubical --safe --no-import-sorts --guardedness"
   },
   "run": {
-    "start": "2026-11-20T20:49:59Z",
-    "finished": "2026-11-20T20:52:40Z",
+    "start": "2026-11-20T21:26:11Z",
+    "finished": "2026-11-20T21:29:08Z",
     "layer": "all",
-    "tctl_start_c": 53.4,
+    "tctl_start_c": 56,
     "boxrun": {
       "mem_mb": 8000,
       "timeout_s": 3600
@@ -41,7 +42,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.06,
-      "max_rss_kib": 46676,
+      "max_rss_kib": 46672,
       "expect_msg": "",
       "detail": ""
     },
@@ -51,8 +52,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 0.08,
-      "max_rss_kib": 49188,
+      "wall_s": 0.09,
+      "max_rss_kib": 49196,
       "expect_msg": "",
       "detail": ""
     },
@@ -63,7 +64,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.04,
-      "max_rss_kib": 45172,
+      "max_rss_kib": 45152,
       "expect_msg": "",
       "detail": ""
     },
@@ -74,7 +75,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.06,
-      "max_rss_kib": 45940,
+      "max_rss_kib": 45928,
       "expect_msg": "",
       "detail": ""
     },
@@ -85,7 +86,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.04,
-      "max_rss_kib": 45160,
+      "max_rss_kib": 45152,
       "expect_msg": "",
       "detail": ""
     },
@@ -107,7 +108,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.04,
-      "max_rss_kib": 45148,
+      "max_rss_kib": 45172,
       "expect_msg": "",
       "detail": ""
     },
@@ -140,7 +141,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.05,
-      "max_rss_kib": 46620,
+      "max_rss_kib": 46628,
       "expect_msg": "",
       "detail": ""
     },
@@ -151,7 +152,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.05,
-      "max_rss_kib": 45800,
+      "max_rss_kib": 45920,
       "expect_msg": "",
       "detail": ""
     },
@@ -161,8 +162,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.32,
-      "max_rss_kib": 386052,
+      "wall_s": 5.47,
+      "max_rss_kib": 387888,
       "expect_msg": "",
       "detail": ""
     },
@@ -172,8 +173,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 2.05,
-      "max_rss_kib": 168148,
+      "wall_s": 2.07,
+      "max_rss_kib": 174356,
       "expect_msg": "",
       "detail": ""
     },
@@ -183,8 +184,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 3.32,
-      "max_rss_kib": 241860,
+      "wall_s": 3.33,
+      "max_rss_kib": 240028,
       "expect_msg": "",
       "detail": ""
     },
@@ -195,7 +196,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.79,
-      "max_rss_kib": 94672,
+      "max_rss_kib": 95632,
       "expect_msg": "",
       "detail": ""
     },
@@ -205,8 +206,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 0.33,
-      "max_rss_kib": 68652,
+      "wall_s": 0.34,
+      "max_rss_kib": 68572,
       "expect_msg": "",
       "detail": ""
     },
@@ -217,7 +218,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.17,
-      "max_rss_kib": 56668,
+      "max_rss_kib": 56592,
       "expect_msg": "",
       "detail": ""
     },
@@ -227,8 +228,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.78,
-      "max_rss_kib": 377952,
+      "wall_s": 5.73,
+      "max_rss_kib": 408608,
       "expect_msg": "",
       "detail": ""
     },
@@ -238,8 +239,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 1.12,
-      "max_rss_kib": 118116,
+      "wall_s": 1.16,
+      "max_rss_kib": 118972,
       "expect_msg": "",
       "detail": ""
     },
@@ -249,8 +250,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.57,
-      "max_rss_kib": 381732,
+      "wall_s": 5.63,
+      "max_rss_kib": 383776,
       "expect_msg": "",
       "detail": ""
     },
@@ -260,8 +261,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.44,
-      "max_rss_kib": 388580,
+      "wall_s": 5.57,
+      "max_rss_kib": 388924,
       "expect_msg": "",
       "detail": ""
     },
@@ -271,8 +272,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.53,
-      "max_rss_kib": 333032,
+      "wall_s": 4.59,
+      "max_rss_kib": 331460,
       "expect_msg": "",
       "detail": ""
     },
@@ -282,8 +283,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.09,
-      "max_rss_kib": 289796,
+      "wall_s": 4.14,
+      "max_rss_kib": 302860,
       "expect_msg": "",
       "detail": ""
     },
@@ -293,8 +294,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 7.54,
-      "max_rss_kib": 476508,
+      "wall_s": 7.59,
+      "max_rss_kib": 504852,
       "expect_msg": "",
       "detail": ""
     },
@@ -304,8 +305,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 1.36,
-      "max_rss_kib": 133300,
+      "wall_s": 1.41,
+      "max_rss_kib": 126964,
       "expect_msg": "",
       "detail": ""
     },
@@ -315,8 +316,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 0.23,
-      "max_rss_kib": 58068,
+      "wall_s": 0.14,
+      "max_rss_kib": 57384,
       "expect_msg": "",
       "detail": ""
     },
@@ -326,8 +327,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 3.5,
-      "max_rss_kib": 259684,
+      "wall_s": 3.54,
+      "max_rss_kib": 256648,
       "expect_msg": "",
       "detail": ""
     },
@@ -337,8 +338,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.43,
-      "max_rss_kib": 385628,
+      "wall_s": 5.48,
+      "max_rss_kib": 385532,
       "expect_msg": "",
       "detail": ""
     },
@@ -348,8 +349,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 7.57,
-      "max_rss_kib": 475840,
+      "wall_s": 7.78,
+      "max_rss_kib": 484648,
       "expect_msg": "",
       "detail": ""
     },
@@ -359,8 +360,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.58,
-      "max_rss_kib": 387396,
+      "wall_s": 5.61,
+      "max_rss_kib": 380540,
       "expect_msg": "",
       "detail": ""
     },
@@ -370,8 +371,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.7,
-      "max_rss_kib": 346048,
+      "wall_s": 4.76,
+      "max_rss_kib": 343588,
       "expect_msg": "",
       "detail": ""
     },
@@ -381,8 +382,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.3,
-      "max_rss_kib": 301124,
+      "wall_s": 4.31,
+      "max_rss_kib": 309892,
       "expect_msg": "",
       "detail": ""
     },
@@ -392,8 +393,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 2.04,
-      "max_rss_kib": 172892,
+      "wall_s": 2.06,
+      "max_rss_kib": 176060,
       "expect_msg": "",
       "detail": ""
     },
@@ -415,7 +416,7 @@
       "status": "REJECTED",
       "exit_code": 42,
       "wall_s": 0.04,
-      "max_rss_kib": 45708,
+      "max_rss_kib": 45636,
       "expect_msg": "Unsolved interaction metas",
       "detail": ""
     },
@@ -426,9 +427,9 @@
       "status": "KNOWN-HOLE",
       "exit_code": 0,
       "wall_s": 0.03,
-      "max_rss_kib": 44660,
+      "max_rss_kib": 44532,
       "expect_msg": "postulate",
-      "detail": "accepted on this pin (agda/agda#8341)"
+      "detail": "accepted on Agda 2.8.0 < 2.9.0 (agda/agda#8341)"
     },
     {
       "layer": "mustfail",
@@ -448,7 +449,7 @@
       "status": "REJECTED",
       "exit_code": 42,
       "wall_s": 0.03,
-      "max_rss_kib": 44832,
+      "max_rss_kib": 44844,
       "expect_msg": "TERMINATING",
       "detail": ""
     },
@@ -502,8 +503,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.59,
-      "max_rss_kib": 403580,
+      "wall_s": 5.89,
+      "max_rss_kib": 400448,
       "expect_msg": "",
       "detail": ""
     },
@@ -513,8 +514,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.56,
-      "max_rss_kib": 405144,
+      "wall_s": 19.15,
+      "max_rss_kib": 405164,
       "expect_msg": "",
       "detail": ""
     },
@@ -524,7 +525,7 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.82,
+      "wall_s": 5.89,
       "max_rss_kib": 410764,
       "expect_msg": "",
       "detail": ""
@@ -535,8 +536,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.62,
-      "max_rss_kib": 381812,
+      "wall_s": 5.67,
+      "max_rss_kib": 381428,
       "expect_msg": "",
       "detail": ""
     },
@@ -546,8 +547,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.49,
-      "max_rss_kib": 391028,
+      "wall_s": 5.79,
+      "max_rss_kib": 391036,
       "expect_msg": "",
       "detail": ""
     },
@@ -557,8 +558,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.48,
-      "max_rss_kib": 388836,
+      "wall_s": 5.57,
+      "max_rss_kib": 388864,
       "expect_msg": "",
       "detail": ""
     },
@@ -568,8 +569,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.55,
-      "max_rss_kib": 300104,
+      "wall_s": 4.57,
+      "max_rss_kib": 300188,
       "expect_msg": "",
       "detail": ""
     },
@@ -579,8 +580,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.51,
-      "max_rss_kib": 370680,
+      "wall_s": 5.56,
+      "max_rss_kib": 370716,
       "expect_msg": "",
       "detail": ""
     },
@@ -590,8 +591,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.59,
-      "max_rss_kib": 389968,
+      "wall_s": 5.65,
+      "max_rss_kib": 389900,
       "expect_msg": "",
       "detail": ""
     },
@@ -601,8 +602,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 6.06,
-      "max_rss_kib": 411412,
+      "wall_s": 5.99,
+      "max_rss_kib": 411456,
       "expect_msg": "",
       "detail": ""
     },
@@ -612,8 +613,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.72,
-      "max_rss_kib": 423616,
+      "wall_s": 5.77,
+      "max_rss_kib": 423680,
       "expect_msg": "",
       "detail": ""
     },
@@ -623,8 +624,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 7.93,
-      "max_rss_kib": 515624,
+      "wall_s": 8.05,
+      "max_rss_kib": 515676,
       "expect_msg": "",
       "detail": ""
     },
@@ -634,21 +635,54 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 7.96,
-      "max_rss_kib": 519564,
+      "wall_s": 8.19,
+      "max_rss_kib": 519584,
       "expect_msg": "",
       "detail": ""
     },
     {
       "layer": "control",
-      "file": "no-forbidden-token",
+      "file": "forbidden-tokens",
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0,
       "max_rss_kib": 0,
       "expect_msg": "",
-      "detail": "0 hits in 17 files"
+      "detail": "0 hits in 17 files (--require-safe)"
+    },
+    {
+      "layer": "control",
+      "file": "fixture-B1StringFakeComment",
+      "expect": "hits",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "expect_msg": "",
+      "detail": "fixture yields 1/1 planted hits"
+    },
+    {
+      "layer": "control",
+      "file": "fixture-B2IdentifierDashDash",
+      "expect": "hits",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "expect_msg": "",
+      "detail": "fixture yields 1/1 planted hits"
+    },
+    {
+      "layer": "control",
+      "file": "fixture-PlantedForbidden",
+      "expect": "hits",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "expect_msg": "",
+      "detail": "fixture yields 9/9 planted hits"
     }
   ]
 }
