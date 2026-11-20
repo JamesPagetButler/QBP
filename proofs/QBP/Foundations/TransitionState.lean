@@ -251,7 +251,7 @@ theorem finrank_tangent {s : CDAlg ℝ 4} (hs : bil s s = 1) (hs0 : s.coord 0 = 
   have h16 : finrank ℝ (CDAlg ℝ 4) = 16 := by rw [CDDimension.finrank_cdAlg 4]; norm_num
   rw [finrank_top, Module.finrank_prod, Module.finrank_self, h16] at hrk
   have : finrank ℝ (LinearMap.ker (tangentProbe s)) = 14 := by omega
-  simpa only [Tangent] using this
+  simpa only [Tangent] using! this
 
 /-- **Where the tangential gradient is nonzero, the potential constrains exactly one of
     those 14 directions.**  At a state of the sphere with `g` tangential and `g ≠ 0` — i.e.
@@ -271,7 +271,7 @@ theorem finrank_vNeutral {s g : CDAlg ℝ 4} (hs : bil s s = 1) (hs0 : s.coord 0
   have h16 : finrank ℝ (CDAlg ℝ 4) = 16 := by rw [CDDimension.finrank_cdAlg 4]; norm_num
   rw [finrank_top, Module.finrank_prod, Module.finrank_prod, Module.finrank_self, h16] at hrk
   have : finrank ℝ (LinearMap.ker (vProbe s g)) = 13 := by omega
-  simpa only [VNeutral] using this
+  simpa only [VNeutral] using! this
 
 /-- **The `V`-blind deformations are genuinely there.**  A nonzero direction exists in
     every `VNeutral s g` with `g` tangential and nonzero — in the intended reading

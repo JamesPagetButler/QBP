@@ -8,6 +8,7 @@ import Mathlib.Analysis.Calculus.Gradient.Basic
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
 import Mathlib.Analysis.ODE.Gronwall
+import Mathlib.Analysis.ODE.ExistUnique
 import Mathlib.Analysis.Calculus.LocalExtr.Basic
 import Mathlib.Dynamics.OmegaLimit
 
@@ -1377,7 +1378,7 @@ theorem bil_gradV_eq_zero_of_potential_eq_one {s v : CDAlg ℝ 4}
     rw [he]
     have hin : HasDerivAt (fun t : ℝ => 1 + t ^ 2 * N v) 0 0 := by
       simpa using ((hasDerivAt_pow 2 (0 : ℝ)).mul_const (N v)).const_add (1 : ℝ)
-    simpa using hin.pow 2
+    simpa using! hin.pow 2
   have hdf : HasDerivAt (fun t : ℝ => Hosting.potential (s + t • v) - (N (s + t • v)) ^ 2)
       (2 * bil (comm s) (secVar s v) - 0) 0 := hd1.sub hd2
   have hf0 : Hosting.potential (s + (0 : ℝ) • v) - (N (s + (0 : ℝ) • v)) ^ 2 = 0 := by
