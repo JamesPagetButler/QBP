@@ -118,7 +118,9 @@ def cmd_check_imports(a: argparse.Namespace) -> int:
             print(f"  missing (QBP imports it, the surface file does not): {m}")
         for m in extra:
             print(f"  extra (no QBP file imports it any more): {m}")
-        print("  regenerate: python3 lean-toolcheck/toolcheck.py imports --proofs .")
+        print(
+            "  regenerate: python3 tools/lean-toolcheck/toolcheck.py imports --proofs proofs  (from the repo root)"
+        )
         return 1
     print(f"toolcheck: import surface current ({len(live)} Mathlib modules)")
     return 0

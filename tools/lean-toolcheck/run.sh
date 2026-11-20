@@ -5,8 +5,8 @@
 # under `boxrun` (box lease, thermal guard, RSS cap), one Lean process at a time, then
 # grades each run against the TOOLCHECK-EXPECT lines in its header (toolcheck.py).
 #
-#   cd proofs && lean-toolcheck/run.sh            # all files
-#   cd proofs && lean-toolcheck/run.sh T04 MF02   # a subset (file-name prefixes)
+#   tools/lean-toolcheck/run.sh            # all files (from any cwd; Lean runs from proofs/)
+#   tools/lean-toolcheck/run.sh T04 MF02   # a subset (file-name prefixes)
 #
 # Modes:
 #   default  ONE boxrun lease for the whole suite (one queue slot, one cool-start gate);
@@ -31,8 +31,8 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROOFS="$(cd "$HERE/.." && pwd)"
-REPO="$(cd "$PROOFS/.." && pwd)"
+REPO="$(cd "$HERE/../.." && pwd)"          # suite lives in <repo>/tools/lean-toolcheck
+PROOFS="$REPO/proofs"                       # Lean env, pins and Mathlib .oleans come from proofs/
 CHECKER="$REPO/scripts/check_lean_foundations.py"
 MEM_MB="${TOOLCHECK_MEM_MB:-8000}"
 TIMEOUT="${TOOLCHECK_TIMEOUT:-900}"
@@ -130,7 +130,7 @@ echo "toolcheck: $TOOLCHAIN · Mathlib $MATHLIB_SHA7 · ${#FILES[@]} file(s) · 
 
 for f in "${FILES[@]}"; do
   stem="$(basename "$f" .lean)"
-  rel="${f#"$PROOFS"/}"
+  rel="../${f#"$REPO"/}"   # repo-relative from proofs/ (cwd = the Lake project), e.g. ../tools/lean-toolcheck/tests/T01_…lean
   t0="$(tctl)"
   set +e
   if [[ "$INNER" == 1 ]]; then
@@ -216,5 +216,5 @@ if ((${#preflight[@]} > 0)); then
   printf 'toolcheck: PREFLIGHT FAILURE: %s\n' "${preflight[@]}"
   exit 2
 fi
-echo "toolcheck: results → lean-toolcheck/results/${OUT_BASE}.{json,md} (raw logs: $(basename "$RAW")/, gitignored)"
+echo "toolcheck: results → tools/lean-toolcheck/results/${OUT_BASE}.{json,md} (raw logs: $(basename "$RAW")/, gitignored)"
 exit "$grc"

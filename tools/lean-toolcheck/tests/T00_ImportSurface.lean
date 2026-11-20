@@ -1,6 +1,6 @@
 /-
 TOOLCHECK T00 — the Mathlib IMPORT SURFACE: every Mathlib module any QBP .lean file imports
-(comment-stripped grep over proofs/, excluding .lake and this suite; 65 modules on the
+(comment-stripped grep over proofs/, excluding .lake; 65 modules on the
 current pins).
 
 Feature: module paths. Mathlib moves and splits files between releases (with
@@ -8,7 +8,7 @@ Feature: module paths. Mathlib moves and splits files between releases (with
 breaks `import` before any proof is elaborated. This file fails first on such a bump,
 and `run.sh` refuses to run if this list has drifted from QBP's live imports
 (`toolcheck.py check-imports`). Regenerate with
-`python3 lean-toolcheck/toolcheck.py imports --proofs .` (from proofs/).
+`python3 tools/lean-toolcheck/toolcheck.py imports --proofs proofs` (from the repo root).
 
 Used by: every QBP file that imports Mathlib (see `FEATURES.md` row T00).
 

@@ -9,15 +9,18 @@ focused test file and to the QBP files that use it (issue #823 W5; policy of rec
 `proofs/lakefile.lean` Mathlib `c5ea00351c28e24afc9f0f84379aa41082b1188f` (stable tag `v4.30.0`) — as of
 this table's date, 2026-11-20. Re-read them before trusting the table.
 
-**How to run:** `cd proofs && lean-toolcheck/run.sh` (all files) or `lean-toolcheck/run.sh T04 MF02` (prefixes).
-Each file is one `lake env lean` under `boxrun` (lease, thermal guard, RSS cap). Results:
+**How to run:** `tools/lean-toolcheck/run.sh` (all files) or `tools/lean-toolcheck/run.sh T04 MF02` (prefixes),
+from any directory. Each file is one `lake env lean` run with cwd = `proofs/` (so the Lean environment, the pins
+and the Mathlib `.oleans` are `proofs/`'s), under `boxrun` (lease, thermal guard, RSS cap). Results:
 `results/results-<toolchain>-<mathlib-sha7>.{json,md}`. Exit 0 = every file behaved as expected.
-The suite is **not** a `lean_lib` and is **not** in `lake build`: the must-fail controls are meant to fail,
-and a default target must not. `scripts/check_layer_imports.py` does not police `proofs/lean-toolcheck/`
-(it is outside its enforced dirs), so no quarantine entry is needed.
 
-Usage counts below are from a comment-stripped grep of `proofs/**/*.lean` (80 files, excluding `.lake/` and
-this suite) on 2026-11-20 at `origin/master` `1892146`.
+**Why `tools/`, not `proofs/`:** these are tool tests, not theory. Outside `proofs/` they are not a `lean_lib`,
+not in `lake build` (the must-fail controls are meant to fail), not theory-bearing for the Tier-3 gate, and not
+scanned by the inverse anchor audit or `scripts/check_layer_imports.py` — with no gate exclusion or baseline
+change (director decision on PR #824, option (b)).
+
+Usage counts below are from a comment-stripped grep of `proofs/**/*.lean` (80 files, excluding `.lake/`) on
+2026-11-20 at `origin/master` `1892146`.
 
 ## 1. Feature table (base suite)
 

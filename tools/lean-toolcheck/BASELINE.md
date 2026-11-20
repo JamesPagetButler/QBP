@@ -1,9 +1,9 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `20261120T204403Z` (2026-11-20 20:44–20:45 UTC) · **overall GREEN — 22/22 files as expected**
+**Run:** `20261120T210059Z` (2026-11-20 21:01–21:02 UTC, from `tools/lean-toolcheck/`) · **overall GREEN — 22/22 files as expected**
 (18 tool tests pass, 4 must-fail controls caught with the expected message) · 98 theorems axiom-audited.
 Machine-readable record: [`results/results-v4.30.0-c5ea003.json`](results/results-v4.30.0-c5ea003.json)
-(+ the `.md` table). Re-run: `cd proofs && lean-toolcheck/run.sh`. A later run on the same pins that is much
+(+ the `.md` table). Re-run: `tools/lean-toolcheck/run.sh`. A later run on the same pins that is much
 slower, or uses much more RSS, than this table is a **finding, not a pass** (#823 R6).
 
 ## Versions
@@ -13,7 +13,7 @@ slower, or uses much more RSS, than this table is a **finding, not a pass** (#82
 | Toolchain | `leanprover/lean4:v4.30.0` | `proofs/lean-toolchain` |
 | Lean binary reported | `Lean (version 4.30.0, x86_64-unknown-linux-gnu, commit d024af099ca4bf2c86f649261ebf59565dc8c622, Release)` | `lake env lean --version` (preflight) |
 | Mathlib | `c5ea00351c28e24afc9f0f84379aa41082b1188f` (stable tag `v4.30.0`) | `proofs/lakefile.lean`; `lake-manifest.json` rev identical (preflight lockstep check) |
-| Suite commit | this PR's head (`proofs/lean-toolcheck/`) | — |
+| Suite commit | this PR's head (`tools/lean-toolcheck/`; moved from `proofs/` in PR #824, option (b)) | — |
 | Foundations checker | `scripts/check_lean_foundations.py` at `origin/master` `1892146` | run per file with a zero baseline |
 
 ## Box conditions
@@ -21,38 +21,38 @@ slower, or uses much more RSS, than this table is a **finding, not a pass** (#82
 | | Value |
 |---|---|
 | Wrapper | `boxrun --gpu --mem-mb 8000 --timeout 19800 --wait` — **one lease for the whole suite** (batch mode), thermal guard on, RSS watch 8000 MB; 1 pinned core |
-| Queue | started after 30 s in the queue; cool-start gate Tctl ≤ 58 °C |
-| Duration | 71 s lease (68.2 s summed Lean wall time) |
-| Thermal | Tctl 55.6 °C at start; max 59.1 °C (boxrun record); **0 guard pauses**, guard action `none`; GPU junction 32 °C (unused) |
-| Host | AMD FX-8350 (8 cores), 31 991 MB RAM, 12.6 GB available at the end; other seats' jobs queued around this one |
+| Queue | started after 1 s in the queue; cool-start gate Tctl ≤ 58 °C |
+| Duration | 74 s lease (70.4 s summed Lean wall time) |
+| Thermal | Tctl 47.0 °C at start; max 61.5 °C (boxrun record); **0 guard pauses**, guard action `none`; GPU junction 32 °C (unused) |
+| Host | AMD FX-8350 (8 cores), 31 991 MB RAM, 12.8 GB available at the end; other seats' jobs queued around this one |
 | Oleans | Mathlib `.oleans` borrowed from the main checkout via a symlinked `proofs/.lake/packages` (rev verified = the pin); nothing was built; page cache **warm** (see note 1) |
 
 ## Per-file results
 
 | File | Kind | Result | Lean exit | Wall (s) | Max RSS (MB) | Axiom audit | Detection (must-fail) |
 |---|---|---|---|---|---|---|---|
-| `tests/T00_ImportSurface.lean` | tool | ✅ PASS | 0 | 4.64 | 3767 | 1 thm, no axioms | — |
-| `tests/T01_DecideFin.lean` | tool | ✅ PASS | 0 | 3.18 | 1840 | 5 thm ⊆ std3 | — |
-| `tests/T02_DecidableInstances.lean` | tool | ✅ PASS | 0 | 3.11 | 1921 | 4 thm ⊆ std3 | — |
-| `tests/T03_FinCases.lean` | tool | ✅ PASS | 0 | 3.06 | 1952 | 3 thm ⊆ std3 | — |
-| `tests/T04_Ring.lean` | tool | ✅ PASS | 0 | 3.53 | 1972 | 5 thm ⊆ std3 | — |
-| `tests/T05_FieldSimp.lean` | tool | ✅ PASS | 0 | 2.99 | 1933 | 3 thm ⊆ std3 | — |
-| `tests/T06_LinarithPositivity.lean` | tool | ✅ PASS | 0 | 3.35 | 2036 | 5 thm ⊆ std3 | — |
-| `tests/T07_NormNumCasts.lean` | tool | ✅ PASS | 0 | 3.91 | 2817 | 6 thm ⊆ std3 | — |
-| `tests/T08_ModuleLinComb.lean` | tool | ✅ PASS | 0 | 3.67 | 2163 | 5 thm ⊆ std3 | — |
-| `tests/T09_SimpFamily.lean` | tool | ✅ PASS | 0 | 3.76 | 2393 | 9 thm ⊆ std3 | — |
-| `tests/T10_Quaternion.lean` | tool | ✅ PASS | 0 | 4.37 | 2958 | 5 thm ⊆ std3 | — |
-| `tests/T11_NonAssocHierarchy.lean` | tool | ✅ PASS | 0 | 5.31 | 2147 | 3 thm ⊆ std3 | — |
-| `tests/T12_FinsetSum.lean` | tool | ✅ PASS | 0 | 3.13 | 2022 | 7 thm ⊆ std3 | — |
-| `tests/T13_RealAnalysis.lean` | tool | ✅ PASS | 0 | 3.89 | 2790 | 8 thm ⊆ std3 | — |
-| `tests/T14_LinearAlgebra.lean` | tool | ✅ PASS | 0 | 4.03 | 2945 | 5 thm ⊆ std3 | — |
-| `tests/T15_Complex.lean` | tool | ✅ PASS | 0 | 3.02 | 1951 | 5 thm ⊆ std3 | — |
-| `tests/T16_CoreTactics.lean` | tool | ✅ PASS | 0 | 3.41 | 1967 | 13 thm ⊆ std3 | — |
-| `tests/T17_FloatOracle.lean` | tool | ✅ PASS | 0 | 1.27 | 774 | 1 thm ⊆ std3 | — |
-| `must-fail/MF01_Sorry/…` | must-fail | ✅ caught | 0 | 1.12 | 774 | both thms: `[sorryAx]` | Lean warning ``declaration uses `sorry` `` · `sorryAx` on the direct AND the inheriting theorem · checker `RATCHET violated — sorry: 1 > baseline 0` |
+| `tests/T00_ImportSurface.lean` | tool | ✅ PASS | 0 | 4.99 | 3762 | 1 thm, no axioms | — |
+| `tests/T01_DecideFin.lean` | tool | ✅ PASS | 0 | 3.36 | 1839 | 5 thm ⊆ std3 | — |
+| `tests/T02_DecidableInstances.lean` | tool | ✅ PASS | 0 | 3.14 | 1910 | 4 thm ⊆ std3 | — |
+| `tests/T03_FinCases.lean` | tool | ✅ PASS | 0 | 3.15 | 1940 | 3 thm ⊆ std3 | — |
+| `tests/T04_Ring.lean` | tool | ✅ PASS | 0 | 3.58 | 1952 | 5 thm ⊆ std3 | — |
+| `tests/T05_FieldSimp.lean` | tool | ✅ PASS | 0 | 3.01 | 1925 | 3 thm ⊆ std3 | — |
+| `tests/T06_LinarithPositivity.lean` | tool | ✅ PASS | 0 | 3.61 | 2018 | 5 thm ⊆ std3 | — |
+| `tests/T07_NormNumCasts.lean` | tool | ✅ PASS | 0 | 4.13 | 2817 | 6 thm ⊆ std3 | — |
+| `tests/T08_ModuleLinComb.lean` | tool | ✅ PASS | 0 | 3.71 | 2149 | 5 thm ⊆ std3 | — |
+| `tests/T09_SimpFamily.lean` | tool | ✅ PASS | 0 | 3.90 | 2380 | 9 thm ⊆ std3 | — |
+| `tests/T10_Quaternion.lean` | tool | ✅ PASS | 0 | 4.60 | 2958 | 5 thm ⊆ std3 | — |
+| `tests/T11_NonAssocHierarchy.lean` | tool | ✅ PASS | 0 | 5.47 | 2129 | 3 thm ⊆ std3 | — |
+| `tests/T12_FinsetSum.lean` | tool | ✅ PASS | 0 | 3.11 | 2011 | 7 thm ⊆ std3 | — |
+| `tests/T13_RealAnalysis.lean` | tool | ✅ PASS | 0 | 4.06 | 2789 | 8 thm ⊆ std3 | — |
+| `tests/T14_LinearAlgebra.lean` | tool | ✅ PASS | 0 | 4.26 | 2944 | 5 thm ⊆ std3 | — |
+| `tests/T15_Complex.lean` | tool | ✅ PASS | 0 | 3.06 | 1944 | 5 thm ⊆ std3 | — |
+| `tests/T16_CoreTactics.lean` | tool | ✅ PASS | 0 | 3.49 | 1951 | 13 thm ⊆ std3 | — |
+| `tests/T17_FloatOracle.lean` | tool | ✅ PASS | 0 | 1.25 | 774 | 1 thm ⊆ std3 | — |
+| `must-fail/MF01_Sorry/…` | must-fail | ✅ caught | 0 | 1.13 | 774 | both thms: `[sorryAx]` | Lean warning ``declaration uses `sorry` `` · `sorryAx` on the direct AND the inheriting theorem · checker `RATCHET violated — sorry: 1 > baseline 0` |
 | `must-fail/MF02_NativeDecide/…` | must-fail | ✅ caught | 0 | 1.14 | 774 | `[QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1]` | checker `HARD-BAN violated — native_decide: 1 occurrence` · non-standard axiom |
-| `must-fail/MF03_VacuousTrue/…` | must-fail | ✅ caught | 0 | 1.12 | 774 | both thms: **no axioms** (clean!) | checker `HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence` + `RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0` |
-| `must-fail/MF04_FalseDecide/…` | must-fail | ✅ caught | 1 | 1.15 | 774 | — (file rejected) | ``Tactic `decide` proved that the proposition 2 + 3 = 1 is false`` (l.19) and ``… 1 - 2 = 0 is false`` (l.22, `Int`) |
+| `must-fail/MF03_VacuousTrue/…` | must-fail | ✅ caught | 0 | 1.14 | 774 | both thms: **no axioms** (clean!) | checker `HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence` + `RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0` |
+| `must-fail/MF04_FalseDecide/…` | must-fail | ✅ caught | 1 | 1.12 | 774 | — (file rejected) | ``Tactic `decide` proved that the proposition 2 + 3 = 1 is false`` (l.19) and ``… 1 - 2 = 0 is false`` (l.22, `Int`) |
 
 "std3" = `{propext, Classical.choice, Quot.sound}`. RSS is `/usr/bin/time` `%M` of the `lake env lean` process tree
 (the largest process, i.e. `lean`). Files without a Mathlib import (T17, MF01–MF04) sit at the 774 MB Lean-core floor;
@@ -111,4 +111,5 @@ of the heavy `decide` modules (FEATURES.md top item 2).
 
 | Date | Run | Change |
 |---|---|---|
-| 2026-11-20 | `20261120T204403Z` | v1 baseline on `v4.30.0` / `c5ea003` (issue #823 W5) |
+| 2026-11-20 | `20261120T204403Z` | v1 baseline on `v4.30.0` / `c5ea003` (issue #823 W5), suite under `proofs/` |
+| 2026-11-20 | `20261120T210059Z` | suite moved to `tools/lean-toolcheck/` (PR #824 option (b)); re-run GREEN 22/22, numbers within ±0.3 s / ±25 MB of v1 |
