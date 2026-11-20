@@ -10,7 +10,7 @@ splits its type-theoretic and runtime implementations. So on the #723 target thi
 is EXPECTED to report "CHANGED" — which then confirms those items landed as described.
 It never fails the suite.
 
-TOOLCHECK-EXPECT: known-limit lean-error did not reduce to `isTrue` or `isFalse`
+TOOLCHECK-EXPECT: known-limit lean-error (?s)^19:\d+: error: Tactic `decide` failed.*did not reduce to `isTrue` or `isFalse`
 -/
 
 namespace QBPToolcheck.KL02

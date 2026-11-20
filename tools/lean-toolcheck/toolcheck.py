@@ -14,14 +14,17 @@ Expectation lines live in each .lean file's header comment:
                                                one axiom report per `#print axioms` line, and the
                                                foundations checker accepts the file
   TOOLCHECK-EXPECT: lean-ok                    Lean exit 0
-  TOOLCHECK-EXPECT: lean-error <regex>         Lean exit != 0 and the output matches <regex>
-  TOOLCHECK-EXPECT: lean-output <regex>        the output matches <regex>
+  TOOLCHECK-EXPECT: lean-error <regex>         Lean exit != 0 and ONE error message, rendered
+                                               `LINE:COL: error: TEXT`, matches <regex> (re.search
+                                               on that single message — anchor with ^LINE:)
+  TOOLCHECK-EXPECT: lean-output <regex>        ONE warning/information message, rendered
+                                               `LINE:COL: warning: TEXT`, matches <regex>
   TOOLCHECK-EXPECT: axiom <thm> <axiom>        `#print axioms <thm>` lists <axiom>
   TOOLCHECK-EXPECT: axiom-nonstd <thm>         `#print axioms <thm>` lists at least one axiom outside
                                                {propext, Classical.choice, Quot.sound} (name-agnostic:
                                                the native-evaluation axiom's name changes in Lean v4.35.0)
   TOOLCHECK-EXPECT: checker-reject <regex>     check_lean_foundations.py (zero baseline) exits 1
-                                               and its output matches <regex>
+                                               and ONE of its `::error::` lines matches <regex>
 
   TOOLCHECK-EXPECT: known-limit checker-accepts            REPORT-ONLY: the checker exits 0 on the file
   TOOLCHECK-EXPECT: known-limit audit-clean <thm>          REPORT-ONLY: `#print axioms <thm>` is ⊆ std3
@@ -32,7 +35,12 @@ Expectation lines live in each .lean file's header comment:
 
 A must-fail whose expected detection does not happen is a suite FAILURE. A Lean crash
 (exit >= 128, e.g. 139 = SIGSEGV) is a FAILURE for every file and is never retried.
-This script only reads Lean's text output; it never treats `#eval` output as proof.
+Lean is run with `--json`: only Lean's own message stream (one JSON object per line) is
+trusted. An axiom report counts only if it is an `information` message positioned exactly at
+a `#print axioms <thm>` command for that <thm>, and reports merge worst-case (union), so
+printed text (`#eval IO.println "'x' does not depend on any axioms"`) can neither add a clean
+report nor clear a real one (MF06). Expected theorem names come from a nesting-aware comment
+stripper (T19). This script never treats `#eval` output as proof.
 """
 
 from __future__ import annotations
@@ -49,15 +57,65 @@ STANDARD_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 EXPECT_RE = re.compile(r"^TOOLCHECK-EXPECT:[ \t]*(\S+)[ \t]*(.*?)[ \t]*$", re.MULTILINE)
 AXIOMS_RE = re.compile(r"'([^']+)' depends on axioms: \[([^\]]*)\]", re.DOTALL)
 NOAXIOMS_RE = re.compile(r"'([^']+)' does not depend on any axioms")
-PRINT_AXIOMS_RE = re.compile(r"^#print axioms\s+(\S+)", re.MULTILINE)
 # Lean 4.30 prints "declaration uses `sorry`" (backticks); older toolchains used 'sorry' (quotes).
 SORRY_WARN_RE = re.compile(r"declaration uses [`']sorry[`']")
-ERROR_RE = re.compile(r"^\S+:\d+:\d+: error", re.MULTILINE)
 
 
 def strip_comments(src: str) -> str:
-    src = re.sub(r"/-.*?-/", "", src, flags=re.DOTALL)
-    return re.sub(r"--.*", "", src)
+    """Blank out Lean comments, preserving every newline and column (Gemini (6) on PR #824).
+
+    A small lexer, not a regex: `/- … -/` block comments NEST in Lean (depth-counted here —
+    a non-greedy `/-.*?-/` ends at the first inner `-/` and exposes the rest as "code"),
+    `--` runs to end of line, and string literals are skipped so a `"/-"` or `"--"` inside a
+    string neither opens a comment nor hides code. Comment characters become spaces, so
+    line/column positions in the result equal those in the source (the axiom audit relies
+    on that to tie each report to its `#print axioms` command).
+    """
+    out: list[str] = []
+    i, n, depth = 0, len(src), 0
+    in_str = False
+    while i < n:
+        c = src[i]
+        two = src[i : i + 2]
+        if depth > 0:
+            if two == "/-":
+                depth += 1
+                out.append("  ")
+                i += 2
+            elif two == "-/":
+                depth -= 1
+                out.append("  ")
+                i += 2
+            else:
+                out.append("\n" if c == "\n" else " ")
+                i += 1
+        elif in_str:
+            if c == "\\" and i + 1 < n:
+                out.append(src[i : i + 2])
+                i += 2
+                continue
+            if c == '"':
+                in_str = False
+            out.append(c)
+            i += 1
+        elif two == "/-":
+            depth = 1
+            out.append("  ")
+            i += 2
+        elif two == "--":
+            j = src.find("\n", i)
+            j = n if j < 0 else j
+            out.append(" " * (j - i))
+            i = j
+        elif c == "'" and i + 2 < n and src[i + 2] == "'" and src[i + 1] != "\\":
+            out.append(src[i : i + 3])  # char literal such as '"' — not a string opener
+            i += 3
+        else:
+            if c == '"':
+                in_str = True
+            out.append(c)
+            i += 1
+    return "".join(out)
 
 
 # ---------------------------------------------------------------- pins
@@ -137,15 +195,84 @@ def cmd_check_imports(a: argparse.Namespace) -> int:
 # ---------------------------------------------------------------- evaluate
 
 
-def parse_axioms(out: str) -> dict[str, list[str]]:
-    res: dict[str, list[str]] = {}
-    for thm, lst in AXIOMS_RE.findall(out):
-        res[thm] = sorted(
-            x.strip() for x in lst.replace("\n", " ").split(",") if x.strip()
+def lean_messages(log: str) -> tuple[list[dict], int]:
+    """Lean's own message stream from `lean --json` output: one JSON object per line.
+
+    Returns (messages, n_untrusted) — each message is {sev, line, col, text}; any other
+    stdout line (e.g. from `#eval IO.println`) is UNTRUSTED and only counted.
+    """
+    msgs: list[dict] = []
+    untrusted = 0
+    for raw in log.splitlines():
+        raw = raw.strip()
+        if not raw:
+            continue
+        try:
+            m = json.loads(raw) if raw.startswith("{") else None
+        except json.JSONDecodeError:
+            m = None
+        if not isinstance(m, dict) or "severity" not in m or "data" not in m:
+            untrusted += 1
+            continue
+        pos = m.get("pos") or {}
+        msgs.append(
+            {
+                "sev": m["severity"],
+                "line": pos.get("line"),
+                "col": pos.get("column"),
+                "text": str(m["data"]),
+            }
         )
-    for thm in NOAXIOMS_RE.findall(out):
-        res[thm] = []
-    return res
+    return msgs, untrusted
+
+
+def render(m: dict) -> str:
+    """One message as `L:C: severity: text` — the unit every expectation regex is matched against."""
+    return f"{m['line']}:{m['col']}: {m['sev']}: {m['text']}"
+
+
+def print_axioms_sites(code: str) -> dict[tuple[int, int], str]:
+    """(line, column) of every `#print axioms <thm>` command in comment-stripped source."""
+    sites: dict[tuple[int, int], str] = {}
+    for ln, line in enumerate(code.splitlines(), start=1):
+        m = re.match(r"^([ \t]*)#print axioms\s+(\S+)", line)
+        if m:
+            sites[(ln, len(m.group(1)))] = m.group(2)
+    return sites
+
+
+def parse_axioms(
+    msgs: list[dict], sites: dict[tuple[int, int], str]
+) -> tuple[dict[str, list[str]], int]:
+    """Axiom audit, spoof-resistant (Gemini (2) on PR #824).
+
+    (a) A report counts only if it is an `information` message from Lean's message stream
+        positioned EXACTLY at a `#print axioms <thm>` command for that same <thm>; text
+        printed by `#eval IO.println`, `run_cmd logInfo …` or anything else is ignored.
+    (b) Merge is worst-case: reports for one theorem are UNIONED, so a later "does not
+        depend on any axioms" can never clear a non-standard axiom already reported.
+    Returns (axioms per theorem, number of axiom-like messages rejected as unpositioned).
+    """
+    res: dict[str, set[str]] = {}
+    rejected = 0
+    for m in msgs:
+        text = m["text"]
+        dep = AXIOMS_RE.search(text)
+        nodep = NOAXIOMS_RE.search(text)
+        if not (dep or nodep):
+            continue
+        thm = (dep or nodep).group(1)  # type: ignore[union-attr]
+        if m["sev"] != "information" or sites.get((m["line"], m["col"])) != thm:
+            rejected += 1
+            continue
+        acc = res.setdefault(thm, set())
+        if dep:
+            acc.update(
+                x.strip()
+                for x in dep.group(2).replace("\n", " ").split(",")
+                if x.strip()
+            )
+    return {k: sorted(v) for k, v in res.items()}, rejected
 
 
 def file_kind(rel: str) -> str:
@@ -182,10 +309,25 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
     chk_out_p = raw / f"{stem}.checker.log"
     chk_out = chk_out_p.read_text() if chk_out_p.exists() else ""
     chk_exit = meta.get("checker_exit")
-    axioms = parse_axioms(log)
+    code = strip_comments(src)
+    msgs, n_untrusted = lean_messages(log)
+    sites = print_axioms_sites(code)
+    axioms, n_rejected = parse_axioms(msgs, sites)
+    errors = [render(m) for m in msgs if m["sev"] == "error"]
+    warn_info = [render(m) for m in msgs if m["sev"] in ("warning", "information")]
+    # checker-reject regexes are matched per `::error::` line, never against the whole output
+    chk_errors = [ln for ln in chk_out.splitlines() if ln.startswith("::error")]
     lean_exit = meta.get("lean_exit")
     failures: list[str] = []
     detections: list[str] = []
+    if n_rejected:
+        detections.append(
+            f"axiom audit ignored {n_rejected} axiom-like message(s) not positioned at a "
+            f"`#print axioms` command (spoof guard)"
+        )
+
+    def any_match(rx: str, lines: list[str]) -> bool:
+        return any(re.search(rx, ln) for ln in lines)
 
     known: list[str] = []
     kind_is_kl = file_kind(rel) == "known-limit"
@@ -207,11 +349,11 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
         if kind == "pass":
             if lean_exit != 0:
                 failures.append(f"Lean exit {lean_exit} (expected 0)")
-            if ERROR_RE.search(log):
+            if errors:
                 failures.append("Lean reported an error")
-            if SORRY_WARN_RE.search(log):
+            if any(SORRY_WARN_RE.search(w) for w in warn_info):
                 failures.append("Lean reported a sorry")
-            wanted = PRINT_AXIOMS_RE.findall(strip_comments(src))
+            wanted = list(sites.values())
             for thm in wanted:
                 if thm not in axioms:
                     failures.append(f"no axiom report for {thm}")
@@ -235,12 +377,12 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
                 failures.append(
                     f"Lean ACCEPTED a must-fail file (expected error /{arg}/)"
                 )
-            elif not re.search(arg, log):
+            elif not any_match(arg, errors):
                 failures.append(f"Lean failed but without the expected message /{arg}/")
             else:
                 detections.append(f"Lean rejected: /{arg}/")
         elif kind == "lean-output":
-            if re.search(arg, log):
+            if any_match(arg, warn_info):
                 detections.append(f"Lean output: /{arg}/")
             else:
                 failures.append(f"expected Lean output /{arg}/ not found")
@@ -267,7 +409,7 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
         elif kind == "checker-reject":
             if chk_exit != 1:
                 failures.append(f"foundations checker did not reject (exit {chk_exit})")
-            elif not re.search(arg, chk_out):
+            elif not any_match(arg, chk_errors):
                 failures.append(
                     f"checker rejected but without the expected message /{arg}/"
                 )
@@ -284,7 +426,7 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
                 hold = ax is not None and not (set(ax) - STANDARD_AXIOMS)
                 what = f"`#print axioms {thm}` is clean ({ax})"
             elif check == "lean-error":
-                hold = lean_exit not in (0, None) and bool(re.search(rest, log))
+                hold = lean_exit not in (0, None) and any_match(rest, errors)
                 what = f"Lean still rejects with /{rest}/"
             else:
                 failures.append(f"unknown known-limit check {check!r}")
@@ -352,6 +494,16 @@ def cmd_evaluate(a: argparse.Namespace) -> int:
     if a.only_present:
         files = [f for f in files if (raw / f"{f.stem}.meta.json").exists()]
     rows = [grade(f, raw, suite) for f in files]
+    # An empty suite (or an emptied layer) must be RED, never a vacuous GREEN (Gemini on PR #824).
+    empty: list[str] = []
+    if not rows:
+        empty.append("no suite files graded — an empty suite is RED")
+    elif not a.only_present:
+        for layer in ("tool", "must-fail", "known-limit"):
+            if not any(r["kind"] == layer for r in rows):
+                empty.append(f"the {layer} layer has zero files — RED")
+    meta.setdefault("preflight_failures", [])
+    meta["preflight_failures"] = list(meta["preflight_failures"]) + empty
     ok = all(r["result"] in ("PASS", "KNOWN-LIMIT") for r in rows) and not meta.get(
         "preflight_failures"
     )

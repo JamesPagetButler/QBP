@@ -70,11 +70,33 @@ RUN_DIR="$HERE/results/runs/${RUN_ID}" # gitignored; one directory per run
 RAW="$RUN_DIR/raw"
 
 # ---- file list ------------------------------------------------------------------
-mapfile -t FILES < <(ls "$HERE"/tests/*.lean; ls "$HERE"/must-fail/*/*.lean; ls "$HERE"/known-limits/*/*.lean)
+# Null-safe globs (no `ls` parsing; any filename character is fine). An empty layer, an empty
+# suite, or a prefix that matches nothing is a refusal (exit 2), never a vacuous GREEN.
+shopt -s nullglob
+L_TESTS=("$HERE"/tests/*.lean)
+L_MF=("$HERE"/must-fail/*/*.lean)
+L_KL=("$HERE"/known-limits/*/*.lean)
+shopt -u nullglob
+for layer in L_TESTS L_MF L_KL; do
+  declare -n arr="$layer"
+  if ((${#arr[@]} == 0)); then
+    echo "toolcheck: REFUSED — layer ${layer#L_} has zero .lean files (an empty layer is RED)" >&2
+    exit 2
+  fi
+  unset -n arr
+done
+FILES=("${L_TESTS[@]}" "${L_MF[@]}" "${L_KL[@]}")
 if (($# > 0)); then
   sel=()
-  for f in "${FILES[@]}"; do
-    for p in "$@"; do [[ "$(basename "$f")" == "$p"* ]] && sel+=("$f"); done
+  for p in "$@"; do
+    hit=0
+    for f in "${FILES[@]}"; do
+      if [[ "$(basename "$f")" == "$p"* ]]; then sel+=("$f"); hit=1; fi
+    done
+    if ((hit == 0)); then
+      echo "toolcheck: REFUSED — prefix '$p' matches no suite file" >&2
+      exit 2
+    fi
   done
   FILES=("${sel[@]}")
 fi
@@ -169,14 +191,14 @@ for f in "${FILES[@]}"; do
   set +e
   if [[ "$INNER" == 1 ]]; then
     /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
-      lake env lean "$rel" > "$RAW/$stem.log" 2>&1
+      lake env lean --json "$rel" > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
     rc=$?
     label="${TOOLCHECK_BATCH_LABEL:-}"
   else
     label="lean-toolcheck-${stem}-${RUN_ID}"
     "$BOXRUN" --gpu --mem-mb "$MEM_MB" --timeout "$TIMEOUT" --wait --label "$label" -- \
       /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
-      lake env lean "$rel" > "$RAW/$stem.log" 2>&1
+      lake env lean --json "$rel" > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
     rc=$?
   fi
   set -e

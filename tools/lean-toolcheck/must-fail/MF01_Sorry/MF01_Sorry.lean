@@ -14,11 +14,11 @@ dangerous. The suite must detect it two ways:
 If any detection is missing, the suite FAILS (a must-fail that passes is a failure).
 
 TOOLCHECK-EXPECT: lean-ok
-TOOLCHECK-EXPECT: lean-output warning: declaration uses [`']sorry[`']
+TOOLCHECK-EXPECT: lean-output ^\d+:\d+: warning: declaration uses [`']sorry[`']$
 TOOLCHECK-EXPECT: axiom QBPToolcheck.MF01.unproved sorryAx
 TOOLCHECK-EXPECT: axiom QBPToolcheck.MF01.uses_unproved sorryAx
 TOOLCHECK-EXPECT: axiom QBPToolcheck.MF01.admitted sorryAx
-TOOLCHECK-EXPECT: checker-reject RATCHET violated — sorry: 1 > baseline 0
+TOOLCHECK-EXPECT: checker-reject ^::error::RATCHET violated — sorry: 1 > baseline 0\.
 -/
 
 namespace QBPToolcheck.MF01

@@ -7,10 +7,10 @@ kernel `decide`.
 the kernel/`decide` path is unsound on the current pins and the suite FAILS loudly.
 A second false claim checks the Nat-truncation trap (standard §7): over `Int`,
 `1 - 2 = -1`, so claiming `= 0` must be rejected (it would be *true* over `Nat`).
-The expected messages pin the source line (`:19:` / `:22:`) so each theorem is matched separately.
+The expected messages are anchored to one Lean error each, at its source line (`^19:` / `^22:`).
 
-TOOLCHECK-EXPECT: lean-error :19:\d+: error: Tactic `decide` proved that the proposition\s+2 \+ 3 = 1\s+is false
-TOOLCHECK-EXPECT: lean-error :22:\d+: error: Tactic `decide` proved that the proposition\s+1 - 2 = 0\s+is false
+TOOLCHECK-EXPECT: lean-error ^19:\d+: error: Tactic `decide` proved that the proposition\s+2 \+ 3 = 1\s+is false
+TOOLCHECK-EXPECT: lean-error ^22:\d+: error: Tactic `decide` proved that the proposition\s+1 - 2 = 0\s+is false
 -/
 
 namespace QBPToolcheck.MF04

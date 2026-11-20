@@ -15,8 +15,8 @@ PR #824). Only a human reading the statement catches them. If the checker misses
 literal form here, the suite FAILS.
 
 TOOLCHECK-EXPECT: lean-ok
-TOOLCHECK-EXPECT: checker-reject HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence
-TOOLCHECK-EXPECT: checker-reject RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0
+TOOLCHECK-EXPECT: checker-reject ^::error::HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence
+TOOLCHECK-EXPECT: checker-reject ^::error::RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0
 -/
 
 namespace QBPToolcheck.MF03

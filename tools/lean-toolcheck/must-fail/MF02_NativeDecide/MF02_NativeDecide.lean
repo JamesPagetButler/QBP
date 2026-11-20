@@ -13,7 +13,7 @@ If either detection is missing, the suite FAILS.
 
 TOOLCHECK-EXPECT: lean-ok
 TOOLCHECK-EXPECT: axiom-nonstd QBPToolcheck.MF02.by_native
-TOOLCHECK-EXPECT: checker-reject HARD-BAN violated — native_decide: 1 occurrence
+TOOLCHECK-EXPECT: checker-reject ^::error::HARD-BAN violated — native_decide: 1 occurrence
 -/
 
 namespace QBPToolcheck.MF02
