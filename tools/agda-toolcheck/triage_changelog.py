@@ -194,6 +194,19 @@ RULES = [
 UNCLASSIFIED = "UNCLASSIFIED — needs a human look before the upgrade PR"
 
 
+LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+URL_RE = re.compile(r"<?https?://\S+>?")
+
+
+def strip_links(title):
+    """Drop markdown links and bare URLs from an item title. The notes are
+    untrusted text and upstream link typos must not leak into the repo (the
+    repo's markdown-link-check would chase them); the triage keys on text."""
+    title = LINK_RE.sub(r"\1", title)
+    title = URL_RE.sub("", title)
+    return re.sub(r"\s{2,}", " ", title).strip()
+
+
 def classify(title, overrides, issue_titles=None):
     """Overrides first, then keyword rules, then (for a PR that only says
     'Fix #N') the title of issue N from the same notes, then UNCLASSIFIED."""
@@ -286,7 +299,7 @@ def main():
         with open(path, encoding="utf-8") as fh:
             text = fh.read()
         for section, key, title in parse(text):
-            items.append((path.rsplit("/", 1)[-1], section, key, title))
+            items.append((path.rsplit("/", 1)[-1], section, key, strip_links(title)))
     issue_titles = {
         k.split("#")[1]: t for _, _, k, t in items if k.startswith("Issue #")
     }
