@@ -101,9 +101,9 @@ Same 17 files, `run.sh --layer project`, 2026-11-20T20:55:31Z → 20:56:56Z, all
 
 ```bash
 cd <QBP checkout>
-TOOLCHECK_MEM_MB=8000 TOOLCHECK_TIMEOUT=3600 proofs/agda-toolcheck/run.sh          # full
+TOOLCHECK_MEM_MB=8000 TOOLCHECK_TIMEOUT=3600 tools/agda-toolcheck/run.sh          # full
 rm -rf proofs/agda/_build proofs/agda-cubical/_build
-TOOLCHECK_TAG=cold proofs/agda-toolcheck/run.sh --layer project                    # cold project layer
+TOOLCHECK_TAG=cold tools/agda-toolcheck/run.sh --layer project                    # cold project layer
 ```
 
 Resource estimate used for this run (pre-run gate): ≤ 1 GB RSS per file expected from the README figures (SubstrateCharge < 700 MB, QuaternionicHopf < 530 MB), ≤ 6 GB worst case for `SkyrmionCharge` under `--lossy-unification`; disk < 50 MB of interface files; cap 8 GB RSS / 3600 s enforced by boxrun. Observed: 644 MiB peak, 2 min 41 s.

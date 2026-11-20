@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# proofs/agda-toolcheck/run.sh — the Agda toolchain baseline suite (QBP#823 W1).
+# tools/agda-toolcheck/run.sh — the Agda toolchain baseline suite (QBP#823 W1).
 #
 # What it does
 #   1. Reads the toolchain: `agda --version`, the agda/cubical pin from
@@ -39,7 +39,7 @@
 #   (--wait is passed, so the run queues instead).
 #
 # Usage
-#   proofs/agda-toolcheck/run.sh [--layer tool|lib|mustfail|project|all] [--no-boxrun]
+#   tools/agda-toolcheck/run.sh [--layer tool|lib|mustfail|project|all] [--no-boxrun]
 #
 set -euo pipefail
 
