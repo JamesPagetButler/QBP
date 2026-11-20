@@ -250,6 +250,38 @@ def test_main_replaces_the_v3_candidate_text_once_the_review_passes(
     assert len(list(changes_dir.glob("*.json"))) == 1
 
 
+def test_main_removes_every_superseded_text_present_at_once(tmp_path, monkeypatch):
+    """Gemini real-API review, PR #821 (final pass): the superseded-text
+    cleanup must not stop after its first match -- a hand-edited ledger that
+    somehow carries more than one stale text at once (never produced by this
+    script's own normal operation, but not ruled out by anything the schema
+    enforces) must still end up with exactly the current NOTES_ADDITION and
+    none of the superseded texts, not just whichever one the loop hit first."""
+    ledger_path = tmp_path / "ledger.json"
+    ledger = _ledger_with_target_anchor()
+    anchor = ledger["anchors"][0]
+    anchor["e_axis"] = dict(m.E_AXIS)
+    anchor["evidence_ref"] = [dict(e) for e in m.EVIDENCE_REF]
+    anchor["review_flag"] = m.REVIEW_FLAG
+    anchor["notes"] = (
+        anchor["notes"] + m.OLD_NOTES_ADDITION_V1 + m.OLD_NOTES_ADDITION_V2
+    )
+    _write_canonical_ledger(ledger_path, ledger)
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["encode_791_desi_fit_ac3.py", "--ledger", str(ledger_path), "--pr", "900"],
+    )
+    m.main()
+
+    after = json.loads(ledger_path.read_text())
+    fixed = next(a for a in after["anchors"] if a["id"] == m.ANCHOR_ID)
+    assert m.OLD_NOTES_ADDITION_V1 not in fixed["notes"]
+    assert m.OLD_NOTES_ADDITION_V2 not in fixed["notes"]
+    assert fixed["notes"].count(m.NOTES_ADDITION) == 1
+
+
 def test_main_refuses_a_ledger_without_the_target_anchor(tmp_path, monkeypatch):
     ledger_path = tmp_path / "ledger.json"
     ledger = _ledger_with_target_anchor()

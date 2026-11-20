@@ -294,12 +294,15 @@ def main() -> int:
             # items 4/5; seq5625 kill-condition-review landing): REPLACE
             # whichever superseded text is present, never append alongside
             # it -- an old text is wrong in some specific way and must not
-            # survive next to its own correction. At most one can match
-            # (each run's own already_applied()/write step leaves exactly
-            # the newest text behind), so trying both in turn is safe.
+            # survive next to its own correction. Normally at most one
+            # superseded text is ever present (each run's own write step
+            # leaves exactly the newest text behind), but checking all three
+            # unconditionally (Gemini real-API review, PR #821, final
+            # review pass) -- not just the first match -- is a free
+            # defensive belt against a hand-edited ledger carrying more
+            # than one stale text at once.
             if superseded in current_notes:
                 current_notes = current_notes.replace(superseded, "")
-                break
         if NOTES_ADDITION not in current_notes:
             a["notes"] = current_notes + NOTES_ADDITION
         else:
