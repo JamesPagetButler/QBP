@@ -20,11 +20,14 @@
 #                   on Agda >= FIXED-IN acceptance is ACCEPTED = suite failure.
 #        project    proofs/agda/*.agda and proofs/agda-cubical/*.agda, the CI-gated
 #                   QBP proofs, in the CI order                → must PASS
-#      plus controls: forbidden_tokens.sh --require-safe over the two gated
-#      directories (covers the --safe hole of agda/agda#8341 on 2.8.0) and its
-#      own controls — every fixture in control/ must yield exactly its
-#      `PLANTED: n` hits — and the MANIFEST check: every file listed in MANIFEST
-#      was found and ran (suite layers: the found set must equal the listed set).
+#      plus controls: no-nested-source (any .agda/.lagda* below the top level of
+#      a gated directory, _build/ included, is an unchecked source → FAIL; CI
+#      type-checks the trees flat), forbidden_tokens.sh --require-safe over the
+#      two gated directories (covers the --safe hole of agda/agda#8341 on 2.8.0;
+#      REQUIRES PR #826's scripts/agda_forbidden_tokens.py, else FAIL), its own
+#      controls — every fixture in control/ must yield exactly its `PLANTED: n`
+#      hits — and the MANIFEST check: every file listed in MANIFEST was found and
+#      ran (suite layers: the found set must equal the listed set).
 #      A signal exit (rc >= 128) is CRASH in every layer; a crash never counts
 #      as REJECTED.
 #   3. Records per file: status, exit code, wall seconds, max RSS (KiB) via
@@ -326,14 +329,21 @@ if want project; then
   # exactly as CI: cd into the directory, `agda --safe` each file in glob order
   run_layer_dir substrate "$REPO/proofs/agda"         pass superset
   run_layer_dir cubical   "$REPO/proofs/agda-cubical" pass superset
-  # lexical control (forbidden_tokens.sh, raw text) over the two gated DIRECTORIES,
-  # as PR #826's CI step does: every file carries --safe, no forbidden token anywhere
+  # (7) the gated trees are flat by convention and CI type-checks `*.agda` flat:
+  # any source in a subdirectory (_build/ included) is an unchecked nested source
+  nested="$(find "$REPO/proofs/agda" "$REPO/proofs/agda-cubical" -mindepth 2 -type f \
+            \( -name '*.agda' -o -name '*.lagda' -o -name '*.lagda.*' \) 2>/dev/null | sort || true)"
+  if [ -z "$nested" ]; then nstatus=PASS; ndetail="no .agda/.lagda* source below the top level of proofs/agda or proofs/agda-cubical"
+  else nstatus=FAIL; ndetail="unchecked nested source: $(echo "$nested" | sed "s#^$REPO/##" | head -3 | tr '\n' ' ' | cut -c1-200)"; fi
+  row control no-nested-source pass "$nstatus" 0 0 0 "$ndetail"
+  # lexical control over the two gated DIRECTORIES, as PR #826's CI step does:
+  # every file carries --safe, no forbidden token anywhere. ONE scanner,
+  # fail-closed: without scripts/agda_forbidden_tokens.py the control FAILS.
   set +e
   hits="$("$HERE/forbidden_tokens.sh" --require-safe "$REPO/proofs/agda" "$REPO/proofs/agda-cubical" 2>"$TMP/ft.err")"; hrc=$?
   set -e
-  scanner="$(sed -n 's/.*\[\(.*\)\]$/\1/p' "$TMP/ft.err" | tail -1)"
-  if [ "$hrc" -eq 0 ] && [ -z "$hits" ]; then lstatus=PASS; ldetail="0 hits over proofs/agda + proofs/agda-cubical (--require-safe; scanner: $scanner)"
-  elif [ "$hrc" -eq 2 ]; then lstatus=FAIL; ldetail="scanner self-test failed: $(tr '\n' ' ' < "$TMP/ft.err" | cut -c1-200)"
+  if [ "$hrc" -eq 0 ] && [ -z "$hits" ]; then lstatus=PASS; ldetail="0 hits over proofs/agda + proofs/agda-cubical (--require-safe; scripts/agda_forbidden_tokens.py)"
+  elif [ "$hrc" -eq 2 ]; then lstatus=FAIL; ldetail="$(tr '\n' ' ' < "$TMP/ft.err" | cut -c1-220)"
   else lstatus=FAIL; ldetail="$(echo "$hits" | head -3 | tr '\n' ' ' | cut -c1-200)"; fi
   row control forbidden-tokens pass "$lstatus" 0 0 0 "$ldetail"
   # the control's own controls: every fixture in control/ must yield exactly its PLANTED hits
