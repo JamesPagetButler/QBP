@@ -1,0 +1,171 @@
+qbp-kz-g2 round 3 — raw files:
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t00.jsonl  L=8 t=0 T=1.08 mode=eq  complete  sha256 caf86820d84ef9f0edd8ef6ca1a2acc287fe6ad89286cc8aad8ace663363f856
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t01.jsonl  L=8 t=1 T=1.1 mode=eq  complete  sha256 24817f203d481905d141a0d893300d8c895e218f8c34eea017bca661cb7638da
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t02.jsonl  L=8 t=2 T=1.12 mode=eq  complete  sha256 a5bdc0dca012ef5757728ec4ce1413719f951ee71db7f55f46bfcc214ddf9e9a
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t04.jsonl  L=8 t=4 T=1.14 mode=eq  complete  sha256 1f9a7ae08c883903deac643d8445ca52ab6f7a3e823c1e2d7d0a791881608f7d
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t06.jsonl  L=8 t=6 T=1.16 mode=eq  complete  sha256 d8a1385d3cb335530d7575e959b24f8ff19a0c015e39da67501c6d80a6b81217
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t08.jsonl  L=8 t=8 T=1.18 mode=eq  complete  sha256 81e7ff99cab193bb901ac65935be452717fd29f8f32135fcc6d7869eb4c372fc
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t09.jsonl  L=8 t=9 T=1.2 mode=eq  complete  sha256 f3af8bff79c780d30a05ea250d9978a1d97482859a8daf6a6706e86f8521c93b
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t00.jsonl  L=12 t=0 T=1.08 mode=eq  complete  sha256 d5c9e15661a6da2173a001aab3c28fbddb817409a965600c9bb4b38e83a595bb
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t01.jsonl  L=12 t=1 T=1.1 mode=eq  complete  sha256 33d6288ffba03d5d4124833dff793231621587ef7c064f859756ae7ffd6d3915
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t02.jsonl  L=12 t=2 T=1.12 mode=eq  complete  sha256 3070d1bdd878224aa1cc384a913cbc4c64d74422544534b38b77d050b5aa9d11
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t03.jsonl  L=12 t=3 T=1.13 mode=eq  complete  sha256 8cb96ca340cfda3b9462e13e054ead824f03133ef01fe08e9a1fe621c1a4adb8
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t04.jsonl  L=12 t=4 T=1.14 mode=eq  complete  sha256 fe392763b811bcbdec18bcc08c28813a6c09f8a8014696fa73c3cc8eca061e0c
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t05.jsonl  L=12 t=5 T=1.15 mode=eq  complete  sha256 173066dd2d84a06653a48243e2e65992ae1b0ea5b0d98175ca2854ff5f9a02ff
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t06.jsonl  L=12 t=6 T=1.16 mode=eq  complete  sha256 f58a5209895b852eee39de9c88598d28de21d8b562c12fd17b9f133187feb90b
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t07.jsonl  L=12 t=7 T=1.17 mode=eq  complete  sha256 1ffcf2cbba0f46ceed7ea6c582aaa74890012f89f2fb0c0e628caf1b7bf41220
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t08.jsonl  L=12 t=8 T=1.18 mode=eq  complete  sha256 de40485bb5175db5ab1cfa7940a67c89eab97a685bd97c3f0b01edaa791e076d
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t09.jsonl  L=12 t=9 T=1.2 mode=eq  complete  sha256 aceefd18ee115ca02b6a43f23b2e802dba4040cc083d5e293c94ba5e9471dfa7
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t00.jsonl  L=16 t=0 T=1.08 mode=eq  complete  sha256 1cf48096d8c7b1e922265f4cd057c25790af301f9287af26befdd65444a7afc8
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t01.jsonl  L=16 t=1 T=1.1 mode=eq  complete  sha256 6222b4c4b1b1d98a2cd16ab8550dfb3e7a5cab0b640422e5f024c071fe5d72db
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t02.jsonl  L=16 t=2 T=1.12 mode=eq  complete  sha256 8f21489747ff56dabca3a779286f0c11795ada37108472964f4796926b52bad5
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t03.jsonl  L=16 t=3 T=1.13 mode=eq  complete  sha256 05e80b2df000e874eafe19a43c7d1ddc002e0ee156b748e402b592aadf0c54fa
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t04.jsonl  L=16 t=4 T=1.14 mode=eq  complete  sha256 6301d5bc5d0eafc49db45644e6b94e1eafaa9206eeaa531e3ead47e99d30bdfb
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t05.jsonl  L=16 t=5 T=1.15 mode=eq  complete  sha256 2d1771ce64081642a176205270bb618ae388a4ffc452bc43044698c2edacd22f
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t06.jsonl  L=16 t=6 T=1.16 mode=eq  complete  sha256 b1d9d62662ddeb56e8b9f8aede57c36e462d0900a841b0c1ac5e198017253414
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t07.jsonl  L=16 t=7 T=1.17 mode=eq  complete  sha256 1cebe705ec751c63ae04e419583a9f336292fe757f35ee2a927f699659b2cc3e
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t08.jsonl  L=16 t=8 T=1.18 mode=eq  complete  sha256 10f2c86f305a91fcb3b9bb9def8717cf7419694fe3400b4ebd96ca90393f077b
+  /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t09.jsonl  L=16 t=9 T=1.2 mode=eq  complete  sha256 40ed422dacc2055425bb810817572df9f536830c9d15454ce6ea34d4814aee79
+
+qbp-kz-g2 round 3 — equilibrium analysis (FROZEN-v1 §3)  prereg_sha 132f6a4251ab3ff9ecb8f9b56c607ba1a1dd7e7ed4256fd4fb6f952c0fe1a623
+bins: 60 per L over the pooled e; smoothing 3-bin (truncated edges); floor 3 sigma; dF0 = ln 2 = 0.6931; eps floor 0.20; block 250; D > 3
+
+| L | t | T | dF_L(T) | sigma_dF | resolved | peaks (bins) | h_lower | h_valley | depth/sigma | V_L(T) | D_e | D_S | start-dep | undersampled | S bimodal | file |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 8 | 0 | 1.08 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.665978 | 0.06 | 0.27 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t00.jsonl |
+| 8 | 1 | 1.10 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.665938 | 0.64 | 0.97 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t01.jsonl |
+| 8 | 2 | 1.12 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.665896 | 0.75 | 0.17 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t02.jsonl |
+| 8 | 4 | 1.14 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.665781 | 0.39 | 0.62 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t04.jsonl |
+| 8 | 6 | 1.16 | 7.4262 | 1.1915 | true | 20,52 (valley 34) | 839.7 | 0.5 | 28.98 | 0.644226 | 20.22 | 20.17 | true | true | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t06.jsonl |
+| 8 | 8 | 1.18 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666500 | 0.31 | 0.45 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t08.jsonl |
+| 8 | 9 | 1.20 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666524 | 0.76 | 1.33 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L8-t09.jsonl |
+| 12 | 0 | 1.08 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666460 | 0.15 | 0.85 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t00.jsonl |
+| 12 | 1 | 1.10 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666450 | 0.48 | 0.15 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t01.jsonl |
+| 12 | 2 | 1.12 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666435 | 0.51 | 1.07 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t02.jsonl |
+| 12 | 3 | 1.13 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666423 | 1.40 | 1.35 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t03.jsonl |
+| 12 | 4 | 1.14 | 7.8256 | 1.6729 | true | 15,51 (valley 32) | 834.7 | 0.3 | 28.87 | 0.635118 | 4.56 | 4.58 | true | true | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t04.jsonl |
+| 12 | 5 | 1.15 | 7.7313 | 5.1542 | true | 17,53 (valley 25) | 1139.3 | 0.5 | 33.75 | 0.645466 | 897.86 | 1204.52 | true | false | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t05.jsonl |
+| 12 | 6 | 1.16 | 7.6664 | 5.1109 | true | 20,54 (valley 28) | 1067.7 | 0.5 | 32.68 | 0.647873 | 683.65 | 825.61 | true | false | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t06.jsonl |
+| 12 | 7 | 1.17 | 7.4077 | 4.9385 | true | 24,54 (valley 35) | 824.3 | 0.5 | 28.71 | 0.651432 | 317.39 | 361.35 | true | false | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t07.jsonl |
+| 12 | 8 | 1.18 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666618 | 1.72 | 1.16 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t08.jsonl |
+| 12 | 9 | 1.20 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666626 | 0.67 | 2.27 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L12-t09.jsonl |
+| 16 | 0 | 1.08 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666581 | 0.57 | 0.47 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t00.jsonl |
+| 16 | 1 | 1.10 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666575 | 0.83 | 0.19 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t01.jsonl |
+| 16 | 2 | 1.12 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666569 | 1.26 | 2.28 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t02.jsonl |
+| 16 | 3 | 1.13 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666562 | 0.19 | 0.25 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t03.jsonl |
+| 16 | 4 | 1.14 | 7.9421 | 5.2948 | true | 13,52 (valley 20) | 1406.7 | 0.5 | 37.51 | 0.643988 | 1100.25 | 1255.80 | true | false | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t04.jsonl |
+| 16 | 5 | 1.15 | 7.9374 | 5.2916 | true | 16,54 (valley 21) | 1400.0 | 0.5 | 37.42 | 0.645799 | 1217.31 | 1359.06 | true | false | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t05.jsonl |
+| 16 | 6 | 1.16 | 7.8846 | 5.2564 | true | 19,55 (valley 26) | 1328.0 | 0.5 | 36.44 | 0.648146 | 936.56 | 1149.74 | true | false | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t06.jsonl |
+| 16 | 7 | 1.17 | 7.6840 | 5.1227 | true | 23,56 (valley 31) | 1086.7 | 0.5 | 32.96 | 0.651849 | 366.62 | 442.20 | true | false | true | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t07.jsonl |
+| 16 | 8 | 1.18 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666647 | 0.85 | 1.29 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t08.jsonl |
+| 16 | 9 | 1.20 | 0.0000 | 0.0000 | false | - | 0.0 | 0.0 | 0.00 | 0.666649 | 0.81 | 1.77 | false | false | false | /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/raw/qbp-kz-g2-r3-eq-L16-t09.jsonl |
+
+per run (tau_int in RECORD units; n_eff = 5000 / (2 tau); undersampled iff n_eff < 20; SE of <e> at blocks 10/50/250):
+| L | t | seed | start | tau_int_rec | W | n_eff | undersampled | tau recorded | <e> | SE10 | SE50 | SE250 | <S> | max step e (rec) | max step S (rec) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 8 | 0 | 6000 | haar | 0.785 | 5 | 3186.6 | false | 0.785 | 0.940837 | 3.67e-04 | 4.11e-04 | 3.71e-04 | 0.597910 | 0.0974 (52) | 0.0578 (4299) |
+| 8 | 0 | 6001 | haar | 0.730 | 5 | 3426.8 | false | 0.730 | 0.940408 | 3.46e-04 | 3.57e-04 | 3.13e-04 | 0.598039 | 0.1045 (2549) | 0.0605 (778) |
+| 8 | 0 | 6002 | aligned | 0.744 | 5 | 3358.7 | false | 0.744 | 0.940646 | 3.65e-04 | 3.78e-04 | 3.09e-04 | 0.598047 | 0.1346 (478) | 0.0723 (478) |
+| 8 | 1 | 6004 | haar | 0.857 | 6 | 2918.6 | false | 0.857 | 0.972242 | 4.14e-04 | 3.97e-04 | 3.07e-04 | 0.579422 | 0.1079 (3318) | 0.0626 (893) |
+| 8 | 1 | 6005 | haar | 0.800 | 5 | 3126.8 | false | 0.800 | 0.971633 | 3.97e-04 | 3.66e-04 | 4.12e-04 | 0.580083 | 0.1094 (625) | 0.0676 (3363) |
+| 8 | 1 | 6006 | aligned | 0.858 | 6 | 2912.7 | false | 0.858 | 0.972261 | 4.10e-04 | 4.24e-04 | 4.34e-04 | 0.579354 | 0.1122 (1891) | 0.0626 (1891) |
+| 8 | 2 | 6008 | haar | 0.946 | 6 | 2644.0 | false | 0.946 | 1.007164 | 4.53e-04 | 4.61e-04 | 4.76e-04 | 0.558175 | 0.1069 (4111) | 0.0619 (3129) |
+| 8 | 2 | 6009 | haar | 0.986 | 6 | 2536.1 | false | 0.986 | 1.007043 | 4.69e-04 | 4.94e-04 | 4.96e-04 | 0.558664 | 0.1036 (2263) | 0.0576 (2631) |
+| 8 | 2 | 6010 | aligned | 0.949 | 6 | 2635.4 | false | 0.949 | 1.007468 | 4.53e-04 | 4.68e-04 | 3.52e-04 | 0.558354 | 0.1223 (1732) | 0.0619 (1732) |
+| 8 | 4 | 6016 | haar | 1.386 | 9 | 1803.3 | false | 1.386 | 1.047299 | 5.87e-04 | 5.99e-04 | 6.25e-04 | 0.532757 | 0.0984 (3149) | 0.0713 (3942) |
+| 8 | 4 | 6017 | haar | 1.451 | 9 | 1723.3 | false | 1.451 | 1.048235 | 5.98e-04 | 6.35e-04 | 5.21e-04 | 0.532278 | 0.1226 (3662) | 0.0754 (3662) |
+| 8 | 4 | 6018 | aligned | 1.265 | 8 | 1976.8 | false | 1.265 | 1.047474 | 5.77e-04 | 5.61e-04 | 6.38e-04 | 0.532883 | 0.1085 (4312) | 0.0822 (2435) |
+| 8 | 6 | 6024 | haar | 2.534 | 16 | 986.6 | false | 2.534 | 1.465294 | 5.32e-04 | 6.30e-04 | 7.91e-04 | 0.105666 | 0.0894 (950) | 0.0743 (823) |
+| 8 | 6 | 6025 | haar | 338.943 | 2034 | 7.4 | true | 338.943 | 1.397147 | 6.33e-03 | 1.41e-02 | 3.12e-02 | 0.178605 | 0.1274 (4088) | 0.0872 (4088) |
+| 8 | 6 | 6026 | aligned | 1.885 | 12 | 1326.3 | false | 1.885 | 1.100167 | 7.46e-04 | 8.53e-04 | 7.98e-04 | 0.497151 | 0.1200 (4341) | 0.0873 (2987) |
+| 8 | 8 | 6032 | haar | 1.299 | 8 | 1923.8 | false | 1.299 | 1.483425 | 3.52e-04 | 3.70e-04 | 3.96e-04 | 0.093379 | 0.0726 (2376) | 0.0622 (1279) |
+| 8 | 8 | 6033 | haar | 1.284 | 8 | 1946.7 | false | 1.284 | 1.484010 | 3.52e-04 | 3.97e-04 | 4.94e-04 | 0.092692 | 0.0727 (1803) | 0.0619 (3543) |
+| 8 | 8 | 6034 | aligned | 1.108 | 7 | 2256.8 | false | 1.108 | 1.483857 | 3.27e-04 | 3.38e-04 | 3.15e-04 | 0.093268 | 0.0852 (2675) | 0.0557 (1676) |
+| 8 | 9 | 6036 | haar | 0.931 | 6 | 2684.2 | false | 0.931 | 1.497131 | 2.93e-04 | 2.92e-04 | 2.76e-04 | 0.086659 | 0.0735 (3227) | 0.0624 (3296) |
+| 8 | 9 | 6037 | haar | 0.902 | 6 | 2770.1 | false | 0.902 | 1.496882 | 2.82e-04 | 3.00e-04 | 2.95e-04 | 0.086973 | 0.0723 (1663) | 0.0554 (4947) |
+| 8 | 9 | 6038 | aligned | 0.946 | 6 | 2642.7 | false | 0.946 | 1.497283 | 2.86e-04 | 2.58e-04 | 3.03e-04 | 0.086283 | 0.0808 (1118) | 0.0634 (2056) |
+| 12 | 0 | 6040 | haar | 0.843 | 6 | 2966.1 | false | 0.843 | 0.943015 | 2.22e-04 | 2.22e-04 | 2.34e-04 | 0.583808 | 0.0518 (1508) | 0.0337 (2335) |
+| 12 | 0 | 6041 | haar | 0.757 | 5 | 3301.5 | false | 0.757 | 0.942873 | 1.93e-04 | 2.15e-04 | 2.13e-04 | 0.584006 | 0.0572 (2923) | 0.0308 (1265) |
+| 12 | 0 | 6042 | aligned | 0.829 | 5 | 3016.1 | false | 0.829 | 0.942988 | 2.08e-04 | 2.19e-04 | 2.52e-04 | 0.584124 | 0.0609 (4189) | 0.0304 (1048) |
+| 12 | 1 | 6044 | haar | 0.889 | 6 | 2811.9 | false | 0.889 | 0.975143 | 2.38e-04 | 2.32e-04 | 1.99e-04 | 0.564402 | 0.0610 (242) | 0.0382 (230) |
+| 12 | 1 | 6045 | haar | 0.865 | 6 | 2889.8 | false | 0.865 | 0.975086 | 2.24e-04 | 2.43e-04 | 2.31e-04 | 0.564154 | 0.0592 (2307) | 0.0392 (2228) |
+| 12 | 1 | 6046 | aligned | 0.873 | 6 | 2862.1 | false | 0.873 | 0.974960 | 2.26e-04 | 2.54e-04 | 2.84e-04 | 0.564318 | 0.0669 (1682) | 0.0377 (132) |
+| 12 | 2 | 6048 | haar | 0.964 | 6 | 2592.5 | false | 0.964 | 1.010884 | 2.57e-04 | 2.60e-04 | 2.04e-04 | 0.541834 | 0.0569 (3893) | 0.0365 (942) |
+| 12 | 2 | 6049 | haar | 1.011 | 7 | 2472.2 | false | 1.011 | 1.011201 | 2.49e-04 | 2.78e-04 | 2.92e-04 | 0.541776 | 0.0607 (1611) | 0.0361 (982) |
+| 12 | 2 | 6050 | aligned | 1.115 | 7 | 2241.6 | false | 1.115 | 1.011225 | 2.62e-04 | 2.75e-04 | 3.13e-04 | 0.541414 | 0.0597 (4521) | 0.0401 (822) |
+| 12 | 3 | 6052 | haar | 1.127 | 7 | 2217.5 | false | 1.127 | 1.030931 | 2.75e-04 | 3.09e-04 | 3.12e-04 | 0.529044 | 0.0598 (2141) | 0.0359 (2932) |
+| 12 | 3 | 6053 | haar | 1.300 | 8 | 1923.8 | false | 1.300 | 1.030714 | 2.88e-04 | 3.18e-04 | 3.45e-04 | 0.528736 | 0.0599 (4892) | 0.0374 (1721) |
+| 12 | 3 | 6054 | aligned | 1.261 | 8 | 1983.3 | false | 1.261 | 1.031440 | 2.94e-04 | 3.32e-04 | 3.74e-04 | 0.528354 | 0.0652 (1315) | 0.0345 (1505) |
+| 12 | 4 | 6056 | haar | 437.430 | 2630 | 5.7 | true | 437.430 | 1.286116 | 8.57e-03 | 1.92e-02 | 4.37e-02 | 0.247888 | 0.0574 (3750) | 0.0390 (4979) |
+| 12 | 4 | 6057 | haar | 207.384 | 1245 | 12.1 | true | 207.384 | 1.086878 | 4.90e-03 | 1.09e-02 | 2.37e-02 | 0.475155 | 0.0631 (1638) | 0.0381 (4851) |
+| 12 | 4 | 6058 | aligned | 1.444 | 9 | 1731.7 | false | 1.444 | 1.053129 | 3.33e-04 | 3.50e-04 | 3.28e-04 | 0.514152 | 0.0622 (2511) | 0.0387 (4145) |
+| 12 | 5 | 6060 | haar | 2.612 | 16 | 957.0 | false | 2.612 | 1.457566 | 2.97e-04 | 3.19e-04 | 3.08e-04 | 0.060580 | 0.0499 (290) | 0.0354 (781) |
+| 12 | 5 | 6061 | haar | 2.062 | 13 | 1212.2 | false | 2.062 | 1.457799 | 2.69e-04 | 3.10e-04 | 2.77e-04 | 0.060421 | 0.0453 (4155) | 0.0344 (528) |
+| 12 | 5 | 6062 | aligned | 1.585 | 10 | 1577.5 | false | 1.585 | 1.078003 | 3.75e-04 | 3.59e-04 | 3.70e-04 | 0.497135 | 0.0684 (2123) | 0.0406 (394) |
+| 12 | 6 | 6064 | haar | 1.568 | 10 | 1593.9 | false | 1.568 | 1.468444 | 2.16e-04 | 2.76e-04 | 2.86e-04 | 0.055833 | 0.0458 (4189) | 0.0350 (4504) |
+| 12 | 6 | 6065 | haar | 1.635 | 10 | 1528.6 | false | 1.635 | 1.468176 | 2.38e-04 | 2.41e-04 | 2.60e-04 | 0.056243 | 0.0416 (2372) | 0.0309 (2358) |
+| 12 | 6 | 6066 | aligned | 2.158 | 13 | 1158.5 | false | 2.158 | 1.108218 | 4.70e-04 | 5.40e-04 | 4.90e-04 | 0.474634 | 0.0584 (3619) | 0.0403 (827) |
+| 12 | 7 | 6068 | haar | 1.282 | 8 | 1950.8 | false | 1.282 | 1.476958 | 2.00e-04 | 2.07e-04 | 1.97e-04 | 0.053203 | 0.0400 (3210) | 0.0316 (2110) |
+| 12 | 7 | 6069 | haar | 1.281 | 8 | 1951.5 | false | 1.281 | 1.476778 | 1.96e-04 | 2.34e-04 | 2.17e-04 | 0.052962 | 0.0382 (4110) | 0.0301 (2644) |
+| 12 | 7 | 6070 | aligned | 6.361 | 39 | 393.0 | false | 6.361 | 1.151030 | 8.11e-04 | 1.05e-03 | 1.02e-03 | 0.440207 | 0.0670 (2884) | 0.0458 (2884) |
+| 12 | 8 | 6072 | haar | 1.147 | 7 | 2180.1 | false | 1.147 | 1.484206 | 1.80e-04 | 1.82e-04 | 1.94e-04 | 0.050760 | 0.0353 (2459) | 0.0317 (298) |
+| 12 | 8 | 6073 | haar | 1.000 | 6 | 2500.6 | false | 1.000 | 1.484273 | 1.76e-04 | 1.91e-04 | 2.04e-04 | 0.050624 | 0.0373 (2298) | 0.0334 (3801) |
+| 12 | 8 | 6074 | aligned | 1.229 | 8 | 2034.8 | false | 1.229 | 1.484577 | 1.87e-04 | 1.87e-04 | 1.39e-04 | 0.050480 | 0.0420 (1066) | 0.0292 (4321) |
+| 12 | 9 | 6076 | haar | 0.805 | 5 | 3103.8 | false | 0.805 | 1.497275 | 1.42e-04 | 1.50e-04 | 1.30e-04 | 0.046898 | 0.0370 (3231) | 0.0271 (4120) |
+| 12 | 9 | 6077 | haar | 0.890 | 6 | 2810.3 | false | 0.890 | 1.497420 | 1.49e-04 | 1.42e-04 | 1.41e-04 | 0.046958 | 0.0439 (3547) | 0.0298 (61) |
+| 12 | 9 | 6078 | aligned | 0.882 | 6 | 2834.1 | false | 0.882 | 1.497232 | 1.49e-04 | 1.53e-04 | 1.41e-04 | 0.047279 | 0.0414 (4744) | 0.0307 (2628) |
+| 16 | 0 | 6080 | haar | 0.895 | 6 | 2792.6 | false | 0.895 | 0.943762 | 1.38e-04 | 1.47e-04 | 1.40e-04 | 0.577058 | 0.0348 (807) | 0.0202 (4105) |
+| 16 | 0 | 6081 | haar | 0.758 | 5 | 3300.1 | false | 0.758 | 0.943699 | 1.28e-04 | 1.31e-04 | 1.22e-04 | 0.577261 | 0.0375 (3006) | 0.0198 (176) |
+| 16 | 0 | 6082 | aligned | 0.805 | 5 | 3104.1 | false | 0.805 | 0.943815 | 1.33e-04 | 1.47e-04 | 1.17e-04 | 0.577255 | 0.0362 (600) | 0.0193 (327) |
+| 16 | 1 | 6084 | haar | 0.940 | 6 | 2658.7 | false | 0.940 | 0.975936 | 1.49e-04 | 1.66e-04 | 1.84e-04 | 0.557256 | 0.0413 (354) | 0.0285 (354) |
+| 16 | 1 | 6085 | haar | 0.871 | 6 | 2869.1 | false | 0.871 | 0.975742 | 1.43e-04 | 1.58e-04 | 1.63e-04 | 0.557426 | 0.0458 (1527) | 0.0227 (994) |
+| 16 | 1 | 6086 | aligned | 1.076 | 7 | 2324.4 | false | 1.076 | 0.975681 | 1.55e-04 | 1.71e-04 | 1.47e-04 | 0.557298 | 0.0414 (4109) | 0.0213 (2781) |
+| 16 | 2 | 6088 | haar | 1.038 | 7 | 2407.5 | false | 1.038 | 1.011809 | 1.68e-04 | 1.83e-04 | 2.29e-04 | 0.534297 | 0.0411 (1850) | 0.0238 (102) |
+| 16 | 2 | 6089 | haar | 0.984 | 6 | 2540.1 | false | 0.984 | 1.011888 | 1.67e-04 | 1.72e-04 | 1.71e-04 | 0.534266 | 0.0371 (583) | 0.0243 (622) |
+| 16 | 2 | 6090 | aligned | 1.077 | 7 | 2320.8 | false | 1.077 | 1.012115 | 1.66e-04 | 1.86e-04 | 1.57e-04 | 0.533732 | 0.0365 (3314) | 0.0221 (707) |
+| 16 | 3 | 6092 | haar | 1.198 | 8 | 2086.6 | false | 1.198 | 1.032336 | 1.88e-04 | 2.05e-04 | 1.52e-04 | 0.520316 | 0.0416 (4755) | 0.0272 (1548) |
+| 16 | 3 | 6093 | haar | 1.237 | 8 | 2021.0 | false | 1.237 | 1.032347 | 1.88e-04 | 2.09e-04 | 2.63e-04 | 0.520340 | 0.0422 (804) | 0.0286 (804) |
+| 16 | 3 | 6094 | aligned | 1.260 | 8 | 1984.0 | false | 1.260 | 1.032384 | 1.86e-04 | 1.76e-04 | 1.70e-04 | 0.520409 | 0.0361 (2508) | 0.0228 (3772) |
+| 16 | 4 | 6096 | haar | 3.924 | 24 | 637.1 | false | 3.924 | 1.444253 | 2.67e-04 | 3.35e-04 | 3.46e-04 | 0.044728 | 0.0360 (373) | 0.0228 (1859) |
+| 16 | 4 | 6097 | haar | 3.370 | 21 | 741.9 | false | 3.370 | 1.444323 | 2.50e-04 | 2.85e-04 | 2.61e-04 | 0.044377 | 0.0279 (3700) | 0.0203 (1043) |
+| 16 | 4 | 6098 | aligned | 1.390 | 9 | 1798.5 | false | 1.390 | 1.054759 | 2.18e-04 | 2.33e-04 | 2.82e-04 | 0.505002 | 0.0372 (1846) | 0.0237 (1555) |
+| 16 | 5 | 6100 | haar | 2.060 | 13 | 1213.9 | false | 2.060 | 1.457843 | 1.75e-04 | 1.82e-04 | 1.52e-04 | 0.039344 | 0.0292 (880) | 0.0202 (4422) |
+| 16 | 5 | 6101 | haar | 2.195 | 14 | 1138.9 | false | 2.195 | 1.457836 | 1.79e-04 | 2.13e-04 | 2.32e-04 | 0.039185 | 0.0290 (3625) | 0.0206 (2438) |
+| 16 | 5 | 6102 | aligned | 1.751 | 11 | 1427.7 | false | 1.751 | 1.080578 | 2.51e-04 | 3.19e-04 | 2.78e-04 | 0.486334 | 0.0406 (4154) | 0.0244 (1602) |
+| 16 | 6 | 6104 | haar | 1.557 | 10 | 1605.3 | false | 1.557 | 1.468427 | 1.50e-04 | 1.65e-04 | 2.04e-04 | 0.036446 | 0.0320 (4882) | 0.0210 (4613) |
+| 16 | 6 | 6105 | haar | 1.431 | 9 | 1747.2 | false | 1.431 | 1.468512 | 1.42e-04 | 1.52e-04 | 1.83e-04 | 0.036360 | 0.0257 (1435) | 0.0181 (3592) |
+| 16 | 6 | 6106 | aligned | 2.563 | 16 | 975.4 | false | 2.563 | 1.110434 | 3.22e-04 | 3.64e-04 | 3.58e-04 | 0.463998 | 0.0366 (4821) | 0.0254 (1765) |
+| 16 | 7 | 6108 | haar | 1.314 | 8 | 1902.7 | false | 1.314 | 1.477070 | 1.31e-04 | 1.46e-04 | 1.64e-04 | 0.034455 | 0.0269 (2084) | 0.0205 (2183) |
+| 16 | 7 | 6109 | haar | 1.202 | 8 | 2080.1 | false | 1.202 | 1.477072 | 1.25e-04 | 1.25e-04 | 1.19e-04 | 0.034321 | 0.0250 (4419) | 0.0192 (107) |
+| 16 | 7 | 6110 | aligned | 7.393 | 45 | 338.2 | false | 7.393 | 1.154929 | 5.44e-04 | 7.98e-04 | 8.73e-04 | 0.428150 | 0.0475 (4230) | 0.0294 (2397) |
+| 16 | 8 | 6112 | haar | 1.073 | 7 | 2329.8 | false | 1.073 | 1.484370 | 1.13e-04 | 1.24e-04 | 1.11e-04 | 0.032793 | 0.0255 (635) | 0.0174 (4605) |
+| 16 | 8 | 6113 | haar | 1.062 | 7 | 2353.7 | false | 1.062 | 1.484518 | 1.09e-04 | 1.28e-04 | 1.34e-04 | 0.032770 | 0.0263 (1625) | 0.0211 (3066) |
+| 16 | 8 | 6114 | aligned | 1.072 | 7 | 2331.1 | false | 1.072 | 1.484555 | 1.12e-04 | 1.25e-04 | 9.74e-05 | 0.032919 | 0.0251 (2049) | 0.0185 (4367) |
+| 16 | 9 | 6116 | haar | 0.830 | 5 | 3011.7 | false | 0.830 | 1.497260 | 9.53e-05 | 9.56e-05 | 9.04e-05 | 0.030629 | 0.0236 (2796) | 0.0201 (4387) |
+| 16 | 9 | 6117 | haar | 0.798 | 5 | 3131.8 | false | 0.798 | 1.497316 | 9.12e-05 | 9.64e-05 | 7.30e-05 | 0.030558 | 0.0229 (2586) | 0.0175 (435) |
+| 16 | 9 | 6118 | aligned | 0.753 | 5 | 3318.4 | false | 0.753 | 1.497199 | 9.20e-05 | 9.54e-05 | 9.31e-05 | 0.030811 | 0.0269 (2996) | 0.0196 (1144) |
+
+primary:
+| L | dF*(L) | T*(L) (t) | sigma*(L) | V_min(L) at T | bins [lo, hi] | de at T* |
+|---|---|---|---|---|---|---|
+| 8 | 7.4262 | 1.16 (6) | 1.1915 | 0.644226 at 1.16 | [0.85935, 1.55212] | 0.3695 |
+| 12 | 7.8256 | 1.14 (4) | 1.6729 | 0.635118 at 1.14 | [0.88740, 1.53135] | 0.3864 |
+| 16 | 7.9421 | 1.14 (4) | 5.2948 | 0.643988 at 1.14 | [0.91560, 1.51571] | 0.3901 |
+
+rule (precedence (a) -> (b) -> (c)):
+  eps(16,12) = 11.1055  eps(12,8) = 4.1077
+  (a) dF*(16) = 7.9421 >= ln 2 = 0.6931 ? true;  dF*(16) >= dF*(12) - eps = -3.2798 ? true;  dF*(12) = 7.8256 >= dF*(8) - eps = 3.3185 ? true  => (a) clauses true
+  (a)-side gate: undersampled run at (16, T*(16) = 1.14)? false
+  (b) dF_16(T) = 0 and dF_12(T) = 0 at every T ? false
+  (b)-side gate: undersampled run at any (L in {12,16}, T)? true;  start-dependent point at any (L in {12,16}, T)? true (without a resolved pair: false)
+
+OUTCOME: H-FO by rule (a)
+
+secondaries (non-gating):
+  V_min: L=8 0.644226, L=12 0.635118, L=16 0.643988; two-point 1/L^3 extrapolation V* = 0.650461 (2/3 = 0.666667)
+  at (16, T*(16) = 1.14): de (peak separation) = 0.3901; phase-locking count = 3 of 3 seeds
+  de trend at each L's own T*: L=8 0.3695, L=12 0.3864, L=16 0.3901 (0 = no resolved pair there)
+  no coexistence T readable at L = 16 (4 bimodal grid point(s); needs >= 2 with an equal-weight crossing)
+  S histograms: 9 of 27 points resolved-bimodal (descriptive only)
+
+plot data written to /tmp/claude-1000/-home-prime-Documents-QBP/cc9bae42-b88b-4399-8c1c-777c775ce9bd/scratchpad/kz-r3-run/analysis/plot.json
