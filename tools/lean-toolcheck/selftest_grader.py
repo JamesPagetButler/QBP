@@ -171,6 +171,66 @@ results.append(
     )
 )
 
+
+# 7. Gemini r2 (b) and (c): replay MF07 (same-line site) and MF08 (interpolation) as
+#    PASS-labelled attack files — real Lean logs, header expectations swapped for `pass`
+#    with the line count kept, so every Lean position still matches. The new grader must
+#    FAIL both; an old grader (optional 4th arg) shows whether it was exploitable.
+def as_pass_attack(src_stem: str, src_rel: str, new_stem: str) -> tuple[Path, Path]:
+    s3 = work / f"suite-{new_stem}"
+    shutil.copytree(suite, s3, ignore=shutil.ignore_patterns("results"))
+    text = (suite / src_rel).read_text(encoding="utf-8").splitlines(keepends=True)
+    first = True
+    out = []
+    for ln in text:
+        if ln.startswith("TOOLCHECK-EXPECT:"):
+            out.append("TOOLCHECK-EXPECT: pass\n" if first else "\n")
+            first = False
+        else:
+            out.append(ln)
+    (s3 / "tests" / f"{new_stem}.lean").write_text("".join(out), encoding="utf-8")
+    r3 = work / f"raw-{new_stem}"
+    shutil.copytree(raw, r3)
+    for ext in (".log", ".meta.json", ".checker.log", ".stderr"):
+        p = r3 / f"{src_stem}{ext}"
+        if p.exists():
+            shutil.copy(p, r3 / f"{new_stem}{ext}")
+    return s3, r3
+
+
+for src_stem, src_rel, new_stem in (
+    (
+        "MF07_SameLineSite",
+        "must-fail/MF07_SameLineSite/MF07_SameLineSite.lean",
+        "T90_AttackSameLine",
+    ),
+    (
+        "MF08_InterpolationLexer",
+        "must-fail/MF08_InterpolationLexer/MF08_InterpolationLexer.lean",
+        "T91_AttackInterpolation",
+    ),
+):
+    s3, r3 = as_pass_attack(src_stem, src_rel, new_stem)
+    res = evaluate(new_tc, r3, s3, new_stem)
+    got = res["rows"][f"{new_stem}.lean"]["result"]
+    ok = ok and got == "FAIL"
+    results.append(
+        (
+            f"plant[{new_stem}] pass-labelled attack, NEW grader (must FAIL)",
+            row(res, f"{new_stem}.lean"),
+            "",
+        )
+    )
+    if old_tc is not None:
+        res_old = evaluate(old_tc, r3, s3, new_stem + "-old")
+        results.append(
+            (
+                f"plant[{new_stem}] pass-labelled attack, OLD grader",
+                row(res_old, f"{new_stem}.lean"),
+                "",
+            )
+        )
+
 for a, b, c in results:
     print(f"| {a} | {b} | {c} |")
 print("selftest:", "OK — every plant behaved as required" if ok else "FAILED")

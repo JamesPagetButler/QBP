@@ -39,8 +39,12 @@ Lean is run with `--json`: only Lean's own message stream (one JSON object per l
 trusted. An axiom report counts only if it is an `information` message positioned exactly at
 a `#print axioms <thm>` command for that <thm>, and reports merge worst-case (union), so
 printed text (`#eval IO.println "'x' does not depend on any axioms"`) can neither add a clean
-report nor clear a real one (MF06). Expected theorem names come from a nesting-aware comment
-stripper (T19). This script never treats `#eval` output as proof.
+report nor clear a real one (MF06). Sites are found ANYWHERE on a line (MF07) in source with
+comments and string bodies blanked by a nesting-aware lexer (T19). COVERAGE: the audit covers
+exactly the `#print axioms` sites this lexer finds; the suite convention is ONE site per
+theorem. The lexer does not model string interpolation, so a file with a brace inside a string
+literal is REFUSED (MF08; `TOOLCHECK-EXPECT: grader-refuses` marks a must-fail that expects
+it). This script never treats `#eval` output as proof.
 """
 
 from __future__ import annotations
@@ -61,61 +65,96 @@ NOAXIOMS_RE = re.compile(r"'([^']+)' does not depend on any axioms")
 SORRY_WARN_RE = re.compile(r"declaration uses [`']sorry[`']")
 
 
-def strip_comments(src: str) -> str:
-    """Blank out Lean comments, preserving every newline and column (Gemini (6) on PR #824).
+def lex(src: str) -> str:
+    """Classify every character of a Lean source: 'c' code, 'm' comment, 's' string body.
 
-    A small lexer, not a regex: `/- … -/` block comments NEST in Lean (depth-counted here —
-    a non-greedy `/-.*?-/` ends at the first inner `-/` and exposes the rest as "code"),
-    `--` runs to end of line, and string literals are skipped so a `"/-"` or `"--"` inside a
-    string neither opens a comment nor hides code. Comment characters become spaces, so
-    line/column positions in the result equal those in the source (the axiom audit relies
-    on that to tie each report to its `#print axioms` command).
+    The returned string has the same length as `src` (one class letter per character).
+    Rules (Gemini (6) and r2 (c) on PR #824):
+      * `/- … -/` block comments NEST (depth-counted) — a non-greedy regex would end at the
+        first inner closer and expose the rest as "code";
+      * `--` runs to end of line;
+      * "…" string literals with backslash escapes; the quotes themselves are 'c', the body
+        is 's'; a char literal such as '"' or '\\"' does not open a string.
+    SUPPORTED SUBSET: the lexer does NOT model string interpolation (`s!"…{e}…"`, and the
+    implicit interpolation of `throwError "…{e}…"` / `m!` / `f!`). Instead `brace_in_string`
+    reports any `{` or `}` inside a string body, and the grader REFUSES such a file — every
+    interpolation needs a brace inside the first string segment, so refusing braces makes the
+    simple string rule exact for every file the grader accepts (write a literal brace as
+    "\\x7B" / "\\x7D"). See must-fail MF08.
     """
-    out: list[str] = []
+    cls: list[str] = []
     i, n, depth = 0, len(src), 0
     in_str = False
     while i < n:
         c = src[i]
         two = src[i : i + 2]
         if depth > 0:
-            if two == "/-":
-                depth += 1
-                out.append("  ")
-                i += 2
-            elif two == "-/":
-                depth -= 1
-                out.append("  ")
+            if two in ("/-", "-/"):
+                depth += 1 if two == "/-" else -1
+                cls.append("mm")
                 i += 2
             else:
-                out.append("\n" if c == "\n" else " ")
+                cls.append("m")
                 i += 1
         elif in_str:
             if c == "\\" and i + 1 < n:
-                out.append(src[i : i + 2])
+                cls.append("ss")
                 i += 2
                 continue
             if c == '"':
                 in_str = False
-            out.append(c)
+                cls.append("c")
+            else:
+                cls.append("s")
             i += 1
         elif two == "/-":
             depth = 1
-            out.append("  ")
+            cls.append("mm")
             i += 2
         elif two == "--":
             j = src.find("\n", i)
             j = n if j < 0 else j
-            out.append(" " * (j - i))
+            cls.append("m" * (j - i))
             i = j
         elif c == "'" and i + 2 < n and src[i + 2] == "'" and src[i + 1] != "\\":
-            out.append(src[i : i + 3])  # char literal such as '"' — not a string opener
+            cls.append("ccc")  # char literal such as '"' — not a string opener
             i += 3
+        elif c == "'" and i + 3 < n and src[i + 1] == "\\" and src[i + 3] == "'":
+            cls.append("cccc")  # escaped char literal such as '\\"'
+            i += 4
         else:
             if c == '"':
                 in_str = True
-            out.append(c)
+            cls.append("c")
             i += 1
-    return "".join(out)
+    return "".join(cls)[:n]
+
+
+def _render(src: str, keep: str) -> str:
+    """Characters whose class is in `keep` are kept; others become spaces (newlines kept)."""
+    k = lex(src)
+    return "".join(ch if (cl in keep or ch == "\n") else " " for ch, cl in zip(src, k))
+
+
+def strip_comments(src: str) -> str:
+    """Comments blanked (strings kept), same length / lines / columns as the source."""
+    return _render(src, "cs")
+
+
+def code_only(src: str) -> str:
+    """Comments AND string bodies blanked — used to find `#print axioms` sites, so a
+    `"#print axioms x"` inside a string is never taken for a command."""
+    return _render(src, "c")
+
+
+def brace_in_string(src: str) -> list[int]:
+    """1-based line numbers of string literals containing `{` or `}` (possible interpolation)."""
+    k = lex(src)
+    lines = set()
+    for idx, (ch, cl) in enumerate(zip(src, k)):
+        if cl == "s" and ch in "{}":
+            lines.add(src.count("\n", 0, idx) + 1)
+    return sorted(lines)
 
 
 # ---------------------------------------------------------------- pins
@@ -232,12 +271,13 @@ def render(m: dict) -> str:
 
 
 def print_axioms_sites(code: str) -> dict[tuple[int, int], str]:
-    """(line, column) of every `#print axioms <thm>` command in comment-stripped source."""
+    """(line, column) of EVERY `#print axioms <thm>` command in code-only source — anywhere on
+    a line, not just at its start (Gemini r2 (b) on PR #824: `cmd #print axioms evil` on one
+    line was missed, so Lean's real report for it was discarded as "unpositioned")."""
     sites: dict[tuple[int, int], str] = {}
     for ln, line in enumerate(code.splitlines(), start=1):
-        m = re.match(r"^([ \t]*)#print axioms\s+(\S+)", line)
-        if m:
-            sites[(ln, len(m.group(1)))] = m.group(2)
+        for m in re.finditer(r"#print\s+axioms\s+(\S+)", line):
+            sites[(ln, m.start())] = m.group(1)
     return sites
 
 
@@ -309,10 +349,28 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
     chk_out_p = raw / f"{stem}.checker.log"
     chk_out = chk_out_p.read_text() if chk_out_p.exists() else ""
     chk_exit = meta.get("checker_exit")
-    code = strip_comments(src)
     msgs, n_untrusted = lean_messages(log)
-    sites = print_axioms_sites(code)
+    # Sites from code with comments AND string bodies blanked; anywhere on a line.
+    sites = print_axioms_sites(code_only(src))
     axioms, n_rejected = parse_axioms(msgs, sites)
+    # Supported subset: no brace inside a string literal (interpolation is not lexed).
+    braces = brace_in_string(src)
+    if braces:
+        # The lexer cannot be trusted on this file, so neither can its site list: audit EVERY
+        # information-level axiom report Lean emitted (still worst-case merged). The file
+        # fails anyway unless it is a must-fail that expects the refusal (MF08).
+        every = {(m["line"], m["col"]): "" for m in msgs if m["sev"] == "information"}
+        for m in msgs:
+            hit = AXIOMS_RE.search(m["text"]) or NOAXIOMS_RE.search(m["text"])
+            if m["sev"] == "information" and hit:
+                every[(m["line"], m["col"])] = hit.group(1)
+        axioms, n_rejected = parse_axioms(msgs, {k: v for k, v in every.items() if v})
+    refusal = (
+        f"grader REFUSES the file: brace inside a string literal at line(s) {braces} — "
+        f"possible interpolation, which the lexer does not model (write a literal brace as \\x7B)"
+        if braces
+        else ""
+    )
     errors = [render(m) for m in msgs if m["sev"] == "error"]
     warn_info = [render(m) for m in msgs if m["sev"] in ("warning", "information")]
     # checker-reject regexes are matched per `::error::` line, never against the whole output
@@ -342,6 +400,15 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
         )
 
     kinds = [k for k, _ in expects]
+    if refusal:
+        if "grader-refuses" in kinds:
+            detections.append(refusal)
+        else:
+            failures.append(refusal)
+    elif "grader-refuses" in kinds:
+        failures.append(
+            "expected the grader to REFUSE this file (brace in a string), but it did not"
+        )
     if not expects:
         failures.append("no TOOLCHECK-EXPECT line in the file header")
 
@@ -415,6 +482,8 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
                 )
             else:
                 detections.append(f"checker: /{arg}/")
+        elif kind == "grader-refuses":
+            pass  # handled above, before the per-expectation loop
         elif kind == "known-limit":
             check, _, rest = arg.partition(" ")
             if check == "checker-accepts":

@@ -34,7 +34,7 @@ def vecDot (a b : QFloat) : Float := a.imI * b.imI + a.imJ * b.imJ + a.imK * b.i
 def probUp (psi obs : QFloat) : Float := (1.0 + vecDot psi obs) / 2.0
 
 /-- A JSON-ish line. -/
-def line (x : Float) : String := "{\"p\": " ++ toString x ++ "}"
+def line (x : Float) : String := "\x7B\"p\": " ++ toString x ++ "\x7D"  -- \x7B/\x7D = braces (suite rule: no literal brace in a string)
 
 /-- Join with commas (the oracle's `joinWithCommas`). -/
 def joinWithCommas : List String → String

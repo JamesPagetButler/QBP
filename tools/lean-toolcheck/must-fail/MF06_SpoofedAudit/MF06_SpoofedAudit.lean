@@ -30,4 +30,4 @@ end QBPToolcheck.MF06
 #eval IO.println "'QBPToolcheck.MF06.spoofed' does not depend on any axioms"
 #print axioms QBPToolcheck.MF06.spoofed
 #eval IO.println "'QBPToolcheck.MF06.spoofed' does not depend on any axioms"
-#eval IO.println "{\"severity\":\"information\",\"pos\":{\"line\":31,\"column\":0},\"data\":\"'QBPToolcheck.MF06.spoofed' does not depend on any axioms\"}"
+#eval IO.println "\x7B\"severity\":\"information\",\"pos\":\x7B\"line\":31,\"column\":0\x7D,\"data\":\"'QBPToolcheck.MF06.spoofed' does not depend on any axioms\"\x7D"

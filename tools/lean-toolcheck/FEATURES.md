@@ -19,6 +19,11 @@ Lean message (`LINE:COL: severity: text`) or ONE checker `::error::` line, never
 empty layer or an unmatched prefix is RED. A Lean crash (exit ≥ 128) fails the run and is
 never retried.
 
+> **Coverage, stated plainly: the suite's axiom audit covers the `#print axioms` sites its lexer finds — nothing else; the
+> suite convention is ONE site per theorem.** Sites are found anywhere on a line, in code with comments and string bodies
+> blanked. A suite file with a brace inside a string literal is REFUSED (the lexer does not model interpolation; write
+> `\x7B`/`\x7D`). The real CI gate (QBP#827) enumerates declarations with Lean itself instead of a Python lexer.
+
 > **Limit, stated plainly: the vacuity check is SYNTACTIC ONLY.** `scripts/check_lean_foundations.py` catches the
 > literal `: True :=` (MF03). A vacuous statement in any other spelling (`x = x → True`, the #472 shape behind a
 > beta-redex `(fun _ => True) 3`) passes BOTH the checker and the axiom audit; those are pinned as report-only
@@ -69,6 +74,8 @@ Usage counts below are from a comment-stripped grep of `proofs/**/*.lean` (80 fi
 | MF04 | false `decide` (`(2 : Fin 5) + 3 = 1`; `(1 : Int) - 2 = 0`, which is *true* over `Nat`) | Lean rejects (non-zero exit) | `proved that the proposition … is false` (both, line-pinned) | ✅ caught (Lean exit 1, both messages) |
 | MF05 | user `axiom cheat : False` + `theorem one_eq_two : 1 = 2 := cheat.elim` | **axiom audit only** (`#print axioms` lists `QBPToolcheck.MF05.cheat`); the foundations checker ACCEPTS the file (recorded as a known limit) | `axiom … ⊇ QBPToolcheck.MF05.cheat` · non-std axiom | ✅ caught by the audit; checker-accepts confirmed |
 | MF06 | **spoofed axiom audit**: `spoofed` uses `sorry`; the file then `#eval IO.println`s fake "does not depend on any axioms" lines (before and after the real report, plain and forged-JSON) | axiom audit via `lean --json`: only an `information` message positioned at the `#print axioms` command counts, and reports merge worst-case; + checker RATCHET | `axiom … ⊇ sorryAx` · `^::error::RATCHET violated — sorry: 1 > baseline 0\.` | ✅ caught (3 spoof messages ignored); the pre-fix grader was fooled (reported `[]`) |
+| MF07 | **same-line site** (Gemini r2 (b)): `#print axioms clean #print axioms dirty` on ONE line; `dirty` rests on a user axiom | sites found anywhere on a line (column = the `#`); the pre-fix grader only saw line starts and discarded the real report | `axiom … dirty ⊇ QBPToolcheck.MF07.cheat` · non-std | ✅ caught; replayed as a pass-labelled attack in `selftest_grader.py` |
+| MF08 | **interpolation desync** (Gemini r2 (c)): `s!" { " /- " } "` makes a non-interpolating lexer see a comment opener in code and blank the rest of the file, hiding `dirty`'s site | the grader REFUSES any file with a brace inside a string literal (supported subset; interpolation is not lexed); on a refused file it audits every axiom report Lean emitted | `grader-refuses` · `axiom … dirty ⊇ QBPToolcheck.MF08.cheat` | ✅ refused and the axiom still reported; replayed as a pass-labelled attack |
 
 ### Known limits (report-only: "confirmed" or "CHANGED", never a failure)
 
@@ -140,3 +147,4 @@ items (QBP uses none); Lake features beyond `build`/`env`/`exe cache get`.
 | 2026-11-20 | v1 — table, must-fail controls, project-layer row, draft triage (issue #823 W5) |
 | 2026-11-20 | v1.1 — Red Team fix round on PR #824: MF05 custom axiom; `admit` in MF01; KNOWN-LIMIT rows KL01 (vacuity is syntactic) + KL02 (Fin.foldl `decide`); T18 Fin folds; lean4#14554 reclassified relevant; runs no longer rewrite the committed baseline (`--update-baseline`); preflight robust to a fresh checkout |
 | 2026-11-20 | v1.2 — Gemini fix round on PR #824: axiom audit via `lean --json`, position-tied + worst-case merge (MF06 spoof control); nesting-aware comment lexer (T19); expectation regexes anchored to single messages; empty suite / layer / prefix is RED; null-safe file globs |
+| 2026-11-20 | v1.3 — Gemini r2: sites found anywhere on a line (MF07); braces inside string literals refused (MF08, interpolation not lexed); string bodies blanked for site detection; coverage statement (lexer-found sites, one per theorem) |
