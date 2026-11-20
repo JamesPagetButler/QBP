@@ -120,13 +120,8 @@ REVIEW_FLAG = (
 
 NOTES_ADDITION = (
     "\n\nE-axis update (QBP#791 AC3, writer lane, 2026-11-20): e_axis set to "
-    'falsified -- a FALSIFIED CANDIDATE (frozen pre-reg §5, row "A '
-    'disfavoured": "propose a falsified candidate ... with kill-condition '
-    "review\"; the paper, PR #792 l.175, and qbp-oppenheimer's AC1 sign both "
-    "say the same, oppenheimer theory re-confirm on PR #821, "
-    "issuecomment-7047925804 item 4: the ledger must not be stronger than "
-    "the paper) -- for the recorded reading-I density as fitted (model A, "
-    "z_t fixed at 0.70), via the pre-registered qbp-desi-fit round-1 fit "
+    "falsified for the recorded reading-I density as fitted (model A, z_t "
+    "fixed at 0.70), via the pre-registered qbp-desi-fit round-1 fit "
     "(QBP#775/#782). ΔAIC(A - ΛCDM) = +109.734 against the frozen rule "
     '"disfavoured iff ΔAIC >= +2" (see evidence_ref for the pre-reg and '
     "raw-output pointers). post_hoc: true -- z_t and (A+B)^2 = Omega_DE were "
@@ -139,12 +134,11 @@ NOTES_ADDITION = (
     "Δχ² = +92.354), or the COMP-cmb-power-spectrum-accretion CAMB re-run "
     "(QBP#772 AC3, separate). Paper write-back: QBP#792 (merged `c0597b6`). "
     "Physics sign: qbp-oppenheimer, QBP#791 AC1, 2026-10-29. Kill-condition "
-    "review: qbp-oppenheimer, QBP#772 issuecomment-7048003226, 2026-11-20 "
-    "(passes) -- the code reproduces the known ΛCDM/CPL answers, SNe and BAO "
-    "each disfavour A on their own, the arm-B z_t profile fails at every "
-    "z_t from 0.1 to 2.0 so the verdict does not rest on the contaminated "
-    "z_t, k matches, no best fit sits on a bound. See the `review_flag` "
-    "field for the separate, unfolded sign-labelling fact (QBP#772 AC1)."
+    "review (frozen §5): qbp-oppenheimer, QBP#772 issuecomment-7048003226, "
+    "2026-11-20, passes (pipeline reproduces ΛCDM/CPL known answers; SNe "
+    "and BAO each disfavour A; fails at every z_t in 0.1-2.0). See the "
+    "`review_flag` field for the separate, unfolded sign-labelling fact "
+    "(QBP#772 AC1)."
 )
 
 
@@ -205,9 +199,50 @@ OLD_NOTES_ADDITION_V2 = (
     "sign-labelling fact (QBP#772 AC1)."
 )
 
-# Checked in this order: the most recent superseded text must be tried first,
-# since OLD_NOTES_ADDITION_V1's text is not a substring of V2's.
-SUPERSEDED_NOTES_ADDITIONS = (OLD_NOTES_ADDITION_V2, OLD_NOTES_ADDITION_V1)
+# head 578a9e9, superseded by oppenheimer's exact final wording (seq5627):
+# once the kill-condition review is RECORDED AND PASSING, the "FALSIFIED
+# CANDIDATE" qualifier clause (and its citation chain) is no longer accurate
+# -- a candidate/provisional framing on a result whose review has actually
+# concluded overstates the uncertainty, the mirror-image mistake of V2's
+# "pending" text understating it. Also the kill-condition sentence's wording
+# is tightened to his literal seq5627 text.
+OLD_NOTES_ADDITION_V3 = (
+    "\n\nE-axis update (QBP#791 AC3, writer lane, 2026-11-20): e_axis set to "
+    'falsified -- a FALSIFIED CANDIDATE (frozen pre-reg §5, row "A '
+    'disfavoured": "propose a falsified candidate ... with kill-condition '
+    "review\"; the paper, PR #792 l.175, and qbp-oppenheimer's AC1 sign both "
+    "say the same, oppenheimer theory re-confirm on PR #821, "
+    "issuecomment-7047925804 item 4: the ledger must not be stronger than "
+    "the paper) -- for the recorded reading-I density as fitted (model A, "
+    "z_t fixed at 0.70), via the pre-registered qbp-desi-fit round-1 fit "
+    "(QBP#775/#782). ΔAIC(A - ΛCDM) = +109.734 against the frozen rule "
+    '"disfavoured iff ΔAIC >= +2" (see evidence_ref for the pre-reg and '
+    "raw-output pointers). post_hoc: true -- z_t and (A+B)^2 = Omega_DE were "
+    "set from the same data families this fit uses (frozen contamination "
+    "guard, answered YES), so this round's best possible NON-falsifying "
+    'outcome was "consistent (post-hoc)"; falsified is a terminal e_axis '
+    "outcome and is not bounded by that ceiling. Scoped to this candidate "
+    "formulation only: says nothing about reading II of the records, the "
+    "free-transition variant B (QBP#774, record only -- not as good as CPL, "
+    "Δχ² = +92.354), or the COMP-cmb-power-spectrum-accretion CAMB re-run "
+    "(QBP#772 AC3, separate). Paper write-back: QBP#792 (merged `c0597b6`). "
+    "Physics sign: qbp-oppenheimer, QBP#791 AC1, 2026-10-29. Kill-condition "
+    "review: qbp-oppenheimer, QBP#772 issuecomment-7048003226, 2026-11-20 "
+    "(passes) -- the code reproduces the known ΛCDM/CPL answers, SNe and BAO "
+    "each disfavour A on their own, the arm-B z_t profile fails at every "
+    "z_t from 0.1 to 2.0 so the verdict does not rest on the contaminated "
+    "z_t, k matches, no best fit sits on a bound. See the `review_flag` "
+    "field for the separate, unfolded sign-labelling fact (QBP#772 AC1)."
+)
+
+# Checked in this order: the most recent superseded text must be tried first
+# -- none of V1/V2/V3's texts is a substring of another, so order only
+# matters for which one a stale ledger happens to carry.
+SUPERSEDED_NOTES_ADDITIONS = (
+    OLD_NOTES_ADDITION_V3,
+    OLD_NOTES_ADDITION_V2,
+    OLD_NOTES_ADDITION_V1,
+)
 
 
 def already_applied(anchor: dict) -> bool:
@@ -278,15 +313,14 @@ def main() -> int:
 
     fragment_note = (
         f"QBP#791 AC3: {ANCHOR_ID} gains e_axis (value falsified, "
-        f"post_hoc true) -- a FALSIFIED CANDIDATE (frozen pre-reg §5; the "
-        f"paper, PR #792; qbp-oppenheimer's AC1 sign all say the same) -- "
-        f"for the recorded reading-I density as fitted (model A) -- the "
-        f"pre-registered qbp-desi-fit round-1 fit (QBP#775/#782) found it "
-        f"disfavoured vs LCDM (ΔAIC +109.734 against the frozen "
-        f"'disfavoured iff >= +2' threshold); evidence_ref records the "
-        f"frozen pre-reg (sha256 f6a18616...090a @ 0a59a59) and the raw "
-        f"output (sha256 e143b835...700a @ 421aa94). Scoped to this "
-        f"candidate formulation only -- does not test reading II or the "
+        f"post_hoc true) for the recorded reading-I density as fitted "
+        f"(model A) -- the pre-registered qbp-desi-fit round-1 fit "
+        f"(QBP#775/#782) found it disfavoured vs LCDM (ΔAIC +109.734 "
+        f"against the frozen 'disfavoured iff >= +2' threshold); "
+        f"evidence_ref records the frozen pre-reg (sha256 "
+        f"f6a18616...090a @ 0a59a59) and the raw output (sha256 "
+        f"e143b835...700a @ 421aa94). Scoped to this candidate "
+        f"formulation only -- does not test reading II or the "
         f"COMP-cmb-power-spectrum-accretion CAMB re-run (QBP#772 AC3, "
         f"separate). Also lands QBP#772 AC1: a review_flag noting the "
         f"anchor's own description prose is wrong-signed relative to the "
@@ -294,12 +328,10 @@ def main() -> int:
         f"unfolded from the e_axis fact per qbp-architecture's QBP#791 AC1 "
         f"confirmation. Paper write-back QBP#792 (merged c0597b6). Physics "
         f"sign: qbp-oppenheimer, QBP#791 AC1, 2026-10-29. Kill-condition "
-        f"review: qbp-oppenheimer, QBP#772 issuecomment-7048003226, "
-        f"2026-11-20 (passes) -- code reproduces the known LCDM/CPL "
-        f"answers, SNe and BAO each disfavour A on their own, the arm-B "
-        f"z_t profile fails at every z_t from 0.1 to 2.0 so the verdict "
-        f"does not rest on the contaminated z_t, k matches, no best fit "
-        f"sits on a bound."
+        f"review (frozen §5): qbp-oppenheimer, QBP#772 "
+        f"issuecomment-7048003226, 2026-11-20, passes (pipeline reproduces "
+        f"LCDM/CPL known answers; SNe and BAO each disfavour A; fails at "
+        f"every z_t in 0.1-2.0)."
     )
     if not args.dry_run:
         changes_dir = Path(args.ledger).resolve().parent / "changes.d"

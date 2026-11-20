@@ -217,6 +217,39 @@ def test_main_replaces_the_v1_superseded_text_directly(tmp_path, monkeypatch):
     assert len(list(changes_dir.glob("*.json"))) == 1
 
 
+def test_main_replaces_the_v3_candidate_text_once_the_review_passes(
+    tmp_path, monkeypatch
+):
+    """oppenheimer seq5627: once the QBP#772 kill-condition review is
+    recorded AND PASSING, the "FALSIFIED CANDIDATE" qualifier clause (V3,
+    written while the review was still pending) overstates the remaining
+    uncertainty and must be dropped entirely, not just have its kill-
+    condition sentence updated in place."""
+    ledger_path = tmp_path / "ledger.json"
+    ledger = _ledger_with_target_anchor()
+    anchor = ledger["anchors"][0]
+    anchor["e_axis"] = dict(m.E_AXIS)
+    anchor["evidence_ref"] = [dict(e) for e in m.EVIDENCE_REF]
+    anchor["review_flag"] = m.REVIEW_FLAG
+    anchor["notes"] = anchor["notes"] + m.OLD_NOTES_ADDITION_V3
+    _write_canonical_ledger(ledger_path, ledger)
+    changes_dir = tmp_path / "changes.d"
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["encode_791_desi_fit_ac3.py", "--ledger", str(ledger_path), "--pr", "900"],
+    )
+    m.main()
+
+    after = json.loads(ledger_path.read_text())
+    fixed = next(a for a in after["anchors"] if a["id"] == m.ANCHOR_ID)
+    assert m.OLD_NOTES_ADDITION_V3 not in fixed["notes"]
+    assert "FALSIFIED CANDIDATE" not in fixed["notes"]
+    assert fixed["notes"].count(m.NOTES_ADDITION) == 1
+    assert len(list(changes_dir.glob("*.json"))) == 1
+
+
 def test_main_refuses_a_ledger_without_the_target_anchor(tmp_path, monkeypatch):
     ledger_path = tmp_path / "ledger.json"
     ledger = _ledger_with_target_anchor()
