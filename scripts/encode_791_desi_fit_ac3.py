@@ -176,7 +176,15 @@ def main() -> int:
         a["review_flag"] = REVIEW_FLAG
         a["e_axis"] = E_AXIS
         a["evidence_ref"] = EVIDENCE_REF
-        a["notes"] = (a.get("notes") or "") + NOTES_ADDITION
+        # Gemini real-API review, PR #821: `already_applied()` only guards a
+        # FULL match (all four fields). A partial-drift re-run (e.g. a
+        # steward hand-edits `review_flag` afterwards, so `already_applied`
+        # is False) must not duplicate NOTES_ADDITION on top of an addition
+        # that already landed in a prior run -- checked here, independent of
+        # already_applied()'s all-or-nothing gate.
+        current_notes = a.get("notes") or ""
+        if NOTES_ADDITION not in current_notes:
+            a["notes"] = current_notes + NOTES_ADDITION
 
         if not args.dry_run and not args.pr:
             raise SystemExit(

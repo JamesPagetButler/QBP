@@ -105,6 +105,40 @@ def test_main_second_run_is_an_idempotent_no_op(tmp_path, monkeypatch):
     assert list(changes_dir.glob("*.json")) == fragments_after_first  # no 2nd fragment
 
 
+def test_main_on_partial_drift_corrects_fields_without_duplicating_notes(
+    tmp_path, monkeypatch
+):
+    """Gemini real-API review, PR #821: `already_applied()` is an all-or-
+    nothing check across four fields, so a steward hand-edit to just one of
+    them (here: `review_flag`, after a correction) makes it return False even
+    though `notes` already carries NOTES_ADDITION from an earlier run. A
+    naive unconditional `notes = notes + NOTES_ADDITION` would duplicate the
+    addition in that case. Must correct the drifted field and leave `notes`
+    with exactly one copy."""
+    ledger_path = tmp_path / "ledger.json"
+    ledger = _ledger_with_target_anchor()
+    anchor = ledger["anchors"][0]
+    anchor["e_axis"] = dict(m.E_AXIS)
+    anchor["evidence_ref"] = [dict(e) for e in m.EVIDENCE_REF]
+    anchor["notes"] = anchor["notes"] + m.NOTES_ADDITION
+    anchor["review_flag"] = "a stale, hand-edited flag text"  # the drift
+    _write_canonical_ledger(ledger_path, ledger)
+    changes_dir = tmp_path / "changes.d"
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["encode_791_desi_fit_ac3.py", "--ledger", str(ledger_path), "--pr", "900"],
+    )
+    m.main()
+
+    after = json.loads(ledger_path.read_text())
+    fixed = next(a for a in after["anchors"] if a["id"] == m.ANCHOR_ID)
+    assert fixed["review_flag"] == m.REVIEW_FLAG  # drift corrected
+    assert fixed["notes"].count(m.NOTES_ADDITION) == 1  # not duplicated
+    assert len(list(changes_dir.glob("*.json"))) == 1  # fragment still written
+
+
 def test_main_refuses_a_ledger_without_the_target_anchor(tmp_path, monkeypatch):
     ledger_path = tmp_path / "ledger.json"
     ledger = _ledger_with_target_anchor()
