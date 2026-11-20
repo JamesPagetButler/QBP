@@ -138,24 +138,21 @@ NOTES_ADDITION = (
     "free-transition variant B (QBP#774, record only -- not as good as CPL, "
     "Δχ² = +92.354), or the COMP-cmb-power-spectrum-accretion CAMB re-run "
     "(QBP#772 AC3, separate). Paper write-back: QBP#792 (merged `c0597b6`). "
-    "Physics sign: qbp-oppenheimer, QBP#791 AC1, 2026-10-29 (two amendments, "
-    "on the issue). Kill-condition review (frozen §5): PENDING, owner "
-    "qbp-oppenheimer, on QBP#772 -- the AC1 sign above is the paper-wording "
-    "sign-off, NOT the kill-condition review (oppenheimer theory re-confirm "
-    'on PR #821, issuecomment-7047925804 item 5). This "candidate" '
-    "qualifier is expected to drop in a later one-fragment PR once that "
-    "review lands. See the `review_flag` field for the separate, unfolded "
-    "sign-labelling fact (QBP#772 AC1)."
+    "Physics sign: qbp-oppenheimer, QBP#791 AC1, 2026-10-29. Kill-condition "
+    "review: qbp-oppenheimer, QBP#772 issuecomment-7048003226, 2026-11-20 "
+    "(passes) -- the code reproduces the known ΛCDM/CPL answers, SNe and BAO "
+    "each disfavour A on their own, the arm-B z_t profile fails at every "
+    "z_t from 0.1 to 2.0 so the verdict does not rest on the contaminated "
+    "z_t, k matches, no best fit sits on a bound. See the `review_flag` "
+    "field for the separate, unfolded sign-labelling fact (QBP#772 AC1)."
 )
 
 
-# The PR #821 real-run text (head 05ff9ea), superseded by the fix round below
-# (oppenheimer theory re-confirm, issuecomment-7047925804 items 4/5): missing
-# the "candidate" qualifier the frozen pre-reg §5 and the paper both require,
-# and wrongly credited the AC1 paper-wording sign as the (still-pending)
-# kill-condition review. A run against the already-pushed ledger must REPLACE
-# this exact text, not append the fix alongside it.
-OLD_NOTES_ADDITION = (
+# The PR #821 real-run text (head 05ff9ea), superseded by the oppenheimer
+# theory re-confirm fix round (issuecomment-7047925804 items 4/5): missing
+# "candidate" (frozen pre-reg §5 / the paper both require it), and wrongly
+# credited the AC1 paper-wording sign as the kill-condition review.
+OLD_NOTES_ADDITION_V1 = (
     "\n\nE-axis update (QBP#791 AC3, writer lane, 2026-11-20): e_axis set to "
     "falsified for the recorded reading-I density as fitted (model A, z_t "
     "fixed at 0.70), via the pre-registered qbp-desi-fit round-1 fit "
@@ -174,6 +171,43 @@ OLD_NOTES_ADDITION = (
     "2026-10-29 (two amendments, on the issue). See the `review_flag` field "
     "for the separate, unfolded sign-labelling fact (QBP#772 AC1)."
 )
+
+# head 5bdccbf, superseded by oppenheimer's kill-condition review landing on
+# QBP#772 (seq5625, issuecomment-7048003226, "passes") -- that review was
+# PENDING when this text was written; it has since completed.
+OLD_NOTES_ADDITION_V2 = (
+    "\n\nE-axis update (QBP#791 AC3, writer lane, 2026-11-20): e_axis set to "
+    'falsified -- a FALSIFIED CANDIDATE (frozen pre-reg §5, row "A '
+    'disfavoured": "propose a falsified candidate ... with kill-condition '
+    "review\"; the paper, PR #792 l.175, and qbp-oppenheimer's AC1 sign both "
+    "say the same, oppenheimer theory re-confirm on PR #821, "
+    "issuecomment-7047925804 item 4: the ledger must not be stronger than "
+    "the paper) -- for the recorded reading-I density as fitted (model A, "
+    "z_t fixed at 0.70), via the pre-registered qbp-desi-fit round-1 fit "
+    "(QBP#775/#782). ΔAIC(A - ΛCDM) = +109.734 against the frozen rule "
+    '"disfavoured iff ΔAIC >= +2" (see evidence_ref for the pre-reg and '
+    "raw-output pointers). post_hoc: true -- z_t and (A+B)^2 = Omega_DE were "
+    "set from the same data families this fit uses (frozen contamination "
+    "guard, answered YES), so this round's best possible NON-falsifying "
+    'outcome was "consistent (post-hoc)"; falsified is a terminal e_axis '
+    "outcome and is not bounded by that ceiling. Scoped to this candidate "
+    "formulation only: says nothing about reading II of the records, the "
+    "free-transition variant B (QBP#774, record only -- not as good as CPL, "
+    "Δχ² = +92.354), or the COMP-cmb-power-spectrum-accretion CAMB re-run "
+    "(QBP#772 AC3, separate). Paper write-back: QBP#792 (merged `c0597b6`). "
+    "Physics sign: qbp-oppenheimer, QBP#791 AC1, 2026-10-29 (two amendments, "
+    "on the issue). Kill-condition review (frozen §5): PENDING, owner "
+    "qbp-oppenheimer, on QBP#772 -- the AC1 sign above is the paper-wording "
+    "sign-off, NOT the kill-condition review (oppenheimer theory re-confirm "
+    'on PR #821, issuecomment-7047925804 item 5). This "candidate" '
+    "qualifier is expected to drop in a later one-fragment PR once that "
+    "review lands. See the `review_flag` field for the separate, unfolded "
+    "sign-labelling fact (QBP#772 AC1)."
+)
+
+# Checked in this order: the most recent superseded text must be tried first,
+# since OLD_NOTES_ADDITION_V1's text is not a substring of V2's.
+SUPERSEDED_NOTES_ADDITIONS = (OLD_NOTES_ADDITION_V2, OLD_NOTES_ADDITION_V1)
 
 
 def already_applied(anchor: dict) -> bool:
@@ -220,13 +254,17 @@ def main() -> int:
         # that already landed in a prior run -- checked here, independent of
         # already_applied()'s all-or-nothing gate.
         current_notes = a.get("notes") or ""
-        if OLD_NOTES_ADDITION in current_notes:
-            # oppenheimer theory re-confirm fix round (issuecomment-7047925804
-            # items 4/5): REPLACE the superseded text, never append alongside
-            # it -- the old text is wrong (missing "candidate"; wrongly
-            # credits AC1 as the kill-condition review) and must not survive
-            # next to its own correction.
-            current_notes = current_notes.replace(OLD_NOTES_ADDITION, "")
+        for superseded in SUPERSEDED_NOTES_ADDITIONS:
+            # oppenheimer theory re-confirm rounds (issuecomment-7047925804
+            # items 4/5; seq5625 kill-condition-review landing): REPLACE
+            # whichever superseded text is present, never append alongside
+            # it -- an old text is wrong in some specific way and must not
+            # survive next to its own correction. At most one can match
+            # (each run's own already_applied()/write step leaves exactly
+            # the newest text behind), so trying both in turn is safe.
+            if superseded in current_notes:
+                current_notes = current_notes.replace(superseded, "")
+                break
         if NOTES_ADDITION not in current_notes:
             a["notes"] = current_notes + NOTES_ADDITION
         else:
@@ -255,13 +293,13 @@ def main() -> int:
         f"sign-corrected reading-I density (PR #774 v0.2, ec47285), kept "
         f"unfolded from the e_axis fact per qbp-architecture's QBP#791 AC1 "
         f"confirmation. Paper write-back QBP#792 (merged c0597b6). Physics "
-        f"sign: qbp-oppenheimer (QBP#791 AC1, 2026-10-29). Kill-condition "
-        f"review (frozen §5): PENDING, owner qbp-oppenheimer, on QBP#772 "
-        f"-- the AC1 sign is the paper-wording sign-off, NOT the "
-        f"kill-condition review (oppenheimer theory re-confirm on PR #821, "
-        f"issuecomment-7047925804 items 4/5 -- this fix round corrects an "
-        f"earlier real-run's text that conflated the two and omitted "
-        f"'candidate')."
+        f"sign: qbp-oppenheimer, QBP#791 AC1, 2026-10-29. Kill-condition "
+        f"review: qbp-oppenheimer, QBP#772 issuecomment-7048003226, "
+        f"2026-11-20 (passes) -- code reproduces the known LCDM/CPL "
+        f"answers, SNe and BAO each disfavour A on their own, the arm-B "
+        f"z_t profile fails at every z_t from 0.1 to 2.0 so the verdict "
+        f"does not rest on the contaminated z_t, k matches, no best fit "
+        f"sits on a bound."
     )
     if not args.dry_run:
         changes_dir = Path(args.ledger).resolve().parent / "changes.d"
