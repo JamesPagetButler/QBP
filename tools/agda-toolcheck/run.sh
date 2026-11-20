@@ -2,6 +2,8 @@
 # tools/agda-toolcheck/run.sh — the Agda toolchain baseline suite (QBP#823 W1).
 #
 # What it does
+#   0. Self-tests its own grader (synthetic outputs → expected statuses) and
+#      refuses to run if a case fails. `--self-test` runs only this.
 #   1. Reads the toolchain: `agda --version`, the agda/cubical pin from
 #      .github/workflows/agda-cubical.yml, the library name from
 #      proofs/agda-cubical/qbp-cubical.agda-lib, and the HEAD of the locally
@@ -10,24 +12,28 @@
 #   2. Runs four layers, every file as `agda --safe <file>` (exactly as CI does):
 #        tool/      builtins-only feature tests            → must PASS
 #        lib/       pinned agda/cubical symbol tests        → must PASS
-#        mustfail/  negative controls                       → must FAIL with the
-#                   `-- EXPECT: <substring>` recorded in each file's header.
-#                   A `MUSTFAIL-KNOWN-HOLE` file also carries `FIXED-IN: <ver>`;
+#        mustfail/  negative controls                       → must be REJECTED with
+#                   the non-empty `-- EXPECT: <substring>` of each header, matched
+#                   against the error output (not the "Checking …" echo lines).
+#                   A `MUSTFAIL-KNOWN-HOLE` file also carries `FIXED-IN: <ver>`:
 #                   on Agda < FIXED-IN acceptance is KNOWN-HOLE (not a failure),
-#                   on Agda >= FIXED-IN acceptance is ACCEPTED = suite failure
+#                   on Agda >= FIXED-IN acceptance is ACCEPTED = suite failure.
 #        project    proofs/agda/*.agda and proofs/agda-cubical/*.agda, the CI-gated
 #                   QBP proofs, in the CI order                → must PASS
-#      plus the lexical control forbidden_tokens.sh over the project layer
-#      (--require-safe: every gated file must carry --safe and no forbidden
-#      pragma/flag/token — this covers the --safe hole of agda/agda#8341 on
-#      2.8.0) AND its own control: control/PlantedForbidden.agda must produce
-#      exactly its `PLANTED: n` hits, or the suite fails (the scan went blind
-#      or started flagging decoys).
+#      plus controls: forbidden_tokens.sh --require-safe over the two gated
+#      directories (covers the --safe hole of agda/agda#8341 on 2.8.0) and its
+#      own controls — every fixture in control/ must yield exactly its
+#      `PLANTED: n` hits — and the MANIFEST check: every file listed in MANIFEST
+#      was found and ran (suite layers: the found set must equal the listed set).
+#      A signal exit (rc >= 128) is CRASH in every layer; a crash never counts
+#      as REJECTED.
 #   3. Records per file: status, exit code, wall seconds, max RSS (KiB) via
-#      /usr/bin/time. By default into results/runs/<run-id>/ (git-ignored);
-#      with --update-baseline into results/results-<agda>-<cubical-sha7>.{json,md}
-#      (the committed baseline — only a deliberate run rewrites it).
-#   4. Exits non-zero on ANY unexpected result.
+#      /usr/bin/time, into results/runs/<run-id>/ (git-ignored). With
+#      --update-baseline, and ONLY if the whole run graded green, the record is
+#      then copied to results/results-<agda>-<cubical-sha7>.{json,md} (the
+#      committed baseline). A failed run never touches the baseline.
+#   4. Exits non-zero on ANY unexpected result (FAIL, ACCEPTED, WRONG-ERROR,
+#      CRASH, manifest mismatch, fixture mismatch, pin mismatch).
 #
 # Box safety
 #   The whole run is wrapped in ONE boxrun scope (box lease + thermal guard +
@@ -36,14 +42,22 @@
 #     TOOLCHECK_MEM_MB   RSS cap for the run, MiB   (default 8000)
 #     TOOLCHECK_TIMEOUT  deadline, seconds          (default 3600)
 #     TOOLCHECK_TAG      suffix for the results files (e.g. "cold"), optional
+#   Exit 87 = RSS cap hit, 124 = deadline/thermal pause ran out, 75 = box busy
+#   (--wait is passed, so the run queues instead).
 #   Timings are what they are: a file's wall time includes re-checking any
 #   QBP module it imports whose interface (_build/) is missing, and the
 #   pinned library's interfaces are expected to be prebuilt (~/cubical/_build).
-#   Exit 87 = RSS cap hit, 124 = deadline/thermal pause ran out, 75 = box busy
-#   (--wait is passed, so the run queues instead).
+#
+# Test seams (never set in a real run; each forces UPDATE_BASELINE off and is
+# recorded in the JSON under toolchain/run):
+#     TOOLCHECK_FAKE_AGDA_VERSION=<ver>  pretend the pin is another Agda (F2 grading)
+#     TOOLCHECK_INJECT_FAIL=1            add a synthetic FAIL row (shows a failed run
+#                                        cannot write the baseline)
+#     TOOLCHECK_MANIFEST=<path>          use another MANIFEST (shows a missing file fails)
 #
 # Usage
-#   tools/agda-toolcheck/run.sh [--layer tool|lib|mustfail|project|all] [--no-boxrun] [--update-baseline]
+#   tools/agda-toolcheck/run.sh [--layer tool|lib|mustfail|project|all] [--no-boxrun]
+#                              [--update-baseline] [--self-test]
 #
 set -euo pipefail
 
@@ -52,18 +66,102 @@ REPO="$(cd "$HERE/../.." && pwd)"
 LAYER=all
 USE_BOXRUN=1
 UPDATE_BASELINE=0
+SELF_TEST_ONLY=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --layer) LAYER="$2"; shift 2 ;;
     --no-boxrun) USE_BOXRUN=0; shift ;;
     --update-baseline) UPDATE_BASELINE=1; shift ;;
-    -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
+    --self-test) SELF_TEST_ONLY=1; USE_BOXRUN=0; shift ;;
+    -h|--help) sed -n '2,60p' "$0"; exit 0 ;;
     *) echo "run.sh: unknown argument $1" >&2; exit 2 ;;
   esac
 done
+case "$LAYER" in tool|lib|mustfail|project|all) ;; *) echo "run.sh: bad --layer $LAYER" >&2; exit 2 ;; esac
 
 TOOLCHECK_MEM_MB="${TOOLCHECK_MEM_MB:-8000}"
 TOOLCHECK_TIMEOUT="${TOOLCHECK_TIMEOUT:-3600}"
+
+# ---- grading (pure: no agda, no globals except AGDA_VERSION) ---------------
+# version comparison (GNU sort -V): ver_ge A B  ⇔  A >= B
+ver_ge() { [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -1)" = "$1" ]; }
+
+# error lines of an agda log: drop the progress echoes and boxrun chatter
+error_lines() { grep -vE '^(Checking|Finished| Checking|boxrun:)' "$1" || true; }
+
+# grade <expect: pass|fail|hole> <rc> <outfile> <expect_msg> <fixed_in> <agda_version>
+# prints "STATUS|detail"
+grade() {
+  local expect="$1" rc="$2" out="$3" msg="$4" fixed_in="$5" ver="$6"
+  local tail5; tail5="$(error_lines "$out" | head -5 | tr '\n' ' ' | cut -c1-200)"
+  if [ "$rc" -ge 128 ]; then echo "CRASH|agda died by signal (rc=$rc): a crash is never a rejection"; return; fi
+  case "$expect" in
+    pass)
+      if [ "$rc" -eq 0 ]; then echo "PASS|"; else echo "FAIL|$tail5"; fi ;;
+    fail|hole)
+      if [ -z "$msg" ]; then echo "WRONG-ERROR|must-fail file has no non-empty EXPECT: line"; return; fi
+      local matched=0
+      if [ "$rc" -ne 0 ] && error_lines "$out" | grep -qF -- "$msg"; then matched=1; fi
+      if [ "$expect" = fail ]; then
+        if [ "$matched" = 1 ]; then echo "REJECTED|"
+        elif [ "$rc" -ne 0 ]; then echo "WRONG-ERROR|rejected but not with '$msg': $tail5"
+        else echo "ACCEPTED|must-fail was accepted"; fi
+        return
+      fi
+      # hole: keyed to the pin by FIXED-IN (Red Team F2)
+      if [ -z "$fixed_in" ]; then echo "WRONG-ERROR|KNOWN-HOLE file without a FIXED-IN: line"; return; fi
+      if ver_ge "$ver" "$fixed_in"; then
+        if [ "$matched" = 1 ]; then echo "FIXED|rejected on Agda $ver >= $fixed_in"
+        elif [ "$rc" -ne 0 ]; then echo "WRONG-ERROR|rejected but not with '$msg': $tail5"
+        else echo "ACCEPTED|REGRESSION: accepted on Agda $ver, fixed in $fixed_in"; fi
+      else
+        if [ "$rc" -eq 0 ]; then echo "KNOWN-HOLE|accepted on Agda $ver < $fixed_in (agda/agda#8341)"
+        elif [ "$matched" = 1 ]; then echo "FIXED-EARLY|rejected on Agda $ver < $fixed_in: update FIXED-IN"
+        else echo "WRONG-ERROR|rejected but not with '$msg': $tail5"; fi
+      fi ;;
+  esac
+}
+is_unexpected() { case "$1" in FAIL|ACCEPTED|WRONG-ERROR|CRASH) return 0 ;; *) return 1 ;; esac; }
+
+# ---- grader self-test (runs first, always) ---------------------------------
+self_test() {
+  local t; t="$(mktemp -d)"; local fails=0 n=0
+  printf 'Checking X (x.agda).\nerror: [Foo]\nboom here\n' > "$t/err"
+  printf 'Checking postulate-in-name (p.agda).\nerror: [Bar]\nsomething else\n' > "$t/echo-only"
+  printf 'Checking X (x.agda).\nFinished X.\n' > "$t/ok"
+  : > "$t/empty"
+  expect_case() {  # expect_case <name> <want-status> <expect> <rc> <out> <msg> <fixed_in> <ver>
+    local name="$1" want="$2"; shift 2
+    local got; got="$(grade "$@")"; got="${got%%|*}"; n=$((n+1))
+    if [ "$got" = "$want" ]; then printf '  self-test ok    %-34s → %s\n' "$name" "$got"
+    else printf '  self-test FAIL  %-34s → %s (wanted %s)\n' "$name" "$got" "$want"; fails=$((fails+1)); fi
+  }
+  expect_case pass-rc0                PASS        pass 0   "$t/ok"        ""     ""    2.8.0
+  expect_case pass-rc1                FAIL        pass 1   "$t/err"       ""     ""    2.8.0
+  expect_case pass-signal-137         CRASH       pass 137 "$t/empty"     ""     ""    2.8.0
+  expect_case fail-rejected-with-msg  REJECTED    fail 42  "$t/err"       boom   ""    2.8.0
+  expect_case fail-empty-expect       WRONG-ERROR fail 42  "$t/err"       ""     ""    2.8.0
+  expect_case fail-msg-only-in-echo   WRONG-ERROR fail 42  "$t/echo-only" postulate "" 2.8.0
+  expect_case fail-wrong-message      WRONG-ERROR fail 42  "$t/err"       other  ""    2.8.0
+  expect_case fail-accepted           ACCEPTED    fail 0   "$t/ok"        boom   ""    2.8.0
+  expect_case fail-signal-not-reject  CRASH       fail 139 "$t/err"       boom   ""    2.8.0
+  expect_case hole-below-fix-accepted KNOWN-HOLE  hole 0   "$t/ok"        boom   2.9.0 2.8.0
+  expect_case hole-below-fix-patch    KNOWN-HOLE  hole 0   "$t/ok"        boom   2.9.0 2.8.0.2
+  expect_case hole-at-fix-accepted    ACCEPTED    hole 0   "$t/ok"        boom   2.9.0 2.9.0
+  expect_case hole-after-fix-accepted ACCEPTED    hole 0   "$t/ok"        boom   2.9.0 2.10.0
+  expect_case hole-at-fix-rejected    FIXED       hole 42  "$t/err"       boom   2.9.0 2.9.0
+  expect_case hole-below-fix-rejected FIXED-EARLY hole 42  "$t/err"       boom   2.9.0 2.8.0
+  expect_case hole-no-fixed-in        WRONG-ERROR hole 0   "$t/ok"        boom   ""    2.8.0
+  expect_case hole-empty-expect       WRONG-ERROR hole 0   "$t/ok"        ""     2.9.0 2.8.0
+  expect_case hole-signal             CRASH       hole 137 "$t/err"       boom   2.9.0 2.8.0
+  if ver_ge 2.10.0 2.9.0 && ! ver_ge 2.8.0.2 2.9.0 && ver_ge 2.9.0 2.9.0; then printf '  self-test ok    %-34s\n' ver_ge; n=$((n+1))
+  else printf '  self-test FAIL  %-34s\n' ver_ge; fails=$((fails+1)); n=$((n+1)); fi
+  rm -rf "$t"
+  echo "agda-toolcheck: grader self-test: $((n-fails))/$n ok"
+  [ "$fails" -eq 0 ]
+}
+if ! self_test; then echo "run.sh: grader self-test FAILED — refusing to run" >&2; exit 2; fi
+[ "$SELF_TEST_ONLY" = 1 ] && exit 0
 
 # ---- re-exec under boxrun (one scope for the whole suite) -------------------
 if [ "$USE_BOXRUN" = 1 ] && [ "${AGDA_TOOLCHECK_INNER:-0}" != 1 ]; then
@@ -83,14 +181,21 @@ done
 
 # ---- toolchain facts --------------------------------------------------------
 AGDA_VERSION="$(agda --version | head -1 | awk '{print $3}')"
-# test seam for the KNOWN-HOLE grading only (never set in a real run): pretend
-# the pin is a different Agda so the ACCEPTED-on-fixed-pin path can be exercised
+SEAMS=""
 AGDA_FAKED=false
 if [ -n "${TOOLCHECK_FAKE_AGDA_VERSION:-}" ]; then
-  AGDA_VERSION="$TOOLCHECK_FAKE_AGDA_VERSION"; AGDA_FAKED=true
-  echo "agda-toolcheck: WARNING — TOOLCHECK_FAKE_AGDA_VERSION=$AGDA_VERSION (grading test only; not a baseline)" >&2
+  AGDA_VERSION="$TOOLCHECK_FAKE_AGDA_VERSION"; AGDA_FAKED=true; SEAMS="$SEAMS fake-agda-version"
+fi
+INJECT_FAIL=false
+[ "${TOOLCHECK_INJECT_FAIL:-0}" = 1 ] && { INJECT_FAIL=true; SEAMS="$SEAMS inject-fail"; }
+MANIFEST="$HERE/MANIFEST"
+if [ -n "${TOOLCHECK_MANIFEST:-}" ]; then MANIFEST="$TOOLCHECK_MANIFEST"; SEAMS="$SEAMS alt-manifest"; fi
+if [ -n "$SEAMS" ]; then
+  echo "agda-toolcheck: WARNING — test seam(s) active:$SEAMS (not a baseline; --update-baseline disabled)" >&2
   UPDATE_BASELINE=0
 fi
+[ -f "$MANIFEST" ] || { echo "run.sh: MANIFEST not found at $MANIFEST" >&2; exit 2; }
+
 WORKFLOW="$REPO/.github/workflows/agda-cubical.yml"
 CI_PIN="$(grep -oE 'checkout [0-9a-f]{40}' "$WORKFLOW" | awk '{print $2}' | head -1)"
 CI_AGDA="$(grep -oE 'releases/download/v[0-9.]+' "$WORKFLOW" | head -1 | sed 's#.*/v##')"
@@ -129,12 +234,10 @@ for h in /sys/class/hwmon/hwmon*; do
 done
 START_ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 SHA7="${CI_PIN:0:7}"
-if [ "$UPDATE_BASELINE" = 1 ]; then
-  OUT_DIR="$HERE/results"                                  # the committed baseline
-else
-  OUT_DIR="$HERE/results/runs/$(date -u +%Y%m%dT%H%M%SZ)"  # git-ignored scratch record
-fi
-mkdir -p "$OUT_DIR/logs"   # full per-file agda output
+RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
+RUN_DIR="$HERE/results/runs/$RUN_ID"          # every run records here (git-ignored)
+BASE_DIR="$HERE/results"                       # the committed baseline, written only on green
+mkdir -p "$RUN_DIR/logs"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 ROWS="$TMP/rows.ndjson"; : > "$ROWS"
@@ -143,144 +246,152 @@ UNEXPECTED=0
 echo "agda-toolcheck: Agda $AGDA_VERSION (CI pins $CI_AGDA, match=$AGDA_MATCH)"
 echo "agda-toolcheck: cubical CI pin $CI_PIN ($LIB_NAME; flags: $LIB_FLAGS)"
 echo "agda-toolcheck: cubical local HEAD $LOCAL_PIN (match=$PIN_MATCH)"
-echo "agda-toolcheck: Tctl at start ${TCTL} C; layer=$LAYER; start $START_ISO; output → $OUT_DIR$([ "$UPDATE_BASELINE" = 1 ] && echo ' (UPDATING THE COMMITTED BASELINE)')"
+echo "agda-toolcheck: Tctl at start ${TCTL} C; layer=$LAYER; start $START_ISO; run dir $RUN_DIR$([ "$UPDATE_BASELINE" = 1 ] && echo '; will update the committed baseline IF green')"
 
-# version comparison (GNU sort -V): ver_ge A B  ⇔  A >= B
-ver_ge() { [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -1)" = "$1" ]; }
 if [ "$PIN_MATCH" != true ] && [ "${ALLOW_PIN_MISMATCH:-0}" != 1 ]; then
   echo "agda-toolcheck: PIN MISMATCH between local cubical checkout and CI — fix ~/cubical or set ALLOW_PIN_MISMATCH=1" >&2
   UNEXPECTED=$((UNEXPECTED+1))
 fi
 
+# row <layer> <file> <expect> <status> <rc> <wall> <rss> <detail>
+row() {
+  is_unexpected "$4" && UNEXPECTED=$((UNEXPECTED+1))
+  printf '%-9s %-11s %-28s rc=%-3s %7ss %9s KiB  %s\n' "$1" "$4" "$2" "$5" "$6" "$7" "$8"
+  jq -nc --arg layer "$1" --arg file "$2" --arg expect "$3" --arg status "$4" \
+         --argjson rc "$5" --argjson wall "$6" --argjson rss "$7" --arg detail "$8" \
+         '{layer:$layer,file:$file,expect:$expect,status:$status,exit_code:$rc,wall_s:$wall,max_rss_kib:$rss,detail:$detail}' >> "$ROWS"
+}
+
 # ---- one check -------------------------------------------------------------
 # check <layer> <dir> <file> <expectation: pass|fail|hole>
 check() {
   local layer="$1" dir="$2" file="$3" expect="$4"
-  local out="$TMP/out" tfile="$TMP/time" rc wall rss status detail="" expect_msg=""
+  local out="$TMP/out" tfile="$TMP/time" rc wall rss graded expect_msg="" fixed_in=""
   if [ "$expect" != pass ]; then
-    expect_msg="$(sed -n 's/^-- EXPECT: *//p' "$dir/$file" | head -1)"
+    expect_msg="$(sed -n 's/^-- *EXPECT: *//p' "$dir/$file" | head -1)"
+    fixed_in="$(sed -n 's/^-- *FIXED-IN: *//p' "$dir/$file" | head -1)"
   fi
   set +e
   ( cd "$dir" && /usr/bin/time -f '%e %M' -o "$tfile" agda --safe "$file" ) > "$out" 2>&1
   rc=$?
   set -e
-  cp "$out" "$OUT_DIR/logs/$layer-${file%.agda}.log"
+  cp "$out" "$RUN_DIR/logs/$layer-${file%.agda}.log"
   # GNU time prepends "Command exited with non-zero status N" on failure: take the last line
   read -r wall rss < <(tail -1 "$tfile") || { wall=0; rss=0; }
   case "$wall" in ''|*[!0-9.]*) wall=0 ;; esac
   case "$rss" in ''|*[!0-9]*) rss=0 ;; esac
-  case "$expect" in
-    pass)
-      if [ "$rc" -eq 0 ]; then status=PASS; else status=FAIL; detail="$(grep -v '^Checking\|^ Checking\|^Finished' "$out" | head -3 | tr '\n' ' ' | cut -c1-200)"; fi ;;
-    fail)
-      if [ "$rc" -ne 0 ] && grep -qF -- "$expect_msg" "$out"; then status=REJECTED
-      elif [ "$rc" -ne 0 ]; then status=WRONG-ERROR; detail="$(tail -5 "$out" | tr '\n' ' ' | cut -c1-200)"
-      else status=ACCEPTED; detail="must-fail was accepted"; fi ;;
-    hole)
-      # keyed to the pin: FIXED-IN from the file header (Red Team F2)
-      local fixed_in; fixed_in="$(sed -n 's/^-- *FIXED-IN: *//p' "$dir/$file" | head -1)"
-      if [ -z "$fixed_in" ]; then status=WRONG-ERROR; detail="KNOWN-HOLE file without a FIXED-IN: line"
-      elif ver_ge "$AGDA_VERSION" "$fixed_in"; then
-        # the fix is in this Agda: the file is an ordinary must-fail now
-        if [ "$rc" -ne 0 ] && grep -qF -- "$expect_msg" "$out"; then status=FIXED; detail="rejected on Agda $AGDA_VERSION >= $fixed_in"
-        elif [ "$rc" -ne 0 ]; then status=WRONG-ERROR; detail="$(tail -5 "$out" | tr '\n' ' ' | cut -c1-200)"
-        else status=ACCEPTED; detail="REGRESSION: accepted on Agda $AGDA_VERSION, fixed in $fixed_in"; fi
-      else
-        if [ "$rc" -eq 0 ]; then status=KNOWN-HOLE; detail="accepted on Agda $AGDA_VERSION < $fixed_in (agda/agda#8341)"
-        elif grep -qF -- "$expect_msg" "$out"; then status=FIXED-EARLY; detail="rejected on Agda $AGDA_VERSION < $fixed_in: update FIXED-IN"
-        else status=WRONG-ERROR; detail="$(tail -5 "$out" | tr '\n' ' ' | cut -c1-200)"; fi
-      fi ;;
-  esac
-  case "$status" in FAIL|ACCEPTED|WRONG-ERROR) UNEXPECTED=$((UNEXPECTED+1)) ;; esac
-  printf '%-9s %-8s %-28s rc=%-3s %7ss %9s KiB  %s\n' "$layer" "$status" "$file" "$rc" "$wall" "$rss" "$detail"
-  jq -nc --arg layer "$layer" --arg file "$file" --arg expect "$expect" --arg status "$status" \
-         --argjson rc "$rc" --argjson wall "$wall" --argjson rss "$rss" --arg detail "$detail" \
-         --arg expect_msg "$expect_msg" \
-         '{layer:$layer,file:$file,expect:$expect,status:$status,exit_code:$rc,wall_s:$wall,max_rss_kib:$rss,expect_msg:$expect_msg,detail:$detail}' >> "$ROWS"
+  graded="$(grade "$expect" "$rc" "$out" "$expect_msg" "$fixed_in" "$AGDA_VERSION")"
+  row "$layer" "$file" "$expect" "${graded%%|*}" "$rc" "$wall" "$rss" "${graded#*|}"
 }
 
-run_layer_dir() {   # run_layer_dir <layer> <dir> <expectation>
-  local layer="$1" dir="$2" expect="$3" f
-  for f in "$dir"/*.agda; do
-    [ -e "$f" ] || continue
-    check "$layer" "$dir" "$(basename "$f")" "$expect"
-  done
+# ---- manifest: what must be found (Gemini (6)) -------------------------------
+# manifest_check <layer> <dir> <mode: exact|superset>  — also echoes the files to run
+manifest_check() {
+  local layer="$1" dir="$2" mode="$3" listed found missing extra f detail status
+  listed="$(awk -F'\t' -v l="$layer" '$1==l {print $2}' "$MANIFEST" | sort)"
+  found="$(cd "$dir" 2>/dev/null && ls -1 *.agda 2>/dev/null | sort || true)"
+  missing="$(comm -23 <(printf '%s\n' "$listed") <(printf '%s\n' "$found") | grep . || true)"
+  extra="$(comm -13 <(printf '%s\n' "$listed") <(printf '%s\n' "$found") | grep . || true)"
+  local nl nf; nl="$(printf '%s\n' "$listed" | grep -c . || true)"; nf="$(printf '%s\n' "$found" | grep -c . || true)"
+  status=PASS; detail="$nf found, $nl listed"
+  if [ "$nl" -eq 0 ]; then status=FAIL; detail="MANIFEST lists no files for layer $layer"
+  elif [ -n "$missing" ]; then status=FAIL; detail="listed but not found in $dir: $(echo "$missing" | tr '\n' ' ')"
+  elif [ "$mode" = exact ] && [ -n "$extra" ]; then status=FAIL; detail="found but not listed in MANIFEST: $(echo "$extra" | tr '\n' ' ')"
+  elif [ -n "$extra" ]; then detail="$detail (new, unlisted, will be checked: $(echo "$extra" | tr '\n' ' '))"; fi
+  row control "manifest-$layer" manifest "$status" 0 0 0 "$detail"
+  [ "$status" = PASS ] || return 0
+  printf '%s\n' "$found" > "$TMP/files-$layer"
+}
+
+run_layer_dir() {   # run_layer_dir <layer> <dir> <expectation> <manifest-mode>
+  local layer="$1" dir="$2" expect="$3" mode="$4" f
+  : > "$TMP/files-$layer"
+  manifest_check "$layer" "$dir" "$mode"
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    if [ "$expect" = mustfail ]; then
+      if grep -q '^-- MUSTFAIL-KNOWN-HOLE' "$dir/$f"; then check "$layer" "$dir" "$f" hole; else check "$layer" "$dir" "$f" fail; fi
+    else
+      check "$layer" "$dir" "$f" "$expect"
+    fi
+  done < "$TMP/files-$layer"
 }
 
 want() { [ "$LAYER" = all ] || [ "$LAYER" = "$1" ]; }
 
-if want tool;     then run_layer_dir tool     "$HERE/tool" pass; fi
-if want lib;      then run_layer_dir lib      "$HERE/lib"  pass; fi
-if want mustfail; then
-  for f in "$HERE"/mustfail/*.agda; do
-    if grep -q '^-- MUSTFAIL-KNOWN-HOLE' "$f"; then exp=hole; else exp=fail; fi
-    check mustfail "$HERE/mustfail" "$(basename "$f")" "$exp"
-  done
-fi
+if want tool;     then run_layer_dir tool     "$HERE/tool"     pass     exact; fi
+if want lib;      then run_layer_dir lib      "$HERE/lib"      pass     exact; fi
+if want mustfail; then run_layer_dir mustfail "$HERE/mustfail" mustfail exact; fi
 if want project; then
   # exactly as CI: cd into the directory, `agda --safe` each file in glob order
-  run_layer_dir substrate "$REPO/proofs/agda"         pass
-  run_layer_dir cubical   "$REPO/proofs/agda-cubical" pass
-  # lexical control (forbidden_tokens.sh): every gated file carries --safe and
-  # no forbidden pragma / OPTIONS flag / token — covers agda/agda#8341 on 2.8.0
-  gated=( "$REPO"/proofs/agda/*.agda "$REPO"/proofs/agda-cubical/*.agda )
+  run_layer_dir substrate "$REPO/proofs/agda"         pass superset
+  run_layer_dir cubical   "$REPO/proofs/agda-cubical" pass superset
+  # lexical control (forbidden_tokens.sh, raw text) over the two gated DIRECTORIES,
+  # as PR #826's CI step does: every file carries --safe, no forbidden token anywhere
   set +e
-  hits="$("$HERE/forbidden_tokens.sh" --require-safe "${gated[@]}" 2>/dev/null)"; hrc=$?
+  hits="$("$HERE/forbidden_tokens.sh" --require-safe "$REPO/proofs/agda" "$REPO/proofs/agda-cubical" 2>"$TMP/ft.err")"; hrc=$?
   set -e
-  if [ "$hrc" -eq 0 ] && [ -z "$hits" ]; then lstatus=PASS; ldetail="0 hits in ${#gated[@]} files (--require-safe)"
-  else lstatus=FAIL; ldetail="$(echo "$hits" | head -3 | tr '\n' ' ' | cut -c1-200)"; UNEXPECTED=$((UNEXPECTED+1)); fi
-  printf '%-9s %-8s %-28s %s\n' control "$lstatus" forbidden-tokens "$ldetail"
-  jq -nc --arg status "$lstatus" --arg detail "$ldetail" \
-     '{layer:"control",file:"forbidden-tokens",expect:"pass",status:$status,exit_code:0,wall_s:0,max_rss_kib:0,expect_msg:"",detail:$detail}' >> "$ROWS"
+  scanner="$(sed -n 's/.*\[\(.*\)\]$/\1/p' "$TMP/ft.err" | tail -1)"
+  if [ "$hrc" -eq 0 ] && [ -z "$hits" ]; then lstatus=PASS; ldetail="0 hits over proofs/agda + proofs/agda-cubical (--require-safe; scanner: $scanner)"
+  elif [ "$hrc" -eq 2 ]; then lstatus=FAIL; ldetail="scanner self-test failed: $(tr '\n' ' ' < "$TMP/ft.err" | cut -c1-200)"
+  else lstatus=FAIL; ldetail="$(echo "$hits" | head -3 | tr '\n' ' ' | cut -c1-200)"; fi
+  row control forbidden-tokens pass "$lstatus" 0 0 0 "$ldetail"
   # the control's own controls: every fixture in control/ must yield exactly its PLANTED hits
-  # (PlantedForbidden: one hit per forbidden construct; B1/B2: the PR #826 scanner bypasses)
-  for fixture in "$HERE"/control/*.agda; do
-    fname="$(basename "$fixture" .agda)"
+  : > "$TMP/files-control"
+  manifest_check control "$HERE/control" exact
+  while IFS= read -r fname; do
+    [ -n "$fname" ] || continue
+    fixture="$HERE/control/$fname"
     planted="$(sed -n 's/^-- *PLANTED: *\([0-9]*\).*/\1/p' "$fixture" | head -1)"
     set +e
     fhits="$("$HERE/forbidden_tokens.sh" "$fixture" 2>/dev/null)"
     set -e
     nf="$(printf '%s\n' "$fhits" | grep -c . || true)"
     if [ -n "$planted" ] && [ "$nf" -eq "$planted" ]; then fstatus=PASS; fdetail="fixture yields $nf/$planted planted hits"
-    else fstatus=FAIL; fdetail="fixture yields $nf hits, expected ${planted:-?} — the scan is blind or over-eager"; UNEXPECTED=$((UNEXPECTED+1)); fi
-    printf '%-9s %-8s %-28s %s\n' control "$fstatus" "fixture-$fname" "$fdetail"
-    jq -nc --arg status "$fstatus" --arg detail "$fdetail" --arg file "fixture-$fname" \
-       '{layer:"control",file:$file,expect:"hits",status:$status,exit_code:0,wall_s:0,max_rss_kib:0,expect_msg:"",detail:$detail}' >> "$ROWS"
-  done
+    else fstatus=FAIL; fdetail="fixture yields $nf hits, expected ${planted:-?} — the scan is blind or over-eager"; fi
+    row control "fixture-${fname%.agda}" hits "$fstatus" 0 0 0 "$fdetail"
+  done < "$TMP/files-control"
+fi
+if [ "$INJECT_FAIL" = true ]; then
+  row control injected-failure pass FAIL 0 0 0 "TOOLCHECK_INJECT_FAIL=1: synthetic failure to show the baseline is not written"
 fi
 
+# ---- record (always to the run dir; the baseline only on green) -------------
 END_ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-# TOOLCHECK_TAG=cold (etc.) keeps a variant run from overwriting the baseline file
 TAG="${TOOLCHECK_TAG:+-$TOOLCHECK_TAG}"
-JSON="$OUT_DIR/results-$AGDA_VERSION-$SHA7$TAG.json"
-MD="$OUT_DIR/results-$AGDA_VERSION-$SHA7$TAG.md"
+NAME="results-$AGDA_VERSION-$SHA7$TAG"
 jq -n --arg agda "$AGDA_VERSION" --arg ci_agda "$CI_AGDA" --argjson agda_match "$AGDA_MATCH" --argjson agda_faked "$AGDA_FAKED" \
       --arg ci_pin "$CI_PIN" --arg local_pin "$LOCAL_PIN" --argjson pin_match "$PIN_MATCH" \
       --arg lib "$LIB_NAME" --arg flags "$LIB_FLAGS" --arg start "$START_ISO" --arg finish "$END_ISO" \
-      --argjson tctl "$TCTL" --arg layer "$LAYER" --argjson unexpected "$UNEXPECTED" \
-      --argjson mem "$TOOLCHECK_MEM_MB" --argjson timeout "$TOOLCHECK_TIMEOUT" \
+      --argjson tctl "$TCTL" --arg layer "$LAYER" --argjson unexpected "$UNEXPECTED" --arg seams "${SEAMS# }" \
+      --argjson mem "$TOOLCHECK_MEM_MB" --argjson timeout "$TOOLCHECK_TIMEOUT" --arg run_id "$RUN_ID" \
       --slurpfile rows "$ROWS" \
-      '{suite:"qbp-agda-toolcheck", version:1,
+      '{suite:"qbp-agda-toolcheck", version:2,
         toolchain:{agda:$agda, agda_faked:$agda_faked, ci_agda:$ci_agda, agda_match:$agda_match,
                    cubical_ci_pin:$ci_pin, cubical_local_head:$local_pin, pin_match:$pin_match,
                    cubical_lib_name:$lib, lib_flags:$flags},
-        run:{"start":$start, "finished":$finish, "layer":$layer, "tctl_start_c":$tctl,
-             "boxrun":{"mem_mb":$mem, "timeout_s":$timeout}},
-        unexpected:$unexpected, results:$rows}' > "$JSON"
+        run:{"id":$run_id, "start":$start, "finished":$finish, "layer":$layer, "tctl_start_c":$tctl,
+             "test_seams":$seams, "boxrun":{"mem_mb":$mem, "timeout_s":$timeout}},
+        unexpected:$unexpected, results:$rows}' > "$RUN_DIR/$NAME.json"
 {
   echo "# agda-toolcheck results — Agda $AGDA_VERSION, agda/cubical $SHA7"
   echo
-  echo "Run $START_ISO → $END_ISO · Tctl at start ${TCTL} C · layer $LAYER · unexpected $UNEXPECTED"
+  echo "Run $RUN_ID: $START_ISO → $END_ISO · Tctl at start ${TCTL} C · layer $LAYER · unexpected $UNEXPECTED${SEAMS:+ · TEST SEAMS:$SEAMS}"
   echo
   echo "| layer | file | status | rc | wall s | max RSS MiB | detail |"
   echo "|---|---|---|---|---|---|---|"
   jq -r '"| \(.layer) | `\(.file)` | \(.status) | \(.exit_code) | \(.wall_s) | \((.max_rss_kib/1024*10|round)/10) | \(.detail) |"' "$ROWS"
-} > "$MD"
+} > "$RUN_DIR/$NAME.md"
 echo
-echo "agda-toolcheck: wrote $JSON"
-echo "agda-toolcheck: wrote $MD"
+echo "agda-toolcheck: wrote $RUN_DIR/$NAME.{json,md}"
 if [ "$UNEXPECTED" -ne 0 ]; then
   echo "agda-toolcheck: $UNEXPECTED UNEXPECTED result(s)" >&2
+  [ "$UPDATE_BASELINE" = 1 ] && echo "agda-toolcheck: committed baseline NOT updated (run was not green)" >&2
   exit 1
+fi
+if [ "$UPDATE_BASELINE" = 1 ]; then
+  cp "$RUN_DIR/$NAME.json" "$BASE_DIR/$NAME.json"
+  cp "$RUN_DIR/$NAME.md"   "$BASE_DIR/$NAME.md"
+  echo "agda-toolcheck: committed baseline updated → $BASE_DIR/$NAME.{json,md}"
 fi
 echo "agda-toolcheck: all expected (green)"
