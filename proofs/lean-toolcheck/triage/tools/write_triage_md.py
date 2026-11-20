@@ -49,11 +49,12 @@ for ver in sorted(
     L.append("| PR | Section | Disposition | Item (truncated) | Reason |")
     L.append("|---|---|---|---|---|")
     for x in sorted(rows, key=lambda x: (order[x["disp"]], x["sec"], x["pr"])):
-        t = (
-            re.sub(r"https?://[^\s)]*", "‹url›", x["text"])
-            .replace("|", "\\|")
-            .replace("\n", " ")
-        )
+        # Neutralise every link so the markdown link checker never fetches or resolves it:
+        # `[label](target)` -> `label`, then bare URLs -> ‹url›, then stray brackets.
+        t = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", x["text"])
+        t = re.sub(r"https?://[^\s)]*", "‹url›", t)
+        t = t.replace("[", "⟦").replace("]", "⟧")
+        t = t.replace("|", "\\|").replace("\n", " ")
         if len(t) > 140:
             t = t[:137] + "…"
         r = x["reason"].replace("|", "\\|")
