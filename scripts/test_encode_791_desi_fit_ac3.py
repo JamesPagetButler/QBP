@@ -139,6 +139,55 @@ def test_main_on_partial_drift_corrects_fields_without_duplicating_notes(
     assert len(list(changes_dir.glob("*.json"))) == 1  # fragment still written
 
 
+def test_main_rewrites_an_existing_fragment_in_place_without_erroring_or_duplicating(
+    tmp_path, monkeypatch
+):
+    """oppenheimer theory re-confirm fix round, PR #821 (issuecomment-
+    7047925804): a fix round that corrects the fragment's own `note` text
+    must not hit `write_fragment`'s "already exists" refusal (the fragment
+    was already added by this same open, unmerged PR) and must not write a
+    second file (ledger_bookkeeping_lint.py's "exactly one fragment" rule is
+    repo-wide, not per-commit)."""
+    ledger_path = tmp_path / "ledger.json"
+    ledger = _ledger_with_target_anchor()
+    anchor = ledger["anchors"][0]
+    anchor["e_axis"] = dict(m.E_AXIS)
+    anchor["evidence_ref"] = [dict(e) for e in m.EVIDENCE_REF]
+    anchor["review_flag"] = m.REVIEW_FLAG
+    anchor["notes"] = anchor["notes"] + m.OLD_NOTES_ADDITION  # stale text
+    _write_canonical_ledger(ledger_path, ledger)
+    changes_dir = tmp_path / "changes.d"
+    changes_dir.mkdir()
+    stale_fragment = m.build_fragment(
+        issue=m.FRAGMENT_ISSUE,
+        slug=m.FRAGMENT_SLUG,
+        pr=900,
+        encoder="scripts/encode_791_desi_fit_ac3.py",
+        note="a stale, pre-fix-round note",
+        touched_ids=[m.ANCHOR_ID],
+    )
+    fragment_file = m.fragment_path(m.FRAGMENT_ISSUE, m.FRAGMENT_SLUG, changes_dir)
+    fragment_file.write_text(m.canonical_dump(stale_fragment), encoding="utf-8")
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["encode_791_desi_fit_ac3.py", "--ledger", str(ledger_path), "--pr", "900"],
+    )
+    m.main()  # must not raise FragmentError("already exists")
+
+    fragments = list(changes_dir.glob("*.json"))
+    assert len(fragments) == 1  # never a second file
+    frag = json.loads(fragments[0].read_text())
+    assert frag["note"] != "a stale, pre-fix-round note"  # content actually fixed
+    assert "candidate" in frag["note"].lower()
+
+    after = json.loads(ledger_path.read_text())
+    fixed = next(a for a in after["anchors"] if a["id"] == m.ANCHOR_ID)
+    assert m.OLD_NOTES_ADDITION not in fixed["notes"]
+    assert fixed["notes"].count(m.NOTES_ADDITION) == 1
+
+
 def test_main_refuses_a_ledger_without_the_target_anchor(tmp_path, monkeypatch):
     ledger_path = tmp_path / "ledger.json"
     ledger = _ledger_with_target_anchor()
