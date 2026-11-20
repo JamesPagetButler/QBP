@@ -42,12 +42,13 @@ RATCHET = {
 }
 
 
-def strip_comments(src: str) -> str:
-    # block comments /- ... -/ (Lean nests, but a non-greedy single pass is enough for our files);
-    # then line comments -- ... to EOL.
-    src = re.sub(r"/-.*?-/", "", src, flags=re.DOTALL)
-    src = re.sub(r"--.*", "", src)
-    return src
+# #827 AC1: comments are stripped by a real Lean lexer (nesting depth-counted, string and
+# char literals skipped) shared with the axiom-audit script — NOT a regex. The old
+# `re.sub(r"/-.*?-/", …)` ignored strings, so after a `"/-"` string it deleted everything up
+# to the next `-/`, and a `native_decide` in that span passed the HARD-BAN (PR #824 KL03).
+# `-I` (isolated) callers do not get this script's directory on sys.path, so add it here.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lean_lexer import strip_comments  # noqa: E402  (after the sys.path fix above)
 
 
 def scan(lean_dir):
