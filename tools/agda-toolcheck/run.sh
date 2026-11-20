@@ -8,7 +8,13 @@
 #      .github/workflows/agda-cubical.yml, the library name from
 #      proofs/agda-cubical/qbp-cubical.agda-lib, and the HEAD of the locally
 #      registered cubical checkout (~/.agda/libraries). A local/CI pin mismatch
-#      is a finding and fails the run (ALLOW_PIN_MISMATCH=1 to override).
+#      is a finding and fails the run (TOOLCHECK_ALLOW_PIN_MISMATCH=1 lets a
+#      candidate run proceed; being a TOOLCHECK_* seam it also refuses
+#      --update-baseline). Independently of any variable, --update-baseline is
+#      refused whenever pin_match or agda_match is false: a baseline is only
+#      ever written by the exact toolchain CI pins. The results JSON records the
+#      resolved path and sha256 of agda, python3, jq, /usr/bin/time and the
+#      scanner script that produced it.
 #   2. Runs four layers, every file as `agda --safe <file>` (exactly as CI does):
 #        tool/      builtins-only feature tests            → must PASS
 #        lib/       pinned agda/cubical symbol tests        → must PASS
@@ -44,7 +50,8 @@
 #   (AGDA_TOOLCHECK_INNER=1) or --no-boxrun is given. Knobs:
 #     TOOLCHECK_MEM_MB   RSS cap for the run, MiB   (default 8000)
 #     TOOLCHECK_TIMEOUT  deadline, seconds          (default 3600)
-#     TOOLCHECK_TAG      suffix for the results files (e.g. "cold"), optional
+#     TOOLCHECK_TAG      suffix for the results files (e.g. "cold"), optional;
+#                        must match ^[A-Za-z0-9_-]{1,32}$ (else usage error, exit 2)
 #   Exit 87 = RSS cap hit, 124 = deadline/thermal pause ran out, 75 = box busy
 #   (--wait is passed, so the run queues instead).
 #   Timings are what they are: a file's wall time includes re-checking any
@@ -89,6 +96,10 @@ case "$LAYER" in tool|lib|mustfail|project|all) ;; *) echo "run.sh: bad --layer 
 
 TOOLCHECK_MEM_MB="${TOOLCHECK_MEM_MB:-8000}"
 TOOLCHECK_TIMEOUT="${TOOLCHECK_TIMEOUT:-3600}"
+if [ -n "${TOOLCHECK_TAG:-}" ] && ! [[ "$TOOLCHECK_TAG" =~ ^[A-Za-z0-9_-]{1,32}$ ]]; then
+  echo "run.sh: TOOLCHECK_TAG must match ^[A-Za-z0-9_-]{1,32}$ (got '${TOOLCHECK_TAG:0:40}')" >&2; exit 2
+fi
+case "$TOOLCHECK_MEM_MB$TOOLCHECK_TIMEOUT" in *[!0-9]*) echo "run.sh: TOOLCHECK_MEM_MB/TOOLCHECK_TIMEOUT must be integers" >&2; exit 2 ;; esac
 
 # ---- grading (pure: no agda, no globals except AGDA_VERSION) ---------------
 # version comparison (GNU sort -V): ver_ge A B  ⇔  A >= B
@@ -183,9 +194,20 @@ if [ "$USE_BOXRUN" = 1 ] && [ "${AGDA_TOOLCHECK_INNER:-0}" != 1 ]; then
        env AGDA_TOOLCHECK_INNER=1 "$0" --layer "$LAYER" --no-boxrun "${UB[@]}"
 fi
 
-for tool in agda jq /usr/bin/time; do
+for tool in agda jq python3 /usr/bin/time; do
   command -v "$tool" >/dev/null 2>&1 || { echo "run.sh: missing $tool" >&2; exit 2; }
 done
+# the binaries that produce this record: resolved path + sha256 (PR #825 Gemini r4)
+bin_entry() {   # bin_entry <name> <path-or-empty> → JSON object
+  local name="$1" p="$2" rp sha
+  if [ -n "$p" ] && [ -e "$p" ]; then rp="$(readlink -f "$p")"; sha="$(sha256sum "$rp" | cut -d' ' -f1)"
+  else rp=""; sha=""; fi
+  jq -nc --arg n "$name" --arg p "$rp" --arg s "$sha" '{name:$n, path:(if $p=="" then null else $p end), sha256:(if $s=="" then null else $s end)}'
+}
+SCANNER_PATH="${TOOLCHECK_SHARED_SCANNER:-$HERE/../../scripts/agda_forbidden_tokens.py}"
+BINARIES="$(jq -s '.' <(bin_entry agda "$(command -v agda)") <(bin_entry python3 "$(command -v python3)") \
+                      <(bin_entry jq "$(command -v jq)") <(bin_entry time /usr/bin/time) \
+                      <(bin_entry agda_forbidden_tokens.py "$SCANNER_PATH"))"
 
 # ---- toolchain facts --------------------------------------------------------
 AGDA_VERSION="$(agda --version | head -1 | awk '{print $3}')"
@@ -262,9 +284,10 @@ echo "agda-toolcheck: Agda $AGDA_VERSION (CI pins $CI_AGDA, match=$AGDA_MATCH)"
 echo "agda-toolcheck: cubical CI pin $CI_PIN ($LIB_NAME; flags: $LIB_FLAGS)"
 echo "agda-toolcheck: cubical local HEAD $LOCAL_PIN (match=$PIN_MATCH)"
 echo "agda-toolcheck: Tctl at start ${TCTL} C; layer=$LAYER; start $START_ISO; run dir $RUN_DIR$([ "$UPDATE_BASELINE" = 1 ] && echo '; will update the committed baseline IF green')"
+echo "agda-toolcheck: binaries: $(jq -r '.[] | "\(.name)=\(.path // "absent")@\((.sha256 // "-")[0:12])"' <<< "$BINARIES" | tr '\n' ' ')"
 
-if [ "$PIN_MATCH" != true ] && [ "${ALLOW_PIN_MISMATCH:-0}" != 1 ]; then
-  echo "agda-toolcheck: PIN MISMATCH between local cubical checkout and CI — fix ~/cubical or set ALLOW_PIN_MISMATCH=1" >&2
+if [ "$PIN_MATCH" != true ] && [ "${TOOLCHECK_ALLOW_PIN_MISMATCH:-0}" != 1 ]; then
+  echo "agda-toolcheck: PIN MISMATCH between local cubical checkout and CI — fix ~/cubical or set TOOLCHECK_ALLOW_PIN_MISMATCH=1 (a seam: no baseline)" >&2
   UNEXPECTED=$((UNEXPECTED+1))
 fi
 
@@ -385,11 +408,11 @@ NAME="results-$AGDA_VERSION-$SHA7$TAG"
 jq -n --arg agda "$AGDA_VERSION" --arg ci_agda "$CI_AGDA" --argjson agda_match "$AGDA_MATCH" --argjson agda_faked "$AGDA_FAKED" \
       --arg ci_pin "$CI_PIN" --arg local_pin "$LOCAL_PIN" --argjson pin_match "$PIN_MATCH" \
       --arg lib "$LIB_NAME" --arg flags "$LIB_FLAGS" --arg start "$START_ISO" --arg finish "$END_ISO" \
-      --argjson tctl "$TCTL" --arg layer "$LAYER" --argjson unexpected "$UNEXPECTED" --arg seams "${SEAMS# }" \
+      --argjson tctl "$TCTL" --arg layer "$LAYER" --argjson unexpected "$UNEXPECTED" --arg seams "${SEAMS# }" --argjson binaries "$BINARIES" \
       --argjson mem "$TOOLCHECK_MEM_MB" --argjson timeout "$TOOLCHECK_TIMEOUT" --arg run_id "$RUN_ID" \
       --slurpfile rows "$ROWS" \
       '{suite:"qbp-agda-toolcheck", version:2,
-        toolchain:{agda:$agda, agda_faked:$agda_faked, ci_agda:$ci_agda, agda_match:$agda_match,
+        toolchain:{agda:$agda, agda_faked:$agda_faked, ci_agda:$ci_agda, agda_match:$agda_match, binaries:$binaries,
                    cubical_ci_pin:$ci_pin, cubical_local_head:$local_pin, pin_match:$pin_match,
                    cubical_lib_name:$lib, lib_flags:$flags},
         run:{"id":$run_id, "start":$start, "finished":$finish, "layer":$layer, "tctl_start_c":$tctl,
@@ -411,11 +434,16 @@ if [ "$UNEXPECTED" -ne 0 ]; then
   [ "$UPDATE_BASELINE" = 1 ] && echo "agda-toolcheck: committed baseline NOT updated (run was not green)" >&2
   exit 1
 fi
-if [ "$UPDATE_REQUESTED" = 1 ] && [ -n "$SEAMS" ]; then
-  echo "agda-toolcheck: all expected (green), but --update-baseline REFUSED: test seam(s) active:$SEAMS" >&2
+# a baseline is written only by the exact toolchain CI pins, with no seam active
+REFUSE=""
+[ -n "$SEAMS" ] && REFUSE="$REFUSE test seam(s) active:$SEAMS;"
+[ "$PIN_MATCH" = true ] || REFUSE="$REFUSE pin_match=false (local cubical $LOCAL_PIN ≠ CI $CI_PIN);"
+[ "$AGDA_MATCH" = true ] || REFUSE="$REFUSE agda_match=false (Agda $AGDA_VERSION ≠ CI $CI_AGDA);"
+if [ "$UPDATE_REQUESTED" = 1 ] && [ -n "$REFUSE" ]; then
+  echo "agda-toolcheck: all expected (green), but --update-baseline REFUSED:$REFUSE" >&2
   exit 3
 fi
-if [ "$UPDATE_BASELINE" = 1 ] && [ -z "$SEAMS" ]; then
+if [ "$UPDATE_BASELINE" = 1 ] && [ -z "$REFUSE" ]; then
   cp "$RUN_DIR/$NAME.json" "$BASE_DIR/$NAME.json"
   cp "$RUN_DIR/$NAME.md"   "$BASE_DIR/$NAME.md"
   echo "agda-toolcheck: committed baseline updated → $BASE_DIR/$NAME.{json,md}"

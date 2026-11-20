@@ -1,70 +1,70 @@
 # agda-toolcheck results — Agda 2.8.0, agda/cubical 7b9019b
 
-Run 20261120T224439Z: 2026-11-20T22:44:39Z → 2026-11-20T22:48:52Z · Tctl at start 63.6 C · layer all · unexpected 0
+Run 20261120T225839Z: 2026-11-20T22:58:39Z → 2026-11-20T23:01:23Z · Tctl at start 57.4 C · layer all · unexpected 0
 
 | layer | file | status | rc | wall s | max RSS MiB | detail |
 |---|---|---|---|---|---|---|
 | control | `manifest-tool` | PASS | 0 | 0 | 0 | 12 found, 12 listed |
-| tool | `CircleHIT.agda` | PASS | 0 | 0.04 | 44.3 |  |
-| tool | `CoreSyntax.agda` | PASS | 0 | 0.07 | 45.7 |  |
-| tool | `GlueUa.agda` | PASS | 0 | 0.11 | 48.1 |  |
-| tool | `Guardedness.agda` | PASS | 0 | 0.05 | 44.3 |  |
-| tool | `HComp.agda` | PASS | 0 | 0.06 | 44.9 |  |
-| tool | `Interval.agda` | PASS | 0 | 0.04 | 44.2 |  |
-| tool | `LibFlags.agda` | PASS | 0 | 0.03 | 43.6 |  |
-| tool | `LossyUnification.agda` | PASS | 0 | 0.04 | 44.2 |  |
-| tool | `Opaque.agda` | PASS | 0 | 0.05 | 44.1 |  |
-| tool | `PathP.agda` | PASS | 0 | 0.05 | 44.4 |  |
-| tool | `SuspJoinHIT.agda` | PASS | 0 | 0.05 | 45.6 |  |
-| tool | `Transp.agda` | PASS | 0 | 0.05 | 44.8 |  |
+| tool | `CircleHIT.agda` | PASS | 0 | 0.04 | 45.5 |  |
+| tool | `CoreSyntax.agda` | PASS | 0 | 0.06 | 46.8 |  |
+| tool | `GlueUa.agda` | PASS | 0 | 0.08 | 49.3 |  |
+| tool | `Guardedness.agda` | PASS | 0 | 0.04 | 45.3 |  |
+| tool | `HComp.agda` | PASS | 0 | 0.06 | 46.1 |  |
+| tool | `Interval.agda` | PASS | 0 | 0.04 | 45.4 |  |
+| tool | `LibFlags.agda` | PASS | 0 | 0.03 | 44.7 |  |
+| tool | `LossyUnification.agda` | PASS | 0 | 0.04 | 45.4 |  |
+| tool | `Opaque.agda` | PASS | 0 | 0.04 | 45.2 |  |
+| tool | `PathP.agda` | PASS | 0 | 0.04 | 45.6 |  |
+| tool | `SuspJoinHIT.agda` | PASS | 0 | 0.05 | 46.8 |  |
+| tool | `Transp.agda` | PASS | 0 | 0.05 | 46 |  |
 | control | `manifest-lib` | PASS | 0 | 0 | 0 | 22 found, 22 listed |
-| lib | `LibConnected.agda` | PASS | 0 | 5.54 | 378.8 |  |
-| lib | `LibDataBoolNat.agda` | PASS | 0 | 2.1 | 170.3 |  |
-| lib | `LibDataInt.agda` | PASS | 0 | 3.49 | 234.5 |  |
-| lib | `LibDataSigma.agda` | PASS | 0 | 0.81 | 93.4 |  |
-| lib | `LibEquivIso.agda` | PASS | 0 | 0.33 | 67.2 |  |
-| lib | `LibFunction.agda` | PASS | 0 | 0.17 | 55.3 |  |
-| lib | `LibGroupBase.agda` | PASS | 0 | 5.83 | 399.1 |  |
-| lib | `LibHLevelsGroupoid.agda` | PASS | 0 | 1.14 | 116.3 |  |
-| lib | `LibHopf.agda` | PASS | 0 | 5.74 | 374.9 |  |
-| lib | `LibHSpace.agda` | PASS | 0 | 5.6 | 379.9 |  |
-| lib | `LibJoin.agda` | PASS | 0 | 4.74 | 329.8 |  |
-| lib | `LibLoopspace.agda` | PASS | 0 | 4.16 | 295.9 |  |
-| lib | `LibPinSn.agda` | PASS | 0 | 7.7 | 493 |  |
-| lib | `LibPointed.agda` | PASS | 0 | 1.36 | 124 |  |
-| lib | `LibPrelude.agda` | PASS | 0 | 0.15 | 56.1 |  |
-| lib | `LibS1.agda` | PASS | 0 | 3.56 | 250.7 |  |
-| lib | `LibSn.agda` | PASS | 0 | 5.54 | 376.6 |  |
-| lib | `LibSnDegree.agda` | PASS | 0 | 7.8 | 473.3 |  |
-| lib | `LibSnMultiplication.agda` | PASS | 0 | 5.66 | 371.6 |  |
-| lib | `LibSusp.agda` | PASS | 0 | 4.75 | 335.7 |  |
-| lib | `LibTruncations.agda` | PASS | 0 | 4.41 | 302.6 |  |
-| lib | `LibUnivalence.agda` | PASS | 0 | 2.09 | 172 |  |
+| lib | `LibConnected.agda` | PASS | 0 | 5.31 | 380.2 |  |
+| lib | `LibDataBoolNat.agda` | PASS | 0 | 2.05 | 171.6 |  |
+| lib | `LibDataInt.agda` | PASS | 0 | 3.33 | 235.7 |  |
+| lib | `LibDataSigma.agda` | PASS | 0 | 0.8 | 94.7 |  |
+| lib | `LibEquivIso.agda` | PASS | 0 | 0.33 | 68.4 |  |
+| lib | `LibFunction.agda` | PASS | 0 | 0.16 | 56.5 |  |
+| lib | `LibGroupBase.agda` | PASS | 0 | 5.76 | 400.4 |  |
+| lib | `LibHLevelsGroupoid.agda` | PASS | 0 | 1.15 | 117.5 |  |
+| lib | `LibHopf.agda` | PASS | 0 | 5.69 | 376.1 |  |
+| lib | `LibHSpace.agda` | PASS | 0 | 5.62 | 381.3 |  |
+| lib | `LibJoin.agda` | PASS | 0 | 4.75 | 331 |  |
+| lib | `LibLoopspace.agda` | PASS | 0 | 4.13 | 297.1 |  |
+| lib | `LibPinSn.agda` | PASS | 0 | 7.52 | 494.4 |  |
+| lib | `LibPointed.agda` | PASS | 0 | 1.35 | 125.3 |  |
+| lib | `LibPrelude.agda` | PASS | 0 | 0.14 | 57.3 |  |
+| lib | `LibS1.agda` | PASS | 0 | 3.47 | 251.9 |  |
+| lib | `LibSn.agda` | PASS | 0 | 5.42 | 377.9 |  |
+| lib | `LibSnDegree.agda` | PASS | 0 | 7.56 | 474.6 |  |
+| lib | `LibSnMultiplication.agda` | PASS | 0 | 5.64 | 373 |  |
+| lib | `LibSusp.agda` | PASS | 0 | 4.68 | 336.9 |  |
+| lib | `LibTruncations.agda` | PASS | 0 | 4.31 | 303.8 |  |
+| lib | `LibUnivalence.agda` | PASS | 0 | 2.05 | 173.2 |  |
 | control | `manifest-mustfail` | PASS | 0 | 0 | 0 | 5 found, 5 listed |
-| mustfail | `BadPath.agda` | REJECTED | 42 | 0.04 | 44.5 |  |
-| mustfail | `Hole.agda` | REJECTED | 42 | 0.04 | 44.6 |  |
-| mustfail | `LetPostulate.agda` | KNOWN-HOLE | 0 | 0.03 | 43.6 | accepted on Agda 2.8.0 < 2.9.0 (agda/agda#8341) |
-| mustfail | `Postulate.agda` | REJECTED | 42 | 0.03 | 44.2 |  |
-| mustfail | `Terminating.agda` | REJECTED | 42 | 0.03 | 43.9 |  |
+| mustfail | `BadPath.agda` | REJECTED | 42 | 0.04 | 45.8 |  |
+| mustfail | `Hole.agda` | REJECTED | 42 | 0.04 | 45.9 |  |
+| mustfail | `LetPostulate.agda` | KNOWN-HOLE | 0 | 0.03 | 44.9 | accepted on Agda 2.8.0 < 2.9.0 (agda/agda#8341) |
+| mustfail | `Postulate.agda` | REJECTED | 42 | 0.03 | 45.5 |  |
+| mustfail | `Terminating.agda` | REJECTED | 42 | 0.03 | 45.1 |  |
 | control | `manifest-substrate` | PASS | 0 | 0 | 0 | 4 found, 4 listed |
-| substrate | `QBPHSpace.agda` | PASS | 0 | 0.04 | 44.1 |  |
-| substrate | `QBPJoin.agda` | PASS | 0 | 0.05 | 45.3 |  |
-| substrate | `QBPSpheres.agda` | PASS | 0 | 0.04 | 44.6 |  |
-| substrate | `QBPSubstrate.agda` | PASS | 0 | 0.04 | 44.3 |  |
+| substrate | `QBPHSpace.agda` | PASS | 0 | 0.04 | 45.3 |  |
+| substrate | `QBPJoin.agda` | PASS | 0 | 0.05 | 46.5 |  |
+| substrate | `QBPSpheres.agda` | PASS | 0 | 0.04 | 45.8 |  |
+| substrate | `QBPSubstrate.agda` | PASS | 0 | 0.04 | 45.5 |  |
 | control | `manifest-cubical` | PASS | 0 | 0 | 0 | 13 found, 13 listed |
-| cubical | `AssocTransport.agda` | PASS | 0 | 5.78 | 394.2 |  |
-| cubical | `CDAssocBool.agda` | PASS | 0 | 25.26 | 395.9 |  |
-| cubical | `CDAssocCubesStatus.agda` | PASS | 0 | 5.95 | 401.2 |  |
-| cubical | `CDAssocReduction.agda` | PASS | 0 | 5.75 | 373 |  |
-| cubical | `CDJoinBR.agda` | PASS | 0 | 5.66 | 381.9 |  |
-| cubical | `CDLawsBool.agda` | PASS | 0 | 5.68 | 379.8 |  |
-| cubical | `Diamond.agda` | PASS | 0 | 4.66 | 293.2 |  |
-| cubical | `HopfNoAssoc.agda` | PASS | 0 | 5.69 | 362.1 |  |
-| cubical | `QBPS3HSpace.agda` | PASS | 0 | 5.87 | 380.8 |  |
-| cubical | `QuaternionicHopf.agda` | PASS | 0 | 6.06 | 401.9 |  |
-| cubical | `S3FromCD.agda` | PASS | 0 | 72.9 | 413.8 |  |
-| cubical | `SkyrmionCharge.agda` | PASS | 0 | 8.06 | 503.7 |  |
-| cubical | `SubstrateCharge.agda` | PASS | 0 | 8.09 | 507.5 |  |
+| cubical | `AssocTransport.agda` | PASS | 0 | 5.67 | 395.7 |  |
+| cubical | `CDAssocBool.agda` | PASS | 0 | 5.82 | 397 |  |
+| cubical | `CDAssocCubesStatus.agda` | PASS | 0 | 6.03 | 402.5 |  |
+| cubical | `CDAssocReduction.agda` | PASS | 0 | 5.69 | 374.3 |  |
+| cubical | `CDJoinBR.agda` | PASS | 0 | 5.51 | 383.2 |  |
+| cubical | `CDLawsBool.agda` | PASS | 0 | 5.49 | 381.1 |  |
+| cubical | `Diamond.agda` | PASS | 0 | 4.53 | 294.5 |  |
+| cubical | `HopfNoAssoc.agda` | PASS | 0 | 5.5 | 363.4 |  |
+| cubical | `QBPS3HSpace.agda` | PASS | 0 | 5.65 | 382.1 |  |
+| cubical | `QuaternionicHopf.agda` | PASS | 0 | 6.04 | 403.2 |  |
+| cubical | `S3FromCD.agda` | PASS | 0 | 5.72 | 415.1 |  |
+| cubical | `SkyrmionCharge.agda` | PASS | 0 | 7.91 | 504.9 |  |
+| cubical | `SubstrateCharge.agda` | PASS | 0 | 7.98 | 508.8 |  |
 | control | `no-nested-source` | PASS | 0 | 0 | 0 | no .agda/.lagda* source below the top level of proofs/agda or proofs/agda-cubical |
 | control | `forbidden-tokens` | PASS | 0 | 0 | 0 | 0 hits over proofs/agda + proofs/agda-cubical (--require-safe; scripts/agda_forbidden_tokens.py) |
 | control | `manifest-control` | PASS | 0 | 0 | 0 | 3 found, 3 listed |

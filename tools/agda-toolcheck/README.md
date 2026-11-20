@@ -54,7 +54,10 @@ TOOLCHECK_FAKE_AGDA_VERSION=2.9.0 tools/agda-toolcheck/run.sh --layer mustfail  
 TOOLCHECK_INJECT_FAIL=1 tools/agda-toolcheck/run.sh --layer tool --update-baseline  # (5): exit 1, baseline byte-identical
 TOOLCHECK_MANIFEST=<alt> tools/agda-toolcheck/run.sh --layer tool                  # (6): a listed-but-missing file → manifest FAIL
 TOOLCHECK_SHARED_SCANNER=<stub> TOOLCHECK_FOO=1 tools/agda-toolcheck/run.sh --layer tool --update-baseline  # (8): refused, exit 3, baseline untouched
+TOOLCHECK_ALLOW_PIN_MISMATCH=1 tools/agda-toolcheck/run.sh                        # candidate run on a non-CI pin: allowed, but a seam → never a baseline
 ```
+
+A baseline (`--update-baseline`) is written only when the run is green, no `TOOLCHECK_*` seam is set, **and** `pin_match` and `agda_match` are both true — the exact toolchain CI pins. The JSON records `toolchain.binaries` (resolved path + sha256 of `agda`, `python3`, `jq`, `/usr/bin/time` and the scanner script actually used). `TOOLCHECK_TAG` must match `^[A-Za-z0-9_-]{1,32}$`.
 
 Statuses: `PASS` · `FAIL` · `CRASH` (rc ≥ 128) · `REJECTED` · `WRONG-ERROR` (rejected, but not with the `EXPECT:` text, or no `EXPECT:`) · `ACCEPTED` (a must-fail that passed) · `KNOWN-HOLE` / `FIXED` / `FIXED-EARLY` (pin-keyed). Unexpected = `FAIL`, `CRASH`, `WRONG-ERROR`, `ACCEPTED`, plus any manifest / fixture / pin mismatch.
 
