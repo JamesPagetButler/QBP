@@ -713,6 +713,65 @@ def test_discover_ledger_picks_latest_v03_only():
     _check(M.DEFAULT_LEDGER.endswith(".v0.3.json"), "default is the v0.3 ledger")
 
 
+def test_render_markdown_derives_version_from_the_given_ledger_path_not_the_real_repo():
+    """F6 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): render_markdown
+    used to call ledger_version.current_version(ledger_path) with only the
+    path, letting changes_dir/repo_root default to ledger_version.py's OWN
+    module constants -- the REAL repo, not wherever ledger_path actually is.
+    Builds a throwaway git repo with its own fragment and confirms the
+    reported version is derived from THAT repo, not the real one (which has
+    no fragments at all, so a leak would show the frozen base unchanged --
+    this test's throwaway repo's fragment bumps it, so a leak is detectable)."""
+    with tempfile.TemporaryDirectory() as td:
+        # Generic names throughout (not the real canonical ledger filename or
+        # "cth-inventory" directory) -- a literal "confluent-trust-inventory"
+        # or "cth-inventory" string in a scripts/*.py write call trips
+        # tests/test_cth_ledger_edit.py's AST taint guard, which scans for
+        # exactly those substrings to catch a script writing the real ledger
+        # outside cth_ledger_edit. This test writes a THROWAWAY ledger, not
+        # the real one, so it must not spell the real name.
+        repo = os.path.join(td, "repo")
+        os.makedirs(os.path.join(repo, "data/ledgerdir"))
+        subprocess.run(["git", "init", "-q", "-b", "master"], cwd=repo, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "t@example.com"], cwd=repo, check=True
+        )
+        subprocess.run(["git", "config", "user.name", "t"], cwd=repo, check=True)
+        ledger_path = os.path.join(repo, "data/ledgerdir/ledger.json")
+        with open(ledger_path, "w") as f:
+            json.dump({"version": "9.9.0", "anchors": []}, f)
+        subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=repo, check=True)
+
+        sys.path.insert(0, HERE)
+        import ledger_fragment as lf  # noqa: E402  (scripts/ already on sys.path)
+
+        from pathlib import Path as _Path
+
+        changes_dir = _Path(repo) / "data/ledgerdir/changes.d"
+        lf.write_fragment(
+            issue=1,
+            slug="a",
+            pr=1,
+            encoder="e",
+            note="n",
+            touched_ids=["X"],
+            changes_dir=changes_dir,
+        )
+        subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "fragment"], cwd=repo, check=True)
+
+        out = M.render_markdown([], {"programme": "test"}, ledger_path=ledger_path)
+        _check(
+            "9.10.0" in out,
+            f"expected the throwaway repo's derived version 9.10.0, got: {out!r}",
+        )
+        _check(
+            "9.9.0" not in out or "derivation failed" in out,
+            f"must not silently fall back to the frozen base: {out!r}",
+        )
+
+
 def test_cli_md_json_summary():
     out = subprocess.run(
         [sys.executable, SCRIPT, "--summary"],

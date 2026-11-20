@@ -14,7 +14,10 @@ Run: python3 -m pytest scripts/test_compute_fit_sigma.py -v
 import importlib.util
 import json
 import pathlib
+import re
 import sys
+
+import pytest
 
 _spec = importlib.util.spec_from_file_location(
     "compute_fit_sigma",
@@ -23,6 +26,7 @@ _spec = importlib.util.spec_from_file_location(
 cfs = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(cfs)
 
+import cth_ledger_edit  # noqa: E402  (scripts/ is on sys.path via cfs's own insert)
 
 # ---- sigma_meas_for ------------------------------------------------------------------
 
@@ -424,30 +428,199 @@ def _minimal_candidate_ledger():
     }
 
 
-def test_two_consecutive_main_runs_write_one_fit_history_entry_and_one_version_bump(
+def test_two_consecutive_main_runs_write_one_fit_history_entry_and_one_fragment(
     tmp_path, monkeypatch
 ):
-    """Gemini G1/G2 (PR #814 review): a no-op re-run must not duplicate fit_history or
-    bump the ledger version a second time — a repeat evaluation is not a new trial."""
+    """Gemini G1/G2 (PR #814 review): a no-op re-run must not duplicate fit_history —
+    a repeat evaluation is not a new trial. QBP#817 variant A: version/changelog are
+    frozen now, so "bumped" becomes "exactly one changes.d/ fragment written"."""
     ledger_path = tmp_path / "ledger.json"
     _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    changes_dir = tmp_path / "changes.d"
 
     monkeypatch.setattr(
-        sys, "argv", ["compute_fit_sigma.py", "--ledger", str(ledger_path)]
+        sys,
+        "argv",
+        ["compute_fit_sigma.py", "--ledger", str(ledger_path), "--pr", "900"],
     )
     cfs.main()
     after_first = json.loads(ledger_path.read_text())
     anchor = after_first["anchors"][0]
     assert len(anchor["fit_history"]) == 1
-    assert after_first["version"] == "1.1.0"
-    assert len(after_first["changelog"]) == 1
+    assert after_first["version"] == "1.0.0"  # frozen — never bumped
+    assert len(after_first["changelog"]) == 0  # frozen — never appended
+    fragments_after_first = list(changes_dir.glob("*.json"))
+    assert len(fragments_after_first) == 1
+    frag = json.loads(fragments_after_first[0].read_text())
+    assert frag["pr"] == 900 and frag["touched_ids"] == [anchor["id"]]
 
     cfs.main()
     after_second = json.loads(ledger_path.read_text())
     anchor2 = after_second["anchors"][0]
     assert len(anchor2["fit_history"]) == 1  # NOT 2 — the no-op must not re-append
-    assert after_second["version"] == "1.1.0"  # NOT bumped a second time
-    assert len(after_second["changelog"]) == 1  # NOT a second changelog entry
+    assert list(changes_dir.glob("*.json")) == fragments_after_first  # no 2nd fragment
+
+
+def test_fit_history_ledger_version_is_the_exact_fragment_id_this_run_wrote(
+    tmp_path, monkeypatch
+):
+    """F8 (cth-implementor's schema-axis call on QBP#817 PR-1, revised
+    2026-11-18 after qbp-oppenheimer caught the squash/rebase problem with
+    the first revision, "the run's commit sha" -- a PR-branch commit is
+    unreachable from master after a squash/rebase merge, so an append-only
+    record citing it would cite a permanently dangling commit): the stored
+    `ledger_version` must be the EXACT fragment id ("<issue>-<slug>") the
+    same run wrote -- not merely something shaped like one -- so a
+    mismatch between the two writes fails loud (qbp-oppenheimer,
+    issuecomment seq5356). It must also never match the pre-freeze semver
+    shape, the discriminator the docs rely on."""
+    ledger_path = tmp_path / "ledger.json"
+    ledger = _minimal_candidate_ledger()
+    ledger["version"] = "9.9.9"  # the frozen base -- must never be stored either
+    _write_canonical_ledger(ledger_path, ledger)
+    changes_dir = tmp_path / "changes.d"
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "compute_fit_sigma.py",
+            "--ledger",
+            str(ledger_path),
+            "--pr",
+            "900",
+            "--slug",
+            "some-run",
+        ],
+    )
+    cfs.main()
+    after = json.loads(ledger_path.read_text())
+    stored = after["anchors"][0]["fit_history"][0]["ledger_version"]
+
+    fragments = list(changes_dir.glob("*.json"))
+    assert len(fragments) == 1
+    expected_fragment_id = fragments[0].stem  # "<issue>-<slug>", filename minus .json
+
+    assert stored == expected_fragment_id
+    assert stored != "9.9.9"
+    assert not re.fullmatch(r"\d+\.\d+\.\d+", stored), (
+        f"fragment id {stored!r} must never collide with the pre-freeze "
+        f"semver shape the docs use to discriminate the two row kinds"
+    )
+
+
+def test_main_without_pr_refuses_on_a_real_change(tmp_path, monkeypatch):
+    """QBP#817 variant A: a real change needs a fragment, which needs a PR number —
+    refuse loudly rather than writing an unlinked fragment or silently skipping it."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    monkeypatch.setattr(
+        sys, "argv", ["compute_fit_sigma.py", "--ledger", str(ledger_path)]
+    )
+    with pytest.raises(SystemExit, match="--pr"):
+        cfs.main()
+    # nothing was written at all — the ledger_edit context raises before exit
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
+
+
+def test_main_refuses_a_bad_slug_before_touching_the_ledger_at_all(
+    tmp_path, monkeypatch
+):
+    """Nit (qbp-architecture, QBP#819 Red Team re-confirm, 2026-11-18): a bad
+    --slug used to fail only inside write_fragment()'s fragment_path() call,
+    AFTER the ledger_edit() block had already run verify()/write() for
+    real -- an orphan LEDGER CHANGE with no fragment ever written, the
+    mirror image of F5's orphan-fragment hole. Must now refuse before the
+    ledger is touched at all."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "compute_fit_sigma.py",
+            "--ledger",
+            str(ledger_path),
+            "--pr",
+            "900",
+            "--slug",
+            "Not_Kebab",
+        ],
+    )
+    with pytest.raises(SystemExit, match="kebab-case"):
+        cfs.main()
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
+    assert not (tmp_path / "changes.d").exists()
+
+
+def test_main_refuses_a_slug_with_a_trailing_newline(tmp_path, monkeypatch):
+    """Consistency nit (qbp-oppenheimer, QBP#819, 2026-11-18, same class as
+    N1): the old `_SLUG_RE.match(slug + "$")` check accepted a slug with a
+    trailing newline, since `$` matches just before a final trailing
+    newline. Must refuse it the same way as any other non-kebab slug,
+    before the ledger is touched at all."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "compute_fit_sigma.py",
+            "--ledger",
+            str(ledger_path),
+            "--pr",
+            "900",
+            "--slug",
+            "ok-slug\n",
+        ],
+    )
+    with pytest.raises(SystemExit, match="kebab-case"):
+        cfs.main()
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
+    assert not (tmp_path / "changes.d").exists()
+
+
+def test_a_failed_ledger_verify_writes_no_orphan_fragment(tmp_path, monkeypatch):
+    """F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): the fragment
+    write must happen only after `ledger_edit()`'s `verify()`/`write()` have
+    already succeeded, never inside the `with` block itself — otherwise a
+    failing verify() (any ConfinementError, not just a missing --pr) leaves
+    an orphan fragment on disk, claiming ids, with no matching ledger write
+    at all. Forces a verify() failure directly (an UNDECLARED-change style
+    failure, simulated by making verify() always raise) and asserts the
+    changes.d/ directory stays empty."""
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    changes_dir = tmp_path / "changes.d"
+
+    monkeypatch.setattr(
+        cth_ledger_edit.LedgerEdit,
+        "verify",
+        lambda self: (_ for _ in ()).throw(
+            cth_ledger_edit.ConfinementError("simulated verify() failure")
+        ),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["compute_fit_sigma.py", "--ledger", str(ledger_path), "--pr", "900"],
+    )
+    with pytest.raises(cth_ledger_edit.ConfinementError, match="simulated"):
+        cfs.main()
+
+    assert not changes_dir.exists() or list(changes_dir.glob("*.json")) == []
+    # the ledger itself is also untouched, same as any other failed ledger_edit
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
+
+
+def test_main_dry_run_without_pr_does_not_raise(tmp_path, monkeypatch):
+    ledger_path = tmp_path / "ledger.json"
+    _write_canonical_ledger(ledger_path, _minimal_candidate_ledger())
+    monkeypatch.setattr(
+        sys, "argv", ["compute_fit_sigma.py", "--ledger", str(ledger_path), "--dry-run"]
+    )
+    cfs.main()  # must not raise even though --pr is absent
+    assert json.loads(ledger_path.read_text()) == _minimal_candidate_ledger()
 
 
 # ---- is_candidate: only anchors with BOTH numeric fields are touched -----------------

@@ -68,6 +68,7 @@ import os
 import shutil
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -77,6 +78,7 @@ ROOT = HERE.parent
 sys.path.insert(0, str(HERE))
 import encode_pa_from_evidence as enc  # noqa: E402
 import render_pa_badge as badge  # noqa: E402
+import cth_ledger_edit  # noqa: E402
 from cth_ledger_edit import canonical_dump  # noqa: E402
 
 FIXTURES = ROOT / "tools/cth-pa/testdata/pa"
@@ -261,6 +263,7 @@ def evidence_from_fixture(
 
 def run_encoder(ledger: Path, repo: Path, evidence_dir: Path, tmp_path: Path, **kw):
     evidence_dir.mkdir(parents=True, exist_ok=True)
+    kw.setdefault("pr", 900)  # QBP#817 variant A: a real change needs a PR number
     return enc.run(
         evidence_dir=evidence_dir,
         pinned_master="HEAD",
@@ -288,8 +291,14 @@ def test_encoder_has_no_pa_argument():
         "--pa_local",
     }
     assert not (opts & forbidden), opts & forbidden
-    # nothing in the parser accepts an integer grade at all
+    # nothing in the parser accepts an integer GRADE — `--pr` is int-typed too
+    # (QBP#817 variant A: the PR number a real run's changes.d/ fragment belongs
+    # to), but it is categorically not a grade: it never reaches plan_writes()
+    # or any pa_local/pa_effective computation, only the fragment's own `pr`
+    # field for the changelog view's link column.
     for act in ap._actions:
+        if act.option_strings == ["--pr"]:
+            continue
         assert act.type is not int, act.option_strings
     # and the CLI refuses an injected grade
     with pytest.raises(SystemExit):
@@ -316,7 +325,7 @@ def test_ignores_non_v2_records(tmp_path):
     )
     (ev / "README.md").write_text("not evidence\n", encoding="utf-8")
     ledger = mk_ledger(tmp_path, [anchor("PROOF-a", proof_file="proofs/A.lean")])
-    out = run_encoder(ledger, repo, ev, tmp_path)
+    out = run_encoder(ledger, repo, ev, tmp_path, pr=900)
     rep = out["report"]
     assert rep["v2_record_count"] == 0
     assert [Path(i["file"]).name for i in rep["ignored_non_v2"]] == [
@@ -328,7 +337,13 @@ def test_ignores_non_v2_records(tmp_path):
     assert "proof_assistants" not in a
     # key order: the two new keys are appended at the END of the record
     assert list(a)[-2:] == ["pa_local", "pa_effective"]
-    assert L["version"] == "6.14.0" and L["changelog"][-1]["version"] == "6.14.0"
+    # QBP#817 variant A: version/changelog are frozen now — the real change is a
+    # changes.d/ fragment, not a ledger bump.
+    assert L["version"] == "6.13.0" and len(L["changelog"]) == 1  # unchanged
+    fragments = list((ledger.parent / "changes.d").glob("*.json"))
+    assert len(fragments) == 1
+    frag = json.loads(fragments[0].read_text())
+    assert frag["pr"] == 900 and frag["touched_ids"] == ["PROOF-a"]
 
 
 def test_is_v2_record_shape():
@@ -934,6 +949,68 @@ def test_engine_excludes_relevance_edges():
 # ---------------------------------------------------------------------------------------
 # AC2 — no silent rise
 # ---------------------------------------------------------------------------------------
+def _minimal_apply_writes_args(ledger: Path):
+    """A minimal (plan, note_args) pair for apply_writes() directly -- bypasses
+    the full evidence-matching pipeline (pinned sha, Lean fixtures, etc.) since
+    T1/F5 are about apply_writes()'s own write-ordering, not grading."""
+    plan = {
+        "PRED-a": {
+            "changed": True,
+            "pa_local": 1,
+            "pa_effective": 1,
+            "proof_assistants": None,
+        }
+    }
+    note_args = dict(
+        n_targets=1,
+        n_records=1,
+        commit="deadbeef",
+        dist=Counter({(1, 1): 1}),
+        engine_id="test-engine",
+    )
+    return plan, note_args
+
+
+def test_apply_writes_real_run_without_pr_refuses(tmp_path):
+    """T1 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): mutant M8 (drop
+    the `if not pr: raise` guard) SURVIVED all 81 scripts/test_pa_encoder.py
+    tests because none of them exercised a real (non-dry-run) write with `pr`
+    actually omitted -- every test that writes passes pr=900/901/etc. This
+    test is the twin of
+    test_compute_fit_sigma.py::test_main_without_pr_refuses_on_a_real_change,
+    and kills M8."""
+    ledger = mk_ledger(tmp_path, [anchor("PRED-a")])
+    plan, note_args = _minimal_apply_writes_args(ledger)
+    changes_dir = ledger.parent / "changes.d"
+    with pytest.raises(SystemExit, match="pr=<number>"):
+        enc.apply_writes(ledger, plan, note_args, "2026-11-17T00:00:00Z", dry_run=False)
+    assert not changes_dir.exists() or list(changes_dir.glob("*.json")) == []
+    assert json.loads(ledger.read_text())["anchors"][0].get("pa_local") is None
+
+
+def test_apply_writes_failed_verify_writes_no_orphan_fragment(tmp_path, monkeypatch):
+    """F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): same class as
+    compute_fit_sigma's F5 fix -- the fragment write must happen only after
+    `ledger_edit()`'s verify()/write() already succeeded, not inside the
+    `with` block. Forces verify() to fail and asserts no orphan fragment."""
+    ledger = mk_ledger(tmp_path, [anchor("PRED-a")])
+    plan, note_args = _minimal_apply_writes_args(ledger)
+    changes_dir = ledger.parent / "changes.d"
+
+    monkeypatch.setattr(
+        cth_ledger_edit.LedgerEdit,
+        "verify",
+        lambda self: (_ for _ in ()).throw(
+            cth_ledger_edit.ConfinementError("simulated verify() failure")
+        ),
+    )
+    with pytest.raises(cth_ledger_edit.ConfinementError, match="simulated"):
+        enc.apply_writes(
+            ledger, plan, note_args, "2026-11-17T00:00:00Z", dry_run=False, pr=900
+        )
+    assert not changes_dir.exists() or list(changes_dir.glob("*.json")) == []
+
+
 def test_no_silent_pa_rise(tmp_path):
     repo = mk_repo(tmp_path, {"proofs/A.lean": "a\n", "proofs/B.lean": "b\n"})
     head = git(repo, "rev-parse", "HEAD")
@@ -949,8 +1026,10 @@ def test_no_silent_pa_rise(tmp_path):
         evidence_from_fixture("01_lean_clean.json", "PROOF-a", "proofs/A.lean", pin),
     )
     ledger = mk_ledger(tmp_path, [A, B])
-    first = run_encoder(ledger, repo, ev, tmp_path)
-    assert first["changed"] and first["version"] == "6.14.0"
+    first = run_encoder(ledger, repo, ev, tmp_path, pr=900)
+    # QBP#817 variant A: version is frozen — "changed" with the SAME (unbumped)
+    # base is the expected shape now, not a bump to "6.14.0".
+    assert first["changed"] and first["version"] == "6.13.0"
     after1 = ledger.read_text()
     grades1 = {
         a["id"]: (a["pa_local"], a["pa_effective"])
@@ -984,7 +1063,7 @@ def test_no_silent_pa_rise(tmp_path):
             a["pa_local"] = 2
             a["pa_effective"] = 2
     ledger.write_text(canonical_dump(L), encoding="utf-8")
-    third = run_encoder(ledger, repo, ev, tmp_path)
+    third = run_encoder(ledger, repo, ev, tmp_path, pr=901)
     assert third["changed"]
     L3 = json.loads(ledger.read_text())
     assert {
@@ -994,10 +1073,10 @@ def test_no_silent_pa_rise(tmp_path):
         ("PROOF-b", "pa_local"),
         ("PROOF-b", "pa_effective"),
     }
-    assert L3["version"] == "6.15.0"
+    assert L3["version"] == "6.13.0"  # frozen — never bumped
     # withdrawing the evidence removes the array and drops the grade — never silently
     shutil.rmtree(ev)
-    fourth = run_encoder(ledger, repo, ev, tmp_path)
+    fourth = run_encoder(ledger, repo, ev, tmp_path, pr=902)
     L4 = json.loads(ledger.read_text())
     a = [x for x in L4["anchors"] if x["id"] == "PROOF-a"][0]
     assert a["pa_local"] == 0 and "proof_assistants" not in a
@@ -2186,7 +2265,7 @@ def test_dry_run_never_writes_the_committed_report(tmp_path, monkeypatch):
     assert out2["report"]["_report_scratch"] is False
     assert (committed / "backfill-2026-10-02.md").read_text() == "RECORD\n"
     # a real run with no --report writes the committed record (the AC4 table)
-    out3 = enc.run(dry_run=False, **kw)
+    out3 = enc.run(dry_run=False, pr=900, **kw)
     assert out3["report"]["_report_scratch"] is False
     assert (committed / "backfill-2026-10-02.md").read_text() != "RECORD\n"
     assert (committed / "backfill-2026-10-02.json").exists()

@@ -4,11 +4,13 @@ on:
     paths:
       - 'proofs/agda/**'
       - '.github/workflows/agda-substrate.yml'
+      - 'scripts/agda_forbidden_tokens.py'
   push:
     branches: [master]
     paths:
       - 'proofs/agda/**'
       - '.github/workflows/agda-substrate.yml'
+      - 'scripts/agda_forbidden_tokens.py'
 jobs:
   typecheck:
     # #757: display name unique repo-wide (`typecheck` also exists in agda-cubical.yml)
@@ -22,6 +24,8 @@ jobs:
           mkdir -p "$HOME/agda-2.8.0"
           tar -xJf /tmp/agda.tar.xz -C "$HOME/agda-2.8.0"
           echo "$HOME/agda-2.8.0" >> "$GITHUB_PATH"
+      - name: Forbidden-token check (covers the --safe let-postulate hole, agda/agda#8341; QBP#823 G1)
+        run: python3 -I scripts/agda_forbidden_tokens.py proofs/agda proofs/agda-cubical
       - name: Type-check the QBP substrate (executable-binary V&V)
         run: |
           agda --version
