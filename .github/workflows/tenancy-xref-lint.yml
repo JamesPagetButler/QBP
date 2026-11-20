@@ -2,7 +2,47 @@
 # Lints the QBP federation tenancy doc for stale filesystem cross-references.
 # QBP #433 — CI check that catches broken in-repo refs; #738 — verifies
 # `expected-on-sibling`-annotated federation refs when the sibling is checked
-# out (INFO "not verifiable here" on CI, where siblings are absent).
+# out.
+#
+# #761 — the sibling repos annotated in docs/qbp-federation-tenancy.md (BMA →
+# `bma-systema`, Contextus) are now checked out ON CI, read-only, before the
+# linter runs — so `expected-on-sibling` verification actually happens here,
+# not only on the beekeeper's box. See `scripts/tenancy_xref_linter.py`'s
+# module docstring for the annotation contract and exit-code semantics.
+#
+# Checkout shape: SHALLOW (fetch-depth: 1), not sparse. Both repos are a few
+# hundred KB to a few MB, so a full shallow clone costs nothing meaningful;
+# `sparse-checkout` was tried first but drops out because actions/checkout
+# adds a `--filter=blob:none` partial-clone fetch whenever sparse-checkout is
+# set, and GitHub rejects that filtered fetch with a 403 "Write access to
+# repository not granted" for this fine-grained, Contents:read-only PAT (a
+# known fine-grained-PAT + partial-clone interaction, confirmed on this PR's
+# own CI run — not a sign the token's scope is wrong).
+#
+# Token: `SIBLING_READ_TOKEN` is a fine-grained GitHub PAT created 2026-11-13,
+# scoped to `bma-systema` ONLY, with Contents: read-only and no write scope of
+# any kind. Contextus is a public repo and needs no token. GitHub does not
+# pass repository secrets to workflows triggered from forked-repo pull
+# requests. This repo has no Dependabot config (no `.github/dependabot.yml`)
+# and, per the owner's ruling on #761 (qbp-oppenheimer, 2026-11-13), no fork
+# PRs today — so no actor-scoped exemption is needed yet. If Dependabot or
+# outside-fork PRs are ever enabled here, add a visible, actor-scoped
+# exemption at the call site below (e.g. `if: github.actor !=
+# 'dependabot[bot]'`) that logs "skipped: no secret for <actor>" — never make
+# `scripts/check_sibling_token_present.sh` itself silent.
+#
+# Fail-loud contract: a missing or unreadable SIBLING_READ_TOKEN FAILS this
+# job (`scripts/check_sibling_token_present.sh`), and a sibling ref that is
+# still "not verifiable here" after the checkout also FAILS it
+# (`tenancy_xref_linter.py --fail-on-unverifiable`) — neither silently
+# downgrades to the local-dev "not verifiable here / exit 0" path. The
+# `tenancy-xref-lint-missing-secret-negative-control` job below is a checked-
+# in proof that the fail-loud guard really does fail without the secret
+# (Red Team note, PR #808, issuecomment-6866713929).
+#
+# #738 AC3 (promoting `tenancy-xref-lint` to a required status check) is a
+# beekeeper repo-admin ruleset action, tracked on #738 — not done by this
+# workflow.
 #
 # Also hosts the Prediction-Classification gate (#736, re-filed from #170 AC4):
 # every research/*_expected_results.md must carry a `## Prediction Classification`
@@ -25,6 +65,7 @@ on:
       - "docs/qbp-federation-tenancy.md"
       - "scripts/tenancy_xref_linter.py"
       - "scripts/test_tenancy_xref_linter.py"
+      - "scripts/check_sibling_token_present.sh"
       - ".github/workflows/tenancy-xref-lint.yml"
       - "research/**"
       - "scripts/check_prediction_classification.py"
@@ -39,6 +80,7 @@ on:
       - "docs/qbp-federation-tenancy.md"
       - "scripts/tenancy_xref_linter.py"
       - "scripts/test_tenancy_xref_linter.py"
+      - "scripts/check_sibling_token_present.sh"
       - ".github/workflows/tenancy-xref-lint.yml"
       - "research/**"
       - "scripts/check_prediction_classification.py"
@@ -50,6 +92,9 @@ on:
 jobs:
   tenancy-xref-lint:
     runs-on: ubuntu-latest
+    env:
+      QBP_SIBLING_ROOT: ${{ github.workspace }}/.ci-siblings
+      SIBLING_READ_TOKEN: ${{ secrets.SIBLING_READ_TOKEN }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
@@ -59,11 +104,75 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: "Linter self-tests (#738 expected-on-sibling contract)"
+      - name: "Fail loud if SIBLING_READ_TOKEN is missing (#761)"
+        run: scripts/check_sibling_token_present.sh
+
+      - name: "Checkout bma-systema sibling (shallow, read-only token)"
+        # Full (non-sparse) checkout: bma-systema is ~2.3 MB (gh api
+        # repos/.../bma-systema .size, 2026-11-14), so the bandwidth cost of
+        # skipping sparse-checkout is negligible. actions/checkout only adds
+        # a `--filter=blob:none` partial-clone fetch when `sparse-checkout`
+        # is set, and that filtered fetch gets rejected by GitHub with a 403
+        # "Write access to repository not granted" for this fine-grained,
+        # Contents:read-only PAT (observed on this PR's own CI run) — a known
+        # fine-grained-PAT + partial-clone interaction, not a token-scope
+        # bug. Shallow (fetch-depth: 1) is kept; sparse is dropped.
+        uses: actions/checkout@v4
+        with:
+          repository: JamesPagetButler/bma-systema
+          token: ${{ env.SIBLING_READ_TOKEN }}
+          ref: main
+          path: .ci-siblings/BMA
+          fetch-depth: 1
+
+      - name: "Checkout Contextus sibling (public, anonymous, shallow)"
+        # Contextus is ~380 KB (gh api repos/.../Contextus .size, 2026-11-14)
+        # — same rationale as the bma-systema step above: full shallow clone,
+        # no sparse-checkout, to avoid the blob:none partial-clone filter.
+        # `token: ''` forces a genuinely anonymous clone of this PUBLIC repo
+        # (the implicit default github.token is scoped to THIS repo, QBP, and
+        # is not valid credentials for Contextus; passing it unintentionally
+        # can make an otherwise-anonymous-eligible public clone fail auth).
+        uses: actions/checkout@v4
+        with:
+          repository: JamesPagetButler/Contextus
+          token: ""
+          ref: main
+          path: .ci-siblings/Contextus
+          fetch-depth: 1
+
+      - name: "Confirm the bma-systema checkout actually landed (fail loud, not silent)"
+        run: |
+          if [ ! -d "${QBP_SIBLING_ROOT}/BMA/theory/hypergraph-inference" ]; then
+            echo "::error::bma-systema sibling checkout did not land theory/hypergraph-inference/ under \$QBP_SIBLING_ROOT — the token may be invalid, expired, or missing read access. Failing loudly (QBP#761) instead of letting the linter silently report 'not verifiable here'."
+            exit 1
+          fi
+
+      - name: "Linter self-tests (#738 / #761 expected-on-sibling contract)"
         run: python3 scripts/test_tenancy_xref_linter.py
 
-      - name: "Lint tenancy doc cross-references"
-        run: python3 scripts/tenancy_xref_linter.py
+      - name: "Lint tenancy doc cross-references (siblings checked out — must show unverifiable: 0)"
+        run: python3 scripts/tenancy_xref_linter.py --fail-on-unverifiable
+
+  tenancy-xref-lint-missing-secret-negative-control:
+    # QBP#761 point 6 / Red Team note on PR #808 (issuecomment-6866713929):
+    # a checked-in negative control proving check_sibling_token_present.sh
+    # actually fails when SIBLING_READ_TOKEN is absent, rather than only
+    # asserting it in a comment. Deliberately does NOT read the real secret.
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository (for the guard script only)"
+        uses: actions/checkout@v4
+
+      - name: "Negative control: guard must fail loud with no token set"
+        env:
+          SIBLING_READ_TOKEN: ""
+        run: |
+          if scripts/check_sibling_token_present.sh; then
+            echo "::error::Expected scripts/check_sibling_token_present.sh to fail (non-zero exit) with SIBLING_READ_TOKEN unset, but it exited 0. The fail-loud guard is broken — this job is a deliberate negative control (QBP#761)."
+            exit 1
+          fi
+          echo "PASS (negative control): the guard correctly failed loud with no SIBLING_READ_TOKEN set."
 
   prediction-classification-gate:
     runs-on: ubuntu-latest
