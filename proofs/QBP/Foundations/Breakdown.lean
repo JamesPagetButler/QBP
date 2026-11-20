@@ -58,7 +58,7 @@
   `{propext, Classical.choice, Quot.sound}`.
 -/
 import Mathlib.Algebra.Quaternion
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import QBP.Foundations.CDLifting
 import QBP.Foundations.SedenionOctonionCount
 

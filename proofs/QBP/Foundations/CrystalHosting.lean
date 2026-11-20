@@ -1726,7 +1726,7 @@ theorem genByPair_eq_quatSpan_of_param {s : CDAlg ℝ 4} (hs : s.coord 0 = 0)
     rw [ell_mul_loOf hu0, show -(hiOf u) = (-1 : ℝ) • hiOf u by module]
     exact GenByPair.smul _ hY
   ext x
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   constructor
   · exact fun hx => genByPair_subset_quatSpan_of_param (u := u) hs (b₀ := b₀) hu0 hlo hhi x hx
   · rintro ⟨a, b, c, d, rfl⟩
@@ -1793,7 +1793,7 @@ theorem quatSpan_inter_eq_complex {u₁ u₂ : CDAlg ℝ 3} (h1 : u₁.coord 0 =
     {x : CDAlg ℝ 4 | InQuatSpan (loOf u₁) x} ∩ {x : CDAlg ℝ 4 | InQuatSpan (loOf u₂) x}
       = {x : CDAlg ℝ 4 | ∃ a b : ℝ, x = a • (1 : CDAlg ℝ 4) + b • ell} := by
   ext x
-  simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+  simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨⟨a₁, b₁, c₁, d₁, hx1⟩, ⟨a₂, b₂, c₂, d₂, hx2⟩⟩
     have hlo1 : cdLo x = a₁ • (1 : CDAlg ℝ 3) + c₁ • u₁ := by
