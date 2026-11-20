@@ -48,6 +48,12 @@ jobs:
               - 'proofs/QBP/Foundations/.lean-gate-baseline.json'
               - 'proofs/QBP/.build-visibility-quarantine.json'
               - 'scripts/check_lean_foundations.py'
+              - 'scripts/lean_lexer.py'
+              - 'scripts/test_check_lean_foundations.py'
+              - 'scripts/gen_lean_axiom_audit.py'
+              - 'scripts/check_lean_axiom_audit.py'
+              - 'scripts/test_lean_axiom_audit.py'
+              - 'scripts/lean_audit_fixtures/**'
               - 'scripts/check_layer_imports.py'
               - 'scripts/test_check_layer_imports.py'
               - '.github/workflows/lean-foundations.yml'
@@ -79,6 +85,8 @@ jobs:
           python-version: '3.11'
       - name: Enforce the foundations proof standard
         run: python3 scripts/check_lean_foundations.py --dir proofs/QBP/Foundations
+      - name: Self-test the foundations lexer (planted "/-" string, nested comments, interpolation)
+        run: python3 scripts/test_check_lean_foundations.py
       - name: Enforce layer-import DAG + aggregator + build-visibility completeness
         run: python3 scripts/check_layer_imports.py
       - name: Self-test the layer-import gate (adversarial build-invisibility plant)
@@ -122,8 +130,28 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
         run: lake build
-      # NOTE: #print axioms audit — activates when a Foundations theorem is first claimed
-      # `proof_state: verified` in the CTH inventory. At that point this job adds a step that
-      # runs `#print axioms <thm>` and asserts the axiom set ⊆ {propext, Classical.choice,
-      # Quot.sound}. No verified Foundations theorem exists yet, so the step is a no-op today;
-      # wired here so the obligation is visible (issue #481 AC).
+      # AXIOM AUDIT (#827 AC2–AC4; replaces the old "#print axioms audit — no-op today" note
+      # from #481). Lean itself enumerates EVERY constant (theorem, def, instance, axiom,
+      # inductive, auxiliary) of every module in the default targets' import closure and
+      # computes its axiom closure; anything outside {propext, Classical.choice, Quot.sound}
+      # — sorryAx, native_decide's native axioms, any user `axiom` — fails this job. Coverage
+      # does not depend on how a file is written (no Python lexer decides WHAT is audited; it
+      # only picks the modules from the lakefile roots). Trust: only Lean's --json message
+      # stream, only messages positioned at the generated driver's `run_cmd`, exactly one
+      # SUMMARY per driver (scripts/check_lean_axiom_audit.py). Modules no default target
+      # builds are listed as not covered in the step output.
+      - name: Axiom-audit self-test (planted fixtures, core Lean only)
+        run: python3 scripts/test_lean_axiom_audit.py
+      - name: Axiom audit (Lean enumerates every declaration of every built module)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/axiom-audit"
+          python3 scripts/gen_lean_axiom_audit.py --proofs proofs --out-dir "$out"
+          for f in "$out"/AxiomAudit_*.lean; do
+            # lean exits non-zero when the driver logs NONSTD errors; the checker decides.
+            (cd proofs && lake env lean --json "$f" > "${f%.lean}.jsonl" 2> "${f%.lean}.stderr") || true
+          done
+          python3 scripts/check_lean_axiom_audit.py --manifest "$out/manifest.json"
