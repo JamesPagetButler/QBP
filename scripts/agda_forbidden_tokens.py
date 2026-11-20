@@ -136,7 +136,7 @@ def is_agda_source(path: Path) -> bool:
     )
 
 
-def agda_lib_includes(lib: Path) -> list[str]:
+def agda_lib_includes(lib: Path, strip_comments: bool = True) -> list[str]:
     """The `include:` entries of an .agda-lib, parsed the way Agda reads it.
 
     Field lines start at column 0 as `key: value`; the key is compared with
@@ -147,7 +147,7 @@ def agda_lib_includes(lib: Path) -> list[str]:
     out: list[str] = []
     collecting = False
     for raw in lib.read_text(encoding="utf-8").splitlines():
-        line = raw.split("--", 1)[0]
+        line = raw.split("--", 1)[0] if strip_comments else raw
         if not line.strip():
             continue
         if not line[0].isspace():
@@ -167,7 +167,11 @@ def include_escapes(lib: Path, roots: list[Path]) -> list[str]:
     unscanned source, so it is reported as a finding.
     """
     bad: list[str] = []
-    for part in agda_lib_includes(lib):
+    # Read the include list twice, with and without `--` comment stripping,
+    # and check the union. Then a path such as `safe--/../../x` is checked in
+    # full whichever way Agda treats an inline `--` (Gemini review r3, PR #826).
+    parts = agda_lib_includes(lib) + agda_lib_includes(lib, strip_comments=False)
+    for part in dict.fromkeys(parts):
         target = (lib.parent / part).resolve()
         if not any(target == r or r in target.parents for r in roots):
             bad.append(part)

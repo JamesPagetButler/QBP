@@ -111,3 +111,11 @@ def test_symlinks_under_gated_trees_are_forbidden(tmp_path):
     (root / "evil").symlink_to(outside, target_is_directory=True)
     assert aft.symlinks_under([str(root)]) == [root / "evil"]
     assert aft.main(["x", str(root)]) == 1
+
+
+def test_include_with_inline_dashdash_is_checked_in_full(tmp_path):
+    # Gemini r3: `safe--/../../evil` must not be truncated to `safe`.
+    (tmp_path / "safe").mkdir()
+    lib = tmp_path / "x.agda-lib"
+    lib.write_text("name: x\ninclude: safe--/../../evil\n")
+    assert "safe--/../../evil" in aft.include_escapes(lib, [tmp_path.resolve()])
