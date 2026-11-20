@@ -454,7 +454,11 @@ OVERRIDES = {
     ),
     14267: (
         R,
-        "`Fin.foldl` now reduces in the kernel — may let more `decide` goals close; no QBP change needed",
+        "`Fin.foldl` now reduces in the kernel — may let more `decide` goals close; T18 (`decide +kernel` / `Fin.foldl_succ`) + KL02 probe (elaborator `decide` stuck at v4.30.0, expected to flip)",
+    ),
+    14554: (
+        R,
+        "`Fin.foldl` type-theoretic vs runtime split — QBP never names `Fin.foldl`, but kernel `decide` over Fin-indexed sweeps reduces through core folds; T18 + KL02 + the G1 rebuild and the heavy-`decide` RSS re-measure (with lean4#8309). Reclassified from not-relevant (Red Team on PR #824)",
     ),
     14316: (
         R,

@@ -13,8 +13,8 @@ and/or the full project rebuild (G1) · `not-relevant` = one-line reason.
 |---|---|
 | breaking | 8 |
 | breaking-no-touch | 6 |
-| relevant | 153 |
-| not-relevant | 793 |
+| relevant | 154 |
+| not-relevant | 792 |
 | **total** | **960** |
 
 ## Lean release-note items
@@ -379,7 +379,7 @@ and/or the full project rebuild (G1) · `not-relevant` = one-line reason.
 | lean4#14194 | Library | relevant | reduces the aggressiveness of e-matching for `eraseIdx` by not automatically translating into `drop`/`take` anymore at every opportunity. | QBP uses identifiers take — covered by the tool tests / project rebuild |
 | lean4#14231 | Library | relevant | marks `Array.back`, `Array.back!`, and `Array.back?` as `@⟦expose⟧`, so that in a downstream module their bodies are available for defini… | QBP uses tactics decide — covered by the tool tests / project rebuild |
 | lean4#14265 | Library | relevant | moves various declarations that were polluting public namespaces into internal namespaces (like `Lean`). | QBP uses identifiers Lean — covered by the tool tests / project rebuild |
-| lean4#14267 | Library | relevant | makes `Fin.foldl` reduce in the kernel by marking its inner `loop` `semireducible` (well-founded definitions are `irreducible` by default… | `Fin.foldl` now reduces in the kernel — may let more `decide` goals close; no QBP change needed |
+| lean4#14267 | Library | relevant | makes `Fin.foldl` reduce in the kernel by marking its inner `loop` `semireducible` (well-founded definitions are `irreducible` by default… | `Fin.foldl` now reduces in the kernel — may let more `decide` goals close; T18 (`decide +kernel` / `Fin.foldl_succ`) + KL02 probe (elaborator `decide` stuck at v4.30.0, expected to flip) |
 | lean4#14577 | Other | relevant | fixes a kernel bug where a nested inductive datatype whose parametric arguments are ill typed could be accepted. | kernel SOUNDNESS fix (nested inductives w/ phantom params; v4.32.2 point release) — pinned v4.30.0 kernel is affected; target must contain it |
 | lean4#14607 | Other | relevant | adds a missing `check_no_metavar_no_fvar` checks to the kernel inductive type module. Without it, users could use metaprogramming to snea… | kernel arithmetic / trust base — MF04 + T01/T12 kernel `decide` cover it |
 | lean4#14609 | Other | relevant | fixes a soundness bug in the module system. A `partial` definition lost its `partial` marking when it crossed a module boundary, so downs… | kernel/runtime SOUNDNESS fix — trust base of every QBP proof; #723 must land on a version containing it (covered by MF04 + full project rebuild) |
@@ -689,6 +689,7 @@ and/or the full project rebuild (G1) · `not-relevant` = one-line reason.
 | lean4#15157 | Lake | relevant | introduces the `--from-export` option for `lake check` and the `--solution-from-export` and `--challenge-from-export` flags for `lake com… | Lake build/env/cache path QBP uses — exercised by run.sh (`lake env lean`) + CI `lake build` |
 | lean4#14270 | Language | relevant | lets `decide` and `rfl` reduce nonempty `Array` equality in the kernel across module boundaries. | QBP uses tactics decide, rfl — covered by the tool tests / project rebuild |
 | lean4#14350 | Language | relevant | enforces that elements of singleton notation need to indent e.g. nested application arguments, as otherwise the overlap with structure no… | language/elaboration change on constructs QBP uses (structure, notation) — covered by tests + project rebuild |
+| lean4#14554 | Language | relevant | fixes #14540 by separating the type-theoretic and runtime implementations of `Fin.foldl`. | `Fin.foldl` type-theoretic vs runtime split — QBP never names `Fin.foldl`, but kernel `decide` over Fin-indexed sweeps reduces through core folds; T18 + KL02 + the G1 rebuild and the heavy-`decide` RSS re-measure (with lean4#8309). Reclassified from not-relevant (Red Team on PR #824) |
 | lean4#14590 | Language | relevant | names the variables of a verification condition after the program, and makes those names accessible. Take | language/elaboration change on constructs QBP uses (variable) — covered by tests + project rebuild |
 | lean4#14854 | Language | relevant | makes the `constructor` tactic emit a warning if multiple constructors match, and adds a `constructor!` tactic that has the previous beha… | `constructor` warns when several constructors match (`constructor!` keeps old behaviour) — QBP uses `constructor` 65× in 20 files; warnings, not errors; T16 `and_build` |
 | lean4#14909 | Language | relevant | fixes elaboration of sort-polymorphic inductive types such as `inductive T : Sort u \| a \| b`, which previously failed with `` Unknown c… | language/elaboration change on constructs QBP uses (inductive, set_option) — covered by tests + project rebuild |
@@ -736,7 +737,6 @@ and/or the full project rebuild (G1) · `not-relevant` = one-line reason.
 | lean4#15147 | Lake | not-relevant | introduces `comparator.json` as the default location for the config file of `lake comparator`. | Lake feature QBP does not use (QBP uses only `lake build`, `lake env`, `lake exe cache get`, `lake exe <oracle>`) |
 | lean4#15156 | Lake | not-relevant | adds an expert user flag to comparator to disable its sandbox, this flag should not be used in usual production environments and is only … | Lake feature QBP does not use (QBP uses only `lake build`, `lake env`, `lake exe cache get`, `lake exe <oracle>`) |
 | lean4#13815 | Language | not-relevant | fixes an issue where ambiguous syntax would have missing terminfo or missing context (such as the metavariable context), leading to error… | diagnostic / editor text only — does not change what elaborates |
-| lean4#14554 | Language | not-relevant | fixes #14540 by separating the type-theoretic and runtime implementations of `Fin.foldl`. | internal / metaprogramming / error-message change with no QBP-visible surface |
 | lean4#14600 | Language | not-relevant | adds a warning when deprecating a declaration in favor of another declaration that is not reducibly defeq. | deprecation-defeq warning — QBP declares no deprecations |
 | lean4#14703 | Language | not-relevant | lets a `repeat` or `while` loop state the loop invariant and the termination measure that `vcgen` needs, so a loop inside a `def` with a … | Sym/vcgen/mvcgen/contract (intrinsic-verification) machinery — QBP does not use it (0 uses) |
 | lean4#14705 | Language | not-relevant | adds a clickable hint (and thus also a code action) to `deprecated` linter. | linter framework / new linter — warnings only; QBP's CI fails on errors, not warnings |

@@ -7,8 +7,8 @@
   "mathlib_sha7": "c5ea003",
   "manifest_mathlib_rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
   "lean_version_reported": "Lean (version 4.30.0, x86_64-unknown-linux-gnu, commit d024af099ca4bf2c86f649261ebf59565dc8c622, Release)",
-  "run_id": "20261120T210059Z",
-  "date_utc": "2026-11-20T21:02:13Z",
+  "run_id": "20261120T212158Z",
+  "date_utc": "2026-11-20T21:26:00Z",
   "runner": {
     "wrapper": "boxrun --gpu --wait (RSS watch, thermal guard)",
     "mode": "batch: one boxrun lease for the suite",
@@ -19,7 +19,7 @@
   "box": {
     "cpu": "AMD FX(tm)-8350 Eight-Core Processor",
     "mem_total_mb": 31991,
-    "mem_available_mb_at_end": 12769,
+    "mem_available_mb_at_end": 12606,
     "nproc": 8
   },
   "preflight_failures": [],
@@ -31,10 +31,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.99,
-      "maxrss_mb": 3762,
-      "tctl_start_c": 47.0,
-      "tctl_end_c": 45.9,
+      "wall_s": 5.04,
+      "maxrss_mb": 3761,
+      "tctl_start_c": 58.1,
+      "tctl_end_c": 59.6,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -43,6 +43,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -52,10 +53,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.36,
-      "maxrss_mb": 1839,
-      "tctl_start_c": 45.9,
-      "tctl_end_c": 48.4,
+      "wall_s": 3.44,
+      "maxrss_mb": 1827,
+      "tctl_start_c": 59.8,
+      "tctl_end_c": 60.4,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -76,6 +77,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -85,10 +87,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.14,
-      "maxrss_mb": 1910,
-      "tctl_start_c": 48.4,
-      "tctl_end_c": 47.6,
+      "wall_s": 3.35,
+      "maxrss_mb": 1904,
+      "tctl_start_c": 60.4,
+      "tctl_end_c": 59.6,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -115,6 +117,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -124,10 +127,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.15,
-      "maxrss_mb": 1940,
-      "tctl_start_c": 47.6,
-      "tctl_end_c": 48.8,
+      "wall_s": 3.3,
+      "maxrss_mb": 1935,
+      "tctl_start_c": 59.6,
+      "tctl_end_c": 60.0,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -149,6 +152,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -158,10 +162,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.58,
-      "maxrss_mb": 1952,
-      "tctl_start_c": 48.8,
-      "tctl_end_c": 49.4,
+      "wall_s": 3.78,
+      "maxrss_mb": 1948,
+      "tctl_start_c": 60.0,
+      "tctl_end_c": 59.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -192,6 +196,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -201,10 +206,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.01,
-      "maxrss_mb": 1925,
-      "tctl_start_c": 49.6,
-      "tctl_end_c": 49.2,
+      "wall_s": 3.14,
+      "maxrss_mb": 1918,
+      "tctl_start_c": 59.6,
+      "tctl_end_c": 59.9,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -227,6 +232,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -236,10 +242,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.61,
-      "maxrss_mb": 2018,
-      "tctl_start_c": 49.0,
-      "tctl_end_c": 51.4,
+      "wall_s": 3.56,
+      "maxrss_mb": 2015,
+      "tctl_start_c": 59.8,
+      "tctl_end_c": 59.9,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -272,6 +278,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -281,10 +288,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.13,
-      "maxrss_mb": 2817,
-      "tctl_start_c": 51.8,
-      "tctl_end_c": 55.9,
+      "wall_s": 4.22,
+      "maxrss_mb": 2807,
+      "tctl_start_c": 59.9,
+      "tctl_end_c": 60.4,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -321,6 +328,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -330,10 +338,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.71,
-      "maxrss_mb": 2149,
-      "tctl_start_c": 55.6,
-      "tctl_end_c": 51.9,
+      "wall_s": 3.9,
+      "maxrss_mb": 2147,
+      "tctl_start_c": 60.2,
+      "tctl_end_c": 61.1,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -366,6 +374,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -375,10 +384,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.9,
-      "maxrss_mb": 2380,
-      "tctl_start_c": 52.0,
-      "tctl_end_c": 53.9,
+      "wall_s": 4.02,
+      "maxrss_mb": 2376,
+      "tctl_start_c": 61.2,
+      "tctl_end_c": 60.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -409,6 +418,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -418,10 +428,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.6,
-      "maxrss_mb": 2958,
-      "tctl_start_c": 54.1,
-      "tctl_end_c": 54.0,
+      "wall_s": 4.56,
+      "maxrss_mb": 2950,
+      "tctl_start_c": 60.4,
+      "tctl_end_c": 60.2,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -454,6 +464,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -463,10 +474,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 5.47,
-      "maxrss_mb": 2129,
-      "tctl_start_c": 54.0,
-      "tctl_end_c": 54.8,
+      "wall_s": 5.61,
+      "maxrss_mb": 2125,
+      "tctl_start_c": 60.1,
+      "tctl_end_c": 60.1,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -489,6 +500,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -498,10 +510,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.11,
-      "maxrss_mb": 2011,
-      "tctl_start_c": 55.0,
-      "tctl_end_c": 56.5,
+      "wall_s": 3.26,
+      "maxrss_mb": 2008,
+      "tctl_start_c": 60.2,
+      "tctl_end_c": 59.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -544,6 +556,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -553,10 +566,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.06,
-      "maxrss_mb": 2789,
-      "tctl_start_c": 56.8,
-      "tctl_end_c": 56.1,
+      "wall_s": 4.11,
+      "maxrss_mb": 2780,
+      "tctl_start_c": 59.6,
+      "tctl_end_c": 60.1,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -604,6 +617,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -613,10 +627,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.26,
-      "maxrss_mb": 2944,
-      "tctl_start_c": 56.1,
-      "tctl_end_c": 57.1,
+      "wall_s": 4.42,
+      "maxrss_mb": 2936,
+      "tctl_start_c": 59.9,
+      "tctl_end_c": 60.6,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -649,6 +663,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -658,10 +673,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.06,
-      "maxrss_mb": 1944,
-      "tctl_start_c": 57.5,
-      "tctl_end_c": 56.5,
+      "wall_s": 3.25,
+      "maxrss_mb": 1940,
+      "tctl_start_c": 60.5,
+      "tctl_end_c": 59.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -694,6 +709,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -703,10 +719,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.49,
-      "maxrss_mb": 1951,
-      "tctl_start_c": 56.5,
-      "tctl_end_c": 56.8,
+      "wall_s": 3.72,
+      "maxrss_mb": 1947,
+      "tctl_start_c": 59.5,
+      "tctl_end_c": 60.9,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -756,6 +772,7 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -765,10 +782,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 1.25,
+      "wall_s": 1.27,
       "maxrss_mb": 774,
-      "tctl_start_c": 56.6,
-      "tctl_end_c": 56.6,
+      "tctl_start_c": 60.9,
+      "tctl_end_c": 60.2,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -779,6 +796,37 @@
       },
       "detections": [],
       "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T18_FinFold.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.19,
+      "maxrss_mb": 774,
+      "tctl_start_c": 60.2,
+      "tctl_end_c": 59.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T18.foldl_sum_kernel": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T18.foldl_sum_simp": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T18.foldr_sum": []
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -789,13 +837,14 @@
         "lean-output warning: declaration uses [`']sorry[`']",
         "axiom QBPToolcheck.MF01.unproved sorryAx",
         "axiom QBPToolcheck.MF01.uses_unproved sorryAx",
+        "axiom QBPToolcheck.MF01.admitted sorryAx",
         "checker-reject RATCHET violated — sorry: 1 > baseline 0"
       ],
       "lean_exit": 0,
-      "wall_s": 1.13,
+      "wall_s": 1.15,
       "maxrss_mb": 774,
-      "tctl_start_c": 56.9,
-      "tctl_end_c": 56.6,
+      "tctl_start_c": 60.0,
+      "tctl_end_c": 59.6,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 1,
@@ -805,15 +854,20 @@
         ],
         "QBPToolcheck.MF01.uses_unproved": [
           "sorryAx"
+        ],
+        "QBPToolcheck.MF01.admitted": [
+          "sorryAx"
         ]
       },
       "detections": [
         "Lean output: /warning: declaration uses [`']sorry[`']/",
         "axiom audit: QBPToolcheck.MF01.unproved ⊇ sorryAx",
         "axiom audit: QBPToolcheck.MF01.uses_unproved ⊇ sorryAx",
+        "axiom audit: QBPToolcheck.MF01.admitted ⊇ sorryAx",
         "checker: /RATCHET violated — sorry: 1 > baseline 0/"
       ],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -827,8 +881,8 @@
       "lean_exit": 0,
       "wall_s": 1.14,
       "maxrss_mb": 774,
-      "tctl_start_c": 56.4,
-      "tctl_end_c": 55.5,
+      "tctl_start_c": 59.6,
+      "tctl_end_c": 59.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 1,
@@ -842,6 +896,7 @@
         "checker: /HARD-BAN violated — native_decide: 1 occurrence/"
       ],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -855,8 +910,8 @@
       "lean_exit": 0,
       "wall_s": 1.14,
       "maxrss_mb": 774,
-      "tctl_start_c": 55.5,
-      "tctl_end_c": 55.9,
+      "tctl_start_c": 59.5,
+      "tctl_end_c": 59.6,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 1,
@@ -869,6 +924,7 @@
         "checker: /RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0/"
       ],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
     },
     {
@@ -879,10 +935,10 @@
         "lean-error :22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false"
       ],
       "lean_exit": 1,
-      "wall_s": 1.12,
+      "wall_s": 1.14,
       "maxrss_mb": 774,
-      "tctl_start_c": 55.9,
-      "tctl_end_c": 55.5,
+      "tctl_start_c": 59.8,
+      "tctl_end_c": 60.0,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -892,16 +948,102 @@
         "Lean rejected: /:22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false/"
       ],
       "failures": [],
+      "known_limits": [],
       "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF05_CustomAxiom/MF05_CustomAxiom.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF05.one_eq_two QBPToolcheck.MF05.cheat",
+        "axiom-nonstd QBPToolcheck.MF05.one_eq_two",
+        "known-limit checker-accepts"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 774,
+      "tctl_start_c": 60.0,
+      "tctl_end_c": 60.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF05.one_eq_two": [
+          "QBPToolcheck.MF05.cheat"
+        ]
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF05.one_eq_two ⊇ QBPToolcheck.MF05.cheat",
+        "axiom audit: QBPToolcheck.MF05.one_eq_two has non-standard ['QBPToolcheck.MF05.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: foundations checker accepts the file (exit 0)"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "known-limits/KL01_VacuityBypass/KL01_VacuityBypass.lean",
+      "kind": "known-limit",
+      "expect": [
+        "lean-ok",
+        "known-limit checker-accepts",
+        "known-limit audit-clean QBPToolcheck.KL01.refl_implies_true",
+        "known-limit audit-clean QBPToolcheck.KL01.alternativity"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.17,
+      "maxrss_mb": 774,
+      "tctl_start_c": 60.0,
+      "tctl_end_c": 60.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.KL01.refl_implies_true": [],
+        "QBPToolcheck.KL01.alternativity": []
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: foundations checker accepts the file (exit 0)",
+        "KNOWN-LIMIT confirmed: `#print axioms QBPToolcheck.KL01.refl_implies_true` is clean ([])",
+        "KNOWN-LIMIT confirmed: `#print axioms QBPToolcheck.KL01.alternativity` is clean ([])"
+      ],
+      "result": "KNOWN-LIMIT"
+    },
+    {
+      "file": "known-limits/KL02_FinFoldlDecide/KL02_FinFoldlDecide.lean",
+      "kind": "known-limit",
+      "expect": [
+        "known-limit lean-error did not reduce to `isTrue` or `isFalse`"
+      ],
+      "lean_exit": 1,
+      "wall_s": 1.17,
+      "maxrss_mb": 774,
+      "tctl_start_c": 60.1,
+      "tctl_end_c": 59.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {},
+      "detections": [],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: Lean still rejects with /did not reduce to `isTrue` or `isFalse`/"
+      ],
+      "result": "KNOWN-LIMIT"
     }
   ],
   "summary": {
-    "files": 22,
-    "pass": 22,
+    "files": 26,
+    "pass": 26,
     "fail": 0,
-    "tool_files": 18,
-    "must_fail_files": 4,
-    "theorems_audited": 98,
+    "tool_files": 19,
+    "must_fail_files": 5,
+    "known_limit_files": 2,
+    "theorems_audited": 105,
     "overall": "GREEN"
   }
 }

@@ -23,7 +23,15 @@ Expectation lines live in each .lean file's header comment:
   TOOLCHECK-EXPECT: checker-reject <regex>     check_lean_foundations.py (zero baseline) exits 1
                                                and its output matches <regex>
 
-A must-fail whose expected detection does not happen is a suite FAILURE.
+  TOOLCHECK-EXPECT: known-limit checker-accepts            REPORT-ONLY: the checker exits 0 on the file
+  TOOLCHECK-EXPECT: known-limit audit-clean <thm>          REPORT-ONLY: `#print axioms <thm>` is ⊆ std3
+  TOOLCHECK-EXPECT: known-limit lean-error <regex>         REPORT-ONLY: Lean exits != 0 matching <regex>
+      A known-limit row documents a gap the suite KNOWS it cannot catch (e.g. the vacuity
+      check is syntactic). It is reported as "confirmed" or "changed" and never fails the
+      suite; a "changed" row means the tool improved (or regressed) — read it at the bump.
+
+A must-fail whose expected detection does not happen is a suite FAILURE. A Lean crash
+(exit >= 128, e.g. 139 = SIGSEGV) is a FAILURE for every file and is never retried.
 This script only reads Lean's text output; it never treats `#eval` output as proof.
 """
 
@@ -140,6 +148,14 @@ def parse_axioms(out: str) -> dict[str, list[str]]:
     return res
 
 
+def file_kind(rel: str) -> str:
+    if rel.startswith("must-fail/"):
+        return "must-fail"
+    if rel.startswith("known-limits/"):
+        return "known-limit"
+    return "tool"
+
+
 def grade(src_path: Path, raw: Path, suite: Path) -> dict:
     rel = src_path.relative_to(suite).as_posix()
     stem = src_path.stem
@@ -149,7 +165,7 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
     if not meta_p.exists():
         return {
             "file": rel,
-            "kind": "must-fail" if rel.startswith("must-fail/") else "tool",
+            "kind": file_kind(rel),
             "expect": [f"{k} {a}".strip() for k, a in expects],
             "lean_exit": None,
             "wall_s": None,
@@ -171,9 +187,16 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
     failures: list[str] = []
     detections: list[str] = []
 
+    known: list[str] = []
+    kind_is_kl = file_kind(rel) == "known-limit"
     if lean_exit in (75, 86, 87, 124):
         failures.append(
             f"boxrun aborted the run (exit {lean_exit}: 75 busy / 86 thermal / 87 mem / 124 timeout)"
+        )
+    elif isinstance(lean_exit, int) and lean_exit >= 128:
+        failures.append(
+            f"Lean CRASHED (exit {lean_exit} = signal {lean_exit - 128}; "
+            f"wall {meta.get('wall_s')} s, RSS {meta.get('maxrss_mb')} MB) — not retried"
         )
 
     kinds = [k for k, _ in expects]
@@ -250,6 +273,30 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
                 )
             else:
                 detections.append(f"checker: /{arg}/")
+        elif kind == "known-limit":
+            check, _, rest = arg.partition(" ")
+            if check == "checker-accepts":
+                hold = chk_exit == 0
+                what = f"foundations checker accepts the file (exit {chk_exit})"
+            elif check == "audit-clean":
+                thm = rest.strip()
+                ax = axioms.get(thm)
+                hold = ax is not None and not (set(ax) - STANDARD_AXIOMS)
+                what = f"`#print axioms {thm}` is clean ({ax})"
+            elif check == "lean-error":
+                hold = lean_exit not in (0, None) and bool(re.search(rest, log))
+                what = f"Lean still rejects with /{rest}/"
+            else:
+                failures.append(f"unknown known-limit check {check!r}")
+                continue
+            known.append(
+                (
+                    "KNOWN-LIMIT confirmed: "
+                    if hold
+                    else "KNOWN-LIMIT CHANGED (re-read): "
+                )
+                + what
+            )
         else:
             failures.append(f"unknown expectation kind {kind!r}")
 
@@ -266,7 +313,7 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
 
     return {
         "file": rel,
-        "kind": "must-fail" if rel.startswith("must-fail/") else "tool",
+        "kind": file_kind(rel),
         "expect": [f"{k} {a}".strip() for k, a in expects],
         "lean_exit": lean_exit,
         "wall_s": meta.get("wall_s"),
@@ -279,7 +326,8 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
         "axioms": axioms,
         "detections": detections,
         "failures": failures,
-        "result": "PASS" if not failures else "FAIL",
+        "known_limits": known,
+        "result": "FAIL" if failures else ("KNOWN-LIMIT" if kind_is_kl else "PASS"),
     }
 
 
@@ -296,13 +344,17 @@ def axiom_summary(axioms: dict[str, list[str]]) -> str:
 def cmd_evaluate(a: argparse.Namespace) -> int:
     raw, suite = Path(a.raw), Path(a.suite)
     meta = json.loads(Path(a.meta).read_text()) if a.meta else {}
-    files = sorted((suite / "tests").glob("*.lean")) + sorted(
-        (suite / "must-fail").glob("*/*.lean")
+    files = (
+        sorted((suite / "tests").glob("*.lean"))
+        + sorted((suite / "must-fail").glob("*/*.lean"))
+        + sorted((suite / "known-limits").glob("*/*.lean"))
     )
     if a.only_present:
         files = [f for f in files if (raw / f"{f.stem}.meta.json").exists()]
     rows = [grade(f, raw, suite) for f in files]
-    ok = all(r["result"] == "PASS" for r in rows) and not meta.get("preflight_failures")
+    ok = all(r["result"] in ("PASS", "KNOWN-LIMIT") for r in rows) and not meta.get(
+        "preflight_failures"
+    )
     doc = {
         "suite": "qbp-lean-toolcheck",
         "schema": 1,
@@ -310,10 +362,11 @@ def cmd_evaluate(a: argparse.Namespace) -> int:
         "files": rows,
         "summary": {
             "files": len(rows),
-            "pass": sum(r["result"] == "PASS" for r in rows),
+            "pass": sum(r["result"] in ("PASS", "KNOWN-LIMIT") for r in rows),
             "fail": sum(r["result"] == "FAIL" for r in rows),
             "tool_files": sum(r["kind"] == "tool" for r in rows),
             "must_fail_files": sum(r["kind"] == "must-fail" for r in rows),
+            "known_limit_files": sum(r["kind"] == "known-limit" for r in rows),
             "theorems_audited": sum(len(r["axioms"]) for r in rows),
             "overall": "GREEN" if ok else "RED",
         },
@@ -330,9 +383,12 @@ def cmd_evaluate(a: argparse.Namespace) -> int:
         "|---|---|---|---|---|---|---|---|---|",
     ]
     for r in rows:
-        det = "; ".join(r["failures"] or r["detections"]) or "—"
+        det = (
+            "; ".join(r["failures"] or (r["detections"] + r.get("known_limits", [])))
+            or "—"
+        )
         lines.append(
-            f"| `{r['file']}` | {r['kind']} | {'✅' if r['result'] == 'PASS' else '❌'} {r['result']} | "
+            f"| `{r['file']}` | {r['kind']} | { {'PASS': '✅', 'KNOWN-LIMIT': '🟡'}.get(r['result'], '❌') } {r['result']} | "
             f"{r['lean_exit']} | {r['wall_s']} | {r['maxrss_mb']} | {r.get('tctl_start_c')}→{r.get('tctl_end_c')} | "
             f"{axiom_summary(r['axioms'])} | {det} |"
         )

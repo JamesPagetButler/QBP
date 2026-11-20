@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 # QBP Lean toolcheck suite runner (issue #823 W5; policy docs/lean-version-cadence.md).
 #
-# Runs every tool test (tests/*.lean) and every must-fail control (must-fail/*/*.lean)
-# under `boxrun` (box lease, thermal guard, RSS cap), one Lean process at a time, then
+# Runs every tool test (tests/*.lean), every must-fail control (must-fail/*/*.lean) and
+# every report-only known-limit probe (known-limits/*/*.lean) under `boxrun` (box lease, thermal guard, RSS cap), one Lean process at a time, then
 # grades each run against the TOOLCHECK-EXPECT lines in its header (toolcheck.py).
 #
 #   tools/lean-toolcheck/run.sh            # all files (from any cwd; Lean runs from proofs/)
 #   tools/lean-toolcheck/run.sh T04 MF02   # a subset (file-name prefixes)
+#   tools/lean-toolcheck/run.sh --update-baseline   # full run; if GREEN, ALSO overwrite the
+#                                                   # COMMITTED results/results-<tc>-<sha7>.*
+#                                                   # (alias --record). Never on a subset.
 #
 # Modes:
 #   default  ONE boxrun lease for the whole suite (one queue slot, one cool-start gate);
@@ -16,7 +19,9 @@
 #   TOOLCHECK_PER_FILE=1  one boxrun lease PER FILE (per-file boxrun records: pauses, max Tctl).
 #
 # Reads the pins from proofs/lean-toolchain and proofs/lakefile.lean — no version is
-# hard-coded here. Writes results/results-<toolchain>-<mathlib-sha7>.{json,md}.
+# hard-coded here. A normal run writes ONLY to results/runs/<run-id>/ (gitignored); the
+# committed baseline results/results-<toolchain>-<mathlib-sha7>.{json,md} is rewritten only
+# with --update-baseline (Red Team F4 on PR #824: a reviewer's run must not dirty the record).
 # Exit 0 = every file behaved as expected (tools pass, must-fails caught with the expected
 # message); 1 = an unexpected result; 2 = preflight refused (pins/manifest/import surface);
 # 75/86/87/124 = boxrun refused or aborted the batch (busy / thermal / memory / timeout).
@@ -40,16 +45,32 @@ BOXRUN="${BOXRUN:-boxrun}"
 BOXRUN_LOG="${BOXRUN_LOG:-$HOME/.box-telemetry/boxrun.log}"
 RUN_ID="${TOOLCHECK_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)}"
 INNER="${TOOLCHECK_INNER:-0}"
+UPDATE_BASELINE="${TOOLCHECK_UPDATE_BASELINE:-0}"
+
+args=()
+for a in "$@"; do
+  case "$a" in
+    --update-baseline | --record) UPDATE_BASELINE=1 ;;
+    -*) echo "toolcheck: unknown flag $a" >&2; exit 2 ;;
+    *) args+=("$a") ;;
+  esac
+done
+set -- "${args[@]+"${args[@]}"}"
+if [[ "$UPDATE_BASELINE" == 1 && $# -gt 0 ]]; then
+  echo "toolcheck: --update-baseline needs a FULL run (no file prefixes)" >&2
+  exit 2
+fi
 
 cd "$PROOFS"
 
 # ---- pins (read, never hard-coded) -------------------------------------------------
 eval "$(python3 -I "$HERE/toolcheck.py" pins --proofs "$PROOFS")"
 OUT_BASE="results-${VERSION}-${MATHLIB_SHA7}"
-RAW="$HERE/results/raw-${OUT_BASE}"
+RUN_DIR="$HERE/results/runs/${RUN_ID}" # gitignored; one directory per run
+RAW="$RUN_DIR/raw"
 
 # ---- file list ------------------------------------------------------------------
-mapfile -t FILES < <(ls "$HERE"/tests/*.lean; ls "$HERE"/must-fail/*/*.lean)
+mapfile -t FILES < <(ls "$HERE"/tests/*.lean; ls "$HERE"/must-fail/*/*.lean; ls "$HERE"/known-limits/*/*.lean)
 if (($# > 0)); then
   sel=()
   for f in "${FILES[@]}"; do
@@ -89,6 +110,7 @@ if [[ "$INNER" != 1 && "${TOOLCHECK_PER_FILE:-0}" != 1 ]]; then
   "$BOXRUN" --gpu --mem-mb "$MEM_MB" --timeout "$total_to" --wait \
     --label "lean-toolcheck-suite-${RUN_ID}" -- \
     env TOOLCHECK_INNER=1 TOOLCHECK_RUN_ID="$RUN_ID" TOOLCHECK_BATCH_LABEL="lean-toolcheck-suite-${RUN_ID}" \
+    TOOLCHECK_UPDATE_BASELINE="$UPDATE_BASELINE" \
     bash "$HERE/run.sh" "$@"
   rc=$?
   set -e
@@ -111,7 +133,19 @@ fi
 if [[ "$TOOLCHAIN" == *-rc* || "$TOOLCHAIN" == *nightly* ]]; then
   preflight+=("lean-toolchain names a non-stable release: $TOOLCHAIN (cadence policy P1)")
 fi
-LEAN_REPORTED="$(lake env lean --version 2>&1 | head -1 || true)"
+# F1 (Red Team on PR #824): on a fresh checkout lake-manifest.json is absent (gitignored) and
+# the first `lake env` prints "info: QBPProofs: no previous manifest, creating one from
+# scratch" BEFORE Lean's version line — never take line 1; match the `Lean (version` line.
+LEAN_VERSION_OUT="$(lake env lean --version 2>&1 || true)"
+LEAN_REPORTED="$(grep -m1 -E '^Lean \(version ' <<<"$LEAN_VERSION_OUT" || true)"
+if [[ -z "$LEAN_REPORTED" ]]; then
+  LEAN_REPORTED="(no 'Lean (version' line in: $(tr '\n' ' ' <<<"$LEAN_VERSION_OUT" | cut -c1-200))"
+fi
+# lake may just have (re)created the manifest — re-read so the lockstep check sees it.
+eval "$(python3 -I "$HERE/toolcheck.py" pins --proofs "$PROOFS")"
+if [[ -n "$MANIFEST_MATHLIB_REV" && "$MANIFEST_MATHLIB_REV" != "$MATHLIB_SHA" ]]; then
+  preflight+=("lake-manifest.json mathlib rev $MANIFEST_MATHLIB_REV != lakefile pin $MATHLIB_SHA (after lake env)")
+fi
 want_ver="${VERSION#v}"
 if [[ "$LEAN_REPORTED" != *"version ${want_ver},"* && "$LEAN_REPORTED" != *"version ${want_ver} "* ]]; then
   preflight+=("lake env lean reports '$LEAN_REPORTED', pin is $TOOLCHAIN")
@@ -209,12 +243,20 @@ PY
 set +e
 subset=(); (($# > 0)) && subset=(--only-present)
 python3 -I "$HERE/toolcheck.py" evaluate --raw "$RAW" --suite "$HERE" --meta "$RAW/meta.json" \
-  --out-json "$HERE/results/${OUT_BASE}.json" --out-md "$HERE/results/${OUT_BASE}.md" "${subset[@]+"${subset[@]}"}"
+  --out-json "$RUN_DIR/${OUT_BASE}.json" --out-md "$RUN_DIR/${OUT_BASE}.md" "${subset[@]+"${subset[@]}"}"
 grc=$?
 set -e
 if ((${#preflight[@]} > 0)); then
   printf 'toolcheck: PREFLIGHT FAILURE: %s\n' "${preflight[@]}"
   exit 2
 fi
-echo "toolcheck: results → tools/lean-toolcheck/results/${OUT_BASE}.{json,md} (raw logs: $(basename "$RAW")/, gitignored)"
+echo "toolcheck: results → tools/lean-toolcheck/results/runs/${RUN_ID}/${OUT_BASE}.{json,md} (gitignored)"
+if [[ "$UPDATE_BASELINE" == 1 ]]; then
+  if ((grc == 0)); then
+    cp "$RUN_DIR/${OUT_BASE}.json" "$RUN_DIR/${OUT_BASE}.md" "$HERE/results/"
+    echo "toolcheck: --update-baseline: committed baseline results/${OUT_BASE}.{json,md} overwritten from run ${RUN_ID}"
+  else
+    echo "toolcheck: --update-baseline REFUSED: the run is not GREEN — committed baseline left untouched"
+  fi
+fi
 exit "$grc"

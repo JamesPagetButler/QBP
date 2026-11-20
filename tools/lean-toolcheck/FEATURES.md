@@ -11,8 +11,17 @@ this table's date, 2026-11-20. Re-read them before trusting the table.
 
 **How to run:** `tools/lean-toolcheck/run.sh` (all files) or `tools/lean-toolcheck/run.sh T04 MF02` (prefixes),
 from any directory. Each file is one `lake env lean` run with cwd = `proofs/` (so the Lean environment, the pins
-and the Mathlib `.oleans` are `proofs/`'s), under `boxrun` (lease, thermal guard, RSS cap). Results:
-`results/results-<toolchain>-<mathlib-sha7>.{json,md}`. Exit 0 = every file behaved as expected.
+and the Mathlib `.oleans` are `proofs/`'s), under `boxrun` (lease, thermal guard, RSS cap). A normal run writes
+only to `results/runs/<run-id>/` (gitignored); the committed baseline `results/results-<toolchain>-<mathlib-sha7>.{json,md}`
+changes only with `run.sh --update-baseline` on a full GREEN run. Exit 0 = every file behaved as expected
+(tool tests pass, must-fails caught, known-limit probes reported). A Lean crash (exit ≥ 128) fails the run and is
+never retried.
+
+> **Limit, stated plainly: the vacuity check is SYNTACTIC ONLY.** `scripts/check_lean_foundations.py` catches the
+> literal `: True :=` (MF03). A vacuous statement in any other spelling (`x = x → True`, the #472 shape behind a
+> beta-redex `(fun _ => True) 3`) passes BOTH the checker and the axiom audit; those are pinned as report-only
+> KNOWN-LIMIT rows (KL01). Only a human reading the statement catches them. Likewise the checker has no rule for a
+> user `axiom`; there the axiom audit is the only detector (MF05).
 
 **Why `tools/`, not `proofs/`:** these are tool tests, not theory. Outside `proofs/` they are not a `lean_lib`,
 not in `lake build` (the must-fail controls are meant to fail), not theory-bearing for the Tier-3 gate, and not
@@ -44,16 +53,25 @@ Usage counts below are from a comment-stripped grep of `proofs/**/*.lean` (80 fi
 | T15 | `Complex`: `I_sq`, `ext`, `normSq`, `conj`; "order lost at ℂ" witness | 3 files — `TowerLaws`, `Hurwitz`, `Breakdown` | `tests/T15_Complex.lean` | ✅ PASS (all thms ⊆ std3) |
 | T16 | core tactics/decls: `omega`, `rcases`/`obtain`/`rintro`, `induction … with`, `constructor`, `calc`, `unfold`, `show`/`change`, `split_ifs`, `by_contra`, `funext`, `noncomputable def`, `structure`, local `notation` | 11–26 files each — `OctonionAutBranching`, `NoAutonomousDynamics`, `CDLifting`, `DoubleSlit` | `tests/T16_CoreTactics.lean` | ✅ PASS (all thms ⊆ std3) |
 | T17 | `Float` / `String` / `IO` API of the differential-test oracle (compile only; nothing `#eval`'d) | `Oracle/FloatCompute`, `Oracle/Main`, `Units/Oracle`, `Units/GenTestVectors` | `tests/T17_FloatOracle.lean` | ✅ PASS (all thms ⊆ std3) |
-| — | `#print axioms` output format (the completeness gate's parser) | 48 files / 1 395 `#print axioms` lines | every test file ends with `#print axioms`; `toolcheck.py` parses them | ✅ parsed for all 98 audited theorems (93 tool-test thms ⊆ std3; 5 must-fail thms as expected) |
+| T18 | kernel reduction through core `Fin` folds: `Fin.foldr` by `decide`, `Fin.foldl` by `decide +kernel` and by `Fin.foldl_succ` | indirect — the Fin-indexed kernel `decide` sweeps (`Octonion32Count`, `SedenionOctonionCount`, `FanoGenesis`, `SeamSpectrum`); lean4#14267 / #14554 | `tests/T18_FinFold.lean` | ✅ PASS (all thms ⊆ std3) |
+| — | `#print axioms` output format (the completeness gate's parser) | 48 files / 1 395 `#print axioms` lines | every test file ends with `#print axioms`; `toolcheck.py` parses them | ✅ parsed for all 105 audited theorems (96 tool-test thms ⊆ std3; must-fail / known-limit thms as expected) |
 
 ### Must-fail controls (a must-fail that passes is a suite FAILURE)
 
 | ID | Control | Must be detected by | Expected message (regex in the file header) | Status |
 |---|---|---|---|---|
-| MF01 | `sorry`, direct + inherited through a lemma | axiom audit (`sorryAx` on both theorems) + Lean warning + foundations checker RATCHET | Lean warning "declaration uses sorry" (v4.30.0 quotes it in backticks; regex is quote-agnostic) · `sorryAx` · `RATCHET violated — sorry: 1 > baseline 0` | ✅ caught (warning + `sorryAx` ×2 + checker) |
+| MF01 | `sorry`, direct + inherited through a lemma, + `admit` | axiom audit (`sorryAx` on all three theorems) + Lean warning + foundations checker RATCHET (which counts the word `sorry` only — `admit` is caught by the audit alone) | Lean warning "declaration uses sorry" (v4.30.0 quotes it in backticks; regex is quote-agnostic) · `sorryAx` ×3 · `RATCHET violated — sorry: 1 > baseline 0` | ✅ caught (warning + `sorryAx` ×3 + checker) |
 | MF02 | `native_decide` | foundations checker HARD-BAN + axiom audit (non-standard axiom, **name-agnostic**) | `HARD-BAN violated — native_decide: 1 occurrence` · axiom ∉ std3 | ✅ caught (checker + axiom `…_native.native_decide.ax_1_1`) |
-| MF03 | vacuous `: True := by trivial` and `: True := trivial` | foundations checker HARD-BAN + RATCHET (**the axiom audit is clean — it cannot see vacuity**) | `HARD-BAN violated — vacuous-proof …: 1 occurrence` · `RATCHET violated — vacuous-… theorem: 2 > baseline 0` | ✅ caught by the checker only (axiom audit clean) |
-| MF04 | false `decide` (`(2 : Fin 5) + 3 = 1`; `(1 : ℤ) - 2 = 0`, which is *true* over ℕ) | Lean rejects (non-zero exit) | `proved that the proposition … is false` (both) | ✅ caught (Lean exit 1, both messages) |
+| MF03 | vacuous, LITERAL `: True := by trivial` and `: True := trivial` | foundations checker HARD-BAN + RATCHET (**the axiom audit is clean — it cannot see vacuity**; the checker sees only this literal spelling — see KL01) | `HARD-BAN violated — vacuous-proof …: 1 occurrence` · `RATCHET violated — vacuous-… theorem: 2 > baseline 0` | ✅ caught by the checker only (axiom audit clean) |
+| MF04 | false `decide` (`(2 : Fin 5) + 3 = 1`; `(1 : Int) - 2 = 0`, which is *true* over `Nat`) | Lean rejects (non-zero exit) | `proved that the proposition … is false` (both, line-pinned) | ✅ caught (Lean exit 1, both messages) |
+| MF05 | user `axiom cheat : False` + `theorem one_eq_two : 1 = 2 := cheat.elim` | **axiom audit only** (`#print axioms` lists `QBPToolcheck.MF05.cheat`); the foundations checker ACCEPTS the file (recorded as a known limit) | `axiom … ⊇ QBPToolcheck.MF05.cheat` · non-std axiom | ✅ caught by the audit; checker-accepts confirmed |
+
+### Known limits (report-only: "confirmed" or "CHANGED", never a failure)
+
+| ID | Limit | Probe | Status @ v4.30.0 |
+|---|---|---|---|
+| KL01 | **vacuity detection is syntactic**: `theorem refl_implies_true (x : Nat) : x = x → True` and `theorem alternativity : (fun (_ : Nat) => True) 3` (the #472 shape behind a beta-redex) pass the checker AND have a clean `#print axioms` | `known-limits/KL01_VacuityBypass/` (Red Team F3 on PR #824) | 🟡 confirmed (checker exit 0; both `does not depend on any axioms`) |
+| KL02 | elaborator `decide` is stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`"); `decide +kernel` works (T18) | `known-limits/KL02_FinFoldlDecide/` — expected to report CHANGED at the #723 target (lean4#14267, #14554) | 🟡 confirmed |
 
 ### Project layer (QBP's own proofs)
 
@@ -80,7 +98,7 @@ release-note item, one disposition and one reason each, plus the Mathlib usage s
 
 | Source | Items | breaking → touches QBP | breaking, no touch | relevant → test | not relevant |
 |---|---|---|---|---|---|
-| Lean release notes v4.31.0 – v4.36.0 (incl. point releases 4.32.1, 4.32.2, 4.33.1, 4.34.1) | 960 | 8 | 6 | 153 | 793 |
+| Lean release notes v4.31.0 – v4.36.0 (incl. point releases 4.32.1, 4.32.2, 4.33.1, 4.34.1) | 960 | 8 | 6 | 154 | 792 |
 | Mathlib v4.30.0 → v4.35.0, QBP usage only | 3 modules + 1 lemma + 2 index false-positives | 4 (warnings) | — | — | 2 |
 
 **Method (and its limits).** Release notes were read as text from `leanprover/reference-manual`
@@ -90,7 +108,7 @@ disposition against a usage index of QBP's comment-stripped sources (tactics, id
 deprecation item, and every rule-flagged breaking item — were then hand-dispositioned (the `OVERRIDES` in the
 generator, reproduced as reasons in the table). The remaining "not relevant" reasons are rule-assigned by
 section and keyword (e.g. "Sym/vcgen machinery — QBP does not use it"); they are honest one-liners, not a
-line-by-line reading of 790 items. The Mathlib scan cannot see simp-set *contents* or instance changes —
+line-by-line reading of ~790 items (lean4#14554 was moved to relevant on Red Team review). The Mathlib scan cannot see simp-set *contents* or instance changes —
 for those the rebuild (G1) is the test. Generators (re-runnable for the next range; they reproduce the
 committed table byte-for-byte): [`triage/tools/`](triage/tools/README.md).
 
@@ -115,3 +133,4 @@ items (QBP uses none); Lake features beyond `build`/`env`/`exe cache get`.
 | Date | Change |
 |---|---|
 | 2026-11-20 | v1 — table, must-fail controls, project-layer row, draft triage (issue #823 W5) |
+| 2026-11-20 | v1.1 — Red Team fix round on PR #824: MF05 custom axiom; `admit` in MF01; KNOWN-LIMIT rows KL01 (vacuity is syntactic) + KL02 (Fin.foldl `decide`); T18 Fin folds; lean4#14554 reclassified relevant; runs no longer rewrite the committed baseline (`--update-baseline`); preflight robust to a fresh checkout |
