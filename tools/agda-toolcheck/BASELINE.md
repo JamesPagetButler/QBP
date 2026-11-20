@@ -12,12 +12,12 @@ this table; a big slowdown is a finding, not a pass.
 | agda/cubical | CI pin `7b9019b2993535d6931991d87f5c762aee87a67a`; local `~/cubical` HEAD identical → `pin_match = true`; library `cubical-0.9`, flags `--cubical --safe --no-import-sorts --guardedness` |
 | library interfaces | `~/cubical/_build` (38 MB, built 2026-08-31) present → library-dependent files load interfaces instead of re-checking the closure |
 | box | AMD FX-8350, 32 GB; run via `boxrun --gpu --mem-mb 8000 --timeout 3600 --wait`, 1 thread, nice 19 |
-| Tctl at start | 59.6 °C (full run); 40.2 °C (cold project-layer run) |
-| run | `run.sh --layer all --update-baseline`, 2026-11-20T22:31:59Z → 2026-11-20T22:35:37Z (summed agda wall 213.5 s) |
+| Tctl at start | 63.6 °C (full run); 40.2 °C (cold project-layer run) |
+| run | `run.sh --layer all --update-baseline`, 2026-11-20T22:44:39Z → 2026-11-20T22:48:52Z (summed agda wall 249.1 s) |
 | result | **0 unexpected** — 51 PASS · 4 REJECTED · 1 KNOWN-HOLE · 11 controls PASS; exit 0 |
 | records | `results/results-2.8.0-7b9019b.json` / `.md` (full), `results/results-2.8.0-7b9019b-cold.json` / `.md` (project layer, QBP interfaces removed first) |
 | scanner | PR #826's `scripts/agda_forbidden_tokens.py` (`origin/housekeeping/823-agda-ci-forbidden-tokens` @ `45a050e`, sha256 `a87ccd2daf512069…`), placed locally and uncommitted for this run; the control FAILS without it |
-| timing note | this run's `lib` layer summed 135 s vs 83 s in the previous baseline run on the same pins (Tctl 59.6 °C at start, box shared with other seats' jobs; boxrun pauses at 65 °C): a box-temperature effect, not a toolchain change — the R6 comparison for a candidate should use a cool box (Tctl ≤ 50 °C at start) |
+| timing note | the recorded run started at Tctl 63.6 °C (box shared with other seats' jobs; boxrun pauses the job at 65 °C and resumes at 55 °C), so its `cubical` layer summed 165 s against 78 s in the 21:58Z run and the 22:31Z run's `lib` layer 135 s against 83 s — box-temperature effects, not toolchain changes; the per-file RSS figures are unaffected (peak 507 MiB in every warm run). The R6 comparison for a candidate should start from a cool box (Tctl ≤ 50 °C) and compare against the cool figures in this table's history: tool 0.6 s · lib 83 s · project 78 s |
 
 Peak RSS over the whole run: **507 MiB** (`SubstrateCharge.agda`, warm) / **644 MiB** (same file, cold). Nothing came near the 8 GB cap.
 
@@ -43,66 +43,66 @@ Peak RSS over the whole run: **507 MiB** (`SubstrateCharge.agda`, warm) / **644 
 | layer | file | status | rc | wall s | max RSS MiB |
 |---|---|---|---|---|---|
 | control | `manifest-tool` | PASS | — | — | 12 found, 12 listed |
-| tool | `CircleHIT.agda` | PASS | 0 | 0.07 | 44.2 |
-| tool | `CoreSyntax.agda` | PASS | 0 | 0.06 | 45.6 |
-| tool | `GlueUa.agda` | PASS | 0 | 0.08 | 48.1 |
-| tool | `Guardedness.agda` | PASS | 0 | 0.04 | 44.1 |
+| tool | `CircleHIT.agda` | PASS | 0 | 0.04 | 44.3 |
+| tool | `CoreSyntax.agda` | PASS | 0 | 0.07 | 45.7 |
+| tool | `GlueUa.agda` | PASS | 0 | 0.11 | 48.1 |
+| tool | `Guardedness.agda` | PASS | 0 | 0.05 | 44.3 |
 | tool | `HComp.agda` | PASS | 0 | 0.06 | 44.9 |
-| tool | `Interval.agda` | PASS | 0 | 0.04 | 44.1 |
-| tool | `LibFlags.agda` | PASS | 0 | 0.03 | 43.5 |
-| tool | `LossyUnification.agda` | PASS | 0 | 0.04 | 44.1 |
-| tool | `Opaque.agda` | PASS | 0 | 0.04 | 44.0 |
-| tool | `PathP.agda` | PASS | 0 | 0.04 | 44.4 |
-| tool | `SuspJoinHIT.agda` | PASS | 0 | 0.05 | 45.5 |
+| tool | `Interval.agda` | PASS | 0 | 0.04 | 44.2 |
+| tool | `LibFlags.agda` | PASS | 0 | 0.03 | 43.6 |
+| tool | `LossyUnification.agda` | PASS | 0 | 0.04 | 44.2 |
+| tool | `Opaque.agda` | PASS | 0 | 0.05 | 44.1 |
+| tool | `PathP.agda` | PASS | 0 | 0.05 | 44.4 |
+| tool | `SuspJoinHIT.agda` | PASS | 0 | 0.05 | 45.6 |
 | tool | `Transp.agda` | PASS | 0 | 0.05 | 44.8 |
 | control | `manifest-lib` | PASS | — | — | 22 found, 22 listed |
-| lib | `LibConnected.agda` | PASS | 0 | 5.40 | 379.0 |
-| lib | `LibDataBoolNat.agda` | PASS | 0 | 2.13 | 170.3 |
-| lib | `LibDataInt.agda` | PASS | 0 | 3.48 | 234.4 |
+| lib | `LibConnected.agda` | PASS | 0 | 5.54 | 378.8 |
+| lib | `LibDataBoolNat.agda` | PASS | 0 | 2.10 | 170.3 |
+| lib | `LibDataInt.agda` | PASS | 0 | 3.49 | 234.5 |
 | lib | `LibDataSigma.agda` | PASS | 0 | 0.81 | 93.4 |
-| lib | `LibEquivIso.agda` | PASS | 0 | 0.34 | 67.0 |
+| lib | `LibEquivIso.agda` | PASS | 0 | 0.33 | 67.2 |
 | lib | `LibFunction.agda` | PASS | 0 | 0.17 | 55.3 |
-| lib | `LibGroupBase.agda` | PASS | 0 | 5.92 | 399.1 |
-| lib | `LibHLevelsGroupoid.agda` | PASS | 0 | 1.21 | 116.2 |
-| lib | `LibHopf.agda` | PASS | 0 | 5.75 | 374.6 |
-| lib | `LibHSpace.agda` | PASS | 0 | 5.72 | 380.0 |
-| lib | `LibJoin.agda` | PASS | 0 | 56.29 | 327.9 |
-| lib | `LibLoopspace.agda` | PASS | 0 | 4.32 | 295.9 |
-| lib | `LibPinSn.agda` | PASS | 0 | 7.81 | 493.0 |
-| lib | `LibPointed.agda` | PASS | 0 | 1.42 | 124.0 |
+| lib | `LibGroupBase.agda` | PASS | 0 | 5.83 | 399.1 |
+| lib | `LibHLevelsGroupoid.agda` | PASS | 0 | 1.14 | 116.3 |
+| lib | `LibHopf.agda` | PASS | 0 | 5.74 | 374.9 |
+| lib | `LibHSpace.agda` | PASS | 0 | 5.60 | 379.9 |
+| lib | `LibJoin.agda` | PASS | 0 | 4.74 | 329.8 |
+| lib | `LibLoopspace.agda` | PASS | 0 | 4.16 | 295.9 |
+| lib | `LibPinSn.agda` | PASS | 0 | 7.70 | 493.0 |
+| lib | `LibPointed.agda` | PASS | 0 | 1.36 | 124.0 |
 | lib | `LibPrelude.agda` | PASS | 0 | 0.15 | 56.1 |
-| lib | `LibS1.agda` | PASS | 0 | 3.57 | 250.7 |
-| lib | `LibSn.agda` | PASS | 0 | 5.50 | 376.5 |
-| lib | `LibSnDegree.agda` | PASS | 0 | 7.89 | 473.3 |
-| lib | `LibSnMultiplication.agda` | PASS | 0 | 5.80 | 371.6 |
-| lib | `LibSusp.agda` | PASS | 0 | 4.79 | 335.5 |
-| lib | `LibTruncations.agda` | PASS | 0 | 4.46 | 302.7 |
-| lib | `LibUnivalence.agda` | PASS | 0 | 2.19 | 171.9 |
+| lib | `LibS1.agda` | PASS | 0 | 3.56 | 250.7 |
+| lib | `LibSn.agda` | PASS | 0 | 5.54 | 376.6 |
+| lib | `LibSnDegree.agda` | PASS | 0 | 7.80 | 473.3 |
+| lib | `LibSnMultiplication.agda` | PASS | 0 | 5.66 | 371.6 |
+| lib | `LibSusp.agda` | PASS | 0 | 4.75 | 335.7 |
+| lib | `LibTruncations.agda` | PASS | 0 | 4.41 | 302.6 |
+| lib | `LibUnivalence.agda` | PASS | 0 | 2.09 | 172.0 |
 | control | `manifest-mustfail` | PASS | — | — | 5 found, 5 listed |
-| mustfail | `BadPath.agda` | REJECTED | 42 | 0.04 | 44.3 |
+| mustfail | `BadPath.agda` | REJECTED | 42 | 0.04 | 44.5 |
 | mustfail | `Hole.agda` | REJECTED | 42 | 0.04 | 44.6 |
-| mustfail | `LetPostulate.agda` | KNOWN-HOLE | 0 | 0.03 | 43.5 |
-| mustfail | `Postulate.agda` | REJECTED | 42 | 0.03 | 44.1 |
-| mustfail | `Terminating.agda` | REJECTED | 42 | 0.03 | 43.8 |
+| mustfail | `LetPostulate.agda` | KNOWN-HOLE | 0 | 0.03 | 43.6 |
+| mustfail | `Postulate.agda` | REJECTED | 42 | 0.03 | 44.2 |
+| mustfail | `Terminating.agda` | REJECTED | 42 | 0.03 | 43.9 |
 | control | `manifest-substrate` | PASS | — | — | 4 found, 4 listed |
 | substrate | `QBPHSpace.agda` | PASS | 0 | 0.04 | 44.1 |
 | substrate | `QBPJoin.agda` | PASS | 0 | 0.05 | 45.3 |
 | substrate | `QBPSpheres.agda` | PASS | 0 | 0.04 | 44.6 |
 | substrate | `QBPSubstrate.agda` | PASS | 0 | 0.04 | 44.3 |
 | control | `manifest-cubical` | PASS | — | — | 13 found, 13 listed |
-| cubical | `AssocTransport.agda` | PASS | 0 | 5.71 | 394.5 |
-| cubical | `CDAssocBool.agda` | PASS | 0 | 5.64 | 395.7 |
-| cubical | `CDAssocCubesStatus.agda` | PASS | 0 | 5.87 | 401.2 |
-| cubical | `CDAssocReduction.agda` | PASS | 0 | 5.64 | 372.9 |
-| cubical | `CDJoinBR.agda` | PASS | 0 | 5.54 | 381.9 |
-| cubical | `CDLawsBool.agda` | PASS | 0 | 5.53 | 379.8 |
-| cubical | `Diamond.agda` | PASS | 0 | 4.55 | 293.1 |
-| cubical | `HopfNoAssoc.agda` | PASS | 0 | 5.61 | 362.1 |
-| cubical | `QBPS3HSpace.agda` | PASS | 0 | 5.68 | 380.7 |
-| cubical | `QuaternionicHopf.agda` | PASS | 0 | 6.00 | 401.9 |
-| cubical | `S3FromCD.agda` | PASS | 0 | 5.86 | 413.8 |
-| cubical | `SkyrmionCharge.agda` | PASS | 0 | 7.92 | 503.7 |
-| cubical | `SubstrateCharge.agda` | PASS | 0 | 7.92 | 507.4 |
+| cubical | `AssocTransport.agda` | PASS | 0 | 5.78 | 394.2 |
+| cubical | `CDAssocBool.agda` | PASS | 0 | 25.26 | 395.9 |
+| cubical | `CDAssocCubesStatus.agda` | PASS | 0 | 5.95 | 401.2 |
+| cubical | `CDAssocReduction.agda` | PASS | 0 | 5.75 | 373.0 |
+| cubical | `CDJoinBR.agda` | PASS | 0 | 5.66 | 381.9 |
+| cubical | `CDLawsBool.agda` | PASS | 0 | 5.68 | 379.8 |
+| cubical | `Diamond.agda` | PASS | 0 | 4.66 | 293.2 |
+| cubical | `HopfNoAssoc.agda` | PASS | 0 | 5.69 | 362.1 |
+| cubical | `QBPS3HSpace.agda` | PASS | 0 | 5.87 | 380.8 |
+| cubical | `QuaternionicHopf.agda` | PASS | 0 | 6.06 | 401.9 |
+| cubical | `S3FromCD.agda` | PASS | 0 | 72.90 | 413.8 |
+| cubical | `SkyrmionCharge.agda` | PASS | 0 | 8.06 | 503.7 |
+| cubical | `SubstrateCharge.agda` | PASS | 0 | 8.09 | 507.5 |
 | control | `no-nested-source` | PASS | — | — | no .agda/.lagda* source below the top level of proofs/agda or proofs/agda-cubical |
 | control | `forbidden-tokens` | PASS | — | — | 0 hits over proofs/agda + proofs/agda-cubical (--require-safe; scripts/agda_forbidden_tokens.py) |
 | control | `manifest-control` | PASS | — | — | 3 found, 3 listed |
@@ -110,7 +110,7 @@ Peak RSS over the whole run: **507 MiB** (`SubstrateCharge.agda`, warm) / **644 
 | control | `fixture-B2IdentifierDashDash` | PASS | — | — | fixture yields 1/1 planted hits |
 | control | `fixture-PlantedForbidden` | PASS | — | — | fixture yields 9/9 planted hits |
 
-Summed agda wall time: tool 0.60 s · lib 135.1 s · mustfail 0.17 s · project 77.6 s.
+Summed agda wall time: tool 0.64 s · lib 82.7 s · mustfail 0.17 s · project 165.6 s.
 
 ## Project layer, cold (QBP's `_build/` removed first; library interfaces still warm)
 
@@ -127,6 +127,7 @@ Same 17 files, `run.sh --layer project`, 2026-11-20T20:55:31Z → 20:56:56Z, all
 | (3) flat `*.agda` globs | planted tree: `root/Clean.agda` (clean), `root/sub/Lit.lagda.md` (let-bound axiom, no `--safe`), `root/sub/x.agda-lib` (pragma name in a comment), `root/sub/_build/Hidden.agda` (`primTrustMe-user`), `root/sub/Link.agda` → symlink to an outside file; `forbidden_tokens.sh --require-safe root` | 6 hits: symlink, `_build` token, literate token, `.agda-lib` token, 2 missing-safe; PR #826's script at `45a050e` on the same tree: 5 findings on the same four files (it also reads through the symlink) |
 | (3) r2 — one scanner, fail-closed | `run.sh --layer project` with `scripts/agda_forbidden_tokens.py` absent (run `20261120T221533Z`) | `control FAIL forbidden-tokens … requires PR #826's scanner (scripts/agda_forbidden_tokens.py)`, the three fixtures FAIL (0 hits), `5 UNEXPECTED`, exit 1. The green baseline below was produced with #826's file placed locally from `origin/housekeeping/823-agda-ci-forbidden-tokens` (uncommitted); **#825 merges after #826** |
 | (7) r2 — unchecked nested source | planted `proofs/agda/_build/nested/Planted.lagda.md` (a let-bound axiom, git-ignored path), same run `20261120T221533Z` | `control FAIL no-nested-source … unchecked nested source: proofs/agda/_build/nested/Planted.lagda.md`; the file is not type-checked (CI's `*.agda` loop would not see it either); removed after the run |
+| (8) r3 — unregistered seam `TOOLCHECK_SHARED_SCANNER` | deny-by-default seams: stub scanner printing 0 hits via `TOOLCHECK_SHARED_SCANNER` + unknown `TOOLCHECK_FOO=1`, `run.sh --layer tool --update-baseline` (run `20261120T224434Z`) | the stub blinds `forbidden_tokens.sh` (0 hits on the 9-hit fixture — why it matters); the suite records `run.test_seams = "TOOLCHECK_FOO TOOLCHECK_SHARED_SCANNER"`, grades the tool layer green, then **refuses** `--update-baseline` (exit 3); `sha256sum` of both baseline files before = after |
 | F2 (Red Team) hole not keyed to the pin | `TOOLCHECK_FAKE_AGDA_VERSION=2.9.0 run.sh --layer mustfail` (run `20261120T212435Z`) | `mustfail ACCEPTED LetPostulate.agda … REGRESSION`, exit 1; self-test `hole-at-fix-accepted`, `hole-after-fix-accepted` → ACCEPTED |
 
 ## How to reproduce

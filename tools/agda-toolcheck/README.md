@@ -48,10 +48,12 @@ tools/agda-toolcheck/run.sh --self-test       # grader self-test only (no agda, 
 TOOLCHECK_MEM_MB=8000 TOOLCHECK_TIMEOUT=3600 tools/agda-toolcheck/run.sh
 tools/agda-toolcheck/run.sh --no-boxrun       # CI only (no box lease there)
 tools/agda-toolcheck/forbidden_tokens.sh --require-safe proofs/agda proofs/agda-cubical   # the lexical control alone (needs scripts/agda_forbidden_tokens.py)
-# test seams (never for a baseline; each disables --update-baseline and is recorded in the JSON):
+# test seams — DENY BY DEFAULT: every TOOLCHECK_* variable except MEM_MB/TIMEOUT/TAG is a seam; all are recorded
+# in run.test_seams and any of them REFUSES --update-baseline (exit 3 after a green run); an unknown TOOLCHECK_FOO=1 counts too:
 TOOLCHECK_FAKE_AGDA_VERSION=2.9.0 tools/agda-toolcheck/run.sh --layer mustfail   # F2: LetPostulate must come out ACCEPTED, exit 1
 TOOLCHECK_INJECT_FAIL=1 tools/agda-toolcheck/run.sh --layer tool --update-baseline  # (5): exit 1, baseline byte-identical
 TOOLCHECK_MANIFEST=<alt> tools/agda-toolcheck/run.sh --layer tool                  # (6): a listed-but-missing file → manifest FAIL
+TOOLCHECK_SHARED_SCANNER=<stub> TOOLCHECK_FOO=1 tools/agda-toolcheck/run.sh --layer tool --update-baseline  # (8): refused, exit 3, baseline untouched
 ```
 
 Statuses: `PASS` · `FAIL` · `CRASH` (rc ≥ 128) · `REJECTED` · `WRONG-ERROR` (rejected, but not with the `EXPECT:` text, or no `EXPECT:`) · `ACCEPTED` (a must-fail that passed) · `KNOWN-HOLE` / `FIXED` / `FIXED-EARLY` (pin-keyed). Unexpected = `FAIL`, `CRASH`, `WRONG-ERROR`, `ACCEPTED`, plus any manifest / fixture / pin mismatch.

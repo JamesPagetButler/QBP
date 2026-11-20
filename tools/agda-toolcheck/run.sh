@@ -51,12 +51,17 @@
 #   QBP module it imports whose interface (_build/) is missing, and the
 #   pinned library's interfaces are expected to be prebuilt (~/cubical/_build).
 #
-# Test seams (never set in a real run; each forces UPDATE_BASELINE off and is
-# recorded in the JSON under toolchain/run):
+# Test seams — DENY BY DEFAULT: every TOOLCHECK_* environment variable other
+# than the three knobs above is a seam. All active seams are recorded in the
+# JSON (run.test_seams); with any seam set, --update-baseline is REFUSED
+# (exit 3 after an otherwise green run) and the committed baseline is never
+# written. Known seams (an unknown TOOLCHECK_FOO=1 is caught the same way):
 #     TOOLCHECK_FAKE_AGDA_VERSION=<ver>  pretend the pin is another Agda (F2 grading)
 #     TOOLCHECK_INJECT_FAIL=1            add a synthetic FAIL row (shows a failed run
 #                                        cannot write the baseline)
 #     TOOLCHECK_MANIFEST=<path>          use another MANIFEST (shows a missing file fails)
+#     TOOLCHECK_SHARED_SCANNER=<path>    point forbidden_tokens.sh at another scanner
+#                                        (a stub printing 0 hits must never baseline)
 #
 # Usage
 #   tools/agda-toolcheck/run.sh [--layer tool|lib|mustfail|project|all] [--no-boxrun]
@@ -184,17 +189,24 @@ done
 
 # ---- toolchain facts --------------------------------------------------------
 AGDA_VERSION="$(agda --version | head -1 | awk '{print $3}')"
+# Test seams, DENY BY DEFAULT (Gemini r3 (8)): EVERY environment variable named
+# TOOLCHECK_* is a seam unless it is one of the three resource/filename knobs
+# that cannot affect grading (MEM_MB, TIMEOUT, TAG). Seams are all recorded in
+# the JSON (run.test_seams) and any seam refuses --update-baseline — so an
+# override added later (in this script, in forbidden_tokens.sh, anywhere) can
+# never be forgotten and never produce a baseline.
 SEAMS=""
+for v in $(compgen -e | grep '^TOOLCHECK_' | sort || true); do
+  case "$v" in TOOLCHECK_MEM_MB|TOOLCHECK_TIMEOUT|TOOLCHECK_TAG) ;; *) SEAMS="$SEAMS $v" ;; esac
+done
 AGDA_FAKED=false
-if [ -n "${TOOLCHECK_FAKE_AGDA_VERSION:-}" ]; then
-  AGDA_VERSION="$TOOLCHECK_FAKE_AGDA_VERSION"; AGDA_FAKED=true; SEAMS="$SEAMS fake-agda-version"
-fi
+if [ -n "${TOOLCHECK_FAKE_AGDA_VERSION:-}" ]; then AGDA_VERSION="$TOOLCHECK_FAKE_AGDA_VERSION"; AGDA_FAKED=true; fi
 INJECT_FAIL=false
-[ "${TOOLCHECK_INJECT_FAIL:-0}" = 1 ] && { INJECT_FAIL=true; SEAMS="$SEAMS inject-fail"; }
-MANIFEST="$HERE/MANIFEST"
-if [ -n "${TOOLCHECK_MANIFEST:-}" ]; then MANIFEST="$TOOLCHECK_MANIFEST"; SEAMS="$SEAMS alt-manifest"; fi
+[ "${TOOLCHECK_INJECT_FAIL:-0}" = 1 ] && INJECT_FAIL=true
+MANIFEST="${TOOLCHECK_MANIFEST:-$HERE/MANIFEST}"
+UPDATE_REQUESTED="$UPDATE_BASELINE"
 if [ -n "$SEAMS" ]; then
-  echo "agda-toolcheck: WARNING — test seam(s) active:$SEAMS (not a baseline; --update-baseline disabled)" >&2
+  echo "agda-toolcheck: WARNING — test seam(s) active:$SEAMS (not a baseline; --update-baseline refused)" >&2
   UPDATE_BASELINE=0
 fi
 [ -f "$MANIFEST" ] || { echo "run.sh: MANIFEST not found at $MANIFEST" >&2; exit 2; }
@@ -399,7 +411,11 @@ if [ "$UNEXPECTED" -ne 0 ]; then
   [ "$UPDATE_BASELINE" = 1 ] && echo "agda-toolcheck: committed baseline NOT updated (run was not green)" >&2
   exit 1
 fi
-if [ "$UPDATE_BASELINE" = 1 ]; then
+if [ "$UPDATE_REQUESTED" = 1 ] && [ -n "$SEAMS" ]; then
+  echo "agda-toolcheck: all expected (green), but --update-baseline REFUSED: test seam(s) active:$SEAMS" >&2
+  exit 3
+fi
+if [ "$UPDATE_BASELINE" = 1 ] && [ -z "$SEAMS" ]; then
   cp "$RUN_DIR/$NAME.json" "$BASE_DIR/$NAME.json"
   cp "$RUN_DIR/$NAME.md"   "$BASE_DIR/$NAME.md"
   echo "agda-toolcheck: committed baseline updated → $BASE_DIR/$NAME.{json,md}"
