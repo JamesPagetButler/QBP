@@ -368,7 +368,8 @@ def demoMat : Matrix (Fin 8) (Fin 8) ℚ :=
   Matrix.of fun i j => (demoRows[i.val]!)[j.val]!
 
 #eval demoRows                        -- the concrete 8×8 structure matrix
-#eval decide (∀ i j, demoMat i j = octonionLeftMul demoX i j)  -- true
+#eval (List.finRange 8).all fun i => (List.finRange 8).all fun j =>
+  demoMat i j == octonionLeftMul demoX i j                     -- true
 #eval demoMat.det                     -- 1731891456
 #eval N demoX ^ 4                     -- 1731891456  (= 204⁴, matching the theorem)
 #eval decide (demoMat.det = N demoX ^ 4)                       -- true

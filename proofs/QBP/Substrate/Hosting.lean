@@ -484,7 +484,7 @@ theorem universe_intersection_eq_complex {U₁ U₂ : Universe}
     refine hne ?_
     rw [he1, he2, hEq]
     ext x
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     exact inQuatSpan_neg_dir
   rw [he1, he2]
   exact quatSpan_inter_eq_complex hu1 hu2 hN1 hN2 hd hd'

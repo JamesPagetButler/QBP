@@ -4,15 +4,16 @@ open Lake DSL
 -- Mathlib pin (foundations rebuild Phase 0, housekeeping item §2 in discovery
 -- response action items): pinned to the SHA already resolved in
 -- proofs/lake-manifest.json so `lake update` is reproducible across machines.
--- This SHA is the Mathlib `v4.30.0` STABLE release tag, compatible with toolchain
--- `leanprover/lean4:v4.30.0` (see proofs/lean-toolchain). Bumped off the
--- superseded `v4.30.0-rc2` per the version-cadence policy (#489): pin to stable
--- tags, never RCs. To bump:
+-- This SHA is the Mathlib `v4.35.0` STABLE release tag, compatible with toolchain
+-- `leanprover/lean4:v4.35.0` (see proofs/lean-toolchain). Bumped v4.30.0 → v4.35.0
+-- by #723 (kernel-soundness point releases 4.32.1/4.32.2/4.33.1/4.34.1; cadence
+-- doc §4.1 correctness-advisory case). Per the version-cadence policy (#489): pin
+-- to stable tags, never RCs. To bump:
 -- 1. update this @ "<sha>" to a known-good Mathlib STABLE tag (per #489 cadence),
 --    2. run `lake update`, 3. `lake exe cache get`, 4. verify zero-sorry rebuild
 --    + `#print axioms` audit before merge.
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4.git" @ "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+  "https://github.com/leanprover-community/mathlib4.git" @ "56a005855ea17e0b0958f73ec801ae140b0a1679"
 
 package «QBPProofs» where
   -- Package configuration

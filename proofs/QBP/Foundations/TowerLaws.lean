@@ -27,7 +27,7 @@
 
   Completeness: zero `sorry`, zero `native_decide`, zero vacuous `True`.
 -/
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Complex.Log
 import Mathlib.Algebra.Quaternion
 import Mathlib.Analysis.Quaternion

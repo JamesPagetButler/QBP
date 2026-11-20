@@ -134,7 +134,7 @@ theorem coupling_decomposition (U₀ U₁ a₀ b₀ a₁ b₁ : ℝ) :
        U₀ * a₁ + U₁ * a₀,
        U₀ * b₁ - U₁ * b₀⟩ := by
   ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
-                Quaternion.imJ_mul, Quaternion.imK_mul]
+                Quaternion.imJ_mul, Quaternion.imK_mul] <;> ring
 
 /-- Coupling decomposition specialized to purely real ψ₀ and ψ₁.
     When b₀ = b₁ = 0: result = ⟨U₀a₀ - U₁a₁, 0, U₀a₁ + U₁a₀, 0⟩ -/
@@ -143,7 +143,7 @@ theorem coupling_decomposition_real (U₀ U₁ a₀ a₁ : ℝ) :
     let psi : Q := ⟨a₀, 0, a₁, 0⟩
     potential * psi = ⟨U₀ * a₀ - U₁ * a₁, 0, U₀ * a₁ + U₁ * a₀, 0⟩ := by
   ext <;> simp [Quaternion.re_mul, Quaternion.imI_mul,
-                Quaternion.imJ_mul, Quaternion.imK_mul]
+                Quaternion.imJ_mul, Quaternion.imK_mul] <;> ring
 
 /-! ## Section 3b: Norm Conservation (Coupling Cancellation)
 
