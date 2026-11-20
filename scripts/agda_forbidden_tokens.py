@@ -136,6 +136,30 @@ def is_agda_source(path: Path) -> bool:
     )
 
 
+def agda_lib_includes(lib: Path) -> list[str]:
+    """The `include:` entries of an .agda-lib, parsed the way Agda reads it.
+
+    Field lines start at column 0 as `key: value`; the key is compared with
+    surrounding whitespace removed (`include  : x` counts). Continuation lines
+    are indented. `--` comments and blank lines are skipped and do not end a
+    field (Gemini review r2 on PR #826).
+    """
+    out: list[str] = []
+    collecting = False
+    for raw in lib.read_text(encoding="utf-8").splitlines():
+        line = raw.split("--", 1)[0]
+        if not line.strip():
+            continue
+        if not line[0].isspace():
+            key, sep, val = line.partition(":")
+            collecting = bool(sep) and key.strip() == "include"
+            if collecting:
+                out.extend(val.split())
+        elif collecting:
+            out.extend(line.split())
+    return out
+
+
 def include_escapes(lib: Path, roots: list[Path]) -> list[str]:
     """`include:` dirs in an .agda-lib that resolve outside the scanned roots.
 
@@ -143,22 +167,29 @@ def include_escapes(lib: Path, roots: list[Path]) -> list[str]:
     unscanned source, so it is reported as a finding.
     """
     bad: list[str] = []
-    lines = lib.read_text(encoding="utf-8").splitlines()
-    collecting = False
-    for line in lines:
-        if line.strip().startswith("include:"):
-            collecting = True
-            parts = line.split(":", 1)[1].split()
-        elif collecting and line[:1].isspace() and line.strip():
-            parts = line.split()
-        else:
-            collecting = False
-            continue
-        for part in parts:
-            target = (lib.parent / part).resolve()
-            if not any(target == r or r in target.parents for r in roots):
-                bad.append(part)
+    for part in agda_lib_includes(lib):
+        target = (lib.parent / part).resolve()
+        if not any(target == r or r in target.parents for r in roots):
+            bad.append(part)
     return bad
+
+
+def symlinks_under(args: list[str]) -> list[Path]:
+    """Every symlink under the scanned roots.
+
+    Directory traversal here does not follow directory symlinks, but Agda's
+    module lookup does, so a symlinked folder could hide sources from the
+    scan (Gemini review r2 on PR #826). Symlinks are therefore banned
+    outright under the gated trees.
+    """
+    found: list[Path] = []
+    for arg in args:
+        p = Path(arg)
+        if p.is_symlink():
+            found.append(p)
+        if p.is_dir() and not p.is_symlink():
+            found.extend(f for f in sorted(p.rglob("*")) if f.is_symlink())
+    return found
 
 
 def collect_files(args: list[str]) -> list[Path]:
@@ -192,6 +223,9 @@ def main(argv: list[str]) -> int:
     files = collect_files(argv[1:])
     total = 0
     roots = [Path(a).resolve() for a in argv[1:] if Path(a).is_dir()]
+    for link in symlinks_under(argv[1:]):
+        print(f"FORBIDDEN {link}: symlinks are not allowed under the gated trees")
+        total += 1
     for f in files:
         if f.name.endswith(".agda-lib"):
             for part in include_escapes(f, roots):

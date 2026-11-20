@@ -89,3 +89,25 @@ def test_agda_lib_include_outside_roots_is_flagged(tmp_path):
 def test_agda_lib_flags_are_scanned(tmp_path):
     (tmp_path / "f.agda-lib").write_text("name: f\ninclude: .\nflags: --type-in-type\n")
     assert aft.main(["x", str(tmp_path)]) == 1
+
+
+def test_agda_lib_parser_matches_agda(tmp_path):
+    # Gemini r2: spacing before the colon, comments and blank lines inside
+    # a multi-line include must not hide entries.
+    lib = tmp_path / "x.agda-lib"
+    lib.write_text(
+        "name: x\ninclude  : .\n  -- a comment\n\n  ../hidden\ndepend: cubical\n"
+    )
+    assert aft.agda_lib_includes(lib) == [".", "../hidden"]
+    assert aft.include_escapes(lib, [tmp_path.resolve()]) == ["../hidden"]
+
+
+def test_symlinks_under_gated_trees_are_forbidden(tmp_path):
+    root = tmp_path / "proofs"
+    root.mkdir()
+    outside = tmp_path / "evil"
+    outside.mkdir()
+    (outside / "Hack.agda").write_text("x = primTrustMe\n")
+    (root / "evil").symlink_to(outside, target_is_directory=True)
+    assert aft.symlinks_under([str(root)]) == [root / "evil"]
+    assert aft.main(["x", str(root)]) == 1
