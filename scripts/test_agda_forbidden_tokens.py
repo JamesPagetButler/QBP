@@ -41,3 +41,21 @@ def test_main_exit_codes(tmp_path):
     (tmp_path / "Bad.agda").write_text("module Bad where\npostulate p : Set\n")
     assert aft.main(["x", str(tmp_path)]) == 1
     assert aft.main(["x"]) == 2
+
+
+def test_every_listed_token_has_a_per_token_self_test():
+    listed = set(aft.WORD_TOKENS) | {"--" + f for f in aft.FLAG_TOKENS} | {"{!"}
+    assert listed == set(aft.SELF_TEST_PER_TOKEN)
+
+
+def test_dropping_a_token_fails_the_self_test(monkeypatch):
+    # Mutation M5 from the PR #826 Red Team: remove one token from the list.
+    import re
+
+    words = [w for w in aft.WORD_TOKENS if w != "NO_POSITIVITY_CHECK"]
+    monkeypatch.setattr(
+        aft,
+        "_WORD_RE",
+        re.compile(r"(?<![\w'])(" + "|".join(words) + r")(?![\w'])"),
+    )
+    assert any("NO_POSITIVITY_CHECK" in e for e in aft.self_test())

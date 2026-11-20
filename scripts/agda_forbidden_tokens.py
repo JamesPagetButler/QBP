@@ -82,8 +82,38 @@ SELF_TEST_MUST_PASS = {
 }
 
 
+# One must-hit per forbidden token, written out independently of WORD_TOKENS
+# and FLAG_TOKENS above. If it were generated from those lists, deleting a
+# token would delete its test too, and the mutant would survive (PR #826
+# Red Team M5). Each source must be flagged with exactly that token.
+SELF_TEST_PER_TOKEN = {
+    "postulate": "x = postulate\n",
+    "primTrustMe": "x = primTrustMe\n",
+    "primEraseEquality": "x = primEraseEquality\n",
+    "REWRITE": "{-# REWRITE r #-}\n",
+    "TERMINATING": "{-# TERMINATING #-}\n",
+    "NON_TERMINATING": "{-# NON_TERMINATING #-}\n",
+    "NO_POSITIVITY_CHECK": "{-# NO_POSITIVITY_CHECK #-}\n",
+    "NO_UNIVERSE_CHECK": "{-# NO_UNIVERSE_CHECK #-}\n",
+    "NON_COVERING": "{-# NON_COVERING #-}\n",
+    "INJECTIVE": "{-# INJECTIVE f #-}\n",
+    "--type-in-type": "{-# OPTIONS --type-in-type #-}\n",
+    "--rewriting": "{-# OPTIONS --rewriting #-}\n",
+    "--allow-unsolved-metas": "{-# OPTIONS --allow-unsolved-metas #-}\n",
+    "--allow-incomplete-matches": "{-# OPTIONS --allow-incomplete-matches #-}\n",
+    "--no-positivity-check": "{-# OPTIONS --no-positivity-check #-}\n",
+    "--no-termination-check": "{-# OPTIONS --no-termination-check #-}\n",
+    "--omega-in-omega": "{-# OPTIONS --omega-in-omega #-}\n",
+    "{!": "x = {! !}\n",
+}
+
+
 def self_test() -> list[str]:
     errors = []
+    for tok, src in SELF_TEST_PER_TOKEN.items():
+        found = [t for _, t in scan_text(src)]
+        if tok not in found:
+            errors.append(f"self-test per-token '{tok}' was NOT flagged (got {found})")
     for name, src in SELF_TEST_MUST_HIT.items():
         if not scan_text(src):
             errors.append(f"self-test must-hit '{name}' was NOT flagged")
@@ -103,7 +133,7 @@ def main(argv: list[str]) -> int:
             print(f"SELF-TEST FAIL: {e}", file=sys.stderr)
         return 2
     print(
-        f"self-test ok ({len(SELF_TEST_MUST_HIT)} must-hit, {len(SELF_TEST_MUST_PASS)} must-pass)"
+        f"self-test ok ({len(SELF_TEST_PER_TOKEN)} per-token, {len(SELF_TEST_MUST_HIT)} must-hit, {len(SELF_TEST_MUST_PASS)} must-pass)"
     )
     files: list[Path] = []
     for arg in argv[1:]:
