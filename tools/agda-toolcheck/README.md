@@ -6,6 +6,11 @@ agda/cubical move can be checked against a recorded baseline. Personas carry
 no version numbers; **this directory and the `agda` skill are where version
 knowledge lives.**
 
+The suite lives under `tools/`, not `proofs/`: a tool test is not a theory
+statement, so it must trip neither the Tier-3 theory gate nor the anchor
+audits that watch `proofs/**`. It still runs the real QBP proofs where they
+live (the project layer below).
+
 The pins are read from the repo, never assumed:
 
 | what | file |
@@ -31,10 +36,10 @@ The pins are read from the repo, never assumed:
 ## Run
 
 ```bash
-proofs/agda-toolcheck/run.sh                 # all layers, wrapped in boxrun (--wait)
-proofs/agda-toolcheck/run.sh --layer lib     # one layer
-TOOLCHECK_MEM_MB=8000 TOOLCHECK_TIMEOUT=3600 proofs/agda-toolcheck/run.sh
-proofs/agda-toolcheck/run.sh --no-boxrun     # CI only (no box lease there)
+tools/agda-toolcheck/run.sh                 # all layers, wrapped in boxrun (--wait)
+tools/agda-toolcheck/run.sh --layer lib     # one layer
+TOOLCHECK_MEM_MB=8000 TOOLCHECK_TIMEOUT=3600 tools/agda-toolcheck/run.sh
+tools/agda-toolcheck/run.sh --no-boxrun     # CI only (no box lease there)
 ```
 
 Exit codes: `0` green · `1` unexpected result(s) (see the table) · `2` usage /

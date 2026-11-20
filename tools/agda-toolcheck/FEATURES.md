@@ -117,9 +117,9 @@ D=<fresh empty dir>   # downloaded content is untrusted: keep it out of the repo
 gh api 'repos/agda/agda/releases?per_page=20' --jq '.[] | [.tag_name,.published_at,.prerelease] | @tsv'
 for v in 2.8.0.1 2.8.0.2 2.9.0; do
   gh api "repos/agda/agda/contents/doc/release-notes/$v.md?ref=master" -H 'Accept: application/vnd.github.raw' > "$D/agda-$v.md"; done
-python3 -I proofs/agda-toolcheck/triage_changelog.py --notes "$D/agda-2.8.0.1.md" --notes "$D/agda-2.8.0.2.md" \
-  --notes "$D/agda-2.9.0.md" --overrides proofs/agda-toolcheck/triage_overrides.json \
-  --label "Agda 2.8.0 → 2.9.0" > proofs/agda-toolcheck/triage/agda-2.8.0-to-2.9.0.md
+python3 -I tools/agda-toolcheck/triage_changelog.py --notes "$D/agda-2.8.0.1.md" --notes "$D/agda-2.8.0.2.md" \
+  --notes "$D/agda-2.9.0.md" --overrides tools/agda-toolcheck/triage_overrides.json \
+  --label "Agda 2.8.0 → 2.9.0" > tools/agda-toolcheck/triage/agda-2.8.0-to-2.9.0.md
 ```
 
 `triage_overrides.json` holds the hand judgements (first match wins); the
