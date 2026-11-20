@@ -131,7 +131,9 @@ Building mathlib from source can take hours; the cache reduces this to minutes.
 
 ### "error: no such file or directory" for QBP.lean
 
-Ensure you're in the `proofs/` directory when running `lake build`. **Running `lake` from the repo root (no `lakefile` there) is not a no-op:** elan treats the root as an unconfigured project and downloads an *unpinned* toolchain (observed 2026-09-29: a 3 GB `v4.34.1` plus a stray `v4.33.1`, ~6 GB under `~/.elan`), so the standing recipe is always `cd <worktree>/proofs && run-bounded <cap> lake build …` (#683). Deleting stray toolchains under `~/.elan` is the beekeeper's call.
+**Standing build recipe (host-agnostic, #683 AC15).** Build from the directory holding the lakefile — `proofs/` — so the toolchain resolves from `proofs/lean-toolchain`; never run `lake` from the repo root (it has no lakefile, so elan treats it as an unconfigured project and fetches an *unpinned* toolchain). Run builds through the federation's compute wrapper (currently `boxrun`; see the `lean` skill for its flags), e.g. `cd <worktree>/proofs && boxrun … -- lake build <target>`. Removing unpinned toolchains from the host's elan store is the beekeeper's call.
+
+*Observed 2026-09-28/29 on the then-current host (dated evidence, not a standing instruction): running `lake` from the worktree root made elan download an unpinned ~3 GB toolchain (`v4.34.1`; a stray `v4.33.1` was also present; ~6 GB under `~/.elan` in total).*
 
 ## Next Steps
 
