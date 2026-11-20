@@ -165,7 +165,6 @@ theorem quaternion_not_commutative :
   refine ⟨⟨0, 1, 0, 0⟩, ⟨0, 0, 1, 0⟩, ?_⟩
   intro h
   have hk := congrArg QuaternionAlgebra.imK h
-  simp only at hk
   norm_num at hk
 
 /-- Generic CDAlg basis-pair non-commutativity, driven by a `decide`d coefficient
