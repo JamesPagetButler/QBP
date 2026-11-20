@@ -1,6 +1,6 @@
 {
   "suite": "qbp-agda-toolcheck",
-  "version": 1,
+  "version": 2,
   "toolchain": {
     "agda": "2.8.0",
     "agda_faked": false,
@@ -13,10 +13,12 @@
     "lib_flags": "--cubical --safe --no-import-sorts --guardedness"
   },
   "run": {
-    "start": "2026-11-20T21:26:11Z",
-    "finished": "2026-11-20T21:29:08Z",
+    "id": "20261120T215853Z",
+    "start": "2026-11-20T21:58:53Z",
+    "finished": "2026-11-20T22:01:39Z",
     "layer": "all",
-    "tctl_start_c": 56,
+    "tctl_start_c": 56.5,
+    "test_seams": "",
     "boxrun": {
       "mem_mb": 8000,
       "timeout_s": 3600
@@ -25,6 +27,16 @@
   "unexpected": 0,
   "results": [
     {
+      "layer": "control",
+      "file": "manifest-tool",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "12 found, 12 listed"
+    },
+    {
       "layer": "tool",
       "file": "CircleHIT.agda",
       "expect": "pass",
@@ -32,7 +44,6 @@
       "exit_code": 0,
       "wall_s": 0.04,
       "max_rss_kib": 45300,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -42,8 +53,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.06,
-      "max_rss_kib": 46672,
-      "expect_msg": "",
+      "max_rss_kib": 46708,
       "detail": ""
     },
     {
@@ -52,9 +62,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 0.09,
+      "wall_s": 0.08,
       "max_rss_kib": 49196,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -65,7 +74,6 @@
       "exit_code": 0,
       "wall_s": 0.04,
       "max_rss_kib": 45152,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -75,8 +83,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.06,
-      "max_rss_kib": 45928,
-      "expect_msg": "",
+      "max_rss_kib": 45940,
       "detail": ""
     },
     {
@@ -86,8 +93,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.04,
-      "max_rss_kib": 45152,
-      "expect_msg": "",
+      "max_rss_kib": 45156,
       "detail": ""
     },
     {
@@ -98,7 +104,6 @@
       "exit_code": 0,
       "wall_s": 0.03,
       "max_rss_kib": 44532,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -109,7 +114,6 @@
       "exit_code": 0,
       "wall_s": 0.04,
       "max_rss_kib": 45172,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -120,7 +124,6 @@
       "exit_code": 0,
       "wall_s": 0.04,
       "max_rss_kib": 45044,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -129,9 +132,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 0.04,
-      "max_rss_kib": 45428,
-      "expect_msg": "",
+      "wall_s": 0.05,
+      "max_rss_kib": 45404,
       "detail": ""
     },
     {
@@ -141,8 +143,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.05,
-      "max_rss_kib": 46628,
-      "expect_msg": "",
+      "max_rss_kib": 46612,
       "detail": ""
     },
     {
@@ -152,9 +153,18 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.05,
-      "max_rss_kib": 45920,
-      "expect_msg": "",
+      "max_rss_kib": 45804,
       "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "manifest-lib",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "22 found, 22 listed"
     },
     {
       "layer": "lib",
@@ -162,9 +172,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.47,
-      "max_rss_kib": 387888,
-      "expect_msg": "",
+      "wall_s": 5.4,
+      "max_rss_kib": 387868,
       "detail": ""
     },
     {
@@ -173,9 +182,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 2.07,
+      "wall_s": 2.08,
       "max_rss_kib": 174356,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -184,9 +192,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 3.33,
-      "max_rss_kib": 240028,
-      "expect_msg": "",
+      "wall_s": 3.41,
+      "max_rss_kib": 240024,
       "detail": ""
     },
     {
@@ -195,9 +202,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 0.79,
+      "wall_s": 0.8,
       "max_rss_kib": 95632,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -206,9 +212,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 0.34,
-      "max_rss_kib": 68572,
-      "expect_msg": "",
+      "wall_s": 0.33,
+      "max_rss_kib": 68696,
       "detail": ""
     },
     {
@@ -218,8 +223,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.17,
-      "max_rss_kib": 56592,
-      "expect_msg": "",
+      "max_rss_kib": 56588,
       "detail": ""
     },
     {
@@ -228,9 +232,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.73,
-      "max_rss_kib": 408608,
-      "expect_msg": "",
+      "wall_s": 5.75,
+      "max_rss_kib": 408628,
       "detail": ""
     },
     {
@@ -239,9 +242,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 1.16,
-      "max_rss_kib": 118972,
-      "expect_msg": "",
+      "wall_s": 1.15,
+      "max_rss_kib": 119032,
       "detail": ""
     },
     {
@@ -250,9 +252,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.63,
-      "max_rss_kib": 383776,
-      "expect_msg": "",
+      "wall_s": 5.82,
+      "max_rss_kib": 383572,
       "detail": ""
     },
     {
@@ -261,9 +262,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.57,
-      "max_rss_kib": 388924,
-      "expect_msg": "",
+      "wall_s": 5.53,
+      "max_rss_kib": 388912,
       "detail": ""
     },
     {
@@ -272,9 +272,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.59,
-      "max_rss_kib": 331460,
-      "expect_msg": "",
+      "wall_s": 4.7,
+      "max_rss_kib": 337528,
       "detail": ""
     },
     {
@@ -283,9 +282,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.14,
-      "max_rss_kib": 302860,
-      "expect_msg": "",
+      "wall_s": 4.23,
+      "max_rss_kib": 302884,
       "detail": ""
     },
     {
@@ -294,9 +292,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 7.59,
-      "max_rss_kib": 504852,
-      "expect_msg": "",
+      "wall_s": 7.75,
+      "max_rss_kib": 504856,
       "detail": ""
     },
     {
@@ -306,8 +303,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 1.41,
-      "max_rss_kib": 126964,
-      "expect_msg": "",
+      "max_rss_kib": 126996,
       "detail": ""
     },
     {
@@ -316,9 +312,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 0.14,
-      "max_rss_kib": 57384,
-      "expect_msg": "",
+      "wall_s": 0.15,
+      "max_rss_kib": 57380,
       "detail": ""
     },
     {
@@ -327,9 +322,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 3.54,
-      "max_rss_kib": 256648,
-      "expect_msg": "",
+      "wall_s": 3.61,
+      "max_rss_kib": 256680,
       "detail": ""
     },
     {
@@ -338,9 +332,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.48,
-      "max_rss_kib": 385532,
-      "expect_msg": "",
+      "wall_s": 5.82,
+      "max_rss_kib": 385632,
       "detail": ""
     },
     {
@@ -349,9 +342,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 7.78,
-      "max_rss_kib": 484648,
-      "expect_msg": "",
+      "wall_s": 7.79,
+      "max_rss_kib": 484612,
       "detail": ""
     },
     {
@@ -360,9 +352,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.61,
-      "max_rss_kib": 380540,
-      "expect_msg": "",
+      "wall_s": 5.76,
+      "max_rss_kib": 380456,
       "detail": ""
     },
     {
@@ -371,9 +362,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.76,
-      "max_rss_kib": 343588,
-      "expect_msg": "",
+      "wall_s": 4.89,
+      "max_rss_kib": 343572,
       "detail": ""
     },
     {
@@ -382,9 +372,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.31,
-      "max_rss_kib": 309892,
-      "expect_msg": "",
+      "wall_s": 4.46,
+      "max_rss_kib": 309704,
       "detail": ""
     },
     {
@@ -393,10 +382,19 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 2.06,
-      "max_rss_kib": 176060,
-      "expect_msg": "",
+      "wall_s": 2.1,
+      "max_rss_kib": 175944,
       "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "manifest-mustfail",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "5 found, 5 listed"
     },
     {
       "layer": "mustfail",
@@ -406,7 +404,6 @@
       "exit_code": 42,
       "wall_s": 0.04,
       "max_rss_kib": 45448,
-      "expect_msg": "UnequalTerms",
       "detail": ""
     },
     {
@@ -416,8 +413,7 @@
       "status": "REJECTED",
       "exit_code": 42,
       "wall_s": 0.04,
-      "max_rss_kib": 45636,
-      "expect_msg": "Unsolved interaction metas",
+      "max_rss_kib": 45640,
       "detail": ""
     },
     {
@@ -428,7 +424,6 @@
       "exit_code": 0,
       "wall_s": 0.03,
       "max_rss_kib": 44532,
-      "expect_msg": "postulate",
       "detail": "accepted on Agda 2.8.0 < 2.9.0 (agda/agda#8341)"
     },
     {
@@ -439,7 +434,6 @@
       "exit_code": 42,
       "wall_s": 0.03,
       "max_rss_kib": 45156,
-      "expect_msg": "Cannot postulate",
       "detail": ""
     },
     {
@@ -449,9 +443,18 @@
       "status": "REJECTED",
       "exit_code": 42,
       "wall_s": 0.03,
-      "max_rss_kib": 44844,
-      "expect_msg": "TERMINATING",
+      "max_rss_kib": 44852,
       "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "manifest-substrate",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "4 found, 4 listed"
     },
     {
       "layer": "substrate",
@@ -461,7 +464,6 @@
       "exit_code": 0,
       "wall_s": 0.04,
       "max_rss_kib": 45104,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -471,8 +473,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.05,
-      "max_rss_kib": 46312,
-      "expect_msg": "",
+      "max_rss_kib": 46308,
       "detail": ""
     },
     {
@@ -482,8 +483,7 @@
       "status": "PASS",
       "exit_code": 0,
       "wall_s": 0.04,
-      "max_rss_kib": 45616,
-      "expect_msg": "",
+      "max_rss_kib": 45592,
       "detail": ""
     },
     {
@@ -494,8 +494,17 @@
       "exit_code": 0,
       "wall_s": 0.04,
       "max_rss_kib": 45300,
-      "expect_msg": "",
       "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "manifest-cubical",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "13 found, 13 listed"
     },
     {
       "layer": "cubical",
@@ -503,9 +512,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.89,
-      "max_rss_kib": 400448,
-      "expect_msg": "",
+      "wall_s": 5.73,
+      "max_rss_kib": 403832,
       "detail": ""
     },
     {
@@ -514,9 +522,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 19.15,
-      "max_rss_kib": 405164,
-      "expect_msg": "",
+      "wall_s": 5.72,
+      "max_rss_kib": 405120,
       "detail": ""
     },
     {
@@ -525,9 +532,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.89,
-      "max_rss_kib": 410764,
-      "expect_msg": "",
+      "wall_s": 5.9,
+      "max_rss_kib": 410756,
       "detail": ""
     },
     {
@@ -536,9 +542,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.67,
-      "max_rss_kib": 381428,
-      "expect_msg": "",
+      "wall_s": 5.75,
+      "max_rss_kib": 381876,
       "detail": ""
     },
     {
@@ -547,9 +552,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.79,
-      "max_rss_kib": 391036,
-      "expect_msg": "",
+      "wall_s": 5.68,
+      "max_rss_kib": 390940,
       "detail": ""
     },
     {
@@ -558,9 +562,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.57,
-      "max_rss_kib": 388864,
-      "expect_msg": "",
+      "wall_s": 5.65,
+      "max_rss_kib": 388932,
       "detail": ""
     },
     {
@@ -569,9 +572,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 4.57,
-      "max_rss_kib": 300188,
-      "expect_msg": "",
+      "wall_s": 4.62,
+      "max_rss_kib": 300124,
       "detail": ""
     },
     {
@@ -580,9 +582,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.56,
-      "max_rss_kib": 370716,
-      "expect_msg": "",
+      "wall_s": 5.66,
+      "max_rss_kib": 370712,
       "detail": ""
     },
     {
@@ -591,9 +592,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.65,
-      "max_rss_kib": 389900,
-      "expect_msg": "",
+      "wall_s": 5.74,
+      "max_rss_kib": 389868,
       "detail": ""
     },
     {
@@ -602,9 +602,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.99,
-      "max_rss_kib": 411456,
-      "expect_msg": "",
+      "wall_s": 6.12,
+      "max_rss_kib": 411452,
       "detail": ""
     },
     {
@@ -613,9 +612,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 5.77,
-      "max_rss_kib": 423680,
-      "expect_msg": "",
+      "wall_s": 5.85,
+      "max_rss_kib": 423600,
       "detail": ""
     },
     {
@@ -624,9 +622,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 8.05,
-      "max_rss_kib": 515676,
-      "expect_msg": "",
+      "wall_s": 8.14,
+      "max_rss_kib": 515636,
       "detail": ""
     },
     {
@@ -635,9 +632,8 @@
       "expect": "pass",
       "status": "PASS",
       "exit_code": 0,
-      "wall_s": 8.19,
+      "wall_s": 8.02,
       "max_rss_kib": 519584,
-      "expect_msg": "",
       "detail": ""
     },
     {
@@ -648,8 +644,17 @@
       "exit_code": 0,
       "wall_s": 0,
       "max_rss_kib": 0,
-      "expect_msg": "",
-      "detail": "0 hits in 17 files (--require-safe)"
+      "detail": "0 hits over proofs/agda + proofs/agda-cubical (--require-safe; scanner: builtin grep (shared scripts/agda_forbidden_tokens.py not present))"
+    },
+    {
+      "layer": "control",
+      "file": "manifest-control",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "3 found, 3 listed"
     },
     {
       "layer": "control",
@@ -659,7 +664,6 @@
       "exit_code": 0,
       "wall_s": 0,
       "max_rss_kib": 0,
-      "expect_msg": "",
       "detail": "fixture yields 1/1 planted hits"
     },
     {
@@ -670,7 +674,6 @@
       "exit_code": 0,
       "wall_s": 0,
       "max_rss_kib": 0,
-      "expect_msg": "",
       "detail": "fixture yields 1/1 planted hits"
     },
     {
@@ -681,7 +684,6 @@
       "exit_code": 0,
       "wall_s": 0,
       "max_rss_kib": 0,
-      "expect_msg": "",
       "detail": "fixture yields 9/9 planted hits"
     }
   ]
