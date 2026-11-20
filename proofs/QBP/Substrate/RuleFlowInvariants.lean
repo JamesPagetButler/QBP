@@ -366,11 +366,11 @@ variable {γ : ℝ → CDAlg ℝ 4} {t : ℝ}
 
 theorem hasDerivAt_gramLo (hγ : HasDerivAt γ (ruleField (γ t)) t) :
     HasDerivAt (fun r => gramLo (γ r)) (gramLo (ruleField (γ t))) t := by
-  simpa using gramLoCLM.hasFDerivAt.comp_hasDerivAt t hγ
+  simpa using! gramLoCLM.hasFDerivAt.comp_hasDerivAt t hγ
 
 theorem hasDerivAt_gramHi (hγ : HasDerivAt γ (ruleField (γ t)) t) :
     HasDerivAt (fun r => gramHi (γ r)) (gramHi (ruleField (γ t))) t := by
-  simpa using gramHiCLM.hasFDerivAt.comp_hasDerivAt t hγ
+  simpa using! gramHiCLM.hasFDerivAt.comp_hasDerivAt t hγ
 
 /-- **`Ȧ = 4V·(2A − 1)`.** -/
 theorem hasDerivAt_gramA_along_flow (hγ : HasDerivAt γ (ruleField (γ t)) t) :
