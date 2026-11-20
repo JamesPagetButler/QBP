@@ -59,3 +59,33 @@ def test_dropping_a_token_fails_the_self_test(monkeypatch):
         re.compile(r"(?<![\w'])(" + "|".join(words) + r")(?![\w'])"),
     )
     assert any("NO_POSITIVITY_CHECK" in e for e in aft.self_test())
+
+
+def test_literate_and_build_dirs_are_scanned(tmp_path):
+    # Gemini review on PR #826: literate Agda files and `_build/` sources
+    # must not be skipped (both are importable).
+    (tmp_path / "_build").mkdir()
+    (tmp_path / "_build" / "Hidden.agda").write_text("x = primTrustMe\n")
+    (tmp_path / "deep" / "er").mkdir(parents=True)
+    (tmp_path / "deep" / "er" / "Lit.lagda.md").write_text(
+        "```agda\npostulate p : Set\n```\n"
+    )
+    (tmp_path / "Old.lagda").write_text("\\begin{code}\nx = {! !}\n\\end{code}\n")
+    (tmp_path / "Skip.agdai").write_text("postulate binary artefact")
+    names = sorted(f.name for f in aft.collect_files([str(tmp_path)]))
+    assert names == ["Hidden.agda", "Lit.lagda.md", "Old.lagda"]  # no .agda-lib here
+    assert aft.main(["x", str(tmp_path)]) == 1
+
+
+def test_agda_lib_include_outside_roots_is_flagged(tmp_path):
+    root = tmp_path / "proofs"
+    root.mkdir()
+    (root / "ok.agda-lib").write_text("name: ok\ninclude: .\nflags: --cubical --safe\n")
+    assert aft.main(["x", str(root)]) == 0
+    (root / "bad.agda-lib").write_text("name: bad\ninclude: . ../elsewhere\n")
+    assert aft.main(["x", str(root)]) == 1
+
+
+def test_agda_lib_flags_are_scanned(tmp_path):
+    (tmp_path / "f.agda-lib").write_text("name: f\ninclude: .\nflags: --type-in-type\n")
+    assert aft.main(["x", str(tmp_path)]) == 1

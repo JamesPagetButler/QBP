@@ -123,6 +123,60 @@ def self_test() -> list[str]:
     return errors
 
 
+# Every source form Agda will load: plain and literate (.lagda, .lagda.md,
+# .lagda.tex, .lagda.rst, .lagda.org, ...). Gemini review on PR #826: a
+# literate file is importable from plain code, so skipping it is a bypass.
+def is_agda_source(path: Path) -> bool:
+    name = path.name
+    return (
+        name.endswith(".agda")
+        or name.endswith(".lagda")
+        or ".lagda." in name
+        or name.endswith(".agda-lib")
+    )
+
+
+def include_escapes(lib: Path, roots: list[Path]) -> list[str]:
+    """`include:` dirs in an .agda-lib that resolve outside the scanned roots.
+
+    An include path pointing elsewhere would let a gated file import an
+    unscanned source, so it is reported as a finding.
+    """
+    bad: list[str] = []
+    lines = lib.read_text(encoding="utf-8").splitlines()
+    collecting = False
+    for line in lines:
+        if line.strip().startswith("include:"):
+            collecting = True
+            parts = line.split(":", 1)[1].split()
+        elif collecting and line[:1].isspace() and line.strip():
+            parts = line.split()
+        else:
+            collecting = False
+            continue
+        for part in parts:
+            target = (lib.parent / part).resolve()
+            if not any(target == r or r in target.parents for r in roots):
+                bad.append(part)
+    return bad
+
+
+def collect_files(args: list[str]) -> list[Path]:
+    # No directory is excluded. `_build` holds only .agdai/.json artefacts,
+    # but it is also a legal module-path component, so excluding it would let
+    # `import _build.X` smuggle an unscanned source (Gemini review, PR #826).
+    files: list[Path] = []
+    for arg in args:
+        p = Path(arg)
+        if p.is_dir():
+            files.extend(
+                f for f in sorted(p.rglob("*")) if f.is_file() and is_agda_source(f)
+            )
+        else:
+            files.append(p)
+    return files
+
+
 def main(argv: list[str]) -> int:
     if len(argv) < 2:
         print(__doc__, file=sys.stderr)
@@ -135,13 +189,16 @@ def main(argv: list[str]) -> int:
     print(
         f"self-test ok ({len(SELF_TEST_PER_TOKEN)} per-token, {len(SELF_TEST_MUST_HIT)} must-hit, {len(SELF_TEST_MUST_PASS)} must-pass)"
     )
-    files: list[Path] = []
-    for arg in argv[1:]:
-        p = Path(arg)
-        files.extend(sorted(p.rglob("*.agda")) if p.is_dir() else [p])
-    files = [f for f in files if "_build" not in f.parts]
+    files = collect_files(argv[1:])
     total = 0
+    roots = [Path(a).resolve() for a in argv[1:] if Path(a).is_dir()]
     for f in files:
+        if f.name.endswith(".agda-lib"):
+            for part in include_escapes(f, roots):
+                print(
+                    f"FORBIDDEN {f}: include path '{part}' is outside the scanned roots"
+                )
+                total += 1
         for lineno, tok in scan_text(f.read_text(encoding="utf-8")):
             print(f"FORBIDDEN {f}:{lineno}: {tok}")
             total += 1
