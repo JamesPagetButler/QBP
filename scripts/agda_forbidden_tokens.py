@@ -7,11 +7,12 @@ inside a `let` under `--safe` (agda/agda#8341). Until the pin moves past the
 fix, this lexical check closes that gap in CI. It also backs up `--safe` for
 the other escapes.
 
-What it does:
-- strips `{- ... -}` block comments (nested), but keeps `{-# ... #-}` pragmas;
-- strips `--` line comments outside pragmas, so `{-# OPTIONS --type-in-type #-}`
-  is still seen;
-- reports every forbidden token with file:line.
+What it does: scans the **raw** text, with no comment stripping. A
+comment-aware scanner was bypassed twice in review (PR #826 Red Team: a
+string literal opening a fake `{-`, and an identifier like `a--b` read as
+a line comment). Raw scanning has no lexer to get wrong. The cost is one
+convention: never write a forbidden token in a gated file, even in a
+comment.
 
 A built-in must-hit self-test runs first, so a check that silently stopped
 matching fails loudly instead of reporting "0 hits".
@@ -55,64 +56,9 @@ _FLAG_RE = re.compile(r"--(" + "|".join(FLAG_TOKENS) + r")\b")
 _HOLE_RE = re.compile(r"\{!")
 
 
-def strip_comments(text: str) -> str:
-    """Remove comments, keeping pragmas and line structure (newlines kept)."""
-    out: list[str] = []
-    i, n, depth = 0, len(text), 0
-    in_pragma = False
-    while i < n:
-        two = text[i : i + 2]
-        if depth == 0 and not in_pragma and text.startswith("{-#", i):
-            in_pragma = True
-            out.append("{-#")
-            i += 3
-            continue
-        if in_pragma:
-            if text.startswith("#-}", i):
-                in_pragma = False
-                out.append("#-}")
-                i += 3
-                continue
-            out.append(text[i])
-            i += 1
-            continue
-        if two == "{-":
-            depth += 1
-            i += 2
-            continue
-        if depth > 0:
-            if two == "-}":
-                depth -= 1
-                i += 2
-                continue
-            if text[i] == "\n":
-                out.append("\n")
-            i += 1
-            continue
-        if two == "--" and _is_line_comment(text, i):
-            while i < n and text[i] != "\n":
-                i += 1
-            continue
-        out.append(text[i])
-        i += 1
-    return "".join(out)
-
-
-def _is_line_comment(text: str, i: int) -> bool:
-    # In Agda, `--` starts a comment unless it is part of a longer operator
-    # name; a run of dashes followed by a symbol char is an operator.
-    j = i
-    while j < len(text) and text[j] == "-":
-        j += 1
-    nxt = text[j] if j < len(text) else "\n"
-    prev = text[i - 1] if i > 0 else " "
-    symbol = set("!#$%&*+./<=>?@\\^|~:")
-    return prev not in symbol and nxt not in symbol
-
-
 def scan_text(text: str) -> list[tuple[int, str]]:
     hits: list[tuple[int, str]] = []
-    for lineno, line in enumerate(strip_comments(text).splitlines(), 1):
+    for lineno, line in enumerate(text.splitlines(), 1):
         for rx in (_WORD_RE, _FLAG_RE, _HOLE_RE):
             for m in rx.finditer(line):
                 hits.append((lineno, m.group(0)))
@@ -125,12 +71,14 @@ SELF_TEST_MUST_HIT = {
     "pragma": "{-# TERMINATING #-}\nloop : ⊥\nloop = loop\n",
     "erase": "x = primEraseEquality\n",
     "hole": "x : ⊤\nx = {! !}\n",
+    # The two PR #826 Red Team bypasses of the old comment-aware scanner.
+    "B1_string_fake_comment": 's = "{-"\nf = let postulate p : ⊥ in p\nt = "-}"\n',
+    "B2_identifier_dashdash": "f = let a--b = tt ; postulate p : ⊥ in p\n",
+    "in_comment": "-- postulate\nx = tt\n",
 }
 SELF_TEST_MUST_PASS = {
-    "line_comment": "-- postulate in a comment is fine\nx = tt\n",
-    "block_comment": "{- a postulate {- nested -} here -}\nx = tt\n",
     "safe_options": "{-# OPTIONS --cubical --safe --guardedness #-}\nmodule X where\n",
-    "identifier": "postulated-free = tt\nmy-postulate' = tt\n",
+    "identifier": "postulated-free = tt\n",
 }
 
 

@@ -20,14 +20,18 @@ def test_options_flag_seen_despite_double_dash():
     assert (1, "--type-in-type") in hits
 
 
-def test_comments_are_ignored():
-    src = "-- postulate\n{- postulate {- TERMINATING -} -}\nx = tt\n"
-    assert aft.scan_text(src) == []
+def test_red_team_bypasses_are_caught():
+    b1 = 's = "{-"\nf = let postulate p : ⊥ in p\nt = "-}"\n'
+    b2 = "f = let a--b = tt ; postulate p : ⊥ in p\n"
+    assert (2, "postulate") in aft.scan_text(b1)
+    assert (1, "postulate") in aft.scan_text(b2)
 
 
-def test_line_numbers_survive_block_comments():
-    src = "{- one\ntwo -}\nf = primTrustMe\n"
-    assert aft.scan_text(src) == [(3, "primTrustMe")]
+def test_raw_scan_flags_tokens_in_comments_too():
+    assert aft.scan_text("-- postulate\n{- TERMINATING -}\n") == [
+        (1, "postulate"),
+        (2, "TERMINATING"),
+    ]
 
 
 def test_main_exit_codes(tmp_path):
