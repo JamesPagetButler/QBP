@@ -7,8 +7,8 @@
   "mathlib_sha7": "c5ea003",
   "manifest_mathlib_rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
   "lean_version_reported": "Lean (version 4.30.0, x86_64-unknown-linux-gnu, commit d024af099ca4bf2c86f649261ebf59565dc8c622, Release)",
-  "run_id": "20261120T212158Z",
-  "date_utc": "2026-11-20T21:26:00Z",
+  "run_id": "20261120T223723Z",
+  "date_utc": "2026-11-20T22:38:50Z",
   "runner": {
     "wrapper": "boxrun --gpu --wait (RSS watch, thermal guard)",
     "mode": "batch: one boxrun lease for the suite",
@@ -19,7 +19,7 @@
   "box": {
     "cpu": "AMD FX(tm)-8350 Eight-Core Processor",
     "mem_total_mb": 31991,
-    "mem_available_mb_at_end": 12606,
+    "mem_available_mb_at_end": 12621,
     "nproc": 8
   },
   "preflight_failures": [],
@@ -31,10 +31,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 5.04,
-      "maxrss_mb": 3761,
-      "tctl_start_c": 58.1,
-      "tctl_end_c": 59.6,
+      "wall_s": 5.22,
+      "maxrss_mb": 3763,
+      "tctl_start_c": 60.6,
+      "tctl_end_c": 60.4,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -53,10 +53,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.44,
+      "wall_s": 3.52,
       "maxrss_mb": 1827,
-      "tctl_start_c": 59.8,
-      "tctl_end_c": 60.4,
+      "tctl_start_c": 60.2,
+      "tctl_end_c": 59.8,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -88,9 +88,9 @@
       ],
       "lean_exit": 0,
       "wall_s": 3.35,
-      "maxrss_mb": 1904,
-      "tctl_start_c": 60.4,
-      "tctl_end_c": 59.6,
+      "maxrss_mb": 1906,
+      "tctl_start_c": 59.6,
+      "tctl_end_c": 59.2,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -127,10 +127,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.3,
-      "maxrss_mb": 1935,
-      "tctl_start_c": 59.6,
-      "tctl_end_c": 60.0,
+      "wall_s": 3.35,
+      "maxrss_mb": 1937,
+      "tctl_start_c": 59.4,
+      "tctl_end_c": 61.0,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -162,10 +162,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.78,
-      "maxrss_mb": 1948,
-      "tctl_start_c": 60.0,
-      "tctl_end_c": 59.5,
+      "wall_s": 3.81,
+      "maxrss_mb": 1949,
+      "tctl_start_c": 60.9,
+      "tctl_end_c": 61.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -206,10 +206,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.14,
-      "maxrss_mb": 1918,
-      "tctl_start_c": 59.6,
-      "tctl_end_c": 59.9,
+      "wall_s": 3.3,
+      "maxrss_mb": 1922,
+      "tctl_start_c": 61.4,
+      "tctl_end_c": 60.0,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -242,10 +242,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.56,
-      "maxrss_mb": 2015,
-      "tctl_start_c": 59.8,
-      "tctl_end_c": 59.9,
+      "wall_s": 3.67,
+      "maxrss_mb": 2017,
+      "tctl_start_c": 60.1,
+      "tctl_end_c": 60.8,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -288,10 +288,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.22,
-      "maxrss_mb": 2807,
-      "tctl_start_c": 59.9,
-      "tctl_end_c": 60.4,
+      "wall_s": 4.44,
+      "maxrss_mb": 2810,
+      "tctl_start_c": 60.8,
+      "tctl_end_c": 60.9,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -338,10 +338,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.9,
-      "maxrss_mb": 2147,
-      "tctl_start_c": 60.2,
-      "tctl_end_c": 61.1,
+      "wall_s": 4.15,
+      "maxrss_mb": 2149,
+      "tctl_start_c": 61.0,
+      "tctl_end_c": 61.0,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -384,10 +384,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.02,
-      "maxrss_mb": 2376,
-      "tctl_start_c": 61.2,
-      "tctl_end_c": 60.5,
+      "wall_s": 4.16,
+      "maxrss_mb": 2378,
+      "tctl_start_c": 61.1,
+      "tctl_end_c": 60.6,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -398,9 +398,12 @@
         "QBPToolcheck.T09.add_y_only": [
           "propext"
         ],
+        "QBPToolcheck.T09.simpa_using": [],
+        "QBPToolcheck.T09.simp_at": [],
         "QBPToolcheck.T09.simp_rw_binder": [
           "propext"
         ],
+        "QBPToolcheck.T09.dsimp_def": [],
         "QBPToolcheck.T09.local_simp_use": [
           "propext"
         ],
@@ -411,10 +414,7 @@
           "Classical.choice",
           "Quot.sound",
           "propext"
-        ],
-        "QBPToolcheck.T09.simpa_using": [],
-        "QBPToolcheck.T09.simp_at": [],
-        "QBPToolcheck.T09.dsimp_def": []
+        ]
       },
       "detections": [],
       "failures": [],
@@ -428,10 +428,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.56,
-      "maxrss_mb": 2950,
-      "tctl_start_c": 60.4,
-      "tctl_end_c": 60.2,
+      "wall_s": 4.71,
+      "maxrss_mb": 2951,
+      "tctl_start_c": 60.8,
+      "tctl_end_c": 61.9,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -474,10 +474,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 5.61,
-      "maxrss_mb": 2125,
-      "tctl_start_c": 60.1,
-      "tctl_end_c": 60.1,
+      "wall_s": 5.68,
+      "maxrss_mb": 2127,
+      "tctl_start_c": 61.9,
+      "tctl_end_c": 61.4,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -510,10 +510,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.26,
-      "maxrss_mb": 2008,
-      "tctl_start_c": 60.2,
-      "tctl_end_c": 59.5,
+      "wall_s": 3.28,
+      "maxrss_mb": 2010,
+      "tctl_start_c": 61.4,
+      "tctl_end_c": 60.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -566,10 +566,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 4.11,
-      "maxrss_mb": 2780,
-      "tctl_start_c": 59.6,
-      "tctl_end_c": 60.1,
+      "wall_s": 4.14,
+      "maxrss_mb": 2783,
+      "tctl_start_c": 60.5,
+      "tctl_end_c": 61.1,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -628,9 +628,9 @@
       ],
       "lean_exit": 0,
       "wall_s": 4.42,
-      "maxrss_mb": 2936,
-      "tctl_start_c": 59.9,
-      "tctl_end_c": 60.6,
+      "maxrss_mb": 2938,
+      "tctl_start_c": 61.1,
+      "tctl_end_c": 61.4,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -673,10 +673,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.25,
-      "maxrss_mb": 1940,
-      "tctl_start_c": 60.5,
-      "tctl_end_c": 59.5,
+      "wall_s": 3.16,
+      "maxrss_mb": 1943,
+      "tctl_start_c": 61.2,
+      "tctl_end_c": 61.1,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -719,10 +719,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 3.72,
-      "maxrss_mb": 1947,
-      "tctl_start_c": 59.5,
-      "tctl_end_c": 60.9,
+      "wall_s": 3.56,
+      "maxrss_mb": 1950,
+      "tctl_start_c": 61.1,
+      "tctl_end_c": 61.4,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -735,6 +735,8 @@
           "Quot.sound",
           "propext"
         ],
+        "QBPToolcheck.T16.rcases_use": [],
+        "QBPToolcheck.T16.rintro_use": [],
         "QBPToolcheck.T16.sum_formula": [
           "propext"
         ],
@@ -762,13 +764,11 @@
           "Quot.sound",
           "propext"
         ],
+        "QBPToolcheck.T16.by_contra_use": [],
+        "QBPToolcheck.T16.swap_swap": [],
         "QBPToolcheck.T16.funext_use": [
           "Quot.sound"
-        ],
-        "QBPToolcheck.T16.rcases_use": [],
-        "QBPToolcheck.T16.rintro_use": [],
-        "QBPToolcheck.T16.by_contra_use": [],
-        "QBPToolcheck.T16.swap_swap": []
+        ]
       },
       "detections": [],
       "failures": [],
@@ -782,10 +782,10 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 1.27,
+      "wall_s": 1.26,
       "maxrss_mb": 774,
-      "tctl_start_c": 60.9,
-      "tctl_end_c": 60.2,
+      "tctl_start_c": 61.5,
+      "tctl_end_c": 60.4,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -806,14 +806,15 @@
         "pass"
       ],
       "lean_exit": 0,
-      "wall_s": 1.19,
+      "wall_s": 1.15,
       "maxrss_mb": 774,
-      "tctl_start_c": 60.2,
-      "tctl_end_c": 59.9,
+      "tctl_start_c": 60.6,
+      "tctl_end_c": 60.0,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
       "axioms": {
+        "QBPToolcheck.T18.foldr_sum": [],
         "QBPToolcheck.T18.foldl_sum_kernel": [
           "Quot.sound",
           "propext"
@@ -821,8 +822,30 @@
         "QBPToolcheck.T18.foldl_sum_simp": [
           "Quot.sound",
           "propext"
-        ],
-        "QBPToolcheck.T18.foldr_sum": []
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T19_NestedComments.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 774,
+      "tctl_start_c": 60.2,
+      "tctl_end_c": 60.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T19.real_after_nested": [],
+        "QBPToolcheck.T19.tricky_eq": []
       },
       "detections": [],
       "failures": [],
@@ -834,17 +857,17 @@
       "kind": "must-fail",
       "expect": [
         "lean-ok",
-        "lean-output warning: declaration uses [`']sorry[`']",
+        "lean-output ^\\d+:\\d+: warning: declaration uses [`']sorry[`']$",
         "axiom QBPToolcheck.MF01.unproved sorryAx",
         "axiom QBPToolcheck.MF01.uses_unproved sorryAx",
         "axiom QBPToolcheck.MF01.admitted sorryAx",
-        "checker-reject RATCHET violated — sorry: 1 > baseline 0"
+        "checker-reject ^::error::RATCHET violated — sorry: 1 > baseline 0\\."
       ],
       "lean_exit": 0,
-      "wall_s": 1.15,
+      "wall_s": 1.17,
       "maxrss_mb": 774,
-      "tctl_start_c": 60.0,
-      "tctl_end_c": 59.6,
+      "tctl_start_c": 60.2,
+      "tctl_end_c": 60.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 1,
@@ -860,11 +883,11 @@
         ]
       },
       "detections": [
-        "Lean output: /warning: declaration uses [`']sorry[`']/",
+        "Lean output: /^\\d+:\\d+: warning: declaration uses [`']sorry[`']$/",
         "axiom audit: QBPToolcheck.MF01.unproved ⊇ sorryAx",
         "axiom audit: QBPToolcheck.MF01.uses_unproved ⊇ sorryAx",
         "axiom audit: QBPToolcheck.MF01.admitted ⊇ sorryAx",
-        "checker: /RATCHET violated — sorry: 1 > baseline 0/"
+        "checker: /^::error::RATCHET violated — sorry: 1 > baseline 0\\./"
       ],
       "failures": [],
       "known_limits": [],
@@ -876,13 +899,13 @@
       "expect": [
         "lean-ok",
         "axiom-nonstd QBPToolcheck.MF02.by_native",
-        "checker-reject HARD-BAN violated — native_decide: 1 occurrence"
+        "checker-reject ^::error::HARD-BAN violated — native_decide: 1 occurrence"
       ],
       "lean_exit": 0,
       "wall_s": 1.14,
       "maxrss_mb": 774,
-      "tctl_start_c": 59.6,
-      "tctl_end_c": 59.5,
+      "tctl_start_c": 60.5,
+      "tctl_end_c": 60.9,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 1,
@@ -893,7 +916,7 @@
       },
       "detections": [
         "axiom audit: QBPToolcheck.MF02.by_native has non-standard ['QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1']",
-        "checker: /HARD-BAN violated — native_decide: 1 occurrence/"
+        "checker: /^::error::HARD-BAN violated — native_decide: 1 occurrence/"
       ],
       "failures": [],
       "known_limits": [],
@@ -904,14 +927,14 @@
       "kind": "must-fail",
       "expect": [
         "lean-ok",
-        "checker-reject HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence",
-        "checker-reject RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0"
+        "checker-reject ^::error::HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence",
+        "checker-reject ^::error::RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0"
       ],
       "lean_exit": 0,
-      "wall_s": 1.14,
+      "wall_s": 1.12,
       "maxrss_mb": 774,
-      "tctl_start_c": 59.5,
-      "tctl_end_c": 59.6,
+      "tctl_start_c": 60.9,
+      "tctl_end_c": 60.5,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 1,
@@ -920,8 +943,8 @@
         "QBPToolcheck.MF03.sedenion_is_flexible": []
       },
       "detections": [
-        "checker: /HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence/",
-        "checker: /RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0/"
+        "checker: /^::error::HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence/",
+        "checker: /^::error::RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0/"
       ],
       "failures": [],
       "known_limits": [],
@@ -931,21 +954,21 @@
       "file": "must-fail/MF04_FalseDecide/MF04_FalseDecide.lean",
       "kind": "must-fail",
       "expect": [
-        "lean-error :19:\\d+: error: Tactic `decide` proved that the proposition\\s+2 \\+ 3 = 1\\s+is false",
-        "lean-error :22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false"
+        "lean-error ^19:\\d+: error: Tactic `decide` proved that the proposition\\s+2 \\+ 3 = 1\\s+is false",
+        "lean-error ^22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false"
       ],
       "lean_exit": 1,
-      "wall_s": 1.14,
+      "wall_s": 1.13,
       "maxrss_mb": 774,
-      "tctl_start_c": 59.8,
-      "tctl_end_c": 60.0,
+      "tctl_start_c": 60.6,
+      "tctl_end_c": 60.9,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
       "axioms": {},
       "detections": [
-        "Lean rejected: /:19:\\d+: error: Tactic `decide` proved that the proposition\\s+2 \\+ 3 = 1\\s+is false/",
-        "Lean rejected: /:22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false/"
+        "Lean rejected: /^19:\\d+: error: Tactic `decide` proved that the proposition\\s+2 \\+ 3 = 1\\s+is false/",
+        "Lean rejected: /^22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false/"
       ],
       "failures": [],
       "known_limits": [],
@@ -961,10 +984,10 @@
         "known-limit checker-accepts"
       ],
       "lean_exit": 0,
-      "wall_s": 1.13,
+      "wall_s": 1.15,
       "maxrss_mb": 774,
-      "tctl_start_c": 60.0,
-      "tctl_end_c": 60.0,
+      "tctl_start_c": 61.0,
+      "tctl_end_c": 60.6,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -984,6 +1007,36 @@
       "result": "PASS"
     },
     {
+      "file": "must-fail/MF06_SpoofedAudit/MF06_SpoofedAudit.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF06.spoofed sorryAx",
+        "checker-reject ^::error::RATCHET violated — sorry: 1 > baseline 0\\."
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.16,
+      "maxrss_mb": 774,
+      "tctl_start_c": 60.6,
+      "tctl_end_c": 60.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF06.spoofed": [
+          "sorryAx"
+        ]
+      },
+      "detections": [
+        "axiom audit ignored 3 axiom-like message(s) not positioned at a `#print axioms` command (spoof guard)",
+        "axiom audit: QBPToolcheck.MF06.spoofed ⊇ sorryAx",
+        "checker: /^::error::RATCHET violated — sorry: 1 > baseline 0\\./"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
       "file": "known-limits/KL01_VacuityBypass/KL01_VacuityBypass.lean",
       "kind": "known-limit",
       "expect": [
@@ -993,10 +1046,10 @@
         "known-limit audit-clean QBPToolcheck.KL01.alternativity"
       ],
       "lean_exit": 0,
-      "wall_s": 1.17,
+      "wall_s": 1.13,
       "maxrss_mb": 774,
-      "tctl_start_c": 60.0,
-      "tctl_end_c": 60.1,
+      "tctl_start_c": 60.9,
+      "tctl_end_c": 61.0,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -1017,13 +1070,13 @@
       "file": "known-limits/KL02_FinFoldlDecide/KL02_FinFoldlDecide.lean",
       "kind": "known-limit",
       "expect": [
-        "known-limit lean-error did not reduce to `isTrue` or `isFalse`"
+        "known-limit lean-error (?s)^19:\\d+: error: Tactic `decide` failed.*did not reduce to `isTrue` or `isFalse`"
       ],
       "lean_exit": 1,
-      "wall_s": 1.17,
+      "wall_s": 1.14,
       "maxrss_mb": 774,
-      "tctl_start_c": 60.1,
-      "tctl_end_c": 59.6,
+      "tctl_start_c": 61.0,
+      "tctl_end_c": 60.9,
       "max_tctl_c": null,
       "guard_pauses": null,
       "checker_exit": 0,
@@ -1031,19 +1084,49 @@
       "detections": [],
       "failures": [],
       "known_limits": [
-        "KNOWN-LIMIT confirmed: Lean still rejects with /did not reduce to `isTrue` or `isFalse`/"
+        "KNOWN-LIMIT confirmed: Lean still rejects with /(?s)^19:\\d+: error: Tactic `decide` failed.*did not reduce to `isTrue` or `isFalse`/"
+      ],
+      "result": "KNOWN-LIMIT"
+    },
+    {
+      "file": "known-limits/KL03_CheckerStringComment/KL03_CheckerStringComment.lean",
+      "kind": "known-limit",
+      "expect": [
+        "lean-ok",
+        "axiom-nonstd QBPToolcheck.KL03.hidden_native",
+        "known-limit checker-accepts"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 774,
+      "tctl_start_c": 61.0,
+      "tctl_end_c": 61.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.KL03.hidden_native": [
+          "QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1"
+        ]
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.KL03.hidden_native has non-standard ['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']"
+      ],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: foundations checker accepts the file (exit 0)"
       ],
       "result": "KNOWN-LIMIT"
     }
   ],
   "summary": {
-    "files": 26,
-    "pass": 26,
+    "files": 29,
+    "pass": 29,
     "fail": 0,
-    "tool_files": 19,
-    "must_fail_files": 5,
-    "known_limit_files": 2,
-    "theorems_audited": 105,
+    "tool_files": 20,
+    "must_fail_files": 6,
+    "known_limit_files": 3,
+    "theorems_audited": 109,
     "overall": "GREEN"
   }
 }

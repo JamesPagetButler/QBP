@@ -32,5 +32,7 @@ printed text cannot fake or clear an audit (MF06). Expected theorem names come f
 comment lexer (T19). Every expectation regex is matched against one Lean message (`LINE:COL: severity: text`) or one
 checker `::error::` line. An empty suite, an empty layer or a prefix that matches nothing is RED.
 
+Grader self-test (planted negative controls on a real run's raw logs): `python3 -I tools/lean-toolcheck/selftest_grader.py tools/lean-toolcheck <results/runs/ID/raw> <workdir>`.
+
 See [`FEATURES.md`](FEATURES.md) (feature table + draft upgrade triage) and [`BASELINE.md`](BASELINE.md) (current
 numbers, box conditions, observed flake).

@@ -1,16 +1,21 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `20261120T212158Z` (2026-11-20 21:24–21:26 UTC, `tools/lean-toolcheck/run.sh --update-baseline`) ·
-**overall GREEN — 26/26 files as expected**: 19 tool tests pass, 5 must-fail controls caught with the expected
-message, 2 known-limit probes confirmed (report-only) · 105 theorems axiom-audited.
+**Run:** `20261120T223723Z` (2026-11-20 22:37–22:38 UTC, `tools/lean-toolcheck/run.sh --update-baseline`) ·
+**overall GREEN — 29/29 files as expected**: 20 tool tests pass, 6 must-fail controls caught with the expected
+message, 3 known-limit probes confirmed (report-only) · 109 theorems axiom-audited.
 Machine-readable record: [`results/results-v4.30.0-c5ea003.json`](results/results-v4.30.0-c5ea003.json)
 (+ the `.md` table). Re-run: `tools/lean-toolcheck/run.sh` — this writes only to `results/runs/<run-id>/`
 (gitignored); the committed record changes only with `--update-baseline` on a full GREEN run. A later run on the
 same pins that is much slower, or uses much more RSS, than this table is a **finding, not a pass** (#823 R6).
 
-> **Limit: the vacuity check is SYNTACTIC ONLY.** The foundations checker catches the literal `: True :=` (MF03);
+> **Limits.** The vacuity check is SYNTACTIC ONLY: the foundations checker catches the literal `: True :=` (MF03);
 > `x = x → True` and `(fun _ => True) 3` pass both the checker and the axiom audit (KL01, report-only). A user
-> `axiom` is caught by the axiom audit alone; the checker accepts it (MF05).
+> `axiom` is caught by the axiom audit alone (MF05). The checker's own comment stripper is string-blind: after a
+> string containing a block-comment opener it misses a `native_decide` (KL03; the audit still catches it).
+>
+> **How the grader reads Lean.** `lean --json`; only Lean's message stream is trusted; an axiom report counts only
+> as an `information` message positioned at its `#print axioms` command; reports merge worst-case (MF06). Every
+> expectation regex is matched against one Lean message or one checker `::error::` line.
 
 ## Versions
 
@@ -26,10 +31,10 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 
 | | Value |
 |---|---|
-| Wrapper | `boxrun --gpu --mem-mb 8000 --timeout 23400 --wait` — **one lease for the whole suite**, thermal guard on, RSS watch 8000 MB; 1 pinned core |
-| Queue | started after 2 m 41 s in the queue (cool-start gate Tctl ≤ 58 °C; an Agda suite and another seat's job queued behind) |
-| Duration | 81 s lease (77.2 s summed Lean wall time) |
-| Thermal | Tctl 58.1 °C at start; max 61.1 °C (boxrun record); **0 guard pauses**, guard action `none` |
+| Wrapper | `boxrun --gpu --mem-mb 8000 --timeout 26100 --wait` — **one lease for the whole suite**, thermal guard on, RSS watch 8000 MB; 1 pinned core |
+| Queue | started after 0 s in the queue (cool-start gate Tctl ≤ 58 °C); the box was busy (Agda suites, other seats' runs) around it |
+| Duration | 86 s lease (81.8 s summed Lean wall time) |
+| Thermal | Tctl 60.6 °C when the first file started; max 61.9 °C (boxrun record); **0 guard pauses**, guard action `none` |
 | Host | AMD FX-8350 (8 cores), 31 991 MB RAM, 12.6 GB available at the end |
 | Oleans | Mathlib `.oleans` borrowed from the main checkout via a symlinked `proofs/.lake/packages` (rev verified = the pin); nothing was built; page cache warm |
 
@@ -37,64 +42,81 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 
 | File | Kind | Result | Lean exit | Wall (s) | Max RSS (MB) | Axiom audit | Detection |
 |---|---|---|---|---|---|---|---|
-| `tests/T00_ImportSurface.lean` | tool | ✅ PASS | 0 | 5.04 | 3761 | 1 thm, no axioms | — |
-| `tests/T01_DecideFin.lean` | tool | ✅ PASS | 0 | 3.44 | 1827 | 5 thm ⊆ std3 | — |
-| `tests/T02_DecidableInstances.lean` | tool | ✅ PASS | 0 | 3.35 | 1904 | 4 thm ⊆ std3 | — |
-| `tests/T03_FinCases.lean` | tool | ✅ PASS | 0 | 3.30 | 1935 | 3 thm ⊆ std3 | — |
-| `tests/T04_Ring.lean` | tool | ✅ PASS | 0 | 3.78 | 1948 | 5 thm ⊆ std3 | — |
-| `tests/T05_FieldSimp.lean` | tool | ✅ PASS | 0 | 3.14 | 1918 | 3 thm ⊆ std3 | — |
-| `tests/T06_LinarithPositivity.lean` | tool | ✅ PASS | 0 | 3.56 | 2015 | 5 thm ⊆ std3 | — |
-| `tests/T07_NormNumCasts.lean` | tool | ✅ PASS | 0 | 4.22 | 2807 | 6 thm ⊆ std3 | — |
-| `tests/T08_ModuleLinComb.lean` | tool | ✅ PASS | 0 | 3.90 | 2147 | 5 thm ⊆ std3 | — |
-| `tests/T09_SimpFamily.lean` | tool | ✅ PASS | 0 | 4.02 | 2376 | 9 thm ⊆ std3 | — |
-| `tests/T10_Quaternion.lean` | tool | ✅ PASS | 0 | 4.56 | 2950 | 5 thm ⊆ std3 | — |
-| `tests/T11_NonAssocHierarchy.lean` | tool | ✅ PASS | 0 | 5.61 | 2125 | 3 thm ⊆ std3 | — |
-| `tests/T12_FinsetSum.lean` | tool | ✅ PASS | 0 | 3.26 | 2008 | 7 thm ⊆ std3 | — |
-| `tests/T13_RealAnalysis.lean` | tool | ✅ PASS | 0 | 4.11 | 2780 | 8 thm ⊆ std3 | — |
-| `tests/T14_LinearAlgebra.lean` | tool | ✅ PASS | 0 | 4.42 | 2936 | 5 thm ⊆ std3 | — |
-| `tests/T15_Complex.lean` | tool | ✅ PASS | 0 | 3.25 | 1940 | 5 thm ⊆ std3 | — |
-| `tests/T16_CoreTactics.lean` | tool | ✅ PASS | 0 | 3.72 | 1947 | 13 thm ⊆ std3 | — |
-| `tests/T17_FloatOracle.lean` | tool | ✅ PASS | 0 | 1.27 | 774 | 1 thm ⊆ std3 | — |
-| `tests/T18_FinFold.lean` | tool | ✅ PASS | 0 | 1.19 | 774 | 3 thm ⊆ std3 | — |
-| `must-fail/MF01_Sorry/…` | must-fail | ✅ caught | 0 | 1.15 | 774 | `['sorryAx']` | Lean warning ``declaration uses `sorry` `` · `sorryAx` on the direct, the inheriting AND the `admit` theorem · checker `RATCHET violated — sorry: 1 > baseline 0` (the checker does not count `admit`) |
+| `tests/T00_ImportSurface.lean` | tool | ✅ PASS | 0 | 5.22 | 3763 | 1 thm, no axioms | — |
+| `tests/T01_DecideFin.lean` | tool | ✅ PASS | 0 | 3.52 | 1827 | 5 thm ⊆ std3 | — |
+| `tests/T02_DecidableInstances.lean` | tool | ✅ PASS | 0 | 3.35 | 1906 | 4 thm ⊆ std3 | — |
+| `tests/T03_FinCases.lean` | tool | ✅ PASS | 0 | 3.35 | 1937 | 3 thm ⊆ std3 | — |
+| `tests/T04_Ring.lean` | tool | ✅ PASS | 0 | 3.81 | 1949 | 5 thm ⊆ std3 | — |
+| `tests/T05_FieldSimp.lean` | tool | ✅ PASS | 0 | 3.30 | 1922 | 3 thm ⊆ std3 | — |
+| `tests/T06_LinarithPositivity.lean` | tool | ✅ PASS | 0 | 3.67 | 2017 | 5 thm ⊆ std3 | — |
+| `tests/T07_NormNumCasts.lean` | tool | ✅ PASS | 0 | 4.44 | 2810 | 6 thm ⊆ std3 | — |
+| `tests/T08_ModuleLinComb.lean` | tool | ✅ PASS | 0 | 4.15 | 2149 | 5 thm ⊆ std3 | — |
+| `tests/T09_SimpFamily.lean` | tool | ✅ PASS | 0 | 4.16 | 2378 | 9 thm ⊆ std3 | — |
+| `tests/T10_Quaternion.lean` | tool | ✅ PASS | 0 | 4.71 | 2951 | 5 thm ⊆ std3 | — |
+| `tests/T11_NonAssocHierarchy.lean` | tool | ✅ PASS | 0 | 5.68 | 2127 | 3 thm ⊆ std3 | — |
+| `tests/T12_FinsetSum.lean` | tool | ✅ PASS | 0 | 3.28 | 2010 | 7 thm ⊆ std3 | — |
+| `tests/T13_RealAnalysis.lean` | tool | ✅ PASS | 0 | 4.14 | 2783 | 8 thm ⊆ std3 | — |
+| `tests/T14_LinearAlgebra.lean` | tool | ✅ PASS | 0 | 4.42 | 2938 | 5 thm ⊆ std3 | — |
+| `tests/T15_Complex.lean` | tool | ✅ PASS | 0 | 3.16 | 1943 | 5 thm ⊆ std3 | — |
+| `tests/T16_CoreTactics.lean` | tool | ✅ PASS | 0 | 3.56 | 1950 | 13 thm ⊆ std3 | — |
+| `tests/T17_FloatOracle.lean` | tool | ✅ PASS | 0 | 1.26 | 774 | 1 thm ⊆ std3 | — |
+| `tests/T18_FinFold.lean` | tool | ✅ PASS | 0 | 1.15 | 774 | 3 thm ⊆ std3 | — |
+| `tests/T19_NestedComments.lean` | tool | ✅ PASS | 0 | 1.14 | 774 | 2 thm, no axioms | — |
+| `must-fail/MF01_Sorry/…` | must-fail | ✅ caught | 0 | 1.17 | 774 | `['sorryAx']` | Lean warning ``declaration uses `sorry` `` · `sorryAx` on the direct, the inheriting AND the `admit` theorem · checker `RATCHET violated — sorry: 1 > baseline 0` (the checker does not count `admit`) |
 | `must-fail/MF02_NativeDecide/…` | must-fail | ✅ caught | 0 | 1.14 | 774 | `['QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1']` | checker `HARD-BAN violated — native_decide: 1 occurrence` · non-standard axiom `…_native.native_decide.ax_1_1` |
-| `must-fail/MF03_VacuousTrue/…` | must-fail | ✅ caught | 0 | 1.14 | 774 | 2 thm, no axioms | checker `HARD-BAN … : True := by trivial: 1 occurrence` + `RATCHET … vacuous-: True := theorem: 2 > baseline 0` (literal spelling only — see KL01) |
-| `must-fail/MF04_FalseDecide/…` | must-fail | ✅ caught | 1 | 1.14 | 774 | — (file rejected) | ``Tactic `decide` proved that the proposition 2 + 3 = 1 is false`` (l.19) and ``… 1 - 2 = 0 is false`` (l.22, `Int`) |
-| `must-fail/MF05_CustomAxiom/…` | must-fail | ✅ caught | 0 | 1.13 | 774 | `['QBPToolcheck.MF05.cheat']` | axiom audit only: `#print axioms` = `[QBPToolcheck.MF05.cheat]`; checker ACCEPTS (known limit, confirmed) |
-| `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.17 | 774 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
-| `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.17 | 774 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
+| `must-fail/MF03_VacuousTrue/…` | must-fail | ✅ caught | 0 | 1.12 | 774 | 2 thm, no axioms | checker `HARD-BAN … : True := by trivial: 1 occurrence` + `RATCHET … vacuous-: True := theorem: 2 > baseline 0` (literal spelling only — see KL01) |
+| `must-fail/MF04_FalseDecide/…` | must-fail | ✅ caught | 1 | 1.13 | 774 | — (file rejected) | ``Tactic `decide` proved that the proposition 2 + 3 = 1 is false`` (l.19) and ``… 1 - 2 = 0 is false`` (l.22, `Int`) |
+| `must-fail/MF05_CustomAxiom/…` | must-fail | ✅ caught | 0 | 1.15 | 774 | `['QBPToolcheck.MF05.cheat']` | axiom audit only: `#print axioms` = `[QBPToolcheck.MF05.cheat]`; checker ACCEPTS (known limit, confirmed) |
+| `must-fail/MF06_SpoofedAudit/…` | must-fail | ✅ caught | 0 | 1.16 | 774 | `['sorryAx']` | axiom audit (JSON, position-tied, worst-case) sees `sorryAx` despite 3 printed fake clean reports (ignored) · checker RATCHET |
+| `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.13 | 774 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
+| `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.14 | 774 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
+| `known-limits/KL03_CheckerStringComment/…` | known-limit | 🟡 known limit | 0 | 1.14 | 774 | `['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']` | 🟡 confirmed: checker exit 0 (string-blind stripper misses the `native_decide`); HARD: audit shows the native axiom |
 
 "std3" = `{propext, Classical.choice, Quot.sound}`. RSS is `/usr/bin/time` `%M` of the `lake env lean` process tree
-(the largest process, i.e. `lean`). Files without a Mathlib import (T17, T18, MF*, KL*) sit at the 774 MB Lean-core
+(the largest process, i.e. `lean`). Files without a Mathlib import (T17–T19, MF*, KL*) sit at the 774 MB Lean-core
 floor; Mathlib-importing files at 1.8–3.8 GB, dominated by the import (cf. the 3.35 GiB `Mathlib.Tactic` floor in
-`docs/foundations/lean-build-resource-notes.md`).
+`docs/foundations/lean-build-resource-notes.md`). Switching to `lean --json` changed neither time nor RSS.
 
 ### Repeatability and the observed SIGSEGV flake
 
-| Run | Mode | Files | Result | Lease | Crashes (exit ≥ 128) |
-|---|---|---|---|---|---|
-| `20261120T211819Z` | **fresh-manifest** (`proofs/lake-manifest.json` deleted first — the F1 path) | 26 | GREEN 26/26 | 92 s | 0 |
-| `20261120T212023Z` | normal | 26 | GREEN 26/26 | 81 s | 0 |
-| `20261120T212158Z` | `--update-baseline` (this record) | 26 | GREEN 26/26 | 81 s | 0 |
-| earlier today (`…204151Z`, `…204403Z`, `…210059Z`) | normal, 22-file suite | 22 | GREEN 22/22 each | 71–74 s | 0 |
+| Run | Mode | Files | Result | Lease | Guard pauses | Crashes (exit ≥ 128) |
+|---|---|---|---|---|---|---|
+| `20261120T221059Z` | normal (final file set) | 29 | GREEN 29/29 | 132 s | 1 (box at 70.9 °C from other load; paused, resumed) | 0 |
+| `20261120T221927Z` | normal | 29 | GREEN 29/29 | 86 s | 0 | 0 |
+| `20261120T223723Z` | `--update-baseline` (this record) | 29 | GREEN 29/29 | 86 s | 0 | 0 |
+| `…220452Z`, `…220639Z` | normal, during the Gemini round (28 / 29 files) | — | GREEN each | 88 s / — | 0 | 0 |
+| `…211819Z`, `…212023Z`, `…212158Z` | Red Team round (26 files; the first with the manifest deleted) | 26 | GREEN each | 81–92 s | 0 | 0 |
+| earlier (`…204151Z`, `…204403Z`, `…210059Z`) | 22-file suite | 22 | GREEN each | 71–74 s | 0 | 0 |
 
 **Observed flake, not reproduced here.** The Red Team's first independent run on PR #824 (qbp-architecture,
 issuecomment-7050748708, 2026-11-20) saw **T05 and T07 exit 139 (SIGSEGV) at 0.68 s, during import**, then pass
 alone (3.1 s / 4.1 s) and in a full re-run; that box also logged intermittent `failed to create thread` aborts the
-same day. In the six full runs above (T05 and T07 each ran six times, 3.0–4.3 s, 1.9 / 2.8 GB RSS) there was **no
+same day. Across the 11 full runs above, T05 and T07 each ran 11 times (3.0–4.3 s, 1.9 / 2.8 GB RSS) with **no
 crash**. I have no burst log of the crashing run (it was the reviewer's), so it is recorded as an observed,
 unreproduced flake — source: the reviewer's run. The suite does **not** retry: a crash (exit ≥ 128) is graded
-FAIL with exit code, wall and RSS in the result row (`toolcheck.py`), so if it recurs the run is red and the row
-plus the boxrun burst log (`~/.box-telemetry/bursts/lean-toolcheck-suite-<run-id>-*/`) are the evidence to hand
-to deming.
+FAIL with exit code, wall and RSS in the result row, so if it recurs the run is red and the row plus the boxrun
+burst log (`~/.box-telemetry/bursts/lean-toolcheck-suite-<run-id>-*/`) are the evidence to hand to deming.
 
-### Grader negative control (2026-11-20, not committed)
+### Planted negative controls (`selftest_grader.py`, committed)
 
-To show a must-fail that *passes* is reported as a failure, raw results were copied and five misses planted
-(checker exit forced to 0 for MF03; Lean exit forced to 0 for MF04; MF02's axiom list replaced by `[propext]`;
-MF01's sorry warning deleted; `sorryAx` injected into a T04 theorem). `toolcheck.py evaluate` on the copy returned
-**exit 1 with all five flagged** (`foundations checker did not reject`, `Lean ACCEPTED a must-fail file`, `axiom
-audit MISSED`, `expected Lean output … not found`, `non-standard axioms ['sorryAx']`).
+Raw logs of a real GREEN run were copied and one defect planted per copy; the grader ran on each copy. Run on this
+record's raw logs (`…223723Z`): `python3 -I tools/lean-toolcheck/selftest_grader.py tools/lean-toolcheck <raw> <work> [old toolcheck.py]` → exit 0 ("every plant behaved as required"). The pre-fix rows used `de19998`'s `toolcheck.py`.
+
+| Plant | Grader | Result |
+|---|---|---|
+| none (the real run) | new | GREEN, exit 0 |
+| MF06 spoof (`#eval`-printed fake clean reports, plain + forged JSON) | **pre-fix (`de19998`)** | **FAIL — fooled**: `axiom audit MISSED sorryAx … (got [])` |
+| same | new | caught: `sorryAx`; 3 axiom-like messages not positioned at a `#print axioms` command ignored |
+| T19 nested comments (`#print axioms ghost` inside a nested comment) | **pre-fix (`de19998`)** | **FAIL**: `no axiom report for QBPToolcheck.T19.ghost` |
+| same | new | PASS |
+| MF04's error text demoted to an `information` message | new | FAIL: `Lean failed but without the expected message /^19:…/` (anchoring) |
+| MF01's checker text moved off its `::error::` line | new | FAIL: `checker rejected but without the expected message` (anchoring) |
+| fake clean report for MF05 at another position + a raw stdout line | new | caught: `cheat` still reported; spoof ignored |
+| fake clean report for MF05 **at the real `#print axioms` site**, after the real one | new | caught: worst-case merge keeps `cheat` |
+| suite copy without `known-limits/` | new | **RED**: `the known-limit layer has zero files` |
+| `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
+
+Earlier controls (Red Team round): five planted misses in MF01–MF04 / T04 were all flagged (exit 1).
 
 ## Project layer (QBP's own proofs) — from CI, not re-run locally
 
@@ -114,7 +136,7 @@ audit MISSED`, `expected Lean output … not found`, `non-standard axioms ['sorr
 ~30–45 min on one pinned core (918 s of 4-vCPU runner time, FX-8350 single-thread ≈ 1.5–2.5× slower) with a
 ≥ 4.6 GiB peak, holding the shared box lease the whole time in a queue that other seats' jobs (Agda suite, sc2
 runs) were using; it would produce no information CI did not already produce on the *identical* `proofs/`
-tree and pins. The tool layer needs only the Mathlib `.oleans`, so only the suite files (26) were run locally.
+tree and pins. The tool layer needs only the Mathlib `.oleans`, so only the suite files (29) were run locally.
 On the #723 bump branch the project layer is CI's job on the new pins (G1) — plus a local peak-RSS re-measure
 of the heavy `decide` modules (FEATURES.md top item 2).
 
@@ -135,13 +157,19 @@ of the heavy `decide` modules (FEATURES.md top item 2).
    subset-based, so neither goes blind.
 4. **The axiom gate is blind to vacuity, and the checker's vacuity rule is syntactic** (MF03 + KL01): the checker sees
    only the literal `: True :=`; any other vacuous spelling needs a human reading the statement.
-
 5. **Fresh-checkout preflight (Red Team F1).** With `proofs/lake-manifest.json` absent (it is gitignored, so every
    fresh clone), the first `lake env lean --version` prints seven Lake lines first (`info: QBPProofs: no previous
    manifest, creating one from scratch`, `info: mathlib: running post-update hooks`, the cache-tool lines) and the
    `Lean (version …)` line last; `head -1` read the info line as the version. The preflight now greps the
    `Lean (version` line and re-reads the manifest after `lake env` recreates it. Verified on run `…211819Z`,
    started with the manifest deleted.
+6. **The plain-text `#print axioms` output was spoofable** (Gemini (2)): on v4.30.0 the plain `lean` output prints
+   axiom reports WITHOUT a position, interleaved with `#eval` stdout, so a printed fake line was indistinguishable.
+   With `--json` each report is a message with `pos` (the `#print axioms` command's line/column) and `#eval` output
+   is a separate message at the `#eval`'s position.
+7. **The foundations checker itself (KL03)** has the same naive comment regex the grader had, and is string-blind:
+   reproduced a `native_decide` in `proofs/QBP/Foundations` that would pass its HARD-BAN (checker exit 0). Not fixed
+   here (no gate-script change in this PR); flagged for an issue.
 
 ## Change history
 
@@ -150,3 +178,4 @@ of the heavy `decide` modules (FEATURES.md top item 2).
 | 2026-11-20 | `20261120T204403Z` | v1 baseline on `v4.30.0` / `c5ea003` (issue #823 W5), suite under `proofs/` |
 | 2026-11-20 | `20261120T210059Z` | suite moved to `tools/lean-toolcheck/` (PR #824 option (b)); re-run GREEN 22/22, numbers within ±0.3 s / ±25 MB of v1 |
 | 2026-11-20 | `20261120T212158Z` | Red Team fix round: +MF05 (custom axiom), +`admit` in MF01, +KL01/KL02 known limits, +T18; preflight fixed for fresh checkouts; runs write to `results/runs/` and only `--update-baseline` touches this record; 3 consecutive full runs GREEN, SIGSEGV flake not reproduced |
+| 2026-11-20 | `20261120T223723Z` | Gemini fix round: `lean --json` + position-tied, worst-case axiom audit (+MF06 spoof control); nesting/string-aware comment lexer (+T19); anchored expectation matching; empty suite/layer/prefix RED; +KL03 (checker string-blind); 3 consecutive full runs GREEN 29/29 |
