@@ -209,6 +209,11 @@ for src_stem, src_rel, new_stem in (
         "must-fail/MF08_InterpolationLexer/MF08_InterpolationLexer.lean",
         "T91_AttackInterpolation",
     ),
+    (
+        "MF09_NonAsciiColumn",
+        "must-fail/MF09_NonAsciiColumn/MF09_NonAsciiColumn.lean",
+        "T92_AttackNonAsciiColumn",
+    ),
 ):
     s3, r3 = as_pass_attack(src_stem, src_rel, new_stem)
     res = evaluate(new_tc, r3, s3, new_stem)
@@ -230,6 +235,38 @@ for src_stem, src_rel, new_stem in (
                 "",
             )
         )
+
+
+# 8. Gemini r3 (e): PIN Lean's `pos.column` unit on MF09's REAL output. The dirty report's
+#    column must equal the codepoint offset of its `#print` in the original source line, and
+#    (because the line has a multi-byte prefix) differ from the UTF-8 byte offset — so this
+#    check distinguishes the two units and fails loudly if a toolchain ever switches.
+mf09_src = (suite / "must-fail/MF09_NonAsciiColumn/MF09_NonAsciiColumn.lean").read_text(
+    encoding="utf-8"
+)
+lines = mf09_src.splitlines()
+mf09_ln = next(
+    i
+    for i, ln in enumerate(lines, start=1)
+    if "#print axioms QBPToolcheck.MF09.dirty" in ln
+)
+idx = lines[mf09_ln - 1].index("#print axioms QBPToolcheck.MF09.dirty")
+cp, by = idx, len(lines[mf09_ln - 1][:idx].encode("utf-8"))
+got_col = None
+for l in (raw / "MF09_NonAsciiColumn.log").read_text(encoding="utf-8").splitlines():
+    if l.strip().startswith("{"):
+        m = json.loads(l)
+        if "'QBPToolcheck.MF09.dirty' depends on axioms" in m.get("data", ""):
+            got_col = (m["pos"]["line"], m["pos"]["column"])
+pin_ok = got_col == (mf09_ln, cp) and cp != by
+ok = ok and pin_ok
+results.append(
+    (
+        "pin[Lean column unit] MF09 real Lean output (must equal the CODEPOINT offset, not bytes)",
+        f"{'PASS' if pin_ok else 'FAIL'}: Lean reported {got_col}; codepoint offset ({mf09_ln}, {cp}); UTF-8 byte offset ({mf09_ln}, {by})",
+        "",
+    )
+)
 
 for a, b, c in results:
     print(f"| {a} | {b} | {c} |")

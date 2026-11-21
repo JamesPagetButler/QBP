@@ -16,7 +16,7 @@ Each file is one `lake env lean` with cwd = `proofs/` (pins, Lean env and Mathli
 | Dir | What | Graded as |
 |---|---|---|
 | `tests/` | T00–T19: one feature per file, ends in `#print axioms` | must pass, all axioms ⊆ {propext, Classical.choice, Quot.sound}, checker accepts |
-| `must-fail/` | MF01 sorry/admit · MF02 native_decide · MF03 literal `: True :=` · MF04 false `decide` · MF05 custom `axiom` · MF06 spoofed axiom audit · MF07 same-line site · MF08 interpolation (refused) | must be caught **with the expected message**; a must-fail that passes is a suite failure |
+| `must-fail/` | MF01 sorry/admit · MF02 native_decide · MF03 literal `: True :=` · MF04 false `decide` · MF05 custom `axiom` · MF06 spoofed axiom audit · MF07 same-line site · MF08 interpolation (refused) · MF09 non-ASCII prefix before a same-line site | must be caught **with the expected message**; a must-fail that passes is a suite failure |
 | `known-limits/` | KL01 non-literal vacuity · KL02 `Fin.foldl` under `decide` · KL03 checker blind to a `native_decide` after a string containing a comment opener | report-only: "confirmed" / "CHANGED", never a failure |
 
 **Limits, stated plainly.** The vacuity check is **syntactic only**: the foundations checker matches the literal
@@ -28,7 +28,7 @@ fails the run and is never retried.
 
 **How the grader reads Lean.** Lean runs with `--json`; only Lean's own message stream is trusted. An axiom report
 counts only as an `information` message positioned at its `#print axioms` command, and reports merge worst-case, so
-printed text cannot fake or clear an audit (MF06). Sites are found anywhere on a line (MF07), in source with
+printed text cannot fake or clear an audit (MF06). Sites are found anywhere on a line (MF07), with the column computed in Lean's unit — codepoints, pinned by probe and self-test (MF09) — in source with
 comments and string bodies blanked by a nesting- and string-aware lexer (T19).
 
 > **Coverage, stated plainly: the audit covers the `#print axioms` sites the lexer finds — nothing else. The suite's

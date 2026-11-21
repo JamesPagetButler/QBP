@@ -270,14 +270,31 @@ def render(m: dict) -> str:
     return f"{m['line']}:{m['col']}: {m['sev']}: {m['text']}"
 
 
-def print_axioms_sites(code: str) -> dict[tuple[int, int], str]:
-    """(line, column) of EVERY `#print axioms <thm>` command in code-only source — anywhere on
-    a line, not just at its start (Gemini r2 (b) on PR #824: `cmd #print axioms evil` on one
-    line was missed, so Lean's real report for it was discarded as "unpositioned")."""
+# Lean's `--json` `pos.column` unit, PINNED by probe (Gemini r3 (e) on PR #824, 2026-11-20,
+# v4.30.0): for `def αβγ : Nat := 1 #print axioms dirty` Lean reported column 19 = the
+# CODEPOINT offset of `#` (its UTF-8 byte offset is 22). `selftest_grader.py` re-checks this pin
+# on MF09's real Lean output every run, so a toolchain that switched to bytes would fail loudly.
+LEAN_COLUMN_UNIT = "codepoint"
+
+
+def lean_column(source_line: str, char_index: int) -> int:
+    """Column of `source_line[char_index]` in Lean's unit, computed from the ORIGINAL source line."""
+    prefix = source_line[:char_index]
+    if LEAN_COLUMN_UNIT == "codepoint":
+        return len(prefix)  # Python str indices are codepoints
+    return len(prefix.encode("utf-8"))
+
+
+def print_axioms_sites(src: str) -> dict[tuple[int, int], str]:
+    """(line, column) of EVERY `#print axioms <thm>` command — anywhere on a line, not just at
+    its start (Gemini r2 (b)). Matches are found in code-only text (comments and string bodies
+    blanked; same length as the source), and the column is then computed in Lean's unit from
+    the ORIGINAL source line (Gemini r3 (e))."""
     sites: dict[tuple[int, int], str] = {}
-    for ln, line in enumerate(code.splitlines(), start=1):
+    orig_lines = src.splitlines()
+    for ln, line in enumerate(code_only(src).splitlines(), start=1):
         for m in re.finditer(r"#print\s+axioms\s+(\S+)", line):
-            sites[(ln, m.start())] = m.group(1)
+            sites[(ln, lean_column(orig_lines[ln - 1], m.start()))] = m.group(1)
     return sites
 
 
@@ -351,7 +368,7 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
     chk_exit = meta.get("checker_exit")
     msgs, n_untrusted = lean_messages(log)
     # Sites from code with comments AND string bodies blanked; anywhere on a line.
-    sites = print_axioms_sites(code_only(src))
+    sites = print_axioms_sites(src)
     axioms, n_rejected = parse_axioms(msgs, sites)
     # Supported subset: no brace inside a string literal (interpolation is not lexed).
     braces = brace_in_string(src)
