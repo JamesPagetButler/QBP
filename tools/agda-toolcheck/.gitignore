@@ -1,0 +1,4 @@
+results/logs/
+results/runs/
+# the repo-level .gitignore ignores every lib/ directory; this one is source
+!lib/

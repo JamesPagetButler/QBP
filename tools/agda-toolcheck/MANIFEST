@@ -1,0 +1,66 @@
+# tools/agda-toolcheck/MANIFEST — what the suite must find and run (Gemini (6)).
+# One `layer<TAB>file` per line. run.sh fails if anything listed is missing,
+# and, for the suite's own layers (tool, lib, mustfail, control), if anything
+# unlisted appears — a renamed, deleted or empty directory can never go green
+# with zero tests. For the project layers (substrate, cubical) every listed file
+# must be present and run; new QBP files are allowed (they are checked and
+# reported) because adding a proof must not need a manifest edit here.
+tool	CircleHIT.agda
+tool	CoreSyntax.agda
+tool	GlueUa.agda
+tool	Guardedness.agda
+tool	HComp.agda
+tool	Interval.agda
+tool	LibFlags.agda
+tool	LossyUnification.agda
+tool	Opaque.agda
+tool	PathP.agda
+tool	SuspJoinHIT.agda
+tool	Transp.agda
+lib	LibConnected.agda
+lib	LibDataBoolNat.agda
+lib	LibDataInt.agda
+lib	LibDataSigma.agda
+lib	LibEquivIso.agda
+lib	LibFunction.agda
+lib	LibGroupBase.agda
+lib	LibHLevelsGroupoid.agda
+lib	LibHSpace.agda
+lib	LibHopf.agda
+lib	LibJoin.agda
+lib	LibLoopspace.agda
+lib	LibPinSn.agda
+lib	LibPointed.agda
+lib	LibPrelude.agda
+lib	LibS1.agda
+lib	LibSn.agda
+lib	LibSnDegree.agda
+lib	LibSnMultiplication.agda
+lib	LibSusp.agda
+lib	LibTruncations.agda
+lib	LibUnivalence.agda
+mustfail	BadPath.agda
+mustfail	Hole.agda
+mustfail	LetPostulate.agda
+mustfail	Postulate.agda
+mustfail	Terminating.agda
+control	B1StringFakeComment.agda
+control	B2IdentifierDashDash.agda
+control	PlantedForbidden.agda
+substrate	QBPHSpace.agda
+substrate	QBPJoin.agda
+substrate	QBPSpheres.agda
+substrate	QBPSubstrate.agda
+cubical	AssocTransport.agda
+cubical	CDAssocBool.agda
+cubical	CDAssocCubesStatus.agda
+cubical	CDAssocReduction.agda
+cubical	CDJoinBR.agda
+cubical	CDLawsBool.agda
+cubical	Diamond.agda
+cubical	HopfNoAssoc.agda
+cubical	QBPS3HSpace.agda
+cubical	QuaternionicHopf.agda
+cubical	S3FromCD.agda
+cubical	SkyrmionCharge.agda
+cubical	SubstrateCharge.agda

@@ -1,0 +1,225 @@
+{
+  "suite": "qbp-agda-toolcheck",
+  "version": 1,
+  "toolchain": {
+    "agda": "2.8.0",
+    "ci_agda": "2.8.0",
+    "agda_match": true,
+    "cubical_ci_pin": "7b9019b2993535d6931991d87f5c762aee87a67a",
+    "cubical_local_head": "7b9019b2993535d6931991d87f5c762aee87a67a",
+    "pin_match": true,
+    "cubical_lib_name": "cubical-0.9",
+    "lib_flags": "--cubical --safe --no-import-sorts --guardedness"
+  },
+  "run": {
+    "start": "2026-11-20T20:55:31Z",
+    "finished": "2026-11-20T20:56:56Z",
+    "layer": "project",
+    "tctl_start_c": 40.2,
+    "boxrun": {
+      "mem_mb": 8000,
+      "timeout_s": 3600
+    }
+  },
+  "unexpected": 0,
+  "results": [
+    {
+      "layer": "substrate",
+      "file": "QBPHSpace.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 45104,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "substrate",
+      "file": "QBPJoin.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.05,
+      "max_rss_kib": 46312,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "substrate",
+      "file": "QBPSpheres.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 45616,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "substrate",
+      "file": "QBPSubstrate.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 45300,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "AssocTransport.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.66,
+      "max_rss_kib": 376564,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDAssocBool.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 8.66,
+      "max_rss_kib": 460704,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDAssocCubesStatus.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.9,
+      "max_rss_kib": 400496,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDAssocReduction.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.56,
+      "max_rss_kib": 381836,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDJoinBR.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.48,
+      "max_rss_kib": 390936,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDLawsBool.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.5,
+      "max_rss_kib": 388776,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "Diamond.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 4.57,
+      "max_rss_kib": 300196,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "HopfNoAssoc.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 6.37,
+      "max_rss_kib": 392076,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "QBPS3HSpace.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.62,
+      "max_rss_kib": 389936,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "QuaternionicHopf.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 6.13,
+      "max_rss_kib": 408300,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "S3FromCD.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.71,
+      "max_rss_kib": 423744,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "SkyrmionCharge.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 9.01,
+      "max_rss_kib": 567348,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "SubstrateCharge.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 10.2,
+      "max_rss_kib": 659032,
+      "expect_msg": "",
+      "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "no-forbidden-token",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "expect_msg": "",
+      "detail": "0 hits in 17 files"
+    }
+  ]
+}
