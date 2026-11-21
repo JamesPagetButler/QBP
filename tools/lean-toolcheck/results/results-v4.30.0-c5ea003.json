@@ -1,0 +1,1222 @@
+{
+  "suite": "qbp-lean-toolcheck",
+  "schema": 1,
+  "toolchain": "leanprover/lean4:v4.30.0",
+  "version": "v4.30.0",
+  "mathlib_sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+  "mathlib_sha7": "c5ea003",
+  "manifest_mathlib_rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+  "lean_version_reported": "Lean (version 4.30.0, x86_64-unknown-linux-gnu, commit d024af099ca4bf2c86f649261ebf59565dc8c622, Release)",
+  "run_id": "20261121T021507Z",
+  "date_utc": "2026-11-21T02:16:49Z",
+  "runner": {
+    "wrapper": "boxrun --gpu --wait (RSS watch, thermal guard)",
+    "mode": "batch: one boxrun lease for the suite",
+    "mem_cap_mb": 8000,
+    "timeout_s_per_file": 900,
+    "threads": 1
+  },
+  "box": {
+    "cpu": "AMD FX(tm)-8350 Eight-Core Processor",
+    "mem_total_mb": 31991,
+    "mem_available_mb_at_end": 12388,
+    "nproc": 8
+  },
+  "preflight_failures": [],
+  "files": [
+    {
+      "file": "tests/T00_ImportSurface.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 4.54,
+      "maxrss_mb": 3796,
+      "tctl_start_c": 57.9,
+      "tctl_end_c": 57.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T00.imports_loaded": []
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T01_DecideFin.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.17,
+      "maxrss_mb": 1843,
+      "tctl_start_c": 57.8,
+      "tctl_end_c": 57.4,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T01.fano_pair_on_unique_line": [
+          "propext"
+        ],
+        "QBPToolcheck.T01.fanoLines_length": [
+          "propext"
+        ],
+        "QBPToolcheck.T01.qtab_anticomm": [
+          "propext"
+        ],
+        "QBPToolcheck.T01.qtab_sq_neg_one": [
+          "propext"
+        ],
+        "QBPToolcheck.T01.bool_table": []
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T02_DecidableInstances.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.12,
+      "maxrss_mb": 1926,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 57.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T02.evens_closed": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T02.zero_one_not_closed": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T02.card_odd_fin16": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T02.card_op": [
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T03_FinCases.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.12,
+      "maxrss_mb": 1952,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 59.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T03.v_ne_zero": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T03.mem_small": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T03.v_eq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T04_Ring.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.71,
+      "maxrss_mb": 1967,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 59.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T04.two_square": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T04.four_square": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T04.int_signed": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T04.rat_half": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T04.ring_nf_hyp": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T05_FieldSimp.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.04,
+      "maxrss_mb": 1936,
+      "tctl_start_c": 59.1,
+      "tctl_end_c": 58.8,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T05.recip_sum": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T05.inv_norm": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T05.redshift_ratio": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T06_LinarithPositivity.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.4,
+      "maxrss_mb": 2042,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 59.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T06.lin": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T06.am_gm": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T06.normSq_nonneg": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T06.pos_of": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T06.prod_pos": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T07_NormNumCasts.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.96,
+      "maxrss_mb": 2844,
+      "tctl_start_c": 59.6,
+      "tctl_end_c": 59.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T07.nn_real": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.nn_int": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.sqrt_four": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.sq_sqrt_two": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.cast_push": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.cast_lift": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T08_ModuleLinComb.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.69,
+      "maxrss_mb": 2166,
+      "tctl_start_c": 59.2,
+      "tctl_end_c": 59.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T08.module_collect": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T08.module_two": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T08.module_after_rw": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T08.lincomb": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T08.abel_rearrange": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T09_SimpFamily.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.8,
+      "maxrss_mb": 2402,
+      "tctl_start_c": 59.6,
+      "tctl_end_c": 58.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T09.add_x_comm": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.add_y_only": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.simpa_using": [],
+        "QBPToolcheck.T09.simp_at": [],
+        "QBPToolcheck.T09.simp_rw_binder": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.dsimp_def": [],
+        "QBPToolcheck.T09.local_simp_use": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.scoped_simp_use": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.qJ_sq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T10_Quaternion.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 4.32,
+      "maxrss_mb": 2986,
+      "tctl_start_c": 58.5,
+      "tctl_end_c": 58.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T10.i_mul_j": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T10.quaternion_not_comm": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T10.star_qi": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T10.normSq_eq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T10.normSq_mul": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T11_NonAssocHierarchy.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 5.36,
+      "maxrss_mb": 2141,
+      "tctl_start_c": 58.2,
+      "tctl_end_c": 58.8,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T11.cross_not_assoc": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T11.associator_eq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T11.distrib_use": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T12_FinsetSum.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.14,
+      "maxrss_mb": 2026,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 58.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T12.sum_four": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_eight": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_succ": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_swap": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_lin": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_congr_use": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_closed": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T13_RealAnalysis.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.94,
+      "maxrss_mb": 2811,
+      "tctl_start_c": 58.6,
+      "tctl_end_c": 58.8,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T13.sqrt_sq_id": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.sqrt_pos_of": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.sqrt_nn": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.pyth": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.cos_pi_and_pos": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.exp_log": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.hasDerivAt_sq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.deriv_cube": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T14_LinearAlgebra.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 4.1,
+      "maxrss_mb": 2963,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 59.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T14.finrank_fin8": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T14.proj0_ker": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T14.det2": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T14.inner_self": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T14.poly_eval": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T15_Complex.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.05,
+      "maxrss_mb": 1957,
+      "tctl_start_c": 59.1,
+      "tctl_end_c": 58.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T15.I_sq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T15.mul_coords": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T15.normSq_coords": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T15.conj_im": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T15.no_real_sqrt_neg_one": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T16_CoreTactics.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.48,
+      "maxrss_mb": 1971,
+      "tctl_start_c": 59.0,
+      "tctl_end_c": 67.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T16.omega_idx": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.omega_int": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.rcases_use": [],
+        "QBPToolcheck.T16.rintro_use": [],
+        "QBPToolcheck.T16.sum_formula": [
+          "propext"
+        ],
+        "QBPToolcheck.T16.and_build": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.calc_chain": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.sq_unfold": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.sq_change": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.clampZ_nonneg": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.by_contra_use": [],
+        "QBPToolcheck.T16.swap_swap": [],
+        "QBPToolcheck.T16.funext_use": [
+          "Quot.sound"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T17_FloatOracle.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 7.4,
+      "maxrss_mb": 776,
+      "tctl_start_c": 67.6,
+      "tctl_end_c": 52.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T17.join_singleton": [
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T18_FinFold.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.35,
+      "maxrss_mb": 776,
+      "tctl_start_c": 53.1,
+      "tctl_end_c": 55.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T18.foldr_sum": [],
+        "QBPToolcheck.T18.foldl_sum_kernel": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T18.foldl_sum_simp": [
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T19_NestedComments.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 776,
+      "tctl_start_c": 55.8,
+      "tctl_end_c": 56.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T19.real_after_nested": [],
+        "QBPToolcheck.T19.tricky_eq": []
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF01_Sorry/MF01_Sorry.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "lean-output ^\\d+:\\d+: warning: declaration uses [`']sorry[`']$",
+        "axiom QBPToolcheck.MF01.unproved sorryAx",
+        "axiom QBPToolcheck.MF01.uses_unproved sorryAx",
+        "axiom QBPToolcheck.MF01.admitted sorryAx",
+        "checker-reject ^::error::RATCHET violated — sorry: 1 > baseline 0\\."
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 776,
+      "tctl_start_c": 56.6,
+      "tctl_end_c": 57.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF01.unproved": [
+          "sorryAx"
+        ],
+        "QBPToolcheck.MF01.uses_unproved": [
+          "sorryAx"
+        ],
+        "QBPToolcheck.MF01.admitted": [
+          "sorryAx"
+        ]
+      },
+      "detections": [
+        "Lean output: /^\\d+:\\d+: warning: declaration uses [`']sorry[`']$/",
+        "axiom audit: QBPToolcheck.MF01.unproved ⊇ sorryAx",
+        "axiom audit: QBPToolcheck.MF01.uses_unproved ⊇ sorryAx",
+        "axiom audit: QBPToolcheck.MF01.admitted ⊇ sorryAx",
+        "checker: /^::error::RATCHET violated — sorry: 1 > baseline 0\\./"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF02_NativeDecide/MF02_NativeDecide.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom-nonstd QBPToolcheck.MF02.by_native",
+        "checker-reject ^::error::HARD-BAN violated — native_decide: 1 occurrence"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.4,
+      "tctl_end_c": 56.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF02.by_native": [
+          "QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1"
+        ]
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF02.by_native has non-standard ['QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1']",
+        "checker: /^::error::HARD-BAN violated — native_decide: 1 occurrence/"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF03_VacuousTrue/MF03_VacuousTrue.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "checker-reject ^::error::HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence",
+        "checker-reject ^::error::RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.1,
+      "tctl_end_c": 57.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF03.octonion_is_alternative": [],
+        "QBPToolcheck.MF03.sedenion_is_flexible": []
+      },
+      "detections": [
+        "checker: /^::error::HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence/",
+        "checker: /^::error::RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0/"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF04_FalseDecide/MF04_FalseDecide.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-error ^19:\\d+: error: Tactic `decide` proved that the proposition\\s+2 \\+ 3 = 1\\s+is false",
+        "lean-error ^22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false"
+      ],
+      "lean_exit": 1,
+      "wall_s": 1.15,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.4,
+      "tctl_end_c": 57.4,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {},
+      "detections": [
+        "Lean rejected: /^19:\\d+: error: Tactic `decide` proved that the proposition\\s+2 \\+ 3 = 1\\s+is false/",
+        "Lean rejected: /^22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false/"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF05_CustomAxiom/MF05_CustomAxiom.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF05.one_eq_two QBPToolcheck.MF05.cheat",
+        "axiom-nonstd QBPToolcheck.MF05.one_eq_two",
+        "known-limit checker-accepts"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 57.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF05.one_eq_two": [
+          "QBPToolcheck.MF05.cheat"
+        ]
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF05.one_eq_two ⊇ QBPToolcheck.MF05.cheat",
+        "axiom audit: QBPToolcheck.MF05.one_eq_two has non-standard ['QBPToolcheck.MF05.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: foundations checker accepts the file (exit 0)"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF06_SpoofedAudit/MF06_SpoofedAudit.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF06.spoofed sorryAx",
+        "checker-reject ^::error::RATCHET violated — sorry: 1 > baseline 0\\."
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.16,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.1,
+      "tctl_end_c": 57.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF06.spoofed": [
+          "sorryAx"
+        ]
+      },
+      "detections": [
+        "axiom audit ignored 3 axiom-like message(s) not positioned at a `#print axioms` command (spoof guard)",
+        "axiom audit: QBPToolcheck.MF06.spoofed ⊇ sorryAx",
+        "checker: /^::error::RATCHET violated — sorry: 1 > baseline 0\\./"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF07_SameLineSite/MF07_SameLineSite.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF07.dirty QBPToolcheck.MF07.cheat",
+        "axiom-nonstd QBPToolcheck.MF07.dirty"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.2,
+      "tctl_end_c": 57.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF07.clean": [],
+        "QBPToolcheck.MF07.dirty": [
+          "QBPToolcheck.MF07.cheat"
+        ]
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF07.dirty ⊇ QBPToolcheck.MF07.cheat",
+        "axiom audit: QBPToolcheck.MF07.dirty has non-standard ['QBPToolcheck.MF07.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF08_InterpolationLexer/MF08_InterpolationLexer.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "grader-refuses",
+        "axiom QBPToolcheck.MF08.dirty QBPToolcheck.MF08.cheat"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.15,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.4,
+      "tctl_end_c": 57.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF08.clean": [],
+        "QBPToolcheck.MF08.dirty": [
+          "QBPToolcheck.MF08.cheat"
+        ]
+      },
+      "detections": [
+        "grader REFUSES the file: brace inside a string literal at line(s) [38] — possible interpolation, which the lexer does not model (write a literal brace as \\x7B)",
+        "axiom audit: QBPToolcheck.MF08.dirty ⊇ QBPToolcheck.MF08.cheat"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF09_NonAsciiColumn/MF09_NonAsciiColumn.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF09.dirty QBPToolcheck.MF09.cheat",
+        "axiom-nonstd QBPToolcheck.MF09.dirty"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 57.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF09.clean": [],
+        "QBPToolcheck.MF09.dirty": [
+          "QBPToolcheck.MF09.cheat"
+        ]
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF09.dirty ⊇ QBPToolcheck.MF09.cheat",
+        "axiom audit: QBPToolcheck.MF09.dirty has non-standard ['QBPToolcheck.MF09.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "known-limits/KL01_VacuityBypass/KL01_VacuityBypass.lean",
+      "kind": "known-limit",
+      "expect": [
+        "lean-ok",
+        "known-limit checker-accepts",
+        "known-limit audit-clean QBPToolcheck.KL01.refl_implies_true",
+        "known-limit audit-clean QBPToolcheck.KL01.alternativity"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.2,
+      "tctl_end_c": 57.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.KL01.refl_implies_true": [],
+        "QBPToolcheck.KL01.alternativity": []
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: foundations checker accepts the file (exit 0)",
+        "KNOWN-LIMIT confirmed: `#print axioms QBPToolcheck.KL01.refl_implies_true` is clean ([])",
+        "KNOWN-LIMIT confirmed: `#print axioms QBPToolcheck.KL01.alternativity` is clean ([])"
+      ],
+      "result": "KNOWN-LIMIT"
+    },
+    {
+      "file": "known-limits/KL02_FinFoldlDecide/KL02_FinFoldlDecide.lean",
+      "kind": "known-limit",
+      "expect": [
+        "known-limit lean-error (?s)^19:\\d+: error: Tactic `decide` failed.*did not reduce to `isTrue` or `isFalse`"
+      ],
+      "lean_exit": 1,
+      "wall_s": 1.14,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.4,
+      "tctl_end_c": 57.4,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {},
+      "detections": [],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: Lean still rejects with /(?s)^19:\\d+: error: Tactic `decide` failed.*did not reduce to `isTrue` or `isFalse`/"
+      ],
+      "result": "KNOWN-LIMIT"
+    },
+    {
+      "file": "known-limits/KL03_CheckerStringComment/KL03_CheckerStringComment.lean",
+      "kind": "known-limit",
+      "expect": [
+        "lean-ok",
+        "axiom-nonstd QBPToolcheck.KL03.hidden_native",
+        "known-limit checker-accepts"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.15,
+      "maxrss_mb": 776,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 57.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.KL03.hidden_native": [
+          "QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1"
+        ]
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.KL03.hidden_native has non-standard ['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']"
+      ],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: foundations checker accepts the file (exit 0)"
+      ],
+      "result": "KNOWN-LIMIT"
+    }
+  ],
+  "summary": {
+    "files": 32,
+    "pass": 32,
+    "fail": 0,
+    "tool_files": 20,
+    "must_fail_files": 9,
+    "known_limit_files": 3,
+    "theorems_audited": 115,
+    "overall": "GREEN"
+  }
+}
