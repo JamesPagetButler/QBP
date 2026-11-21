@@ -36,7 +36,8 @@ Before writing any proof, read **`~/Documents/inter/lean-proof-best-practices.md
 7. **Numeric types:** annotate `: Int`/`: ℤ` for signed arithmetic (`Nat` truncates: `1 - 2 = 0` — this already caused a false-verified theorem). You generally **cannot `decide` over ℝ** — prove real-valued laws structurally (`ring`, `field_simp`, Mathlib lemmas), carrying `≠ 0` hypotheses where division appears.
 8. **Mathlib has** `Quaternion`/`QuaternionAlgebra`, `CliffordAlgebra`, the `Ring`/`Algebra` hierarchy — reuse them. It does **not** have octonions or Cayley–Dickson — build them on `NonAssocRing`/`NonUnitalNonAssocRing`/`Algebra` (never `Ring`, which assumes associativity).
 9. **Mathlib naming** (snake_case theorems, UpperCamelCase types, lowerCamelCase defs); docstrings `/-- -/` attach to declarations, `/- -/` for free commentary.
-10. **Toolchain pin:** repo is `leanprover/lean4:v4.30.0` (stable), Mathlib SHA `c5ea0035…` (`proofs/lean-toolchain`, `proofs/lakefile.lean`; was `v4.30.0-rc2`/`215c5f44…` on 2026-05-31 — corrected 2026-10-24, see Lessons F). Run `lake exe cache get` before `lake build` (or Mathlib rebuilds for hours). Keep `lean-toolchain`/`lakefile.lean`/`lake-manifest.json` in lockstep.
+10. **Toolchain: read the pin, don't remember it.** The versions live in the repo, not in this persona: `proofs/lean-toolchain` (Lean) and `proofs/lakefile.lean` (the Mathlib SHA). Read them at the start of every task. Run `lake exe cache get` before `lake build` (or Mathlib rebuilds for hours). Keep `lean-toolchain`/`lakefile.lean`/`lake-manifest.json` in lockstep. Cadence policy: `docs/lean-version-cadence.md` (#489). The toolcheck suite `tools/lean-toolcheck/` is the base and new-feature test (QBP#823). The `lean` skill carries the feature table, the holds table (e.g. the PhysLean bridge) and the upgrade flow.
+10a. **Lean forward (QBP#823).** At the start of a task, at most once a day (cache under `~/.cache/`), compare the pins with the latest stable Lean release (`gh api repos/leanprover/lean4/releases`) and its matching Mathlib tag. If newer stable ones exist, **report the candidate in your Output and do not upgrade**. Upgrades run between sprints through the trust-but-verify flow: security check, then the base and new-feature suites. A hold needs a written reason, kept in the skill's holds table. Never `lake update` unless the owner asked.
 
 ## Resource discipline (HARD — shared machine)
 
@@ -103,7 +104,7 @@ Sources: PR #729 body (claims table, imported-name check, "First attempt, stated
 
 ### F. Stale facts corrected 2026-10-24
 
-- Toolchain is `leanprover/lean4:v4.30.0` (stable) with Mathlib `c5ea00351c28e24afc9f0f84379aa41082b1188f` (`proofs/lean-toolchain`, `proofs/lakefile.lean`; cadence per #489, PR #719) — rule 10 above said the rc2/`215c5f44…` pin of 2026-05-31.
+- Rule 10 used to name a specific toolchain and Mathlib SHA. It went stale once (the rc2/`215c5f44…` pin of 2026-05-31, corrected 2026-10-24). That is why rule 10 now says to read the pin files instead (QBP#823).
 - `#print axioms` is now used in-file (10 lines in `Octonion32Count.lean` per PR #727; 18 in `RuleFlowLeafFoliation.lean` per PR #729) and CI has a Lean gate (`.github/workflows/lean-foundations.yml`: `check_lean_foundations.py` bans `native_decide`/vacuous `: True :=`, ratchets `sorry`; `lake build (zero errors)` with the Mathlib cache). "Used zero times" in rule 3 was true on 2026-05-31 and is not now.
 
 ## Working method
