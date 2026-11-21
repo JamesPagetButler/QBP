@@ -9,6 +9,8 @@ Two enforcement tiers:
     - native_decide          — trusted-compiler escape; kernel `decide` only
     - `: True := by trivial`  — the vacuous-proof cardinal sin (the archive octonionMul
                                 pattern: a named theorem that proves only True)
+    - brace inside a string   — possible string interpolation, which the lexer does not
+                                model (#827): banned so the lexer stays exact
 
   RATCHET (baseline count in .lean-gate-baseline.json; must not INCREASE):
     - sorry                   — honest unproven placeholder; allowed in the skeleton but
@@ -17,7 +19,11 @@ Two enforcement tiers:
                                 ✗-cells must become real statements (scope-deliberation
                                 exit gate), so this count must only go down
 
-Comments are stripped before matching (doc-comments legitimately mention "sorry").
+Comments are stripped before matching (doc-comments legitimately mention "sorry") by the
+shared Lean lexer `scripts/lean_lexer.py` (#827 AC1): nested block comments are depth-counted
+and string/char literals are skipped. Matching is TOKEN-level only — whether a theorem really
+avoids `sorryAx` / native axioms is decided by the CI axiom audit (`gen_lean_axiom_audit.py` +
+`check_lean_axiom_audit.py`), which asks Lean, not this script.
 
 Usage: check_lean_foundations.py [--dir proofs/QBP/Foundations] [--baseline <path>] [--update-baseline]
 Exit 0 = pass, 1 = violation.
@@ -42,16 +48,30 @@ RATCHET = {
 }
 
 
-def strip_comments(src: str) -> str:
-    # block comments /- ... -/ (Lean nests, but a non-greedy single pass is enough for our files);
-    # then line comments -- ... to EOL.
-    src = re.sub(r"/-.*?-/", "", src, flags=re.DOTALL)
-    src = re.sub(r"--.*", "", src)
-    return src
+# #827 AC1: comments are stripped by a real Lean lexer (nesting depth-counted, string and
+# char literals skipped) shared with the axiom-audit script — NOT a regex. The old
+# `re.sub(r"/-.*?-/", …)` ignored strings, so after a `"/-"` string it deleted everything up
+# to the next `-/`, and a `native_decide` in that span passed the HARD-BAN (PR #824 KL03).
+# `-I` (isolated) callers do not get this script's directory on sys.path, so add it here.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lean_lexer import (
+    brace_in_string,
+    strip_comments,
+)  # noqa: E402  (after the sys.path fix)
+
+# The lexer does not model string interpolation (`s!"…{e}…"`, `throwError "…{e}…"`): an
+# interpolation hole can hold a string with a comment opener (`s!" { " /- " } "`) that would
+# desynchronise it from Lean and hide the code after it. Every interpolation needs a brace in
+# a string literal, so a brace inside a string is HARD-BANNED in the scanned tree (0 in
+# proofs/QBP/Foundations on 2026-11-20): with it banned, the simple string rule is exact.
+BRACE_IN_STRING = (
+    "brace inside a string literal (possible interpolation; write \\x7B / \\x7D)"
+)
 
 
 def scan(lean_dir):
     hard = {k: 0 for k in HARD_BAN}
+    hard[BRACE_IN_STRING] = 0
     ratchet = {k: 0 for k in RATCHET}
     hard_hits = []
     for path in sorted(
@@ -65,6 +85,10 @@ def scan(lean_dir):
             hard[name] += n
             if n:
                 hard_hits.append((path, name, n))
+        nb = len(brace_in_string(raw))
+        hard[BRACE_IN_STRING] += nb
+        if nb:
+            hard_hits.append((path, BRACE_IN_STRING, nb))
         for name, rx in RATCHET.items():
             ratchet[name] += len(rx.findall(code))
     return hard, ratchet, hard_hits

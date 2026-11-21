@@ -1,0 +1,17 @@
+{
+  "policy": "Exact, issue-linked exceptions to the CI axiom audit (QBP #827; director ruling, option (a)). Each entry names ONE fully qualified declaration and the EXACT extra axiom name(s) it may depend on, plus the open issue that owns it. A declaration is allowed only if its non-standard axioms EQUAL the entry's; any other non-standard axiom fails the gate; an entry whose declaration no longer reports exactly these axioms is STALE and fails the gate, so the entry must be deleted when its issue lands. No wildcards, prefixes or per-file entries. A Lean toolchain bump that renumbers the native axiom (`ax_1_1`) makes the entry stale on purpose: re-check it, do not widen it.",
+  "entries": [
+    {
+      "declaration": "hessian_traceSq_1152_universal",
+      "axioms": ["hessian_traceSq_1152_universal._native.native_decide.ax_1_1"],
+      "issue": 582,
+      "reason": "Sprint12-Inherited/SedenionHessianTraceSq.lean: the one documented native_decide theorem of the corpus (kernel decide impractical). Issue #582 (OPEN) resolves it by native-compute attestation, not a kernel proof."
+    },
+    {
+      "declaration": "hessian_traceSq_1152_universal._native.native_decide.ax_1_1",
+      "axioms": ["hessian_traceSq_1152_universal._native.native_decide.ax_1_1"],
+      "issue": 582,
+      "reason": "The per-call native axiom that native_decide declares for hessian_traceSq_1152_universal is itself a constant of the same module; the audit (every declaration) reports it as depending on itself. Same exception as the entry above, issue #582."
+    }
+  ]
+}
