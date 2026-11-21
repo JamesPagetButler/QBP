@@ -4,8 +4,10 @@
 Grades the outputs of the driver files written by `gen_lean_axiom_audit.py` and run with
 `lake env lean --json <driver>`. The drivers make LEAN enumerate every constant of every
 in-scope module (the default targets' import closure) and compute its axiom closure; this
-script only checks what Lean reported. A non-standard axiom — `sorryAx`, a native-evaluation
-axiom (`…_native.native_decide.ax_…`, `Lean.ofReduceBool`), any user `axiom` — FAILS.
+script only checks what Lean reported. RULE 1: ANY axiom outside {propext, Classical.choice,
+Quot.sound} FAILS — `sorryAx`, a native-evaluation axiom of whatever name the toolchain emits
+(per-call `…_native.native_decide.ax_…` since Lean 4.29; `Lean.ofReduceBool` before), any user
+`axiom`. The gate never keys on a specific native-axiom name.
 
 Trust rules (as in PR #824's toolcheck grader, Gemini (2)):
   * only Lean's own `--json` message stream is read; any other output line (e.g. printed by an
@@ -219,6 +221,11 @@ def main() -> int:
     # A theorem that USES an excepted declaration inherits that declaration's non-standard
     # axiom in its own closure, has no entry of its own, and therefore FAILS — the exception
     # covers exactly the named declaration, never anything that depends on it.
+    # The gate keys on NO specific axiom name (architect, seq 5690: from Lean 4.29 each native
+    # computation gets its own named axiom, and 4.35.0 removes `Lean.trustCompiler` /
+    # `Lean.ofReduceBool`): RULE 1 is "any axiom outside {propext, Classical.choice,
+    # Quot.sound} fails", decided in the Lean driver. `excepted_axioms` below is used ONLY to
+    # add an explanatory hint to a dependent's failure message, never to decide pass/fail.
     excepted_axioms = {x for e in allow.values() for x in e["axioms"]}
     for decl, axs in sorted(found_ax.items()):
         mod = next(b["module"] for b in nonstd if b["decl"] == decl)

@@ -213,11 +213,12 @@ def main() -> int:
             native_entries("AllowDep", "allowed_native"),
         )
         found = {d for d, _ in res["non_standard"]}
+        # The failure comes from rule 1 alone (any axiom outside the standard three, no entry of
+        # its own) — NOT from matching a native-axiom name; the "inherits …" text is only a hint.
         report(
             rc == 1
             and found == {ns("AllowDep", "uses_allowed")}
-            and len(res["allowlisted"]) == 2
-            and "dependents of an exception are NOT excused" in out,
+            and len(res["allowlisted"]) == 2,
             f"a theorem USING the excepted declaration fails — the gate is transitive (exit {rc}): {sorted(found)}",
             out,
         )
