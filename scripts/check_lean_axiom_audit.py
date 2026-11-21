@@ -23,8 +23,10 @@ ALLOWLIST (scripts/lean_axiom_allowlist.json): exact, issue-linked exceptions �
 declaration + the exact extra axiom names + an issue number. A declaration is allowed only if its
 non-standard axioms EQUAL the entry's; any other non-standard axiom fails; an entry whose
 declaration no longer reports exactly those axioms is STALE and fails, so the entry must be
-deleted when its issue lands. No wildcards, prefixes or per-file entries. Today there is ONE
-exception: the documented native_decide theorem of issue #582.
+deleted when its issue lands. No wildcards, prefixes or per-file entries. TRANSITIVE: matching
+is by exact declaration name against each declaration's FULL axiom closure, so any declaration
+that depends on an excepted one inherits its axiom and fails (it has no entry of its own).
+Today there is ONE exception: the documented native_decide theorem of issue #582.
 
 usage: check_lean_axiom_audit.py --manifest DIR/manifest.json [--json OUT] [--allowlist FILE]
        (expects DIR/AxiomAudit_<k>.jsonl next to each driver, as written by the CI step)
@@ -212,9 +214,15 @@ def main() -> int:
     allow = load_allowlist(Path(a.allowlist), errors) if a.allowlist else {}
     uniq: set[tuple[str, str]] = set()
     allowed_hits: list[str] = []
+    # TRANSITIVE by construction (Cartan, seq 5688): every declaration's axiom set is its FULL
+    # closure, computed by Lean, and the allowlist is matched by EXACT declaration name only.
+    # A theorem that USES an excepted declaration inherits that declaration's non-standard
+    # axiom in its own closure, has no entry of its own, and therefore FAILS — the exception
+    # covers exactly the named declaration, never anything that depends on it.
+    excepted_axioms = {x for e in allow.values() for x in e["axioms"]}
     for decl, axs in sorted(found_ax.items()):
         mod = next(b["module"] for b in nonstd if b["decl"] == decl)
-        entry = allow.get(decl)
+        entry = allow.get(decl)  # exact name; no prefix / dependency / file matching
         if entry is not None and axs == set(entry["axioms"]):
             allowed_hits.append(decl)
             print(
@@ -227,6 +235,11 @@ def main() -> int:
         why = ""
         if entry is not None:
             why = f" (allowlist entry for issue #{entry['issue']} permits exactly {sorted(entry['axioms'])})"
+        elif axs & excepted_axioms:
+            why = (
+                f" — inherits {sorted(axs & excepted_axioms)} from an allowlisted declaration; "
+                f"dependents of an exception are NOT excused (transitive gate)"
+            )
         print(
             f"::error::NON-STANDARD AXIOM: {decl} (module {mod}) depends on {sorted(axs)}{why}"
         )

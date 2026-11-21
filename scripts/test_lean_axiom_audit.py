@@ -16,6 +16,7 @@ core, so this takes seconds and needs no Mathlib), generates audit drivers for t
   * allowlist (#827 option (a)): an allowlisted native_decide declaration passes; the same
     declaration without an entry fails; a SECOND native_decide in the allowlisted file fails;
     a STALE entry fails; an entry naming the wrong axiom does not allow; a wildcard is rejected;
+    a theorem that USES the excepted declaration fails (the gate is transitive — Cartan seq 5688);
   * forged-JSON spoof: a well-formed fake SUMMARY line appended to the Clean output must
     turn the verdict into FAIL (duplicate summary), never into a pass.
 
@@ -133,7 +134,7 @@ def main() -> int:
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
             "HOME": os.environ.get("HOME", "/tmp"),
         }
-        for m in ("Clean", "Bad", "AllowOne", "AllowTwo"):
+        for m in ("Clean", "Bad", "AllowOne", "AllowTwo", "AllowDep"):
             r = run(
                 [
                     a.lean,
@@ -200,6 +201,24 @@ def main() -> int:
         report(
             rc == 1 and found == want and len(res["allowlisted"]) == 2,
             f"a SECOND native_decide in the allowlisted file fails (exit {rc}): {sorted(found)}",
+            out,
+        )
+        # TRANSITIVITY (Cartan, seq 5688): a theorem USING the excepted declaration inherits its
+        # native axiom and must fail; only the exactly-named declaration (+ its axiom) is allowed.
+        rc, res, out = audit(
+            a.lean,
+            work,
+            "AuditFixture.AllowDep",
+            env,
+            native_entries("AllowDep", "allowed_native"),
+        )
+        found = {d for d, _ in res["non_standard"]}
+        report(
+            rc == 1
+            and found == {ns("AllowDep", "uses_allowed")}
+            and len(res["allowlisted"]) == 2
+            and "dependents of an exception are NOT excused" in out,
+            f"a theorem USING the excepted declaration fails — the gate is transitive (exit {rc}): {sorted(found)}",
             out,
         )
         stale = native_entries("Clean", "gone")

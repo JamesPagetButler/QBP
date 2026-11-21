@@ -147,7 +147,8 @@ jobs:
       # OPEN issue #582 (native-compute attestation). Entries are exact (declaration + exact
       # axiom names + issue), never wildcards/prefixes/files; any other non-standard axiom fails;
       # a STALE entry (declaration gone or no longer needing that axiom) fails too, so the entry
-      # must be deleted when #582 lands.
+      # must be deleted when #582 lands. TRANSITIVE: the exception covers exactly that name —
+      # any declaration that USES it inherits the native axiom in its own closure and fails.
       - name: Axiom-audit self-test (planted fixtures, core Lean only)
         run: python3 scripts/test_lean_axiom_audit.py
       - name: Axiom audit (Lean enumerates every declaration of every built module)
