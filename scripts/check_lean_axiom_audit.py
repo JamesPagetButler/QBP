@@ -19,7 +19,14 @@ Trust rules (as in PR #824's toolcheck grader, Gemini (2)):
     message in the driver (failed import, missing module, elaboration error) FAILS;
   * an empty audit (no drivers, no declarations) FAILS.
 
-usage: check_lean_axiom_audit.py --manifest DIR/manifest.json [--json OUT]
+ALLOWLIST (scripts/lean_axiom_allowlist.json): exact, issue-linked exceptions — fully qualified
+declaration + the exact extra axiom names + an issue number. A declaration is allowed only if its
+non-standard axioms EQUAL the entry's; any other non-standard axiom fails; an entry whose
+declaration no longer reports exactly those axioms is STALE and fails, so the entry must be
+deleted when its issue lands. No wildcards, prefixes or per-file entries. Today there is ONE
+exception: the documented native_decide theorem of issue #582.
+
+usage: check_lean_axiom_audit.py --manifest DIR/manifest.json [--json OUT] [--allowlist FILE]
        (expects DIR/AxiomAudit_<k>.jsonl next to each driver, as written by the CI step)
 Exit 0 = pass, 1 = fail.
 """
@@ -60,10 +67,60 @@ def read_jsonl(p: Path) -> tuple[list[dict], int]:
     return msgs, untrusted
 
 
+DEFAULT_ALLOWLIST = Path(__file__).resolve().parent / "lean_axiom_allowlist.json"
+
+
+def parse_axiom_list(text: str) -> set[str]:
+    """`[a, b]` (Lean's rendering of the NONSTD list) -> {"a", "b"}."""
+    return {
+        x.strip()
+        for x in text.strip().strip("[]").replace("\n", " ").split(",")
+        if x.strip()
+    }
+
+
+def load_allowlist(path: Path, errors: list[str]) -> dict[str, dict]:
+    """Exact, issue-linked exceptions. Each entry: declaration (fully qualified), axioms (exact
+    names), issue (int), reason. No wildcards, prefixes or per-file entries — those are rejected.
+    """
+    if not path.exists():
+        errors.append(f"allowlist {path} not found")
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    out: dict[str, dict] = {}
+    for e in data.get("entries", []):
+        decl, axs, issue = e.get("declaration"), e.get("axioms"), e.get("issue")
+        bad = (
+            not isinstance(decl, str)
+            or not decl
+            or not isinstance(axs, list)
+            or not axs
+            or not isinstance(issue, int)
+            or not e.get("reason")
+            or any(ch in s for s in [decl, *axs] for ch in "*?[]")
+            or decl.endswith(".")
+            or decl.endswith(".lean")
+        )
+        if bad:
+            errors.append(
+                f"malformed allowlist entry (exact names, a list of axioms, an int issue and a reason required): {e}"
+            )
+            continue
+        if decl in out:
+            errors.append(f"duplicate allowlist entry for {decl}")
+        out[decl] = {"axioms": list(axs), "issue": issue}
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", required=True)
     ap.add_argument("--json")
+    ap.add_argument(
+        "--allowlist",
+        default=str(DEFAULT_ALLOWLIST),
+        help="issue-linked exact exceptions (default scripts/lean_axiom_allowlist.json; '' = none)",
+    )
     a = ap.parse_args()
     man = json.loads(Path(a.manifest).read_text())
     drivers = man.get("drivers", [])
@@ -149,10 +206,38 @@ def main() -> int:
             f"axiom audit [{tag}]: {found}/{total} modules, {decls} declarations, {bad} non-standard; "
             f"{untrusted} untrusted non-JSON line(s) ignored"
         )
-    uniq = {(b["decl"], b["axioms"]) for b in nonstd}
-    for decl, ax in sorted(uniq):
+    found_ax: dict[str, set[str]] = {}
+    for b in nonstd:
+        found_ax.setdefault(b["decl"], set()).update(parse_axiom_list(b["axioms"]))
+    allow = load_allowlist(Path(a.allowlist), errors) if a.allowlist else {}
+    uniq: set[tuple[str, str]] = set()
+    allowed_hits: list[str] = []
+    for decl, axs in sorted(found_ax.items()):
         mod = next(b["module"] for b in nonstd if b["decl"] == decl)
-        print(f"::error::NON-STANDARD AXIOM: {decl} (module {mod}) depends on {ax}")
+        entry = allow.get(decl)
+        if entry is not None and axs == set(entry["axioms"]):
+            allowed_hits.append(decl)
+            print(
+                f"::warning::ALLOWLISTED (issue #{entry['issue']}): {decl} (module {mod}) depends on "
+                f"{sorted(axs)} — the only kind of exception this gate accepts; delete the entry when "
+                f"#{entry['issue']} lands"
+            )
+            continue
+        uniq.add((decl, str(sorted(axs))))
+        why = ""
+        if entry is not None:
+            why = f" (allowlist entry for issue #{entry['issue']} permits exactly {sorted(entry['axioms'])})"
+        print(
+            f"::error::NON-STANDARD AXIOM: {decl} (module {mod}) depends on {sorted(axs)}{why}"
+        )
+    # A STALE entry fails too: the declaration is gone, or no longer needs exactly those axioms,
+    # so the exception must be deleted (e.g. when #582 lands) rather than linger unused.
+    for decl, entry in sorted(allow.items()):
+        if decl not in allowed_hits and decl not in found_ax:
+            errors.append(
+                f"STALE allowlist entry: {decl} (issue #{entry['issue']}) — the audit no longer reports it "
+                f"with {sorted(entry['axioms'])}; delete the entry from {a.allowlist}"
+            )
     for e in errors:
         print(f"::error::{e}")
     not_built = man.get("not_built", [])
@@ -168,6 +253,7 @@ def main() -> int:
             json.dumps(
                 {
                     "non_standard": sorted(map(list, uniq)),
+                    "allowlisted": allowed_hits,
                     "errors": errors,
                     "modules": sorted(audited_modules),
                     "declaration_audits": total_decls,

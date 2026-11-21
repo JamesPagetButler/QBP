@@ -53,6 +53,7 @@ jobs:
               - 'scripts/gen_lean_axiom_audit.py'
               - 'scripts/check_lean_axiom_audit.py'
               - 'scripts/test_lean_axiom_audit.py'
+              - 'scripts/lean_axiom_allowlist.json'
               - 'scripts/lean_audit_fixtures/**'
               - 'scripts/check_layer_imports.py'
               - 'scripts/test_check_layer_imports.py'
@@ -140,6 +141,13 @@ jobs:
       # stream, only messages positioned at the generated driver's `run_cmd`, exactly one
       # SUMMARY per driver (scripts/check_lean_axiom_audit.py). Modules no default target
       # builds are listed as not covered in the step output.
+      # THE ONLY EXCEPTION (scripts/lean_axiom_allowlist.json, director ruling on #827): the
+      # documented native_decide theorem `hessian_traceSq_1152_universal`
+      # (Sprint12-Inherited/SedenionHessianTraceSq.lean) and its per-call native axiom, owned by
+      # OPEN issue #582 (native-compute attestation). Entries are exact (declaration + exact
+      # axiom names + issue), never wildcards/prefixes/files; any other non-standard axiom fails;
+      # a STALE entry (declaration gone or no longer needing that axiom) fails too, so the entry
+      # must be deleted when #582 lands.
       - name: Axiom-audit self-test (planted fixtures, core Lean only)
         run: python3 scripts/test_lean_axiom_audit.py
       - name: Axiom audit (Lean enumerates every declaration of every built module)
