@@ -38,6 +38,8 @@ EXPECT_BAD = {
     "AuditFixture.Bad.by_cheat",
     "AuditFixture.Bad.cheat",
     "AuditFixture.Bad.sorried_value",
+    # native_decide declares its per-call native axiom as a constant of the module itself:
+    "AuditFixture.Bad.hidden_native._native.native_decide.ax_1_1",
 }
 
 
@@ -95,6 +97,7 @@ def main() -> int:
             r = run(
                 [
                     a.lean,
+                    f"--root={FIX}",  # module name AuditFixture.<m> from the fixture root
                     "-o",
                     str(build / f"{m}.olean"),
                     str(FIX / "AuditFixture" / f"{m}.lean"),
