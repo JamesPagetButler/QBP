@@ -11,6 +11,8 @@ Two enforcement tiers:
                                 pattern: a named theorem that proves only True)
     - brace inside a string   — possible string interpolation, which the lexer does not
                                 model (#827): banned so the lexer stays exact
+    - `//-`, `<--`, …         — a comment opener glued to a symbol character, which Lean's
+                                extensible symbol tokens may read as code (#829): banned
 
   RATCHET (baseline count in .lean-gate-baseline.json; must not INCREASE):
     - sorry                   — honest unproven placeholder; allowed in the skeleton but
@@ -20,8 +22,9 @@ Two enforcement tiers:
                                 exit gate), so this count must only go down
 
 Comments are stripped before matching (doc-comments legitimately mention "sorry") by the
-shared Lean lexer `scripts/lean_lexer.py` (#827 AC1): nested block comments are depth-counted
-and string/char literals are skipped. Matching is TOKEN-level only — whether a theorem really
+shared Lean lexer `scripts/lean_lexer.py` (#827 AC1, #829): a token walk following Lean's
+tokenizer — nested block comments depth-counted; string, raw-string (`r#"…"#`) and char
+literals and identifiers (incl. `x'`, `«…»`) skipped. Matching is TOKEN-level only — whether a theorem really
 avoids `sorryAx` / native axioms is decided by the CI axiom audit (`gen_lean_axiom_audit.py` +
 `check_lean_axiom_audit.py`), which asks Lean, not this script.
 
@@ -55,6 +58,7 @@ RATCHET = {
 # `-I` (isolated) callers do not get this script's directory on sys.path, so add it here.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lean_lexer import (
+    ambiguous_comment_openers,
     brace_in_string,
     strip_comments,
 )  # noqa: E402  (after the sys.path fix)
@@ -67,11 +71,18 @@ from lean_lexer import (
 BRACE_IN_STRING = (
     "brace inside a string literal (possible interpolation; write \\x7B / \\x7D)"
 )
+# Lean checks for `--` / `/-` only at a token boundary, and the symbol-token table is extensible
+# by any import, so a comment opener glued to a symbol character (`//-`, `<--`) may be code to
+# Lean. Banned (0 in all of proofs/ on 2026-11-24) so the lexer never has to guess (PR #829).
+AMBIGUOUS_OPENER = (
+    "comment opener `--`/`/-` glued to a symbol character (put a space before it)"
+)
 
 
 def scan(lean_dir):
     hard = {k: 0 for k in HARD_BAN}
     hard[BRACE_IN_STRING] = 0
+    hard[AMBIGUOUS_OPENER] = 0
     ratchet = {k: 0 for k in RATCHET}
     hard_hits = []
     for path in sorted(
@@ -85,10 +96,14 @@ def scan(lean_dir):
             hard[name] += n
             if n:
                 hard_hits.append((path, name, n))
-        nb = len(brace_in_string(raw))
-        hard[BRACE_IN_STRING] += nb
-        if nb:
-            hard_hits.append((path, BRACE_IN_STRING, nb))
+        for name, fn in (
+            (BRACE_IN_STRING, brace_in_string),
+            (AMBIGUOUS_OPENER, ambiguous_comment_openers),
+        ):
+            nb = len(fn(raw))
+            hard[name] += nb
+            if nb:
+                hard_hits.append((path, name, nb))
         for name, rx in RATCHET.items():
             ratchet[name] += len(rx.findall(code))
     return hard, ratchet, hard_hits

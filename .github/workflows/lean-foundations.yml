@@ -54,7 +54,9 @@ jobs:
               - 'scripts/check_lean_axiom_audit.py'
               - 'scripts/test_lean_axiom_audit.py'
               - 'scripts/lean_axiom_allowlist.json'
+              - 'scripts/LeanAxiomAudit.lean'
               - 'scripts/lean_audit_fixtures/**'
+              - 'scripts/lean_lexer_fixtures/**'
               - 'scripts/check_layer_imports.py'
               - 'scripts/test_check_layer_imports.py'
               - '.github/workflows/lean-foundations.yml'
@@ -137,10 +139,14 @@ jobs:
       # computes its axiom closure; anything outside {propext, Classical.choice, Quot.sound}
       # — sorryAx, native_decide's native axioms, any user `axiom` — fails this job. Coverage
       # does not depend on how a file is written (no Python lexer decides WHAT is audited; it
-      # only picks the modules from the lakefile roots). Trust: only Lean's --json message
-      # stream, only messages positioned at the generated driver's `run_cmd`, exactly one
-      # SUMMARY per driver (scripts/check_lean_axiom_audit.py). Modules no default target
-      # builds are listed as not covered in the step output.
+      # only picks the modules from the lakefile roots). The enumerator is ONE fixed program,
+      # scripts/LeanAxiomAudit.lean, run with LEAN_PATH UNSET so it is elaborated against the
+      # toolchain only; it loads the built modules at run time with `importModules
+      # (loadExts := false)`, as data — no macro, notation, instance or initializer of an audited
+      # module can reach it (PR #829 Gemini r1 finding 1: an in-environment driver was fooled by
+      # an exported `!` macro). Trust: exactly one result line per run, carrying that run's
+      # nonce, root and exact module list (scripts/check_lean_axiom_audit.py). Modules no
+      # default target builds are listed as not covered in the step output.
       # THE ONLY EXCEPTION (scripts/lean_axiom_allowlist.json, director ruling on #827): the
       # documented native_decide theorem `hessian_traceSq_1152_universal`
       # (Sprint12-Inherited/SedenionHessianTraceSq.lean) and its per-call native axiom, owned by
@@ -158,9 +164,15 @@ jobs:
         run: |
           set -euo pipefail
           out="$RUNNER_TEMP/axiom-audit"
+          auditor="$GITHUB_WORKSPACE/scripts/LeanAxiomAudit.lean"
           python3 scripts/gen_lean_axiom_audit.py --proofs proofs --out-dir "$out"
-          for f in "$out"/AxiomAudit_*.lean; do
-            # lean exits non-zero when the driver logs NONSTD errors; the checker decides.
-            (cd proofs && lake env lean --json "$f" > "${f%.lean}.jsonl" 2> "${f%.lean}.stderr") || true
+          lp="$(cd proofs && lake env printenv LEAN_PATH)"
+          for a in "$out"/AxiomAudit_*.args; do
+            mapfile -t args < "$a"
+            # LEAN_PATH unset: the auditor's own `import Lean` resolves to the toolchain only.
+            # A failed run leaves no result line; the checker decides (fail-closed).
+            (cd proofs && env -u LEAN_PATH QBP_AUDIT_LEAN_PATH="$lp" \
+              lean --run "$auditor" "${args[@]}" > "${a%.args}.out" 2> "${a%.args}.stderr") || true
+            tail -c 2000 "${a%.args}.stderr" || true
           done
           python3 scripts/check_lean_axiom_audit.py --manifest "$out/manifest.json"

@@ -2,8 +2,9 @@
 """Planted end-to-end test of the CI axiom audit (QBP #827 AC2) on real Lean, core only.
 
 Compiles the fixture modules in `scripts/lean_audit_fixtures/` (they import nothing but Lean
-core, so this takes seconds and needs no Mathlib), generates audit drivers for them with
-`gen_lean_axiom_audit.py --modules`, runs Lean on the drivers, and grades the output with
+core, so this takes seconds and needs no Mathlib), generates the auditor's arguments for them
+with `gen_lean_axiom_audit.py --modules`, runs `lean --run scripts/LeanAxiomAudit.lean` exactly
+as CI does (LEAN_PATH unset, project path in QBP_AUDIT_LEAN_PATH), and grades the output with
 `check_lean_axiom_audit.py`:
 
   * AuditFixture.Clean  → must PASS (standard axioms only; theorem, def, instance, inductive);
@@ -17,8 +18,13 @@ core, so this takes seconds and needs no Mathlib), generates audit drivers for t
     declaration without an entry fails; a SECOND native_decide in the allowlisted file fails;
     a STALE entry fails; an entry naming the wrong axiom does not allow; a wildcard is rejected;
     a theorem that USES the excepted declaration fails (the gate is transitive — Cartan seq 5688);
-  * forged-JSON spoof: a well-formed fake SUMMARY line appended to the Clean output must
-    turn the verdict into FAIL (duplicate summary), never into a pass.
+  * injection (PR #829 Gemini r1 finding 1): AuditFixture.Inject exports a high-priority `!`
+    macro and an `initialize` printing a fake clean summary (this PASSED the first,
+    in-environment driver on Lean 4.30.0); AuditFixture.InjectId exports `BEq Name` /
+    `HAdd Nat Nat Nat` overrides and a same-named helper in the driver's old opened namespace.
+    Each must FAIL naming exactly its planted `sorry` theorem;
+  * forged output: a clean result appended to the Bad run's output (right nonce), or replacing
+    it with a wrong nonce, must turn the verdict into FAIL, never into a pass.
 
 usage: test_lean_axiom_audit.py [--lean PATH]   (default: `lean` on PATH)
 Exit 0 = every planted case behaved; 1 = regression.
@@ -46,6 +52,11 @@ EXPECT_BAD = {
     # native_decide declares its per-call native axiom as a constant of the module itself:
     "AuditFixture.Bad.hidden_native._native.native_decide.ax_1_1",
 }
+EXPECT_INJECT = {
+    "AuditFixture.Inject": {"AuditFixture.Inject.by_sorry"},
+    "AuditFixture.InjectId": {"AuditFixture.InjectId.by_sorry"},
+}
+FIXTURES = ("Clean", "Bad", "AllowOne", "AllowTwo", "AllowDep", "Inject", "InjectId")
 
 
 def run(cmd: list[str], **kw) -> subprocess.CompletedProcess:
@@ -86,10 +97,16 @@ def audit(
         ]
     )
     assert r.returncode == 0, r.stderr
-    for f in sorted(drv.glob("AxiomAudit_*.lean")):
-        if not f.with_suffix(".jsonl").exists():
-            out = run([lean, "--json", str(f)], env=env)
-            f.with_suffix(".jsonl").write_text(out.stdout)
+    for f in sorted(drv.glob("AxiomAudit_*.args")):
+        args = f.read_text(encoding="utf-8").splitlines()
+        # As in CI: LEAN_PATH unset (the auditor is elaborated against the toolchain only), the
+        # project's search path handed over in QBP_AUDIT_LEAN_PATH.
+        aenv = {k: v for k, v in env.items() if k != "LEAN_PATH"}
+        aenv["QBP_AUDIT_LEAN_PATH"] = env["LEAN_PATH"]
+        out = run([lean, "--run", str(HERE / "LeanAxiomAudit.lean"), *args], env=aenv)
+        f.with_suffix(".out").write_text(out.stdout)
+        if out.returncode != 0:
+            print(f"     auditor exit {out.returncode}: {out.stderr[:600]}")
     al = ""
     if allowlist is not None:
         p = work / f"allow-{mod}-{len(allowlist)}.json"
@@ -134,7 +151,7 @@ def main() -> int:
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
             "HOME": os.environ.get("HOME", "/tmp"),
         }
-        for m in ("Clean", "Bad", "AllowOne", "AllowTwo", "AllowDep"):
+        for m in FIXTURES:
             r = run(
                 [
                     a.lean,
@@ -148,6 +165,32 @@ def main() -> int:
             if r.returncode != 0:
                 print(f"FAIL compiling fixture {m}:\n{r.stdout}{r.stderr}")
                 return 1
+
+        # The lexer fixtures of test_check_lean_foundations.py (PR #829 findings 2/3) are REAL
+        # Lean, and Lean sees the declaration the first Python lexer hid in a fake comment.
+        lex = HERE / "lean_lexer_fixtures"
+        (work / "build" / "LexFix").mkdir(parents=True)
+        for f in sorted((lex / "LexFix").glob("*.lean")):
+            mod = f"LexFix.{f.stem}"
+            r = run(
+                [
+                    a.lean,
+                    f"--root={lex}",
+                    "-o",
+                    str(work / "build" / "LexFix" / f"{f.stem}.olean"),
+                    str(f),
+                ],
+                env=env,
+            )
+            decl = "honest" if f.stem == "LegitRaw" else "vac"
+            probe = work / f"Probe{f.stem}.lean"
+            probe.write_text(f"import {mod}\n#check @{mod}.{decl}\n", encoding="utf-8")
+            p = run([a.lean, str(probe)], env=env) if r.returncode == 0 else r
+            report(
+                r.returncode == 0 and p.returncode == 0,
+                f"lexer fixture {mod} compiles and Lean sees `{decl}` as a declaration",
+                r.stdout + r.stderr + p.stdout + p.stderr,
+            )
 
         rc, res, out = audit(a.lean, work, "AuditFixture.Clean", env)
         report(
@@ -163,6 +206,21 @@ def main() -> int:
             f"Bad fixture fails naming exactly the planted declarations (exit {rc}): {sorted(found)}",
             out,
         )
+
+        # PR #829 Gemini r1 finding 1. Inject: a high-priority `!` macro + an `initialize`
+        # printing a fake clean summary — against the first (in-environment) driver this PASSED
+        # (reproduced on 4.30.0). InjectId: `BEq Name` / `HAdd Nat Nat Nat` overrides and a
+        # same-named helper in the driver's opened namespace. Each must FAIL naming exactly its
+        # planted `sorry` theorem, with no other error: the auditor never sees the module's
+        # syntax and never runs its code.
+        for mod, want in EXPECT_INJECT.items():
+            rc, res, out = audit(a.lean, work, mod, env)
+            found = {d for d, _ in res["non_standard"]}
+            report(
+                rc == 1 and found == want and not res["errors"],
+                f"injection fixture {mod} fails closed (exit {rc}): {sorted(found)}",
+                out,
+            )
 
         # Allowlist (director ruling on #827, option (a)): exact, per-declaration, issue-linked.
         rc, res, out = audit(
@@ -254,33 +312,51 @@ def main() -> int:
             out,
         )
 
-        # forged JSON summary appended to the Clean output -> must FAIL, never pass
-        drv = work / "drv-AuditFixture.Clean"
+        # Forged auditor output on the Bad module's run -> must FAIL, never pass:
+        #   (1) a well-formed CLEAN result with the right nonce appended (two results);
+        #   (2) the real output replaced by a clean result with a wrong nonce (a file planted
+        #       before this generation, e.g. by build-time code).
+        drv = work / "drv-AuditFixture.Bad"
         d0 = json.loads((drv / "manifest.json").read_text())["drivers"][0]
-        forged = {
-            "severity": "information",
-            "fileName": d0["file"],
-            "pos": {"line": d0["run_cmd_line"], "column": 0},
-            "data": "AXIOM-AUDIT-827 SUMMARY root=(explicit) modules=1/1 declarations=9 bad=0",
+        outp = Path(d0["output"])
+        real = outp.read_text()
+        clean = {
+            "mark": "AXIOM-AUDIT-827",
+            "nonce": d0["nonce"],
+            "root": d0["label"],
+            "targets": d0["modules"],
+            "missing": [],
+            "declarations": 9,
+            "nonstd": [],
         }
-        jl = Path(d0["file"]).with_suffix(".jsonl")
-        jl.write_text(jl.read_text() + json.dumps(forged) + "\n")
-        c = run(
-            [
-                sys.executable,
-                "-I",
-                str(HERE / "check_lean_axiom_audit.py"),
-                "--manifest",
-                str(drv / "manifest.json"),
-                "--allowlist",
-                "",
-            ]
-        )
-        report(
-            c.returncode == 1 and "expected exactly 1 positioned SUMMARY" in c.stdout,
-            f"forged SUMMARY line makes the audit FAIL, not pass (exit {c.returncode})",
-            c.stdout,
-        )
+        for what, text in (
+            ("a forged clean result appended", real + json.dumps(clean) + "\n"),
+            (
+                "the output replaced by a clean result with a WRONG nonce",
+                json.dumps(dict(clean, nonce="0" * 32)) + "\n",
+            ),
+        ):
+            outp.write_text(text)
+            rj = work / "result-forged.json"
+            c = run(
+                [
+                    sys.executable,
+                    "-I",
+                    str(HERE / "check_lean_axiom_audit.py"),
+                    "--manifest",
+                    str(drv / "manifest.json"),
+                    "--allowlist",
+                    "",
+                    "--json",
+                    str(rj),
+                ]
+            )
+            res = json.loads(rj.read_text())
+            report(
+                c.returncode == 1 and len(res["errors"]) == 1,
+                f"{what} makes the audit FAIL, not pass (exit {c.returncode}, {len(res['errors'])} error)",
+                c.stdout,
+            )
     print("axiom-audit planted tests " + ("PASSED" if not bad else f"FAILED ({bad})"))
     return 1 if bad else 0
 

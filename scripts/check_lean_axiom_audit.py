@@ -1,25 +1,28 @@
 #!/usr/bin/env python3
 """Lean CI axiom audit, checker side — QBP issue #827 AC2/AC3.
 
-Grades the outputs of the driver files written by `gen_lean_axiom_audit.py` and run with
-`lake env lean --json <driver>`. The drivers make LEAN enumerate every constant of every
-in-scope module (the default targets' import closure) and compute its axiom closure; this
-script only checks what Lean reported. RULE 1: ANY axiom outside {propext, Classical.choice,
-Quot.sound} FAILS — `sorryAx`, a native-evaluation axiom of whatever name the toolchain emits
-(per-call `…_native.native_decide.ax_…` since Lean 4.29; `Lean.ofReduceBool` before), any user
-`axiom`. The gate never keys on a specific native-axiom name.
+Grades the outputs of the fixed auditor program `scripts/LeanAxiomAudit.lean`, run once per
+default-target root with the arguments `gen_lean_axiom_audit.py` wrote. The auditor makes LEAN
+enumerate every constant of every in-scope module (the default targets' import closure) and
+compute its axiom closure; this script only checks what Lean reported. RULE 1: ANY axiom
+outside {propext, Classical.choice, Quot.sound} FAILS — `sorryAx`, a native-evaluation axiom of
+whatever name the toolchain emits (per-call `…_native.native_decide.ax_…` since Lean 4.29;
+`Lean.ofReduceBool` before), any user `axiom`. The gate never keys on a specific native-axiom
+name; the standard-three filter itself runs inside the auditor.
 
-Trust rules (as in PR #824's toolcheck grader, Gemini (2)):
-  * only Lean's own `--json` message stream is read; any other output line (e.g. printed by an
-    imported module's `initialize`) is untrusted and ignored;
-  * a message counts only if its `fileName` is the driver itself and it is positioned at the
-    driver's `run_cmd` line (recorded by the generator) — imported modules cannot place
-    messages there;
-  * the driver must emit exactly one `SUMMARY` information message with
-    `modules=K/K` (every in-scope module of that root was found in the environment) and
-    `declarations>0`; `bad` must equal the number of `NONSTD` error messages; ANY other error
-    message in the driver (failed import, missing module, elaboration error) FAILS;
-  * an empty audit (no drivers, no declarations) FAILS.
+Trust model (PR #829, Gemini r1 finding 1). The auditor is elaborated against the toolchain
+only and loads the audited modules at run time as data (`importModules (loadExts := false)`):
+no macro, notation, instance or initializer of an audited module can change what it computes
+or prints. On top of that:
+  * each run's stdout is redirected into a fresh file and must hold EXACTLY ONE result line
+    (`{"mark": "AXIOM-AUDIT-827", …}`); other lines are shown, never graded;
+  * the result must carry the run's NONCE (fresh per generation, after `lake build`), the
+    run's root, and EXACTLY the manifest's target module list;
+  * every target module must be present in the loaded environment (`missing == []`), at least
+    one declaration must be audited, and an empty audit (no runs) FAILS;
+  * a run with no output (crash, failed import) FAILS.
+Known limit (not this gate's job): the .olean files are trusted as written by `lake build`; the
+auditor does not re-typecheck them in the kernel (that is lean4checker's job).
 
 ALLOWLIST (scripts/lean_axiom_allowlist.json): exact, issue-linked exceptions — fully qualified
 declaration + the exact extra axiom names + an issue number. A declaration is allowed only if its
@@ -31,7 +34,7 @@ that depends on an excepted one inherits its axiom and fails (it has no entry of
 Today there is ONE exception: the documented native_decide theorem of issue #582.
 
 usage: check_lean_axiom_audit.py --manifest DIR/manifest.json [--json OUT] [--allowlist FILE]
-       (expects DIR/AxiomAudit_<k>.jsonl next to each driver, as written by the CI step)
+       (expects DIR/AxiomAudit_<k>.out, the auditor's stdout for each run, as written by CI)
 Exit 0 = pass, 1 = fail.
 """
 
@@ -39,23 +42,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
-import re
 import sys
 from pathlib import Path
 
 MARK = "AXIOM-AUDIT-827"
-SUMMARY = re.compile(
-    rf"^{MARK} SUMMARY root=(?P<root>\S+) modules=(?P<found>\d+)/(?P<total>\d+) "
-    r"declarations=(?P<decls>\d+) bad=(?P<bad>\d+)\s*$"
-)
-NONSTD = re.compile(
-    rf"^{MARK} NONSTD (?P<decl>\S+) module=(?P<mod>\S+) axioms=(?P<ax>.*)$", re.DOTALL
-)
 
 
-def read_jsonl(p: Path) -> tuple[list[dict], int]:
-    msgs, untrusted = [], 0
+def read_output(p: Path) -> tuple[list[dict], int]:
+    """(result objects carrying the audit mark, count of other non-empty lines)."""
+    results, other = [], 0
     for raw in p.read_text(encoding="utf-8", errors="replace").splitlines():
         raw = raw.strip()
         if not raw:
@@ -64,23 +59,14 @@ def read_jsonl(p: Path) -> tuple[list[dict], int]:
             m = json.loads(raw) if raw.startswith("{") else None
         except json.JSONDecodeError:
             m = None
-        if isinstance(m, dict) and "severity" in m and "data" in m:
-            msgs.append(m)
+        if isinstance(m, dict) and m.get("mark") == MARK:
+            results.append(m)
         else:
-            untrusted += 1
-    return msgs, untrusted
+            other += 1
+    return results, other
 
 
 DEFAULT_ALLOWLIST = Path(__file__).resolve().parent / "lean_axiom_allowlist.json"
-
-
-def parse_axiom_list(text: str) -> set[str]:
-    """`[a, b]` (Lean's rendering of the NONSTD list) -> {"a", "b"}."""
-    return {
-        x.strip()
-        for x in text.strip().strip("[]").replace("\n", " ").split(",")
-        if x.strip()
-    }
 
 
 def load_allowlist(path: Path, errors: list[str]) -> dict[str, dict]:
@@ -135,84 +121,81 @@ def main() -> int:
     if not drivers:
         errors.append("no audit drivers — an empty audit is a failure")
     for d in drivers:
-        drv = Path(d["file"])
-        out = drv.with_suffix(".jsonl")
-        tag = d["root"] or "(explicit)"
+        out = Path(d["output"])
+        tag = d["label"]
         if not out.exists():
-            errors.append(f"[{tag}] no Lean output {out.name} — driver not run")
-            continue
-        msgs, untrusted = read_jsonl(out)
-        mine = [
-            m
-            for m in msgs
-            if os.path.realpath(str(m.get("fileName", "")))
-            == os.path.realpath(str(drv))
-        ]
-        at_cmd = [
-            m for m in mine if (m.get("pos") or {}).get("line") == d["run_cmd_line"]
-        ]
-        summaries = [
-            SUMMARY.match(m["data"].strip())
-            for m in at_cmd
-            if m["severity"] == "information" and SUMMARY.match(m["data"].strip())
-        ]
-        bad_here = []
-        for m in at_cmd:
-            if m["severity"] == "error":
-                hit = NONSTD.match(m["data"].strip())
-                if hit:
-                    bad_here.append(
-                        {
-                            "decl": hit["decl"],
-                            "module": hit["mod"],
-                            "axioms": hit["ax"].strip(),
-                            "root": tag,
-                        }
-                    )
-        others = [
-            m
-            for m in mine
-            if m["severity"] == "error"
-            and not (m in at_cmd and NONSTD.match(m["data"].strip()))
-        ]
-        for m in others:
             errors.append(
-                f"[{tag}] Lean error in the driver: {m['data'].strip()[:300]}"
-            )
-        if len(summaries) != 1:
-            errors.append(
-                f"[{tag}] expected exactly 1 positioned SUMMARY, found {len(summaries)}"
+                f"[{tag}] no auditor output {out.name} — the run did not happen"
             )
             continue
-        s = summaries[0]
-        found, total, decls, bad = (
-            int(s["found"]),
-            int(s["total"]),
-            int(s["decls"]),
-            int(s["bad"]),
-        )
-        if found != total or total != len(d["modules"]):
+        results, other = read_output(out)
+        if other:
+            # The auditor prints nothing but its one JSON line; anything else (e.g. a warning
+            # from elaborating LeanAxiomAudit.lean) is shown, never graded.
+            print(f"[{tag}] {other} non-result output line(s) ignored")
+        if len(results) != 1:
             errors.append(
-                f"[{tag}] only {found}/{total} in-scope modules present (manifest lists {len(d['modules'])})"
+                f"[{tag}] expected exactly 1 auditor result line, found {len(results)}"
+            )
+            continue
+        r = results[0]
+        if r.get("nonce") != d["nonce"]:
+            errors.append(
+                f"[{tag}] auditor result carries the wrong nonce — not this run's output"
+            )
+            continue
+        if r.get("root") != tag or r.get("targets") != d["modules"]:
+            errors.append(
+                f"[{tag}] auditor result is for a different scope "
+                f"(root={r.get('root')}, {len(r.get('targets') or [])} targets)"
+            )
+            continue
+        missing = r.get("missing")
+        decls = r.get("declarations")
+        bad_raw = r.get("nonstd")
+        if (
+            not isinstance(missing, list)
+            or not isinstance(decls, int)
+            or not isinstance(bad_raw, list)
+        ):
+            errors.append(f"[{tag}] malformed auditor result")
+            continue
+        if missing:
+            errors.append(
+                f"[{tag}] in-scope module(s) absent from the loaded environment: {missing}"
             )
         if decls == 0:
             errors.append(
                 f"[{tag}] zero declarations audited — an empty audit is a failure"
             )
-        if bad != len(bad_here):
-            errors.append(
-                f"[{tag}] SUMMARY says bad={bad} but {len(bad_here)} NONSTD message(s) were found"
+        bad_here = []
+        for b in bad_raw:
+            if not (
+                isinstance(b, dict)
+                and isinstance(b.get("decl"), str)
+                and isinstance(b.get("axioms"), list)
+                and b["axioms"]
+            ):
+                errors.append(f"[{tag}] malformed non-standard entry: {b}")
+                continue
+            bad_here.append(
+                {
+                    "decl": b["decl"],
+                    "module": str(b.get("module", "")),
+                    "axioms": [str(x) for x in b["axioms"]],
+                    "root": tag,
+                }
             )
         total_decls += decls
         audited_modules.update(d["modules"])
         nonstd.extend(bad_here)
         print(
-            f"axiom audit [{tag}]: {found}/{total} modules, {decls} declarations, {bad} non-standard; "
-            f"{untrusted} untrusted non-JSON line(s) ignored"
+            f"axiom audit [{tag}]: {len(d['modules']) - len(missing)}/{len(d['modules'])} modules, "
+            f"{decls} declarations, {len(bad_here)} non-standard"
         )
     found_ax: dict[str, set[str]] = {}
     for b in nonstd:
-        found_ax.setdefault(b["decl"], set()).update(parse_axiom_list(b["axioms"]))
+        found_ax.setdefault(b["decl"], set()).update(b["axioms"])
     allow = load_allowlist(Path(a.allowlist), errors) if a.allowlist else {}
     uniq: set[tuple[str, str]] = set()
     allowed_hits: list[str] = []

@@ -71,6 +71,40 @@ CASES = [
 ]
 
 
+FIXTURES = HERE / "lean_lexer_fixtures" / "LexFix"
+VAC = "vacuous-`: True :=` theorem"
+AMB = "comment opener `--`/`/-` glued to a symbol character (put a space before it)"
+# PR #829 Gemini r1 findings 2/3 (+ the same desync class). Each file is real Lean (the Lean-side
+# self-test `test_lean_axiom_audit.py` compiles it and checks that Lean sees `vac` as a
+# declaration). Expected = (exit code, the EXACT non-zero hard-ban counts, the EXACT ratchet
+# counts), never wording. Under the first lexer every must-fail file except CharEsc passed
+# with vacuous count 0 — `vac` was hidden in a fake comment.
+LEXER_FIXTURES = [
+    ("Raw.lean", 1, {}, {VAC: 1, "sorry": 0}),
+    ("RawHashes.lean", 1, {}, {VAC: 1, "sorry": 0}),
+    ("CharPrime.lean", 1, {}, {VAC: 1, "sorry": 0}),
+    ("CharEsc.lean", 1, {}, {VAC: 1, "sorry": 0}),
+    ("Guillemet.lean", 1, {}, {VAC: 1, "sorry": 0}),
+    # The lexer cannot know Lean's token table: `//-` is refused outright (and `vac` is not
+    # counted, because to the lexer it IS inside the comment — the refusal is what fails it).
+    ("Ambig.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
+    ("LegitRaw.lean", 0, {}, {VAC: 0, "sorry": 0}),
+]
+
+
+def run_fixture(name: str) -> tuple[int, dict, dict]:
+    sys.path.insert(0, str(HERE))
+    import check_lean_foundations as clf  # noqa: E402
+
+    with tempfile.TemporaryDirectory() as d:
+        (Path(d) / name).write_text(
+            (FIXTURES / name).read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        hard, ratchet, _ = clf.scan(d)
+        rc, _ = run_case((FIXTURES / name).read_text(encoding="utf-8"))
+    return rc, {k: v for k, v in hard.items() if v}, ratchet
+
+
 def run_case(src: str) -> tuple[int, str]:
     with tempfile.TemporaryDirectory() as d:
         (Path(d) / "X.lean").write_text(src, encoding="utf-8")
@@ -108,6 +142,29 @@ def main() -> int:
         if not good:
             print("     " + out.replace("\n", "\n     ")[:800])
             bad += 1
+    for name, want_rc, want_hard, want_ratchet in LEXER_FIXTURES:
+        rc, hard, ratchet = run_fixture(name)
+        good = rc == want_rc and hard == want_hard and ratchet == want_ratchet
+        print(
+            ("ok  " if good else "FAIL")
+            + f" lexer fixture {name}: exit {rc}, hard {hard}, ratchet {ratchet}"
+        )
+        bad += not good
+    # unit checks of the token rules themselves (PR #829)
+    units = [
+        ('r#" " /- "# x', "x"),  # raw string closes at "#, x is code
+        ('r##" "# -- "## x', "x"),
+        ("x'\"'/-\" x2", "x2"),  # x' is an identifier, "'/-" a string
+        ("«/-» x3", "x3"),
+        ("'\\x22' \"/-\" x4", "x4"),
+        ('2r"/-" x5', "x5"),  # number 2, then a raw string
+    ]
+    for src, word in units:
+        good = word in strip_comments(src) and len(strip_comments(src)) == len(src)
+        print(
+            ("ok  " if good else "FAIL") + f" lexer unit {src!r} keeps {word!r} as code"
+        )
+        bad += not good
     print("lexer/gate planted tests " + ("PASSED" if not bad else f"FAILED ({bad})"))
     return 1 if bad else 0
 
