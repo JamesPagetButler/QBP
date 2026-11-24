@@ -45,6 +45,16 @@ Federation refs and the `expected-on-sibling` annotation (#738):
 Exit codes: 0 OK; 1 on any FAIL (in-repo broken ref, broken sibling ref,
 orphan or malformed annotation, missing doc).
 
+`--fail-on-unverifiable` (#761, CI-only): once sibling repos are actually
+checked out under `$QBP_SIBLING_ROOT` (e.g. on CI via
+`.github/workflows/tenancy-xref-lint.yml`), every annotated federation ref
+is expected to VERIFY. Passing this flag turns a lingering "not verifiable
+here" on an annotated ref into exit 1 (with an explicit message) instead of
+the default exit 0 -- which is correct for local dev, where siblings are
+often simply absent on disk and INFO-without-failure is the right behaviour.
+Do not pass this flag for a local run; it is meant for CI only, after the
+sibling checkout step.
+
 NOT matched:
 - Bare GitHub PR/issue/comment URLs (handled by link-checker.yml)
 - External URLs (handled by link-checker.yml)
@@ -295,6 +305,16 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help=f"dir holding sibling checkouts (default: ${SIBLING_ROOT_ENV} or ~/Documents)",
     )
+    ap.add_argument(
+        "--fail-on-unverifiable",
+        action="store_true",
+        help=(
+            "CI-only (#761): exit 1 if any annotated federation ref is still "
+            "'not verifiable here' after linting -- use once sibling repos "
+            "are checked out under --sibling-root/$QBP_SIBLING_ROOT, never "
+            "for a plain local run"
+        ),
+    )
     args = ap.parse_args(argv)
 
     repo_root: Path = args.repo_root.resolve()
@@ -304,7 +324,16 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     res = lint_tenancy_doc(doc_path, repo_root, sibling_root)
-    return report(res)
+    rc = report(res)
+    if rc == 0 and args.fail_on_unverifiable and res.federation_unverifiable > 0:
+        print(
+            f"\nFAIL: --fail-on-unverifiable set and {res.federation_unverifiable} "
+            "annotated federation ref(s) are still 'not verifiable here' -- the "
+            "sibling checkout was expected to have landed by now (CI-only check, "
+            "QBP#761)."
+        )
+        return 1
+    return rc
 
 
 if __name__ == "__main__":
