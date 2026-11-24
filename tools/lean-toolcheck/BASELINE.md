@@ -1,8 +1,10 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `20261121T021507Z` (2026-11-21 02:15–02:16 UTC, `tools/lean-toolcheck/run.sh --update-baseline`) ·
-**overall GREEN — 32/32 files as expected**: 20 tool tests pass, 9 must-fail controls caught with the expected
-message, 3 known-limit probes confirmed (report-only) · 115 theorems axiom-audited.
+**Run:** `20261124T234344Z` (2026-11-24 23:43–23:45 UTC, `tools/lean-toolcheck/run.sh --update-baseline`) ·
+**overall GREEN — 37/37 files as expected**: 20 tool tests pass, 14 must-fail controls caught with the expected
+message, 3 known-limit probes confirmed (report-only) · 120 theorems axiom-audited. (The per-file table below keeps
+the `20261121T021507Z` numbers for T00–MF09; MF10–MF14 rows are from `20261124T234344Z`; the committed
+`results/` record is the new run.)
 Machine-readable record: [`results/results-v4.30.0-c5ea003.json`](results/results-v4.30.0-c5ea003.json)
 (+ the `.md` table). Re-run: `tools/lean-toolcheck/run.sh` — this writes only to `results/runs/<run-id>/`
 (gitignored); the committed record changes only with `--update-baseline` on a full GREEN run. A later run on the
@@ -13,9 +15,13 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 > `axiom` is caught by the axiom audit alone (MF05). The checker's own comment stripper is string-blind: after a
 > string containing a block-comment opener it misses a `native_decide` (KL03; the audit still catches it).
 >
-> **How the grader reads Lean.** `lean --json`; only Lean's message stream is trusted; an axiom report counts only
-> as an `information` message positioned at its `#print axioms` command; reports merge worst-case (MF06). Every
-> expectation regex is matched against one Lean message or one checker `::error::` line.
+> **How the grader reads Lean.** `lean --json`; an axiom report counts only as an `information` message positioned
+> at its `#print axioms` command; reports merge worst-case (MF06). Stdout is **not** a trusted channel — code the
+> file runs can forge a message on `/dev/stdout` and exit before Lean prints the real report (MF14) — so a pass file
+> is graded fail-closed: one report per site, none off a site, no non-Lean stdout line, no code-executing construct
+> (`EXEC_RE`, a supported-subset denylist; the out-of-process audit is QBP#827). Lines are counted Lean's way:
+> bytes, only `\r\n` → `\n`, split at `\n` only (MF10/MF11). Every expectation regex is matched against one Lean
+> message or one checker `::error::` line.
 >
 > **Coverage: the audit covers the `#print axioms` sites the lexer finds (anywhere on a line, MF07); the suite
 > convention is one site per theorem.** A file with a brace inside a string literal is refused (MF08: the lexer does
@@ -75,7 +81,12 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 | `must-fail/MF06_SpoofedAudit/…` | must-fail | ✅ caught | 0 | 1.16 | 776 | `['sorryAx']` | axiom audit (JSON, position-tied, worst-case) sees `sorryAx` despite 3 printed fake clean reports (ignored) · checker RATCHET |
 | `must-fail/MF07_SameLineSite/…` | must-fail | ✅ caught | 0 | 1.13 | 776 | `[]`; `['QBPToolcheck.MF07.cheat']` | sites found anywhere on a line: `dirty` (col 38) reports `[QBPToolcheck.MF07.cheat]` |
 | `must-fail/MF08_InterpolationLexer/…` | must-fail | ✅ caught | 0 | 1.15 | 776 | `[]`; `['QBPToolcheck.MF08.cheat']` | grader REFUSES (brace inside a string literal, l.37); audit of every Lean report still shows `cheat` |
-| `must-fail/MF09_NonAsciiColumn/…` | must-fail | ✅ caught | 0 | 1.14 | 776 | `[]`; `['QBPToolcheck.MF09.cheat']` | column in Lean's unit (codepoints, pinned): `dirty` after `αβγ` reports `[QBPToolcheck.MF09.cheat]` |
+| `must-fail/MF09_NonAsciiColumn/…` (with astral `𝔽`, run `…234344Z`) | must-fail | ✅ caught | 0 | 1.24 | 784 | `[]`; `['QBPToolcheck.MF09.cheat']` | column in Lean's unit (codepoints, pinned vs bytes AND UTF-16): `dirty` after `αβγ` + `𝔽` reports `[QBPToolcheck.MF09.cheat]` |
+| `must-fail/MF10_FormFeedLineDesync/…` | must-fail | ✅ caught | 0 | 2.39 | 1444 | `['QBPToolcheck.MF10.cheat']` | lines split at `\n` only: real report at (33, 79) accepted; forged `run_cmd` clean report at (33, 0) ignored |
+| `must-fail/MF11_LoneCRLineDesync/…` | must-fail | ✅ caught | 0 | 2.38 | 1444 | `['QBPToolcheck.MF11.cheat']` | bytes read, lone `\r` not a break: real report at line 30 accepted; forged one at line 31 ignored |
+| `must-fail/MF12_EscapedQuoteSite/…` | must-fail | ✅ caught | 0 | 1.30 | 784 | `['QBPToolcheck.MF12.cheat']` | site after `"a\"b"` found |
+| `must-fail/MF13_CleanBraceRefused/…` | must-fail | ✅ caught | 0 | 1.17 | 784 | `[]` | grader REFUSES (brace in a string, l.19) |
+| `must-fail/MF14_ExecForgesStdout/…` | must-fail | ✅ caught | 0 | 1.25 | 784 | `[]` (**forged** — the real report was never printed) | exec refusal (l.27 `#eval`); the stdout audit alone is fooled, as designed |
 | `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.13 | 776 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
 | `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.14 | 776 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
 | `known-limits/KL03_CheckerStringComment/…` | known-limit | 🟡 known limit | 0 | 1.15 | 776 | `['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']` | 🟡 confirmed: checker exit 0 (string-blind stripper misses the `native_decide`); HARD: audit shows the native axiom |
@@ -134,6 +145,18 @@ record's raw logs (`…225231Z`, same files): `python3 -I tools/lean-toolcheck/s
 | same | new | **FAIL**: `grader REFUSES the file: brace inside a string literal` |
 | MF09 replayed as a pass-labelled attack (multi-byte prefix before a same-line site) | pre-r3 (`4c0aecb`) and new | **FAIL** both — Lean counts codepoints, the same unit as Python's str index, so there was no mismatch to exploit |
 | **unit pin** on MF09's real Lean output | new | PASS: Lean reported column 37 = codepoint offset 37 (UTF-8 byte offset 40) |
+| **unit pin** on MF09 with astral `𝔽` (run `…234344Z`) | new | PASS: Lean (33, 45) = codepoints 45; bytes 51; UTF-16 46 |
+| **line-rule pins** on MF10 / MF11 real output | new | PASS: Lean line 33 / 30 = `\n`-only rule; Python rule (splitlines / universal newlines) 34 / 31 |
+| MF10 / MF11 replayed as pass-labelled attacks (T93/T94) | **`19bbbd4`** | **PASS — exploitable** (real report discarded, forged `run_cmd` report accepted) |
+| same | new | **FAIL** (exec refusal, unpositioned report, `cheat`) |
+| MF14 replayed as a pass-labelled attack (T98: `#eval` forges `/dev/stdout`, then exits 0) | **`19bbbd4`** | **PASS — exploitable** |
+| same | new | **FAIL**: code-executing construct refused |
+| MF13 replayed as a pass file (T97, clean + brace) / MF13 with the brace removed | new | **FAIL** by refusal / **FAIL** (`grader-refuses` not met) |
+| forged clean report off-site (T96) / at-site as `warning` (T96b), real report removed | new | **FAIL** both (spoof guard: position / severity) |
+| clean T01 + duplicate report at a site / + forged report off-site / + non-Lean stdout line / + severity-less JSON at a site | new | **FAIL** each (fail-closed pass rules) |
+| MF01 with an UNANCHORED checker regex and the text on a `note:` line | new | **FAIL** (`::error` lines only) |
+| T19 with `#print axioms` inside a string literal | new | PASS (strings are not commands) |
+| `mutants_grader.py`: 25 grader mutants (M01–M19 reconstructed from the Red Team list, M20–M25 new rules) | new | **24 KILLED, 1 SURVIVED** (M04, equivalent: code-only and original lines have equal length) |
 | `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
 
 Earlier controls (Red Team round): five planted misses in MF01–MF04 / T04 were all flagged (exit 1).
@@ -206,6 +229,25 @@ So Lean's column unit is codepoints, and `#eval` output is always positioned at 
 prints newlines. It can never land on a `#print axioms` site; if it did, worst-case merge would still keep the real
 report.
 
+## Line-break probe (Gemini r4 (f), 2026-11-24, `lean --json`, v4.30.0)
+
+One physical line `#check a /- X -/ #check b` per character X; the second `#check`'s reported line shows whether X
+starts a line. Then X placed in code position.
+
+| X | in a comment: `b` reported at | in code |
+|---|---|---|
+| `\r` (lone) | same line, col 37 | error `isolated carriage returns are not allowed` |
+| `\v`, `\f`, `\x1c`, `\x1d`, `\x1e` | same line, col 37 | error `expected token` |
+| `\x85` | same line, col 38 | error `expected token` |
+| U+2028, U+2029 | same line, col 39 | error `expected token` |
+| `\r\n` | **next line**, col 4 | accepted (a line break) |
+
+So Lean breaks lines only at `\n`, with `\r\n` normalised (`FileMap.ofString`, `crlfToLf` in `mkInputContext`), and
+none of the other characters is even legal outside a comment or string. Gemini's literal counterexample (a form
+feed at the start of a code line) is therefore a Lean parse error, not a silent pass; the attack is real once the
+character sits in a comment (MF10), and a lone `\r` in a comment is a second, independent vector through Python's
+text-mode universal newlines (MF11).
+
 ## Change history
 
 | Date | Run | Change |
@@ -216,3 +258,4 @@ report.
 | 2026-11-20 | `20261120T223723Z` | Gemini fix round: `lean --json` + position-tied, worst-case axiom audit (+MF06 spoof control); nesting/string-aware comment lexer (+T19); anchored expectation matching; empty suite/layer/prefix RED; +KL03 (checker string-blind); 3 consecutive full runs GREEN 29/29 |
 | 2026-11-20 | `20261120T230310Z` | Gemini r2: sites anywhere on a line (+MF07); braces in strings refused (+MF08); string bodies blanked for site detection; coverage statement; 3 consecutive full runs GREEN 31/31 |
 | 2026-11-21 | `20261121T021507Z` | Gemini r3 (e): column unit probed (codepoints) and pinned (`LEAN_COLUMN_UNIT`, computed from the original source line); +MF09; self-test unit pin; 3 consecutive full runs GREEN 32/32 |
+| 2026-11-24 | `20261124T234344Z` | Gemini r4 (f) + Red Team (`19bbbd4`): `\n`-only line model, bytes read (+MF10, +MF11, line-rule pins); fail-closed pass rules and `EXEC_RE` code-execution refusal (+MF14); +MF12 (escaped quote), +MF13 (clean-brace refusal); astral `𝔽` in MF09; guard-dependent plants; `mutants_grader.py` 24/25; 3 full runs GREEN (34/34 before MF12–MF14, then 37/37 ×2) |

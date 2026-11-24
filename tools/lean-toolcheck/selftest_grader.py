@@ -179,16 +179,18 @@ results.append(
 def as_pass_attack(src_stem: str, src_rel: str, new_stem: str) -> tuple[Path, Path]:
     s3 = work / f"suite-{new_stem}"
     shutil.copytree(suite, s3, ignore=shutil.ignore_patterns("results"))
-    text = (suite / src_rel).read_text(encoding="utf-8").splitlines(keepends=True)
+    # Bytes in, bytes out, split at `\n` only (Gemini r4 (f)): a text-mode read would turn a
+    # lone `\r` (MF11) into a line break and desync the copy from the real Lean logs.
+    text = (suite / src_rel).read_bytes().decode("utf-8").split("\n")
     first = True
     out = []
     for ln in text:
         if ln.startswith("TOOLCHECK-EXPECT:"):
-            out.append("TOOLCHECK-EXPECT: pass\n" if first else "\n")
+            out.append("TOOLCHECK-EXPECT: pass" if first else "")
             first = False
         else:
             out.append(ln)
-    (s3 / "tests" / f"{new_stem}.lean").write_text("".join(out), encoding="utf-8")
+    (s3 / "tests" / f"{new_stem}.lean").write_bytes("\n".join(out).encode("utf-8"))
     r3 = work / f"raw-{new_stem}"
     shutil.copytree(raw, r3)
     for ext in (".log", ".meta.json", ".checker.log", ".stderr"):
@@ -214,6 +216,26 @@ for src_stem, src_rel, new_stem in (
         "must-fail/MF09_NonAsciiColumn/MF09_NonAsciiColumn.lean",
         "T92_AttackNonAsciiColumn",
     ),
+    (
+        "MF10_FormFeedLineDesync",
+        "must-fail/MF10_FormFeedLineDesync/MF10_FormFeedLineDesync.lean",
+        "T93_AttackFormFeedLines",
+    ),
+    (
+        "MF11_LoneCRLineDesync",
+        "must-fail/MF11_LoneCRLineDesync/MF11_LoneCRLineDesync.lean",
+        "T94_AttackLoneCRLines",
+    ),
+    (
+        "MF14_ExecForgesStdout",
+        "must-fail/MF14_ExecForgesStdout/MF14_ExecForgesStdout.lean",
+        "T98_AttackExecForge",
+    ),
+    (
+        "MF13_CleanBraceRefused",
+        "must-fail/MF13_CleanBraceRefused/MF13_CleanBraceRefused.lean",
+        "T97_AttackCleanBrace",
+    ),
 ):
     s3, r3 = as_pass_attack(src_stem, src_rel, new_stem)
     res = evaluate(new_tc, r3, s3, new_stem)
@@ -237,36 +259,231 @@ for src_stem, src_rel, new_stem in (
         )
 
 
+# 7b. Red Team on PR #824 (19bbbd4): plants whose outcome DEPENDS on each guard, so a mutant
+#     that drops the guard is killed (the union merge alone absorbed every earlier spoof).
+def drop_real_and_forge(sev, at_site):
+    def mut(p):
+        ms = jl(p)
+        real = next(m for m in ms if "depends on axioms" in m["data"])
+        thm = real["data"].split("'")[1]
+        ms = [m for m in ms if m is not real]
+        ms.append(
+            {
+                "severity": sev,
+                "pos": dict(real["pos"]) if at_site else {"line": 1, "column": 0},
+                "data": f"'{thm}' does not depend on any axioms",
+            }
+        )
+        wjl(p, ms)
+
+    return mut
+
+
+MF05 = ("MF05_CustomAxiom", "must-fail/MF05_CustomAxiom/MF05_CustomAxiom.lean")
+for tag, mut, what in (
+    # M10: the real report is absent; a forged clean `information` report sits OFF the site.
+    ("T96_ForgedOffSite", drop_real_and_forge("information", False), "position"),
+    # M11: the real report is absent; a forged clean report sits AT the site as a `warning`.
+    ("T96b_ForgedWarningAtSite", drop_real_and_forge("warning", True), "severity"),
+):
+    s3, r3 = as_pass_attack(*MF05, tag)
+    mut(r3 / f"{tag}.log")
+    res = evaluate(new_tc, r3, s3, tag)
+    ok = ok and res["rows"][f"{tag}.lean"]["result"] == "FAIL"
+    results.append(
+        (f"plant[{tag}] spoof guard: {what} (must FAIL)", row(res, f"{tag}.lean"), "")
+    )
+
+
+# M19: MF13 with the brace replaced in the SOURCE copy (same length, so Lean's positions still
+# match): it still expects `grader-refuses`, the grader no longer refuses -> must FAIL.
+def unbrace_mf13(s4):
+    f = s4 / "must-fail/MF13_CleanBraceRefused/MF13_CleanBraceRefused.lean"
+    f.write_bytes(f.read_bytes().replace(b'"a { b"', b'"a x b"'))
+
+
+# M15: MF01's checker regex UNANCHORED in the suite copy, and the matching checker text moved
+# onto a `note:` line: only the "`::error` lines only" filter can still fail it.
+def unanchor_mf01(s4):
+    f = s4 / "must-fail/MF01_Sorry/MF01_Sorry.lean"
+    f.write_bytes(
+        f.read_bytes().replace(
+            b"checker-reject ^::error::RATCHET", b"checker-reject RATCHET"
+        )
+    )
+
+
+def note_mf01(d):
+    p = d / "MF01_Sorry.checker.log"
+    p.write_text(p.read_text().replace("::error::RATCHET", "note: RATCHET"))
+
+
+for tag, suite_mut, raw_mut, name in (
+    ("refuse-expected-not-refused", unbrace_mf13, None, "MF13_CleanBraceRefused.lean"),
+    ("checker-unanchored", unanchor_mf01, note_mf01, "MF01_Sorry.lean"),
+):
+    s4 = work / f"suite-{tag}"
+    shutil.copytree(suite, s4, ignore=shutil.ignore_patterns("results"))
+    suite_mut(s4)
+    r4 = work / f"raw-{tag}"
+    shutil.copytree(raw, r4)
+    if raw_mut is not None:
+        raw_mut(r4)
+    res = evaluate(new_tc, r4, s4, tag)
+    ok = ok and res["rows"][name]["result"] == "FAIL"
+    results.append((f"plant[{tag}] {name} (must FAIL)", row(res, name), ""))
+
+
+# Fail-closed rules on a CLEAN pass file (T01): each plant alone must turn it FAIL.
+def t01_dup(d):
+    p = d / "T01_DecideFin.log"
+    ms = jl(p)
+    wjl(p, ms + [dict(next(m for m in ms if "axioms" in m["data"]))])
+
+
+def t01_offsite(d):
+    p = d / "T01_DecideFin.log"
+    ms = jl(p)
+    site = next(m for m in ms if "axioms" in m["data"])
+    wjl(p, ms + [{**site, "pos": {"line": 1, "column": 0}}])
+
+
+def t01_untrusted(d):
+    p = d / "T01_DecideFin.log"
+    p.write_text(p.read_text() + "printed by code, not a Lean message\n")
+
+
+for tag, mut in (
+    ("pass-duplicate-at-site", t01_dup),
+    ("pass-forged-offsite", t01_offsite),
+    ("pass-untrusted-stdout", t01_untrusted),
+):
+    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+
+
+# M18: a JSON line WITHOUT `severity` at a real site, replacing the real report: only Lean's
+# message shape (severity + data) may be trusted, so this must FAIL.
+def t01_no_severity(d):
+    p = d / "T01_DecideFin.log"
+    ms = jl(p)
+    real = next(m for m in ms if "axioms" in m["data"])
+    thm = real["data"].split("'")[1]
+    forged = {
+        "pos": dict(real["pos"]),
+        "data": f"'{thm}' does not depend on any axioms",
+    }
+    wjl(p, [m for m in ms if m is not real] + [forged])
+
+
+planted("pass-json-without-severity", t01_no_severity, ["T01_DecideFin.lean"], "FAIL")
+
+# M16: a `#print axioms` INSIDE a string literal is not a command. T19's string body is replaced
+# (same length, so Lean's positions still match) by a fake site; the grader must ignore it and
+# the file must still PASS (a grader that kept strings would demand a report for it).
+s5 = work / "suite-site-in-string"
+shutil.copytree(suite, s5, ignore=shutil.ignore_patterns("results"))
+t19 = s5 / "tests" / "T19_NestedComments.lean"
+body = "/- not a comment -- nor this"
+fake = "#print axioms QBPToolcheck.X"
+assert len(fake) == len(body)
+t19.write_bytes(t19.read_bytes().replace(body.encode(), fake.encode()))
+res = evaluate(new_tc, raw, s5, "site-in-string")
+ok = ok and res["rows"]["T19_NestedComments.lean"]["result"] == "PASS"
+results.append(
+    (
+        "plant[site-in-string] T19 with `#print axioms` inside a string (must PASS)",
+        row(res, "T19_NestedComments.lean"),
+        "",
+    )
+)
+
+
 # 8. Gemini r3 (e): PIN Lean's `pos.column` unit on MF09's REAL output. The dirty report's
 #    column must equal the codepoint offset of its `#print` in the original source line, and
 #    (because the line has a multi-byte prefix) differ from the UTF-8 byte offset — so this
 #    check distinguishes the two units and fails loudly if a toolchain ever switches.
-mf09_src = (suite / "must-fail/MF09_NonAsciiColumn/MF09_NonAsciiColumn.lean").read_text(
-    encoding="utf-8"
+mf09_src = (
+    (suite / "must-fail/MF09_NonAsciiColumn/MF09_NonAsciiColumn.lean")
+    .read_bytes()
+    .decode("utf-8")
 )
-lines = mf09_src.splitlines()
+lines = mf09_src.split("\n")
 mf09_ln = next(
     i
     for i, ln in enumerate(lines, start=1)
     if "#print axioms QBPToolcheck.MF09.dirty" in ln
 )
 idx = lines[mf09_ln - 1].index("#print axioms QBPToolcheck.MF09.dirty")
-cp, by = idx, len(lines[mf09_ln - 1][:idx].encode("utf-8"))
+pre = lines[mf09_ln - 1][:idx]
+cp, by, u16 = idx, len(pre.encode("utf-8")), len(pre.encode("utf-16-le")) // 2
 got_col = None
-for l in (raw / "MF09_NonAsciiColumn.log").read_text(encoding="utf-8").splitlines():
+for l in (raw / "MF09_NonAsciiColumn.log").read_bytes().decode("utf-8").split("\n"):
     if l.strip().startswith("{"):
         m = json.loads(l)
         if "'QBPToolcheck.MF09.dirty' depends on axioms" in m.get("data", ""):
             got_col = (m["pos"]["line"], m["pos"]["column"])
-pin_ok = got_col == (mf09_ln, cp) and cp != by
+pin_ok = got_col == (mf09_ln, cp) and cp != by and cp != u16
 ok = ok and pin_ok
 results.append(
     (
-        "pin[Lean column unit] MF09 real Lean output (must equal the CODEPOINT offset, not bytes)",
-        f"{'PASS' if pin_ok else 'FAIL'}: Lean reported {got_col}; codepoint offset ({mf09_ln}, {cp}); UTF-8 byte offset ({mf09_ln}, {by})",
+        "pin[Lean column unit] MF09 real Lean output (must equal the CODEPOINT offset, not bytes or UTF-16)",
+        f"{'PASS' if pin_ok else 'FAIL'}: Lean reported {got_col}; codepoint offset ({mf09_ln}, {cp}); UTF-8 byte offset ({mf09_ln}, {by}); UTF-16 offset ({mf09_ln}, {u16})",
         "",
     )
 )
+
+
+# 9. Gemini r4 (f): PIN Lean's LINE rule on MF10's and MF11's REAL output. Lean must report
+#    `dirty` at the `\n`-only line of its `#print axioms` — and, because each file plants a
+#    character that Python treats as a line break (form feed for `str.splitlines`, lone CR for
+#    text-mode universal newlines), that line must DIFFER from the Python-rule line, so the
+#    check distinguishes the two rules and fails loudly if a toolchain ever changes its rule.
+def lean_line_pin(stem: str, thm: str, py_rule) -> tuple[bool, str]:
+    src_b = next((suite / "must-fail").glob(f"{stem}/{stem}.lean")).read_bytes()
+    needle = f"#print axioms {thm}"
+    lean_ln = next(
+        i
+        for i, ln in enumerate(
+            src_b.decode("utf-8").replace("\r\n", "\n").split("\n"), 1
+        )
+        if needle in ln
+    )
+    py_ln = next(i for i, ln in enumerate(py_rule(src_b), 1) if needle in ln)
+    got = None
+    for l in (raw / f"{stem}.log").read_bytes().decode("utf-8").split("\n"):
+        if l.strip().startswith("{"):
+            m = json.loads(l)
+            if f"'{thm}' depends on axioms" in m.get("data", ""):
+                got = m["pos"]["line"]
+    good = got == lean_ln and lean_ln != py_ln
+    return good, (
+        f"{'PASS' if good else 'FAIL'}: Lean reported line {got}; `\\n`-only line {lean_ln}; "
+        f"Python-rule line {py_ln}"
+    )
+
+
+for stem, thm, rule_name, rule in (
+    (
+        "MF10_FormFeedLineDesync",
+        "QBPToolcheck.MF10.dirty",
+        "str.splitlines (breaks at \\f)",
+        lambda b: b.decode("utf-8").splitlines(),
+    ),
+    (
+        "MF11_LoneCRLineDesync",
+        "QBPToolcheck.MF11.dirty",
+        "text-mode read (universal newlines: lone \\r -> \\n)",
+        lambda b: b.decode("utf-8")
+        .replace("\r\n", "\n")
+        .replace("\r", "\n")
+        .split("\n"),
+    ),
+):
+    good, msg = lean_line_pin(stem, thm, rule)
+    ok = ok and good
+    results.append(
+        (f"pin[Lean line rule] {stem} real Lean output vs {rule_name}", msg, "")
+    )
 
 for a, b, c in results:
     print(f"| {a} | {b} | {c} |")

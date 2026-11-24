@@ -16,7 +16,7 @@ Each file is one `lake env lean` with cwd = `proofs/` (pins, Lean env and Mathli
 | Dir | What | Graded as |
 |---|---|---|
 | `tests/` | T00–T19: one feature per file, ends in `#print axioms` | must pass, all axioms ⊆ {propext, Classical.choice, Quot.sound}, checker accepts |
-| `must-fail/` | MF01 sorry/admit · MF02 native_decide · MF03 literal `: True :=` · MF04 false `decide` · MF05 custom `axiom` · MF06 spoofed axiom audit · MF07 same-line site · MF08 interpolation (refused) · MF09 non-ASCII prefix before a same-line site | must be caught **with the expected message**; a must-fail that passes is a suite failure |
+| `must-fail/` | MF01 sorry/admit · MF02 native_decide · MF03 literal `: True :=` · MF04 false `decide` · MF05 custom `axiom` · MF06 spoofed axiom audit · MF07 same-line site · MF08 interpolation (refused) · MF09 non-ASCII prefix before a same-line site · MF10 form feed / MF11 lone CR in a comment (line-count desync) · MF12 escaped quote before a site · MF13 clean file with a brace in a string (refused) · MF14 code run during elaboration forges stdout and exits (exec-refused) | must be caught **with the expected message**; a must-fail that passes is a suite failure |
 | `known-limits/` | KL01 non-literal vacuity · KL02 `Fin.foldl` under `decide` · KL03 checker blind to a `native_decide` after a string containing a comment opener | report-only: "confirmed" / "CHANGED", never a failure |
 
 **Limits, stated plainly.** The vacuity check is **syntactic only**: the foundations checker matches the literal
@@ -26,10 +26,17 @@ detector there (MF05). The checker's comment stripper is also string-blind: afte
 block-comment opener it misses a `native_decide` (KL03; the audit still catches it). A Lean crash (exit ≥ 128)
 fails the run and is never retried.
 
-**How the grader reads Lean.** Lean runs with `--json`; only Lean's own message stream is trusted. An axiom report
-counts only as an `information` message positioned at its `#print axioms` command, and reports merge worst-case, so
-printed text cannot fake or clear an audit (MF06). Sites are found anywhere on a line (MF07), with the column computed in Lean's unit — codepoints, pinned by probe and self-test (MF09) — in source with
-comments and string bodies blanked by a nesting- and string-aware lexer (T19).
+**How the grader reads Lean.** Lean runs with `--json`. An axiom report counts only as an `information` message
+positioned at its `#print axioms` command, and reports merge worst-case, so `#eval`-printed text cannot add a clean
+report or clear a real one (MF06). **Stdout is not a trusted channel:** code the file runs can write a forged JSON
+message to `/dev/stdout`, or exit before Lean prints the real report (MF14). So a **pass** file is graded
+fail-closed: exactly one positioned report per `#print axioms` site, no axiom-like message off a site, no stdout line
+that is not a Lean message, and no code-executing construct (`#eval`, `run_cmd`, `elab`, `initialize`,
+`implemented_by`, `native_decide`, … — `EXEC_RE`, a supported-subset denylist, not a proof; the out-of-process audit
+is QBP#827). Sites are found anywhere on a line (MF07), with the column in Lean's unit — codepoints, pinned by probe
+and self-test (MF09) — and lines counted Lean's way: bytes read, only `\r\n` → `\n`, split at `\n` only, never
+`str.splitlines()` or text-mode universal newlines (MF10 form feed, MF11 lone CR; pinned by self-test), in source with
+comments and string bodies blanked by a nesting-, string- and escape-aware lexer (T19, MF12).
 
 > **Coverage, stated plainly: the audit covers the `#print axioms` sites the lexer finds — nothing else. The suite's
 > convention is ONE site per theorem.** A theorem without a site is not audited. The lexer does not model string
