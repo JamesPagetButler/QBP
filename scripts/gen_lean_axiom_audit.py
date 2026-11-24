@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """Generate the Lean axiom-audit runs — QBP issue #827 AC2/AC3.
 
-COVERAGE COMES FROM LEAN, NOT FROM PYTHON. Python only decides which MODULES are in scope —
-the transitive import closure of the `@[default_target]` roots in `proofs/lakefile.lean`,
-i.e. exactly what CI's bare `lake build` compiles (parsed with `check_layer_imports.py`'s
-lakefile/import helpers). For each default-target root it writes the ARGUMENTS of one run of
-the fixed auditor program `scripts/LeanAxiomAudit.lean`, which loads that root's ELABORATED
-ENVIRONMENT from the built .olean files: every constant whose defining module is in scope —
-theorem, def, instance, axiom, inductive, auxiliary lemma, however the source is written
-(comments, strings, `#print axioms` or not) — has its axiom closure computed, and any axiom
-outside {propext, Classical.choice, Quot.sound} is reported. One run per root because roots
-can clash when imported together (e.g. two `lean_exe` roots each defining `main`).
+COVERAGE AND SCOPE COME FROM LEAN, NOT FROM PYTHON. Python picks only the ROOTS (the
+`@[default_target]` roots in `proofs/lakefile.lean`, i.e. what CI's bare `lake build` compiles)
+and writes, for each root, the ARGUMENTS of one run of the fixed auditor program
+`scripts/LeanAxiomAudit.lean`. The auditor loads that root's environment from the built .olean
+files and audits every module it really loaded whose .olean lies in the project build directory
+(PR #829 Red Team finding 4: a Python import regex had missed `import A import Hidden` on one
+line). Every constant of those modules — theorem, def, instance, axiom, inductive, auxiliary
+lemma, however the source is written — has its exact axiom closure computed, and any axiom
+outside {propext, Classical.choice, Quot.sound} is reported. The Python import closure
+(`check_layer_imports.py` helpers, now multi-import-per-line) is kept only as a cross-check:
+each of its modules must be in Lean's scope. One run per root because roots can clash when
+imported together (e.g. two `lean_exe` roots each defining `main`). The allowlist's declarations
+are passed along so the auditor fingerprints them (identity pins, Red Team finding 3).
 
 WHY THERE IS NO GENERATED .lean DRIVER (PR #829, Gemini r1 finding 1). The first version wrote
 a `.lean` driver that IMPORTED the audited modules and ran the audit in a `run_cmd`. Such a file
@@ -25,7 +28,8 @@ exists while the auditor is elaborated, and none of their code runs. This genera
 the auditor's arguments and the manifest the checker grades against.
 
 usage:
-  gen_lean_axiom_audit.py --proofs proofs --out-dir DIR      write DIR/AxiomAudit_<n>.args + DIR/manifest.json
+  gen_lean_axiom_audit.py --proofs proofs --out-dir DIR [--allowlist FILE] [--project-dir D]
+                                                             write DIR/AxiomAudit_<n>.args + DIR/manifest.json
   gen_lean_axiom_audit.py --proofs proofs --topo             print the in-scope modules in build order
   gen_lean_axiom_audit.py --proofs proofs --modules M1 M2 --out-dir DIR
                                                              (fixtures/tests) audit exactly these modules
@@ -105,11 +109,29 @@ def all_modules(proofs: Path, srcdirs: list[str]) -> list[str]:
     return sorted(out)
 
 
-def write(out: Path, groups: list[tuple[str, list[str]]], extra: dict) -> None:
+def allowlist_names(path: str) -> list[str]:
+    """Declarations named by the allowlist (the auditor fingerprints exactly these)."""
+    if not path or not Path(path).exists():
+        return []
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    return sorted(
+        {e["declaration"] for e in data.get("entries", []) if isinstance(e, dict)}
+    )
+
+
+def write(
+    out: Path,
+    groups: list[tuple[str, list[str]]],
+    extra: dict,
+    project_dirs: list[str],
+    allow: list[str],
+) -> None:
     """One auditor run per root: DIR/AxiomAudit_<k>.args (one argument per line: NONCE, LABEL,
-    then `i:<import>` and `t:<target module>` items) + DIR/manifest.json. The NONCE is fresh per
-    generation (CI generates after `lake build`), so no file written during the build can pass
-    for the auditor's output; leftover outputs in DIR are deleted first."""
+    then `i:<import>`, `t:<expected module>`, `p:<project build dir>`, `a:<allowlisted name>`
+    items) + DIR/manifest.json. The NONCE is fresh per generation (CI generates after
+    `lake build`), so no file written during the build can pass for the auditor's output;
+    leftover outputs in DIR are deleted first. The SCOPE is decided by Lean (every loaded
+    module whose .olean lies under a `p:` directory); `t:` is only a cross-check."""
     out.mkdir(parents=True, exist_ok=True)
     for old in list(out.glob("AxiomAudit_*")):
         old.unlink()
@@ -125,7 +147,13 @@ def write(out: Path, groups: list[tuple[str, list[str]]], extra: dict) -> None:
         nonce = secrets.token_hex(16)
         label = root or "(explicit)"
         imports = [root] if root else list(mods)
-        args = [nonce, label] + [f"i:{m}" for m in imports] + [f"t:{m}" for m in mods]
+        args = (
+            [nonce, label]
+            + [f"i:{m}" for m in imports]
+            + [f"t:{m}" for m in mods]
+            + [f"p:{d}" for d in project_dirs]
+            + [f"a:{n}" for n in allow]
+        )
         f = out / f"AxiomAudit_{k}.args"
         f.write_text("\n".join(args) + "\n", encoding="utf-8")
         files.append(
@@ -151,11 +179,28 @@ def main() -> int:
     ap.add_argument("--out-dir")
     ap.add_argument("--topo", action="store_true")
     ap.add_argument("--modules", nargs="*")
+    ap.add_argument(
+        "--project-dir",
+        action="append",
+        help="project build dir(s) holding the audited .olean files "
+        "(default PROOFS/.lake/build/lib/lean)",
+    )
+    ap.add_argument(
+        "--allowlist",
+        default=str(Path(__file__).resolve().parent / "lean_axiom_allowlist.json"),
+        help="allowlist whose declarations the auditor fingerprints ('' = none)",
+    )
     a = ap.parse_args()
     proofs = Path(a.proofs)
+    pdirs = a.project_dir or [str(proofs / ".lake" / "build" / "lib" / "lean")]
+    allow = allowlist_names(a.allowlist)
     if a.modules:
         write(
-            Path(a.out_dir), [("", a.modules)], {"in_scope": a.modules, "not_built": []}
+            Path(a.out_dir),
+            [("", a.modules)],
+            {"in_scope": a.modules, "all_modules": a.modules},
+            pdirs,
+            allow,
         )
         return 0
     roots, closures, srcdirs = scope(proofs)
@@ -167,15 +212,17 @@ def main() -> int:
     if a.topo:
         print("\n".join(in_scope))
         return 0
-    not_built = [m for m in all_modules(proofs, srcdirs) if m not in in_scope]
+    everything = all_modules(proofs, srcdirs)
     write(
         Path(a.out_dir),
         [(r, closures[r]) for r in roots],
-        {"in_scope": in_scope, "not_built": not_built},
+        {"in_scope": in_scope, "all_modules": everything},
+        pdirs,
+        allow,
     )
     print(
-        f"axiom-audit runs: {len(roots)} root(s), {len(in_scope)} in-scope module(s); "
-        f"{len(not_built)} module(s) in proofs/ not built by `lake build`: {', '.join(not_built) or '—'}"
+        f"axiom-audit runs: {len(roots)} root(s); the Python import closure lists "
+        f"{len(in_scope)} module(s) (a cross-check — Lean decides the audited scope)"
     )
     return 0
 

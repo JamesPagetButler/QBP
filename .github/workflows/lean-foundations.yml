@@ -102,6 +102,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # PR #829 Red Team finding 2 (e3): `#eval` in a proof file runs arbitrary IO during
+      # `lake build` and could rewrite the gate scripts or the allowlist in this checkout. Take a
+      # copy of scripts/ BEFORE anything Lean runs and run the gate from that copy only.
+      # Its tree hash goes into a STEP OUTPUT, which the runner fixes when this step ends, so
+      # build-time code cannot alter it; the gate steps re-hash the snapshot and refuse to run
+      # on any difference. Residual limit (stated in the checker docstring): build-time code
+      # runs as the same user, so the toolchain binaries themselves are not pinned.
+      - name: Snapshot the gate scripts before any Lean code runs
+        id: gate
+        run: |
+          set -euo pipefail
+          cp -a scripts "$RUNNER_TEMP/gate"
+          chmod -R a-w "$RUNNER_TEMP/gate"
+          h="$(cd "$RUNNER_TEMP/gate" && find . -type f -not -path '*/__pycache__/*' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
+          echo "tree hash $h"
+          echo "sha=$h" >> "$GITHUB_OUTPUT"
       - name: Install elan (pinned toolchain from proofs/lean-toolchain)
         run: |
           set -euo pipefail
@@ -156,7 +172,11 @@ jobs:
       # must be deleted when #582 lands. TRANSITIVE: the exception covers exactly that name —
       # any declaration that USES it inherits the native axiom in its own closure and fails.
       - name: Axiom-audit self-test (planted fixtures, core Lean only)
-        run: python3 scripts/test_lean_axiom_audit.py
+        run: |
+          set -euo pipefail
+          h="$(cd "$RUNNER_TEMP/gate" && find . -type f -not -path '*/__pycache__/*' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
+          if [ "$h" != "${{ steps.gate.outputs.sha }}" ]; then echo "::error::gate snapshot changed during the build"; exit 1; fi
+          python3 "$RUNNER_TEMP/gate/test_lean_axiom_audit.py"
       - name: Axiom audit (Lean enumerates every declaration of every built module)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -164,8 +184,11 @@ jobs:
         run: |
           set -euo pipefail
           out="$RUNNER_TEMP/axiom-audit"
-          auditor="$GITHUB_WORKSPACE/scripts/LeanAxiomAudit.lean"
-          python3 scripts/gen_lean_axiom_audit.py --proofs proofs --out-dir "$out"
+          gate="$RUNNER_TEMP/gate"   # the pre-build snapshot, never the (build-writable) checkout
+          h="$(cd "$RUNNER_TEMP/gate" && find . -type f -not -path '*/__pycache__/*' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
+          if [ "$h" != "${{ steps.gate.outputs.sha }}" ]; then echo "::error::gate snapshot changed during the build"; exit 1; fi
+          auditor="$gate/LeanAxiomAudit.lean"
+          python3 "$gate/gen_lean_axiom_audit.py" --proofs proofs --out-dir "$out" --allowlist "$gate/lean_axiom_allowlist.json"
           lp="$(cd proofs && lake env printenv LEAN_PATH)"
           for a in "$out"/AxiomAudit_*.args; do
             mapfile -t args < "$a"
@@ -175,4 +198,4 @@ jobs:
               lean --run "$auditor" "${args[@]}" > "${a%.args}.out" 2> "${a%.args}.stderr") || true
             tail -c 2000 "${a%.args}.stderr" || true
           done
-          python3 scripts/check_lean_axiom_audit.py --manifest "$out/manifest.json"
+          python3 "$gate/check_lean_axiom_audit.py" --manifest "$out/manifest.json" --allowlist "$gate/lean_axiom_allowlist.json"

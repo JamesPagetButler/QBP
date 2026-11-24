@@ -73,6 +73,17 @@ BUILD_VISIBILITY_DIRS = PHYSICS_DIRS + ["Sprint12-Inherited"]
 # (`/- c -/ import X`, `-/ import X`); on stripped text comments are spaces, so a
 # whitespace-tolerant anchor is both safe and necessary (PR #719 Red Team K1).
 IMPORT_RE = re.compile(r"^[ \t]*import\s+([\w.]+)", re.MULTILINE)
+# PR #829 Red Team finding 4: several import commands may share one line (`import A import
+# Hidden` is valid Lean). IMPORT_RE (one per line, anchored) read only the first, so `Hidden`
+# was invisible to the build-visibility closure (rule 5) and to the axiom-audit scope.
+# `imports_of_text` therefore takes EVERY import command token in the comment-stripped text —
+# any number per line, `[public|private] [meta] import [all] Name` — anywhere in the file (a
+# superset of Lean's header, so a misplaced import still counts: fail-closed). IMPORT_RE is
+# kept for the `strip_comments` unit test.
+IMPORT_CMD_RE = re.compile(
+    r"(?<![\w.'!?«])(?:(?:public|private)\s+)?(?:meta\s+)?import\s+(?:all\s+)?"
+    r"((?:[\w'!?]+|«[^»]*»)(?:\.(?:[\w'!?]+|«[^»]*»))*)"
+)
 QUARANTINE_RE = re.compile(r"^\|\s*`(QBP\.[\w.]+)`", re.MULTILINE)
 # Lakefile parsing: `lean_lib`/`lean_exe` target blocks, each with an optional
 # `srcDir := "X"` and roots given as `root := `Mod`` or `roots := #[`A, `B]`.
@@ -142,8 +153,9 @@ def strip_comments(text: str) -> str:
 
 
 def imports_of_text(text: str) -> list[str]:
-    """Real `import X` lines of a Lean source, ignoring any inside comments."""
-    return IMPORT_RE.findall(strip_comments(text))
+    """The imports of a Lean source's header, ignoring any inside comments — every import
+    command, including several on one line (PR #829 Red Team finding 4)."""
+    return IMPORT_CMD_RE.findall(strip_comments(text))
 
 
 def imports_of(path: Path) -> list[str]:

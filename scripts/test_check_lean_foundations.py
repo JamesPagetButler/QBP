@@ -70,6 +70,59 @@ CASES = [
     ),
 ]
 
+NATIVE = "native_decide"
+# PR #829 Red Team: inline must-reject / must-pass cases with EXACT counts
+# (name, source, exit, non-zero hard-ban counts, ratchet counts).
+INLINE_CASES = [
+    (
+        'Red Team f1: raw string r#"a"/-"# then native_decide (verbatim repro)',
+        'def s : String := r#"a"/-"#\ntheorem t : 1 = 1 := by native_decide\ndef u : String := "-/"\n',
+        1,
+        {NATIVE: 1},
+        {"sorry": 0},
+    ),
+    (
+        "Red Team f2: guillemet idents «x/-» … «-/» around native_decide (verbatim repro)",
+        "def «x/-» : Nat := 1\ntheorem t : 1 = 1 := by native_decide\ndef «-/» : Nat := 2\n",
+        1,
+        {NATIVE: 1},
+        {"sorry": 0},
+    ),
+    (
+        "M21: `-- /-` is a LINE comment, so native_decide on the next line is code",
+        "-- /-\ntheorem t : 1 = 1 := by native_decide\n-- -/\n",
+        1,
+        {NATIVE: 1},
+        {"sorry": 0},
+    ),
+    (
+        "M19: char '\"' then a real block comment holding native_decide (must pass)",
+        'def c : Char := \'"\'\n/- native_decide -/\ndef d : String := "x"\n',
+        0,
+        {},
+        {"sorry": 0},
+    ),
+    (
+        'Gemini r1 (3) verbatim class: char literal \'"\' then a string "/-" then native_decide',
+        'def q : Char := \'"\'\ndef s : String := "/-"\ntheorem t : 1 = 1 := by native_decide\n'
+        'def u : String := "-/"\n',
+        1,
+        {NATIVE: 1},
+        {"sorry": 0},
+    ),
+]
+
+
+def run_src(src: str) -> tuple[int, dict, dict]:
+    sys.path.insert(0, str(HERE))
+    import check_lean_foundations as clf  # noqa: E402
+
+    with tempfile.TemporaryDirectory() as d:
+        (Path(d) / "X.lean").write_text(src, encoding="utf-8")
+        hard, ratchet, _ = clf.scan(d)
+    rc, _ = run_case(src)
+    return rc, {k: v for k, v in hard.items() if v}, ratchet
+
 
 FIXTURES = HERE / "lean_lexer_fixtures" / "LexFix"
 VAC = "vacuous-`: True :=` theorem"
@@ -149,6 +202,12 @@ def main() -> int:
             ("ok  " if good else "FAIL")
             + f" lexer fixture {name}: exit {rc}, hard {hard}, ratchet {ratchet}"
         )
+        bad += not good
+    for name, src, want_rc, want_hard, want_ratchet in INLINE_CASES:
+        rc, hard, ratchet = run_src(src)
+        ratchet = {k: v for k, v in ratchet.items() if k in want_ratchet}
+        good = rc == want_rc and hard == want_hard and ratchet == want_ratchet
+        print(("ok  " if good else "FAIL") + f" {name}: exit {rc}, hard {hard}")
         bad += not good
     # unit checks of the token rules themselves (PR #829)
     units = [

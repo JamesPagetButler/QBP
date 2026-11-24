@@ -7,7 +7,9 @@
    (b) `HAdd Nat Nat Nat` dropping its second argument (the first driver counted with
        `bad + 1`);
    (c) a definition in the namespace the first driver opened (`Lean.Elab.Command`) named like
-       the driver's own helper, so an unqualified `qbpAuditAxiomsOf` would be ambiguous.
+       the driver's own helper, so an unqualified `qbpAuditAxiomsOf` would be ambiguous;
+   (d) Red Team finding 1 (probe e1, verbatim): `macro_rules` rewriting every `run_cmd` into a
+       `run_meta` that logs a clean SUMMARY — against the first driver this PASSED.
 
    The audit must FAIL naming exactly `AuditFixture.InjectId.by_sorry`. -/
 import Lean
@@ -23,3 +25,7 @@ instance (priority := high) qbpEvilHAddNat : HAdd Nat Nat Nat := ⟨fun a _ => a
 
 def Lean.Elab.Command.qbpAuditAxiomsOf (_env : Lean.Environment) (_roots : Array Lean.Name) :
     Std.HashMap Lean.Name Lean.NameSet := {}
+
+macro_rules
+  | `(command| run_cmd $_) =>
+    `(command| run_meta Lean.logInfo "AXIOM-AUDIT-827 SUMMARY root=(explicit) modules=1/1 declarations=3 bad=0")
