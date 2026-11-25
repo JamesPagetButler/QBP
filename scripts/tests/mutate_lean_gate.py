@@ -340,6 +340,29 @@ M = [
         "RESERVED_ROOTS: set = set()",
         [L],
     ),
+    # --- PR #829 Red Team r5 rule (interim token-declaration ban) -----------------------------
+    (
+        "T5a token-declaration ban (lexer-code match) dropped",
+        FD,
+        "            (TOKEN_DECL, lambda t: TOKEN_DECL_CODE.findall(code_only(t))),\n",
+        "",
+        [F],
+    ),
+    (
+        "T5b token-declaration ban (raw-text fallback) dropped",
+        FD,
+        "            (TOKEN_DECL_LINE, lambda t: TOKEN_DECL_RAW.findall(t)),\n",
+        "",
+        [F],
+    ),
+    (
+        "T5c both token-declaration bans dropped (the gate is forged again)",
+        FD,
+        "            (TOKEN_DECL, lambda t: TOKEN_DECL_CODE.findall(code_only(t))),\n"
+        "            (TOKEN_DECL_LINE, lambda t: TOKEN_DECL_RAW.findall(t)),\n",
+        "",
+        [F],
+    ),
     (
         "M17 lexer without nesting",
         LX,

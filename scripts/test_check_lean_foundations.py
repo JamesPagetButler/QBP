@@ -71,6 +71,8 @@ CASES = [
 ]
 
 NATIVE = "native_decide"
+TD = "token-declaring command (notation/infix/prefix/postfix/syntax/macro/elab/…), lexer code (interim ban, #836)"
+TDL = "token-declaring command at a line start, raw-text fallback (interim ban, #836)"
 RAW = 'raw string literal r"…" / r#"…"# (lexer-approximated; write an ordinary string)'
 CHR = "char literal (lexer-approximated; use a string or Char.ofNat)"
 GLU = "identifier character, quote, « or ` glued directly after a number (put a space between)"
@@ -139,6 +141,21 @@ INLINE_CASES = [
         {},
         {"sorry": 0},
     ),
+    (
+        "Red Team r5: every token-declaring form (attribute-prefixed, local, scoped, private) refused",
+        '@[inherit_doc] local notation "q1" => (1 : Nat)\n'
+        'scoped infixl:65 " +++ " => Nat.add\n'
+        'private syntax "qq" : term\n'
+        "macro_rules | `(qq) => `(1)\n"
+        'elab "ee" : term => pure (Lean.mkNatLit 1)\n'
+        "declare_syntax_cat qcat\n"
+        'prefix:max "√√" => Nat.succ\n'
+        'postfix:max "!!" => Nat.succ\n'
+        'macro "mm" : term => `(2)\n',
+        1,
+        {TD: 9, TDL: 9},
+        {"sorry": 0},
+    ),
 ]
 
 
@@ -164,7 +181,7 @@ AMB = "comment opener `--`/`/-` not at a line start or after whitespace (put a s
 LEXER_FIXTURES = [
     ("Raw.lean", 1, {RAW: 1}, {VAC: 1, "sorry": 0}),
     ("RawHashes.lean", 1, {RAW: 1}, {VAC: 1, "sorry": 0}),
-    ("CharPrime.lean", 1, {}, {VAC: 1, "sorry": 0}),
+    ("CharPrime.lean", 1, {TD: 1, TDL: 1}, {VAC: 1, "sorry": 0}),
     ("CharEsc.lean", 1, {CHR: 7}, {VAC: 1, "sorry": 0}),
     ("Guillemet.lean", 1, {}, {VAC: 1, "sorry": 0}),
     # The lexer cannot know Lean's token table: `//-` is refused outright (and `vac` is not
@@ -172,19 +189,25 @@ LEXER_FIXTURES = [
     ("Ambig.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
     # Red Team r2 finding 5 (T5, T6): a token may START with `(` or U+00A0 — only Lean
     # whitespace and line starts are clean boundaries.
-    ("GluedParen.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
-    ("GluedNbsp.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
+    ("GluedParen.lean", 1, {AMB: 1, TD: 1, TDL: 1}, {VAC: 0, "sorry": 0}),
+    ("GluedNbsp.lean", 1, {AMB: 1, TD: 1, TDL: 1}, {VAC: 0, "sorry": 0}),
     # Raw strings and char literals are HARD-BANNED in the scanned tree since PR #829 Gemini r2
     # (0 in proofs/QBP/Foundations): LegitRaw is lexed correctly (no fake comment, nothing
     # counted) but refused for exactly its 2 raw strings and 1 char literal.
-    ("LegitRaw.lean", 1, {RAW: 2, CHR: 1}, {VAC: 0, "sorry": 0}),
+    ("LegitRaw.lean", 1, {RAW: 2, CHR: 1, TD: 1, TDL: 1}, {VAC: 0, "sorry": 0}),
     # PR #829 Gemini r2 finding 1 (same lexer-gap class as PR #824 T89/T90): a raw string or
     # char literal glued after a hex / scientific number. Lexed per Lean's `numberFnAux`,
     # `vac` is code (counted), and the glued token and the literal are each refused.
     ("NumHexRaw.lean", 1, {RAW: 1, GLU: 1}, {VAC: 1, "sorry": 0}),
     ("NumHexChar.lean", 1, {CHR: 1, GLU: 1}, {VAC: 1, "sorry": 0}),
     ("NumSciRaw.lean", 1, {RAW: 1, GLU: 1}, {VAC: 1, "sorry": 0}),
-    ("NumNotation.lean", 1, {RAW: 1, GLU: 1}, {VAC: 1, "sorry": 0}),
+    ("NumNotation.lean", 1, {RAW: 1, GLU: 1, TD: 1, TDL: 1}, {VAC: 1, "sorry": 0}),
+    # PR #829 Red Team r5 finding 1: a file-declared token holding a quote. The lexer IS fooled
+    # (`vac` hidden: vacuous count 0), which is exactly why the token-declaring command itself
+    # is refused, by the lexer-code match AND by the raw-text fallback (1 each).
+    ("A1TokQuote.lean", 1, {TD: 1, TDL: 1}, {VAC: 0, "sorry": 0}),
+    ("A1x22.lean", 1, {TD: 1, TDL: 1}, {VAC: 0, "sorry": 0}),
+    ("A2TokSym.lean", 1, {TD: 1, TDL: 1}, {VAC: 0, "sorry": 0}),
 ]
 
 

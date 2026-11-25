@@ -60,6 +60,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lean_lexer import (
     ambiguous_comment_openers,
     brace_in_string,
+    code_only,
     literal_sites,
     strip_comments,
 )  # noqa: E402  (after the sys.path fix)
@@ -86,6 +87,29 @@ RAW_STRING = (
 )
 CHAR_LITERAL = "char literal (lexer-approximated; use a string or Char.ofNat)"
 GLUED_NUMBER = "identifier character, quote, « or ` glued directly after a number (put a space between)"
+# PR #829 Red Team r5 (finding 1, reproduced on Lean 4.30): a file can DECLARE a token that
+# contains a quote (`notation "zz\"" x => x`, a symbol atom `⟪\"`, or the escape `\x22`). Lean then
+# reads `zz"` as one token while the lexer opens a string, desyncs into a fake comment and hides a
+# vacuous theorem. INTERIM fix: HARD-BAN every token-declaring command in the scanned tree (0 in
+# proofs/QBP/Foundations and 0 in all of proofs/ on 2026-11-25). Under the beekeeper's QBP#836
+# ruling ("allow pure syntax macros", AC1b), PR A replaces this ban with the Lean-parser check,
+# which permits pure notation and macros whose expansions stay in the subset; tokens declared by
+# IMPORTED modules are an open case in that PR's scope. Matched twice: on the lexer's code (comments
+# and strings blanked) AND on raw text per line, because the lexer is what such a file fools.
+_TOKEN_KW = (
+    r"(?:notation3?|infixl|infixr|infix|prefix|postfix|syntax|macro_rules|macro|"
+    r"elab_rules|elab|declare_syntax_cat)"
+)
+TOKEN_DECL_CODE = re.compile(r"(?<![\w.'!?«])" + _TOKEN_KW + r"(?![\w'!?])")
+TOKEN_DECL_RAW = re.compile(
+    r"^\s*(?:@\[[^\]]*\]\s*)?(?:(?:private|protected|noncomputable)\s+)?"
+    r"(?:(?:local|scoped)\s+)?" + _TOKEN_KW + r"\b",
+    re.MULTILINE,
+)
+TOKEN_DECL = "token-declaring command (notation/infix/prefix/postfix/syntax/macro/elab/…), lexer code (interim ban, #836)"
+TOKEN_DECL_LINE = (
+    "token-declaring command at a line start, raw-text fallback (interim ban, #836)"
+)
 AMBIGUOUS_OPENER = "comment opener `--`/`/-` not at a line start or after whitespace (put a space before it)"
 
 
@@ -93,7 +117,7 @@ def scan(lean_dir):
     hard = {k: 0 for k in HARD_BAN}
     hard[BRACE_IN_STRING] = 0
     hard[AMBIGUOUS_OPENER] = 0
-    for k in (RAW_STRING, CHAR_LITERAL, GLUED_NUMBER):
+    for k in (RAW_STRING, CHAR_LITERAL, GLUED_NUMBER, TOKEN_DECL, TOKEN_DECL_LINE):
         hard[k] = 0
     ratchet = {k: 0 for k in RATCHET}
     hard_hits = []
@@ -114,6 +138,8 @@ def scan(lean_dir):
             (RAW_STRING, lambda t: literal_sites(t)["raw"]),
             (CHAR_LITERAL, lambda t: literal_sites(t)["char"]),
             (GLUED_NUMBER, lambda t: literal_sites(t)["glued_number"]),
+            (TOKEN_DECL, lambda t: TOKEN_DECL_CODE.findall(code_only(t))),
+            (TOKEN_DECL_LINE, lambda t: TOKEN_DECL_RAW.findall(t)),
         ):
             nb = len(fn(raw))
             hard[name] += nb
