@@ -192,7 +192,11 @@ def main() -> int:
     )
     a = ap.parse_args()
     proofs = Path(a.proofs)
-    pdirs = a.project_dir or [str(proofs / ".lake" / "build" / "lib" / "lean")]
+    # absolute: the auditor runs from inside proofs/, not from where this script was called
+    pdirs = [
+        str(Path(d).resolve())
+        for d in (a.project_dir or [str(proofs / ".lake" / "build" / "lib" / "lean")])
+    ]
     allow = allowlist_names(a.allowlist)
     if a.modules:
         write(
