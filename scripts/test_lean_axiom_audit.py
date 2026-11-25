@@ -62,6 +62,8 @@ EXPECT_INJECT = {
     "AuditFixture.InjectId": {"AuditFixture.InjectId.by_sorry"},
 }
 # Build order matters: ScopeRoot imports ScopeA and ScopeHidden.
+# Lexer fixtures that Lean 4.30 itself does not compile (PR #829 Gemini r2 F1, P1-P3).
+LEAN_REJECTS = {"NumHexRaw", "NumHexChar", "NumSciRaw"}
 FIXTURES = (
     "Clean",
     "Bad",
@@ -351,6 +353,16 @@ def main() -> int:
                 ],
                 env=env,
             )
+            if f.stem in LEAN_REJECTS:
+                # Gemini r2 F1 shapes P1-P3: Lean 4.30 itself REJECTS them (a function argument
+                # needs whitespace before it: "unexpected token; expected command" right after
+                # the number), so the forge is not real there; the lexer still refuses them.
+                report(
+                    r.returncode != 0 and "unexpected token" in r.stdout + r.stderr,
+                    f"lexer fixture {mod} is rejected by Lean itself (exit {r.returncode})",
+                    r.stdout + r.stderr,
+                )
+                continue
             decl = "honest" if f.stem == "LegitRaw" else "vac"
             probe = work / f"Probe{f.stem}.lean"
             probe.write_text(f"import {mod}\n#check @{mod}.{decl}\n", encoding="utf-8")

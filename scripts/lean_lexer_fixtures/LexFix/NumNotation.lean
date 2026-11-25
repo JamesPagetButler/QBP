@@ -2,6 +2,7 @@
 -- A lexer that read only decimal digits took `0` and then an identifier, read the rest as an
 -- ordinary string with an escape, and opened a FAKE comment at `/-`, hiding `vac`. Lexed per
 -- Lean's `numberFnAux`, `vac` is code; the glued number and the literal are refused.
+-- Lean 4.30 compiles this file and sees `vac` (CI run 45672287560): the class is real.
 namespace LexFix.NumNotation
 
 notation:0x41r"\" " /- " => (0 : Nat)
