@@ -62,6 +62,9 @@ def qbpDeps (ci : ConstantInfo) (full : Bool) : Array Name :=
   | .thmInfo v => if full then t ++ v.value.getUsedConstants else t
   | .opaqueInfo v => t ++ v.value.getUsedConstants
   | .inductInfo v => t ++ v.ctors.toArray
+  -- Recursor reduction rules (PR #829 Gemini r2 finding 3), as `Lean.collectAxioms` walks them.
+  -- Axiom closure only: fingerprints keep statement-level identity (and the #582 pins stable).
+  | .recInfo v => if full then v.rules.foldl (fun acc r => acc ++ r.rhs.getUsedConstants) t else t
   | _ => t
 
 structure QbpFrame where

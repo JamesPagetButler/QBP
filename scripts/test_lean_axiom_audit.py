@@ -81,6 +81,7 @@ FIXTURES = (
     "AllowLit",
     "DangleA",
     "DangleB",
+    "OpaqueSorry",
 )
 # The ORACLE is Lean's own in-file `collectAxioms` (what `#print axioms` uses), run at the END
 # of a copy of the fixture, on the module's own constants (`map₂`). It is NOT computed through an
@@ -285,6 +286,55 @@ def main() -> int:
                 return 1
         h = Harness(a.lean, work, env)
 
+        # PR #829 Gemini r2 finding 5: the generator's own paths (no Lean needed).
+        # (a) only @[default_target] libraries are roots: a fake tree with a default lib A and a
+        #     non-default lib B must give exactly [A] (the default filter is the gate's scope);
+        # (b) a module under a toolchain root (`Lean.Evil`) is refused outright.
+        fake = work / "fake-proofs"
+        fake.mkdir()
+        (fake / "lakefile.lean").write_text(
+            "import Lake\nopen Lake DSL\npackage «P» where\n\n"
+            "@[default_target]\nlean_lib «A» where\n  roots := #[`A]\n\n"
+            "lean_lib «B» where\n  roots := #[`B]\n",
+            encoding="utf-8",
+        )
+        (fake / "A.lean").write_text("theorem a : True := trivial\n", encoding="utf-8")
+        (fake / "B.lean").write_text("theorem b : True := trivial\n", encoding="utf-8")
+        g = run(
+            [
+                sys.executable,
+                "-I",
+                str(HERE / "gen_lean_axiom_audit.py"),
+                "--proofs",
+                str(fake),
+                "--topo",
+            ]
+        )
+        report(
+            g.returncode == 0 and g.stdout.split() == ["A"],
+            f"generator scope = default targets only (got {g.stdout.split()})",
+            g.stdout + g.stderr,
+        )
+        g = run(
+            [
+                sys.executable,
+                "-I",
+                str(HERE / "gen_lean_axiom_audit.py"),
+                "--modules",
+                "Lean.Evil",
+                "--out-dir",
+                str(work / "drv-reserved"),
+                "--allowlist",
+                "",
+            ]
+        )
+        report(
+            g.returncode != 0
+            and not (work / "drv-reserved" / "manifest.json").exists(),
+            f"generator refuses a module under a toolchain root (exit {g.returncode})",
+            g.stdout + g.stderr,
+        )
+
         # The lexer fixtures of test_check_lean_foundations.py (PR #829 findings 2/3) are REAL
         # Lean, and Lean sees the declaration the first Python lexer hid in a fake comment.
         lex = HERE / "lean_lexer_fixtures"
@@ -331,6 +381,7 @@ def main() -> int:
             "AuditFixture.Cycle",
             "AuditFixture.AllowTwo",
             "AuditFixture.AllowDep",
+            "AuditFixture.OpaqueSorry",
         ):
             rc, res, out = h.audit(mod)
             want = h.oracle(mod)

@@ -144,7 +144,7 @@ def load_allowlist(path: Path, errors: list[str]) -> dict[str, dict]:
             and _exact_name(e.get("declaration"))
             and _exact_name(e.get("module"))
             and _hex64(e.get("fingerprint"))
-            and isinstance(e.get("issue"), int)
+            and type(e.get("issue")) is int  # not bool (Gemini r2 F8)
             and bool(e.get("reason"))
             and isinstance(axs, list)
             and bool(axs)
@@ -253,7 +253,7 @@ def grade_run(d: dict, errors: list[str]) -> tuple[list[dict], int, list[str]] |
         isinstance(scope, list)
         and isinstance(missing, list)
         and isinstance(unresolved, list)
-        and isinstance(decls, int)
+        and type(decls) is int
         and isinstance(bad_raw, list)
     ):
         errors.append(f"[{tag}] malformed auditor result")

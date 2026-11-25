@@ -71,6 +71,21 @@ CASES = [
 ]
 
 NATIVE = "native_decide"
+RAW = 'raw string literal r"…" / r#"…"# (lexer-approximated; write an ordinary string)'
+CHR = "char literal (lexer-approximated; use a string or Char.ofNat)"
+GLU = "identifier character, quote, « or ` glued directly after a number (put a space between)"
+BRACE = "brace inside a string literal (possible interpolation; write \\x7B / \\x7D)"
+_R0 = {"sorry": 0, "vacuous-`: True :=` theorem": 0}
+# exact (exit, non-zero hard-ban counts, ratchet counts) for the original CASES, in order
+CASE_COUNTS = [
+    (1, {NATIVE: 1}, _R0),
+    (1, {NATIVE: 1}, _R0),
+    (1, {BRACE: 1}, _R0),
+    (1, {CHR: 1}, {"sorry": 1, "vacuous-`: True :=` theorem": 0}),
+    (0, {}, _R0),
+    (0, {}, _R0),
+    (0, {}, _R0),
+]
 # PR #829 Red Team: inline must-reject / must-pass cases with EXACT counts
 # (name, source, exit, non-zero hard-ban counts, ratchet counts).
 INLINE_CASES = [
@@ -78,7 +93,7 @@ INLINE_CASES = [
         'Red Team f1: raw string r#"a"/-"# then native_decide (verbatim repro)',
         'def s : String := r#"a"/-"#\ntheorem t : 1 = 1 := by native_decide\ndef u : String := "-/"\n',
         1,
-        {NATIVE: 1},
+        {NATIVE: 1, RAW: 1},
         {"sorry": 0},
     ),
     (
@@ -96,10 +111,10 @@ INLINE_CASES = [
         {"sorry": 0},
     ),
     (
-        "M19: char '\"' then a real block comment holding native_decide (must pass)",
+        "M19: char '\"' then a real block comment holding native_decide (lexed right: only the char is refused)",
         'def c : Char := \'"\'\n/- native_decide -/\ndef d : String := "x"\n',
-        0,
-        {},
+        1,
+        {CHR: 1},
         {"sorry": 0},
     ),
     (
@@ -107,7 +122,21 @@ INLINE_CASES = [
         'def q : Char := \'"\'\ndef s : String := "/-"\ntheorem t : 1 = 1 := by native_decide\n'
         'def u : String := "-/"\n',
         1,
-        {NATIVE: 1},
+        {NATIVE: 1, CHR: 1},
+        {"sorry": 0},
+    ),
+    (
+        "field index `h.1.symm` is not a number: nothing glued, must pass",
+        "theorem t (h : 1 = 1 ∧ 2 = 2) : 1 = 1 := h.1.symm.symm\n",
+        0,
+        {},
+        {"sorry": 0},
+    ),
+    (
+        "numbers of every Lean form, unglued: must pass",
+        "def a : Nat := 0x1F + 0b101 + 0o17 + 1_000\ndef b : Float := 1.5e-3 + 2.0 + 3e2\n",
+        0,
+        {},
         {"sorry": 0},
     ),
 ]
@@ -133,10 +162,10 @@ AMB = "comment opener `--`/`/-` not at a line start or after whitespace (put a s
 # counts), never wording. Under the first lexer every must-fail file except CharEsc passed
 # with vacuous count 0 — `vac` was hidden in a fake comment.
 LEXER_FIXTURES = [
-    ("Raw.lean", 1, {}, {VAC: 1, "sorry": 0}),
-    ("RawHashes.lean", 1, {}, {VAC: 1, "sorry": 0}),
+    ("Raw.lean", 1, {RAW: 1}, {VAC: 1, "sorry": 0}),
+    ("RawHashes.lean", 1, {RAW: 1}, {VAC: 1, "sorry": 0}),
     ("CharPrime.lean", 1, {}, {VAC: 1, "sorry": 0}),
-    ("CharEsc.lean", 1, {}, {VAC: 1, "sorry": 0}),
+    ("CharEsc.lean", 1, {CHR: 7}, {VAC: 1, "sorry": 0}),
     ("Guillemet.lean", 1, {}, {VAC: 1, "sorry": 0}),
     # The lexer cannot know Lean's token table: `//-` is refused outright (and `vac` is not
     # counted, because to the lexer it IS inside the comment — the refusal is what fails it).
@@ -145,7 +174,17 @@ LEXER_FIXTURES = [
     # whitespace and line starts are clean boundaries.
     ("GluedParen.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
     ("GluedNbsp.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
-    ("LegitRaw.lean", 0, {}, {VAC: 0, "sorry": 0}),
+    # Raw strings and char literals are HARD-BANNED in the scanned tree since PR #829 Gemini r2
+    # (0 in proofs/QBP/Foundations): LegitRaw is lexed correctly (no fake comment, nothing
+    # counted) but refused for exactly its 2 raw strings and 1 char literal.
+    ("LegitRaw.lean", 1, {RAW: 2, CHR: 1}, {VAC: 0, "sorry": 0}),
+    # PR #829 Gemini r2 finding 1 (same lexer-gap class as PR #824 T89/T90): a raw string or
+    # char literal glued after a hex / scientific number. Lexed per Lean's `numberFnAux`,
+    # `vac` is code (counted), and the glued token and the literal are each refused.
+    ("NumHexRaw.lean", 1, {RAW: 1, GLU: 1}, {VAC: 1, "sorry": 0}),
+    ("NumHexChar.lean", 1, {CHR: 1, GLU: 1}, {VAC: 1, "sorry": 0}),
+    ("NumSciRaw.lean", 1, {RAW: 1, GLU: 1}, {VAC: 1, "sorry": 0}),
+    ("NumNotation.lean", 1, {RAW: 1, GLU: 1}, {VAC: 1, "sorry": 0}),
 ]
 
 
@@ -192,10 +231,21 @@ def main() -> int:
     ok = ok and "not" not in code_only(src) and brace_in_string('x := "{"') == [1]
     print(("ok  " if ok else "FAIL") + " lexer unit checks")
     bad += not ok
-    for name, src, must_reject, want in CASES:
+    # PR #829 Gemini r2 finding 7: these original cases now assert the EXACT exit code and
+    # counts (the wording check is kept only as a readable second condition).
+    for (name, src, must_reject, want), (w_rc, w_hard, w_ratchet) in zip(
+        CASES, CASE_COUNTS
+    ):
         rc, out = run_case(src)
-        good = (rc == 1 and want in out) if must_reject else rc == 0
-        print(("ok  " if good else "FAIL") + f" {name} (exit {rc})")
+        _, hard, ratchet = run_src(src)
+        good = (
+            rc == w_rc
+            and rc == int(must_reject)
+            and hard == w_hard
+            and ratchet == w_ratchet
+            and (want in out if must_reject else True)
+        )
+        print(("ok  " if good else "FAIL") + f" {name} (exit {rc}, hard {hard})")
         if not good:
             print("     " + out.replace("\n", "\n     ")[:800])
             bad += 1

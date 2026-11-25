@@ -195,6 +195,14 @@ jobs:
           [ "$tc" = "leanprover/lean4:$LEAN_RELEASE" ] || { echo "::error::proofs/lean-toolchain is '$tc', the audit job pins $LEAN_RELEASE — update both"; exit 1; }
           n="$(/usr/bin/grep -c "mathlib4.git\" @ \"$MATHLIB_REV\"" proofs/lakefile.lean || true)"
           [ "$n" = "1" ] || { echo "::error::proofs/lakefile.lean does not pin Mathlib to $MATHLIB_REV — update both"; exit 1; }
+          # Gemini r2 F4: the manifest too, when committed (on master it is gitignored, so the
+          # lakefile pin is the one the compile job resolves).
+          if [ -f proofs/lake-manifest.json ]; then
+            r="$(/usr/bin/python3 -I -c 'import json, sys; m = json.load(open(sys.argv[1])); print(next(p["rev"] for p in m["packages"] if p["name"] == "mathlib"))' proofs/lake-manifest.json)"
+            [ "$r" = "$MATHLIB_REV" ] || { echo "::error::proofs/lake-manifest.json pins Mathlib to $r, the audit job pins $MATHLIB_REV"; exit 1; }
+          else
+            echo "proofs/lake-manifest.json is not committed: the lakefile pin is the one checked"
+          fi
       - name: Install the pinned Lean release (SHA-256 verified)
         run: |
           set -euo pipefail
@@ -240,7 +248,10 @@ jobs:
           for d in "$MATHLIB"/.lake/packages/*/.lake/build/lib/lean; do lp="$lp:$d"; done
           /usr/bin/python3 -I scripts/gen_lean_axiom_audit.py --proofs proofs --out-dir "$out" \
             --project-dir "$proj" --allowlist scripts/lean_axiom_allowlist.json
-          for a in "$out"/AxiomAudit_*.args; do
+          shopt -s nullglob
+          runs=("$out"/AxiomAudit_*.args)
+          [ "${#runs[@]}" -gt 0 ] || { echo "::error::the generator wrote no audit runs"; exit 1; }
+          for a in "${runs[@]}"; do
             mapfile -t args < "$a"
             # LEAN_PATH unset: the auditor's own `import Lean` resolves to the toolchain only.
             # A failed run leaves no result line; the checker decides (fail-closed).

@@ -32,6 +32,7 @@ CK, AU, LX, FD, LI = (
     "check_lean_foundations.py",
     "check_layer_imports.py",
 )
+GN = "gen_lean_axiom_audit.py"
 M = [
     (
         "M1 sorryAx added to the standard set",
@@ -258,6 +259,85 @@ M = [
         AU,
         '  | .lit (.natVal n) => s!"(N {n})"',
         '  | .lit (.natVal _) => "(N)"',
+        [L],
+    ),
+    # --- PR #829 Gemini r2 rules ----------------------------------------------------------------
+    (
+        "G1a number lexing reverted to decimal digits only (finding 1)",
+        LX,
+        "            i = _number_end(src, i)\n",
+        "            while i < n and src[i].isascii() and src[i].isdigit():\n                i += 1\n",
+        [F],
+    ),
+    (
+        "G1b glued-after-number check dropped",
+        LX,
+        "            i = _number_end(src, i)\n"
+        '            if i < n and (_id_rest(src[i]) or src[i] in "\\"\'«`"):\n',
+        "            i = _number_end(src, i)\n            if False:\n",
+        [F],
+    ),
+    (
+        "G1c field-index rule dropped (`h.1.symm` read as a number)",
+        LX,
+        '        elif c.isascii() and c.isdigit() and i > 0 and src[i - 1] == ".":',
+        "        elif False:",
+        [F],
+    ),
+    (
+        "G1d raw-string ban dropped",
+        FD,
+        '            (RAW_STRING, lambda t: literal_sites(t)["raw"]),\n',
+        "",
+        [F],
+    ),
+    (
+        "G1e char-literal ban dropped",
+        FD,
+        '            (CHAR_LITERAL, lambda t: literal_sites(t)["char"]),\n',
+        "",
+        [F],
+    ),
+    (
+        "G3 recursor-rule rhs no longer walked (finding 3)",
+        AU,
+        "  | .recInfo v => if full then v.rules.foldl (fun acc r => acc ++ r.rhs.getUsedConstants) t else t\n",
+        "",
+        [L],
+    ),
+    (
+        "G5a importModules with loadExts := true (finding 5)",
+        AU,
+        "  let env ← importModules imports {} (loadExts := false)",
+        "  let env ← importModules imports {} (loadExts := true)",
+        [L],
+    ),
+    (
+        "G5b theorem values no longer walked",
+        AU,
+        "  | .thmInfo v => if full then t ++ v.value.getUsedConstants else t\n",
+        "",
+        [L],
+    ),
+    (
+        "G5c opaque values no longer walked",
+        AU,
+        "  | .opaqueInfo v => t ++ v.value.getUsedConstants\n",
+        "",
+        [L],
+    ),
+    (
+        "G5d generator default-target filter dropped",
+        GN,
+        "    roots = [r for _, rs, d in targets if d for r in rs]",
+        "    roots = [r for _, rs, d in targets for r in rs]",
+        [L],
+    ),
+    (
+        "G5e generator reserved-root refusal dropped",
+        GN,
+        'RESERVED_ROOTS = {"Init", "Std", "Lean", "Lake"}',
+        "RESERVED_ROOTS: set = set()",
         [L],
     ),
     (

@@ -60,6 +60,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lean_lexer import (
     ambiguous_comment_openers,
     brace_in_string,
+    literal_sites,
     strip_comments,
 )  # noqa: E402  (after the sys.path fix)
 
@@ -74,6 +75,17 @@ BRACE_IN_STRING = (
 # Lean checks for `--` / `/-` only at a token boundary, and the symbol-token table is extensible
 # by any import, so a comment opener glued to a symbol character (`//-`, `<--`) may be code to
 # Lean. Banned (0 in all of proofs/ on 2026-11-24) so the lexer never has to guess (PR #829).
+# PR #829 Gemini r2 finding 1 (same lexer-gap class as PR #824's T89/T90): around raw strings,
+# char literals and numbers a lexer can only approximate Lean's tokenizer. The scanned tree
+# uses NONE of them (2026-11-25: 0 raw strings and 0 char literals in proofs/QBP/Foundations;
+# across all 80 proofs/ files 0 raw strings, 5 char literals in the two Oracle files, 0 glued
+# numbers), so they are HARD-BANNED there, as PR #824 r5 bans raw strings. The lasting fix is to
+# run this gate on Lean's own parser (PR #824 r5 `LeanSubsetParse`), scheduled in the #836 build.
+RAW_STRING = (
+    'raw string literal r"…" / r#"…"# (lexer-approximated; write an ordinary string)'
+)
+CHAR_LITERAL = "char literal (lexer-approximated; use a string or Char.ofNat)"
+GLUED_NUMBER = "identifier character, quote, « or ` glued directly after a number (put a space between)"
 AMBIGUOUS_OPENER = "comment opener `--`/`/-` not at a line start or after whitespace (put a space before it)"
 
 
@@ -81,6 +93,8 @@ def scan(lean_dir):
     hard = {k: 0 for k in HARD_BAN}
     hard[BRACE_IN_STRING] = 0
     hard[AMBIGUOUS_OPENER] = 0
+    for k in (RAW_STRING, CHAR_LITERAL, GLUED_NUMBER):
+        hard[k] = 0
     ratchet = {k: 0 for k in RATCHET}
     hard_hits = []
     for path in sorted(
@@ -97,6 +111,9 @@ def scan(lean_dir):
         for name, fn in (
             (BRACE_IN_STRING, brace_in_string),
             (AMBIGUOUS_OPENER, ambiguous_comment_openers),
+            (RAW_STRING, lambda t: literal_sites(t)["raw"]),
+            (CHAR_LITERAL, lambda t: literal_sites(t)["char"]),
+            (GLUED_NUMBER, lambda t: literal_sites(t)["glued_number"]),
         ):
             nb = len(fn(raw))
             hard[name] += nb

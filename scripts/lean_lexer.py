@@ -23,7 +23,11 @@ source. It walks the source TOKEN BY TOKEN, following Lean 4.30's own tokenizer
     belongs to the identifier `x'` and `"'/-"` is a STRING (no comment) — the first lexer took
     `'"'` for a char literal and opened a comment at `/-`. `«…»` may hold any character,
     including `"` and `/-`; name literals `` `foo `` are identifiers too;
-  * a number is its decimal digits (`2r"x"` is the number 2 then a raw string, as in Lean).
+  * a NUMBER is lexed as Lean 4.30's `numberFnAux` does: `0x`/`0b`/`0o` prefixes, `_`
+    separators, a scientific part (`1.5e-3`). PR #829 Gemini r2 finding 1: reading only
+    decimal digits turned `0x1r"\\" " /- "` into `0` + identifier `x1r` + a string and opened a
+    fake comment. `literal_sites` also reports any identifier character, quote, `«` or
+    backquote glued directly after a number, and the checker refuses it.
 
 What the lexer does NOT model (both fail CLOSED in the foundations checker, which HARD-BANs
 them so the simple rules above are exact for every file it accepts):
@@ -144,7 +148,63 @@ def _ident_end(src: str, i: int) -> int:
         return j
 
 
+_DEC = set("0123456789")
+_BIN = set("01")
+_OCT = set("01234567")
+
+
+def _take_digits(src: str, j: int, digits: set) -> int:
+    """Lean `takeDigitsFn`: digits with `_` separators."""
+    while j < len(src) and (src[j] in digits or src[j] == "_"):
+        j += 1
+    return j
+
+
+def _number_end(src: str, i: int) -> int:
+    """End (exclusive) of the numeric literal starting at src[i] (an ASCII digit), following
+    Lean 4.30 `numberFnAux` (PR #829 Gemini r2 finding 1): `0b`/`0B` binary, `0o`/`0O` octal,
+    `0x`/`0X` hexadecimal, otherwise decimal with `_` separators and an optional scientific part
+    (`.digits`, a bare `.`, `e`/`E` with an optional sign and digits). `1..` stops before `..`.
+    """
+    n = len(src)
+    if src[i] == "0" and i + 1 < n and src[i + 1] in "bBoOxX":
+        base = {"b": _BIN, "o": _OCT, "x": set("0123456789abcdefABCDEF")}[
+            src[i + 1].lower()
+        ]
+        return _take_digits(src, i + 2, base)
+    j = _take_digits(src, i, _DEC)
+    if src[j : j + 2] == "..":
+        return j
+    if j < n and src[j] == ".":
+        j += 1
+        if j < n and src[j] in _DEC:
+            j = _take_digits(src, j, _DEC)
+    if j < n and src[j] in "eE":
+        k = j + 1
+        if k < n and src[k] in "+-":
+            k += 1
+        if k < n and src[k] in _DEC:
+            j = _take_digits(src, k, _DEC)
+    return j
+
+
 def lex(src: str) -> str:
+    return _lex(src)[0]
+
+
+def literal_sites(src: str) -> dict[str, list[int]]:
+    """1-based line numbers of the token shapes the foundations checker HARD-BANs because a
+    lexer can only approximate how Lean reads around them (PR #829 Gemini r2 finding 1):
+      * `raw`: raw-string openers `r"` / `r#…#"`;
+      * `char`: char literals;
+      * `glued_number`: a numeric literal directly followed by an identifier character, a
+        quote, `«` or a backquote (e.g. `0x1r"…"`, `1e1'…'`) — refused, never guessed at.
+    """
+    _, ev = _lex(src)
+    return {k: sorted({src.count("\n", 0, p) + 1 for p in v}) for k, v in ev.items()}
+
+
+def _lex(src: str) -> tuple[str, dict[str, list[int]]]:
     """Classify every character of a Lean source: 'c' code, 'm' comment, 's' string body.
 
     The returned string has the same length as `src` (one class letter per character). String
@@ -153,6 +213,7 @@ def lex(src: str) -> str:
     """
     n = len(src)
     cls = ["c"] * n
+    ev: dict[str, list[int]] = {"raw": [], "char": [], "glued_number": []}
     i = 0
     while i < n:
         c = src[i]
@@ -183,6 +244,7 @@ def lex(src: str) -> str:
             cls[i + 1 : j] = "s" * (j - i - 1)
             i = j + 1
         elif c == "r" and _raw_start(src, i) >= 0:
+            ev["raw"].append(i)
             h = _raw_start(src, i)
             body = i + 2 + h
             close = src.find('"' + "#" * h, body)
@@ -190,6 +252,7 @@ def lex(src: str) -> str:
             cls[body:j] = "s" * (j - body)
             i = n if close < 0 else close + 1 + h
         elif c == "'" and src[i + 1 : i + 2] != "'" and _char_lit_end(src, i) > 0:
+            ev["char"].append(i)
             i = _char_lit_end(src, i)
         elif c == "'":
             i += 2 if src[i + 1 : i + 2] == "'" else 1  # the symbol `''` / a lone `'`
@@ -199,12 +262,19 @@ def lex(src: str) -> str:
             )  # name literal `foo — an identifier, no raw-string check
         elif _id_first(c) or c == "«":
             i = _ident_end(src, i)
-        elif c.isascii() and c.isdigit():
-            while i < n and src[i].isascii() and src[i].isdigit():
+        elif c.isascii() and c.isdigit() and i > 0 and src[i - 1] == ".":
+            # a FIELD INDEX (`h.1.symm`, `L.2.1.val`): Lean's `fieldIdxFn` takes digits only
+            while i < n and src[i] in _DEC:
                 i += 1
+            if i < n and (_id_rest(src[i]) or src[i] in "\"'«`"):
+                ev["glued_number"].append(i)
+        elif c.isascii() and c.isdigit():
+            i = _number_end(src, i)
+            if i < n and (_id_rest(src[i]) or src[i] in "\"'«`"):
+                ev["glued_number"].append(i)
         else:
             i += 1
-    return "".join(cls)
+    return "".join(cls), ev
 
 
 def _render(src: str, keep: str) -> str:
