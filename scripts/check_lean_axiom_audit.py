@@ -31,8 +31,18 @@ or `initialize` block of an audited module can change what it computes or prints
     that job's own checkout, with a hash-verified toolchain and absolute tool paths; no project
     Lean code runs there, and the build job hands over only its .olean output (Red Team r2
     finding 1: build-time `#eval` could plant a fake `python3` on the build job's PATH).
-Known limit: the .olean files are trusted as `lake build` wrote them; there is no kernel re-check
-(lean4checker's job).
+  * a constant that is referenced but absent from the loaded environment (DANGLING) fails the
+    run instead of counting as axiom-free (Red Team r3), so an inconsistent .olean set (a module
+    replaced by a compile that lacks a constant its dependents use) cannot pass silently.
+KNOWN LIMIT, STATED PRECISELY (Red Team r3 finding S1, "olean substitution"; closure pending a
+beekeeper threat-model ruling, tracked in the issue linked from PR #829): the gate audits the
+.olean files the compile job hands over, NOT the sources. Code that runs at build time in any
+audited module (`#eval`, `run_cmd`, `run_elab`, `run_meta`, an elaborator or `initialize`) can
+replace another module's .olean with a VALID compile of different source (e.g. a clean version
+of a module that `lake build` compiled with a `sorry`): the audit then PASSES with coverage
+satisfied, although `lake build` warned about the `sorry`. A kernel re-check (lean4checker)
+would not catch this either, because the substitute is well-typed; what is missing is a
+source <-> .olean binding. Nine proofs/ files use `#eval` today (all pure computations).
 
 ALLOWLIST (scripts/lean_axiom_allowlist.json): exact, issue-linked exceptions. An entry names ONE
 declaration and PINS its identity (Red Team 3): its module and a SHA-256 fingerprint (computed in
@@ -254,6 +264,12 @@ def grade_run(d: dict, errors: list[str]) -> tuple[list[dict], int, list[str]] |
             f"{sorted(set(missing) | (set(d['modules']) - set(scope)))}"
         )
     shadowed, std = r.get("shadowed"), r.get("std")
+    dangling = r.get("dangling")
+    if not isinstance(dangling, list) or dangling:
+        errors.append(
+            f"[{tag}] constant(s) referenced but absent from the loaded environment "
+            f"(an inconsistent .olean set): {dangling}"
+        )
     if not isinstance(shadowed, list) or shadowed:
         errors.append(
             f"[{tag}] toolchain-rooted module(s) resolved outside the toolchain library: {shadowed}"

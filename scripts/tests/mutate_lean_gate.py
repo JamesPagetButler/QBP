@@ -238,6 +238,28 @@ M = [
         '_LEAN_WHITESPACE = set(" \\t\\r\\n\\u00a0")',
         [F],
     ),
+    # --- PR #829 Red Team r3 rules -------------------------------------------------------------
+    (
+        "R3a dangling-reference check dropped (checker)",
+        CK,
+        "    if not isinstance(dangling, list) or dangling:",
+        "    if False:",
+        [L],
+    ),
+    (
+        "R3b auditor treats a dangling dependency as axiom-free (the old behaviour)",
+        AU,
+        "        let some dci := env.find? d | dangling := dangling.insert d; memo := memo.insert d {}; continue",
+        "        let some dci := env.find? d | memo := memo.insert d {}; continue",
+        [L],
+    ),
+    (
+        "N4 fingerprint ignores numeric literals",
+        AU,
+        '  | .lit (.natVal n) => s!"(N {n})"',
+        '  | .lit (.natVal _) => "(N)"',
+        [L],
+    ),
     (
         "M17 lexer without nesting",
         LX,

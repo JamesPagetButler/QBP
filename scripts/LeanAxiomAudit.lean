@@ -72,8 +72,13 @@ structure QbpFrame where
 
 /-- Axiom closure of every constant reachable from `roots`: iterative Tarjan SCC, so every
 member of a dependency cycle gets the full axiom set of the cycle (exact, like `collectAxioms`). -/
-def qbpAuditAxiomsOf (env : Environment) (roots : Array Name) : Std.HashMap Name NameSet := Id.run do
+def qbpAuditAxiomsOf (env : Environment) (roots : Array Name) :
+    Std.HashMap Name NameSet × NameSet := Id.run do
   let mut memo : Std.HashMap Name NameSet := {}
+  -- DANGLING references (PR #829 Red Team r3): a name used by a constant but absent from the
+  -- loaded environment (e.g. an .olean replaced by a compile that lacks it) is NOT axiom-free;
+  -- it is collected here and the run fails on it.
+  let mut dangling : NameSet := {}
   let mut index : Std.HashMap Name Nat := {}
   let mut low : Std.HashMap Name Nat := {}
   let mut onS : NameSet := {}
@@ -81,7 +86,7 @@ def qbpAuditAxiomsOf (env : Environment) (roots : Array Name) : Std.HashMap Name
   let mut counter := 0
   for r in roots do
     if index.contains r || memo.contains r then continue
-    let some rci := env.find? r | memo := memo.insert r {}; continue
+    let some rci := env.find? r | dangling := dangling.insert r; memo := memo.insert r {}; continue
     index := index.insert r counter; low := low.insert r counter; counter := counter + 1
     sstack := sstack.push r; onS := onS.insert r
     let mut frames : Array QbpFrame := #[{ n := r, deps := qbpDeps rci true, i := 0 }]
@@ -95,7 +100,7 @@ def qbpAuditAxiomsOf (env : Environment) (roots : Array Name) : Std.HashMap Name
           if onS.contains d then
             low := low.insert f.n (Nat.min (low.getD f.n 0) di)
           continue
-        let some dci := env.find? d | memo := memo.insert d {}; continue
+        let some dci := env.find? d | dangling := dangling.insert d; memo := memo.insert d {}; continue
         index := index.insert d counter; low := low.insert d counter; counter := counter + 1
         sstack := sstack.push d; onS := onS.insert d
         frames := frames.push { n := d, deps := qbpDeps dci true, i := 0 }
@@ -123,7 +128,7 @@ def qbpAuditAxiomsOf (env : Environment) (roots : Array Name) : Std.HashMap Name
         if 0 < frames.size then
           let p := frames.back!
           low := low.insert p.n (Nat.min (low.getD p.n 0) ln)
-  return memo
+  return (memo, dangling)
 
 def qbpStdList : List Name := [``propext, ``Classical.choice, ``Quot.sound]
 
@@ -235,7 +240,7 @@ def main (args : List String) : IO UInt32 := do
     match env.getModuleIdxFor? n with
     | some i => toString (modNames[i.toNat]?.getD .anonymous)
     | none => ""
-  let memo := qbpAuditAxiomsOf env inScope
+  let (memo, dangling) := qbpAuditAxiomsOf env inScope
   let mut bad : Array Json := #[]
   for n in inScope do
     let axs := (memo.get? n).getD {}
@@ -266,6 +271,7 @@ def main (args : List String) : IO UInt32 := do
     ("missing", Json.arr (missing.map (fun t => Json.str (toString t)))),
     ("unresolved", Json.arr (unresolved.map (fun t => Json.str (toString t)))),
     ("shadowed", Json.arr (shadowed.map (fun t => Json.str (toString t)))),
+    ("dangling", Json.arr (dangling.toList.toArray.map (fun t => Json.str (toString t)))),
     ("std", Json.arr stdJ),
     ("declarations", inScope.size), ("nonstd", Json.arr bad)]
   IO.println out.compress

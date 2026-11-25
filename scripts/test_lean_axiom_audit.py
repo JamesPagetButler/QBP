@@ -78,6 +78,9 @@ FIXTURES = (
     "ScopeHidden",
     "ScopeRoot",
     "PreludeProp",
+    "AllowLit",
+    "DangleA",
+    "DangleB",
 )
 # The ORACLE is Lean's own in-file `collectAxioms` (what `#print axioms` uses), run at the END
 # of a copy of the fixture, on the module's own constants (`map₂`). It is NOT computed through an
@@ -410,6 +413,82 @@ def main() -> int:
             out,
         )
 
+        # Red Team r3: DANGLING references fail closed. DangleB uses DangleA.helper; replace
+        # DangleA.olean by a compile of a different source without `helper` (an inconsistent
+        # .olean set, as in the S1 probe). The reference no longer resolves: the run must FAIL on
+        # it (exactly 1 error, no declaration named), never count it as axiom-free.
+        rc, res, out = h.audit("AuditFixture.DangleB")
+        report(
+            rc == 1 and found(res) == {ns("DangleB", "uses"), ns("DangleA", "helper")},
+            f"DangleB before the substitution fails on its sorry (exit {rc})",
+            out,
+        )
+        sub = work / "subst-src" / "AuditFixture"
+        sub.mkdir(parents=True)
+        (sub / "DangleA.lean").write_text(
+            "namespace AuditFixture.DangleA\ntheorem other : True := trivial\nend AuditFixture.DangleA\n",
+            encoding="utf-8",
+        )
+        r = run(
+            [
+                a.lean,
+                f"--root={sub.parent}",
+                "-o",
+                str(build / "DangleA.olean"),
+                str(sub / "DangleA.lean"),
+            ],
+            env=env,
+        )
+        report(
+            r.returncode == 0, "substitute DangleA.olean compiles", r.stdout + r.stderr
+        )
+        rc, res, out = h.audit("AuditFixture.DangleB")
+        report(
+            rc == 1 and not res["non_standard"] and len(res["errors"]) == 1,
+            f"a dangling reference after an .olean substitution fails closed (exit {rc})",
+            out,
+        )
+
+        # Red Team r3 / mutant N4: change ONE numeric literal of an allowlisted declaration's
+        # statement (`≤ 50` -> `≤ 51`), keep the old pins: the pins must no longer match.
+        lit = [ns("AllowLit", "allowed_native"), ns("AllowLit", "allowed_native") + AX]
+        lit_pins = h.pins("AuditFixture.AllowLit", lit)
+        rc, res, out = h.audit("AuditFixture.AllowLit", lit_pins)
+        report(
+            rc == 0 and sorted(res["allowlisted"]) == sorted(lit),
+            f"AllowLit with its genuine pins passes (exit {rc})",
+            out,
+        )
+        lit_src = work / "lit-src" / "AuditFixture"
+        lit_src.mkdir(parents=True)
+        (lit_src / "AllowLit.lean").write_text(
+            (FIX / "AuditFixture" / "AllowLit.lean")
+            .read_text(encoding="utf-8")
+            .replace("(List.range 10).sum ≤ 50", "(List.range 10).sum ≤ 51"),
+            encoding="utf-8",
+        )
+        r = run(
+            [
+                a.lean,
+                f"--root={lit_src.parent}",
+                "-o",
+                str(build / "AllowLit.olean"),
+                str(lit_src / "AllowLit.lean"),
+            ],
+            env=env,
+        )
+        report(
+            r.returncode == 0,
+            "AllowLit with one literal changed compiles",
+            r.stdout + r.stderr,
+        )
+        rc, res, out = h.audit("AuditFixture.AllowLit", lit_pins)
+        report(
+            rc == 1 and found(res) == set(lit) and not res["allowlisted"],
+            f"one numeric literal changed: the old pins no longer allow it (exit {rc})",
+            out,
+        )
+
         # Red Team 4: two imports on one line — Lean's scope includes the hidden module.
         rc, res, out = h.audit("AuditFixture.ScopeRoot")
         report(
@@ -585,6 +664,7 @@ def main() -> int:
         real_res = json.loads(real.strip().splitlines()[-1])
         clean = {
             "shadowed": [],
+            "dangling": [],
             "std": real_res["std"],
             "mark": "AXIOM-AUDIT-827",
             "nonce": d0["nonce"],
@@ -656,6 +736,10 @@ def main() -> int:
                         ],
                     )
                 ),
+            ),
+            (
+                "a result with a dangling reference",
+                json.dumps(dict(clean, dangling=["X.y"])),
             ),
             (
                 "a result whose propext is not an axiom",
