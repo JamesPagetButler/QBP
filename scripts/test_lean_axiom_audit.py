@@ -485,8 +485,11 @@ def main() -> int:
         wild = [dict(pinned[0], declaration="AuditFixture.AllowOne.*")]
         rc, res, out = h.audit("AuditFixture.AllowOne", wild)
         report(
-            rc == 1 and found(res) == set(one) and len(res["errors"]) == 1,
-            f"a wildcard entry is rejected (exit {rc})",
+            rc == 1
+            and found(res) == set(one)
+            and len(res["errors"]) == 1
+            and res["rejected_entries"] == 1,
+            f"a wildcard entry is rejected as malformed (exit {rc})",
             out,
         )
 

@@ -55,6 +55,7 @@ from pathlib import Path
 MARK = "AXIOM-AUDIT-827"
 DEFAULT_ALLOWLIST = Path(__file__).resolve().parent / "lean_axiom_allowlist.json"
 _BAD_CHARS = "*?[]"
+REJECTED: list[dict] = []  # malformed allowlist entries (reported in --json as a count)
 
 
 def read_output(p: Path) -> tuple[list[dict], int]:
@@ -123,6 +124,7 @@ def load_allowlist(path: Path, errors: list[str]) -> dict[str, dict]:
             and len({x["name"] for x in axs}) == len(axs)
         )
         if not ok:
+            REJECTED.append(e)
             errors.append(
                 "malformed allowlist entry (exact declaration + module + fingerprint, a list of "
                 f"axioms each with exact name + module + fingerprint, an int issue and a reason): {e}"
@@ -350,6 +352,7 @@ def main() -> int:
                     "non_standard": sorted(map(list, uniq)),
                     "allowlisted": allowed_hits,
                     "errors": errors,
+                    "rejected_entries": len(REJECTED),
                     "modules": sorted(audited),
                     "declaration_audits": total_decls,
                     "not_covered": not_covered,
