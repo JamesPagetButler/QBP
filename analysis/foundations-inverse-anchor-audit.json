@@ -180,7 +180,7 @@
   "stale": [],
   "stats": {
     "anchor_side_phantoms": 0,
-    "anchors_total": 348,
+    "anchors_total": 349,
     "anchors_with_proof_file": 126,
     "anchors_with_theorems_list": 73,
     "lean_side_orphans": 35,
