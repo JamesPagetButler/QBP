@@ -242,6 +242,8 @@ def main() -> int:
         if not good and out:
             print(out[-3000:])
         bad += not good
+        if not good and os.environ.get("QBP_TEST_FAIL_FAST"):
+            sys.exit(1)  # mutation runs: one failing case is a kill
 
     def found(res: dict) -> set[str]:
         return {d for d, _ in res["non_standard"]}

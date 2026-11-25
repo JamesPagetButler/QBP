@@ -4,12 +4,12 @@
     {
       "declaration": "hessian_traceSq_1152_universal",
       "module": "SedenionHessianTraceSq",
-      "fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+      "fingerprint": "81974184ddd29e4bfb5312eb1dfa704b554969440099ea13982ccafe7c6465c0",
       "axioms": [
         {
           "name": "hessian_traceSq_1152_universal._native.native_decide.ax_1_1",
           "module": "SedenionHessianTraceSq",
-          "fingerprint": "0000000000000000000000000000000000000000000000000000000000000000"
+          "fingerprint": "d1034767b9cafca505882e44d65e8586e8be616261b95139db4b0c5aff69d9e3"
         }
       ],
       "issue": 582,
@@ -18,16 +18,17 @@
     {
       "declaration": "hessian_traceSq_1152_universal._native.native_decide.ax_1_1",
       "module": "SedenionHessianTraceSq",
-      "fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+      "fingerprint": "d1034767b9cafca505882e44d65e8586e8be616261b95139db4b0c5aff69d9e3",
       "axioms": [
         {
           "name": "hessian_traceSq_1152_universal._native.native_decide.ax_1_1",
           "module": "SedenionHessianTraceSq",
-          "fingerprint": "0000000000000000000000000000000000000000000000000000000000000000"
+          "fingerprint": "d1034767b9cafca505882e44d65e8586e8be616261b95139db4b0c5aff69d9e3"
         }
       ],
       "issue": 582,
       "reason": "The per-call native axiom that native_decide declares for hessian_traceSq_1152_universal is itself a constant of the same module; the audit (every declaration) reports it as depending on itself. Same exception as the entry above, issue #582."
     }
-  ]
+  ],
+  "pins_recorded": "Pins observed by the Lean auditor in CI run 45515692569 (head 22200a2) on master's proofs/ tree, toolchain v4.30.0; recorded after review of the module and axiom names (SedenionHessianTraceSq; the per-call native axiom)."
 }
