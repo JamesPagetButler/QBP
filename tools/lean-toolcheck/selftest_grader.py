@@ -283,6 +283,11 @@ for src_stem, src_rel, new_stem in (
         "must-fail/MF20_OpenInSimprocForge/MF20_OpenInSimprocForge.lean",
         "T85_AttackOpenInSimproc",
     ),
+    (
+        "MF21_SimprocPatternForgesOlean",
+        "must-fail/MF21_SimprocPatternForgesOlean/MF21_SimprocPatternForgesOlean.lean",
+        "T88_AttackSimprocPatternOlean",
+    ),
 ):
     s3, r3 = as_pass_attack(src_stem, src_rel, new_stem)
     res = evaluate(new_tc, r3, s3, new_stem)
@@ -557,7 +562,10 @@ results.append(
 )
 
 
-# 7c. Red Team r3 / director ruling: the STRUCTURAL audit alone. A grader copy whose
+# 7c. Red Team r3 / director ruling: the STRUCTURAL audit alone (scope of the claim, Red Team r4:
+#     MF05 is a real axiom the auditor sees; the five forge files exit BEFORE any .olean exists,
+#     so they fail closed. A file that writes its own .olean is NOT caught by the audit alone:
+#     see the S1 row below). A grader copy whose
 #     `subset_violations` always returns [] (every subset rule off) grades the pass-labelled
 #     replays of the forge files and of MF05 (a plain user axiom): each must still FAIL, and
 #     the failure must come from the structural audit (PR #829 auditor on a fresh .olean).
@@ -571,10 +579,10 @@ tc8.write_text(
     t8.replace(sig, sig + "    return []  # SELFTEST: every subset rule off\n")
 )
 for src_stem, new_stem in (
-    ("MF05_CustomAxiom", "T86_StructuralOnlyAxiom"),
-    ("MF14_ExecForgesStdout", "T87_StructuralOnlyEval"),
-    ("MF15_SyntaxAttributeHandler", "T88_StructuralOnlyHandler"),
-    ("MF17_MacroBuildsEval", "T89_StructuralOnlyMacro"),
+    ("MF05_CustomAxiom", "T76_StructuralOnlyAxiom"),
+    ("MF14_ExecForgesStdout", "T77_StructuralOnlyEval"),
+    ("MF15_SyntaxAttributeHandler", "T78_StructuralOnlyHandler"),
+    ("MF17_MacroBuildsEval", "T79_StructuralOnlyMacro"),
     ("MF19_IndentedSimprocForge", "T84s_StructuralOnlyIndented"),
     ("MF20_OpenInSimprocForge", "T85s_StructuralOnlyOpenIn"),
 ):
@@ -592,6 +600,42 @@ for src_stem, new_stem in (
             + "; ".join(x for x in f["failures"] if x.startswith("structural audit"))[
                 :200
             ],
+            "",
+        )
+    )
+
+
+# S1 (PR #829's stated limit, QBP#836; Red Team r4 T86/T88): with every subset rule off, a file
+# that writes a clean .olean of its own module name to the compile's -o path is EXPECTED to PASS
+# the structural audit. MF21 (T88: `simproc_pattern%`) and MF22 (T86: a REAL `axiom cheat` plus
+# an `#eval`) both do. These rows document that the subset is the PRECONDITION for the structural
+# verdict (the earlier "auditor alone" rows above only cover files that exit before any .olean
+# exists). If one ever FAILs, the limit changed: re-read the README layering.
+for src_stem, new_stem, what in (
+    ("MF21_SimprocPatternForgesOlean", "T88s_StructuralOnlyS1", "MF21 (T88)"),
+    (
+        "MF22_AxiomEvalForgesOlean",
+        "T86s_StructuralOnlyS1Axiom",
+        "MF22 (T86, real axiom)",
+    ),
+):
+    s12, r12 = as_pass_attack(
+        src_stem, f"must-fail/{src_stem}/{src_stem}.lean", new_stem
+    )
+    shutil.copy(tc8, s12 / "toolcheck.py")
+    res = evaluate(s12 / "toolcheck.py", r12, s12, new_stem)
+    f12 = res["rows"][f"{new_stem}.lean"]
+    s1_ok = f12["result"] == "PASS"
+    ok = ok and s1_ok
+    results.append(
+        (
+            f"S1-limit[{new_stem}] {what} with every subset rule OFF (EXPECTED to PASS the audit: the compile wrote a forged .olean)",
+            (
+                "PASS as documented (S1 holds)"
+                if s1_ok
+                else "CHANGED — re-read the S1 limit: "
+            )
+            + "; ".join(f12["failures"])[:150],
             "",
         )
     )
@@ -683,6 +727,22 @@ AUDIT_PLANTS = [
         t01_audit(lambda r, l, i: "\n".join(l[:i] + l[i + 1 :]) + "\n"),
     ),
     ("audit-no-olean", _meta_mut(lambda m: m["audit"].update(olean=False))),
+    (
+        "audit-dangling",
+        t01_audit(
+            lambda r, l, i: _emit({**r, "dangling": ["QBPToolcheck.T01.ghost"]}, l, i)
+        ),
+    ),
+    (
+        "audit-extra-scope",
+        t01_audit(
+            lambda r, l, i: _emit(
+                {**r, "scope": r["scope"] + ["ToolcheckAudit.Extra"]}, l, i
+            )
+        ),
+    ),
+    ("audit-auditor-exit-1", _meta_mut(lambda m: m["audit"].update(auditor_exit=1))),
+    ("audit-compile-exit-1", _meta_mut(lambda m: m["audit"].update(compile_exit=1))),
     ("audit-no-record", _meta_mut(lambda m: m.pop("audit"))),
 ]
 for tag, mut in AUDIT_PLANTS:
@@ -700,6 +760,20 @@ ok = ok and res["rows"]["T01_DecideFin.lean"]["result"] == "FAIL"
 results.append(
     (
         "plant[heads-stale] command_heads.json for another toolchain (T01 must FAIL)",
+        row(res, "T01_DecideFin.lean"),
+        "",
+    )
+)
+s13 = work / "suite-heads-imports-stale"
+shutil.copytree(suite, s13, ignore=shutil.ignore_patterns("results"))
+hj = json.loads((s13 / "command_heads.json").read_text())
+hj["imports"] = hj["imports"][:-1]  # same pins, one T00 import fewer
+(s13 / "command_heads.json").write_text(json.dumps(hj))
+res = evaluate(s13 / "toolcheck.py", raw, s13, "heads-imports-stale")
+ok = ok and res["rows"]["T01_DecideFin.lean"]["result"] == "FAIL"
+results.append(
+    (
+        "plant[heads-imports-stale] command_heads.json for another T00 import list (T01 must FAIL)",
         row(res, "T01_DecideFin.lean"),
         "",
     )
@@ -769,6 +843,12 @@ RULE_CASES = [
         "  deriving instance Repr for Nat",
         {"H"},
     ),  # the `deriving instance` command (M49)
+    ("  simproc_pattern% Nat.succ _ => go", {"H"}),  # T88: a non-word command head
+    ("  x compile_def% y", {"H"}),
+    ("  x $ y", {"H"}),
+    ("  exact ?_", {"H"}),
+    ("  x foo% y", {"H"}),  # any `name%` elaborator token
+    ("theorem t : 7 % 2 = 1 := rfl", set()),  # the spaced `%` operator is fine
 ]
 # Rule D in isolation: every refused keyword, mid-line, must give D, plus H exactly when Lean's
 # own command-keyword list (read here from command_heads.json, which no grader mutant touches)

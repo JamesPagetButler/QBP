@@ -11,7 +11,8 @@ Subcommands
 Expectation lines live in each .lean file's header comment:
   TOOLCHECK-EXPECT: pass                       VERDICT from the STRUCTURAL audit (`structural_audit`): no
                                                declaration of the freshly compiled .olean rests on an axiom
-                                               outside the standard three. In addition (defense in depth):
+                                               outside the standard three, PRECONDITION: the file is inside the
+                                               pass-file SUBSET (no user code runs at compile time). Also:
                                                Lean exit 0, no error / sorry, every `#print axioms`
                                                result within {propext, Classical.choice, Quot.sound},
                                                EXACTLY one positioned axiom report per `#print axioms`
@@ -66,6 +67,8 @@ it). This script never treats `#eval` output as proof.
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import importlib.util
 import json
 import re
@@ -80,11 +83,13 @@ AXIOMS_RE = re.compile(r"'([^']+)' depends on axioms: \[([^\]]*)\]", re.DOTALL)
 NOAXIOMS_RE = re.compile(r"'([^']+)' does not depend on any axioms")
 # Lean 4.30 prints "declaration uses `sorry`" (backticks); older toolchains used 'sorry' (quotes).
 SORRY_WARN_RE = re.compile(r"declaration uses [`']sorry[`']")
-# ---- the pass-file SUBSET: DEFENSE IN DEPTH, not the soundness boundary -----------------------
+# ---- the pass-file SUBSET: the PRECONDITION of the structural verdict (until QBP#836) ---------
 # Director ruling after Red Team r3 on PR #824: three rounds (T80-T85) show token rules cannot be
 # closed, so a pass file's AXIOM VERDICT comes from the structural audit (`structural_audit`: the
 # PR #829 auditor on an .olean compiled in a fresh process), never from the file's own output.
-# The subset stays as a second, independent layer. It is checked on the code-only text
+# The two layers are NOT independent (Red Team r4 T88/MF21): the compile is not sandboxed, so code
+# that runs during it can write the .olean the auditor reads. The structural verdict is sound only
+# for files that run no user code, which is what the subset enforces. It is checked on the code-only text
 # (comments and string bodies blanked by `lex`, so neither can trigger or hide a rule), one
 # `\n`-line at a time; every violation is tagged with its rule:
 #   A. a code line that starts in COLUMN 0 starts a command: after any leading `@[...]` its first
@@ -169,10 +174,37 @@ def load_command_heads() -> tuple[frozenset[str], dict]:
         d = json.loads(_HEADS_FILE.read_text())
     except (OSError, ValueError):
         return frozenset(), {}
-    return frozenset(d.get("word_heads", [])), d
+    return frozenset(d.get("heads", [])), d
 
 
 COMMAND_HEADS, COMMAND_HEADS_META = load_command_heads()
+# Non-word command heads (Red Team r4 T88: `simproc_pattern%` ran user code inside the subset).
+# `@[` is rule C's; `/--` and `/-!` open doc comments, which `lex` blanks, so neither is a
+# command head in code-only text. Every other non-word head (`…%`, `$`, `?`, `#check'`, …) is
+# refused ANYWHERE as a token, and so is any `name%` token at all (term/command elaborators).
+_NONWORD_EXEMPT = frozenset({"@[", "/--", "/-!"})
+_NONWORD_HEADS = tuple(
+    sorted(
+        (
+            h
+            for h in COMMAND_HEADS
+            if not re.fullmatch(r"#?[A-Za-z_][A-Za-z0-9_!?.']*", h)
+        ),
+        key=len,
+        reverse=True,
+    )
+)
+_PCT_TOKEN = re.compile(r"(?<![\w.'])[A-Za-z_][A-Za-z0-9_.']*%")
+
+
+def t00_imports() -> list[str]:
+    """`Lean` + the T00 import surface: what command_heads.json must have been generated with."""
+    t00 = Path(__file__).resolve().parent / "tests" / "T00_ImportSurface.lean"
+    try:
+        code = strip_comments(read_lean_source(t00))
+    except OSError:
+        return []
+    return ["Lean"] + re.findall(r"^[ \t]*import\s+(\S+)", code, re.MULTILINE)
 
 
 def _blank_attr_lists(ln: str) -> str:
@@ -232,6 +264,20 @@ def subset_violations(src: str) -> list[str]:
             if t == "deriving" and (j + 1 >= len(toks) or toks[j + 1] != "instance"):
                 continue  # a `deriving C` clause of a structure/inductive, not the command
             out.append(f"[H] l.{i}: command keyword `{t}` is not an allowed command")
+        bare = _blank_attr_lists(ln)
+        for h in _NONWORD_HEADS:  # H, non-word heads (any position)
+            if h in _NONWORD_EXEMPT:
+                continue
+            pat = (
+                r"(?<![\w.'])" if h[:1].isalnum() or h[:1] == "_" else ""
+            ) + re.escape(h)
+            if re.search(pat, bare):
+                out.append(f"[H] l.{i}: command head `{h}` is not an allowed command")
+        for m in _PCT_TOKEN.finditer(bare):  # H, any `name%` elaborator token
+            if m.group(0) not in _NONWORD_HEADS:
+                out.append(
+                    f"[H] l.{i}: elaborator token `{m.group(0)}` is outside the subset"
+                )
         for m in re.finditer(r"#(\w+)", ln):  # B
             if m.group(1) != "print" or not re.match(r"[ \t]+axioms\b", ln[m.end() :]):
                 out.append(
@@ -553,9 +599,6 @@ def parse_axioms(
     return {k: sorted(v) for k, v in res.items()}, rejected, dups
 
 
-AUDIT_MARK = "AXIOM-AUDIT-827"
-
-
 def _audit_checker(run_meta: dict):
     """PR #829's checker module (for `std_mismatch`), loaded from beside the auditor. Nothing is
     vendored: the pins live in `scripts/check_lean_axiom_audit.py` (STD_PINS)."""
@@ -576,12 +619,14 @@ def structural_audit(
     """The AXIOM VERDICT for a file (director ruling after Red Team r3 on PR #824).
 
     run.sh compiled the file to an .olean in a fresh process and ran the PR #829 auditor
-    (`scripts/LeanAxiomAudit.lean`) on it: `lean --run`, LEAN_PATH unset, the toolchain library
-    first, `importModules (loadExts := false)`, no initializers, so no code of the file runs and
-    nothing it printed is read. Returns (problems that make the audit unusable, non-standard
-    axioms per declaration). Fail-closed: no .olean, no auditor, not exactly one result line,
-    a wrong nonce/root/scope, a non-empty `missing`/`unresolved`/`shadowed`, standard axioms that
-    are not the toolchain's, or zero declarations is a problem."""
+    (`scripts/LeanAxiomAudit.lean`) on it. The auditor's result line is graded by PR #829's OWN
+    `grade_run` (imported from `check_lean_axiom_audit.py` beside the auditor, never copied:
+    Red Team r4 found a copy had drifted and missed `dangling`). This function adds only what
+    is specific to a one-file toolcheck run: compile exit 0, the .olean present, auditor exit
+    0, and a scope of exactly this file's module. Returns (problems, non-standard axioms per
+    declaration). PRECONDITION (Red Team r4 T86/T88, #829's stated limit S1 / QBP#836): the
+    compile is not sandboxed, so code the file runs at compile time could write the .olean the
+    auditor reads. The verdict is sound only for files inside the pass-file SUBSET."""
     a = fmeta.get("audit")
     if not isinstance(a, dict):
         return [
@@ -592,53 +637,44 @@ def structural_audit(
             f"the fresh compile produced no .olean (exit {a.get('compile_exit')}): nothing to "
             f"audit (a file that exits early fails closed here)"
         ], {}
+    probs: list[str] = []
+    if a.get("compile_exit") != 0:
+        probs.append(f"the fresh compile exited {a.get('compile_exit')} (must be 0)")
+    if a.get("auditor_exit") != 0:
+        probs.append(f"the auditor exited {a.get('auditor_exit')} (must be 0)")
     chk = _audit_checker(run_meta)
     if chk is None:
-        return [
-            "PR #829 auditor/checker unavailable (run meta has no usable `auditor`)"
-        ], {}
-    out = raw / f"{stem}.audit.out"
-    text = out.read_bytes().decode("utf-8", "replace") if out.exists() else ""
-    res = []
-    for ln in text.split("\n"):
-        try:
-            d = json.loads(ln)
-        except ValueError:
-            continue
-        if isinstance(d, dict) and d.get("mark") == AUDIT_MARK:
-            res.append(d)
-    if len(res) != 1:
-        return [
-            f"auditor printed {len(res)} result lines, exactly 1 required "
-            f"(auditor exit {a.get('auditor_exit')})"
-        ], {}
-    d = res[0]
-    probs: list[str] = []
-    mod = f"ToolcheckAudit.{stem}"
-    if d.get("nonce") != a.get("nonce"):
-        probs.append("auditor result carries the wrong nonce")
-    if d.get("root") != stem:
-        probs.append(f"auditor result is for root {d.get('root')!r}, not {stem!r}")
-    if d.get("scope") != [mod]:
-        probs.append(f"audit scope {d.get('scope')} is not [{mod}]")
-    for k in ("missing", "unresolved", "shadowed"):
-        if d.get(k) != []:
-            probs.append(f"auditor `{k}` = {d.get(k)} (must be [])")
-    bad_std = chk.std_mismatch(d.get("std"))
-    if bad_std:
-        probs.append(f"standard axioms are not the toolchain's: {bad_std}")
-    if not isinstance(d.get("declarations"), int) or d["declarations"] < 1:
-        probs.append(
-            f"auditor enumerated {d.get('declarations')} declarations (need >= 1)"
+        return (
+            probs
+            + [
+                "PR #829 auditor/checker unavailable (run meta has no usable `auditor`)"
+            ],
+            {},
         )
+    mod = f"ToolcheckAudit.{stem}"
+    errors: list[str] = []
+    with contextlib.redirect_stdout(io.StringIO()):  # grade_run prints progress lines
+        got = chk.grade_run(
+            {
+                "output": str(raw / f"{stem}.audit.out"),
+                "label": stem,
+                "nonce": a.get("nonce"),
+                "modules": [mod],
+            },
+            errors,
+        )
+    probs += [f"PR #829 grade_run: {e}" for e in errors]
     nonstd: dict[str, list[str]] = {}
-    if not isinstance(d.get("nonstd"), list):
-        probs.append("auditor `nonstd` is not a list")
-    else:
-        for b in d["nonstd"]:
+    if got is not None:
+        bad, _decls, scope = got
+        if scope != [mod]:
+            probs.append(f"audit scope {scope} is not [{mod}]")
+        for b in bad:
             nonstd[str(b.get("decl"))] = sorted(
                 str(x.get("name")) for x in b.get("axioms", []) if isinstance(x, dict)
             )
+    elif not errors:
+        probs.append("PR #829 grade_run rejected the result")
     return probs, nonstd
 
 
@@ -768,12 +804,14 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
                     f"structural audit: {decl} rests on non-standard axioms {axs}"
                 )
             heads_tc = COMMAND_HEADS_META.get("toolchain")
-            if heads_tc != run_meta.get("toolchain") or COMMAND_HEADS_META.get(
-                "mathlib_sha"
-            ) != run_meta.get("mathlib_sha"):
+            if (
+                heads_tc != run_meta.get("toolchain")
+                or COMMAND_HEADS_META.get("mathlib_sha") != run_meta.get("mathlib_sha")
+                or COMMAND_HEADS_META.get("imports") != t00_imports()
+            ):
                 failures.append(
-                    "command_heads.json was generated for another toolchain/Mathlib "
-                    "(re-run gen_command_heads.py)"
+                    "command_heads.json was generated for another toolchain/Mathlib/"
+                    "T00 import surface (re-run gen_command_heads.py)"
                 )
             # Fail-closed (Red Team 1(b) on PR #824): Lean's stdout is writable by any code the
             # file runs, so a pass file must run none, print nothing but Lean's own messages,

@@ -6,6 +6,7 @@ comment does not include the patches). M20-M25 target the r4 rules; M23 and M26-
 pass-file subset rules (Red Team r2); M35-M51 the structural audit and rules H/I (Red Team r3);
 `E …` mutants drop each SUBSET_* list entry in turn.
 A mutant is KILLED iff selftest_grader.py exits non-zero with the mutated grader.
+Disk: about 0.3 GB peak (one mutant's work dir at a time; each is deleted after its run).
 """
 
 import shutil
@@ -142,25 +143,29 @@ M = {
     "M37 audit: missing .olean not a problem": [
         ('    if not a.get("olean"):', "    if False:")
     ],
-    "M38 audit: nonce not checked": [
-        ('if d.get("nonce") != a.get("nonce"):', "if False:")
+    "M40 audit: exact one-module scope not checked": [
+        ("if scope != [mod]:", "if False:")
     ],
-    "M39 audit: root not checked": [('if d.get("root") != stem:', "if False:")],
-    "M40 audit: scope not checked": [('if d.get("scope") != [mod]:', "if False:")],
-    "M41 audit: missing/unresolved/shadowed not checked": [
-        ("        if d.get(k) != []:", "        if False:")
+    "M38 audit: PR #829 grade_run errors ignored": [
+        ('probs += [f"PR #829 grade_run: {e}" for e in errors]', "pass")
     ],
-    "M42 audit: standard-axiom pins not checked": [
-        ("    if bad_std:", "    if False:")
+    "M39 audit: compile exit not checked": [
+        ('if a.get("compile_exit") != 0:', "if False:")
     ],
-    "M43 audit: zero declarations accepted": [
+    "M41 audit: auditor exit not checked": [
+        ('if a.get("auditor_exit") != 0:', "if False:")
+    ],
+    "M52 rule H: non-word command heads off": [
         (
-            'if not isinstance(d.get("declarations"), int) or d["declarations"] < 1:',
-            "if False:",
+            "for h in _NONWORD_HEADS:  # H, non-word heads",
+            "for h in ():  # H, non-word heads",
         )
     ],
-    "M44 audit: several result lines accepted": [
-        ("if len(res) != 1:", "if len(res) < 1:")
+    "M53 rule H: `name%` elaborator tokens off": [
+        ("for m in _PCT_TOKEN.finditer(bare):  # H", "for m in []:  # H")
+    ],
+    "M54 heads pin: T00 import list not compared": [
+        ('or COMMAND_HEADS_META.get("imports") != t00_imports()', "or False")
     ],
     "M45 pass: stale command_heads.json accepted": [
         (
@@ -259,6 +264,9 @@ for name, reps in M.items():
             text=True,
         )
         rows.append((name, "KILLED" if r.returncode != 0 else "SURVIVED"))
+        # Disk bound: each selftest copies the suite + raw logs ~100 times (~0.3 GB). Keeping
+        # every mutant's directory filled the shared disk on 2026-11-25, so delete it now.
+        shutil.rmtree(d, ignore_errors=True)
 for mname, v in rows:
     print(f"| {mname} | {v} |")
 k = sum(v == "KILLED" for _, v in rows)

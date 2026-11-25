@@ -5,8 +5,9 @@ pass-file subset's rule H (Red Team r3 on PR #824).
 The list is not hand-written. A generated driver imports `Lean` plus every module of the T00
 import surface (all the Mathlib modules QBP imports). It reads
 `(parserExtension.getState env).categories["command"].tables.leadingTable`, which is the parser's
-own first-token index, and prints its keys as one JSON line. Word-like tokens (`def`, `simproc`,
-`#eval`, …) are written to `command_heads.json`, with the toolchain and Mathlib pins. The grader
+own first-token index, and prints its keys as one JSON line. EVERY leading token is written to
+`command_heads.json` (`heads`; Red Team r4: the non-word ones such as `simproc_pattern%` matter
+too), with the toolchain, Mathlib and import-list pins. The grader
 refuses a file whose pins differ, so a toolchain bump must regenerate the list. The number of
 UNINDEXED command parsers (`leadingParsers`, which have no first token) is recorded too. Those are
 a stated limit of a text scan.
@@ -69,6 +70,10 @@ def main() -> int:
         print("gen_command_heads: the driver failed", file=sys.stderr)
         return 1
     d = json.loads(line)
+    # `Name.toString` escapes non-identifier tokens as «…»; the token itself is inside.
+    d["leading"] = [
+        t[1:-1] if t.startswith("«") and t.endswith("»") else t for t in d["leading"]
+    ]
     words = sorted(
         {t for t in d["leading"] if re.fullmatch(r"#?[A-Za-z_][A-Za-z0-9_!?]*", t)}
     )
@@ -80,6 +85,7 @@ def main() -> int:
         "imports": ["Lean"] + mods,
         "leading_tokens_total": len(d["leading"]),
         "unindexed_command_parsers": d["unindexed"],
+        "heads": sorted(d["leading"]),
         "word_heads": words,
     }
     (HERE / "command_heads.json").write_text(json.dumps(out, indent=1) + "\n")
