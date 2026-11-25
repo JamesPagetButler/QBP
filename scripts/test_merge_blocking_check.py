@@ -138,7 +138,75 @@ def test_check_function_parity_with_cli():
 def test_never_edits_anything():
     src = open(SCRIPT, encoding="utf-8").read()
     assert "gh pr edit" not in src and "gh api" not in src
-    assert src.count("open(") == 1 and "open(args.body_file" in src
+    # two reads only (#835 added the changed-file list); no write mode anywhere
+    assert src.count("open(") == 2, src.count("open(")
+    assert "open(args.body_file" in src and "open(args.changed_file" in src
+    assert '"w"' not in src and "'w'" not in src
+
+
+# ---- #835 beekeeper-box scope guard (ruling 2026-11-24, QBP#714 issuecomment-7147354671)
+
+HVR_NILD = (
+    "Sign-off required (merge-blocking):\n- [x] Red Team review\n- [x] Gemini review\n"
+    "- [ ] ~~Human Visual Review (beekeeper)~~ ⊘ pure housekeeping\n"
+    "- [ ] ~~Merge authorized (beekeeper; QBP lane)~~ ⊘ pure housekeeping\n"
+)
+OTHER_NILD = (
+    "Sign-off required (merge-blocking):\n- [x] Red Team review\n"
+    "- [ ] ~~schema co-sign~~ ⊘ n/a\n- [x] Human Visual Review (beekeeper)\n"
+)
+
+
+def _scoped(body, labels, changed):
+    import tempfile
+
+    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as fh:
+        fh.write("\n".join(changed) + "\n")
+        path = fh.name
+    try:
+        return run(body, "--labels", ",".join(labels), "--changed-file", path)
+    finally:
+        os.unlink(path)
+
+
+def test_hvr_nil_passes_on_pure_housekeeping():
+    r = _scoped(
+        HVR_NILD, ["housekeeping", "tier-2-review"], ["scripts/x.py", "CONTRIBUTING.md"]
+    )
+    assert r.returncode == 0, r.stdout
+
+
+def test_hvr_nil_fails_without_housekeeping_label():
+    r = _scoped(HVR_NILD, ["tier-2-review"], ["scripts/x.py"])
+    assert r.returncode == 1 and "no `housekeeping` label" in r.stdout, r.stdout
+    assert r.stdout.count("::error::⊘-nil'd beekeeper box") == 2, r.stdout
+
+
+def test_hvr_nil_fails_on_theory_path_even_if_housekeeping():
+    for path in ("proofs/QBP/Foo.lean", "docs/foundations/a.md", "docs/theory/b.md"):
+        r = _scoped(HVR_NILD, ["housekeeping"], ["scripts/x.py", path])
+        assert r.returncode == 1 and "theory-bearing" in r.stdout, (path, r.stdout)
+
+
+def test_hvr_nil_fails_on_tier3_label_even_if_housekeeping():
+    r = _scoped(HVR_NILD, ["housekeeping", "tier-3-review"], ["scripts/x.py"])
+    assert r.returncode == 1 and "theory-bearing" in r.stdout, r.stdout
+
+
+def test_hvr_nil_fails_closed_without_scope_inputs():
+    r = run(HVR_NILD)
+    assert r.returncode == 1 and "fail closed" in r.stdout, r.stdout
+
+
+def test_other_nils_unaffected_by_guard():
+    assert run(OTHER_NILD).returncode == 0
+    assert _scoped(OTHER_NILD, ["tier-3-review"], ["proofs/a.lean"]).returncode == 0
+
+
+def test_theory_definition_matches_pr_process_lints():
+    import check_pr_prose_claims as lint
+
+    assert c.THEORY_PATHS == lint.THEORY_PATHS and c.THEORY_LABEL == lint.THEORY_LABEL
 
 
 # ---- verdict source: the judge is the BASE copy, never the PR head (arch §I4, PR #780)

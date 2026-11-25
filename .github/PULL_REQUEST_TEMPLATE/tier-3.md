@@ -130,5 +130,15 @@ Routing rubric: docs/workflows/pr7_conflict_routing_rubric.md (v0.2)
 - [ ] CTH anchor impact declared above
 - [ ] Every substantive claim terminates at one of the 5 anchor types
 
+<!-- Tier 3 is theory: HVR and Merge authorized are never ⊘-nil'd here (beekeeper ruling
+     2026-11-24, QBP#714 issuecomment-7147354671; CONTRIBUTING.md §Housekeeping vs theory). -->
+
+## Sign-off required (merge-blocking):
+
+- [ ] Red Team review (Claude)
+- [ ] Gemini review (real API)
+- [ ] Human Visual Review (beekeeper)
+- [ ] Merge authorized (beekeeper; QBP lane)
+
 ---
 *Tier 3: Full panel review required (Red Team + Blue Team, sequential)*
