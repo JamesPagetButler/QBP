@@ -3,11 +3,6 @@
   "version": "6.25.0",
   "schema_version": "v0.3",
   "timestamp": "2026-05-11T01:29:09Z",
-  "meta_axiom": {
-    "id": "META-1",
-    "name": "Change is constant",
-    "statement": "No framework is guaranteed complete. All knowledge is provisional within its axiomatic system."
-  },
   "axioms": [
     {
       "id": "AXIOM-1",
@@ -13345,6 +13340,22 @@
       "id_history": [
         "META-regime-of-validity-field"
       ]
+    },
+    {
+      "id": "WISDOM-change-is-constant",
+      "name": "Change is constant",
+      "tier": 1,
+      "provenance": "T",
+      "provenance_kind": "theory",
+      "status": "coherent",
+      "description": "No framework is guaranteed complete. All knowledge is provisional within its axiomatic system.",
+      "prediction_chain": [],
+      "statement": "No framework is guaranteed complete. All knowledge is provisional within its axiomatic system.",
+      "id_history": [
+        "META-1"
+      ],
+      "last_tested_at": "2026-11-16T16:45:00Z",
+      "notes": "QBP#655 (#654 D6): reclassified out of the root population per qbp-oppenheimer's theory ruling — META-1 is an epistemic meta-principle about the ledger itself, not a physical root; grepping the ledger confirms no record cites META-1 via derived_from/prediction_chain/forced_by. Moved from the single-object `meta_axiom` top-level key (now removed entirely — not in inventory.schema.v0.3.json's top-level `required` list) into `anchors[]` under a WISDOM- id: `anchors[]` is not one of root_audit.py's ROOT_LISTS, so this removes META-1 from the D1 root gate structurally. `name`/`statement` text unchanged from META-1 (also carried as `description` to satisfy the Anchor schema's required field). `id_history: [\"META-1\"]` preserves the prior id. Register: docs/cth/root-audit-register.json's open_roots META-1 entry removed in the same PR (shrink-only)."
     }
   ],
   "inputs": [
@@ -14019,11 +14030,11 @@
     },
     {
       "version": "6.25.0",
-      "date": "2026-11-16T16:41:48Z",
-      "note": "QBP#683 AC6: HostingSeamBridge witness — potential_eq_potV / potential_eq_potV_fun (rfl, QBP.Substrate.HostingSeamBridge) added to PROOF-substrate-hosting-definition.theorems[] + companions; one-line bridge note on PROOF-seam-top-plane-on-frozen-ridge. Rides PR #803; inverse-anchor baseline bumped so the new module's theorems are no longer orphans. Rebased onto master post-#814 (6.24.0 -> 6.25.0); re-run fresh against the new baseline rather than hand-edited."
+      "date": "2026-11-16T16:45:00Z",
+      "note": "QBP#655 (#654 D6): reclassified META-1 out of the root population — removed the single-object `meta_axiom` top-level key (not schema-required) and minted WISDOM-change-is-constant in `anchors[]` (not a ROOT_LISTS key) carrying the same name/statement text + id_history:['META-1']. Theory ruling: qbp-oppenheimer (META-1 is an epistemic meta-principle about the ledger, cited by nothing via derived_from/prediction_chain/forced_by). Encoding: qbp-implementor writer lane. docs/cth/root-audit-register.json's open_roots META-1 entry removed in the same PR (shrink-only)."
     }
   ],
-  "last_updated": "2026-11-16T16:41:48Z",
+  "last_updated": "2026-11-16T16:45:00Z",
   "update_provenance": "qbp-oppenheimer 2026-09-18: ruling bundle v0.7 sort encoded (PR #652; nothing ruled)",
   "retired_axioms": [
     {

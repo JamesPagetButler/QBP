@@ -1,0 +1,13 @@
+{
+  "issue": 683,
+  "slug": "ac6-hosting-seam-bridge",
+  "pr": 803,
+  "encoder": "cth_ledger_edit replay of PR #803 @8f8587e record edits (qbp-oppenheimer, #817 migration)",
+  "note": "QBP#683 AC6: HostingSeamBridge witness — potential_eq_potV / potential_eq_potV_fun (rfl, QBP.Substrate.HostingSeamBridge) added to PROOF-substrate-hosting-definition.theorems[] + companions; one-line bridge note on PROOF-seam-top-plane-on-frozen-ridge. Rides PR #803; inverse-anchor baseline bumped so the new module's theorems are no longer orphans. Migrated to the QBP#817 fragment scheme: the record edits approved at 8f8587e were replayed onto master via cth_ledger_edit; no hand-written version/changelog/last_updated.",
+  "touched_ids": [
+    "PROOF-seam-top-plane-on-frozen-ridge",
+    "PROOF-substrate-hosting-definition"
+  ],
+  "version": null,
+  "date": null
+}

@@ -228,6 +228,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cth_ledger_edit import ledger_edit  # noqa: E402
+from ledger_fragment import write_fragment  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "archive/cth-inventory/confluent-trust-inventory-v5_3.v0.3.json"
@@ -2111,13 +2112,6 @@ def plan_writes(
     return plan
 
 
-def bump_minor(version: str) -> str:
-    m = re.match(r"^(\d+)\.(\d+)\.(\d+)$", version)
-    if not m:
-        raise Refusal(f"ledger version {version!r} is not x.y.z")
-    return f"{m.group(1)}.{int(m.group(2)) + 1}.0"
-
-
 def changelog_note(
     n_targets: int,
     n_changed: int,
@@ -2152,13 +2146,18 @@ def apply_writes(
     note_args: Dict[str, Any],
     today: str,
     dry_run: bool,
+    pr: Optional[int] = None,
 ) -> Tuple[bool, str]:
-    """Write the planned grades through the confined writer. Returns (changed, version)."""
+    """Write the planned grades through the confined writer. Returns (changed,
+    frozen_base_version). QBP#817 variant A: version/changelog/last_updated are
+    frozen — a real change is recorded as a changes.d/ fragment instead (`pr`
+    is required whenever this actually writes something, not on a dry run)."""
     changed_ids = [cid for cid, p in plan.items() if p["changed"]]
     if not changed_ids:
         return False, ""
     with ledger_edit(str(ledger_path), dry_run=dry_run) as ed:
         L = ed.ledger
+        frozen_base = L["version"]
         for cid in changed_ids:
             p = plan[cid]
             a = ed.record("anchors", cid)
@@ -2168,23 +2167,28 @@ def apply_writes(
                 a["proof_assistants"] = p["proof_assistants"]
             elif "proof_assistants" in a:
                 del a["proof_assistants"]
-        new_version = bump_minor(L["version"])
-        L["version"] = new_version
-        ed.touch("version")
-        if L.get("last_updated") != today:
-            L["last_updated"] = today
-            ed.touch("last_updated")
-        L["changelog"].append(
-            OrderedDict(
-                [
-                    ("version", new_version),
-                    ("date", today),
-                    ("note", changelog_note(n_changed=len(changed_ids), **note_args)),
-                ]
+        # F5 (qbp-architecture, QBP#817 PR-1 review, 2026-11-17): refusing a
+        # missing `pr` still happens in here (before any write), but the actual
+        # fragment write must not — ledger_edit()'s verify()/write() run only
+        # after this `with` block exits cleanly, so writing the fragment inside
+        # it would leave an orphan fragment on disk if verify() ever failed.
+        if not dry_run and not pr:
+            raise SystemExit(
+                "this run changed anchors, so it needs pr=<number> to write "
+                "its changes.d/ fragment (QBP#817 variant A)"
             )
+
+    if not dry_run:
+        write_fragment(
+            issue=692,
+            slug=_dt.datetime.now(_dt.timezone.utc).strftime("run-%Y%m%d-%H%M%S"),
+            pr=pr,
+            encoder="scripts/encode_pa_from_evidence.py",
+            note=changelog_note(n_changed=len(changed_ids), **note_args),
+            touched_ids=changed_ids,
+            changes_dir=Path(ledger_path).resolve().parent / "changes.d",
         )
-        ed.touch("changelog")
-    return True, new_version
+    return True, frozen_base
 
 
 # ---------------------------------------------------------------------------------------
@@ -2272,8 +2276,18 @@ def build_report(
             ("issue", "QBP#692"),
             ("generated", meta["today"]),
             ("ledger", meta["ledger"]),
+            # QBP#817 variant A: version is frozen — both fields are the same
+            # frozen base when changed is True (nothing bumps it any more); a
+            # real change is recorded as a changes.d/ fragment instead.
             ("ledger_version_before", ledger_before["version"]),
-            ("ledger_version_after", meta.get("version_after") or "(no change)"),
+            (
+                "ledger_version_after",
+                (
+                    "frozen (unchanged) — see changes.d/ fragment"
+                    if meta.get("version_after")
+                    else "(no change)"
+                ),
+            ),
             ("pinned_master_rev", meta["pinned_master_rev"]),
             ("pinned_master_commit", meta["pinned_master_commit"]),
             ("engine", engine_out["engine"]),
@@ -2645,6 +2659,13 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument(
         "--repo", type=Path, default=ROOT, help="(tests) git repo for the pinned rev"
     )
+    ap.add_argument(
+        "--pr",
+        type=int,
+        default=None,
+        help="the PR number this run's changes.d/ fragment belongs to (QBP#817 "
+        "variant A: required whenever this run actually changes anything)",
+    )
     return ap
 
 
@@ -2657,6 +2678,7 @@ def run(
     report_path: Optional[Path],
     today: Optional[str] = None,
     write_report: bool = True,
+    pr: Optional[int] = None,
 ) -> Dict[str, Any]:
     """The whole pipeline; returns {changed, version, report, results}."""
     today = today or _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT00:00:00Z")
@@ -2685,7 +2707,9 @@ def run(
             dist=dist,
             engine_id=engine_out["engine"],
         )
-        changed, version = apply_writes(ledger_path, plan, note_args, today, dry_run)
+        changed, version = apply_writes(
+            ledger_path, plan, note_args, today, dry_run, pr=pr
+        )
         # The git sha of the evidence store this backfill graded against (QBP#692 strike-2
         # invariant, architect seq 2554): pa-reconcile.yml's INTER_PIN must equal this, so the
         # pin moves atomically with the ledger. Resolved when evidence_dir is a git checkout
@@ -2763,6 +2787,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         repo=args.repo,
         dry_run=args.dry_run,
         report_path=args.report,
+        pr=args.pr,
     )
     rep = out["report"]
     print(
@@ -2808,7 +2833,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 1
     print(
         f"{'DRY ' if args.dry_run else ''}applied: {rep['changed_anchor_count']} anchors; "
-        f"ledger {rep['ledger_version_before']} → {out['version']}"
+        f"ledger frozen base {rep['ledger_version_before']} (unchanged — see "
+        f"changes.d/ fragment, QBP#817)"
     )
     return 0
 
