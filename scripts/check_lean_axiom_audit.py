@@ -66,9 +66,18 @@ _BAD_CHARS = "*?[]"
 # TOOLCHAIN's axioms. Each is pinned to its toolchain module and the SHA-256 of the auditor's
 # canonical serialisation (observed on Lean v4.30.0; a toolchain bump re-pins them, on purpose).
 STD_PINS = {
-    "propext": ("Init.Core", "PROPEXT_FP"),
-    "Classical.choice": ("Init.Prelude", "CHOICE_FP"),
-    "Quot.sound": ("Init.Core", "QSOUND_FP"),
+    "propext": (
+        "Init.Core",
+        "b50a8c8e4e321906cb5d7fc00262b46a1a40bf609db218405f193572bbcb565d",
+    ),
+    "Classical.choice": (
+        "Init.Prelude",
+        "0434f51415cd2f674f197d2d4c1d510df4c46ed731ba370dd5d0f4c9564838da",
+    ),
+    "Quot.sound": (
+        "Init.Core",
+        "068b62003f54b39bef7cdd818f6184f9192eabce7cd046661cf4049c7c85d3c7",
+    ),
 }
 REJECTED: list[dict] = []  # malformed allowlist entries (reported in --json as a count)
 
