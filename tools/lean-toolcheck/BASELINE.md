@@ -1,10 +1,16 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `20261124T234344Z` (2026-11-24 23:43–23:45 UTC, `tools/lean-toolcheck/run.sh --update-baseline`) ·
-**overall GREEN — 37/37 files as expected**: 20 tool tests pass, 14 must-fail controls caught with the expected
-message, 3 known-limit probes confirmed (report-only) · 120 theorems axiom-audited. (The per-file table below keeps
-the `20261121T021507Z` numbers for T00–MF09; MF10–MF14 rows are from `20261124T234344Z`; the committed
-`results/` record is the new run.)
+**Run:** `20261125T020851Z` (2026-11-25 02:53–02:56 UTC, `tools/lean-toolcheck/run.sh --update-baseline`) ·
+**overall GREEN — 42/42 files as expected**: 20 tool tests pass, T20 confirmed outside the pass-file subset
+(compile check), 18 must-fail controls caught with the expected message, 3 known-limit probes confirmed
+(report-only) · 123 theorems axiom-audited. Two cpu-thermal guard pauses (max Tctl 70.9 °C, other load on the box)
+are the likely cause of T16's 71.0 s wall time in that run (not pinned to the file); the run before (`20261125T011601Z`) timed it at 3.41 s.
+The per-file table below keeps the `20261121T021507Z` numbers for the unchanged files, and adds rows from later
+runs for new or changed files. The committed `results/` record is `20261125T020851Z`.
+
+> **A toolcheck PASS is NOT an axiom certificate.** It covers a supported subset of Lean only (README, "The
+> pass-file subset"). The sound audit is out-of-process: QBP#827 / PR #829.
+
 Machine-readable record: [`results/results-v4.30.0-c5ea003.json`](results/results-v4.30.0-c5ea003.json)
 (+ the `.md` table). Re-run: `tools/lean-toolcheck/run.sh` — this writes only to `results/runs/<run-id>/`
 (gitignored); the committed record changes only with `--update-baseline` on a full GREEN run. A later run on the
@@ -19,7 +25,8 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 > at its `#print axioms` command; reports merge worst-case (MF06). Stdout is **not** a trusted channel — code the
 > file runs can forge a message on `/dev/stdout` and exit before Lean prints the real report (MF14) — so a pass file
 > is graded fail-closed: one report per site, none off a site, no non-Lean stdout line, no code-executing construct
-> (`EXEC_RE`, a supported-subset denylist; the out-of-process audit is QBP#827). Lines are counted Lean's way:
+> (the pass-file SUBSET: column-0 command allowlist, attribute allowlist, no syntax/handler/evaluation keyword;
+> a toolcheck PASS is NOT an axiom certificate — the out-of-process audit is QBP#827 / PR #829). Lines are counted Lean's way:
 > bytes, only `\r\n` → `\n`, split at `\n` only (MF10/MF11). Every expectation regex is matched against one Lean
 > message or one checker `::error::` line.
 >
@@ -87,6 +94,13 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 | `must-fail/MF12_EscapedQuoteSite/…` | must-fail | ✅ caught | 0 | 1.30 | 784 | `['QBPToolcheck.MF12.cheat']` | site after `"a\"b"` found |
 | `must-fail/MF13_CleanBraceRefused/…` | must-fail | ✅ caught | 0 | 1.17 | 784 | `[]` | grader REFUSES (brace in a string, l.19) |
 | `must-fail/MF14_ExecForgesStdout/…` | must-fail | ✅ caught | 0 | 1.25 | 784 | `[]` (**forged** — the real report was never printed) | exec refusal (l.27 `#eval`); the stdout audit alone is fooled, as designed |
+| `tests/T09_SimpFamily.lean` (`attribute [local simp]` moved to T20; run `…020851Z`) | tool | ✅ PASS | 0 | 4.04 | 2405 | 8 thm ⊆ std3 | — |
+| `tests/T16_CoreTactics.lean` (`local notation` moved to T20; run `…011601Z`) | tool | ✅ PASS | 0 | 3.41 | 1990 | 13 thm ⊆ std3 | — |
+| `tests/T20_SubsetRefusedFeatures.lean` | tool (compile only) | ✅ as expected | 0 | 3.11 | 1888 | not graded | subset refusal confirmed: `local`, `notation`, `section`, `attribute` |
+| `must-fail/MF15_SyntaxAttributeHandler/…` | must-fail | ✅ caught | 0 | 2.30 | 1447 | `[]` (**forged**) | subset: `syntax`, `attribute`, user command in column 0 |
+| `must-fail/MF16_HandlerNotFirstAttr/…` | must-fail | ✅ caught | 0 | 2.29 | 1447 | `[]` (**forged**) | subset: `@[inline, command_elab …]`, both items refused |
+| `must-fail/MF17_MacroBuildsEval/…` | must-fail | ✅ caught | 0 | 1.28 | 784 | `[]` (**forged**) | subset: `macro`, user command in column 0 |
+| `must-fail/MF18_TermElabHandler/…` | must-fail | ✅ caught | 0 | 2.27 | 1448 | `[]` (**forged**) | subset: `syntax`, `attribute` |
 | `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.13 | 776 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
 | `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.14 | 776 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
 | `known-limits/KL03_CheckerStringComment/…` | known-limit | 🟡 known limit | 0 | 1.15 | 776 | `['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']` | 🟡 confirmed: checker exit 0 (string-blind stripper misses the `native_decide`); HARD: audit shows the native axiom |
@@ -156,7 +170,12 @@ record's raw logs (`…225231Z`, same files): `python3 -I tools/lean-toolcheck/s
 | clean T01 + duplicate report at a site / + forged report off-site / + non-Lean stdout line / + severity-less JSON at a site | new | **FAIL** each (fail-closed pass rules) |
 | MF01 with an UNANCHORED checker regex and the text on a `note:` line | new | **FAIL** (`::error` lines only) |
 | T19 with `#print axioms` inside a string literal | new | PASS (strings are not commands) |
-| `mutants_grader.py`: 25 grader mutants (M01–M19 reconstructed from the Red Team list, M20–M25 new rules) | new | **24 KILLED, 1 SURVIVED** (M04, equivalent: code-only and original lines have equal length) |
+| `mutants_grader.py`: 25 grader mutants (M01–M19 reconstructed from the Red Team list, M20–M25 new rules) | `c333116` | **24 KILLED, 1 SURVIVED** (M04, equivalent: code-only and original lines have equal length) |
+| MF15–MF18 replayed as pass-labelled attacks (T80–T83: user syntax / handlers forge stdout, then exit 0) | **`c333116`** | **PASS — exploitable** (all four) |
+| same | new | **FAIL** (all four: pass-file subset) |
+| 42 refused constructs, each appended to clean T01 (rule D keywords, rule B `#` commands, rule C attributes, rule A column-0 commands) | new | **42/42 FAIL** |
+| T20 with its refused lines commented out (still expects `subset-refused`) | new | **FAIL** |
+| `mutants_grader.py` final: 33 rule mutants + 44 list-entry mutants (each SUBSET_* entry dropped in turn) | new | **76 KILLED, 1 SURVIVED** (M04, equivalent) |
 | `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
 
 Earlier controls (Red Team round): five planted misses in MF01–MF04 / T04 were all flagged (exit 1).
@@ -259,3 +278,4 @@ text-mode universal newlines (MF11).
 | 2026-11-20 | `20261120T230310Z` | Gemini r2: sites anywhere on a line (+MF07); braces in strings refused (+MF08); string bodies blanked for site detection; coverage statement; 3 consecutive full runs GREEN 31/31 |
 | 2026-11-21 | `20261121T021507Z` | Gemini r3 (e): column unit probed (codepoints) and pinned (`LEAN_COLUMN_UNIT`, computed from the original source line); +MF09; self-test unit pin; 3 consecutive full runs GREEN 32/32 |
 | 2026-11-24 | `20261124T234344Z` | Gemini r4 (f) + Red Team (`19bbbd4`): `\n`-only line model, bytes read (+MF10, +MF11, line-rule pins); fail-closed pass rules and `EXEC_RE` code-execution refusal (+MF14); +MF12 (escaped quote), +MF13 (clean-brace refusal); astral `𝔽` in MF09; guard-dependent plants; `mutants_grader.py` 24/25; 3 full runs GREEN (34/34 before MF12–MF14, then 37/37 ×2) |
+| 2026-11-25 | `20261125T020851Z` | Red Team r2 (`c333116`): `EXEC_RE` replaced by the pass-file SUBSET (column-0 command allowlist, `#print axioms` the only `#` command, attribute allowlist per item, refused syntax/handler/evaluation keywords anywhere); +MF15–MF18 (T80–T83); `local notation` / `attribute [local simp]` moved to T20 (compile only); a PASS is stated NOT to be an axiom certificate; 3 full runs GREEN 42/42 |

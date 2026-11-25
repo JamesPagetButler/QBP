@@ -8,11 +8,11 @@ below, and calls `IO.Process.exit 0`. Lean never elaborates the `#print axioms`,
 report (`cheat`) is never printed, the exit code is 0, there is one report at the site and
 nothing unpositioned: every stdout-based rule is satisfied by the forgery. No stdout audit can
 be sound on a file that runs code, so the grader refuses code-executing constructs in a pass
-file (`EXEC_RE`); `selftest_grader.py` replays this file as a pass-labelled attack. The
-audit cannot see `cheat` here — the exec refusal is the only detector.
+file (the pass-file subset); `selftest_grader.py` replays this file as a pass-labelled attack. The
+audit cannot see `cheat` here — the subset refusal is the only detector.
 
 TOOLCHECK-EXPECT: lean-ok
-TOOLCHECK-EXPECT: exec-refused
+TOOLCHECK-EXPECT: subset-refused
 -/
 
 namespace QBPToolcheck.MF14

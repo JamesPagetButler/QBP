@@ -13,7 +13,7 @@ Expectation lines live in each .lean file's header comment:
                                                result within {propext, Classical.choice, Quot.sound},
                                                EXACTLY one positioned axiom report per `#print axioms`
                                                site, no unpositioned axiom-like message, no non-Lean
-                                               stdout line, no code-executing construct (EXEC_RE), and
+                                               stdout line, the file inside the pass-file SUBSET, and
                                                the foundations checker accepts the file (fail-closed)
   TOOLCHECK-EXPECT: lean-ok                    Lean exit 0
   TOOLCHECK-EXPECT: lean-error <regex>         Lean exit != 0 and ONE error message, rendered
@@ -27,7 +27,7 @@ Expectation lines live in each .lean file's header comment:
                                                the native-evaluation axiom's name changes in Lean v4.35.0)
   TOOLCHECK-EXPECT: checker-reject <regex>     check_lean_foundations.py (zero baseline) exits 1
                                                and ONE of its `::error::` lines matches <regex>
-  TOOLCHECK-EXPECT: exec-refused               the grader finds a code-executing construct (EXEC_RE)
+  TOOLCHECK-EXPECT: subset-refused             the file leaves the pass-file subset (subset_violations)
 
   TOOLCHECK-EXPECT: known-limit checker-accepts            REPORT-ONLY: the checker exits 0 on the file
   TOOLCHECK-EXPECT: known-limit audit-clean <thm>          REPORT-ONLY: `#print axioms <thm>` is ⊆ std3
@@ -38,13 +38,17 @@ Expectation lines live in each .lean file's header comment:
 
 A must-fail whose expected detection does not happen is a suite FAILURE. A Lean crash
 (exit >= 128, e.g. 139 = SIGSEGV) is a FAILURE for every file and is never retried.
-Lean is run with `--json`: only Lean's own message stream (one JSON object per line) is
-trusted. An axiom report counts only if it is an `information` message positioned exactly at
-a `#print axioms <thm>` command for that <thm>, and reports merge worst-case (union), so
-printed text (`#eval IO.println "'x' does not depend on any axioms"`) can neither add a clean
-report nor clear a real one (MF06). That guard is NOT a trusted channel: code the file runs can
-write to `/dev/stdout` or exit early, so it rests on fail-closed rules for pass files (one report
-per site, nothing unpositioned, nothing but Lean messages, no code-executing construct; MF14). Sites are found ANYWHERE on a line (MF07) in source with
+A toolcheck PASS is a statement about a SUPPORTED SUBSET of Lean, NOT an axiom certificate:
+the sound audit is the out-of-process one (QBP#827 / PR #829). Lean is run with `--json`. An
+axiom report counts only if it is an `information` message positioned exactly at a
+`#print axioms <thm>` command for that <thm>, and reports merge worst-case (union), so printed
+text (`#eval IO.println "'x' does not depend on any axioms"`) can neither add a clean report nor
+clear a real one (MF06). Stdout is NOT a trusted channel: code the file defines or runs can write
+to `/dev/stdout` and exit before Lean prints the real report (MF14-MF18). So a PASS file is
+graded fail-closed: exactly one report per site, nothing unpositioned, nothing but Lean
+messages, and the whole file inside the pass-file SUBSET (`subset_violations`: a top-level
+command allowlist, `#print axioms` as the only `#` command, an attribute allowlist, and no
+syntax-extension / handler / evaluation keyword anywhere). Sites are found ANYWHERE on a line (MF07) in source with
 comments and string bodies blanked by a nesting-aware lexer (T19). Lines are counted Lean's
 way — bytes read, only `\\r\\n` -> `\\n`, split at `\\n` only (MF10/MF11). COVERAGE: the audit covers
 exactly the `#print axioms` sites this lexer finds; the suite convention is ONE site per
@@ -69,18 +73,118 @@ AXIOMS_RE = re.compile(r"'([^']+)' depends on axioms: \[([^\]]*)\]", re.DOTALL)
 NOAXIOMS_RE = re.compile(r"'([^']+)' does not depend on any axioms")
 # Lean 4.30 prints "declaration uses `sorry`" (backticks); older toolchains used 'sorry' (quotes).
 SORRY_WARN_RE = re.compile(r"declaration uses [`']sorry[`']")
-# Constructs that RUN code while the file is elaborated (Red Team 1(b) on PR #824). Running code
-# can write anything to Lean's stdout — a forged `--json` message via `/dev/stdout` — and can end
-# the process (`IO.Process.exit 0`) before Lean prints the real report, so no stdout-based audit
-# is sound on such a file. A PASS file must contain none of them (matched in code-only text, so
-# comments and strings never trigger it). This is a SUPPORTED-SUBSET denylist, not a proof that
-# no code runs; the out-of-process audit is QBP#827. See must-fail MF14.
-EXEC_RE = re.compile(
-    r"#eval\b|#guard\b|#print_eval\b|\brun_(?:cmd|elab|meta|tac)\b|\belab(?:_rules)?\b"
-    r"|\bby_elab\b|\b(?:builtin_)?initialize\b|\bimplemented_by\b|\bextern\b"
-    r"|@\[\s*(?:command_elab|term_elab|tactic|init)\b|\bnative_decide\b|\+native\b"
-    r"|\bofReduceBool\b|\breduceBool\b"
+# ---- the pass-file SUBSET (Red Team r2 on PR #824; director ruling: command allowlist) ----
+# Code that runs during elaboration can forge Lean's stdout and exit before the real report
+# (MF14), and ANY user-defined syntax or handler can expand to `#eval` (MF15-MF18), so a token
+# denylist cannot close that channel. A PASS file must therefore stay inside a small subset of
+# Lean, checked on the code-only text (comments and string bodies blanked by `lex`, so neither
+# can trigger or hide a rule), line by line (`lean_lines`):
+#   A. every code line that starts in COLUMN 0 is a top-level command and must start (after any
+#      leading `@[...]`) with a SUBSET_COMMANDS keyword (`#print` is further restricted to
+#      `#print axioms` by rule B); `noncomputable` must be `noncomputable def`. Indented lines
+#      are continuations.
+#   B. a `#word` token ANYWHERE must be `#print axioms` (no other `#` command, even mid-line).
+#   C. every `@[...]` ANYWHERE must close on its line and list only SUBSET_ATTRIBUTES items,
+#      each optionally prefixed by `local` / `scoped` (so no handler attribute, at any position).
+#   D. no SUBSET_DENY_WORDS token ANYWHERE: syntax extension, handler registration, the
+#      `attribute` command and code-evaluating commands/tactics, even mid-line.
+# The lists are the MINIMUM the 20 tool tests need (each entry has a selftest plant or is used).
+# LIMIT, stated plainly: a command imported from Mathlib/Batteries placed MID-LINE after a term
+# is caught only by B or D (no Lean parser here). A toolcheck PASS is therefore a statement about
+# a supported subset of Lean, NOT an axiom certificate; the sound audit is QBP#827 / PR #829.
+SUBSET_COMMANDS = (
+    "import",
+    "namespace",
+    "end",
+    "open",
+    "variable",
+    "set_option",
+    "theorem",
+    "def",
+    "noncomputable",
+    "instance",
+    "structure",
+    "inductive",
+    "#print",
 )
+SUBSET_ATTRIBUTES = (
+    "simp",
+    "ext",
+)
+SUBSET_DENY_WORDS = (
+    "attribute",
+    "macro",
+    "macro_rules",
+    "syntax",
+    "declare_syntax_cat",
+    "notation",
+    "infix",
+    "infixl",
+    "infixr",
+    "prefix",
+    "postfix",
+    "elab",
+    "elab_rules",
+    "run_cmd",
+    "run_elab",
+    "run_meta",
+    "run_tac",
+    "by_elab",
+    "initialize",
+    "builtin_initialize",
+    "implemented_by",
+    "extern",
+    "unsafe",
+    "native_decide",
+    "+native",
+    "ofReduceBool",
+    "reduceBool",
+    "plausible",
+    "slim_check",
+)
+_ATTR_PREFIXES = ("scoped",)
+
+
+def subset_violations(src: str) -> list[str]:
+    """Every way `src` leaves the pass-file subset (rules A-D above); empty = inside it."""
+    out: list[str] = []
+    for i, ln in enumerate(lean_lines(code_only(src)), start=1):
+        if ln and not ln[0].isspace():  # A: a top-level command starts here
+            rest = ln
+            while True:
+                m = re.match(r"@\[[^\]]*\][ \t]*", rest)
+                if not m:
+                    break
+                rest = rest[m.end() :]
+            toks = rest.split()
+            if toks:
+                head, nxt = toks[0], (toks[1] if len(toks) > 1 else "")
+                if head not in SUBSET_COMMANDS:
+                    out.append(f"l.{i}: top-level `{head}` is not an allowed command")
+                elif head == "noncomputable" and nxt != "def":
+                    out.append(
+                        f"l.{i}: `noncomputable {nxt}` (only `noncomputable def`)"
+                    )
+        for m in re.finditer(r"#(\w+)", ln):  # B
+            if m.group(1) != "print" or not re.match(r"[ \t]+axioms\b", ln[m.end() :]):
+                out.append(
+                    f"l.{i}: `{m.group(0)}` (the only allowed `#` command is `#print axioms`)"
+                )
+        for m in re.finditer(r"@\[", ln):  # C
+            close = ln.find("]", m.end())
+            if close < 0:
+                out.append(f"l.{i}: `@[` not closed on its line")
+                continue
+            for item in ln[m.end() : close].split(","):
+                words = item.split()
+                while words and words[0] in _ATTR_PREFIXES:
+                    words = words[1:]
+                if " ".join(words) not in SUBSET_ATTRIBUTES:
+                    out.append(f"l.{i}: attribute `{item.strip()}` is not allowed")
+        for w in SUBSET_DENY_WORDS:  # D
+            if re.search(r"(?<![\w.'])" + re.escape(w) + r"(?![\w'!?])", ln):
+                out.append(f"l.{i}: `{w}` is outside the pass-file subset")
+    return out
 
 
 def read_lean_source(p: Path) -> str:
@@ -418,13 +522,7 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
     # Sites from code with comments AND string bodies blanked; anywhere on a line.
     sites = print_axioms_sites(src)
     axioms, n_rejected, dup_sites = parse_axioms(msgs, sites)
-    execs = sorted(
-        {
-            (i, m.group(0))
-            for i, ln in enumerate(lean_lines(code_only(src)), start=1)
-            for m in EXEC_RE.finditer(ln)
-        }
-    )
+    subset = subset_violations(src)
     # Supported subset: no brace inside a string literal (interpolation is not lexed).
     braces = brace_in_string(src)
     if braces:
@@ -458,18 +556,19 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
             f"`#print axioms` command (spoof guard)"
         )
 
-    exec_note = (
-        f"file RUNS code during elaboration ({', '.join(f'l.{i} `{t}`' for i, t in execs)}) — "
-        f"it could forge or suppress Lean's stdout, so no audit of it is trusted"
-        if execs
+    subset_note = (
+        f"file leaves the pass-file subset ({len(subset)}: {'; '.join(subset[:6])}"
+        f"{' …' if len(subset) > 6 else ''}) — code it defines or runs could forge or suppress "
+        f"Lean's stdout, so no audit of it is trusted"
+        if subset
         else ""
     )
-    if "exec-refused" in [k for k, _ in expects]:
-        if execs:
-            detections.append(exec_note)
+    if "subset-refused" in [k for k, _ in expects]:
+        if subset:
+            detections.append(subset_note)
         else:
             failures.append(
-                "expected a code-executing construct, but the grader found none"
+                "expected the file to leave the pass-file subset, but it does not"
             )
 
     def any_match(rx: str, lines: list[str]) -> bool:
@@ -505,8 +604,8 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
             # Fail-closed (Red Team 1(b) on PR #824): Lean's stdout is writable by any code the
             # file runs, so a pass file must run none, print nothing but Lean's own messages,
             # and get exactly one positioned report per `#print axioms` site.
-            if execs:
-                failures.append(exec_note)
+            if subset:
+                failures.append(subset_note)
             if n_rejected:
                 failures.append(
                     f"{n_rejected} axiom-like message(s) NOT at a `#print axioms` site — "
@@ -588,7 +687,7 @@ def grade(src_path: Path, raw: Path, suite: Path) -> dict:
                 )
             else:
                 detections.append(f"checker: /{arg}/")
-        elif kind in ("grader-refuses", "exec-refused"):
+        elif kind in ("grader-refuses", "subset-refused"):
             pass  # handled above, before the per-expectation loop
         elif kind == "known-limit":
             check, _, rest = arg.partition(" ")

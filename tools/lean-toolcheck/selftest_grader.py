@@ -236,6 +236,26 @@ for src_stem, src_rel, new_stem in (
         "must-fail/MF13_CleanBraceRefused/MF13_CleanBraceRefused.lean",
         "T97_AttackCleanBrace",
     ),
+    (
+        "MF15_SyntaxAttributeHandler",
+        "must-fail/MF15_SyntaxAttributeHandler/MF15_SyntaxAttributeHandler.lean",
+        "T80_AttackSyntaxAttribute",
+    ),
+    (
+        "MF16_HandlerNotFirstAttr",
+        "must-fail/MF16_HandlerNotFirstAttr/MF16_HandlerNotFirstAttr.lean",
+        "T81_AttackHandlerNotFirst",
+    ),
+    (
+        "MF17_MacroBuildsEval",
+        "must-fail/MF17_MacroBuildsEval/MF17_MacroBuildsEval.lean",
+        "T82_AttackMacroEval",
+    ),
+    (
+        "MF18_TermElabHandler",
+        "must-fail/MF18_TermElabHandler/MF18_TermElabHandler.lean",
+        "T83_AttackTermElab",
+    ),
 ):
     s3, r3 = as_pass_attack(src_stem, src_rel, new_stem)
     res = evaluate(new_tc, r3, s3, new_stem)
@@ -279,20 +299,22 @@ def drop_real_and_forge(sev, at_site):
     return mut
 
 
-MF05 = ("MF05_CustomAxiom", "must-fail/MF05_CustomAxiom/MF05_CustomAxiom.lean")
+# The real report of one T01 theorem is removed and a forged clean report put elsewhere. T01 is
+# inside the pass-file subset, so ONLY the position / severity guard can fail it.
+def t01_guard(sev, at_site):
+    def mut(d):
+        drop_real_and_forge(sev, at_site)(d / "T01_DecideFin.log")
+
+    return mut
+
+
 for tag, mut, what in (
     # M10: the real report is absent; a forged clean `information` report sits OFF the site.
-    ("T96_ForgedOffSite", drop_real_and_forge("information", False), "position"),
+    ("T96-forged-offsite", t01_guard("information", False), "position"),
     # M11: the real report is absent; a forged clean report sits AT the site as a `warning`.
-    ("T96b_ForgedWarningAtSite", drop_real_and_forge("warning", True), "severity"),
+    ("T96b-forged-warning-at-site", t01_guard("warning", True), "severity"),
 ):
-    s3, r3 = as_pass_attack(*MF05, tag)
-    mut(r3 / f"{tag}.log")
-    res = evaluate(new_tc, r3, s3, tag)
-    ok = ok and res["rows"][f"{tag}.lean"]["result"] == "FAIL"
-    results.append(
-        (f"plant[{tag}] spoof guard: {what} (must FAIL)", row(res, f"{tag}.lean"), "")
-    )
+    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
 
 
 # M19: MF13 with the brace replaced in the SOURCE copy (same length, so Lean's positions still
@@ -332,6 +354,31 @@ for tag, suite_mut, raw_mut, name in (
     res = evaluate(new_tc, r4, s4, tag)
     ok = ok and res["rows"][name]["result"] == "FAIL"
     results.append((f"plant[{tag}] {name} (must FAIL)", row(res, name), ""))
+
+
+# M34: a `subset-refused` file that is in fact INSIDE the subset must FAIL. T20's three refused
+# lines are commented out in a suite copy (line count unchanged; T20 has no `#print axioms`).
+s7 = work / "suite-subset-refused-unmet"
+shutil.copytree(suite, s7, ignore=shutil.ignore_patterns("results"))
+t20 = s7 / "tests" / "T20_SubsetRefusedFeatures.lean"
+body = t20.read_bytes().decode("utf-8")
+for bad in (
+    'local notation "⇄" p => Pair.swap p',
+    "section LocalSimp",
+    "attribute [local simp] double",
+):
+    assert body.count(bad) == 1
+    body = body.replace(bad, "-- " + bad)
+t20.write_bytes(body.encode("utf-8"))
+res = evaluate(new_tc, raw, s7, "subset-refused-unmet")
+ok = ok and res["rows"]["T20_SubsetRefusedFeatures.lean"]["result"] == "FAIL"
+results.append(
+    (
+        "plant[subset-refused-unmet] T20 with its refused lines commented out (must FAIL)",
+        row(res, "T20_SubsetRefusedFeatures.lean"),
+        "",
+    )
+)
 
 
 # Fail-closed rules on a CLEAN pass file (T01): each plant alone must turn it FAIL.
@@ -393,6 +440,91 @@ results.append(
     (
         "plant[site-in-string] T19 with `#print axioms` inside a string (must PASS)",
         row(res, "T19_NestedComments.lean"),
+        "",
+    )
+)
+
+
+SUBSET_PLANTS = [
+    # rule D: each refused keyword, mid-line
+    *[
+        ("D", f"  x {w} y")
+        for w in (
+            "attribute",
+            "macro",
+            "macro_rules",
+            "syntax",
+            "declare_syntax_cat",
+            "notation",
+            "infix",
+            "infixl",
+            "infixr",
+            "prefix",
+            "postfix",
+            "elab",
+            "elab_rules",
+            "run_cmd",
+            "run_elab",
+            "run_meta",
+            "run_tac",
+            "by_elab",
+            "initialize",
+            "builtin_initialize",
+            "implemented_by",
+            "extern",
+            "unsafe",
+            "native_decide",
+            "ofReduceBool",
+            "reduceBool",
+            "plausible",
+            "slim_check",
+        )
+    ],
+    ("D", "  decide +native"),
+    # rule B: `#` commands other than `#print axioms`, mid-line
+    ("B", "  #eval 1"),
+    ("B", "  #guard true"),
+    ("B", "  #sample Nat"),
+    ("B", "  #check 1"),
+    ("B", "  #print foo"),
+    # rule C: attribute lists, mid-line (handler not first; unknown attribute; unclosed)
+    ("C", "  @[simp, command_elab foo] def x := 1"),
+    ("C", "  @[inline] def x := 1"),
+    ("C", "  @[local simp] def x := 1"),
+    ("C", "  @[simp"),
+    # rule A: column-0 commands outside the allowlist, and its two sub-checks
+    ("A", "alias foo := bar"),
+    ("A", "qbp_custom_command"),
+    ("A", "noncomputable instance : Inhabited Nat := ⟨0⟩"),
+    ("A", "#print foo"),
+]
+
+
+def subset_plant(tag, line):
+    s6 = work / f"suite-subset-{tag}"
+    shutil.copytree(suite, s6, ignore=shutil.ignore_patterns("results"))
+    f = s6 / "tests" / "T01_DecideFin.lean"
+    body = f.read_bytes().decode("utf-8")
+    f.write_bytes((body.rstrip("\n") + "\n" + line + "\n").encode("utf-8"))
+    return s6
+
+
+n_subset = 0
+for k, (rule_id, line) in enumerate(SUBSET_PLANTS):
+    s6 = subset_plant(f"{k:02d}", line)
+    res = evaluate(new_tc, raw, s6, f"subset-{k:02d}")
+    got = res["rows"]["T01_DecideFin.lean"]["result"]
+    good = got == "FAIL"
+    ok = ok and good
+    n_subset += good
+    if not good:
+        results.append(
+            (f"plant[subset {rule_id}] T01 + `{line.strip()}` (must FAIL)", got, "")
+        )
+results.append(
+    (
+        f"plant[subset] {len(SUBSET_PLANTS)} refused constructs appended to clean T01 (each must FAIL)",
+        f"{n_subset}/{len(SUBSET_PLANTS)} FAIL",
         "",
     )
 )

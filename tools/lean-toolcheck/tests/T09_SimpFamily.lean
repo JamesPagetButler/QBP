@@ -1,7 +1,8 @@
 /-
 TOOLCHECK T09 — the `simp` family: terminal `simp [lemmas]`, `simp only [...]`,
 `simpa … using`, `simp … at h ⊢`, `simp_rw`, `dsimp only`, user `@[simp]` lemmas,
-`attribute [local simp]`, and `scoped` simp sets opened with `open scoped … in`.
+and `scoped` simp sets opened with `open scoped … in`. (`attribute [local simp]` moved to
+T20: the `attribute` command is outside the pass-file subset, Red Team r2 on PR #824.)
 
 Feature: rewriting with lemma sets. The simp-set *contents* are the most migration-
 sensitive thing QBP relies on: PR #491 (the v4.30.0-rc2 → v4.30.0 bump) broke `qJ_sq`
@@ -62,14 +63,6 @@ theorem simp_rw_binder (f : ℕ → P2) : (∀ n, ((f n).add (f n)).x = 2 * (f n
 theorem dsimp_def (p q : P2) : (p.add q).x = p.x + q.x := by
   dsimp only [P2.add]
 
-section LocalSimp
-/-- A non-simp lemma promoted locally. -/
-theorem double (a : ℤ) : a + a = 2 * a := by ring
-attribute [local simp] double
-
-theorem local_simp_use (a : ℤ) : a + a + 0 = 2 * a := by simp
-end LocalSimp
-
 /-- A scoped simp lemma inside a namespace. -/
 @[scoped simp] theorem neg_neg' (a : ℤ) : - -a = a := Int.neg_neg a
 
@@ -90,6 +83,5 @@ end QBPToolcheck.T09
 #print axioms QBPToolcheck.T09.simp_at
 #print axioms QBPToolcheck.T09.simp_rw_binder
 #print axioms QBPToolcheck.T09.dsimp_def
-#print axioms QBPToolcheck.T09.local_simp_use
 #print axioms QBPToolcheck.T09.scoped_simp_use
 #print axioms QBPToolcheck.T09.qJ_sq

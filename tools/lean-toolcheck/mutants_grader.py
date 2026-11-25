@@ -2,7 +2,8 @@
 
 usage: python3 -I tools/lean-toolcheck/mutants_grader.py tools/lean-toolcheck <results/runs/ID/raw> <workdir>
 M01-M19 reconstruct the Red Team's mutant set on PR #824 (from its one-line descriptions; the
-comment does not include the patches). M20-M25 target the rules added in this fix round.
+comment does not include the patches). M20-M25 target the r4 rules; M23 and M26-M34 the
+pass-file subset rules (Red Team r2); `E …` mutants drop each SUBSET_* list entry in turn.
 A mutant is KILLED iff selftest_grader.py exits non-zero with the mutated grader.
 """
 
@@ -92,10 +93,40 @@ M = {
     "M22 pass: non-Lean stdout not a failure": [
         ("            if n_untrusted:\n", "            if False:\n")
     ],
-    "M23 pass: code-executing construct not a failure": [
+    "M23 pass: leaving the subset not a failure": [
         (
-            "            if execs:\n                failures",
-            "            if False:\n                failures",
+            "            if subset:\n                failures.append(subset_note)",
+            "            if False:\n                failures.append(subset_note)",
+        )
+    ],
+    "M26 rule A (column-0 command allowlist) off": [
+        ("        if ln and not ln[0].isspace():  # A", "        if False:  # A")
+    ],
+    "M28 rule A: `noncomputable` need not be `noncomputable def`": [
+        ('elif head == "noncomputable" and nxt != "def":', "elif False:")
+    ],
+    "M29 rule B (`#` commands anywhere) off": [
+        ('for m in re.finditer(r"#(\\w+)", ln):  # B', "for m in []:  # B")
+    ],
+    "M30 rule C (attribute allowlist) off": [
+        ('for m in re.finditer(r"@\\[", ln):  # C', "for m in []:  # C")
+    ],
+    "M31 rule C: an unclosed `@[` accepted": [
+        (
+            '                out.append(f"l.{i}: `@[` not closed on its line")\n',
+            "                pass\n",
+        )
+    ],
+    "M32 rule D (refused keywords anywhere) off": [
+        ("for w in SUBSET_DENY_WORDS:  # D", "for w in ():  # D")
+    ],
+    "M33 attribute prefix `scoped` not stripped": [
+        ('_ATTR_PREFIXES = ("scoped",)', "_ATTR_PREFIXES = ()")
+    ],
+    "M34 `subset-refused` expectation always met": [
+        (
+            '            failures.append(\n                "expected the file to leave the pass-file subset',
+            '            (\n                "expected the file to leave the pass-file subset',
         )
     ],
     "M24 line model back to str.splitlines()": [
@@ -108,6 +139,31 @@ M = {
         )
     ],
 }
+
+
+def list_entries(name: str) -> list[str]:
+    i = src.index(f"{name} = (\n")
+    j = src.index("\n)\n", i)
+    return [ln for ln in src[i:j].split("\n")[1:] if ln.strip()]
+
+
+for lst in ("SUBSET_COMMANDS", "SUBSET_ATTRIBUTES", "SUBSET_DENY_WORDS"):
+    for ln in list_entries(lst):
+        block_start = src.index(f"{lst} = (\n")
+        M[f"E {lst} minus {ln.strip()}"] = [
+            (
+                src[block_start : src.index("\n)\n", block_start)],
+                (
+                    src[block_start : src.index("\n)\n", block_start)].replace(
+                        ln + "\n", "", 1
+                    )
+                    if ln + "\n" in src[block_start : src.index("\n)\n", block_start)]
+                    else src[block_start : src.index("\n)\n", block_start)].replace(
+                        "\n" + ln, "", 1
+                    )
+                ),
+            )
+        ]
 
 rows = []
 for name, reps in M.items():
@@ -141,3 +197,9 @@ for mname, v in rows:
     print(f"| {mname} | {v} |")
 k = sum(v == "KILLED" for _, v in rows)
 print(f"KILLED {k} / {len(rows)}; SURVIVED {sum(v == 'SURVIVED' for _, v in rows)}")
+ent = [(n, v) for n, v in rows if n.startswith("E ")]
+print(
+    f"  rule mutants: {sum(v == 'KILLED' for n, v in rows if not n.startswith('E '))}"
+    f" / {len(rows) - len(ent)} killed; list-entry mutants: "
+    f"{sum(v == 'KILLED' for _, v in ent)} / {len(ent)} killed"
+)

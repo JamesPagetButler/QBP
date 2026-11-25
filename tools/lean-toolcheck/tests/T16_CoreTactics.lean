@@ -2,8 +2,9 @@
 TOOLCHECK T16 — core (Lean / Batteries-level) tactics and declarations QBP relies on:
 `omega`, `rcases`/`obtain`/`rintro` patterns, `induction … with`, `constructor`,
 `refine ⟨_, ?_⟩`, `calc`, `unfold`, `show`/`change`, `funext`, `split_ifs`, `by_contra`,
-`exact absurd`, `noncomputable def`, `structure`, `notation`, `open … in`,
-`namespace`/`section`/`variable`.
+`exact absurd`, `noncomputable def`, `structure`, `open … in`,
+`namespace`/`section`/`variable`. (`local notation` moved to T20: syntax extension is
+outside the pass-file subset, Red Team r2 on PR #824.)
 
 Used by (QBP, 2026-11-20 grep): `omega` 11 files — `QBP/Foundations/OctonionAutBranching.lean`,
 `CDAlg.lean`, `TransitionState.lean`; `rcases`/`obtain` 26 files — `NoAutonomousDynamics.lean`,
@@ -84,7 +85,7 @@ theorem by_contra_use (n : ℕ) (h : n ≠ 0) : 0 < n := by
   by_contra hn
   exact absurd (Nat.eq_zero_of_not_pos hn) h
 
-/-- A local `notation` and a `structure` with a field-projection lemma. -/
+/-- A `structure` with a field-projection lemma. -/
 structure Pair where
   fst : ℤ
   snd : ℤ
@@ -92,9 +93,7 @@ structure Pair where
 /-- Swap. -/
 def Pair.swap (p : Pair) : Pair := ⟨p.snd, p.fst⟩
 
-local notation "⇄" p => Pair.swap p
-
-theorem swap_swap (p : Pair) : (⇄ (⇄ p)) = p := by
+theorem swap_swap (p : Pair) : p.swap.swap = p := by
   cases p
   rfl
 
