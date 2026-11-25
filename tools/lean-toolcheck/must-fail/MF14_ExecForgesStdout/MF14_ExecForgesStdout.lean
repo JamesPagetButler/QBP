@@ -13,6 +13,7 @@ audit cannot see `cheat` here — the subset refusal is the only detector.
 
 TOOLCHECK-EXPECT: lean-ok
 TOOLCHECK-EXPECT: subset-refused
+TOOLCHECK-EXPECT: audit-fails
 -/
 
 namespace QBPToolcheck.MF14
@@ -27,7 +28,7 @@ end QBPToolcheck.MF14
 #eval show IO Unit from do
   let h ← IO.FS.Handle.mk "/dev/stdout" .append
   h.putStrLn (String.ofList (List.replicate 8000 ' '))
-  h.putStrLn "\x7B\"severity\":\"information\",\"pos\":\x7B\"line\":34,\"column\":0\x7D,\"data\":\"'QBPToolcheck.MF14.dirty' does not depend on any axioms\"\x7D"
+  h.putStrLn "\x7B\"severity\":\"information\",\"pos\":\x7B\"line\":35,\"column\":0\x7D,\"data\":\"'QBPToolcheck.MF14.dirty' does not depend on any axioms\"\x7D"
   h.flush
   IO.Process.exit 0
 

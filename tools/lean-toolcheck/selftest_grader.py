@@ -193,10 +193,27 @@ def as_pass_attack(src_stem: str, src_rel: str, new_stem: str) -> tuple[Path, Pa
     (s3 / "tests" / f"{new_stem}.lean").write_bytes("\n".join(out).encode("utf-8"))
     r3 = work / f"raw-{new_stem}"
     shutil.copytree(raw, r3)
-    for ext in (".log", ".meta.json", ".checker.log", ".stderr"):
+    for ext in (
+        ".log",
+        ".meta.json",
+        ".checker.log",
+        ".stderr",
+        ".compile.log",
+        ".audit.out",
+        ".audit.stderr",
+    ):
         p = r3 / f"{src_stem}{ext}"
         if p.exists():
             shutil.copy(p, r3 / f"{new_stem}{ext}")
+    # The auditor's result names its root and module; the replay renames them with the file
+    # (exactly as it renames the logs), so the audit is graded on content, not on the stem.
+    a = r3 / f"{new_stem}.audit.out"
+    if a.exists():
+        a.write_text(
+            a.read_text()
+            .replace(f'"root":"{src_stem}"', f'"root":"{new_stem}"')
+            .replace(f"ToolcheckAudit.{src_stem}", f"ToolcheckAudit.{new_stem}")
+        )
     return s3, r3
 
 
@@ -255,6 +272,16 @@ for src_stem, src_rel, new_stem in (
         "MF18_TermElabHandler",
         "must-fail/MF18_TermElabHandler/MF18_TermElabHandler.lean",
         "T83_AttackTermElab",
+    ),
+    (
+        "MF19_IndentedSimprocForge",
+        "must-fail/MF19_IndentedSimprocForge/MF19_IndentedSimprocForge.lean",
+        "T84_AttackIndentedSimproc",
+    ),
+    (
+        "MF20_OpenInSimprocForge",
+        "must-fail/MF20_OpenInSimprocForge/MF20_OpenInSimprocForge.lean",
+        "T85_AttackOpenInSimproc",
     ),
 ):
     s3, r3 = as_pass_attack(src_stem, src_rel, new_stem)
@@ -525,6 +552,284 @@ results.append(
     (
         f"plant[subset] {len(SUBSET_PLANTS)} refused constructs appended to clean T01 (each must FAIL)",
         f"{n_subset}/{len(SUBSET_PLANTS)} FAIL",
+        "",
+    )
+)
+
+
+# 7c. Red Team r3 / director ruling: the STRUCTURAL audit alone. A grader copy whose
+#     `subset_violations` always returns [] (every subset rule off) grades the pass-labelled
+#     replays of the forge files and of MF05 (a plain user axiom): each must still FAIL, and
+#     the failure must come from the structural audit (PR #829 auditor on a fresh .olean).
+s8 = work / "suite-subset-off"
+shutil.copytree(suite, s8, ignore=shutil.ignore_patterns("results"))
+tc8 = s8 / "toolcheck.py"
+t8 = tc8.read_text()
+sig = "def subset_violations(src: str) -> list[str]:\n"
+assert t8.count(sig) == 1
+tc8.write_text(
+    t8.replace(sig, sig + "    return []  # SELFTEST: every subset rule off\n")
+)
+for src_stem, new_stem in (
+    ("MF05_CustomAxiom", "T86_StructuralOnlyAxiom"),
+    ("MF14_ExecForgesStdout", "T87_StructuralOnlyEval"),
+    ("MF15_SyntaxAttributeHandler", "T88_StructuralOnlyHandler"),
+    ("MF17_MacroBuildsEval", "T89_StructuralOnlyMacro"),
+    ("MF19_IndentedSimprocForge", "T84s_StructuralOnlyIndented"),
+    ("MF20_OpenInSimprocForge", "T85s_StructuralOnlyOpenIn"),
+):
+    s9, r9 = as_pass_attack(src_stem, f"must-fail/{src_stem}/{src_stem}.lean", new_stem)
+    shutil.copy(tc8, s9 / "toolcheck.py")
+    res = evaluate(s9 / "toolcheck.py", r9, s9, new_stem)
+    f = res["rows"][f"{new_stem}.lean"]
+    by_audit = any(x.startswith("structural audit") for x in f["failures"])
+    good = f["result"] == "FAIL" and by_audit
+    ok = ok and good
+    results.append(
+        (
+            f"structural-only[{new_stem}] subset rules OFF (must FAIL by the structural audit)",
+            ("FAIL by audit: " if good else "NOT CAUGHT BY AUDIT: ")
+            + "; ".join(x for x in f["failures"] if x.startswith("structural audit"))[
+                :200
+            ],
+            "",
+        )
+    )
+
+
+# 7d. The structural audit's own guards, on the clean pass file T01's REAL auditor output:
+#     each tampering must turn T01 FAIL.
+def t01_audit(fn):
+    def mut(d):
+        p = d / "T01_DecideFin.audit.out"
+        lines = [l for l in p.read_text().split("\n") if l.strip()]
+        res_i = next(i for i, l in enumerate(lines) if '"AXIOM-AUDIT-827"' in l)
+        r = json.loads(lines[res_i])
+        out = fn(r, lines, res_i)
+        p.write_text(out)
+
+    return mut
+
+
+def _emit(r, lines, i):
+    return "\n".join(lines[:i] + [json.dumps(r)] + lines[i + 1 :]) + "\n"
+
+
+def _meta_mut(fn):
+    def mut(d):
+        p = d / "T01_DecideFin.meta.json"
+        m = json.loads(p.read_text())
+        fn(m)
+        p.write_text(json.dumps(m))
+
+    return mut
+
+
+AUDIT_PLANTS = [
+    (
+        "audit-nonstd",
+        t01_audit(
+            lambda r, l, i: _emit(
+                {
+                    **r,
+                    "nonstd": [
+                        {
+                            "decl": "QBPToolcheck.T01.x",
+                            "module": "ToolcheckAudit.T01_DecideFin",
+                            "axioms": [
+                                {"name": "QBPToolcheck.T01.cheat", "module": ""}
+                            ],
+                        }
+                    ],
+                },
+                l,
+                i,
+            )
+        ),
+    ),
+    (
+        "audit-wrong-nonce",
+        t01_audit(lambda r, l, i: _emit({**r, "nonce": "0" * 32}, l, i)),
+    ),
+    (
+        "audit-wrong-root",
+        t01_audit(lambda r, l, i: _emit({**r, "root": "Other"}, l, i)),
+    ),
+    ("audit-wrong-scope", t01_audit(lambda r, l, i: _emit({**r, "scope": []}, l, i))),
+    ("audit-missing", t01_audit(lambda r, l, i: _emit({**r, "missing": ["X"]}, l, i))),
+    (
+        "audit-unresolved",
+        t01_audit(lambda r, l, i: _emit({**r, "unresolved": ["X"]}, l, i)),
+    ),
+    (
+        "audit-shadowed",
+        t01_audit(lambda r, l, i: _emit({**r, "shadowed": ["Init.Core"]}, l, i)),
+    ),
+    (
+        "audit-std-forged",
+        t01_audit(
+            lambda r, l, i: _emit(
+                {**r, "std": [{**x, "fp": "forged"} for x in r["std"]]}, l, i
+            )
+        ),
+    ),
+    (
+        "audit-zero-decls",
+        t01_audit(lambda r, l, i: _emit({**r, "declarations": 0}, l, i)),
+    ),
+    ("audit-two-results", t01_audit(lambda r, l, i: "\n".join(l + [l[i]]) + "\n")),
+    (
+        "audit-no-result",
+        t01_audit(lambda r, l, i: "\n".join(l[:i] + l[i + 1 :]) + "\n"),
+    ),
+    ("audit-no-olean", _meta_mut(lambda m: m["audit"].update(olean=False))),
+    ("audit-no-record", _meta_mut(lambda m: m.pop("audit"))),
+]
+for tag, mut in AUDIT_PLANTS:
+    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+
+
+# The command-heads pin: a heads list generated for another toolchain fails every pass file.
+s10 = work / "suite-heads-stale"
+shutil.copytree(suite, s10, ignore=shutil.ignore_patterns("results"))
+hj = json.loads((s10 / "command_heads.json").read_text())
+hj["toolchain"] = "leanprover/lean4:v0.0.0"
+(s10 / "command_heads.json").write_text(json.dumps(hj))
+res = evaluate(s10 / "toolcheck.py", raw, s10, "heads-stale")
+ok = ok and res["rows"]["T01_DecideFin.lean"]["result"] == "FAIL"
+results.append(
+    (
+        "plant[heads-stale] command_heads.json for another toolchain (T01 must FAIL)",
+        row(res, "T01_DecideFin.lean"),
+        "",
+    )
+)
+
+
+# The two structural-audit expectation kinds must FAIL when unmet: MF05's real `cheat` report
+# removed from its auditor output (`audit-nonstd` unmet), and the clean T01 relabelled
+# `audit-fails` (its audit is clean).
+def mf05_clean_audit(d):
+    p = d / "MF05_CustomAxiom.audit.out"
+    lines = [l for l in p.read_text().split("\n") if l.strip()]
+    i = next(k for k, l in enumerate(lines) if '"AXIOM-AUDIT-827"' in l)
+    r = json.loads(lines[i])
+    r["nonstd"] = []
+    p.write_text(_emit(r, lines, i))
+
+
+planted("audit-nonstd-unmet", mf05_clean_audit, ["MF05_CustomAxiom.lean"], "FAIL")
+s11 = work / "suite-audit-fails-unmet"
+shutil.copytree(suite, s11, ignore=shutil.ignore_patterns("results"))
+t01 = s11 / "tests" / "T01_DecideFin.lean"
+t01.write_bytes(
+    t01.read_bytes().replace(
+        b"TOOLCHECK-EXPECT: pass", b"TOOLCHECK-EXPECT: audit-fails"
+    )
+)
+res = evaluate(new_tc, raw, s11, "audit-fails-unmet")
+ok = ok and res["rows"]["T01_DecideFin.lean"]["result"] == "FAIL"
+results.append(
+    (
+        "plant[audit-fails-unmet] clean T01 relabelled `audit-fails` (must FAIL)",
+        row(res, "T01_DecideFin.lean"),
+        "",
+    )
+)
+
+# 7e. Rule isolation (Red Team r3 X1/X4): each source must give EXACTLY the expected rule tags,
+#     so a mutant that weakens ONE rule is killed even where another rule also fires.
+sys.path.insert(0, str(suite))
+import toolcheck as _tc  # noqa: E402
+
+RULE_CASES = [
+    ("axiom foo : True", {"A", "D", "H"}),  # X1: column-0 `axiom`
+    ("@[command_elab k] def x := 1", {"C"}),  # X4: handler attribute alone
+    ("@[macro k] def x := 1", {"C", "D"}),
+    ("@[simp] theorem t : True := trivial", set()),
+    ("  simproc p (Nat.succ _) := fun _ => pure .continue", {"D", "H"}),  # T84 shape
+    (
+        "open Nat in simproc p (Nat.succ _) := fun _ => pure .continue",
+        {"D", "H", "I"},
+    ),  # T85
+    ("open Nat in theorem t : True := trivial", set()),
+    ("open Nat in qbp_user_cmd", {"I"}),
+    ("set_option autoImplicit false in\n  theorem t : True := trivial", {"I"}),
+    ("set_option autoImplicit false in\ntheorem t : True := trivial", set()),
+    ("def q : Nat := 0 axiom cheat : False", {"D", "H"}),
+    ("  example : True := trivial", {"H"}),
+    ("  section", {"H"}),
+    ("noncomputable instance : Inhabited Nat := ⟨0⟩", {"A"}),
+    ("#check 1", {"A", "B", "H"}),
+    ("theorem t : True := by\n  #print foo", {"B"}),
+    ("open scoped Nat", set()),
+    ("structure S where\n  x : Nat\n  deriving Repr", set()),
+    ("  x scoped y", {"H"}),  # `scoped` excused only right after `open` (M48)
+    (
+        "  deriving instance Repr for Nat",
+        {"H"},
+    ),  # the `deriving instance` command (M49)
+]
+# Rule D in isolation: every refused keyword, mid-line, must give D, plus H exactly when Lean's
+# own command-keyword list (read here from command_heads.json, which no grader mutant touches)
+# has it. The keyword list is HARDCODED (the same list as SUBSET_PLANTS), never read from the
+# grader, so dropping a word from SUBSET_DENY_WORDS is killed even where rule H also fires.
+_heads = set(json.loads((suite / "command_heads.json").read_text())["word_heads"])
+for _w in (
+    "attribute",
+    "macro",
+    "macro_rules",
+    "syntax",
+    "declare_syntax_cat",
+    "notation",
+    "infix",
+    "infixl",
+    "infixr",
+    "prefix",
+    "postfix",
+    "elab",
+    "elab_rules",
+    "run_cmd",
+    "run_elab",
+    "run_meta",
+    "run_tac",
+    "by_elab",
+    "initialize",
+    "builtin_initialize",
+    "implemented_by",
+    "extern",
+    "unsafe",
+    "native_decide",
+    "ofReduceBool",
+    "reduceBool",
+    "plausible",
+    "slim_check",
+    "axiom",
+    "simproc",
+    "dsimproc",
+    "simproc_decl",
+    "dsimproc_decl",
+):
+    RULE_CASES.append((f"  x {_w} y", {"D"} | ({"H"} if _w in _heads else set())))
+RULE_CASES.append(("  decide +native", {"D"}))
+rules_ok = True
+for src_txt, want in RULE_CASES:
+    got = {v[1] for v in _tc.subset_violations(src_txt + "\n") if v.startswith("[")}
+    good = got == want
+    rules_ok = rules_ok and good
+    ok = ok and good
+    if not good:
+        results.append(
+            (
+                f"rule-isolation `{src_txt[:50]}`",
+                f"FAIL: got {sorted(got)}, want {sorted(want)}",
+                "",
+            )
+        )
+results.append(
+    (
+        f"rule-isolation: {len(RULE_CASES)} one-construct sources, exact rule tags",
+        "see failures above" if not rules_ok else "all exact",
         "",
     )
 )

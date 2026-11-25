@@ -5,12 +5,15 @@ No `#eval`/`run_cmd` token appears in code, so the `c333116` token denylist miss
 trigger forges a clean `--json` report for `dirty` (which rests on `axiom cheat : False`) at its
 `#print axioms` site on `/dev/stdout`, then exits 0 before Lean prints the real report. Any
 user syntax or handler can expand to `#eval`, so only the pass-file SUBSET (a top-level command
-allowlist + attribute allowlist + syntax/handler keyword refusal) closes this class.
+allowlist + attribute allowlist + syntax/handler keyword refusal) refuses this class, and the
+STRUCTURAL audit (PR #829 auditor on a fresh .olean) fails it closed: the file exits before an
+.olean is written.
 `selftest_grader.py` replays this file as a pass-labelled attack. The audit cannot see `cheat`
-here; the subset refusal is the only detector.
+on stdout; the subset refusal and the structural audit are the detectors.
 
 TOOLCHECK-EXPECT: lean-ok
 TOOLCHECK-EXPECT: subset-refused
+TOOLCHECK-EXPECT: audit-fails
 -/
 
 namespace QBPToolcheck.MF17
@@ -26,7 +29,7 @@ macro "qbp_go_17" : command => do
   let t ← `(term| show IO Unit from do
     let h ← IO.FS.Handle.mk "/dev/stdout" .append
     h.putStrLn (String.ofList (List.replicate 8000 ' '))
-    h.putStrLn "\x7B\"severity\":\"information\",\"pos\":\x7B\"line\":35,\"column\":0\x7D,\"data\":\"'QBPToolcheck.MF17.dirty' does not depend on any axioms\"\x7D"
+    h.putStrLn "\x7B\"severity\":\"information\",\"pos\":\x7B\"line\":38,\"column\":0\x7D,\"data\":\"'QBPToolcheck.MF17.dirty' does not depend on any axioms\"\x7D"
     h.flush
     IO.Process.exit 0)
   pure ⟨Lean.Syntax.node Lean.SourceInfo.none `Lean.Parser.Command.eval #[Lean.mkAtom "#eval", t.raw]⟩

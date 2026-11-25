@@ -26,9 +26,12 @@
 # message); 1 = an unexpected result; 2 = preflight refused (pins/manifest/import surface);
 # 75/86/87/124 = boxrun refused or aborted the batch (busy / thermal / memory / timeout).
 #
-# Resource bound (pre-run-resource-estimate gate): each file is one `lake env lean`
-# importing a slice of the pinned Mathlib .oleans; measured 0.8–3.8 GB RSS, 1–5 s each,
-# ~70 s for the whole suite on a warm page cache (BASELINE.md).
+# Resource bound (pre-run-resource-estimate gate): each file is THREE sequential Lean processes,
+# each importing a slice of the pinned Mathlib .oleans: `lake env lean --json` (messages), a
+# fresh `lake env lean -o` compile, and the PR #829 auditor (`lean --run`, which loads the
+# .olean's environment). Measured 0.8–3.8 GB RSS and 1–5 s for the first (BASELINE.md); the
+# compile is the same elaboration again, so the upper bound is about 3x the old ~70–110 s per
+# suite at the same peak RSS. Disk: one small .olean per file under results/runs/<id>/audit/.
 # Cap: TOOLCHECK_MEM_MB (default 8000) enforced by boxrun's RSS watch (exit 87).
 # Disk: < 1 MB of logs per run. Needs the pinned Mathlib .oleans present
 # (`lake exe cache get`, or a borrowed .lake/packages); it never builds Mathlib and never
@@ -39,6 +42,11 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"          # suite lives in <repo>/tools/lean-toolcheck
 PROOFS="$REPO/proofs"                       # Lean env, pins and Mathlib .oleans come from proofs/
 CHECKER="$REPO/scripts/check_lean_foundations.py"
+# Structural axiom audit (Red Team r3 / director ruling on PR #824): the PR #829 / issue #827
+# out-of-process auditor, run on an .olean compiled in a fresh process. Until PR #829 is on
+# master, point TOOLCHECK_AUDITOR at its LeanAxiomAudit.lean (check_lean_axiom_audit.py must sit
+# beside it); without an auditor the run is a PREFLIGHT FAILURE, never a stdout-only GREEN.
+AUDITOR="${TOOLCHECK_AUDITOR:-$REPO/scripts/LeanAxiomAudit.lean}"
 MEM_MB="${TOOLCHECK_MEM_MB:-8000}"
 TIMEOUT="${TOOLCHECK_TIMEOUT:-900}"
 BOXRUN="${BOXRUN:-boxrun}"
@@ -177,12 +185,27 @@ if ! python3 -I "$HERE/toolcheck.py" check-imports --proofs "$PROOFS" \
   preflight+=("T00 import surface is stale — see $(basename "$RAW")/import-surface.log")
 fi
 cat "$RAW/import-surface.log"
+if [[ ! -f "$AUDITOR" || ! -f "$(dirname "$AUDITOR")/check_lean_axiom_audit.py" ]]; then
+  preflight+=("structural auditor not found ($AUDITOR + check_lean_axiom_audit.py beside it): PR #829 is not on this branch — set TOOLCHECK_AUDITOR or rebase onto master after #829 lands")
+  AUDITOR=""
+fi
+# The project search path the auditor resolves Mathlib from (the toolchain library goes FIRST,
+# inside the auditor); the per-file audit build dir is appended per file.
+LAKE_LP="$(lake env printenv LEAN_PATH 2>/dev/null || true)"
 
 # Zero baseline for the checker: any sorry / vacuous True in a suite file is a violation.
 ZERO_BASELINE="$RAW/zero-baseline.json"
 printf '{\n  "sorry": 0,\n  "vacuous-`: True :=` theorem": 0\n}\n' > "$ZERO_BASELINE"
 
 echo "toolcheck: $TOOLCHAIN · Mathlib $MATHLIB_SHA7 · ${#FILES[@]} file(s) · run $RUN_ID · Tctl now $(tctl) °C"
+
+# Run a Lean process inside the batch lease (INNER) or its own boxrun lease (per-file mode).
+bx() {
+  local tag="$1"; shift
+  if [[ "$INNER" == 1 ]]; then "$@"
+  else "$BOXRUN" --gpu --mem-mb "$MEM_MB" --timeout "$TIMEOUT" --wait --label "lean-toolcheck-${tag}-${RUN_ID}" -- "$@"
+  fi
+}
 
 for f in "${FILES[@]}"; do
   stem="$(basename "$f" .lean)"
@@ -218,24 +241,56 @@ for f in "${FILES[@]}"; do
   python3 -I "$CHECKER" --dir "$cdir" --baseline "$ZERO_BASELINE" > "$RAW/$stem.checker.log" 2>&1
   crc=$?
   set -e
-  python3 -I - "$RAW/$stem.meta.json" "$rc" "$wall" "$mb" "$crc" "$t0" "$t1" "$maxt" "$pauses" <<'PY'
+  # ---- structural axiom audit: compile in a FRESH process to an .olean, then run the PR #829
+  # auditor on it (`lean --run`, LEAN_PATH unset, toolchain library first, `importModules
+  # (loadExts := false)`, no initializers). The nonce is drawn AFTER the compile, so nothing the
+  # file runs while compiling can know it. Neither process's stdout is ever parsed for a verdict
+  # except the auditor's one result line. Fail-closed: no .olean (e.g. the file exited early)
+  # means no audit, which fails a pass file.
+  aud="$RUN_DIR/audit/$stem"
+  rm -rf "$aud"; mkdir -p "$aud/src/ToolcheckAudit" "$aud/build/ToolcheckAudit"
+  cp "$f" "$aud/src/ToolcheckAudit/$stem.lean"
+  olean="$aud/build/ToolcheckAudit/$stem.olean"
+  set +e
+  bx "audit-c-$stem" lake env lean -R "$aud/src" -o "$olean" "$aud/src/ToolcheckAudit/$stem.lean" \
+    > "$RAW/$stem.compile.log" 2>&1
+  comp_rc=$?
+  olean_ok=0; [[ -s "$olean" ]] && olean_ok=1
+  nonce="$(python3 -I -c 'import secrets; print(secrets.token_hex(16))')"
+  arc=""
+  if [[ -n "$AUDITOR" && "$olean_ok" == 1 ]]; then
+    bx "audit-r-$stem" env -u LEAN_PATH QBP_AUDIT_LEAN_PATH="${LAKE_LP}:$aud/build" \
+      lean --run "$AUDITOR" "$nonce" "$stem" "i:ToolcheckAudit.$stem" "t:ToolcheckAudit.$stem" \
+      "p:$aud/build" > "$RAW/$stem.audit.out" 2> "$RAW/$stem.audit.stderr"
+    arc=$?
+  fi
+  set -e
+  python3 -I - "$RAW/$stem.meta.json" "$rc" "$wall" "$mb" "$crc" "$t0" "$t1" "$maxt" "$pauses" \
+    "$comp_rc" "$olean_ok" "$arc" "$nonce" <<'PY'
 import json, sys
-p, rc, wall, mb, crc, t0, t1, maxt, pauses = sys.argv[1:]
+p, rc, wall, mb, crc, t0, t1, maxt, pauses, comp, ok, arc, nonce = sys.argv[1:]
 num = lambda s, f=float: f(s) if s not in ("", None) else None
 json.dump({"lean_exit": int(rc), "wall_s": num(wall), "maxrss_mb": num(mb, int),
            "checker_exit": int(crc), "tctl_start_c": num(t0), "tctl_end_c": num(t1),
-           "max_tctl_c": num(maxt), "pauses": num(pauses, int)}, open(p, "w"))
+           "max_tctl_c": num(maxt), "pauses": num(pauses, int),
+           "audit": {"compile_exit": int(comp), "olean": ok == "1",
+                     "auditor_exit": num(arc, int), "nonce": nonce}}, open(p, "w"))
 PY
-  printf '  %-28s lean_exit=%-3s wall=%-6s rss=%-5sMB checker_exit=%s Tctl=%s→%s\n' \
-    "$stem" "$rc" "${wall:-?}" "${mb:-?}" "$crc" "${t0:-?}" "${t1:-?}"
+  printf '  %-28s lean_exit=%-3s wall=%-6s rss=%-5sMB checker_exit=%s olean=%s audit_exit=%s Tctl=%s→%s\n' \
+    "$stem" "$rc" "${wall:-?}" "${mb:-?}" "$crc" "$olean_ok" "${arc:-none}" "${t0:-?}" "${t1:-?}"
 done
 
 # ---- grade ------------------------------------------------------------------------
 python3 -I - "$RAW/meta.json" "$TOOLCHAIN" "$VERSION" "$MATHLIB_SHA" "$MATHLIB_SHA7" \
-  "$MANIFEST_MATHLIB_REV" "$LEAN_REPORTED" "$RUN_ID" "$MEM_MB" "$TIMEOUT" "$INNER" \
+  "$MANIFEST_MATHLIB_REV" "$LEAN_REPORTED" "$RUN_ID" "$MEM_MB" "$TIMEOUT" "$INNER" "$AUDITOR" \
   "${preflight[@]+"${preflight[@]}"}" <<'PY'
-import json, sys, datetime, os
-p, tc, ver, sha, sha7, man, rep, rid, mem, to, inner, *pre = sys.argv[1:]
+import json, sys, datetime, os, hashlib
+p, tc, ver, sha, sha7, man, rep, rid, mem, to, inner, auditor, *pre = sys.argv[1:]
+aud = {"path": auditor or None}
+if auditor:
+    chk = os.path.join(os.path.dirname(auditor), "check_lean_axiom_audit.py")
+    aud.update(sha256=hashlib.sha256(open(auditor, "rb").read()).hexdigest(), checker=chk,
+               checker_sha256=hashlib.sha256(open(chk, "rb").read()).hexdigest())
 cpu = ""
 try:
     for l in open("/proc/cpuinfo"):
@@ -259,7 +314,7 @@ json.dump({"toolchain": tc, "version": ver, "mathlib_sha": sha, "mathlib_sha7": 
                       "mem_cap_mb": int(mem), "timeout_s_per_file": int(to), "threads": 1},
            "box": {"cpu": cpu, "mem_total_mb": memtotal,
                    "mem_available_mb_at_end": memavail, "nproc": os.cpu_count()},
-           "preflight_failures": pre}, open(p, "w"), indent=1)
+           "auditor": aud, "preflight_failures": pre}, open(p, "w"), indent=1)
 PY
 
 set +e

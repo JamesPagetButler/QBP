@@ -3,7 +3,8 @@
 usage: python3 -I tools/lean-toolcheck/mutants_grader.py tools/lean-toolcheck <results/runs/ID/raw> <workdir>
 M01-M19 reconstruct the Red Team's mutant set on PR #824 (from its one-line descriptions; the
 comment does not include the patches). M20-M25 target the r4 rules; M23 and M26-M34 the
-pass-file subset rules (Red Team r2); `E …` mutants drop each SUBSET_* list entry in turn.
+pass-file subset rules (Red Team r2); M35-M51 the structural audit and rules H/I (Red Team r3);
+`E …` mutants drop each SUBSET_* list entry in turn.
 A mutant is KILLED iff selftest_grader.py exits non-zero with the mutated grader.
 """
 
@@ -113,7 +114,7 @@ M = {
     ],
     "M31 rule C: an unclosed `@[` accepted": [
         (
-            '                out.append(f"l.{i}: `@[` not closed on its line")\n',
+            '                out.append(f"[C] l.{i}: `@[` not closed on its line")\n',
             "                pass\n",
         )
     ],
@@ -127,6 +128,71 @@ M = {
         (
             '            failures.append(\n                "expected the file to leave the pass-file subset',
             '            (\n                "expected the file to leave the pass-file subset',
+        )
+    ],
+    "M35 pass: structural-audit problems ignored": [
+        (
+            '            for pr in audit_probs:\n                failures.append(f"structural audit: {pr}")',
+            "            for pr in audit_probs:\n                pass",
+        )
+    ],
+    "M36 pass: structural-audit non-standard axioms ignored": [
+        ("for decl, axs in sorted(audit_nonstd.items()):", "for decl, axs in []:")
+    ],
+    "M37 audit: missing .olean not a problem": [
+        ('    if not a.get("olean"):', "    if False:")
+    ],
+    "M38 audit: nonce not checked": [
+        ('if d.get("nonce") != a.get("nonce"):', "if False:")
+    ],
+    "M39 audit: root not checked": [('if d.get("root") != stem:', "if False:")],
+    "M40 audit: scope not checked": [('if d.get("scope") != [mod]:', "if False:")],
+    "M41 audit: missing/unresolved/shadowed not checked": [
+        ("        if d.get(k) != []:", "        if False:")
+    ],
+    "M42 audit: standard-axiom pins not checked": [
+        ("    if bad_std:", "    if False:")
+    ],
+    "M43 audit: zero declarations accepted": [
+        (
+            'if not isinstance(d.get("declarations"), int) or d["declarations"] < 1:',
+            "if False:",
+        )
+    ],
+    "M44 audit: several result lines accepted": [
+        ("if len(res) != 1:", "if len(res) < 1:")
+    ],
+    "M45 pass: stale command_heads.json accepted": [
+        (
+            '                failures.append(\n                    "command_heads.json was generated',
+            '                (\n                    "command_heads.json was generated',
+        )
+    ],
+    "M46 rule H (command keywords anywhere) off": [
+        ("toks = _WORD.findall(_blank_attr_lists(ln))  # H", "toks = []  # H")
+    ],
+    "M47 rule I (`… in` combinator) off": [
+        ('if toks and toks[0] in ("open", "set_option"):  # I', "if False:  # I")
+    ],
+    "M48 rule H: every `scoped` excused": [
+        ('if t == "scoped" and j > 0 and toks[j - 1] == "open":', 'if t == "scoped":')
+    ],
+    "M49 rule H: every `deriving` excused": [
+        (
+            'if t == "deriving" and (j + 1 >= len(toks) or toks[j + 1] != "instance"):',
+            'if t == "deriving":',
+        )
+    ],
+    "M50 `audit-nonstd` expectation always met": [
+        (
+            '                failures.append(\n                    f"structural audit did NOT report',
+            '                (\n                    f"structural audit did NOT report',
+        )
+    ],
+    "M51 `audit-fails` expectation always met": [
+        (
+            '                failures.append(\n                    "expected the structural audit to fail',
+            '                (\n                    "expected the structural audit to fail',
         )
     ],
     "M24 line model back to str.splitlines()": [

@@ -1,15 +1,22 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `20261125T020851Z` (2026-11-25 02:53–02:56 UTC, `tools/lean-toolcheck/run.sh --update-baseline`) ·
-**overall GREEN — 42/42 files as expected**: 20 tool tests pass, T20 confirmed outside the pass-file subset
-(compile check), 18 must-fail controls caught with the expected message, 3 known-limit probes confirmed
-(report-only) · 123 theorems axiom-audited. Two cpu-thermal guard pauses (max Tctl 70.9 °C, other load on the box)
-are the likely cause of T16's 71.0 s wall time in that run (not pinned to the file); the run before (`20261125T011601Z`) timed it at 3.41 s.
-The per-file table below keeps the `20261121T021507Z` numbers for the unchanged files, and adds rows from later
-runs for new or changed files. The committed `results/` record is `20261125T020851Z`.
+**Run:** `20261125T045011Z` (2026-11-25 04:55–05:05 UTC, `tools/lean-toolcheck/run.sh --update-baseline`, with
+`TOOLCHECK_AUDITOR` set to PR #829's `scripts/LeanAxiomAudit.lean` at `3c8771c`, sha256 `1e969453…b0b1b`, checker
+`check_lean_axiom_audit.py` sha256 `28af5319…ac8de`) · **overall GREEN — 44/44 files as expected**:
+- 20 tool tests pass. **Each verdict comes from the structural audit:** the PR #829 auditor found no non-standard axiom
+  in any of the 20 freshly compiled `.olean` files.
+- T20 is confirmed outside the subset (compile check only).
+- 20 must-fail controls are caught: MF05 by the auditor itself (`one_eq_two` rests on `cheat`), and MF14–MF20 by the
+  subset and by a fail-closed structural audit (no `.olean`).
+- 3 known-limit probes are confirmed. 125 theorems are cross-checked on stdout.
 
-> **A toolcheck PASS is NOT an axiom certificate.** It covers a supported subset of Lean only (README, "The
-> pass-file subset"). The sound audit is out-of-process: QBP#827 / PR #829.
+The run uses one boxrun lease for 627 s: three Lean processes per file, at most 3794 MB RSS, and no thermal pause.
+**This record must be regenerated after this PR is rebased onto master with PR #829 merged**, so that the auditor
+path is `scripts/LeanAxiomAudit.lean`. The per-file table below keeps earlier numbers for unchanged files; new
+rows give their run.
+
+> **The axiom verdict is STRUCTURAL** (README). The token subset is defense in depth. A toolcheck PASS is still a
+> supported-subset statement: no sandbox and no kernel re-check (PR #829's stated limits).
 
 Machine-readable record: [`results/results-v4.30.0-c5ea003.json`](results/results-v4.30.0-c5ea003.json)
 (+ the `.md` table). Re-run: `tools/lean-toolcheck/run.sh` — this writes only to `results/runs/<run-id>/`
@@ -101,6 +108,9 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 | `must-fail/MF16_HandlerNotFirstAttr/…` | must-fail | ✅ caught | 0 | 2.29 | 1447 | `[]` (**forged**) | subset: `@[inline, command_elab …]`, both items refused |
 | `must-fail/MF17_MacroBuildsEval/…` | must-fail | ✅ caught | 0 | 1.28 | 784 | `[]` (**forged**) | subset: `macro`, user command in column 0 |
 | `must-fail/MF18_TermElabHandler/…` | must-fail | ✅ caught | 0 | 2.27 | 1448 | `[]` (**forged**) | subset: `syntax`, `attribute` |
+| `must-fail/MF05_CustomAxiom/…` (run `…045011Z`) | must-fail | ✅ caught | 0 | 1.16 | 785 | `['QBPToolcheck.MF05.cheat']` | **structural audit** (PR #829 auditor on a fresh `.olean`): `one_eq_two` rests on `cheat` |
+| `must-fail/MF19_IndentedSimprocForge/…` (T84) | must-fail | ✅ caught | 0 | 2.29 | 1450 | `[]` (**forged**) | subset rules H + D; structural audit fails closed (no `.olean`) |
+| `must-fail/MF20_OpenInSimprocForge/…` (T85, Mathlib-only import) | must-fail | ✅ caught | 0 | 1.70 | 927 | `[]` (**forged**) | subset rules H + I + D; structural audit fails closed (no `.olean`) |
 | `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.13 | 776 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
 | `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.14 | 776 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
 | `known-limits/KL03_CheckerStringComment/…` | known-limit | 🟡 known limit | 0 | 1.15 | 776 | `['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']` | 🟡 confirmed: checker exit 0 (string-blind stripper misses the `native_decide`); HARD: audit shows the native axiom |
@@ -175,7 +185,13 @@ record's raw logs (`…225231Z`, same files): `python3 -I tools/lean-toolcheck/s
 | same | new | **FAIL** (all four: pass-file subset) |
 | 42 refused constructs, each appended to clean T01 (rule D keywords, rule B `#` commands, rule C attributes, rule A column-0 commands) | new | **42/42 FAIL** |
 | T20 with its refused lines commented out (still expects `subset-refused`) | new | **FAIL** |
-| `mutants_grader.py` final: 33 rule mutants + 44 list-entry mutants (each SUBSET_* entry dropped in turn) | new | **76 KILLED, 1 SURVIVED** (M04, equivalent) |
+| `mutants_grader.py` final: 33 rule mutants + 44 list-entry mutants (each SUBSET_* entry dropped in turn) | `ce7074d` | **76 KILLED, 1 SURVIVED** (M04, equivalent) |
+| MF19/MF20 replayed as pass-labelled attacks (T84/T85: `simproc` forge, indented / behind `open Nat in`) | **`ce7074d`** | **PASS — exploitable** (both) |
+| same | new | **FAIL** (structural audit: no `.olean`; subset H/I/D) |
+| **structural audit ALONE** (a grader copy with every subset rule off): replays of MF05, MF14, MF15, MF17, MF19, MF20 | new | **6/6 FAIL by the structural audit** (MF05: the auditor reports `cheat`; the forge files: no `.olean`) |
+| 13 tamperings of T01's real auditor output / audit record (wrong nonce, root, scope; `missing`/`unresolved`/`shadowed`; forged std fingerprints; 0 declarations; 2 or 0 result lines; a non-standard report; no `.olean`; no record) | new | **13/13 FAIL** |
+| `command_heads.json` pinned to another toolchain | new | **FAIL** |
+| rule isolation: 18 one-construct sources, exact rule tags (X1 column-0 `axiom` → A+D+H; X4 `@[command_elab k]` → C only) | new | all exact |
 | `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
 
 Earlier controls (Red Team round): five planted misses in MF01–MF04 / T04 were all flagged (exit 1).
@@ -279,3 +295,4 @@ text-mode universal newlines (MF11).
 | 2026-11-21 | `20261121T021507Z` | Gemini r3 (e): column unit probed (codepoints) and pinned (`LEAN_COLUMN_UNIT`, computed from the original source line); +MF09; self-test unit pin; 3 consecutive full runs GREEN 32/32 |
 | 2026-11-24 | `20261124T234344Z` | Gemini r4 (f) + Red Team (`19bbbd4`): `\n`-only line model, bytes read (+MF10, +MF11, line-rule pins); fail-closed pass rules and `EXEC_RE` code-execution refusal (+MF14); +MF12 (escaped quote), +MF13 (clean-brace refusal); astral `𝔽` in MF09; guard-dependent plants; `mutants_grader.py` 24/25; 3 full runs GREEN (34/34 before MF12–MF14, then 37/37 ×2) |
 | 2026-11-25 | `20261125T020851Z` | Red Team r2 (`c333116`): `EXEC_RE` replaced by the pass-file SUBSET (column-0 command allowlist, `#print axioms` the only `#` command, attribute allowlist per item, refused syntax/handler/evaluation keywords anywhere); +MF15–MF18 (T80–T83); `local notation` / `attribute [local simp]` moved to T20 (compile only); a PASS is stated NOT to be an axiom certificate; 3 full runs GREEN 42/42 |
+| 2026-11-25 | `20261125T045011Z` | Red Team r3 (`ce7074d`) + director ruling: STRUCTURAL verdict (PR #829 auditor on a fresh `.olean`, `structural_audit`); subset rules H (Lean-generated command keywords anywhere) and I (`… in`), `axiom`/simprocs denied; +MF19/MF20; 2 full runs GREEN 44/44 with the auditor (PR #829 `3c8771c`); PR blocked on #829 |

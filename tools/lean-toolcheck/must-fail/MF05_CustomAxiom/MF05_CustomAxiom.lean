@@ -11,6 +11,7 @@ the axiom audit: `#print axioms` lists `QBPToolcheck.MF05.cheat`, a name outside
 TOOLCHECK-EXPECT: lean-ok
 TOOLCHECK-EXPECT: axiom QBPToolcheck.MF05.one_eq_two QBPToolcheck.MF05.cheat
 TOOLCHECK-EXPECT: axiom-nonstd QBPToolcheck.MF05.one_eq_two
+TOOLCHECK-EXPECT: audit-nonstd QBPToolcheck.MF05.one_eq_two
 TOOLCHECK-EXPECT: known-limit checker-accepts
 -/
 
