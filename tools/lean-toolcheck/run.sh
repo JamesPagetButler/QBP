@@ -189,9 +189,28 @@ if [[ ! -f "$AUDITOR" || ! -f "$(dirname "$AUDITOR")/check_lean_axiom_audit.py" 
   preflight+=("structural auditor not found ($AUDITOR + check_lean_axiom_audit.py beside it): PR #829 is not on this branch — set TOOLCHECK_AUDITOR or rebase onto master after #829 lands")
   AUDITOR=""
 fi
+# Red Team r5 finding 2: the auditor and its checker must be the PINNED files (auditor_pin.json).
+if [[ -n "$AUDITOR" ]]; then
+  if ! pin_out="$(python3 -I - "$HERE/auditor_pin.json" "$AUDITOR" <<'PY'
+import hashlib, json, os, sys
+pin = json.load(open(sys.argv[1])); a = sys.argv[2]
+c = os.path.join(os.path.dirname(a), "check_lean_axiom_audit.py")
+h = lambda p: hashlib.sha256(open(p, "rb").read()).hexdigest()
+bad = [n for n, f in (("LeanAxiomAudit.lean", a), ("check_lean_axiom_audit.py", c)) if h(f) != pin[n]]
+if bad:
+    print(f"{', '.join(bad)} sha256 differs from auditor_pin.json (PR #829 {pin['commit'][:7]})")
+    sys.exit(1)
+PY
+)"; then
+    preflight+=("structural auditor not the pinned one: $pin_out")
+  fi
+fi
 # The project search path the auditor resolves Mathlib from (the toolchain library goes FIRST,
 # inside the auditor); the per-file audit build dir is appended per file.
 LAKE_LP="$(lake env printenv LEAN_PATH 2>/dev/null || true)"
+# The Lean-parser layer sees ONLY the pinned packages (Mathlib and its deps), never the project's
+# own build dir: no QBP module, and so no QBP initializer, can be imported by a suite file there.
+PKG_LP="$(tr ':' '\n' <<<"$LAKE_LP" | grep -F '/.lake/packages/' | paste -sd: - || true)"
 
 # Zero baseline for the checker: any sorry / vacuous True in a suite file is a violation.
 ZERO_BASELINE="$RAW/zero-baseline.json"
@@ -211,7 +230,16 @@ for f in "${FILES[@]}"; do
   stem="$(basename "$f" .lean)"
   rel="../${f#"$REPO"/}"   # repo-relative from proofs/ (cwd = the Lake project), e.g. ../tools/lean-toolcheck/tests/T01_…lean
   t0="$(tctl)"
+  # ---- Lean-parser subset check FIRST (Red Team r5 / director decision): LeanSubsetParse.lean
+  # parses the file with Lean's own parser and elaborates nothing but builtin scope commands, so
+  # the file's code never runs here. It runs before every other Lean process on this file, with
+  # its own nonce drawn just before it.
+  pnonce="$(python3 -I -c 'import secrets; print(secrets.token_hex(16))')"
   set +e
+  bx "parse-$stem" env -u LEAN_PATH QBP_SUBSET_LEAN_PATH="$PKG_LP" \
+    lean --run "$HERE/LeanSubsetParse.lean" "$pnonce" "$f" \
+    > "$RAW/$stem.parse.out" 2> "$RAW/$stem.parse.stderr"
+  prc=$?
   if [[ "$INNER" == 1 ]]; then
     /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
       lake env lean --json "$rel" > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
@@ -266,15 +294,16 @@ for f in "${FILES[@]}"; do
   fi
   set -e
   python3 -I - "$RAW/$stem.meta.json" "$rc" "$wall" "$mb" "$crc" "$t0" "$t1" "$maxt" "$pauses" \
-    "$comp_rc" "$olean_ok" "$arc" "$nonce" <<'PY'
+    "$comp_rc" "$olean_ok" "$arc" "$nonce" "$prc" "$pnonce" <<'PY'
 import json, sys
-p, rc, wall, mb, crc, t0, t1, maxt, pauses, comp, ok, arc, nonce = sys.argv[1:]
+p, rc, wall, mb, crc, t0, t1, maxt, pauses, comp, ok, arc, nonce, prc, pnonce = sys.argv[1:]
 num = lambda s, f=float: f(s) if s not in ("", None) else None
 json.dump({"lean_exit": int(rc), "wall_s": num(wall), "maxrss_mb": num(mb, int),
            "checker_exit": int(crc), "tctl_start_c": num(t0), "tctl_end_c": num(t1),
            "max_tctl_c": num(maxt), "pauses": num(pauses, int),
            "audit": {"compile_exit": int(comp), "olean": ok == "1",
-                     "auditor_exit": num(arc, int), "nonce": nonce}}, open(p, "w"))
+                     "auditor_exit": num(arc, int), "nonce": nonce},
+           "subset_parse": {"exit": int(prc), "nonce": pnonce}}, open(p, "w"))
 PY
   printf '  %-28s lean_exit=%-3s wall=%-6s rss=%-5sMB checker_exit=%s olean=%s audit_exit=%s Tctl=%s→%s\n' \
     "$stem" "$rc" "${wall:-?}" "${mb:-?}" "$crc" "$olean_ok" "${arc:-none}" "${t0:-?}" "${t1:-?}"

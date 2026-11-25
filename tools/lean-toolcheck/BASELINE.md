@@ -1,22 +1,26 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `r4b-20261125` (2026-11-25 11:35–11:44 UTC, `tools/lean-toolcheck/run.sh --update-baseline`). The run had
+**Run:** `r5b-20261125` (2026-11-25 14:54–15:11 UTC, `tools/lean-toolcheck/run.sh`; its results, re-graded
+byte-identically by the committed grader, are the committed baseline). The run had
 `TOOLCHECK_AUDITOR` set to PR #829's `scripts/LeanAxiomAudit.lean` at **`6b07147`** (sha256 `1fa1ecc9…`), with
 checker `check_lean_axiom_audit.py` (sha256 `0e95cd7c…`, whose own `grade_run` grades the result).
 
-**Overall GREEN: 46/46 files as expected.**
+**Overall GREEN: 48/48 files as expected.**
 - **20 tool tests pass.** Each verdict comes from the structural audit, graded by #829's `grade_run`, with every
-  file inside the pass-file subset. The subset is the verdict's precondition.
+  file inside the pass-file subset: by **Lean's own parser** (`LeanSubsetParse.lean`, rules L/P) and by the
+  Python rules. The subset is the verdict's precondition.
 - **T20** is confirmed outside the subset.
-- **22 must-fail controls are caught:**
+- **24 must-fail controls are caught:**
   - MF05 by the auditor itself;
   - MF14–MF20 by the subset, with the audit failing closed (no `.olean`);
-  - **MF21** (T88) and **MF22** (T86, a real `axiom cheat`) by the subset ALONE. Their audit is clean because
-    the file wrote the `.olean`: limit S1.
+  - **MF21** (T88), **MF22** (T86, a real `axiom cheat`), **MF23** (T89 raw string) and **MF24** (T90 guillemets)
+    by the subset ALONE. Their audit is clean because the file wrote the `.olean`: limit S1.
 - 3 known-limit probes are confirmed.
-- 127 theorems are cross-checked on stdout.
+- 129 theorems are cross-checked on stdout.
 
-The run used one boxrun lease for 539 s, at most 3795 MB RSS, with no thermal pauses (cool start, Tctl ≤ 64.2 °C per file).
+The run used one boxrun lease for 979 s with no thermal pauses (cool start). The `--json` runs peaked at 3803 MB
+RSS. The Lean-parser runs are not timed per file; the pre-run survey measured 1.9–5.0 GB each (it loads the
+imports' environment extensions), inside the 7000 MB boxrun cap.
 **Regenerate this record after the rebase onto master once PR #829 has merged.**
 
 > **Layering** (README): the axiom verdict is structural, and the pass-file subset is its **precondition** until
@@ -117,6 +121,8 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 | `must-fail/MF20_OpenInSimprocForge/…` (T85, Mathlib-only import) | must-fail | ✅ caught | 0 | 1.70 | 927 | `[]` (**forged**) | subset rules H + I + D; structural audit fails closed (no `.olean`) |
 | `must-fail/MF21_SimprocPatternForgesOlean/…` (T88, run `…084631Z`) | must-fail | ✅ caught | 0 | 2.42 | 1465 | `[]` (**forged**) | subset rule H (`simproc_pattern%`) ONLY. The structural audit is **clean**, because the compile wrote a substituted `.olean` (S1) |
 | `must-fail/MF22_AxiomEvalForgesOlean/…` (T86, run `r4b-20261125`) | must-fail | ✅ caught | 0 | 1.27 | 785 | `[]` (**forged**) | subset rules A + H + D (`axiom`) + B (`#eval`) ONLY. The structural audit is **clean** (`problems: []`, `nonstd: {}`) although `dirty` rests on `cheat`: the compile wrote a substituted `.olean` (S1) |
+| `must-fail/MF23_RawStringLexDesync/…` (T89, run `r5b-20261125`) | must-fail | ✅ caught | 0 | 2.43 | 1467 | `[]` (**forged**) | rule R (raw-string opener) + the Lean-parser layer (rule L: `simproc_pattern%` and other kinds not allowed; rule P). The structural audit is **clean** (S1) |
+| `must-fail/MF24_GuillemetLexDesync/…` (T90, run `r5b-20261125`) | must-fail | ✅ caught | 0 | 2.47 | 1466 | `[]` (**forged**) | rule R (`«`) + the Lean-parser layer. The structural audit is **clean** (S1) |
 | `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.13 | 776 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
 | `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.14 | 776 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
 | `known-limits/KL03_CheckerStringComment/…` | known-limit | 🟡 known limit | 0 | 1.15 | 776 | `['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']` | 🟡 confirmed: checker exit 0 (string-blind stripper misses the `native_decide`); HARD: audit shows the native axiom |
@@ -202,7 +208,14 @@ record's raw logs (`…225231Z`, same files): `python3 -I tools/lean-toolcheck/s
 | same | new | **FAIL** (rule H: `simproc_pattern%`) |
 | `mutants_grader.py` r4: 50 rule mutants + 49 list-entry mutants (each mutant's work dir deleted after its run; ~0.3 GB peak disk) | new | **98 KILLED, 1 SURVIVED** (M04, equivalent) |
 | MF21 (T88s) and MF22 (T86s, a real `axiom cheat`) with EVERY subset rule off | new | **PASS, as documented** (both): the structural audit alone is fooled by a file that writes its own `.olean` (S1, QBP#836). The earlier "auditor alone 6/6" holds only for forges that exit BEFORE any `.olean` exists |
-| T01 auditor line with `dangling: [ghost]` / extra module in scope / auditor exit 1 / compile exit 1 | new | **FAIL** each (`dangling` via #829's own `grade_run`) |
+| T01 auditor line with `dangling: [ghost]` / extra module in scope / auditor exit 1 / compile exit 1 | `67a214b` | **FAIL** each (`dangling` via #829's own `grade_run`) |
+| MF23/MF24 replayed as pass-labelled attacks (T89 raw string, T90 guillemets) | **`67a214b`** (its own suite tree) | **PASS — exploitable** (both) |
+| same | new | **FAIL** (rule R + rules L/P) |
+| **Lean-parser layer ALONE** (a grader copy with every Python subset rule off): every must-fail MF01–MF24 replayed as a pass-labelled attack | new | **all 11 subset must-fails (MF14–MF24, incl. the T84–T90 shapes MF19–MF24) CAUGHT by L/P**; of the rest, MF01–MF03 and MF05–MF12 are caught too (e.g. `sorry`/`axiom` kinds, an `#eval`), MF04 (false `decide`) and MF13 (clean brace) are not, and need not be (not subset defects) |
+| 20 tamperings of T01's real Lean-parser record / meta (wrong nonce; a disallowed top/node/nested kind, attribute, option, config `native`; parse/scope/header error; head column/line moved; no/false `done`; count mismatch; a dropped command; a non-JSON line; an import outside the pinned packages; parse exit 1; no record) + the auditor and checker sha256 pins | new | **20/20 + 2/2 FAIL** |
+| `subset_kinds.json` for another toolchain / T00 import list / `LeanSubsetParse.lean` | new | **FAIL** each |
+| rule R alone (`«` / `r"` in T01's header comment) and rule P one direction at a time (a Python-only start; a Lean-only start) | new | **FAIL** each, by that check alone |
+| `mutants_grader.py` r5 (bounded): R01–R21 + every-10th sample of M01–E… | new | **31/31 KILLED** after the 4 single-catcher plants (first pass 30/34) |
 | `command_heads.json` with one T00 import fewer (same pins) | new | **FAIL** |
 | rule isolation: 60 one-construct sources, exact rule tags (adds `simproc_pattern%`, `compile_def%`, `$`, `?_`, `foo%`; spaced `%` allowed) | new | all exact |
 | `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
@@ -311,3 +324,4 @@ text-mode universal newlines (MF11).
 | 2026-11-25 | `20261125T045011Z` | Red Team r3 (`ce7074d`) + director ruling: STRUCTURAL verdict (PR #829 auditor on a fresh `.olean`, `structural_audit`); subset rules H (Lean-generated command keywords anywhere) and I (`… in`), `axiom`/simprocs denied; +MF19/MF20; 2 full runs GREEN 44/44 with the auditor (PR #829 `3c8771c`); PR blocked on #829 |
 | 2026-11-25 | `20261125T084631Z` | Red Team r4 pre-check (`5b4792e`): rule H keeps every command head (incl. the 14 non-word ones) and any `name%` token; +MF21 (T88); the subset is restated as the verdict's PRECONDITION (S1); `structural_audit` calls #829's `grade_run` (`dangling` checked) plus compile/auditor exit 0; the heads pin includes the T00 imports; re-integrated against #829 `6b07147`; GREEN 45/45 |
 | 2026-11-25 | `r4b-20261125` | Red Team r4 pre-check, closing items: +MF22 (T86: a real `axiom` behind an `#eval` that forges the `.olean`), replayed with every subset rule off as an EXPECTED audit PASS (S1); the "auditor alone 6/6" claim restated; structural-only stems renamed T76–T79 (no clash with the Red Team's T86/T88); auditor PR #829 `6b07147`; GREEN 46/46; selftest exit 0 (82 rows); mutants 98/99 (M04 equivalent) from the completed r4 run on `20261125T084631Z` raw logs: `toolcheck.py` is unchanged since, and the selftest only gained rows; a re-run on these logs hit its 7200 s run-bounded time cap (exit 124, no memory pressure) and was not repeated |
+| 2026-11-25 | `r5b-20261125` | Red Team r5 delta (`67a214b`) + director decision: the subset precondition from **Lean's own parser** (`LeanSubsetParse.lean`, parse only; rules L/P; `subset_kinds.json` from `gen_subset_kinds.py`, closed-world); rule R refuses raw strings and `«`; +MF23 (T89), +MF24 (T90); PR #829 auditor files pinned (`auditor_pin.json`); GREEN 48/48; selftest exit 0 (139 rows); mutants BOUNDED (one selftest ~3 min): all 21 r5 mutants R01–R21 + a deterministic every-10th sample (10) of the earlier 99 → first pass 30/34 KILLED; the 4 survivors (R01/R02 rule R, R17/R18 rule P one direction) showed the selftest lacked single-catcher plants, 4 were added, and the re-run killed 4/4. So **R01–R21: 21/21, sample: 10/10**; the other 89 earlier mutants were not re-run this round |

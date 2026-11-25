@@ -10,6 +10,7 @@ Exit 0 iff the unplanted run is GREEN and every plant behaved as required.
 """
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -18,6 +19,9 @@ from pathlib import Path
 suite, raw, work = map(Path, sys.argv[1:4])
 old_tc = Path(sys.argv[4]) if len(sys.argv) > 4 else None
 new_tc = suite / "toolcheck.py"
+LSIG = (
+    "def lean_parse_subset(src: str, raw: Path, stem: str, fmeta: dict) -> list[str]:\n"
+)
 if work.exists():
     shutil.rmtree(work)
 work.mkdir(parents=True)
@@ -200,6 +204,8 @@ def as_pass_attack(src_stem: str, src_rel: str, new_stem: str) -> tuple[Path, Pa
         ".stderr",
         ".compile.log",
         ".audit.out",
+        ".parse.out",
+        ".parse.stderr",
         ".audit.stderr",
     ):
         p = r3 / f"{src_stem}{ext}"
@@ -287,6 +293,16 @@ for src_stem, src_rel, new_stem in (
         "MF21_SimprocPatternForgesOlean",
         "must-fail/MF21_SimprocPatternForgesOlean/MF21_SimprocPatternForgesOlean.lean",
         "T88_AttackSimprocPatternOlean",
+    ),
+    (
+        "MF23_RawStringLexDesync",
+        "must-fail/MF23_RawStringLexDesync/MF23_RawStringLexDesync.lean",
+        "T89_AttackRawStringDesync",
+    ),
+    (
+        "MF24_GuillemetLexDesync",
+        "must-fail/MF24_GuillemetLexDesync/MF24_GuillemetLexDesync.lean",
+        "T90_AttackGuillemetDesync",
     ),
 ):
     s3, r3 = as_pass_attack(src_stem, src_rel, new_stem)
@@ -402,7 +418,15 @@ for bad in (
     assert body.count(bad) == 1
     body = body.replace(bad, "-- " + bad)
 t20.write_bytes(body.encode("utf-8"))
-res = evaluate(new_tc, raw, s7, "subset-refused-unmet")
+# The source is edited AFTER the run, so T20's real Lean-parser record no longer matches it; this
+# plant tests the `subset-refused` expectation logic, so its grader copy has the Lean layer off.
+tc7 = s7 / "toolcheck.py"
+t7 = tc7.read_text()
+assert t7.count(LSIG) == 1
+tc7.write_text(
+    t7.replace(LSIG, LSIG + "    return []  # SELFTEST: source edited after the run\n")
+)
+res = evaluate(tc7, raw, s7, "subset-refused-unmet")
 ok = ok and res["rows"]["T20_SubsetRefusedFeatures.lean"]["result"] == "FAIL"
 results.append(
     (
@@ -575,8 +599,11 @@ tc8 = s8 / "toolcheck.py"
 t8 = tc8.read_text()
 sig = "def subset_violations(src: str) -> list[str]:\n"
 assert t8.count(sig) == 1
+assert t8.count(LSIG) == 1
 tc8.write_text(
-    t8.replace(sig, sig + "    return []  # SELFTEST: every subset rule off\n")
+    t8.replace(sig, sig + "    return []  # SELFTEST: every subset rule off\n").replace(
+        LSIG, LSIG + "    return []  # SELFTEST: the Lean-parser layer off too\n"
+    )
 )
 for src_stem, new_stem in (
     ("MF05_CustomAxiom", "T76_StructuralOnlyAxiom"),
@@ -747,6 +774,233 @@ AUDIT_PLANTS = [
 ]
 for tag, mut in AUDIT_PLANTS:
     planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+
+
+# 7e. Red Team r5 / director decision: the Lean-parser layer (`lean_parse_subset`, rules L/P) on
+#     T01's REAL LeanSubsetParse output. Each tampering must turn T01 FAIL.
+def t01_parse(fn):
+    def mut(d):
+        p = d / "T01_DecideFin.parse.out"
+        recs = [json.loads(l) for l in p.read_text().split("\n") if l.strip()]
+        out = fn(recs)
+        p.write_text(
+            out
+            if isinstance(out, str)
+            else "\n".join(json.dumps(r) for r in out) + "\n"
+        )
+
+    return mut
+
+
+def _first_cmd(recs, **kw):
+    recs[1].update(kw)
+    return recs
+
+
+def _cmd_add(field, val):
+    def f(recs):
+        recs[1][field] = list(recs[1].get(field, [])) + [val]
+        return recs
+
+    return f
+
+
+PARSE_PLANTS = [
+    (
+        "parse-wrong-nonce",
+        t01_parse(lambda r: [r[0], {**r[1], "nonce": "0" * 32}] + r[2:]),
+    ),
+    (
+        "parse-kind-not-allowed",
+        t01_parse(lambda r: _first_cmd(r, kind="Lean.Parser.Command.eval")),
+    ),
+    (
+        "parse-node-kind-not-allowed",
+        t01_parse(_cmd_add("kinds", "Lean.Parser.Command.simprocPattern")),
+    ),
+    (
+        "parse-nested-not-allowed",
+        t01_parse(_cmd_add("nested", "Lean.Parser.Command.eval")),
+    ),
+    ("parse-attr-not-allowed", t01_parse(_cmd_add("attrs", "simple:implemented_by"))),
+    (
+        "parse-option-not-allowed",
+        t01_parse(_cmd_add("set_option", "debug.skipKernelTC")),
+    ),
+    ("parse-config-native", t01_parse(_cmd_add("config", "native"))),
+    ("parse-error", t01_parse(lambda r: _first_cmd(r, parse_error=True))),
+    ("parse-scope-error", t01_parse(lambda r: _first_cmd(r, scope_error=True))),
+    ("parse-head-col", t01_parse(lambda r: _first_cmd(r, head_col=2))),
+    (
+        "parse-head-line",
+        t01_parse(lambda r: _first_cmd(r, head_line=r[1]["head_line"] + 1)),
+    ),
+    ("parse-no-done", t01_parse(lambda r: r[:-1])),
+    ("parse-done-false", t01_parse(lambda r: r[:-1] + [{**r[-1], "done": False}])),
+    ("parse-count-mismatch", t01_parse(lambda r: r[:-1] + [{**r[-1], "commands": 99}])),
+    ("parse-dropped-command", t01_parse(lambda r: [r[0]] + r[2:])),
+    (
+        "parse-not-json",
+        t01_parse(lambda r: "\n".join(json.dumps(x) for x in r) + "\nnot json\n"),
+    ),
+    (
+        "parse-import-outside",
+        t01_parse(
+            lambda r: [{**r[0], "imports": r[0]["imports"] + ["QBP.Foo"]}] + r[1:]
+        ),
+    ),
+    (
+        "parse-header-error",
+        t01_parse(lambda r: [{**r[0], "parse_error": True}] + r[1:]),
+    ),
+    ("parse-exit-1", _meta_mut(lambda m: m["subset_parse"].update(exit=1))),
+    ("parse-no-record", _meta_mut(lambda m: m.pop("subset_parse"))),
+    (
+        "auditor-pin-mismatch",
+        _meta_mut(
+            lambda m: (
+                m.update(auditor={**m["auditor"], "sha256": "0" * 64})
+                if "auditor" in m
+                else None
+            )
+        ),
+    ),
+]
+
+
+def _run_meta_mut(fn):
+    def mut(d):
+        p = d / "meta.json"
+        m = json.loads(p.read_text())
+        fn(m)
+        p.write_text(json.dumps(m))
+
+    return mut
+
+
+# The auditor pin lives in the RUN meta (run.sh records the sha256s); per-file meta has none.
+PARSE_PLANTS[-1] = (
+    "auditor-pin-mismatch",
+    _run_meta_mut(lambda m: m["auditor"].update(sha256="0" * 64)),
+)
+PARSE_PLANTS.append(
+    (
+        "checker-pin-mismatch",
+        _run_meta_mut(lambda m: m["auditor"].update(checker_sha256="0" * 64)),
+    )
+)
+for tag, mut in PARSE_PLANTS:
+    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+
+
+# Rule P, each direction ALONE (so a mutant that drops one direction is killed): a Python-only
+# start (the first command's head moved onto the second's line: Lean loses a start line, gains
+# none) and a Lean-only start (an extra column-0 nested head on a comment line).
+def _dup_head(recs):
+    recs[1]["head_line"] = recs[2]["head_line"]
+    return recs
+
+
+def _extra_nested_head(recs):
+    recs[1]["nested_heads"] = list(recs[1].get("nested_heads", [])) + [[2, 0]]
+    return recs
+
+
+for tag, mut in (
+    ("parse-python-only-start", t01_parse(_dup_head)),
+    ("parse-lean-only-start", t01_parse(_extra_nested_head)),
+):
+    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+
+
+# Rule R ALONE: a guillemet / a raw-string opener inside T01's header COMMENT (same line count, so
+# the real Lean-parser record still matches the file; the Lean layer is clean, rule R must fire).
+for tag, r_old, r_new in (
+    ("rule-R-guillemet-in-comment", "TOOLCHECK T01 —", "TOOLCHECK T01 «"),
+    ("rule-R-raw-string-in-comment", "TOOLCHECK T01 —", 'TOOLCHECK T01 r"'),
+):
+    sR = work / f"suite-{tag}"
+    shutil.copytree(suite, sR, ignore=shutil.ignore_patterns("results"))
+    t01p = sR / "tests" / "T01_DecideFin.lean"
+    t01text = t01p.read_bytes().decode("utf-8")
+    assert t01text.count(r_old) == 1
+    t01p.write_bytes(t01text.replace(r_old, r_new).encode("utf-8"))
+    res = evaluate(sR / "toolcheck.py", raw, sR, tag)
+    f = res["rows"]["T01_DecideFin.lean"]
+    only_r = f["result"] == "FAIL" and not any(
+        ("[L]" in x or "[P]" in x) for x in f["failures"]
+    )
+    ok = ok and only_r
+    results.append(
+        (
+            f"plant[{tag}] T01 (must FAIL by rule R alone)",
+            ("FAIL by R: " if only_r else "NOT R-only: ")
+            + "; ".join(f["failures"])[:160],
+            "",
+        )
+    )
+
+# The subset_kinds.json pins: another toolchain, another T00 import list, another parser.
+for tag, edit in (
+    ("kinds-stale-toolchain", lambda k: k.update(toolchain="leanprover/lean4:v0.0.0")),
+    ("kinds-stale-imports", lambda k: k.update(imports=k["imports"][:-1])),
+    ("kinds-stale-parser", lambda k: k.update(parser_sha256="0" * 64)),
+):
+    sk = work / f"suite-{tag}"
+    shutil.copytree(suite, sk, ignore=shutil.ignore_patterns("results"))
+    kj = json.loads((sk / "subset_kinds.json").read_text())
+    edit(kj)
+    (sk / "subset_kinds.json").write_text(json.dumps(kj))
+    res = evaluate(sk / "toolcheck.py", raw, sk, tag)
+    ok = ok and res["rows"]["T01_DecideFin.lean"]["result"] == "FAIL"
+    results.append(
+        (
+            f"plant[{tag}] subset_kinds.json pin (T01 must FAIL)",
+            row(res, "T01_DecideFin.lean"),
+            "",
+        )
+    )
+
+# THE LEAN-PARSER LAYER ALONE (director decision, r5): a grader copy with every Python subset
+# rule OFF (subset_violations returns []), so only rules L/P decide. Every must-fail is replayed
+# as a pass-labelled attack. A must-fail that expects `subset-refused` MUST be caught by L/P;
+# the rest are reported (their defect is not a subset matter: sorry, a false `decide`, …).
+sL = work / "suite-lean-layer-only"
+shutil.copytree(suite, sL, ignore=shutil.ignore_patterns("results"))
+tcL = sL / "toolcheck.py"
+tL = tcL.read_text()
+assert tL.count(sig) == 1
+tcL.write_text(
+    tL.replace(sig, sig + "    return []  # SELFTEST: Python subset rules off\n")
+)
+lean_layer_rows = []
+for mf in sorted((suite / "must-fail").glob("*/*.lean")):
+    src_stem = mf.stem
+    new_stem = "TL" + src_stem[2:4] + "_LeanLayerOnly"
+    sLx, rLx = as_pass_attack(src_stem, mf.relative_to(suite).as_posix(), new_stem)
+    shutil.copy(tcL, sLx / "toolcheck.py")
+    res = evaluate(sLx / "toolcheck.py", rLx, sLx, new_stem)
+    f = res["rows"][f"{new_stem}.lean"]
+    lp = [x for x in f["failures"] if "[L]" in x or "[P]" in x]
+    expects_subset = "subset-refused" in mf.read_text()
+    good = bool(lp) or not expects_subset
+    ok = ok and good
+    tags = sorted(set(re.findall(r"\[(L|P)\] l\.\d+: ([^`(]*)", " ".join(lp))))
+    lean_layer_rows.append((src_stem, "CAUGHT" if lp else "not caught", expects_subset))
+    results.append(
+        (
+            f"lean-layer-only[{src_stem}] Python subset rules OFF"
+            + (" (must be caught by L/P)" if expects_subset else " (reported)"),
+            (
+                ("CAUGHT by L/P: " + "; ".join(lp)[:160])
+                if lp
+                else ("not caught by L/P" + ("" if good else " — FAILURE"))
+            ),
+            f["result"],
+        )
+    )
+    shutil.rmtree(sLx, ignore_errors=True)
+    shutil.rmtree(rLx, ignore_errors=True)
 
 
 # The command-heads pin: a heads list generated for another toolchain fails every pass file.

@@ -1,0 +1,7 @@
+{
+ "pr": 829,
+ "commit": "6b07147d4b4e9920e8b5f81687f010915e477f5d",
+ "note": "PR #829 auditor files the grader accepts. Re-pin at the rebase onto master (then: the git blobs of scripts/ at HEAD).",
+ "LeanAxiomAudit.lean": "1fa1ecc9a603e36229826a4aa0c877210d36594a240f94333df18832425643f8",
+ "check_lean_axiom_audit.py": "0e95cd7c83325a1792178ae0c1c9805d9410aad1aafbde6a6cd11a80255bb524"
+}

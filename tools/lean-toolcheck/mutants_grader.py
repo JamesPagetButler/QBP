@@ -4,11 +4,16 @@ usage: python3 -I tools/lean-toolcheck/mutants_grader.py tools/lean-toolcheck <r
 M01-M19 reconstruct the Red Team's mutant set on PR #824 (from its one-line descriptions; the
 comment does not include the patches). M20-M25 target the r4 rules; M23 and M26-M34 the
 pass-file subset rules (Red Team r2); M35-M51 the structural audit and rules H/I (Red Team r3);
-`E …` mutants drop each SUBSET_* list entry in turn.
+`E …` mutants drop each SUBSET_* list entry in turn. R01-R21 target the r5 code: rule R, the
+Lean-parser layer (rules L/P), the subset_kinds.json pin and the auditor pin.
+Bounding (r5: one selftest is now ~2 min): MUTANTS_FILTER=<regex> keeps matching names only;
+MUTANTS_STRIDE=<k> keeps every k-th of the REST (a deterministic sample, reported as such).
 A mutant is KILLED iff selftest_grader.py exits non-zero with the mutated grader.
 Disk: about 0.3 GB peak (one mutant's work dir at a time; each is deleted after its run).
 """
 
+import os
+import re
 import shutil
 import subprocess
 import sys
@@ -236,6 +241,102 @@ for lst in ("SUBSET_COMMANDS", "SUBSET_ATTRIBUTES", "SUBSET_DENY_WORDS"):
             )
         ]
 
+M.update(
+    {
+        "R01 rule R raw string off": [
+            ("        if _RAW_STRING.search(ln):\n", "        if False:\n")
+        ],
+        "R02 rule R guillemet off": [
+            ('        if "\\u00ab" in ln:\n', "        if False:\n")
+        ],
+        "R03 Lean-parser layer off": [
+            (
+                "    subset = subset_violations(src) + lean_parse_subset(src, raw, stem, meta)\n",
+                "    subset = subset_violations(src)\n",
+            )
+        ],
+        "R04 parse nonce unchecked": [
+            (
+                'if not isinstance(d, dict) or not nonce or d.get("nonce") != nonce:',
+                "if not isinstance(d, dict):",
+            )
+        ],
+        "R05 top-level kind unchecked": [
+            (
+                '        if c.get("kind") not in allow["top_kinds"]:\n',
+                "        if False:\n",
+            )
+        ],
+        "R06 node kinds unchecked": [('            ("kinds", "syntax kind"),\n', "")],
+        "R07 nested kinds unchecked": [
+            ('            ("nested", "nested command kind"),\n', "")
+        ],
+        "R08 attributes unchecked": [('            ("attrs", "attribute"),\n', "")],
+        "R09 options unchecked": [('            ("set_option", "option"),\n', "")],
+        "R10 tactic configs unchecked": [
+            ('            ("config", "tactic config"),\n', "")
+        ],
+        "R11 parse errors ignored": [
+            ('        if c.get("parse_error"):\n', "        if False:\n")
+        ],
+        "R12 scope errors ignored": [
+            ('        if c.get("scope_error"):\n', "        if False:\n")
+        ],
+        "R13 done line unchecked": [
+            ('    if done.get("done") is not True:\n', "    if False:\n")
+        ],
+        "R14 imports unchecked": [
+            (
+                '        if m.split(".")[0] not in ALLOWED_IMPORT_ROOTS:\n',
+                "        if False:\n",
+            )
+        ],
+        "R15 parse exit unchecked": [
+            ('    if rec.get("exit") != 0:\n', "    if False:\n")
+        ],
+        "R16 rule P column unchecked": [
+            ('        if c.get("head_col") != 0:\n', "        if False:\n")
+        ],
+        "R17 rule P python-only starts ignored": [
+            ("    for i in sorted(py_starts - lean_starts):\n", "    for i in []:\n")
+        ],
+        "R18 rule P lean-only starts ignored": [
+            (
+                "    for i in sorted(x for x in lean_starts - py_starts if isinstance(x, int)):\n",
+                "    for i in []:\n",
+            )
+        ],
+        "R19 subset_kinds pin ignored": [
+            (
+                "            for pr in subset_kinds_pin_problems(run_meta):\n",
+                "            for pr in []:\n",
+            )
+        ],
+        "R20 auditor pin ignored": [
+            ("    probs += auditor_pin_problems(run_meta)\n", "    pass\n")
+        ],
+        "R21 header parse error ignored": [
+            ('    if hdr.get("parse_error"):\n', "    if False:\n")
+        ],
+    }
+)
+_flt = os.environ.get("MUTANTS_FILTER")
+_stride = int(os.environ.get("MUTANTS_STRIDE", "1"))
+if _flt or _stride > 1:
+    keep: dict[str, list[tuple[str, str]]] = {}
+    rest: list[tuple[str, list[tuple[str, str]]]] = []
+    for mk, mv in M.items():
+        if _flt and re.search(_flt, mk):
+            keep[mk] = mv
+        else:
+            rest.append((mk, mv))
+    for j, (mk, mv) in enumerate(rest):
+        if _stride > 1 and j % _stride == 0:
+            keep[mk] = mv
+    print(
+        f"(bounded run: {len(keep)} of {len(M)} mutants; filter {_flt!r}, stride {_stride})"
+    )
+    M = keep
 rows = []
 for name, reps in M.items():
     s = src

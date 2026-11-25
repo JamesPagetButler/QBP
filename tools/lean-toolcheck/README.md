@@ -16,7 +16,7 @@ Each file is one `lake env lean` with cwd = `proofs/` (pins, Lean env and Mathli
 | Dir | What | Graded as |
 |---|---|---|
 | `tests/` | T00–T19: one feature per file, ends in `#print axioms`, inside the pass-file subset · T20: `local notation` + `attribute [local simp]`, outside the subset (compile check only) | T00–T19 must pass: all axioms ⊆ {propext, Classical.choice, Quot.sound}, checker accepts, file inside the subset · T20 `lean-ok` + `subset-refused` |
-| `must-fail/` | MF01 sorry/admit · MF02 native_decide · MF03 literal `: True :=` · MF04 false `decide` · MF05 custom `axiom` · MF06 spoofed axiom audit · MF07 same-line site · MF08 interpolation (refused) · MF09 non-ASCII prefix before a same-line site · MF10 form feed / MF11 lone CR in a comment (line-count desync) · MF12 escaped quote before a site · MF13 clean file with a brace in a string (refused) · MF14 `#eval` forges stdout and exits · MF15–MF18 the same forge through user syntax/handlers: `syntax` + `attribute [command_elab]`, `@[inline, command_elab]`, a `macro` that builds `#eval`, `term_elab` · MF19/MF20 the same through a `simproc` (indented; behind `open Nat in`, Mathlib-only import). All are `subset-refused` + `audit-fails` (no `.olean`); MF05 is `audit-nonstd` (the auditor sees `cheat`) · MF21 an indented `simproc_pattern%` that forges the `.olean` itself · MF22 a REAL `axiom cheat` hidden by an `#eval` that forges the `.olean` (both `subset-refused`; the audit alone is fooled, S1) | must be caught **with the expected message**; a must-fail that passes is a suite failure |
+| `must-fail/` | MF01 sorry/admit · MF02 native_decide · MF03 literal `: True :=` · MF04 false `decide` · MF05 custom `axiom` · MF06 spoofed axiom audit · MF07 same-line site · MF08 interpolation (refused) · MF09 non-ASCII prefix before a same-line site · MF10 form feed / MF11 lone CR in a comment (line-count desync) · MF12 escaped quote before a site · MF13 clean file with a brace in a string (refused) · MF14 `#eval` forges stdout and exits · MF15–MF18 the same forge through user syntax/handlers: `syntax` + `attribute [command_elab]`, `@[inline, command_elab]`, a `macro` that builds `#eval`, `term_elab` · MF19/MF20 the same through a `simproc` (indented; behind `open Nat in`, Mathlib-only import). All are `subset-refused` + `audit-fails` (no `.olean`); MF05 is `audit-nonstd` (the auditor sees `cheat`) · MF21 an indented `simproc_pattern%` that forges the `.olean` itself · MF22 a REAL `axiom cheat` hidden by an `#eval` that forges the `.olean` (both `subset-refused`; the audit alone is fooled, S1) · MF23 a raw string `r"\"` and MF24 guillemet identifiers that desynced the Python lexer (T89/T90; refused by rule R and by the Lean-parser layer) | must be caught **with the expected message**; a must-fail that passes is a suite failure |
 | `known-limits/` | KL01 non-literal vacuity · KL02 `Fin.foldl` under `decide` · KL03 checker blind to a `native_decide` after a string containing a comment opener | report-only: "confirmed" / "CHANGED", never a failure |
 
 **Limits, stated plainly.** The vacuity check is **syntactic only**: the foundations checker matches the literal
@@ -46,6 +46,10 @@ fails the run and is never retried.
 > independently would need a second, trusted compile, which is the sandbox again. Both are left to QBP#836, as a
 > stated limit. There is no kernel re-check either (lean4checker's job).
 >
+> **Auditor pin.** `auditor_pin.json` holds the sha256 of PR #829's `LeanAxiomAudit.lean` and
+> `check_lean_axiom_audit.py` (PR #829 `6b07147`; re-pin at the rebase). A different file is a preflight failure in
+> `run.sh`, and a pass file FAILS if the run meta records other shas.
+>
 > **Status: this PR is blocked on PR #829.** Until #829 is on master, a run without `TOOLCHECK_AUDITOR=<PR #829's
 > LeanAxiomAudit.lean>` (with `check_lean_axiom_audit.py` beside it) is a **PREFLIGHT FAILURE**, never a
 > stdout-only GREEN.
@@ -61,7 +65,47 @@ bytes read, only `\r\n` → `\n`, split at `\n` only, never `str.splitlines()` o
 (MF10 form feed, MF11 lone CR; pinned by self-test), in source with comments and string bodies blanked by a
 nesting-, string- and escape-aware lexer (T19, MF12).
 
-**The pass-file subset** (`subset_violations` in `toolcheck.py`; the minimum T00–T19 need). It is checked on the
+### The pass-file subset, layer 1: Lean's own parser (the verdict's precondition, since Red Team r5)
+
+Five rounds of Red Team findings (the last two: T89 raw string `r"\"`, T90 guillemet identifiers) were each a gap
+in a **Python re-lexing of Lean**. Each gap was a full forged PASS, because the compile is not sandboxed (S1). So the
+subset check now comes from **Lean's parser**:
+
+- **`LeanSubsetParse.lean`** (trusted toolchain code, run with `lean --run`, `LEAN_PATH` unset, toolchain library
+  first) parses the file's header and imports exactly those modules. That runs the imported modules' initializers
+  (toolchain and pinned Mathlib: trusted), never code from the file. It then parses every command with
+  `Lean.Parser.parseCommand` **without elaborating it**: no `#eval`, simproc, macro or elaborator of the file ever
+  runs. The one exception is the top-level scope commands `namespace` `section` `end` `open` `set_option`. Lean's own
+  builtin elaborator runs those, because `open`/`namespace` activate scoped syntax; any error they log FAILS the file.
+- It emits one JSON line per command, each carrying a nonce drawn just before the run: the top-level syntax kind, the
+  position of its first token outside a doc comment, nested command-category kinds (after `in`), **every syntax-node
+  kind** in the command, attribute kinds/names, `set_option` keys and tactic-config names (`decide +kernel`). It runs
+  **first**, before any other Lean process on the file.
+- **Rule L** (`lean_parse_subset`): every one of those must be on the allowlist in **`subset_kinds.json`**. That file is
+  generated by `gen_subset_kinds.py` as the union of what the 20 pass-labelled tool tests use (7 top-level kinds,
+  199 node kinds, attributes `simp` `ext`, options `maxHeartbeats` `maxRecDepth`, config `kernel`). It is closed-world:
+  the generator refuses a top-level kind outside a fixed list, and any code-running or syntax-extending kind. It is
+  pinned to the toolchain, the Mathlib sha, the T00 import list and the sha256 of `LeanSubsetParse.lean`. Imports must
+  be T00 modules. A parse error, a missing or truncated record, a wrong nonce or a count mismatch FAILS.
+- **Rule P (the layers must agree):** the lines where Lean's commands start (first token outside a doc comment, which
+  must be in column 0) must be **exactly** the column-0 code lines the Python lexer sees after the header. A lexer
+  desync shows up as a disagreement, and any disagreement FAILS.
+
+**Soundness argument.** A file can change how later commands parse only through a command or attribute that extends
+the syntax or registers a parser (`syntax`, `notation`, `macro`, `declare_syntax_cat`, `elab`, `initialize`,
+`attribute [… parser]`, a `scoped` declaration of syntax, …). None of these is on the kind/attribute allowlist. So up to the
+first command outside the allowlist, "the header environment plus Lean's own scope commands" is exactly the
+environment real Lean parses that prefix in, and the parse is faithful. From that command on, the grade already
+FAILS. A command elaborated by real Lean but skipped here (`theorem`, `def`, `instance`, `structure`, `inductive`,
+`variable`, `#print axioms`, with only `simp`/`ext` attributes) adds declarations, never syntax, so skipping it does
+not change any later parse. **Limits:** the elaborated scope commands and the imports are trusted toolchain/Mathlib
+code. Inside an allowed command the allowlist is of syntax kinds, so a construct that runs code must have its own kind
+(`run_tac`, `by_elab`, `#eval`, simprocs: all absent from the list) or a named config (`+native`: not `kernel`).
+
+### The pass-file subset, layer 2: the Python rules (independent)
+
+`subset_violations` in `toolcheck.py` (the minimum T00–T19 need) stays as a second, independent layer; a file must
+pass both. Rule R runs on the **raw** source. The rest run on the
 code-only text (comments and string bodies blanked, so neither can trigger or hide a rule), one `\n`-line at a time:
 
 | Rule | Allowed | Everything else is refused, e.g. |
@@ -71,9 +115,10 @@ code-only text (comments and string bodies blanked, so neither can trigger or hi
 | **I. `open … in` / `set_option … in`** | followed by an allowed command, on the same line or on the next line in column 0 | `open Nat in simproc …`, `open Nat in <user command>`, a following indented line |
 | **B. `#` commands, anywhere** (also mid-line) | `#print axioms` | `#eval`, `#guard`, `#sample`, `#test`, `#check`, `#print <other>` |
 | **C. attributes, anywhere.** Every `@[…]` must close on its line; every item, after an optional `scoped`, must be allowed | `simp`, `ext` | `inline`, `local …`, `command_elab`/`term_elab`/`tactic`/`macro`/`init`/`builtin_*` at ANY position in the list |
+| **R. constructs the lexer does not model, anywhere in the RAW source** (Red Team r5) | — | any raw-string opener `r"` `r#"` `r##"` …, any guillemet `«` (MF23 = T89, MF24 = T90; no tool test uses either) |
 | **D. keywords, anywhere** (also mid-line) | — | `attribute` `macro` `macro_rules` `syntax` `declare_syntax_cat` `notation` `infix` `infixl` `infixr` `prefix` `postfix` `elab` `elab_rules` `run_cmd` `run_elab` `run_meta` `run_tac` `by_elab` `initialize` `builtin_initialize` `implemented_by` `extern` `unsafe` `native_decide` `+native` `ofReduceBool` `reduceBool` `plausible` `slim_check` `axiom` `simproc` `dsimproc` `simproc_decl` `dsimproc_decl` |
 
-**Limit of the subset, stated plainly:** it is a text scan, not a parser, and it is NOT the soundness boundary
+**Limit of layer 2, stated plainly:** it is a text scan, not a parser (layer 1 is the parser), and neither layer is the soundness boundary
 (the structural audit is). It cannot see a command that a module outside the T00 import surface adds
 (the pin catches a changed surface), or a token-free command parser (none exists at these pins). Because the
 subset is the precondition for the structural verdict (above), these are limits of the verdict too.
