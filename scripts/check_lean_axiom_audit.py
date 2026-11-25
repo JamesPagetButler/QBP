@@ -22,8 +22,15 @@ or `initialize` block of an audited module can change what it computes or prints
     module's .olean must resolve (`unresolved == []`), and at least one declaration must be
     audited. Modules of `proofs/` that NO run loaded are listed as not covered;
   * a run with no output (crash, failed import), a malformed result, or no runs at all FAILS;
-  * CI runs THIS script, the auditor and the allowlist from a copy taken BEFORE `lake build`, so
-    code run during the build (`#eval`) cannot rewrite them (Red Team 2, e3).
+  * the three standard axioms must be the TOOLCHAIN's: each name is pinned to its toolchain
+    module and fingerprint, and no toolchain-rooted module may resolve elsewhere (Red Team r2
+    findings 2, 3);
+  * with `--build-dir`, EVERY .olean of the build output must be in some run's scope (Red Team
+    r2 finding 4: a default `lean_lib` without `roots :=` used to be built but never audited);
+  * CI runs this script, the auditor and the allowlist in a SEPARATE job on a fresh runner, from
+    that job's own checkout, with a hash-verified toolchain and absolute tool paths; no project
+    Lean code runs there, and the build job hands over only its .olean output (Red Team r2
+    finding 1: build-time `#eval` could plant a fake `python3` on the build job's PATH).
 Known limit: the .olean files are trusted as `lake build` wrote them; there is no kernel re-check
 (lean4checker's job).
 
@@ -55,6 +62,14 @@ from pathlib import Path
 MARK = "AXIOM-AUDIT-827"
 DEFAULT_ALLOWLIST = Path(__file__).resolve().parent / "lean_axiom_allowlist.json"
 _BAD_CHARS = "*?[]"
+# Red Team r2 finding 3: the names `propext`, `Classical.choice`, `Quot.sound` must denote the
+# TOOLCHAIN's axioms. Each is pinned to its toolchain module and the SHA-256 of the auditor's
+# canonical serialisation (observed on Lean v4.30.0; a toolchain bump re-pins them, on purpose).
+STD_PINS = {
+    "propext": ("Init.Core", "PROPEXT_FP"),
+    "Classical.choice": ("Init.Prelude", "CHOICE_FP"),
+    "Quot.sound": ("Init.Core", "QSOUND_FP"),
+}
 REJECTED: list[dict] = []  # malformed allowlist entries (reported in --json as a count)
 
 
@@ -159,6 +174,36 @@ def entry_mismatch(b: dict, entry: dict) -> str:
     return ""
 
 
+def std_mismatch(std: object) -> str:
+    """'' if the run's three standard axioms are exactly the toolchain's pinned ones."""
+    if not isinstance(std, list):
+        return "no standard-axiom report"
+    got = {x.get("name"): x for x in std if isinstance(x, dict)}
+    bad = []
+    for name, (mod, fp) in STD_PINS.items():
+        x = got.get(name)
+        if x is None:
+            bad.append(f"{name} not reported")
+        elif (
+            x.get("axiom") is not True
+            or x.get("module") != mod
+            or sha(x.get("fp")) != fp
+        ):
+            bad.append(
+                f"{name}: axiom={x.get('axiom')} module={x.get('module')} "
+                f"fingerprint={sha(x.get('fp'))} (pinned: axiom, {mod}, {fp})"
+            )
+    return "; ".join(bad)
+
+
+def olean_modules(build_dir: Path) -> set[str]:
+    """Module names of every .olean under a project build directory."""
+    return {
+        ".".join(f.relative_to(build_dir).with_suffix("").parts)
+        for f in build_dir.rglob("*.olean")
+    }
+
+
 def grade_run(d: dict, errors: list[str]) -> tuple[list[dict], int, list[str]] | None:
     """Validate one auditor run; (non-standard entries, declarations, scope) or None."""
     out = Path(d["output"])
@@ -199,6 +244,14 @@ def grade_run(d: dict, errors: list[str]) -> tuple[list[dict], int, list[str]] |
             f"[{tag}] in-scope module(s) absent from Lean's loaded scope: "
             f"{sorted(set(missing) | (set(d['modules']) - set(scope)))}"
         )
+    shadowed, std = r.get("shadowed"), r.get("std")
+    if not isinstance(shadowed, list) or shadowed:
+        errors.append(
+            f"[{tag}] toolchain-rooted module(s) resolved outside the toolchain library: {shadowed}"
+        )
+    std_bad = std_mismatch(std)
+    if std_bad:
+        errors.append(f"[{tag}] standard axioms are not the toolchain's: {std_bad}")
     if unresolved:
         errors.append(
             f"[{tag}] loaded module(s) whose .olean did not resolve: {unresolved}"
@@ -243,6 +296,13 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", required=True)
     ap.add_argument("--json")
+    ap.add_argument(
+        "--build-dir",
+        action="append",
+        default=[],
+        help="project build directory (repeatable): EVERY .olean in it must be in some run's "
+        "Lean scope, or the gate FAILS (Red Team r2 finding 4)",
+    )
     ap.add_argument(
         "--allowlist",
         default=str(DEFAULT_ALLOWLIST),
@@ -334,6 +394,20 @@ def main() -> int:
                         ]
                     )
                 )
+    # COVERAGE FAILS CLOSED (Red Team r2 finding 4): a module that the build produced but no run
+    # audited (e.g. a default `lean_lib` with no `roots :=`, which the Python lakefile parser
+    # does not see) is an error, not a note.
+    for bd in a.build_dir:
+        built = olean_modules(Path(bd))
+        if not built:
+            errors.append(
+                f"build directory {bd} holds no .olean — nothing to check coverage against"
+            )
+        unaudited = sorted(built - audited)
+        if unaudited:
+            errors.append(
+                f"built but NOT audited ({len(unaudited)} module(s) in {bd}): {', '.join(unaudited)}"
+            )
     for e in errors:
         print(f"::error::{e}")
     every = man.get("all_modules", [])

@@ -74,9 +74,7 @@ BRACE_IN_STRING = (
 # Lean checks for `--` / `/-` only at a token boundary, and the symbol-token table is extensible
 # by any import, so a comment opener glued to a symbol character (`//-`, `<--`) may be code to
 # Lean. Banned (0 in all of proofs/ on 2026-11-24) so the lexer never has to guess (PR #829).
-AMBIGUOUS_OPENER = (
-    "comment opener `--`/`/-` glued to a symbol character (put a space before it)"
-)
+AMBIGUOUS_OPENER = "comment opener `--`/`/-` not at a line start or after whitespace (put a space before it)"
 
 
 def scan(lean_dir):

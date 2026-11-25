@@ -33,8 +33,9 @@ them so the simple rules above are exact for every file it accepts):
     so inside a multi-character symbol token the two characters do not open a comment (e.g.
     `//-` can be the token `//` then `-`, and `<--` can be `<-` then `-`). The token table is
     extensible by any import, so `ambiguous_comment_openers` reports every `--` / `/-` that
-    directly follows a symbol character (anything but whitespace, an identifier, a literal or
-    one of `( ) [ ] { } ⟨ ⟩ , ;`) and the checker refuses the file.
+    is not at a clean token boundary (file start, Lean whitespace, or right after a comment)
+    and the checker refuses the file (Red Team r2 finding 5: `(` and U+00A0 can start a token).
+
 
 Provenance: started as a reviewed copy of the lexer in `tools/lean-toolcheck/toolcheck.py`
 (PR #824, Gemini (6) + r2 (c)); PR #829 replaced the character loop with the token walk
@@ -44,10 +45,9 @@ to fix).
 
 from __future__ import annotations
 
-import unicodedata
-
-# Characters after which a `--` / `/-` cannot be inside a multi-character symbol token.
-_SAFE_BEFORE_OPENER = set(" \t\r\n()[]{}⟨⟩,;")
+# Lean's own whitespace (`Lean.Parser.whitespace`): the only characters after which a `--` /
+# `/-` is certainly a comment opener (Red Team r2 finding 5).
+_LEAN_WHITESPACE = set(" \t\r\n")
 _QUOTABLE = set("\\\"'rnt")
 _HEX = set("0123456789abcdefABCDEF")
 
@@ -235,22 +235,22 @@ def brace_in_string(src: str) -> list[int]:
 
 
 def ambiguous_comment_openers(src: str) -> list[int]:
-    """1-based line numbers of comment openers (`--`, `/-`) that directly follow a symbol
-    character, where Lean's longest-match symbol tokens could make them NOT a comment.
+    """1-based line numbers of comment openers (`--`, `/-`) that are NOT at a clean token boundary.
+
+    Lean's `whitespace` function treats `--` / `/-` as a comment only where it is looking for
+    whitespace: at the start of the file, after Lean whitespace (space, tab, CR, LF) or right
+    after another comment. Anywhere else the two characters may continue a SYMBOL TOKEN, and any
+    import (or the file itself) can declare one: `macro "(/-" : term` makes `(/-` code, and so
+    does an atom starting with U+00A0, which is not Lean whitespace (PR #829 Red Team r2
+    finding 5, probes T5/T6). So only those boundaries are exempt; every other opener is
+    reported and the foundations checker refuses the file.
     """
     k = lex(src)
     lines = set()
-    for idx in range(1, len(src)):
-        if k[idx] == "m" and k[idx - 1] != "m" and src[idx : idx + 2] in ("--", "/-"):
-            p = src[idx - 1]
-            if (
-                k[idx - 1] == "s"
-                or p in _SAFE_BEFORE_OPENER
-                or _id_rest(p)
-                or p in "\"'»"
-            ):
-                continue
-            if unicodedata.category(p).startswith("Z"):
-                continue
-            lines.add(src.count("\n", 0, idx) + 1)
+    for idx in range(len(src)):
+        if k[idx] != "m" or src[idx : idx + 2] not in ("--", "/-"):
+            continue
+        if idx == 0 or k[idx - 1] == "m" or src[idx - 1] in _LEAN_WHITESPACE:
+            continue
+        lines.add(src.count("\n", 0, idx) + 1)
     return sorted(lines)

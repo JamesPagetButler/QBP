@@ -4,14 +4,16 @@
 # FAULT-S4-001 + the archive octonionMul `True := by trivial` stub are what this prevents).
 # Policy: inter/lean-proof-best-practices.md Rule 4 + docs/foundations/scope-deliberation-2026-05-31.md.
 #
-# Three jobs:
+# Four jobs:
 #   changes (always runs) — dorny/paths-filter decides whether any Lean-relevant path changed.
 #   foundations-standard (fast, no toolchain; runs when changes.lean == true) — hard-ban native_decide +
 #     `: True := by trivial`; ratchet sorry + vacuous-`: True :=` theorems against
 #     proofs/QBP/Foundations/.lean-gate-baseline.json.
-#   lake-build (heavy; runs when changes.lean == true) — `lake build` must succeed (zero errors) with the
-#     pinned toolchain + Mathlib cache. Required status check on master since 2026-09-21; when skipped
-#     (no Lean path changed) GitHub reports the check as satisfied.
+#   lake-build "lake build (compile)" (heavy; runs when changes.lean == true) — `lake build` with the
+#     pinned toolchain + Mathlib cache; uploads the project's .olean output.
+#   axiom-audit "lake build (zero errors)" — on a FRESH runner, fails unless the compile job succeeded,
+#     then audits every built module (PR #829). This is the required status check on master (the
+#     name required since 2026-09-21); when skipped (no Lean path changed) GitHub reports it satisfied.
 #
 # Same shape as cth-schema-lint.yml (PR #459): workflow + script + fail-on-violation.
 
@@ -95,29 +97,16 @@ jobs:
       - name: Self-test the layer-import gate (adversarial build-invisibility plant)
         run: python3 scripts/test_check_layer_imports.py
 
+
   lake-build:
     needs: changes
     if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.lean == 'true') }}
-    name: lake build (zero errors)
+    # Compiles the project. The REQUIRED check "lake build (zero errors)" is the axiom-audit job
+    # below, which fails unless this job succeeded (PR #829 Red Team r2 finding 1).
+    name: lake build (compile)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # PR #829 Red Team finding 2 (e3): `#eval` in a proof file runs arbitrary IO during
-      # `lake build` and could rewrite the gate scripts or the allowlist in this checkout. Take a
-      # copy of scripts/ BEFORE anything Lean runs and run the gate from that copy only.
-      # Its tree hash goes into a STEP OUTPUT, which the runner fixes when this step ends, so
-      # build-time code cannot alter it; the gate steps re-hash the snapshot and refuse to run
-      # on any difference. Residual limit (stated in the checker docstring): build-time code
-      # runs as the same user, so the toolchain binaries themselves are not pinned.
-      - name: Snapshot the gate scripts before any Lean code runs
-        id: gate
-        run: |
-          set -euo pipefail
-          cp -a scripts "$RUNNER_TEMP/gate"
-          chmod -R a-w "$RUNNER_TEMP/gate"
-          h="$(cd "$RUNNER_TEMP/gate" && find . -type f -not -path '*/__pycache__/*' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
-          echo "tree hash $h"
-          echo "sha=$h" >> "$GITHUB_OUTPUT"
       - name: Install elan (pinned toolchain from proofs/lean-toolchain)
         run: |
           set -euo pipefail
@@ -149,53 +138,115 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
         run: lake build
-      # AXIOM AUDIT (#827 AC2–AC4; replaces the old "#print axioms audit — no-op today" note
-      # from #481). Lean itself enumerates EVERY constant (theorem, def, instance, axiom,
-      # inductive, auxiliary) of every module in the default targets' import closure and
-      # computes its axiom closure; anything outside {propext, Classical.choice, Quot.sound}
-      # — sorryAx, native_decide's native axioms, any user `axiom` — fails this job. Coverage
-      # does not depend on how a file is written (no Python lexer decides WHAT is audited; it
-      # only picks the modules from the lakefile roots). The enumerator is ONE fixed program,
-      # scripts/LeanAxiomAudit.lean, run with LEAN_PATH UNSET so it is elaborated against the
-      # toolchain only; it loads the built modules at run time with `importModules
-      # (loadExts := false)`, as data — no macro, notation, instance or initializer of an audited
-      # module can reach it (PR #829 Gemini r1 finding 1: an in-environment driver was fooled by
-      # an exported `!` macro). Trust: exactly one result line per run, carrying that run's
-      # nonce, root and exact module list (scripts/check_lean_axiom_audit.py). Modules no
-      # default target builds are listed as not covered in the step output.
-      # THE ONLY EXCEPTION (scripts/lean_axiom_allowlist.json, director ruling on #827): the
-      # documented native_decide theorem `hessian_traceSq_1152_universal`
-      # (Sprint12-Inherited/SedenionHessianTraceSq.lean) and its per-call native axiom, owned by
-      # OPEN issue #582 (native-compute attestation). Entries are exact (declaration + exact
-      # axiom names + issue), never wildcards/prefixes/files; any other non-standard axiom fails;
-      # a STALE entry (declaration gone or no longer needing that axiom) fails too, so the entry
-      # must be deleted when #582 lands. TRANSITIVE: the exception covers exactly that name —
-      # any declaration that USES it inherits the native axiom in its own closure and fails.
-      - name: Axiom-audit self-test (planted fixtures, core Lean only)
+      # The project's .olean files are the ONLY thing this job hands to the audit. Nothing else
+      # produced here (no script, no binary, no path) reaches the grading job.
+      - name: Upload the project build output (.olean files) for the audit job
+        uses: actions/upload-artifact@v4
+        with:
+          name: proofs-build-lib
+          path: proofs/.lake/build/lib/lean
+          retention-days: 1
+          if-no-files-found: error
+
+  # AXIOM AUDIT (#827 AC2–AC4; replaces the old "#print axioms audit — no-op today" note from
+  # #481), on a FRESH RUNNER (PR #829 Red Team r2 finding 1). Proof code runs during `lake build`
+  # (`#eval`) and could plant tools on that runner's PATH (a fake `python3` in ~/.elan/bin made
+  # the old in-job gate print PASSED). So the gate runs here instead, and here NO project Lean
+  # code runs:
+  #   * fresh checkout: the gate scripts, the auditor and the allowlist come from the PR's own
+  #     checkout in THIS job, never from the build job;
+  #   * the toolchain is the release tarball named below, verified against its SHA-256, and
+  #     called by absolute path; Python is /usr/bin/python3; no `lake` runs on the project (the
+  #     search path is written from the artifact layout, not from `lake env`);
+  #   * Mathlib comes from its own pinned commit and cache (`lake exe cache get` inside the
+  #     Mathlib checkout runs Mathlib's code, never the project's lakefile);
+  #   * the build job hands over only its .olean output. The .olean data is the one stated
+  #     trust (no kernel re-check here; that is lean4checker's job).
+  # The pins below must equal proofs/lean-toolchain and the lakefile's Mathlib pin (checked).
+  # Lean enumerates EVERY constant of every project module the default roots really load and
+  # computes its exact axiom closure; anything outside the toolchain's {propext,
+  # Classical.choice, Quot.sound} fails. EVERY .olean of the build output must be audited, or
+  # the job fails. THE ONLY EXCEPTION: scripts/lean_axiom_allowlist.json (issue #582, two
+  # identity-pinned entries; any dependent fails — the gate is transitive).
+  axiom-audit:
+    needs: [changes, lake-build]
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.lean == 'true') }}
+    # The required status check on master (since 2026-09-21) is named "lake build (zero errors)".
+    # This job carries that name and fails unless the compile job succeeded, so the required
+    # check now means: the project builds AND its axiom audit passes.
+    name: lake build (zero errors)
+    runs-on: ubuntu-latest
+    env:
+      LEAN_RELEASE: v4.30.0
+      LEAN_TARBALL_SHA256: 4dad74141c2c119ca1aa626656be83b8e14238afba97271fd7bf1eb3f081b319
+      MATHLIB_REV: c5ea00351c28e24afc9f0f84379aa41082b1188f
+    steps:
+      - name: The compile job must have succeeded
+        run: |
+          if [ "${{ needs.lake-build.result }}" != "success" ]; then
+            echo "::error::lake build (compile) did not succeed (${{ needs.lake-build.result }})"; exit 1
+          fi
+      - uses: actions/checkout@v4
+      - name: The workflow's pins equal the PR's toolchain and Mathlib pins
         run: |
           set -euo pipefail
-          h="$(cd "$RUNNER_TEMP/gate" && find . -type f -not -path '*/__pycache__/*' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
-          if [ "$h" != "${{ steps.gate.outputs.sha }}" ]; then echo "::error::gate snapshot changed during the build"; exit 1; fi
-          python3 "$RUNNER_TEMP/gate/test_lean_axiom_audit.py"
-      - name: Axiom audit (Lean enumerates every declaration of every built module)
+          tc="$(/usr/bin/cat proofs/lean-toolchain)"
+          [ "$tc" = "leanprover/lean4:$LEAN_RELEASE" ] || { echo "::error::proofs/lean-toolchain is '$tc', the audit job pins $LEAN_RELEASE — update both"; exit 1; }
+          n="$(/usr/bin/grep -c "mathlib4.git\" @ \"$MATHLIB_REV\"" proofs/lakefile.lean || true)"
+          [ "$n" = "1" ] || { echo "::error::proofs/lakefile.lean does not pin Mathlib to $MATHLIB_REV — update both"; exit 1; }
+      - name: Install the pinned Lean release (SHA-256 verified)
+        run: |
+          set -euo pipefail
+          v="${LEAN_RELEASE#v}"
+          cd "$RUNNER_TEMP"
+          /usr/bin/curl -sSfL -o lean.tar.zst \
+            "https://github.com/leanprover/lean4/releases/download/$LEAN_RELEASE/lean-$v-linux.tar.zst"
+          echo "$LEAN_TARBALL_SHA256  lean.tar.zst" | /usr/bin/sha256sum -c -
+          /usr/bin/tar --use-compress-program=/usr/bin/zstd -xf lean.tar.zst
+          tcd="$RUNNER_TEMP/lean-$v-linux"
+          "$tcd/bin/lean" --version
+          echo "TC=$tcd" >> "$GITHUB_ENV"
+      - name: Mathlib at its pinned commit, with its own cache (no project code)
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          m="$RUNNER_TEMP/mathlib"
+          /usr/bin/git init -q "$m"
+          /usr/bin/git -C "$m" fetch -q --depth 1 https://github.com/leanprover-community/mathlib4.git "$MATHLIB_REV"
+          /usr/bin/git -C "$m" checkout -q FETCH_HEAD
+          [ "$(/usr/bin/git -C "$m" rev-parse HEAD)" = "$MATHLIB_REV" ]
+          cd "$m" && PATH="$TC/bin:/usr/bin:/bin" "$TC/bin/lake" exe cache get
+          echo "MATHLIB=$m" >> "$GITHUB_ENV"
+      - name: Download the project build output (.olean files only)
+        uses: actions/download-artifact@v4
+        with:
+          name: proofs-build-lib
+          path: ${{ runner.temp }}/proj-lib
+      - name: Axiom-audit self-test (planted fixtures, core Lean only)
+        run: |
+          set -euo pipefail
+          PATH="$TC/bin:/usr/bin:/bin" /usr/bin/python3 -I scripts/test_lean_axiom_audit.py --lean "$TC/bin/lean"
+      - name: Axiom audit (Lean enumerates every declaration of every built module)
+        run: |
+          set -euo pipefail
           out="$RUNNER_TEMP/axiom-audit"
-          gate="$RUNNER_TEMP/gate"   # the pre-build snapshot, never the (build-writable) checkout
-          h="$(cd "$RUNNER_TEMP/gate" && find . -type f -not -path '*/__pycache__/*' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
-          if [ "$h" != "${{ steps.gate.outputs.sha }}" ]; then echo "::error::gate snapshot changed during the build"; exit 1; fi
-          auditor="$gate/LeanAxiomAudit.lean"
-          python3 "$gate/gen_lean_axiom_audit.py" --proofs proofs --out-dir "$out" --allowlist "$gate/lean_axiom_allowlist.json"
-          lp="$(cd proofs && lake env printenv LEAN_PATH)"
+          proj="$RUNNER_TEMP/proj-lib"
+          # The search path, written from the artifact layout (the auditor puts the toolchain
+          # library FIRST): project output, Mathlib, Mathlib's dependencies.
+          lp="$proj:$MATHLIB/.lake/build/lib/lean"
+          for d in "$MATHLIB"/.lake/packages/*/.lake/build/lib/lean; do lp="$lp:$d"; done
+          /usr/bin/python3 -I scripts/gen_lean_axiom_audit.py --proofs proofs --out-dir "$out" \
+            --project-dir "$proj" --allowlist scripts/lean_axiom_allowlist.json
           for a in "$out"/AxiomAudit_*.args; do
             mapfile -t args < "$a"
             # LEAN_PATH unset: the auditor's own `import Lean` resolves to the toolchain only.
             # A failed run leaves no result line; the checker decides (fail-closed).
-            (cd proofs && env -u LEAN_PATH QBP_AUDIT_LEAN_PATH="$lp" \
-              lean --run "$auditor" "${args[@]}" > "${a%.args}.out" 2> "${a%.args}.stderr") || true
-            tail -c 2000 "${a%.args}.stderr" || true
+            (cd "$RUNNER_TEMP" && /usr/bin/env -u LEAN_PATH QBP_AUDIT_LEAN_PATH="$lp" \
+              "$TC/bin/lean" --run "$GITHUB_WORKSPACE/scripts/LeanAxiomAudit.lean" "${args[@]}" \
+              > "${a%.args}.out" 2> "${a%.args}.stderr") || true
+            /usr/bin/tail -c 2000 "${a%.args}.stderr" || true
           done
-          python3 "$gate/check_lean_axiom_audit.py" --manifest "$out/manifest.json" --allowlist "$gate/lean_axiom_allowlist.json"
+          /usr/bin/python3 -I scripts/check_lean_axiom_audit.py --manifest "$out/manifest.json" \
+            --allowlist scripts/lean_axiom_allowlist.json --build-dir "$proj"

@@ -77,6 +77,7 @@ FIXTURES = (
     "ScopeA",
     "ScopeHidden",
     "ScopeRoot",
+    "PreludeProp",
 )
 # The ORACLE is Lean's own in-file `collectAxioms` (what `#print axioms` uses), run at the END
 # of a copy of the fixture, on the module's own constants (`map₂`). It is NOT computed through an
@@ -135,20 +136,23 @@ class Harness:
         assert r.returncode == 0, r.stderr
         return drv, al
 
-    def run_auditor(self, drv: Path) -> None:
+    def run_auditor(self, drv: Path, lean_path: str | None = None) -> None:
         for f in sorted(drv.glob("AxiomAudit_*.args")):
             args = f.read_text(encoding="utf-8").splitlines()
             # As in CI: LEAN_PATH unset (the auditor is elaborated against the toolchain only),
             # the project's search path handed over in QBP_AUDIT_LEAN_PATH.
             aenv = {k: v for k, v in self.env.items() if k != "LEAN_PATH"}
-            aenv["QBP_AUDIT_LEAN_PATH"] = self.env["LEAN_PATH"]
+            aenv["QBP_AUDIT_LEAN_PATH"] = lean_path or self.env["LEAN_PATH"]
             out = run(
                 [self.lean, "--run", str(HERE / "LeanAxiomAudit.lean"), *args], env=aenv
             )
             f.with_suffix(".out").write_text(out.stdout)
 
-    def check(self, drv: Path, al: str) -> tuple[int, dict, str]:
+    def check(
+        self, drv: Path, al: str, build_dirs: list[str] | None = None
+    ) -> tuple[int, dict, str]:
         rj = drv / "result.json"
+        extra = [x for bd in (build_dirs or []) for x in ("--build-dir", bd)]
         c = run(
             [
                 sys.executable,
@@ -160,16 +164,21 @@ class Harness:
                 str(rj),
                 "--allowlist",
                 al,
+                *extra,
             ]
         )
         return c.returncode, json.loads(rj.read_text()), c.stdout
 
     def audit(
-        self, mod: str, allowlist: list[dict] | None = None
+        self,
+        mod: str | list[str],
+        allowlist: list[dict] | None = None,
+        lean_path: str | None = None,
+        build_dirs: list[str] | None = None,
     ) -> tuple[int, dict, str]:
-        drv, al = self.gen([mod], allowlist)
-        self.run_auditor(drv)
-        return self.check(drv, al)
+        drv, al = self.gen([mod] if isinstance(mod, str) else mod, allowlist)
+        self.run_auditor(drv, lean_path)
+        return self.check(drv, al, build_dirs)
 
     def pins(self, mod: str, names: list[str]) -> list[dict]:
         """Genuine pinned entries for `names` in `mod` (read back from a first audit run)."""
@@ -343,6 +352,64 @@ def main() -> int:
                 out,
             )
 
+        # Red Team r2 finding 2 (T2): an empty `prelude` module named `Init` placed FIRST on the
+        # project search path. The toolchain library comes first, so the real `Init` is used and
+        # Bad still fails naming exactly its planted declarations, with no other error.
+        fake_src = work / "fakeinit-src"
+        fake_src.mkdir()
+        (fake_src / "Init.lean").write_text("prelude\n", encoding="utf-8")
+        fake = work / "fakeinit"
+        fake.mkdir()
+        r = run(
+            [
+                a.lean,
+                f"--root={fake_src}",
+                "-o",
+                str(fake / "Init.olean"),
+                str(fake_src / "Init.lean"),
+            ],
+            env=env,
+        )
+        report(r.returncode == 0, "fake `Init` module compiles", r.stdout + r.stderr)
+        rc, res, out = h.audit("AuditFixture.Bad", lean_path=f"{fake}:{work / 'build'}")
+        report(
+            rc == 1 and found(res) == EXPECT_BAD and not res["errors"],
+            f"a fake `Init` first on the project path cannot hide sorryAx (exit {rc}): {len(found(res))} decls",
+            out,
+        )
+
+        # Red Team r2 finding 3 (T3): a `prelude` module declaring its own `axiom propext : False`.
+        # The name `propext` must denote the toolchain's axiom (Init.Core, pinned fingerprint).
+        rc, res, out = h.audit("AuditFixture.PreludeProp")
+        report(
+            rc == 1 and not res["non_standard"] and len(res["errors"]) == 1,
+            f"a same-named `propext` from a prelude module fails the standard-axiom pins (exit {rc})",
+            out,
+        )
+
+        # Red Team r2 finding 4 (T4): coverage fails CLOSED against the build directory. A build
+        # directory holding Clean and ScopeA, audited for Clean only, must FAIL (ScopeA built but
+        # not audited); audited for both, it passes.
+        cov = work / "cov" / "AuditFixture"
+        cov.mkdir(parents=True)
+        for m in ("Clean", "ScopeA"):
+            shutil.copy(build / f"{m}.olean", cov / f"{m}.olean")
+        bd = [str(work / "cov")]
+        rc, res, out = h.audit("AuditFixture.Clean", build_dirs=bd)
+        report(
+            rc == 1 and not res["non_standard"] and len(res["errors"]) == 1,
+            f"a built module that no run audits fails coverage (exit {rc})",
+            out,
+        )
+        rc, res, out = h.audit(
+            ["AuditFixture.Clean", "AuditFixture.ScopeA"], build_dirs=bd
+        )
+        report(
+            rc == 0 and not res["errors"],
+            f"every built module audited: coverage passes (exit {rc})",
+            out,
+        )
+
         # Red Team 4: two imports on one line — Lean's scope includes the hidden module.
         rc, res, out = h.audit("AuditFixture.ScopeRoot")
         report(
@@ -515,7 +582,10 @@ def main() -> int:
         d0 = json.loads((bad_drv / "manifest.json").read_text())["drivers"][0]
         outp = Path(d0["output"])
         real = outp.read_text()
+        real_res = json.loads(real.strip().splitlines()[-1])
         clean = {
+            "shadowed": [],
+            "std": real_res["std"],
             "mark": "AXIOM-AUDIT-827",
             "nonce": d0["nonce"],
             "root": d0["label"],
@@ -554,6 +624,50 @@ def main() -> int:
             (
                 "a malformed non-standard entry",
                 json.dumps(dict(clean, nonstd=[{"decl": 5}])),
+            ),
+            (
+                "a result with a shadowed toolchain module",
+                json.dumps(dict(clean, shadowed=["Init"])),
+            ),
+            (
+                "a result whose propext comes from another module",
+                json.dumps(
+                    dict(
+                        clean,
+                        std=[
+                            dict(x, module="Evil") if x["name"] == "propext" else x
+                            for x in real_res["std"]
+                        ],
+                    )
+                ),
+            ),
+            (
+                "a result whose propext has another statement (fingerprint)",
+                json.dumps(
+                    dict(
+                        clean,
+                        std=[
+                            (
+                                dict(x, fp=x["fp"] + " forged")
+                                if x["name"] == "propext"
+                                else x
+                            )
+                            for x in real_res["std"]
+                        ],
+                    )
+                ),
+            ),
+            (
+                "a result whose propext is not an axiom",
+                json.dumps(
+                    dict(
+                        clean,
+                        std=[
+                            dict(x, axiom=False) if x["name"] == "propext" else x
+                            for x in real_res["std"]
+                        ],
+                    )
+                ),
             ),
         ]
         for what, text in forged:

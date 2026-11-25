@@ -126,7 +126,7 @@ def run_src(src: str) -> tuple[int, dict, dict]:
 
 FIXTURES = HERE / "lean_lexer_fixtures" / "LexFix"
 VAC = "vacuous-`: True :=` theorem"
-AMB = "comment opener `--`/`/-` glued to a symbol character (put a space before it)"
+AMB = "comment opener `--`/`/-` not at a line start or after whitespace (put a space before it)"
 # PR #829 Gemini r1 findings 2/3 (+ the same desync class). Each file is real Lean (the Lean-side
 # self-test `test_lean_axiom_audit.py` compiles it and checks that Lean sees `vac` as a
 # declaration). Expected = (exit code, the EXACT non-zero hard-ban counts, the EXACT ratchet
@@ -141,6 +141,10 @@ LEXER_FIXTURES = [
     # The lexer cannot know Lean's token table: `//-` is refused outright (and `vac` is not
     # counted, because to the lexer it IS inside the comment — the refusal is what fails it).
     ("Ambig.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
+    # Red Team r2 finding 5 (T5, T6): a token may START with `(` or U+00A0 — only Lean
+    # whitespace and line starts are clean boundaries.
+    ("GluedParen.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
+    ("GluedNbsp.lean", 1, {AMB: 1}, {VAC: 0, "sorry": 0}),
     ("LegitRaw.lean", 0, {}, {VAC: 0, "sorry": 0}),
 ]
 

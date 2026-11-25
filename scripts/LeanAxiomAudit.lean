@@ -15,7 +15,12 @@ imported into this file: `main` loads them at RUN time with `Lean.importModules`
     `enableInitializersExecution`, which this program never calls — so an imported module cannot
     print a forged result or `IO.Process.exit 0` (Red Team 2). Nothing printed after the import is
     parsed by anyone: the ONE result line is written by this program at the end;
-  * this program's own `import Lean` resolves only against the toolchain (`LEAN_PATH` unset).
+  * this program's own `import Lean` resolves only against the toolchain (`LEAN_PATH` unset),
+    and at run time the toolchain library comes FIRST on the search path, so no project module can
+    stand in for `Init`/`Std`/`Lean`/`Lake` (`shadowed` reports any that resolved elsewhere);
+  * the result reports what the names `propext`, `Classical.choice`, `Quot.sound` denote in the
+    loaded environment (kind, module, fingerprint), so the checker can verify they are the
+    toolchain's own axioms, not same-named project ones (Red Team r2 finding 3).
 
 SCOPE COMES FROM LEAN (Red Team 4). The audited modules are every module in the loaded
 environment (`env.header.moduleNames`, i.e. everything the root really imports, however its
@@ -35,8 +40,9 @@ and body/constructors), plus the names of the non-project constants it reaches. 
 SHA-256s it and compares it with the allowlist entry's pin.
 
 usage: env -u LEAN_PATH QBP_AUDIT_LEAN_PATH=<sp> lean --run LeanAxiomAudit.lean NONCE LABEL ITEM...
-  <sp>   the project's search path (`lake env printenv LEAN_PATH`), ':'-separated; the
-         library of the toolchain running this program is appended after it
+  <sp>   the project's search path, ':'-separated (in CI: the project build output and the
+         pinned Mathlib cache, written from the artifact layout). The library of the toolchain
+         running this program is put FIRST, before it (Red Team r2 finding 2)
   ITEM   `i:Mod` import Mod · `t:Mod` Mod must be in scope (cross-check) ·
          `p:DIR` a project build directory (scope) · `a:Name` allowlisted name (fingerprint it)
 Output: exactly one JSON line on stdout:
@@ -119,8 +125,13 @@ def qbpAuditAxiomsOf (env : Environment) (roots : Array Name) : Std.HashMap Name
           low := low.insert p.n (Nat.min (low.getD p.n 0) ln)
   return memo
 
+def qbpStdList : List Name := [``propext, ``Classical.choice, ``Quot.sound]
+
 def qbpStd : NameSet :=
   (({} : NameSet).insert ``propext).insert ``Classical.choice |>.insert ``Quot.sound
+
+/-- Module-name roots owned by the toolchain. -/
+def qbpReservedRoots : List Name := [`Init, `Std, `Lean, `Lake]
 
 /-- Canonical serialisation of an expression (binder names dropped; everything else kept). -/
 partial def qbpSer (e : Expr) : String :=
@@ -172,8 +183,13 @@ def main (args : List String) : IO UInt32 := do
     | IO.eprintln "usage: LeanAxiomAudit NONCE LABEL ITEM..."; return 2
   let some sp ← IO.getEnv "QBP_AUDIT_LEAN_PATH"
     | IO.eprintln "QBP_AUDIT_LEAN_PATH is not set"; return 2
-  -- Project paths first (as `lake env` orders them), then THIS binary's own toolchain library.
-  searchPathRef.set (System.SearchPath.parse sp ++ [← getLibDir (← getBuildDir)])
+  -- TOOLCHAIN LIBRARY FIRST (PR #829 Red Team r2 finding 2): a project directory earlier on the
+  -- path could otherwise supply its own `Init` (an empty `prelude` module) and make `sorryAx`
+  -- vanish. With the toolchain first, every `Init`/`Std`/`Lean`/`Lake` module resolves to the
+  -- toolchain of the binary running this program; the `shadowed` check below verifies that.
+  let tcLib ← getLibDir (← getBuildDir)
+  let tcDir := (← IO.FS.realPath tcLib).toString ++ "/"
+  searchPathRef.set ([tcLib] ++ System.SearchPath.parse sp)
   let mut imports : Array Import := #[]
   let mut targets : Array Name := #[]
   let mut projDirs : Array String := #[]
@@ -194,11 +210,15 @@ def main (args : List String) : IO UInt32 := do
   let mut scopeIdx : Std.HashSet Nat := {}
   let mut scope : Array Name := #[]
   let mut unresolved : Array Name := #[]
+  let mut shadowed : Array Name := #[]
   for h : k in [0:modNames.size] do
     let m := modNames[k]
     let path : Option String ←
       try pure (some (← IO.FS.realPath (← findOLean m)).toString) catch _ => pure none
     let some path := path | unresolved := unresolved.push m; continue
+    -- A toolchain-rooted module must come from the toolchain library, never from elsewhere.
+    if qbpReservedRoots.contains m.getRoot && !path.startsWith tcDir then
+      shadowed := shadowed.push m
     if projDirs.any (fun d => path.startsWith d) then
       scopeIdx := scopeIdx.insert k
       scope := scope.push m
@@ -229,11 +249,24 @@ def main (args : List String) : IO UInt32 := do
       ("axioms", Json.arr axJ)]
     bad := bad.push (Json.mkObj
       (if pinned then base ++ [("fp", Json.str (qbpFingerprint env inProject n))] else base))
+  -- STANDARD AXIOM IDENTITY (Red Team r2 finding 3): the three standard axioms are matched by
+  -- name in the filter above, so report what those names ARE in this environment — kind,
+  -- module and fingerprint — for the checker to compare with the toolchain's pins. A `prelude`
+  -- module declaring its own `axiom propext : False` is caught here.
+  let stdJ := qbpStdList.toArray.map fun a =>
+    match env.find? a with
+    | some ci => Json.mkObj [("name", Json.str (toString a)), ("module", Json.str (modOf a)),
+        ("axiom", Json.bool (ci matches .axiomInfo _)),
+        ("fp", Json.str (qbpFingerprint env inProject a))]
+    | none => Json.mkObj [("name", Json.str (toString a)), ("module", Json.str ""),
+        ("axiom", Json.bool false), ("fp", Json.str "")]
   let out := Json.mkObj [
     ("mark", "AXIOM-AUDIT-827"), ("nonce", nonce), ("root", label),
     ("scope", Json.arr (scope.map (fun t => Json.str (toString t)))),
     ("missing", Json.arr (missing.map (fun t => Json.str (toString t)))),
     ("unresolved", Json.arr (unresolved.map (fun t => Json.str (toString t)))),
+    ("shadowed", Json.arr (shadowed.map (fun t => Json.str (toString t)))),
+    ("std", Json.arr stdJ),
     ("declarations", inScope.size), ("nonstd", Json.arr bad)]
   IO.println out.compress
   return 0
