@@ -35,7 +35,7 @@ or `initialize` block of an audited module can change what it computes or prints
     run instead of counting as axiom-free (Red Team r3), so an inconsistent .olean set (a module
     replaced by a compile that lacks a constant its dependents use) cannot pass silently.
 KNOWN LIMIT, STATED PRECISELY (Red Team r3 finding S1, "olean substitution"; closure pending a
-beekeeper threat-model ruling, tracked in the issue linked from PR #829): the gate audits the
+beekeeper threat-model ruling, tracked in issue #836): the gate audits the
 .olean files the compile job hands over, NOT the sources. Code that runs at build time in any
 audited module (`#eval`, `run_cmd`, `run_elab`, `run_meta`, an elaborator or `initialize`) can
 replace another module's .olean with a VALID compile of different source (e.g. a clean version
