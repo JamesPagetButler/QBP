@@ -509,7 +509,7 @@ def main() -> int:
         sub = work / "subst-src" / "AuditFixture"
         sub.mkdir(parents=True)
         (sub / "DangleA.lean").write_text(
-            "namespace AuditFixture.DangleA\ntheorem other : True := trivial\nend AuditFixture.DangleA\n",
+            "namespace AuditFixture.DangleA\ntheorem other : (1 : Nat) = 1 := rfl\nend AuditFixture.DangleA\n",
             encoding="utf-8",
         )
         r = run(
