@@ -139,7 +139,9 @@ def test_never_edits_anything():
     src = open(SCRIPT, encoding="utf-8").read()
     assert "gh pr edit" not in src and "gh api" not in src
     # two reads only (#835 added the changed-file list); no write mode anywhere
-    assert src.count("open(") == 2, src.count("open(")
+    # three reads only (body, changed-file list, workflow files for the R2 lane
+    # derivation); no write mode anywhere
+    assert src.count("open(") == 3, src.count("open(")
     assert "open(args.body_file" in src and "open(args.changed_file" in src
     assert '"w"' not in src and "'w'" not in src
 
@@ -393,6 +395,132 @@ def test_tier3_gate_sees_both_sides_of_a_rename():
     assert (
         "git diff --name-only --no-renames" in wf
     ), "tier-3 gate must list rename sources"
+
+
+# ---- round 3 (delta Red Team at eaaaa86, PR #838)
+
+PR828_BODY = (
+    "## Follow-ups (not forced, not done here)\n\n- x\n\n## Review / merge\n\n"
+    "- [ ] Security check (Thompson via deming) PASS\n"
+    "- [x] Red Team review — APPROVE\n- [x] Gemini review (real API)\n"
+    "- [ ] Human Visual Review (beekeeper)\n- [ ] merge authorized\n\n---\n*Tier 2*\n"
+)
+PR828_LABELS = ["housekeeping", "tier-2-review", "tier-3-review", "review-ready"]
+PR828_FILES = [f"proofs/QBP/File{i}.lean" for i in range(16)]
+
+
+def test_r1_pr828_shape_no_region_on_theory_pr_is_red():
+    r = _scoped(PR828_BODY, PR828_LABELS, PR828_FILES)
+    assert (
+        r.returncode == 1 and "no §2.2 region on a theory / merge-lane PR" in r.stdout
+    )
+    # empty body, no labels, theory paths: still red
+    assert _scoped("", [], PR828_FILES).returncode == 1
+
+
+def test_r1_no_region_on_lane_pr_is_red():
+    assert _scoped(ABSENT, ["housekeeping"], ["CONTRIBUTING.md"]).returncode == 1
+
+
+def test_r1_no_region_elsewhere_stays_warn_only():
+    for labels, changed in ((["tier-2-review"], ["src/x.py"]), (HK, ["docs/x.md"])):
+        r = _scoped(ABSENT, labels, changed)
+        assert r.returncode == 0 and "::warning::" in r.stdout, (labels, r.stdout)
+    # unscoped (no inputs) keeps the #781 policy too
+    assert run(ABSENT).returncode == 0
+
+
+R2_FILES = (
+    "scripts/notifier_review_state.py",
+    ".github/workflows/pr-process-lints.yml",
+    "scripts/check_pr_prose_claims.py",
+    "scripts/check_notifier_workflow_list.py",
+    ".github/workflows/closing-ac-guard.yml",
+    ".github/workflows/reopen-falsely-closed.yml",
+)
+# the hand list as of round 2 + the six R2 names: the structural set must cover it
+HAND_LIST = (
+    "CONTRIBUTING.md",
+    "docs/workflows/review_tiers.md",
+    ".github/PULL_REQUEST_TEMPLATE/tier-2.md",
+    ".github/CODEOWNERS",
+    "CODEOWNERS",
+    "docs/CODEOWNERS",
+    ".github/workflows/merge-blocking-boxes.yml",
+    ".github/workflows/tier-3-review-gate.yml",
+    ".github/workflows/pr-check-status.yml",
+    "scripts/merge_blocking_check.py",
+    "scripts/pr_merge_blocking_boxes.py",
+    "scripts/merge_blocking_verdict_source.py",
+    "scripts/check_tier3_label.py",
+    "scripts/pr_box_evidence.py",
+) + R2_FILES
+
+
+def test_r2_missing_gate_files_are_lane():
+    for path in R2_FILES:
+        r = _scoped(HVR_NILD, ["housekeeping"], [path])
+        assert r.returncode == 1 and "merge-lane" in r.stdout, (path, r.stdout)
+
+
+def test_r2_structural_set_covers_the_hand_list():
+    for path in HAND_LIST:
+        assert c.touches_lane([path]), path
+    derived = c.workflow_scripts()
+    assert derived is not None and len(derived) > 20, derived
+    for path in HAND_LIST:
+        if path.startswith("scripts/"):
+            assert path in derived, f"{path} not derived from any workflow"
+
+
+def test_r2_any_github_file_and_any_codeowners_is_lane():
+    for path in (
+        ".github/ISSUE_TEMPLATE/bug.md",
+        ".github/dependabot.yml",
+        "sub/CODEOWNERS",
+    ):
+        assert c.touches_lane([path]), path
+    # a script no workflow references stays housekeeping
+    assert not c.touches_lane(["scripts/some_unreferenced_helper.py"])
+
+
+def test_r2_derivation_fails_closed_without_workflows():
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as d:
+        assert c.workflow_scripts(d) is None
+        assert c.touches_lane(["scripts/some_unreferenced_helper.py"], root=d)
+        assert not c.touches_lane(["docs/x.md"], root=d)
+        os.makedirs(os.path.join(d, ".github", "workflows"))
+        # a workflow dir with no readable workflow file is "cannot derive", not "empty"
+        assert c.workflow_scripts(d) is None
+        assert c.touches_lane(["scripts/some_unreferenced_helper.py"], root=d)
+        with open(os.path.join(d, ".github", "workflows", "a.yml"), "w") as fh:
+            fh.write('run: python3 "$SRC_DIR/scripts/gate_x.py"\n')
+        assert c.workflow_scripts(d) == {"scripts/gate_x.py"}
+        assert c.touches_lane(["scripts/gate_x.py"], root=d)
+        assert not c.touches_lane(["scripts/other.py"], root=d)
+
+
+def test_r3_n12_merge_blocking_box_is_not_merge_authorized():
+    body = (
+        NO_BK_BOXES
+        + "- [x] Human Visual Review (beekeeper)\n- [x] Merge-blocking boxes green\n"
+    )
+    r = _scoped(body, ["tier-2-review"], ["src/x.py"])
+    assert (
+        r.returncode == 1 and "Merge authorized (beekeeper; QBP lane)" in r.stdout
+    ), r.stdout
+
+
+def test_r3_m4f_n9_nil_variants():
+    for box in ("Merge approval", "Human_Visual_Review"):
+        body = BK_TICKED + f"- [ ] ~~{box}~~ ⊘ pure housekeeping\n"
+        r = _scoped(body, ["tier-2-review"], ["src/x.py"])
+        assert r.returncode == 1 and "⊘-nil'd beekeeper box" in r.stdout, (
+            box,
+            r.stdout,
+        )
 
 
 # ---- verdict source: the judge is the BASE copy, never the PR head (arch §I4, PR #780)

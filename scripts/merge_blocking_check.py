@@ -34,12 +34,17 @@ issuecomment-7147354671).  Active when the workflow passes `--labels` and
                       or the `tier-3-review` label.  Paths decide; the label can
                       only ADD theory status, never remove it (a GITHUB_TOKEN
                       label does not re-trigger this job — F2 on PR #838).
-  merge-lane file   = LANE_PATHS: the box/tier/label gates, their workflows, the
-                      PR templates, CONTRIBUTING.md, review_tiers.md, CODEOWNERS.
-                      Those PRs stay the beekeeper's (CLAUDE.md delegation rule).
+  merge-lane file   = CONTRIBUTING.md, review_tiers.md, anything under .github/,
+                      any CODEOWNERS, and every scripts/ path a workflow references
+                      (derived from the judging copy's workflows).  Those PRs stay
+                      the beekeeper's (CLAUDE.md delegation rule).
 
+  0. Scope inputs supplied, theory-bearing or merge-lane PR, and NO §2.2 region
+     → exit 1 (the no-region warn-only policy, #781, stays for every other PR).
   1. A ⊘-nil'd beekeeper box (HVR / merge authorized / beekeeper, matched after
-     NFKC + zero-width removal) on a PR that is not pure housekeeping → exit 1.
+     NFKC + zero-width + markdown removal) on a PR that is not pure housekeeping
+     → exit 1.  The match is a first line only: cross-script lookalikes and
+     spaced letters evade it, and rule 2 backstops them.
   2. Positive requirement: on a PR with a §2.2 region that is neither pure
      housekeeping nor plain Tier 1 (`tier-1-review` label, no theory, no lane
      file), the region must hold a TICKED Human Visual Review box AND a TICKED
@@ -66,7 +71,9 @@ from pr_merge_blocking_boxes import parse  # noqa: E402
 # markdown emphasis + strike markers dropped, case-folded.
 _ZW_RE = re.compile("[\u00ad\u200b-\u200f\u2060\ufeff]")
 _MD_RE = re.compile(r"[~*_`]")
-# A NIL'd box naming the beekeeper's sign-off in any spelling (wide on purpose).
+# A NIL'd box naming the beekeeper's sign-off (wide on purpose, but NOT every
+# spelling: cross-script lookalikes (Cyrillic/Greek) and spaced letters evade it;
+# rule 2's positive requirement is the backstop — the canonical box is then missing).
 BEEKEEPER_NIL_RE = re.compile(
     r"visual\W*review|beekeeper|\bh\W?v\W?r|merge\W*authori[sz]|merge\W*approv"
 )
@@ -90,25 +97,45 @@ THEORY_PATHS = (
     "archive/cth-inventory/",
 )
 THEORY_LABEL = "tier-3-review"
-# Merge-lane / governance machinery (F4 on PR #838): a PR touching any of these is
-# never pure housekeeping — the beekeeper merges it (CLAUDE.md: "A PR that changes
-# this delegation or any seat's merge lane is merged by the beekeeper").
+# Merge-lane / governance machinery (F4 on PR #838, made structural in R2): a PR
+# touching any of these is never pure housekeeping — the beekeeper merges it
+# (CLAUDE.md: "A PR that changes this delegation or any seat's merge lane is
+# merged by the beekeeper").  Three parts:
+#   1. LANE_PATHS: the tier/lane docs and everything under `.github/` (every
+#      workflow, PR/issue template and repo config);
+#   2. any file named CODEOWNERS, wherever it sits;
+#   3. every `scripts/…` path that any workflow file references (derived at run
+#      time from the JUDGING copy's `.github/workflows/`, so a gate script
+#      cannot be left off by hand).  If no workflow file can be read, every
+#      `scripts/` path counts as lane (fail closed).
 LANE_PATHS = (
     "CONTRIBUTING.md",
     "docs/workflows/review_tiers.md",
-    ".github/PULL_REQUEST_TEMPLATE/",
-    ".github/CODEOWNERS",
-    "CODEOWNERS",
-    "docs/CODEOWNERS",
-    ".github/workflows/merge-blocking-boxes.yml",
-    ".github/workflows/tier-3-review-gate.yml",
-    ".github/workflows/pr-check-status.yml",
-    "scripts/merge_blocking_check.py",
-    "scripts/pr_merge_blocking_boxes.py",
-    "scripts/merge_blocking_verdict_source.py",
-    "scripts/check_tier3_label.py",
-    "scripts/pr_box_evidence.py",
+    ".github/",
 )
+REPO_ROOT = os.path.dirname(HERE)
+_WF_SCRIPT_RE = re.compile(r"(?<![\w.-])scripts/[A-Za-z0-9_./-]*[A-Za-z0-9_]")
+
+
+def workflow_scripts(root: str = REPO_ROOT):
+    """Return the set of `scripts/…` paths referenced by any workflow, or None
+    when no workflow file is readable (callers then fail closed)."""
+    wf_dir = os.path.join(root, ".github", "workflows")
+    try:
+        names = sorted(os.listdir(wf_dir))
+    except OSError:
+        return None
+    found, read_any = set(), False
+    for n in names:
+        if not n.endswith((".yml", ".yaml")):
+            continue
+        try:
+            with open(os.path.join(wf_dir, n), encoding="utf-8") as fh:
+                found.update(_WF_SCRIPT_RE.findall(fh.read()))
+            read_any = True
+        except OSError:
+            continue
+    return found if read_any else None
 
 
 def _norm(text: str) -> str:
@@ -128,12 +155,18 @@ def is_theory_bearing(labels, changed) -> bool:
     return any(p.startswith(THEORY_PATHS) for p in changed)
 
 
-def touches_lane(changed) -> bool:
-    return any(
-        p == lp or (lp.endswith("/") and p.startswith(lp))
-        for p in changed
-        for lp in LANE_PATHS
-    )
+def touches_lane(changed, root: str = REPO_ROOT) -> bool:
+    derived = workflow_scripts(root)
+    for p in changed:
+        if any(p == lp or (lp.endswith("/") and p.startswith(lp)) for lp in LANE_PATHS):
+            return True
+        if os.path.basename(p) == "CODEOWNERS":
+            return True
+        if derived is None and p.startswith("scripts/"):
+            return True
+        if derived is not None and p in derived:
+            return True
+    return False
 
 
 def pure_housekeeping(labels, changed) -> bool:
@@ -215,6 +248,21 @@ def check(body: str, absent_blocks: bool = False, labels=None, changed=None) -> 
         f"unticked={n_un} ticked={n_t} nil={n_nil} region={res['region']} "
         f"evidence={n_ev}"
     )
+    scoped = labels is not None and changed is not None
+    if (
+        res["region"] == "absent"
+        and scoped
+        and (is_theory_bearing(labels, changed) or touches_lane(changed))
+    ):
+        # R1 on PR #838: deleting the region must not switch the #835 rules off.
+        why = _why_not_pure(labels, changed)
+        _annot(
+            "error",
+            f"Merge-blocking boxes: no §2.2 region on a theory / merge-lane PR ({why}) — "
+            f"it must carry the region with ticked Human Visual Review and `merge "
+            f"authorized` boxes (#835). {ABSENT_FIX}.",
+        )
+        return 1
     if res["region"] == "absent":
         msg = f"Merge-blocking boxes: no §2.2 region in the PR body — {ABSENT_FIX}."
         if absent_blocks:
@@ -223,7 +271,6 @@ def check(body: str, absent_blocks: bool = False, labels=None, changed=None) -> 
         _annot("warning", msg + f" (not blocking in this configuration) See {DOC_URL}")
         return 0
     bk_nil = [t for t in res["nil"] if BEEKEEPER_NIL_RE.search(_norm(t))]
-    scoped = labels is not None and changed is not None
     if bk_nil:
         if not scoped:
             ok, why = False, "PR labels/changed files not supplied (fail closed)"
