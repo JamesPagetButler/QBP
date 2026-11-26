@@ -1,0 +1,727 @@
+{
+  "suite": "qbp-agda-toolcheck",
+  "version": 2,
+  "toolchain": {
+    "agda": "2.8.0",
+    "agda_faked": false,
+    "ci_agda": "2.8.0",
+    "agda_match": true,
+    "binaries": [
+      {
+        "name": "agda",
+        "path": "/home/prime/agda-2.8.0/agda",
+        "sha256": "d4be55933c4120006c67b110f1db6c46f86ba6ad444fa7048a0fe95ad8f1a3af"
+      },
+      {
+        "name": "python3",
+        "path": "/usr/bin/python3.10",
+        "sha256": "a2f33a6e006989270f4340528eb61f8f97366e00a5d1b602ac8672ea44fc56ae"
+      },
+      {
+        "name": "jq",
+        "path": "/usr/bin/jq",
+        "sha256": "858a84f22b39317f13a57b4b91e535925c1b4f819d9bb2864361df4ad6acb00f"
+      },
+      {
+        "name": "time",
+        "path": "/usr/bin/time",
+        "sha256": "7310b9b4c51a8f4d26c1af0da250f03a49ec8a8141033123e79196ad18f6c81b"
+      },
+      {
+        "name": "agda_forbidden_tokens.py",
+        "path": "/home/prime/Documents/QBP/.claude/worktrees/agent-a4c8486884e6903bd/scripts/agda_forbidden_tokens.py",
+        "sha256": "a87ccd2daf512069f2a081b6c5959f594459a1ad4983937ec3085260afee131e"
+      }
+    ],
+    "cubical_ci_pin": "7b9019b2993535d6931991d87f5c762aee87a67a",
+    "cubical_local_head": "7b9019b2993535d6931991d87f5c762aee87a67a",
+    "pin_match": true,
+    "cubical_lib_name": "cubical-0.9",
+    "lib_flags": "--cubical --safe --no-import-sorts --guardedness"
+  },
+  "run": {
+    "id": "20261120T225839Z",
+    "start": "2026-11-20T22:58:39Z",
+    "finished": "2026-11-20T23:01:23Z",
+    "layer": "all",
+    "tctl_start_c": 57.4,
+    "test_seams": "",
+    "boxrun": {
+      "mem_mb": 8000,
+      "timeout_s": 3600
+    }
+  },
+  "unexpected": 0,
+  "results": [
+    {
+      "layer": "control",
+      "file": "manifest-tool",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "12 found, 12 listed"
+    },
+    {
+      "layer": "tool",
+      "file": "CircleHIT.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46572,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "CoreSyntax.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.06,
+      "max_rss_kib": 47940,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "GlueUa.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.08,
+      "max_rss_kib": 50472,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "Guardedness.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46424,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "HComp.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.06,
+      "max_rss_kib": 47188,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "Interval.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46444,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "LibFlags.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.03,
+      "max_rss_kib": 45804,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "LossyUnification.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46444,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "Opaque.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46316,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "PathP.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46684,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "SuspJoinHIT.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.05,
+      "max_rss_kib": 47892,
+      "detail": ""
+    },
+    {
+      "layer": "tool",
+      "file": "Transp.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.05,
+      "max_rss_kib": 47072,
+      "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "manifest-lib",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "22 found, 22 listed"
+    },
+    {
+      "layer": "lib",
+      "file": "LibConnected.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.31,
+      "max_rss_kib": 389288,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibDataBoolNat.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 2.05,
+      "max_rss_kib": 175688,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibDataInt.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 3.33,
+      "max_rss_kib": 241384,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibDataSigma.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.8,
+      "max_rss_kib": 96928,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibEquivIso.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.33,
+      "max_rss_kib": 69996,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibFunction.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.16,
+      "max_rss_kib": 57880,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibGroupBase.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.76,
+      "max_rss_kib": 409992,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibHLevelsGroupoid.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 1.15,
+      "max_rss_kib": 120308,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibHopf.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.69,
+      "max_rss_kib": 385176,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibHSpace.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.62,
+      "max_rss_kib": 390464,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibJoin.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 4.75,
+      "max_rss_kib": 338964,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibLoopspace.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 4.13,
+      "max_rss_kib": 304220,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibPinSn.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 7.52,
+      "max_rss_kib": 506244,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibPointed.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 1.35,
+      "max_rss_kib": 128296,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibPrelude.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.14,
+      "max_rss_kib": 58656,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibS1.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 3.47,
+      "max_rss_kib": 257976,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibSn.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.42,
+      "max_rss_kib": 386932,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibSnDegree.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 7.56,
+      "max_rss_kib": 485980,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibSnMultiplication.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.64,
+      "max_rss_kib": 381928,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibSusp.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 4.68,
+      "max_rss_kib": 344964,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibTruncations.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 4.31,
+      "max_rss_kib": 311104,
+      "detail": ""
+    },
+    {
+      "layer": "lib",
+      "file": "LibUnivalence.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 2.05,
+      "max_rss_kib": 177328,
+      "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "manifest-mustfail",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "5 found, 5 listed"
+    },
+    {
+      "layer": "mustfail",
+      "file": "BadPath.agda",
+      "expect": "fail",
+      "status": "REJECTED",
+      "exit_code": 42,
+      "wall_s": 0.04,
+      "max_rss_kib": 46888,
+      "detail": ""
+    },
+    {
+      "layer": "mustfail",
+      "file": "Hole.agda",
+      "expect": "fail",
+      "status": "REJECTED",
+      "exit_code": 42,
+      "wall_s": 0.04,
+      "max_rss_kib": 47052,
+      "detail": ""
+    },
+    {
+      "layer": "mustfail",
+      "file": "LetPostulate.agda",
+      "expect": "hole",
+      "status": "KNOWN-HOLE",
+      "exit_code": 0,
+      "wall_s": 0.03,
+      "max_rss_kib": 45996,
+      "detail": "accepted on Agda 2.8.0 < 2.9.0 (agda/agda#8341)"
+    },
+    {
+      "layer": "mustfail",
+      "file": "Postulate.agda",
+      "expect": "fail",
+      "status": "REJECTED",
+      "exit_code": 42,
+      "wall_s": 0.03,
+      "max_rss_kib": 46572,
+      "detail": ""
+    },
+    {
+      "layer": "mustfail",
+      "file": "Terminating.agda",
+      "expect": "fail",
+      "status": "REJECTED",
+      "exit_code": 42,
+      "wall_s": 0.03,
+      "max_rss_kib": 46176,
+      "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "manifest-substrate",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "4 found, 4 listed"
+    },
+    {
+      "layer": "substrate",
+      "file": "QBPHSpace.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46380,
+      "detail": ""
+    },
+    {
+      "layer": "substrate",
+      "file": "QBPJoin.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.05,
+      "max_rss_kib": 47592,
+      "detail": ""
+    },
+    {
+      "layer": "substrate",
+      "file": "QBPSpheres.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46892,
+      "detail": ""
+    },
+    {
+      "layer": "substrate",
+      "file": "QBPSubstrate.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0.04,
+      "max_rss_kib": 46572,
+      "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "manifest-cubical",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "13 found, 13 listed"
+    },
+    {
+      "layer": "cubical",
+      "file": "AssocTransport.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.67,
+      "max_rss_kib": 405192,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDAssocBool.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.82,
+      "max_rss_kib": 406560,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDAssocCubesStatus.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 6.03,
+      "max_rss_kib": 412132,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDAssocReduction.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.69,
+      "max_rss_kib": 383264,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDJoinBR.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.51,
+      "max_rss_kib": 392396,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "CDLawsBool.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.49,
+      "max_rss_kib": 390260,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "Diamond.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 4.53,
+      "max_rss_kib": 301540,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "HopfNoAssoc.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.5,
+      "max_rss_kib": 372104,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "QBPS3HSpace.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.65,
+      "max_rss_kib": 391300,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "QuaternionicHopf.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 6.04,
+      "max_rss_kib": 412904,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "S3FromCD.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 5.72,
+      "max_rss_kib": 425028,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "SkyrmionCharge.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 7.91,
+      "max_rss_kib": 517052,
+      "detail": ""
+    },
+    {
+      "layer": "cubical",
+      "file": "SubstrateCharge.agda",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 7.98,
+      "max_rss_kib": 521000,
+      "detail": ""
+    },
+    {
+      "layer": "control",
+      "file": "no-nested-source",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "no .agda/.lagda* source below the top level of proofs/agda or proofs/agda-cubical"
+    },
+    {
+      "layer": "control",
+      "file": "forbidden-tokens",
+      "expect": "pass",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "0 hits over proofs/agda + proofs/agda-cubical (--require-safe; scripts/agda_forbidden_tokens.py)"
+    },
+    {
+      "layer": "control",
+      "file": "manifest-control",
+      "expect": "manifest",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "3 found, 3 listed"
+    },
+    {
+      "layer": "control",
+      "file": "fixture-B1StringFakeComment",
+      "expect": "hits",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "fixture yields 1/1 planted hits"
+    },
+    {
+      "layer": "control",
+      "file": "fixture-B2IdentifierDashDash",
+      "expect": "hits",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "fixture yields 1/1 planted hits"
+    },
+    {
+      "layer": "control",
+      "file": "fixture-PlantedForbidden",
+      "expect": "hits",
+      "status": "PASS",
+      "exit_code": 0,
+      "wall_s": 0,
+      "max_rss_kib": 0,
+      "detail": "fixture yields 9/9 planted hits"
+    }
+  ]
+}

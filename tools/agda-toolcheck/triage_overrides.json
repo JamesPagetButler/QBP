@@ -1,0 +1,662 @@
+[
+ {
+  "match": "^Option `-j` to type check modules in parallel",
+  "bucket": "relevant",
+  "reason": "could cut CI/local wall time ~3x at ~2x RAM; test = run the suite with -j under the same RSS cap and compare results/*.json (R6); never default-on until the RSS profile is known"
+ },
+ {
+  "match": "^Substantial performance improvements",
+  "bucket": "relevant",
+  "reason": "R6: compare per-file wall/RSS against BASELINE.md; the SkyrmionCharge/SubstrateCharge rows are the sensitive ones"
+ },
+ {
+  "match": "Agda on WASM|Forester backend|Emacs: Syntax highlighting|Improvements to automatic term synthesis|Qualified `do`",
+  "bucket": "not",
+  "reason": "not a type-checking change (platform / backend / editor / tactic)"
+ },
+ {
+  "match": "^Local rewrite rules",
+  "bucket": "not",
+  "reason": "rewriting is off and forbidden under QBP's --safe discipline"
+ },
+ {
+  "match": "^Improved termination checker for copatterns",
+  "bucket": "relevant",
+  "reason": "tool/Guardedness (copattern Stream) + project re-run"
+ },
+ {
+  "match": "^Warning about unused imports",
+  "bucket": "relevant",
+  "reason": "QBP imports with explicit `using` lists; expect UnusedImports warnings (non-fatal, no -Werror); record the count in the new baseline and prune"
+ },
+ {
+  "match": "^Around 60 fixes|^Around 130 other issues",
+  "bucket": "relevant",
+  "reason": "summary line; each fix is triaged individually below"
+ },
+ {
+  "match": "^Dropped support for GHC|^Agda supports GHC versions",
+  "bucket": "not",
+  "reason": "GHC range; QBP uses the official prebuilt bindist"
+ },
+ {
+  "match": "^The new Cabal flag `version-with-git-hash`",
+  "bucket": "not",
+  "reason": "build flag for source installs; the bindist prints a clean version (2.8.0.2 fixed the hash suffix) — run.sh parses `agda --version` field 3, re-check the format on the candidate"
+ },
+ {
+  "match": "^New option `--parallel`",
+  "bucket": "relevant",
+  "reason": "same as the -j highlight: R6 timing/RSS comparison before any use"
+ },
+ {
+  "match": "^New option `--print-options`|^New flag `--no-write-interfaces`|^New command-line option `--literate-markdown-only-agda-blocks`|^Setting environment variable `NO_COLOR`|^New option `--quote-metas`",
+  "bucket": "not",
+  "reason": "new opt-in options QBP does not pass"
+ },
+ {
+  "match": "^The flavor of Cubical Agda can now be chosen",
+  "bucket": "relevant",
+  "reason": "`--cubical` keeps meaning `--cubical=full`; test = tool/ and lib/ still accept the bare flag; `--cubical=no-glue` is NOT for QBP (Glue is load-bearing: tool/GlueUa, HopfNoAssoc)"
+ },
+ {
+  "match": "^The flag `--termination-depth=N` now means",
+  "bucket": "relevant",
+  "reason": "default depth 1→3 with iterative deepening: can only accept more; project re-run (no QBP file needed depth > 1)"
+ },
+ {
+  "match": "^The new flag `--no-occurrence-analysis`",
+  "bucket": "not",
+  "reason": "opt-in flag; default behaviour unchanged"
+ },
+ {
+  "match": "^`\\{-# NO_POSITIVITY_CHECK #-\\}` pragmas are now recognized",
+  "bucket": "not",
+  "reason": "pragma forbidden under --safe anyway (mustfail family); QBP never uses it"
+ },
+ {
+  "match": "^New option `--local-rewriting`|^New `primRewriteNoMatch`",
+  "bucket": "not",
+  "reason": "rewriting; off and forbidden under QBP's --safe discipline"
+ },
+ {
+  "match": "^The `ETA` pragma has been removed",
+  "bucket": "not",
+  "reason": "QBP uses no ETA pragma (grep: 0 hits)"
+ },
+ {
+  "match": "^Eta-equality for record types is no longer inferred",
+  "bucket": "breaking",
+  "reason": "QBP records: HSpace (QBPHSpace.agda), CDLaws/CDCommLaws, SubstrateLink helpers — none is recursive, so no UnguardedEtaRecord is expected; the pinned agda/cubical has recursive records? → project+lib re-run answers it"
+ },
+ {
+  "match": "^New options `--irrelevance`",
+  "bucket": "not",
+  "reason": "default on, unchanged; QBP uses no irrelevance"
+ },
+ {
+  "match": "Now `--erased-matches` takes an optional argument",
+  "bucket": "not",
+  "reason": "--erasure is off in QBP; the default without --erasure is unchanged (`none`)"
+ },
+ {
+  "match": "^The new \\(experimental and possibly unstable\\) options `--erased-funext`",
+  "bucket": "not",
+  "reason": "erased postulates; off and not --safe-relevant for QBP (never enabled)"
+ },
+ {
+  "match": "^Error `ClashingDefinition` now gives the lineage|^Errors `GenericError` and `GenericDocError` have been replaced|^New error `NamedWhereModuleUnderWith`|^Generalisation failures due to unresolvable|^New error `WrongNamedArgumentInLHS`",
+  "bucket": "relevant",
+  "reason": "error text changes: mustfail EXPECT substrings (`Cannot postulate`, `TERMINATING`, `Unsolved interaction metas`, `false != true`) must be re-pinned if run.sh reports WRONG-ERROR"
+ },
+ {
+  "match": "^New warning `UnusedImports`",
+  "bucket": "relevant",
+  "reason": "see the highlight: expect warnings in QBP's `using`-list imports; non-fatal; prune in the upgrade PR"
+ },
+ {
+  "match": "^`UselessImport` warning|^`UselessPragma` warning|^Error warning `IllegalDeclarationInDataDefinition`|^Error `RecursiveRecordNeedsInductivity` turned|^New warning `DivergentModalityInClause`|^New warning `InvalidDataOrRecDefParameter`|^New warning `InvalidTacticAttribute`|^New warning `RewriteVariablesBoundInSingleton`|^`UnknownNamesInFixityDecl`|^The new warning `DefinitionBeforeDeclaration`|^New warning `ShouldBeEtaRecordPattern`",
+  "bucket": "not",
+  "reason": "new warnings for constructs QBP does not use (import-without-open, REWRITE, data-body decls, recursive records, modalities, tactics, mutual, record patterns in binders)"
+ },
+ {
+  "match": "^New warning `FixityDeclarationForNonOperator`",
+  "bucket": "breaking",
+  "reason": "agda/cubical at the pin has `infix 2 Σ-syntax`-style declarations and the cubical commits 3d828af/c2d05f7 exist precisely to fix this for 2.9.0 → the cubical pin must move with Agda"
+ },
+ {
+  "match": "^New warning `LibraryVersionConflict`",
+  "bucket": "relevant",
+  "reason": "QBP has exactly one library (cubical-0.9); a warning here would mean a stray ~/.agda/libraries entry — run.sh prints the local pin"
+ },
+ {
+  "match": "The parser will reject ASCII opening delimiters which are closed by a Unicode delimiter",
+  "bucket": "not",
+  "reason": "QBP uses no instance braces ⦃ ⦄ or idiom brackets (grep: 0 hits)"
+ },
+ {
+  "match": "^Modality annotations in aliases and let-bindings",
+  "bucket": "not",
+  "reason": "modalities unused in QBP"
+ },
+ {
+  "match": "^Postfix projections cannot be surrounded by parentheses",
+  "bucket": "breaking",
+  "reason": "check: QBP writes `x .fst`, `e .Iso.fun`, never `r (.proj)` (grep for `(.` finds none) — project re-run is the proof"
+ },
+ {
+  "match": "^Idiom brackets and `do` notation may now appear",
+  "bucket": "not",
+  "reason": "do / idiom brackets unused"
+ },
+ {
+  "match": "Named `where`-modules \\(`module M where`\\) are no longer allowed in clauses that use with-abstraction",
+  "bucket": "relevant",
+  "reason": "soundness fix (#8698); QBP uses no `with`, so nothing to migrate; project re-run"
+ },
+ {
+  "match": "The pseudo-name `R.constructor`",
+  "bucket": "not",
+  "reason": "QBP never writes `R.constructor`"
+ },
+ {
+  "match": "In the presence of `--erasure`, types of lambdas",
+  "bucket": "not",
+  "reason": "--erasure off"
+ },
+ {
+  "match": "Instance search will no longer eta-expand|^Instance search now finds instance fields",
+  "bucket": "not",
+  "reason": "no instance search in QBP"
+ },
+ {
+  "match": "^Functions defined using with-abstraction equality",
+  "bucket": "not",
+  "reason": "no `with` in QBP"
+ },
+ {
+  "match": "^Added support for \\[Cubical Agda without Glue Types\\]",
+  "bucket": "relevant",
+  "reason": "new VARIANT only; QBP stays on `--cubical` (full). Test = tool/GlueUa must keep passing under the bare flag; do not adopt no-glue (HopfNoAssoc/QuaternionicHopf glue)"
+ },
+ {
+  "match": "^Added the \\[Sharp modality\\]",
+  "bucket": "not",
+  "reason": "--cohesion off"
+ },
+ {
+  "match": "The fixity declarations for `Agda.Builtin.Int.pos` and for `primINeg`, `primIMin`, and `primIMax`",
+  "bucket": "breaking",
+  "reason": "DIRECT HIT: agda/cubical@7b9019b's Core/Primitives renames these WITHOUT fixity → `i ∧ j ∨ k` parses differently/ambiguously under 2.9.0. cubical c2d05f7 (2026-09-09) adds the fixities. The Agda bump REQUIRES moving the cubical pin to ≥ c2d05f7 (R2: Lean and Mathlib move together ⇒ Agda and cubical move together). QBP's own tool/ files use the builtins renamed via `renaming (primIMin to _∧_ …)` — add fixities there too (tool/Interval, HComp, GlueUa, Transp)"
+ },
+ {
+  "match": "^`tcTypeError` now throws|^Tactic arguments \\(`@tactic`\\) are now supported|^`unquoteDecl` and `unquoteDef` now check",
+  "bucket": "not",
+  "reason": "reflection; unused"
+ },
+ {
+  "match": "^Suppport for version-specific `defaults` files",
+  "bucket": "relevant",
+  "reason": "useful for a dual-version box during the upgrade (`~/.agda/defaults-2.9.0`); note in the skill, no test"
+ },
+ {
+  "match": "^The JSON interaction protocol|^Proof search \\(Mimer|^Syntax highlighting and go-to-definition|^By temporarily turning on printing of hidden arguments|^The implicit \\(hidden and instance\\) fields of a record pattern|^Catch-all copattern clauses are now tolerated|^A normalization level can now also passed|^Fixed an internal error in `Cmd_helper_function`|^`NON_TERMINATING` functions now only reduce|^_Go-to-definition_",
+  "bucket": "not",
+  "reason": "interactive / Emacs mode; QBP checks in batch mode"
+ },
+ {
+  "match": "^`agda --html|^New option `--ghc-trace`|^The JS backend",
+  "bucket": "not",
+  "reason": "backend; QBP never compiles or renders Agda"
+ },
+ {
+  "match": "Postulates in safe mode \\(regression in 2.8.0\\)",
+  "bucket": "relevant",
+  "reason": "THE --safe HOLE ON OUR PIN: `let postulate p : ⊥ in p` passes 2.8.0. mustfail/LetPostulate.agda pins it as KNOWN-HOLE; on 2.9.0 it must flip to FIXED; run.sh's no-forbidden-token control covers the gap meanwhile"
+ },
+ {
+  "match": "Cubical primitive side conditions are not checked when an application is inferred",
+  "bucket": "breaking",
+  "reason": "a consistency fix that can REJECT previously accepted glue/unglue applications: HopfNoAssoc.agda (ua-gluePt, ua-unglue, hfill systems) and QuaternionicHopf.agda are the files to re-check; tool/GlueUa exercises prim^glue with explicit side conditions"
+ },
+ {
+  "match": "Endpoints of paths are not checked without `--cubical`",
+  "bucket": "not",
+  "reason": "QBP always passes --cubical; endpoints ARE checked (mustfail/BadPath is the control)"
+ },
+ {
+  "match": "Canonicity failure with --cubical|Putting a `pattern` `record` in an index kills canonicity",
+  "bucket": "relevant",
+  "reason": "cubical canonicity fixes (Glue/HCompU bugfix PR 8719): tool/GlueUa + tool/HComp + project re-run; no `pattern` records in QBP"
+ },
+ {
+  "match": "The unifier's cycle rule checks only the head constructor for higher inductive types",
+  "bucket": "relevant",
+  "reason": "HIT unification soundness: every QBP HIT recursor (S¹/Susp/join); tool/CircleHIT, tool/SuspJoinHIT + project re-run"
+ },
+ {
+  "match": "Internal error when giving the unit type in a function on HITs|Internal error with src/full/Agda/TypeChecking/Substitute.hs:140:33 using Cubical Agda|Internal error during cubical boundary recovery",
+  "bucket": "relevant",
+  "reason": "cubical/HIT internal-error fixes: cannot change accepted proofs, but confirm no new rejection — project re-run"
+ },
+ {
+  "match": "Importing file with --cubical reports error about --two-level",
+  "bucket": "relevant",
+  "reason": "import-time flag compatibility check for --cubical modules: lib/ layer (every pinned import) + project re-run"
+ },
+ {
+  "match": "Guarded Cubical",
+  "bucket": "not",
+  "reason": "--guarded (ticks) is off; QBP uses --guardedness only"
+ },
+ {
+  "match": "Cubical Agda prints `IsOne",
+  "bucket": "not",
+  "reason": "error-message cosmetics only"
+ },
+ {
+  "match": "Agda deletes read-only interface files|Caching is broken",
+  "bucket": "relevant",
+  "reason": "interface-file handling: the local ~/cubical/_build cache is what keeps lib/ fast; re-run the suite twice (cold, warm) on the candidate"
+ },
+ {
+  "match": "Meta solutions leak from abstract and opaque blocks",
+  "bucket": "relevant",
+  "reason": "opaque/abstract soundness: tool/Opaque; CDJoinBR/SubstrateCharge mention abstract only in comments"
+ },
+ {
+  "match": "Increase `--termination-depth`",
+  "bucket": "relevant",
+  "reason": "default depth change (see Pragmas); project re-run"
+ },
+ {
+  "match": "Termination checker rejects program when field takes 2 or 4|termination checking failure in copattern-style definition|Simple termination checking fails with --without-K|Manually eta-expanding clause makes termination checking fail",
+  "bucket": "relevant",
+  "reason": "termination checker accepts MORE; tool/Guardedness + project re-run"
+ },
+ {
+  "match": "Positivity|positivity",
+  "bucket": "relevant",
+  "reason": "positivity checker fixes (some reject more: #8564/#8565/#8688 were unsoundnesses): QBP's data types are S¹/Susp/Join/𝟙/𝟚/⊥ — strictly positive; project re-run"
+ },
+ {
+  "match": "Warn if one includes several versions of the same library",
+  "bucket": "relevant",
+  "reason": "LibraryVersionConflict: QBP has one library; run.sh prints the resolved pin"
+ },
+ {
+  "match": "Hidden lambda insertion skipped due to untried instance constraints",
+  "bucket": "not",
+  "reason": "instance constraints; none in QBP (cubical upstream adapted its own files in af1f88a)"
+ },
+ {
+  "match": "Unused implicit parameter in pattern synonym|pattern synonym",
+  "bucket": "not",
+  "reason": "QBP defines no pattern synonyms (`pattern` appears only in comments)"
+ },
+ {
+  "match": "Interface serialiser conflates the Float literals",
+  "bucket": "not",
+  "reason": "Float literals unused"
+ },
+ {
+  "match": "Projection-likeness drops arguments|--projection-like",
+  "bucket": "relevant",
+  "reason": "projection-like optimisation affects reduction of record projections (HSpace.μ etc.): project re-run; a reduction change would show as a conversion failure"
+ },
+ {
+  "match": "The coverage checker infers missing clauses under the wrong module-parameter substitution|Data/record types copied by a module application inside a block|Incorrect substitution when opening parameterised module with a generalised variable|Agda ignores constructor parameters but only if they're copied under a parameterised module",
+  "bucket": "relevant",
+  "reason": "parameterised-module soundness: QBP leans on `module _ (H : HSpace …)` barriers (SubstrateCharge, HopfNoAssoc.HopfNA, LibHopf) — project re-run is the test"
+ },
+ {
+  "match": "Clause-based matcher treats a MissingClauses-stuck argument|Clause-based reduction skips underapplied clauses|Clause-based reduction falls through on a stuck lazy|Reduction missing during LHS checking",
+  "bucket": "relevant",
+  "reason": "reduction-strategy fixes can change what is DEFINITIONAL (every `= refl` in QBP's β-rule checks): tool/*HIT, tool/Transp + project re-run"
+ },
+ {
+  "match": "SIGMA` builtin accepts types that are not Σ-types|Proof of global choice and of false|Function call tricks positivity checker|Positivity bug with builtins|The telescope of a projection need not be the telescope|Occurrence analysis ignores sorts|The unifier's cycle check looks inside irrelevant|Escape from sharp modality",
+  "bucket": "relevant",
+  "reason": "consistency fix in the kernel: cannot break a sound proof, but strengthens what a green --safe certifies; project re-run"
+ },
+ {
+  "match": "Termination checker descends into irrelevant constructor arguments",
+  "bucket": "relevant",
+  "reason": "consistency fix (termination); project re-run"
+ },
+ {
+  "match": "Inconsistency with named `where` modules under `with`",
+  "bucket": "relevant",
+  "reason": "consistency fix; no `with` in QBP; project re-run"
+ },
+ {
+  "match": "don't allow postulates in --safe lets",
+  "bucket": "relevant",
+  "reason": "the fix for the KNOWN-HOLE (mustfail/LetPostulate must flip to FIXED)"
+ },
+ {
+  "match": "check cubical side conditions also in inference mode",
+  "bucket": "breaking",
+  "reason": "the fix for #8683: may reject inferred glue applications — HopfNoAssoc/QuaternionicHopf re-check"
+ },
+ {
+  "match": "Small bugfix for Cubical Glue/HCompU|eta for cubical primitives against neutrals|Bubble transpSysTel|Erased levels \\[cubical\\]|only ask if meta is an IP if cubical|Reverted two commits that made certain level arguments erased",
+  "bucket": "relevant",
+  "reason": "cubical-core change: tool/GlueUa, tool/HComp, tool/Transp + project re-run"
+ },
+ {
+  "match": "countPatternVars for HITs|Treat occurrences in constructors of HITs as weakly rigid",
+  "bucket": "relevant",
+  "reason": "HIT handling: tool/CircleHIT, tool/SuspJoinHIT + project re-run"
+ },
+ {
+  "match": "Implement a --cubical=no-glue option",
+  "bucket": "relevant",
+  "reason": "variant flag; QBP stays on full --cubical (Glue load-bearing)"
+ },
+ {
+  "match": "Type check in parallel|Progress reporting when checking in parallel",
+  "bucket": "relevant",
+  "reason": "-j: R6 comparison under the RSS cap before any use"
+ },
+ {
+  "match": "termination checker|Termination checker|termination masks|termination",
+  "bucket": "relevant",
+  "reason": "termination checker: tool/Guardedness + mustfail/Terminating + project re-run"
+ },
+ {
+  "match": "positivity checking|positivity checker|argOccurrences|occurrences",
+  "bucket": "relevant",
+  "reason": "positivity/occurrence analysis: project re-run (QBP's HITs are strictly positive)"
+ },
+ {
+  "match": "Don't solve metas from outside current abstract block",
+  "bucket": "relevant",
+  "reason": "abstract/opaque: tool/Opaque"
+ },
+ {
+  "match": "support `defaults-X.Y.Z` files",
+  "bucket": "relevant",
+  "reason": "library management: handy during a dual-version upgrade window; skill note"
+ },
+ {
+  "match": "Consider interface to merge imported whilst checking confluence",
+  "bucket": "not",
+  "reason": "confluence checking is for rewriting; off"
+ },
+ {
+  "match": "Improve caching for \\(large\\) opaque blocks",
+  "bucket": "relevant",
+  "reason": "opaque + performance: tool/Opaque, R6"
+ },
+ {
+  "match": "Fix #8634|--build-library|bogus fields",
+  "bucket": "not",
+  "reason": "--build-library / Emacs .agda-lib error paths; QBP's two .agda-lib files have only name/include/depend/flags"
+ },
+ {
+  "match": "NO_POSITIVITY_CHECK|NO_UNIVERSE_CHECK|type-in-type",
+  "bucket": "not",
+  "reason": "pragma/flag forbidden under --safe (mustfail family); QBP never uses it"
+ },
+ {
+  "match": "OperatorsExpr parsing blows up|Improve operator parsing performance|parsing",
+  "bucket": "relevant",
+  "reason": "operator-parsing performance: R6 timing comparison (QBP files are mixfix-heavy)"
+ },
+ {
+  "match": "BUILTIN REFL",
+  "bucket": "not",
+  "reason": "hint text for the non-cubical `in` idiom; unused"
+ },
+ {
+  "match": "\\[\\]-cong",
+  "bucket": "not",
+  "reason": "erasure feature; --erasure off"
+ },
+ {
+  "match": "--print-options|--bash-complete|--help",
+  "bucket": "not",
+  "reason": "CLI help/completion only"
+ },
+ {
+  "match": "Only generate copies for used names|module copying|Module copying",
+  "bucket": "relevant",
+  "reason": "module-application performance (QBP instantiates parameterised modules: HopfNA, SubstrateLink, GroupTheory): R6 + project re-run"
+ },
+ {
+  "match": "containers|pqueue|aeson|deepseq|Dependencies|dependencies|TeX-Live|texlive",
+  "bucket": "not",
+  "reason": "upstream Haskell dependency bumps; invisible to the bindist user"
+ },
+ {
+  "match": "readonly .agdai|read-only interface",
+  "bucket": "relevant",
+  "reason": "interface files: the ~/cubical/_build cache; cold+warm re-run"
+ },
+ {
+  "match": "LeftInverse|Unify\\.hs|antiUnify|unspining|checkInternal",
+  "bucket": "relevant",
+  "reason": "unifier / internal checker change: project re-run (conversion failures would surface)"
+ },
+ {
+  "match": "tutorial|Tutorial|manual|Manual|Agda Web|Let's play",
+  "bucket": "not",
+  "reason": "documentation only"
+ },
+ {
+  "match": "input method|completion-ignored|window-system|minibuffer|repeat-mode|agda-input|fraktur|agda.sty|agda-mode|Emacs",
+  "bucket": "not",
+  "reason": "Emacs mode / LaTeX style; QBP checks in batch mode"
+ },
+ {
+  "match": "Treeless|treeless|case-of-case",
+  "bucket": "not",
+  "reason": "compiler pipeline; QBP never compiles Agda"
+ },
+ {
+  "match": "occurrence analysis",
+  "bucket": "not",
+  "reason": "opt-out flag for the occurrence analysis; default unchanged"
+ },
+ {
+  "match": "backtrace when conversion checking fails",
+  "bucket": "relevant",
+  "reason": "diagnostics only; may change error text (mustfail WRONG-ERROR would flag it)"
+ },
+ {
+  "match": "LetAxiom",
+  "bucket": "relevant",
+  "reason": "bookkeeping for let-bound postulates (the #8341 family): mustfail/LetPostulate"
+ },
+ {
+  "match": "section updating|checkParameters|copied constructors",
+  "bucket": "relevant",
+  "reason": "parameterised-module copying soundness: QBP's module barriers; project re-run"
+ },
+ {
+  "match": "conPartNotations|OperatorInformation|underscore in names",
+  "bucket": "relevant",
+  "reason": "mixfix/underscore name parsing: tool/CoreSyntax (_⊗_, _+ℕ_) + project re-run"
+ },
+ {
+  "match": "Strict lets",
+  "bucket": "not",
+  "reason": "let-binding evaluation strategy in the compiler/evaluator; no semantic change for type checking"
+ },
+ {
+  "match": "Added a test case|test case|Tried to fix a bug related to PR #8593",
+  "bucket": "not",
+  "reason": "upstream test / erased-postulate option work; not enabled"
+ },
+ {
+  "match": "Dotted expression|fix of #7181|Alternative fix of #8687|Fix for #8700|Fix #8532|Fix #8771|Fix #8777|Fix #7664|Fix #8808|Fix #8853|Fix #8636|Fix #8638|Fix #8703|Fix #7181|Fix #8545",
+  "bucket": "relevant",
+  "reason": "(cross-referenced issue) see the Issue row of the same number"
+ },
+ {
+  "match": "`Type` printed as `Set`",
+  "bucket": "not",
+  "reason": "error-message printing only"
+ },
+ {
+  "match": "Agda hanging on cyclic meta instantiation",
+  "bucket": "relevant",
+  "reason": "checker hang fix: cannot change accepted proofs; R6 timing"
+ },
+ {
+  "match": "--erased-matches",
+  "bucket": "not",
+  "reason": "--erasure off"
+ },
+ {
+  "match": "Forcing translation prevents reduction",
+  "bucket": "relevant",
+  "reason": "reduction change (forcing): can alter what is definitional; tool/*HIT β-rule refl checks + project re-run"
+ },
+ {
+  "match": "Grammar for postfix projections",
+  "bucket": "breaking",
+  "reason": "postfix-projection grammar tightened: QBP writes `x .fst`/`e .Iso.fun` only; project re-run is the check"
+ },
+ {
+  "match": "--build-library",
+  "bucket": "not",
+  "reason": "--build-library workflow; QBP checks files directly"
+ },
+ {
+  "match": "Fix issue #8788",
+  "bucket": "not",
+  "reason": "--erased-matches; --erasure off"
+ },
+ {
+  "match": "Fix #8454",
+  "bucket": "not",
+  "reason": "error-message printing (Type vs Set)"
+ },
+ {
+  "match": "Fix #8610",
+  "bucket": "not",
+  "reason": "internal error in the scope monad (a crash, not a false proof)"
+ },
+ {
+  "match": "Fix #8119",
+  "bucket": "not",
+  "reason": "internal error on a non-projection used as postfix projection; QBP has none"
+ },
+ {
+  "match": "Fix #8587",
+  "bucket": "not",
+  "reason": "path endpoints without --cubical; QBP always passes --cubical (mustfail/BadPath)"
+ },
+ {
+  "match": "Fix #8529",
+  "bucket": "not",
+  "reason": "NO_UNIVERSE_CHECK attachment; pragma forbidden under --safe"
+ },
+ {
+  "match": "Fix #8577|Fix #8365",
+  "bucket": "not",
+  "reason": "rewriting-related crash; rewriting off"
+ },
+ {
+  "match": "Fix #8215|Fix for issue #8097|Fix #8344|Fix #8402|Fix #8094",
+  "bucket": "not",
+  "reason": "instance/Mimer/Emacs/LaTeX/CLI-help fix; not on QBP's batch path"
+ },
+ {
+  "match": "Fix #7139",
+  "bucket": "not",
+  "reason": "indexed-type (green slime) clause mangling; QBP's HITs are not indexed families"
+ },
+ {
+  "match": "Internal error|__IMPOSSIBLE__|IMPOSSIBLE|Crash|crash|panics|Impossible state",
+  "bucket": "not",
+  "reason": "internal-error fix on a construct path QBP does not hit (an internal error is a crash, never a false proof); project re-run covers the general case"
+ },
+ {
+  "match": "Hidden arguments|hidden arguments|implicit arguments|implicit argument",
+  "bucket": "relevant",
+  "reason": "implicit-argument insertion changes can alter elaboration of library calls (cf. cubical af1f88a): lib/ layer + project re-run"
+ },
+ {
+  "match": "Make Agda go faster|Optimize|optimization|Optimization|optimisations|caching|Caching|serialization|Serializ|checkpointing|benchmark|Benchmark|profiling|Lines/second|free variable|Free variable",
+  "bucket": "relevant",
+  "reason": "performance PR: R6 timing/RSS comparison in results/*.json"
+ },
+ {
+  "match": "Bump actions|workflows|flake|Makefile|LTS|stack|cabal|nix|Nix|CI|release|Release|changelog|CHANGELOG|typo|Typo|doc|Doc",
+  "bucket": "not",
+  "reason": "upstream build/CI/docs housekeeping"
+ },
+ {
+  "match": "Mimer|mimer|Emacs|emacs|interaction|Interaction|highlight|Highlight|C-c|hole|Hole|goal|Goal|split|Split|refine|Refine|give|Give|Cmd_|helper",
+  "bucket": "not",
+  "reason": "interactive / Emacs mode; QBP checks in batch mode"
+ },
+ {
+  "match": "JS|GHC backend|backend|Backend|compiler|Compiler|COMPILE|FOREIGN|treeless|Scott|HTML|html|LaTeX|Forester|forester|literate|Literate|Markdown|Typst",
+  "bucket": "not",
+  "reason": "backend / literate output; QBP never compiles or renders Agda"
+ },
+ {
+  "match": "rewrit|Rewrit|REWRITE|confluence|Confluence",
+  "bucket": "not",
+  "reason": "rewriting; off and forbidden under --safe discipline"
+ },
+ {
+  "match": "record where|Record where",
+  "bucket": "not",
+  "reason": "`record where` sugar; unused"
+ },
+ {
+  "match": "erased|Erased|erasure|Erasure|irrelevan|Irrelevan|Prop|polarit|Polarit|cohesion|flat|Flat|sharp|Sharp|modalit|Modalit|@0|@ω|resourced",
+  "bucket": "not",
+  "reason": "modalities / erasure / Prop / polarity / cohesion; none enabled in QBP"
+ },
+ {
+  "match": "instance|Instance|⦃",
+  "bucket": "not",
+  "reason": "instance search; QBP declares no instances"
+ },
+ {
+  "match": "reflection|Reflection|tactic|Tactic|macro|Macro|quote|unquote|tcTypeError|reconstructed|Reconstructed",
+  "bucket": "not",
+  "reason": "reflection; unused"
+ },
+ {
+  "match": "Float|float|Char|String|Word|FromNat|literal|Literal",
+  "bucket": "not",
+  "reason": "builtin literals / primitives QBP does not use"
+ },
+ {
+  "match": "\\bwith\\b|With|inspect",
+  "bucket": "not",
+  "reason": "with-abstraction; no QBP Agda file uses `with`"
+ },
+ {
+  "match": "\\bdo\\b|idiom|Idiom|qualified",
+  "bucket": "not",
+  "reason": "do / idiom brackets; unused"
+ },
+ {
+  "match": "postfix|Postfix",
+  "bucket": "not",
+  "reason": "parenthesised postfix projections; QBP uses `x .fst` only"
+ },
+ {
+  "match": "mutual|Mutual|interleaved",
+  "bucket": "not",
+  "reason": "mutual blocks; unused"
+ },
+ {
+  "match": "Sized|sized|Size",
+  "bucket": "not",
+  "reason": "sized types; off"
+ },
+ {
+  "match": "GHC|ghc",
+  "bucket": "not",
+  "reason": "GHC version/build; QBP uses the prebuilt bindist"
+ }
+]
