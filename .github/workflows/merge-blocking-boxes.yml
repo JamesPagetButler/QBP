@@ -32,7 +32,8 @@
 # PR's BASE sha out into `base/` and runs the verdict from
 # `base/scripts/merge_blocking_check.py` (which imports the base parser). Only
 # when the base lacks a script (first landing) does the head copy judge, with a
-# `::warning::` and `verdict-source=head(bootstrap)` in the log. The workflow
+# `::warning::` and `verdict-source=head(bootstrap)` in the log (unreachable since
+# PR #780 landed: master's base always carries both scripts). The workflow
 # file and the selector are head-side by nature of `pull_request`; their edits
 # are visible in the diff under `.github/workflows/` and `scripts/`.
 #
@@ -70,26 +71,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # F1 on PR #838 (round 5): the PR's own code must never run on the judge's
+  # filesystem. Head self-tests live in their OWN job (another runner), so head
+  # code cannot rewrite `base/` before the verdict. The verdict job below
+  # executes no head-side file: it only reads the head tree as text
+  # (`--head-root=.`). Wiring test: test_verdict_job_runs_no_head_code.
+  merge-blocking-head-selftest:
+    name: Merge-blocking boxes (head self-test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # PR head — coverage for the PR's own edits, not the verdict
+      - name: Self-test the head copy (isolated job — cannot touch the judge)
+        run: |
+          python3 scripts/test_pr_merge_blocking_boxes.py
+          python3 scripts/test_merge_blocking_check.py
+
   merge-blocking-boxes:
     name: Merge-blocking boxes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # PR head: self-tested below; never the judge
+      - uses: actions/checkout@v4 # PR head: read as TEXT only (--head-root); never executed here
       - uses: actions/checkout@v4 # PR base sha: THE judge (arch §I4, PR #780)
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           path: base
-      - name: Select the verdict source (base; head only as a first-landing bootstrap)
+      - name: Select the verdict source (base selector only — never a head script, F1 PR #838)
         id: src
         run: |
           set -euo pipefail
           SEL=base/scripts/merge_blocking_verdict_source.py
-          [ -f "$SEL" ] || SEL=scripts/merge_blocking_verdict_source.py
+          [ -f "$SEL" ] || { echo "::error::base selector missing — refusing to run a head copy"; exit 1; }
           python3 "$SEL" --base base --head .
-      - name: Self-test the head copy (coverage for the PR's own edits — not the verdict)
-        run: |
-          python3 scripts/test_pr_merge_blocking_boxes.py
-          python3 scripts/test_merge_blocking_check.py
       - name: Self-test the base copy (the judge must pass its own fixtures before it judges)
         if: steps.src.outputs.source == 'base'
         env:

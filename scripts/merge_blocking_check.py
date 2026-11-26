@@ -136,10 +136,26 @@ LANE_WORKFLOWS = (
 WF_DIR = ".github/workflows/"
 REPO_ROOT = os.path.dirname(HERE)
 _WF_SCRIPT_RE = re.compile(r"(?<![\w.-])scripts/[A-Za-z0-9_./-]*[A-Za-z0-9_]")
+# Backstop "power" (F2 on PR #838, round 5): ANY permission scope granted `write`
+# (quoted or not — statuses/checks/actions included), `write-all`, the gh
+# merge/edit/close verbs, and any secret other than GITHUB_TOKEN (a PAT bypasses
+# the permission block entirely; `secrets: inherit` hands every secret on).
+# The permission match relies on the repo setting default_workflow_permissions:
+# read (beekeeper-only): with read defaults, an ungranted token cannot write.
+_WF_WRITE_SCOPE_RE = re.compile(r"[\"']?([a-z][a-z-]*)[\"']?\s*:\s*[\"']?write\b")
+# Write scopes that cannot merge, label, post a status/check or touch a PR/issue:
+# code-scanning upload (CodeQL in ci.yml — PR #778 must stay housekeeping),
+# OIDC tokens, build attestations.  Everything else granted `write` is power.
+NON_MERGE_WRITE_SCOPES = frozenset({"security-events", "id-token", "attestations"})
 _WF_POWER_RE = re.compile(
-    r"\b(?:pull-requests|issues|contents)\s*:\s*write\b|\bwrite-all\b"
+    r"\bwrite-all\b"
     r"|\bgh\s+pr\s+(?:merge|edit|close)\b|\bgh\s+issue\s+(?:close|reopen|edit)\b"
+    r"|\bsecrets\s*\.\s*(?!GITHUB_TOKEN\b)[A-Za-z_]\w*"
+    r"|\bsecrets\s*\[\s*[\"'](?!GITHUB_TOKEN[\"'])"
+    r"|\bsecrets\s*:\s*inherit\b"
 )
+ACTIONS_DIR = ".github/actions/"
+ACTION_FILES = ("action.yml", "action.yaml")
 _HEAD_ROOT = None  # set by check(head_root=...) — the PR head checkout
 
 
@@ -198,15 +214,26 @@ def workflow_scripts(root: str = REPO_ROOT):
 
 
 def _workflow_has_power(path: str) -> bool:
-    """Backstop (4): True if the changed workflow's head copy can write or merge.
-    No head checkout supplied → True (fail closed); a deleted file → False."""
+    """Backstop (4): True if the changed workflow / composite action's head copy
+    can write or merge.  No head checkout → True (fail closed); a symlink → True
+    WITHOUT reading it (F4: a link to /dev/zero must not hang the judge);
+    unreadable / non-UTF-8 → True; a deleted file → False."""
     if _HEAD_ROOT is None:
         return True
     full = os.path.join(_HEAD_ROOT, path)
+    if os.path.islink(full):
+        return True
     if not os.path.exists(full):
         return False
     text = _read(full)
-    return True if text is None else bool(_WF_POWER_RE.search(text))
+    if text is None:
+        return True
+    if _WF_POWER_RE.search(text):
+        return True
+    return any(
+        m.group(1) not in NON_MERGE_WRITE_SCOPES
+        for m in _WF_WRITE_SCOPE_RE.finditer(text)
+    )
 
 
 def _norm(text: str) -> str:
@@ -235,15 +262,13 @@ def touches_lane(changed, root: str = REPO_ROOT) -> bool:
             return True
         if p.startswith(WF_DIR) and p[len(WF_DIR) :] in LANE_WORKFLOWS:
             return True
-        if derived is None and p.startswith(("scripts/", WF_DIR)):
+        if derived is None and p.startswith(("scripts/", WF_DIR, ACTIONS_DIR)):
             return True
         if derived is not None and p in derived:
             return True
-        if (
-            p.startswith(WF_DIR)
-            and p.endswith((".yml", ".yaml"))
-            and _workflow_has_power(p)
-        ):
+        is_wf = p.startswith(WF_DIR) and p.endswith((".yml", ".yaml"))
+        is_action = p.startswith(ACTIONS_DIR) and os.path.basename(p) in ACTION_FILES
+        if (is_wf or is_action) and _workflow_has_power(p):
             return True
     return False
 

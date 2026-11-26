@@ -92,8 +92,9 @@ Routing rubric: docs/workflows/pr7_conflict_routing_rubric.md (v0.2)
      HVR/Merge-authorized box unless the PR is `housekeeping`-labelled and changes nothing under
      proofs/, docs/theory/, docs/foundations/, paper/, archive/cth-inventory/ and no merge-lane
      file (CONTRIBUTING.md, review_tiers.md, these templates, CODEOWNERS, the review/box/label/
-     tier/merge/close-gate workflows and their scripts, or a workflow edit that grants write or
-     calls gh pr merge/edit/close / gh issue close/reopen/edit; ordinary CI and proof tooling
+     tier/merge/close-gate workflows and their scripts, or a workflow / composite-action edit
+     that grants write, uses a non-GITHUB_TOKEN secret or calls gh pr merge/edit/close /
+     gh issue close/reopen/edit; ordinary CI and proof tooling
      stays housekeeping); otherwise both boxes must be present and ticked. Keep this region:
      a theory or merge-lane PR without it is red.
      Beekeeper ruling 2026-11-24, QBP#714 issuecomment-7147354671; CONTRIBUTING.md

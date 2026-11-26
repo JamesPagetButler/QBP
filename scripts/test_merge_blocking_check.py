@@ -5,6 +5,7 @@ Run: python3 scripts/test_merge_blocking_check.py   (also pytest-collectable)
 """
 
 import os
+import re
 import subprocess
 import sys
 
@@ -648,6 +649,161 @@ def test_r3_m4f_n9_nil_variants():
             box,
             r.stdout,
         )
+
+
+def _head_with(rel, content, binary=False):
+    import tempfile
+
+    d = tempfile.mkdtemp()
+    full = os.path.join(d, rel)
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, "wb" if binary else "w") as fh:
+        fh.write(content)
+    return d
+
+
+def test_r5_f2_backstop_catches_every_write_form():
+    import shutil
+
+    for grant in (
+        'permissions:\n  "pull-requests": write\n',
+        'permissions:\n  pull-requests: "write"\n',
+        "permissions:\n  'issues': 'write'\n",
+        "permissions:\n  statuses: write\n",
+        "permissions:\n  checks: write\n",
+        "permissions:\n  actions: write\n",
+        "permissions: {pull-requests: write}\n",
+        "env:\n  GH_TOKEN: ${{ secrets.SIBLING_READ_TOKEN }}\n",
+        "env:\n  T: ${{ secrets['OTHER_PAT'] }}\n",
+        "jobs:\n  x:\n    uses: ./.github/workflows/y.yml\n    secrets: inherit\n",
+    ):
+        head = _head_with(".github/workflows/new.yml", "name: N\n" + grant)
+        try:
+            r = _scoped(HVR_NILD, HK, [".github/workflows/new.yml"], head_root=head)
+            assert r.returncode == 1 and "merge-lane" in r.stdout, (grant, r.stdout)
+        finally:
+            shutil.rmtree(head)
+
+
+def test_r5_f2_non_merge_scopes_and_github_token_are_not_power():
+    import shutil
+
+    for ok in (
+        "permissions:\n  contents: read\n  security-events: write\n",
+        "permissions:\n  id-token: write\n",
+        "env:\n  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n",
+        "env:\n  GH_TOKEN: ${{ github.token }}\n",
+    ):
+        head = _head_with(".github/workflows/new.yml", "name: N\n" + ok)
+        try:
+            r = _scoped(HVR_NILD, HK, [".github/workflows/new.yml"], head_root=head)
+            assert r.returncode == 0, (ok, r.stdout)
+        finally:
+            shutil.rmtree(head)
+
+
+def test_r5_f3_composite_action_backstop():
+    import shutil
+
+    for name in ("action.yml", "action.yaml"):
+        rel = f".github/actions/m/{name}"
+        head = _head_with(
+            rel, "runs:\n  using: composite\n  steps:\n    - run: gh pr merge 1\n"
+        )
+        try:
+            r = _scoped(HVR_NILD, HK, [rel], head_root=head)
+            assert r.returncode == 1 and "merge-lane" in r.stdout, (rel, r.stdout)
+        finally:
+            shutil.rmtree(head)
+    head = _head_with(".github/actions/m/action.yml", "runs:\n  using: composite\n")
+    try:
+        r = _scoped(HVR_NILD, HK, [".github/actions/m/action.yml"], head_root=head)
+        assert r.returncode == 0, r.stdout
+    finally:
+        shutil.rmtree(head)
+    # no head copy → fail closed for actions too
+    assert _scoped(HVR_NILD, HK, [".github/actions/m/action.yml"]).returncode == 1
+
+
+def test_r5_f4_f6_symlink_and_unreadable_head_workflow_are_lane():
+    import shutil
+    import tempfile
+
+    # F4: symlink → lane without reading (a /dev/zero target would hang a read)
+    d = tempfile.mkdtemp()
+    try:
+        os.makedirs(os.path.join(d, ".github", "workflows"))
+        os.symlink("/dev/zero", os.path.join(d, ".github", "workflows", "z.yml"))
+        r = subprocess.run(
+            [
+                sys.executable,
+                SCRIPT,
+                "--labels=housekeeping",
+                f"--changed-file={_write_tmp('.github/workflows/z.yml')}",
+                f"--head-root={d}",
+            ],
+            input=HVR_NILD,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout
+    finally:
+        shutil.rmtree(d)
+    # F6 (kills B5): a non-UTF-8 head workflow counts as power
+    head = _head_with(
+        ".github/workflows/bad.yml", b"\xff\xfe\x00name: x\n", binary=True
+    )
+    try:
+        r = _scoped(HVR_NILD, HK, [".github/workflows/bad.yml"], head_root=head)
+        assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout
+    finally:
+        shutil.rmtree(head)
+
+
+def _write_tmp(text):
+    import tempfile
+
+    fh = tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False)
+    fh.write(text + "\n")
+    fh.close()
+    return fh.name
+
+
+def test_r5_f1_verdict_job_runs_no_head_code():
+    """F1: no step in the verdict job executes a head-side file; head self-tests
+    run in a separate job (another runner), so head code cannot rewrite base/."""
+    import yaml
+
+    wf = yaml.safe_load(open(WORKFLOW, encoding="utf-8"))
+    jobs = wf["jobs"]
+    verdict_job = jobs["merge-blocking-boxes"]
+    assert verdict_job["name"] == "Merge-blocking boxes"
+    for st in verdict_job["steps"]:
+        run_ = st.get("run", "")
+        # every python3 invocation must target the judging copy ($SRC_DIR or base/)
+        for m in re.finditer(r"python3\s+(\S+)", run_):
+            target = m.group(1).strip('"')
+            assert target.startswith(("$SRC_DIR/", "base/", '"$SEL"', "$SEL", "-")), (
+                st,
+                target,
+            )
+        assert "SEL=scripts/" not in run_, st  # no head selector fallback
+    sel = [st for st in verdict_job["steps"] if st.get("id") == "src"][0]["run"]
+    assert "SEL=base/scripts/merge_blocking_verdict_source.py" in sel, sel
+    # the head self-tests live in their own job with a distinct display name
+    head_jobs = [
+        (k, j)
+        for k, j in jobs.items()
+        if k != "merge-blocking-boxes"
+        and any(
+            "python3 scripts/test_merge_blocking_check.py" in s.get("run", "")
+            for s in j["steps"]
+        )
+    ]
+    assert len(head_jobs) == 1, list(jobs)
+    k, j = head_jobs[0]
+    assert j.get("name") != "Merge-blocking boxes" and "needs" not in j, (k, j)
 
 
 # ---- verdict source: the judge is the BASE copy, never the PR head (arch §I4, PR #780)
