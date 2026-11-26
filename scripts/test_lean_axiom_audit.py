@@ -84,6 +84,12 @@ FIXTURES = (
     "DangleA",
     "DangleB",
     "OpaqueSorry",
+    "VacB3",
+    "VacB4",
+    "VacB6",
+    "VacB8",
+    "VacSpell",
+    "VacControl",
 )
 # The ORACLE is Lean's own in-file `collectAxioms` (what `#print axioms` uses), run at the END
 # of a copy of the fixture, on the module's own constants (`map₂`). It is NOT computed through an
@@ -115,6 +121,9 @@ def sha(t: str) -> str:
 class Harness:
     def __init__(self, lean: str, work: Path, env: dict) -> None:
         self.lean, self.work, self.env, self.n = lean, work, env, 0
+        self.vac_path = str(
+            HERE / "lean_vacuity_allowlist.json"
+        )  # the real one (empty)
 
     def gen(self, mods: list[str], allowlist: list[dict] | None) -> tuple[Path, str]:
         self.n += 1
@@ -137,6 +146,8 @@ class Harness:
                 str(self.work / "build"),
                 "--allowlist",
                 al,
+                "--vacuity-allowlist",
+                self.vac_path,
             ]
         )
         assert r.returncode == 0, r.stderr
@@ -170,6 +181,8 @@ class Harness:
                 str(rj),
                 "--allowlist",
                 al,
+                "--vacuity-allowlist",
+                self.vac_path,
                 *extra,
             ]
         )
@@ -181,7 +194,14 @@ class Harness:
         allowlist: list[dict] | None = None,
         lean_path: str | None = None,
         build_dirs: list[str] | None = None,
+        vacuity: list[dict] | None = None,
     ) -> tuple[int, dict, str]:
+        self.vac_path = str(HERE / "lean_vacuity_allowlist.json")
+        if vacuity is not None:
+            self.n += 1
+            vp = self.work / f"vac-{self.n}.json"
+            vp.write_text(json.dumps({"entries": vacuity}))
+            self.vac_path = str(vp)
         drv, al = self.gen([mod] if isinstance(mod, str) else mod, allowlist)
         self.run_auditor(drv, lean_path)
         return self.check(drv, al, build_dirs)
@@ -552,6 +572,85 @@ def main() -> int:
             out,
         )
 
+        # PR #829 Red Team r6 (director's option (b)): SEMANTIC VACUITY. B3/B4/B6/B8 declare a token
+        # (binder_predicate, run_cmd + parsed notation, @[term_parser], #eval in CommandElabM) and
+        # hide `theorem vac : True` from the Python token gate, which PASSES them (shown first, so
+        # the catch below is the vacuity check's alone). The axiom audit — which never uses the token
+        # gate — must FAIL each one, naming exactly `vac` as vacuous (1 error, no axiom issue).
+        for fx in ("VacB3", "VacB4", "VacB6", "VacB8"):
+            fdir = work / f"gate-{fx}"
+            fdir.mkdir()
+            shutil.copy(FIX / "AuditFixture" / f"{fx}.lean", fdir / f"{fx}.lean")
+            base = work / f"gate-{fx}.json"
+            base.write_text(json.dumps({"sorry": 0, "vacuous-`: True :=` theorem": 0}))
+            g = run(
+                [
+                    sys.executable,
+                    "-I",
+                    str(HERE / "check_lean_foundations.py"),
+                    "--dir",
+                    str(fdir),
+                    "--baseline",
+                    str(base),
+                ]
+            )
+            report(
+                g.returncode == 0,
+                f"{fx}: the token gate is fooled (exit {g.returncode})",
+                g.stdout,
+            )
+            rc, res, out = h.audit(f"AuditFixture.{fx}")
+            report(
+                rc == 1
+                and res["vacuous"] == [ns(fx, "vac")]
+                and not res["non_standard"]
+                and len(res["errors"]) == 1,
+                f"{fx}: the semantic vacuity check FAILS exactly `vac` (exit {rc}): {res['vacuous']}",
+                out,
+            )
+        spell = [ns("VacSpell", f"v{k}") for k in range(1, 8)]
+        rc, res, out = h.audit("AuditFixture.VacSpell")
+        report(
+            rc == 1 and res["vacuous"] == sorted(spell) and len(res["errors"]) == 7,
+            f"VacSpell: (True), id True, True ∧ True, ∀ n, True, a def, p → True, True ↔ True all flagged (exit {rc})",
+            out,
+        )
+        rc, res, out = h.audit("AuditFixture.VacControl")
+        report(
+            rc == 0 and not res["vacuous"] and not res["errors"],
+            f"VacControl: real statements proved by trivial / rfl pass (exit {rc})",
+            out,
+        )
+        # The vacuity allowlist: an entry pinned to module + fingerprint allows exactly that theorem;
+        # a wrong fingerprint does not; a stale entry fails.
+        dummy = [
+            {
+                "declaration": spell[0],
+                "module": "AuditFixture.VacSpell",
+                "fingerprint": "0" * 64,
+                "issue": 1,
+                "reason": "probe",
+            }
+        ]
+        rc, res, out = h.audit("AuditFixture.VacSpell", vacuity=dummy)
+        fp = next(x["fp"] for x in res["vacuous_reports"] if x["decl"] == spell[0])
+        pin = [dict(dummy[0], fingerprint=sha(fp))]
+        rc, res, out = h.audit("AuditFixture.VacSpell", vacuity=pin)
+        report(
+            rc == 1
+            and res["vacuous_allowed"] == [spell[0]]
+            and res["vacuous"] == sorted(spell[1:])
+            and len(res["errors"]) == 6,
+            f"a pinned vacuity entry allows exactly its theorem (exit {rc})",
+            out,
+        )
+        rc, res, out = h.audit("AuditFixture.VacSpell", vacuity=dummy)
+        report(
+            rc == 1 and not res["vacuous_allowed"] and len(res["errors"]) == 8,
+            f"a wrong vacuity fingerprint does not allow it, and the entry is stale (exit {rc})",
+            out,
+        )
+
         # Red Team 4: two imports on one line — Lean's scope includes the hidden module.
         rc, res, out = h.audit("AuditFixture.ScopeRoot")
         report(
@@ -737,6 +836,9 @@ def main() -> int:
             "unresolved": [],
             "declarations": 9,
             "nonstd": [],
+            "theorems_checked": 1,
+            "vacuous": [],
+            "vacuity_errors": [],
         }
         forged = [
             (
@@ -798,6 +900,16 @@ def main() -> int:
                             for x in real_res["std"]
                         ],
                     )
+                ),
+            ),
+            (
+                "a result without the semantic-vacuity report",
+                json.dumps({k: v for k, v in clean.items() if k != "vacuous"}),
+            ),
+            (
+                "a result with an undecided vacuity check (timeout)",
+                json.dumps(
+                    dict(clean, vacuity_errors=[{"decl": "X.y", "error": "timeout"}])
                 ),
             ),
             (

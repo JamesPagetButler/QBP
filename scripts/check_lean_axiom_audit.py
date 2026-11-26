@@ -44,6 +44,13 @@ satisfied, although `lake build` warned about the `sorry`. A kernel re-check (le
 would not catch this either, because the substitute is well-typed; what is missing is a
 source <-> .olean binding. Nine proofs/ files use `#eval` today (all pure computations).
 
+SEMANTIC VACUITY (PR #829 Red Team r6): in the same auditor run, every audited THEOREM's statement
+is reduced (whnf at default transparency, every ∀/→ binder peeled, ∧/↔ split); if every leaf is
+`True` the theorem is VACUOUS and FAILS unless scripts/lean_vacuity_allowlist.json (empty) pins it
+by module + fingerprint. This decides on the term the kernel accepted, so no lexer desync, declared
+token or elaboration-time trick can hide a vacuous theorem. A reduction error or a timeout (per-
+theorem heartbeat budget) fails that theorem; a run without the report fails.
+
 ALLOWLIST (scripts/lean_axiom_allowlist.json): exact, issue-linked exceptions. An entry names ONE
 declaration and PINS its identity (Red Team 3): its module and a SHA-256 fingerprint (computed in
 Lean: the constant's canonical statement/body plus every project constant it reaches), and for
@@ -71,6 +78,10 @@ from pathlib import Path
 
 MARK = "AXIOM-AUDIT-827"
 DEFAULT_ALLOWLIST = Path(__file__).resolve().parent / "lean_axiom_allowlist.json"
+DEFAULT_VACUITY_ALLOWLIST = (
+    Path(__file__).resolve().parent / "lean_vacuity_allowlist.json"
+)
+VACUOUS: list[dict] = []  # every run's vacuous-theorem reports (graded in main)
 _BAD_CHARS = "*?[]"
 # Red Team r2 finding 3: the names `propext`, `Classical.choice`, `Quot.sound` must denote the
 # TOOLCHAIN's axioms. Each is pinned to its toolchain module and the SHA-256 of the auditor's
@@ -128,6 +139,30 @@ def _hex64(s: object) -> bool:
     return (
         isinstance(s, str) and len(s) == 64 and all(c in "0123456789abcdef" for c in s)
     )
+
+
+def load_vacuity_allowlist(path: Path, errors: list[str]) -> dict[str, dict]:
+    """Pinned exceptions for vacuous theorems: declaration, module, fingerprint, issue, reason.
+    Starts EMPTY (director, PR #829 r6)."""
+    if not path.exists():
+        errors.append(f"vacuity allowlist {path} not found")
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    out: dict[str, dict] = {}
+    for e in data.get("entries", []):
+        ok = (
+            isinstance(e, dict)
+            and _exact_name(e.get("declaration"))
+            and _exact_name(e.get("module"))
+            and _hex64(e.get("fingerprint"))
+            and type(e.get("issue")) is int
+            and bool(e.get("reason"))
+        )
+        if not ok:
+            errors.append(f"malformed vacuity allowlist entry: {e}")
+            continue
+        out[e["declaration"]] = e
+    return out
 
 
 def load_allowlist(path: Path, errors: list[str]) -> dict[str, dict]:
@@ -264,6 +299,28 @@ def grade_run(d: dict, errors: list[str]) -> tuple[list[dict], int, list[str]] |
             f"{sorted(set(missing) | (set(d['modules']) - set(scope)))}"
         )
     shadowed, std = r.get("shadowed"), r.get("std")
+    # SEMANTIC VACUITY (PR #829 Red Team r6): the auditor decides, per audited theorem, whether its
+    # statement reduces to `True` (after whnf, binder peeling and the ∧/↔ split). A missing report,
+    # a reduction error / timeout, or (in main) a vacuous theorem without a pinned entry FAILS.
+    thm_n, vac, vac_err = (
+        r.get("theorems_checked"),
+        r.get("vacuous"),
+        r.get("vacuity_errors"),
+    )
+    if (
+        type(thm_n) is not int
+        or not isinstance(vac, list)
+        or not isinstance(vac_err, list)
+    ):
+        errors.append(f"[{tag}] no semantic-vacuity report in the auditor result")
+    else:
+        for x in vac_err:
+            errors.append(f"[{tag}] vacuity check could not decide (fails closed): {x}")
+        for x in vac:
+            if isinstance(x, dict) and isinstance(x.get("decl"), str):
+                VACUOUS.append(dict(x, root=tag))
+            else:
+                errors.append(f"[{tag}] malformed vacuity entry: {x}")
     dangling = r.get("dangling")
     if not isinstance(dangling, list) or dangling:
         errors.append(
@@ -322,6 +379,11 @@ def main() -> int:
     ap.add_argument("--manifest", required=True)
     ap.add_argument("--json")
     ap.add_argument(
+        "--vacuity-allowlist",
+        default=str(DEFAULT_VACUITY_ALLOWLIST),
+        help="pinned exceptions for vacuous theorems ('' = none)",
+    )
+    ap.add_argument(
         "--build-dir",
         action="append",
         default=[],
@@ -351,6 +413,33 @@ def main() -> int:
         audited.update(scope)
         nonstd.extend(bad_here)
     allow = load_allowlist(Path(a.allowlist), errors) if a.allowlist else {}
+    vallow = (
+        load_vacuity_allowlist(Path(a.vacuity_allowlist), errors)
+        if a.vacuity_allowlist
+        else {}
+    )
+    vac_failed: set[str] = set()
+    vac_allowed: set[str] = set()
+    for x in VACUOUS:
+        ve = vallow.get(x["decl"])
+        if (
+            ve is not None
+            and x.get("module") == ve["module"]
+            and sha(x.get("fp")) == ve["fingerprint"]
+        ):
+            vac_allowed.add(x["decl"])
+            continue
+        vac_failed.add(x["decl"])
+    for decl in sorted(vac_failed):
+        mod = next(x.get("module") for x in VACUOUS if x["decl"] == decl)
+        errors.append(
+            f"VACUOUS theorem: {decl} (module {mod}) — its statement reduces to True "
+            f"(semantic check, not a spelling); no pinned vacuity-allowlist entry"
+        )
+    for decl in sorted(set(vallow) - vac_allowed):
+        errors.append(
+            f"STALE vacuity-allowlist entry: {decl} — not reported as vacuous with its pins"
+        )
     # One verdict per declaration (overlapping roots report the same declaration); every report
     # of a declaration must match its entry for it to be allowed.
     by_decl: dict[str, list[dict]] = {}
@@ -456,6 +545,9 @@ def main() -> int:
                     "declaration_audits": total_decls,
                     "not_covered": not_covered,
                     "reports": nonstd,
+                    "vacuous": sorted(vac_failed),
+                    "vacuous_allowed": sorted(vac_allowed),
+                    "vacuous_reports": VACUOUS,
                 },
                 indent=1,
             )

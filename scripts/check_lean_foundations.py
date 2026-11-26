@@ -93,9 +93,17 @@ GLUED_NUMBER = "identifier character, quote, « or ` glued directly after a numb
 # vacuous theorem. INTERIM fix: HARD-BAN every token-declaring command in the scanned tree (0 in
 # proofs/QBP/Foundations and 0 in all of proofs/ on 2026-11-25). Under the beekeeper's QBP#836
 # ruling ("allow pure syntax macros", AC1b), PR A replaces this ban with the Lean-parser check,
-# which permits pure notation and macros whose expansions stay in the subset; tokens declared by
-# IMPORTED modules are an open case in that PR's scope. Matched twice: on the lexer's code (comments
-# and strings blanked) AND on raw text per line, because the lexer is what such a file fools.
+# which permits pure notation and macros whose expansions stay in the subset. Matched twice: on the
+# lexer's code (comments and strings blanked) AND on raw text per line, because the lexer is what
+# such a file fools. The raw fallback reads raw text, so a COMMENT line that starts with one of these
+# words (e.g. a doc line "  notation for …") is refused too — it fails closed (0 such lines today).
+# THIS BAN IS AN EARLY WARNING, NOT THE GUARANTEE (PR #829 Red Team r6). A keyword list cannot be
+# complete: `binder_predicate`, a `@[term_parser]` def, or elaboration-time code in the file itself
+# (`run_cmd` / `run_elab` / `#eval` in `CommandElabM`, building the token at run time) declares
+# tokens too, and so do imported modules. That residue is S1-class, closed by QBP#836 AC1 + AC2. The
+# HARM it enables — a vacuous theorem the lexer cannot see — is now caught SEMANTICALLY by the axiom
+# audit (`LeanAxiomAudit.lean`: every audited theorem whose statement reduces to `True` fails),
+# whatever this lexer sees.
 _TOKEN_KW = (
     r"(?:notation3?|infixl|infixr|infix|prefix|postfix|syntax|macro_rules|macro|"
     r"elab_rules|elab|declare_syntax_cat)"

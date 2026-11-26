@@ -190,6 +190,11 @@ def main() -> int:
         default=str(Path(__file__).resolve().parent / "lean_axiom_allowlist.json"),
         help="allowlist whose declarations the auditor fingerprints ('' = none)",
     )
+    ap.add_argument(
+        "--vacuity-allowlist",
+        default=str(Path(__file__).resolve().parent / "lean_vacuity_allowlist.json"),
+        help="vacuity allowlist whose theorems the auditor fingerprints ('' = none)",
+    )
     a = ap.parse_args()
     proofs = Path(a.proofs)
     # absolute: the auditor runs from inside proofs/, not from where this script was called
@@ -197,7 +202,9 @@ def main() -> int:
         str(Path(d).resolve())
         for d in (a.project_dir or [str(proofs / ".lake" / "build" / "lib" / "lean")])
     ]
-    allow = allowlist_names(a.allowlist)
+    allow = sorted(
+        set(allowlist_names(a.allowlist)) | set(allowlist_names(a.vacuity_allowlist))
+    )
     if a.modules:
         write(
             Path(a.out_dir),

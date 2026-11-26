@@ -340,6 +340,42 @@ M = [
         "RESERVED_ROOTS: set = set()",
         [L],
     ),
+    # --- PR #829 Red Team r6 rule (semantic vacuity, director's option (b)) -------------------
+    (
+        "V1 semantic vacuity check dropped (checker)",
+        CK,
+        "    for decl in sorted(vac_failed):",
+        "    for decl in []:",
+        [L],
+    ),
+    (
+        "V2 vacuity: binder peel dropped",
+        AU,
+        "  | .forallE n t b bi => Meta.withLocalDecl n bi t fun x => qbpVacuous (b.instantiate1 x)",
+        "  | .forallE _ _ _ _ => return false",
+        [L],
+    ),
+    (
+        "V3 vacuity: ∧ split dropped",
+        AU,
+        "    if e.isAppOfArity ``And 2 || e.isAppOfArity ``Iff 2 then",
+        "    if e.isAppOfArity ``Iff 2 then",
+        [L],
+    ),
+    (
+        "V4 vacuity: whnf skipped",
+        AU,
+        "  let e ← Meta.whnf e",
+        "  let e ← pure e",
+        [L],
+    ),
+    (
+        "V5 undecided vacuity checks ignored (checker)",
+        CK,
+        "        for x in vac_err:",
+        "        for x in []:",
+        [L],
+    ),
     # --- PR #829 Red Team r5 rule (interim token-declaration ban) -----------------------------
     (
         "T5a token-declaration ban (lexer-code match) dropped",

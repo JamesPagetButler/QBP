@@ -186,6 +186,28 @@ def qbpFingerprint (env : Environment) (inProject : Name → Bool) (c : Name) : 
       if !seen.contains d then todo := todo.push d
   return "\n".intercalate (parts.qsort (· < ·)).toList
 
+/-- SEMANTIC VACUITY (PR #829 Red Team r6, director's option (b)). A theorem's statement is
+VACUOUS if, after `whnf` (default transparency) and peeling every `∀` / `→` binder, its conclusion
+splits along `∧` / `↔` into leaves that each reduce to `True`: `True`, `(True)`, `id True`, a def
+unfolding to `True`, `True ∧ True`, `∀ n, True`, `p → True`, … The check decides on the TERM the
+kernel accepted, so no lexer trick (a token declared by `notation`, `binder_predicate`,
+`@[term_parser]`, `run_cmd`, `#eval` in `CommandElabM`, or an import) can hide a vacuous theorem.
+NOTE (fail-closed): with `loadExts := false` no reducibility attribute is loaded, so `whnf` may
+unfold MORE than an elaborating Lean would; that can only flag more statements, never fewer. -/
+partial def qbpVacuous (e : Expr) : MetaM Bool := do
+  let e ← Meta.whnf e
+  match e with
+  | .forallE n t b bi => Meta.withLocalDecl n bi t fun x => qbpVacuous (b.instantiate1 x)
+  | _ =>
+    if e.isConstOf ``True then return true
+    if e.isAppOfArity ``And 2 || e.isAppOfArity ``Iff 2 then
+      return (← qbpVacuous e.appFn!.appArg!) && (← qbpVacuous e.appArg!)
+    return false
+
+/-- Per-theorem reduction budget, in heartbeats (×1000 internally). A timeout or any error is
+reported and FAILS that theorem (fail-closed). -/
+def qbpVacuityHeartbeats : Nat := 200000
+
 def main (args : List String) : IO UInt32 := do
   let nonce :: label :: items := args
     | IO.eprintln "usage: LeanAxiomAudit NONCE LABEL ITEM..."; return 2
@@ -268,6 +290,31 @@ def main (args : List String) : IO UInt32 := do
         ("fp", Json.str (qbpFingerprint env inProject a))]
     | none => Json.mkObj [("name", Json.str (toString a)), ("module", Json.str ""),
         ("axiom", Json.bool false), ("fp", Json.str "")]
+  -- SEMANTIC VACUITY over every audited theorem, in this same run (no initializers, loadExts :=
+  -- false). Each check gets a fresh `CoreM` context with its own heartbeat budget.
+  let coreCtx : Core.Context :=
+    { fileName := "<qbp-axiom-audit>", fileMap := default,
+      maxHeartbeats := qbpVacuityHeartbeats * 1000 }
+  let mut vacuous : Array Json := #[]
+  let mut vacErrors : Array Json := #[]
+  let mut thmCount := 0
+  for n in inScope do
+    let some (.thmInfo v) := env.find? n | continue
+    thmCount := thmCount + 1
+    let r : Except String Bool ← try
+        let (b, _) ← (Meta.MetaM.run' (qbpVacuous v.type)).toIO coreCtx { env := env }
+        pure (Except.ok b)
+      catch e => pure (Except.error (toString e))
+    match r with
+    | .ok true =>
+      let base := [("decl", Json.str (toString n)), ("module", Json.str (modOf n))]
+      vacuous := vacuous.push (Json.mkObj
+        (if allowNames.contains n then base ++ [("fp", Json.str (qbpFingerprint env inProject n))]
+         else base))
+    | .ok false => pure ()
+    | .error msg =>
+      vacErrors := vacErrors.push (Json.mkObj [("decl", Json.str (toString n)),
+        ("module", Json.str (modOf n)), ("error", Json.str (toString (msg.take 300)))])
   let out := Json.mkObj [
     ("mark", "AXIOM-AUDIT-827"), ("nonce", nonce), ("root", label),
     ("scope", Json.arr (scope.map (fun t => Json.str (toString t)))),
@@ -276,6 +323,8 @@ def main (args : List String) : IO UInt32 := do
     ("shadowed", Json.arr (shadowed.map (fun t => Json.str (toString t)))),
     ("dangling", Json.arr (dangling.toList.toArray.map (fun t => Json.str (toString t)))),
     ("std", Json.arr stdJ),
-    ("declarations", inScope.size), ("nonstd", Json.arr bad)]
+    ("declarations", inScope.size), ("nonstd", Json.arr bad),
+    ("theorems_checked", thmCount), ("vacuous", Json.arr vacuous),
+    ("vacuity_errors", Json.arr vacErrors)]
   IO.println out.compress
   return 0
