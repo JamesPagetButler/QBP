@@ -24,15 +24,30 @@ everywhere.  The check passes with a `::warning::` that names the fix.  To make
 absence blocking later, pass `--absent-blocks` in the workflow step (one line).
 
 Beekeeper-box scope guard (#835; beekeeper ruling 2026-11-24, QBP#714
-issuecomment-7147354671): a ⊘-nil'd box whose text names Human Visual Review /
-HVR or `merge authorized` is accepted ONLY on a pure housekeeping PR — label
-`housekeeping` and not theory-bearing (the PR Process Lints §1 definition:
-no `tier-3-review` label, no changed path under proofs/, docs/theory/,
-docs/foundations/).  Otherwise exit 1.  "When in doubt, treat it as theory":
-if the scope inputs are not supplied the guard fails closed on such a nil.
+issuecomment-7147354671).  Active when the workflow passes `--labels` and
+`--changed-file` (a changed rename contributes BOTH its old and new path):
+
+  pure housekeeping = label `housekeeping` AND not theory-bearing AND touches
+                      no merge-lane file.
+  theory-bearing    = any changed path under THEORY_PATHS (the union of
+                      PR Process Lints §1 and the tier-3 gate's THEORY_GLOBS),
+                      or the `tier-3-review` label.  Paths decide; the label can
+                      only ADD theory status, never remove it (a GITHUB_TOKEN
+                      label does not re-trigger this job — F2 on PR #838).
+  merge-lane file   = LANE_PATHS: the box/tier/label gates, their workflows, the
+                      PR templates, CONTRIBUTING.md, review_tiers.md, CODEOWNERS.
+                      Those PRs stay the beekeeper's (CLAUDE.md delegation rule).
+
+  1. A ⊘-nil'd beekeeper box (HVR / merge authorized / beekeeper, matched after
+     NFKC + zero-width removal) on a PR that is not pure housekeeping → exit 1.
+  2. Positive requirement: on a PR with a §2.2 region that is neither pure
+     housekeeping nor plain Tier 1 (`tier-1-review` label, no theory, no lane
+     file), the region must hold a TICKED Human Visual Review box AND a TICKED
+     Merge authorized box → else exit 1 (a deleted or renamed box cannot pass).
+  Without the scope inputs, rule 1 fails closed and rule 2 is not evaluated.
 
 Usage: merge_blocking_check.py [--body-file F | reads stdin] [--absent-blocks]
-                               [--labels "a,b"] [--changed-file F]
+                               [--labels="a,b"] [--changed-file=F]
 """
 
 from __future__ import annotations
@@ -41,28 +56,120 @@ import argparse
 import os
 import re
 import sys
+import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from pr_merge_blocking_boxes import parse  # noqa: E402
 
-# A nil'd box naming one of the beekeeper's own boxes (HVR / merge authorized).
-BEEKEEPER_BOX_RE = re.compile(
-    r"human\s+visual\s+review|\bhvr\b|merge[\s-]+authori[sz]ed", re.I
+# Normalisation before any name match: NFKC, zero-width / soft-hyphen removal,
+# markdown emphasis + strike markers dropped, case-folded.
+_ZW_RE = re.compile("[\u00ad\u200b-\u200f\u2060\ufeff]")
+_MD_RE = re.compile(r"[~*_`]")
+# A NIL'd box naming the beekeeper's sign-off in any spelling (wide on purpose).
+BEEKEEPER_NIL_RE = re.compile(
+    r"visual\W*review|beekeeper|\bh\W?v\W?r|merge\W*authori[sz]|merge\W*approv"
 )
+# The two boxes a non-housekeeping Tier 2+ PR must carry TICKED (canonical names).
+HVR_BOX_RE = re.compile(r"human\W*visual\W*review|\bhvr\b")
+MA_BOX_RE = re.compile(r"merge\W*authori[sz]ed")
 HOUSEKEEPING_LABEL = "housekeeping"
+TIER1_LABEL = "tier-1-review"
 
-# Theory-bearing = the PR Process Lints §1 definition.  Kept as a local copy (not
-# an import) so the base-sha judge stays the two files it has always been; the
-# test suite asserts it equals `check_pr_prose_claims.THEORY_PATHS/THEORY_LABEL`.
-THEORY_PATHS = ("proofs/", "docs/theory/", "docs/foundations/")
+# Theory-bearing paths: the UNION of PR Process Lints §1
+# (`check_pr_prose_claims.THEORY_PATHS`) and the tier-3 gate
+# (`check_tier3_label.THEORY_GLOBS` prefixes), as path prefixes (stricter than the
+# globs: any file under them).  Kept as a local copy so the base-sha judge stays
+# the two files the verdict selector requires; the test suite asserts this is a
+# superset of both sources, so neither can widen without this following.
+THEORY_PATHS = (
+    "proofs/",
+    "docs/theory/",
+    "docs/foundations/",
+    "paper/",
+    "archive/cth-inventory/",
+)
 THEORY_LABEL = "tier-3-review"
+# Merge-lane / governance machinery (F4 on PR #838): a PR touching any of these is
+# never pure housekeeping — the beekeeper merges it (CLAUDE.md: "A PR that changes
+# this delegation or any seat's merge lane is merged by the beekeeper").
+LANE_PATHS = (
+    "CONTRIBUTING.md",
+    "docs/workflows/review_tiers.md",
+    ".github/PULL_REQUEST_TEMPLATE/",
+    ".github/CODEOWNERS",
+    "CODEOWNERS",
+    "docs/CODEOWNERS",
+    ".github/workflows/merge-blocking-boxes.yml",
+    ".github/workflows/tier-3-review-gate.yml",
+    ".github/workflows/pr-check-status.yml",
+    "scripts/merge_blocking_check.py",
+    "scripts/pr_merge_blocking_boxes.py",
+    "scripts/merge_blocking_verdict_source.py",
+    "scripts/check_tier3_label.py",
+    "scripts/pr_box_evidence.py",
+)
+
+
+def _norm(text: str) -> str:
+    return _MD_RE.sub(
+        "", _ZW_RE.sub("", unicodedata.normalize("NFKC", text))
+    ).casefold()
+
+
+def _labels(labels) -> set:
+    return {x.strip().casefold() for x in labels}
 
 
 def is_theory_bearing(labels, changed) -> bool:
-    if THEORY_LABEL in labels:
+    """Paths decide; the `tier-3-review` label (case-folded) can only add."""
+    if THEORY_LABEL in _labels(labels):
         return True
     return any(p.startswith(THEORY_PATHS) for p in changed)
+
+
+def touches_lane(changed) -> bool:
+    return any(
+        p == lp or (lp.endswith("/") and p.startswith(lp))
+        for p in changed
+        for lp in LANE_PATHS
+    )
+
+
+def pure_housekeeping(labels, changed) -> bool:
+    """True iff the PR is pure housekeeping per the 2026-11-24 ruling (#835).
+
+    The `housekeeping` label match is exact (after strip): a near-miss fails closed.
+    """
+    return (
+        HOUSEKEEPING_LABEL in {x.strip() for x in labels}
+        and not is_theory_bearing(labels, changed)
+        and not touches_lane(changed)
+    )
+
+
+def needs_beekeeper_boxes(labels, changed) -> bool:
+    """Tier 2+ and not pure housekeeping → HVR + merge authorized must be ticked."""
+    if pure_housekeeping(labels, changed):
+        return False
+    plain_tier1 = (
+        TIER1_LABEL in _labels(labels)
+        and not is_theory_bearing(labels, changed)
+        and not touches_lane(changed)
+    )
+    return not plain_tier1
+
+
+def _why_not_pure(labels, changed) -> str:
+    if is_theory_bearing(labels, changed):
+        return (
+            "PR is theory-bearing (tier-3-review label or a path under "
+            + ", ".join(THEORY_PATHS)
+            + ")"
+        )
+    if touches_lane(changed):
+        return "PR touches merge-lane / governance files (beekeeper-merged)"
+    return "no `housekeeping` label"
 
 
 DOC_URL = (
@@ -93,11 +200,6 @@ def _annot(level: str, msg: str) -> None:
     print(f"::{level}::{esc}")
 
 
-def pure_housekeeping(labels, changed) -> bool:
-    """True iff the PR is pure housekeeping per the 2026-11-24 ruling (#835)."""
-    return HOUSEKEEPING_LABEL in labels and not is_theory_bearing(labels, changed)
-
-
 def check(body: str, absent_blocks: bool = False, labels=None, changed=None) -> int:
     """Return the exit code for `body` and print the actionable report.
 
@@ -120,18 +222,14 @@ def check(body: str, absent_blocks: bool = False, labels=None, changed=None) -> 
             return 1
         _annot("warning", msg + f" (not blocking in this configuration) See {DOC_URL}")
         return 0
-    bk_nil = [t for t in res["nil"] if BEEKEEPER_BOX_RE.search(t)]
+    bk_nil = [t for t in res["nil"] if BEEKEEPER_NIL_RE.search(_norm(t))]
+    scoped = labels is not None and changed is not None
     if bk_nil:
-        if labels is None or changed is None:
+        if not scoped:
             ok, why = False, "PR labels/changed files not supplied (fail closed)"
         else:
-            ok = pure_housekeeping(set(labels), list(changed))
-            why = (
-                "no `housekeeping` label"
-                if HOUSEKEEPING_LABEL not in labels
-                else "PR is theory-bearing (tier-3-review label or a path under "
-                "proofs/, docs/theory/, docs/foundations/)"
-            )
+            ok = pure_housekeeping(labels, changed)
+            why = "" if ok else _why_not_pure(labels, changed)
         if not ok:
             print(
                 f"\nFAIL — {len(bk_nil)} beekeeper box(es) ⊘-nil'd on a PR that is "
@@ -144,6 +242,33 @@ def check(body: str, absent_blocks: bool = False, labels=None, changed=None) -> 
                     f"⊘-nil'd beekeeper box on a non-housekeeping PR: {t} — HVR and "
                     f"`merge authorized` may be nil'd only on pure housekeeping "
                     f"({why}); when in doubt, treat it as theory (#835)",
+                )
+            print(f"Contract: {LOCAL_DOC}")
+            return 1
+    if scoped and needs_beekeeper_boxes(labels, changed):
+        ticked_n = [_norm(t) for t in res["ticked"]]
+        missing = [
+            name
+            for name, rx in (
+                ("Human Visual Review (beekeeper)", HVR_BOX_RE),
+                ("Merge authorized (beekeeper; QBP lane)", MA_BOX_RE),
+            )
+            if not any(rx.search(t) for t in ticked_n)
+            and not any(rx.search(_norm(t)) for t in res["unticked"])
+        ]
+        if missing:
+            why = _why_not_pure(labels, changed)
+            print(
+                f"\nFAIL — required beekeeper box(es) missing from the §2.2 region "
+                f"on a Tier 2+ PR that is not pure housekeeping ({why}):"
+            )
+            for name in missing:
+                print(f"  - [ ] {name}")
+                _annot(
+                    "error",
+                    f"required beekeeper box missing: {name} — Tier 2+ PRs keep HVR and "
+                    f"`merge authorized` except pure housekeeping ({why}); add the box "
+                    f"to the merge-blocking region (#835)",
                 )
             print(f"Contract: {LOCAL_DOC}")
             return 1
@@ -178,7 +303,7 @@ def main(argv=None) -> int:
     ap.add_argument(
         "--labels",
         default=None,
-        help="comma-separated PR label names (enables the #835 beekeeper-box guard)",
+        help="comma-separated PR label names (enables the #835 beekeeper-box guard; pass as --labels=VALUE)",
     )
     ap.add_argument(
         "--changed-file",

@@ -120,9 +120,13 @@ jobs:
           set -euo pipefail
           labels=$(gh api "repos/$REPO/pulls/$PR" --jq '[.labels[].name] | join(",")')
           echo "labels=$labels" >> "$GITHUB_OUTPUT"
-          # paginated REST (gh pr view --json files caps at 100 files — K10); fail closed on mismatch
-          gh api "repos/$REPO/pulls/$PR/files?per_page=100" --paginate --jq '.[].filename' > /tmp/changed.txt
-          n_api=$(grep -c . /tmp/changed.txt || true)
+          # paginated REST (gh pr view --json files caps at 100 files — K10); fail closed on mismatch.
+          # One TSV row per changed file: filename + previous_filename (set only on a rename),
+          # so a file renamed OUT of a theory path is still seen (F1 on PR #838).
+          gh api "repos/$REPO/pulls/$PR/files?per_page=100" --paginate \
+            --jq '.[] | [.filename, (.previous_filename // "")] | @tsv' > /tmp/files.tsv
+          n_api=$(grep -c . /tmp/files.tsv || true)   # entries, not paths (renames add a path)
+          tr '\t' '\n' < /tmp/files.tsv | grep -v '^$' > /tmp/changed.txt || true
           n_pr=$(gh api "repos/$REPO/pulls/$PR" --jq .changed_files)
           if [ "$n_pr" -gt 3000 ]; then
             echo "::warning::PR has $n_pr changed files; the files API caps at 3000 — treated as theory-bearing (when in doubt, theory)"
@@ -143,4 +147,4 @@ jobs:
           SRC_DIR: ${{ steps.src.outputs.dir }}
           SCOPE: ${{ steps.scope.outputs.supported }}
           LABELS: ${{ steps.scope.outputs.labels }}
-        run: python3 "$SRC_DIR/scripts/merge_blocking_check.py" --body-file /tmp/body.md ${SCOPE:+--labels "$LABELS" --changed-file /tmp/changed.txt}
+        run: python3 "$SRC_DIR/scripts/merge_blocking_check.py" --body-file /tmp/body.md ${SCOPE:+"--labels=$LABELS" --changed-file=/tmp/changed.txt}

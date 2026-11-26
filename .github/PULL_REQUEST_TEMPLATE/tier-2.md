@@ -87,9 +87,12 @@ Routing rubric: docs/workflows/pr7_conflict_routing_rubric.md (v0.2)
      (`housekeeping` label, no theory touched: tooling, CI, docs, process, incl. Lean/Agda proof
      *tooling* that changes no proof statement) ⊘-nils both — replace each line with
      `- [ ] ~~<box text>~~ ⊘ pure housekeeping`. Any PR touching theory (a `proofs/` statement,
-     `docs/foundations/`, a result claim) keeps both. When in doubt, treat it as theory.
-     The `Merge-blocking boxes` check rejects a nil'd HVR/Merge-authorized box on a PR that is
-     not `housekeeping`-labelled or that changes proofs/, docs/theory/ or docs/foundations/.
+     `docs/foundations/`, a result claim) keeps both, and so does every other non-housekeeping
+     PR. When in doubt, treat it as theory. The `Merge-blocking boxes` check rejects a nil'd
+     HVR/Merge-authorized box unless the PR is `housekeeping`-labelled and changes nothing under
+     proofs/, docs/theory/, docs/foundations/, paper/, archive/cth-inventory/ and no merge-lane
+     file (CONTRIBUTING.md, review_tiers.md, these templates, the merge-blocking/Tier-3/notifier
+     workflows and scripts); otherwise both boxes must be present and ticked.
      Beekeeper ruling 2026-11-24, QBP#714 issuecomment-7147354671; CONTRIBUTING.md
      §Housekeeping vs theory. -->
 

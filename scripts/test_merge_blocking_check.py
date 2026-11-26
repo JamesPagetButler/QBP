@@ -146,14 +146,23 @@ def test_never_edits_anything():
 
 # ---- #835 beekeeper-box scope guard (ruling 2026-11-24, QBP#714 issuecomment-7147354671)
 
+HK = ["housekeeping", "tier-2-review"]
 HVR_NILD = (
     "Sign-off required (merge-blocking):\n- [x] Red Team review\n- [x] Gemini review\n"
     "- [ ] ~~Human Visual Review (beekeeper)~~ ⊘ pure housekeeping\n"
     "- [ ] ~~Merge authorized (beekeeper; QBP lane)~~ ⊘ pure housekeeping\n"
 )
+BK_TICKED = (
+    "Sign-off required (merge-blocking):\n- [x] Red Team review\n- [x] Gemini review\n"
+    "- [x] Human Visual Review (beekeeper)\n- [x] Merge authorized (beekeeper; QBP lane)\n"
+)
 OTHER_NILD = (
     "Sign-off required (merge-blocking):\n- [x] Red Team review\n"
     "- [ ] ~~schema co-sign~~ ⊘ n/a\n- [x] Human Visual Review (beekeeper)\n"
+    "- [x] Merge authorized (beekeeper; QBP lane)\n"
+)
+NO_BK_BOXES = (
+    "Sign-off required (merge-blocking):\n- [x] Red Team review\n- [x] Gemini review\n"
 )
 
 
@@ -164,15 +173,13 @@ def _scoped(body, labels, changed):
         fh.write("\n".join(changed) + "\n")
         path = fh.name
     try:
-        return run(body, "--labels", ",".join(labels), "--changed-file", path)
+        return run(body, f"--labels={','.join(labels)}", f"--changed-file={path}")
     finally:
         os.unlink(path)
 
 
 def test_hvr_nil_passes_on_pure_housekeeping():
-    r = _scoped(
-        HVR_NILD, ["housekeeping", "tier-2-review"], ["scripts/x.py", "CONTRIBUTING.md"]
-    )
+    r = _scoped(HVR_NILD, HK, ["scripts/x.py", "docs/notes.md"])
     assert r.returncode == 0, r.stdout
 
 
@@ -182,15 +189,71 @@ def test_hvr_nil_fails_without_housekeeping_label():
     assert r.stdout.count("::error::⊘-nil'd beekeeper box") == 2, r.stdout
 
 
-def test_hvr_nil_fails_on_theory_path_even_if_housekeeping():
-    for path in ("proofs/QBP/Foo.lean", "docs/foundations/a.md", "docs/theory/b.md"):
+def test_housekeeping_label_match_is_exact():
+    # near-miss labels fail closed; surrounding whitespace is stripped
+    assert _scoped(HVR_NILD, ["Housekeeping"], ["scripts/x.py"]).returncode == 1
+    assert _scoped(HVR_NILD, ["housekeeping "], ["scripts/x.py"]).returncode == 0
+
+
+def test_hvr_nil_fails_on_every_theory_path_even_if_housekeeping():
+    for path in (
+        "proofs/QBP/Foo.lean",
+        "docs/foundations/a.md",
+        "docs/theory/b.md",
+        "paper/main.tex",
+        "archive/cth-inventory/x.json",
+    ):
         r = _scoped(HVR_NILD, ["housekeeping"], ["scripts/x.py", path])
         assert r.returncode == 1 and "theory-bearing" in r.stdout, (path, r.stdout)
 
 
-def test_hvr_nil_fails_on_tier3_label_even_if_housekeeping():
-    r = _scoped(HVR_NILD, ["housekeeping", "tier-3-review"], ["scripts/x.py"])
+def test_rename_out_of_proofs_counts_as_theory():
+    # the workflow writes BOTH filename and previous_filename for a rename (F1)
+    r = _scoped(HVR_NILD, ["housekeeping"], ["archive/X.lean", "proofs/QBP/X.lean"])
     assert r.returncode == 1 and "theory-bearing" in r.stdout, r.stdout
+
+
+def test_hvr_nil_fails_on_tier3_label_case_folded():
+    for lab in ("tier-3-review", "Tier-3-Review", " tier-3-review "):
+        r = _scoped(HVR_NILD, ["housekeeping", lab], ["scripts/x.py"])
+        assert r.returncode == 1 and "theory-bearing" in r.stdout, (lab, r.stdout)
+
+
+def test_theory_status_never_depends_on_a_missing_label():
+    # no tier-3 label yet (GITHUB_TOKEN auto-label race, F2): paths alone decide
+    r = _scoped(HVR_NILD, ["housekeeping"], ["paper/a.tex"])
+    assert r.returncode == 1, r.stdout
+
+
+def test_lane_files_are_never_pure_housekeeping():
+    for path in (
+        "CONTRIBUTING.md",
+        "docs/workflows/review_tiers.md",
+        ".github/PULL_REQUEST_TEMPLATE/tier-2.md",
+        ".github/workflows/merge-blocking-boxes.yml",
+        ".github/workflows/tier-3-review-gate.yml",
+        ".github/workflows/pr-check-status.yml",
+        "scripts/merge_blocking_check.py",
+        "scripts/pr_merge_blocking_boxes.py",
+        "scripts/merge_blocking_verdict_source.py",
+        "scripts/check_tier3_label.py",
+        ".github/CODEOWNERS",
+    ):
+        r = _scoped(HVR_NILD, ["housekeeping"], [path])
+        assert r.returncode == 1 and "merge-lane" in r.stdout, (path, r.stdout)
+    # a similarly-named file that is not a lane file stays housekeeping
+    assert _scoped(HVR_NILD, HK, ["docs/CONTRIBUTING-notes.md"]).returncode == 0
+
+
+def test_pr_838_itself_cannot_nil_the_boxes():
+    changed = [
+        ".github/PULL_REQUEST_TEMPLATE/tier-2.md",
+        ".github/workflows/merge-blocking-boxes.yml",
+        "CONTRIBUTING.md",
+        "docs/workflows/review_tiers.md",
+        "scripts/merge_blocking_check.py",
+    ]
+    assert _scoped(HVR_NILD, HK, changed).returncode == 1
 
 
 def test_hvr_nil_fails_closed_without_scope_inputs():
@@ -198,15 +261,138 @@ def test_hvr_nil_fails_closed_without_scope_inputs():
     assert r.returncode == 1 and "fail closed" in r.stdout, r.stdout
 
 
+def test_nil_name_variants_are_all_caught():
+    for box in (
+        "HVR",
+        "HVRs",
+        "H.V.R.",
+        "Human-Visual-Review",
+        "Human​Visual Review",
+        "ＨＶＲ",  # fullwidth → NFKC (kills a dropped normalize)
+        "Mer\u200bge author\u200bised",  # zero-width inside words (kills a dropped _ZW_RE)
+        "Visual review (beekeeper)",
+        "Beekeeper review",
+        "Merge authorised",
+        "Merge approval (beekeeper)",
+    ):
+        # both canonical boxes ticked, so only the nil rule can turn this red
+        body = BK_TICKED + f"- [ ] ~~{box}~~ ⊘ pure housekeeping\n"
+        r = _scoped(body, ["tier-2-review"], ["scripts/x.py"])
+        assert r.returncode == 1 and "⊘-nil'd beekeeper box" in r.stdout, (
+            box,
+            r.stdout,
+        )
+        assert "required beekeeper box missing" not in r.stdout, (box, r.stdout)
+
+
+def test_ordinary_nils_stay_ordinary():
+    # M4e: the wide nil match must not swallow unrelated nils
+    for box in ("schema co-sign", "Red Team review", "Gemini review", "two-axis"):
+        body = BK_TICKED + f"- [ ] ~~{box}~~ ⊘ n/a\n"
+        r = _scoped(body, ["tier-2-review"], ["scripts/x.py"])
+        assert r.returncode == 0, (box, r.stdout)
+
+
 def test_other_nils_unaffected_by_guard():
     assert run(OTHER_NILD).returncode == 0
     assert _scoped(OTHER_NILD, ["tier-3-review"], ["proofs/a.lean"]).returncode == 0
 
 
-def test_theory_definition_matches_pr_process_lints():
-    import check_pr_prose_claims as lint
+def test_tier2_requires_ticked_bk_boxes_present():
+    # F5: a deleted HVR / merge-authorized box cannot pass on a Tier 2+ PR
+    r = _scoped(NO_BK_BOXES, ["tier-2-review"], ["scripts/x.py"])
+    assert r.returncode == 1 and r.stdout.count("required beekeeper box missing") == 2
+    assert _scoped(BK_TICKED, ["tier-2-review"], ["scripts/x.py"]).returncode == 0
 
-    assert c.THEORY_PATHS == lint.THEORY_PATHS and c.THEORY_LABEL == lint.THEORY_LABEL
+
+def test_theory_pr_requires_ticked_bk_boxes_even_with_lookalike_nil():
+    # a Cyrillic-а lookalike evades the name match, but the positive rule catches it
+    body = NO_BK_BOXES + "- [ ] ~~Humаn Visuаl Rеviеw~~ ⊘ x\n"
+    r = _scoped(body, ["tier-3-review"], ["proofs/a.lean"])
+    assert r.returncode == 1 and "required beekeeper box missing" in r.stdout, r.stdout
+
+
+def test_box_moved_out_of_region_is_missing():
+    body = (
+        NO_BK_BOXES
+        + "\nSome prose.\n- [x] Human Visual Review\n- [x] Merge authorized\n"
+    )
+    assert _scoped(body, ["tier-2-review"], ["scripts/x.py"]).returncode == 1
+
+
+def test_unticked_bk_box_reported_once_as_unticked():
+    body = (
+        NO_BK_BOXES + "- [ ] Human Visual Review (beekeeper)\n- [x] Merge authorized\n"
+    )
+    r = _scoped(body, ["tier-2-review"], ["scripts/x.py"])
+    assert r.returncode == 1 and "unticked merge-blocking box: Human Visual" in r.stdout
+    assert "required beekeeper box missing" not in r.stdout, r.stdout
+
+
+def test_plain_tier1_and_pure_housekeeping_need_no_bk_boxes():
+    assert _scoped(NO_BK_BOXES, ["tier-1-review"], ["docs/x.md"]).returncode == 0
+    assert _scoped(NO_BK_BOXES, HK, ["scripts/x.py"]).returncode == 0
+    # a tier-1 label cannot exempt theory or lane files
+    assert _scoped(NO_BK_BOXES, ["tier-1-review"], ["paper/a.tex"]).returncode == 1
+    assert _scoped(NO_BK_BOXES, ["tier-1-review"], ["CONTRIBUTING.md"]).returncode == 1
+
+
+def test_label_starting_with_dash_is_parsed():
+    r = _scoped(BK_TICKED, ["-x", "tier-2-review"], ["scripts/x.py"])
+    assert r.returncode == 0, (r.returncode, r.stdout, r.stderr)
+
+
+def test_theory_definition_is_superset_of_both_gates():
+    import check_pr_prose_claims as lint
+    import check_tier3_label as t3
+
+    for p in lint.THEORY_PATHS:
+        assert p.startswith(c.THEORY_PATHS), p
+    assert c.THEORY_LABEL == lint.THEORY_LABEL == t3.TIER3_LABEL
+    for g in t3.THEORY_GLOBS:
+        prefix = g.split("*", 1)[0]
+        assert prefix.startswith(c.THEORY_PATHS), g
+
+
+def test_workflow_scope_wiring():
+    """F6: pin the #835 wiring in merge-blocking-boxes.yml."""
+    import yaml
+
+    wf = yaml.safe_load(open(WORKFLOW, encoding="utf-8"))
+    on = wf.get("on", wf.get(True))
+    types = on["pull_request"]["types"]
+    assert "labeled" in types and "unlabeled" in types, types
+    steps = wf["jobs"]["merge-blocking-boxes"]["steps"]
+    scope = [s for s in steps if s.get("id") == "scope"]
+    assert len(scope) == 1, steps
+    run_ = scope[0]["run"]
+    assert "--paginate" in run_, run_
+    assert (
+        """--jq '.[] | [.filename, (.previous_filename // "")] | @tsv'""" in run_
+    ), run_
+    assert '[ "$n_api" != "$n_pr" ]' in run_, run_
+    mism = run_.split('[ "$n_api" != "$n_pr" ]', 1)[1].split("\nfi", 1)[0]
+    assert "exit 1" in mism, mism
+    assert 'echo "proofs/__enumeration_incomplete__" >> /tmp/changed.txt' in run_, run_
+    assert "-gt 3000" in run_, run_
+    verdict = steps[-1]
+    assert (
+        '${SCOPE:+"--labels=$LABELS" --changed-file=/tmp/changed.txt}' in verdict["run"]
+    ), verdict["run"]
+    assert verdict["env"]["SCOPE"] == "${{ steps.scope.outputs.supported }}"
+    assert verdict["env"]["LABELS"] == "${{ steps.scope.outputs.labels }}"
+
+
+def test_tier3_gate_sees_both_sides_of_a_rename():
+    wf = open(
+        os.path.join(
+            os.path.dirname(HERE), ".github", "workflows", "tier-3-review-gate.yml"
+        ),
+        encoding="utf-8",
+    ).read()
+    assert (
+        "git diff --name-only --no-renames" in wf
+    ), "tier-3 gate must list rename sources"
 
 
 # ---- verdict source: the judge is the BASE copy, never the PR head (arch §I4, PR #780)

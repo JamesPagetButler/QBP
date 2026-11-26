@@ -165,11 +165,12 @@ Beekeeper ruling, approved 2026-11-24 ([QBP#714 issuecomment-7147354671](https:/
 
 | PR kind | Beekeeper HVR + `merge authorized` | Merger |
 |---|---|---|
-| **Pure housekeeping** — `housekeeping`-labelled and touches no theory: tooling, CI, docs and process, including Lean or Agda proof *tooling* that changes no proof statement | **Not required**, even at Tier 2. ⊘-nil both boxes: `- [ ] ~~Human Visual Review (beekeeper)~~ ⊘ pure housekeeping` | notary-implementor, once CI, Red Team, Gemini and every other box are green |
-| **Touches theory in any way** — Tier 3, a proof statement in `proofs/`, anything in `docs/foundations/`, a result claim — whatever its label | **Required** | notary-implementor, only after both boxes are ticked |
+| **Pure housekeeping** — `housekeeping`-labelled and touches no theory: tooling, CI, docs and process, including Lean or Agda proof *tooling* that changes no proof statement | **Not required**, even at Tier 2. ⊘-nil both boxes: `- [ ] ~~Human Visual Review (beekeeper)~~ ⊘ pure housekeeping` | notary-implementor under the notary lane (author ≠ reviewer ≠ merger, notarisation record), once CI, Red Team, Gemini and every other box are green |
+| **Touches theory in any way** — Tier 3, a proof statement in `proofs/`, anything in `docs/foundations/`, a result claim — whatever its label | **Required** | notary-implementor under the notary lane (author ≠ reviewer ≠ merger, notarisation record), only after both boxes are ticked |
+| **Every other Tier 2+ PR** — not pure housekeeping (no `housekeeping` label, or it touches merge-lane / governance files) | **Required**, as before the ruling | unchanged: the existing QBP lanes (incl. the QBP#714 cross-merge lane), only after both boxes are ticked |
 | **Doubtful case** | **When in doubt, treat it as theory** (boxes required) | as for theory |
 
-Mechanical guard: the `Merge-blocking boxes` check (item 8 below) fails a PR that ⊘-nils an HVR or `merge authorized` box unless the PR carries the `housekeeping` label and is not theory-bearing (no `tier-3-review` label; no changed path under `proofs/`, `docs/theory/`, `docs/foundations/` — the same set as `PR Process Lints` §1). Proof tooling that lives under `proofs/` therefore keeps its boxes: the path rule fails closed, in line with "when in doubt, theory". A result claim is not machine-detectable; the author and reviewers own that call. A PR that changes these tiers or any merge lane is merged by the beekeeper.
+Mechanical guard (item 8 below): The `Merge-blocking boxes` check enforces this from the PR's changed paths and labels. (1) A ⊘-nil'd HVR / `merge authorized` / beekeeper box is accepted only on **pure housekeeping**: `housekeeping` label, no theory-bearing path (`proofs/`, `docs/theory/`, `docs/foundations/`, `paper/`, `archive/cth-inventory/` — the union of PR Process Lints §1 and the Tier-3 gate; a rename counts both its old and new path), no `tier-3-review` label, and no merge-lane / governance file (`CONTRIBUTING.md`, this file, the PR templates, CODEOWNERS, the merge-blocking / Tier-3 / notifier workflows and their scripts). Paths decide theory status; a label can only add it. (2) Every other PR with a merge-blocking region, except a plain `tier-1-review` PR, must carry a **ticked** Human Visual Review box and a **ticked** `merge authorized` box; a deleted or renamed box turns the check red. Proof tooling under `proofs/` therefore keeps its boxes (fails closed: when in doubt, theory). A result claim outside those paths cannot be detected mechanically; the author and reviewers own that call. A PR that changes the review tiers, any merge lane, governance, the delegation or a constitutional document is merged by the beekeeper, never via the notary lane.
 
 ---
 
@@ -317,12 +318,13 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    the contract parse is co-signed by qbp-architecture. **Auto-nudge, never
    auto-tick:** the hand that owns a box ticks it, or ⊘-nils it with a reason
    (`- [ ] ~~option~~ ⊘ reason`); a struck fragment inside a live ask stays
-   unticked. **Scope guard on beekeeper boxes (#835):** a ⊘-nil'd box whose
-   text names Human Visual Review / HVR or `merge authorized` turns the check
-   **red** unless the PR is pure housekeeping (`housekeeping` label, not
-   theory-bearing — see "Housekeeping vs theory" under Tier 2); the job reads
-   the PR's labels and changed files for this and re-runs on
-   `labeled`/`unlabeled`. **No-region policy:** a body with no §2.2 region at all passes
+   unticked. **Scope guard on beekeeper boxes (#835):** a ⊘-nil'd box naming
+   HVR / `merge authorized` / the beekeeper turns the check **red** unless the
+   PR is pure housekeeping, and every other Tier 2+ PR must carry both boxes
+   ticked (see "Housekeeping vs theory" under Tier 2). The job reads the PR's
+   labels and changed files (renames: both paths) and re-runs on
+   `labeled`/`unlabeled`; a label added with `GITHUB_TOKEN` does not re-trigger
+   it, so theory status comes from paths, never from a label it may not see. **No-region policy:** a body with no §2.2 region at all passes
    this check with a `::warning::` naming the fix (the notifier still withholds
    ✅ for it, item 7c) — not blocking until the PR templates carry the region
    everywhere; the beekeeper flips absence to blocking by adding
