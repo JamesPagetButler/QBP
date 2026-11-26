@@ -168,14 +168,20 @@ NO_BK_BOXES = (
 )
 
 
-def _scoped(body, labels, changed):
+REPO = os.path.dirname(HERE)
+
+
+def _scoped(body, labels, changed, head_root=None):
     import tempfile
 
     with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as fh:
         fh.write("\n".join(changed) + "\n")
         path = fh.name
     try:
-        return run(body, f"--labels={','.join(labels)}", f"--changed-file={path}")
+        extra = [f"--head-root={head_root}"] if head_root else []
+        return run(
+            body, f"--labels={','.join(labels)}", f"--changed-file={path}", *extra
+        )
     finally:
         os.unlink(path)
 
@@ -379,7 +385,8 @@ def test_workflow_scope_wiring():
     assert "-gt 3000" in run_, run_
     verdict = steps[-1]
     assert (
-        '${SCOPE:+"--labels=$LABELS" --changed-file=/tmp/changed.txt}' in verdict["run"]
+        '${SCOPE:+"--labels=$LABELS" --changed-file=/tmp/changed.txt --head-root=.}'
+        in verdict["run"]
     ), verdict["run"]
     assert verdict["env"]["SCOPE"] == "${{ steps.scope.outputs.supported }}"
     assert verdict["env"]["LABELS"] == "${{ steps.scope.outputs.labels }}"
@@ -458,9 +465,12 @@ HAND_LIST = (
 
 
 def test_r2_missing_gate_files_are_lane():
+    # with the real head checkout, so the backstop's fail-closed default can't mask
+    # a lane workflow that is lane only by NAME (no write grant of its own)
     for path in R2_FILES:
-        r = _scoped(HVR_NILD, ["housekeeping"], [path])
-        assert r.returncode == 1 and "merge-lane" in r.stdout, (path, r.stdout)
+        for hr in (None, REPO):
+            r = _scoped(HVR_NILD, ["housekeeping"], [path], head_root=hr)
+            assert r.returncode == 1 and "merge-lane" in r.stdout, (path, hr, r.stdout)
 
 
 def test_r2_structural_set_covers_the_hand_list():
@@ -473,15 +483,104 @@ def test_r2_structural_set_covers_the_hand_list():
             assert path in derived, f"{path} not derived from any workflow"
 
 
-def test_r2_any_github_file_and_any_codeowners_is_lane():
+def test_r4_fixed_lane_files_and_codeowners():
     for path in (
-        ".github/ISSUE_TEMPLATE/bug.md",
-        ".github/dependabot.yml",
+        ".github/PULL_REQUEST_TEMPLATE/tier-1.md",
+        "CONTRIBUTING.md",
+        "docs/workflows/review_tiers.md",
+        ".github/CODEOWNERS",
         "sub/CODEOWNERS",
     ):
         assert c.touches_lane([path]), path
-    # a script no workflow references stays housekeeping
+    # a script no lane workflow references stays housekeeping
     assert not c.touches_lane(["scripts/some_unreferenced_helper.py"])
+
+
+def test_r4_narrow_set_is_the_lane_workflows_and_their_scripts():
+    derived = c.workflow_scripts()
+    assert derived is not None
+    for s_ in (
+        "scripts/audit_closed_acs.py",
+        "scripts/check_closing_acs.py",
+        "scripts/check_pending_upgrades.py",
+        "scripts/check_job_display_names.py",
+    ):
+        assert s_ in derived, s_
+    # ordinary CI / content-lint scripts are NOT in the narrow set
+    for s_ in (
+        "scripts/agda_forbidden_tokens.py",
+        "scripts/tenancy_xref_linter.py",
+        "scripts/root_audit.py",
+        "scripts/list_numeric_anchors.py",
+    ):
+        assert s_ not in derived, s_
+
+
+# PR #826 (Agda CI) and PR #778 (Lean CI): named housekeeping by the ruling
+PR826_FILES = [
+    ".github/workflows/agda-cubical.yml",
+    ".github/workflows/agda-substrate.yml",
+    "scripts/agda_forbidden_tokens.py",
+    "scripts/test_agda_forbidden_tokens.py",
+]
+PR778_FILES = [".github/workflows/ci.yml", ".github/workflows/lean-foundations.yml"]
+
+
+def test_r4_pr826_and_pr778_stay_pure_housekeeping():
+    old, c._HEAD_ROOT = c._HEAD_ROOT, REPO
+    try:
+        for files in (PR826_FILES, PR778_FILES):
+            assert not c.touches_lane(files), files
+    finally:
+        c._HEAD_ROOT = old
+    for files in (PR826_FILES, PR778_FILES):
+        r = _scoped(HVR_NILD, HK, files, head_root=REPO)
+        assert r.returncode == 0, (files, r.stdout)
+
+
+def test_r4_backstop_workflow_gaining_power_is_lane():
+    import tempfile
+
+    for grant in (
+        "permissions:\n  pull-requests: write\n",
+        "permissions:\n  issues: write\n",
+        "permissions:\n  contents: write\n",
+        "permissions: write-all\n",
+        "run: gh pr merge 1 --squash\n",
+        "run: gh pr edit 1 --add-label x\n",
+        "run: gh pr close 1\n",
+        "run: gh issue close 2\n",
+        "run: gh issue reopen 2\n",
+        "run: gh issue edit 2 --add-label y\n",
+    ):
+        with tempfile.TemporaryDirectory() as head:
+            os.makedirs(os.path.join(head, ".github", "workflows"))
+            with open(os.path.join(head, ".github", "workflows", "ci.yml"), "w") as fh:
+                fh.write("name: CI\n" + grant)
+            r = _scoped(HVR_NILD, HK, [".github/workflows/ci.yml"], head_root=head)
+            assert r.returncode == 1 and "merge-lane" in r.stdout, (grant, r.stdout)
+    # a read-only workflow edit stays housekeeping; a deleted workflow too
+    with tempfile.TemporaryDirectory() as head:
+        os.makedirs(os.path.join(head, ".github", "workflows"))
+        with open(os.path.join(head, ".github", "workflows", "ci.yml"), "w") as fh:
+            fh.write("name: CI\npermissions:\n  contents: read\n")
+        assert (
+            _scoped(
+                HVR_NILD, HK, [".github/workflows/ci.yml"], head_root=head
+            ).returncode
+            == 0
+        )
+        assert (
+            _scoped(
+                HVR_NILD, HK, [".github/workflows/gone.yml"], head_root=head
+            ).returncode
+            == 0
+        )
+
+
+def test_r4_backstop_fails_closed_without_head_root():
+    r = _scoped(HVR_NILD, HK, PR778_FILES)
+    assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout
 
 
 def test_r2_derivation_fails_closed_without_workflows():
@@ -490,16 +589,44 @@ def test_r2_derivation_fails_closed_without_workflows():
     with tempfile.TemporaryDirectory() as d:
         assert c.workflow_scripts(d) is None
         assert c.touches_lane(["scripts/some_unreferenced_helper.py"], root=d)
+        assert c.touches_lane([".github/workflows/ci.yml"], root=d)
         assert not c.touches_lane(["docs/x.md"], root=d)
-        os.makedirs(os.path.join(d, ".github", "workflows"))
-        # a workflow dir with no readable workflow file is "cannot derive", not "empty"
+        # cannot derive → a read-only workflow edit is still lane (fails closed even
+        # when the backstop, given a head copy, would say "no power")
+        old, c._HEAD_ROOT = c._HEAD_ROOT, REPO
+        try:
+            assert c.touches_lane([".github/workflows/ci.yml"], root=d)
+            assert not c.touches_lane([".github/workflows/ci.yml"])
+        finally:
+            c._HEAD_ROOT = old
+        wf = os.path.join(d, ".github", "workflows")
+        os.makedirs(wf)
+        os.makedirs(os.path.join(d, "scripts"))
+        # every lane workflow present but one → still None (partial read fails open)
+        for n in c.LANE_WORKFLOWS[1:]:
+            with open(os.path.join(wf, n), "w") as fh:
+                fh.write("name: x\n")
         assert c.workflow_scripts(d) is None
-        assert c.touches_lane(["scripts/some_unreferenced_helper.py"], root=d)
-        with open(os.path.join(d, ".github", "workflows", "a.yml"), "w") as fh:
+        # all present, one references a gate script that imports a helper
+        with open(os.path.join(wf, c.LANE_WORKFLOWS[0]), "w") as fh:
             fh.write('run: python3 "$SRC_DIR/scripts/gate_x.py"\n')
-        assert c.workflow_scripts(d) == {"scripts/gate_x.py"}
-        assert c.touches_lane(["scripts/gate_x.py"], root=d)
+        with open(os.path.join(d, "scripts", "gate_x.py"), "w") as fh:
+            fh.write("import helper_y\nimport os\n")
+        with open(os.path.join(d, "scripts", "helper_y.py"), "w") as fh:
+            fh.write("X = 1\n")
+        assert c.workflow_scripts(d) == {"scripts/gate_x.py", "scripts/helper_y.py"}
+        assert c.touches_lane(["scripts/helper_y.py"], root=d)
         assert not c.touches_lane(["scripts/other.py"], root=d)
+        # a non-UTF-8 lane workflow → None, not a crash
+        with open(os.path.join(wf, c.LANE_WORKFLOWS[1]), "wb") as fh:
+            fh.write(b"\xff\xfe\x00bad")
+        assert c.workflow_scripts(d) is None
+        with open(os.path.join(wf, c.LANE_WORKFLOWS[1]), "w") as fh:
+            fh.write("name: x\n")
+        # an unparseable lane script → None
+        with open(os.path.join(d, "scripts", "gate_x.py"), "w") as fh:
+            fh.write("def (:\n")
+        assert c.workflow_scripts(d) is None
 
 
 def test_r3_n12_merge_blocking_box_is_not_merge_authorized():

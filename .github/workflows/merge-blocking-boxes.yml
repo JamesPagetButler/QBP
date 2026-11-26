@@ -47,6 +47,9 @@
 # `labeled`/`unlabeled`, so removing the label re-judges the nil. The scope flags
 # are passed only when the judging copy supports them (first landing: base lacks
 # them, so the base judges as before).
+# `--head-root=.` lets the judge read a CHANGED workflow's head copy for the
+# narrow-lane backstop (write permissions or gh pr merge/edit/close, gh issue
+# close/reopen/edit → lane); the judge's own code still comes from base.
 #
 # Listed in the notifier's workflow_run list (enforced by #507 §3 drift lint).
 
@@ -147,4 +150,4 @@ jobs:
           SRC_DIR: ${{ steps.src.outputs.dir }}
           SCOPE: ${{ steps.scope.outputs.supported }}
           LABELS: ${{ steps.scope.outputs.labels }}
-        run: python3 "$SRC_DIR/scripts/merge_blocking_check.py" --body-file /tmp/body.md ${SCOPE:+"--labels=$LABELS" --changed-file=/tmp/changed.txt}
+        run: python3 "$SRC_DIR/scripts/merge_blocking_check.py" --body-file /tmp/body.md ${SCOPE:+"--labels=$LABELS" --changed-file=/tmp/changed.txt --head-root=.}

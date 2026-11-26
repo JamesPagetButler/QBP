@@ -34,10 +34,14 @@ issuecomment-7147354671).  Active when the workflow passes `--labels` and
                       or the `tier-3-review` label.  Paths decide; the label can
                       only ADD theory status, never remove it (a GITHUB_TOKEN
                       label does not re-trigger this job — F2 on PR #838).
-  merge-lane file   = CONTRIBUTING.md, review_tiers.md, anything under .github/,
-                      any CODEOWNERS, and every scripts/ path a workflow references
-                      (derived from the judging copy's workflows).  Those PRs stay
-                      the beekeeper's (CLAUDE.md delegation rule).
+  merge-lane file   = NARROW set (beekeeper 2026-11-26): CONTRIBUTING.md,
+                      review_tiers.md, the PR templates, any CODEOWNERS, the lane
+                      workflows (review state / boxes / labels / tiers / merge and
+                      close gates), the scripts they reference + import, and any
+                      changed workflow that grants write or calls gh pr
+                      merge|edit|close / gh issue close|reopen|edit.  Ordinary CI
+                      and proof tooling stays housekeeping.  Those PRs stay the
+                      beekeeper's (CLAUDE.md delegation rule).
 
   0. Scope inputs supplied, theory-bearing or merge-lane PR, and NO §2.2 region
      → exit 1 (the no-region warn-only policy, #781, stays for every other PR).
@@ -52,12 +56,13 @@ issuecomment-7147354671).  Active when the workflow passes `--labels` and
   Without the scope inputs, rule 1 fails closed and rule 2 is not evaluated.
 
 Usage: merge_blocking_check.py [--body-file F | reads stdin] [--absent-blocks]
-                               [--labels="a,b"] [--changed-file=F]
+                               [--labels="a,b"] [--changed-file=F] [--head-root=DIR]
 """
 
 from __future__ import annotations
 
 import argparse
+import ast
 import os
 import re
 import sys
@@ -97,45 +102,111 @@ THEORY_PATHS = (
     "archive/cth-inventory/",
 )
 THEORY_LABEL = "tier-3-review"
-# Merge-lane / governance machinery (F4 on PR #838, made structural in R2): a PR
-# touching any of these is never pure housekeeping — the beekeeper merges it
-# (CLAUDE.md: "A PR that changes this delegation or any seat's merge lane is
-# merged by the beekeeper").  Three parts:
-#   1. LANE_PATHS: the tier/lane docs and everything under `.github/` (every
-#      workflow, PR/issue template and repo config);
-#   2. any file named CODEOWNERS, wherever it sits;
-#   3. every `scripts/…` path that any workflow file references (derived at run
-#      time from the JUDGING copy's `.github/workflows/`, so a gate script
-#      cannot be left off by hand).  If no workflow file can be read, every
-#      `scripts/` path counts as lane (fail closed).
+# Merge-lane / governance machinery: a PR touching any of these is never pure
+# housekeeping — the beekeeper merges it (CLAUDE.md: "A PR that changes this
+# delegation or any seat's merge lane is merged by the beekeeper").  NARROW set
+# (beekeeper decision 2026-11-26, PR #838 issuecomment-7196437075): ordinary CI
+# and proof tooling (e.g. PR #826 Agda CI, PR #778 Lean CI) stay housekeeping.
+#   1. LANE_PATHS: the tier/lane docs and the PR templates; any CODEOWNERS.
+#   2. LANE_WORKFLOWS: the workflows that read or write PR review state, boxes,
+#      labels or tiers, or that gate merges or issue closes.
+#   3. every `scripts/…` path those workflows reference, plus the `scripts/`
+#      modules those scripts import (transitively) — derived at run time from the
+#      JUDGING copy, so a PR cannot drop its own gate from the set.  Any
+#      unreadable / missing lane workflow or script → None → fail closed (every
+#      `scripts/` and `.github/workflows/` path counts as lane).
+#   4. backstop: any CHANGED workflow whose head copy grants write permissions or
+#      calls `gh pr merge|edit|close` / `gh issue close|reopen|edit` (no head
+#      copy supplied → every changed workflow counts).
 LANE_PATHS = (
     "CONTRIBUTING.md",
     "docs/workflows/review_tiers.md",
-    ".github/",
+    ".github/PULL_REQUEST_TEMPLATE/",
 )
+LANE_WORKFLOWS = (
+    "merge-blocking-boxes.yml",
+    "tier-3-review-gate.yml",
+    "pr-check-status.yml",
+    "pr-process-lints.yml",
+    "closing-ac-guard.yml",
+    "reopen-falsely-closed.yml",
+    "closed-ac-sweep-tests.yml",
+    "pending-upgrades.yml",
+)
+WF_DIR = ".github/workflows/"
 REPO_ROOT = os.path.dirname(HERE)
 _WF_SCRIPT_RE = re.compile(r"(?<![\w.-])scripts/[A-Za-z0-9_./-]*[A-Za-z0-9_]")
+_WF_POWER_RE = re.compile(
+    r"\b(?:pull-requests|issues|contents)\s*:\s*write\b|\bwrite-all\b"
+    r"|\bgh\s+pr\s+(?:merge|edit|close)\b|\bgh\s+issue\s+(?:close|reopen|edit)\b"
+)
+_HEAD_ROOT = None  # set by check(head_root=...) — the PR head checkout
+
+
+def _read(path: str):
+    """File text, or None on ANY read failure (OSError or bad UTF-8)."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return fh.read()
+    except (OSError, UnicodeDecodeError):
+        return None
+
+
+def _script_imports(text: str, root: str):
+    """`scripts/<m>.py` modules imported by a script, or None if unparseable."""
+    try:
+        tree = ast.parse(text)
+    except (SyntaxError, ValueError):
+        return None
+    out = set()
+    for node in ast.walk(tree):
+        names = []
+        if isinstance(node, ast.Import):
+            names = [a.name for a in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+            names = [node.module]
+        for n in names:
+            cand = f"scripts/{n.split('.')[0]}.py"
+            if os.path.isfile(os.path.join(root, cand)):
+                out.add(cand)
+    return out
 
 
 def workflow_scripts(root: str = REPO_ROOT):
-    """Return the set of `scripts/…` paths referenced by any workflow, or None
-    when no workflow file is readable (callers then fail closed)."""
-    wf_dir = os.path.join(root, ".github", "workflows")
-    try:
-        names = sorted(os.listdir(wf_dir))
-    except OSError:
-        return None
-    found, read_any = set(), False
-    for n in names:
-        if not n.endswith((".yml", ".yaml")):
-            continue
-        try:
-            with open(os.path.join(wf_dir, n), encoding="utf-8") as fh:
-                found.update(_WF_SCRIPT_RE.findall(fh.read()))
-            read_any = True
-        except OSError:
-            continue
-    return found if read_any else None
+    """`scripts/…` paths the lane workflows reference, plus their transitive
+    `scripts/` imports.  None (callers fail closed) if any lane workflow or any
+    referenced .py script cannot be read or parsed — a partial read fails open."""
+    found = set()
+    for n in LANE_WORKFLOWS:
+        text = _read(os.path.join(root, WF_DIR, n))
+        if text is None:
+            return None
+        found.update(_WF_SCRIPT_RE.findall(text))
+    todo = [p for p in found if p.endswith(".py")]
+    while todo:
+        p = todo.pop()
+        if not os.path.isfile(os.path.join(root, p)):
+            continue  # a referenced path that is not a file (fragment / prose)
+        text = _read(os.path.join(root, p))
+        imports = None if text is None else _script_imports(text, root)
+        if imports is None:
+            return None
+        for m in imports - found:
+            found.add(m)
+            todo.append(m)
+    return found
+
+
+def _workflow_has_power(path: str) -> bool:
+    """Backstop (4): True if the changed workflow's head copy can write or merge.
+    No head checkout supplied → True (fail closed); a deleted file → False."""
+    if _HEAD_ROOT is None:
+        return True
+    full = os.path.join(_HEAD_ROOT, path)
+    if not os.path.exists(full):
+        return False
+    text = _read(full)
+    return True if text is None else bool(_WF_POWER_RE.search(text))
 
 
 def _norm(text: str) -> str:
@@ -162,9 +233,17 @@ def touches_lane(changed, root: str = REPO_ROOT) -> bool:
             return True
         if os.path.basename(p) == "CODEOWNERS":
             return True
-        if derived is None and p.startswith("scripts/"):
+        if p.startswith(WF_DIR) and p[len(WF_DIR) :] in LANE_WORKFLOWS:
+            return True
+        if derived is None and p.startswith(("scripts/", WF_DIR)):
             return True
         if derived is not None and p in derived:
+            return True
+        if (
+            p.startswith(WF_DIR)
+            and p.endswith((".yml", ".yaml"))
+            and _workflow_has_power(p)
+        ):
             return True
     return False
 
@@ -233,12 +312,16 @@ def _annot(level: str, msg: str) -> None:
     print(f"::{level}::{esc}")
 
 
-def check(body: str, absent_blocks: bool = False, labels=None, changed=None) -> int:
+def check(
+    body: str, absent_blocks: bool = False, labels=None, changed=None, head_root=None
+) -> int:
     """Return the exit code for `body` and print the actionable report.
 
     `labels`/`changed` are the PR's label names and changed paths; `None`
     means "not supplied", which fails closed for a nil'd beekeeper box.
     """
+    global _HEAD_ROOT
+    _HEAD_ROOT = head_root
     res = parse(body)
     n_un, n_t, n_nil = len(res["unticked"]), len(res["ticked"]), len(res["nil"])
     n_ev = len(res.get("evidence", []))
@@ -357,6 +440,11 @@ def main(argv=None) -> int:
         default=None,
         help="file listing the PR's changed paths, one per line (#835 guard)",
     )
+    ap.add_argument(
+        "--head-root",
+        default=None,
+        help="PR head checkout, read for the changed-workflow backstop (#835)",
+    )
     args = ap.parse_args(argv)
     labels = changed = None
     if args.labels is not None:
@@ -377,7 +465,13 @@ def main(argv=None) -> int:
     except OSError as e:
         _annot("error", f"Merge-blocking boxes: cannot read PR body: {e}")
         return 2
-    return check(body, absent_blocks=args.absent_blocks, labels=labels, changed=changed)
+    return check(
+        body,
+        absent_blocks=args.absent_blocks,
+        labels=labels,
+        changed=changed,
+        head_root=args.head_root,
+    )
 
 
 if __name__ == "__main__":
