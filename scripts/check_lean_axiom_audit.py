@@ -369,7 +369,9 @@ def grade_run(d: dict, errors: list[str]) -> tuple[list[dict], int, list[str]] |
         bad_here.append(dict(b, root=tag))
     print(
         f"axiom audit [{tag}]: Lean scope {len(scope)} module(s), {decls} declarations, "
-        f"{len(bad_here)} non-standard"
+        f"{len(bad_here)} non-standard; vacuity: {thm_n} theorem(s) checked, "
+        f"{len(vac) if isinstance(vac, list) else '?'} vacuous, "
+        f"{len(vac_err) if isinstance(vac_err, list) else '?'} undecided"
     )
     return bad_here, decls, [str(s) for s in scope]
 
