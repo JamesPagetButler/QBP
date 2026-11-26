@@ -899,6 +899,8 @@ Unsure?                                → Tier 2
 
 James can upgrade or downgrade any PR's tier.
 
+**Gemini model per tier (deming, beekeeper-directed 2026-11-22):** the review tier picks the Gemini MCP `profile=`, whatever the work type. Use `t3` for Tier 3, and `t2` for Tier 2 and below; `t0` and `t1` are also available. Every Gemini answer is stamped with the model that served it, and a "Gemini review" box cites that stamp. The table of record is Nidavellir `ops/model-routing/gemini-profiles.json` (Nidavellir#147).
+
 **Session-based reviews:** For multi-round PRs, Gemini reviews use `session_id` to maintain context across rounds. See [review_tiers.md](docs/workflows/review_tiers.md#session-based-reviews-multi-round-prs).
 
 ### Reviewing Agents
