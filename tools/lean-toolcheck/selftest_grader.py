@@ -27,7 +27,9 @@ if work.exists():
 work.mkdir(parents=True)
 
 
-def evaluate(tc: Path, rawdir: Path, suitedir: Path, tag: str) -> dict:
+def evaluate(
+    tc: Path, rawdir: Path, suitedir: Path, tag: str, recheck: bool = False
+) -> dict:
     out_j, out_m = work / f"{tag}.json", work / f"{tag}.md"
     r = subprocess.run(
         [
@@ -45,7 +47,12 @@ def evaluate(tc: Path, rawdir: Path, suitedir: Path, tag: str) -> dict:
             str(out_j),
             "--out-md",
             str(out_m),
-        ],
+        ]
+        + (
+            []
+            if recheck or "--skip-input-recheck" not in tc.read_text()
+            else ["--skip-input-recheck"]
+        ),  # older graders (OLD replays) have no such flag
         capture_output=True,
         text=True,
     )
@@ -891,6 +898,206 @@ PARSE_PLANTS.append(
 )
 for tag, mut in PARSE_PLANTS:
     planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+
+
+# 7f. Red Team r6 concern 2: every Lean-parser record field is REQUIRED and typed. Each field of
+#     the header, the first command and the done line is deleted in turn, and three are given the
+#     wrong type: T01 must FAIL every time.
+FIELD_PLANTS = []
+for where, idx, fields in (
+    ("header", 0, ["nonce", "header", "imports", "parse_error"]),
+    (
+        "command",
+        1,
+        [
+            "nonce",
+            "i",
+            "line",
+            "col",
+            "head_line",
+            "head_col",
+            "kind",
+            "nested",
+            "nested_heads",
+            "kinds",
+            "attrs",
+            "set_option",
+            "config",
+            "parse_error",
+            "scope_error",
+        ],
+    ),
+    ("done", -1, ["nonce", "done", "commands", "parse_errors", "scope_errors"]),
+):
+    for fld in fields:
+
+        def _drop(recs, idx=idx, fld=fld):
+            recs[idx].pop(fld, None)
+            return recs
+
+        FIELD_PLANTS.append((f"field-missing-{where}-{fld}", t01_parse(_drop)))
+for tag, idx, fld, val in (
+    ("field-type-command-kinds", 1, "kinds", "Lean.Parser.Command.declaration"),
+    ("field-type-header-imports", 0, "imports", "Mathlib"),
+    ("field-type-command-nested_heads", 1, "nested_heads", [[1]]),
+    ("field-type-command-head_line", 1, "head_line", "21"),
+    ("field-type-done-commands", -1, "commands", True),
+):
+
+    def _retype(recs, idx=idx, fld=fld, val=val):
+        recs[idx][fld] = val
+        return recs
+
+    FIELD_PLANTS.append((tag, t01_parse(_retype)))
+for tag, mut in FIELD_PLANTS:
+    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+
+
+# 7g. Red Team r6 concern 1(b): writes into the THROWAWAY suite copy, attributed per file.
+def _mf25_meta(fn):
+    def mut(d):
+        q = d / "MF25_WritesSuiteInput.meta.json"
+        m = json.loads(q.read_text())
+        fn(m)
+        q.write_text(json.dumps(m))
+
+    return mut
+
+
+for tag, mut, name in (
+    (
+        "writes-unexpected",
+        _meta_mut(lambda m: m.update(suite_copy_writes=["toolcheck.py"])),
+        "T01_DecideFin.lean",
+    ),
+    (
+        "writes-record-missing",
+        _meta_mut(lambda m: m.pop("suite_copy_writes")),
+        "T01_DecideFin.lean",
+    ),
+    (
+        "writes-record-wrong-type",
+        _meta_mut(lambda m: m.update(suite_copy_writes="toolcheck.py")),
+        "T01_DecideFin.lean",
+    ),
+    (
+        "writes-expected-unmet",
+        _mf25_meta(lambda m: m.update(suite_copy_writes=[])),
+        "MF25_WritesSuiteInput.lean",
+    ),
+):
+    planted(tag, mut, [name], "FAIL")
+
+# The real run: MF25's write was attributed to MF25 (and only to it), and the run's own input
+# verification passed, so the REAL tree was unchanged after every file had run.
+m25 = json.loads((raw / "MF25_WritesSuiteInput.meta.json").read_text())
+others = [
+    q.name
+    for q in raw.glob("*.meta.json")
+    if q.name != "MF25_WritesSuiteInput.meta.json"
+    and json.loads(q.read_text()).get("suite_copy_writes")
+]
+ver = json.loads((raw / "inputs.verify.json").read_text())
+real_ok = (
+    m25.get("suite_copy_writes") == ["subset_kinds.json"]
+    and not others
+    and ver.get("ok") is True
+)
+ok = ok and real_ok
+results.append(
+    (
+        "real-run[MF25] write attributed to MF25 only; real tree unchanged (inputs.verify ok)",
+        f"MF25 writes {m25.get('suite_copy_writes')}; other writers {others}; verify ok={ver.get('ok')}",
+        "",
+    )
+)
+
+
+# 7h. Red Team r6 concern 1(a): the run-level input manifest.
+def _verify_fail(d):
+    q = d / "inputs.verify.json"
+    q.write_text(
+        json.dumps(
+            {
+                "ok": False,
+                "problems": ["suite input changed during the run: toolcheck.py"],
+            }
+        )
+    )
+
+
+for tag, mut in (
+    ("inputs-verify-failed", _verify_fail),
+    ("inputs-manifest-missing", lambda d: (d / "inputs.json").unlink()),
+    ("inputs-verify-missing", lambda d: (d / "inputs.verify.json").unlink()),
+):
+    dI = work / f"raw-{tag}"
+    shutil.copytree(raw, dI)
+    mut(dI)
+    res = evaluate(new_tc, dI, suite, tag)
+    good = res["overall"] == "RED" and res["exit"] != 0
+    ok = ok and good
+    results.append(
+        (
+            f"plant[{tag}] run must be RED",
+            f"overall {res['overall']} exit {res['exit']}; {res['pre'][:2]}",
+            "",
+        )
+    )
+    shutil.rmtree(dI, ignore_errors=True)
+
+
+# Grade-time recheck ON. This tests the recheck LOGIC, not that the suite under test is the very
+# commit the run used (run.sh's own in-memory verification does that; a mutant suite copy differs
+# from the run by construction). So the run's manifest is re-synthesised from the suite under
+# test (same rule as run.sh: no results/, __pycache__ or .md): unchanged suite -> GREEN; the
+# allowlist edited afterwards (one appended newline: same JSON) -> RED.
+def _suite_hashes_st(root):
+    import hashlib
+
+    out = {}
+    for f in sorted(root.rglob("*")):
+        rel = f.relative_to(root)
+        if (
+            not f.is_file()
+            or rel.parts[0] == "results"
+            or "__pycache__" in rel.parts
+            or f.suffix == ".md"
+        ):
+            continue
+        out[rel.as_posix()] = hashlib.sha256(f.read_bytes()).hexdigest()
+    return out
+
+
+rawM = work / "raw-recheck-manifest"
+shutil.copytree(raw, rawM)
+_man = json.loads((rawM / "inputs.json").read_text())
+_man["suite"] = _suite_hashes_st(suite)
+(rawM / "inputs.json").write_text(json.dumps(_man))
+res = evaluate(new_tc, rawM, suite, "recheck-clean", recheck=True)
+good = res["overall"] == "GREEN"
+ok = ok and good
+results.append(
+    (
+        "recheck[clean] grade-time re-hash of the unchanged suite (must be GREEN)",
+        f"overall {res['overall']}",
+        "",
+    )
+)
+sQ = work / "suite-recheck-tampered"
+shutil.copytree(suite, sQ, ignore=shutil.ignore_patterns("results"))
+(sQ / "subset_kinds.json").write_text((sQ / "subset_kinds.json").read_text() + "\n")
+res = evaluate(sQ / "toolcheck.py", rawM, sQ, "recheck-tampered", recheck=True)
+good = res["overall"] == "RED" and any("subset_kinds.json" in x for x in res["pre"])
+ok = ok and good
+results.append(
+    (
+        "recheck[tampered] allowlist edited after the run (must be RED)",
+        f"overall {res['overall']}; {res['pre'][:1]}",
+        "",
+    )
+)
+shutil.rmtree(sQ, ignore_errors=True)
 
 
 # Rule P, each direction ALONE (so a mutant that drops one direction is killed): a Python-only

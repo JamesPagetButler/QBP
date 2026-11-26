@@ -16,7 +16,7 @@ Each file is one `lake env lean` with cwd = `proofs/` (pins, Lean env and Mathli
 | Dir | What | Graded as |
 |---|---|---|
 | `tests/` | T00–T19: one feature per file, ends in `#print axioms`, inside the pass-file subset · T20: `local notation` + `attribute [local simp]`, outside the subset (compile check only) | T00–T19 must pass: all axioms ⊆ {propext, Classical.choice, Quot.sound}, checker accepts, file inside the subset · T20 `lean-ok` + `subset-refused` |
-| `must-fail/` | MF01 sorry/admit · MF02 native_decide · MF03 literal `: True :=` · MF04 false `decide` · MF05 custom `axiom` · MF06 spoofed axiom audit · MF07 same-line site · MF08 interpolation (refused) · MF09 non-ASCII prefix before a same-line site · MF10 form feed / MF11 lone CR in a comment (line-count desync) · MF12 escaped quote before a site · MF13 clean file with a brace in a string (refused) · MF14 `#eval` forges stdout and exits · MF15–MF18 the same forge through user syntax/handlers: `syntax` + `attribute [command_elab]`, `@[inline, command_elab]`, a `macro` that builds `#eval`, `term_elab` · MF19/MF20 the same through a `simproc` (indented; behind `open Nat in`, Mathlib-only import). All are `subset-refused` + `audit-fails` (no `.olean`); MF05 is `audit-nonstd` (the auditor sees `cheat`) · MF21 an indented `simproc_pattern%` that forges the `.olean` itself · MF22 a REAL `axiom cheat` hidden by an `#eval` that forges the `.olean` (both `subset-refused`; the audit alone is fooled, S1) · MF23 a raw string `r"\"` and MF24 guillemet identifiers that desynced the Python lexer (T89/T90; refused by rule R and by the Lean-parser layer) | must be caught **with the expected message**; a must-fail that passes is a suite failure |
+| `must-fail/` | MF01 sorry/admit · MF02 native_decide · MF03 literal `: True :=` · MF04 false `decide` · MF05 custom `axiom` · MF06 spoofed axiom audit · MF07 same-line site · MF08 interpolation (refused) · MF09 non-ASCII prefix before a same-line site · MF10 form feed / MF11 lone CR in a comment (line-count desync) · MF12 escaped quote before a site · MF13 clean file with a brace in a string (refused) · MF14 `#eval` forges stdout and exits · MF15–MF18 the same forge through user syntax/handlers: `syntax` + `attribute [command_elab]`, `@[inline, command_elab]`, a `macro` that builds `#eval`, `term_elab` · MF19/MF20 the same through a `simproc` (indented; behind `open Nat in`, Mathlib-only import). All are `subset-refused` + `audit-fails` (no `.olean`); MF05 is `audit-nonstd` (the auditor sees `cheat`) · MF21 an indented `simproc_pattern%` that forges the `.olean` itself · MF22 a REAL `axiom cheat` hidden by an `#eval` that forges the `.olean` (both `subset-refused`; the audit alone is fooled, S1) · MF23 a raw string `r"\"` and MF24 guillemet identifiers that desynced the Python lexer (T89/T90; refused by rule R and by the Lean-parser layer) · MF25 an `#eval` that writes a suite input (`writes-detected`: the write lands in the throwaway copy and is attributed to MF25) | must be caught **with the expected message**; a must-fail that passes is a suite failure |
 | `known-limits/` | KL01 non-literal vacuity · KL02 `Fin.foldl` under `decide` · KL03 checker blind to a `native_decide` after a string containing a comment opener | report-only: "confirmed" / "CHANGED", never a failure |
 
 **Limits, stated plainly.** The vacuity check is **syntactic only**: the foundations checker matches the literal
@@ -45,6 +45,27 @@ fails the run and is never retried.
 > from `/proc/self/cmdline` at run time, so any path the runner picks is visible to it. Verifying the `.olean`
 > independently would need a second, trusted compile, which is the sandbox again. Both are left to QBP#836, as a
 > stated limit. There is no kernel re-check either (lean4checker's job).
+>
+> **S1 covers the WHOLE RUN, not just pass files (Red Team r6).** Must-fail and known-limit files run user code by
+> design (MF14–MF25), and nothing they run is sandboxed. So they could try to persist an effect into the next run:
+> a rewritten grader, allowlist, pin or test, or a planted `.olean` under `.lake/packages`. Three guards, none of
+> which is a sandbox:
+> - **Throwaway copy.** Every Lean process that runs a file's code (the `--json` run and the fresh compile) runs in a
+>   throwaway copy of the suite outside the repo (`mktemp -d`), with its working directory inside the copy. Relative
+>   writes land in the copy. The copy is hashed before and after each file, so a write is attributed to that file
+>   (`suite_copy_writes`); a file that writes without `TOOLCHECK-EXPECT: writes-detected` FAILS (MF25 expects it).
+> - **Input manifest.** Before the first Lean process, `run.sh` hashes every suite input by content (grader scripts,
+>   json allowlists and pins, `LeanSubsetParse.lean`, every test source; not the `.md` docs), plus `proofs/lean-toolchain`,
+>   `proofs/lakefile.lean`, the foundations checker and the auditor. It also takes a stat manifest (size, mtime,
+>   ctime, inode) of every file in the pinned `.lake/packages/*` trees and the toolchain. After the last Lean process
+>   it verifies all of it. A mismatch makes the run **INVALID**: exit 1, and no baseline update. The grader requires
+>   the verification record, and re-hashes the suite it grades against the manifest. `run.sh` is one shell function
+>   and holds the manifest program in memory, so a file that rewrites `run.sh` or `toolcheck.py` mid-run cannot change
+>   the check.
+> - **What is assumed, stated plainly.** An absolute-path write by a must-fail file is *detected*, not prevented, and
+>   only for the paths above. The **integrity of the Mathlib cache and the toolchain before the run is assumed**: the
+>   manifest proves only that they did not change *during* the run. Another seat rebuilding the shared packages
+>   mid-run also makes the run INVALID (fail-closed). The sound fix is still the sandbox (QBP#836).
 >
 > **Auditor pin.** `auditor_pin.json` holds the sha256 of PR #829's `LeanAxiomAudit.lean` and
 > `check_lean_axiom_audit.py` (PR #829 `6b07147`; re-pin at the rebase). A different file is a preflight failure in
@@ -86,7 +107,8 @@ subset check now comes from **Lean's parser**:
   199 node kinds, attributes `simp` `ext`, options `maxHeartbeats` `maxRecDepth`, config `kernel`). It is closed-world:
   the generator refuses a top-level kind outside a fixed list, and any code-running or syntax-extending kind. It is
   pinned to the toolchain, the Mathlib sha, the T00 import list and the sha256 of `LeanSubsetParse.lean`. Imports must
-  be T00 modules. A parse error, a missing or truncated record, a wrong nonce or a count mismatch FAILS.
+  come from pinned packages. A parse error, a missing or truncated record, a wrong nonce or a count mismatch FAILS.
+  **Every field of every record is required and typed** (Red Team r6): a missing or mistyped field FAILS.
 - **Rule P (the layers must agree):** the lines where Lean's commands start (first token outside a doc comment, which
   must be in column 0) must be **exactly** the column-0 code lines the Python lexer sees after the header. A lexer
   desync shows up as a disagreement, and any disagreement FAILS.

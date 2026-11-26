@@ -37,6 +37,105 @@
 # (`lake exe cache get`, or a borrowed .lake/packages); it never builds Mathlib and never
 # runs `lake update`.
 set -euo pipefail
+# Red Team r6: the whole script is one function, so bash has PARSED all of it before the first Lean
+# process runs. A suite file that rewrites run.sh mid-run cannot change what this run does next.
+main() {
+# The input-manifest program (Red Team r6 concern 1), held IN MEMORY for the same reason: the
+# post-run check must not be code a suite file could have rewritten on disk.
+MANIFEST_PY="$(cat <<'PYEOF'
+import hashlib, json, os, sys
+
+
+def suite_files(root):
+    out = {}
+    for d, dirs, fs in os.walk(root):
+        rel = os.path.relpath(d, root)
+        if rel == ".":
+            dirs[:] = [x for x in dirs if x != "results"]
+        dirs[:] = [x for x in dirs if x != "__pycache__"]
+        for f in fs:
+            if f.endswith(".md"):  # docs never affect grading (and BASELINE is edited after runs)
+                continue
+            p = os.path.join(d, f)
+            r = os.path.relpath(p, root).replace(os.sep, "/")
+            with open(p, "rb") as fh:
+                out[r] = hashlib.sha256(fh.read()).hexdigest()
+    return dict(sorted(out.items()))
+
+
+def tree_digest(root):
+    root = os.path.realpath(root)
+    h, n = hashlib.sha256(), 0
+    for d, dirs, fs in os.walk(root):
+        dirs.sort()
+        for f in sorted(fs):
+            p = os.path.join(d, f)
+            st = os.lstat(p)
+            h.update(
+                f"{os.path.relpath(p, root)}\0{st.st_size}\0{st.st_mtime_ns}\0{st.st_ctime_ns}\0{st.st_ino}\n".encode()
+            )
+            n += 1
+    return {"root": root, "files": n, "digest": h.hexdigest()}
+
+
+def snapshot(suite, repo_files, trees):
+    rf = {}
+    for p in repo_files:
+        try:
+            with open(p, "rb") as fh:
+                rf[p] = hashlib.sha256(fh.read()).hexdigest()
+        except OSError:
+            rf[p] = None
+    return {
+        "suite_dir": os.path.realpath(suite),
+        "suite": suite_files(suite),
+        "repo_files": rf,
+        "trees": [tree_digest(t) for t in trees if t],
+    }
+
+
+mode = sys.argv[1]
+if mode == "suite":  # suite DIR OUT: content hashes of a (throwaway) suite tree
+    json.dump(suite_files(sys.argv[2]), open(sys.argv[3], "w"))
+elif mode == "diff":  # diff BEFORE AFTER: changed/added/removed paths, one JSON list
+    a, b = json.load(open(sys.argv[2])), json.load(open(sys.argv[3]))
+    print(json.dumps(sorted(k for k in set(a) | set(b) if a.get(k) != b.get(k))))
+else:  # snapshot|verify OUT SUITE TREES(:-sep) REPO_FILE...  [verify: + BEFORE BEFORE_SHA]
+    if mode == "verify":
+        before_p, before_sha = sys.argv[2], sys.argv[3]
+        out, suite, trees, files = sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7:]
+    else:
+        out, suite, trees, files = sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:]
+    now = snapshot(suite, files, [t for t in trees.split(":") if t])
+    if mode == "snapshot":
+        json.dump(now, open(out, "w"), indent=0)
+        sys.exit(0)
+    probs = []
+    raw = open(before_p, "rb").read()
+    if hashlib.sha256(raw).hexdigest() != before_sha:
+        probs.append("the pre-run manifest itself was rewritten during the run")
+    before = json.loads(raw)
+    for k in sorted(set(before["suite"]) | set(now["suite"])):
+        if before["suite"].get(k) != now["suite"].get(k):
+            probs.append(f"suite input changed during the run: {k}")
+    for k in sorted(set(before["repo_files"]) | set(now["repo_files"])):
+        if before["repo_files"].get(k) != now["repo_files"].get(k):
+            probs.append(f"repo input changed during the run: {k}")
+    if [(t["root"], t["files"], t["digest"]) for t in before["trees"]] != [
+        (t["root"], t["files"], t["digest"]) for t in now["trees"]
+    ]:
+        for tb, tn in zip(before["trees"], now["trees"]):
+            if tb != tn:
+                probs.append(
+                    f"package/toolchain tree changed during the run: {tb['root']} "
+                    f"({tb['files']} -> {tn['files']} files)"
+                )
+        if len(before["trees"]) != len(now["trees"]):
+            probs.append("the set of package/toolchain trees changed")
+    json.dump({"ok": not probs, "problems": probs}, open(out, "w"), indent=1)
+    sys.exit(1 if probs else 0)
+PYEOF
+)"
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"          # suite lives in <repo>/tools/lean-toolcheck
@@ -218,6 +317,29 @@ printf '{\n  "sorry": 0,\n  "vacuous-`: True :=` theorem": 0\n}\n' > "$ZERO_BASE
 
 echo "toolcheck: $TOOLCHAIN · Mathlib $MATHLIB_SHA7 · ${#FILES[@]} file(s) · run $RUN_ID · Tctl now $(tctl) °C"
 
+# ---- cross-run persistence (Red Team r6 concern 1) -----------------------------------
+# (b) every Lean process that runs a file's code (the --json run, the fresh compile) runs in a
+# THROWAWAY COPY of the suite outside the repo, with its cwd there. Relative writes land in the
+# copy; the copy is hashed before and after each file, so a write is attributed to that file.
+# Absolute-path writes cannot be stopped without a sandbox (S1, QBP#836), so:
+# (a) a manifest of every input (suite files by content; repo inputs; the pinned package trees
+# and the toolchain by stat: size, mtime, ctime, inode) is taken BEFORE the first Lean process
+# and verified after the last one. A mismatch makes the run INVALID (exit 1, no baseline update).
+WORK_TMP="$(mktemp -d "${TMPDIR:-/tmp}/lean-toolcheck-${RUN_ID}-XXXXXX")"
+trap 'rm -rf "$WORK_TMP"' EXIT
+TSUITE="$WORK_TMP/suite"
+fresh_copy() {
+  rm -rf "$TSUITE"; mkdir -p "$TSUITE"
+  (cd "$HERE" && tar --exclude=./results --exclude='./__pycache__' -cf - .) | tar -xf - -C "$TSUITE"
+}
+fresh_copy
+TC_DIR="$(lake env lean --print-prefix 2>/dev/null || true)"
+MAN_TREES="${PKG_LP}:${TC_DIR}"
+MAN_FILES=("$PROOFS/lean-toolchain" "$PROOFS/lakefile.lean" "$CHECKER")
+[[ -n "$AUDITOR" ]] && MAN_FILES+=("$AUDITOR" "$(dirname "$AUDITOR")/check_lean_axiom_audit.py")
+python3 -I -c "$MANIFEST_PY" snapshot "$RAW/inputs.json" "$HERE" "$MAN_TREES" "${MAN_FILES[@]}"
+INPUTS_SHA="$(sha256sum "$RAW/inputs.json" | cut -d' ' -f1)"
+
 # Run a Lean process inside the batch lease (INNER) or its own boxrun lease (per-file mode).
 bx() {
   local tag="$1"; shift
@@ -240,16 +362,18 @@ for f in "${FILES[@]}"; do
     lean --run "$HERE/LeanSubsetParse.lean" "$pnonce" "$f" \
     > "$RAW/$stem.parse.out" 2> "$RAW/$stem.parse.stderr"
   prc=$?
+  tf="$TSUITE/${f#"$HERE"/}"   # this file's copy in the throwaway suite
+  python3 -I -c "$MANIFEST_PY" suite "$TSUITE" "$WORK_TMP/copy.before.json"
   if [[ "$INNER" == 1 ]]; then
-    /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
-      lake env lean --json "$rel" > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
+    (cd "$(dirname "$tf")" && /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
+      lake -d "$PROOFS" env lean --json "$tf") > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
     rc=$?
     label="${TOOLCHECK_BATCH_LABEL:-}"
   else
     label="lean-toolcheck-${stem}-${RUN_ID}"
-    "$BOXRUN" --gpu --mem-mb "$MEM_MB" --timeout "$TIMEOUT" --wait --label "$label" -- \
+    (cd "$(dirname "$tf")" && "$BOXRUN" --gpu --mem-mb "$MEM_MB" --timeout "$TIMEOUT" --wait --label "$label" -- \
       /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
-      lake env lean --json "$rel" > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
+      lake -d "$PROOFS" env lean --json "$tf") > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
     rc=$?
   fi
   set -e
@@ -275,13 +399,13 @@ for f in "${FILES[@]}"; do
   # file runs while compiling can know it. Neither process's stdout is ever parsed for a verdict
   # except the auditor's one result line. Fail-closed: no .olean (e.g. the file exited early)
   # means no audit, which fails a pass file.
-  aud="$RUN_DIR/audit/$stem"
+  aud="$WORK_TMP/audit/$stem"   # in the throwaway area too (its cwd and its -o path)
   rm -rf "$aud"; mkdir -p "$aud/src/ToolcheckAudit" "$aud/build/ToolcheckAudit"
   cp "$f" "$aud/src/ToolcheckAudit/$stem.lean"
   olean="$aud/build/ToolcheckAudit/$stem.olean"
   set +e
-  bx "audit-c-$stem" lake env lean -R "$aud/src" -o "$olean" "$aud/src/ToolcheckAudit/$stem.lean" \
-    > "$RAW/$stem.compile.log" 2>&1
+  (cd "$aud" && bx "audit-c-$stem" lake -d "$PROOFS" env lean -R "$aud/src" -o "$olean" \
+    "$aud/src/ToolcheckAudit/$stem.lean") > "$RAW/$stem.compile.log" 2>&1
   comp_rc=$?
   olean_ok=0; [[ -s "$olean" ]] && olean_ok=1
   nonce="$(python3 -I -c 'import secrets; print(secrets.token_hex(16))')"
@@ -293,21 +417,39 @@ for f in "${FILES[@]}"; do
     arc=$?
   fi
   set -e
+  python3 -I -c "$MANIFEST_PY" suite "$TSUITE" "$WORK_TMP/copy.after.json"
+  writes="$(python3 -I -c "$MANIFEST_PY" diff "$WORK_TMP/copy.before.json" "$WORK_TMP/copy.after.json")"
+  [[ "$writes" != "[]" ]] && fresh_copy   # the next file gets a clean copy
   python3 -I - "$RAW/$stem.meta.json" "$rc" "$wall" "$mb" "$crc" "$t0" "$t1" "$maxt" "$pauses" \
-    "$comp_rc" "$olean_ok" "$arc" "$nonce" "$prc" "$pnonce" <<'PY'
+    "$comp_rc" "$olean_ok" "$arc" "$nonce" "$prc" "$pnonce" "$writes" <<'PY'
 import json, sys
-p, rc, wall, mb, crc, t0, t1, maxt, pauses, comp, ok, arc, nonce, prc, pnonce = sys.argv[1:]
+p, rc, wall, mb, crc, t0, t1, maxt, pauses, comp, ok, arc, nonce, prc, pnonce, writes = sys.argv[1:]
 num = lambda s, f=float: f(s) if s not in ("", None) else None
 json.dump({"lean_exit": int(rc), "wall_s": num(wall), "maxrss_mb": num(mb, int),
            "checker_exit": int(crc), "tctl_start_c": num(t0), "tctl_end_c": num(t1),
            "max_tctl_c": num(maxt), "pauses": num(pauses, int),
            "audit": {"compile_exit": int(comp), "olean": ok == "1",
                      "auditor_exit": num(arc, int), "nonce": nonce},
-           "subset_parse": {"exit": int(prc), "nonce": pnonce}}, open(p, "w"))
+           "subset_parse": {"exit": int(prc), "nonce": pnonce},
+           "suite_copy_writes": json.loads(writes)}, open(p, "w"))
 PY
   printf '  %-28s lean_exit=%-3s wall=%-6s rss=%-5sMB checker_exit=%s olean=%s audit_exit=%s Tctl=%s→%s\n' \
     "$stem" "$rc" "${wall:-?}" "${mb:-?}" "$crc" "$olean_ok" "${arc:-none}" "${t0:-?}" "${t1:-?}"
 done
+
+# ---- post-run input verification (in memory; Red Team r6 concern 1(a)) -----------------
+set +e
+python3 -I -c "$MANIFEST_PY" verify "$RAW/inputs.json" "$INPUTS_SHA" "$RAW/inputs.verify.json" \
+  "$HERE" "$MAN_TREES" "${MAN_FILES[@]}"
+vrc=$?
+set -e
+INPUTS_OK=1
+if ((vrc != 0)); then
+  INPUTS_OK=0
+  echo "toolcheck: INPUT MANIFEST MISMATCH after the run:"
+  python3 -I -c 'import json,sys; [print("  -", p) for p in json.load(open(sys.argv[1]))["problems"]]' \
+    "$RAW/inputs.verify.json" || true
+fi
 
 # ---- grade ------------------------------------------------------------------------
 python3 -I - "$RAW/meta.json" "$TOOLCHAIN" "$VERSION" "$MATHLIB_SHA" "$MATHLIB_SHA7" \
@@ -358,11 +500,18 @@ if ((${#preflight[@]} > 0)); then
 fi
 echo "toolcheck: results → tools/lean-toolcheck/results/runs/${RUN_ID}/${OUT_BASE}.{json,md} (gitignored)"
 if [[ "$UPDATE_BASELINE" == 1 ]]; then
-  if ((grc == 0)); then
+  if ((grc == 0)) && [[ "$INPUTS_OK" == 1 ]]; then
     cp "$RUN_DIR/${OUT_BASE}.json" "$RUN_DIR/${OUT_BASE}.md" "$HERE/results/"
     echo "toolcheck: --update-baseline: committed baseline results/${OUT_BASE}.{json,md} overwritten from run ${RUN_ID}"
   else
     echo "toolcheck: --update-baseline REFUSED: the run is not GREEN — committed baseline left untouched"
   fi
 fi
+if [[ "${INPUTS_OK:-1}" != 1 ]]; then
+  echo "toolcheck: RUN INVALID — a suite, repo or package input changed during the run (see raw/inputs.verify.json)"
+  grc=1
+fi
 exit "$grc"
+}
+main "$@"
+exit $?

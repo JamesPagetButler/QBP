@@ -4,7 +4,8 @@ usage: python3 -I tools/lean-toolcheck/mutants_grader.py tools/lean-toolcheck <r
 M01-M19 reconstruct the Red Team's mutant set on PR #824 (from its one-line descriptions; the
 comment does not include the patches). M20-M25 target the r4 rules; M23 and M26-M34 the
 pass-file subset rules (Red Team r2); M35-M51 the structural audit and rules H/I (Red Team r3);
-`E …` mutants drop each SUBSET_* list entry in turn. R01-R21 target the r5 code: rule R, the
+`E …` mutants drop each SUBSET_* list entry in turn. R01-R21 target the r5 code (R22-R28 the r6 field-schema, write-attribution and input-manifest
+checks): rule R, the
 Lean-parser layer (rules L/P), the subset_kinds.json pin and the auditor pin.
 Bounding (r5: one selftest is now ~2 min): MUTANTS_FILTER=<regex> keeps matching names only;
 MUTANTS_STRIDE=<k> keeps every k-th of the REST (a deterministic sample, reported as such).
@@ -317,6 +318,37 @@ M.update(
         ],
         "R21 header parse error ignored": [
             ('    if hdr.get("parse_error"):\n', "    if False:\n")
+        ],
+        "R22 parse-record shape unchecked": [
+            (
+                "def _record_shape_problems(rec: dict, schema: dict, what: str) -> list[str]:\n",
+                "def _record_shape_problems(rec: dict, schema: dict, what: str) -> list[str]:\n    return []\n",
+            )
+        ],
+        "R23 unexpected suite-copy writes allowed": [
+            (
+                "        else:\n            failures.append(msg)\n",
+                "        else:\n            pass\n",
+            )
+        ],
+        "R24 write record not required": [
+            (
+                "    if not isinstance(writes, list) or not all(isinstance(w, str) for w in writes):\n",
+                "    if False:\n",
+            )
+        ],
+        "R25 expected write unmet ignored": [
+            ('    elif "writes-detected" in kinds:\n', "    elif False:\n")
+        ],
+        "R26 run-time input verification ignored": [
+            ('    if verify.get("ok") is not True:\n', "    if False:\n")
+        ],
+        "R27 grade-time recheck off": [("    if recheck:\n", "    if False:\n")],
+        "R28 manifest records not required": [
+            (
+                '        return [\n            "no input manifest / verification record',
+                '        return []\n        return [\n            "no input manifest / verification record',
+            )
         ],
     }
 )

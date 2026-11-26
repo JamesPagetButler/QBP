@@ -663,6 +663,63 @@ def subset_kinds_pin_problems(run_meta: dict) -> list[str]:
     return out
 
 
+def _is_str_list(v) -> bool:
+    return isinstance(v, list) and all(isinstance(x, str) for x in v)
+
+
+def _is_int(v) -> bool:
+    return isinstance(v, int) and not isinstance(v, bool)
+
+
+def _is_pos_list(v) -> bool:
+    return isinstance(v, list) and all(
+        isinstance(x, list) and len(x) == 2 and all(_is_int(y) for y in x) for x in v
+    )
+
+
+# The Lean-parser record schema (LeanSubsetParse.lean). Every field is REQUIRED.
+HEADER_FIELDS = {
+    "nonce": lambda v: isinstance(v, str),
+    "header": lambda v: v is True,
+    "imports": _is_str_list,
+    "parse_error": lambda v: isinstance(v, bool),
+}
+COMMAND_FIELDS = {
+    "nonce": lambda v: isinstance(v, str),
+    "i": _is_int,
+    "line": _is_int,
+    "col": _is_int,
+    "head_line": _is_int,
+    "head_col": _is_int,
+    "kind": lambda v: isinstance(v, str),
+    "nested": _is_str_list,
+    "nested_heads": _is_pos_list,
+    "kinds": _is_str_list,
+    "attrs": _is_str_list,
+    "set_option": _is_str_list,
+    "config": _is_str_list,
+    "parse_error": lambda v: isinstance(v, bool),
+    "scope_error": lambda v: isinstance(v, bool),
+}
+DONE_FIELDS = {
+    "nonce": lambda v: isinstance(v, str),
+    "done": lambda v: isinstance(v, bool),
+    "commands": _is_int,
+    "parse_errors": _is_int,
+    "scope_errors": _is_int,
+}
+
+
+def _record_shape_problems(rec: dict, schema: dict, what: str) -> list[str]:
+    out = []
+    for f, ok in schema.items():
+        if f not in rec:
+            out.append(f"[L] Lean-parser {what}: field `{f}` is missing")
+        elif not ok(rec[f]):
+            out.append(f"[L] Lean-parser {what}: field `{f}` has the wrong type")
+    return out
+
+
 def lean_parse_subset(src: str, raw: Path, stem: str, fmeta: dict) -> list[str]:
     """The pass-file subset AS LEAN'S OWN PARSER SEES IT (Red Team r5 / director decision on
     PR #824). run.sh ran `LeanSubsetParse.lean` on the file BEFORE any other Lean process: it
@@ -704,6 +761,14 @@ def lean_parse_subset(src: str, raw: Path, stem: str, fmeta: dict) -> list[str]:
     if len(recs) < 2 or not recs[0].get("header") or "done" not in recs[-1]:
         return out + ["[L] Lean-parser output is not header … done"]
     hdr, done, cmds = recs[0], recs[-1], recs[1:-1]
+    # Red Team r6 concern 2: every field present with its type; a malformed record FAILS (no
+    # `.get(f, [])` defaults anywhere below this point).
+    bad = _record_shape_problems(hdr, HEADER_FIELDS, "header")
+    bad += _record_shape_problems(done, DONE_FIELDS, "done line")
+    for c in cmds:
+        bad += _record_shape_problems(c, COMMAND_FIELDS, f"command {c.get('i')}")
+    if bad:
+        return out + bad
     if any("header" in r or "done" in r or "i" not in r for r in cmds):
         return out + ["[L] Lean-parser output has a stray header/done line"]
     if done.get("done") is not True:
@@ -714,7 +779,7 @@ def lean_parse_subset(src: str, raw: Path, stem: str, fmeta: dict) -> list[str]:
         out.append("[L] Lean-parser command records are not 1..n with a matching count")
     if hdr.get("parse_error"):
         out.append("[L] the header does not parse")
-    for m in hdr.get("imports", []):
+    for m in hdr["imports"]:
         if m.split(".")[0] not in ALLOWED_IMPORT_ROOTS:
             out.append(
                 f"[L] import `{m}` is not from a pinned package {sorted(ALLOWED_IMPORT_ROOTS)}"
@@ -741,7 +806,7 @@ def lean_parse_subset(src: str, raw: Path, stem: str, fmeta: dict) -> list[str]:
             ("set_option", "option"),
             ("config", "tactic config"),
         ):
-            for x in sorted(set(c.get(f, [])) - allow[f]):
+            for x in sorted(set(c[f]) - allow[f]):
                 out.append(f"[L] {where}: {label} `{x}` is not allowed")
     # P: agreement with the Python layer
     code = lean_lines(code_only(src))
@@ -754,7 +819,7 @@ def lean_parse_subset(src: str, raw: Path, stem: str, fmeta: dict) -> list[str]:
     lean_starts = {c.get("head_line") for c in cmds}
     # a nested command (after `set_option … in` / `open … in`) on its own column-0 line
     for c in cmds:
-        for nh in c.get("nested_heads", []):
+        for nh in c["nested_heads"]:
             if isinstance(nh, list) and len(nh) == 2 and nh[1] == 0:
                 lean_starts.add(nh[0])
     for c in cmds:
@@ -916,6 +981,9 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
     axioms, n_rejected, dup_sites = parse_axioms(msgs, sites)
     audit_probs, audit_nonstd = structural_audit(raw, stem, meta, run_meta)
     subset = subset_violations(src) + lean_parse_subset(src, raw, stem, meta)
+    # Red Team r6 concern 1(b): this file's Lean processes ran in a throwaway copy of the suite;
+    # run.sh hashed the copy before and after. A write there is a FAIL unless the file expects it.
+    writes = meta.get("suite_copy_writes")
     # Supported subset: no brace inside a string literal (interpolation is not lexed).
     braces = brace_in_string(src)
     if braces:
@@ -991,6 +1059,20 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
         )
     if not expects:
         failures.append("no TOOLCHECK-EXPECT line in the file header")
+    if not isinstance(writes, list) or not all(isinstance(w, str) for w in writes):
+        failures.append(
+            "no throwaway-copy write record for this file (run.sh did not record it)"
+        )
+    elif writes:
+        msg = f"the file WROTE suite inputs while it ran (throwaway copy): {writes[:6]}"
+        if "writes-detected" in kinds:
+            detections.append(msg)
+        else:
+            failures.append(msg)
+    elif "writes-detected" in kinds:
+        failures.append(
+            "expected the file to write a suite input, but no write was recorded"
+        )
 
     for kind, arg in expects:
         if kind == "pass":
@@ -1124,7 +1206,7 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
                 failures.append(
                     "expected the structural audit to fail, but it is clean"
                 )
-        elif kind in ("grader-refuses", "subset-refused"):
+        elif kind in ("grader-refuses", "subset-refused", "writes-detected"):
             pass  # handled above, before the per-expectation loop
         elif kind == "known-limit":
             check, _, rest = arg.partition(" ")
@@ -1195,6 +1277,55 @@ def axiom_summary(axioms: dict[str, list[str]]) -> str:
     return f"{len(axioms)} thm; non-std: {', '.join(extra)}" + ("" if len(sets) else "")
 
 
+def _suite_hashes(root: Path) -> dict[str, str]:
+    """Content sha256 of every suite input (the same rule as run.sh's manifest program)."""
+    out = {}
+    for f in sorted(root.rglob("*")):
+        rel = f.relative_to(root)
+        if (
+            not f.is_file()
+            or rel.parts[0] == "results"
+            or "__pycache__" in rel.parts
+            or f.suffix == ".md"  # docs never affect grading (same rule as run.sh)
+        ):
+            continue
+        out[rel.as_posix()] = hashlib.sha256(f.read_bytes()).hexdigest()
+    return out
+
+
+def inputs_problems(raw: Path, suite: Path, recheck: bool) -> list[str]:
+    """Red Team r6 concern 1(a). run.sh took a manifest of every input before the first Lean
+    process (`inputs.json`) and verified it after the last one (`inputs.verify.json`). The run is
+    valid only if that verification passed AND, at grade time, the suite being graded still has
+    exactly the hashed contents (so a grader or allowlist rewritten during or after the run is
+    caught by whoever re-grades)."""
+    try:
+        before = json.loads((raw / "inputs.json").read_text())
+        verify = json.loads((raw / "inputs.verify.json").read_text())
+    except (OSError, ValueError):
+        return [
+            "no input manifest / verification record in the raw logs (run.sh must write both)"
+        ]
+    out = []
+    if verify.get("ok") is not True:
+        out += [
+            f"input manifest: {x}"
+            for x in verify.get("problems", ["verification failed"])
+        ]
+    if recheck:
+        want = before.get("suite")
+        if not isinstance(want, dict) or not want:
+            out.append("input manifest has no suite hashes")
+        else:
+            now = _suite_hashes(suite)
+            for k in sorted(set(want) | set(now)):
+                if want.get(k) != now.get(k):
+                    out.append(
+                        f"suite input differs from the run's manifest at grade time: {k}"
+                    )
+    return out
+
+
 def cmd_evaluate(a: argparse.Namespace) -> int:
     raw, suite = Path(a.raw), Path(a.suite)
     meta = json.loads(Path(a.meta).read_text()) if a.meta else {}
@@ -1214,6 +1345,7 @@ def cmd_evaluate(a: argparse.Namespace) -> int:
         for layer in ("tool", "must-fail", "known-limit"):
             if not any(r["kind"] == layer for r in rows):
                 empty.append(f"the {layer} layer has zero files — RED")
+    empty += inputs_problems(raw, suite, not a.skip_input_recheck)
     meta.setdefault("preflight_failures", [])
     meta["preflight_failures"] = list(meta["preflight_failures"]) + empty
     ok = all(r["result"] in ("PASS", "KNOWN-LIMIT") for r in rows) and not meta.get(
@@ -1288,6 +1420,12 @@ def main() -> int:
         "--only-present",
         action="store_true",
         help="grade only files that were run (subset runs)",
+    )
+    p.add_argument(
+        "--skip-input-recheck",
+        action="store_true",
+        help="SELFTEST ONLY: do not re-hash the suite against the run's manifest (plants edit "
+        "suite copies on purpose); the run-time verification record is still required",
     )
     p.set_defaults(fn=cmd_evaluate)
     a = ap.parse_args()

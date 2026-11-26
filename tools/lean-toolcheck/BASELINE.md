@@ -1,24 +1,28 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `r5b-20261125` (2026-11-25 14:54–15:11 UTC, `tools/lean-toolcheck/run.sh`; its results, re-graded
-byte-identically by the committed grader, are the committed baseline). The run had
+**Run:** `r6a-20261125` (2026-11-25 23:51–2026-11-26 00:05 UTC, `tools/lean-toolcheck/run.sh --update-baseline`;
+input manifest verified after the last Lean process: **ok**). The run had
 `TOOLCHECK_AUDITOR` set to PR #829's `scripts/LeanAxiomAudit.lean` at **`6b07147`** (sha256 `1fa1ecc9…`), with
 checker `check_lean_axiom_audit.py` (sha256 `0e95cd7c…`, whose own `grade_run` grades the result).
 
-**Overall GREEN: 48/48 files as expected.**
+**Overall GREEN: 49/49 files as expected.**
 - **20 tool tests pass.** Each verdict comes from the structural audit, graded by #829's `grade_run`, with every
   file inside the pass-file subset: by **Lean's own parser** (`LeanSubsetParse.lean`, rules L/P) and by the
   Python rules. The subset is the verdict's precondition.
 - **T20** is confirmed outside the subset.
-- **24 must-fail controls are caught:**
+- **25 must-fail controls are caught:**
   - MF05 by the auditor itself;
   - MF14–MF20 by the subset, with the audit failing closed (no `.olean`);
   - **MF21** (T88), **MF22** (T86, a real `axiom cheat`), **MF23** (T89 raw string) and **MF24** (T90 guillemets)
     by the subset ALONE. Their audit is clean because the file wrote the `.olean`: limit S1.
+  - **MF25** (Red Team r6): its `#eval` wrote the throwaway copy's `subset_kinds.json`; the write was attributed to
+    MF25 alone (`suite_copy_writes`), and the real tree was unchanged (`inputs.verify.json`: ok, 64 suite files
+    by content, 107,163 package and toolchain files by stat).
 - 3 known-limit probes are confirmed.
-- 129 theorems are cross-checked on stdout.
+- 130 theorems are cross-checked on stdout.
 
-The run used one boxrun lease for 979 s with no thermal pauses (cool start). The `--json` runs peaked at 3803 MB
+The run used one boxrun lease for 883 s with no thermal pauses (cool start; launched only once MemAvailable was
+≥ 10 GB, because an interactive process held 4.7 GB). The `--json` runs peaked at 3792 MB
 RSS. The Lean-parser runs are not timed per file; the pre-run survey measured 1.9–5.0 GB each (it loads the
 imports' environment extensions), inside the 7000 MB boxrun cap.
 **Regenerate this record after the rebase onto master once PR #829 has merged.**
@@ -123,6 +127,7 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 | `must-fail/MF22_AxiomEvalForgesOlean/…` (T86, run `r4b-20261125`) | must-fail | ✅ caught | 0 | 1.27 | 785 | `[]` (**forged**) | subset rules A + H + D (`axiom`) + B (`#eval`) ONLY. The structural audit is **clean** (`problems: []`, `nonstd: {}`) although `dirty` rests on `cheat`: the compile wrote a substituted `.olean` (S1) |
 | `must-fail/MF23_RawStringLexDesync/…` (T89, run `r5b-20261125`) | must-fail | ✅ caught | 0 | 2.43 | 1467 | `[]` (**forged**) | rule R (raw-string opener) + the Lean-parser layer (rule L: `simproc_pattern%` and other kinds not allowed; rule P). The structural audit is **clean** (S1) |
 | `must-fail/MF24_GuillemetLexDesync/…` (T90, run `r5b-20261125`) | must-fail | ✅ caught | 0 | 2.47 | 1466 | `[]` (**forged**) | rule R (`«`) + the Lean-parser layer. The structural audit is **clean** (S1) |
+| `must-fail/MF25_WritesSuiteInput/…` (Red Team r6, run `r6a-20261125`) | must-fail | ✅ caught | 0 | 1.26 | 784 | clean (`fine` is `rfl`) | subset (`#eval`: rules A/B/H, Lean layer L) + **writes-detected**: the write landed in the throwaway copy and was attributed to MF25 only |
 | `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.13 | 776 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
 | `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.14 | 776 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
 | `known-limits/KL03_CheckerStringComment/…` | known-limit | 🟡 known limit | 0 | 1.15 | 776 | `['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']` | 🟡 confirmed: checker exit 0 (string-blind stripper misses the `native_decide`); HARD: audit shows the native axiom |
@@ -216,6 +221,12 @@ record's raw logs (`…225231Z`, same files): `python3 -I tools/lean-toolcheck/s
 | `subset_kinds.json` for another toolchain / T00 import list / `LeanSubsetParse.lean` | new | **FAIL** each |
 | rule R alone (`«` / `r"` in T01's header comment) and rule P one direction at a time (a Python-only start; a Lean-only start) | new | **FAIL** each, by that check alone |
 | `mutants_grader.py` r5 (bounded): R01–R21 + every-10th sample of M01–E… | new | **31/31 KILLED** after the 4 single-catcher plants (first pass 30/34) |
+| 24 missing-field + 5 wrong-type tamperings of T01's Lean-parser record (every header, command and done field) | new | **29/29 FAIL** |
+| suite-copy writes: unexpected (T01), record missing, record mistyped, expected-but-unmet (MF25) | new | **FAIL** each |
+| run-level manifest: verification failed / manifest missing / verification missing | new | **RED** each |
+| grade-time re-hash: manifest synthesised from the suite under test → GREEN; allowlist edited afterwards → RED | new | as required |
+| real run: MF25's write attributed to MF25 only, other writers none, `inputs.verify.json` ok | `r6a-20261125` | ✔ |
+| `mutants_grader.py` r6: R22–R28 (schema, write attribution, manifest) + R19 (`subset_kinds.json` pin, = the Red Team's L9) | new | **8/8 KILLED** (+ M01 as the sample entry: 9/9). `run.sh`'s in-memory verification is bash, outside the Python mutant harness; its effect is covered by the real run's `inputs.verify.json` and the RED plants |
 | `command_heads.json` with one T00 import fewer (same pins) | new | **FAIL** |
 | rule isolation: 60 one-construct sources, exact rule tags (adds `simproc_pattern%`, `compile_def%`, `$`, `?_`, `foo%`; spaced `%` allowed) | new | all exact |
 | `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
@@ -325,3 +336,4 @@ text-mode universal newlines (MF11).
 | 2026-11-25 | `20261125T084631Z` | Red Team r4 pre-check (`5b4792e`): rule H keeps every command head (incl. the 14 non-word ones) and any `name%` token; +MF21 (T88); the subset is restated as the verdict's PRECONDITION (S1); `structural_audit` calls #829's `grade_run` (`dangling` checked) plus compile/auditor exit 0; the heads pin includes the T00 imports; re-integrated against #829 `6b07147`; GREEN 45/45 |
 | 2026-11-25 | `r4b-20261125` | Red Team r4 pre-check, closing items: +MF22 (T86: a real `axiom` behind an `#eval` that forges the `.olean`), replayed with every subset rule off as an EXPECTED audit PASS (S1); the "auditor alone 6/6" claim restated; structural-only stems renamed T76–T79 (no clash with the Red Team's T86/T88); auditor PR #829 `6b07147`; GREEN 46/46; selftest exit 0 (82 rows); mutants 98/99 (M04 equivalent) from the completed r4 run on `20261125T084631Z` raw logs: `toolcheck.py` is unchanged since, and the selftest only gained rows; a re-run on these logs hit its 7200 s run-bounded time cap (exit 124, no memory pressure) and was not repeated |
 | 2026-11-25 | `r5b-20261125` | Red Team r5 delta (`67a214b`) + director decision: the subset precondition from **Lean's own parser** (`LeanSubsetParse.lean`, parse only; rules L/P; `subset_kinds.json` from `gen_subset_kinds.py`, closed-world); rule R refuses raw strings and `«`; +MF23 (T89), +MF24 (T90); PR #829 auditor files pinned (`auditor_pin.json`); GREEN 48/48; selftest exit 0 (139 rows); mutants BOUNDED (one selftest ~3 min): all 21 r5 mutants R01–R21 + a deterministic every-10th sample (10) of the earlier 99 → first pass 30/34 KILLED; the 4 survivors (R01/R02 rule R, R17/R18 rule P one direction) showed the selftest lacked single-catcher plants, 4 were added, and the re-run killed 4/4. So **R01–R21: 21/21, sample: 10/10**; the other 89 earlier mutants were not re-run this round |
+| 2026-11-25 | `r6a-20261125` | Red Team r6 (`9c61306`, APPROVE-WITH-CONCERN): throwaway suite copy for every code-running Lean process with per-file write attribution; pre/post input manifest held in memory by `run.sh` (one function); grade-time re-hash; +MF25; the Lean-parser record schema required and typed; GREEN 49/49; selftest exit 0 (179 rows); mutants R19 + R22–R28 8/8 KILLED (bounded: the earlier mutants were not re-run this round) |
