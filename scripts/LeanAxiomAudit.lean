@@ -195,7 +195,8 @@ and splitting `∧` / `↔`, every leaf is `True` — e.g. `True`, `(True)`, `id
 decides on the TERM the kernel accepted, so no lexer trick (a token declared by `notation`,
 `binder_predicate`, `@[term_parser]`, `run_cmd`, `#eval` in `CommandElabM`, or an import) can hide a
 vacuous statement. SCOPE, by design: only statements that reduce to `True`; `∃`, `∨`, `¬False` and
-other vacuous premises, equations by `rfl`, inhabited types and wrapper propositions are NOT flagged.
+other vacuous premises, equations by `rfl`, inhabited types and wrapper propositions are NOT flagged,
+nor is a classical `if c then True else True` (`whnf` stops at `Classical.choice`).
 `loadExts := false` loads no reducibility or matcher metadata; `.all` transparency and
 `smartUnfolding := false` make the reduction independent of both. -/
 partial def qbpVacuous (e : Expr) : MetaM Bool := do
@@ -211,6 +212,16 @@ partial def qbpVacuous (e : Expr) : MetaM Bool := do
     if e.isAppOfArity ``And 2 || e.isAppOfArity ``Iff 2 then
       return (← qbpVacuous e.appFn!.appArg!) && (← qbpVacuous e.appArg!)
     return false
+
+/-- Is `ty` a proposition? `Meta.isProp` reduces the sort with `whnfD` (default transparency even
+inside `withTransparency .all`), so a sort behind an `@[irreducible]` alias of `Prop`
+(`@[irreducible] def MyProp : Type := Prop`) was answered "not a proposition" and the constant was
+skipped (PR #829 Red Team r8, G7). Fallback: reduce the inferred sort at `.all` and test level 0. -/
+def qbpIsPropAll (ty : Expr) : MetaM Bool := do
+  if ← Meta.isProp ty then return true
+  match ← Meta.withTransparency .all (Meta.whnf (← Meta.inferType ty)) with
+  | .sort l => return l.normalize == Level.zero
+  | _ => return false
 
 /-- Per-constant reduction budget, in heartbeats (×1000 internally): 200000, or the value of the
 `QBP_AUDIT_VACUITY_HEARTBEATS` environment variable (the self-test sets a tiny one to prove the
@@ -316,6 +327,7 @@ def main (args : List String) : IO UInt32 := do
   let mut vacuous : Array Json := #[]
   let mut vacErrors : Array Json := #[]
   let mut thmCount := 0
+  let mut nonPropCount := 0
   -- Candidates (Red Team r7 finding 1): every theorem, def (incl. `abbrev`, `noncomputable def`,
   -- `instance`) and opaque whose TYPE is a proposition — not only `theorem`s.
   for n in inScope do
@@ -323,11 +335,13 @@ def main (args : List String) : IO UInt32 := do
     unless ci matches .thmInfo _ || ci matches .defnInfo _ || ci matches .opaqueInfo _ do continue
     let r : Except String (Option Bool) ← try
         let (b, _) ← (Meta.MetaM.run' (do
-            if ← Meta.isProp ci.type then return some (← qbpVacuous ci.type) else return none)).toIO
+            if ← qbpIsPropAll ci.type then return some (← qbpVacuous ci.type) else return none)).toIO
           coreCtx { env := env }
         pure (Except.ok b)
       catch e => pure (Except.error (toString e))
-    if r matches .ok none then continue
+    if r matches .ok none then
+      nonPropCount := nonPropCount + 1
+      continue
     thmCount := thmCount + 1
     match r with
     | .ok none => pure ()
@@ -349,7 +363,7 @@ def main (args : List String) : IO UInt32 := do
     ("dangling", Json.arr (dangling.toList.toArray.map (fun t => Json.str (toString t)))),
     ("std", Json.arr stdJ),
     ("declarations", inScope.size), ("nonstd", Json.arr bad),
-    ("theorems_checked", thmCount), ("vacuous", Json.arr vacuous),
+    ("theorems_checked", thmCount), ("non_prop_skipped", nonPropCount), ("vacuous", Json.arr vacuous),
     ("vacuity_errors", Json.arr vacErrors)]
   IO.println out.compress
   return 0

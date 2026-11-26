@@ -392,6 +392,13 @@ M = [
         [L],
     ),
     (
+        "V11 candidate filter reverted to plain Meta.isProp (Red Team r8, G7)",
+        AU,
+        "            if ← qbpIsPropAll ci.type then return some (← qbpVacuous ci.type) else return none)).toIO",
+        "            if ← Meta.isProp ci.type then return some (← qbpVacuous ci.type) else return none)).toIO",
+        [L],
+    ),
+    (
         "X1 auditor drops an undecided constant instead of reporting it (finding 6)",
         AU,
         "      catch e => pure (Except.error (toString e))",

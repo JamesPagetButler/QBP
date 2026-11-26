@@ -51,7 +51,8 @@ by module + fingerprint. This decides on the term the kernel accepted, so no lex
 token or elaboration-time trick can hide a vacuous theorem. A reduction error or a timeout (per-
 theorem heartbeat budget) fails that theorem; a run without the report fails. SCOPE, by design:
 statements that REDUCE TO `True`. `∃`, `∨`, `¬False` / other vacuous premises, equations by `rfl`,
-inhabited types and wrapper propositions are not flagged (no check can catch every easy theorem).
+inhabited types, wrapper propositions and a classical `if c then True else True` (`whnf` stops at
+`Classical.choice`) are not flagged (no check can catch every easy theorem).
 
 ALLOWLIST (scripts/lean_axiom_allowlist.json): exact, issue-linked exceptions. An entry names ONE
 declaration and PINS its identity (Red Team 3): its module and a SHA-256 fingerprint (computed in
@@ -375,7 +376,8 @@ def grade_run(d: dict, errors: list[str]) -> tuple[list[dict], int, list[str]] |
         f"axiom audit [{tag}]: Lean scope {len(scope)} module(s), {decls} declarations, "
         f"{len(bad_here)} non-standard; vacuity: {thm_n} theorem(s) checked, "
         f"{len(vac) if isinstance(vac, list) else '?'} vacuous, "
-        f"{len(vac_err) if isinstance(vac_err, list) else '?'} undecided"
+        f"{len(vac_err) if isinstance(vac_err, list) else '?'} undecided, "
+        f"{r.get('non_prop_skipped', '?')} non-Prop constant(s) skipped"
     )
     return bad_here, decls, [str(s) for s in scope]
 

@@ -95,6 +95,7 @@ FIXTURES = (
     "VacIrred",
     "VacRec",
     "VacBudget",
+    "VacIrredSort",
 )
 # The ORACLE is Lean's own in-file `collectAxioms` (what `#print axioms` uses), run at the END
 # of a copy of the fixture, on the module's own constants (`map₂`). It is NOT computed through an
@@ -637,6 +638,7 @@ def main() -> int:
             ("VacKinds", ["vd", "va", "vo", "vn"]),
             ("VacIrred", ["vi"]),
             ("VacRec", ["r0", "r3", "w2"]),
+            ("VacIrredSort", ["vac", "vac2"]),
         ):
             rc, res, out = h.audit(f"AuditFixture.{fx}")
             exp_v = sorted(ns(fx, w) for w in want_v)
