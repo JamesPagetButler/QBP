@@ -90,6 +90,11 @@ FIXTURES = (
     "VacB8",
     "VacSpell",
     "VacControl",
+    "VacKinds",
+    "VacB3Def",
+    "VacIrred",
+    "VacRec",
+    "VacBudget",
 )
 # The ORACLE is Lean's own in-file `collectAxioms` (what `#print axioms` uses), run at the END
 # of a copy of the fixture, on the module's own constants (`map₂`). It is NOT computed through an
@@ -153,13 +158,17 @@ class Harness:
         assert r.returncode == 0, r.stderr
         return drv, al
 
-    def run_auditor(self, drv: Path, lean_path: str | None = None) -> None:
+    def run_auditor(
+        self, drv: Path, lean_path: str | None = None, vac_budget: int | None = None
+    ) -> None:
         for f in sorted(drv.glob("AxiomAudit_*.args")):
             args = f.read_text(encoding="utf-8").splitlines()
             # As in CI: LEAN_PATH unset (the auditor is elaborated against the toolchain only),
             # the project's search path handed over in QBP_AUDIT_LEAN_PATH.
             aenv = {k: v for k, v in self.env.items() if k != "LEAN_PATH"}
             aenv["QBP_AUDIT_LEAN_PATH"] = lean_path or self.env["LEAN_PATH"]
+            if vac_budget is not None:
+                aenv["QBP_AUDIT_VACUITY_HEARTBEATS"] = str(vac_budget)
             out = run(
                 [self.lean, "--run", str(HERE / "LeanAxiomAudit.lean"), *args], env=aenv
             )
@@ -195,6 +204,7 @@ class Harness:
         lean_path: str | None = None,
         build_dirs: list[str] | None = None,
         vacuity: list[dict] | None = None,
+        vac_budget: int | None = None,
     ) -> tuple[int, dict, str]:
         self.vac_path = str(HERE / "lean_vacuity_allowlist.json")
         if vacuity is not None:
@@ -203,7 +213,7 @@ class Harness:
             vp.write_text(json.dumps({"entries": vacuity}))
             self.vac_path = str(vp)
         drv, al = self.gen([mod] if isinstance(mod, str) else mod, allowlist)
-        self.run_auditor(drv, lean_path)
+        self.run_auditor(drv, lean_path, vac_budget)
         return self.check(drv, al, build_dirs)
 
     def pins(self, mod: str, names: list[str]) -> list[dict]:
@@ -577,7 +587,7 @@ def main() -> int:
         # hide `theorem vac : True` from the Python token gate, which PASSES them (shown first, so
         # the catch below is the vacuity check's alone). The axiom audit — which never uses the token
         # gate — must FAIL each one, naming exactly `vac` as vacuous (1 error, no axiom issue).
-        for fx in ("VacB3", "VacB4", "VacB6", "VacB8"):
+        for fx in ("VacB3", "VacB4", "VacB6", "VacB8", "VacB3Def"):
             fdir = work / f"gate-{fx}"
             fdir.mkdir()
             shutil.copy(FIX / "AuditFixture" / f"{fx}.lean", fdir / f"{fx}.lean")
@@ -621,6 +631,44 @@ def main() -> int:
             f"VacControl: real statements proved by trivial / rfl pass (exit {rc})",
             out,
         )
+        # Red Team r7: every Prop-typed constant (def / abbrev / opaque / noncomputable def), `.all`
+        # transparency (@[irreducible]), recursion (structural; well-founded) — each flagged exactly.
+        for fx, want_v in (
+            ("VacKinds", ["vd", "va", "vo", "vn"]),
+            ("VacIrred", ["vi"]),
+            ("VacRec", ["r0", "r3", "w2"]),
+        ):
+            rc, res, out = h.audit(f"AuditFixture.{fx}")
+            exp_v = sorted(ns(fx, w) for w in want_v)
+            report(
+                rc == 1
+                and res["vacuous"] == exp_v
+                and len(res["errors"]) == len(exp_v),
+                f"{fx}: exactly {want_v} flagged vacuous (exit {rc}): {res['vacuous']}",
+                out,
+            )
+        # Heartbeat enforcement (Gemini r5; Red Team r7 finding 6, mutants X1/X3): the exponential
+        # ∧-chain `big` is decided (vacuous) with the default budget; with a budget of 1 heartbeat the
+        # real auditor must report it UNDECIDED, which fails the run — never pass it, never drop it.
+        rc, res, out = h.audit("AuditFixture.VacBudget")
+        report(
+            rc == 1
+            and res["vacuous"] == [ns("VacBudget", "big")]
+            and len(res["errors"]) == 1,
+            f"VacBudget, default budget: `big` decided vacuous (exit {rc})",
+            out,
+        )
+        rc, res, out = h.audit("AuditFixture.VacBudget", vac_budget=1)
+        report(
+            rc == 1
+            and not res["vacuous"]
+            and len(res["errors"]) == 1
+            and "could not decide" in res["errors"][0]
+            and ns("VacBudget", "big") in res["errors"][0],
+            f"VacBudget, 1-heartbeat budget: `big` UNDECIDED, the run fails closed (exit {rc})",
+            out,
+        )
+
         # The vacuity allowlist: an entry pinned to module + fingerprint allows exactly that theorem;
         # a wrong fingerprint does not; a stale entry fails.
         dummy = [
@@ -648,6 +696,25 @@ def main() -> int:
         report(
             rc == 1 and not res["vacuous_allowed"] and len(res["errors"]) == 8,
             f"a wrong vacuity fingerprint does not allow it, and the entry is stale (exit {rc})",
+            out,
+        )
+        # Red Team r7 X6: the right fingerprint under a WRONG module does not allow it.
+        rc, res, out = h.audit(
+            "AuditFixture.VacSpell",
+            vacuity=[dict(pin[0], module="AuditFixture.Elsewhere")],
+        )
+        report(
+            rc == 1 and not res["vacuous_allowed"] and len(res["errors"]) == 8,
+            f"a vacuity entry with the right fingerprint but the wrong module does not allow it (exit {rc})",
+            out,
+        )
+        # Gemini r5: a DUPLICATE vacuity entry is an error even when both copies match.
+        rc, res, out = h.audit("AuditFixture.VacSpell", vacuity=[pin[0], pin[0]])
+        report(
+            rc == 1
+            and res["vacuous_allowed"] == [spell[0]]
+            and len(res["errors"]) == 7,
+            f"a duplicate vacuity entry is refused (exit {rc}, {len(res['errors'])} errors)",
             out,
         )
 

@@ -186,16 +186,24 @@ def qbpFingerprint (env : Environment) (inProject : Name → Bool) (c : Name) : 
       if !seen.contains d then todo := todo.push d
   return "\n".intercalate (parts.qsort (· < ·)).toList
 
-/-- SEMANTIC VACUITY (PR #829 Red Team r6, director's option (b)). A theorem's statement is
-VACUOUS if, after `whnf` (default transparency) and peeling every `∀` / `→` binder, its conclusion
-splits along `∧` / `↔` into leaves that each reduce to `True`: `True`, `(True)`, `id True`, a def
-unfolding to `True`, `True ∧ True`, `∀ n, True`, `p → True`, … The check decides on the TERM the
-kernel accepted, so no lexer trick (a token declared by `notation`, `binder_predicate`,
-`@[term_parser]`, `run_cmd`, `#eval` in `CommandElabM`, or an import) can hide a vacuous theorem.
-NOTE (fail-closed): with `loadExts := false` no reducibility attribute is loaded, so `whnf` may
-unfold MORE than an elaborating Lean would; that can only flag more statements, never fewer. -/
+/-- SEMANTIC VACUITY (PR #829 Red Team r6/r7, director's option (b)). A Prop-typed constant
+(theorem, def, abbrev, opaque) is VACUOUS if its statement REDUCES TO `True`: after `whnf` at
+`.all` transparency with smart unfolding off (so `@[irreducible]` defs and recursive definitions,
+structural or well-founded, unfold through their compiled bodies), peeling every `∀` / `→` binder,
+and splitting `∧` / `↔`, every leaf is `True` — e.g. `True`, `(True)`, `id True`, `True ∧ True`,
+`∀ n, True`, `p → True`, a def (any reducibility) or a recursive def whose value is `True`. The check
+decides on the TERM the kernel accepted, so no lexer trick (a token declared by `notation`,
+`binder_predicate`, `@[term_parser]`, `run_cmd`, `#eval` in `CommandElabM`, or an import) can hide a
+vacuous statement. SCOPE, by design: only statements that reduce to `True`; `∃`, `∨`, `¬False` and
+other vacuous premises, equations by `rfl`, inhabited types and wrapper propositions are NOT flagged.
+`loadExts := false` loads no reducibility or matcher metadata; `.all` transparency and
+`smartUnfolding := false` make the reduction independent of both. -/
 partial def qbpVacuous (e : Expr) : MetaM Bool := do
-  let e ← Meta.whnf e
+  -- Heartbeat budget enforced at every step (not only inside `whnf`), so a statement whose split
+  -- explodes fails closed as UNDECIDED instead of running unbounded.
+  Core.checkMaxHeartbeats "qbp-vacuity"
+  -- `.all` transparency (Red Team r7 finding 2): `@[irreducible]` defs unfold too.
+  let e ← Meta.withTransparency .all (Meta.whnf e)
   match e with
   | .forallE n t b bi => Meta.withLocalDecl n bi t fun x => qbpVacuous (b.instantiate1 x)
   | _ =>
@@ -204,9 +212,14 @@ partial def qbpVacuous (e : Expr) : MetaM Bool := do
       return (← qbpVacuous e.appFn!.appArg!) && (← qbpVacuous e.appArg!)
     return false
 
-/-- Per-theorem reduction budget, in heartbeats (×1000 internally). A timeout or any error is
-reported and FAILS that theorem (fail-closed). -/
-def qbpVacuityHeartbeats : Nat := 200000
+/-- Per-constant reduction budget, in heartbeats (×1000 internally): 200000, or the value of the
+`QBP_AUDIT_VACUITY_HEARTBEATS` environment variable (the self-test sets a tiny one to prove the
+budget is enforced; CI's audit step does not set it). A timeout or any error is reported and FAILS
+that constant (fail-closed). -/
+def qbpVacuityHeartbeats : IO Nat := do
+  match (← IO.getEnv "QBP_AUDIT_VACUITY_HEARTBEATS") >>= String.toNat? with
+  | some k => pure k
+  | none => pure 200000
 
 def main (args : List String) : IO UInt32 := do
   let nonce :: label :: items := args
@@ -292,26 +305,38 @@ def main (args : List String) : IO UInt32 := do
         ("axiom", Json.bool false), ("fp", Json.str "")]
   -- SEMANTIC VACUITY over every audited theorem, in this same run (no initializers, loadExts :=
   -- false). Each check gets a fresh `CoreM` context with its own heartbeat budget.
+  -- `smartUnfolding := false` (Red Team r7 finding 3): with `loadExts := false` the smart-unfolding
+  -- / matcher metadata is not loaded, so recursive definitions are unfolded through their compiled
+  -- `brecOn` / `WellFounded.fix` bodies instead.
+  let budget ← qbpVacuityHeartbeats
   let coreCtx : Core.Context :=
     { fileName := "<qbp-axiom-audit>", fileMap := default,
-      maxHeartbeats := qbpVacuityHeartbeats * 1000 }
+      options := ({} : Options).setBool `smartUnfolding false,
+      maxHeartbeats := budget * 1000 }
   let mut vacuous : Array Json := #[]
   let mut vacErrors : Array Json := #[]
   let mut thmCount := 0
+  -- Candidates (Red Team r7 finding 1): every theorem, def (incl. `abbrev`, `noncomputable def`,
+  -- `instance`) and opaque whose TYPE is a proposition — not only `theorem`s.
   for n in inScope do
-    let some (.thmInfo v) := env.find? n | continue
-    thmCount := thmCount + 1
-    let r : Except String Bool ← try
-        let (b, _) ← (Meta.MetaM.run' (qbpVacuous v.type)).toIO coreCtx { env := env }
+    let some ci := env.find? n | continue
+    unless ci matches .thmInfo _ || ci matches .defnInfo _ || ci matches .opaqueInfo _ do continue
+    let r : Except String (Option Bool) ← try
+        let (b, _) ← (Meta.MetaM.run' (do
+            if ← Meta.isProp ci.type then return some (← qbpVacuous ci.type) else return none)).toIO
+          coreCtx { env := env }
         pure (Except.ok b)
       catch e => pure (Except.error (toString e))
+    if r matches .ok none then continue
+    thmCount := thmCount + 1
     match r with
-    | .ok true =>
+    | .ok none => pure ()
+    | .ok (some true) =>
       let base := [("decl", Json.str (toString n)), ("module", Json.str (modOf n))]
       vacuous := vacuous.push (Json.mkObj
         (if allowNames.contains n then base ++ [("fp", Json.str (qbpFingerprint env inProject n))]
          else base))
-    | .ok false => pure ()
+    | .ok (some false) => pure ()
     | .error msg =>
       vacErrors := vacErrors.push (Json.mkObj [("decl", Json.str (toString n)),
         ("module", Json.str (modOf n)), ("error", Json.str (toString (msg.take 300)))])

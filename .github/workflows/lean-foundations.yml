@@ -57,6 +57,7 @@ jobs:
               - 'scripts/check_lean_axiom_audit.py'
               - 'scripts/test_lean_axiom_audit.py'
               - 'scripts/lean_axiom_allowlist.json'
+              - 'scripts/lean_vacuity_allowlist.json'
               - 'scripts/LeanAxiomAudit.lean'
               - 'scripts/lean_audit_fixtures/**'
               - 'scripts/lean_lexer_fixtures/**'

@@ -44,12 +44,14 @@ satisfied, although `lake build` warned about the `sorry`. A kernel re-check (le
 would not catch this either, because the substitute is well-typed; what is missing is a
 source <-> .olean binding. Nine proofs/ files use `#eval` today (all pure computations).
 
-SEMANTIC VACUITY (PR #829 Red Team r6): in the same auditor run, every audited THEOREM's statement
-is reduced (whnf at default transparency, every ∀/→ binder peeled, ∧/↔ split); if every leaf is
-`True` the theorem is VACUOUS and FAILS unless scripts/lean_vacuity_allowlist.json (empty) pins it
+SEMANTIC VACUITY (PR #829 Red Team r6/r7): in the same auditor run, every audited Prop-typed
+constant (theorem, def, abbrev, opaque) is reduced (whnf at `.all` transparency with smart unfolding
+off, every ∀/→ binder peeled, ∧/↔ split); if every leaf is `True` it is VACUOUS and FAILS unless scripts/lean_vacuity_allowlist.json (empty) pins it
 by module + fingerprint. This decides on the term the kernel accepted, so no lexer desync, declared
 token or elaboration-time trick can hide a vacuous theorem. A reduction error or a timeout (per-
-theorem heartbeat budget) fails that theorem; a run without the report fails.
+theorem heartbeat budget) fails that theorem; a run without the report fails. SCOPE, by design:
+statements that REDUCE TO `True`. `∃`, `∨`, `¬False` / other vacuous premises, equations by `rfl`,
+inhabited types and wrapper propositions are not flagged (no check can catch every easy theorem).
 
 ALLOWLIST (scripts/lean_axiom_allowlist.json): exact, issue-linked exceptions. An entry names ONE
 declaration and PINS its identity (Red Team 3): its module and a SHA-256 fingerprint (computed in
@@ -161,6 +163,8 @@ def load_vacuity_allowlist(path: Path, errors: list[str]) -> dict[str, dict]:
         if not ok:
             errors.append(f"malformed vacuity allowlist entry: {e}")
             continue
+        if e["declaration"] in out:
+            errors.append(f"duplicate vacuity allowlist entry for {e['declaration']}")
         out[e["declaration"]] = e
     return out
 
