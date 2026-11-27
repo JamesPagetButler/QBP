@@ -68,7 +68,9 @@ jobs:
           git fetch --no-tags origin "${{ steps.pr.outputs.base }}" "${{ steps.pr.outputs.head }}"
           MB=$(git merge-base "origin/${{ steps.pr.outputs.base }}" "${{ steps.pr.outputs.head }}")
           echo "merge-base: $MB"
-          git diff --name-only "$MB" "${{ steps.pr.outputs.head }}" > /tmp/changed.txt
+          # --no-renames: a rename lists BOTH old and new path, so a theory file renamed
+          # out of proofs/ (etc.) still triggers the gate (F1 on PR #838).
+          git diff --name-only --no-renames "$MB" "${{ steps.pr.outputs.head }}" > /tmp/changed.txt
           echo "changed files:"; cat /tmp/changed.txt
       - name: Collect labels + comments
         env:

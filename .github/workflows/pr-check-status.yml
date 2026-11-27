@@ -223,7 +223,9 @@ jobs:
           # review-ready revoked" on PR #785 for an open HVR box (live, 2026-10-29). It
           # belongs with the Tier-3 gate: out of TECH-GREEN, in ALL-GREEN. Guarded by
           # scripts/test_notifier_review_gates.py (every merge-blocking check name is listed).
-          REVIEW_GATES='["Tier-3 review-label required on theory-bearing diffs","Merge-blocking boxes"]'
+          # `Merge-blocking boxes (head self-test)` (PR #838) is the PR's own self-tests, run in a
+          # job isolated from the judge; it is listed so a red self-test holds review-ready too.
+          REVIEW_GATES='["Tier-3 review-label required on theory-bearing diffs","Merge-blocking boxes","Merge-blocking boxes (head self-test)"]'
 
           # Per-SHA check runs minus self (pagination: one array per page -> slurp+add),
           # then reduced to the LATEST check-run per name (#721 AC1).

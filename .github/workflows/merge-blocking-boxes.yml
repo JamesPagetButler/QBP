@@ -32,7 +32,8 @@
 # PR's BASE sha out into `base/` and runs the verdict from
 # `base/scripts/merge_blocking_check.py` (which imports the base parser). Only
 # when the base lacks a script (first landing) does the head copy judge, with a
-# `::warning::` and `verdict-source=head(bootstrap)` in the log. The workflow
+# `::warning::` and `verdict-source=head(bootstrap)` in the log (unreachable since
+# PR #780 landed: master's base always carries both scripts). The workflow
 # file and the selector are head-side by nature of `pull_request`; their edits
 # are visible in the diff under `.github/workflows/` and `scripts/`.
 #
@@ -40,13 +41,24 @@
 # the check; `synchronize` re-runs on every push. Fork PRs: body is read via the
 # API with the read-only default token, so the job runs for them too.
 #
+# Beekeeper-box scope guard (#835; beekeeper ruling 2026-11-24, QBP#714
+# issuecomment-7147354671): a ⊘-nil'd HVR / `merge authorized` box passes only on
+# a pure housekeeping PR (label `housekeeping`, not theory-bearing). The job reads
+# the PR's labels and changed files (latest, via API) for that and re-runs on
+# `labeled`/`unlabeled`, so removing the label re-judges the nil. The scope flags
+# are passed only when the judging copy supports them (first landing: base lacks
+# them, so the base judges as before).
+# `--head-root=.` lets the judge read a CHANGED workflow's head copy for the
+# narrow-lane backstop (write permissions or gh pr merge/edit/close, gh issue
+# close/reopen/edit → lane); the judge's own code still comes from base.
+#
 # Listed in the notifier's workflow_run list (enforced by #507 §3 drift lint).
 
 name: Merge-blocking boxes
 
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]   # labeled/unlabeled: #835 scope guard reads labels
 
 permissions:
   contents: read
@@ -59,26 +71,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # F1 on PR #838 (round 5): the PR's own code must never run on the judge's
+  # filesystem. Head self-tests live in their OWN job (another runner), so head
+  # code cannot rewrite `base/` before the verdict. The verdict job below
+  # executes no head-side file: it only reads the head tree as text
+  # (`--head-root=.`). Wiring test: test_verdict_job_runs_no_head_code.
+  merge-blocking-head-selftest:
+    name: Merge-blocking boxes (head self-test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # PR head — coverage for the PR's own edits, not the verdict
+      - name: Self-test the head copy (isolated job — cannot touch the judge)
+        run: |
+          python3 scripts/test_pr_merge_blocking_boxes.py
+          python3 scripts/test_merge_blocking_check.py
+
   merge-blocking-boxes:
     name: Merge-blocking boxes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # PR head: self-tested below; never the judge
+      - uses: actions/checkout@v4 # PR head: read as TEXT only (--head-root); never executed here
       - uses: actions/checkout@v4 # PR base sha: THE judge (arch §I4, PR #780)
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           path: base
-      - name: Select the verdict source (base; head only as a first-landing bootstrap)
+      - name: Select the verdict source (base selector only — never a head script, F1 PR #838)
         id: src
         run: |
           set -euo pipefail
           SEL=base/scripts/merge_blocking_verdict_source.py
-          [ -f "$SEL" ] || SEL=scripts/merge_blocking_verdict_source.py
+          [ -f "$SEL" ] || { echo "::error::base selector missing — refusing to run a head copy"; exit 1; }
           python3 "$SEL" --base base --head .
-      - name: Self-test the head copy (coverage for the PR's own edits — not the verdict)
-        run: |
-          python3 scripts/test_pr_merge_blocking_boxes.py
-          python3 scripts/test_merge_blocking_check.py
       - name: Self-test the base copy (the judge must pass its own fixtures before it judges)
         if: steps.src.outputs.source == 'base'
         env:
@@ -92,6 +115,11 @@ jobs:
               echo "::warning::$SRC_DIR/scripts/$t.py absent on the base — base self-test skipped"
             fi
           done
+      - name: Require PyYAML (H3, PR #838 — the backstop parses workflows with it)
+        # Without PyYAML the judge would treat EVERY workflow change as lane (fail
+        # closed), silently undoing the narrow ruling; fail loudly instead.
+        run: |
+          python3 -c 'import yaml' || { echo "::error::PyYAML missing on the runner — the #835 backstop cannot judge workflows"; exit 1; }
       - name: Fetch the PR body (latest, via API — not the event snapshot)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -101,8 +129,42 @@ jobs:
           set -euo pipefail
           gh api "repos/$REPO/pulls/$PR" --jq '.body // ""' > /tmp/body.md
           echo "body: $(wc -c < /tmp/body.md) bytes for PR #$PR"
+      - name: Fetch the PR labels and changed files (#835 scope guard; latest, via API)
+        id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          SRC_DIR: ${{ steps.src.outputs.dir }}
+        run: |
+          set -euo pipefail
+          labels=$(gh api "repos/$REPO/pulls/$PR" --jq '[.labels[].name] | join(",")')
+          echo "labels=$labels" >> "$GITHUB_OUTPUT"
+          # paginated REST (gh pr view --json files caps at 100 files — K10); fail closed on mismatch.
+          # One TSV row per changed file: filename + previous_filename (set only on a rename),
+          # so a file renamed OUT of a theory path is still seen (F1 on PR #838).
+          gh api "repos/$REPO/pulls/$PR/files?per_page=100" --paginate \
+            --jq '.[] | [.filename, (.previous_filename // "")] | @tsv' > /tmp/files.tsv
+          n_api=$(grep -c . /tmp/files.tsv || true)   # entries, not paths (renames add a path)
+          tr '\t' '\n' < /tmp/files.tsv | grep -v '^$' > /tmp/changed.txt || true
+          n_pr=$(gh api "repos/$REPO/pulls/$PR" --jq .changed_files)
+          if [ "$n_pr" -gt 3000 ]; then
+            echo "::warning::PR has $n_pr changed files; the files API caps at 3000 — treated as theory-bearing (when in doubt, theory)"
+            echo "proofs/__enumeration_incomplete__" >> /tmp/changed.txt
+          elif [ "$n_api" != "$n_pr" ]; then
+            echo "::error::changed-file enumeration mismatch (api=$n_api, pr=$n_pr) — failing closed"; exit 1
+          fi
+          echo "labels=[$labels] changed=$n_api"
+          if grep -q -- '--changed-file' "$SRC_DIR/scripts/merge_blocking_check.py"; then
+            echo "supported=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::judging copy predates the #835 scope guard — scope flags not passed"
+            echo "supported=" >> "$GITHUB_OUTPUT"
+          fi
       - name: Merge-blocking boxes (red iff an unticked box sits in a §2.2 region)
         # beekeeper's flip (#781): append `--absent-blocks` to also fail bodies with no §2.2 region
         env:
           SRC_DIR: ${{ steps.src.outputs.dir }}
-        run: python3 "$SRC_DIR/scripts/merge_blocking_check.py" --body-file /tmp/body.md
+          SCOPE: ${{ steps.scope.outputs.supported }}
+          LABELS: ${{ steps.scope.outputs.labels }}
+        run: python3 "$SRC_DIR/scripts/merge_blocking_check.py" --body-file /tmp/body.md ${SCOPE:+"--labels=$LABELS" --changed-file=/tmp/changed.txt --head-root=.}

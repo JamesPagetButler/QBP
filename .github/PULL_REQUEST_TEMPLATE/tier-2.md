@@ -83,5 +83,29 @@ Routing rubric: docs/workflows/pr7_conflict_routing_rubric.md (v0.2)
 - [ ] No secrets or credentials included
 - [ ] CTH anchor impact declared above (or marked N/A)
 
+<!-- Each box is ticked by the hand that owns it. HVR + Merge authorized: PURE HOUSEKEEPING ONLY
+     (`housekeeping` label, no theory touched: tooling, CI, docs, process, incl. Lean/Agda proof
+     *tooling* that changes no proof statement) ⊘-nils both — replace each line with
+     `- [ ] ~~<box text>~~ ⊘ pure housekeeping`. Any PR touching theory (a `proofs/` statement,
+     `docs/foundations/`, a result claim) keeps both, and so does every other non-housekeeping
+     PR. When in doubt, treat it as theory. The `Merge-blocking boxes` check rejects a nil'd
+     HVR/Merge-authorized box unless the PR is `housekeeping`-labelled and changes nothing under
+     proofs/, docs/theory/, docs/foundations/, paper/, archive/cth-inventory/ and no merge-lane
+     file (CONTRIBUTING.md, review_tiers.md, these templates, CODEOWNERS, the review/box/label/
+     tier/merge/close-gate workflows and their scripts, or a workflow / composite-action edit
+     that grants write, touches any secret but GITHUB_TOKEN or calls gh pr merge/edit/close /
+     gh issue close/reopen/edit; ordinary CI and proof tooling
+     stays housekeeping); otherwise both boxes must be present and ticked. Keep this region:
+     a theory or merge-lane PR without it is red.
+     Beekeeper ruling 2026-11-24, QBP#714 issuecomment-7147354671; CONTRIBUTING.md
+     §Housekeeping vs theory. -->
+
+## Sign-off required (merge-blocking):
+
+- [ ] Red Team review (Claude)
+- [ ] Gemini review (real API)
+- [ ] Human Visual Review (beekeeper) — nil only if pure housekeeping (see comment above)
+- [ ] Merge authorized (beekeeper; QBP lane) — nil only if pure housekeeping (see comment above)
+
 ---
 *Tier 2: Dual AI review required (Red Team + Blue Team)*

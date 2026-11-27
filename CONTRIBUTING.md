@@ -7,7 +7,7 @@ This document outlines the process for contributing to the Quaternion-Based Phys
 1.  **Start with an Issue:** All work must begin with a documented Issue. This creates a public record of the task and allows for initial discussion.
 2.  **Branch for Work:** All work is to be done on a descriptively named branch (e.g., `feature/exp01-sg-theory`). Do not commit directly to `master`.
 3.  **Submit a Pull Request:** All changes must be proposed via a Pull Request (PR), which must reference the originating Issue in its description.
-4.  **Require Tiered Review & Sign-Off:** All Pull Requests are subject to a tiered review process based on scope. Tier 1 (docs/typos) requires single AI review. Tier 2 (code/tests) requires dual AI review (Red Team + Blue Team). Tier 3 (theory/proofs) requires full panel review. See [Tiered Review System](#tiered-review-system) for details. Final sign-off from James is always required.
+4.  **Require Tiered Review & Sign-Off:** All Pull Requests are subject to a tiered review process based on scope. Tier 1 (docs/typos) requires single AI review. Tier 2 (code/tests) requires dual AI review (Red Team + Blue Team). Tier 3 (theory/proofs) requires full panel review. See [Tiered Review System](#tiered-review-system) for details. Final sign-off from James (Human Visual Review and `merge authorized`) is required on every Tier 2+ PR **except pure housekeeping** (beekeeper ruling 2026-11-24; definition in [Housekeeping vs theory](#housekeeping-vs-theory-hvr-and-merge-authorized)).
 5.  **Link Tests to Reality:** Every automated test must be a "synthetic experiment" that simulates a real, physically verifiable experiment. This connection must be explicitly documented.
 
 ---
@@ -885,7 +885,7 @@ Not all PRs need the same level of scrutiny. Use the appropriate tier based on P
 |------|------|----------------|--------|
 | **Tier 0** | Before implementing non-trivial designs | Gemini critique (`critique_my_approach`) | *(no label — pre-PR)* |
 | **Tier 1** | Docs, typos, formatting, comments | Single AI review (Red OR Blue) | `tier-1-review` |
-| **Tier 2** | Code, tests, config, housekeeping | Red Team + Gemini, Human Visual Review | `tier-2-review` |
+| **Tier 2** | Code, tests, config, housekeeping | Red Team + Gemini, Human Visual Review (⊘-nil for pure housekeeping — see below) | `tier-2-review` |
 | **Tier 3** | Theory, proofs, architecture, new phases | Red Team → Gemini (sequential), Human Visual Review | `tier-3-review` |
 
 **Tier Selection Decision Tree:**
@@ -898,6 +898,19 @@ Unsure?                                → Tier 2
 ```
 
 James can upgrade or downgrade any PR's tier.
+
+#### Housekeeping vs theory: HVR and `merge authorized`
+
+Beekeeper ruling, approved 2026-11-24 ([QBP#714 issuecomment-7147354671](https://github.com/JamesPagetButler/QBP/issues/714#issuecomment-7147354671)): *"I work with the notary on permission and they should be able to merge housekeeping work, I still hold a hrv and accept to merge on theory work."* This overrides the Tier 2 HVR requirement for pure housekeeping.
+
+| PR kind | Beekeeper HVR + `merge authorized` | Merger |
+|---|---|---|
+| **Pure housekeeping** — `housekeeping`-labelled and touches no theory: tooling, CI, docs and process, including Lean or Agda proof *tooling* that changes no proof statement | **Not required**, even at Tier 2. Both boxes are ⊘-nil'd with the reason `pure housekeeping` | notary-implementor under the notary lane (author ≠ reviewer ≠ merger, notarisation record), once CI, Red Team, Gemini and every other box are green |
+| **Touches theory in any way** — Tier 3, a proof statement in `proofs/`, anything in `docs/foundations/`, a result claim — whatever its label | **Required** | notary-implementor under the notary lane (author ≠ reviewer ≠ merger, notarisation record), only after both boxes are ticked |
+| **Every other Tier 2+ PR** — not pure housekeeping (no `housekeeping` label, or it touches merge-lane / governance files) | **Required**, as before the ruling | merge-lane / governance PRs: **the beekeeper**; otherwise unchanged: the existing QBP lanes (incl. the QBP#714 cross-merge lane), only after both boxes are ticked |
+| **Doubtful case** | **When in doubt, treat it as theory** (boxes required) | as for theory |
+
+The `Merge-blocking boxes` check enforces this from the PR's changed paths and labels. (1) A ⊘-nil'd HVR / `merge authorized` / beekeeper box is accepted only on **pure housekeeping**: `housekeeping` label, no theory-bearing path (`proofs/`, `docs/theory/`, `docs/foundations/`, `paper/`, `archive/cth-inventory/` — the union of PR Process Lints §1 and the Tier-3 gate; a rename counts both its old and new path), no `tier-3-review` label, and no merge-lane / governance file: `CONTRIBUTING.md`, `docs/workflows/review_tiers.md`, the PR templates, any `CODEOWNERS`, the **lane workflows** (those that read or write review state, boxes, labels or tiers, or gate merges or issue closes: merge-blocking boxes, Tier-3 gate, notifier, PR Process Lints, closing-AC guard, reopen-falsely-closed, closed-AC sweep, pending upgrades) and the `scripts/` files they run or import (derived from the judging copy), plus any changed workflow or composite action (`.github/actions/**/action.y*ml`) that grants any `write` scope or `write-all` at workflow or job level (read structurally with a YAML parser, so anchors, block scalars and escapes resolve; a file that does not parse counts as power; only `security-events` is exempt, and only while the ruleset has no code-scanning rule), references `secrets` in any form or case other than exactly `secrets.GITHUB_TOKEN`, calls `gh pr merge|edit|close` / `gh issue close|reopen|edit`, or is a symlink. A changed helper file in a composite action counts if it, or its enclosing `action.yml`, does. This backstop relies on the repo setting `default_workflow_permissions: read`, which only the beekeeper can change. Ordinary CI and proof tooling (e.g. Agda or Lean CI) stays housekeeping (beekeeper decision 2026-11-26, PR #838). Paths decide theory status; a label can only add it. (2) Every other PR with a merge-blocking region, except a plain `tier-1-review` PR, must carry a **ticked** Human Visual Review box and a **ticked** `merge authorized` box; a deleted or renamed box turns the check red. The nil-name match in (1) is a first line only: cross-script lookalikes and spaced letters evade it, and (2) is the backstop that catches them, because the canonical box is then missing. (3) A theory-bearing or merge-lane PR with **no** merge-blocking region is red; every other PR without a region keeps the #781 warn-only policy. Proof tooling under `proofs/` therefore keeps its boxes (fails closed: when in doubt, theory). A result claim outside those paths cannot be detected mechanically; the author and reviewers own that call. A PR that changes the review tiers, any merge lane, governance, the delegation or a constitutional document is merged by the beekeeper, never via the notary lane.
 
 **Session-based reviews:** For multi-round PRs, Gemini reviews use `session_id` to maintain context across rounds. See [review_tiers.md](docs/workflows/review_tiers.md#session-based-reviews-multi-round-prs).
 
@@ -925,7 +938,7 @@ Before any PR can be merged, the PR **must** contain:
 | Gemini Review (2 personas) | Claude (as scribe) | PR Comment |
 | Gemini Summary | Claude (as scribe) | PR Comment |
 | All CI checks passing | GitHub Actions | Status checks |
-| Human explicit merge command | James | CLI instruction |
+| Human explicit merge command (every Tier 2+ PR except pure housekeeping, where it is ⊘-nil'd) | James | CLI instruction / `merge authorized` box |
 
 ### Review Flow
 
@@ -944,14 +957,18 @@ Before any PR can be merged, the PR **must** contain:
       ↓
 6. CI checks pass
       ↓
-7. Human Visual Review (Tier 2+)
+7. Human Visual Review (Tier 2+; ⊘-nil for pure housekeeping —
+   see "Housekeeping vs theory" above)
    - AI prepares visual artifacts (plots, comparison tables)
    - James inspects for anomalies via pattern recognition
    - Findings are BLOCKING
       ↓
-8. James reviews, asks questions if needed
+8. James reviews, asks questions if needed (every Tier 2+ PR
+   except pure housekeeping)
       ↓
-9. James issues explicit "merge" command
+9. James issues explicit "merge" command (every Tier 2+ PR except
+   pure housekeeping; there, notary-implementor merges under the notary
+   lane once every other box is green)
       ↓
 10. Merge executed
 ```
@@ -963,8 +980,8 @@ Before any PR can be merged, the PR **must** contain:
 3.  **Documentation of Gemini's Review:** Claude acts as scribe, copying Gemini's Markdown review and posting it as a separate PR comment.
 4.  **Issue Synthesis:** Claude synthesizes both reviews into a summary using **traffic-light table format** (PASS/FAIL/PARTIAL) — tables first, prose second. Flags unmet acceptance criteria as **BLOCKING**. If Claude and Gemini disagree on a finding, uses the **CONFLICT template** (see [review_tiers.md](docs/workflows/review_tiers.md#contested-use-debate-lite)).
 5.  **Pivot Detection:** If a review identifies a **systemic failure** (the AC itself is flawed, not the code), flag as **BLOCKING (PIVOT REQUIRED)** and follow the [Pivot Protocol](docs/workflows/pivot_protocol.md). See "Pivot Protocol Integration" below.
-6.  **Human Visual Review (Tier 2+):** AI prepares visual artifacts for James — plots, comparison tables, before/after screenshots, traffic-light AC tables. James inspects for anomalies using pattern recognition. Findings from this step are **BLOCKING**. See [review_tiers.md](docs/workflows/review_tiers.md#human-visual-review-tier-2).
-7.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command.
+6.  **Human Visual Review (Tier 2+):** AI prepares visual artifacts for James — plots, comparison tables, before/after screenshots, traffic-light AC tables. James inspects for anomalies using pattern recognition. Findings from this step are **BLOCKING**. See [review_tiers.md](docs/workflows/review_tiers.md#human-visual-review-tier-2). Required on every Tier 2+ PR **except pure housekeeping**, which ⊘-nils this step (see [Housekeeping vs theory](#housekeeping-vs-theory-hvr-and-merge-authorized)); a doubtful case is treated as theory.
+7.  **Final Approval:** James reviews all summaries, asks clarifying questions if needed, then issues explicit merge command (ticks `merge authorized`). Only for pure housekeeping is `merge authorized` ⊘-nil'd; notary-implementor under the notary lane (author ≠ reviewer ≠ merger, notarisation record) then merges once every other box is green.
 
 ### Acceptance Criteria Verification Protocol
 

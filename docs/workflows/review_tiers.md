@@ -134,7 +134,7 @@ Pattern 4 (Human Tie-Breaking) is the escape hatch from Pattern 2's debate loop,
 | **Tool config** | Gemini: `thinking=true`, `session_id` for multi-round PRs |
 | **Blocking?** | Yes — FAIL items block merge |
 | **Label** | `tier-2-review` |
-| **Human Visual Review** | **Required** — see below |
+| **Human Visual Review** | **Required** — see below. **Exception: pure housekeeping** (⊘-nil; see [Housekeeping vs theory](#housekeeping-vs-theory-hvr-and-merge-authorized)) |
 
 ### Tier 2 Checklist
 
@@ -144,7 +144,7 @@ Pattern 4 (Human Tie-Breaking) is the escape hatch from Pattern 2's debate loop,
 - [ ] Code style consistent with codebase
 - [ ] **Scale compatibility check** — datasets on shared axes must not differ by >10× in characteristic scale (see [Known AI Blind Spots](#known-ai-blind-spots))
 - [ ] AC verification (if issue linked)
-- [ ] **Human Visual Review completed** (James inspects outputs)
+- [ ] **Human Visual Review completed** (James inspects outputs) — or ⊘-nil'd with reason `pure housekeeping`
 
 ### Human Visual Review (Tier 2+)
 
@@ -158,6 +158,19 @@ After AI reviews complete, AI prepares visual artifacts for James:
 | Traffic-light AC status table | All Tier 2+ PRs |
 
 James inspects these visually. His pattern recognition catches anomalies that sequential text-based AI review misses (proven: unit issue, results format issue). Findings from Human Visual Review are BLOCKING.
+
+### Housekeeping vs theory: HVR and `merge authorized`
+
+Beekeeper ruling, approved 2026-11-24 ([QBP#714 issuecomment-7147354671](https://github.com/JamesPagetButler/QBP/issues/714#issuecomment-7147354671)): *"I work with the notary on permission and they should be able to merge housekeeping work, I still hold a hrv and accept to merge on theory work."*
+
+| PR kind | Beekeeper HVR + `merge authorized` | Merger |
+|---|---|---|
+| **Pure housekeeping** — `housekeeping`-labelled and touches no theory: tooling, CI, docs and process, including Lean or Agda proof *tooling* that changes no proof statement | **Not required**, even at Tier 2. ⊘-nil both boxes: `- [ ] ~~Human Visual Review (beekeeper)~~ ⊘ pure housekeeping` | notary-implementor under the notary lane (author ≠ reviewer ≠ merger, notarisation record), once CI, Red Team, Gemini and every other box are green |
+| **Touches theory in any way** — Tier 3, a proof statement in `proofs/`, anything in `docs/foundations/`, a result claim — whatever its label | **Required** | notary-implementor under the notary lane (author ≠ reviewer ≠ merger, notarisation record), only after both boxes are ticked |
+| **Every other Tier 2+ PR** — not pure housekeeping (no `housekeeping` label, or it touches merge-lane / governance files) | **Required**, as before the ruling | merge-lane / governance PRs: **the beekeeper**; otherwise unchanged: the existing QBP lanes (incl. the QBP#714 cross-merge lane), only after both boxes are ticked |
+| **Doubtful case** | **When in doubt, treat it as theory** (boxes required) | as for theory |
+
+Mechanical guard (item 8 below): The `Merge-blocking boxes` check enforces this from the PR's changed paths and labels. (1) A ⊘-nil'd HVR / `merge authorized` / beekeeper box is accepted only on **pure housekeeping**: `housekeeping` label, no theory-bearing path (`proofs/`, `docs/theory/`, `docs/foundations/`, `paper/`, `archive/cth-inventory/` — the union of PR Process Lints §1 and the Tier-3 gate; a rename counts both its old and new path), no `tier-3-review` label, and no merge-lane / governance file: `CONTRIBUTING.md`, this file, the PR templates, any `CODEOWNERS`, the **lane workflows** (those that read or write review state, boxes, labels or tiers, or gate merges or issue closes: merge-blocking boxes, Tier-3 gate, notifier, PR Process Lints, closing-AC guard, reopen-falsely-closed, closed-AC sweep, pending upgrades) and the `scripts/` files they run or import (derived from the judging copy), plus any changed workflow or composite action (`.github/actions/**/action.y*ml`) that grants any `write` scope or `write-all` at workflow or job level (read structurally with a YAML parser, so anchors, block scalars and escapes resolve; a file that does not parse counts as power; only `security-events` is exempt, and only while the ruleset has no code-scanning rule), references `secrets` in any form or case other than exactly `secrets.GITHUB_TOKEN`, calls `gh pr merge|edit|close` / `gh issue close|reopen|edit`, or is a symlink. A changed helper file in a composite action counts if it, or its enclosing `action.yml`, does. This backstop relies on the repo setting `default_workflow_permissions: read`, which only the beekeeper can change. Ordinary CI and proof tooling (e.g. Agda or Lean CI) stays housekeeping (beekeeper decision 2026-11-26, PR #838). Paths decide theory status; a label can only add it. (2) Every other PR with a merge-blocking region, except a plain `tier-1-review` PR, must carry a **ticked** Human Visual Review box and a **ticked** `merge authorized` box; a deleted or renamed box turns the check red. The nil-name match in (1) is a first line only: cross-script lookalikes and spaced letters evade it, and (2) is the backstop that catches them, because the canonical box is then missing. (3) A theory-bearing or merge-lane PR with **no** merge-blocking region is red; every other PR without a region keeps the #781 warn-only policy. Proof tooling under `proofs/` therefore keeps its boxes (fails closed: when in doubt, theory). A result claim outside those paths cannot be detected mechanically; the author and reviewers own that call. A PR that changes the review tiers, any merge lane, governance, the delegation or a constitutional document is merged by the beekeeper, never via the notary lane.
 
 ---
 
@@ -173,7 +186,7 @@ James inspects these visually. His pattern recognition catches anomalies that se
 | **Tool config** | Gemini: `thinking=true`, `session_id` always |
 | **Blocking?** | Yes — strict. All findings require resolution. |
 | **Label** | `tier-3-review` |
-| **Human Visual Review** | **Required** — James inspects all visual outputs |
+| **Human Visual Review** | **Required** — James inspects all visual outputs (never ⊘-nil'd: Tier 3 is theory) |
 
 ### Tier 3 Checklist
 
@@ -305,15 +318,24 @@ The anchoring rule's mirror image, applied to the PR **author's** claims:
    the contract parse is co-signed by qbp-architecture. **Auto-nudge, never
    auto-tick:** the hand that owns a box ticks it, or ⊘-nils it with a reason
    (`- [ ] ~~option~~ ⊘ reason`); a struck fragment inside a live ask stays
-   unticked. **No-region policy:** a body with no §2.2 region at all passes
+   unticked. **Scope guard on beekeeper boxes (#835):** a ⊘-nil'd box naming
+   HVR / `merge authorized` / the beekeeper turns the check **red** unless the
+   PR is pure housekeeping, every other Tier 2+ PR must carry both boxes
+   ticked, and a theory / merge-lane PR without a region is red (see
+   "Housekeeping vs theory" under Tier 2). The job reads the PR's
+   labels and changed files (renames: both paths) and re-runs on
+   `labeled`/`unlabeled`; a label added with `GITHUB_TOKEN` does not re-trigger
+   it, so theory status comes from paths, never from a label it may not see. **No-region policy:** a body with no §2.2 region at all passes
    this check with a `::warning::` naming the fix (the notifier still withholds
    ✅ for it, item 7c) — not blocking until the PR templates carry the region
    everywhere; the beekeeper flips absence to blocking by adding
    `--absent-blocks` to the check step (one line; tracked as #781, AC: every
    PR template carries the region). **The judge is not the evidence:** the
    check runs from a checkout of the PR's *base* sha (`base/scripts/…`), so a
-   PR that edits the check or the parser is still judged by the base copy;
-   the head copy judges only when the base lacks a script (first landing,
+   PR that edits the check or the parser is still judged by the base copy.
+   The PR's own self-tests run in a separate job (`Merge-blocking boxes (head
+   self-test)`), never on the judge's runner, so head code cannot rewrite
+   `base/` (PR #838 round 5); the head copy judges only when the base lacks a script (first landing,
    `::warning::` + `verdict-source=head(bootstrap)` in the log). An unticked box in a
    PR's *test plan* or *checklist* (outside the region) never blocks — only
    sign-off boxes do. Wiring step (beekeeper): Settings → Rules → master
