@@ -935,6 +935,49 @@ def test_r6_g6_actions_fail_closed_when_derivation_fails():
         shutil.rmtree(root)
 
 
+def test_r7_read_is_bounded_and_oversize_fails_closed():
+    """2026-11-26 host OOM: _read must never slurp a whole file. Over
+    MAX_READ_BYTES → None (power / lane); at the limit → read normally."""
+    import shutil
+    import tempfile
+
+    d = tempfile.mkdtemp()
+    try:
+        big = os.path.join(d, "big.yml")
+        with open(big, "w") as fh:
+            fh.write("# x\n" * (c.MAX_READ_BYTES // 4 + 8))
+        assert c._read(big) is None
+        ok = os.path.join(d, "ok.yml")
+        with open(ok, "w") as fh:
+            fh.write("a" * c.MAX_READ_BYTES)
+        assert c._read(ok) == "a" * c.MAX_READ_BYTES
+    finally:
+        shutil.rmtree(d)
+    # an oversized, otherwise harmless head workflow counts as lane
+    body = "name: N\n" + "# padding\n" * (c.MAX_READ_BYTES // 10 + 8)
+    r = _power_rc(".github/workflows/new.yml", body)
+    assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout[:300]
+
+
+def test_r7_symlink_to_harmless_file_is_still_lane():
+    """Kills P7 without any endless device: a symlinked workflow is lane by the
+    islink guard alone, even when its target is a small, powerless file."""
+    import shutil
+    import tempfile
+
+    d = tempfile.mkdtemp()
+    try:
+        wf = os.path.join(d, ".github", "workflows")
+        os.makedirs(wf)
+        with open(os.path.join(d, "plain.yml"), "w") as fh:
+            fh.write("name: plain\npermissions:\n  contents: read\n")
+        os.symlink(os.path.join(d, "plain.yml"), os.path.join(wf, "z.yml"))
+        r = _scoped(HVR_NILD, HK, [".github/workflows/z.yml"], head_root=d)
+        assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout
+    finally:
+        shutil.rmtree(d)
+
+
 # ---- verdict source: the judge is the BASE copy, never the PR head (arch §I4, PR #780)
 
 import merge_blocking_verdict_source as vs  # noqa: E402

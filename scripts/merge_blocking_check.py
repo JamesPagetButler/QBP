@@ -206,12 +206,26 @@ ACTION_FILES = ("action.yml", "action.yaml")
 _HEAD_ROOT = None  # set by check(head_root=...) — the PR head checkout
 
 
+# Bounded reads: no workflow, action or gate script is anywhere near this size.
+# A larger file (or an endless device such as /dev/zero reached some other way)
+# is never slurped: reading stops at MAX_READ_BYTES + 1 and the file counts as
+# unreadable → power / fail closed (2026-11-26 host OOM from an unbounded read).
+MAX_READ_BYTES = 1 << 20
+
+
 def _read(path: str):
-    """File text, or None on ANY read failure (OSError or bad UTF-8)."""
+    """File text, or None on ANY read failure (OSError, bad UTF-8, or a file
+    larger than MAX_READ_BYTES — read is bounded, never the whole file)."""
     try:
-        with open(path, encoding="utf-8") as fh:
-            return fh.read()
-    except (OSError, UnicodeDecodeError):
+        with open(path, "rb") as fh:
+            data = fh.read(MAX_READ_BYTES + 1)
+    except OSError:
+        return None
+    if len(data) > MAX_READ_BYTES:
+        return None
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
         return None
 
 
