@@ -1,0 +1,2047 @@
+{
+  "suite": "qbp-lean-toolcheck",
+  "schema": 1,
+  "toolchain": "leanprover/lean4:v4.30.0",
+  "version": "v4.30.0",
+  "mathlib_sha": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+  "mathlib_sha7": "c5ea003",
+  "manifest_mathlib_rev": "c5ea00351c28e24afc9f0f84379aa41082b1188f",
+  "lean_version_reported": "Lean (version 4.30.0, x86_64-unknown-linux-gnu, commit d024af099ca4bf2c86f649261ebf59565dc8c622, Release)",
+  "run_id": "r10a-20261127",
+  "date_utc": "2026-11-27T19:13:32Z",
+  "runner": {
+    "wrapper": "boxrun --gpu --wait (RSS watch, thermal guard)",
+    "mode": "batch: one boxrun lease for the suite",
+    "mem_cap_mb": 7000,
+    "timeout_s_per_file": 900,
+    "threads": 1
+  },
+  "box": {
+    "cpu": "AMD FX(tm)-8350 Eight-Core Processor",
+    "mem_total_mb": 31991,
+    "mem_available_mb_at_end": 11199,
+    "nproc": 8
+  },
+  "auditor": {
+    "path": "/home/prime/Documents/QBP/.claude/worktrees/agent-a8ab2108bbd3ae19d/scripts/LeanAxiomAudit.lean",
+    "sha256": "dd951cbb6ea99c00d302ca04ad9caf1e8c8873550806032a25fe039cee33f411",
+    "checker": "/home/prime/Documents/QBP/.claude/worktrees/agent-a8ab2108bbd3ae19d/scripts/check_lean_axiom_audit.py",
+    "checker_sha256": "8fdb8cd2734776e71f7c8a882a6d9e1f034b0a7dad886833ed0d6aa3aa862ae0"
+  },
+  "preflight_failures": [],
+  "files": [
+    {
+      "file": "tests/T00_ImportSurface.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 6.37,
+      "maxrss_mb": 3817,
+      "tctl_start_c": 61.2,
+      "tctl_end_c": 60.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T00.imports_loaded": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T01_DecideFin.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.21,
+      "maxrss_mb": 1864,
+      "tctl_start_c": 60.4,
+      "tctl_end_c": 61.8,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T01.fano_pair_on_unique_line": [
+          "propext"
+        ],
+        "QBPToolcheck.T01.fanoLines_length": [
+          "propext"
+        ],
+        "QBPToolcheck.T01.qtab_anticomm": [
+          "propext"
+        ],
+        "QBPToolcheck.T01.qtab_sq_neg_one": [
+          "propext"
+        ],
+        "QBPToolcheck.T01.bool_table": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T02_DecidableInstances.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.1,
+      "maxrss_mb": 1946,
+      "tctl_start_c": 59.8,
+      "tctl_end_c": 60.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T02.evens_closed": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T02.zero_one_not_closed": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T02.card_odd_fin16": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T02.card_op": [
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T03_FinCases.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.04,
+      "maxrss_mb": 1972,
+      "tctl_start_c": 58.5,
+      "tctl_end_c": 60.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T03.v_ne_zero": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T03.mem_small": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T03.v_eq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T04_Ring.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.55,
+      "maxrss_mb": 1991,
+      "tctl_start_c": 58.6,
+      "tctl_end_c": 61.4,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T04.two_square": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T04.four_square": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T04.int_signed": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T04.rat_half": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T04.ring_nf_hyp": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T05_FieldSimp.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.02,
+      "maxrss_mb": 1962,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 61.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T05.recip_sum": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T05.inv_norm": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T05.redshift_ratio": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T06_LinarithPositivity.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.45,
+      "maxrss_mb": 2061,
+      "tctl_start_c": 61.9,
+      "tctl_end_c": 61.8,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T06.lin": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T06.am_gm": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T06.normSq_nonneg": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T06.pos_of": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T06.prod_pos": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T07_NormNumCasts.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.95,
+      "maxrss_mb": 2861,
+      "tctl_start_c": 59.4,
+      "tctl_end_c": 69.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T07.nn_real": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.nn_int": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.sqrt_four": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.sq_sqrt_two": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.cast_push": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T07.cast_lift": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T08_ModuleLinComb.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.71,
+      "maxrss_mb": 2187,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 59.4,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T08.module_collect": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T08.module_two": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T08.module_after_rw": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T08.lincomb": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T08.abel_rearrange": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T09_SimpFamily.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.87,
+      "maxrss_mb": 2419,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 62.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T09.add_x_comm": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.add_y_only": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.simpa_using": [],
+        "QBPToolcheck.T09.simp_at": [],
+        "QBPToolcheck.T09.simp_rw_binder": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.dsimp_def": [],
+        "QBPToolcheck.T09.scoped_simp_use": [
+          "propext"
+        ],
+        "QBPToolcheck.T09.qJ_sq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T10_Quaternion.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 4.3,
+      "maxrss_mb": 3006,
+      "tctl_start_c": 60.2,
+      "tctl_end_c": 60.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T10.i_mul_j": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T10.quaternion_not_comm": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T10.star_qi": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T10.normSq_eq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T10.normSq_mul": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T11_NonAssocHierarchy.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 5.33,
+      "maxrss_mb": 2174,
+      "tctl_start_c": 58.2,
+      "tctl_end_c": 61.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T11.cross_not_assoc": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T11.associator_eq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T11.distrib_use": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T12_FinsetSum.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.12,
+      "maxrss_mb": 2050,
+      "tctl_start_c": 59.9,
+      "tctl_end_c": 59.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T12.sum_four": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_eight": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_succ": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_swap": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_lin": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_congr_use": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T12.sum_closed": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T13_RealAnalysis.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.9,
+      "maxrss_mb": 2834,
+      "tctl_start_c": 59.1,
+      "tctl_end_c": 59.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T13.sqrt_sq_id": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.sqrt_pos_of": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.sqrt_nn": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.pyth": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.cos_pi_and_pos": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.exp_log": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.hasDerivAt_sq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T13.deriv_cube": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T14_LinearAlgebra.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 4.08,
+      "maxrss_mb": 2986,
+      "tctl_start_c": 59.4,
+      "tctl_end_c": 61.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T14.finrank_fin8": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T14.proj0_ker": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T14.det2": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T14.inner_self": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T14.poly_eval": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T15_Complex.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.03,
+      "maxrss_mb": 1977,
+      "tctl_start_c": 59.1,
+      "tctl_end_c": 60.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T15.I_sq": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T15.mul_coords": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T15.normSq_coords": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T15.conj_im": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T15.no_real_sqrt_neg_one": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T16_CoreTactics.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 3.29,
+      "maxrss_mb": 1990,
+      "tctl_start_c": 59.2,
+      "tctl_end_c": 59.8,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T16.omega_idx": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.omega_int": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.rcases_use": [],
+        "QBPToolcheck.T16.rintro_use": [],
+        "QBPToolcheck.T16.sum_formula": [
+          "propext"
+        ],
+        "QBPToolcheck.T16.and_build": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.calc_chain": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.sq_unfold": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.sq_change": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.clampZ_nonneg": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T16.by_contra_use": [],
+        "QBPToolcheck.T16.swap_swap": [],
+        "QBPToolcheck.T16.funext_use": [
+          "Quot.sound"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T17_FloatOracle.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.27,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 60.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T17.join_singleton": [
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T18_FinFold.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.17,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.9,
+      "tctl_end_c": 60.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T18.foldr_sum": [],
+        "QBPToolcheck.T18.foldl_sum_kernel": [
+          "Quot.sound",
+          "propext"
+        ],
+        "QBPToolcheck.T18.foldl_sum_simp": [
+          "Quot.sound",
+          "propext"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T19_NestedComments.lean",
+      "kind": "tool",
+      "expect": [
+        "pass"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.5,
+      "tctl_end_c": 60.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.T19.real_after_nested": [],
+        "QBPToolcheck.T19.tricky_eq": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "tests/T20_SubsetRefusedFeatures.lean",
+      "kind": "tool",
+      "expect": [
+        "lean-ok",
+        "subset-refused"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.93,
+      "maxrss_mb": 1902,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 61.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {},
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (22: [A] l.25: top-level `local` is not an allowed command; [H] l.25: command keyword `local` is not an allowed command; [H] l.25: command keyword `notation` is not an allowed command; [D] l.25: `notation` is outside the pass-file subset; [A] l.31: top-level `section` is not an allowed command; [H] l.31: command keyword `section` is not an allowed command …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF01_Sorry/MF01_Sorry.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "lean-output ^\\d+:\\d+: warning: declaration uses [`']sorry[`']$",
+        "axiom QBPToolcheck.MF01.unproved sorryAx",
+        "axiom QBPToolcheck.MF01.uses_unproved sorryAx",
+        "axiom QBPToolcheck.MF01.admitted sorryAx",
+        "checker-reject ^::error::RATCHET violated — sorry: 1 > baseline 0\\."
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.4,
+      "tctl_end_c": 59.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF01.unproved": [
+          "sorryAx"
+        ],
+        "QBPToolcheck.MF01.uses_unproved": [
+          "sorryAx"
+        ],
+        "QBPToolcheck.MF01.admitted": [
+          "sorryAx"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF01.uses_unproved": [
+            "sorryAx"
+          ],
+          "QBPToolcheck.MF01.admitted": [
+            "sorryAx"
+          ],
+          "QBPToolcheck.MF01.unproved": [
+            "sorryAx"
+          ]
+        }
+      },
+      "detections": [
+        "Lean output: /^\\d+:\\d+: warning: declaration uses [`']sorry[`']$/",
+        "axiom audit: QBPToolcheck.MF01.unproved ⊇ sorryAx",
+        "axiom audit: QBPToolcheck.MF01.uses_unproved ⊇ sorryAx",
+        "axiom audit: QBPToolcheck.MF01.admitted ⊇ sorryAx",
+        "checker: /^::error::RATCHET violated — sorry: 1 > baseline 0\\./"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF02_NativeDecide/MF02_NativeDecide.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom-nonstd QBPToolcheck.MF02.by_native",
+        "checker-reject ^::error::HARD-BAN violated — native_decide: 1 occurrence"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.6,
+      "tctl_end_c": 60.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF02.by_native": [
+          "QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF02.by_native": [
+            "QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1"
+          ],
+          "QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1": [
+            "QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF02.by_native has non-standard ['QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1']",
+        "checker: /^::error::HARD-BAN violated — native_decide: 1 occurrence/"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF03_VacuousTrue/MF03_VacuousTrue.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "checker-reject ^::error::HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence",
+        "checker-reject ^::error::RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.12,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.0,
+      "tctl_end_c": 59.8,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF03.octonion_is_alternative": [],
+        "QBPToolcheck.MF03.sedenion_is_flexible": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "checker: /^::error::HARD-BAN violated — vacuous-proof `: True := by trivial`: 1 occurrence/",
+        "checker: /^::error::RATCHET violated — vacuous-`: True :=` theorem: 2 > baseline 0/"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF04_FalseDecide/MF04_FalseDecide.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-error ^19:\\d+: error: Tactic `decide` proved that the proposition\\s+2 \\+ 3 = 1\\s+is false",
+        "lean-error ^22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false"
+      ],
+      "lean_exit": 1,
+      "wall_s": 1.15,
+      "maxrss_mb": 784,
+      "tctl_start_c": 60.0,
+      "tctl_end_c": 59.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {},
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 1): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [
+        "Lean rejected: /^19:\\d+: error: Tactic `decide` proved that the proposition\\s+2 \\+ 3 = 1\\s+is false/",
+        "Lean rejected: /^22:\\d+: error: Tactic `decide` proved that the proposition\\s+1 - 2 = 0\\s+is false/"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF05_CustomAxiom/MF05_CustomAxiom.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF05.one_eq_two QBPToolcheck.MF05.cheat",
+        "axiom-nonstd QBPToolcheck.MF05.one_eq_two",
+        "audit-nonstd QBPToolcheck.MF05.one_eq_two",
+        "known-limit checker-accepts"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 784,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 60.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF05.one_eq_two": [
+          "QBPToolcheck.MF05.cheat"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF05.one_eq_two": [
+            "QBPToolcheck.MF05.cheat"
+          ],
+          "QBPToolcheck.MF05.cheat": [
+            "QBPToolcheck.MF05.cheat"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF05.one_eq_two ⊇ QBPToolcheck.MF05.cheat",
+        "axiom audit: QBPToolcheck.MF05.one_eq_two has non-standard ['QBPToolcheck.MF05.cheat']",
+        "structural audit: QBPToolcheck.MF05.one_eq_two rests on ['QBPToolcheck.MF05.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: foundations checker accepts the file (exit 0)"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF06_SpoofedAudit/MF06_SpoofedAudit.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF06.spoofed sorryAx",
+        "checker-reject ^::error::RATCHET violated — sorry: 1 > baseline 0\\."
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.25,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.9,
+      "tctl_end_c": 60.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF06.spoofed": [
+          "sorryAx"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF06.spoofed": [
+            "sorryAx"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit ignored 3 axiom-like message(s) not positioned at a `#print axioms` command (spoof guard)",
+        "axiom audit: QBPToolcheck.MF06.spoofed ⊇ sorryAx",
+        "checker: /^::error::RATCHET violated — sorry: 1 > baseline 0\\./"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF07_SameLineSite/MF07_SameLineSite.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF07.dirty QBPToolcheck.MF07.cheat",
+        "axiom-nonstd QBPToolcheck.MF07.dirty"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.9,
+      "tctl_end_c": 60.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF07.clean": [],
+        "QBPToolcheck.MF07.dirty": [
+          "QBPToolcheck.MF07.cheat"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF07.dirty": [
+            "QBPToolcheck.MF07.cheat"
+          ],
+          "QBPToolcheck.MF07.cheat": [
+            "QBPToolcheck.MF07.cheat"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF07.dirty ⊇ QBPToolcheck.MF07.cheat",
+        "axiom audit: QBPToolcheck.MF07.dirty has non-standard ['QBPToolcheck.MF07.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF08_InterpolationLexer/MF08_InterpolationLexer.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "grader-refuses",
+        "axiom QBPToolcheck.MF08.dirty QBPToolcheck.MF08.cheat"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.1,
+      "tctl_end_c": 59.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF08.clean": [],
+        "QBPToolcheck.MF08.dirty": [
+          "QBPToolcheck.MF08.cheat"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF08.dirty": [
+            "QBPToolcheck.MF08.cheat"
+          ],
+          "QBPToolcheck.MF08.cheat": [
+            "QBPToolcheck.MF08.cheat"
+          ]
+        }
+      },
+      "detections": [
+        "grader REFUSES the file: brace inside a string literal at line(s) [38] — possible interpolation, which the lexer does not model (write a literal brace as \\x7B)",
+        "axiom audit: QBPToolcheck.MF08.dirty ⊇ QBPToolcheck.MF08.cheat"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF09_NonAsciiColumn/MF09_NonAsciiColumn.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF09.dirty QBPToolcheck.MF09.cheat",
+        "axiom-nonstd QBPToolcheck.MF09.dirty"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.16,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.5,
+      "tctl_end_c": 60.4,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF09.clean": [],
+        "QBPToolcheck.MF09.dirty": [
+          "QBPToolcheck.MF09.cheat"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF09.dirty": [
+            "QBPToolcheck.MF09.cheat"
+          ],
+          "QBPToolcheck.MF09.cheat": [
+            "QBPToolcheck.MF09.cheat"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF09.dirty ⊇ QBPToolcheck.MF09.cheat",
+        "axiom audit: QBPToolcheck.MF09.dirty has non-standard ['QBPToolcheck.MF09.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF10_FormFeedLineDesync/MF10_FormFeedLineDesync.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF10.dirty QBPToolcheck.MF10.cheat",
+        "axiom-nonstd QBPToolcheck.MF10.dirty"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.18,
+      "maxrss_mb": 1459,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 60.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF10.dirty": [
+          "QBPToolcheck.MF10.cheat"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF10.dirty": [
+            "QBPToolcheck.MF10.cheat"
+          ],
+          "QBPToolcheck.MF10.cheat": [
+            "QBPToolcheck.MF10.cheat"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit ignored 1 axiom-like message(s) not positioned at a `#print axioms` command (spoof guard)",
+        "axiom audit: QBPToolcheck.MF10.dirty ⊇ QBPToolcheck.MF10.cheat",
+        "axiom audit: QBPToolcheck.MF10.dirty has non-standard ['QBPToolcheck.MF10.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF11_LoneCRLineDesync/MF11_LoneCRLineDesync.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF11.dirty QBPToolcheck.MF11.cheat",
+        "axiom-nonstd QBPToolcheck.MF11.dirty"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.15,
+      "maxrss_mb": 1461,
+      "tctl_start_c": 58.8,
+      "tctl_end_c": 59.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF11.dirty": [
+          "QBPToolcheck.MF11.cheat"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF11.cheat": [
+            "QBPToolcheck.MF11.cheat"
+          ],
+          "QBPToolcheck.MF11.dirty": [
+            "QBPToolcheck.MF11.cheat"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit ignored 1 axiom-like message(s) not positioned at a `#print axioms` command (spoof guard)",
+        "axiom audit: QBPToolcheck.MF11.dirty ⊇ QBPToolcheck.MF11.cheat",
+        "axiom audit: QBPToolcheck.MF11.dirty has non-standard ['QBPToolcheck.MF11.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF12_EscapedQuoteSite/MF12_EscapedQuoteSite.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "axiom QBPToolcheck.MF12.dirty QBPToolcheck.MF12.cheat",
+        "axiom-nonstd QBPToolcheck.MF12.dirty"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.5,
+      "tctl_end_c": 60.4,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF12.dirty": [
+          "QBPToolcheck.MF12.cheat"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.MF12.dirty": [
+            "QBPToolcheck.MF12.cheat"
+          ],
+          "QBPToolcheck.MF12.cheat": [
+            "QBPToolcheck.MF12.cheat"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.MF12.dirty ⊇ QBPToolcheck.MF12.cheat",
+        "axiom audit: QBPToolcheck.MF12.dirty has non-standard ['QBPToolcheck.MF12.cheat']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF13_CleanBraceRefused/MF13_CleanBraceRefused.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "grader-refuses"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.2,
+      "tctl_end_c": 59.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF13.clean": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "grader REFUSES the file: brace inside a string literal at line(s) [19] — possible interpolation, which the lexer does not model (write a literal brace as \\x7B)"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF14_ExecForgesStdout/MF14_ExecForgesStdout.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "audit-fails"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.15,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.9,
+      "tctl_end_c": 59.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF14.dirty": []
+      },
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (13: [A] l.22: top-level `axiom` is not an allowed command; [H] l.22: command keyword `axiom` is not an allowed command; [D] l.22: `axiom` is outside the pass-file subset; [A] l.28: top-level `#eval` is not an allowed command; [H] l.28: command keyword `#eval` is not an allowed command; [B] l.28: `#eval` (the only allowed `#` command is `#print axioms`) …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "structural audit does not clear the file: the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF15_SyntaxAttributeHandler/MF15_SyntaxAttributeHandler.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "audit-fails"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.2,
+      "maxrss_mb": 1461,
+      "tctl_start_c": 57.9,
+      "tctl_end_c": 59.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF15.dirty": []
+      },
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (24: [A] l.24: top-level `axiom` is not an allowed command; [H] l.24: command keyword `axiom` is not an allowed command; [D] l.24: `axiom` is outside the pass-file subset; [A] l.30: top-level `syntax` is not an allowed command; [H] l.30: command keyword `syntax` is not an allowed command; [D] l.30: `syntax` is outside the pass-file subset …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "structural audit does not clear the file: the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF16_HandlerNotFirstAttr/MF16_HandlerNotFirstAttr.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "audit-fails"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.19,
+      "maxrss_mb": 1461,
+      "tctl_start_c": 57.1,
+      "tctl_end_c": 60.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF16.dirty": []
+      },
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (22: [A] l.24: top-level `axiom` is not an allowed command; [H] l.24: command keyword `axiom` is not an allowed command; [D] l.24: `axiom` is outside the pass-file subset; [A] l.30: top-level `syntax` is not an allowed command; [H] l.30: command keyword `syntax` is not an allowed command; [D] l.30: `syntax` is outside the pass-file subset …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "structural audit does not clear the file: the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF17_MacroBuildsEval/MF17_MacroBuildsEval.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "audit-fails"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.24,
+      "maxrss_mb": 784,
+      "tctl_start_c": 57.4,
+      "tctl_end_c": 59.8,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF17.dirty": []
+      },
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (24: [A] l.22: top-level `axiom` is not an allowed command; [H] l.22: command keyword `axiom` is not an allowed command; [D] l.22: `axiom` is outside the pass-file subset; [A] l.28: top-level `macro` is not an allowed command; [H] l.28: command keyword `macro` is not an allowed command; [D] l.28: `macro` is outside the pass-file subset …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "structural audit does not clear the file: the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF18_TermElabHandler/MF18_TermElabHandler.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "audit-fails"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.2,
+      "maxrss_mb": 1459,
+      "tctl_start_c": 57.8,
+      "tctl_end_c": 58.9,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF18.dirty": []
+      },
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (22: [A] l.24: top-level `axiom` is not an allowed command; [H] l.24: command keyword `axiom` is not an allowed command; [D] l.24: `axiom` is outside the pass-file subset; [A] l.30: top-level `syntax` is not an allowed command; [H] l.30: command keyword `syntax` is not an allowed command; [D] l.30: `syntax` is outside the pass-file subset …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "structural audit does not clear the file: the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF19_IndentedSimprocForge/MF19_IndentedSimprocForge.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "audit-fails"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.22,
+      "maxrss_mb": 1458,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 59.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF19.dirty": []
+      },
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (14: [H] l.22: command keyword `axiom` is not an allowed command; [D] l.22: `axiom` is outside the pass-file subset; [H] l.26: command keyword `simproc` is not an allowed command; [D] l.26: `simproc` is outside the pass-file subset; [L] l.22: syntax kind `Lean.Parser.Command.axiom` is not allowed; [L] l.26: command kind `Lean.Parser.«command__Simproc__[_]_(_):=_»` is not allowed …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "structural audit does not clear the file: the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF20_OpenInSimprocForge/MF20_OpenInSimprocForge.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "audit-fails"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.63,
+      "maxrss_mb": 927,
+      "tctl_start_c": 57.5,
+      "tctl_end_c": 59.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF20.dirty": []
+      },
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (14: [H] l.23: command keyword `axiom` is not an allowed command; [D] l.23: `axiom` is outside the pass-file subset; [I] l.27: `… in simproc`: not an allowed command; [H] l.27: command keyword `simproc` is not an allowed command; [D] l.27: `simproc` is outside the pass-file subset; [L] l.22: syntax kind `Lean.Parser.Command.axiom` is not allowed …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "structural audit does not clear the file: the fresh compile produced no .olean (exit 0): nothing to audit (a file that exits early fails closed here)"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF21_SimprocPatternForgesOlean/MF21_SimprocPatternForgesOlean.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.35,
+      "maxrss_mb": 1465,
+      "tctl_start_c": 57.1,
+      "tctl_end_c": 59.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF21.bogus": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (14: [H] l.49: command head `simproc_pattern%` is not an allowed command; [L] l.24: syntax kind `Lean.Parser.Command.openSimple` is not allowed; [L] l.28: syntax kind `Lean.Parser.Term.cdot` is not allowed; [L] l.28: syntax kind `Lean.Parser.Term.doIdDecl` is not allowed; [L] l.28: syntax kind `Lean.Parser.Term.doLetArrow` is not allowed; [L] l.28: syntax kind `Lean.Parser.Term.doMatch` is not allowed …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF22_AxiomEvalForgesOlean/MF22_AxiomEvalForgesOlean.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.2,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.4,
+      "tctl_end_c": 58.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF22.dirty": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (18: [A] l.24: top-level `axiom` is not an allowed command; [H] l.24: command keyword `axiom` is not an allowed command; [D] l.24: `axiom` is outside the pass-file subset; [A] l.30: top-level `#eval` is not an allowed command; [H] l.30: command keyword `#eval` is not an allowed command; [B] l.30: `#eval` (the only allowed `#` command is `#print axioms`) …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF23_RawStringLexDesync/MF23_RawStringLexDesync.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.42,
+      "maxrss_mb": 1465,
+      "tctl_start_c": 58.1,
+      "tctl_end_c": 59.1,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF23.bogus": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (14: [R] l.3: raw-string opener (`r\"`/`r#\"`): the lexer does not model it; [R] l.41: raw-string opener (`r\"`/`r#\"`): the lexer does not model it; [L] l.16: syntax kind `Lean.Parser.Command.openSimple` is not allowed; [L] l.20: syntax kind `Lean.Parser.Term.cdot` is not allowed; [L] l.20: syntax kind `Lean.Parser.Term.doIdDecl` is not allowed; [L] l.20: syntax kind `Lean.Parser.Term.doLetArrow` is not allowed …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF24_GuillemetLexDesync/MF24_GuillemetLexDesync.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused"
+      ],
+      "lean_exit": 0,
+      "wall_s": 2.34,
+      "maxrss_mb": 1466,
+      "tctl_start_c": 59.8,
+      "tctl_end_c": 59.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.MF24.bogus": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (16: [R] l.41: guillemet `«`: the lexer does not model it; [R] l.43: guillemet `«`: the lexer does not model it; [L] l.16: syntax kind `Lean.Parser.Command.openSimple` is not allowed; [L] l.20: syntax kind `Lean.Parser.Term.cdot` is not allowed; [L] l.20: syntax kind `Lean.Parser.Term.doIdDecl` is not allowed; [L] l.20: syntax kind `Lean.Parser.Term.doLetArrow` is not allowed …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF25_WritesSuiteInput/MF25_WritesSuiteInput.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "writes-detected"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.18,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.5,
+      "tctl_end_c": 59.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF25.fine": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (11: [A] l.25: top-level `#eval` is not an allowed command; [H] l.25: command keyword `#eval` is not an allowed command; [B] l.25: `#eval` (the only allowed `#` command is `#print axioms`); [L] l.25: command kind `Lean.Parser.Command.eval` is not allowed; [L] l.25: syntax kind `Lean.Parser.Command.eval` is not allowed; [L] l.25: syntax kind `Lean.Parser.Term.doIdDecl` is not allowed …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "the file WROTE suite inputs while it ran (throwaway copy): ['subset_kinds.json']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF91_DetachedSurvivor/MF91_DetachedSurvivor.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused",
+        "writes-detected"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.69,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.1,
+      "tctl_end_c": 60.2,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF91.fine": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (9: [A] l.30: top-level `#eval` is not an allowed command; [H] l.30: command keyword `#eval` is not an allowed command; [B] l.30: `#eval` (the only allowed `#` command is `#print axioms`); [L] l.30: command kind `Lean.Parser.Command.eval` is not allowed; [L] l.30: syntax kind `Lean.Parser.Command.eval` is not allowed; [L] l.30: syntax kind `Lean.Parser.Term.doLetArrow` is not allowed …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted",
+        "the file WROTE suite inputs while it ran (throwaway copy): ['must-fail/MF91_DetachedSurvivor/.mf91-alive']"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF93a_SealDecoy/MF93a_SealDecoy.lean",
+      "kind": "must-fail",
+      "expect": [
+        "records-tampered"
+      ],
+      "lean_exit": null,
+      "wall_s": null,
+      "maxrss_mb": null,
+      "axioms": {},
+      "detections": [
+        "raw records were REWRITTEN after their seal (by a later file's process)"
+      ],
+      "failures": [],
+      "result": "PASS"
+    },
+    {
+      "file": "must-fail/MF93b_RawRecordForge/MF93b_RawRecordForge.lean",
+      "kind": "must-fail",
+      "expect": [
+        "lean-ok",
+        "subset-refused"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.17,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.0,
+      "tctl_end_c": 59.4,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.MF93b.fine": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [
+        "file leaves the pass-file subset (9: [A] l.23: top-level `#eval` is not an allowed command; [H] l.23: command keyword `#eval` is not an allowed command; [B] l.23: `#eval` (the only allowed `#` command is `#print axioms`); [L] l.23: command kind `Lean.Parser.Command.eval` is not allowed; [L] l.23: syntax kind `Lean.Parser.Command.eval` is not allowed; [L] l.23: syntax kind `Lean.Parser.Term.doLetArrow` is not allowed …) — code it defines or runs could forge or suppress Lean's stdout, so no audit of it is trusted"
+      ],
+      "failures": [],
+      "known_limits": [],
+      "result": "PASS"
+    },
+    {
+      "file": "known-limits/KL01_VacuityBypass/KL01_VacuityBypass.lean",
+      "kind": "known-limit",
+      "expect": [
+        "lean-ok",
+        "known-limit checker-accepts",
+        "known-limit audit-clean QBPToolcheck.KL01.refl_implies_true",
+        "known-limit audit-clean QBPToolcheck.KL01.alternativity"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.13,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.5,
+      "tctl_end_c": 59.5,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {
+        "QBPToolcheck.KL01.refl_implies_true": [],
+        "QBPToolcheck.KL01.alternativity": []
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: foundations checker accepts the file (exit 0)",
+        "KNOWN-LIMIT confirmed: `#print axioms QBPToolcheck.KL01.refl_implies_true` is clean ([])",
+        "KNOWN-LIMIT confirmed: `#print axioms QBPToolcheck.KL01.alternativity` is clean ([])"
+      ],
+      "result": "KNOWN-LIMIT"
+    },
+    {
+      "file": "known-limits/KL02_FinFoldlDecide/KL02_FinFoldlDecide.lean",
+      "kind": "known-limit",
+      "expect": [
+        "known-limit lean-error (?s)^19:\\d+: error: Tactic `decide` failed.*did not reduce to `isTrue` or `isFalse`"
+      ],
+      "lean_exit": 1,
+      "wall_s": 1.16,
+      "maxrss_mb": 784,
+      "tctl_start_c": 59.2,
+      "tctl_end_c": 59.6,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 0,
+      "axioms": {},
+      "structural_audit": {
+        "problems": [
+          "the fresh compile produced no .olean (exit 1): nothing to audit (a file that exits early fails closed here)"
+        ],
+        "nonstd": {}
+      },
+      "detections": [],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT confirmed: Lean still rejects with /(?s)^19:\\d+: error: Tactic `decide` failed.*did not reduce to `isTrue` or `isFalse`/"
+      ],
+      "result": "KNOWN-LIMIT"
+    },
+    {
+      "file": "known-limits/KL03_CheckerStringComment/KL03_CheckerStringComment.lean",
+      "kind": "known-limit",
+      "expect": [
+        "lean-ok",
+        "axiom-nonstd QBPToolcheck.KL03.hidden_native",
+        "known-limit checker-accepts"
+      ],
+      "lean_exit": 0,
+      "wall_s": 1.14,
+      "maxrss_mb": 784,
+      "tctl_start_c": 58.6,
+      "tctl_end_c": 60.0,
+      "max_tctl_c": null,
+      "guard_pauses": null,
+      "checker_exit": 1,
+      "axioms": {
+        "QBPToolcheck.KL03.hidden_native": [
+          "QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1"
+        ]
+      },
+      "structural_audit": {
+        "problems": [],
+        "nonstd": {
+          "QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1": [
+            "QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1"
+          ],
+          "QBPToolcheck.KL03.hidden_native": [
+            "QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1"
+          ]
+        }
+      },
+      "detections": [
+        "axiom audit: QBPToolcheck.KL03.hidden_native has non-standard ['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']"
+      ],
+      "failures": [],
+      "known_limits": [
+        "KNOWN-LIMIT CHANGED (re-read): foundations checker accepts the file (exit 1)"
+      ],
+      "result": "KNOWN-LIMIT"
+    }
+  ],
+  "summary": {
+    "files": 52,
+    "pass": 52,
+    "fail": 0,
+    "tool_files": 21,
+    "must_fail_files": 28,
+    "known_limit_files": 3,
+    "theorems_audited": 132,
+    "overall": "GREEN"
+  }
+}

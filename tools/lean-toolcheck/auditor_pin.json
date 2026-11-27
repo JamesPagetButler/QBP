@@ -1,0 +1,7 @@
+{
+ "pr": 829,
+ "commit": "a44ff37 (PR #829 merged into master)",
+ "note": "The PR #829 auditor files on master (scripts/), which run.sh uses by default. Re-pin whenever scripts/LeanAxiomAudit.lean or scripts/check_lean_axiom_audit.py changes.",
+ "LeanAxiomAudit.lean": "dd951cbb6ea99c00d302ca04ad9caf1e8c8873550806032a25fe039cee33f411",
+ "check_lean_axiom_audit.py": "8fdb8cd2734776e71f7c8a882a6d9e1f034b0a7dad886833ed0d6aa3aa862ae0"
+}

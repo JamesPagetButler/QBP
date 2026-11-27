@@ -1,0 +1,370 @@
+# Lean toolcheck — baseline on the current pins
+
+**Run:** `r10a-20261127` (2026-11-27 18:58–19:13 UTC, Red Team r9 fixes; `tools/lean-toolcheck/run.sh --update-baseline`; every Lean
+process in its own PID namespace; input manifest verified after the last Lean process **and again after grading**:
+**ok** both; graded from the private, manifest-checked copy). The auditor is the repo's own
+`scripts/LeanAxiomAudit.lean` on master **`a44ff37`** (sha256 `dd951cbb…`), with checker
+`scripts/check_lean_axiom_audit.py` (sha256 `8fdb8cd2…`, whose own `grade_run` grades the result), both re-pinned in
+`auditor_pin.json`.
+
+**Overall GREEN: 52/52 files as expected.**
+- **20 tool tests pass.** Each verdict comes from the structural audit, graded by #829's `grade_run`, with every
+  file inside the pass-file subset: by **Lean's own parser** (`LeanSubsetParse.lean`, rules L/P) and by the
+  Python rules. The subset is the verdict's precondition.
+- **T20** is confirmed outside the subset.
+- **28 must-fail controls are caught:**
+  - MF05 by the auditor itself;
+  - MF14–MF20 by the subset, with the audit failing closed (no `.olean`);
+  - **MF21** (T88), **MF22** (T86, a real `axiom cheat`), **MF23** (T89 raw string) and **MF24** (T90 guillemets)
+    by the subset ALONE. Their audit is clean because the file wrote the `.olean`: limit S1.
+  - **MF25** (Red Team r6): its `#eval` wrote the throwaway copy's `subset_kinds.json`; the write was attributed to
+    MF25 alone (`suite_copy_writes`), and the real tree was unchanged (`inputs.verify.json`: ok, 64 suite files
+    by content, 107,163 package and toolchain files by stat).
+  - **MF91** (Red Team r7): its `setsid` daemon heartbeated only while its Lean process lived (attributed to MF91);
+    the PID namespace killed it, so **no file had late writes** (survivor check clean everywhere).
+  - **MF93a/MF93b** (Red Team r8): MF93b rewrote the decoy MF93a's raw records in the real run directory during
+    its own Lean run; the raw-record seal caught exactly that (`seal.verify.json`: 53 seals, tampered
+    `[MF93a_SealDecoy]`), and the run stayed valid because the decoy expects it.
+- 3 known-limit probes are confirmed.
+- 132 theorems are cross-checked on stdout.
+
+The run used one boxrun lease for 919 s with no thermal pauses (cool start; MemAvailable 11.0 GB at launch).
+The `--json` runs peaked at 3814 MB
+RSS. The Lean-parser runs are not timed per file; the pre-run survey measured 1.9–5.0 GB each (it loads the
+imports' environment extensions), inside the 7000 MB boxrun cap.
+**Regenerate this record after the rebase onto master once PR #829 has merged.**
+
+> **Layering** (README): the axiom verdict is structural, and the pass-file subset is its **precondition** until
+> QBP#836 adds a sandbox. A PASS is a supported-subset statement: there is no sandbox and no kernel re-check.
+
+Machine-readable record: [`results/results-v4.30.0-c5ea003.json`](results/results-v4.30.0-c5ea003.json)
+(+ the `.md` table). Re-run: `tools/lean-toolcheck/run.sh` — this writes only to `results/runs/<run-id>/`
+(gitignored); the committed record changes only with `--update-baseline` on a full GREEN run. A later run on the
+same pins that is much slower, or uses much more RSS, than this table is a **finding, not a pass** (#823 R6).
+
+> **Limits.** The vacuity check is SYNTACTIC ONLY: the foundations checker catches the literal `: True :=` (MF03);
+> `x = x → True` and `(fun _ => True) 3` pass both the checker and the axiom audit (KL01, report-only). A user
+> `axiom` is caught by the axiom audit alone (MF05). The checker's own comment stripper is string-blind: after a
+> string containing a block-comment opener it misses a `native_decide` (KL03; the audit still catches it).
+>
+> **How the grader reads Lean.** `lean --json`; an axiom report counts only as an `information` message positioned
+> at its `#print axioms` command; reports merge worst-case (MF06). Stdout is **not** a trusted channel — code the
+> file runs can forge a message on `/dev/stdout` and exit before Lean prints the real report (MF14) — so a pass file
+> is graded fail-closed: one report per site, none off a site, no non-Lean stdout line, no code-executing construct
+> (the pass-file SUBSET: column-0 command allowlist, attribute allowlist, no syntax/handler/evaluation keyword;
+> a toolcheck PASS is NOT an axiom certificate — the out-of-process audit is QBP#827 / PR #829). Lines are counted Lean's way:
+> bytes, only `\r\n` → `\n`, split at `\n` only (MF10/MF11). Every expectation regex is matched against one Lean
+> message or one checker `::error::` line.
+>
+> **Coverage: the audit covers the `#print axioms` sites the lexer finds (anywhere on a line, MF07); the suite
+> convention is one site per theorem.** A file with a brace inside a string literal is refused (MF08: the lexer does
+> not model interpolation). Site columns are computed in Lean's `pos.column` unit — codepoints, pinned by probe
+> and re-checked on MF09's real output every self-test.
+
+## Versions
+
+| | Value | Source |
+|---|---|---|
+| Toolchain | `leanprover/lean4:v4.30.0` | `proofs/lean-toolchain` |
+| Lean binary reported | `Lean (version 4.30.0, x86_64-unknown-linux-gnu, commit d024af099ca4bf2c86f649261ebf59565dc8c622, Release)` | `lake env lean --version`, the `Lean (version` line (preflight; not line 1 — see note 5) |
+| Mathlib | `c5ea00351c28e24afc9f0f84379aa41082b1188f` (stable tag `v4.30.0`) | `proofs/lakefile.lean`; `lake-manifest.json` rev identical (re-read after `lake env`) |
+| Suite | `tools/lean-toolcheck/` at this PR's head (moved from `proofs/`, PR #824 option (b)) | — |
+| Foundations checker | `scripts/check_lean_foundations.py` at `origin/master` `1892146` | run per file with a zero baseline |
+
+## Box conditions
+
+| | Value |
+|---|---|
+| Wrapper | `boxrun --gpu --mem-mb 8000 --timeout 28800 --wait` — **one lease for the whole suite**, thermal guard on, RSS watch 8000 MB; 1 pinned core |
+| Queue | started after 0 s in the queue (cool-start gate Tctl ≤ 58 °C); the box was busy (Agda suites, other seats' runs) around it |
+| Duration | 91 s lease (86.5 s summed Lean wall time) |
+| Thermal | Tctl 57.9 °C when the first file started; max 68.8 °C (boxrun record, other load); **1 guard pause** (paused, resumed; no kill) |
+| Host | AMD FX-8350 (8 cores), 31 991 MB RAM, 12.4 GB available at the end |
+| Oleans | Mathlib `.oleans` borrowed from the main checkout via a symlinked `proofs/.lake/packages` (rev verified = the pin); nothing was built; page cache warm |
+
+## Per-file results
+
+| File | Kind | Result | Lean exit | Wall (s) | Max RSS (MB) | Axiom audit | Detection |
+|---|---|---|---|---|---|---|---|
+| `tests/T00_ImportSurface.lean` | tool | ✅ PASS | 0 | 4.54 | 3796 | 1 thm, no axioms | — |
+| `tests/T01_DecideFin.lean` | tool | ✅ PASS | 0 | 3.17 | 1843 | 5 thm ⊆ std3 | — |
+| `tests/T02_DecidableInstances.lean` | tool | ✅ PASS | 0 | 3.12 | 1926 | 4 thm ⊆ std3 | — |
+| `tests/T03_FinCases.lean` | tool | ✅ PASS | 0 | 3.12 | 1952 | 3 thm ⊆ std3 | — |
+| `tests/T04_Ring.lean` | tool | ✅ PASS | 0 | 3.71 | 1967 | 5 thm ⊆ std3 | — |
+| `tests/T05_FieldSimp.lean` | tool | ✅ PASS | 0 | 3.04 | 1936 | 3 thm ⊆ std3 | — |
+| `tests/T06_LinarithPositivity.lean` | tool | ✅ PASS | 0 | 3.40 | 2042 | 5 thm ⊆ std3 | — |
+| `tests/T07_NormNumCasts.lean` | tool | ✅ PASS | 0 | 3.96 | 2844 | 6 thm ⊆ std3 | — |
+| `tests/T08_ModuleLinComb.lean` | tool | ✅ PASS | 0 | 3.69 | 2166 | 5 thm ⊆ std3 | — |
+| `tests/T09_SimpFamily.lean` | tool | ✅ PASS | 0 | 3.80 | 2402 | 9 thm ⊆ std3 | — |
+| `tests/T10_Quaternion.lean` | tool | ✅ PASS | 0 | 4.32 | 2986 | 5 thm ⊆ std3 | — |
+| `tests/T11_NonAssocHierarchy.lean` | tool | ✅ PASS | 0 | 5.36 | 2141 | 3 thm ⊆ std3 | — |
+| `tests/T12_FinsetSum.lean` | tool | ✅ PASS | 0 | 3.14 | 2026 | 7 thm ⊆ std3 | — |
+| `tests/T13_RealAnalysis.lean` | tool | ✅ PASS | 0 | 3.94 | 2811 | 8 thm ⊆ std3 | — |
+| `tests/T14_LinearAlgebra.lean` | tool | ✅ PASS | 0 | 4.10 | 2963 | 5 thm ⊆ std3 | — |
+| `tests/T15_Complex.lean` | tool | ✅ PASS | 0 | 3.05 | 1957 | 5 thm ⊆ std3 | — |
+| `tests/T16_CoreTactics.lean` | tool | ✅ PASS | 0 | 3.48 | 1971 | 13 thm ⊆ std3 | — |
+| `tests/T17_FloatOracle.lean` | tool | ✅ PASS | 0 | 7.40 | 776 | 1 thm ⊆ std3 | — |
+| `tests/T18_FinFold.lean` | tool | ✅ PASS | 0 | 1.35 | 776 | 3 thm ⊆ std3 | — |
+| `tests/T19_NestedComments.lean` | tool | ✅ PASS | 0 | 1.14 | 776 | 2 thm, no axioms | — |
+| `must-fail/MF01_Sorry/…` | must-fail | ✅ caught | 0 | 1.14 | 776 | `['sorryAx']` | Lean warning ``declaration uses `sorry` `` · `sorryAx` on the direct, the inheriting AND the `admit` theorem · checker `RATCHET violated — sorry: 1 > baseline 0` (the checker does not count `admit`) |
+| `must-fail/MF02_NativeDecide/…` | must-fail | ✅ caught | 0 | 1.14 | 776 | `['QBPToolcheck.MF02.by_native._native.native_decide.ax_1_1']` | checker `HARD-BAN violated — native_decide: 1 occurrence` · non-standard axiom `…_native.native_decide.ax_1_1` |
+| `must-fail/MF03_VacuousTrue/…` | must-fail | ✅ caught | 0 | 1.13 | 776 | 2 thm, no axioms | checker `HARD-BAN … : True := by trivial: 1 occurrence` + `RATCHET … vacuous-: True := theorem: 2 > baseline 0` (literal spelling only — see KL01) |
+| `must-fail/MF04_FalseDecide/…` | must-fail | ✅ caught | 1 | 1.15 | 776 | — (file rejected) | ``Tactic `decide` proved that the proposition 2 + 3 = 1 is false`` (l.19) and ``… 1 - 2 = 0 is false`` (l.22, `Int`) |
+| `must-fail/MF05_CustomAxiom/…` | must-fail | ✅ caught | 0 | 1.13 | 776 | `['QBPToolcheck.MF05.cheat']` | axiom audit only: `#print axioms` = `[QBPToolcheck.MF05.cheat]`; checker ACCEPTS (known limit, confirmed) |
+| `must-fail/MF06_SpoofedAudit/…` | must-fail | ✅ caught | 0 | 1.16 | 776 | `['sorryAx']` | axiom audit (JSON, position-tied, worst-case) sees `sorryAx` despite 3 printed fake clean reports (ignored) · checker RATCHET |
+| `must-fail/MF07_SameLineSite/…` | must-fail | ✅ caught | 0 | 1.13 | 776 | `[]`; `['QBPToolcheck.MF07.cheat']` | sites found anywhere on a line: `dirty` (col 38) reports `[QBPToolcheck.MF07.cheat]` |
+| `must-fail/MF08_InterpolationLexer/…` | must-fail | ✅ caught | 0 | 1.15 | 776 | `[]`; `['QBPToolcheck.MF08.cheat']` | grader REFUSES (brace inside a string literal, l.37); audit of every Lean report still shows `cheat` |
+| `must-fail/MF09_NonAsciiColumn/…` (with astral `𝔽`, run `…234344Z`) | must-fail | ✅ caught | 0 | 1.24 | 784 | `[]`; `['QBPToolcheck.MF09.cheat']` | column in Lean's unit (codepoints, pinned vs bytes AND UTF-16): `dirty` after `αβγ` + `𝔽` reports `[QBPToolcheck.MF09.cheat]` |
+| `must-fail/MF10_FormFeedLineDesync/…` | must-fail | ✅ caught | 0 | 2.39 | 1444 | `['QBPToolcheck.MF10.cheat']` | lines split at `\n` only: real report at (33, 79) accepted; forged `run_cmd` clean report at (33, 0) ignored |
+| `must-fail/MF11_LoneCRLineDesync/…` | must-fail | ✅ caught | 0 | 2.38 | 1444 | `['QBPToolcheck.MF11.cheat']` | bytes read, lone `\r` not a break: real report at line 30 accepted; forged one at line 31 ignored |
+| `must-fail/MF12_EscapedQuoteSite/…` | must-fail | ✅ caught | 0 | 1.30 | 784 | `['QBPToolcheck.MF12.cheat']` | site after `"a\"b"` found |
+| `must-fail/MF13_CleanBraceRefused/…` | must-fail | ✅ caught | 0 | 1.17 | 784 | `[]` | grader REFUSES (brace in a string, l.19) |
+| `must-fail/MF14_ExecForgesStdout/…` | must-fail | ✅ caught | 0 | 1.25 | 784 | `[]` (**forged** — the real report was never printed) | exec refusal (l.27 `#eval`); the stdout audit alone is fooled, as designed |
+| `tests/T09_SimpFamily.lean` (`attribute [local simp]` moved to T20; run `…020851Z`) | tool | ✅ PASS | 0 | 4.04 | 2405 | 8 thm ⊆ std3 | — |
+| `tests/T16_CoreTactics.lean` (`local notation` moved to T20; run `…011601Z`) | tool | ✅ PASS | 0 | 3.41 | 1990 | 13 thm ⊆ std3 | — |
+| `tests/T20_SubsetRefusedFeatures.lean` | tool (compile only) | ✅ as expected | 0 | 3.11 | 1888 | not graded | subset refusal confirmed: `local`, `notation`, `section`, `attribute` |
+| `must-fail/MF15_SyntaxAttributeHandler/…` | must-fail | ✅ caught | 0 | 2.30 | 1447 | `[]` (**forged**) | subset: `syntax`, `attribute`, user command in column 0 |
+| `must-fail/MF16_HandlerNotFirstAttr/…` | must-fail | ✅ caught | 0 | 2.29 | 1447 | `[]` (**forged**) | subset: `@[inline, command_elab …]`, both items refused |
+| `must-fail/MF17_MacroBuildsEval/…` | must-fail | ✅ caught | 0 | 1.28 | 784 | `[]` (**forged**) | subset: `macro`, user command in column 0 |
+| `must-fail/MF18_TermElabHandler/…` | must-fail | ✅ caught | 0 | 2.27 | 1448 | `[]` (**forged**) | subset: `syntax`, `attribute` |
+| `must-fail/MF05_CustomAxiom/…` (run `…045011Z`) | must-fail | ✅ caught | 0 | 1.16 | 785 | `['QBPToolcheck.MF05.cheat']` | **structural audit** (PR #829 auditor on a fresh `.olean`): `one_eq_two` rests on `cheat` |
+| `must-fail/MF19_IndentedSimprocForge/…` (T84) | must-fail | ✅ caught | 0 | 2.29 | 1450 | `[]` (**forged**) | subset rules H + D; structural audit fails closed (no `.olean`) |
+| `must-fail/MF20_OpenInSimprocForge/…` (T85, Mathlib-only import) | must-fail | ✅ caught | 0 | 1.70 | 927 | `[]` (**forged**) | subset rules H + I + D; structural audit fails closed (no `.olean`) |
+| `must-fail/MF21_SimprocPatternForgesOlean/…` (T88, run `…084631Z`) | must-fail | ✅ caught | 0 | 2.42 | 1465 | `[]` (**forged**) | subset rule H (`simproc_pattern%`) ONLY. The structural audit is **clean**, because the compile wrote a substituted `.olean` (S1) |
+| `must-fail/MF22_AxiomEvalForgesOlean/…` (T86, run `r4b-20261125`) | must-fail | ✅ caught | 0 | 1.27 | 785 | `[]` (**forged**) | subset rules A + H + D (`axiom`) + B (`#eval`) ONLY. The structural audit is **clean** (`problems: []`, `nonstd: {}`) although `dirty` rests on `cheat`: the compile wrote a substituted `.olean` (S1) |
+| `must-fail/MF23_RawStringLexDesync/…` (T89, run `r5b-20261125`) | must-fail | ✅ caught | 0 | 2.43 | 1467 | `[]` (**forged**) | rule R (raw-string opener) + the Lean-parser layer (rule L: `simproc_pattern%` and other kinds not allowed; rule P). The structural audit is **clean** (S1) |
+| `must-fail/MF24_GuillemetLexDesync/…` (T90, run `r5b-20261125`) | must-fail | ✅ caught | 0 | 2.47 | 1466 | `[]` (**forged**) | rule R (`«`) + the Lean-parser layer. The structural audit is **clean** (S1) |
+| `must-fail/MF25_WritesSuiteInput/…` (Red Team r6, run `r6a-20261125`) | must-fail | ✅ caught | 0 | 1.26 | 784 | clean (`fine` is `rfl`) | subset (`#eval`: rules A/B/H, Lean layer L) + **writes-detected**: the write landed in the throwaway copy and was attributed to MF25 only |
+| `must-fail/MF91_DetachedSurvivor/…` (Red Team r7, run `r7a-20261127`) | must-fail | ✅ caught | 0 | — | 784 | clean (`fine` is `rfl`) | subset (`#eval`) + **writes-detected** (heartbeats while its Lean process lived); `late_writes: []`, so the daemon died with its PID namespace |
+| `must-fail/MF93a_SealDecoy/…` (Red Team r8 decoy, run `r9a-20261127`) | must-fail | ✅ caught | — | — | — | — (records untrusted) | graded on its seal alone: **records rewritten after their seal**, as expected |
+| `must-fail/MF93b_RawRecordForge/…` (Red Team r8, its MF93) | must-fail | ✅ caught | 0 | 1.16 | 784 | clean (`fine` is `rfl`) | subset (`#eval`); its forge of MF93a's records was caught by the seal |
+| `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.13 | 776 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
+| `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.14 | 776 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
+| `known-limits/KL03_CheckerStringComment/…` | known-limit | 🟡 known limit | 0 | 1.15 | 776 | `['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']` | 🟡 confirmed: checker exit 0 (string-blind stripper misses the `native_decide`); HARD: audit shows the native axiom |
+
+"std3" = `{propext, Classical.choice, Quot.sound}`. RSS is `/usr/bin/time` `%M` of the `lake env lean` process tree
+(the largest process, i.e. `lean`). Files without a Mathlib import (T17–T19, MF*, KL*) sit at the 774 MB Lean-core
+floor; Mathlib-importing files at 1.8–3.8 GB, dominated by the import (cf. the 3.35 GiB `Mathlib.Tactic` floor in
+`docs/foundations/lean-build-resource-notes.md`). Switching to `lean --json` changed neither time nor RSS.
+
+### Repeatability and the observed SIGSEGV flake
+
+| Run | Mode | Files | Result | Lease | Guard pauses | Crashes (exit ≥ 128) |
+|---|---|---|---|---|---|---|
+| `20261121T021138Z` | normal (Gemini r3 final set) | 32 | GREEN 32/32 | 85 s | 0 | 0 |
+| `20261121T021317Z` | normal | 32 | GREEN 32/32 | 86 s | 0 | 0 |
+| `20261121T021507Z` | `--update-baseline` (this record) | 32 | GREEN 32/32 | 91 s | 1 | 0 |
+| `20261120T225231Z` | normal (Gemini r2 final set) | 31 | GREEN 31/31 | 87 s | 0 | 0 |
+| `20261120T225600Z` | normal | 31 | GREEN 31/31 | 86 s | 0 | 0 |
+| `20261120T230310Z` | `--update-baseline` (previous record) | 31 | GREEN 31/31 | 86 s | 0 | 0 |
+| `20261120T221059Z` | normal (final file set) | 29 | GREEN 29/29 | 132 s | 1 (box at 70.9 °C from other load; paused, resumed) | 0 |
+| `20261120T221927Z` | normal | 29 | GREEN 29/29 | 86 s | 0 | 0 |
+| `20261120T223723Z` | `--update-baseline` (previous record) | 29 | GREEN 29/29 | 86 s | 0 | 0 |
+| `…220452Z`, `…220639Z` | normal, during the Gemini round (28 / 29 files) | — | GREEN each | 88 s / — | 0 | 0 |
+| `…211819Z`, `…212023Z`, `…212158Z` | Red Team round (26 files; the first with the manifest deleted) | 26 | GREEN each | 81–92 s | 0 | 0 |
+| earlier (`…204151Z`, `…204403Z`, `…210059Z`) | 22-file suite | 22 | GREEN each | 71–74 s | 0 | 0 |
+
+**Observed flake, not reproduced here.** The Red Team's first independent run on PR #824 (qbp-architecture,
+issuecomment-7050748708, 2026-11-20) saw **T05 and T07 exit 139 (SIGSEGV) at 0.68 s, during import**, then pass
+alone (3.1 s / 4.1 s) and in a full re-run; that box also logged intermittent `failed to create thread` aborts the
+same day. Across the 17 full runs above, T05 and T07 each ran 17 times (3.0–4.3 s, 1.9 / 2.8 GB RSS) with **no
+crash**. I have no burst log of the crashing run (it was the reviewer's), so it is recorded as an observed,
+unreproduced flake — source: the reviewer's run. The suite does **not** retry: a crash (exit ≥ 128) is graded
+FAIL with exit code, wall and RSS in the result row, so if it recurs the run is red and the row plus the boxrun
+burst log (`~/.box-telemetry/bursts/lean-toolcheck-suite-<run-id>-*/`) are the evidence to hand to deming.
+
+### Planted negative controls (`selftest_grader.py`, committed)
+
+Raw logs of a real GREEN run were copied and one defect planted per copy; the grader ran on each copy. Run on this
+record's raw logs (`…225231Z`, same files): `python3 -I tools/lean-toolcheck/selftest_grader.py tools/lean-toolcheck <raw> <work> [old toolcheck.py]` → exit 0 ("every plant behaved as required"). Pre-fix rows: `de19998`'s grader for MF06/T19, `ef8b54f`'s for MF07/MF08.
+
+| Plant | Grader | Result |
+|---|---|---|
+| none (the real run) | new | GREEN, exit 0 |
+| MF06 spoof (`#eval`-printed fake clean reports, plain + forged JSON) | **pre-fix (`de19998`)** | **FAIL — fooled**: `axiom audit MISSED sorryAx … (got [])` |
+| same | new | caught: `sorryAx`; 3 axiom-like messages not positioned at a `#print axioms` command ignored |
+| T19 nested comments (`#print axioms ghost` inside a nested comment) | **pre-fix (`de19998`)** | **FAIL**: `no axiom report for QBPToolcheck.T19.ghost` |
+| same | new | PASS |
+| MF04's error text demoted to an `information` message | new | FAIL: `Lean failed but without the expected message /^19:…/` (anchoring) |
+| MF01's checker text moved off its `::error::` line | new | FAIL: `checker rejected but without the expected message` (anchoring) |
+| fake clean report for MF05 at another position + a raw stdout line | new | caught: `cheat` still reported; spoof ignored |
+| fake clean report for MF05 **at the real `#print axioms` site**, after the real one | new | caught: worst-case merge keeps `cheat` |
+| suite copy without `known-limits/` | new | **RED**: `the known-limit layer has zero files` |
+| MF07 replayed as a **pass-labelled** attack (same-line hidden site, user axiom) | **pre-r2 (`ef8b54f`)** | **PASS — exploitable** (the real report was discarded as unpositioned) |
+| same | new | **FAIL**: `QBPToolcheck.MF07.dirty: non-standard axioms ['QBPToolcheck.MF07.cheat']` |
+| MF08 replayed as a **pass-labelled** attack (`s!` interpolation hides the rest of the file) | **pre-r2 (`ef8b54f`)** | **PASS — exploitable** |
+| same | new | **FAIL**: `grader REFUSES the file: brace inside a string literal` |
+| MF09 replayed as a pass-labelled attack (multi-byte prefix before a same-line site) | pre-r3 (`4c0aecb`) and new | **FAIL** both — Lean counts codepoints, the same unit as Python's str index, so there was no mismatch to exploit |
+| **unit pin** on MF09's real Lean output | new | PASS: Lean reported column 37 = codepoint offset 37 (UTF-8 byte offset 40) |
+| **unit pin** on MF09 with astral `𝔽` (run `…234344Z`) | new | PASS: Lean (33, 45) = codepoints 45; bytes 51; UTF-16 46 |
+| **line-rule pins** on MF10 / MF11 real output | new | PASS: Lean line 33 / 30 = `\n`-only rule; Python rule (splitlines / universal newlines) 34 / 31 |
+| MF10 / MF11 replayed as pass-labelled attacks (T93/T94) | **`19bbbd4`** | **PASS — exploitable** (real report discarded, forged `run_cmd` report accepted) |
+| same | new | **FAIL** (exec refusal, unpositioned report, `cheat`) |
+| MF14 replayed as a pass-labelled attack (T98: `#eval` forges `/dev/stdout`, then exits 0) | **`19bbbd4`** | **PASS — exploitable** |
+| same | new | **FAIL**: code-executing construct refused |
+| MF13 replayed as a pass file (T97, clean + brace) / MF13 with the brace removed | new | **FAIL** by refusal / **FAIL** (`grader-refuses` not met) |
+| forged clean report off-site (T96) / at-site as `warning` (T96b), real report removed | new | **FAIL** both (spoof guard: position / severity) |
+| clean T01 + duplicate report at a site / + forged report off-site / + non-Lean stdout line / + severity-less JSON at a site | new | **FAIL** each (fail-closed pass rules) |
+| MF01 with an UNANCHORED checker regex and the text on a `note:` line | new | **FAIL** (`::error` lines only) |
+| T19 with `#print axioms` inside a string literal | new | PASS (strings are not commands) |
+| `mutants_grader.py`: 25 grader mutants (M01–M19 reconstructed from the Red Team list, M20–M25 new rules) | `c333116` | **24 KILLED, 1 SURVIVED** (M04, equivalent: code-only and original lines have equal length) |
+| MF15–MF18 replayed as pass-labelled attacks (T80–T83: user syntax / handlers forge stdout, then exit 0) | **`c333116`** | **PASS — exploitable** (all four) |
+| same | new | **FAIL** (all four: pass-file subset) |
+| 42 refused constructs, each appended to clean T01 (rule D keywords, rule B `#` commands, rule C attributes, rule A column-0 commands) | new | **42/42 FAIL** |
+| T20 with its refused lines commented out (still expects `subset-refused`) | new | **FAIL** |
+| `mutants_grader.py` final: 33 rule mutants + 44 list-entry mutants (each SUBSET_* entry dropped in turn) | `ce7074d` | **76 KILLED, 1 SURVIVED** (M04, equivalent) |
+| MF19/MF20 replayed as pass-labelled attacks (T84/T85: `simproc` forge, indented / behind `open Nat in`) | **`ce7074d`** | **PASS — exploitable** (both) |
+| same | new | **FAIL** (structural audit: no `.olean`; subset H/I/D) |
+| **structural audit ALONE** (a grader copy with every subset rule off): replays of MF05, MF14, MF15, MF17, MF19, MF20 (stems T76–T79, T84s, T85s) | new | **6/6 FAIL by the structural audit** (MF05: the auditor reports `cheat`; the forge files: no `.olean`). **Restated (Red Team r4 T86):** this holds only for files that exit BEFORE any `.olean` exists; see the S1 rows below |
+| 13 tamperings of T01's real auditor output / audit record (wrong nonce, root, scope; `missing`/`unresolved`/`shadowed`; forged std fingerprints; 0 declarations; 2 or 0 result lines; a non-standard report; no `.olean`; no record) | new | **13/13 FAIL** |
+| `command_heads.json` pinned to another toolchain | new | **FAIL** |
+| rule isolation: 18 one-construct sources, exact rule tags (X1 column-0 `axiom` → A+D+H; X4 `@[command_elab k]` → C only) | `5b4792e` | all exact |
+| MF21 replayed as a pass-labelled attack (T88: `simproc_pattern%` forges the `.olean`) | **`5b4792e`** (with its own `command_heads.json`) | **PASS — exploitable** |
+| same | new | **FAIL** (rule H: `simproc_pattern%`) |
+| `mutants_grader.py` r4: 50 rule mutants + 49 list-entry mutants (each mutant's work dir deleted after its run; ~0.3 GB peak disk) | new | **98 KILLED, 1 SURVIVED** (M04, equivalent) |
+| MF21 (T88s) and MF22 (T86s, a real `axiom cheat`) with EVERY subset rule off | new | **PASS, as documented** (both): the structural audit alone is fooled by a file that writes its own `.olean` (S1, QBP#836). The earlier "auditor alone 6/6" holds only for forges that exit BEFORE any `.olean` exists |
+| T01 auditor line with `dangling: [ghost]` / extra module in scope / auditor exit 1 / compile exit 1 | `67a214b` | **FAIL** each (`dangling` via #829's own `grade_run`) |
+| MF23/MF24 replayed as pass-labelled attacks (T89 raw string, T90 guillemets) | **`67a214b`** (its own suite tree) | **PASS — exploitable** (both) |
+| same | new | **FAIL** (rule R + rules L/P) |
+| **Lean-parser layer ALONE** (a grader copy with every Python subset rule off): every must-fail MF01–MF24 replayed as a pass-labelled attack | new | **all 11 subset must-fails (MF14–MF24, incl. the T84–T90 shapes MF19–MF24) CAUGHT by L/P**; of the rest, MF01–MF03 and MF05–MF12 are caught too (e.g. `sorry`/`axiom` kinds, an `#eval`), MF04 (false `decide`) and MF13 (clean brace) are not, and need not be (not subset defects) |
+| 20 tamperings of T01's real Lean-parser record / meta (wrong nonce; a disallowed top/node/nested kind, attribute, option, config `native`; parse/scope/header error; head column/line moved; no/false `done`; count mismatch; a dropped command; a non-JSON line; an import outside the pinned packages; parse exit 1; no record) + the auditor and checker sha256 pins | new | **20/20 + 2/2 FAIL** |
+| `subset_kinds.json` for another toolchain / T00 import list / `LeanSubsetParse.lean` | new | **FAIL** each |
+| rule R alone (`«` / `r"` in T01's header comment) and rule P one direction at a time (a Python-only start; a Lean-only start) | new | **FAIL** each, by that check alone |
+| `mutants_grader.py` r5 (bounded): R01–R21 + every-10th sample of M01–E… | new | **31/31 KILLED** after the 4 single-catcher plants (first pass 30/34) |
+| 24 missing-field + 5 wrong-type tamperings of T01's Lean-parser record (every header, command and done field) | new | **29/29 FAIL** |
+| suite-copy writes: unexpected (T01), record missing, record mistyped, expected-but-unmet (MF25) | new | **FAIL** each |
+| run-level manifest: verification failed / manifest missing / verification missing | new | **RED** each |
+| grade-time re-hash: manifest synthesised from the suite under test → GREEN; allowlist edited afterwards → RED | new | as required |
+| real run: MF25's write attributed to MF25 only, other writers none, `inputs.verify.json` ok | `r6a-20261125` | ✔ |
+| `mutants_grader.py` r6: R22–R28 (schema, write attribution, manifest) + R19 (`subset_kinds.json` pin, = the Red Team's L9) | new | **8/8 KILLED** (+ M01 as the sample entry: 9/9). `run.sh`'s in-memory verification is bash, outside the Python mutant harness; its effect is covered by the real run's `inputs.verify.json` and the RED plants |
+| **namespace-OFF demonstration** (`TOOLCHECK_TEST_NO_PIDNS=1 run.sh T01 MF91`, run `r7nons`) | new | MF91's daemons (from its `--json` run AND its compile) kept writing after their Lean processes ended: `SURVIVOR … [suite-copy/…/.mf91-alive, audit/…/.mf91-alive]`; MF91 **FAIL**; run **RED + INVALID, exit 1** |
+| late-writes plants: present / record missing / record mistyped (T01) | new | **FAIL** each |
+| real run: MF91 wrote only while alive, no file with late writes | `r7a-20261127` | ✔ |
+| `mutants_grader.py` r7, one mutant per `boxrun --mem-mb 2000` lease: R29, R30 + the Red Team's L9, L10, P1–P4 (KILLED = the selftest reports a failed plant; any other non-zero exit is CRASHED) | new | **7 KILLED, 1 CRASHED, 0 SURVIVED.** KILLED: R29, R30, L9, L10, P1, P2, P3. **P4 CRASHED**: with the missing-field branch skipped, the grader raises `KeyError` on the first deleted field, so the selftest dies before any assertion. The run would be RED (fail-closed), but it is not counted as KILLED. Making a per-file grader exception a FAIL row would make P4 killable (follow-up) |
+| seal plants: T01 marked tampered / decoy's seal held / `seal.verify.json` missing / mistyped | new | **FAIL** each |
+| real run: the seal caught exactly MF93a (53 seals) | `r9a-20261127` | ✔ |
+| **PATH-shim demonstration** (Red Team r8 finding 2): `unshare`, `python3` and `lake` passthrough shims FIRST on `PATH`, T01 only, inside run.sh's boxrun lease (shim dir deleted after) | new | **shims never called**; GREEN 1/1 with real isolation; the manifest records `/usr/bin/python3`, `/usr/bin/unshare`, `/usr/bin/time`, `/bin/sh`, `/bin/bash`, the pinned toolchain's `lean`/`lake` and boxrun's real path |
+| missing-field plants now require the specific message (`field … is missing` / `has the wrong type`), so the shape check is killable; a grader exception is a FAIL row | new | as required |
+| `mutants_grader.py` r8, one per 2000 MB boxrun lease: P4 (re-run), R31 (seal ignored), R32 (decoy's expected tamper unmet ignored), R29 (smoke) | new | **4/4 KILLED** (P4 now KILLED: the missing-field plants require the specific message, and the grader exception became a FAIL row without it) |
+| **T96 + MF95 real-Lean demonstration** (`demos/T96_MF95/run_demo.sh`, scratch suite copy of T00, T01, T96, MF95, KL01; run.sh's own boxrun lease, 7000 MB) | **BEFORE `df2b03e`** | T96 (false `decide`, Lean exit 1) **✅ PASS**, run **GREEN 5/5, exit 0** (forged) |
+| same | **new** | T96 **❌ FAIL** (`records-tampered` is allowed only for a must-fail decoy); `run.sh`: RAW RECORDS TAMPERED, exemption refused; run **RED + INVALID, exit 1** |
+| selftest replay T96s (the real tampered decoy records as a pass-labelled tests/ file listing `records-tampered`) | new | **FAIL** with the restriction message |
+| Q3 plant: `seal.verify.json` with `__global` tampered | new | run **RED** by the run-level check |
+| Q4 plant: no `seal.verify.json`, decoy MF93a | new | decoy **FAIL** |
+| Q5 plant: T01's per-file meta is a JSON list, so `grade()` raises | new | a **FAIL row** naming `AttributeError` |
+| `mutants_grader.py` r9: a KILLED mutant must flip a NAMED selftest row against the unmutated baseline (else CRASHED); R33, Q1–Q5, P4, one 2000 MB boxrun lease each | new | **7/7 KILLED**: R33 by `plant[T96s]`; Q1 by `plant[seal-record-missing]`; Q2 by `real run, NEW grader`; Q3 by `plant[seal-global-tampered]`; Q4 by `plant[seal-record-missing-decoy]`; Q5 by `plant[grade-raises]`; P4 by `plant[field-missing-header-imports]` |
+| selftest row count | — | **195** with the OLD-grader argument, **177** without: the 18 OLD-grader replay rows appear only when the 4th argument is given (`grep -c '^| '` on the selftest output). At `df2b03e` that was 191 vs 173 |
+| `command_heads.json` with one T00 import fewer (same pins) | new | **FAIL** |
+| rule isolation: 60 one-construct sources, exact rule tags (adds `simproc_pattern%`, `compile_def%`, `$`, `?_`, `foo%`; spaced `%` allowed) | new | all exact |
+| `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
+
+Earlier controls (Red Team round): five planted misses in MF01–MF04 / T04 were all flagged (exit 1).
+
+## Project layer (QBP's own proofs) — from CI, not re-run locally
+
+| | Value |
+|---|---|
+| Source | `.github/workflows/lean-foundations.yml` job `lake build (zero errors)`, run **41149457423**, job 124382272424, 2026-10-31 (PR #787 head `f019660`) |
+| Same tree as today? | **Yes** — `git rev-parse f019660:proofs` = `origin/master:proofs` = `ed876f0b` (no Lean path has changed on master since #787) |
+| Result | `Build completed successfully (3611 jobs)`; 0 errors; 0 `sorry` warnings |
+| Re-confirmed | on this PR (#824) at `1215b73`: run 44814875737, `lake build (zero errors)` **pass**, 7 m 08 s job (the suite adds no build target) |
+| Axiom output in the log | 1 383 `depends on axioms` reports + 4 `does not depend on any axioms`; **0 non-standard axioms** (parsed from the log). Note: the one documented `native_decide` (#582, `Sprint12-Inherited/SedenionHessianTraceSq.lean`) has no `#print axioms` line, so the log cannot show its axiom |
+| Timing | job 6 m 47 s: `lake exe cache get` ≈ 1 m 33 s, `lake build` ≈ 5 m 09 s; 99 QBP modules compiled, 918 s summed module time on the runner |
+| Slowest modules | `Foundations.Octonion32Count` 92 s · `SedenionOctonionCount` 80 s · `FanoGenesis` 74 s · `OctonionLaws` 62 s · `Breakdown` 61 s · `Sedenion` 53 s · `Alternator` 38 s · `SeamSpectrum` 24 s · `Substrate.RuleFlow` 21 s · `LeftMulDet` 20 s |
+| Peak RSS (box, measured earlier) | `Octonion32Count` 4.4–4.6 GiB; `OctonionAutBranching` closure 5.2 GiB; import floor 3.35 GiB — `docs/foundations/lean-build-resource-notes.md` (2026-10-21/29) |
+| Warnings | 36 linter warnings (unusedVariables ×21, unnecessarySeqFocus ×6, unusedSimpArgs ×5, dupNamespace ×3); none are errors |
+
+**Why CI and not a local rebuild:** the estimate for a local `lake build` of all QBP targets on this box is
+~30–45 min on one pinned core (918 s of 4-vCPU runner time, FX-8350 single-thread ≈ 1.5–2.5× slower) with a
+≥ 4.6 GiB peak, holding the shared box lease the whole time in a queue that other seats' jobs (Agda suite, sc2
+runs) were using; it would produce no information CI did not already produce on the *identical* `proofs/`
+tree and pins. The tool layer needs only the Mathlib `.oleans`, so only the suite files (29) were run locally.
+On the #723 bump branch the project layer is CI's job on the new pins (G1) — plus a local peak-RSS re-measure
+of the heavy `decide` modules (FEATURES.md top item 2).
+
+## Notes
+
+1. **Cold cache.** The very first T00 run (65 Mathlib modules, cold page cache) took **39.5 s** wall vs 4.6 s warm
+   and pushed the box's IO pressure (`/proc/pressure/io` full avg60) past 20 %; boxrun then refused the *next*
+   job with `BOX DEGRADED … needs a reboot`. The pressure fell back to ≈ 0 within ~2 min without a reboot. A cold
+   run is the realistic case right after a toolchain bump; compare cold-to-cold.
+2. **Sorry-warning text changed.** v4.30.0 prints ``declaration uses `sorry` `` (backticks), not
+   `declaration uses 'sorry'`; the suite's first draft keyed on the quotes and MF01 caught it. The grader regex is
+   now quote-agnostic.
+3. **`native_decide`'s axiom is already per-call on v4.30.0** (`…_native.native_decide.ax_1_1`, measured on
+   MF02), not `Lean.ofReduceBool`. So the docstring of `Sprint12-Inherited/SedenionHessianTraceSq.lean`
+   ("carries `Lean.ofReduceBool` in its axiom set") is very likely stale already on the current pins — *not
+   re-run on that theorem here*; it has no `#print axioms` line. v4.35.0 removes `Lean.ofReduceBool` entirely
+   (lean4#14953). The suite's check is name-agnostic (⊄ std3), and `scripts/check_anchor_manifest.py` is
+   subset-based, so neither goes blind.
+4. **The axiom gate is blind to vacuity, and the checker's vacuity rule is syntactic** (MF03 + KL01): the checker sees
+   only the literal `: True :=`; any other vacuous spelling needs a human reading the statement.
+5. **Fresh-checkout preflight (Red Team F1).** With `proofs/lake-manifest.json` absent (it is gitignored, so every
+   fresh clone), the first `lake env lean --version` prints seven Lake lines first (`info: QBPProofs: no previous
+   manifest, creating one from scratch`, `info: mathlib: running post-update hooks`, the cache-tool lines) and the
+   `Lean (version …)` line last; `head -1` read the info line as the version. The preflight now greps the
+   `Lean (version` line and re-reads the manifest after `lake env` recreates it. Verified on run `…211819Z`,
+   started with the manifest deleted.
+6. **The plain-text `#print axioms` output was spoofable** (Gemini (2)): on v4.30.0 the plain `lean` output prints
+   axiom reports WITHOUT a position, interleaved with `#eval` stdout, so a printed fake line was indistinguishable.
+   With `--json` each report is a message with `pos` (the `#print axioms` command's line/column) and `#eval` output
+   is a separate message at the `#eval`'s position.
+7. **The foundations checker itself (KL03)** has the same naive comment regex the grader had, and is string-blind:
+   reproduced a `native_decide` in `proofs/QBP/Foundations` that would pass its HARD-BAN (checker exit 0). Not fixed
+   here (no gate-script change in this PR); flagged for an issue.
+
+### Lean column-unit probe (Gemini r3 (e), 2026-11-21, v4.30.0)
+
+`lake env lean --json` on a 7-line probe, each line with a non-ASCII prefix before a same-line command:
+
+| Source line | Lean `pos.column` | `#` codepoint offset | `#` UTF-8 byte offset | Message |
+|---|---|---|---|---|
+| `def αβγ : Nat := 1 #print axioms dirty` | **19** | **19** | 22 | `'dirty' depends on axioms: [cheat]` |
+| `def ℕℕ : Nat := 2 #print axioms clean` | **18** | **18** | 22 | `'clean' does not depend on any axioms` |
+| `def δ : Nat := 3 #eval IO.println "'dirty' does not depend …"` | **17** | **17** (of `#eval`) | 18 | the printed text, as an information message **at the `#eval`** |
+| `#eval IO.println "\n'dirty' does not depend …"` (newline inside the output) | **0** | 0 | 0 | the printed text, still at the `#eval`'s own position |
+
+So Lean's column unit is codepoints, and `#eval` output is always positioned at its own `#eval` command, even when it
+prints newlines. It can never land on a `#print axioms` site; if it did, worst-case merge would still keep the real
+report.
+
+## Line-break probe (Gemini r4 (f), 2026-11-24, `lean --json`, v4.30.0)
+
+One physical line `#check a /- X -/ #check b` per character X; the second `#check`'s reported line shows whether X
+starts a line. Then X placed in code position.
+
+| X | in a comment: `b` reported at | in code |
+|---|---|---|
+| `\r` (lone) | same line, col 37 | error `isolated carriage returns are not allowed` |
+| `\v`, `\f`, `\x1c`, `\x1d`, `\x1e` | same line, col 37 | error `expected token` |
+| `\x85` | same line, col 38 | error `expected token` |
+| U+2028, U+2029 | same line, col 39 | error `expected token` |
+| `\r\n` | **next line**, col 4 | accepted (a line break) |
+
+So Lean breaks lines only at `\n`, with `\r\n` normalised (`FileMap.ofString`, `crlfToLf` in `mkInputContext`), and
+none of the other characters is even legal outside a comment or string. Gemini's literal counterexample (a form
+feed at the start of a code line) is therefore a Lean parse error, not a silent pass; the attack is real once the
+character sits in a comment (MF10), and a lone `\r` in a comment is a second, independent vector through Python's
+text-mode universal newlines (MF11).
+
+## Change history
+
+| Date | Run | Change |
+|---|---|---|
+| 2026-11-20 | `20261120T204403Z` | v1 baseline on `v4.30.0` / `c5ea003` (issue #823 W5), suite under `proofs/` |
+| 2026-11-20 | `20261120T210059Z` | suite moved to `tools/lean-toolcheck/` (PR #824 option (b)); re-run GREEN 22/22, numbers within ±0.3 s / ±25 MB of v1 |
+| 2026-11-20 | `20261120T212158Z` | Red Team fix round: +MF05 (custom axiom), +`admit` in MF01, +KL01/KL02 known limits, +T18; preflight fixed for fresh checkouts; runs write to `results/runs/` and only `--update-baseline` touches this record; 3 consecutive full runs GREEN, SIGSEGV flake not reproduced |
+| 2026-11-20 | `20261120T223723Z` | Gemini fix round: `lean --json` + position-tied, worst-case axiom audit (+MF06 spoof control); nesting/string-aware comment lexer (+T19); anchored expectation matching; empty suite/layer/prefix RED; +KL03 (checker string-blind); 3 consecutive full runs GREEN 29/29 |
+| 2026-11-20 | `20261120T230310Z` | Gemini r2: sites anywhere on a line (+MF07); braces in strings refused (+MF08); string bodies blanked for site detection; coverage statement; 3 consecutive full runs GREEN 31/31 |
+| 2026-11-21 | `20261121T021507Z` | Gemini r3 (e): column unit probed (codepoints) and pinned (`LEAN_COLUMN_UNIT`, computed from the original source line); +MF09; self-test unit pin; 3 consecutive full runs GREEN 32/32 |
+| 2026-11-24 | `20261124T234344Z` | Gemini r4 (f) + Red Team (`19bbbd4`): `\n`-only line model, bytes read (+MF10, +MF11, line-rule pins); fail-closed pass rules and `EXEC_RE` code-execution refusal (+MF14); +MF12 (escaped quote), +MF13 (clean-brace refusal); astral `𝔽` in MF09; guard-dependent plants; `mutants_grader.py` 24/25; 3 full runs GREEN (34/34 before MF12–MF14, then 37/37 ×2) |
+| 2026-11-25 | `20261125T020851Z` | Red Team r2 (`c333116`): `EXEC_RE` replaced by the pass-file SUBSET (column-0 command allowlist, `#print axioms` the only `#` command, attribute allowlist per item, refused syntax/handler/evaluation keywords anywhere); +MF15–MF18 (T80–T83); `local notation` / `attribute [local simp]` moved to T20 (compile only); a PASS is stated NOT to be an axiom certificate; 3 full runs GREEN 42/42 |
+| 2026-11-25 | `20261125T045011Z` | Red Team r3 (`ce7074d`) + director ruling: STRUCTURAL verdict (PR #829 auditor on a fresh `.olean`, `structural_audit`); subset rules H (Lean-generated command keywords anywhere) and I (`… in`), `axiom`/simprocs denied; +MF19/MF20; 2 full runs GREEN 44/44 with the auditor (PR #829 `3c8771c`); PR blocked on #829 |
+| 2026-11-25 | `20261125T084631Z` | Red Team r4 pre-check (`5b4792e`): rule H keeps every command head (incl. the 14 non-word ones) and any `name%` token; +MF21 (T88); the subset is restated as the verdict's PRECONDITION (S1); `structural_audit` calls #829's `grade_run` (`dangling` checked) plus compile/auditor exit 0; the heads pin includes the T00 imports; re-integrated against #829 `6b07147`; GREEN 45/45 |
+| 2026-11-25 | `r4b-20261125` | Red Team r4 pre-check, closing items: +MF22 (T86: a real `axiom` behind an `#eval` that forges the `.olean`), replayed with every subset rule off as an EXPECTED audit PASS (S1); the "auditor alone 6/6" claim restated; structural-only stems renamed T76–T79 (no clash with the Red Team's T86/T88); auditor PR #829 `6b07147`; GREEN 46/46; selftest exit 0 (82 rows); mutants 98/99 (M04 equivalent) from the completed r4 run on `20261125T084631Z` raw logs: `toolcheck.py` is unchanged since, and the selftest only gained rows; a re-run on these logs hit its 7200 s run-bounded time cap (exit 124, no memory pressure) and was not repeated |
+| 2026-11-25 | `r5b-20261125` | Red Team r5 delta (`67a214b`) + director decision: the subset precondition from **Lean's own parser** (`LeanSubsetParse.lean`, parse only; rules L/P; `subset_kinds.json` from `gen_subset_kinds.py`, closed-world); rule R refuses raw strings and `«`; +MF23 (T89), +MF24 (T90); PR #829 auditor files pinned (`auditor_pin.json`); GREEN 48/48; selftest exit 0 (139 rows); mutants BOUNDED (one selftest ~3 min): all 21 r5 mutants R01–R21 + a deterministic every-10th sample (10) of the earlier 99 → first pass 30/34 KILLED; the 4 survivors (R01/R02 rule R, R17/R18 rule P one direction) showed the selftest lacked single-catcher plants, 4 were added, and the re-run killed 4/4. So **R01–R21: 21/21, sample: 10/10**; the other 89 earlier mutants were not re-run this round |
+| 2026-11-25 | `r6a-20261125` | Red Team r6 (`9c61306`, APPROVE-WITH-CONCERN): throwaway suite copy for every code-running Lean process with per-file write attribution; pre/post input manifest held in memory by `run.sh` (one function); grade-time re-hash; +MF25; the Lean-parser record schema required and typed; GREEN 49/49; selftest exit 0 (179 rows); mutants R19 + R22–R28 8/8 KILLED (bounded: the earlier mutants were not re-run this round) |
+| 2026-11-27 | `r7a-20261127` | Red Team r7 (`7955bb8`, CHANGES REQUESTED, MF91): per-Lean-process PID namespaces (`unshare --user --map-root-user --fork --pid --mount-proc --kill-child`), per-file survivor check, grader from a private manifest-checked copy, re-verification after grading, sha-checked baseline copy, symlink targets in the tree digest; +MF91; GREEN 50/50; selftest exit 0 (184 rows); mutants (one per 2000 MB boxrun lease): 7 KILLED (R29, R30, L9, L10, P1–P3), 1 CRASHED (P4: `KeyError`, fail-closed), 0 SURVIVED |
+| 2026-11-27 | `r8a-20261127` | Post-merge: `origin/master` merged in (PR #829 merged, `a44ff37`; merge commit, no rebase); auditor + checker re-pinned to master (`dd951cbb…` / `8fdb8cd2…`, incl. #829's round-8 G7 fallback; same CLI and `grade_run` interface); GREEN 50/50; selftest exit 0 (184 rows; the two S1-limit rows now test the STRUCTURAL AUDIT alone, because master's foundations checker also rejects MF21/MF22 replays for an incidental char literal); smoke mutant R29 KILLED (one 2000 MB boxrun lease) |
+| 2026-11-27 | `r9a-20261127` | Red Team r8 (`ae8f7a5`, CHANGES REQUESTED): raw-record seal (+MF93a/MF93b); trusted binaries by absolute path, `PATH` reset, isolation proven in preflight; a grader exception is a FAIL row; GREEN 52/52; selftest exit 0 (191 rows); mutants P4, R31, R32, R29: 4/4 KILLED, 0 CRASHED |
+| 2026-11-27 | `r10a-20261127` | Red Team r9 (`df2b03e`, CHANGES REQUESTED): `records-tampered` limited to must-fail decoys (grader + run.sh); T96 + MF95 regression (selftest replay + demo, BEFORE forged GREEN / AFTER INVALID); Q3/Q4/Q5 plants; mutant kills must name a row; GREEN 52/52; selftest exit 0 (195 rows with OLD, 177 without); mutants 7/7 KILLED |
