@@ -130,6 +130,20 @@ def main():
     check("planted invisible Sprint12 file fails", rc == 1)
     check("Sprint12 orphan named", "Sprint12-Inherited/Orphan.lean" in out)
 
+    # 2b. PR #829 Red Team finding 4: TWO imports on ONE line (valid Lean). The forbidden
+    #     second one used to be invisible (IMPORT_RE read one import per line), so rule 1
+    #     passed. It must fail, naming exactly that import.
+    files = dict(BASE_FILES)
+    files["QBP/Foundations/F1.lean"] = (
+        "import QBP.Foundations.Ok import QBP.Physics.Hidden\n-- foundations leaf\n"
+    )
+    rc, out = run(files)
+    check("one-line `import A import Hidden`: forbidden Hidden fails rule 1", rc == 1)
+    check(
+        "exactly the hidden import is reported",
+        "QBP.Physics.Hidden" in out and out.count("(forbidden)") == 1,
+    )
+
     # 3. Transitive visibility: a physics file reached only via another visible
     #    physics file (not directly by QBP.lean) is visible — guards against a
     #    naive direct-import-only check.

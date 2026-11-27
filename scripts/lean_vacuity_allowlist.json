@@ -1,0 +1,4 @@
+{
+  "policy": "Pinned exceptions to the semantic vacuity check (QBP #827, PR #829 Red Team r6; director: starts EMPTY). An entry names ONE theorem, its module and the SHA-256 fingerprint the auditor computes; a theorem whose statement reduces to True passes only with a matching entry. A stale entry fails. Entries need an issue and a reason, and are added by review, never by the author of the theorem alone.",
+  "entries": []
+}

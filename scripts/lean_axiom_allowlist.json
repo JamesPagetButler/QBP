@@ -1,0 +1,34 @@
+{
+  "policy": "Exact, issue-linked, identity-pinned exceptions to the CI axiom audit (QBP #827; director ruling, option (a); identity pins per PR #829 Red Team finding 3). Each entry names ONE fully qualified declaration, its MODULE and a FINGERPRINT (SHA-256 of the canonical serialisation the Lean auditor computes: the constant's statement/body plus every project constant it reaches), and for EACH excepted axiom its exact name, module and fingerprint, plus the open issue that owns it. A declaration is allowed only if name, module and fingerprint match AND its non-standard axioms are EXACTLY the entry's, each with matching module and fingerprint. The pins are identity checks only; no axiom name decides pass or fail. Any other non-standard axiom fails the gate; an entry whose declaration is not reported, or no longer matches, is STALE and fails, so the entry must be deleted when its issue lands (or re-pinned after review — never widened). No wildcards, prefixes or per-file entries. A Lean toolchain bump that renumbers the native axiom, or any edit to a project constant the theorem reaches, makes the entry stale on purpose: re-check it.",
+  "entries": [
+    {
+      "declaration": "hessian_traceSq_1152_universal",
+      "module": "SedenionHessianTraceSq",
+      "fingerprint": "81974184ddd29e4bfb5312eb1dfa704b554969440099ea13982ccafe7c6465c0",
+      "axioms": [
+        {
+          "name": "hessian_traceSq_1152_universal._native.native_decide.ax_1_1",
+          "module": "SedenionHessianTraceSq",
+          "fingerprint": "d1034767b9cafca505882e44d65e8586e8be616261b95139db4b0c5aff69d9e3"
+        }
+      ],
+      "issue": 582,
+      "reason": "Sprint12-Inherited/SedenionHessianTraceSq.lean: the one documented native_decide theorem of the corpus (kernel decide impractical). Issue #582 (OPEN) resolves it by native-compute attestation, not a kernel proof."
+    },
+    {
+      "declaration": "hessian_traceSq_1152_universal._native.native_decide.ax_1_1",
+      "module": "SedenionHessianTraceSq",
+      "fingerprint": "d1034767b9cafca505882e44d65e8586e8be616261b95139db4b0c5aff69d9e3",
+      "axioms": [
+        {
+          "name": "hessian_traceSq_1152_universal._native.native_decide.ax_1_1",
+          "module": "SedenionHessianTraceSq",
+          "fingerprint": "d1034767b9cafca505882e44d65e8586e8be616261b95139db4b0c5aff69d9e3"
+        }
+      ],
+      "issue": 582,
+      "reason": "The per-call native axiom that native_decide declares for hessian_traceSq_1152_universal is itself a constant of the same module; the audit (every declaration) reports it as depending on itself. Same exception as the entry above, issue #582."
+    }
+  ],
+  "pins_recorded": "Pins observed by the Lean auditor in CI run 45515692569 (head 22200a2) on master's proofs/ tree, toolchain v4.30.0; recorded after review of the module and axiom names (SedenionHessianTraceSq; the per-call native axiom)."
+}
