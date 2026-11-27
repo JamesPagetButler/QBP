@@ -115,6 +115,11 @@ jobs:
               echo "::warning::$SRC_DIR/scripts/$t.py absent on the base — base self-test skipped"
             fi
           done
+      - name: Require PyYAML (H3, PR #838 — the backstop parses workflows with it)
+        # Without PyYAML the judge would treat EVERY workflow change as lane (fail
+        # closed), silently undoing the narrow ruling; fail loudly instead.
+        run: |
+          python3 -c 'import yaml' || { echo "::error::PyYAML missing on the runner — the #835 backstop cannot judge workflows"; exit 1; }
       - name: Fetch the PR body (latest, via API — not the event snapshot)
         env:
           GH_TOKEN: ${{ github.token }}

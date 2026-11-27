@@ -150,7 +150,13 @@ _WF_SCRIPT_RE = re.compile(r"(?<![\w.-])scripts/[A-Za-z0-9_./-]*[A-Za-z0-9_]")
 #  - The gh merge/edit/close and issue close/reopen/edit verbs.
 # The permission walk relies on the repo setting default_workflow_permissions:
 # read (beekeeper-only): with read defaults, an ungranted token cannot write.
-_WF_WRITE_SCOPE_RE = re.compile(r"[\"']?([a-z][a-z-]*)[\"']?\s*:\s*[\"']?write\b")
+# Left-anchored (H4 on PR #838 round 7): without the lookbehind, every start
+# position inside a long letter run re-scanned the run — quadratic, a 1 MiB
+# plain workflow hung the judge.  With it, a start inside a word fails at once,
+# so the scan is linear.
+_WF_WRITE_SCOPE_RE = re.compile(
+    r"(?<![A-Za-z0-9_-])[\"']?([a-z][a-z-]*)[\"']?\s*:\s*[\"']?write\b"
+)
 # The ONE exempt write scope (G3): `security-events` uploads SARIF / manages
 # code-scanning alerts (CodeQL in ci.yml — keeps PR #778 housekeeping).  It cannot
 # label, comment, post a status/check or merge.  This holds ONLY while the master
@@ -160,7 +166,8 @@ NON_MERGE_WRITE_SCOPES = frozenset({"security-events"})
 _WF_POWER_RE = re.compile(
     r"\bwrite-all\b"
     r"|\bgh\s+pr\s+(?:merge|edit|close)\b|\bgh\s+issue\s+(?:close|reopen|edit)\b"
-    r"|\bsecrets\b(?!\.GITHUB_TOKEN\b|\[\s*['\"]GITHUB_TOKEN['\"]\s*\])"
+    # case-insensitive (H1): GitHub expression contexts/properties are
+    r"|(?i:\bsecrets\b(?!\.GITHUB_TOKEN\b|\[\s*['\"]GITHUB_TOKEN['\"]\s*\]))"
 )
 
 
@@ -187,7 +194,13 @@ def _permissions_power(text: str) -> bool:
             )
         return v is not None and not isinstance(v, (list, int, float, bool))
 
+    seen = set()  # H2: aliases are shared nodes — visit each once (linear, cycle-safe)
+
     def walk(node) -> bool:
+        if isinstance(node, (dict, list)):
+            if id(node) in seen:
+                return False
+            seen.add(id(node))
         if isinstance(node, dict):
             for k, v in node.items():
                 if str(k) == "permissions" and grant(v):
@@ -198,7 +211,10 @@ def _permissions_power(text: str) -> bool:
             return any(walk(x) for x in node)
         return False
 
-    return walk(doc)
+    try:
+        return walk(doc)
+    except RecursionError:
+        return True  # pathologically deep input: fail closed
 
 
 ACTIONS_DIR = ".github/actions/"

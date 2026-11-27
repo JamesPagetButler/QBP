@@ -978,6 +978,163 @@ def test_r7_symlink_to_harmless_file_is_still_lane():
         shutil.rmtree(d)
 
 
+def _power_rc_timed(rel, content, timeout=60):
+    """Like _power_rc, but the judge subprocess is killed past `timeout` seconds."""
+    import shutil
+
+    head = _head_with(rel, content)
+    try:
+        return subprocess.run(
+            [
+                sys.executable,
+                SCRIPT,
+                "--labels=housekeeping,tier-2-review",
+                f"--changed-file={_write_tmp(rel)}",
+                f"--head-root={head}",
+            ],
+            input=HVR_NILD,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired:
+        return None  # the judge hung: callers assert on this, a clean FAIL
+    finally:
+        shutil.rmtree(head)
+
+
+def test_r8_h1_secrets_match_is_case_insensitive():
+    for body in (
+        "env:\n  T: ${{ SECRETS.SIBLING_READ_TOKEN }}\n",
+        "env:\n  T: ${{ Secrets['X'] }}\n",
+        "env:\n  T: ${{ Secrets.X }}\n",
+    ):
+        r = _power_rc(".github/workflows/new.yml", "name: N\n" + body)
+        assert r.returncode == 1 and "merge-lane" in r.stdout, (body, r.stdout)
+    # the GITHUB_TOKEN carve-out is case-insensitive too
+    for ok in (
+        "${{ SECRETS.GITHUB_TOKEN }}",
+        "${{ Secrets['GITHUB_TOKEN'] }}",
+        "${{ secrets.github_token }}",
+    ):
+        r = _power_rc(".github/workflows/new.yml", f"name: N\nenv:\n  T: {ok}\n")
+        assert r.returncode == 0, (ok, r.stdout)
+
+
+def test_r8_h4_write_scope_regex_is_linear():
+    import time
+
+    # 40 KB: the old unanchored regex took ~41 s here (quadratic); linear is ms
+    letters = "x" * 40_000
+    t0 = time.monotonic()
+    assert c._WF_WRITE_SCOPE_RE.search("# " + letters) is None
+    assert c._WF_POWER_RE.search("# " + letters) is None
+    assert time.monotonic() - t0 < 2.0, time.monotonic() - t0
+    # still matches real grants
+    for txt in (
+        "pull-requests: write",
+        '"statuses": "write"',
+        "  checks:write",
+        "{checks: write}",
+    ):
+        assert c._WF_WRITE_SCOPE_RE.search(txt), txt
+
+
+def test_r8_h5_cap_is_exactly_one_mib():
+    # pins the literal (kills a raised cap: the other tests read c.MAX_READ_BYTES)
+    assert c.MAX_READ_BYTES == 1 << 20 == 1_048_576
+
+
+def test_r8_h4_h5_exact_cap_letter_run_workflow_is_judged_fast():
+    import time
+
+    prefix = "name: N\n# "
+    body = prefix + "x" * (c.MAX_READ_BYTES - len(prefix) - 1) + "\n"
+    assert len(body.encode()) == c.MAX_READ_BYTES
+    t0 = time.monotonic()
+    r = _power_rc_timed(".github/workflows/new.yml", body, timeout=60)
+    assert r is not None, "judge hung on a 1 MiB plain workflow (H4)"
+    assert r.returncode == 0, r.stdout[:300]  # at the cap, plain → housekeeping
+    assert time.monotonic() - t0 < 30, time.monotonic() - t0
+    # H5: exactly MAX_READ_BYTES + 1 → over the cap → power
+    r = _power_rc_timed(".github/workflows/new.yml", body + "\n", timeout=60)
+    assert r is not None
+    assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout[:300]
+    assert c._read  # direct check of the boundary
+    import tempfile
+
+    with tempfile.NamedTemporaryFile("wb", delete=False) as fh:
+        fh.write(b"#" * (c.MAX_READ_BYTES + 1))
+    try:
+        assert c._read(fh.name) is None
+    finally:
+        os.unlink(fh.name)
+
+
+def test_r8_text_line_catches_duplicate_permissions_keys():
+    # yaml.safe_load keeps the LAST duplicate (read); only the text second line
+    # sees the earlier write grant — pins that line (kills the Y7/F2e survivors)
+    r = _power_rc(
+        ".github/workflows/new.yml",
+        "name: N\npermissions:\n  pull-requests: write\npermissions: read\n",
+    )
+    assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout
+    r = _power_rc(
+        ".github/workflows/new.yml",
+        'name: N\npermissions:\n  "statuses": "write"\npermissions: {}\n',
+    )
+    assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout
+
+
+def test_r8_h2_alias_bomb_and_recursive_alias():
+    import time
+
+    lines = ["name: N", 'a0: &a0 ["x"]']
+    for i in range(1, 10):
+        prev = f"*a{i - 1}"
+        lines.append(f"a{i}: &a{i} [{', '.join([prev] * 9)}]")
+    lines.append("permissions: read")
+    bomb = "\n".join(lines) + "\n"
+    t0 = time.monotonic()
+    r = _power_rc_timed(".github/workflows/new.yml", bomb, timeout=60)
+    assert r is not None, "judge hung on an alias bomb (H2)"
+    assert time.monotonic() - t0 < 30, time.monotonic() - t0
+    assert r.returncode == 0, r.stdout[:300]  # harmless, judged fast
+    t0 = time.monotonic()
+    r = _power_rc_timed(
+        ".github/workflows/new.yml", "name: N\na: &a [*a]\n", timeout=60
+    )
+    assert r is not None
+    assert time.monotonic() - t0 < 30
+    assert "Traceback" not in r.stderr, r.stderr[-500:]
+    assert r.returncode == 0, r.stdout[:300]  # cycle visited once; no grant
+    assert c._permissions_power("a: &a [*a]\npermissions: {checks: write}\n")
+    # pathologically deep nesting: RecursionError (in the loader, before the
+    # walk can recurse) → power, no traceback
+    deep = "a: " + "[" * 2000 + "]" * 2000 + "\n"
+    assert c._permissions_power(deep) is True
+
+
+def test_r8_h3_verdict_job_requires_pyyaml_before_the_verdict():
+    import yaml
+
+    steps = yaml.safe_load(open(WORKFLOW, encoding="utf-8"))["jobs"][
+        "merge-blocking-boxes"
+    ]["steps"]
+    idx = [i for i, st in enumerate(steps) if "import yaml" in st.get("run", "")]
+    assert len(idx) == 1, steps
+    run_ = steps[idx[0]]["run"]
+    assert (
+        "python3 -c 'import yaml'" in run_ and "exit 1" in run_ and "::error::" in run_
+    ), run_
+    verdict = [
+        i
+        for i, st in enumerate(steps)
+        if 'merge_blocking_check.py" --body-file' in st.get("run", "")
+    ]
+    assert verdict and idx[0] < verdict[0], (idx, verdict)
+
+
 # ---- verdict source: the judge is the BASE copy, never the PR head (arch §I4, PR #780)
 
 import merge_blocking_verdict_source as vs  # noqa: E402
