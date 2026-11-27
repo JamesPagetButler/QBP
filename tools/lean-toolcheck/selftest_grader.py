@@ -994,7 +994,8 @@ m25 = json.loads((raw / "MF25_WritesSuiteInput.meta.json").read_text())
 others = [
     q.name
     for q in raw.glob("*.meta.json")
-    if q.name != "MF25_WritesSuiteInput.meta.json"
+    if q.name
+    not in ("MF25_WritesSuiteInput.meta.json", "MF91_DetachedSurvivor.meta.json")
     and json.loads(q.read_text()).get("suite_copy_writes")
 ]
 ver = json.loads((raw / "inputs.verify.json").read_text())
@@ -1008,6 +1009,40 @@ results.append(
     (
         "real-run[MF25] write attributed to MF25 only; real tree unchanged (inputs.verify ok)",
         f"MF25 writes {m25.get('suite_copy_writes')}; other writers {others}; verify ok={ver.get('ok')}",
+        "",
+    )
+)
+
+
+# 7g'. Red Team r7 (MF91): the per-file SURVIVOR check (`late_writes`).
+for tag, mut in (
+    (
+        "late-writes-present",
+        _meta_mut(lambda m: m.update(late_writes=["suite-copy/.mf91-alive"])),
+    ),
+    ("late-writes-record-missing", _meta_mut(lambda m: m.pop("late_writes"))),
+    ("late-writes-record-wrong-type", _meta_mut(lambda m: m.update(late_writes="x"))),
+):
+    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+# The real run: MF91's daemon wrote heartbeats while its --json run was alive (attributed to
+# MF91), and NOTHING was written after any file's Lean processes ended (no survivor), because
+# the PID namespace killed it.
+m91 = json.loads((raw / "MF91_DetachedSurvivor.meta.json").read_text())
+late_any = [
+    q.name
+    for q in raw.glob("*.meta.json")
+    if json.loads(q.read_text()).get("late_writes")
+]
+r91 = (
+    ".mf91-alive" in " ".join(m91.get("suite_copy_writes", []))
+    and m91.get("late_writes") == []
+    and not late_any
+)
+ok = ok and r91
+results.append(
+    (
+        "real-run[MF91] detached daemon wrote only while its Lean process lived; no survivor anywhere",
+        f"MF91 writes {m91.get('suite_copy_writes')}; MF91 late {m91.get('late_writes')}; files with late writes {late_any}",
         "",
     )
 )

@@ -984,6 +984,9 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
     # Red Team r6 concern 1(b): this file's Lean processes ran in a throwaway copy of the suite;
     # run.sh hashed the copy before and after. A write there is a FAIL unless the file expects it.
     writes = meta.get("suite_copy_writes")
+    # Red Team r7 (MF91): run.sh re-hashed the throwaway area 1.2 s after the file's last Lean
+    # process. Any change there means a process the file started outlived it.
+    late = meta.get("late_writes")
     # Supported subset: no brace inside a string literal (interpolation is not lexed).
     braces = brace_in_string(src)
     if braces:
@@ -1072,6 +1075,14 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
     elif "writes-detected" in kinds:
         failures.append(
             "expected the file to write a suite input, but no write was recorded"
+        )
+    if not isinstance(late, list) or not all(isinstance(w, str) for w in late):
+        failures.append(
+            "no survivor-check record for this file (run.sh did not record it)"
+        )
+    elif late:
+        failures.append(
+            f"a process this file started SURVIVED its Lean process and kept writing: {late[:6]}"
         )
 
     for kind, arg in expects:

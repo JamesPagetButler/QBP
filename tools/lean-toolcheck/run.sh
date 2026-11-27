@@ -63,6 +63,19 @@ def suite_files(root):
     return dict(sorted(out.items()))
 
 
+def all_files(root):
+    out = {}
+    for d, dirs, fs in os.walk(root):
+        for f in fs:
+            p = os.path.join(d, f)
+            try:
+                with open(p, "rb") as fh:
+                    out[os.path.relpath(p, root)] = hashlib.sha256(fh.read()).hexdigest()
+            except OSError:
+                out[os.path.relpath(p, root)] = None
+    return dict(sorted(out.items()))
+
+
 def tree_digest(root):
     root = os.path.realpath(root)
     h, n = hashlib.sha256(), 0
@@ -74,6 +87,12 @@ def tree_digest(root):
             h.update(
                 f"{os.path.relpath(p, root)}\0{st.st_size}\0{st.st_mtime_ns}\0{st.st_ctime_ns}\0{st.st_ino}\n".encode()
             )
+            if os.path.islink(p):  # Red Team r7 finding 2: follow the link and stat its TARGET too
+                try:
+                    t = os.stat(p)
+                    h.update(f"-> {os.path.realpath(p)}\0{t.st_size}\0{t.st_mtime_ns}\0{t.st_ctime_ns}\0{t.st_ino}\n".encode())
+                except OSError:
+                    h.update(f"-> {os.path.realpath(p)}\0dangling\n".encode())
             n += 1
     return {"root": root, "files": n, "digest": h.hexdigest()}
 
@@ -95,7 +114,18 @@ def snapshot(suite, repo_files, trees):
 
 
 mode = sys.argv[1]
-if mode == "suite":  # suite DIR OUT: content hashes of a (throwaway) suite tree
+if mode == "all":  # all DIR OUT: content hashes of EVERY file under DIR (no exclusions)
+    json.dump(all_files(sys.argv[2]), open(sys.argv[3], "w"))
+elif mode == "suite-check":  # suite-check BEFORE BEFORE_SHA DIR: DIR's suite == the manifest's
+    raw = open(sys.argv[2], "rb").read()
+    if hashlib.sha256(raw).hexdigest() != sys.argv[3]:
+        print("the pre-run manifest itself was rewritten"); sys.exit(1)
+    want, now = json.loads(raw)["suite"], suite_files(sys.argv[4])
+    bad = sorted(k for k in set(want) | set(now) if want.get(k) != now.get(k))
+    for k in bad:
+        print(f"private grader copy differs from the manifest: {k}")
+    sys.exit(1 if bad else 0)
+elif mode == "suite":  # suite DIR OUT: content hashes of a (throwaway) suite tree
     json.dump(suite_files(sys.argv[2]), open(sys.argv[3], "w"))
 elif mode == "diff":  # diff BEFORE AFTER: changed/added/removed paths, one JSON list
     a, b = json.load(open(sys.argv[2])), json.load(open(sys.argv[3]))
@@ -317,6 +347,25 @@ printf '{\n  "sorry": 0,\n  "vacuous-`: True :=` theorem": 0\n}\n' > "$ZERO_BASE
 
 echo "toolcheck: $TOOLCHAIN · Mathlib $MATHLIB_SHA7 · ${#FILES[@]} file(s) · run $RUN_ID · Tctl now $(tctl) °C"
 
+# ---- process isolation (Red Team r7, MF91) ------------------------------------------
+# Every Lean process runs as PID 1 of its OWN PID namespace (`unshare --user --map-root-user
+# --fork --pid --mount-proc --kill-child`). When it exits, the kernel kills every process left in that
+# namespace, `setsid` and double-forked daemons included. So nothing a file starts can outlive
+# the file's Lean process and race the verification or the grader. If the box cannot create the
+# namespace (unprivileged user namespaces off), that is a PREFLIGHT FAILURE, never a silent skip.
+# TOOLCHECK_TEST_NO_PIDNS=1 (selftest demonstrations only) turns the namespace off; such a run is
+# always INVALID, and shows what the survivor check below catches.
+# `--mount-proc` gives the namespace its own /proc: Lean finds its own binary through
+# /proc/<pid>/exe, and inside the namespace its pid is 1 (the host's init without it).
+ISO=(unshare --user --map-root-user --fork --pid --mount-proc --kill-child --)
+ISO_OFF=0
+if [[ "${TOOLCHECK_TEST_NO_PIDNS:-0}" == 1 ]]; then
+  ISO=(); ISO_OFF=1
+  echo "toolcheck: WARNING — TOOLCHECK_TEST_NO_PIDNS=1: PID namespaces OFF (demonstration); this run is INVALID by construction"
+elif ! "${ISO[@]}" true 2>/dev/null; then
+  preflight+=("cannot create a PID namespace (unshare --user --pid): unprivileged user namespaces are disabled on this host")
+fi
+
 # ---- cross-run persistence (Red Team r6 concern 1) -----------------------------------
 # (b) every Lean process that runs a file's code (the --json run, the fresh compile) runs in a
 # THROWAWAY COPY of the suite outside the repo, with its cwd there. Relative writes land in the
@@ -328,11 +377,18 @@ echo "toolcheck: $TOOLCHAIN · Mathlib $MATHLIB_SHA7 · ${#FILES[@]} file(s) · 
 WORK_TMP="$(mktemp -d "${TMPDIR:-/tmp}/lean-toolcheck-${RUN_ID}-XXXXXX")"
 trap 'rm -rf "$WORK_TMP"' EXIT
 TSUITE="$WORK_TMP/suite"
+SURVIVORS=()
+mkdir -p "$WORK_TMP/late" "$WORK_TMP/audit"
 fresh_copy() {
   rm -rf "$TSUITE"; mkdir -p "$TSUITE"
   (cd "$HERE" && tar --exclude=./results --exclude='./__pycache__' -cf - .) | tar -xf - -C "$TSUITE"
 }
 fresh_copy
+# The GRADER runs from a PRIVATE copy taken now, before any Lean process, and checked against the
+# manifest right before it runs (Red Team r7 ask 2): never from the working tree.
+GDIR="$WORK_TMP/grader"
+mkdir -p "$GDIR"
+(cd "$HERE" && tar --exclude=./results --exclude='./__pycache__' -cf - .) | tar -xf - -C "$GDIR"
 TC_DIR="$(lake env lean --print-prefix 2>/dev/null || true)"
 MAN_TREES="${PKG_LP}:${TC_DIR}"
 MAN_FILES=("$PROOFS/lean-toolchain" "$PROOFS/lakefile.lean" "$CHECKER")
@@ -358,21 +414,21 @@ for f in "${FILES[@]}"; do
   # its own nonce drawn just before it.
   pnonce="$(python3 -I -c 'import secrets; print(secrets.token_hex(16))')"
   set +e
-  bx "parse-$stem" env -u LEAN_PATH QBP_SUBSET_LEAN_PATH="$PKG_LP" \
+  bx "parse-$stem" "${ISO[@]+"${ISO[@]}"}" env -u LEAN_PATH QBP_SUBSET_LEAN_PATH="$PKG_LP" \
     lean --run "$HERE/LeanSubsetParse.lean" "$pnonce" "$f" \
     > "$RAW/$stem.parse.out" 2> "$RAW/$stem.parse.stderr"
   prc=$?
   tf="$TSUITE/${f#"$HERE"/}"   # this file's copy in the throwaway suite
   python3 -I -c "$MANIFEST_PY" suite "$TSUITE" "$WORK_TMP/copy.before.json"
   if [[ "$INNER" == 1 ]]; then
-    (cd "$(dirname "$tf")" && /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
+    (cd "$(dirname "$tf")" && "${ISO[@]+"${ISO[@]}"}" /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
       lake -d "$PROOFS" env lean --json "$tf") > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
     rc=$?
     label="${TOOLCHECK_BATCH_LABEL:-}"
   else
     label="lean-toolcheck-${stem}-${RUN_ID}"
     (cd "$(dirname "$tf")" && "$BOXRUN" --gpu --mem-mb "$MEM_MB" --timeout "$TIMEOUT" --wait --label "$label" -- \
-      /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
+      "${ISO[@]+"${ISO[@]}"}" /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
       lake -d "$PROOFS" env lean --json "$tf") > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
     rc=$?
   fi
@@ -404,14 +460,14 @@ for f in "${FILES[@]}"; do
   cp "$f" "$aud/src/ToolcheckAudit/$stem.lean"
   olean="$aud/build/ToolcheckAudit/$stem.olean"
   set +e
-  (cd "$aud" && bx "audit-c-$stem" lake -d "$PROOFS" env lean -R "$aud/src" -o "$olean" \
+  (cd "$aud" && bx "audit-c-$stem" "${ISO[@]+"${ISO[@]}"}" lake -d "$PROOFS" env lean -R "$aud/src" -o "$olean" \
     "$aud/src/ToolcheckAudit/$stem.lean") > "$RAW/$stem.compile.log" 2>&1
   comp_rc=$?
   olean_ok=0; [[ -s "$olean" ]] && olean_ok=1
   nonce="$(python3 -I -c 'import secrets; print(secrets.token_hex(16))')"
   arc=""
   if [[ -n "$AUDITOR" && "$olean_ok" == 1 ]]; then
-    bx "audit-r-$stem" env -u LEAN_PATH QBP_AUDIT_LEAN_PATH="${LAKE_LP}:$aud/build" \
+    bx "audit-r-$stem" "${ISO[@]+"${ISO[@]}"}" env -u LEAN_PATH QBP_AUDIT_LEAN_PATH="${LAKE_LP}:$aud/build" \
       lean --run "$AUDITOR" "$nonce" "$stem" "i:ToolcheckAudit.$stem" "t:ToolcheckAudit.$stem" \
       "p:$aud/build" > "$RAW/$stem.audit.out" 2> "$RAW/$stem.audit.stderr"
     arc=$?
@@ -419,11 +475,33 @@ for f in "${FILES[@]}"; do
   set -e
   python3 -I -c "$MANIFEST_PY" suite "$TSUITE" "$WORK_TMP/copy.after.json"
   writes="$(python3 -I -c "$MANIFEST_PY" diff "$WORK_TMP/copy.before.json" "$WORK_TMP/copy.after.json")"
-  [[ "$writes" != "[]" ]] && fresh_copy   # the next file gets a clean copy
-  python3 -I - "$RAW/$stem.meta.json" "$rc" "$wall" "$mb" "$crc" "$t0" "$t1" "$maxt" "$pauses" \
-    "$comp_rc" "$olean_ok" "$arc" "$nonce" "$prc" "$pnonce" "$writes" <<'PY'
+  # SURVIVOR CHECK (Red Team r7 ask 1, second layer): after the file's last Lean process, the
+  # throwaway suite copy and the audit area (the cwd of every code-running process) are hashed,
+  # and hashed again 1.2 s later. Any change means something the file started is still running.
+  for k in a b; do
+    [[ "$k" == b ]] && sleep 1.2
+    python3 -I -c "$MANIFEST_PY" all "$TSUITE" "$WORK_TMP/late/s.$k.json"
+    python3 -I -c "$MANIFEST_PY" all "$WORK_TMP/audit" "$WORK_TMP/late/u.$k.json"
+  done
+  late="$(python3 -I - "$WORK_TMP/late" <<'PY'
 import json, sys
-p, rc, wall, mb, crc, t0, t1, maxt, pauses, comp, ok, arc, nonce, prc, pnonce, writes = sys.argv[1:]
+w = sys.argv[1]
+out = []
+for tag, name in (("s", "suite-copy"), ("u", "audit")):
+    x, y = json.load(open(f"{w}/{tag}.a.json")), json.load(open(f"{w}/{tag}.b.json"))
+    out += [f"{name}/{k}" for k in sorted(set(x) | set(y)) if x.get(k) != y.get(k)]
+print(json.dumps(out))
+PY
+)"
+  if [[ "$late" != "[]" ]]; then
+    SURVIVORS+=("$stem: $late")
+    echo "toolcheck: SURVIVOR: something $stem started kept writing after its Lean processes ended: $late"
+  fi
+  [[ "$writes" != "[]" || "$late" != "[]" ]] && fresh_copy   # the next file gets a clean copy
+  python3 -I - "$RAW/$stem.meta.json" "$rc" "$wall" "$mb" "$crc" "$t0" "$t1" "$maxt" "$pauses" \
+    "$comp_rc" "$olean_ok" "$arc" "$nonce" "$prc" "$pnonce" "$writes" "$late" <<'PY'
+import json, sys
+p, rc, wall, mb, crc, t0, t1, maxt, pauses, comp, ok, arc, nonce, prc, pnonce, writes, late = sys.argv[1:]
 num = lambda s, f=float: f(s) if s not in ("", None) else None
 json.dump({"lean_exit": int(rc), "wall_s": num(wall), "maxrss_mb": num(mb, int),
            "checker_exit": int(crc), "tctl_start_c": num(t0), "tctl_end_c": num(t1),
@@ -431,7 +509,8 @@ json.dump({"lean_exit": int(rc), "wall_s": num(wall), "maxrss_mb": num(mb, int),
            "audit": {"compile_exit": int(comp), "olean": ok == "1",
                      "auditor_exit": num(arc, int), "nonce": nonce},
            "subset_parse": {"exit": int(prc), "nonce": pnonce},
-           "suite_copy_writes": json.loads(writes)}, open(p, "w"))
+           "suite_copy_writes": json.loads(writes), "late_writes": json.loads(late)},
+          open(p, "w"))
 PY
   printf '  %-28s lean_exit=%-3s wall=%-6s rss=%-5sMB checker_exit=%s olean=%s audit_exit=%s Tctl=%s→%s\n' \
     "$stem" "$rc" "${wall:-?}" "${mb:-?}" "$crc" "$olean_ok" "${arc:-none}" "${t0:-?}" "${t1:-?}"
@@ -490,28 +569,49 @@ PY
 
 set +e
 subset=(); (($# > 0)) && subset=(--only-present)
-python3 -I "$HERE/toolcheck.py" evaluate --raw "$RAW" --suite "$HERE" --meta "$RAW/meta.json" \
+# The private grader copy must still match the manifest (Red Team r7 ask 2).
+if ! gchk="$(python3 -I -c "$MANIFEST_PY" suite-check "$RAW/inputs.json" "$INPUTS_SHA" "$GDIR")"; then
+  INPUTS_OK=0
+  echo "toolcheck: PRIVATE GRADER COPY MISMATCH: $gchk"
+fi
+python3 -I "$GDIR/toolcheck.py" evaluate --raw "$RAW" --suite "$GDIR" --meta "$RAW/meta.json" \
   --out-json "$RUN_DIR/${OUT_BASE}.json" --out-md "$RUN_DIR/${OUT_BASE}.md" "${subset[@]+"${subset[@]}"}"
 grc=$?
+OUT_SHA="$(cat "$RUN_DIR/${OUT_BASE}.json" "$RUN_DIR/${OUT_BASE}.md" | sha256sum | cut -d' ' -f1)"
+# Re-verify every input AFTER grading (Red Team r7 ask 3): nothing may have changed since the start.
+python3 -I -c "$MANIFEST_PY" verify "$RAW/inputs.json" "$INPUTS_SHA" "$RAW/inputs.verify2.json" \
+  "$HERE" "$MAN_TREES" "${MAN_FILES[@]}"
+vrc2=$?
 set -e
+if ((vrc2 != 0)); then
+  INPUTS_OK=0
+  echo "toolcheck: INPUT MANIFEST MISMATCH after grading (see raw/inputs.verify2.json)"
+fi
+if ((ISO_OFF == 1)); then INPUTS_OK=0; fi
+if ((${#SURVIVORS[@]} > 0)); then
+  INPUTS_OK=0
+  printf 'toolcheck: SURVIVING PROCESS(ES): %s\n' "${SURVIVORS[@]}"
+fi
 if ((${#preflight[@]} > 0)); then
   printf 'toolcheck: PREFLIGHT FAILURE: %s\n' "${preflight[@]}"
   exit 2
 fi
 echo "toolcheck: results → tools/lean-toolcheck/results/runs/${RUN_ID}/${OUT_BASE}.{json,md} (gitignored)"
 if [[ "$UPDATE_BASELINE" == 1 ]]; then
-  if ((grc == 0)) && [[ "$INPUTS_OK" == 1 ]]; then
+  if ((grc == 0)) && [[ "$INPUTS_OK" == 1 ]] \
+     && [[ "$(cat "$RUN_DIR/${OUT_BASE}.json" "$RUN_DIR/${OUT_BASE}.md" | sha256sum | cut -d' ' -f1)" == "$OUT_SHA" ]]; then
     cp "$RUN_DIR/${OUT_BASE}.json" "$RUN_DIR/${OUT_BASE}.md" "$HERE/results/"
+    [[ "$(cat "$HERE/results/${OUT_BASE}.json" "$HERE/results/${OUT_BASE}.md" | sha256sum | cut -d' ' -f1)" == "$OUT_SHA" ]] \
+      || { echo "toolcheck: baseline copy does not match the grader's output"; grc=1; }
     echo "toolcheck: --update-baseline: committed baseline results/${OUT_BASE}.{json,md} overwritten from run ${RUN_ID}"
   else
-    echo "toolcheck: --update-baseline REFUSED: the run is not GREEN — committed baseline left untouched"
+    echo "toolcheck: --update-baseline REFUSED: the run is not GREEN and VALID (or its output changed) — committed baseline left untouched"
   fi
 fi
 if [[ "${INPUTS_OK:-1}" != 1 ]]; then
-  echo "toolcheck: RUN INVALID — a suite, repo or package input changed during the run (see raw/inputs.verify.json)"
+  echo "toolcheck: RUN INVALID — an input changed, the grader copy differed, a process survived its file, or PID namespaces were off (see above and raw/inputs.verify*.json)"
   grc=1
 fi
 exit "$grc"
 }
-main "$@"
-exit $?
+main "$@"; exit $?  # one line: bash never reads past it, even if this file was rewritten

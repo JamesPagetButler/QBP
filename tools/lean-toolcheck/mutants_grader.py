@@ -9,7 +9,8 @@ checks): rule R, the
 Lean-parser layer (rules L/P), the subset_kinds.json pin and the auditor pin.
 Bounding (r5: one selftest is now ~2 min): MUTANTS_FILTER=<regex> keeps matching names only;
 MUTANTS_STRIDE=<k> keeps every k-th of the REST (a deterministic sample, reported as such).
-A mutant is KILLED iff selftest_grader.py exits non-zero with the mutated grader.
+A mutant is KILLED iff selftest_grader.py exits non-zero AND prints `selftest: FAILED` (a plant's
+assertion failed); a non-zero exit without that line (an exception, an OOM kill) is CRASHED.
 Disk: about 0.3 GB peak (one mutant's work dir at a time; each is deleted after its run).
 """
 
@@ -344,6 +345,45 @@ M.update(
             ('    if verify.get("ok") is not True:\n', "    if False:\n")
         ],
         "R27 grade-time recheck off": [("    if recheck:\n", "    if False:\n")],
+        "R29 survivor (late writes) ignored": [
+            (
+                "    elif late:\n        failures.append(\n",
+                "    elif False:\n        failures.append(\n",
+            )
+        ],
+        "R30 survivor record not required": [
+            (
+                "    if not isinstance(late, list) or not all(isinstance(w, str) for w in late):\n",
+                "    if False:\n",
+            )
+        ],
+        "L9 subset_kinds parser-sha pin unchecked (Red Team r6/r7)": [
+            (
+                '    if k.get("parser_sha256") != _sha256(_PARSER_FILE):\n',
+                "    if False:\n",
+            )
+        ],
+        "L10 import-root check off (Red Team r6/r7)": [
+            (
+                '        if m.split(".")[0] not in ALLOWED_IMPORT_ROOTS:\n',
+                "        if False:\n",
+            )
+        ],
+        "P1 run verification ok ignored (Red Team r7)": [
+            ('    if verify.get("ok") is not True:\n', "    if False:\n")
+        ],
+        "P2 grade-time suite re-hash off (Red Team r7)": [
+            ("    if recheck:\n", "    if False:\n")
+        ],
+        "P3 throwaway-copy writes forced empty (Red Team r7)": [
+            ('    writes = meta.get("suite_copy_writes")\n', "    writes = []\n")
+        ],
+        "P4 parse-record missing-field check off (Red Team r7)": [
+            (
+                '        if f not in rec:\n            out.append(f"[L] Lean-parser {what}: field `{f}` is missing")\n',
+                "        if f not in rec:\n            continue\n",
+            )
+        ],
         "R28 manifest records not required": [
             (
                 '        return [\n            "no input manifest / verification record',
@@ -396,7 +436,13 @@ for name, reps in M.items():
             capture_output=True,
             text=True,
         )
-        rows.append((name, "KILLED" if r.returncode != 0 else "SURVIVED"))
+        if r.returncode == 0:
+            verdict = "SURVIVED"
+        elif "selftest: FAILED" in r.stdout:
+            verdict = "KILLED"  # a plant's assertion failed
+        else:
+            verdict = f"CRASHED (exit {r.returncode}, no failing assertion)"
+        rows.append((name, verdict))
         # Disk bound: each selftest copies the suite + raw logs ~100 times (~0.3 GB). Keeping
         # every mutant's directory filled the shared disk on 2026-11-25, so delete it now.
         shutil.rmtree(d, ignore_errors=True)
