@@ -384,6 +384,15 @@ M.update(
                 "        if f not in rec:\n            continue\n",
             )
         ],
+        "R31 raw-record seal ignored": [
+            (
+                "    if seal_tampered is None or stem in seal_tampered:\n",
+                "    if seal_tampered is None:\n",
+            )
+        ],
+        "R32 decoy's expected tamper unmet ignored": [
+            ('    if "records-tampered" in expect_kinds:\n', "    if False:\n")
+        ],
         "R28 manifest records not required": [
             (
                 '        return [\n            "no input manifest / verification record',

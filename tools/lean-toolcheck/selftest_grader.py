@@ -27,6 +27,23 @@ if work.exists():
 work.mkdir(parents=True)
 
 
+class _NoRows(dict):
+    """Rows of a grader run that produced no output: every lookup is a failed row."""
+
+    def __missing__(self, key):
+        return {
+            "file": key,
+            "result": "NO-OUTPUT",
+            "failures": ["grader produced no output"],
+            "detections": [],
+            "structural_audit": None,
+        }
+
+
+NO_OUTPUT: list[str] = []
+ok = True
+
+
 def evaluate(
     tc: Path, rawdir: Path, suitedir: Path, tag: str, recheck: bool = False
 ) -> dict:
@@ -56,6 +73,18 @@ def evaluate(
         capture_output=True,
         text=True,
     )
+    if not out_j.exists():
+        global ok, NO_OUTPUT
+        ok = False
+        NO_OUTPUT.append(
+            f"{tag}: grader exit {r.returncode}, no output ({r.stderr.strip()[-160:]})"
+        )
+        return {
+            "exit": r.returncode,
+            "rows": _NoRows(),
+            "overall": "NO-OUTPUT",
+            "pre": ["grader produced no output"],
+        }
     d = json.loads(out_j.read_text())
     return {
         "exit": r.returncode,
@@ -75,7 +104,7 @@ results = []
 base = evaluate(new_tc, raw, suite, "base")
 results.append(("real run, NEW grader", base["overall"], f"exit {base['exit']}"))
 
-ok = base["overall"] == "GREEN"
+ok = ok and base["overall"] == "GREEN"
 # 1. optionally demonstrate the bugs with an OLD grader on the same raw logs
 old = evaluate(old_tc, raw, suite, "old") if old_tc is not None else None
 for n in ("MF06_SpoofedAudit.lean", "T19_NestedComments.lean"):
@@ -85,7 +114,7 @@ for n in ("MF06_SpoofedAudit.lean", "T19_NestedComments.lean"):
     ok = ok and base["rows"][n]["result"] == "PASS"
 
 
-def planted(tag, mutate, names, must):
+def planted(tag, mutate, names, must, need=None):
     """must = 'FAIL' (the plant must be flagged) or 'PASS' (the spoof must be neutralised)."""
     global ok
     d = work / f"raw-{tag}"
@@ -94,6 +123,8 @@ def planted(tag, mutate, names, must):
     res = evaluate(new_tc, d, suite, tag)
     for n in names:
         ok = ok and res["rows"][n]["result"] == must
+        if need is not None:
+            ok = ok and any(need in x for x in res["rows"][n]["failures"])
         results.append(
             (
                 f"plant[{tag}] {n} (must {must})",
@@ -945,7 +976,19 @@ for where, idx, fields in (
             recs[idx].pop(fld, None)
             return recs
 
-        FIELD_PLANTS.append((f"field-missing-{where}-{fld}", t01_parse(_drop)))
+        # The structural fields are caught by earlier checks (nonce, header … done, `i`); every
+        # other field must be reported AS MISSING (Red Team r8: so the shape check is killable).
+        FIELD_PLANTS.append(
+            (
+                f"field-missing-{where}-{fld}",
+                t01_parse(_drop),
+                (
+                    None
+                    if fld in ("nonce", "header", "done", "i")
+                    else f"field `{fld}` is missing"
+                ),
+            )
+        )
 for tag, idx, fld, val in (
     ("field-type-command-kinds", 1, "kinds", "Lean.Parser.Command.declaration"),
     ("field-type-header-imports", 0, "imports", "Mathlib"),
@@ -958,9 +1001,9 @@ for tag, idx, fld, val in (
         recs[idx][fld] = val
         return recs
 
-    FIELD_PLANTS.append((tag, t01_parse(_retype)))
-for tag, mut in FIELD_PLANTS:
-    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL")
+    FIELD_PLANTS.append((tag, t01_parse(_retype), f"field `{fld}` has the wrong type"))
+for tag, mut, need in FIELD_PLANTS:
+    planted(tag, mut, ["T01_DecideFin.lean"], "FAIL", need)
 
 
 # 7g. Red Team r6 concern 1(b): writes into the THROWAWAY suite copy, attributed per file.
@@ -1053,6 +1096,56 @@ results.append(
     (
         "real-run[MF91] detached daemon wrote only while its Lean process lived; no survivor anywhere",
         f"MF91 writes {m91.get('suite_copy_writes')}; MF91 late {m91.get('late_writes')}; files with late writes {late_any}",
+        "",
+    )
+)
+
+
+# 7i. Red Team r8 (MF93): the raw-record SEAL.
+def _seal_edit(fn):
+    def mut(d):
+        q = d / "seal.verify.json"
+        m = json.loads(q.read_text())
+        fn(m)
+        q.write_text(json.dumps(m))
+
+    return mut
+
+
+for tag, mut, name in (
+    (
+        "seal-tampered-T01",
+        _seal_edit(lambda m: m["tampered"].append("T01_DecideFin")),
+        "T01_DecideFin.lean",
+    ),
+    (
+        "seal-decoy-held",
+        _seal_edit(
+            lambda m: m.update(
+                tampered=[x for x in m["tampered"] if x != "MF93a_SealDecoy"]
+            )
+        ),
+        "MF93a_SealDecoy.lean",
+    ),
+    (
+        "seal-record-missing",
+        lambda d: (d / "seal.verify.json").unlink(),
+        "T01_DecideFin.lean",
+    ),
+    (
+        "seal-record-mistyped",
+        _seal_edit(lambda m: m.update(tampered="T01_DecideFin")),
+        "T01_DecideFin.lean",
+    ),
+):
+    planted(tag, mut, [name], "FAIL")
+seal = json.loads((raw / "seal.verify.json").read_text())
+r93 = seal.get("tampered") == ["MF93a_SealDecoy"]
+ok = ok and r93
+results.append(
+    (
+        "real-run[MF93] MF93b rewrote the decoy MF93a's records; the seal caught exactly that",
+        f"tampered {seal.get('tampered')}; seals checked {seal.get('checked')}",
         "",
     )
 )
@@ -1510,5 +1603,7 @@ for stem, thm, rule_name, rule in (
 
 for a, b, c in results:
     print(f"| {a} | {b} | {c} |")
+for x in NO_OUTPUT:
+    print(f"| grader NO OUTPUT (counted as a failed assertion) | {x} |  |")
 print("selftest:", "OK — every plant behaved as required" if ok else "FAILED")
 sys.exit(0 if ok else 1)

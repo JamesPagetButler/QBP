@@ -166,6 +166,28 @@ else:  # snapshot|verify OUT SUITE TREES(:-sep) REPO_FILE...  [verify: + BEFORE 
     sys.exit(1 if probs else 0)
 PYEOF
 )"
+# The raw-record SEAL program (Red Team r8 finding 1), in memory for the same reason.
+SEAL_PY="$(cat <<'PYEOF'
+import hashlib, os, sys
+raw, stem = sys.argv[1], sys.argv[2]
+if stem == "__global":
+    paths = [os.path.join(raw, n) for n in ("zero-baseline.json", "import-surface.log")]
+else:
+    paths = sorted(os.path.join(raw, f) for f in os.listdir(raw) if f.startswith(stem + "."))
+    for dd, _, fs in os.walk(os.path.join(raw, "checker-" + stem)):
+        paths += sorted(os.path.join(dd, f) for f in fs)
+h = hashlib.sha256()
+for q in paths:
+    h.update(os.path.relpath(q, raw).encode() + b"\0")
+    try:
+        with open(q, "rb") as fh:
+            h.update(hashlib.sha256(fh.read()).hexdigest().encode())
+    except OSError:
+        h.update(b"missing")
+    h.update(b"\n")
+print(f"{h.hexdigest()}:{len(paths)}")
+PYEOF
+)"
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"          # suite lives in <repo>/tools/lean-toolcheck
@@ -183,6 +205,26 @@ BOXRUN_LOG="${BOXRUN_LOG:-$HOME/.box-telemetry/boxrun.log}"
 RUN_ID="${TOOLCHECK_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)}"
 INNER="${TOOLCHECK_INNER:-0}"
 UPDATE_BASELINE="${TOOLCHECK_UPDATE_BASELINE:-0}"
+# ---- trusted binaries by ABSOLUTE path (Red Team r8 finding 2) -------------------------
+# Nothing that matters is found through PATH (a shim in ~/.local/bin could stand in for it).
+# python3, unshare, time and sh are the system's; lean and lake are derived from the toolchain
+# PIN below (never the elan shims on PATH); boxrun is resolved once to its real path. Every one
+# is recorded by content in the input manifest, so a change during the run makes it INVALID.
+PY=/usr/bin/python3
+UNSHARE=/usr/bin/unshare
+for b in "$PY" "$UNSHARE" /usr/bin/time /bin/sh /bin/bash; do
+  [[ -x "$b" ]] || { echo "toolcheck: REFUSED — required system binary $b is missing" >&2; exit 2; }
+done
+if [[ "$BOXRUN" != none ]]; then
+  BOXRUN="$(command -v "$BOXRUN" || true)"
+  [[ -n "$BOXRUN" ]] || { echo "toolcheck: REFUSED — boxrun not found" >&2; exit 2; }
+  BOXRUN="$(readlink -f "$BOXRUN")"
+  export BOXRUN   # absolute: the inner (boxrun-leased) run.sh inherits it, never re-resolves it
+fi
+# From here on PATH holds only root-owned system directories (plus, below, the pinned toolchain's
+# bin/), so no user-writable shim (e.g. in ~/.local/bin) can stand in for sed, tr, readlink, grep,
+# tar, sha256sum, setsid … — the tools the isolation proof and the checks themselves use.
+export PATH=/usr/bin:/bin
 
 args=()
 for a in "$@"; do
@@ -201,8 +243,16 @@ fi
 cd "$PROOFS"
 
 # ---- pins (read, never hard-coded) -------------------------------------------------
-eval "$(python3 -I "$HERE/toolcheck.py" pins --proofs "$PROOFS")"
+eval "$("$PY" -I "$HERE/toolcheck.py" pins --proofs "$PROOFS")"
 OUT_BASE="results-${VERSION}-${MATHLIB_SHA7}"
+TC_DIR="${ELAN_HOME:-$HOME/.elan}/toolchains/$(sed 's#/#--#; s#:#---#' <<<"$TOOLCHAIN")"
+LEAN_BIN="$TC_DIR/bin/lean"
+LAKE_BIN="$TC_DIR/bin/lake"
+export PATH="$TC_DIR/bin:/usr/bin:/bin"   # the pinned toolchain (in the input manifest), then system
+if [[ ! -x "$LEAN_BIN" || ! -x "$LAKE_BIN" ]]; then
+  echo "toolcheck: REFUSED — the pinned toolchain $TOOLCHAIN is not installed at $TC_DIR" >&2
+  exit 2
+fi
 RUN_DIR="$HERE/results/runs/${RUN_ID}" # gitignored; one directory per run
 RAW="$RUN_DIR/raw"
 
@@ -295,13 +345,13 @@ fi
 # F1 (Red Team on PR #824): on a fresh checkout lake-manifest.json is absent (gitignored) and
 # the first `lake env` prints "info: QBPProofs: no previous manifest, creating one from
 # scratch" BEFORE Lean's version line — never take line 1; match the `Lean (version` line.
-LEAN_VERSION_OUT="$(lake env lean --version 2>&1 || true)"
+LEAN_VERSION_OUT="$("$LAKE_BIN" env "$LEAN_BIN" --version 2>&1 || true)"
 LEAN_REPORTED="$(grep -m1 -E '^Lean \(version ' <<<"$LEAN_VERSION_OUT" || true)"
 if [[ -z "$LEAN_REPORTED" ]]; then
   LEAN_REPORTED="(no 'Lean (version' line in: $(tr '\n' ' ' <<<"$LEAN_VERSION_OUT" | cut -c1-200))"
 fi
 # lake may just have (re)created the manifest — re-read so the lockstep check sees it.
-eval "$(python3 -I "$HERE/toolcheck.py" pins --proofs "$PROOFS")"
+eval "$("$PY" -I "$HERE/toolcheck.py" pins --proofs "$PROOFS")"
 if [[ -n "$MANIFEST_MATHLIB_REV" && "$MANIFEST_MATHLIB_REV" != "$MATHLIB_SHA" ]]; then
   preflight+=("lake-manifest.json mathlib rev $MANIFEST_MATHLIB_REV != lakefile pin $MATHLIB_SHA (after lake env)")
 fi
@@ -309,7 +359,7 @@ want_ver="${VERSION#v}"
 if [[ "$LEAN_REPORTED" != *"version ${want_ver},"* && "$LEAN_REPORTED" != *"version ${want_ver} "* ]]; then
   preflight+=("lake env lean reports '$LEAN_REPORTED', pin is $TOOLCHAIN")
 fi
-if ! python3 -I "$HERE/toolcheck.py" check-imports --proofs "$PROOFS" \
+if ! "$PY" -I "$HERE/toolcheck.py" check-imports --proofs "$PROOFS" \
      --file "$HERE/tests/T00_ImportSurface.lean" > "$RAW/import-surface.log" 2>&1; then
   preflight+=("T00 import surface is stale — see $(basename "$RAW")/import-surface.log")
 fi
@@ -320,7 +370,7 @@ if [[ ! -f "$AUDITOR" || ! -f "$(dirname "$AUDITOR")/check_lean_axiom_audit.py" 
 fi
 # Red Team r5 finding 2: the auditor and its checker must be the PINNED files (auditor_pin.json).
 if [[ -n "$AUDITOR" ]]; then
-  if ! pin_out="$(python3 -I - "$HERE/auditor_pin.json" "$AUDITOR" <<'PY'
+  if ! pin_out="$("$PY" -I - "$HERE/auditor_pin.json" "$AUDITOR" <<'PY'
 import hashlib, json, os, sys
 pin = json.load(open(sys.argv[1])); a = sys.argv[2]
 c = os.path.join(os.path.dirname(a), "check_lean_axiom_audit.py")
@@ -336,7 +386,7 @@ PY
 fi
 # The project search path the auditor resolves Mathlib from (the toolchain library goes FIRST,
 # inside the auditor); the per-file audit build dir is appended per file.
-LAKE_LP="$(lake env printenv LEAN_PATH 2>/dev/null || true)"
+LAKE_LP="$("$LAKE_BIN" env printenv LEAN_PATH 2>/dev/null || true)"
 # The Lean-parser layer sees ONLY the pinned packages (Mathlib and its deps), never the project's
 # own build dir: no QBP module, and so no QBP initializer, can be imported by a suite file there.
 PKG_LP="$(tr ':' '\n' <<<"$LAKE_LP" | grep -F '/.lake/packages/' | paste -sd: - || true)"
@@ -344,6 +394,14 @@ PKG_LP="$(tr ':' '\n' <<<"$LAKE_LP" | grep -F '/.lake/packages/' | paste -sd: - 
 # Zero baseline for the checker: any sorry / vacuous True in a suite file is a violation.
 ZERO_BASELINE="$RAW/zero-baseline.json"
 printf '{\n  "sorry": 0,\n  "vacuous-`: True :=` theorem": 0\n}\n' > "$ZERO_BASELINE"
+# ---- raw-record SEAL (Red Team r8 finding 1, MF93) -------------------------------------
+# A file's Lean processes can write anywhere the user can, including an EARLIER file's raw
+# records in RAW while they run. So right after each file's records are complete, their hash is
+# kept IN THIS SHELL'S MEMORY (SEAL), and every seal is re-checked before grading. A record that
+# changed after its seal makes that file FAIL and the run INVALID, unless the file expects it
+# (`TOOLCHECK-EXPECT: records-tampered`, the MF93a decoy that MF93b attacks).
+declare -A SEAL=() FILE_OF=()
+SEAL[__global]="$("$PY" -I -c "$SEAL_PY" "$RAW" __global)"
 
 echo "toolcheck: $TOOLCHAIN · Mathlib $MATHLIB_SHA7 · ${#FILES[@]} file(s) · run $RUN_ID · Tctl now $(tctl) °C"
 
@@ -357,13 +415,19 @@ echo "toolcheck: $TOOLCHAIN · Mathlib $MATHLIB_SHA7 · ${#FILES[@]} file(s) · 
 # always INVALID, and shows what the survivor check below catches.
 # `--mount-proc` gives the namespace its own /proc: Lean finds its own binary through
 # /proc/<pid>/exe, and inside the namespace its pid is 1 (the host's init without it).
-ISO=(unshare --user --map-root-user --fork --pid --mount-proc --kill-child --)
+ISO=("$UNSHARE" --user --map-root-user --fork --pid --mount-proc --kill-child --)
 ISO_OFF=0
 if [[ "${TOOLCHECK_TEST_NO_PIDNS:-0}" == 1 ]]; then
   ISO=(); ISO_OFF=1
   echo "toolcheck: WARNING — TOOLCHECK_TEST_NO_PIDNS=1: PID namespaces OFF (demonstration); this run is INVALID by construction"
-elif ! "${ISO[@]}" true 2>/dev/null; then
-  preflight+=("cannot create a PID namespace (unshare --user --pid): unprivileged user namespaces are disabled on this host")
+else
+  # PROVE the isolation, do not just run it (Red Team r8): inside, the shell must be PID 1 and its
+  # PID namespace must differ from this one's.
+  iso_out="$("${ISO[@]}" /bin/sh -c 'echo $$; readlink /proc/self/ns/pid' 2>/dev/null || true)"
+  if [[ "$(sed -n 1p <<<"$iso_out")" != 1 || -z "$(sed -n 2p <<<"$iso_out")" \
+        || "$(sed -n 2p <<<"$iso_out")" == "$(readlink /proc/self/ns/pid)" ]]; then
+    preflight+=("PID-namespace isolation NOT proven with $UNSHARE (inside: $(tr '\n' ' ' <<<"${iso_out:-nothing}")) — unprivileged user namespaces off?")
+  fi
 fi
 
 # ---- cross-run persistence (Red Team r6 concern 1) -----------------------------------
@@ -389,11 +453,12 @@ fresh_copy
 GDIR="$WORK_TMP/grader"
 mkdir -p "$GDIR"
 (cd "$HERE" && tar --exclude=./results --exclude='./__pycache__' -cf - .) | tar -xf - -C "$GDIR"
-TC_DIR="$(lake env lean --print-prefix 2>/dev/null || true)"
 MAN_TREES="${PKG_LP}:${TC_DIR}"
-MAN_FILES=("$PROOFS/lean-toolchain" "$PROOFS/lakefile.lean" "$CHECKER")
+MAN_FILES=("$PROOFS/lean-toolchain" "$PROOFS/lakefile.lean" "$CHECKER"
+           "$PY" "$UNSHARE" /usr/bin/time /bin/sh /bin/bash "$LEAN_BIN" "$LAKE_BIN")
+[[ "$BOXRUN" != none ]] && MAN_FILES+=("$BOXRUN")
 [[ -n "$AUDITOR" ]] && MAN_FILES+=("$AUDITOR" "$(dirname "$AUDITOR")/check_lean_axiom_audit.py")
-python3 -I -c "$MANIFEST_PY" snapshot "$RAW/inputs.json" "$HERE" "$MAN_TREES" "${MAN_FILES[@]}"
+"$PY" -I -c "$MANIFEST_PY" snapshot "$RAW/inputs.json" "$HERE" "$MAN_TREES" "${MAN_FILES[@]}"
 INPUTS_SHA="$(sha256sum "$RAW/inputs.json" | cut -d' ' -f1)"
 
 # Run a Lean process inside the batch lease (INNER) or its own boxrun lease (per-file mode).
@@ -412,24 +477,24 @@ for f in "${FILES[@]}"; do
   # parses the file with Lean's own parser and elaborates nothing but builtin scope commands, so
   # the file's code never runs here. It runs before every other Lean process on this file, with
   # its own nonce drawn just before it.
-  pnonce="$(python3 -I -c 'import secrets; print(secrets.token_hex(16))')"
+  pnonce="$("$PY" -I -c 'import secrets; print(secrets.token_hex(16))')"
   set +e
   bx "parse-$stem" "${ISO[@]+"${ISO[@]}"}" env -u LEAN_PATH QBP_SUBSET_LEAN_PATH="$PKG_LP" \
-    lean --run "$HERE/LeanSubsetParse.lean" "$pnonce" "$f" \
+    "$LEAN_BIN" --run "$HERE/LeanSubsetParse.lean" "$pnonce" "$f" \
     > "$RAW/$stem.parse.out" 2> "$RAW/$stem.parse.stderr"
   prc=$?
   tf="$TSUITE/${f#"$HERE"/}"   # this file's copy in the throwaway suite
-  python3 -I -c "$MANIFEST_PY" suite "$TSUITE" "$WORK_TMP/copy.before.json"
+  "$PY" -I -c "$MANIFEST_PY" suite "$TSUITE" "$WORK_TMP/copy.before.json"
   if [[ "$INNER" == 1 ]]; then
     (cd "$(dirname "$tf")" && "${ISO[@]+"${ISO[@]}"}" /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
-      lake -d "$PROOFS" env lean --json "$tf") > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
+      "$LAKE_BIN" -d "$PROOFS" env "$LEAN_BIN" --json "$tf") > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
     rc=$?
     label="${TOOLCHECK_BATCH_LABEL:-}"
   else
     label="lean-toolcheck-${stem}-${RUN_ID}"
     (cd "$(dirname "$tf")" && "$BOXRUN" --gpu --mem-mb "$MEM_MB" --timeout "$TIMEOUT" --wait --label "$label" -- \
       "${ISO[@]+"${ISO[@]}"}" /usr/bin/time -f 'TOOLCHECK-TIME wall=%e maxrss_kb=%M' -o "$RAW/$stem.time" \
-      lake -d "$PROOFS" env lean --json "$tf") > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
+      "$LAKE_BIN" -d "$PROOFS" env "$LEAN_BIN" --json "$tf") > "$RAW/$stem.log" 2> "$RAW/$stem.stderr"
     rc=$?
   fi
   set -e
@@ -446,7 +511,7 @@ for f in "${FILES[@]}"; do
   # foundations checker on this file alone (isolated dir: the checker scans a directory)
   cdir="$RAW/checker-$stem"; mkdir -p "$cdir"; cp "$f" "$cdir/"
   set +e
-  python3 -I "$CHECKER" --dir "$cdir" --baseline "$ZERO_BASELINE" > "$RAW/$stem.checker.log" 2>&1
+  "$PY" -I "$CHECKER" --dir "$cdir" --baseline "$ZERO_BASELINE" > "$RAW/$stem.checker.log" 2>&1
   crc=$?
   set -e
   # ---- structural axiom audit: compile in a FRESH process to an .olean, then run the PR #829
@@ -460,30 +525,30 @@ for f in "${FILES[@]}"; do
   cp "$f" "$aud/src/ToolcheckAudit/$stem.lean"
   olean="$aud/build/ToolcheckAudit/$stem.olean"
   set +e
-  (cd "$aud" && bx "audit-c-$stem" "${ISO[@]+"${ISO[@]}"}" lake -d "$PROOFS" env lean -R "$aud/src" -o "$olean" \
+  (cd "$aud" && bx "audit-c-$stem" "${ISO[@]+"${ISO[@]}"}" "$LAKE_BIN" -d "$PROOFS" env "$LEAN_BIN" -R "$aud/src" -o "$olean" \
     "$aud/src/ToolcheckAudit/$stem.lean") > "$RAW/$stem.compile.log" 2>&1
   comp_rc=$?
   olean_ok=0; [[ -s "$olean" ]] && olean_ok=1
-  nonce="$(python3 -I -c 'import secrets; print(secrets.token_hex(16))')"
+  nonce="$("$PY" -I -c 'import secrets; print(secrets.token_hex(16))')"
   arc=""
   if [[ -n "$AUDITOR" && "$olean_ok" == 1 ]]; then
     bx "audit-r-$stem" "${ISO[@]+"${ISO[@]}"}" env -u LEAN_PATH QBP_AUDIT_LEAN_PATH="${LAKE_LP}:$aud/build" \
-      lean --run "$AUDITOR" "$nonce" "$stem" "i:ToolcheckAudit.$stem" "t:ToolcheckAudit.$stem" \
+      "$LEAN_BIN" --run "$AUDITOR" "$nonce" "$stem" "i:ToolcheckAudit.$stem" "t:ToolcheckAudit.$stem" \
       "p:$aud/build" > "$RAW/$stem.audit.out" 2> "$RAW/$stem.audit.stderr"
     arc=$?
   fi
   set -e
-  python3 -I -c "$MANIFEST_PY" suite "$TSUITE" "$WORK_TMP/copy.after.json"
-  writes="$(python3 -I -c "$MANIFEST_PY" diff "$WORK_TMP/copy.before.json" "$WORK_TMP/copy.after.json")"
+  "$PY" -I -c "$MANIFEST_PY" suite "$TSUITE" "$WORK_TMP/copy.after.json"
+  writes="$("$PY" -I -c "$MANIFEST_PY" diff "$WORK_TMP/copy.before.json" "$WORK_TMP/copy.after.json")"
   # SURVIVOR CHECK (Red Team r7 ask 1, second layer): after the file's last Lean process, the
   # throwaway suite copy and the audit area (the cwd of every code-running process) are hashed,
   # and hashed again 1.2 s later. Any change means something the file started is still running.
   for k in a b; do
     [[ "$k" == b ]] && sleep 1.2
-    python3 -I -c "$MANIFEST_PY" all "$TSUITE" "$WORK_TMP/late/s.$k.json"
-    python3 -I -c "$MANIFEST_PY" all "$WORK_TMP/audit" "$WORK_TMP/late/u.$k.json"
+    "$PY" -I -c "$MANIFEST_PY" all "$TSUITE" "$WORK_TMP/late/s.$k.json"
+    "$PY" -I -c "$MANIFEST_PY" all "$WORK_TMP/audit" "$WORK_TMP/late/u.$k.json"
   done
-  late="$(python3 -I - "$WORK_TMP/late" <<'PY'
+  late="$("$PY" -I - "$WORK_TMP/late" <<'PY'
 import json, sys
 w = sys.argv[1]
 out = []
@@ -498,7 +563,7 @@ PY
     echo "toolcheck: SURVIVOR: something $stem started kept writing after its Lean processes ended: $late"
   fi
   [[ "$writes" != "[]" || "$late" != "[]" ]] && fresh_copy   # the next file gets a clean copy
-  python3 -I - "$RAW/$stem.meta.json" "$rc" "$wall" "$mb" "$crc" "$t0" "$t1" "$maxt" "$pauses" \
+  "$PY" -I - "$RAW/$stem.meta.json" "$rc" "$wall" "$mb" "$crc" "$t0" "$t1" "$maxt" "$pauses" \
     "$comp_rc" "$olean_ok" "$arc" "$nonce" "$prc" "$pnonce" "$writes" "$late" <<'PY'
 import json, sys
 p, rc, wall, mb, crc, t0, t1, maxt, pauses, comp, ok, arc, nonce, prc, pnonce, writes, late = sys.argv[1:]
@@ -512,13 +577,14 @@ json.dump({"lean_exit": int(rc), "wall_s": num(wall), "maxrss_mb": num(mb, int),
            "suite_copy_writes": json.loads(writes), "late_writes": json.loads(late)},
           open(p, "w"))
 PY
+  SEAL[$stem]="$("$PY" -I -c "$SEAL_PY" "$RAW" "$stem")"; FILE_OF[$stem]="$f"
   printf '  %-28s lean_exit=%-3s wall=%-6s rss=%-5sMB checker_exit=%s olean=%s audit_exit=%s Tctl=%s→%s\n' \
     "$stem" "$rc" "${wall:-?}" "${mb:-?}" "$crc" "$olean_ok" "${arc:-none}" "${t0:-?}" "${t1:-?}"
 done
 
 # ---- post-run input verification (in memory; Red Team r6 concern 1(a)) -----------------
 set +e
-python3 -I -c "$MANIFEST_PY" verify "$RAW/inputs.json" "$INPUTS_SHA" "$RAW/inputs.verify.json" \
+"$PY" -I -c "$MANIFEST_PY" verify "$RAW/inputs.json" "$INPUTS_SHA" "$RAW/inputs.verify.json" \
   "$HERE" "$MAN_TREES" "${MAN_FILES[@]}"
 vrc=$?
 set -e
@@ -526,12 +592,26 @@ INPUTS_OK=1
 if ((vrc != 0)); then
   INPUTS_OK=0
   echo "toolcheck: INPUT MANIFEST MISMATCH after the run:"
-  python3 -I -c 'import json,sys; [print("  -", p) for p in json.load(open(sys.argv[1]))["problems"]]' \
+  "$PY" -I -c 'import json,sys; [print("  -", p) for p in json.load(open(sys.argv[1]))["problems"]]' \
     "$RAW/inputs.verify.json" || true
 fi
 
+# ---- re-check every seal (no Lean process is alive any more) ---------------------------
+TAMPERED=()
+for k in "${!SEAL[@]}"; do
+  if [[ "$("$PY" -I -c "$SEAL_PY" "$RAW" "$k")" != "${SEAL[$k]}" ]]; then
+    TAMPERED+=("$k")
+    if [[ "$k" == __global ]] || ! grep -q '^TOOLCHECK-EXPECT: records-tampered' "${FILE_OF[$k]}"; then
+      INPUTS_OK=0
+      echo "toolcheck: RAW RECORDS TAMPERED after their seal: $k (written by a later file's process)"
+    fi
+  fi
+done
+"$PY" -I -c 'import json,sys; json.dump({"checked": int(sys.argv[2]), "tampered": sorted(sys.argv[3:])}, open(sys.argv[1], "w"))' \
+  "$RAW/seal.verify.json" "${#SEAL[@]}" "${TAMPERED[@]+"${TAMPERED[@]}"}"
+
 # ---- grade ------------------------------------------------------------------------
-python3 -I - "$RAW/meta.json" "$TOOLCHAIN" "$VERSION" "$MATHLIB_SHA" "$MATHLIB_SHA7" \
+"$PY" -I - "$RAW/meta.json" "$TOOLCHAIN" "$VERSION" "$MATHLIB_SHA" "$MATHLIB_SHA7" \
   "$MANIFEST_MATHLIB_REV" "$LEAN_REPORTED" "$RUN_ID" "$MEM_MB" "$TIMEOUT" "$INNER" "$AUDITOR" \
   "${preflight[@]+"${preflight[@]}"}" <<'PY'
 import json, sys, datetime, os, hashlib
@@ -570,16 +650,16 @@ PY
 set +e
 subset=(); (($# > 0)) && subset=(--only-present)
 # The private grader copy must still match the manifest (Red Team r7 ask 2).
-if ! gchk="$(python3 -I -c "$MANIFEST_PY" suite-check "$RAW/inputs.json" "$INPUTS_SHA" "$GDIR")"; then
+if ! gchk="$("$PY" -I -c "$MANIFEST_PY" suite-check "$RAW/inputs.json" "$INPUTS_SHA" "$GDIR")"; then
   INPUTS_OK=0
   echo "toolcheck: PRIVATE GRADER COPY MISMATCH: $gchk"
 fi
-python3 -I "$GDIR/toolcheck.py" evaluate --raw "$RAW" --suite "$GDIR" --meta "$RAW/meta.json" \
+"$PY" -I "$GDIR/toolcheck.py" evaluate --raw "$RAW" --suite "$GDIR" --meta "$RAW/meta.json" \
   --out-json "$RUN_DIR/${OUT_BASE}.json" --out-md "$RUN_DIR/${OUT_BASE}.md" "${subset[@]+"${subset[@]}"}"
 grc=$?
 OUT_SHA="$(cat "$RUN_DIR/${OUT_BASE}.json" "$RUN_DIR/${OUT_BASE}.md" | sha256sum | cut -d' ' -f1)"
 # Re-verify every input AFTER grading (Red Team r7 ask 3): nothing may have changed since the start.
-python3 -I -c "$MANIFEST_PY" verify "$RAW/inputs.json" "$INPUTS_SHA" "$RAW/inputs.verify2.json" \
+"$PY" -I -c "$MANIFEST_PY" verify "$RAW/inputs.json" "$INPUTS_SHA" "$RAW/inputs.verify2.json" \
   "$HERE" "$MAN_TREES" "${MAN_FILES[@]}"
 vrc2=$?
 set -e

@@ -1,18 +1,18 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `r8a-20261127` (2026-11-27 06:06–06:21 UTC, after merging `origin/master` (PR #829 merged, `a44ff37`); `tools/lean-toolcheck/run.sh --update-baseline`; every Lean
+**Run:** `r9a-20261127` (2026-11-27 15:59–16:13 UTC, Red Team r8 fixes on top of the post-#829 merge; `tools/lean-toolcheck/run.sh --update-baseline`; every Lean
 process in its own PID namespace; input manifest verified after the last Lean process **and again after grading**:
 **ok** both; graded from the private, manifest-checked copy). The auditor is the repo's own
 `scripts/LeanAxiomAudit.lean` on master **`a44ff37`** (sha256 `dd951cbb…`), with checker
 `scripts/check_lean_axiom_audit.py` (sha256 `8fdb8cd2…`, whose own `grade_run` grades the result), both re-pinned in
 `auditor_pin.json`.
 
-**Overall GREEN: 50/50 files as expected.**
+**Overall GREEN: 52/52 files as expected.**
 - **20 tool tests pass.** Each verdict comes from the structural audit, graded by #829's `grade_run`, with every
   file inside the pass-file subset: by **Lean's own parser** (`LeanSubsetParse.lean`, rules L/P) and by the
   Python rules. The subset is the verdict's precondition.
 - **T20** is confirmed outside the subset.
-- **26 must-fail controls are caught:**
+- **28 must-fail controls are caught:**
   - MF05 by the auditor itself;
   - MF14–MF20 by the subset, with the audit failing closed (no `.olean`);
   - **MF21** (T88), **MF22** (T86, a real `axiom cheat`), **MF23** (T89 raw string) and **MF24** (T90 guillemets)
@@ -22,10 +22,13 @@ process in its own PID namespace; input manifest verified after the last Lean pr
     by content, 107,163 package and toolchain files by stat).
   - **MF91** (Red Team r7): its `setsid` daemon heartbeated only while its Lean process lived (attributed to MF91);
     the PID namespace killed it, so **no file had late writes** (survivor check clean everywhere).
+  - **MF93a/MF93b** (Red Team r8): MF93b rewrote the decoy MF93a's raw records in the real run directory during
+    its own Lean run; the raw-record seal caught exactly that (`seal.verify.json`: 53 seals, tampered
+    `[MF93a_SealDecoy]`), and the run stayed valid because the decoy expects it.
 - 3 known-limit probes are confirmed.
-- 131 theorems are cross-checked on stdout.
+- 132 theorems are cross-checked on stdout.
 
-The run used one boxrun lease for 914 s with no thermal pauses (cool start; MemAvailable 10.7 GB at launch).
+The run used one boxrun lease for 868 s with no thermal pauses (cool start; MemAvailable 11.4 GB at launch).
 The `--json` runs peaked at 3814 MB
 RSS. The Lean-parser runs are not timed per file; the pre-run survey measured 1.9–5.0 GB each (it loads the
 imports' environment extensions), inside the 7000 MB boxrun cap.
@@ -133,6 +136,8 @@ same pins that is much slower, or uses much more RSS, than this table is a **fin
 | `must-fail/MF24_GuillemetLexDesync/…` (T90, run `r5b-20261125`) | must-fail | ✅ caught | 0 | 2.47 | 1466 | `[]` (**forged**) | rule R (`«`) + the Lean-parser layer. The structural audit is **clean** (S1) |
 | `must-fail/MF25_WritesSuiteInput/…` (Red Team r6, run `r6a-20261125`) | must-fail | ✅ caught | 0 | 1.26 | 784 | clean (`fine` is `rfl`) | subset (`#eval`: rules A/B/H, Lean layer L) + **writes-detected**: the write landed in the throwaway copy and was attributed to MF25 only |
 | `must-fail/MF91_DetachedSurvivor/…` (Red Team r7, run `r7a-20261127`) | must-fail | ✅ caught | 0 | — | 784 | clean (`fine` is `rfl`) | subset (`#eval`) + **writes-detected** (heartbeats while its Lean process lived); `late_writes: []`, so the daemon died with its PID namespace |
+| `must-fail/MF93a_SealDecoy/…` (Red Team r8 decoy, run `r9a-20261127`) | must-fail | ✅ caught | — | — | — | — (records untrusted) | graded on its seal alone: **records rewritten after their seal**, as expected |
+| `must-fail/MF93b_RawRecordForge/…` (Red Team r8, its MF93) | must-fail | ✅ caught | 0 | 1.16 | 784 | clean (`fine` is `rfl`) | subset (`#eval`); its forge of MF93a's records was caught by the seal |
 | `known-limits/KL01_VacuityBypass/…` | known-limit | 🟡 known limit | 0 | 1.13 | 776 | 2 thm, no axioms | 🟡 confirmed: checker exit 0; both theorems `does not depend on any axioms` — vacuity check is syntactic |
 | `known-limits/KL02_FinFoldlDecide/…` | known-limit | 🟡 known limit | 1 | 1.14 | 776 | — (file rejected) | 🟡 confirmed: elaborator `decide` stuck on `Fin.foldl` ("did not reduce to `isTrue` or `isFalse`") |
 | `known-limits/KL03_CheckerStringComment/…` | known-limit | 🟡 known limit | 0 | 1.15 | 776 | `['QBPToolcheck.KL03.hidden_native._native.native_decide.ax_1_1']` | 🟡 confirmed: checker exit 0 (string-blind stripper misses the `native_decide`); HARD: audit shows the native axiom |
@@ -236,6 +241,11 @@ record's raw logs (`…225231Z`, same files): `python3 -I tools/lean-toolcheck/s
 | late-writes plants: present / record missing / record mistyped (T01) | new | **FAIL** each |
 | real run: MF91 wrote only while alive, no file with late writes | `r7a-20261127` | ✔ |
 | `mutants_grader.py` r7, one mutant per `boxrun --mem-mb 2000` lease: R29, R30 + the Red Team's L9, L10, P1–P4 (KILLED = the selftest reports a failed plant; any other non-zero exit is CRASHED) | new | **7 KILLED, 1 CRASHED, 0 SURVIVED.** KILLED: R29, R30, L9, L10, P1, P2, P3. **P4 CRASHED**: with the missing-field branch skipped, the grader raises `KeyError` on the first deleted field, so the selftest dies before any assertion. The run would be RED (fail-closed), but it is not counted as KILLED. Making a per-file grader exception a FAIL row would make P4 killable (follow-up) |
+| seal plants: T01 marked tampered / decoy's seal held / `seal.verify.json` missing / mistyped | new | **FAIL** each |
+| real run: the seal caught exactly MF93a (53 seals) | `r9a-20261127` | ✔ |
+| **PATH-shim demonstration** (Red Team r8 finding 2): `unshare`, `python3` and `lake` passthrough shims FIRST on `PATH`, T01 only, inside run.sh's boxrun lease (shim dir deleted after) | new | **shims never called**; GREEN 1/1 with real isolation; the manifest records `/usr/bin/python3`, `/usr/bin/unshare`, `/usr/bin/time`, `/bin/sh`, `/bin/bash`, the pinned toolchain's `lean`/`lake` and boxrun's real path |
+| missing-field plants now require the specific message (`field … is missing` / `has the wrong type`), so the shape check is killable; a grader exception is a FAIL row | new | as required |
+| `mutants_grader.py` r8, one per 2000 MB boxrun lease: P4 (re-run), R31 (seal ignored), R32 (decoy's expected tamper unmet ignored), R29 (smoke) | new | **4/4 KILLED** (P4 now KILLED: the missing-field plants require the specific message, and the grader exception became a FAIL row without it) |
 | `command_heads.json` with one T00 import fewer (same pins) | new | **FAIL** |
 | rule isolation: 60 one-construct sources, exact rule tags (adds `simproc_pattern%`, `compile_def%`, `$`, `?_`, `foo%`; spaced `%` allowed) | new | all exact |
 | `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
@@ -348,3 +358,4 @@ text-mode universal newlines (MF11).
 | 2026-11-25 | `r6a-20261125` | Red Team r6 (`9c61306`, APPROVE-WITH-CONCERN): throwaway suite copy for every code-running Lean process with per-file write attribution; pre/post input manifest held in memory by `run.sh` (one function); grade-time re-hash; +MF25; the Lean-parser record schema required and typed; GREEN 49/49; selftest exit 0 (179 rows); mutants R19 + R22–R28 8/8 KILLED (bounded: the earlier mutants were not re-run this round) |
 | 2026-11-27 | `r7a-20261127` | Red Team r7 (`7955bb8`, CHANGES REQUESTED, MF91): per-Lean-process PID namespaces (`unshare --user --map-root-user --fork --pid --mount-proc --kill-child`), per-file survivor check, grader from a private manifest-checked copy, re-verification after grading, sha-checked baseline copy, symlink targets in the tree digest; +MF91; GREEN 50/50; selftest exit 0 (184 rows); mutants (one per 2000 MB boxrun lease): 7 KILLED (R29, R30, L9, L10, P1–P3), 1 CRASHED (P4: `KeyError`, fail-closed), 0 SURVIVED |
 | 2026-11-27 | `r8a-20261127` | Post-merge: `origin/master` merged in (PR #829 merged, `a44ff37`; merge commit, no rebase); auditor + checker re-pinned to master (`dd951cbb…` / `8fdb8cd2…`, incl. #829's round-8 G7 fallback; same CLI and `grade_run` interface); GREEN 50/50; selftest exit 0 (184 rows; the two S1-limit rows now test the STRUCTURAL AUDIT alone, because master's foundations checker also rejects MF21/MF22 replays for an incidental char literal); smoke mutant R29 KILLED (one 2000 MB boxrun lease) |
+| 2026-11-27 | `r9a-20261127` | Red Team r8 (`ae8f7a5`, CHANGES REQUESTED): raw-record seal (+MF93a/MF93b); trusted binaries by absolute path, `PATH` reset, isolation proven in preflight; a grader exception is a FAIL row; GREEN 52/52; selftest exit 0 (191 rows); mutants P4, R31, R32, R29: 4/4 KILLED, 0 CRASHED |

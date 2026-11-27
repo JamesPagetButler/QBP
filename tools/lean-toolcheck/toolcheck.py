@@ -941,6 +941,20 @@ def structural_audit(
     return probs, nonstd
 
 
+def _seal_tampered(raw: Path) -> set[str] | None:
+    """Stems whose raw records changed after their seal, or None if there is no valid record."""
+    try:
+        d = json.loads((raw / "seal.verify.json").read_text())
+    except (OSError, ValueError):
+        return None
+    t = d.get("tampered") if isinstance(d, dict) else None
+    if not isinstance(t, list) or not all(isinstance(x, str) for x in t):
+        return None
+    if not isinstance(d.get("checked"), int) or isinstance(d.get("checked"), bool):
+        return None
+    return set(t)
+
+
 def file_kind(rel: str) -> str:
     if rel.startswith("must-fail/"):
         return "must-fail"
@@ -967,6 +981,46 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
             "detections": [],
             "failures": [
                 "not run (no raw result) — the suite was interrupted or skipped it"
+            ],
+            "result": "FAIL",
+        }
+    # Red Team r8 (MF93): run.sh sealed this file's raw records in memory right after they were
+    # complete, and re-checked every seal before grading (`seal.verify.json`). A record changed
+    # after its seal is UNTRUSTED: the row is decided by the seal alone.
+    seal_tampered = _seal_tampered(raw)
+    expect_kinds = [k for k, _ in expects]
+    if seal_tampered is None or stem in seal_tampered:
+        tampered = seal_tampered is not None
+        ok_t = tampered and "records-tampered" in expect_kinds
+        msg = (
+            "raw records were REWRITTEN after their seal (by a later file's process)"
+            if tampered
+            else "no raw-record seal check (seal.verify.json) in the raw logs"
+        )
+        return {
+            "file": rel,
+            "kind": file_kind(rel),
+            "expect": [f"{k} {a}".strip() for k, a in expects],
+            "lean_exit": None,
+            "wall_s": None,
+            "maxrss_mb": None,
+            "axioms": {},
+            "detections": [msg] if ok_t else [],
+            "failures": [] if ok_t else [msg],
+            "result": "PASS" if ok_t else "FAIL",
+        }
+    if "records-tampered" in expect_kinds:
+        return {
+            "file": rel,
+            "kind": file_kind(rel),
+            "expect": [f"{k} {a}".strip() for k, a in expects],
+            "lean_exit": None,
+            "wall_s": None,
+            "maxrss_mb": None,
+            "axioms": {},
+            "detections": [],
+            "failures": [
+                "expected this file's raw records to be tampered with, but its seal held"
             ],
             "result": "FAIL",
         }
@@ -1217,7 +1271,12 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
                 failures.append(
                     "expected the structural audit to fail, but it is clean"
                 )
-        elif kind in ("grader-refuses", "subset-refused", "writes-detected"):
+        elif kind in (
+            "grader-refuses",
+            "subset-refused",
+            "writes-detected",
+            "records-tampered",
+        ):
             pass  # handled above, before the per-expectation loop
         elif kind == "known-limit":
             check, _, rest = arg.partition(" ")
@@ -1347,7 +1406,29 @@ def cmd_evaluate(a: argparse.Namespace) -> int:
     )
     if a.only_present:
         files = [f for f in files if (raw / f"{f.stem}.meta.json").exists()]
-    rows = [grade(f, raw, suite, meta) for f in files]
+    rows = []
+    for f in files:
+        try:
+            rows.append(grade(f, raw, suite, meta))
+        except (
+            Exception
+        ) as e:  # Red Team r8 ruling: a grader exception is a FAIL row, never a crash
+            rows.append(
+                {
+                    "file": f.relative_to(suite).as_posix(),
+                    "kind": file_kind(f.relative_to(suite).as_posix()),
+                    "expect": [],
+                    "lean_exit": None,
+                    "wall_s": None,
+                    "maxrss_mb": None,
+                    "axioms": {},
+                    "detections": [],
+                    "failures": [
+                        f"grader error while grading this file: {type(e).__name__}: {e}"
+                    ],
+                    "result": "FAIL",
+                }
+            )
     # An empty suite (or an emptied layer) must be RED, never a vacuous GREEN (Gemini on PR #824).
     empty: list[str] = []
     if not rows:
@@ -1357,6 +1438,11 @@ def cmd_evaluate(a: argparse.Namespace) -> int:
             if not any(r["kind"] == layer for r in rows):
                 empty.append(f"the {layer} layer has zero files — RED")
     empty += inputs_problems(raw, suite, not a.skip_input_recheck)
+    st = _seal_tampered(raw)
+    if st is None:
+        empty.append("no raw-record seal check (seal.verify.json) in the raw logs")
+    elif "__global" in st:
+        empty.append("run-level raw records were rewritten after their seal")
     meta.setdefault("preflight_failures", [])
     meta["preflight_failures"] = list(meta["preflight_failures"]) + empty
     ok = all(r["result"] in ("PASS", "KNOWN-LIMIT") for r in rows) and not meta.get(
