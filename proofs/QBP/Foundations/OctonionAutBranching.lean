@@ -527,7 +527,6 @@ theorem gamma_id_iff (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1) :
       rwa [mul_assoc, conj_mul_one_of_unit ha, mul_one] at hx2
     have ha3 : a.coord i3Q = 0 := by
       have e1 := congrArg (fun z : CDAlg ℝ 2 => z.coord i2Q) hc1
-      dsimp only at e1
       rw [mul_e_coord_q, e_mul_coord_q, xor_1Q2Q, mulCoeff2_1Q3Q_antisymm] at e1
       push_cast [neg_mul] at e1
       have hne : (mulCoeff 2 i1Q i3Q : ℝ)
@@ -542,7 +541,6 @@ theorem gamma_id_iff (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1) :
         · exact h6
     have ha2 : a.coord i2Q = 0 := by
       have e1 := congrArg (fun z : CDAlg ℝ 2 => z.coord i3Q) hc1
-      dsimp only at e1
       rw [mul_e_coord_q, e_mul_coord_q, xor_1Q3Q, mulCoeff2_2Q1Q_antisymm] at e1
       push_cast [neg_mul] at e1
       have hne : (mulCoeff 2 i1Q i2Q : ℝ)
@@ -557,7 +555,6 @@ theorem gamma_id_iff (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1) :
         · exact h6
     have ha1 : a.coord i1Q = 0 := by
       have e1 := congrArg (fun z : CDAlg ℝ 2 => z.coord i3Q) hc2
-      dsimp only at e1
       rw [mul_e_coord_q, e_mul_coord_q, xor_2Q3Q, mulCoeff2_2Q1Q_antisymm] at e1
       push_cast [neg_mul] at e1
       have hne : (mulCoeff 2 i1Q i2Q : ℝ)
@@ -596,7 +593,6 @@ theorem gamma_id_iff (a b : CDAlg ℝ 2) (ha : N a = 1) (hb : N b = 1) :
       · subst hi; rw [smul_coord, one_coord, if_pos rfl, mul_one]
       · have hi' : i.val ≠ 0 := fun hcontra => hi (Fin.ext hcontra)
         have hceq := congrArg (fun z : CDAlg ℝ 2 => z.coord i) hac
-        dsimp only at hceq
         rw [conj_coord, if_neg hi'] at hceq
         have hz : a.coord i = 0 := by linarith
         rw [hz, smul_coord, one_coord, if_neg hi, mul_zero]

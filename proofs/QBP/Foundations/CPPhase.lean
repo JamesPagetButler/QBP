@@ -13,7 +13,7 @@
   anchor terminates at a committed, CI-built theorem rather than an untracked file.
   Self-contained (Mathlib `Real.arctan` only). Zero sorry / native_decide.
 -/
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Tactic.NormNum
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan

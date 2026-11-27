@@ -95,7 +95,6 @@ theorem xor_eq_zero_iff (i j : Fin (2^n)) : (i ^^^ j) = 0 ↔ i = j := by
   constructor
   · intro h
     have h2 := congrArg (fun t => (t ^^^ j : Fin (2^n))) h
-    simp only at h2
     rwa [xor_xor_cancel i j, xor_zero_left] at h2
   · intro h; subst h; exact xor_self_eq i
 

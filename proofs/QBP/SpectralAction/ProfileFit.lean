@@ -43,7 +43,7 @@
   Best-practices: ~/Documents/inter/lean-proof-best-practices.md,
   ~/Documents/QBP-implementor/docs/cth/proof-anchor-best-practices.md.
 -/
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Tactic
 

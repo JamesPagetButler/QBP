@@ -29,7 +29,7 @@
   definitional `rfl` trick.  See the per-theorem docstrings for the precise
   split of "proven outright" vs "assumed as documented hypothesis".
 -/
-import Mathlib.Data.Real.Sign
+import Mathlib.Basic.Real.Sign
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Fintype.Fin
 import Mathlib.Logic.Equiv.Basic
