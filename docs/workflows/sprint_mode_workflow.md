@@ -228,9 +228,7 @@ Every Oppenheimer-approved merge under the AI Gate logs:
 - Any CONTESTED items + their resolution
 - Logged via Gemini MCP `record_decision` tool OR as a sticky PR comment with header `oppenheimer-gate-log`
 
-**Git revert safety (deferred AC from #383):**
-
-The "test revert path on a dummy branch" AC is **deferred to a follow-up issue**. Justification: documentation alone doesn't validate the revert path; a small focused exercise on a throwaway branch is the right verification mechanism, separate from this docs PR. Tracking the deferral.
+**Git revert safety:** see [§Git Revert Safety](#git-revert-safety) below (the #383 deferred AC, delivered by #734 with the dummy-branch test on record).
 
 **Precedent operational use (2026-05-13 through 2026-05-15):**
 
@@ -404,7 +402,7 @@ Remove any entry that:
 ## Safety Rails
 
 ### Prohibited Actions
-- `git push --force`, `git reset --hard`
+- `git push --force` (confirm-first everywhere); `git reset` of any mode on a shared branch — see [Git Revert Safety](#git-revert-safety)
 - Direct commits to master
 - Closing issues without AC verification
 - Skipping required reviews
@@ -422,6 +420,156 @@ If Sprint Mode must be interrupted:
 2. Document state in SPRINT_STATUS.md
 3. Note return point clearly
 4. Exit Sprint Mode cleanly
+
+---
+
+## Git Revert Safety
+
+Delivered by #734 (the #383 deferred AC). Four blocks: what we tag, how we undo, what the
+Oppenheimer gate checks before a merge, and how each action is logged. The dummy-branch test
+that validates the revert path is on record at
+[`analysis/734-revert-safety-test-log.md`](../../analysis/734-revert-safety-test-log.md).
+
+### Tagging strategy
+
+Tags are the recovery anchors: a revert decision is made relative to the nearest tag, never
+relative to "whatever HEAD was yesterday".
+
+| Event | Tag name | Who creates + pushes | When |
+|---|---|---|---|
+| Sprint opens (scope ratified, Oppenheimer Gate engaged) | `sprint-N-open` | beekeeper or herschel (sprint-driver) | on the merge-base commit the sprint branches from |
+| Sprint closes (close runbook run in full) | `sprint-N-close` | beekeeper or herschel | on the master commit after the last sprint PR merges |
+| Theory-bearing PR (Tier 3 / `proofs/` / `docs/foundations/`) about to merge | `pre-merge-<PR>` | the merging seat, immediately before `gh pr merge` | on the master commit the PR will land on |
+| Anchor-ledger version bump (CTH ledger) | `ledger-vX.Y.Z` | the seat that merges the bump (cth-implementor lane) | on the merge commit that carries the new version |
+| Pre-registration frozen (spike runbook) | `prereg-<slug>-frozen-vN` | the spike director, after the sha256 is posted on the issue | on the commit that contains the FROZEN document |
+
+Rules:
+
+- **Annotated tags only** (`git tag -a`), message = the issue/PR number and one line of context.
+  Lightweight tags carry no author or date and cannot be signed.
+- **Signed where the signer is available** (`git tag -s`): the beekeeper's YubiKey GPG key signs
+  sprint and ledger tags; seats without a key use `-a` and say so in the tag message.
+- **Push a tag by name** — `git push origin sprint-N-open` — never `git push --tags` (it sweeps up
+  local scratch tags) and never `git push -f origin <tag>`: moving a tag is a force-push and is
+  confirm-first like every other force-push (below).
+- A tag is immutable once pushed. A wrong tag is corrected by a **new** tag (`…-v2`) plus a note
+  on the issue, not by deletion.
+- Tags never substitute for the ledger or the pre-registration sha256; they locate the commit the
+  recorded sha256 belongs to.
+- **Authority note.** A tag push by a seat is a new write category not covered by the standing
+  federation authorizations. Until the beekeeper ratifies this section, every tag in the table is
+  created and pushed by the beekeeper (seats may *propose* the tag name + commit on the issue).
+
+### Revert-vs-reset decision tree
+
+`git revert` is the default. `git reset` of any kind — `--soft`, `--mixed`, `--hard` — is
+**forbidden on shared branches**: master, and any pushed PR branch another seat has fetched. All
+three modes rewrite published history on the next push and silently drop the collaborator's view
+of it (the test log shows exactly what a collaborator loses).
+
+```
+A bad change has landed. Where?
+│
+├─ Local-only branch nobody else has fetched
+│    → reset / amend / rebase are fine (your history, your risk).
+│
+└─ Shared branch (master, or a pushed PR branch another seat has fetched)
+     → git reset is FORBIDDEN (any mode). Choose:
+     │
+     ├─ Is the bad commit already built upon (later commits depend on its content)?
+     │    └─ yes → NEW FORWARD COMMIT that fixes the state. A revert would conflict
+     │             with or silently undo the dependent work.
+     │
+     ├─ Would a revert re-open a closed ledger version or a FROZEN pre-registration?
+     │    └─ yes → NEW FORWARD COMMIT that bumps the version (ledger-vX.Y.Z+1,
+     │             prereg …-frozen-vN+1). Closed versions are never un-closed.
+     │
+     └─ otherwise → git revert <sha> --no-edit, one revert per bad commit, NEWEST
+                    first (reverse chronological: C, then B, then A — reverting the
+                    oldest while its dependants stand guarantees conflicts); keep the
+                    auto message, add the rationale in the log entry. A revert of a
+                    TRUE merge commit uses -m 1 (parent 1 = the target branch); this
+                    repo squash-merges, so a landed PR is one ordinary commit and
+                    needs no -m. Either way the revert is a PR like any other.
+```
+
+- Expect a conflict when neighbouring commits touch adjacent lines (the #734 test reverted the
+  middle of three one-line appends and conflicted): resolve by hand, `git add`, `git revert
+  --continue`; `--no-edit` only helps when the revert applies cleanly. Git also refuses `git switch`
+  mid-revert and `git branch -D` of the checked-out branch — finish or `--abort` first.
+- A revert on master goes through a PR with the same review tier as the change it undoes;
+  "it is only a revert" does not lower the tier.
+- **Force-push is confirm-first everywhere**, on every repo, regardless of ownership or interim
+  write-grant — workspace `CLAUDE.md` §Federation-mode standing authorizations ("Force-push stays
+  confirm-first … regardless of repo ownership or interim grant"). A classifier block on a
+  force-push is the rule working, not an obstacle to route around.
+- Never `git stash` in a shared worktree stack and never `git reset --hard` outside a throwaway
+  clone; the `worktree-isolation` hard gate exists because a shared tree lost data (2026-05-14).
+
+### Oppenheimer-gate checklist
+
+The gate "synthesises Red Team + Gemini findings" (flow step 4 above). Synthesis is not a
+verdict; before the merge the gate ticks all four groups, citing the artifact for each tick.
+
+- **Correctness**
+  - [ ] every statement in the PR matches its proof or evidence (theorem text = the claim; a
+        number in prose = the number in the measurement file)
+  - [ ] every derived formula or sign is checked against two known limits and the check is
+        asserted in the PR (the w_eff sign in PR #774 was missed by both reviewers and caught only by
+        a two-limit check)
+  - [ ] the anchoring rule holds: no unanchored BLOCKING claim in any review (`review_tiers.md`)
+- **Scope**
+  - [ ] the diff is a subset of the tracked issue's ACs; anything else is split out or named as
+        an explicit, reviewed addition
+  - [ ] no theory smuggled into a housekeeping PR (tier 3 / `proofs/` / `docs/foundations/`
+        content in a `housekeeping`-labelled PR is a BLOCK and a re-tier)
+- **Tests**
+  - [ ] CI green at the **head** sha, read from `gh pr checks` at the moment of the verdict
+  - [ ] every test-plan box ticked, or ⊘-nil'd with a reason (`- [ ] ~~option~~ ⊘ reason`)
+  - [ ] a refactor shows which existing tests cover each changed path
+- **AC verification**
+  - [ ] each AC of the tracked issue ticked on the issue with the evidence link that satisfies it
+  - [ ] `Closes #N` present only when every AC of #N is met; `Tracks #N` when legs remain
+  - [ ] `mergeStateStatus == CLEAN` (branch current, not BEHIND) in the readiness line
+
+A gate verdict is APPROVE / APPROVE-WITH-CONCERN / DEFER. A DEFER names the box that is not
+ticked. The gate never ticks a box on the author's word (evidence-first discipline).
+
+### Logging format
+
+**Per-action entry.** Every Oppenheimer-approved merge and every revert or forward-fix on a
+shared branch logs the fields in *Decision logging* above (PR + summary, reviewer verdicts,
+anchor-rule check, CONTESTED items) **plus**:
+
+- `rationale` — why this action and not nothing
+- `alternatives considered` — the branches of the decision tree that were rejected, one clause each
+- `risk` — what could still be wrong after this action, and who watches for it
+
+**Phase-boundary summary.** At sprint open, at sprint close and at each merge to master, one
+entry with: `what changed` (PRs/commits, tag), `what was reverted` (sha → revert sha, or "none"),
+`open risks` (carried forward, each with an owner). It is posted where the per-action log lives
+(Gemini MCP `record_decision`, or a sticky PR / tracking-issue comment headed
+`oppenheimer-gate-log`).
+
+Filled example (merge boundary):
+
+```
+oppenheimer-gate-log · merge · PR #NNN · 2026-11-01T03:10Z
+summary: revert of 1a2b3c4 (ledger row 17 re-tagged PROOF without a proof artifact)
+verdicts: Red Team APPROVE (3/3) · Gemini APPROVE · §I4 ack cth-implementor
+anchor-rule: PASS — the revert cites the missing artifact, not an opinion
+contested: none
+rationale: row 17 claimed PROOF with no Lean file; the ledger must not carry an
+  unbacked PROOF across the sprint-5-open tag
+alternatives considered: forward commit re-tagging to ARGUMENT (rejected — the
+  original commit had no other content, revert is exact); reset (forbidden, shared)
+risk: a downstream edge may already cite row 17 as PROOF — cth-implementor re-runs
+  the inverse-audit tool; owner: cth-implementor, due before sprint-5-open
+--- phase boundary ---
+what changed: PR #NNN merged at d4e5f6a; tag pre-merge-NNN on c3d2e1f
+what was reverted: 1a2b3c4 → d4e5f6a
+open risks: inverse-audit re-run pending (cth-implementor)
+```
 
 ---
 
