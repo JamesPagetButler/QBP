@@ -1,0 +1,22 @@
+/-
+TOOLCHECK MF95 — DEMONSTRATION FILE ONLY (Red Team r9 on PR #824). `run_demo.sh` fills in
+@RAWGLOB@ (the scratch copy's results/runs/*/raw) and installs this as a must-fail.
+
+During its own `--json` run, its `#eval` appends one byte to T96's log in the newest run
+directory of the scratch copy, breaking T96's seal.
+
+TOOLCHECK-EXPECT: lean-ok
+TOOLCHECK-EXPECT: subset-refused
+-/
+
+namespace QBPToolcheck.MF95
+
+theorem fine : (1 : Nat) = 1 := rfl
+
+end QBPToolcheck.MF95
+
+#eval show IO Unit from do
+  let script := "d=$(ls -td @RAWGLOB@ 2>/dev/null | head -1); [ -f \"$d/T96_PassDecoy.log\" ] && printf x >> \"$d/T96_PassDecoy.log\"; exit 0"
+  let _ ← IO.Process.output { cmd := "bash", args := #["-c", script] }
+
+#print axioms QBPToolcheck.MF95.fine

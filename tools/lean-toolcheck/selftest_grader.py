@@ -1132,6 +1132,12 @@ for tag, mut, name in (
         lambda d: (d / "seal.verify.json").unlink(),
         "T01_DecideFin.lean",
     ),
+    # Red Team r9 Q4: with NO seal record, the decoy must not be accepted either.
+    (
+        "seal-record-missing-decoy",
+        lambda d: (d / "seal.verify.json").unlink(),
+        "MF93a_SealDecoy.lean",
+    ),
     (
         "seal-record-mistyped",
         _seal_edit(lambda m: m.update(tampered="T01_DecideFin")),
@@ -1139,6 +1145,70 @@ for tag, mut, name in (
     ),
 ):
     planted(tag, mut, [name], "FAIL")
+# Red Team r9 Q3: a broken RUN-LEVEL seal (`__global`) must make the run RED.
+dG = work / "raw-seal-global-tampered"
+shutil.copytree(raw, dG)
+_sg = json.loads((dG / "seal.verify.json").read_text())
+_sg["tampered"] = sorted(set(_sg["tampered"]) | {"__global"})
+(dG / "seal.verify.json").write_text(json.dumps(_sg))
+res = evaluate(new_tc, dG, suite, "seal-global-tampered")
+good = res["overall"] == "RED" and any("run-level raw records" in x for x in res["pre"])
+ok = ok and good
+results.append(
+    (
+        "plant[seal-global-tampered] __global seal broken (run must be RED by the run-level check)",
+        f"overall {res['overall']}; {res['pre'][:1]}",
+        "",
+    )
+)
+shutil.rmtree(dG, ignore_errors=True)
+
+# Red Team r9 Q5: a raw record that makes grade() RAISE must become a FAIL row naming the
+# exception (T01's per-file meta replaced by a JSON list).
+planted(
+    "grade-raises",
+    lambda d: (d / "T01_DecideFin.meta.json").write_text("[]"),
+    ["T01_DecideFin.lean"],
+    "FAIL",
+    "grader error while grading this file",
+)
+
+# Red Team r9 finding 1 (T96 + MF95): a PASS-labelled file listing `records-tampered`, whose
+# records a later file rewrote, must FAIL (never be exempt). Grader-level regression: the real
+# run's tampered decoy records are replayed as tests/T96s (pass + records-tampered); the real-Lean
+# demonstration is demos/T96_MF95/run_demo.sh.
+sT = work / "suite-t96s"
+shutil.copytree(suite, sT, ignore=shutil.ignore_patterns("results"))
+_src = (suite / "must-fail/MF93a_SealDecoy/MF93a_SealDecoy.lean").read_text()
+(sT / "tests" / "T96s_PassDecoyReplay.lean").write_text(
+    _src.replace(
+        "TOOLCHECK-EXPECT: records-tampered",
+        "TOOLCHECK-EXPECT: pass\nTOOLCHECK-EXPECT: records-tampered",
+    )
+)
+rT = work / "raw-t96s"
+shutil.copytree(raw, rT)
+for q in list(rT.glob("MF93a_SealDecoy.*")):
+    shutil.copy(q, rT / q.name.replace("MF93a_SealDecoy", "T96s_PassDecoyReplay"))
+_st = json.loads((rT / "seal.verify.json").read_text())
+_st["tampered"] = sorted(set(_st["tampered"]) | {"T96s_PassDecoyReplay"})
+(rT / "seal.verify.json").write_text(json.dumps(_st))
+res = evaluate(sT / "toolcheck.py", rT, sT, "t96s")
+fT = res["rows"]["T96s_PassDecoyReplay.lean"]
+good = fT["result"] == "FAIL" and any(
+    "allowed only for a must-fail decoy" in x for x in fT["failures"]
+)
+ok = ok and good
+results.append(
+    (
+        "plant[T96s] pass-labelled file + records-tampered, records rewritten (must FAIL, never exempt)",
+        row(res, "T96s_PassDecoyReplay.lean"),
+        f"overall {res['overall']}",
+    )
+)
+shutil.rmtree(sT, ignore_errors=True)
+shutil.rmtree(rT, ignore_errors=True)
+
 seal = json.loads((raw / "seal.verify.json").read_text())
 r93 = seal.get("tampered") == ["MF93a_SealDecoy"]
 ok = ok and r93

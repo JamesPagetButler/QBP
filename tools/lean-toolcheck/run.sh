@@ -601,7 +601,11 @@ TAMPERED=()
 for k in "${!SEAL[@]}"; do
   if [[ "$("$PY" -I -c "$SEAL_PY" "$RAW" "$k")" != "${SEAL[$k]}" ]]; then
     TAMPERED+=("$k")
-    if [[ "$k" == __global ]] || ! grep -q '^TOOLCHECK-EXPECT: records-tampered' "${FILE_OF[$k]}"; then
+    # The exemption holds ONLY for a must-fail decoy (Red Team r9, T96 + MF95): the file must be
+    # in must-fail/, list records-tampered, and never claim `pass`.
+    if [[ "$k" == __global || "${FILE_OF[$k]}" != "$HERE"/must-fail/* ]] \
+       || ! grep -q '^TOOLCHECK-EXPECT: records-tampered' "${FILE_OF[$k]}" \
+       || grep -q '^TOOLCHECK-EXPECT: pass' "${FILE_OF[$k]}"; then
       INPUTS_OK=0
       echo "toolcheck: RAW RECORDS TAMPERED after their seal: $k (written by a later file's process)"
     fi

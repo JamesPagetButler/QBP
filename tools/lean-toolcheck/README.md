@@ -72,7 +72,10 @@ fails the run and is never retried.
 >   lives. A file's Lean process could rewrite an **earlier** file's raw records in the run directory. So `run.sh` hashes
 >   each file's records into its own memory as soon as they are complete, and re-checks every seal before grading
 >   (`seal.verify.json`). A broken seal makes that file FAIL and the run INVALID, unless the file expects it: the
->   decoy MF93a, which MF93b attacks.
+>   decoy MF93a, which MF93b attacks. **That exemption is for a must-fail decoy only (Red Team r9, T96 + MF95):**
+>   `TOOLCHECK-EXPECT: records-tampered` outside `must-fail/`, or together with `pass`, is a FAIL row in the grader,
+>   and `run.sh` grants the INVALID exemption only to a file in `must-fail/` that lists it and never lists `pass`.
+>   `demos/T96_MF95/run_demo.sh` replays the attack on a scratch copy (BEFORE `df2b03e`: forged GREEN; now: INVALID).
 > - **No trusted binary comes from `PATH` (Red Team r8).** `run.sh` uses `/usr/bin/python3`, `/usr/bin/unshare`,
 >   `/usr/bin/time` and `/bin/sh`; `lean` and `lake` come from the pinned toolchain directory, not the elan shims;
 >   `boxrun` is resolved once to its real path. All of them are in the input manifest. `PATH` is then reset to

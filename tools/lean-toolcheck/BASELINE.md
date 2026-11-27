@@ -1,6 +1,6 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `r9a-20261127` (2026-11-27 15:59–16:13 UTC, Red Team r8 fixes on top of the post-#829 merge; `tools/lean-toolcheck/run.sh --update-baseline`; every Lean
+**Run:** `r10a-20261127` (2026-11-27 18:58–19:13 UTC, Red Team r9 fixes; `tools/lean-toolcheck/run.sh --update-baseline`; every Lean
 process in its own PID namespace; input manifest verified after the last Lean process **and again after grading**:
 **ok** both; graded from the private, manifest-checked copy). The auditor is the repo's own
 `scripts/LeanAxiomAudit.lean` on master **`a44ff37`** (sha256 `dd951cbb…`), with checker
@@ -28,7 +28,7 @@ process in its own PID namespace; input manifest verified after the last Lean pr
 - 3 known-limit probes are confirmed.
 - 132 theorems are cross-checked on stdout.
 
-The run used one boxrun lease for 868 s with no thermal pauses (cool start; MemAvailable 11.4 GB at launch).
+The run used one boxrun lease for 919 s with no thermal pauses (cool start; MemAvailable 11.0 GB at launch).
 The `--json` runs peaked at 3814 MB
 RSS. The Lean-parser runs are not timed per file; the pre-run survey measured 1.9–5.0 GB each (it loads the
 imports' environment extensions), inside the 7000 MB boxrun cap.
@@ -246,6 +246,14 @@ record's raw logs (`…225231Z`, same files): `python3 -I tools/lean-toolcheck/s
 | **PATH-shim demonstration** (Red Team r8 finding 2): `unshare`, `python3` and `lake` passthrough shims FIRST on `PATH`, T01 only, inside run.sh's boxrun lease (shim dir deleted after) | new | **shims never called**; GREEN 1/1 with real isolation; the manifest records `/usr/bin/python3`, `/usr/bin/unshare`, `/usr/bin/time`, `/bin/sh`, `/bin/bash`, the pinned toolchain's `lean`/`lake` and boxrun's real path |
 | missing-field plants now require the specific message (`field … is missing` / `has the wrong type`), so the shape check is killable; a grader exception is a FAIL row | new | as required |
 | `mutants_grader.py` r8, one per 2000 MB boxrun lease: P4 (re-run), R31 (seal ignored), R32 (decoy's expected tamper unmet ignored), R29 (smoke) | new | **4/4 KILLED** (P4 now KILLED: the missing-field plants require the specific message, and the grader exception became a FAIL row without it) |
+| **T96 + MF95 real-Lean demonstration** (`demos/T96_MF95/run_demo.sh`, scratch suite copy of T00, T01, T96, MF95, KL01; run.sh's own boxrun lease, 7000 MB) | **BEFORE `df2b03e`** | T96 (false `decide`, Lean exit 1) **✅ PASS**, run **GREEN 5/5, exit 0** (forged) |
+| same | **new** | T96 **❌ FAIL** (`records-tampered` is allowed only for a must-fail decoy); `run.sh`: RAW RECORDS TAMPERED, exemption refused; run **RED + INVALID, exit 1** |
+| selftest replay T96s (the real tampered decoy records as a pass-labelled tests/ file listing `records-tampered`) | new | **FAIL** with the restriction message |
+| Q3 plant: `seal.verify.json` with `__global` tampered | new | run **RED** by the run-level check |
+| Q4 plant: no `seal.verify.json`, decoy MF93a | new | decoy **FAIL** |
+| Q5 plant: T01's per-file meta is a JSON list, so `grade()` raises | new | a **FAIL row** naming `AttributeError` |
+| `mutants_grader.py` r9: a KILLED mutant must flip a NAMED selftest row against the unmutated baseline (else CRASHED); R33, Q1–Q5, P4, one 2000 MB boxrun lease each | new | **7/7 KILLED**: R33 by `plant[T96s]`; Q1 by `plant[seal-record-missing]`; Q2 by `real run, NEW grader`; Q3 by `plant[seal-global-tampered]`; Q4 by `plant[seal-record-missing-decoy]`; Q5 by `plant[grade-raises]`; P4 by `plant[field-missing-header-imports]` |
+| selftest row count | — | **195** with the OLD-grader argument, **177** without: the 18 OLD-grader replay rows appear only when the 4th argument is given (`grep -c '^| '` on the selftest output). At `df2b03e` that was 191 vs 173 |
 | `command_heads.json` with one T00 import fewer (same pins) | new | **FAIL** |
 | rule isolation: 60 one-construct sources, exact rule tags (adds `simproc_pattern%`, `compile_def%`, `$`, `?_`, `foo%`; spaced `%` allowed) | new | all exact |
 | `run.sh ZZZ` (prefix matches nothing) | runner | **REFUSED**, exit 2 |
@@ -359,3 +367,4 @@ text-mode universal newlines (MF11).
 | 2026-11-27 | `r7a-20261127` | Red Team r7 (`7955bb8`, CHANGES REQUESTED, MF91): per-Lean-process PID namespaces (`unshare --user --map-root-user --fork --pid --mount-proc --kill-child`), per-file survivor check, grader from a private manifest-checked copy, re-verification after grading, sha-checked baseline copy, symlink targets in the tree digest; +MF91; GREEN 50/50; selftest exit 0 (184 rows); mutants (one per 2000 MB boxrun lease): 7 KILLED (R29, R30, L9, L10, P1–P3), 1 CRASHED (P4: `KeyError`, fail-closed), 0 SURVIVED |
 | 2026-11-27 | `r8a-20261127` | Post-merge: `origin/master` merged in (PR #829 merged, `a44ff37`; merge commit, no rebase); auditor + checker re-pinned to master (`dd951cbb…` / `8fdb8cd2…`, incl. #829's round-8 G7 fallback; same CLI and `grade_run` interface); GREEN 50/50; selftest exit 0 (184 rows; the two S1-limit rows now test the STRUCTURAL AUDIT alone, because master's foundations checker also rejects MF21/MF22 replays for an incidental char literal); smoke mutant R29 KILLED (one 2000 MB boxrun lease) |
 | 2026-11-27 | `r9a-20261127` | Red Team r8 (`ae8f7a5`, CHANGES REQUESTED): raw-record seal (+MF93a/MF93b); trusted binaries by absolute path, `PATH` reset, isolation proven in preflight; a grader exception is a FAIL row; GREEN 52/52; selftest exit 0 (191 rows); mutants P4, R31, R32, R29: 4/4 KILLED, 0 CRASHED |
+| 2026-11-27 | `r10a-20261127` | Red Team r9 (`df2b03e`, CHANGES REQUESTED): `records-tampered` limited to must-fail decoys (grader + run.sh); T96 + MF95 regression (selftest replay + demo, BEFORE forged GREEN / AFTER INVALID); Q3/Q4/Q5 plants; mutant kills must name a row; GREEN 52/52; selftest exit 0 (195 rows with OLD, 177 without); mutants 7/7 KILLED |

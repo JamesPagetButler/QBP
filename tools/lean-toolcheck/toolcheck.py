@@ -989,6 +989,26 @@ def grade(src_path: Path, raw: Path, suite: Path, run_meta: dict) -> dict:
     # after its seal is UNTRUSTED: the row is decided by the seal alone.
     seal_tampered = _seal_tampered(raw)
     expect_kinds = [k for k, _ in expects]
+    # Red Team r9 (T96 + MF95): the decoy exemption is ONLY for must-fail files, and never for a
+    # file that also claims to pass. Any other use is refused outright, tampered or not.
+    if "records-tampered" in expect_kinds and (
+        file_kind(rel) != "must-fail" or "pass" in expect_kinds
+    ):
+        return {
+            "file": rel,
+            "kind": file_kind(rel),
+            "expect": [f"{k} {a}".strip() for k, a in expects],
+            "lean_exit": None,
+            "wall_s": None,
+            "maxrss_mb": None,
+            "axioms": {},
+            "detections": [],
+            "failures": [
+                "`TOOLCHECK-EXPECT: records-tampered` is allowed only for a must-fail decoy "
+                "(in must-fail/, never with `pass`)"
+            ],
+            "result": "FAIL",
+        }
     if seal_tampered is None or stem in seal_tampered:
         tampered = seal_tampered is not None
         ok_t = tampered and "records-tampered" in expect_kinds

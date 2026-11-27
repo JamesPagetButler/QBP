@@ -14,6 +14,7 @@ assertion failed); a non-zero exit without that line (an exception, an OOM kill)
 Disk: about 0.3 GB peak (one mutant's work dir at a time; each is deleted after its run).
 """
 
+import json
 import os
 import re
 import shutil
@@ -393,6 +394,39 @@ M.update(
         "R32 decoy's expected tamper unmet ignored": [
             ('    if "records-tampered" in expect_kinds:\n', "    if False:\n")
         ],
+        "R33 records-tampered restriction off (Red Team r9 finding 1)": [
+            (
+                '    if "records-tampered" in expect_kinds and (\n        file_kind(rel) != "must-fail" or "pass" in expect_kinds\n    ):',
+                "    if False:",
+            )
+        ],
+        "Q1 seal record missing treated as clean (Red Team r9)": [
+            (
+                '        d = json.loads((raw / "seal.verify.json").read_text())\n    except (OSError, ValueError):\n        return None',
+                '        d = json.loads((raw / "seal.verify.json").read_text())\n    except (OSError, ValueError):\n        return set()',
+            )
+        ],
+        "Q2 tampered stems ignored (Red Team r9)": [
+            (
+                "    if seal_tampered is None or stem in seal_tampered:\n",
+                "    if seal_tampered is None:\n",
+            )
+        ],
+        "Q3 global seal tamper not a failure (Red Team r9)": [
+            ('    elif "__global" in st:\n', "    elif False:\n")
+        ],
+        "Q4 decoy accepted with no seal record (Red Team r9)": [
+            (
+                '        ok_t = tampered and "records-tampered" in expect_kinds\n',
+                '        ok_t = (tampered or seal_tampered is None) and "records-tampered" in expect_kinds\n',
+            )
+        ],
+        "Q5 per-file exception handling reverted (Red Team r9)": [
+            (
+                "        except (\n            Exception\n        ) as e:",
+                "        except (\n            ZeroDivisionError\n        ) as e:",
+            )
+        ],
         "R28 manifest records not required": [
             (
                 '        return [\n            "no input manifest / verification record',
@@ -418,6 +452,52 @@ if _flt or _stride > 1:
         f"(bounded run: {len(keep)} of {len(M)} mutants; filter {_flt!r}, stride {_stride})"
     )
     M = keep
+
+
+def _rows(out: str, base_dir: Path) -> dict[str, str]:
+    """Selftest table rows keyed by their label, run-specific paths normalised."""
+    t = out.replace(str(base_dir), "<D>")
+    r: dict[str, str] = {}
+    for ln in t.splitlines():
+        if ln.startswith("| ") and ln.count("|") >= 3:
+            r.setdefault(ln.split("|")[1].strip(), ln)
+    return r
+
+
+def _selftest(sdir: Path, wdir: Path):
+    return subprocess.run(
+        [
+            "python3",
+            "-I",
+            str(suite / "selftest_grader.py"),
+            str(sdir),
+            str(raw),
+            str(wdir),
+        ],
+        capture_output=True,
+        text=True,
+    )
+
+
+# The UNMUTATED selftest, once (cached in MUTANTS_BASELINE if set): a mutant is KILLED only if
+# the selftest reports `selftest: FAILED` AND at least one named row differs from this baseline.
+_bfile = os.environ.get("MUTANTS_BASELINE")
+if _bfile and Path(_bfile).exists():
+    BASE = json.loads(Path(_bfile).read_text())
+else:
+    bd = work / "baseline"
+    if bd.exists():
+        shutil.rmtree(bd)
+    shutil.copytree(suite, bd / "suite", ignore=shutil.ignore_patterns("results"))
+    rb = _selftest(bd / "suite", bd / "w")
+    if rb.returncode != 0:
+        print("baseline selftest FAILED: no mutant can be graded")
+        sys.exit(2)
+    BASE = _rows(rb.stdout, bd)
+    shutil.rmtree(bd, ignore_errors=True)
+    if _bfile:
+        Path(_bfile).write_text(json.dumps(BASE))
+
 rows = []
 for name, reps in M.items():
     s = src
@@ -433,22 +513,18 @@ for name, reps in M.items():
             shutil.rmtree(d)
         shutil.copytree(suite, d / "suite", ignore=shutil.ignore_patterns("results"))
         (d / "suite" / "toolcheck.py").write_text(s)
-        r = subprocess.run(
-            [
-                "python3",
-                "-I",
-                str(suite / "selftest_grader.py"),
-                str(d / "suite"),
-                str(raw),
-                str(d / "w"),
-            ],
-            capture_output=True,
-            text=True,
-        )
+        r = _selftest(d / "suite", d / "w")
         if r.returncode == 0:
             verdict = "SURVIVED"
         elif "selftest: FAILED" in r.stdout:
-            verdict = "KILLED"  # a plant's assertion failed
+            mrows = _rows(r.stdout, d)
+            flipped = [k for k in BASE if mrows.get(k) != BASE[k]]
+            verdict = (
+                f"KILLED by: {flipped[0][:110]}"
+                + (f" (+{len(flipped) - 1} more rows)" if len(flipped) > 1 else "")
+                if flipped
+                else "CRASHED (selftest FAILED but no named row differs from the baseline)"
+            )
         else:
             verdict = f"CRASHED (exit {r.returncode}, no failing assertion)"
         rows.append((name, verdict))
@@ -457,7 +533,7 @@ for name, reps in M.items():
         shutil.rmtree(d, ignore_errors=True)
 for mname, v in rows:
     print(f"| {mname} | {v} |")
-k = sum(v == "KILLED" for _, v in rows)
+k = sum(v.startswith("KILLED") for _, v in rows)
 print(f"KILLED {k} / {len(rows)}; SURVIVED {sum(v == 'SURVIVED' for _, v in rows)}")
 ent = [(n, v) for n, v in rows if n.startswith("E ")]
 print(
