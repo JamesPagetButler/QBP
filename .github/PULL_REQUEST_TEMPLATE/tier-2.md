@@ -93,7 +93,7 @@ Routing rubric: docs/workflows/pr7_conflict_routing_rubric.md (v0.2)
      proofs/, docs/theory/, docs/foundations/, paper/, archive/cth-inventory/ and no merge-lane
      file (CONTRIBUTING.md, review_tiers.md, these templates, CODEOWNERS, the review/box/label/
      tier/merge/close-gate workflows and their scripts, or a workflow / composite-action edit
-     that grants write, uses a non-GITHUB_TOKEN secret or calls gh pr merge/edit/close /
+     that grants write, touches any secret but GITHUB_TOKEN or calls gh pr merge/edit/close /
      gh issue close/reopen/edit; ordinary CI and proof tooling
      stays housekeeping); otherwise both boxes must be present and ticked. Keep this region:
      a theory or merge-lane PR without it is red.

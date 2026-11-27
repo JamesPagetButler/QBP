@@ -690,7 +690,6 @@ def test_r5_f2_non_merge_scopes_and_github_token_are_not_power():
 
     for ok in (
         "permissions:\n  contents: read\n  security-events: write\n",
-        "permissions:\n  id-token: write\n",
         "env:\n  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n",
         "env:\n  GH_TOKEN: ${{ github.token }}\n",
     ):
@@ -804,6 +803,136 @@ def test_r5_f1_verdict_job_runs_no_head_code():
     assert len(head_jobs) == 1, list(jobs)
     k, j = head_jobs[0]
     assert j.get("name") != "Merge-blocking boxes" and "needs" not in j, (k, j)
+
+
+def _power_rc(rel, content, binary=False):
+    import shutil
+
+    head = _head_with(rel, content, binary=binary)
+    try:
+        return _scoped(HVR_NILD, HK, [rel], head_root=head)
+    finally:
+        shutil.rmtree(head)
+
+
+def test_r6_g2_yaml_bypasses_are_power():
+    for body in (
+        # anchor + alias
+        "x-perm: &w write\npermissions:\n  pull-requests: *w\n",
+        # folded / literal block scalars
+        "permissions:\n  pull-requests: >-\n    write\n",
+        "permissions:\n  pull-requests: |-\n    write\n",
+        # double-quoted escape
+        'permissions:\n  pull-requests: "\\x77rite"\n',
+        # anchored mapping, escaped key, complex key, job level
+        "x: &p\n  statuses: write\npermissions: *p\n",
+        'permissions:\n  "pull\\x2drequests": write\n',
+        "permissions:\n  ? pull-requests\n  : write\n",
+        "jobs:\n  a:\n    runs-on: x\n    permissions:\n      checks: write\n",
+        # explicit write-all (G6 / B4)
+        "permissions: write-all\n",
+        "jobs:\n  a:\n    permissions: write-all\n",
+        # only the structural walk sees these (kills G2d / G2f): escaped write-all,
+        # and an escaped grant nested at job level
+        'permissions: "write\\x2dall"\n',
+        'x-a: &a "write\\x2dall"\npermissions: *a\n',
+        'jobs:\n  a:\n    runs-on: x\n    permissions:\n      checks: "\\x77rite"\n',
+    ):
+        r = _power_rc(".github/workflows/new.yml", "name: N\n" + body)
+        assert r.returncode == 1 and "merge-lane" in r.stdout, (body, r.stdout)
+
+
+def test_r6_g2_computed_secret_access_is_power():
+    for body in (
+        "env:\n  T: ${{ secrets[format('{0}', 'SIBLING_READ_TOKEN')] }}\n",
+        "env:\n  T: ${{ toJSON(secrets) }}\n",
+        "env:\n  T: ${{ secrets.GITHUB_TOKENX }}\n",
+        'env:\n  T: ${{ secrets[ "X" ] }}\n',
+    ):
+        r = _power_rc(".github/workflows/new.yml", "name: N\n" + body)
+        assert r.returncode == 1 and "merge-lane" in r.stdout, (body, r.stdout)
+    for ok in (
+        "env:\n  T: ${{ secrets.GITHUB_TOKEN }}\n",
+        "env:\n  T: ${{ secrets['GITHUB_TOKEN'] }}\n",
+    ):
+        assert (
+            _power_rc(".github/workflows/new.yml", "name: N\n" + ok).returncode == 0
+        ), ok
+
+
+def test_r6_g2_unparseable_yaml_is_power():
+    r = _power_rc(".github/workflows/new.yml", "name: N\npermissions: [unclosed\n")
+    assert r.returncode == 1 and "merge-lane" in r.stdout, r.stdout
+    r = _power_rc(".github/workflows/new.yml", "- just\n- a list\n")
+    assert r.returncode == 1, r.stdout
+
+
+def test_r6_g3_only_security_events_is_exempt():
+    for scope in ("id-token", "attestations"):
+        r = _power_rc(
+            ".github/workflows/new.yml", f"name: N\npermissions:\n  {scope}: write\n"
+        )
+        assert r.returncode == 1, (scope, r.stdout)
+    ok = "name: N\npermissions:\n  contents: read\n  security-events: write\n"
+    assert _power_rc(".github/workflows/new.yml", ok).returncode == 0
+    assert c.NON_MERGE_WRITE_SCOPES == frozenset({"security-events"})
+    # PR #778 (Lean CI; ci.yml grants security-events: write for CodeQL) stays housekeeping
+    assert _scoped(HVR_NILD, HK, PR778_FILES, head_root=REPO).returncode == 0
+
+
+def test_r6_g5_composite_helper_files():
+    import shutil
+    import tempfile
+
+    d = tempfile.mkdtemp()
+    try:
+        os.makedirs(os.path.join(d, ".github", "actions", "m"))
+        with open(os.path.join(d, ".github", "actions", "m", "action.yml"), "w") as fh:
+            fh.write("runs:\n  using: composite\n  steps:\n    - run: ./run.sh\n")
+        with open(os.path.join(d, ".github", "actions", "m", "run.sh"), "w") as fh:
+            fh.write("echo hi\n")
+        helper = [".github/actions/m/run.sh"]
+        # plain action + plain helper → housekeeping
+        assert _scoped(HVR_NILD, HK, helper, head_root=d).returncode == 0
+        # helper itself gains a merge verb → lane
+        with open(os.path.join(d, ".github", "actions", "m", "run.sh"), "w") as fh:
+            fh.write("gh pr merge 1\n")
+        assert _scoped(HVR_NILD, HK, helper, head_root=d).returncode == 1
+        # helper plain again, but the enclosing action.yml is powerful → lane
+        with open(os.path.join(d, ".github", "actions", "m", "run.sh"), "w") as fh:
+            fh.write("echo hi\n")
+        with open(os.path.join(d, ".github", "actions", "m", "action.yml"), "w") as fh:
+            fh.write(
+                "runs:\n  using: composite\n  steps:\n    - run: gh issue close 1\n"
+            )
+        assert _scoped(HVR_NILD, HK, helper, head_root=d).returncode == 1
+        # a file under .github/actions/ with no enclosing action file → fail closed
+        os.makedirs(os.path.join(d, ".github", "actions", "orphan"))
+        with open(os.path.join(d, ".github", "actions", "orphan", "x.sh"), "w") as fh:
+            fh.write("echo hi\n")
+        orphan = [".github/actions/orphan/x.sh"]
+        assert _scoped(HVR_NILD, HK, orphan, head_root=d).returncode == 1
+    finally:
+        shutil.rmtree(d)
+
+
+def test_r6_g6_actions_fail_closed_when_derivation_fails():
+    # kills F3b: derivation None → a changed composite action is lane even when
+    # its head copy has no power
+    import shutil
+    import tempfile
+
+    head = _head_with(".github/actions/x/action.yml", "runs:\n  using: composite\n")
+    root = tempfile.mkdtemp()
+    old, c._HEAD_ROOT = c._HEAD_ROOT, head
+    try:
+        assert c.workflow_scripts(root) is None
+        assert c.touches_lane([".github/actions/x/action.yml"], root=root)
+        assert not c.touches_lane([".github/actions/x/action.yml"])
+    finally:
+        c._HEAD_ROOT = old
+        shutil.rmtree(head)
+        shutil.rmtree(root)
 
 
 # ---- verdict source: the judge is the BASE copy, never the PR head (arch §I4, PR #780)

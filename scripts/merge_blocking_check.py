@@ -136,24 +136,71 @@ LANE_WORKFLOWS = (
 WF_DIR = ".github/workflows/"
 REPO_ROOT = os.path.dirname(HERE)
 _WF_SCRIPT_RE = re.compile(r"(?<![\w.-])scripts/[A-Za-z0-9_./-]*[A-Za-z0-9_]")
-# Backstop "power" (F2 on PR #838, round 5): ANY permission scope granted `write`
-# (quoted or not — statuses/checks/actions included), `write-all`, the gh
-# merge/edit/close verbs, and any secret other than GITHUB_TOKEN (a PAT bypasses
-# the permission block entirely; `secrets: inherit` hands every secret on).
-# The permission match relies on the repo setting default_workflow_permissions:
+# Backstop "power" (F2 on PR #838 round 5, made structural in round 6 / G2).
+#  - Permissions are read STRUCTURALLY: the head file is parsed with
+#    yaml.safe_load (anchors, aliases, block scalars and escapes all resolve), and
+#    every `permissions` key at any depth is walked: `write-all`, or any scope
+#    whose value is `write` (except NON_MERGE_WRITE_SCOPES), is power.  A parse
+#    failure, a missing PyYAML, or a non-mapping document is power (fail closed).
+#    The text regex below stays as a second line.
+#  - Secrets: ANY `secrets` token is power unless it is exactly
+#    `secrets.GITHUB_TOKEN` or `secrets['GITHUB_TOKEN']` — this covers
+#    `secrets[format(...)]`, `toJSON(secrets)`, `secrets: inherit`, a mention in
+#    a comment (fails closed), and any other expression.
+#  - The gh merge/edit/close and issue close/reopen/edit verbs.
+# The permission walk relies on the repo setting default_workflow_permissions:
 # read (beekeeper-only): with read defaults, an ungranted token cannot write.
 _WF_WRITE_SCOPE_RE = re.compile(r"[\"']?([a-z][a-z-]*)[\"']?\s*:\s*[\"']?write\b")
-# Write scopes that cannot merge, label, post a status/check or touch a PR/issue:
-# code-scanning upload (CodeQL in ci.yml — PR #778 must stay housekeeping),
-# OIDC tokens, build attestations.  Everything else granted `write` is power.
-NON_MERGE_WRITE_SCOPES = frozenset({"security-events", "id-token", "attestations"})
+# The ONE exempt write scope (G3): `security-events` uploads SARIF / manages
+# code-scanning alerts (CodeQL in ci.yml — keeps PR #778 housekeeping).  It cannot
+# label, comment, post a status/check or merge.  This holds ONLY while the master
+# ruleset has no `code_scanning` rule and CodeQL is not a required context;
+# adding either makes this exemption wrong — remove it then.
+NON_MERGE_WRITE_SCOPES = frozenset({"security-events"})
 _WF_POWER_RE = re.compile(
     r"\bwrite-all\b"
     r"|\bgh\s+pr\s+(?:merge|edit|close)\b|\bgh\s+issue\s+(?:close|reopen|edit)\b"
-    r"|\bsecrets\s*\.\s*(?!GITHUB_TOKEN\b)[A-Za-z_]\w*"
-    r"|\bsecrets\s*\[\s*[\"'](?!GITHUB_TOKEN[\"'])"
-    r"|\bsecrets\s*:\s*inherit\b"
+    r"|\bsecrets\b(?!\.GITHUB_TOKEN\b|\[\s*['\"]GITHUB_TOKEN['\"]\s*\])"
 )
+
+
+def _permissions_power(text: str) -> bool:
+    """Structural permission walk (G2).  True = power (incl. any parse failure)."""
+    try:
+        import yaml  # PyYAML: on the runner (the base self-test already imports it)
+
+        doc = yaml.safe_load(text)
+    except Exception:
+        return True
+    if doc is None:
+        return False
+    if not isinstance(doc, dict):
+        return True
+
+    def grant(v) -> bool:
+        if isinstance(v, str):
+            return v.strip() == "write-all"
+        if isinstance(v, dict):
+            return any(
+                str(val).strip() == "write" and str(k) not in NON_MERGE_WRITE_SCOPES
+                for k, val in v.items()
+            )
+        return v is not None and not isinstance(v, (list, int, float, bool))
+
+    def walk(node) -> bool:
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if str(k) == "permissions" and grant(v):
+                    return True
+                if walk(v):
+                    return True
+        elif isinstance(node, list):
+            return any(walk(x) for x in node)
+        return False
+
+    return walk(doc)
+
+
 ACTIONS_DIR = ".github/actions/"
 ACTION_FILES = ("action.yml", "action.yaml")
 _HEAD_ROOT = None  # set by check(head_root=...) — the PR head checkout
@@ -230,10 +277,33 @@ def _workflow_has_power(path: str) -> bool:
         return True
     if _WF_POWER_RE.search(text):
         return True
+    if path.endswith((".yml", ".yaml")) and _permissions_power(text):
+        return True
     return any(
         m.group(1) not in NON_MERGE_WRITE_SCOPES
         for m in _WF_WRITE_SCOPE_RE.finditer(text)
     )
+
+
+def _action_dir_has_power(path: str) -> bool:
+    """G5: a changed file under .github/actions/ is power if it, or the nearest
+    enclosing action.yml / action.yaml in the head copy, is power.  No enclosing
+    action file, or no head copy → power (fail closed)."""
+    if _HEAD_ROOT is None:
+        return True
+    if _workflow_has_power(path):
+        return True
+    d = os.path.dirname(path)
+    while d.startswith(ACTIONS_DIR.rstrip("/")) and len(d) > len(
+        ACTIONS_DIR.rstrip("/")
+    ):
+        for name in ACTION_FILES:
+            cand = f"{d}/{name}"
+            full = os.path.join(_HEAD_ROOT, cand)
+            if os.path.islink(full) or os.path.exists(full):
+                return _workflow_has_power(cand)
+        d = os.path.dirname(d)
+    return True
 
 
 def _norm(text: str) -> str:
@@ -267,8 +337,9 @@ def touches_lane(changed, root: str = REPO_ROOT) -> bool:
         if derived is not None and p in derived:
             return True
         is_wf = p.startswith(WF_DIR) and p.endswith((".yml", ".yaml"))
-        is_action = p.startswith(ACTIONS_DIR) and os.path.basename(p) in ACTION_FILES
-        if (is_wf or is_action) and _workflow_has_power(p):
+        if is_wf and _workflow_has_power(p):
+            return True
+        if p.startswith(ACTIONS_DIR) and _action_dir_has_power(p):
             return True
     return False
 
