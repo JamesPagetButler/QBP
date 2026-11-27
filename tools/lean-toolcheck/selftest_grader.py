@@ -659,17 +659,27 @@ for src_stem, new_stem, what in (
     shutil.copy(tc8, s12 / "toolcheck.py")
     res = evaluate(s12 / "toolcheck.py", r12, s12, new_stem)
     f12 = res["rows"][f"{new_stem}.lean"]
-    s1_ok = f12["result"] == "PASS"
+    # S1 is a statement about the STRUCTURAL AUDIT: with the subset off it must report the forged
+    # .olean as clean. Other, independent layers may still catch the file (since master a44ff37 the
+    # foundations checker hard-bans the forge's incidental char literal); those are reported, not
+    # required, because a forge could avoid them.
+    audit_fails = [x for x in f12["failures"] if x.startswith("structural audit")]
+    other = [x for x in f12["failures"] if not x.startswith("structural audit")]
+    s1_ok = not audit_fails and bool(f12.get("structural_audit") is not None)
     ok = ok and s1_ok
     results.append(
         (
             f"S1-limit[{new_stem}] {what} with every subset rule OFF (EXPECTED to PASS the audit: the compile wrote a forged .olean)",
             (
-                "PASS as documented (S1 holds)"
+                "audit fooled as documented (S1 holds)"
+                + (
+                    f"; other layers still catch it: {'; '.join(other)[:120]}"
+                    if other
+                    else ""
+                )
                 if s1_ok
-                else "CHANGED — re-read the S1 limit: "
-            )
-            + "; ".join(f12["failures"])[:150],
+                else "CHANGED — re-read the S1 limit: " + "; ".join(audit_fails)[:150]
+            ),
             "",
         )
     )

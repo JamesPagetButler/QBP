@@ -77,12 +77,12 @@ fails the run and is never retried.
 >   mid-run also makes the run INVALID (fail-closed). The sound fix is still the sandbox (QBP#836).
 >
 > **Auditor pin.** `auditor_pin.json` holds the sha256 of PR #829's `LeanAxiomAudit.lean` and
-> `check_lean_axiom_audit.py` (PR #829 `6b07147`; re-pin at the rebase). A different file is a preflight failure in
+> `check_lean_axiom_audit.py` (pinned to master `a44ff37`, where PR #829 merged). A different file is a preflight failure in
 > `run.sh`, and a pass file FAILS if the run meta records other shas.
 >
-> **Status: this PR is blocked on PR #829.** Until #829 is on master, a run without `TOOLCHECK_AUDITOR=<PR #829's
-> LeanAxiomAudit.lean>` (with `check_lean_axiom_audit.py` beside it) is a **PREFLIGHT FAILURE**, never a
-> stdout-only GREEN.
+> **Status: PR #829 is merged (master `a44ff37`).** `run.sh` uses `scripts/LeanAxiomAudit.lean` and
+> `scripts/check_lean_axiom_audit.py` from the repo by default. A missing auditor, or one whose sha256 differs from
+> `auditor_pin.json`, is a **PREFLIGHT FAILURE**, never a stdout-only GREEN.
 
 **How the grader reads Lean.** Lean runs with `--json`. An axiom report counts only as an `information` message
 positioned at its `#print axioms` command, and reports merge worst-case, so `#eval`-printed text cannot add a clean

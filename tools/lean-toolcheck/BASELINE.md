@@ -1,10 +1,11 @@
 # Lean toolcheck — baseline on the current pins
 
-**Run:** `r7a-20261127` (2026-11-27 03:48–04:03 UTC, `tools/lean-toolcheck/run.sh --update-baseline`; every Lean
+**Run:** `r8a-20261127` (2026-11-27 06:06–06:21 UTC, after merging `origin/master` (PR #829 merged, `a44ff37`); `tools/lean-toolcheck/run.sh --update-baseline`; every Lean
 process in its own PID namespace; input manifest verified after the last Lean process **and again after grading**:
-**ok** both; graded from the private, manifest-checked copy). The run had
-`TOOLCHECK_AUDITOR` set to PR #829's `scripts/LeanAxiomAudit.lean` at **`6b07147`** (sha256 `1fa1ecc9…`), with
-checker `check_lean_axiom_audit.py` (sha256 `0e95cd7c…`, whose own `grade_run` grades the result).
+**ok** both; graded from the private, manifest-checked copy). The auditor is the repo's own
+`scripts/LeanAxiomAudit.lean` on master **`a44ff37`** (sha256 `dd951cbb…`), with checker
+`scripts/check_lean_axiom_audit.py` (sha256 `8fdb8cd2…`, whose own `grade_run` grades the result), both re-pinned in
+`auditor_pin.json`.
 
 **Overall GREEN: 50/50 files as expected.**
 - **20 tool tests pass.** Each verdict comes from the structural audit, graded by #829's `grade_run`, with every
@@ -24,7 +25,7 @@ checker `check_lean_axiom_audit.py` (sha256 `0e95cd7c…`, whose own `grade_run`
 - 3 known-limit probes are confirmed.
 - 131 theorems are cross-checked on stdout.
 
-The run used one boxrun lease for 896 s with no thermal pauses (cool start; MemAvailable 11.3 GB at launch).
+The run used one boxrun lease for 914 s with no thermal pauses (cool start; MemAvailable 10.7 GB at launch).
 The `--json` runs peaked at 3814 MB
 RSS. The Lean-parser runs are not timed per file; the pre-run survey measured 1.9–5.0 GB each (it loads the
 imports' environment extensions), inside the 7000 MB boxrun cap.
@@ -346,3 +347,4 @@ text-mode universal newlines (MF11).
 | 2026-11-25 | `r5b-20261125` | Red Team r5 delta (`67a214b`) + director decision: the subset precondition from **Lean's own parser** (`LeanSubsetParse.lean`, parse only; rules L/P; `subset_kinds.json` from `gen_subset_kinds.py`, closed-world); rule R refuses raw strings and `«`; +MF23 (T89), +MF24 (T90); PR #829 auditor files pinned (`auditor_pin.json`); GREEN 48/48; selftest exit 0 (139 rows); mutants BOUNDED (one selftest ~3 min): all 21 r5 mutants R01–R21 + a deterministic every-10th sample (10) of the earlier 99 → first pass 30/34 KILLED; the 4 survivors (R01/R02 rule R, R17/R18 rule P one direction) showed the selftest lacked single-catcher plants, 4 were added, and the re-run killed 4/4. So **R01–R21: 21/21, sample: 10/10**; the other 89 earlier mutants were not re-run this round |
 | 2026-11-25 | `r6a-20261125` | Red Team r6 (`9c61306`, APPROVE-WITH-CONCERN): throwaway suite copy for every code-running Lean process with per-file write attribution; pre/post input manifest held in memory by `run.sh` (one function); grade-time re-hash; +MF25; the Lean-parser record schema required and typed; GREEN 49/49; selftest exit 0 (179 rows); mutants R19 + R22–R28 8/8 KILLED (bounded: the earlier mutants were not re-run this round) |
 | 2026-11-27 | `r7a-20261127` | Red Team r7 (`7955bb8`, CHANGES REQUESTED, MF91): per-Lean-process PID namespaces (`unshare --user --map-root-user --fork --pid --mount-proc --kill-child`), per-file survivor check, grader from a private manifest-checked copy, re-verification after grading, sha-checked baseline copy, symlink targets in the tree digest; +MF91; GREEN 50/50; selftest exit 0 (184 rows); mutants (one per 2000 MB boxrun lease): 7 KILLED (R29, R30, L9, L10, P1–P3), 1 CRASHED (P4: `KeyError`, fail-closed), 0 SURVIVED |
+| 2026-11-27 | `r8a-20261127` | Post-merge: `origin/master` merged in (PR #829 merged, `a44ff37`; merge commit, no rebase); auditor + checker re-pinned to master (`dd951cbb…` / `8fdb8cd2…`, incl. #829's round-8 G7 fallback; same CLI and `grade_run` interface); GREEN 50/50; selftest exit 0 (184 rows; the two S1-limit rows now test the STRUCTURAL AUDIT alone, because master's foundations checker also rejects MF21/MF22 replays for an incidental char literal); smoke mutant R29 KILLED (one 2000 MB boxrun lease) |
