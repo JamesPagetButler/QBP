@@ -8,18 +8,18 @@
 
 ---
 
-## 1. Current state (verified 2026-10-17)
+## 1. Current state (verified 2026-10-17; "Latest stable Lean"/"Latest Mathlib stable tag"/"Drift"/"PhysLean bridge" rows re-verified 2026-11-27 for this PR — the rest is unchanged since the 2026-10-17 verification)
 
 | | Value | Source |
 |---|---|---|
 | **QBP toolchain pin** | `leanprover/lean4:v4.30.0` (stable) | `proofs/lean-toolchain` |
 | **QBP Mathlib pin** | `c5ea00351c28e24afc9f0f84379aa41082b1188f` = Mathlib tag `v4.30.0` | `proofs/lakefile.lean` l.15 |
-| **Latest stable Lean** | `v4.35.0` (2026-10-12); `v4.34.1` (2026-09-24) | `gh api repos/leanprover/lean4/releases` |
-| **Latest Mathlib stable tag** | `v4.35.0` (`v4.36.0-rc1` is the current RC) | `gh api repos/leanprover-community/mathlib4/git/matching-refs/tags/v4.3` |
-| **Drift** | **5 stable minors behind** (4.31, 4.32, 4.33, 4.34, 4.35) | — |
+| **Latest stable Lean** | `v4.36.0` (2026-11-16, re-verified 2026-11-27 for this PR); `v4.35.0` (2026-10-12) | `gh api repos/leanprover/lean4/releases` |
+| **Latest Mathlib stable tag** | `v4.36.0` (`fc4f59e577feb1a4956671bc04ac18aaaf8cd842`; `v4.37.0-rc1` is the current RC, re-verified 2026-11-27) | `gh api repos/leanprover-community/mathlib4/git/matching-refs/tags/v4.3` |
+| **Drift** | **6 stable minors behind** (4.31, 4.32, 4.33, 4.34, 4.35, 4.36) — QBP's own `proofs/` pin is unchanged by this PR | — |
 | **PhysLean bridge** | `leanprover/lean4:v4.36.0` (bumped 2026-11-27, inter#325 slot 2) | `proofs-physlean-bridge/lean-toolchain` |
 
-The policy's *target* lag is one stable release (§2 P2); the measured lag is five. The next hygiene bump (§4) is **owed — tracked as #723** — and is the first thing the Toddle drift detector (§7, #724) would flag. It is not done in the housekeeping PR that lands this document — a bump is its own scheduled PR (P3).
+The policy's *target* lag is one stable release (§2 P2); the measured lag is six (re-verified 2026-11-27 — Lean/Mathlib `v4.36.0` released 2026-11-16, QBP's own `proofs/` pin is still `v4.30.0`, unchanged by this PR). The next hygiene bump (§4) is **owed — tracked as #723** — and is the first thing the Toddle drift detector (§7, #724) would flag. It is not done in the housekeeping PR that lands this document — a bump is its own scheduled PR (P3, and is slot 8 of the current inter#325 bump order, not this one).
 
 ---
 
