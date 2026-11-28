@@ -8,7 +8,9 @@
 
 ---
 
-## 1. Current state (verified 2026-10-17; "Latest stable Lean"/"Latest Mathlib stable tag"/"Drift"/"PhysLean bridge" rows re-verified 2026-11-27 for this PR — the rest is unchanged since the 2026-10-17 verification)
+## 1. Current state (verified 2026-10-17)
+
+*The "Latest stable Lean" / "Latest Mathlib stable tag" / "Drift" / "PhysLean bridge" rows below were re-verified 2026-11-27 for this PR; the other rows are unchanged since the 2026-10-17 verification.*
 
 | | Value | Source |
 |---|---|---|
