@@ -17,7 +17,7 @@
 | **Latest stable Lean** | `v4.35.0` (2026-10-12); `v4.34.1` (2026-09-24) | `gh api repos/leanprover/lean4/releases` |
 | **Latest Mathlib stable tag** | `v4.35.0` (`v4.36.0-rc1` is the current RC) | `gh api repos/leanprover-community/mathlib4/git/matching-refs/tags/v4.3` |
 | **Drift** | **5 stable minors behind** (4.31, 4.32, 4.33, 4.34, 4.35) | — |
-| **PhysLean bridge** | `leanprover/lean4:v4.29.1` | `proofs-physlean-bridge/lean-toolchain` |
+| **PhysLean bridge** | `leanprover/lean4:v4.36.0` (bumped 2026-11-27, inter#325 slot 2) | `proofs-physlean-bridge/lean-toolchain` |
 
 The policy's *target* lag is one stable release (§2 P2); the measured lag is five. The next hygiene bump (§4) is **owed — tracked as #723** — and is the first thing the Toddle drift detector (§7, #724) would flag. It is not done in the housekeeping PR that lands this document — a bump is its own scheduled PR (P3).
 
@@ -160,3 +160,4 @@ Same shape as the CTH schema-propagation discipline (#488).
 |---|---|---|
 | 2026-10-17 | qbp-implementor (housekeeping seat) | v1.0 — policy written for #489 (AC1, AC3, AC4 spec, AC5 design note); AC2 cited as landed in PR #491; current drift measured (5 behind) and the owed hygiene bump named |
 | 2026-10-17 | qbp-implementor (housekeeping seat) | v1.1 — PR #719 Red Team (Sabine S1–S4): the three owed items now have trackers (#723 bump, #724 drift detector, inter#187 §12 wording) and are cited in §1/§4/§6/§7; `.lean-gate-baseline.json` given its path; #504 cross-referenced for the PhysLean pin; status line names the ruling basis |
+| 2026-11-27 | qbp-implementor | v1.2 — PhysLean bridge row (§1) updated: `v4.29.1` → `v4.36.0` (inter#325, deming's federation-wide Lean standardisation, slot 2 of the v4.36.0 bump order). QBP's own `proofs/` pin is unchanged by this entry; it is slot 8 of the same order. |
