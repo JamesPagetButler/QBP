@@ -11,8 +11,8 @@ This project deliberately does **not** share QBP's Lean toolchain:
 
 | | QBP `proofs/` | this bridge |
 |---|---|---|
-| Lean | `v4.30.0` | `v4.29.1` (PhysLean's pin) |
-| Mathlib | QBP's pin | PhysLean's `v4.29.1` (transitive) |
+| Lean | `v4.30.0` | `v4.36.0` (PhysLean's pin) |
+| Mathlib | QBP's pin | PhysLean's `v4.36.0` (transitive) |
 | Source | QBP foundations | `require physlib` from git |
 
 Integration happens only through `tests/oracle_predictions.json`. The toolchain
